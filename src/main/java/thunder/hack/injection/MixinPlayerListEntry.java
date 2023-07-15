@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,7 +15,11 @@ import thunder.hack.Thunderhack;
 import thunder.hack.modules.client.OptifineCapes;
 import thunder.hack.utility.OFCapesUtil;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Map;
+import java.util.Objects;
 
 @Mixin(PlayerListEntry.class)
 public class MixinPlayerListEntry {
@@ -41,9 +46,27 @@ public class MixinPlayerListEntry {
     private void getTexture() {
         if (loadedCapeTexture) return;
         loadedCapeTexture = true;
-        Map<MinecraftProfileTexture.Type, Identifier> textures = this.textures;
-        OFCapesUtil.loadPlayerCape(this.profile, id -> {
-            textures.put(MinecraftProfileTexture.Type.CAPE, id);
+
+        Util.getMainWorkerExecutor().execute(() -> {
+            try {
+                URL capesList = new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/capes/capeBase.txt");
+                BufferedReader in = new BufferedReader(new InputStreamReader(capesList.openStream()));
+                String inputLine;
+                while ((inputLine = in.readLine()) != null) {
+                    String colune = inputLine.trim();
+                    String name = colune.split(":")[0];
+                    String cape = colune.split(":")[1];
+                    if(Objects.equals(this.profile.getName(), name)) {
+                        textures.put(MinecraftProfileTexture.Type.CAPE, new Identifier("textures/" + cape + ".png"));
+                        return;
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+            Map<MinecraftProfileTexture.Type, Identifier> textures = this.textures;
+            OFCapesUtil.loadPlayerCape(this.profile, id -> {
+                textures.put(MinecraftProfileTexture.Type.CAPE, id);
+            });
         });
     }
 }

@@ -24,7 +24,7 @@ public class OFCapesUtil {
     }
 
     public static void loadPlayerCape(GameProfile player, ReturnCapeTexture response) {
-        Util.getMainWorkerExecutor().execute(() -> {
+
             try {
                 String uuid = player.getId().toString();
                 NativeImageBackedTexture nIBT = getCapeFromURL(String.format("http://s.optifine.net/capes/%s.png", player.getName()));
@@ -32,7 +32,7 @@ public class OFCapesUtil {
                 response.response(capeTexture);
             } catch (Exception ignored) {
             }
-        });
+
     }
 
     public static NativeImageBackedTexture getCapeFromURL(String capeStringURL) {
