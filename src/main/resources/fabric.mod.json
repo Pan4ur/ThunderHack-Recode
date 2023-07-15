@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "thunderhack",
+  "version": "3.0",
+
+  "name": "ThunderHack",
+  "description": "Player Assistance Mod",
+  "authors": [
+    "Pan4ur#2144"
+  ],
+
+  "license": "CC0-1.0",
+  "accessWidener": "thunderhack.accesswidener",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "thunder.hack.Thunderhack"
+    ]
+  },
+  "mixins": [
+    "thunderhack.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.21",
+    "fabric-api": "*",
+    "minecraft": "~1.20",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

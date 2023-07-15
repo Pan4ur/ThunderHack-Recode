@@ -1,0 +1,229 @@
+package thunder.hack.gui.thundergui.components;
+
+
+import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.gui.thundergui.ThunderGui2;
+import thunder.hack.modules.Module;
+import thunder.hack.modules.client.ThunderHackGui;
+import thunder.hack.setting.impl.Bind;
+import thunder.hack.utility.render.Render2DEngine;
+import net.minecraft.client.util.math.MatrixStack;
+
+import java.awt.*;
+import java.util.Objects;
+
+public class ModulePlate {
+
+    float scroll_animation = 0f;
+    private final Module module;
+    private int posX;
+    private int posY;
+    private float scrollPosY;
+    private float prevPosY;
+    private int progress;
+    private int fade;
+    private final int index;
+    private boolean first_open = true;
+    private boolean listening_bind = false;
+
+
+    public ModulePlate(Module module, int posX, int posY, int index) {
+        this.module = module;
+        this.posX = posX;
+        this.posY = posY;
+        fade = 0;
+        this.index = index * 5;
+        scrollPosY = posY;
+        scroll_animation = 0;
+    }
+
+
+    public void render(MatrixStack stack, int MouseX, int MouseY) {
+
+        if (scrollPosY != posY) {
+            scroll_animation = ThunderGui2.fast(scroll_animation, 1, 15f);
+            posY = (int) Render2DEngine.interpolate(prevPosY, scrollPosY, scroll_animation);
+        }
+
+
+        if ((posY > ThunderGui2.getInstance().main_posY + ThunderGui2.getInstance().height) || posY < ThunderGui2.getInstance().main_posY) {
+            return;
+        }
+
+        Render2DEngine.addWindow(stack,new Render2DEngine.Rectangle(posX + 1,posY + 1,posX + 90 , posY + 30));
+
+        if (module.isOn()) {
+            Render2DEngine.drawGradientRound(stack,posX + 1, posY, 89, 30, 4f,
+                    Render2DEngine.applyOpacity(ThunderHackGui.onColor1.getValue().getColorObject(), getFadeFactor()),
+                    Render2DEngine.applyOpacity(ThunderHackGui.onColor1.getValue().getColorObject(), getFadeFactor()),
+                    Render2DEngine.applyOpacity(ThunderHackGui.onColor2.getValue().getColorObject(), getFadeFactor()),
+                    Render2DEngine.applyOpacity(ThunderHackGui.onColor2.getValue().getColorObject(), getFadeFactor()));
+        } else {
+            Render2DEngine.drawRound(stack,posX + 1, posY, 89, 30, 4f, Render2DEngine.applyOpacity(new Color(25, 20, 30, 255), getFadeFactor()));
+        }
+
+        if (first_open) {
+            Render2DEngine.drawBlurredShadow(stack,MouseX - 20, MouseY - 20, 40, 40, 60, Render2DEngine.applyOpacity(new Color(0xC3555A7E, true), getFadeFactor()));
+            first_open = false;
+        }
+
+        if (isHovered(MouseX, MouseY)) {
+            Render2DEngine.drawBlurredShadow(stack,MouseX - 20, MouseY - 20, 40, 40, 60, Render2DEngine.applyOpacity(new Color(0xC3555A7E, true), getFadeFactor()));
+        }
+
+
+       // GL11.glPushMatrix();
+      //  Stencil.write(false);
+      //  Particles.roundedRect(posX - 0.5, posY - 0.5, 91, 31, 8, Render2DEngine.applyOpacity(new Color(0, 0, 0, 255), getFadeFactor()));
+       // Stencil.erase(true);
+        if (ThunderGui2.selected_plate != this)
+            FontRenderers.icons.drawString(stack,"H", (int) (posX + 80f), (int) (posY + 22f), Render2DEngine.applyOpacity(new Color(0xFFECECEC, true).getRGB(), getFadeFactor()));
+        else {
+            String gear = "H";
+            switch (progress) {
+                case 0:
+                    gear = "H";
+                    break;
+                case 1:
+                    gear = "N";
+                    break;
+                case 2:
+                    gear = "O";
+                    break;
+                case 3:
+                    gear = "P";
+                    break;
+                case 4:
+                    gear = "Q";
+                    break;
+            }
+            FontRenderers.big_icons.drawString(stack,gear, (int) (posX + 80f), (int) (posY + 5f), Render2DEngine.applyOpacity(new Color(0xFF646464, true).getRGB(), getFadeFactor()));
+        }
+
+        FontRenderers.sf_medium.drawString(stack,module.getName(), posX + 5, posY + 5, Render2DEngine.applyOpacity(-1, getFadeFactor()), false);
+
+
+        if (listening_bind) {
+            FontRenderers.modules.drawString(stack,"...", posX + 85 - FontRenderers.modules.getStringWidth(module.getBind().toString()), posY + 5, Render2DEngine.applyOpacity(new Color(0xB0B0B0), getFadeFactor()).getRGB(), false);
+        } else if (!Objects.equals(module.getBind().toString(), "None")) {
+
+            String sbind = module.getBind().toString();
+            if(sbind.equals("LEFT_CONTROL")){
+                sbind = "LCtrl";
+            }
+            if(sbind.equals("RIGHT_CONTROL")){
+                sbind = "RCtrl";
+            }
+            if(sbind.equals("LEFT_SHIFT")){
+                sbind = "LShift";
+            }
+            if(sbind.equals("RIGHT_SHIFT")){
+                sbind = "RShift";
+            }
+            if(sbind.equals("LEFT_ALT")){
+                sbind = "LAlt";
+            }
+            if(sbind.equals("RIGHT_ALT")){
+                sbind = "RAlt";
+            }
+
+            FontRenderers.modules.drawString(stack,sbind, posX + 86 - FontRenderers.modules.getStringWidth(sbind), posY + 6, Render2DEngine.applyOpacity(new Color(0xB0B0B0), getFadeFactor()).getRGB(), false);
+        }
+
+        String[] splitString = module.getDescription().split("-");
+        if (splitString[0] != null && !splitString[0].equals("")) {
+            FontRenderers.settings.drawString(stack,splitString[0], posX + 5, posY + 14, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
+        }
+        if (splitString.length > 1) {
+            if (splitString[1] != null && !splitString[1].equals("")) {
+                FontRenderers.settings.drawString(stack,splitString[1], posX + 5, posY + 19, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
+            }
+        }
+        if (splitString.length == 3) {
+            if (splitString[2] != null && !splitString[2].equals("")) {
+                FontRenderers.settings.drawString(stack,splitString[2], posX + 5, posY + 24, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
+            }
+        }
+        Render2DEngine.popWindow();
+
+    }
+
+    private float getFadeFactor() {
+        return fade / (5f + index);
+    }
+
+
+    public void onTick() {
+        if (progress > 4) {
+            progress = 0;
+        }
+        progress++;
+
+        if (fade < 10 + index) {
+            fade++;
+        }
+    }
+
+
+    private boolean isHovered(int mouseX, int mouseY) {
+        return mouseX > posX && mouseX < posX + 90 && mouseY > posY && mouseY < posY + 30;
+    }
+
+    public void movePosition(float deltaX, float deltaY) {
+        this.posY += deltaY;
+        this.posX += deltaX;
+        scrollPosY = posY;
+    }
+
+    public void scrollElement(float deltaY) {
+        scroll_animation = 0;
+        prevPosY = posY;
+        this.scrollPosY += deltaY;
+    }
+
+    public void mouseClicked(int mouseX, int mouseY, int clickedButton) {
+        if ((posY > ThunderGui2.getInstance().main_posY + ThunderGui2.getInstance().height) || posY < ThunderGui2.getInstance().main_posY) {
+            return;
+        }
+        if (mouseX > posX && mouseX < posX + 90 && mouseY > posY && mouseY < posY + 30) {
+            switch (clickedButton) {
+                case 0:
+                    module.toggle();
+                    break;
+                case 1:
+                    ThunderGui2.selected_plate = this;
+                    break;
+                case 2:
+                    listening_bind = !listening_bind;
+                    break;
+            }
+        }
+    }
+
+    public void keyTyped(String typedChar, int keyCode) {
+        if (listening_bind) {
+            Bind bind = new Bind(keyCode);
+            if (bind.toString().equalsIgnoreCase("Escape")) {
+                return;
+            }
+            if (bind.toString().equalsIgnoreCase("Delete")) {
+                bind = new Bind(-1);
+            }
+            module.bind.setValue(bind);
+            listening_bind = false;
+        }
+    }
+
+    public double getPosX() {
+        return this.posX;
+    }
+
+    public double getPosY() {
+        return this.posY;
+    }
+
+    public Module getModule() {
+        return this.module;
+    }
+
+}

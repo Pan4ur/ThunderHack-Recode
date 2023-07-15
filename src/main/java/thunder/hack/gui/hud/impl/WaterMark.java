@@ -1,0 +1,54 @@
+package thunder.hack.gui.hud.impl;
+
+import com.google.common.eventbus.Subscribe;
+import thunder.hack.Thunderhack;
+import thunder.hack.events.impl.Render2DEvent;
+import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.gui.hud.HudElement;
+import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.combat.Aura;
+import thunder.hack.setting.Setting;
+import thunder.hack.utility.render.Render2DEngine;
+
+public class WaterMark extends HudElement {
+    public WaterMark() {
+        super("WaterMark", "WaterMark", 100,35);
+    }
+
+
+    public static final Setting<Mode> mode = new Setting("Mode", Mode.Big);
+
+    private enum Mode {
+        Big,Small,Classic
+    }
+
+
+    @Subscribe
+    public void onRender2D(Render2DEvent e) {
+        super.onRender2D(e);
+        if(mode.getValue() == Mode.Big) {
+            Render2DEngine.drawBlurredShadow(e.getMatrixStack(), getPosX(), getPosY(), 103, 30, 8, HudEditor.getColor(270));
+            Render2DEngine.renderRoundedGradientRect(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 1f, getPosY() - 1f, 105, 32, HudEditor.hudRound.getValue());
+            Render2DEngine.drawRound(e.getMatrixStack(), getPosX(), getPosY(), 103, 30, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+            FontRenderers.thglitch.drawString(e.getMatrixStack(), "THUNDERHACK", getPosX() + 5.5, getPosY() + 5, -1);
+            // ДА ДААДАДАДА ПОТОМ СДЕЛАЮ НОРМ МЕНЕДЖЕР
+            FontRenderers.monsterrat.drawString(e.getMatrixStack(), "r", getPosX() + 35.5, getPosY() + 21, HudEditor.getColor(0).getRGB());
+            FontRenderers.monsterrat.drawString(e.getMatrixStack(), "e", getPosX() + 35.5 + 4, getPosY() + 21, HudEditor.getColor(30).getRGB());
+            FontRenderers.monsterrat.drawString(e.getMatrixStack(), "c", getPosX() + 35.5 + 10, getPosY() + 21, HudEditor.getColor(2 * 30).getRGB());
+            FontRenderers.monsterrat.drawString(e.getMatrixStack(), "o", getPosX() + 35.5 + 16, getPosY() + 21, HudEditor.getColor(3 * 30).getRGB());
+            FontRenderers.monsterrat.drawString(e.getMatrixStack(), "d", getPosX() + 35.5 + 22, getPosY() + 21, HudEditor.getColor(4 * 30).getRGB());
+            FontRenderers.monsterrat.drawString(e.getMatrixStack(), "e", getPosX() + 35.5 + 28.5, getPosY() + 21, HudEditor.getColor(5 * 30).getRGB());
+        } else if (mode.getValue() == Mode.Small){
+
+            String info = "ThunderHack | " + mc.getSession().getUsername() + " | " + PingHud.getPing() + " ms | " + (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address);
+
+            Render2DEngine.drawBlurredShadow(e.getMatrixStack(), getPosX(), getPosY(), FontRenderers.sf_bold.getStringWidth(info) + 5, 10, 4, HudEditor.getColor(270));
+            Render2DEngine.renderRoundedGradientRect(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 1f, getPosY() - 1f,  FontRenderers.sf_bold.getStringWidth(info) + 7, 12, 3);
+            Render2DEngine.drawRound(e.getMatrixStack(), getPosX(), getPosY(),  FontRenderers.sf_bold.getStringWidth(info) + 5, 10, 3, HudEditor.plateColor.getValue().getColorObject());
+            FontRenderers.sf_bold.drawString(e.getMatrixStack(),info,getPosX() + 2, getPosY() + 3,HudEditor.textColor.getValue().getColor());
+
+        } else {
+            FontRenderers.monsterrat.drawString(e.getMatrixStack(), "ThunderHack v" + Thunderhack.version, getPosX() + 5.5, getPosY() + 5, HudEditor.getColor(1).getRGB());
+        }
+    }
+}

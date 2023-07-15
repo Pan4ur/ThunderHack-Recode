@@ -1,0 +1,52 @@
+{
+  "keypress": {
+    "sounds": [
+      "thunderhack:keypress"
+    ]
+  },
+  "keyrelease": {
+    "sounds": [
+      "thunderhack:keyrelease"
+    ]
+  },
+  "uwu": {
+    "sounds": [
+      "thunderhack:uwu"
+    ]
+  },
+  "disable": {
+    "sounds": [
+      "thunderhack:disable"
+    ]
+  },
+  "enable": {
+    "sounds": [
+      "thunderhack:enable"
+    ]
+  },
+  "moan1": {
+    "sounds": [
+      "thunderhack:moan1"
+    ]
+  },
+  "moan2": {
+    "sounds": [
+      "thunderhack:moan2"
+    ]
+  },
+  "moan3": {
+    "sounds": [
+      "thunderhack:moan3"
+    ]
+  },
+  "moan4": {
+    "sounds": [
+      "thunderhack:moan4"
+    ]
+  },
+  "skeet": {
+    "sounds": [
+      "thunderhack:skeet"
+    ]
+  }
+}

@@ -1,0 +1,58 @@
+package thunder.hack.modules.combat;
+
+import com.google.common.eventbus.Subscribe;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import thunder.hack.Thunderhack;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.PlayerUpdateEvent;
+import thunder.hack.injection.accesors.ILivingEntity;
+import thunder.hack.modules.Module;
+import thunder.hack.modules.movement.Speed;
+import thunder.hack.setting.Setting;
+
+public class TriggerBot extends Module {
+    public TriggerBot() {
+        super("TriggerBot", Category.COMBAT);
+    }
+
+    public final Setting<Float> attackRange = new Setting("Range", 3f, 1f, 7.0f);
+    public final Setting<Boolean> smartCrit = new Setting<>("SmartCrit", true);
+    public final Setting<Boolean> ignoreWalls = new Setting<>("IgnoreWals", false);
+
+    @Subscribe
+    public void onAttack(PlayerUpdateEvent e){
+        if(!autoCrit()) return;
+
+        if(attackRange.getValue() <= 3){
+            if(mc.crosshairTarget != null && mc.crosshairTarget instanceof EntityHitResult ehr && ehr.getEntity() != null){
+                mc.interactionManager.attackEntity(mc.player, ehr.getEntity());
+                mc.player.swingHand(Hand.MAIN_HAND);
+            }
+        } else {
+            Entity ent = Thunderhack.playerManager.getRtxTarger(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());
+            if(ent != null){
+                mc.interactionManager.attackEntity(mc.player, ent);
+                mc.player.swingHand(Hand.MAIN_HAND);
+            }
+        }
+    }
+
+    private boolean autoCrit() {
+        boolean reasonForSkipCrit = !smartCrit.getValue() || mc.player.getAbilities().flying || mc.player.isFallFlying() || mc.player.hasStatusEffect(StatusEffects.SLOWNESS) || mc.player.isHoldingOntoLadder() || (mc.world.getBlockState(new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY())), (int) Math.floor(mc.player.getZ()))).getBlock() == Blocks.COBWEB);
+        if(mc.player.fallDistance > 1 && mc.player.fallDistance < 1.14) return false;
+        if (!(MathHelper.clamp(((float)((ILivingEntity)mc.player).getLastAttackedTicks() + 0.5f) / Aura.getAttackCooldownProgressPerTick(), 0.0F, 1.0F) >= (0.93f))) return false;
+        if (!mc.options.jumpKey.isPressed() && (!Thunderhack.moduleManager.get(TargetStrafe.class).isEnabled() && !Thunderhack.moduleManager.get(Speed.class).isEnabled())) return true;
+        if (mc.player.isInLava()) return true;
+        if (!mc.options.jumpKey.isPressed() && Aura.isAboveWater()) return true;
+        double d2 = (double)((int) mc.player.getY()) - mc.player.getY();
+        if ((d2 == -0.01250004768371582 || d2 == -0.1875) && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, mc.player.getEyeHeight(mc.player.getPose()), 0.0)).iterator().hasNext() && !mc.player.isSneaking()) return true;
+        if (!reasonForSkipCrit) return !mc.player.isOnGround() && mc.player.fallDistance > 0.0f;
+        return true;
+    }
+}
