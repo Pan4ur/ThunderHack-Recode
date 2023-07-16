@@ -197,6 +197,7 @@ public class NameTags extends Module {
                         position.y = Math.min(vector.y, position.y);
                         position.z = Math.max(vector.x, position.z);
                     }
+                    if(spawner.getLogic() == null || spawner.getLogic().renderedEntity == null) continue;
                     String final_string = spawner.getLogic().renderedEntity.getName().getString() + " " + String.format("%.1f",((float)spawner.getLogic().spawnDelay / 20f)) + "s";
 
                     if (position != null) {
