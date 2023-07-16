@@ -302,7 +302,7 @@ public class Burrow extends Module {
         return discrete.getValue() ? Math.floor(value) : value;
     }
 
-    protected BlockPos getPlayerPos() {
+    public static BlockPos getPlayerPos() {
         return Math.abs(mc.player.getVelocity().y) > 0.1 ? BlockPos.ofFloored(mc.player.getPos()) : getPosition(mc.player);
     }
 

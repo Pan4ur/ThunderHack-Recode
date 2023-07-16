@@ -31,7 +31,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     }
 
     @Inject(method = "tick", at = @At("HEAD"))
-    public void tick(CallbackInfo info) {
+    public void tickHook(CallbackInfo info) {
         if (mc.player != null && mc.world != null) {
             Thunderhack.EVENT_BUS.post(new PlayerUpdateEvent());
         }
@@ -46,7 +46,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     }
 
     @Inject(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"), cancellable = true)
-    public void onMove(MovementType movementType, Vec3d movement, CallbackInfo ci) {
+    public void onMoveHook(MovementType movementType, Vec3d movement, CallbackInfo ci) {
         EventMove event = new EventMove(movement.x,movement.y,movement.z);
         Thunderhack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
@@ -59,7 +59,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
 
     @Inject(method = "sendMovementPackets", at = @At("HEAD"), cancellable = true)
-    private void sendMovementPackets(CallbackInfo info) {
+    private void sendMovementPacketsHook(CallbackInfo info) {
         if(PlaceManager.isRotating) return;
         EventSync event = new EventSync(getYaw(),getPitch());
         Thunderhack.EVENT_BUS.post(event);
@@ -83,7 +83,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         }
     }
     @Inject(method = "sendMovementPackets", at = @At("RETURN"), cancellable = true)
-    private void sendMovementPacketsPost(CallbackInfo info) {
+    private void sendMovementPacketsPostHook(CallbackInfo info) {
         mc.player.lastSprinting = pre_sprint_state;
         Core.lock_sprint = false;
         EventPostSync event = new EventPostSync();
@@ -119,7 +119,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     }
 
     @Inject(method = "pushOutOfBlocks", at = @At("HEAD"), cancellable = true)
-    private void onPushOutOfBlocks(double x, double d, CallbackInfo info) {
+    private void onPushOutOfBlocksHook(double x, double d, CallbackInfo info) {
         Velocity velocity = Thunderhack.moduleManager.get(Velocity.class);
         if (velocity.isEnabled() && velocity.noPush.getValue()) {
             info.cancel();
