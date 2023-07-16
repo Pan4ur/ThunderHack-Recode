@@ -6,6 +6,7 @@
 
 ## Info
 ```diff
+- !!! WARNING If the client does not start - download from the Actions tab !!!
 - !!! First public build, stay tuned / Первый публичный билд, следи за обновлениями !!!
 - !!! Скачивая данный клиент ты подтверждаешь что San3kM1x - главный бездарь mcfunny.su !!!
 ```
