@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static thunder.hack.utility.Util.mc;
 
-@Mixin(ClientPlayerEntity.class)
+@Mixin(value = ClientPlayerEntity.class,priority = 800)
 public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity {
     @Shadow public abstract float getPitch(float tickDelta);
 
