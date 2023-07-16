@@ -186,13 +186,88 @@ public abstract class MixinHeldItemRenderer {
                         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float)l * 65.0F));
                         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float)l * -85.0F));
                     } else {
-                        float n = -0.4F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
-                        m = 0.2F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 6.2831855F);
-                        f = -0.2F * MathHelper.sin(swingProgress * 3.1415927F);
-                        int o = bl2 ? 1 : -1;
-                        matrices.translate(0, 0, 0);
-                        this.applyEquipOffset(matrices, arm, equipProgress);
-                        this.applySwingOffset(matrices, arm, swingProgress);
+                   //     Animations.Mode mode = Animations.mode.getValue();
+                       // if (mode == Animations.Mode.IDK) {
+                            float n = -0.4F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
+                            m = 0.2F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 6.2831855F);
+                            f = -0.2F * MathHelper.sin(swingProgress * 3.1415927F);
+                            int o = bl2 ? 1 : -1;
+                            matrices.translate(0, 0, 0);
+                            this.applyEquipOffset(matrices, arm, equipProgress);
+                            this.applySwingOffset(matrices, arm, swingProgress);
+                       /* } else if (mode == Animations.Mode.Default) {
+                            float var4 = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927f);
+                            matrices.translate(0, 0, 0);
+                            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(var4 * -20.0f));
+                            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(var4 * -75.0f));
+
+                            this.applyEquipOffset(matrices, arm, equipProgress);
+                            this.applySwingOffset(matrices, arm, swingProgress);
+                        }
+
+                        */
+                        /*
+                        else if (mode == Animations.Mode.Swipe) {
+                            transformFirstPersonItem(equipProgress / 3.0f, swingprogress);
+                            translate();
+                            float var3 = MathHelper.sin(swingprogress * swingprogress * 3.1415927f);
+                            float var4 = MathHelper.sin(MathHelper.sqrt(swingprogress) * 3.1415927f);
+                            GlStateManager.rotate(var3 * -20.0f, 0.0f, 1.0f, 0.0f);
+                            GlStateManager.rotate(var4 * -20.0f, 0.0f, 0.0f, 2.0f);
+                            GlStateManager.rotate(var4 * -75.0f, 1.0f, 0.0f, 0.0f);
+                        } else if (mode == Animations.Mode.Rich) {
+                            transformSideFirstPerson2(enumhandside, p_187457_7_);
+                            translate4();
+                            float var3 = MathHelper.sin(swingprogress * swingprogress * (float) Math.PI);
+                            float var4 = MathHelper.sin(MathHelper.sqrt(swingprogress) * (float) Math.PI);
+                            GlStateManager.rotate(var4 * -20.0f, 0.0f, 0.0f, 2.0f);
+                            GlStateManager.rotate(var4 * -75.0f, 1.0f, 0.0f, 0.0f);
+                        } else if (mode == Animations.Mode.New) {
+                            transformSideFirstPerson2(enumhandside, p_187457_7_);
+                            translate3();
+                            float var3 = MathHelper.sin(swingprogress * swingprogress * 3.1415927f);
+                            float var4 = MathHelper.sin(MathHelper.sqrt(swingprogress) * 3.1415927f);
+                            GlStateManager.rotate(var4 * -70, var4 * 40, 0.0f, 0);
+                            GlStateManager.rotate(40, -30, 0.0f, 0);
+                        } else if (mode == Animations.Mode.Oblique) {
+                            transformSideFirstPerson2(enumhandside, p_187457_7_);
+                            float var4 = MathHelper.sin(MathHelper.sqrt(swingprogress) * 3.1415927f);
+                            GlStateManager.rotate(var4 * -70, var4 * 70, 0.0f, var4 * -90);
+                        } else if (mode == Animations.Mode.Glide) {
+                            transformFirstPersonItem(equipProgress / 2, 0);
+                            translate();
+                        } else if (mode == Animations.Mode.Fap) {
+                            transformSideFirstPerson2(enumhandside, p_187457_7_);
+                            GlStateManager.translate(0.96f, -0.02f, -0.71999997f);
+                            GlStateManager.rotate(45.0f, 0.0f, 1.0f, 0.0f);
+                            float var3 = MathHelper.sin(0.0f);
+                            float var4 = MathHelper.sin(MathHelper.sqrt(0.0f) * 3.1415927f);
+                            GlStateManager.rotate(var3 * -20.0f, 0.0f, 1.0f, 0.0f);
+                            GlStateManager.rotate(var4 * -20.0f, 0.0f, 0.0f, 1.0f);
+                            GlStateManager.rotate(var4 * -80.0f, 1.0f, 0.0f, 0.0f);
+                            GlStateManager.translate(-0.5f, 0.2f, 0.0f);
+                            GlStateManager.rotate(30.0f, 0.0f, 1.0f, 0.0f);
+                            GlStateManager.rotate(-80.0f, 1.0f, 0.0f, 0.0f);
+                            GlStateManager.rotate(60.0f, 0.0f, 1.0f, 0.0f);
+                            int alpha = (int) Math.min(255L, (System.currentTimeMillis() % 255L > 127L ? Math.abs(Math.abs(System.currentTimeMillis()) % 255L - 255L) : System.currentTimeMillis() % 255L) * 2L);
+                            float f5 = (double) f1 > 0.5 ? 1.0f - f1 : f1;
+                            GlStateManager.translate(0.3f, -0.0f, 0.4f);
+                            GlStateManager.rotate(0.0f, 0.0f, 0.0f, 1.0f);
+                            GlStateManager.translate(0.0f, 0.5f, 0.0f);
+                            GlStateManager.rotate(90.0f, 1.0f, 0.0f, -1.0f);
+                            GlStateManager.translate(0.6f, 0.5f, 0.0f);
+                            GlStateManager.rotate(-90.0f, 1.0f, 0.0f, -1.0f);
+                            GlStateManager.rotate(-10.0f, 1.0f, 0.0f, -1.0f);
+                            GlStateManager.rotate((-f5) * 10.0f, 10.0f, 10.0f, -9.0f);
+                            GlStateManager.rotate(10.0f, -1.0f, 0.0f, 0.0f);
+
+
+                            GlStateManager.translate(0.0, 0.0, -0.5);
+                            GlStateManager.rotate(Thunderhack.moduleManager.getModuleByClass(Animations.class).abobka228 ? (float) (-alpha) / Thunderhack.moduleManager.getModuleByClass(Animations.class).fapSmooth.getValue() : 1.0f, 1.0f, -0.0f, 1.0f);
+                            GlStateManager.translate(0.0, 0.0, 0.5);
+                        }
+
+                         */
                     }
 
 

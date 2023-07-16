@@ -6,13 +6,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.*;
 
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -86,6 +82,71 @@ public class Render3DEngine {
         tessellator.draw();
         RenderSystem.disableBlend();
      //   cleanup();
+    }
+
+    public static void drawFilledSide(MatrixStack stack, Box box, Color c, Direction dir) {
+        float minX = (float) (box.minX - mc.getEntityRenderDispatcher().camera.getPos().getX());
+        float minY = (float) (box.minY - mc.getEntityRenderDispatcher().camera.getPos().getY());
+        float minZ = (float) (box.minZ - mc.getEntityRenderDispatcher().camera.getPos().getZ());
+        float maxX = (float) (box.maxX - mc.getEntityRenderDispatcher().camera.getPos().getX());
+        float maxY = (float) (box.maxY - mc.getEntityRenderDispatcher().camera.getPos().getY());
+        float maxZ = (float) (box.maxZ - mc.getEntityRenderDispatcher().camera.getPos().getZ());
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.enableDepthTest();
+
+
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        if(dir == Direction.DOWN) {
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, minZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, minZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, maxZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, maxZ).color(c.getRGB()).next();
+        }
+
+        if(dir == Direction.NORTH) {
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, minZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, minZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, minZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, minZ).color(c.getRGB()).next();
+        }
+
+        if(dir == Direction.EAST) {
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, minZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, minZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, maxZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, maxZ).color(c.getRGB()).next();
+        }
+        if(dir == Direction.SOUTH) {
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, maxZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, maxZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, maxZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, maxZ).color(c.getRGB()).next();
+        }
+
+        if(dir == Direction.WEST) {
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, minZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, maxZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, maxZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, minZ).color(c.getRGB()).next();
+        }
+
+        if(dir == Direction.UP) {
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, minZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, maxZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, maxZ).color(c.getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, minZ).color(c.getRGB()).next();
+        }
+        RenderSystem.disableDepthTest();
+        tessellator.draw();
+        RenderSystem.disableBlend();
+        //   cleanup();
     }
 
     public static void drawTextIn3D(String text, Vec3d pos, double offX, double offY, double textOffset, Color color) {
@@ -248,6 +309,79 @@ public class Render3DEngine {
         cleanup();
     }
 
+    public static void drawSideOutline(Box box, Color color, float lineWidth,Direction dir) {
+        setup();
+        MatrixStack matrices = matrixFrom(box.minX, box.minY, box.minZ);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        RenderSystem.disableCull();
+        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
+        RenderSystem.lineWidth(lineWidth);
+        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+
+        box = box.offset(new Vec3d(box.minX, box.minY, box.minZ).negate());
+
+        float x1 = (float) box.minX;
+        float y1 = (float) box.minY;
+        float z1 = (float) box.minZ;
+        float x2 = (float) box.maxX;
+        float y2 = (float) box.maxY;
+        float z2 = (float) box.maxZ;
+
+
+
+       // vertexLine(matrices, buffer, x1, y1, z2, x1, y2, z2, color);
+       // vertexLine(matrices, buffer, x1, y1, z1, x1, y2, z1, color);
+       // vertexLine(matrices, buffer, x2, y1, z2, x2, y2, z2, color);
+       // vertexLine(matrices, buffer, x2, y1, z1, x2, y2, z1, color);
+
+
+        if(dir == Direction.DOWN) {
+            vertexLine(matrices, buffer, x1, y1, z1, x2, y1, z1, color);
+            vertexLine(matrices, buffer, x2, y1, z1, x2, y1, z2, color);
+            vertexLine(matrices, buffer, x2, y1, z2, x1, y1, z2, color);
+            vertexLine(matrices, buffer, x1, y1, z2, x1, y1, z1, color);
+        }
+
+        if(dir == Direction.NORTH) {
+            vertexLine(matrices, buffer, x2, y1, z1, x2, y2, z1, color);
+            vertexLine(matrices, buffer, x1, y1, z1, x1, y2, z1, color);
+            vertexLine(matrices, buffer, x2, y1, z1, x1, y1, z1, color);
+            vertexLine(matrices, buffer, x2, y2, z1, x1, y2, z1, color);
+        }
+
+        if(dir == Direction.EAST) {
+            vertexLine(matrices, buffer, x2, y1, z1, x2, y2, z1, color);
+            vertexLine(matrices, buffer, x2, y1, z2, x2, y2, z2, color);
+            vertexLine(matrices, buffer, x2, y2, z2, x2, y2, z1, color);
+            vertexLine(matrices, buffer, x2, y1, z2, x2, y1, z1, color);
+        }
+
+        if(dir == Direction.SOUTH) {
+            vertexLine(matrices, buffer, x1, y1, z2, x1, y2, z2, color);
+            vertexLine(matrices, buffer, x2, y1, z2, x2, y2, z2, color);
+            vertexLine(matrices, buffer, x1, y1, z2, x2, y1, z2, color);
+            vertexLine(matrices, buffer, x1, y2, z2, x2, y2, z2, color);
+        }
+
+        if(dir == Direction.WEST) {
+            vertexLine(matrices, buffer, x1, y1, z1, x1, y2, z1, color);
+            vertexLine(matrices, buffer, x1, y1, z2, x1, y2, z2, color);
+            vertexLine(matrices, buffer, x1, y2, z2, x1, y2, z1, color);
+            vertexLine(matrices, buffer, x1, y1, z2, x1, y1, z1, color);
+        }
+
+        if(dir == Direction.UP) {
+             vertexLine(matrices, buffer, x1, y2, z1, x2, y2, z1, color);
+             vertexLine(matrices, buffer, x2, y2, z1, x2, y2, z2, color);
+             vertexLine(matrices, buffer, x2, y2, z2, x1, y2, z2, color);
+             vertexLine(matrices, buffer, x1, y2, z2, x1, y2, z1, color);
+        }
+
+        tessellator.draw();
+        RenderSystem.enableCull();
+        cleanup();
+    }
 
     public static void drawBottomOutline(Box box, Color color, float lineWidth) {
         setup();

@@ -155,6 +155,13 @@ public class ModuleManager {
         modules.add(new TunnelEsp());
         modules.add(new ElytraSwap());
         modules.add(new OptifineCapes());
+        modules.add(new Radar());
+        modules.add(new DurabilityAlert());
+        modules.add(new LogoutSpots());
+        modules.add(new EntityControl());
+        modules.add(new PortalGodMode());
+        modules.add(new BlockHighLight());
+        modules.add(new BreakHighLight());
 
     }
 
@@ -217,6 +224,7 @@ public class ModuleManager {
     }
 
     public void onUpdate() {
+        if(Module.fullNullCheck()) return;
         modules.stream().filter(Module::isEnabled).forEach(Module::onUpdate);
     }
 

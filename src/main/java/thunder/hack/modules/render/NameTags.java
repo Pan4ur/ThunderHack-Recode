@@ -1,10 +1,17 @@
 package thunder.hack.modules.render;
 
 import com.google.common.eventbus.Subscribe;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.passive.AbstractHorseEntity;
+import net.minecraft.entity.passive.HorseEntity;
+import net.minecraft.entity.passive.TameableEntity;
+import net.minecraft.entity.passive.WolfEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.math.Box;
 import org.joml.Vector4d;
@@ -32,6 +39,7 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class NameTags extends Module {
@@ -40,6 +48,9 @@ public class NameTags extends Module {
     }
 
     private Setting<Boolean> gamemode = new Setting<>("Gamemode", false);
+    private  Setting<Boolean> spawners = new Setting<>("SpawnerNameTag", false);
+    private  Setting<Boolean> entityOwner = new Setting<>("EntityOwner", false);
+
     private  Setting<Boolean> ping = new Setting<>("Ping", false);
     private  Setting<Boolean> health = new Setting<>("Health", true);
     private  Setting<Boolean> distance = new Setting<>("Distance", true);
@@ -116,49 +127,49 @@ public class NameTags extends Module {
 
                 float item_offset = 0;
                 if(armor.getValue())
-                for(ItemStack armorComponent : stacks) {
-                    if (!armorComponent.isEmpty()) {
-                        e.getMatrixStack().push();
-                        e.getMatrixStack().translate(posX - 55 + item_offset, (float) (posY - 35f), 0);
-                        e.getMatrixStack().scale(1.1f, 1.1f, 1.1f);
-                        DiffuseLighting.disableGuiDepthLighting();
-                        e.getContext().drawItem(armorComponent, 0, 0);
-                        e.getContext().drawItemInSlot(mc.textRenderer,armorComponent, 0, 0);
-                        e.getMatrixStack().pop();
+                    for(ItemStack armorComponent : stacks) {
+                        if (!armorComponent.isEmpty()) {
+                            e.getMatrixStack().push();
+                            e.getMatrixStack().translate(posX - 55 + item_offset, (float) (posY - 35f), 0);
+                            e.getMatrixStack().scale(1.1f, 1.1f, 1.1f);
+                            DiffuseLighting.disableGuiDepthLighting();
+                            e.getContext().drawItem(armorComponent, 0, 0);
+                            e.getContext().drawItemInSlot(mc.textRenderer,armorComponent, 0, 0);
+                            e.getMatrixStack().pop();
 
-                        float enchantmentY = 0;
+                            float enchantmentY = 0;
 
-                        NbtList enchants = armorComponent.getEnchantments();
-                        if(enchantss.getValue())
-                        for (int index = 0; index < enchants.size(); ++index) {
-                            String id = enchants.getCompound(index).getString("id");
-                            short level = enchants.getCompound(index).getShort("lvl");
-                            String encName = " ";
+                            NbtList enchants = armorComponent.getEnchantments();
+                            if(enchantss.getValue())
+                                for (int index = 0; index < enchants.size(); ++index) {
+                                    String id = enchants.getCompound(index).getString("id");
+                                    short level = enchants.getCompound(index).getShort("lvl");
+                                    String encName = " ";
 
-                            if(id.equals("minecraft:protection")){
-                                encName = "P" + level;
-                            } else
-                            if(id.equals("minecraft:thorns")){
-                                encName = "T" + level;
-                            } else
-                            if(id.equals("minecraft:sharpness")){
-                                encName = "S" + level;
-                            } else
-                            if(id.equals("minecraft:efficiency")){
-                                encName = "E" + level;
-                            } else
-                            if(id.equals("minecraft:unbreaking")){
-                                encName = "U" + level;
-                            } else
-                            if(id.equals("minecraft:power")){
-                                encName = "PO" + level;
-                            } else continue;
-                            FontRenderers.sf_bold.drawString(e.getMatrixStack(),encName, posX - 50 + item_offset, (float) posY - 45 + enchantmentY, -1);
-                            enchantmentY -= 8;
+                                    if(id.equals("minecraft:protection")){
+                                        encName = "P" + level;
+                                    } else
+                                    if(id.equals("minecraft:thorns")){
+                                        encName = "T" + level;
+                                    } else
+                                    if(id.equals("minecraft:sharpness")){
+                                        encName = "S" + level;
+                                    } else
+                                    if(id.equals("minecraft:efficiency")){
+                                        encName = "E" + level;
+                                    } else
+                                    if(id.equals("minecraft:unbreaking")){
+                                        encName = "U" + level;
+                                    } else
+                                    if(id.equals("minecraft:power")){
+                                        encName = "PO" + level;
+                                    } else continue;
+                                    FontRenderers.sf_bold.drawString(e.getMatrixStack(),encName, posX - 50 + item_offset, (float) posY - 45 + enchantmentY, -1);
+                                    enchantmentY -= 8;
+                                }
                         }
+                        item_offset += 18f;
                     }
-                    item_offset += 18f;
-                }
                 Render2DEngine.drawRect(e.getMatrixStack(),tagX -2 , (float) (posY - 13f), textWidth + 4, 11,fillColorA.getValue().getColorObject());
 
                 if(outline.getValue()) {
@@ -169,11 +180,98 @@ public class NameTags extends Module {
                 }
                 FontRenderers.sf_bold.drawString(e.getMatrixStack(),final_string, tagX, (float) posY - 10, -1);
 
-              //  e.getContext().drawText(mc.textRenderer,final_string, (int) tagX, (int) ((float) posY - 10), -1,false);
+                //  e.getContext().drawText(mc.textRenderer,final_string, (int) tagX, (int) ((float) posY - 10), -1,false);
                 if(box.getValue()) drawBox(p,e);
             }
         }
-       // Command.sendMessage(System.currentTimeMillis() - time + "");
+        // Command.sendMessage(System.currentTimeMillis() - time + "");
+        if(spawners.getValue())
+            for (BlockEntity blockEntity : StorageEsp.getBlockEntities()) {
+                if (blockEntity instanceof MobSpawnerBlockEntity spawner) {
+                    Vec3d vector = new Vec3d( spawner.getPos().getX() + 0.5, spawner.getPos().getY() + 1.5, spawner.getPos().getZ() + 0.5);
+                    Vector4d position = null;
+                    vector = Render3DEngine.worldSpaceToScreenSpace( new Vec3d(vector.x, vector.y, vector.z));
+                    if (vector != null && vector.z > 0 && vector.z < 1) {
+                        position = new Vector4d(vector.x, vector.y, vector.z, 0);
+                        position.x = Math.min(vector.x, position.x);
+                        position.y = Math.min(vector.y, position.y);
+                        position.z = Math.max(vector.x, position.z);
+                    }
+                    String final_string = spawner.getLogic().renderedEntity.getName().getString() + " " + String.format("%.1f",((float)spawner.getLogic().spawnDelay / 20f)) + "s";
+
+                    if (position != null) {
+                        double posX = position.x;
+                        double posY = position.y;
+                        double endPosX = position.z;
+
+                        float diff = (float) (endPosX - posX) / 2;
+                        float textWidth = (FontRenderers.sf_bold.getStringWidth(final_string) * 1);
+                        float tagX = (float) ((posX + diff - textWidth / 2) * 1);
+
+                        Render2DEngine.drawRect(e.getMatrixStack(), tagX - 2, (float) (posY - 13f), textWidth + 4, 11, fillColorA.getValue().getColorObject());
+
+                        if (outline.getValue()) {
+                            Render2DEngine.drawRect(e.getMatrixStack(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1, HudEditor.getColor(270));
+                            Render2DEngine.drawRect(e.getMatrixStack(), tagX - 3, (float) (posY - 3f), textWidth + 6, 1, HudEditor.getColor(0));
+                            Render2DEngine.drawRect(e.getMatrixStack(), tagX - 3, (float) (posY - 14f), 1, 11, HudEditor.getColor(180));
+                            Render2DEngine.drawRect(e.getMatrixStack(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11, HudEditor.getColor(90));
+                        }
+                        FontRenderers.sf_bold.drawString(e.getMatrixStack(), final_string, tagX, (float) posY - 10, -1);
+                    }
+                }
+            }
+        if(entityOwner.getValue()){
+            for (Entity ent : mc.world.getEntities()) {
+
+                String ownerName = "";
+                if(ent instanceof ProjectileEntity pe){
+                    if(pe.getOwner() != null)
+                        ownerName = pe.getOwner().getDisplayName().getString();
+                } else if(ent instanceof HorseEntity he){
+                    if(he.getOwnerUuid() != null)
+                        ownerName = he.getOwnerUuid().toString();
+                }
+                else if(ent instanceof TameableEntity te && te.isTamed()){
+                    ownerName = te.getOwner().getDisplayName().getString();
+                }
+                else continue;
+
+                String final_string =  "Owned by " + ownerName;
+                double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
+                double y = ent.prevY + (ent.getY() - ent.prevY) * mc.getTickDelta();
+                double z = ent.prevZ + (ent.getZ() - ent.prevZ) * mc.getTickDelta();
+                Vec3d vector = new Vec3d(x, y + 2, z);
+                Vector4d position = null;
+                vector = Render3DEngine.worldSpaceToScreenSpace( new Vec3d(vector.x, vector.y, vector.z));
+                if (vector != null && vector.z > 0 && vector.z < 1) {
+                    position = new Vector4d(vector.x, vector.y, vector.z, 0);
+                    position.x = Math.min(vector.x, position.x);
+                    position.y = Math.min(vector.y, position.y);
+                    position.z = Math.max(vector.x, position.z);
+                }
+
+
+                if (position != null) {
+                    double posX = position.x;
+                    double posY = position.y;
+                    double endPosX = position.z;
+
+                    float diff = (float) (endPosX - posX) / 2;
+                    float textWidth = (FontRenderers.sf_bold.getStringWidth(final_string) * 1);
+                    float tagX = (float) ((posX + diff - textWidth / 2) * 1);
+
+                    Render2DEngine.drawRect(e.getMatrixStack(), tagX - 2, (float) (posY - 13f), textWidth + 4, 11, fillColorA.getValue().getColorObject());
+
+                    if (outline.getValue()) {
+                        Render2DEngine.drawRect(e.getMatrixStack(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1, HudEditor.getColor(270));
+                        Render2DEngine.drawRect(e.getMatrixStack(), tagX - 3, (float) (posY - 3f), textWidth + 6, 1, HudEditor.getColor(0));
+                        Render2DEngine.drawRect(e.getMatrixStack(), tagX - 3, (float) (posY - 14f), 1, 11, HudEditor.getColor(180));
+                        Render2DEngine.drawRect(e.getMatrixStack(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11, HudEditor.getColor(90));
+                    }
+                    FontRenderers.sf_bold.drawString(e.getMatrixStack(), final_string, tagX, (float) posY - 10, -1);
+                }
+            }
+        }
     }
 
     @Subscribe

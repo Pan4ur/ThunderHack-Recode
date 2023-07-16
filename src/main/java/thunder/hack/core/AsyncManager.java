@@ -24,7 +24,6 @@ public class AsyncManager {
     private volatile Iterable<Entity> threadSafeEntityList = Collections.emptyList();
     private volatile List<AbstractClientPlayerEntity> threadSafePlayersList = Collections.emptyList();
 
-
     @Subscribe
     public void onTick(EventTick e){
         if(mc.world == null) return;

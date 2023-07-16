@@ -25,9 +25,6 @@ public class FreeCam extends Module {
         super("Freecam", "Freecam", Category.PLAYER);
     }
 
-
-
-
     private static PlayerCopyEntity dummy;
     private Vec3d playerPos;
     private Vec2f playerRot;
@@ -64,8 +61,15 @@ public class FreeCam extends Module {
         prevFlySpeed = mc.player.getAbilities().getFlySpeed();
     }
 
+
     @Override
     public void onDisable() {
+        if(fullNullCheck()){
+            return;
+        }
+        if(dummy == null){
+            return;
+        }
             mc.chunkCullingEnabled = true;
 
             dummy.despawn();
@@ -88,6 +92,14 @@ public class FreeCam extends Module {
 
     @Subscribe
     public void onSync(EventSync event) {
+        if(fullNullCheck()){
+            disable();
+            return;
+        }
+        if(dummy == null){
+            disable();
+            return;
+        }
         HitResult result = mc.crosshairTarget;
         if (result != null )
         {
@@ -115,6 +127,10 @@ public class FreeCam extends Module {
 
     @Subscribe
     public void onPostSync(EventPostSync event) {
+        if(fullNullCheck()){
+            disable();
+            return;
+        }
         if(prevPos == null || prevRotate == null) return;
         mc.player.setPosition(prevPos);
         mc.player.setYaw(prevRotate.x);
@@ -123,11 +139,19 @@ public class FreeCam extends Module {
 
     @Subscribe
     public void onMove(EventMove event) {
+        if(fullNullCheck()){
+            disable();
+            return;
+        }
         mc.player.noClip = true;
     }
 
     @Subscribe
     public void onTick(PlayerUpdateEvent event) {
+        if(fullNullCheck()){
+            disable();
+            return;
+        }
         mc.player.setOnGround(false);
         mc.player.getAbilities().setFlySpeed((float) (speed.getValue() / 5));
         mc.player.getAbilities().flying = true;

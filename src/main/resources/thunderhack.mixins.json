@@ -49,6 +49,7 @@
   "mixins": [
     "MixinAbstractBlock",
     "MixinAbstractBlockState",
+    "MixinAbstractHorseEntity",
     "MixinBlock",
     "MixinBlockItem",
     "MixinEntity",
