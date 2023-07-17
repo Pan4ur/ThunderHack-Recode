@@ -27,6 +27,7 @@
 - more Grim bypasses
 - shaders
 - optimize hud
+- Pitfight 16 is coming up, it would be nice to add modules for 2b2t
 
 ## ScreenShots
 ![image](https://cdn.discordapp.com/attachments/934396624111824900/1129665214300827699/image.png)
