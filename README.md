@@ -21,5 +21,12 @@
 - [FabricApi 1.20.1](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files) - TH won't work without it.
 - [InGameAccountSwitcher](https://www.curseforge.com/minecraft/mc-mods/in-game-account-switcher) - To switch accounts in game
 
+## TODO
+- More modules (130 vs 220 in th+)
+- Freecam sync with ca and ka
+- more Grim bypasses
+- shaders
+- optimize hud
+
 ## ScreenShots
 ![image](https://cdn.discordapp.com/attachments/934396624111824900/1129665214300827699/image.png)
