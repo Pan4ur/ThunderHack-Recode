@@ -173,11 +173,11 @@ public class Strafe extends Module {
                     event.set_x(0);
                     event.set_z(0);
                 }
+                event.cancel();
             } else {
                 oldSpeed = 0;
             }
 
-        event.cancel();
     }
 
     @Subscribe

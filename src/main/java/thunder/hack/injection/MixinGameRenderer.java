@@ -78,9 +78,10 @@ public abstract class MixinGameRenderer {
            mc.getProfiler().pop();
            info.cancel();
         }
-        if(Thunderhack.moduleManager.get(Aura.class).isEnabled() && Aura.target != null && Aura.mode.getValue() != Aura.Mode.None){
+        if(Thunderhack.moduleManager.get(Aura.class).isEnabled() && Aura.target != null && mc.player.distanceTo(Aura.target) <= Aura.attackRange.getValue() && Aura.mode.getValue() != Aura.Mode.None){
             mc.getProfiler().pop();
             info.cancel();
+            // TODO vector from aura
             mc.crosshairTarget = new EntityHitResult(Aura.target);
         }
     }

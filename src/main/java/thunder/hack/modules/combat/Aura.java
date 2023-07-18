@@ -54,7 +54,7 @@ public class Aura extends Module {
     }
 
 
-    public final Setting<Float> attackRange = new Setting("Attack Range", 3.1f, 1f, 7.0f);
+    public static final Setting<Float> attackRange = new Setting("Attack Range", 3.1f, 1f, 7.0f);
     public static final Setting<Mode> mode = new Setting("Rotation", Mode.Universal);
     public final Setting<Boolean> smartCrit = new Setting<>("Smart Crit", true);
     public final Setting<Boolean> ignoreWalls = new Setting<>("Ignore Walls", true);
