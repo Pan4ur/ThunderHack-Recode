@@ -23,3 +23,5 @@ accessible field net/minecraft/world/MobSpawnerLogic minSpawnDelay I
 accessible field net/minecraft/world/MobSpawnerLogic maxSpawnDelay I
 accessible field net/minecraft/world/MobSpawnerLogic renderedEntity Lnet/minecraft/entity/Entity;
 accessible field net/minecraft/client/network/ClientPlayerInteractionManager currentBreakingProgress F
+accessible field net/minecraft/client/Mouse cursorDeltaY D
+accessible field net/minecraft/client/Mouse cursorDeltaX D

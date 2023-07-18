@@ -38,7 +38,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     }
 
     @Redirect(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"), require = 0 )
-    private boolean bruhHook(ClientPlayerEntity player) {
+    private boolean tickMovementHook(ClientPlayerEntity player) {
         NoSlow noSlow = Thunderhack.moduleManager.get(NoSlow.class);
         if (noSlow.isEnabled() && noSlow.canNoSlow())
             return false;

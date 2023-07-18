@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
@@ -60,6 +61,7 @@ public class Burrow extends Module {
     private volatile double last_x;
     private volatile double last_y;
     private volatile double last_z;
+    private int prevSlot;
     private final Timer scaleTimer = new Timer();
     private final Timer timer = new Timer();
 
@@ -164,7 +166,7 @@ public class Burrow extends Module {
         }
 
         int slot = (InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN) == -1 || mc.world.getBlockState(pos.down()).getBlock() == Blocks.ENDER_CHEST ? InventoryUtil.findHotbarBlock(Blocks.ENDER_CHEST) : InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN));
-
+        prevSlot = mc.player.getInventory().selectedSlot;
         if (slot == -1) {
             Command.sendMessage("No Block found!");
             disable();
@@ -204,6 +206,9 @@ public class Burrow extends Module {
 
         mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(rEntity.getX(),  y, rEntity.getZ(), false));
         timer.reset();
+
+        mc.player.getInventory().selectedSlot = prevSlot;
+        mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
         if (!wait.getValue() || placeDisable.getValue()) disable();
     }
 

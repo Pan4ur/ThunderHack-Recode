@@ -198,6 +198,7 @@ public class AutoCrystal extends Module {
             yp[1] = (float) (yp[1] - (yp[1] - ((IClientPlayerEntity) ((mc.player))).getLastYaw()) % gcdFix);
 
             PlaceManager.setTrailingRotation(yp);
+            rotations = null;
         }
     }
 
@@ -323,9 +324,7 @@ public class AutoCrystal extends Module {
         }
 
         if (rotate.getValue()) {
-            rotations = new Vec3d(pos.getX() + 0.5D,
-                    pos.getY() + 1D,
-                    pos.getZ() + 0.5D);
+            rotations = new Vec3d(pos.getX() + 0.5D, pos.getY() + 1D, pos.getZ() + 0.5D);
         }
         return new BlockHitResult(new Vec3d(pos.getX() + 0.5D, pos.getY() + 1D, pos.getZ() + 0.5D), Direction.UP, pos, false);
     }

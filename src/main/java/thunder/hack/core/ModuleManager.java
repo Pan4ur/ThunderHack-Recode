@@ -162,6 +162,7 @@ public class ModuleManager {
         modules.add(new PortalGodMode());
         modules.add(new BlockHighLight());
         modules.add(new BreakHighLight());
+        modules.add(new AutoRespawn());
 
     }
 

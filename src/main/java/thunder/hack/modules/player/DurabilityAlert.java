@@ -38,9 +38,9 @@ public class DurabilityAlert extends Module {
                     if (stack.isEmpty()) continue;
                     if (getDurability(stack) < percent.getValue() && timer.passedMs(30000)) {
                         if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                            mc.player.networkHandler.sendChatCommand("msg " + player.getName() + " Срочно чини броню!");
+                            mc.player.networkHandler.sendChatCommand("msg " + player.getName().getString() + " Срочно чини броню!");
                         } else {
-                            mc.player.networkHandler.sendChatCommand("/msg " + player.getName() + " Repair your armor immediately!");
+                            mc.player.networkHandler.sendChatCommand("/msg " + player.getName().getString() + " Repair your armor immediately!");
                         }
                         timer.reset();
                     }

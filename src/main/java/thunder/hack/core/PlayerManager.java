@@ -1,6 +1,7 @@
 package thunder.hack.core;
 
 import com.google.common.eventbus.Subscribe;
+import net.minecraft.util.math.Vec2f;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
@@ -148,6 +149,15 @@ public class PlayerManager {
         double difZ = to.z - mc.player.getEyePos().z;
         double dist = MathHelper.sqrt((float) (difX * difX + difZ * difZ));
         return new float[]{(float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0), (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difY, dist)))};
+    }
+
+    public static Vec2f calcAngleVec(Vec3d to) {
+        if (to == null) return null;
+        double difX = to.x - mc.player.getEyePos().x;
+        double difY = (to.y - mc.player.getEyePos().y) * -1.0;
+        double difZ = to.z - mc.player.getEyePos().z;
+        double dist = MathHelper.sqrt((float) (difX * difX + difZ * difZ));
+        return new Vec2f((float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0), (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difY, dist))));
     }
 
     private Vec3d getRotationVector(float yaw, float pitch){
