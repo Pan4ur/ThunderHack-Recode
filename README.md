@@ -11,7 +11,7 @@
 - !!! Скачивая данный клиент ты подтверждаешь что San3kM1x - главный бездарь mcfunny.su !!!
 ```
 - Minecraft version: ```fabric``` 1.20.1
-- Client version: v 1.2 (15.07.2023)
+- Client version: v 1.2
 - Default ClickGui keybind - **```P```**
 - Default prefix  - **```.```**
 - Middle click on module to bind
