@@ -5,11 +5,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import thunder.hack.Thunderhack;
-import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
@@ -28,18 +26,10 @@ public class TriggerBot extends Module {
     @Subscribe
     public void onAttack(PlayerUpdateEvent e){
         if(!autoCrit()) return;
-
-        if(attackRange.getValue() <= 3){
-            if(mc.crosshairTarget != null && mc.crosshairTarget instanceof EntityHitResult ehr && ehr.getEntity() != null){
-                mc.interactionManager.attackEntity(mc.player, ehr.getEntity());
-                mc.player.swingHand(Hand.MAIN_HAND);
-            }
-        } else {
-            Entity ent = Thunderhack.playerManager.getRtxTarger(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());
-            if(ent != null){
-                mc.interactionManager.attackEntity(mc.player, ent);
-                mc.player.swingHand(Hand.MAIN_HAND);
-            }
+        Entity ent = Thunderhack.playerManager.getRtxTarger(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());
+        if(ent != null){
+            mc.interactionManager.attackEntity(mc.player, ent);
+            mc.player.swingHand(Hand.MAIN_HAND);
         }
     }
 

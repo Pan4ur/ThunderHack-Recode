@@ -8,10 +8,12 @@ import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.BlockPosWithFacing;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -234,8 +236,8 @@ public class Scaffold extends Module {
     @Subscribe
     public void onRender3D(Render3DEvent event) {
         if (render.getValue() && currentblock != null) {
-            Render3DEngine.drawFilledBox(event.getMatrixStack(),new Box(currentblock.getPosition()), Color2.getValue().getColorObject());
-
+            Render3DEngine.drawFilledBox(event.getMatrixStack(),new Box(currentblock.getPosition()), Render2DEngine.injectAlpha(HudEditor.getColor(0), 150));
+            Render3DEngine.drawBoxOutline(new Box(currentblock.getPosition()), Render2DEngine.injectAlpha(HudEditor.getColor(0), 230), 2);
         }
     }
 

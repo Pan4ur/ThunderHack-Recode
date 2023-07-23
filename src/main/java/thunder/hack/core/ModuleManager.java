@@ -113,7 +113,6 @@ public class ModuleManager {
         modules.add(new AutoTrap());
         modules.add(new AutoWeb());
         modules.add(new HoleFill());
-        modules.add(new VelocityIndicator());
         modules.add(new NameProtect());
         modules.add(new TestHud());
         modules.add(new BoatFly());
@@ -163,6 +162,10 @@ public class ModuleManager {
         modules.add(new BlockHighLight());
         modules.add(new BreakHighLight());
         modules.add(new AutoRespawn());
+     //   modules.add(new AutoBed());
+        modules.add(new Shaders());
+        modules.add(new Trajectories());
+        modules.add(new Media());
 
     }
 

@@ -25,8 +25,7 @@ public class FakePlayer extends Module {
     public void onUpdate(){
         if(mc.player.age % 12 == 0 && fakePlayer != null) {
           //  new EntityStatusS2CPacket((Entity) fakePlayer, (byte) 35).apply(mc.getNetworkHandler());
-          //  Thunderhack.EVENT_BUS.post(new TotemPopEvent(fakePlayer,0));
-
+            Thunderhack.EVENT_BUS.post(new TotemPopEvent(fakePlayer,0));
         }
     }
 

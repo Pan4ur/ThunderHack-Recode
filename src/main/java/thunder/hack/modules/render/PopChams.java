@@ -28,6 +28,7 @@ import thunder.hack.modules.combat.AimBot;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.render.Render2DEngine;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 

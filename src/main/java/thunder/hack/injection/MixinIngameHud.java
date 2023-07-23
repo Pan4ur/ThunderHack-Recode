@@ -1,5 +1,6 @@
 package thunder.hack.injection;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.Render2DEvent;
@@ -18,12 +19,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinIngameHud {
     @Inject(at = @At(value = "HEAD"), method = "render")
     public void render(DrawContext context, float tickDelta, CallbackInfo ci) {
+        Thunderhack.EVENT_BUS.post(new RenderBlurEvent(tickDelta,context));
         if (ClickGui.getInstance().msaa.getValue()) {
             MSAAFramebuffer.use(() -> Thunderhack.EVENT_BUS.post(new Render2DEvent(context.getMatrices(), context)));
         } else {
             Thunderhack.EVENT_BUS.post(new Render2DEvent(context.getMatrices(), context));
         }
-        Thunderhack.EVENT_BUS.post(new RenderBlurEvent(tickDelta,context.getMatrices()));
     }
 
     @Inject(at = @At(value = "HEAD"), method = "renderHotbar",cancellable = true)
@@ -39,6 +40,7 @@ public abstract class MixinIngameHud {
         if(Thunderhack.moduleManager.get(Hotbar.class).isEnabled()){
             ci.cancel();
             Hotbar.renderXpBar(x,context.getMatrices());
+         //   RenderSystem.recordRenderCall(() -> System.out.println("awd"));
         }
     }
 

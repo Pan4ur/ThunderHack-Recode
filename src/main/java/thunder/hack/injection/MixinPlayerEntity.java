@@ -1,9 +1,13 @@
 package thunder.hack.injection;
 import net.minecraft.entity.Entity;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventAttack;
 import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
+import thunder.hack.modules.client.Media;
 import thunder.hack.modules.movement.AutoSprint;
 import thunder.hack.modules.player.FreeCam;
 import net.minecraft.entity.MovementType;
@@ -19,14 +23,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static thunder.hack.utility.Util.mc;
 
-@Mixin(PlayerEntity.class)
-public class MixinPlayerEntity {
+@Mixin(value = PlayerEntity.class, priority = 800)
+public class MixinPlayerEntity{
+    /*
     @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerEntity;noClip:Z", opcode = Opcodes.PUTFIELD))
     void noClipHook(PlayerEntity playerEntity, boolean value) {
         if(Thunderhack.moduleManager.get(FreeCam.class).isEnabled() && !mc.player.isOnGround()){
             playerEntity.noClip = true;
         } else {
             playerEntity.noClip = playerEntity.isSpectator();
+        }
+    }
+
+     */
+
+
+    @Inject(method = "getDisplayName", at = @At("HEAD"), cancellable = true)
+    public void getDisplayNameHook(CallbackInfoReturnable<Text> cir) {
+        if(Thunderhack.moduleManager.get(Media.class).isEnabled() && Thunderhack.moduleManager.get(Media.class).nickProtect.getValue()){
+            cir.setReturnValue(Text.of("Protected"));
         }
     }
 

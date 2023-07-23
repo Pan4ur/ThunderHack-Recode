@@ -75,6 +75,63 @@ public class PlaceUtility {
             new Vec3d(0.95, 0.05, 0.95)
     };
 
+    public static final Vec3d[] halfMultiPoint = new Vec3d[]{
+            // z
+            new Vec3d(0.05, 0.05, 0),
+            new Vec3d(0.05, 0.45, 0),
+            new Vec3d(0.95, 0.05, 0),
+            new Vec3d(0.95, 0.45, 0),
+            new Vec3d(0.5, 0.24, 0),
+            new Vec3d(0.05, 0.05, 1),
+            new Vec3d(0.05, 0.45, 1),
+            new Vec3d(0.95, 0.05, 1),
+            new Vec3d(0.95, 0.45, 1),
+            new Vec3d(0.5, 0.24, 1),
+            // y
+            new Vec3d(0.05, 0, 0.05),
+            new Vec3d(0.05, 0, 0.95),
+            new Vec3d(0.95, 0, 0.05),
+            new Vec3d(0.95, 0, 0.95),
+            new Vec3d(0.5, 0, 0.5),
+            new Vec3d(0.05, 0.4, 0.05),
+            new Vec3d(0.05, 0.4, 0.95),
+            new Vec3d(0.95, 0.4, 0.05),
+            new Vec3d(0.95, 0.4, 0.95),
+            new Vec3d(0.5, 0.4, 0.5),
+            // x
+            new Vec3d(0, 0.05, 0.05),
+            new Vec3d(0, 0.45, 0.05),
+            new Vec3d(0, 0.05, 0.95),
+            new Vec3d(0, 0.45, 0.95),
+            new Vec3d(0, 0.24, 0.5),
+            new Vec3d(1, 0.05, 0.05),
+            new Vec3d(1, 0.45, 0.05),
+            new Vec3d(1, 0.05, 0.95),
+            new Vec3d(1, 0.45, 0.95),
+            new Vec3d(1, 0.24, 0.5)
+    };
+
+    public static float[] rotationToDirection(Direction facing) {
+        switch (facing) {
+            case DOWN -> {
+                return new float[]{mc.player.getYaw(), 90.0f};
+            }
+            case UP -> {
+                return new float[]{mc.player.getYaw(), -90.0f};
+            }
+            case NORTH -> {
+                return new float[]{180.0f, 0.0f};
+            }
+            case SOUTH -> {
+                return new float[]{0.0f, 0.0f};
+            }
+            case WEST -> {
+                return new float[]{90.0f, 0.0f};
+            }
+        }
+        return new float[]{270.0f, 0.0f};
+    }
+
     public static Placement place(Block block, BlockPos pos, boolean rotate, boolean strictDirection, boolean ignoreEntities) {
         Hand hand = null;
         int slot = -1;
@@ -166,7 +223,8 @@ public class PlaceUtility {
     }
 
     public static Placement forcePlace(BlockPos pos, boolean strictDirection, Hand hand, int slot,boolean ignoreEntities) {
-        if(!mc.world.isAir(pos)) return null;
+        if(!canPlaceBlock(pos,  strictDirection, ignoreEntities))return null;
+        if(!mc.world.getBlockState(pos).isReplaceable()) return null;
         Direction side = Direction.DOWN;
         if(strictDirection) {
              side = getPlaceDirection(pos, true);
@@ -181,7 +239,7 @@ public class PlaceUtility {
         float[] angle = calculateAngle(hitVec);
         Placement placement = new Placement(neighbour, opposite, angle[0], angle[1], hand, false, slot);
         placement.getAction().run();
-        return null;
+        return placement;
     }
 
 

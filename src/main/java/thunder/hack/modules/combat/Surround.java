@@ -70,7 +70,7 @@ public class Surround extends Module {
     private int offsetStep = 0;
     private int delayStep = 0;
 
-    private Timer inactivityTimer = new Timer();
+    public static Timer inactivityTimer = new Timer();
 
     private ConcurrentHashMap<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
 

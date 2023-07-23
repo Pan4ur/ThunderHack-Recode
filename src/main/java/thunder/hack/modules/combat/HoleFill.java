@@ -9,6 +9,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.PlaceUtility;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
@@ -34,7 +35,7 @@ public class HoleFill extends Module {
 
     private Setting<Boolean> rotate = new Setting<>("Rotate", true);
     private  Setting<Boolean> strictDirection = new Setting<>("StrictDirection", false);
-    private  Setting<Float> rangeXZ = new Setting<>("Range", 5f, 1f, 6f);
+    private  Setting<Float> placeRange = new Setting<>("Range", 5f, 1f, 6f);
     private  Setting<Integer> actionShift = new Setting<>("ActionShift", 1, 1, 3);
     private  Setting<Integer> actionInterval = new Setting<>("ActionInterval", 0, 0, 5);
     private  Setting<Boolean> jumpDisable = new Setting<>("JumpDisable", false);
@@ -42,6 +43,8 @@ public class HoleFill extends Module {
     private  Setting<Mode> mode = new Setting<>("Mode", Mode.Always);
     private  Setting<Float> rangeToTarget = new Setting<>("RangeToTarget", 2f, 1f, 5f,v-> mode.getValue() == Mode.Target);
     private  Setting<Boolean> autoDisable = new Setting<>("AutoDisable", false);
+
+    public static Timer inactivityTimer = new Timer();
 
     private enum Mode {
         Always, Target
@@ -72,7 +75,7 @@ public class HoleFill extends Module {
 
         List<BlockPos> holes = findHoles();
 
-        PlayerEntity target = getNearestTarget();
+        PlayerEntity target = Thunderhack.combatManager.getTargets(placeRange.getValue()).stream().min(Comparator.comparing(e -> mc.player.squaredDistanceTo(e))).orElse(null);;
 
         if (mode.getValue() == Mode.Target && target == null) return;
 
@@ -83,7 +86,7 @@ public class HoleFill extends Module {
             if(mode.getValue() == Mode.Target){
                 pos = StreamSupport.stream(holes.spliterator(), false)
                         .filter(this::isHole)
-                        .filter(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5)) <= rangeXZ.getValue())
+                        .filter(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5)) <= placeRange.getValue())
                         .filter(p -> PlaceUtility.canPlaceBlock(p, strictDirection.getValue()))
                         .filter(p -> target.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5)) <= rangeToTarget.getValue())
                         .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5))))
@@ -91,7 +94,7 @@ public class HoleFill extends Module {
             } else {
                 pos = StreamSupport.stream(holes.spliterator(), false)
                         .filter(this::isHole)
-                        .filter(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5)) <= rangeXZ.getValue())
+                        .filter(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5)) <= placeRange.getValue())
                         .filter(p -> PlaceUtility.canPlaceBlock(p, strictDirection.getValue()))
                         .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5))))
                         .orElse(null);
@@ -104,6 +107,7 @@ public class HoleFill extends Module {
                     PlaceUtility.ghostBlocks.put(pos, System.currentTimeMillis());
                     tickCounter = 0;
                     if (!mc.player.isOnGround()) return;
+                    inactivityTimer.reset();
                 } else {
                     break;
                 }
@@ -119,8 +123,8 @@ public class HoleFill extends Module {
     private List<BlockPos> findHoles() {
         List<BlockPos> positions = new ArrayList<>();
         BlockPos centerPos = mc.player.getBlockPos();
-        int r = (int) Math.ceil(rangeXZ.getValue()) + 1;
-        int h = rangeXZ.getValue().intValue();
+        int r = (int) Math.ceil(placeRange.getValue()) + 1;
+        int h = placeRange.getValue().intValue();
         for (int i = centerPos.getX() - r; i < centerPos.getX() + r; i++) {
             for (int j = centerPos.getY() - h; j < centerPos.getY() + h; j++) {
                 for (int k = centerPos.getZ() - r; k < centerPos.getZ() + r; k++) {
@@ -158,15 +162,6 @@ public class HoleFill extends Module {
             return true;
         }
         return false;
-    }
-
-    private PlayerEntity getNearestTarget() {
-        return mc.world.getPlayers().stream()
-                .filter(e -> e != mc.player)
-                .filter(e -> !Thunderhack.friendManager.isFriend(e.getEntityName()))
-                .filter(e -> mc.player.squaredDistanceTo(e) < 6)
-                .min(Comparator.comparing(e -> mc.player.squaredDistanceTo(e)))
-                .orElse(null);
     }
 
     public boolean validObi(BlockPos pos) {

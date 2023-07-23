@@ -59,7 +59,7 @@ class RPC extends Module {
             DiscordEventHandlers handlers = new DiscordEventHandlers ( );
             rpc.Discord_Initialize("1093053626198523935", handlers, true, "");
             presence.startTimestamp = (System.currentTimeMillis() / 1000L);
-            presence.largeImageText = "v1.2 by Pan4ur#2144";
+            presence.largeImageText = "v" + Thunderhack.version + " by Pan4ur#2144";
             rpc.Discord_UpdatePresence(presence);
 
             thread = new Thread(() -> {
@@ -86,7 +86,7 @@ class RPC extends Module {
                     } else if(sMode.getValue() == smode.Stats) {
                         presence.state  = "Hacks: " + Thunderhack.moduleManager.getEnabledModules().size() + " / " + Thunderhack.moduleManager.modules.size();
                     } else {
-                        presence.state  = "v1.1 for mc 1.20.1";
+                        presence.state  = "v1.2 for mc 1.20.1";
                     }
 
 

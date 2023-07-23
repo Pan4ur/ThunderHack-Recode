@@ -1,6 +1,7 @@
 package thunder.hack.modules.render;
 
 import com.google.common.eventbus.Subscribe;
+import com.mojang.blaze3d.systems.RenderSystem;
 import thunder.hack.events.impl.EventHeldItemRenderer;
 import thunder.hack.injection.accesors.IHeldItemRenderer;
 import thunder.hack.modules.Module;

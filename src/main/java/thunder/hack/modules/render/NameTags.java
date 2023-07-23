@@ -13,6 +13,7 @@ import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.Box;
 import org.joml.Vector4d;
 import thunder.hack.Thunderhack;
@@ -20,8 +21,10 @@ import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.Render2DEvent;
 import thunder.hack.events.impl.RenderBlurEvent;
 import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.gui.hud.impl.Hotbar;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.client.Media;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
 import net.minecraft.client.network.PlayerListEntry;
@@ -39,7 +42,10 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 public class NameTags extends Module {
@@ -64,10 +70,16 @@ public class NameTags extends Module {
     public  Setting<Integer> bfactor = new Setting("Blur Factor", 5, 1, 20);
     private  Setting<ColorSetting> fillColorA = new Setting<>("Color", new ColorSetting(0x80000000));
 
+    public static final Setting<Font> font = new Setting<>("FontMode", Font.Fancy);
+    public enum Font {
+        Fancy, Fast
+    }
+
 
     @Subscribe
     public void onRender2D(Render2DEvent e){
         long time = System.currentTimeMillis();
+
         for(Entity ent : mc.world.getPlayers()){
             if (ent == mc.player && mc.options.getPerspective().isFirstPerson()) continue;
             double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
@@ -76,6 +88,7 @@ public class NameTags extends Module {
             Vec3d vector = new Vec3d(x, y + 2, z);
 
             Vector4d position = null;
+
 
             vector = Render3DEngine.worldSpaceToScreenSpace( new Vec3d(vector.x, vector.y, vector.z));
             if (vector != null && vector.z > 0 && vector.z < 1) {
@@ -97,7 +110,9 @@ public class NameTags extends Module {
             if (gamemode.getValue()) {
                 final_string += translateGamemode(getEntityGamemode(p)) + " ";
             }
+
             final_string += p.getDisplayName().getString() + " ";
+
             if (health.getValue()) {
                 final_string += getHealthColor(p) + round2(p.getAbsorptionAmount() + p.getHealth()) + " ";
             }
@@ -113,7 +128,14 @@ public class NameTags extends Module {
                 double endPosX = position.z;
 
                 float diff = (float) (endPosX - posX) / 2;
-                float textWidth = (FontRenderers.sf_bold.getStringWidth(final_string) * 1);
+
+                float textWidth;
+
+                if(font.getValue() == Font.Fancy) {
+                    textWidth = (FontRenderers.sf_bold.getStringWidth(final_string) * 1);
+                } else {
+                    textWidth = mc.textRenderer.getWidth(final_string);
+                }
                 float tagX = (float) ((posX + diff - textWidth / 2) * 1);
 
 
@@ -164,7 +186,12 @@ public class NameTags extends Module {
                                     if(id.equals("minecraft:power")){
                                         encName = "PO" + level;
                                     } else continue;
-                                    FontRenderers.sf_bold.drawString(e.getMatrixStack(),encName, posX - 50 + item_offset, (float) posY - 45 + enchantmentY, -1);
+
+                                    if(font.getValue() == Font.Fancy) {
+                                        FontRenderers.sf_bold.drawString(e.getMatrixStack(), encName, posX - 50 + item_offset, (float) posY - 45 + enchantmentY, -1);
+                                    } else {
+                                        e.getContext().drawText(mc.textRenderer, encName, (int) ((int)posX - 50 + item_offset), (int) ((int) posY - 45 + enchantmentY), -1,false);
+                                    }
                                     enchantmentY -= 8;
                                 }
                         }
@@ -178,9 +205,13 @@ public class NameTags extends Module {
                     Render2DEngine.drawRect(e.getMatrixStack(), tagX - 3, (float) (posY - 14f), 1, 11, HudEditor.getColor(180));
                     Render2DEngine.drawRect(e.getMatrixStack(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11, HudEditor.getColor(90));
                 }
-                FontRenderers.sf_bold.drawString(e.getMatrixStack(),final_string, tagX, (float) posY - 10, -1);
 
-                //  e.getContext().drawText(mc.textRenderer,final_string, (int) tagX, (int) ((float) posY - 10), -1,false);
+
+                if(font.getValue() == Font.Fancy){
+                    FontRenderers.sf_bold.drawString(e.getMatrixStack(),final_string, tagX, (float) posY - 10, -1);
+                } else {
+                    e.getContext().drawText(mc.textRenderer,final_string, (int) tagX, (int) ((float) posY - 11), -1,false);
+                }
                 if(box.getValue()) drawBox(p,e);
             }
         }

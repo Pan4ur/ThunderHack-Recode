@@ -1,8 +1,10 @@
 package thunder.hack.modules.render;
 
 import com.google.common.eventbus.Subscribe;
+import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.ParticleEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.notification.Notification;
@@ -47,10 +49,19 @@ public class NoRender extends Module {
     public Setting<Boolean> darkness = new Setting<>("Darkness", false);
     public Setting<Boolean> items = new Setting<>("Items", false);
     public Setting<Boolean> crystals = new Setting<>("Crystals", false);
+    public Setting<Boolean> fireEntity = new Setting<>("FireEntity", true);
+    public Setting<Boolean> antiTitle = new Setting<>("AntiTitle", false);
 
 
     int potionCouter, xpCounter, arrowCounter, itemsCounter;
 
+
+    @Subscribe
+    public void onPacketReceive(PacketEvent.Receive e){
+        if(e.getPacket() instanceof TitleS2CPacket && antiTitle.getValue()){
+            e.cancel();
+        }
+    }
 
     @Subscribe
     public void onSync(EventSync e){

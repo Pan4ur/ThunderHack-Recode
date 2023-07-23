@@ -3,6 +3,7 @@ package thunder.hack.modules.combat;
 import com.google.common.eventbus.Subscribe;
 import net.minecraft.item.BowItem;
 import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
@@ -26,6 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static java.lang.Math.abs;
 import static net.minecraft.util.hit.HitResult.Type.ENTITY;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
 import static thunder.hack.core.PlayerManager.calcAngleVec;
@@ -38,7 +40,7 @@ public class AimBot extends Module {
 
     private final Setting<Mode> mode = new Setting("Mode", Mode.BowAim);
     private final Setting<Rotation> rotation = new Setting("Rotation", Rotation.Silent,v-> mode.getValue() != Mode.AimAssist);
-    public final Setting<Float> aimRange = new Setting("Range", 20f, 1f, 30f,v-> mode.getValue() == Mode.CSAim);
+    public final Setting<Float> aimRange = new Setting("Range", 20f, 1f, 30f,v-> mode.getValue() != Mode.AimAssist);
     public final Setting<Integer> aimStrength = new Setting("AimStrength", 30, 1, 100,v-> mode.getValue() == Mode.AimAssist);
     public final Setting<Boolean> ignoreWalls = new Setting<>("Ignore Walls", true,v-> mode.getValue() == Mode.CSAim);
     public final Setting<Boolean> ignoreInvisible = new Setting<>("IgnoreInvis", false);
@@ -55,7 +57,7 @@ public class AimBot extends Module {
     private enum Mode {CSAim, AimAssist, BowAim}
 
     public static Entity target;
-    private float rotationYaw,rotationPitch;
+    private float rotationYaw,rotationPitch,prevRotationYaw;
     public static float ppx,ppy,ppz,pmx,pmy,pmz;
 
     private Box debug_box;
@@ -68,13 +70,7 @@ public class AimBot extends Module {
         if(mode.getValue() == Mode.BowAim){
             if (!(mc.player.getActiveItem().getItem() instanceof BowItem)) return;
 
-            PlayerEntity nearestTarget = mc.world.getPlayers()
-                    .stream()
-                    .filter(e -> e != mc.player)
-                    .filter(e -> !e.isDead())
-                    .filter(e -> !Thunderhack.friendManager.isFriend(e.getName().getString()))
-                    .filter(e -> e.getHealth() > 0)
-                    .min(Comparator.comparing(t -> mc.player.distanceTo(t))).orElse(null);
+            PlayerEntity nearestTarget = Thunderhack.combatManager.getNearestTarget(aimRange.getValue());
 
             if (nearestTarget == null) return;
 
@@ -108,18 +104,12 @@ public class AimBot extends Module {
                 return;
             }
             rotationYaw = Float.NaN;
-            mc.world.getPlayers()
-                    .stream()
-                    .filter(e -> e != mc.player)
-                    .filter(e -> !e.isDead())
-                    .filter(e -> !Thunderhack.friendManager.isFriend(e.getName().getString()))
-                    .filter(e -> e.getHealth() > 0)
-                    .filter(e -> !e.isInvisibleTo(mc.player) || ignoreInvisible.getValue())
-                    .filter(e -> e.distanceTo(mc.player) < 5)
-                    .min(Comparator.comparing(t -> mc.player.distanceTo(t))).ifPresent(nearestTarget -> {
-                        rotationYaw = calcAngleVec(Thunderhack.moduleManager.get(Aura.class).getLegitLook(nearestTarget)).x;
-                    });
-
+            PlayerEntity nearestTarget = Thunderhack.combatManager.getNearestTarget(5);
+            if(nearestTarget != null){
+                rotationYaw = calcAngleVec(Thunderhack.moduleManager.get(Aura.class).getLegitLook(nearestTarget)).x;
+                assistAcceleration = 0;
+                return;
+            }
             assistAcceleration += aimStrength.getValue() / 10000f;
         }
 
@@ -129,8 +119,10 @@ public class AimBot extends Module {
                 mc.player.setPitch(rotationPitch);
             }
         } else {
-            rotationYaw = mc.player.getYaw();
-            rotationPitch = mc.player.getPitch();
+            if(mode.getValue() == Mode.CSAim) {
+                rotationYaw = mc.player.getYaw();
+                rotationPitch = mc.player.getPitch();
+            }
         }
     }
 
@@ -141,6 +133,7 @@ public class AimBot extends Module {
         ppx = ppy = ppz = pmx = pmz = pmy = 0;
         rotationYaw = mc.player.getYaw();
         rotationPitch = mc.player.getPitch();
+        prevRotationYaw = mc.player.getYaw();
     }
 
     @Subscribe
@@ -150,20 +143,31 @@ public class AimBot extends Module {
         if(mode.getValue() == Mode.AimAssist){
             if (Float.isNaN(rotationYaw)) return;
             double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
-            rotationYaw = (float) (rotationYaw - (rotationYaw - mc.player.getYaw() % 360 ) % gcdFix);
-            if(mc.player.getYaw() % 360  - Math.abs(rotationYaw) >= fov.getValue()) return;
-            mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.getYaw() % 360 ,rotationYaw,assistAcceleration));
+            rotationYaw = (float) (rotationYaw - (rotationYaw - mc.player.getYaw() ) % gcdFix);
+
+            if(abs((mc.player.getYaw() - rotationYaw)) > 170){
+                mc.player.setYaw(rotationYaw);
+                assistAcceleration = 1;
+                return;
+            }
+            mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.getYaw(),rotationYaw,assistAcceleration));
             return;
         }
 
-        if (target != null && (mc.player.canSee(target) || ignoreWalls.getValue()) || (mode.getValue() == Mode.BowAim && mc.player.getActiveItem().getItem() instanceof BowItem)) {
+        if (target != null && (mc.player.canSee(target) || ignoreWalls.getValue())) {
             if(rotation.getValue() == Rotation.Client) {
                 mc.player.setYaw(rotationYaw);
                 mc.player.setPitch(rotationPitch);
             }
         } else {
-            rotationYaw = mc.player.getYaw();
-            rotationPitch = mc.player.getPitch();
+            if(mode.getValue() == Mode.CSAim) {
+                rotationYaw = mc.player.getYaw();
+                rotationPitch = mc.player.getPitch();
+            }
+        }
+        if(rotation.getValue() == Rotation.Client && mode.getValue() == Mode.BowAim && mc.player.getActiveItem().getItem() instanceof BowItem) {
+            mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.prevYaw,rotationYaw,mc.getTickDelta()));
+            mc.player.setPitch((float) Render2DEngine.interpolate(mc.player.prevPitch,rotationPitch,mc.getTickDelta()));
         }
     }
 

@@ -142,10 +142,9 @@ public class Core {
         if(showSkull && !skullTimer.passedMs(3000)){
             int xPos = (int) (Util.getScaledResolution().getScaledWidth() / 2f - 150);
             int yPos = (int) (Util.getScaledResolution().getScaledHeight() / 2f - 150);
-            int alpha = (int) (255 * (1 - (skullTimer.getPassedTimeMs() / 3000f)));
-
-         //   Render2DEngine.drawTexture(SKULL,xPos,yPos,300,300,e.getMatrixStack());
-            Render2DEngine.drawTexture(e.getContext(),SKULL, xPos, yPos, 300, 300,new Color(255,255,255,alpha));
+            float alpha = (1 - (skullTimer.getPassedTimeMs() / 3000f));
+            RenderSystem.setShaderColor(1f,1f,1f,alpha);
+            e.getContext().drawTexture(SKULL,xPos, yPos, 0, 0, 300, 300, 300, 300);
             RenderSystem.setShaderColor(1f,1f,1f,1f);
         } else {
             showSkull = false;
@@ -171,6 +170,7 @@ public class Core {
 
     public void drawLagNotify(Render2DEvent e){
         Render2DEngine.setupRender();
+        RenderSystem.defaultBlendFunc();
         if(!rubberbandTimer.passedMs(5000)){
             DecimalFormat decimalFormat = new DecimalFormat( "#.#" );
             if(MainSettings.language.getValue() == MainSettings.Language.RU) {
@@ -186,8 +186,9 @@ public class Core {
             } else {
                 FontRenderers.modules.drawCenteredString(e.getMatrixStack(), "The server stopped responding! " + decimalFormat.format((float) packetTimer.getTimeMs() / 1000f), (float) Util.getScaledResolution().getScaledWidth() / 2f, (float) Util.getScaledResolution().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
             }
-
-            Render2DEngine.drawTexture(e.getContext(),ICON, (int) ((float) Util.getScaledResolution().getScaledWidth() / 2f - 40), (int) ((float) Util.getScaledResolution().getScaledHeight() / 3f - 120), 80, 80,new Color(0xFFDF00));
+            RenderSystem.setShaderColor(1f, 0.87f, 0f,1f);
+            e.getContext().drawTexture(ICON,(int) ((float) Util.getScaledResolution().getScaledWidth() / 2f - 40), (int) ((float) Util.getScaledResolution().getScaledHeight() / 3f - 120), 0, 0, 80, 80, 80, 80);
+            RenderSystem.setShaderColor(1f,1f,1f,1f);
         }
         if(Thunderhack.serverManager.getTPS() < 10 && notifTimer.passedMs(60000)){
             if(MainSettings.language.getValue() == MainSettings.Language.RU) {

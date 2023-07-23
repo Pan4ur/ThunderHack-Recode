@@ -4,6 +4,8 @@ import com.google.common.eventbus.Subscribe;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.network.packet.s2c.play.*;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.PlaceManager;
@@ -140,14 +142,14 @@ public class AutoCrystal extends Module {
     @Subscribe
     public void onTick(EventTick event) {
         if (timingMode.getValue() == TimingMode.Vanilla && check()) {
-            if (!generateBreak()) generatePlace();
+            if (!generateBreak()) generatePlace(false);
         }
     }
 
     @Subscribe
     public void onPostTick(EventPostTick event) {
         if (timingMode.getValue() == TimingMode.Vanilla && check()) {
-            if (!generateBreak()) generatePlace();
+            if (!generateBreak()) generatePlace(false);
         }
     }
 
@@ -178,7 +180,7 @@ public class AutoCrystal extends Module {
 
             if (check()) {
                 if (!generateBreak()) {
-                    generatePlace();
+                    generatePlace(false);
                 }
             }
         }
@@ -189,7 +191,8 @@ public class AutoCrystal extends Module {
                 float yawDiff = MathHelper.wrapDegrees(yp[0] - ((IClientPlayerEntity) ((mc.player))).getLastYaw());
                 if (Math.abs(yawDiff) > yawAngle.getValue()) {
                     yp[0] = ((IClientPlayerEntity) ((mc.player))).getLastYaw() + (yawDiff * (yawAngle.getValue() / Math.abs(yawDiff)));
-                    PlaceManager.trailingBreakAction = null; PlaceManager.trailingPlaceAction = null;
+                    PlaceManager.trailingBreakAction = null;
+                    PlaceManager.trailingPlaceAction = null;
                 }
             }
 
@@ -208,7 +211,17 @@ public class AutoCrystal extends Module {
     }
 
     private boolean check() {
-        if ((pauseWhileMining.getValue() && mc.interactionManager.isBreakingBlock()) || (pauseWhileGapping.getValue() && mc.player.getActiveItem().getItem() instanceof EnchantedGoldenAppleItem) || (mc.player.getHealth() + mc.player.getAbsorptionAmount() < pauseHealth.getValue()) || (pauseWhenAura.getValue() && Thunderhack.moduleManager.get(Aura.class).isEnabled())) {
+        if ((pauseWhileMining.getValue() && mc.interactionManager.isBreakingBlock())
+                || (pauseWhileGapping.getValue() && mc.player.getActiveItem().getItem() instanceof EnchantedGoldenAppleItem)
+                || (mc.player.getHealth() + mc.player.getAbsorptionAmount() < pauseHealth.getValue())
+                || (pauseWhenAura.getValue() && Thunderhack.moduleManager.get(Aura.class).isEnabled())
+                || Thunderhack.moduleManager.get(Burrow.class).isEnabled()
+                || (Thunderhack.moduleManager.get(Surround.class).isEnabled() && !Surround.inactivityTimer.passedMs(500))
+                || (Thunderhack.moduleManager.get(AutoTrap.class).isEnabled() && !AutoTrap.inactivityTimer.passedMs(500))
+                || (Thunderhack.moduleManager.get(Blocker.class).isEnabled() && !Blocker.inactivityTimer.passedMs(500))
+                || (Thunderhack.moduleManager.get(HoleFill.class).isEnabled() && !HoleFill.inactivityTimer.passedMs(500))
+
+        ) {
             return false;
         }
         if (pauseWhileGapping.getValue() && rightClickGap.getValue() && mc.options.useKey.isPressed() && mc.player.getInventory().getMainHandStack().getItem() instanceof EndCrystalItem) {
@@ -226,7 +239,7 @@ public class AutoCrystal extends Module {
         return true;
     }
 
-    private void generatePlace() {
+    private void generatePlace(boolean adaptive) {
         if (confirm.getValue() != ConfirmMode.FULL || inhibitEntity == null || inhibitEntity.age >= ticksExisted.getValue()) {
             lastBroken = false;
             if ((sync.getValue() != SyncMode.Strict || breakTimer.passedMs(breakDelay.getValue())) && placeTimer.passedMs(placeDelay.getValue())) {
@@ -235,9 +248,7 @@ public class AutoCrystal extends Module {
                         BlockHitResult result = handlePlaceRotation(cachePos);
                         if(result == null) return;
                         PlaceManager.trailingPlaceAction = () -> {
-                            if (placeCrystal(result)) {
-                                placeTimer.reset();
-                            }
+                            if (placeCrystal(result)) placeTimer.reset();
                         };
                         if (timingMode.getValue() == TimingMode.Vanilla) {
                             PlaceManager.trailingPlaceAction.run();
@@ -344,9 +355,7 @@ public class AutoCrystal extends Module {
                 if (breakTimer.passedMs(breakDelay.getValue() + 20)) {
                     if (lastBroken) {
                         lastBroken = false;
-                        if (sync.getValue() == SyncMode.Strict) {
-                            return false;
-                        }
+                        if (sync.getValue() == SyncMode.Strict) return false;
                     }
                     PlaceManager.trailingBreakAction = () -> {
                         if (breakCrystal(crystal)) {
@@ -359,9 +368,7 @@ public class AutoCrystal extends Module {
                                 }
                             }
                         }
-                        if (sync.getValue() != SyncMode.Strict && check()) {
-                            generatePlace();
-                        }
+                        if (sync.getValue() != SyncMode.Strict && check()) generatePlace(false);
                     };
                     if (timingMode.getValue() == TimingMode.Vanilla) {
                         PlaceManager.trailingBreakAction.run();
@@ -395,7 +402,8 @@ public class AutoCrystal extends Module {
             if (autoSwap.getValue() != AutoSwapMode.Silent && (!isOffhand() && mc.player.getMainHandStack().getItem() != Items.END_CRYSTAL)) return false;
 
             mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(isOffhand() ? Hand.OFF_HAND : Hand.MAIN_HAND, result, Util.getWorldActionId(mc.world)));
-            mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(isOffhand() ? Hand.OFF_HAND : Hand.MAIN_HAND));
+          //  mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(isOffhand() ? Hand.OFF_HAND : Hand.MAIN_HAND));
+            mc.player.swingHand(isOffhand() ? Hand.OFF_HAND : Hand.MAIN_HAND);
             placeLocations.put(result.getBlockPos(), System.currentTimeMillis());
             if(autoSwap.getValue() == AutoSwapMode.Silent){
                 mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
@@ -522,15 +530,9 @@ public class AutoCrystal extends Module {
         return bestPos;
     }
 
-    @Subscribe
-    public void onEntitySpawn(EventEntitySpawn e){
-        if (e.getEntity() instanceof EndCrystalEntity entity) {
-            onSpawnCrystal(entity.getX(),entity.getY(),entity.getZ(),entity.getId());
-        }
-    }
-
     public void onSpawnCrystal(double x,double y, double z, int id){
         placeLocations.forEach((pos, time) -> {
+
             if (MathUtil.getSqrDistance(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, x,  y - 1, z) < 1) {
                 placeLocations.remove(pos);
                 cachePos = null;
@@ -569,14 +571,20 @@ public class AutoCrystal extends Module {
                 mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                 Criticals.cancelCrit = false;
 
-
                 breakTimer.reset();
                 lastBroken = true;
                 if (sync.getValue() == SyncMode.Adaptive) {
-                    generatePlace();
+                    generatePlace(true);
                 }
             }
         });
+    }
+
+    @Subscribe
+    public void onEntitySpawn(EventEntitySpawn e){
+        if(e.getEntity() instanceof EndCrystalEntity){
+            onSpawnCrystal(e.getEntity().getX(), e.getEntity().getY(), e.getEntity().getZ(), e.getEntity().getId());
+        }
     }
 
     @Subscribe

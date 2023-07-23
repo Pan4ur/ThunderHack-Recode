@@ -25,11 +25,9 @@ public class Velocity extends Module {
     public Setting<Boolean> autoDisable = new Setting<>("DisableOnVerify", false);
     public Setting<Boolean> noPush = new Setting<>("NoPush", false);
     private final Setting<modeEn> mode = new Setting<>("Mode", modeEn.Matrix);
-    public Setting<Boolean> mairixC = new Setting<>("MatrixCancel", true,v-> mode.getValue() == modeEn.Cancel);
     public Setting<Float> horizontal = new Setting<>("Horizontal", 0.0f, 0.0f, 100.0f, v -> mode.getValue() == modeEn.Custom);
     public Setting<Float> vertical = new Setting<>("Vertical", 0.0f, 0.0f, 100.0f, v -> mode.getValue() == modeEn.Custom);
     private boolean flag;
-    public static int flags;
     private int grimTicks = 0;
 
 
@@ -39,27 +37,12 @@ public class Velocity extends Module {
 
 
     @Override
-    public void onUpdate() {
-        if (mairixC.getValue()) {
-            if(flags >= 90){
-                Thunderhack.notificationManager.publicity("Velocity","Выключен из-за большой вероятности кика!",3, Notification.Type.INFO);
-                disable();
-            }
-        }
-    }
-
-    @Override
     public void onDisable() {
-        flags = 0;
         // Blocks.ICE.slipperiness = 0.98f;
         // Blocks.PACKED_ICE.slipperiness = 0.98f;
          //Blocks.FROSTED_ICE.slipperiness = 0.98f;
     }
 
-    @Override
-    public String getDisplayInfo(){
-        return flags + "";
-    }
 
     @Subscribe
     public void onPacketReceived(PacketEvent.Receive event) {
@@ -89,7 +72,6 @@ public class Velocity extends Module {
                 ((IExplosionS2CPacket)velocity_).setMotionZ(((IExplosionS2CPacket)velocity_).getMotionZ() * this.horizontal.getValue() / 100f);
                 ((IExplosionS2CPacket)velocity_).setMotionY(((IExplosionS2CPacket)velocity_).getMotionY() * this.vertical.getValue() / 100f);
             } else if (mode.getValue() == modeEn.Cancel) {
-                flags += 10;
                 ((IExplosionS2CPacket)velocity_).setMotionX(0);
                 ((IExplosionS2CPacket)velocity_).setMotionY(0);
                 ((IExplosionS2CPacket)velocity_).setMotionZ(0);
@@ -104,11 +86,6 @@ public class Velocity extends Module {
         if (mode.getValue() == modeEn.Cancel && event.getPacket() instanceof EntityVelocityUpdateS2CPacket ) {
             EntityVelocityUpdateS2CPacket pac = event.getPacket();
             if (pac.getId() == mc.player.getId()) {
-                if(MovementUtil.isMoving()){
-                    flags += 3;
-                } else {
-                    flags += 6;
-                }
                 event.setCancelled(true);
                 return;
             }

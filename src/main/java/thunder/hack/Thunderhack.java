@@ -8,6 +8,8 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.utility.render.BlurProgram;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.RoundedGradientProgram;
+import thunder.hack.utility.render.RoundedProgram;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -18,7 +20,7 @@ import java.net.URL;
 public class Thunderhack implements ModInitializer {
 
     public static EventBus EVENT_BUS = new EventBus();
-    public static String version = "1.2b180723";
+    public static String version = "1.2b230723";
     public static boolean oldVersion = false;
     public static float TICK_TIMER = 1f;
     public static BlockPos gps_position;
@@ -52,6 +54,8 @@ public class Thunderhack implements ModInitializer {
             MacroManager.saveMacro();
         }));
         macroManager.onLoad();
+        Render2DEngine.ROUNDED_GRADIENT_PROGRAM = new RoundedGradientProgram();
+        Render2DEngine.ROUNDED_PROGRAM = new RoundedProgram();
         Render2DEngine.BLUR_PROGRAM = new BlurProgram();
         ThSoundPack.registerSounds();
         syncVersion();

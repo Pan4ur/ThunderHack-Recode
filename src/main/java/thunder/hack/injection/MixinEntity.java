@@ -1,5 +1,7 @@
 package thunder.hack.injection;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Shadow;
@@ -9,9 +11,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.PushEvent;
 import thunder.hack.modules.combat.HitBox;
 import thunder.hack.modules.player.NoPitchLimit;
+import thunder.hack.modules.render.NoRender;
+import thunder.hack.modules.render.Shaders;
 import thunder.hack.utility.interfaces.IEntity;
 import thunder.hack.modules.render.Trails;
 import net.minecraft.client.MinecraftClient;
@@ -29,6 +34,8 @@ import static thunder.hack.utility.Util.mc;
 public abstract class MixinEntity implements IEntity {
 
     @Shadow public abstract Box getBoundingBox();
+
+    @Shadow protected abstract void fall(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition);
 
     @Override
     public List<Trails.Trail> getTrails(){
@@ -84,6 +91,22 @@ public abstract class MixinEntity implements IEntity {
         ((Entity)(Object)this).prevYaw += g;
         if (((Entity)(Object)this).getVehicle() != null) {
             ((Entity)(Object)this).getVehicle().onPassengerLookAround(((Entity)(Object)this));
+        }
+    }
+
+    @Inject(method = "isGlowing", at = @At("HEAD"), cancellable = true)
+    void isGlowingHook(CallbackInfoReturnable<Boolean> cir) {
+        Shaders shaders = Thunderhack.moduleManager.get(Shaders.class);
+        if (shaders.isEnabled()) {
+            cir.setReturnValue(shaders.shouldRender((Entity) (Object) this));
+        }
+    }
+
+    @Inject(method = "isOnFire", at = @At("HEAD"), cancellable = true)
+    void isOnFireHook(CallbackInfoReturnable<Boolean> cir) {
+        NoRender nr = Thunderhack.moduleManager.get(NoRender.class);
+        if (nr.isEnabled() && nr.fireEntity.getValue()) {
+            cir.setReturnValue(false);
         }
     }
 }

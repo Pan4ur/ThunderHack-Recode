@@ -8,10 +8,12 @@ import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.Thunderhack;
+import thunder.hack.modules.client.Media;
 import thunder.hack.modules.client.OptifineCapes;
 import thunder.hack.utility.OFCapesUtil;
 
@@ -31,6 +33,9 @@ public class MixinPlayerListEntry {
     private Map<MinecraftProfileTexture.Type, Identifier> textures;
     private boolean loadedCapeTexture = false;
 
+
+    private Identifier sunSkin = new Identifier("textures/sunSkin.png");
+
     @Inject(method = "getCapeTexture", at = @At("HEAD"))
     private void getCapeTextureHook(CallbackInfoReturnable<Identifier> cir) {
         if(Thunderhack.moduleManager.get(OptifineCapes.class).isEnabled())
@@ -42,7 +47,14 @@ public class MixinPlayerListEntry {
         if(Thunderhack.moduleManager.get(OptifineCapes.class).isEnabled())
             getTexture();
     }
+    @Inject(method = "getSkinTexture", at = @At("HEAD"), cancellable = true)
+    public void getSkinTextureHook(CallbackInfoReturnable<Identifier> cir) {
+        if(Thunderhack.moduleManager.get(Media.class).isEnabled() && Thunderhack.moduleManager.get(Media.class).skinProtect.getValue()){
+            cir.setReturnValue(sunSkin);
+        }
+    }
 
+    @Unique
     private void getTexture() {
         if (loadedCapeTexture) return;
         loadedCapeTexture = true;

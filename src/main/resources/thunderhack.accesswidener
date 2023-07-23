@@ -25,3 +25,5 @@ accessible field net/minecraft/world/MobSpawnerLogic renderedEntity Lnet/minecra
 accessible field net/minecraft/client/network/ClientPlayerInteractionManager currentBreakingProgress F
 accessible field net/minecraft/client/Mouse cursorDeltaY D
 accessible field net/minecraft/client/Mouse cursorDeltaX D
+accessible field net/minecraft/entity/Entity hasVisualFire Z
+accessible field net/minecraft/network/packet/s2c/play/GameMessageS2CPacket content Lnet/minecraft/text/Text;

@@ -3,9 +3,13 @@ package thunder.hack.gui.hud.impl;
 import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.entity.MobEntityRenderer;
+import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
+import net.minecraft.item.SwordItem;
 import thunder.hack.events.impl.Render2DEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudEditorGui;
@@ -266,7 +270,7 @@ public class TargetHud extends HudElement {
                 //
 
                 //Имя
-                FontRenderers.modules.drawString(e.getMatrixStack(),target.getName().getString(), getPosX() + 55, getPosY() + 7, -1, false);
+                FontRenderers.modules.drawString(e.getMatrixStack(),target.getDisplayName().getString(), getPosX() + 55, getPosY() + 7, -1, false);
 
 
                 if(target instanceof PlayerEntity) {
@@ -309,6 +313,7 @@ public class TargetHud extends HudElement {
                 } else {
                     RenderSystem.setShaderTexture(0, mc.getEntityRenderDispatcher().getRenderer(target).getTexture(target));
                 }
+
                 RenderSystem.enableBlend();
                 RenderSystem.colorMask(false, false, false, true);
                 RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
@@ -338,7 +343,7 @@ public class TargetHud extends HudElement {
                 //
 
                 //Имя
-                FontRenderers.modules.drawString(e.getMatrixStack(),target.getName().getString(), getPosX() + 48, getPosY() + 7, -1, false);
+                FontRenderers.modules.drawString(e.getMatrixStack(),target.getDisplayName().getString(), getPosX() + 48, getPosY() + 7, -1, false);
 
                 if(target instanceof PlayerEntity) {
 
@@ -385,7 +390,7 @@ public class TargetHud extends HudElement {
                 Render2DEngine.renderTexture(e.getMatrixStack(), getPosX() + 3.5f + hurtPercent, getPosY() + 3.5f + hurtPercent, 40 - hurtPercent*2, 40 - hurtPercent*2, 8, 8, 8, 8, 64, 64);
                 Render2DEngine.renderTexture(e.getMatrixStack(), getPosX() + 3.5f + hurtPercent, getPosY() + 3.5f + hurtPercent, 40 - hurtPercent*2, 40 - hurtPercent*2, 40, 8, 8, 8, 64, 64);
 
-                FontRenderers.modules.drawString(e.getMatrixStack(),target.getName().getString(), getPosX() + 50, getPosY() + 7, -1, false);
+                FontRenderers.modules.drawString(e.getMatrixStack(),target.getDisplayName().getString(), getPosX() + 50, getPosY() + 7, -1, false);
                 FontRenderers.modules.drawString( e.getMatrixStack(),hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * target.getHealth()) / 10.0) : (((Math.round(10.0 * target.getHealth()) / 10.0) / 20f) * 100 + "%" ), getPosX() + 74f, getPosY() + 34f, -1);
 
 

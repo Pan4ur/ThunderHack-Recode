@@ -4,9 +4,11 @@ package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
 import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.injection.accesors.IPlayerPositionLookS2CPacket;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
@@ -30,50 +32,21 @@ public class PacketFly extends Module {
     public Setting<Boolean> limit = new Setting<>("Limit", true);
     public Setting<Boolean> antiKick = new Setting<>("AntiKick", true);
 
-    public Setting<Float> speed = new Setting("Speed", 1.0f, 0.0f, 3.0f);
-    public Setting<Float> timer = new Setting("Timer", 1f, 0.0f, 2f);
-    public Setting<Integer> increaseTicks = new Setting("IncreaseTicks", 20, 1, 20);
-    public Setting<Integer> factor = new Setting("Factor", 1, 1, 10);
-    private final Setting<Mode> mode = new Setting("Mode", Mode.Fast);
-    private final Setting<Phase> phase = new Setting("Phase", Phase.Full);
-    private final Setting<Type> type = new Setting("Type", Type.Preserve);
+    public Setting<Float> speed = new Setting<>("Speed", 1.0f, 0.0f, 3.0f);
+    public Setting<Float> timer = new Setting<>("Timer", 1f, 0.1f, 2f);
+    public Setting<Integer> increaseTicks = new Setting<>("IncreaseTicks", 1, 1, 20);
+    public Setting<Float> factor = new Setting<>("Factor", 1f, 1f, 10f);
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Fast);
+    private final Setting<Phase> phase = new Setting<>("Phase", Phase.Full);
+    private final Setting<Type> type = new Setting<>("Type", Type.Preserve);
     private int teleportId = -1;
     private final ArrayList<PlayerMoveC2SPacket> movePackets = new ArrayList<>();
     private final Random rnd = new Random();
-    private final ConcurrentHashMap teleports = new ConcurrentHashMap();
+    private final ConcurrentHashMap<Integer,Teleport> teleports = new ConcurrentHashMap<>();
     private int ticks = 0;
+    private int factorTicks = 0;
+
     private boolean flip = false;
-
-
-    public static double[] getSpeedDirection(double d) {
-        double d2 = mc.player.input.movementForward;
-        double d3 = mc.player.input.movementSideways;
-        float f = mc.player.getYaw();
-        double[] dArray = new double[2];
-        if (d2 == 0.0 && d3 == 0.0) {
-            dArray[0] = 0.0;
-            dArray[1] = 0.0;
-        } else {
-            if (d2 != 0.0) {
-                if (d3 > 0.0) {
-                    f += (float) (d2 > 0.0 ? -45 : 45);
-                } else if (d3 < 0.0) {
-                    f += (float) (d2 > 0.0 ? 45 : -45);
-                }
-                d3 = 0.0;
-                if (d2 > 0.0) {
-                    d2 = 1.0;
-                } else if (d2 < 0.0) {
-                    d2 = -1.0;
-                }
-            }
-            double cos = Math.cos(Math.toRadians(f + 90.0f));
-            double sin = Math.sin(Math.toRadians(f + 90.0f));
-            dArray[0] = d2 * d * cos + d3 * d * sin;
-            dArray[1] = d2 * d * sin - d3 * d * cos;
-        }
-        return dArray;
-    }
 
     @Override
     public void onEnable() {
@@ -84,16 +57,13 @@ public class PacketFly extends Module {
             movePackets.clear();
             teleports.clear();
         }
-
+        factorTicks = 0;
     }
 
     @Override
     public void onDisable() {
         Thunderhack.TICK_TIMER = (1.0f);
     }
-
-
-
 
     public boolean getTickCounter(int n) {
         ++ticks;
@@ -104,7 +74,7 @@ public class PacketFly extends Module {
         return false;
     }
 
-    private int Method4291() {
+    private int getWorldBorder() {
         if (mc.isInSingleplayer()) {
             return 1;
         }
@@ -117,9 +87,9 @@ public class PacketFly extends Module {
 
     public Vec3d getVectorByMode(Vec3d vec3d, Vec3d vec3d2) {
         Vec3d vec3d3 = vec3d.add(vec3d2);
-        switch ((this.type.getValue())) {
+        switch ((type.getValue())) {
             case Preserve -> {
-                vec3d3 = vec3d3.add(this.Method4291(), 0.0, this.Method4291());
+                vec3d3 = vec3d3.add(getWorldBorder(), 0.0, getWorldBorder());
             }
             case Up -> {
                 vec3d3 = vec3d3.add(0.0, 1337.0, 0.0);
@@ -134,10 +104,10 @@ public class PacketFly extends Module {
         return vec3d3;
     }
 
-    public void Method4293(double x, double y, double z, boolean confirm) {
+    public void sendPackets(double x, double y, double z, boolean confirm) {
         Vec3d vec3d = new Vec3d(x, y, z);
         Vec3d vec3d2 = mc.player.getPos().add(vec3d);
-        Vec3d vec3d3 = this.getVectorByMode(vec3d, vec3d2);
+        Vec3d vec3d3 = getVectorByMode(vec3d, vec3d2);
         PlayerMoveC2SPacket packet1 =  new PlayerMoveC2SPacket.PositionAndOnGround(vec3d2.x, vec3d2.y, vec3d2.z, mc.player.isOnGround());
         movePackets.add(packet1);
         mc.player.networkHandler.sendPacket(packet1);
@@ -152,28 +122,24 @@ public class PacketFly extends Module {
 
     @Subscribe
     public void onPacketReceive(PacketEvent.Receive event) {
-        if (fullNullCheck()) {
-            return;
-        }
-        if (mc.player != null && event.getPacket() instanceof PlayerPositionLookS2CPacket) {
-            PlayerPositionLookS2CPacket pac = event.getPacket();
+        if (fullNullCheck()) return;
+        if (mc.player != null && event.getPacket() instanceof PlayerPositionLookS2CPacket pac) {
             Teleport teleport = (Teleport) teleports.remove(pac.getTeleportId());
             if (
                     mc.player.isAlive()
                     && mc.world.isChunkLoaded((int) mc.player.getX(), (int) mc.player.getZ())
                     && !(mc.currentScreen instanceof DownloadingTerrainScreen)
-                    && this.mode.getValue() != Mode.Rubber
+                    && mode.getValue() != Mode.Rubber
                     && teleport != null
-                    && teleport.getPosX() == pac.getX()
-                    && teleport.getPosY() == pac.getY()
-                    && teleport.getPosZ() == pac.getZ()
+                    && teleport.x == pac.getX()
+                    && teleport.y == pac.getY()
+                    && teleport.z == pac.getZ()
             ) {
-
                 event.setCancelled(true);
                 return;
             }
-            //    yawBypass(sPacketPlayerPosLook,mc.player.getYaw());
-            //  pitchBypass(sPacketPlayerPosLook,mc.player.getPitch());
+            ((IPlayerPositionLookS2CPacket) pac).setYaw(mc.player.getYaw());
+            ((IPlayerPositionLookS2CPacket) pac).setPitch(mc.player.getPitch());
             teleportId = pac.getTeleportId();
         }
     }
@@ -192,24 +158,24 @@ public class PacketFly extends Module {
 
     @Override
     public void onUpdate() {
-        this.teleports.entrySet().removeIf(PacketFly::Method4295);
+        teleports.entrySet().removeIf(PacketFly::Method4295);
     }
 
     private static boolean Method4295(Object o) {
-        return System.currentTimeMillis() - ((Teleport) ((Map.Entry) o).getValue()).getTime() > TimeUnit.SECONDS.toMillis(30L);
+        return System.currentTimeMillis() - ((Teleport) ((Map.Entry) o).getValue()).time > TimeUnit.SECONDS.toMillis(30L);
     }
 
     @Subscribe
     public void onMove(EventMove event) {
         if (!event.isCancelled()) {
-            if (this.mode.getValue() != Mode.Rubber && teleportId == 0) {
+            if (mode.getValue() != Mode.Rubber && teleportId == 0) {
                 return;
             }
             event.setCancelled(true);
             event.set_x(mc.player.getVelocity().x);
             event.set_y(mc.player.getVelocity().y);
             event.set_z(mc.player.getVelocity().z);
-            if (this.phase.getValue() != Phase.Off && (phase.getValue() == Phase.Semi || mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.0625, -0.0625, -0.0625)).iterator().hasNext())) {
+            if (phase.getValue() != Phase.Off && (phase.getValue() == Phase.Semi || mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.0625, -0.0625, -0.0625)).iterator().hasNext())) {
                 mc.player.noClip = true;
             }
         }
@@ -221,32 +187,40 @@ public class PacketFly extends Module {
             Thunderhack.TICK_TIMER = timer.getValue();
         }
         mc.player.setVelocity(0.0, 0.0, 0.0);
-        if (this.mode.getValue() != Mode.Rubber && teleportId == 0) {
+        if (mode.getValue() != Mode.Rubber && teleportId == 0) {
             if (getTickCounter(4)) {
-                Method4293(0.0, 0.0, 0.0, false);
+                sendPackets(0.0, 0.0, 0.0, false);
             }
             return;
         }
         boolean bl = mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.0625, -0.0625, -0.0625)).iterator().hasNext();
         double d = 0.0;
-        d = mc.player.input.jumping && (bl || !MovementUtil.isMoving()) ? ((this.antiKick.getValue()) && !bl ? this.getTickCounter(this.mode.getValue() == Mode.Rubber ? 10 : 20) ? -0.032 : 0.062 : 0.062) : (mc.player.input.sneaking ? -0.062 : (!bl ? (getTickCounter(4) ? ((this.antiKick.getValue()) ? -0.04 : 0.0) : 0.0) : 0.0));
-        if (this.phase.getValue() == Phase.Full && bl && MovementUtil.isMoving() && d != 0.0) {
+        d = mc.player.input.jumping && (bl || !MovementUtil.isMoving()) ? ((antiKick.getValue()) && !bl ? getTickCounter(mode.getValue() == Mode.Rubber ? 10 : 20) ? -0.032 : 0.062 : 0.062) : (mc.player.input.sneaking ? -0.062 : (!bl ? (getTickCounter(4) ? ((antiKick.getValue()) ? -0.04 : 0.0) : 0.0) : 0.0));
+        if (phase.getValue() == Phase.Full && bl && MovementUtil.isMoving() && d != 0.0) {
             d = mc.player.input.jumping ? (d /= 2.5) : (d /= 1.5);
         }
-        double[] dArray = getSpeedDirection(this.phase.getValue() == Phase.Full && bl ? 0.034444444444444444 : (double) (this.speed.getValue()) * 0.26);
-        int n = 1;
-        if (this.mode.getValue() == Mode.Factor && mc.player.age % this.increaseTicks.getValue() == 0) {
-            n = this.factor.getValue();
+        double[] dArray = MovementUtil.forward(phase.getValue() == Phase.Full && bl ? 0.034444444444444444 : (double) (speed.getValue()) * 0.26);
+
+        int factorInt = 1;
+        if (mode.getValue() == Mode.Factor && mc.player.age % increaseTicks.getValue() == 0) {
+            factorInt = (int) Math.floor(factor.getValue());
+            factorTicks++;
+            if (factorTicks > (int) (20D / ((factor.getValue() - (double) factorInt) * 20D))) {
+                factorInt += 1;
+                factorTicks = 0;
+            }
         }
-        for (int i = 1; i <= n; ++i) {
-            if (this.mode.getValue() == Mode.Limit) {
+        Command.sendMessage(factorInt +"");
+
+        for (int i = 1; i <= factorInt; ++i) {
+            if (mode.getValue() == Mode.Limit) {
                 if (mc.player.age % 2 == 0) {
                     if (flip && d >= 0.0) {
                         flip = false;
                         d = -0.032;
                     }
                     mc.player.setVelocity(dArray[0] * (double) i,d * (double) i,dArray[1] * (double) i);
-                    this.Method4293(mc.player.getVelocity().x, mc.player.getVelocity().y, mc.player.getVelocity().z, !this.limit.getValue());
+                    sendPackets(mc.player.getVelocity().x, mc.player.getVelocity().y, mc.player.getVelocity().z, !limit.getValue());
                     continue;
                 }
                 if (!(d < 0.0)) continue;
@@ -254,14 +228,13 @@ public class PacketFly extends Module {
                 continue;
             }
             mc.player.setVelocity(dArray[0] * (double) i,d * (double) i,dArray[1] * (double) i);
-            this.Method4293(mc.player.getVelocity().x, mc.player.getVelocity().y, mc.player.getVelocity().z, this.mode.getValue() != Mode.Rubber);
+            sendPackets(mc.player.getVelocity().x, mc.player.getVelocity().y, mc.player.getVelocity().z, mode.getValue() != Mode.Rubber);
         }
     }
 
     public enum Mode {
         Fast, Factor, Rubber, Limit
     }
-
 
     public enum Phase {
         Full, Off, Semi
@@ -271,33 +244,5 @@ public class PacketFly extends Module {
         Preserve, Up, Down, Bounds
     }
 
-    public static class Teleport {
-        private final double posX;
-        private final double posY;
-        private final double posZ;
-        private final long time;
-
-        public Teleport(double x, double y, double z, long time) {
-            this.posX = x;
-            this.posY = y;
-            this.posZ = z;
-            this.time = time;
-        }
-
-        double getPosX() {
-            return this.posX;
-        }
-
-        double getPosY() {
-            return this.posY;
-        }
-
-        double getPosZ() {
-            return this.posZ;
-        }
-
-        long getTime() {
-            return this.time;
-        }
-    }
+    public record Teleport(double x, double y, double z, long time){}
 }

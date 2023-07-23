@@ -8,6 +8,7 @@ import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
@@ -34,6 +35,7 @@ public class AutoWeb extends Module {
     private  Setting<Boolean> head = new Setting<>("Head", true);
     private  Setting<Boolean> toggelable = new Setting<>("DisableWhenDone", false);
 
+    public static Timer inactivityTimer = new Timer();
 
     private int tickCounter = 0;
 
@@ -58,7 +60,11 @@ public class AutoWeb extends Module {
             tickCounter++;
         }
 
-        PlayerEntity nearestTarget = getNearestTarget();
+        PlayerEntity nearestTarget = Thunderhack.combatManager.getTargets(placeRange.getValue())
+                .stream()
+                .filter(this::isValidBase)
+                .min(Comparator.comparing(e -> mc.player.distanceTo(e)))
+                .orElse(null);;
 
         if (nearestTarget == null || tickCounter < actionInterval.getValue()) {
             return;
@@ -76,6 +82,7 @@ public class AutoWeb extends Module {
                     PlaceUtility.ghostBlocks.put(nextPos, System.currentTimeMillis());
                     renderPoses.put(nextPos, System.currentTimeMillis());
                     tickCounter = 0;
+                    inactivityTimer.reset();
                 } else {
                     break;
                 }
@@ -88,24 +95,8 @@ public class AutoWeb extends Module {
         }
     }
 
-    private PlayerEntity getNearestTarget() {
-        return mc.world.getPlayers()
-                .stream()
-                .filter(e -> e != mc.player)
-                .filter(e -> !e.isDead())
-                .filter(e -> !Thunderhack.friendManager.isFriend(e.getEntityName()))
-                .filter(e -> e.getHealth() > 0)
-                .filter(e -> mc.player.distanceTo(e) <= placeRange.getValue())
-                .filter(this::isValidBase)
-                .min(Comparator.comparing(e -> mc.player.distanceTo(e)))
-                .orElse(null);
-    }
-
     private boolean isValidBase(PlayerEntity player) {
-        BlockPos basePos = BlockPos.ofFloored(player.getPos()).down();
-
-        Block baseBlock = mc.world.getBlockState(basePos).getBlock();
-
+        Block baseBlock = mc.world.getBlockState(BlockPos.ofFloored(player.getPos()).down()).getBlock();
         return !(baseBlock instanceof AirBlock) && !(baseBlock instanceof FluidBlock);
     }
 }

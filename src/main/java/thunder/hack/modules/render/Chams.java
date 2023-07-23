@@ -1,6 +1,9 @@
 package thunder.hack.modules.render;
 
+import com.google.common.eventbus.Subscribe;
+import com.mojang.blaze3d.systems.RenderSystem;
 import thunder.hack.Thunderhack;
+import thunder.hack.events.impl.EventHeldItemRenderer;
 import thunder.hack.modules.Module;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
@@ -14,6 +17,8 @@ import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.PlaceUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
+import java.awt.*;
+
 public class Chams extends Module {
     public Chams() {
         super("Chams", Category.RENDER);
@@ -26,6 +31,7 @@ public class Chams extends Module {
     private final Setting<Boolean> creatures = new Setting<>("Creatures", false).withParent(selection);
     private final Setting<Boolean> monsters = new Setting<>("Monsters", false).withParent(selection);
     private final Setting<Boolean> ambients = new Setting<>("Ambients", false).withParent(selection);
+    private final Setting<Boolean> handItems = new Setting<>("HandItems", false).withParent(selection);
 
     private static final Setting<Parent> colors = new Setting<>("Colors", new Parent(false,0));
     private final Setting<ColorSetting> player = new Setting<>("Player", new ColorSetting(0xFFFFFFFF)).withParent(colors);
@@ -34,6 +40,7 @@ public class Chams extends Module {
     private final Setting<ColorSetting> creature = new Setting<>("Creature", new ColorSetting(0xFFFFFFFF)).withParent(colors);
     private final Setting<ColorSetting> monster = new Setting<>("Monster", new ColorSetting(0xFFFFFFFF)).withParent(colors);
     private final Setting<ColorSetting> ambient = new Setting<>("Ambient", new ColorSetting(0xFFFFFFFF)).withParent(colors);
+    private final Setting<ColorSetting> handItemsColor = new Setting<>("HandItemsColor", new ColorSetting(new Color(0x9317DE5D, true))).withParent(colors);
 
     private final Setting<Parent> scales = new Setting<>("Scales", new Parent(false,0));
     private final Setting<Float> playerScale = new Setting<>("PlayerScale", 1F, 0f, 5F).withParent(scales);
@@ -42,6 +49,14 @@ public class Chams extends Module {
     private final Setting<Float> creatureScale = new Setting<>("CreatureScale", 1F, 0f, 5F).withParent(scales);
     private final Setting<Float> monsterScale = new Setting<>("MonsterScale", 1F, 0f, 5F).withParent(scales);
     private final Setting<Float> ambientScale = new Setting<>("AmbientScale", 1F, 0f, 5F).withParent(scales);
+
+
+    @Subscribe
+    public void onRenderHands(EventHeldItemRenderer e){
+        if(handItems.getValue()){
+            RenderSystem.setShaderColor(handItemsColor.getValue().getRed() / 255f,handItemsColor.getValue().getGreen() / 255f,handItemsColor.getValue().getBlue() / 255f,handItemsColor.getValue().getAlpha() / 255f);
+        }
+    }
 
 
     public ColorSetting getEntityColor(Entity entity) {

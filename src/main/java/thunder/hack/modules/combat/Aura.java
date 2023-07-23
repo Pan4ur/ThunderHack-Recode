@@ -16,6 +16,7 @@ import thunder.hack.notification.NotificationManager;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.InventoryUtil;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.Util;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
 import thunder.hack.utility.math.MathUtil;
@@ -60,6 +61,9 @@ public class Aura extends Module {
     public final Setting<Boolean> ignoreWalls = new Setting<>("Ignore Walls", true);
     public final Setting<Boolean> wallsBypass = new Setting("WallsBypass", false, v-> ignoreWalls.getValue());
     public final Setting<Boolean> shieldBreaker = new Setting("Shield Breaker", false);
+    public static final Setting<Boolean> oldDelay = new Setting("OldDelay", false);
+    public static final Setting<Integer> minCPS = new Setting("MinCPS", 7, 1, 15, v-> oldDelay.getValue());
+    public static final Setting<Integer> maxCPS = new Setting("MaxCPS", 12, 1, 15, v-> oldDelay.getValue());
     public final Setting<Boolean> grimAC = new Setting("GrimAC", false);
     public final Setting<Boolean> esp = new Setting("ESP", true);
     public final Setting<Parent> targets = new Setting<>("Targets", new Parent(false,0));
@@ -82,7 +86,6 @@ public class Aura extends Module {
     public static float ppx,ppy,ppz,pmx,pmy,pmz;
     private int hitTicks;
     public static boolean lookingAtHitbox;
-
 
     @Subscribe
     public void modifyVelocity(EventPlayerTravel e){
@@ -155,7 +158,7 @@ public class Aura extends Module {
                 mc.interactionManager.attackEntity(mc.player, target);
                 Criticals.cancelCrit = false;
                 mc.player.swingHand(Hand.MAIN_HAND);
-                hitTicks = 11;
+                hitTicks = oldDelay.getValue() ? 1 + (int) (20f / MathUtil.random(minCPS.getValue(), maxCPS.getValue())) : 11;
             }
             if(sprint) mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
             if(blocking) mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, Util.getWorldActionId(Util.mc.world)));
@@ -171,15 +174,15 @@ public class Aura extends Module {
 
 
     private void rotate(){
-            if (target != null) {
-                if (mode.getValue() != Mode.None) {
-                    mc.player.setYaw(rotationYaw);
-                    mc.player.setPitch(rotationPitch);
-                }
-            } else {
-                rotationYaw = mc.player.getYaw();
-                rotationPitch = mc.player.getPitch();
+        if (target != null) {
+            if (mode.getValue() != Mode.None) {
+                mc.player.setYaw(rotationYaw);
+                mc.player.setPitch(rotationPitch);
             }
+        } else {
+            rotationYaw = mc.player.getYaw();
+            rotationPitch = mc.player.getPitch();
+        }
 
     }
 
@@ -199,7 +202,12 @@ public class Aura extends Module {
 
         if(mc.player.fallDistance > 1 && mc.player.fallDistance < 1.14) return false;
 
-        if (!(MathHelper.clamp(((float)((ILivingEntity)mc.player).getLastAttackedTicks() + 0.5f) / getAttackCooldownProgressPerTick(), 0.0F, 1.0F) >= (mc.options.jumpKey.isPressed() ? 0.93f : 0.93f))) return false;
+        if(!oldDelay.getValue()) {
+            if (!(MathHelper.clamp(((float) ((ILivingEntity) mc.player).getLastAttackedTicks() + 0.5f) / getAttackCooldownProgressPerTick(), 0.0F, 1.0F) >= (mc.options.jumpKey.isPressed() ? 0.93f : 0.93f)))
+                return false;
+        } else {
+            if(minCPS.getValue() > maxCPS.getValue()) minCPS.setValue(maxCPS.getValue());
+        }
 
         if (!mc.options.jumpKey.isPressed() && (!Thunderhack.moduleManager.get(TargetStrafe.class).isEnabled() && !Thunderhack.moduleManager.get(Speed.class).isEnabled())) return true;
 
@@ -299,9 +307,14 @@ public class Aura extends Module {
 
     public Vec3d getLegitLook(Entity target){
         if(pmx == 0f && pmy == 0f && pmz == 0f){
-            pmx = MathUtil.random(-0.05f,0.05f); pmy = MathUtil.random(-0.05f,0.05f); pmz = MathUtil.random(-0.05f,0.05f);
+            pmx = MathUtil.random(-0.05f,0.05f);
+            pmy = MathUtil.random(-0.05f,0.05f);
+            pmz = MathUtil.random(-0.05f,0.05f);
         }
-        ppx += pmx; ppz += pmz; ppy += pmy;
+
+        ppx += pmx;
+        ppz += pmz;
+        ppy += pmy;
 
         if(ppx >= (target.getBoundingBox().getXLength() - 0.05) / 2f) pmx = MathUtil.random(-0.003f,-0.03f);
         if(ppy >= target.getBoundingBox().getYLength()) pmy = MathUtil.random(-0.001f,-0.03f);
@@ -320,7 +333,9 @@ public class Aura extends Module {
         if(!lookingAtHitbox && target instanceof PlayerEntity){
             float[] rotation1 = Thunderhack.playerManager.calcAngle(target.getPos().add(0,target.getEyeHeight(target.getPose()) / 2f,0));
             if (distanceFromHead(target.getPos().add(0,target.getEyeHeight(target.getPose()) / 2f,0)) <= attackRange.getPow2Value() && Thunderhack.playerManager.checkRtx(rotation1[0], rotation1[1], attackRange.getValue(), false)) {
-                ppx =  0; ppy = target.getEyeHeight(target.getPose()) / 2f; ppz = 0;
+                ppx =  0;
+                ppy = target.getEyeHeight(target.getPose()) / 2f;
+                ppz = 0;
             } else {
                 for (float x1 = -0.25f; x1 < 0.25f; x1 += 0.05f) {
                     for (float z1 = -0.25f; z1 < 0.25f; z1 += 0.05f) {

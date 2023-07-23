@@ -53,6 +53,7 @@ public class Blocker extends Module {
     private int tickCounter = 0;
     private Timer notifTimer = new Timer();
 
+    public static Timer inactivityTimer = new Timer();
 
     @Subscribe
     public void onRender3D(Render3DEvent event) {
@@ -109,6 +110,7 @@ public class Blocker extends Module {
                     PlaceUtility.ghostBlocks.put(pos, System.currentTimeMillis());
                     tickCounter = 0;
                     placePositions.remove(pos);
+                    inactivityTimer.reset();
                     if (!mc.player.isOnGround()) return;
                 } else {
                     break;
@@ -131,6 +133,11 @@ public class Blocker extends Module {
             BlockPos playerPos =  BlockPos.ofFloored(mc.player.getPos());
 
             boolean notif = false;
+
+            if (pos.equals(playerPos.up().up())) {
+                placePositions.add(playerPos.up().up().up());
+                notif = true;
+            }
 
             if (pos.equals(playerPos.north())) {
                 placePositions.add(playerPos.north().add(0, 1, 0));

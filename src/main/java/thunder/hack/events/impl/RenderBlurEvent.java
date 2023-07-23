@@ -1,15 +1,16 @@
 package thunder.hack.events.impl;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.events.Event;
 
 public class RenderBlurEvent extends Event {
     private float partialTicks;
-    private MatrixStack matrixStack;
+    private DrawContext context;
 
-    public RenderBlurEvent(float partialTicks, MatrixStack matrixStack) {
+    public RenderBlurEvent(float partialTicks, DrawContext context) {
         this.partialTicks = partialTicks;
-        this.matrixStack = matrixStack;
+        this.context = context;
 
     }
 
@@ -17,7 +18,11 @@ public class RenderBlurEvent extends Event {
         return partialTicks;
     }
 
+    public DrawContext getDrawContext() {
+        return context;
+    }
+
     public MatrixStack getMatrixStack() {
-        return matrixStack;
+        return context.getMatrices();
     }
 }

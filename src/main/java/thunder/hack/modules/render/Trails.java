@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import org.lwjgl.opengl.GL11;
 import thunder.hack.events.impl.PreRender3DEvent;
 import thunder.hack.events.impl.Render3DEvent;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.interfaces.IEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.ColorSetting;
@@ -39,11 +40,23 @@ public class Trails extends Module {
     public final Setting<Boolean> players = new Setting("Players", false);
    // private final Setting<cMode> cmode = new Setting<>("ColorMode", cMode.Rainbow));
 
+
+
+
     Iterable<Entity> asyncEntities = new ArrayList<>();
 
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
     public Setting<Float> down = new Setting("Down", 0.5F, 0.0F, 2.0F);
     public Setting<Float> width = new Setting("Height", 1.3F, 0.1F, 2.0F);
+
+
+    private final Setting<Mode> lmode = new Setting<>("ColorMode", Mode.Sync);
+    public final Setting<ColorSetting> lcolor = new Setting<>("Color2", new ColorSetting(0x2250b4b4), v -> lmode.getValue() == Mode.Custom);
+
+    private enum Mode {
+        Custom,Sync
+    }
+
 
     @Subscribe
     public void onPreRender3D(PreRender3DEvent event) {
@@ -147,9 +160,6 @@ public class Trails extends Module {
         }
     }
 
-    public HashMap<Entity, Vec3d> lastPoss = new HashMap<>();
-    public HashMap<Entity, Integer> i1 = new HashMap<>();
-
     private void calcTrajectory(Entity e) {
         double motionX = e.getVelocity().x;
         double motionY = e.getVelocity().y;
@@ -190,10 +200,7 @@ public class Trails extends Module {
 
             if (y <= 0) break;
             if (e.getVelocity().x == 0 && e.getVelocity().y == 0 && e.getVelocity().z == 0) continue;
-            lastPoss.put(e, new Vec3d(lastPos.x, lastPos.y, lastPos.z));
-            Render3DEngine.drawLine((float) lastPos.x, (float) lastPos.y, (float) lastPos.z,(float) x, (float) y, (float) z,Render2DEngine.astolfo(i, 300, 0.5f, 10),2);
-            i1.put(e, i);
+            Render3DEngine.drawLine((float) lastPos.x, (float) lastPos.y, (float) lastPos.z,(float) x, (float) y, (float) z,lmode.getValue() == Mode.Sync ? HudEditor.getColor(i) : lcolor.getValue().getColorObject(),2);
         }
-
     }
 }

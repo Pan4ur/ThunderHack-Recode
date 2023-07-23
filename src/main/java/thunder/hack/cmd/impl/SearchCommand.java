@@ -63,15 +63,6 @@ public class SearchCommand  extends Command {
 
     public static Block getRegisteredBlock(String blockName) {
         for (Block block : Registries.BLOCK) {
-            /*
-            if (block.getName().getString().equalsIgnoreCase(blockName)) {
-                Command.sendMessage("Asdawd");
-                return block;
-            }
-            Command.sendMessage(block.getTranslationKey());
-
-             */
-
             if (block.getTranslationKey().replace("block.minecraft.","").equalsIgnoreCase(blockName)) {
                 Command.sendMessage("Asdawd1");
                 return block;

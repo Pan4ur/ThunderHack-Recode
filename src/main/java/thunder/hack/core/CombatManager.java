@@ -13,7 +13,10 @@ import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.AntiBot;
 
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static thunder.hack.utility.Util.mc;
 
@@ -63,5 +66,25 @@ public class CombatManager {
         return popList.get(entity.getName().getString());
     }
 
+    public List<PlayerEntity> getTargets(float range) {
+        return mc.world.getPlayers().stream()
+                .filter(e -> !e.isDead())
+                .filter(entityPlayer -> !Thunderhack.friendManager.isFriend(entityPlayer.getName().getString()))
+                .filter(entityPlayer -> entityPlayer != mc.player)
+                .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
+                .sorted(Comparator.comparing(e -> mc.player.distanceTo(e)))
+                .collect(Collectors.toList());
+    }
+
+    public PlayerEntity getNearestTarget(float range){
+        return mc.world.getPlayers()
+                .stream()
+                .filter(e -> e != mc.player)
+                .filter(e -> !e.isDead())
+                .filter(e -> !Thunderhack.friendManager.isFriend(e.getName().getString()))
+                .filter(e -> e.getHealth() > 0)
+                .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
+                .min(Comparator.comparing(t -> mc.player.distanceTo(t))).orElse(null);
+    }
 
 }
