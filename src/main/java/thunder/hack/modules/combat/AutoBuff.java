@@ -25,6 +25,8 @@ public class AutoBuff extends Module {
     public Setting<Boolean> fire = new Setting<>("FireRes", true);
     public Setting<Boolean> heal = new Setting<>("Heal", true);
 
+    public Setting<Boolean> regen = new Setting<>("Regeneration", true);
+
     public Setting<Integer> health = new Setting<>("Health", 8, 0, 20);
     public Timer timer = new Timer();
 
@@ -65,6 +67,9 @@ public class AutoBuff extends Module {
                 case HEAL -> {
                     id = StatusEffects.INSTANT_HEALTH;
                 }
+                case REGEN -> {
+                    id = StatusEffects.REGENERATION;
+                }
             }
 
             for (StatusEffectInstance effect : PotionUtil.getPotion(stack).getEffects()) {
@@ -83,6 +88,7 @@ public class AutoBuff extends Module {
         boolean shouldThrow = (!mc.player.hasStatusEffect(StatusEffects.SPEED) && isPotionOnHotBar(Potions.SPEED) && speed.getValue())
                 || (!mc.player.hasStatusEffect(StatusEffects.STRENGTH) && isPotionOnHotBar(Potions.STRENGTH) && strenght.getValue())
                 || (!mc.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE) && isPotionOnHotBar(Potions.FIRERES) && fire.getValue())
+                || (!mc.player.hasStatusEffect(StatusEffects.REGENERATION) && isPotionOnHotBar(Potions.REGEN) && regen.getValue())
                 || (mc.player.getHealth() + mc.player.getAbsorptionAmount() < health.getValue() && isPotionOnHotBar(Potions.HEAL) && heal.getValue());
         if (mc.player.age > 80 && shouldThrow) {
             mc.player.setPitch(90);
@@ -98,6 +104,7 @@ public class AutoBuff extends Module {
                     (!mc.player.hasStatusEffect(StatusEffects.SPEED) && isPotionOnHotBar(Potions.SPEED) && speed.getValue())
                             || (!mc.player.hasStatusEffect(StatusEffects.STRENGTH) && isPotionOnHotBar(Potions.STRENGTH) && strenght.getValue())
                             || (!mc.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE) && isPotionOnHotBar(Potions.FIRERES) && fire.getValue())
+                            || (!mc.player.hasStatusEffect(StatusEffects.REGENERATION) && isPotionOnHotBar(Potions.REGEN) && regen.getValue())
                             || (mc.player.getHealth() + mc.player.getAbsorptionAmount() < health.getValue() && isPotionOnHotBar(Potions.HEAL) && heal.getValue());
             if (mc.player.age > 80 && shouldThrow && timer.passedMs(1000)) {
                 if (!mc.player.hasStatusEffect(StatusEffects.SPEED) && isPotionOnHotBar(Potions.SPEED) && speed.getValue()) {
@@ -112,6 +119,9 @@ public class AutoBuff extends Module {
                 if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < health.getValue() && heal.getValue() && isPotionOnHotBar(Potions.HEAL)) {
                     throwPotion(Potions.HEAL);
                 }
+                if (!mc.player.hasStatusEffect(StatusEffects.REGENERATION) && isPotionOnHotBar(Potions.REGEN) && regen.getValue()) {
+                    throwPotion(Potions.REGEN);
+                }
                 mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
                 timer.reset();
             }
@@ -125,6 +135,6 @@ public class AutoBuff extends Module {
     }
 
     public enum Potions {
-        STRENGTH, SPEED, FIRERES, HEAL
+        STRENGTH, SPEED, FIRERES, HEAL, REGEN
     }
 }
