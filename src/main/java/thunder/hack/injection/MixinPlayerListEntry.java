@@ -34,7 +34,7 @@ public class MixinPlayerListEntry {
     private boolean loadedCapeTexture = false;
 
 
-    private Identifier sunSkin = new Identifier("textures/sunSkin.png");
+    private Identifier sunSkin = new Identifier("textures/sunskin.png");
 
     @Inject(method = "getCapeTexture", at = @At("HEAD"))
     private void getCapeTextureHook(CallbackInfoReturnable<Identifier> cir) {
