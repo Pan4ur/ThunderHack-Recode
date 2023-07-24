@@ -19,7 +19,7 @@ import java.net.URL;
 public class Thunderhack implements ModInitializer {
 
     public static EventBus EVENT_BUS = new EventBus();
-    public static String version = "1.2b230723";
+    public static String version = "1.2b240723";
     public static boolean oldVersion = false;
     public static float TICK_TIMER = 1f;
     public static BlockPos gps_position;
