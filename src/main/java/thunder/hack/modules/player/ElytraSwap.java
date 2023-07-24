@@ -5,7 +5,7 @@ import net.minecraft.item.Items;
 import net.minecraft.screen.slot.SlotActionType;
 import thunder.hack.cmd.Command;
 import thunder.hack.modules.Module;
-import thunder.hack.utility.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtil;
 
 public class ElytraSwap extends Module {
     public ElytraSwap() {

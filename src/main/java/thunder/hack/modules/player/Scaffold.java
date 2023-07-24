@@ -2,7 +2,6 @@ package thunder.hack.modules.player;
 
 import com.google.common.eventbus.Subscribe;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
@@ -11,8 +10,8 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.BlockPosWithFacing;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.Block;
@@ -46,34 +45,30 @@ public class Scaffold extends Module {
         super("Scaffold", "лучший скафф", Module.Category.PLAYER);
     }
 
-    private boolean isBlockValid(Block block) {
-        return block.getDefaultState().isSolid();
-    }
-
     private BlockPosWithFacing checkNearBlocks(BlockPos blockPos) {
-        if (isBlockValid(mc.world.getBlockState(blockPos.add(0, -1, 0)).getBlock()))
+        if (mc.world.getBlockState(blockPos.add(0, -1, 0)).isSolid())
             return new BlockPosWithFacing(blockPos.add(0, -1, 0), Direction.UP);
-        else if (isBlockValid(mc.world.getBlockState(blockPos.add(-1, 0, 0)).getBlock()))
+        else if (mc.world.getBlockState(blockPos.add(-1, 0, 0)).isSolid())
             return new BlockPosWithFacing(blockPos.add(-1, 0, 0), Direction.EAST);
-        else if (isBlockValid(mc.world.getBlockState(blockPos.add(1, 0, 0)).getBlock()))
+        else if (mc.world.getBlockState(blockPos.add(1, 0, 0)).isSolid())
             return new BlockPosWithFacing(blockPos.add(1, 0, 0), Direction.WEST);
-        else if (isBlockValid(mc.world.getBlockState(blockPos.add(0, 0, 1)).getBlock()))
+        else if (mc.world.getBlockState(blockPos.add(0, 0, 1)).isSolid())
             return new BlockPosWithFacing(blockPos.add(0, 0, 1), Direction.NORTH);
-        else if (isBlockValid(mc.world.getBlockState(blockPos.add(0, 0, -1)).getBlock()))
+        else if (mc.world.getBlockState(blockPos.add(0, 0, -1)).isSolid())
             return new BlockPosWithFacing(blockPos.add(0, 0, -1), Direction.SOUTH);
         return null;
     }
 
     private int findBlockToPlace() {
         if (mc.player.getMainHandStack().getItem() instanceof BlockItem) {
-            if (isBlockValid(((BlockItem) mc.player.getMainHandStack().getItem()).getBlock()))
+            if (((BlockItem) mc.player.getMainHandStack().getItem()).getBlock().getDefaultState().isSolid())
                 return mc.player.getInventory().selectedSlot;
         }
         for (int i = 0; i < 9; i++) {
             if (mc.player.getInventory().getStack(i).getCount() != 0) {
                 if (mc.player.getInventory().getStack(i).getItem() instanceof BlockItem) {
                     if (!echestholding.getValue() || (echestholding.getValue() && !mc.player.getInventory().getStack(i).getItem().equals(Item.fromBlock(Blocks.ENDER_CHEST)))) {
-                        if (isBlockValid(((BlockItem) mc.player.getInventory().getStack(i).getItem()).getBlock()))
+                        if (((BlockItem) mc.player.getInventory().getStack(i).getItem()).getBlock().getDefaultState().isSolid())
                             return i;
                     }
                 }
@@ -142,7 +137,7 @@ public class Scaffold extends Module {
             if (!mc.player.getInventory().getStack(n >= 36 ? n - 36 : n).isEmpty()) {
                 ItemStack itemStack = mc.player.getInventory().getStack(n >= 36 ? n - 36 : n);
                 if (itemStack.getItem() instanceof BlockItem) {
-                    if (isBlockValid(((BlockItem) itemStack.getItem()).getBlock()))
+                    if (((BlockItem) itemStack.getItem()).getBlock().getDefaultState().isSolid())
                         n2 += itemStack.getCount();
                 }
             }
@@ -152,15 +147,11 @@ public class Scaffold extends Module {
         return n2;
     }
 
-    private Vec3d getEyePosition() {
-        return new Vec3d(mc.player.getX(), mc.player.getY() + 1.8f, mc.player.getZ());
-    }
-
     private float[] getRotations(BlockPos blockPos, Direction enumFacing) {
         Vec3d vec3d = new Vec3d((double) blockPos.getX() + 0.5,  blockPos.getY() + 0.99 , (double) blockPos.getZ() + 0.5);
         vec3d = vec3d.add(new Vec3d(new Vector3f(enumFacing.getVector().getX(),enumFacing.getVector().getY(),enumFacing.getVector().getZ())).multiply(0.5));
 
-        Vec3d vec3d2 = getEyePosition();
+        Vec3d vec3d2 = PlaceUtility.getEyesPos(mc.player);
 
         double d = vec3d.x - vec3d2.x;
         double d2 = vec3d.y - vec3d2.y;
@@ -236,13 +227,10 @@ public class Scaffold extends Module {
     @Subscribe
     public void onRender3D(Render3DEvent event) {
         if (render.getValue() && currentblock != null) {
-            Render3DEngine.drawFilledBox(event.getMatrixStack(),new Box(currentblock.getPosition()), Render2DEngine.injectAlpha(HudEditor.getColor(0), 150));
-            Render3DEngine.drawBoxOutline(new Box(currentblock.getPosition()), Render2DEngine.injectAlpha(HudEditor.getColor(0), 230), 2);
+            Render3DEngine.drawFilledBox(event.getMatrixStack(),new Box(currentblock.position), Render2DEngine.injectAlpha(HudEditor.getColor(0), 150));
+            Render3DEngine.drawBoxOutline(new Box(currentblock.position), Render2DEngine.injectAlpha(HudEditor.getColor(0), 230), 2);
         }
     }
-
-
-
 
     private boolean isOffsetBBEmpty(double x, double z) {
         return !mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(x,  -2, z)).iterator().hasNext();
@@ -279,7 +267,7 @@ public class Scaffold extends Module {
         currentblock = checkNearBlocksExtended(blockPos2);
         if (currentblock != null) {
             if (rotate.getValue()) {
-                float[] rotations = getRotations(currentblock.getPosition(), currentblock.getFacing());
+                float[] rotations = getRotations(currentblock.position, currentblock.facing);
                 if(strictRotate.getValue()){
                     rotation = rotations;
                 } else {
@@ -303,7 +291,7 @@ public class Scaffold extends Module {
                 }
             }
         }
-        if ((mc.player.getMainHandStack().getItem() instanceof BlockItem) && isBlockValid(((BlockItem) mc.player.getMainHandStack().getItem()).getBlock())) {
+        if ((mc.player.getMainHandStack().getItem() instanceof BlockItem) && ((BlockItem) mc.player.getMainHandStack().getItem()).getBlock().getDefaultState().isSolid()) {
             if (!mc.player.input.jumping || mc.player.input.movementForward != 0.0f || mc.player.input.movementSideways != 0.0f || !tower.getValue()) {
                 timer.reset();
             } else {
@@ -321,12 +309,12 @@ public class Scaffold extends Module {
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND,
                     new BlockHitResult(
                             new Vec3d(
-                                    (double) currentblock.getPosition().getX() + Math.random(),
-                                    currentblock.getPosition().getY() + 0.99f,
-                                    (double) currentblock.getPosition().getZ() + Math.random()
+                                    (double) currentblock.position.getX() + Math.random(),
+                                    currentblock.position.getY() + 0.99f,
+                                    (double) currentblock.position.getZ() + Math.random()
                             ),
-                            currentblock.getFacing(),
-                            currentblock.getPosition(),
+                            currentblock.facing,
+                            currentblock.position,
                             false));
 
             mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -337,4 +325,7 @@ public class Scaffold extends Module {
         }
     }
 
+
+    public record BlockPosWithFacing(BlockPos position, Direction facing){
+    }
 }

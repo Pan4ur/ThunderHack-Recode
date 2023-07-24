@@ -1,4 +1,4 @@
-package thunder.hack.utility;
+package thunder.hack.utility.player;
 
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.MathHelper;

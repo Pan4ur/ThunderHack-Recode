@@ -1,9 +1,12 @@
 package thunder.hack.injection;
 
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventAttackBlock;
+import thunder.hack.events.impl.EventStopUsingItem;
 import thunder.hack.modules.player.NoInteract;
 import thunder.hack.modules.player.Reach;
 import thunder.hack.modules.player.SpeedMine;
@@ -53,6 +56,15 @@ public class MixinClientPlayerInteractionManager{
     @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
     private void attackBlockHook(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         Thunderhack.EVENT_BUS.post(new EventAttackBlock(pos,direction));
+    }
+
+    @Inject(method = "stopUsingItem", at = @At("HEAD"), cancellable = true)
+    private void stopUsingItemHook(PlayerEntity player, CallbackInfo ci) {
+        EventStopUsingItem event = new EventStopUsingItem();
+        Thunderhack.EVENT_BUS.post(event);
+        if(event.isCancelled()){
+            ci.cancel();
+        }
     }
 
     @Inject(method = "getReachDistance", at = @At("HEAD"), cancellable = true)

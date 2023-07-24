@@ -9,7 +9,7 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.MovementUtil;
+import thunder.hack.utility.player.MovementUtil;
 
 
 public class LongJump extends Module {

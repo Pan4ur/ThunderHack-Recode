@@ -6,10 +6,9 @@ import thunder.hack.notification.NotificationManager;
 import thunder.hack.utility.ThSoundPack;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.math.BlockPos;
-import thunder.hack.utility.render.BlurProgram;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.RoundedGradientProgram;
-import thunder.hack.utility.render.RoundedProgram;
+import thunder.hack.utility.render.shaders.RoundedGradientProgram;
+import thunder.hack.utility.render.shaders.RoundedProgram;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -56,7 +55,6 @@ public class Thunderhack implements ModInitializer {
         macroManager.onLoad();
         Render2DEngine.ROUNDED_GRADIENT_PROGRAM = new RoundedGradientProgram();
         Render2DEngine.ROUNDED_PROGRAM = new RoundedProgram();
-        Render2DEngine.BLUR_PROGRAM = new BlurProgram();
         ThSoundPack.registerSounds();
         syncVersion();
         initTime = System.currentTimeMillis();

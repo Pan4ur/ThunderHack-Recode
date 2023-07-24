@@ -16,7 +16,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.Vec3d;
-import thunder.hack.utility.MovementUtil;
+import thunder.hack.utility.player.MovementUtil;
 
 import java.util.ArrayList;
 import java.util.Map;

@@ -3,10 +3,7 @@ package thunder.hack.utility.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.gui.font.Texture;
-import thunder.hack.utility.interfaces.IShaderEffect;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.utility.Util;
-import thunder.hack.utility.render.gaussianblur.GaussianFilter;
 import thunder.hack.utility.math.MathUtil;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.NativeImage;
@@ -20,6 +17,8 @@ import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL40C;
+import thunder.hack.utility.render.shaders.RoundedGradientProgram;
+import thunder.hack.utility.render.shaders.RoundedProgram;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -32,7 +31,6 @@ import java.util.Stack;
 import static thunder.hack.utility.Util.mc;
 
 public class Render2DEngine {
-    public static BlurProgram BLUR_PROGRAM;
     public static RoundedGradientProgram ROUNDED_GRADIENT_PROGRAM;
     public static RoundedProgram ROUNDED_PROGRAM;
 
@@ -67,65 +65,6 @@ public class Render2DEngine {
     }
 
     final static Stack<Rectangle> clipStack = new Stack<>();
-
-    public static void initiateBlur(MatrixStack matrices,int strength ,int x, int y, int width, int height) {
-        int quality = 9;
-        Color actualColor = new Color(0x000FFB2, true);
-
-        drawRect(matrices,x,y, width, height, actualColor);
-
-        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        Matrix4f matrix = matrices.peek().getPositionMatrix();
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-        buffer.vertex(matrix, x, y, 0).next();
-        buffer.vertex(matrix, x, y + height, 0).next();
-        buffer.vertex(matrix, x + width, y + height, 0).next();
-        buffer.vertex(matrix, x + width, y, 0).next();
-
-        Render2DEngine.BLUR_PROGRAM.setParameters(16, quality, strength);
-        Render2DEngine.BLUR_PROGRAM.use();
-
-        Tessellator.getInstance().draw();
-    }
-
-
-
-    public static void initiateBlur(MatrixStack matrices,int strength) {
-
-        int quality = 9;
-        Color actualColor = new Color(0x000FFB2, true);
-
-        //  DrawableHelper.fill(matrices, x, y, width, height, actualColor.getRGB());
-
-        int width = Util.getScaledResolution().getScaledWidth();
-        int height = Util.getScaledResolution().getScaledHeight();
-
-        var buffer = Tessellator.getInstance().getBuffer();
-        var matrix = matrices.peek().getPositionMatrix();
-        //  RenderSystem.setShader(GameRenderer::getPositionProgram);
-
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-        buffer.vertex(matrix, 0, 0, 0).next();
-        buffer.vertex(matrix, 0, 0 + height, 0).next();
-        buffer.vertex(matrix, 0 + width, 0 + height, 0).next();
-        buffer.vertex(matrix, 0 + width, 0, 0).next();
-
-        Render2DEngine.BLUR_PROGRAM.setParameters(16, quality, strength);
-        Render2DEngine.BLUR_PROGRAM.use();
-
-        Tessellator.getInstance().draw();
-    }
-
-
-    public static void drawBlur(int radius,MatrixStack matrixStack, Runnable runnable) {
-        preStencil();
-        runnable.run();
-        postStencil();
-        initiateBlur(matrixStack, radius);
-        disableStencil();
-    }
-
-
 
     private static int stencilBit = 0xff;
 
@@ -952,7 +891,9 @@ public class Render2DEngine {
         buffer.vertex(matrix, x + width, y + height, 0).next();
         buffer.vertex(matrix, x + width, y, 0).next();
 
-        ROUNDED_GRADIENT_PROGRAM.setParameters(x, y, width, height, radius, color1, color2, color3, color4);
+      //  ROUNDED_GRADIENT_PROGRAM.setParameters(x, y, width, height, radius, color1, color2, color3, color4);
+        ROUNDED_GRADIENT_PROGRAM.setParameters(x, y, width, height, radius, color2, color1, color3, color4);
+
         ROUNDED_GRADIENT_PROGRAM.use();
         Tessellator.getInstance().draw();
         RenderSystem.disableBlend();

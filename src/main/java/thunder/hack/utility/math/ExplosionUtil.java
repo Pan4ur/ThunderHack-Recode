@@ -4,18 +4,13 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.block.AirBlock;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.DamageUtil;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.explosion.Explosion;
-import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.combat.AutoCrystal;
-import thunder.hack.utility.PlaceUtility;
 
 
 import java.util.Objects;

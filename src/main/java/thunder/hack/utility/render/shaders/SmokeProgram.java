@@ -1,11 +1,10 @@
-package thunder.hack.utility.render;
+package thunder.hack.utility.render.shaders;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.PostEffectPass;
 import net.minecraft.client.gl.PostEffectProcessor;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec2f;
 import org.lwjgl.opengl.GL11;
 import thunder.hack.utility.interfaces.IShaderEffect;
 

@@ -29,6 +29,7 @@ public class CommandManager {
         this.commands.add(new HclipCommand());
         this.commands.add(new VclipCommand());
         this.commands.add(new EclipCommand());
+        this.commands.add(new TrackerCommand());
 
     }
 

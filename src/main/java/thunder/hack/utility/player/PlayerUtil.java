@@ -1,4 +1,4 @@
-package thunder.hack.utility;
+package thunder.hack.utility.player;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.OtherClientPlayerEntity;

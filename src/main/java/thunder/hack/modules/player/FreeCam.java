@@ -13,7 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.Vec3d;
-import thunder.hack.utility.PlaceUtility;
+import thunder.hack.utility.player.PlaceUtility;
 
 import java.util.UUID;
 
@@ -25,7 +25,7 @@ public class FreeCam extends Module {
         super("Freecam", "Freecam", Category.PLAYER);
     }
 
-    private static PlayerCopyEntity dummy;
+    public static PlayerCopyEntity dummy;
     private Vec3d playerPos;
     private Vec2f playerRot;
     private Entity riding;

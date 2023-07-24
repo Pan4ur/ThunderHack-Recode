@@ -2,15 +2,10 @@ package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
 import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.MovementUtil;
+import thunder.hack.utility.player.MovementUtil;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.MathUtil;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.math.Vec3d;
 
 public class AutoFlyme extends Module {
     public final Setting<Boolean> instantSpeed = new Setting<>("InstantSpeed", true);

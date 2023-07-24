@@ -12,7 +12,7 @@ import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.*;
-import thunder.hack.utility.PlaceUtility;
+import thunder.hack.utility.player.PlaceUtility;
 
 import java.util.ArrayList;
 import java.util.Comparator;

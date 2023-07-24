@@ -4,10 +4,9 @@ import com.google.common.eventbus.Subscribe;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.MovementUtil;
+import thunder.hack.utility.player.MovementUtil;
 import net.minecraft.entity.effect.StatusEffects;
 
 public class Speed extends Module {

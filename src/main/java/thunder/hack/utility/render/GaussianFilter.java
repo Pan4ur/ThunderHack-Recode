@@ -1,11 +1,11 @@
-package thunder.hack.utility.render.gaussianblur;
+package thunder.hack.utility.render;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.Kernel;
 
 
-public class GaussianFilter
-        extends ConvolveFilter {
+public class GaussianFilter  {
     protected float radius;
     protected Kernel kernel;
 
@@ -28,18 +28,18 @@ public class GaussianFilter
                     if (f != 0.0F) {
                         int ix = x + col;
                         if (ix < 0) {
-                            if (edgeAction == CLAMP_EDGES) {
+                            if (edgeAction == 1) {
                                 ix = 0;
                             }
-                            else if (edgeAction == WRAP_EDGES) {
+                            else if (edgeAction == 2) {
                                 ix = (x + width) % width;
                             }
 
                         } else if (ix >= width) {
-                            if (edgeAction == CLAMP_EDGES) {
+                            if (edgeAction == 1) {
                                 ix = width - 1;
                             }
-                            else if (edgeAction == WRAP_EDGES) {
+                            else if (edgeAction == 2) {
                                 ix = (x + width) % width;
                             }
                         }
@@ -132,13 +132,20 @@ public class GaussianFilter
         int[] outPixels = new int[width * height];
         src.getRGB(0, 0, width, height, inPixels, 0, width);
         if (this.radius > 0.0F) {
-            convolveAndTranspose(this.kernel, inPixels, outPixels, width, height, this.alpha, (this.alpha && this.premultiplyAlpha), false, CLAMP_EDGES);
-            convolveAndTranspose(this.kernel, outPixels, inPixels, height, width, this.alpha, false, (this.alpha && this.premultiplyAlpha), CLAMP_EDGES);
+            convolveAndTranspose(this.kernel, inPixels, outPixels, width, height, true, true, false, 1);
+            convolveAndTranspose(this.kernel, outPixels, inPixels, height, width, true, false, true, 1);
         }
         dst.setRGB(0, 0, width, height, inPixels, 0, width);
         return dst;
     }
 
+    public BufferedImage createCompatibleDestImage(BufferedImage src, ColorModel dstCM) {
+        if (dstCM == null) {
+            dstCM = src.getColorModel();
+        }
+        return new BufferedImage(dstCM, dstCM.createCompatibleWritableRaster(src.getWidth(), src.getHeight()), dstCM.isAlphaPremultiplied(), null);
+    }
+    
     public String toString() {
         return "Blur/Gaussian Blur...";
     }

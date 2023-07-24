@@ -166,7 +166,8 @@ public class ModuleManager {
         modules.add(new Shaders());
         modules.add(new Trajectories());
         modules.add(new Media());
-
+        modules.add(new Tracker());
+        modules.add(new BreadCrumbs());
     }
 
     public Module get(String name) {

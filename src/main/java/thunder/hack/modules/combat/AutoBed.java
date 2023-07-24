@@ -27,7 +27,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.render.StorageEsp;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.PlaceUtility;
+import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.ExplosionUtil;
 import thunder.hack.utility.render.Render2DEngine;

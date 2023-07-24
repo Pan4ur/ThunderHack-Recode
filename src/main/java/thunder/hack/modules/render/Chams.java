@@ -5,17 +5,13 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventHeldItemRenderer;
 import thunder.hack.modules.Module;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Identifier;
-import org.lwjgl.opengl.GL11;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.PlaceUtility;
-import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.player.PlaceUtility;
 
 import java.awt.*;
 

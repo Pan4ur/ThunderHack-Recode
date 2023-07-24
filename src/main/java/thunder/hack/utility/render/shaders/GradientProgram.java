@@ -1,4 +1,4 @@
-package thunder.hack.utility.render;
+package thunder.hack.utility.render.shaders;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
@@ -8,7 +8,6 @@ import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL11;
 import thunder.hack.utility.interfaces.IShaderEffect;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;

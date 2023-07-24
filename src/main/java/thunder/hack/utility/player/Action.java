@@ -1,4 +1,4 @@
-package thunder.hack.utility;
+package thunder.hack.utility.player;
 
 import thunder.hack.utility.math.Placement;
 

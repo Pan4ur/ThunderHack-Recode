@@ -10,7 +10,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.math.NumberUtils;
 import thunder.hack.cmd.Command;
-import thunder.hack.utility.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtil;
 
 public class EclipCommand extends Command {
     public EclipCommand() {

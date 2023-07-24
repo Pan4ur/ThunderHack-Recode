@@ -33,9 +33,10 @@ import static thunder.hack.utility.Util.mc;
 @Mixin(Entity.class)
 public abstract class MixinEntity implements IEntity {
 
-    @Shadow public abstract Box getBoundingBox();
 
     @Shadow protected abstract void fall(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition);
+
+    @Shadow private Box boundingBox;
 
     @Override
     public List<Trails.Trail> getTrails(){
@@ -77,7 +78,7 @@ public abstract class MixinEntity implements IEntity {
     @Inject(method = {"getBoundingBox"}, at = {@At("HEAD")}, cancellable = true)
     public final void getBoundingBox(CallbackInfoReturnable<Box> cir) {
        if(Thunderhack.moduleManager.get(HitBox.class).isEnabled() && ((Entity)(Object)this) != mc.player){
-           cir.setReturnValue(new Box(getBoundingBox().minX - HitBox.XZExpand.getValue() / 2f,getBoundingBox().minY - HitBox.YExpand.getValue() / 2f,getBoundingBox().minZ - HitBox.XZExpand.getValue() / 2f,getBoundingBox().maxX + HitBox.XZExpand.getValue() / 2f,getBoundingBox().maxY + HitBox.YExpand.getValue() / 2f,getBoundingBox().maxZ + HitBox.XZExpand.getValue() / 2f));
+           cir.setReturnValue(new Box(this.boundingBox.minX - HitBox.XZExpand.getValue() / 2f,this.boundingBox.minY - HitBox.YExpand.getValue() / 2f,this.boundingBox.minZ - HitBox.XZExpand.getValue() / 2f,this.boundingBox.maxX + HitBox.XZExpand.getValue() / 2f,this.boundingBox.maxY + HitBox.YExpand.getValue() / 2f,this.boundingBox.maxZ + HitBox.XZExpand.getValue() / 2f));
        }
     }
 

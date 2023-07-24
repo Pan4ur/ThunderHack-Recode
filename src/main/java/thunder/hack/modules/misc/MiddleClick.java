@@ -7,7 +7,7 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtil;
 import thunder.hack.utility.Timer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;

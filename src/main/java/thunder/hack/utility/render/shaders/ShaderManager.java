@@ -1,4 +1,4 @@
-package thunder.hack.utility.render;
+package thunder.hack.utility.render.shaders;
 
 import thunder.hack.utility.interfaces.IShaderEffect;
 

@@ -3,22 +3,14 @@ package thunder.hack.modules.combat;
 import com.google.common.eventbus.Subscribe;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlaySoundFromEntityS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import thunder.hack.cmd.Command;
-import thunder.hack.cmd.impl.BindCommand;
 import thunder.hack.events.impl.*;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.*;
 import thunder.hack.utility.Timer;
 import net.minecraft.block.*;
 import net.minecraft.item.BlockItem;
@@ -26,10 +18,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
+import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 

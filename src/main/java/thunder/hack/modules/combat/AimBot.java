@@ -57,7 +57,7 @@ public class AimBot extends Module {
     private enum Mode {CSAim, AimAssist, BowAim}
 
     public static Entity target;
-    private float rotationYaw,rotationPitch,prevRotationYaw;
+    private float rotationYaw,rotationPitch;
     public static float ppx,ppy,ppz,pmx,pmy,pmz;
 
     private Box debug_box;
@@ -133,7 +133,6 @@ public class AimBot extends Module {
         ppx = ppy = ppz = pmx = pmz = pmy = 0;
         rotationYaw = mc.player.getYaw();
         rotationPitch = mc.player.getPitch();
-        prevRotationYaw = mc.player.getYaw();
     }
 
     @Subscribe

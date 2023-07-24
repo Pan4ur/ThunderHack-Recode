@@ -1,6 +1,7 @@
 package thunder.hack.injection;
 
 
+import net.minecraft.client.MinecraftClient;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventHeldItemRenderer;
 import thunder.hack.modules.render.Animations;
@@ -24,8 +25,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.modules.render.Shaders;
-import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.ShaderManager;
+import thunder.hack.utility.render.shaders.ShaderManager;
 
 import static thunder.hack.modules.Module.mc;
 

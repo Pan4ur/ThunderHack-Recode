@@ -10,8 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import thunder.hack.modules.render.Shaders;
 import thunder.hack.utility.Util;
-import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.ShaderManager;
+import thunder.hack.utility.render.shaders.ShaderManager;
 
 import static thunder.hack.utility.Util.mc;
 

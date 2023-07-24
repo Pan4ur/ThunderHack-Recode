@@ -1,56 +1,16 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.EnchantedGoldenAppleItem;
-import net.minecraft.item.EndCrystalItem;
 import net.minecraft.item.Items;
-import net.minecraft.item.SwordItem;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.*;
-import net.minecraft.world.RaycastContext;
-import thunder.hack.Thunderhack;
-import thunder.hack.core.PlaceManager;
 import thunder.hack.events.impl.*;
-import thunder.hack.gui.hud.impl.PingHud;
-import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.InventoryUtil;
-import thunder.hack.utility.PlaceUtility;
-import thunder.hack.utility.Timer;
-import thunder.hack.utility.Util;
-import thunder.hack.utility.math.ExplosionUtil;
-import thunder.hack.utility.math.MathUtil;
-import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.player.InventoryUtil;
 
-import java.awt.*;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
-import static thunder.hack.utility.PlaceUtility.canSee;
+import static thunder.hack.utility.player.PlaceUtility.canSee;
 
 public class AutoAnchor extends Module {
     public AutoAnchor() {

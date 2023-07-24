@@ -1,26 +1,20 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.render.*;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.Core;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.movement.Speed;
 import thunder.hack.notification.Notification;
-import thunder.hack.notification.NotificationManager;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.InventoryUtil;
-import thunder.hack.utility.Timer;
+import thunder.hack.utility.player.InventoryUtil;
 import thunder.hack.utility.Util;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
 import thunder.hack.utility.math.MathUtil;
-import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.*;
 import net.minecraft.client.network.OtherClientPlayerEntity;
@@ -41,7 +35,6 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -81,7 +74,7 @@ public class Aura extends Module {
     }
 
     public static Entity target;
-    private float rotationYaw, rotationPitch, prevClientYaw, prevClientPitch;
+    private float rotationYaw, rotationPitch, prevClientYaw;
     private float pitchAcceleration = 1f;
     public static float ppx,ppy,ppz,pmx,pmy,pmz;
     private int hitTicks;
@@ -114,8 +107,6 @@ public class Aura extends Module {
 
     @Subscribe
     public void onAttack(PlayerUpdateEvent e){
-        prevClientPitch = mc.player.getPitch();
-        prevClientYaw = mc.player.getYaw();
         if(target != null && (((LivingEntity)target).getHealth() <= 0 || ((LivingEntity)target).isDead())){
             if(MainSettings.language.getValue() == MainSettings.Language.RU){
                 Thunderhack.notificationManager.publicity("Aura","Цель успешно нейтрализована!",3, Notification.Type.SUCCESS);

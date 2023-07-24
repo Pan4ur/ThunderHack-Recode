@@ -4,7 +4,7 @@ import thunder.hack.cmd.Command;
 import thunder.hack.core.AsyncManager;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtil;
 import thunder.hack.utility.Timer;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.FishingRodItem;

@@ -1,7 +1,6 @@
 package thunder.hack.modules.player;
 
 import com.google.common.eventbus.Subscribe;
-import net.minecraft.block.Blocks;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -10,13 +9,10 @@ import thunder.hack.injection.accesors.IExplosionS2CPacket;
 import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
-import thunder.hack.notification.Notification;
-import thunder.hack.notification.NotificationManager;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.MovementUtil;
+import thunder.hack.utility.player.MovementUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.FishingBobberEntity;
-import net.minecraft.network.packet.c2s.play.PlayPongC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
 

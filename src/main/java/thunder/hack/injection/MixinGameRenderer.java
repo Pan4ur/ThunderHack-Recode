@@ -14,7 +14,6 @@ import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.player.NoEntityTrace;
 import thunder.hack.modules.render.NoRender;
 import thunder.hack.utility.math.FrameRateCounter;
-import thunder.hack.utility.render.GlProgram;
 import thunder.hack.utility.render.MSAAFramebuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -30,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gl.ShaderStage;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.render.shaders.GlProgram;
 
 import java.util.List;
 import java.util.function.Consumer;

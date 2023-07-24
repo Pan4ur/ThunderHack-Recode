@@ -66,8 +66,6 @@ public class NameTags extends Module {
     private  Setting<Boolean> enchantss = new Setting<>("Enchants", true);
     private  Setting<Boolean> potions = new Setting<>("Potions", true);
     private  Setting<Boolean> box = new Setting<>("Box", true);
-    private  Setting<Boolean> blur_box = new Setting<>("BlurBox", false,v-> box.getValue());
-    public  Setting<Integer> bfactor = new Setting("Blur Factor", 5, 1, 20);
     private  Setting<ColorSetting> fillColorA = new Setting<>("Color", new ColorSetting(0x80000000));
 
     public static final Setting<Font> font = new Setting<>("FontMode", Font.Fancy);
@@ -305,48 +303,6 @@ public class NameTags extends Module {
             }
         }
     }
-
-    @Subscribe
-    public void onRenderBlur(RenderBlurEvent e) {
-
-        if(!blur_box.getValue()) return;
-        for(Entity ent : mc.world.getEntities()) {
-            if (!(ent instanceof PlayerEntity)) continue;
-            if (ent == mc.player && mc.options.getPerspective().isFirstPerson()) continue;
-            double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
-            double y = ent.prevY + (ent.getY() - ent.prevY) * mc.getTickDelta();
-            double z = ent.prevZ + (ent.getZ() - ent.prevZ) * mc.getTickDelta();
-            Box axisAlignedBB2 = ent.getBoundingBox();
-            Box axisAlignedBB = new Box(axisAlignedBB2.minX - ent.getX() + x - 0.05, axisAlignedBB2.minY - ent.getY() + y, axisAlignedBB2.minZ - ent.getZ() + z - 0.05, axisAlignedBB2.maxX - ent.getX() + x + 0.05, axisAlignedBB2.maxY - ent.getY() + y + 0.15, axisAlignedBB2.maxZ - ent.getZ() + z + 0.05);
-            Vec3d[] vectors = new Vec3d[]{new Vec3d(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.maxZ)};
-
-            Vector4d position = null;
-            for (Vec3d vector : vectors) {
-                vector = Render3DEngine.worldSpaceToScreenSpace(new Vec3d(vector.x, vector.y, vector.z));
-                if (vector != null && vector.z > 0 && vector.z < 1) {
-                    if (position == null)
-                        position = new Vector4d(vector.x, vector.y, vector.z, 0);
-                    position.x = Math.min(vector.x, position.x);
-                    position.y = Math.min(vector.y, position.y);
-                    position.z = Math.max(vector.x, position.z);
-                    position.w = Math.max(vector.y, position.w);
-                }
-            }
-
-            if (position != null) {
-                double posX = position.x;
-                double posY = position.y;
-                double endPosX = position.z;
-                double endPosY = position.w;
-
-
-                Render2DEngine.initiateBlur(e.getMatrixStack(),bfactor.getValue(), (int) posX, (int) posY, (int) (endPosX - posX), (int) (endPosY - posY));
-            }
-        }
-    }
-
-
-
 
     public void drawBox(PlayerEntity ent,Render2DEvent e){
         double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();

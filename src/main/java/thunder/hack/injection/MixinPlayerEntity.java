@@ -25,7 +25,7 @@ import static thunder.hack.utility.Util.mc;
 
 @Mixin(value = PlayerEntity.class, priority = 800)
 public class MixinPlayerEntity{
-    
+
     @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerEntity;noClip:Z", opcode = Opcodes.PUTFIELD))
     void noClipHook(PlayerEntity playerEntity, boolean value) {
         if(Thunderhack.moduleManager.get(FreeCam.class).isEnabled() && !mc.player.isOnGround()){

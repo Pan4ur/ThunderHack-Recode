@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 
 import thunder.hack.modules.movement.ElytraPlus;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.MovementUtil;
+import thunder.hack.utility.player.MovementUtil;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.ProtectionEnchantment;

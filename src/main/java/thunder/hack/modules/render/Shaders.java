@@ -1,21 +1,12 @@
 package thunder.hack.modules.render;
 
-import com.google.common.eventbus.Subscribe;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import thunder.hack.Thunderhack;
-import thunder.hack.events.impl.EventHeldItemRenderer;
-import thunder.hack.events.impl.Render2DEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.combat.AutoAnchor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.utility.PlaceUtility;
-import thunder.hack.utility.render.Render2DEngine;
-
-import java.awt.*;
 
 public class Shaders extends Module {
 

@@ -1,4 +1,4 @@
-package thunder.hack.utility;
+package thunder.hack.utility.player;
 
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.RaycastContext;
@@ -20,7 +20,6 @@ import net.minecraft.util.math.Vec3d;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.utility.Util.mc;

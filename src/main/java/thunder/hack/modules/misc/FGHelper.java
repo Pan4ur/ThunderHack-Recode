@@ -1,19 +1,15 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
-import net.minecraft.client.network.ClientLoginNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.realms.dto.PlayerInfo;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.network.packet.c2s.play.CommandExecutionC2SPacket;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.notification.Notification;
-import thunder.hack.notification.NotificationManager;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtil;
 import thunder.hack.utility.ThunderUtils;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.Util;

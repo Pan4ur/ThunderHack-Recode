@@ -2,7 +2,6 @@ package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
 import thunder.hack.Thunderhack;
-import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
@@ -17,7 +16,7 @@ import net.minecraft.block.FluidBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import thunder.hack.utility.PlaceUtility;
+import thunder.hack.utility.player.PlaceUtility;
 
 import java.util.Comparator;
 import java.util.concurrent.ConcurrentHashMap;

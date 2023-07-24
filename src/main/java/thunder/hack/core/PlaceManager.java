@@ -5,7 +5,7 @@ import net.minecraft.item.Items;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
-import thunder.hack.utility.Action;
+import thunder.hack.utility.player.Action;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 

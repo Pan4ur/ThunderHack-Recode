@@ -1,4 +1,4 @@
-package thunder.hack.utility.render;
+package thunder.hack.utility.render.shaders;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;

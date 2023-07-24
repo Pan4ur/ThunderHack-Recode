@@ -7,7 +7,7 @@ import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtil;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.ExplosionUtil;
 import net.minecraft.entity.Entity;

@@ -10,8 +10,8 @@ import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.player.Scaffold;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.InventoryUtil;
-import thunder.hack.utility.MovementUtil;
+import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.MovementUtil;
 import thunder.hack.utility.Timer;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -21,7 +21,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.utility.Util;
 
-import static thunder.hack.utility.MovementUtil.isMoving;
+import static thunder.hack.utility.player.MovementUtil.isMoving;
 
 public class Strafe extends Module {
     private final Setting<Boost> boost = new Setting<>("Boost", Boost.None);

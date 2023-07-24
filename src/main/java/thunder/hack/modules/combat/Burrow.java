@@ -23,8 +23,8 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.InventoryUtil;
-import thunder.hack.utility.PlaceUtility;
+import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtil;
 
@@ -61,7 +61,6 @@ public class Burrow extends Module {
     private volatile double last_x;
     private volatile double last_y;
     private volatile double last_z;
-    private int prevSlot;
     private final Timer scaleTimer = new Timer();
     private final Timer timer = new Timer();
 
@@ -166,7 +165,7 @@ public class Burrow extends Module {
         }
 
         int slot = (InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN) == -1 || mc.world.getBlockState(pos.down()).getBlock() == Blocks.ENDER_CHEST ? InventoryUtil.findHotbarBlock(Blocks.ENDER_CHEST) : InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN));
-        prevSlot = mc.player.getInventory().selectedSlot;
+        int prevSlot = mc.player.getInventory().selectedSlot;
         if (slot == -1) {
             Command.sendMessage("No Block found!");
             disable();

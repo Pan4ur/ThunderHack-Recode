@@ -1,4 +1,4 @@
-package thunder.hack.utility.render;
+package thunder.hack.utility.render.shaders;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
@@ -8,39 +8,41 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL30;
 import thunder.hack.utility.Util;
+import thunder.hack.utility.render.WindowResizeCallback;
 
 import java.awt.*;
 
-public class RoundedProgram extends GlProgram {
+public class RoundedGradientProgram extends GlProgram {
 
     private GlUniform uSize;
     private GlUniform uLocation;
     private GlUniform size;
-    private GlUniform color;
+    private GlUniform color1;
+    private GlUniform color2;
+    private GlUniform color3;
+    private GlUniform color4;
 
     private Framebuffer input;
 
-    public RoundedProgram() {
-        super(new Identifier("thunderhack", "round"), VertexFormats.POSITION);
+    public RoundedGradientProgram() {
+        super(new Identifier("thunderhack", "gradientround"), VertexFormats.POSITION);
         WindowResizeCallback.EVENT.register((client, window) -> {
             if (this.input == null) return;
             this.input.resize(window.getFramebufferWidth(), window.getFramebufferHeight(), MinecraftClient.IS_SYSTEM_MAC);
         });
     }
 
-    public void setParameters(float x, float y, float width, float height, float radius, Color color) {
+    public void setParameters(float x, float y, float width, float height, float radius, Color color1, Color color2, Color color3, Color color4) {
         this.size.set(radius * 2);
-        this.uSize.set(width * 2,height * 2);
-        this.uLocation.set(x * 2,-y * 2 + Util.getScaledResolution().getScaledHeight() * 2 - height * 2);
-        this.color.set(color.getRed() / 255f,color.getGreen() / 255f,color.getBlue() / 255f,color.getAlpha() / 255f);
+        this.uSize.set(width * 2, height * 2);
+        this.uLocation.set(x * 2, -y * 2 + Util.getScaledResolution().getScaledHeight() * 2 - height * 2);
+        this.color1.set(color1.getRed() / 255f, color1.getGreen() / 255f, color1.getBlue() / 255f, color1.getAlpha() / 255f);
+        this.color2.set(color2.getRed() / 255f, color2.getGreen() / 255f, color2.getBlue() / 255f, color2.getAlpha() / 255f);
+        this.color3.set(color3.getRed() / 255f, color3.getGreen() / 255f, color3.getBlue() / 255f, color3.getAlpha() / 255f);
+        this.color4.set(color4.getRed() / 255f, color4.getGreen() / 255f, color4.getBlue() / 255f, color4.getAlpha() / 255f);
+
     }
 
-    /*
-     public int normaliseY() {
-        ScaledResolution sr = new ScaledResolution(mc);
-        return (((-Mouse.getY() + sr.getScaledHeight()) + sr.getScaledHeight()) / 2);
-    }
-     */
     @Override
     public void use() {
         var buffer = MinecraftClient.getInstance().getFramebuffer();
@@ -56,7 +58,10 @@ public class RoundedProgram extends GlProgram {
         this.uSize = this.findUniform("uSize");
         this.uLocation = this.findUniform("uLocation");
         this.size = this.findUniform("Size");
-        this.color = this.findUniform("color");
+        this.color1 = this.findUniform("color1");
+        this.color2 = this.findUniform("color2");
+        this.color3 = this.findUniform("color3");
+        this.color4 = this.findUniform("color4");
         var window = MinecraftClient.getInstance().getWindow();
         this.input = new SimpleFramebuffer(window.getFramebufferWidth(), window.getFramebufferHeight(), false, MinecraftClient.IS_SYSTEM_MAC);
     }

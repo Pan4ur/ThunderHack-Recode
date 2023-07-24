@@ -16,8 +16,8 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.InventoryUtil;
-import thunder.hack.utility.PlaceUtility;
+import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.PlaceUtility;
 
 import java.util.ArrayList;
 import java.util.List;

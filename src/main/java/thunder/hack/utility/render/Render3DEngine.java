@@ -272,6 +272,29 @@ public class Render3DEngine {
         cleanup();
     }
 
+    public static void drawLine(Vec3d vec1, Vec3d vec2, Color color, float width) {
+        setup();
+
+        MatrixStack matrices = matrixFrom(vec1.getX(), vec1.getY(), vec1.getZ());
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+
+        // Line
+        RenderSystem.disableDepthTest();
+        RenderSystem.disableCull();
+        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
+        RenderSystem.lineWidth(width);
+
+        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+        vertexLine(matrices, buffer, 0f, 0f, 0f, (float) (vec2.getX() - vec1.getX()), (float) (vec2.getY() - vec1.getY()), (float) (vec2.getZ() - vec1.getZ()), color);
+        tessellator.draw();
+
+        RenderSystem.enableCull();
+        RenderSystem.enableDepthTest();
+        cleanup();
+    }
+
     public static void drawBoxOutline(Box box, Color color, float lineWidth) {
         setup();
         MatrixStack matrices = matrixFrom(box.minX, box.minY, box.minZ);
