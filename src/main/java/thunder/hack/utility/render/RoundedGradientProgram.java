@@ -24,7 +24,7 @@ public class RoundedGradientProgram extends GlProgram {
     private Framebuffer input;
 
     public RoundedGradientProgram() {
-        super(new Identifier("thunderhack", "gradientRound"), VertexFormats.POSITION);
+        super(new Identifier("thunderhack", "gradientround"), VertexFormats.POSITION);
         WindowResizeCallback.EVENT.register((client, window) -> {
             if (this.input == null) return;
             this.input.resize(window.getFramebufferWidth(), window.getFramebufferHeight(), MinecraftClient.IS_SYSTEM_MAC);
