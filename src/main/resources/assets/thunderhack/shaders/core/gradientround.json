@@ -5,7 +5,7 @@
     "dstrgb": "1-srcalpha"
   },
   "vertex": "position",
-  "fragment": "thunderhack:gradientRound",
+  "fragment": "thunderhack:gradientround",
   "attributes": [],
   "samplers": [
   ],
