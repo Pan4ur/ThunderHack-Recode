@@ -25,8 +25,6 @@
 - More modules (130 vs 220 in th+)
 - Freecam sync with ca and ka
 - more Grim bypasses
-- shaders
-- optimize hud
 - Pitfight 16 is coming up, it would be nice to add modules for 2b2t
 
 ## ScreenShots
