@@ -7,7 +7,6 @@ import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.gui.clickui.ClickUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.*;
-import thunder.hack.notification.NotificationManager;
 import thunder.hack.utility.Util;
 
 import thunder.hack.modules.Module;
@@ -168,6 +167,8 @@ public class ModuleManager {
         modules.add(new Media());
         modules.add(new Tracker());
         modules.add(new BreadCrumbs());
+        modules.add(new VisualRange());
+
     }
 
     public Module get(String name) {

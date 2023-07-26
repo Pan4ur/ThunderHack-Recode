@@ -49,6 +49,11 @@ public class RendererFontAdapter implements FontAdapter{
     }
 
     @Override
+    public void drawGradientString(MatrixStack matrices, String s, float x, float y, int offset)  {
+        fontRenderer.drawGradientString(matrices, s, x, y - 3, offset);
+    }
+
+    @Override
     public void drawCenteredString(MatrixStack matrices, String text, double x, double y, int color) {
         int color1 = color;
         if ((color1 & 0xfc000000) == 0) {

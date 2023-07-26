@@ -1,4 +1,4 @@
-package thunder.hack.modules.player;
+package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
 import thunder.hack.Thunderhack;
@@ -11,7 +11,6 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtil;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
@@ -24,7 +23,6 @@ public class Velocity extends Module {
     public Setting<Float> horizontal = new Setting<>("Horizontal", 0.0f, 0.0f, 100.0f, v -> mode.getValue() == modeEn.Custom);
     public Setting<Float> vertical = new Setting<>("Vertical", 0.0f, 0.0f, 100.0f, v -> mode.getValue() == modeEn.Custom);
     private boolean flag;
-    private int grimTicks = 0;
 
 
     public Velocity() {
@@ -36,7 +34,7 @@ public class Velocity extends Module {
     public void onDisable() {
         // Blocks.ICE.slipperiness = 0.98f;
         // Blocks.PACKED_ICE.slipperiness = 0.98f;
-         //Blocks.FROSTED_ICE.slipperiness = 0.98f;
+        //Blocks.FROSTED_ICE.slipperiness = 0.98f;
     }
 
 
@@ -44,8 +42,6 @@ public class Velocity extends Module {
     public void onPacketReceived(PacketEvent.Receive event) {
 
         if (fullNullCheck()) return;
-        Entity entity;
-        EntityStatusS2CPacket  packet;
 
         if (event.getPacket() instanceof GameMessageS2CPacket && autoDisable.getValue()) {
             String text = ((GameMessageS2CPacket) event.getPacket()).content().getString();
@@ -54,8 +50,8 @@ public class Velocity extends Module {
             }
         }
 
-        if (event.getPacket() instanceof EntityStatusS2CPacket  && (packet = event.getPacket()).getStatus() == 31 && (entity = packet.getEntity(Velocity.mc.world)) instanceof FishingBobberEntity) {
-            FishingBobberEntity fishHook = (FishingBobberEntity) entity;
+        if (event.getPacket() instanceof EntityStatusS2CPacket pac  && (pac = event.getPacket()).getStatus() == 31 && pac.getEntity(Velocity.mc.world) instanceof FishingBobberEntity) {
+            FishingBobberEntity fishHook = (FishingBobberEntity) pac.getEntity(Velocity.mc.world) ;
             if (fishHook.getHookedEntity() == Velocity.mc.player) {
                 event.setCancelled(true);
             }
@@ -74,86 +70,46 @@ public class Velocity extends Module {
             }
         }
 
+        if (onlyAura.getValue() && Thunderhack.moduleManager.get(Aura.class).isDisabled()) return;
 
-        if (onlyAura.getValue() && Thunderhack.moduleManager.get(Aura.class).isDisabled()) {
-            return;
-        }
-
-        if (mode.getValue() == modeEn.Cancel && event.getPacket() instanceof EntityVelocityUpdateS2CPacket ) {
-            EntityVelocityUpdateS2CPacket pac = event.getPacket();
+        if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket pac) {
             if (pac.getId() == mc.player.getId()) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (mode.getValue() == modeEn.Sunrise && event.getPacket() instanceof EntityVelocityUpdateS2CPacket ) {
-            EntityVelocityUpdateS2CPacket pac = event.getPacket();
-            if (pac.getId() == mc.player.getId()) {
-                event.setCancelled(true);
-                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), -999.0, mc.player.getZ(), true));
-                return;
-            }
-        }
-
-        if (mode.getValue() == modeEn.Custom) {
-            EntityVelocityUpdateS2CPacket  velocity;
-            if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket  && (velocity = event.getPacket()).getId() == mc.player.getId()) {
-                ((ISPacketEntityVelocity)velocity).setMotionX((int) ((float) velocity.getVelocityX() * this.horizontal.getValue() / 100f));
-                ((ISPacketEntityVelocity)velocity).setMotionY((int) ((float) velocity.getVelocityY() * this.vertical.getValue() / 100f));
-                ((ISPacketEntityVelocity)velocity).setMotionZ((int) ((float) velocity.getVelocityZ() * this.horizontal.getValue() / 100f));
-            }
-        }
-        if (mode.getValue() == modeEn.Matrix) {
-            if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket ) {
-                EntityVelocityUpdateS2CPacket  var4 = event.getPacket();
-                if (var4.getId() == mc.player.getId()) {
+                if(mode.getValue() == modeEn.Matrix) {
                     if (!flag) {
                         event.setCancelled(true);
                         flag = true;
                     } else {
                         flag = false;
-                        ((ISPacketEntityVelocity)var4).setMotionX(((int) ((double) var4.getVelocityX() * -0.1)));
-                        ((ISPacketEntityVelocity)var4).setMotionZ(((int) ((double) var4.getVelocityZ() * -0.1)));
+                        ((ISPacketEntityVelocity) pac).setMotionX(((int) ((double) pac.getVelocityX() * -0.1)));
+                        ((ISPacketEntityVelocity) pac).setMotionZ(((int) ((double) pac.getVelocityZ() * -0.1)));
                     }
+                } else if(mode.getValue() == modeEn.Redirect){
+                    int vX =  pac.getVelocityX();
+                    int vZ =  pac.getVelocityZ();
+                    if (vX < 0) vX *= -1;
+                    if (vZ < 0) vZ *= -1;
+
+                    double[] motion = MovementUtil.forward((vX + vZ));
+
+                    ((ISPacketEntityVelocity) pac).setMotionX((int) (motion[0]));
+                    ((ISPacketEntityVelocity) pac).setMotionY(0);
+                    ((ISPacketEntityVelocity) pac).setMotionZ((int) (motion[1]));
+                } else if (mode.getValue() == modeEn.Custom) {
+                    ((ISPacketEntityVelocity)pac).setMotionX((int) ((float) pac.getVelocityX() * this.horizontal.getValue() / 100f));
+                    ((ISPacketEntityVelocity)pac).setMotionY((int) ((float) pac.getVelocityY() * this.vertical.getValue() / 100f));
+                    ((ISPacketEntityVelocity)pac).setMotionZ((int) ((float) pac.getVelocityZ() * this.horizontal.getValue() / 100f));
+                } else if (mode.getValue() == modeEn.Sunrise) {
+                    event.setCancelled(true);
+                    mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), -999.0, mc.player.getZ(), true));
+                } else if (mode.getValue() == modeEn.Cancel) {
+                    event.setCancelled(true);
                 }
-            }
-        }
-        if(mode.getValue() == modeEn.GrimAC){
-            if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket ) {
-                EntityVelocityUpdateS2CPacket  var4 = event.getPacket();
-                if (var4.getId() == mc.player.getId()) {
-                    event.cancel();
-                    grimTicks = 6;
-                }
-            }
-            if (event.getPacket() instanceof PlayPingS2CPacket && grimTicks > 0) {
-                event.cancel();
-                grimTicks--;
-            }
-        }
-
-        if(mode.getValue() == modeEn.Redirect){
-            EntityVelocityUpdateS2CPacket  velocity;
-            if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket  && (velocity = event.getPacket()).getId() == mc.player.getId()) {
-
-                int vX =  velocity.getVelocityX();
-                int vZ =  velocity.getVelocityZ();
-                if (vX < 0) vX *= -1;
-                if (vZ < 0) vZ *= -1;
-
-                double[] motion = MovementUtil.forward((vX + vZ));
-
-
-                ((ISPacketEntityVelocity) velocity).setMotionX((int) ((float) motion[0]));
-                ((ISPacketEntityVelocity) velocity).setMotionY((int) (0));
-                ((ISPacketEntityVelocity) velocity).setMotionZ((int) ((float) motion[1]));
             }
         }
     }
 
     @Subscribe
-    public void onPreMotion(EventSync var1) {
+    public void onSync(EventSync e) {
         if (mode.getValue() == modeEn.Matrix) {
             if (mc.player.hurtTime > 0 && !mc.player.isOnGround()) {
                 double var3 = mc.player.getYaw() * 0.017453292F;
@@ -162,14 +118,6 @@ public class Velocity extends Module {
                 mc.player.setSprinting(mc.player.age % 2 != 0);
             }
         }
-        if (grimTicks > 0) {
-            grimTicks--;
-        }
-    }
-
-    @Override
-    public void onEnable() {
-        grimTicks = 0;
     }
 
     @Subscribe
@@ -181,8 +129,7 @@ public class Velocity extends Module {
         }
     }
 
-
     public enum modeEn {
-        Matrix, Cancel, Sunrise,Custom, Redirect,GrimAC
+        Matrix, Cancel, Sunrise, Custom, Redirect
     }
 }

@@ -5,7 +5,7 @@ import thunder.hack.Thunderhack;
 import thunder.hack.core.Core;
 import thunder.hack.core.PlaceManager;
 import thunder.hack.events.impl.*;
-import thunder.hack.modules.player.Velocity;
+import thunder.hack.modules.movement.Velocity;
 import thunder.hack.modules.movement.NoSlow;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;

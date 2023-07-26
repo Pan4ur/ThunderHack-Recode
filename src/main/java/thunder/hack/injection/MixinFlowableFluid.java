@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 
 import thunder.hack.Thunderhack;
-import thunder.hack.modules.player.Velocity;
+import thunder.hack.modules.movement.Velocity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;

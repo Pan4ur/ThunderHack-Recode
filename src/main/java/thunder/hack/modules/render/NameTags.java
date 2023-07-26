@@ -61,7 +61,6 @@ public class NameTags extends Module {
     private  Setting<Boolean> health = new Setting<>("Health", true);
     private  Setting<Boolean> distance = new Setting<>("Distance", true);
     private  Setting<Boolean> pops = new Setting<>("TotemPops", true);
-    private  Setting<Boolean> armor = new Setting<>("Armor", true);
     private  Setting<Boolean> outline = new Setting<>("Outline", true);
     private  Setting<Boolean> enchantss = new Setting<>("Enchants", true);
     private  Setting<Boolean> potions = new Setting<>("Potions", true);
@@ -73,6 +72,10 @@ public class NameTags extends Module {
         Fancy, Fast
     }
 
+    public static final Setting<Armor> armorMode = new Setting<>("ArmorMode", Armor.Full);
+    public enum Armor {
+        None, Full, Durability
+    }
 
     @Subscribe
     public void onRender2D(Render2DEvent e){
@@ -138,24 +141,49 @@ public class NameTags extends Module {
 
 
                 ArrayList<ItemStack> stacks = new ArrayList();
-                stacks.add(p.getOffHandStack());
+                if(armorMode.getValue() != Armor.Durability) {
+                    stacks.add(p.getOffHandStack());
+                }
                 stacks.add(p.getInventory().armor.get(0));
                 stacks.add(p.getInventory().armor.get(1));
                 stacks.add(p.getInventory().armor.get(2));
                 stacks.add(p.getInventory().armor.get(3));
-                stacks.add(p.getMainHandStack());
+                if(armorMode.getValue() != Armor.Durability) {
+                    stacks.add(p.getMainHandStack());
+                }
 
                 float item_offset = 0;
-                if(armor.getValue())
+                if(armorMode.getValue() != Armor.None)
                     for(ItemStack armorComponent : stacks) {
                         if (!armorComponent.isEmpty()) {
-                            e.getMatrixStack().push();
-                            e.getMatrixStack().translate(posX - 55 + item_offset, (float) (posY - 35f), 0);
-                            e.getMatrixStack().scale(1.1f, 1.1f, 1.1f);
-                            DiffuseLighting.disableGuiDepthLighting();
-                            e.getContext().drawItem(armorComponent, 0, 0);
-                            e.getContext().drawItemInSlot(mc.textRenderer,armorComponent, 0, 0);
-                            e.getMatrixStack().pop();
+                            if(armorMode.getValue() == Armor.Full) {
+                                e.getMatrixStack().push();
+                                e.getMatrixStack().translate(posX - 55 + item_offset, (float) (posY - 35f), 0);
+                                e.getMatrixStack().scale(1.1f, 1.1f, 1.1f);
+                                DiffuseLighting.disableGuiDepthLighting();
+                                e.getContext().drawItem(armorComponent, 0, 0);
+                                e.getContext().drawItemInSlot(mc.textRenderer, armorComponent, 0, 0);
+                                e.getMatrixStack().pop();
+                            } else {
+                                e.getMatrixStack().push();
+                                e.getMatrixStack().translate(posX - 35 + item_offset, (float) (posY - 20), 0);
+                                e.getMatrixStack().scale(0.7f, 0.7f, 0.7f);
+
+                                int percent = (int) ((Math.ceil((double) (armorComponent.getMaxDamage() - armorComponent.getDamage()) / armorComponent.getMaxDamage())) * 100f);
+                                Color color;
+                                if(percent < 33){
+                                    color = Color.RED;
+                                } else if(percent > 33 && percent < 66){
+                                    color = Color.YELLOW;
+                                } else {
+                                    color = Color.GREEN;
+                                }
+                                e.getContext().drawText(mc.textRenderer, percent + "%", 0, 0, color.getRGB(), false);
+                                e.getMatrixStack().pop();
+                            }
+
+
+
 
                             float enchantmentY = 0;
 
@@ -195,6 +223,9 @@ public class NameTags extends Module {
                         }
                         item_offset += 18f;
                     }
+
+
+
                 Render2DEngine.drawRect(e.getMatrixStack(),tagX -2 , (float) (posY - 13f), textWidth + 4, 11,fillColorA.getValue().getColorObject());
 
                 if(outline.getValue()) {

@@ -210,7 +210,6 @@ public class PacketFly extends Module {
                 factorTicks = 0;
             }
         }
-        Command.sendMessage(factorInt +"");
 
         for (int i = 1; i <= factorInt; ++i) {
             if (mode.getValue() == Mode.Limit) {

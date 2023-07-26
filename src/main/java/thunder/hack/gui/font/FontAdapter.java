@@ -9,6 +9,8 @@ public interface FontAdapter {
 
     void drawString(MatrixStack matrices, String text, float x, float y, float r, float g, float b, float a);
 
+    void drawGradientString(MatrixStack matrices, String s, float x, float y, int offset);
+
     void drawCenteredString(MatrixStack matrices, String text, double x, double y, int color);
 
     void drawCenteredString(MatrixStack matrices, String text, double x, double y, float r, float g, float b, float a);

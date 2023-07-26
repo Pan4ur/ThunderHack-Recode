@@ -2,6 +2,7 @@ package thunder.hack.gui.font;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.math.MathUtil;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
@@ -105,6 +106,40 @@ public class FontRenderer {
             Matrix4f matrix = matrices.peek().getPositionMatrix();
             double prevWidth = drawChar(bufferBuilder, matrix, c, r1, g1, b1, a);
             matrices.translate(prevWidth, 0, 0);
+        }
+
+        matrices.pop();
+    }
+
+    public void drawGradientString(MatrixStack matrices, String s, float x, float y, int offset) {
+        float roundedX = (float) MathUtil.roundToDecimal(x, 1);
+        float roundedY = (float) MathUtil.roundToDecimal(y, 1);
+        float r1 = 0;
+        float g1 = 0;
+        float b1 = 0;
+        matrices.push();
+        matrices.translate(roundedX, roundedY, 0);
+        matrices.scale(0.25F, 0.25F, 1f);
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        // RenderSystem.enableTexture();
+        RenderSystem.disableCull();
+        GlStateManager._texParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        int num = 0;
+        for (char c : s.toCharArray()) {
+            int color = HudEditor.getColor(num * offset).getRGB();
+            r1 = (float) (color >> 16 & 255) / 255.0F;
+            g1 = (float) (color >> 8 & 255) / 255.0F;
+            b1 = (float) (color & 255) / 255.0F;
+
+            Matrix4f matrix = matrices.peek().getPositionMatrix();
+            double prevWidth = drawChar(bufferBuilder, matrix, c, r1, g1, b1, 1f);
+            matrices.translate(prevWidth, 0, 0);
+            num++;
         }
 
         matrices.pop();
