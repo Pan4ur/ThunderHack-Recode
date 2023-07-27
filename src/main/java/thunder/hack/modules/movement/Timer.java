@@ -2,14 +2,17 @@ package thunder.hack.modules.movement;
 
 
 import com.google.common.eventbus.Subscribe;
+import net.minecraft.network.packet.s2c.play.PlayPingS2CPacket;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.PostPlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import net.minecraft.util.math.MathHelper;
 import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.player.MovementUtil;
 
 import java.awt.*;
 
@@ -72,6 +75,7 @@ public class Timer extends Module {
                 && yaw == mc.player.getYaw()
                 && pitch == mc.player.getPitch();
     }
+
 
     @Subscribe
     public void onPostPlayerUpdate(PostPlayerUpdateEvent event) {

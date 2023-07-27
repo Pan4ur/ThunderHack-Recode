@@ -67,14 +67,6 @@ public class ConfigManager  {
         loadSearch();
     }
 
-    public HashMap<Module,String> bind_list = new HashMap<>();
-
-    public void updateBindSet(){
-        bind_list.clear();
-        for(Module module : Thunderhack.moduleManager.modules){
-            bind_list.put(module,module.getBind().toString());
-        }
-    }
 
     public void loadSearch() {
         try {
@@ -279,12 +271,10 @@ public class ConfigManager  {
                             setting2.setValue(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().replace("_", " "));
                             continue;
                         case "Bind":
-                          //  JsonArray array4 = mobject.getAsJsonArray("Keybind");
-                           // setting2.setValue((new Bind.BindConverter()).doBackward(array4.get(0)));
-                           // ((Bind) setting2.getValue()).setHold(array4.get(1).getAsBoolean());
-                           // setting2.setValue( (new Bind.BindConverter()).doBackward(mobject.getAsJsonPrimitive(setting2.getName())));
-                            setting2.setValue( new Bind(mobject.getAsJsonPrimitive(setting2.getName()).getAsInt()));
-
+                            if(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().contains("M"))
+                                setting2.setValue( new Bind(Integer.parseInt(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().replace("M","")),true));
+                            else
+                                setting2.setValue( new Bind(mobject.getAsJsonPrimitive(setting2.getName()).getAsInt(),false));
                             continue;
                         case "ColorSetting":
                             JsonArray array = mobject.getAsJsonArray(setting2.getName());
@@ -351,17 +341,11 @@ public class ConfigManager  {
                 }
 
                 if(Objects.equals(setting.getName(), "Keybind")){
-                  //  JsonArray array = new JsonArray();
-                  //  String key = m.getBind().toString();
-                  //  boolean hold = false;
-                  //  array.add(new JsonPrimitive(key));
-                   // array.add(new JsonPrimitive(hold));
-                  //  attribs.add(setting.getName(), array);
-                  //  if(bind_list.get(m) == null) continue;
-                   // String ms = bind_list.get(m);
-                    Bind bnd = m.getBind();
-                    //System.out.println(ms);
-                    attribs.add("Keybind",new JsonPrimitive(bnd.getKey()));
+
+                    if(m.getBind().isMouse())
+                        attribs.add("Keybind", jp.parse(m.getBind().getBind()));
+                    else
+                        attribs.add("Keybind",new JsonPrimitive(m.getBind().getKey()));
 
                     continue;
                 }
@@ -430,7 +414,7 @@ public class ConfigManager  {
         }
     }
 
-    public File  getCurrentConfig() {
+    public File getCurrentConfig() {
         File file = new File("ThunderHackRecode/misc/currentcfg.txt");
         String name = "config";
         try {

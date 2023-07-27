@@ -96,7 +96,7 @@ public class ModuleCommand
         for(Setting setting2 : feature.getSettings()) {
             if(Objects.equals(setting.getName(), setting2.getName())) {
                 switch (setting2.getType()) {
-                    case "Parent":
+                    case "Parent", "Bind":
                         return;
                     case "Boolean":
                         setting2.setValue(Boolean.valueOf(element.getAsBoolean()));
@@ -113,11 +113,6 @@ public class ModuleCommand
                     case "String":
                         str = element.getAsString();
                         setting2.setValue(str.replace("_", " "));
-                        return;
-                    case "Bind":
-                        JsonArray array4 = element.getAsJsonArray();
-                        setting2.setValue((new Bind.BindConverter()).doBackward(array4.get(0)));
-                        ((Bind) setting2.getValue()).setHold(array4.get(1).getAsBoolean());
                         return;
                     case "ColorSetting":
                         JsonArray array = element.getAsJsonArray();

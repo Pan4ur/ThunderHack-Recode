@@ -278,7 +278,7 @@ public class AutoBed extends Module {
             if (result != null && result.getType() == HitResult.Type.BLOCK && result.getBlockPos().equals(bp)) {
                 break;
             }
-           // Command.sendMessage(point.toString());
+           // Command.sendMessage(point.getBind());
             return PlaceUtility.calculateAngle(p);
         }
         return null;

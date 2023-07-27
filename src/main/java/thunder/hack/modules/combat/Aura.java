@@ -127,7 +127,7 @@ public class Aura extends Module {
             boolean sprint = Core.serversprint;
             if(sprint) mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
 
-            if(shieldBreaker.getValue() && target instanceof PlayerEntity && (((PlayerEntity) target).isUsingItem() && ((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD && (axe_slot != -1 || hotbar_axe_slot != -1))) {
+            if(shieldBreaker.getValue() && target instanceof PlayerEntity && (((PlayerEntity) target).isUsingItem() && (((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD || ((PlayerEntity) target).getMainHandStack().getItem() == Items.SHIELD) && (axe_slot != -1 || hotbar_axe_slot != -1))) {
                 if (axe_slot != -1) {
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, axe_slot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
                     mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
@@ -135,13 +135,13 @@ public class Aura extends Module {
                     mc.player.swingHand(Hand.MAIN_HAND);
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, axe_slot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
                     mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                    Thunderhack.notificationManager.publicity("Aura","Ломаем щит игроку " + target.getName().getString(), 2, Notification.Type.SUCCESS);
+                    notifySBreaker();
                 } else if (hotbar_axe_slot != -1) {
                     mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(hotbar_axe_slot));
                     mc.interactionManager.attackEntity(mc.player, target);
                     mc.player.swingHand(Hand.MAIN_HAND);
                     mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
-                    Thunderhack.notificationManager.publicity("Aura","Ломаем щит игроку " + target.getName().getString(), 2, Notification.Type.SUCCESS);
+                    notifySBreaker();
                 }
             } else if (!(target instanceof PlayerEntity) || !(((PlayerEntity) target).isUsingItem() && ((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD) || ignoreShield.getValue()) {
                 Criticals.cancelCrit = true;
@@ -174,7 +174,14 @@ public class Aura extends Module {
             rotationYaw = mc.player.getYaw();
             rotationPitch = mc.player.getPitch();
         }
+    }
 
+    public void notifySBreaker(){
+        if(MainSettings.language.getValue() == MainSettings.Language.ENG) {
+            Thunderhack.notificationManager.publicity("Aura", "Breaking " + target.getName().getString() +"'s shield", 2, Notification.Type.SUCCESS);
+        } else {
+            Thunderhack.notificationManager.publicity("Aura", "Ломаем щит игроку " + target.getName().getString(), 2, Notification.Type.SUCCESS);
+        }
     }
 
     @Override

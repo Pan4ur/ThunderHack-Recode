@@ -36,7 +36,7 @@ public class BindCommand
             return;
         }
         if (rkey == null) {
-            BindCommand.sendMessage(module.getName() + " is bound to " + Formatting.GRAY + module.getBind().toString());
+            BindCommand.sendMessage(module.getName() + " is bound to " + Formatting.GRAY + module.getBind().getBind());
             return;
         }
         int key = InputUtil.fromTranslationKey("key.keyboard." + rkey.toLowerCase()).getCode();
@@ -47,7 +47,12 @@ public class BindCommand
             BindCommand.sendMessage("Unknown key '" + rkey + "'!");
             return;
         }
-        module.bind.setValue(new Bind(key));
+        if(!rkey.equals("M") && rkey.contains("M")){
+            module.bind.setValue(new Bind(key, true));
+        } else {
+            module.bind.setValue(new Bind(key, false));
+        }
+
         BindCommand.sendMessage("Bind for " + Formatting.GREEN + module.getName() + Formatting.WHITE + " set to " + Formatting.GRAY + rkey.toUpperCase());
     }
 }

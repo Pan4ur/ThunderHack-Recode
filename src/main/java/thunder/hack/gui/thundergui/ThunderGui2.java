@@ -582,7 +582,7 @@ public class ThunderGui2 extends Screen {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == Thunderhack.moduleManager.get(ClickGui.class).getBind().getKey()) {
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             super.keyPressed(keyCode, scanCode, modifiers);
             return true;
         }

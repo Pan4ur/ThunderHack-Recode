@@ -31,9 +31,9 @@ public class KeyBinds extends HudElement {
         float max_width = 40;
         for (Module feature : Thunderhack.moduleManager.modules) {
             if(feature.isDisabled() && onlyEnabled.getValue()) continue;
-            if (!Objects.equals(feature.getBind().toString(), "None") && !feature.getName().equalsIgnoreCase("clickgui") && !feature.getName().equalsIgnoreCase("thundergui")) {
+            if (!Objects.equals(feature.getBind().getBind(), "None") && !feature.getName().equalsIgnoreCase("clickgui") && !feature.getName().equalsIgnoreCase("thundergui")) {
                 y_offset1 += 10;
-                String sbind = feature.getBind().toString();
+                String sbind = feature.getBind().getBind();
                 if(sbind.equals("LEFT_CONTROL")){
                     sbind = "LCtrl";
                 }
@@ -65,8 +65,8 @@ public class KeyBinds extends HudElement {
         int y_offset = 2;
         for (Module feature : Thunderhack.moduleManager.modules) {
             if(feature.isDisabled() && onlyEnabled.getValue()) continue;
-            if (!Objects.equals(feature.getBind().toString(), "None") && !feature.getName().equalsIgnoreCase("clickgui") && !feature.getName().equalsIgnoreCase("thundergui")) {
-                String sbind = feature.getBind().toString();
+            if (!Objects.equals(feature.getBind().getBind(), "None") && !feature.getName().equalsIgnoreCase("clickgui") && !feature.getName().equalsIgnoreCase("thundergui")) {
+                String sbind = feature.getBind().getBind();
                 if(sbind.equals("LEFT_CONTROL")){
                     sbind = "LCtrl";
                 }
@@ -98,9 +98,9 @@ public class KeyBinds extends HudElement {
         float max_width = 40;
         for (Module feature : Thunderhack.moduleManager.modules) {
             if(feature.isDisabled() && onlyEnabled.getValue()) continue;
-            if (!Objects.equals(feature.getBind().toString(), "None") && !feature.getName().equalsIgnoreCase("clickgui") && !feature.getName().equalsIgnoreCase("thundergui")) {
+            if (!Objects.equals(feature.getBind().getBind(), "None") && !feature.getName().equalsIgnoreCase("clickgui") && !feature.getName().equalsIgnoreCase("thundergui")) {
                 y_offset1 += 10;
-                String sbind = feature.getBind().toString();
+                String sbind = feature.getBind().getBind();
                 if(sbind.equals("LEFT_CONTROL")){
                     sbind = "LCtrl";
                 }

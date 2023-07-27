@@ -46,7 +46,6 @@ public class Core {
         Thunderhack.EVENT_BUS.register(this);
     }
     public static boolean lock_sprint, serversprint;
-    public static boolean isMacro = false;
     public static Map<String , Identifier> heads = new ConcurrentHashMap<String, Identifier>();
 
     @Subscribe
@@ -58,7 +57,7 @@ public class Core {
         if (!fullNullCheck()) {
             if (Thunderhack.moduleManager.get(ClickGui.class).getBind().getKey() == -1) {
                 Command.sendMessage(Formatting.RED + "Default clickgui keybind --> P");
-                Thunderhack.moduleManager.get(ClickGui.class).setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode());
+                Thunderhack.moduleManager.get(ClickGui.class).setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(),false);
             }
         }
         ThunderGui2.getInstance().onTick();
@@ -215,9 +214,7 @@ public class Core {
         if (event.getKey() == -1) return;
         for (Macro m : Thunderhack.macroManager.getMacros()) {
             if (m.getBind() == event.getKey()) {
-                isMacro = true;
                 m.runMacro();
-                isMacro = false;
             }
         }
     }

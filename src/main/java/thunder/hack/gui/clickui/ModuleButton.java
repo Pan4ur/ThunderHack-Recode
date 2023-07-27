@@ -15,7 +15,6 @@ import thunder.hack.setting.impl.Parent;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.setting.impl.SubBind;
 import thunder.hack.utility.render.Render2DEngine;
-import net.minecraft.client.util.math.MatrixStack;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.gui.clickui.impl.*;
 import thunder.hack.setting.Setting;
@@ -53,13 +52,9 @@ public class ModuleButton {
 		}
 	}
 
-
-
-
 	public void init() {
 		elements.forEach(AbstractElement::init);
 	}
-	float temp_pos;
 
 	public void render(DrawContext context, int mouseX, int mouseY, float delta, Color color ) {
 		hovered = Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height);
@@ -71,20 +66,10 @@ public class ModuleButton {
 			offsetY = interp(offsetY,target_offset,offset_animation);
 		} else offset_animation = 1f;
 
-
-		if(isOpen()){
-
-		} else {
-
-		}
-
-
 		if (isOpen()) {
 			int sbg = new Color(24, 24, 27).getRGB();
 
-
 			Render2DEngine.drawRoundDoubleColor(context.getMatrices(),x + 4, y + height - 16, (width - 8), (height) + getElementsHeight(),3f,module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(200),0.8f) : new Color(sbg),module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(0),0.8f) : new Color(sbg));
-
 
 			if(isOpen()){
 				Render2DEngine.addWindow(context.getMatrices(),new Render2DEngine.Rectangle(x, y + height - 15, (width) + x + 6, (height) + y + getElementsHeight()));
@@ -114,7 +99,6 @@ public class ModuleButton {
 					combobox.setWHeight(17);
 
 					if (combobox.isOpen()) {
-						//offsetY += (combobox.getSetting().getModes().length * 12);
 						element.setHeight(15 + (combobox.getSetting().getModes().length * 12));
 					} else element.setHeight(17);
 				}
@@ -133,18 +117,13 @@ public class ModuleButton {
 			category_animation = CheckBoxElement.fast(1, 0, 1f);
 		}
 
-	//	Drawable.drawRectWH(matrixStack,x, y, width, isOpen() ? height + 2 : height, ClickGui.getInstance().plateColor.getValue().getColor());
-
 
 		if(module.isEnabled()) {
 			if(hovered){
-				//Drawable.drawBlurredShadow(matrixStack,(float)x + 3,(float)y,(float) width - 6,(float)height,6,ClickGui.getInstance().getColor(200));
 				Render2DEngine.drawBlurredShadow(context.getMatrices(),(float)x + 4,(float)y,(float) width - 8,(float)height  + 2,32,new Color(0, 0, 0, 200));
 				Render2DEngine.drawRoundDoubleColor(context.getMatrices(),x + 4,y,width - 8,height - 2,3f,ClickGui.getInstance().getColor(200),ClickGui.getInstance().getColor(0));
 			} else {
-				//Drawable.drawBlurredShadow(matrixStack,(float)x + 4,(float)y + 1,(float) width - 8,(float)height - 2,6,ClickGui.getInstance().getColor(200));
 				Render2DEngine.drawRoundDoubleColor(context.getMatrices(),x + 4,y + 1f,width - 8,height - 2,3f,ClickGui.getInstance().getColor(200),ClickGui.getInstance().getColor(0));
-				//Command.sendMessage(Drawable.shadowCache.size() + "");
 			}
 		} else {
 			if(hovered)
@@ -156,11 +135,8 @@ public class ModuleButton {
 			if (module.getSettings().size() > 3)
 				FontRenderers.sf_medium.drawString(context.getMatrices(),isOpen() ? "-" : "+",   x +  width - 12,  y + 7, -1);
 		} else {
-			if(!module.getBind().toString().equalsIgnoreCase("none")) {
-			//	if(module.getBind().toString().contains("_")){
-			//		FontRenderers.getRenderer().drawString(context.getMatrices(), module.getBind().toString(), (int) x + (int) width - 7 - (int) FontRenderers.getRenderer().getStringWidth(module.getBind().toString()), (int) y + 9  + (hovered ? -1 : 0), new Color(-1).getRGB());
-			//	} else {
-					String sbind = module.getBind().toString();
+			if(!module.getBind().getBind().equalsIgnoreCase("none")) {
+					String sbind = module.getBind().getBind();
 					if(sbind.equals("LEFT_CONTROL")){
 						sbind = "LCtrl";
 					}
@@ -180,20 +156,22 @@ public class ModuleButton {
 						sbind = "RAlt";
 					}
 					FontRenderers.sf_medium.drawString(context.getMatrices(), sbind, (int) x + (int) width - 11 - (int) FontRenderers.sf_medium.getStringWidth(sbind), (int) y + 7 + (hovered ? -1 : 0), new Color(-1).getRGB());
-				//}
 			}
 		}
-
 
 		if (this.binding) {
 			FontRenderers.getRenderer2().drawString(context.getMatrices(),"Keybind: ", (int) ix,(int) iy + 2, new Color(0xFFEAEAEA).getRGB());
 		} else {
-		//	FontRenderers.sf_medium.drawString(context.getMatrices(), module.getName(), (int) ix + 2.5, (int) iy + 3.5 + (hovered ? -1 : 0), new Color(0x4D000000, true).getRGB());
 			FontRenderers.sf_medium.drawString(context.getMatrices(), module.getName(), (int) ix + 2, (int) iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
 		}
 	}
 
 	public void mouseClicked(int mouseX, int mouseY, int button) {
+		if (this.binding) {
+			module.setBind(button,true);
+			Command.sendMessage( module.getName() + " бинд изменен на " + module.getBind().getBind());
+			binding = false;
+		}
 		if (hovered) {
 			if (button == 0) {
 				module.toggle();
@@ -225,11 +203,11 @@ public class ModuleButton {
 
 		if (this.binding) {
 			if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_SPACE || keyCode == GLFW.GLFW_KEY_DELETE) {
-				module.setBind(-1); //NONE TODO
+				module.setBind(-1, false);
 				Command.sendMessage("Удален бинд с модуля " + module.getName());
 			} else {
-				module.setBind(keyCode);
-				Command.sendMessage( module.getName() + " бинд изменен на " + module.getBind().toString());
+				module.setBind(keyCode, false);
+				Command.sendMessage( module.getName() + " бинд изменен на " + module.getBind().getBind());
 			}
 			binding = false;
 		}

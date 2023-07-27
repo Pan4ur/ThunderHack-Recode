@@ -1,6 +1,7 @@
 package thunder.hack.gui.thundergui.components;
 
 
+import thunder.hack.cmd.Command;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui2;
 import thunder.hack.modules.Module;
@@ -104,10 +105,10 @@ public class ModulePlate {
 
 
         if (listening_bind) {
-            FontRenderers.modules.drawString(stack,"...", posX + 85 - FontRenderers.modules.getStringWidth(module.getBind().toString()), posY + 5, Render2DEngine.applyOpacity(new Color(0xB0B0B0), getFadeFactor()).getRGB(), false);
-        } else if (!Objects.equals(module.getBind().toString(), "None")) {
+            FontRenderers.modules.drawString(stack,"...", posX + 85 - FontRenderers.modules.getStringWidth(module.getBind().getBind()), posY + 5, Render2DEngine.applyOpacity(new Color(0xB0B0B0), getFadeFactor()).getRGB(), false);
+        } else if (!Objects.equals(module.getBind().getBind(), "None")) {
 
-            String sbind = module.getBind().toString();
+            String sbind = module.getBind().getBind();
             if(sbind.equals("LEFT_CONTROL")){
                 sbind = "LCtrl";
             }
@@ -185,6 +186,12 @@ public class ModulePlate {
         if ((posY > ThunderGui2.getInstance().main_posY + ThunderGui2.getInstance().height) || posY < ThunderGui2.getInstance().main_posY) {
             return;
         }
+        if (listening_bind) {
+            module.setBind(clickedButton,true);
+            Command.sendMessage( module.getName() + " бинд изменен на " + module.getBind().getBind());
+            listening_bind = false;
+        }
+
         if (mouseX > posX && mouseX < posX + 90 && mouseY > posY && mouseY < posY + 30) {
             switch (clickedButton) {
                 case 0:
@@ -202,12 +209,12 @@ public class ModulePlate {
 
     public void keyTyped(String typedChar, int keyCode) {
         if (listening_bind) {
-            Bind bind = new Bind(keyCode);
-            if (bind.toString().equalsIgnoreCase("Escape")) {
+            Bind bind = new Bind(keyCode,false);
+            if (bind.getBind().equalsIgnoreCase("Escape")) {
                 return;
             }
-            if (bind.toString().equalsIgnoreCase("Delete")) {
-                bind = new Bind(-1);
+            if (bind.getBind().equalsIgnoreCase("Delete")) {
+                bind = new Bind(-1,false);
             }
             module.bind.setValue(bind);
             listening_bind = false;

@@ -83,8 +83,7 @@ public class ClickGui extends Module {
 
     @Override
     public void onEnable() {
-            Util.mc.setScreen(ClickUI.getClickGui());
-        Thunderhack.configManager.updateBindSet();
+        Util.mc.setScreen(ClickUI.getClickGui());
     }
 
 

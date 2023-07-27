@@ -27,7 +27,7 @@ public class Module  {
     private final Category category;
     public Setting<Boolean> enabled = new Setting<>("Enabled", false);
     public String displayName;
-    public Setting<Bind> bind = new Setting<>("Keybind", new Bind(-1));
+    public Setting<Bind> bind = new Setting<>("Keybind", new Bind(-1,false));
     public Setting<Boolean> drawn = new Setting<>("Drawn", true);
 
 
@@ -161,8 +161,8 @@ public class Module  {
         return this.bind.getValue();
     }
 
-    public void setBind(int key) {
-        this.bind.setValue(new Bind(key));
+    public void setBind(int key, boolean mouse) {
+        this.bind.setValue(new Bind(key, mouse));
     }
 
     public boolean listening() {

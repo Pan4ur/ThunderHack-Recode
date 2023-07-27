@@ -7,6 +7,7 @@ import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.gui.clickui.ClickUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.*;
+import thunder.hack.modules.movement.Timer;
 import thunder.hack.utility.Util;
 
 import thunder.hack.modules.Module;
@@ -18,10 +19,7 @@ import thunder.hack.modules.player.*;
 import thunder.hack.modules.render.*;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ModuleManager {
@@ -279,6 +277,17 @@ public class ModuleManager {
         }
         modules.forEach(module -> {
             if (module.getBind().getKey() == eventKey) {
+                module.toggle();
+            }
+        });
+    }
+
+    public void onMoseKeyPressed(int eventKey) {
+        if (Util.mc.currentScreen instanceof ClickUI) {
+            return;
+        }
+        modules.forEach(module -> {
+            if (Objects.equals(module.getBind().getBind(), "M" + eventKey)) {
                 module.toggle();
             }
         });

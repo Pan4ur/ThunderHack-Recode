@@ -341,7 +341,7 @@ public class ClickUI extends Screen {
 			w.keyTyped(keyCode);
 		});
 
-		if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == Thunderhack.moduleManager.get(ClickGui.class).getBind().getKey()) {
+		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
 			super.keyPressed(keyCode, scanCode, modifiers);
 			return true;
 		}

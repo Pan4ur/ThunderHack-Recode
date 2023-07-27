@@ -105,12 +105,12 @@ public class AimBot extends Module {
             }
             rotationYaw = Float.NaN;
             PlayerEntity nearestTarget = Thunderhack.combatManager.getNearestTarget(5);
+            assistAcceleration += aimStrength.getValue() / 10000f;
+
             if(nearestTarget != null){
                 rotationYaw = calcAngleVec(Thunderhack.moduleManager.get(Aura.class).getLegitLook(nearestTarget)).x;
-                assistAcceleration = 0;
                 return;
             }
-            assistAcceleration += aimStrength.getValue() / 10000f;
         }
 
         if (target != null || (mode.getValue() == Mode.BowAim && mc.player.getActiveItem().getItem() instanceof BowItem)) {
@@ -164,6 +164,7 @@ public class AimBot extends Module {
                 rotationPitch = mc.player.getPitch();
             }
         }
+
         if(rotation.getValue() == Rotation.Client && mode.getValue() == Mode.BowAim && mc.player.getActiveItem().getItem() instanceof BowItem) {
             mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.prevYaw,rotationYaw,mc.getTickDelta()));
             mc.player.setPitch((float) Render2DEngine.interpolate(mc.player.prevPitch,rotationPitch,mc.getTickDelta()));
