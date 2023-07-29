@@ -1,6 +1,7 @@
 package thunder.hack.injection;
 
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.render.NoRender;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameOverlayRenderer;
@@ -16,21 +17,21 @@ public class MixinInGameOverlayRenderer {
 
     @Inject(method = "renderFireOverlay", at = @At("HEAD"), cancellable = true)
     private static void onRenderFireOverlay(MinecraftClient minecraftClient, MatrixStack matrixStack, CallbackInfo ci) {
-        if (Thunderhack.moduleManager.get(NoRender.class).isEnabled() && Thunderhack.moduleManager.get(NoRender.class).fireOverlay.getValue()) {
+        if (ModuleManager.noRender.isEnabled() && NoRender.fireOverlay.getValue()) {
             ci.cancel();
         }
     }
 
     @Inject(method = "renderUnderwaterOverlay", at = @At("HEAD"), cancellable = true)
     private static void onRenderUnderwaterOverlay(MinecraftClient minecraftClient, MatrixStack matrixStack, CallbackInfo ci) {
-        if (Thunderhack.moduleManager.get(NoRender.class).isEnabled() && Thunderhack.moduleManager.get(NoRender.class).waterOverlay.getValue()) {
+        if (ModuleManager.noRender.isEnabled() && NoRender.waterOverlay.getValue()) {
             ci.cancel();
         }
     }
 
     @Inject(method = "renderInWallOverlay", at = @At("HEAD"), cancellable = true)
     private static void onrenderInWallOverlay(Sprite sprite, MatrixStack matrices, CallbackInfo ci) {
-        if (Thunderhack.moduleManager.get(NoRender.class).isEnabled() && Thunderhack.moduleManager.get(NoRender.class).blockOverlay.getValue()) {
+        if (ModuleManager.noRender.isEnabled() && NoRender.blockOverlay.getValue()) {
             ci.cancel();
         }
     }

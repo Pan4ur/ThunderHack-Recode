@@ -7,7 +7,6 @@ import thunder.hack.cmd.Command;
 
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.render.Search;
-import thunder.hack.utility.Util;
 import thunder.hack.modules.Module;
 import net.minecraft.block.Block;
 import thunder.hack.cmd.impl.SearchCommand;
@@ -24,10 +23,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static thunder.hack.modules.Module.mc;
+
 
 public class ConfigManager  {
 
-        public static  File MainFolder = new File(Util.mc.runDirectory, "ThunderHackRecode");
+        public static  File MainFolder = new File(mc.runDirectory, "ThunderHackRecode");
         public static  File ConfigsFolder = new File(MainFolder, "configs");
         public static  File CustomImages = new File(MainFolder, "images");
         public static  File TempFolder = new File(MainFolder, "temp");

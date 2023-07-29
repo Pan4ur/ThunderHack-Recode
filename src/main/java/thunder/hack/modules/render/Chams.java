@@ -30,21 +30,21 @@ public class Chams extends Module {
     private final Setting<Boolean> handItems = new Setting<>("HandItems", false).withParent(selection);
 
     private static final Setting<Parent> colors = new Setting<>("Colors", new Parent(false,0));
-    private final Setting<ColorSetting> player = new Setting<>("Player", new ColorSetting(0xFFFFFFFF)).withParent(colors);
-    private final Setting<ColorSetting> friend = new Setting<>("Friend", new ColorSetting(0xFFFFFFFF)).withParent(colors);
-    private final Setting<ColorSetting> crystal = new Setting<>("Crystal", new ColorSetting(0xFFFFFFFF)).withParent(colors);
-    private final Setting<ColorSetting> creature = new Setting<>("Creature", new ColorSetting(0xFFFFFFFF)).withParent(colors);
-    private final Setting<ColorSetting> monster = new Setting<>("Monster", new ColorSetting(0xFFFFFFFF)).withParent(colors);
-    private final Setting<ColorSetting> ambient = new Setting<>("Ambient", new ColorSetting(0xFFFFFFFF)).withParent(colors);
+    private static final Setting<ColorSetting> player = new Setting<>("Player", new ColorSetting(0xFFFFFFFF)).withParent(colors);
+    private static final Setting<ColorSetting> friend = new Setting<>("Friend", new ColorSetting(0xFFFFFFFF)).withParent(colors);
+    private static final Setting<ColorSetting> crystal = new Setting<>("Crystal", new ColorSetting(0xFFFFFFFF)).withParent(colors);
+    private static final Setting<ColorSetting> creature = new Setting<>("Creature", new ColorSetting(0xFFFFFFFF)).withParent(colors);
+    private static final Setting<ColorSetting> monster = new Setting<>("Monster", new ColorSetting(0xFFFFFFFF)).withParent(colors);
+    private static final Setting<ColorSetting> ambient = new Setting<>("Ambient", new ColorSetting(0xFFFFFFFF)).withParent(colors);
     private final Setting<ColorSetting> handItemsColor = new Setting<>("HandItemsColor", new ColorSetting(new Color(0x9317DE5D, true))).withParent(colors);
 
-    private final Setting<Parent> scales = new Setting<>("Scales", new Parent(false,0));
-    private final Setting<Float> playerScale = new Setting<>("PlayerScale", 1F, 0f, 5F).withParent(scales);
-    private final Setting<Float> friendScale = new Setting<>("FriendScale", 1F, 0f, 5F).withParent(scales);
-    private final Setting<Float> crystalScale = new Setting<>("CrystalScale", 2F, 0f, 5F).withParent(scales);
-    private final Setting<Float> creatureScale = new Setting<>("CreatureScale", 1F, 0f, 5F).withParent(scales);
-    private final Setting<Float> monsterScale = new Setting<>("MonsterScale", 1F, 0f, 5F).withParent(scales);
-    private final Setting<Float> ambientScale = new Setting<>("AmbientScale", 1F, 0f, 5F).withParent(scales);
+    private static final Setting<Parent> scales = new Setting<>("Scales", new Parent(false,0));
+    private static final Setting<Float> playerScale = new Setting<>("PlayerScale", 1F, 0f, 5F).withParent(scales);
+    private static final Setting<Float> friendScale = new Setting<>("FriendScale", 1F, 0f, 5F).withParent(scales);
+    private static final Setting<Float> crystalScale = new Setting<>("CrystalScale", 2F, 0f, 5F).withParent(scales);
+    private static final Setting<Float> creatureScale = new Setting<>("CreatureScale", 1F, 0f, 5F).withParent(scales);
+    private static final Setting<Float> monsterScale = new Setting<>("MonsterScale", 1F, 0f, 5F).withParent(scales);
+    private static final Setting<Float> ambientScale = new Setting<>("AmbientScale", 1F, 0f, 5F).withParent(scales);
 
 
     @Subscribe
@@ -55,7 +55,7 @@ public class Chams extends Module {
     }
 
 
-    public ColorSetting getEntityColor(Entity entity) {
+    public static ColorSetting getEntityColor(Entity entity) {
         if (entity instanceof PlayerEntity) {
             if (Thunderhack.friendManager.isFriend((PlayerEntity) entity)) {
                 return friend.getValue();
@@ -78,7 +78,7 @@ public class Chams extends Module {
         }
     }
 
-    public float getEntityScale(Entity entity) {
+    public static float getEntityScale(Entity entity) {
         if (entity instanceof PlayerEntity) {
             if (Thunderhack.friendManager.isFriend((PlayerEntity) entity)) {
                 return friendScale.getValue();

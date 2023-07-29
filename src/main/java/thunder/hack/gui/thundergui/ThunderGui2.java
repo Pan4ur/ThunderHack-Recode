@@ -8,7 +8,6 @@ import thunder.hack.cmd.Command;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.core.ConfigManager;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.ThunderHackGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
@@ -17,10 +16,8 @@ import thunder.hack.utility.render.MSAAFramebuffer;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterAnimation;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import thunder.hack.gui.thundergui.components.*;
-import thunder.hack.utility.Util;
 
 import java.awt.*;
 import java.io.File;
@@ -28,6 +25,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static thunder.hack.modules.Module.mc;
 
 
 public class ThunderGui2 extends Screen {
@@ -190,8 +189,8 @@ public class ThunderGui2 extends Screen {
         }
         if (open_animation.getAnimationd() <= 0.01 && !open_direction) {
             open_animation = new BetterAnimation();
-            Util.mc.currentScreen = null;
-            Util.mc.setScreen(null);
+            mc.currentScreen = null;
+            mc.setScreen(null);
         }
         context.getMatrices().pop();
     }
@@ -708,6 +707,6 @@ public class ThunderGui2 extends Screen {
 
 
     public enum CurrentMode {
-        Modules, CfgManager, FriendManager
+        Modules, CfgManager, FriendManager, WayPointManager, MacroManager
     }
 }

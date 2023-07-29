@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 public class CombatManager {
     public CombatManager(){

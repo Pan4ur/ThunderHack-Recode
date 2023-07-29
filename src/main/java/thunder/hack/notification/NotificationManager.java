@@ -2,14 +2,15 @@ package thunder.hack.notification;
 
 import com.google.common.eventbus.Subscribe;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.Render2DEvent;
-import thunder.hack.modules.Module;
 import thunder.hack.modules.client.Notifications;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.Util;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static thunder.hack.modules.Module.mc;
 
 public class NotificationManager {
 
@@ -33,10 +34,10 @@ public class NotificationManager {
 
     @Subscribe
     public void onRender2D(Render2DEvent event) {
-        if(!Thunderhack.moduleManager.get(Notifications.class).isEnabled()) return;
+        if(!ModuleManager.notifications.isEnabled()) return;
         if (notificationsnew.size() > 8)
             notificationsnew.remove(0);
-        float startY = (float) (Util.getScaledResolution().getScaledHeight() * position.getValue() - 36f);
+        float startY = (float) (mc.getWindow().getScaledHeight() * position.getValue() - 36f);
         for (int i = 0; i < notificationsnew.size(); i++) {
             Notification notification = notificationsnew.get(i);
             notificationsnew.removeIf(Notification::shouldDelete);

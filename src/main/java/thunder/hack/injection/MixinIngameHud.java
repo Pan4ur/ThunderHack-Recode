@@ -3,6 +3,7 @@ package thunder.hack.injection;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.Render2DEvent;
 import thunder.hack.events.impl.RenderBlurEvent;
 import thunder.hack.gui.hud.impl.Crosshair;
@@ -29,7 +30,7 @@ public abstract class MixinIngameHud {
 
     @Inject(at = @At(value = "HEAD"), method = "renderHotbar",cancellable = true)
     public void renderHotbarCustom(float tickDelta, DrawContext context, CallbackInfo ci) {
-        if(Thunderhack.moduleManager.get(Hotbar.class).isEnabled()){
+        if(ModuleManager.hotbar.isEnabled()){
             ci.cancel();
             Hotbar.renderCustomHotbar(tickDelta,context);
         }
@@ -37,16 +38,15 @@ public abstract class MixinIngameHud {
 
     @Inject(method = "renderExperienceBar", at = @At(value = "HEAD"),cancellable = true)
     public void renderXpBarCustom(DrawContext context, int x, CallbackInfo ci) {
-        if(Thunderhack.moduleManager.get(Hotbar.class).isEnabled()){
+        if(ModuleManager.hotbar.isEnabled()){
             ci.cancel();
             Hotbar.renderXpBar(x,context.getMatrices());
-         //   RenderSystem.recordRenderCall(() -> System.out.println("awd"));
         }
     }
 
     @Inject(method = "renderCrosshair",at = @At(value = "HEAD"),cancellable = true)
     public void renderCrosshair(DrawContext context, CallbackInfo ci) {
-        if(Thunderhack.moduleManager.get(Crosshair.class).isEnabled()){
+        if(ModuleManager.crosshair.isEnabled()){
             ci.cancel();
         }
     }

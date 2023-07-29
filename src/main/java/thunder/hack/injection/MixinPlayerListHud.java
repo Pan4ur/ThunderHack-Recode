@@ -10,12 +10,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.misc.ExtraTab;
 
 import java.util.Comparator;
 import java.util.List;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 
 @Mixin(PlayerListHud.class)
@@ -31,7 +32,7 @@ public class MixinPlayerListHud {
 
     @Inject(method = "collectPlayerEntries", at = @At("HEAD"), cancellable = true)
     private void collectPlayerEntriesHook(CallbackInfoReturnable<List<PlayerListEntry>> cir) {
-        if(Thunderhack.moduleManager.get(ExtraTab.class).isEnabled()){
+        if(ModuleManager.extraTab.isEnabled()){
             cir.setReturnValue(mc.player.networkHandler.getListedPlayerListEntries().stream().sorted(ENTRY_ORDERING).limit(1000).toList());
         } else {
             cir.setReturnValue(mc.player.networkHandler.getListedPlayerListEntries().stream().sorted(ENTRY_ORDERING).limit(80).toList());

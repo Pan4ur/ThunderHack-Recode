@@ -5,7 +5,7 @@ import net.minecraft.util.math.MathHelper;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.modules.Module;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 public class MovementUtil {
     public static boolean isMoving() {

@@ -8,6 +8,7 @@ import com.mojang.datafixers.util.Pair;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.PreRender3DEvent;
 import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.combat.Aura;
@@ -34,7 +35,7 @@ import thunder.hack.utility.render.shaders.GlProgram;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 
 @Mixin(GameRenderer.class)
@@ -60,25 +61,25 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "tiltViewWhenHurt", at = @At("HEAD"), cancellable = true)
     private void tiltViewWhenHurtHook(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        if (Thunderhack.moduleManager.get(NoRender.class).isEnabled() && Thunderhack.moduleManager.get(NoRender.class).hurtCam.getValue()) {
+        if (ModuleManager.noRender.isEnabled() && NoRender.hurtCam.getValue()) {
             ci.cancel();
         }
     }
 
     @Redirect(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;lerp(FFF)F"))
     private float applyCameraTransformationsMathHelperLerpProxy(float delta, float first, float second) {
-        if (Thunderhack.moduleManager.get(NoRender.class).isEnabled() && Thunderhack.moduleManager.get(NoRender.class).nausea.getValue()) return 0;
+        if (ModuleManager.noRender.isEnabled() && NoRender.nausea.getValue()) return 0;
         return MathHelper.lerp(delta, first, second);
     }
 
     @Inject(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/ProjectileUtil;raycast(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Ljava/util/function/Predicate;D)Lnet/minecraft/util/hit/EntityHitResult;"), cancellable = true)
     private void onUpdateTargetedEntity(float tickDelta, CallbackInfo info) {
-        if (Thunderhack.moduleManager.get(NoEntityTrace.class).isEnabled() && (mc.player.getMainHandStack().getItem() instanceof PickaxeItem || !NoEntityTrace.ponly.getValue()) && mc.crosshairTarget.getType() == HitResult.Type.BLOCK) {
+        if (ModuleManager.noEntityTrace.isEnabled() && (mc.player.getMainHandStack().getItem() instanceof PickaxeItem || !NoEntityTrace.ponly.getValue()) && mc.crosshairTarget.getType() == HitResult.Type.BLOCK) {
            if(mc.player.getMainHandStack().getItem() instanceof SwordItem && NoEntityTrace.noSword.getValue()) return;
            mc.getProfiler().pop();
            info.cancel();
         }
-        if(Thunderhack.moduleManager.get(Aura.class).isEnabled() && Aura.target != null && mc.player.distanceTo(Aura.target) <= Aura.attackRange.getValue() && Aura.mode.getValue() != Aura.Mode.None){
+        if(ModuleManager.aura.isEnabled() && Aura.target != null && mc.player.distanceTo(Aura.target) <= Aura.attackRange.getValue() && Aura.mode.getValue() != Aura.Mode.None){
             mc.getProfiler().pop();
             info.cancel();
             // TODO vector from aura

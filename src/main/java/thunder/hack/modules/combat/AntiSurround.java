@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.player.SpeedMine;
@@ -111,7 +112,7 @@ public class AntiSurround extends Module {
                 }
 
                 if (!requirepickaxe.getValue() || mc.player.getMainHandStack().getItem() instanceof PickaxeItem) {
-                    if(Thunderhack.moduleManager.get(SpeedMine.class).isEnabled() && SpeedMine.progress != 0){
+                    if(ModuleManager.speedMine.isEnabled() && SpeedMine.progress != 0){
                         return;
                     }
                     mc.interactionManager.attackBlock(blockpos2, PlaceUtility.getBreakDirection(blockpos2,false));

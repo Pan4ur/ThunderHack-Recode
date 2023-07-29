@@ -5,7 +5,6 @@ import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventKeyPress;
 import thunder.hack.events.impl.EventKeyRelease;
 import thunder.hack.gui.clickui.ClickUI;
-import thunder.hack.utility.Util;
 import thunder.hack.gui.hud.HudEditorGui;
 import net.minecraft.client.Keyboard;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,13 +12,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static thunder.hack.modules.Module.mc;
+
 
 @Mixin(Keyboard.class)
 public class MixinKeyboard {
 
     @Inject(method = "onKey", at = @At("HEAD"), cancellable = true)
     private void onKey(long windowPointer, int key, int scanCode, int action, int modifiers, CallbackInfo ci) {
-        boolean whitelist = Util.mc.currentScreen == null || Util.mc.currentScreen instanceof ClickUI || Util.mc.currentScreen instanceof HudEditorGui;
+        boolean whitelist = mc.currentScreen == null || mc.currentScreen instanceof ClickUI || mc.currentScreen instanceof HudEditorGui;
         if (!whitelist) return;
         if (action == 1) {
             Thunderhack.moduleManager.onKeyPressed(key);

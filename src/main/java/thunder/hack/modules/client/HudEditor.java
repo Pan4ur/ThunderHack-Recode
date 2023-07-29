@@ -4,7 +4,6 @@ import thunder.hack.gui.hud.HudEditorGui;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.Util;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
@@ -57,7 +56,7 @@ public class HudEditor extends Module{
 
     @Override
     public void onEnable(){
-        Util.mc.setScreen(HudEditorGui.getHudGui());
+        mc.setScreen(HudEditorGui.getHudGui());
         toggle();
     }
 }

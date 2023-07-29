@@ -70,9 +70,9 @@
     "accesors.IGameMessageS2CPacket",
     "accesors.IHeldItemRenderer",
     "accesors.ILivingEntity",
+    "accesors.IPlayerMoveC2SPacket",
     "accesors.IPlayerPositionLookS2CPacket",
     "accesors.ISPacketEntityVelocity",
-    "accesors.ISPacketPlayerPosLook",
-    "accesors.PlayerInteractEntityC2SPacketAccessor"
+    "accesors.ISPacketPlayerPosLook"
   ]
 }

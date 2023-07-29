@@ -12,7 +12,6 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InventoryUtil;
 import thunder.hack.utility.player.MovementUtil;
-import thunder.hack.utility.Util;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -21,6 +20,8 @@ import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
+import thunder.hack.utility.player.PlaceUtility;
+import thunder.hack.utility.player.PlayerUtil;
 
 import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.START_FALL_FLYING;
 
@@ -455,10 +456,10 @@ public class ElytraPlus extends Module {
     public void useFireWork() {
         int firework_slot = InventoryUtil.getFireWorks();
         if(mc.player.getOffHandStack().getItem() == Items.FIREWORK_ROCKET){
-            mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, Util.getWorldActionId(Util.mc.world)));
+            mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtil.getWorldActionId(mc.world)));
         } else if(firework_slot != -1) {
             mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(firework_slot));
-            mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, Util.getWorldActionId(Util.mc.world)));
+            mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtil.getWorldActionId(mc.world)));
             mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
         }
     }

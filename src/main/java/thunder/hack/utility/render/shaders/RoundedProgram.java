@@ -7,10 +7,11 @@ import net.minecraft.client.gl.SimpleFramebuffer;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL30;
-import thunder.hack.utility.Util;
 import thunder.hack.utility.render.WindowResizeCallback;
 
 import java.awt.*;
+
+import static thunder.hack.modules.Module.mc;
 
 public class RoundedProgram extends GlProgram {
 
@@ -32,16 +33,10 @@ public class RoundedProgram extends GlProgram {
     public void setParameters(float x, float y, float width, float height, float radius, Color color) {
         this.size.set(radius * 2);
         this.uSize.set(width * 2,height * 2);
-        this.uLocation.set(x * 2,-y * 2 + Util.getScaledResolution().getScaledHeight() * 2 - height * 2);
+        this.uLocation.set(x * 2,-y * 2 + mc.getWindow().getScaledHeight() * 2 - height * 2);
         this.color.set(color.getRed() / 255f,color.getGreen() / 255f,color.getBlue() / 255f,color.getAlpha() / 255f);
     }
 
-    /*
-     public int normaliseY() {
-        ScaledResolution sr = new ScaledResolution(mc);
-        return (((-Mouse.getY() + sr.getScaledHeight()) + sr.getScaledHeight()) / 2);
-    }
-     */
     @Override
     public void use() {
         var buffer = MinecraftClient.getInstance().getFramebuffer();

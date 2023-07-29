@@ -36,10 +36,10 @@ public class MacroManager {
         }
     }
 
-    public static void saveMacro() {
+    public void saveMacro() {
         File file = new File("ThunderHackRecode/misc/macro.txt");
         try {
-            new File("ThunderHack").mkdirs();
+            new File("ThunderHackRecode").mkdirs();
             file.createNewFile();
         } catch (Exception e) {
 

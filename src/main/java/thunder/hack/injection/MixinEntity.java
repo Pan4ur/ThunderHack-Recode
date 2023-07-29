@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity implements IEntity {
@@ -67,7 +67,7 @@ public abstract class MixinEntity implements IEntity {
 
     @Inject(method = {"changeLookDirection"}, at = {@At("HEAD")}, cancellable = true)
     public void changeLookDirectionHook(double cursorDeltaX, double cursorDeltaY, CallbackInfo ci) {
-            if(Thunderhack.moduleManager.get(NoPitchLimit.class).isEnabled()){
+            if(ModuleManager.noPitchLimit.isEnabled()){
                 ci.cancel();
                 changeLookDirectionCustom(cursorDeltaX,cursorDeltaY);
             }
@@ -77,7 +77,7 @@ public abstract class MixinEntity implements IEntity {
 
     @Inject(method = {"getBoundingBox"}, at = {@At("HEAD")}, cancellable = true)
     public final void getBoundingBox(CallbackInfoReturnable<Box> cir) {
-       if(Thunderhack.moduleManager.get(HitBox.class).isEnabled() && ((Entity)(Object)this) != mc.player){
+       if(ModuleManager.hitBox.isEnabled() && ((Entity)(Object)this) != mc.player){
            cir.setReturnValue(new Box(this.boundingBox.minX - HitBox.XZExpand.getValue() / 2f,this.boundingBox.minY - HitBox.YExpand.getValue() / 2f,this.boundingBox.minZ - HitBox.XZExpand.getValue() / 2f,this.boundingBox.maxX + HitBox.XZExpand.getValue() / 2f,this.boundingBox.maxY + HitBox.YExpand.getValue() / 2f,this.boundingBox.maxZ + HitBox.XZExpand.getValue() / 2f));
        }
     }
@@ -97,7 +97,7 @@ public abstract class MixinEntity implements IEntity {
 
     @Inject(method = "isGlowing", at = @At("HEAD"), cancellable = true)
     void isGlowingHook(CallbackInfoReturnable<Boolean> cir) {
-        Shaders shaders = Thunderhack.moduleManager.get(Shaders.class);
+        Shaders shaders = ModuleManager.shaders;
         if (shaders.isEnabled()) {
             cir.setReturnValue(shaders.shouldRender((Entity) (Object) this));
         }
@@ -105,8 +105,7 @@ public abstract class MixinEntity implements IEntity {
 
     @Inject(method = "isOnFire", at = @At("HEAD"), cancellable = true)
     void isOnFireHook(CallbackInfoReturnable<Boolean> cir) {
-        NoRender nr = Thunderhack.moduleManager.get(NoRender.class);
-        if (nr.isEnabled() && nr.fireEntity.getValue()) {
+        if (ModuleManager.noRender.isEnabled() && NoRender.fireEntity.getValue()) {
             cir.setReturnValue(false);
         }
     }

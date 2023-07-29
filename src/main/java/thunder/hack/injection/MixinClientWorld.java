@@ -10,7 +10,7 @@ import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventEntityRemoved;
 import thunder.hack.events.impl.EventEntitySpawn;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 @Mixin(ClientWorld.class)
 public class MixinClientWorld {

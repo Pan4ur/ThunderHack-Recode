@@ -3,8 +3,6 @@ package thunder.hack.gui.font;
 
 
 
-import thunder.hack.cmd.Command;
-import thunder.hack.utility.Util;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import org.lwjgl.BufferUtils;
@@ -21,6 +19,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+
+import static thunder.hack.modules.Module.mc;
 
 public class Glyph {
     final Texture imageTex;
@@ -92,7 +92,7 @@ public class Glyph {
             ByteBuffer data = BufferUtils.createByteBuffer(content.length).put(content);
             data.flip();
             NativeImageBackedTexture tex = new NativeImageBackedTexture(NativeImage.read(data));
-            Util.mc.execute(() -> Util.mc.getTextureManager().registerTexture(i, tex));
+            mc.execute(() -> mc.getTextureManager().registerTexture(i, tex));
         } catch (Exception e) {
             e.printStackTrace();
         }

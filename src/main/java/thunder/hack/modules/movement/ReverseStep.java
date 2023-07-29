@@ -12,6 +12,8 @@ import thunder.hack.setting.Setting;
 public class ReverseStep extends Module {
     public Setting<Float> timer = new Setting("Timer", 3.0F, 1F, 10.0F);
     public Setting<Boolean> anyblock = new Setting<>("AnyBlock", false);
+    public Setting<Boolean> pauseIfShift = new Setting<>("PauseIfShift", false);
+
     private boolean flag = true;
     private boolean prevGround = false;
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Motion);
@@ -22,9 +24,10 @@ public class ReverseStep extends Module {
 
     @Subscribe
     public void onEntitySync(EventSync eventPlayerUpdateWalking) {
-        if (Thunderhack.moduleManager.get(PacketFly.class).isEnabled()) {
-            return;
-        }
+        if (Thunderhack.moduleManager.get(PacketFly.class).isEnabled()) return;
+
+        if(pauseIfShift.getValue() && mc.options.sneakKey.isPressed()) return;
+
         BlockState iBlockState = mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos()).down(2));
         BlockState iBlockState2 = mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos()).down(3));
         BlockState iBlockState3 = mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos()).down(4));

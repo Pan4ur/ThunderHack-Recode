@@ -5,8 +5,15 @@ import net.minecraft.block.AirBlock;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageSources;
+import net.minecraft.entity.damage.DamageType;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.stat.Stats;
 import net.minecraft.util.math.*;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.explosion.Explosion;
@@ -16,13 +23,12 @@ import thunder.hack.modules.combat.AutoCrystal;
 import java.util.Objects;
 import java.util.UUID;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
+
 
 public class ExplosionUtil {
 
     public static boolean terrainIgnore = false;
-
-
 
     public static float getExplosionDamage2(Vec3d crysPos, PlayerEntity target) {
         if(AutoCrystal.predictTicks.getValue() == 0){
@@ -75,14 +81,7 @@ public class ExplosionUtil {
         Explosion explosion = new Explosion(mc.world, null, explosionPos.x, explosionPos.y, explosionPos.z, 6f, false, Explosion.DestructionType.DESTROY);
 
         double maxDist = 12;
-        if (!new Box(
-                MathHelper.floor(explosionPos.x - maxDist - 1.0),
-                MathHelper.floor(explosionPos.y - maxDist - 1.0),
-                MathHelper.floor(explosionPos.z - maxDist - 1.0),
-                MathHelper.floor(explosionPos.x + maxDist + 1.0),
-                MathHelper.floor(explosionPos.y + maxDist + 1.0),
-                MathHelper.floor(explosionPos.z + maxDist + 1.0)).intersects(target.getBoundingBox())
-        ) {
+        if (!new Box(MathHelper.floor(explosionPos.x - maxDist - 1.0), MathHelper.floor(explosionPos.y - maxDist - 1.0), MathHelper.floor(explosionPos.z - maxDist - 1.0), MathHelper.floor(explosionPos.x + maxDist + 1.0), MathHelper.floor(explosionPos.y + maxDist + 1.0), MathHelper.floor(explosionPos.z + maxDist + 1.0)).intersects(target.getBoundingBox())) {
             return 0f;
         }
 
@@ -106,7 +105,6 @@ public class ExplosionUtil {
                         } else if (mc.world.getDifficulty() == Difficulty.HARD) {
                             toDamage = toDamage * 3f / 2f;
                         }
-
 
                     toDamage = DamageUtil.getDamageLeft(toDamage, target.getArmor(), (float) target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
 
@@ -166,7 +164,6 @@ public class ExplosionUtil {
                     } else if (mc.world.getDifficulty() == Difficulty.HARD) {
                         toDamage = toDamage * 3f / 2f;
                     }
-
 
                     toDamage = DamageUtil.getDamageLeft(toDamage, target.getArmor(), (float) Objects.requireNonNull(target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS)).getValue());
 

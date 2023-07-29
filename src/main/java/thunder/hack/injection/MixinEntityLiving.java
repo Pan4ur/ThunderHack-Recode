@@ -1,6 +1,7 @@
 package thunder.hack.injection;
 
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.render.ViewModel;
 import thunder.hack.utility.interfaces.IEntityLiving;
 import net.minecraft.entity.LivingEntity;
@@ -23,13 +24,11 @@ public class MixinEntityLiving implements IEntityLiving {
 
     @Inject(method = {"getHandSwingDuration"}, at = {@At("HEAD")}, cancellable = true)
     private void getArmSwingAnimationEnd(final CallbackInfoReturnable<Integer> info) {
-        if (Thunderhack.moduleManager.get(ViewModel.class).isEnabled() && Thunderhack.moduleManager.get(ViewModel.class).slowAnimation.getValue()) {
-            info.setReturnValue(Thunderhack.moduleManager.get(ViewModel.class).slowAnimationVal.getValue());
-        }
+        if (ModuleManager.viewModel.isEnabled() && ViewModel.slowAnimation.getValue())
+            info.setReturnValue(ViewModel.slowAnimationVal.getValue());
     }
 
     double prevServerX,prevServerY,prevServerZ;
-
 
     @Inject(method = {"updateTrackedPositionAndAngles"}, at = {@At("HEAD")})
     private void updateTrackedPositionAndAnglesHook(double x, double y, double z, float yaw, float pitch, int interpolationSteps, boolean interpolate, CallbackInfo ci) {

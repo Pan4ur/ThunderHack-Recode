@@ -18,9 +18,9 @@ public class AutoTool extends Module {
 
     public Setting<Boolean> swapBack = new Setting<>("SwapBack", true);
     public Setting<Boolean> saveItem = new Setting<>("SaveItem", true);
-    public Setting<Boolean> silent = new Setting<>("Silent", false);
+    public static Setting<Boolean> silent = new Setting<>("Silent", false);
     public Setting<Boolean> echestSilk = new Setting<>("EchestSilk", true);
-    public int itemIndex;
+    public static int itemIndex;
     private boolean swap;
     private long swapDelay;
     private final List<Integer> lastItem = new ArrayList<>();

@@ -55,8 +55,8 @@ public class ViewModel extends Module {
     public Setting<Boolean> animateOffY = new Setting<>("animateOffY", false).withParent(animateOff);
     public Setting<Boolean> animateOffZ = new Setting<>("animateOffZ", false).withParent(animateOff);
     public final Setting<Float> speedAnimateOff = new Setting<>("speedAnimateOff",1f , 1f, 5f).withParent(rotationOff);
-    public Setting<Boolean> slowAnimation = new Setting<>("SlowAnimation", true);
-    public Setting<Integer> slowAnimationVal = new Setting<>("SlowValue",6, 1, 50);
+    public static Setting<Boolean> slowAnimation = new Setting<>("SlowAnimation", true);
+    public static Setting<Integer> slowAnimationVal = new Setting<>("SlowValue",6, 1, 50);
 
 
     private double changeRotate(double value, double speed) {

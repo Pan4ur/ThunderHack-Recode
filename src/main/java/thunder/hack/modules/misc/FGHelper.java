@@ -12,7 +12,6 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InventoryUtil;
 import thunder.hack.utility.ThunderUtils;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.Util;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
@@ -26,6 +25,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.StringUtils;
+import thunder.hack.utility.player.PlayerUtil;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -96,21 +96,21 @@ public class FGHelper extends Module {
                 int hotbarslot = mc.player.getInventory().selectedSlot;
                 mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.AMBIENT, 150.0f, 1.0F);
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(InventoryUtil.getCappuchinoAtHotbar()));
-                mc.getNetworkHandler().sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, Util.getWorldActionId(Util.mc.world)));
+                mc.getNetworkHandler().sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtil.getWorldActionId(mc.world)));
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(hotbarslot));
                 timer.reset();
             }
             if (timer.passedMs(200) && InventoryUtil.getAmericanoAtHotbar() != -1 && !mc.player.hasStatusEffect(StatusEffects.HASTE) && americano.getValue()) {
                 int hotbarslot = mc.player.getInventory().selectedSlot;
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(InventoryUtil.getAmericanoAtHotbar()));
-                mc.getNetworkHandler().sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, Util.getWorldActionId(Util.mc.world)));
+                mc.getNetworkHandler().sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtil.getWorldActionId(mc.world)));
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(hotbarslot));
                 timer.reset();
             }
             if (timer.passedMs(500) && InventoryUtil.getPowderAtHotbar() != -1 && !(mc.player.hasStatusEffect(StatusEffects.STRENGTH)) && mc.crosshairTarget != null && mc.crosshairTarget.getType() != HitResult.Type.BLOCK && powder.getValue()) {
                 int hotbarslot = mc.player.getInventory().selectedSlot;
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(InventoryUtil.getPowderAtHotbar()));
-                mc.getNetworkHandler().sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, Util.getWorldActionId(Util.mc.world)));
+                mc.getNetworkHandler().sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtil.getWorldActionId(mc.world)));
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(hotbarslot));
                 timer.reset();
             }
@@ -166,15 +166,12 @@ public class FGHelper extends Module {
                 for(Entity ent : mc.world.getEntities()){
                     if(ent instanceof PlayerEntity) continue;
                     if(ent instanceof LivingEntity) {
-                        if (((LivingEntity) ent).isDead()) {
-                            mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
-                        }
+                        if (((LivingEntity) ent).isDead()) mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
                     }
                 }
             }
         }
     }
-
 
     private boolean canSendCommand(){
         if(pvpTimer.passedMs(30000)){

@@ -3,11 +3,9 @@ package thunder.hack.modules.combat;
 import com.google.common.eventbus.Subscribe;
 import thunder.hack.events.impl.EventAfterRotate;
 import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.Util;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -17,6 +15,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.util.Hand;
+import thunder.hack.utility.player.PlayerUtil;
 
 public class AutoBuff extends Module {
 
@@ -129,7 +128,7 @@ public class AutoBuff extends Module {
     public void throwPotion(Potions potion) {
         int slot = getPotionSlot(potion);
         mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(slot));
-        mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, Util.getWorldActionId(mc.world)));
+        mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtil.getWorldActionId(mc.world)));
     }
 
     public enum Potions {

@@ -3,6 +3,7 @@ package thunder.hack.modules.combat;
 import com.google.common.eventbus.Subscribe;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.*;
@@ -91,6 +92,7 @@ public class Surround extends Module {
                     Render3DEngine.drawBoxOutline(new Box(pos), HudEditor.getColor(0), 2);
                 }
             });
+        handleSurround();
     }
 
     @Subscribe
@@ -98,11 +100,9 @@ public class Surround extends Module {
         if (event.getPacket() instanceof PlayerPositionLookS2CPacket && disableOnTP.getValue()) toggle();
     }
 
-
     public double prevY;
 
-    @Subscribe
-    public void onEntitySync(PlayerUpdateEvent event) {
+    public void handleSurround() {
         if (fullNullCheck()) {
             toggle();
             return;
@@ -164,10 +164,6 @@ public class Surround extends Module {
                         AutoCrystal.changeId(attackPacket,entity.getId());
                         mc.player.networkHandler.sendPacket(attackPacket);
                         mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-
-                        entity.kill();
-                        entity.setRemoved(Entity.RemovalReason.KILLED);
-                        entity.onRemoved();
                     }
                 }
 
@@ -175,7 +171,6 @@ public class Surround extends Module {
                 renderPoses.put(targetPos, System.currentTimeMillis());
                 blocksPlaced++;
                 inactivityTimer.reset();
-                PlaceUtility.ghostBlocks.put(targetPos, System.currentTimeMillis());
             }
 
             offsetStep++;

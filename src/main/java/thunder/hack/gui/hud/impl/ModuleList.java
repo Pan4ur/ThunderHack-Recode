@@ -8,7 +8,6 @@ import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.Util;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.util.Formatting;
 
@@ -41,7 +40,7 @@ public class ModuleList extends HudElement {
         super.onRender2D(e);
 
         int stringWidth;
-        reverse = getPosX() > (float) (Util.getScaledResolution().getScaledWidth() / 2);
+        reverse = getPosX() > (float) (mc.getWindow().getScaledWidth() / 2);
         int offset = 0;
         int offset2 = 0;
 

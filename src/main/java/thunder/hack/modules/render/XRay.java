@@ -14,7 +14,6 @@ import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.Util;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
@@ -27,16 +26,16 @@ public class XRay extends Module {
     public Setting<Integer> checkSpeed = new Setting<>("CheckSpeed", 4, 1, 5, v -> brutForce.getValue());
     public Setting<Integer> rxz = new Setting<>("RadiusXZ", 20, 5, 200, v -> brutForce.getValue());
     public Setting<Integer> ry = new Setting<>("RadiusY", 6, 2, 50, v -> brutForce.getValue());
-    public Setting<Boolean> netherite = new Setting<>("Netherite", false);
-    public Setting<Boolean> diamond = new Setting<>("Diamond ", false);
-    public Setting<Boolean> gold = new Setting<>("Gold", false);
-    public Setting<Boolean> iron = new Setting<>("Iron", false);
-    public Setting<Boolean> emerald = new Setting<>("Emerald", false);
-    public Setting<Boolean> redstone = new Setting<>("Redstone", false);
-    public Setting<Boolean> lapis = new Setting<>("Lapis", false);
-    public Setting<Boolean> coal = new Setting<>("Coal", false);
-    public Setting<Boolean> water = new Setting<>("Water", false);
-    public Setting<Boolean> lava = new Setting<>("Lava", false);
+    public static Setting<Boolean> netherite = new Setting<>("Netherite", false);
+    public static Setting<Boolean> diamond = new Setting<>("Diamond ", false);
+    public static Setting<Boolean> gold = new Setting<>("Gold", false);
+    public static Setting<Boolean> iron = new Setting<>("Iron", false);
+    public static Setting<Boolean> emerald = new Setting<>("Emerald", false);
+    public static Setting<Boolean> redstone = new Setting<>("Redstone", false);
+    public static Setting<Boolean> lapis = new Setting<>("Lapis", false);
+    public static Setting<Boolean> coal = new Setting<>("Coal", false);
+    public static Setting<Boolean> water = new Setting<>("Water", false);
+    public static Setting<Boolean> lava = new Setting<>("Lava", false);
     
     ArrayList<BlockPos> ores = new ArrayList<>();
     ArrayList<BlockPos> toCheck = new ArrayList<>();
@@ -142,10 +141,10 @@ public class XRay extends Module {
 
     @Subscribe
     public void onRender2D(Render2DEvent e) {
-        FontRenderers.modules.drawCenteredString(e.getMatrixStack(),"Done: " + done + " / " + "All: " + all,Util.getScaledResolution().getScaledWidth() / 2f, 50,-1);
+        FontRenderers.modules.drawCenteredString(e.getMatrixStack(),"Done: " + done + " / " + "All: " + all,mc.getWindow().getScaledWidth() / 2f, 50,-1);
     }
 
-    public boolean isCheckableOre(Block block) {
+    public static boolean isCheckableOre(Block block) {
         if (diamond.getValue() && block == Blocks.DIAMOND_ORE) {
             return true;
         }

@@ -10,8 +10,8 @@ public class AutoSprint extends Module {
         super("AutoSprint", "AutoSprint", Category.MOVEMENT);
     }
 
-    public final Setting<Boolean> sprint = new Setting<>("KeepSprint", true);
-    public final Setting<Float> motion = new Setting("motion", 1f, 0f, 1f,v-> sprint.getValue());
+    public static final Setting<Boolean> sprint = new Setting<>("KeepSprint", true);
+    public static final Setting<Float> motion = new Setting("motion", 1f, 0f, 1f, v-> sprint.getValue());
 
     @Subscribe
     public void onTick(PlayerUpdateEvent event) {

@@ -2,7 +2,9 @@ package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
 import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.Core;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
@@ -12,9 +14,9 @@ import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.player.InventoryUtil;
-import thunder.hack.utility.Util;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
 import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.player.PlayerUtil;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.*;
 import net.minecraft.client.network.OtherClientPlayerEntity;
@@ -152,7 +154,7 @@ public class Aura extends Module {
                 hitTicks = oldDelay.getValue() ? 1 + (int) (20f / MathUtil.random(minCPS.getValue(), maxCPS.getValue())) : 11;
             }
             if(sprint) mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
-            if(blocking) mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, Util.getWorldActionId(Util.mc.world)));
+            if(blocking) mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtil.getWorldActionId(mc.world)));
         }
         hitTicks--;
     }
@@ -380,7 +382,7 @@ public class Aura extends Module {
         if(ent.isDead()) return true;
         if(!entity.isAlive()) return true;
         if(entity instanceof ArmorStandEntity) return true;
-        if(Thunderhack.moduleManager.get(AntiBot.class).isEnabled() && AntiBot.bots.contains(entity)) return true;
+        if(ModuleManager.antiBot.isEnabled() && AntiBot.bots.contains(entity)) return true;
         if((entity instanceof SlimeEntity) && !Slimes.getValue()) return true;
         if((entity instanceof PlayerEntity) && !Players.getValue()) return true;
         if((entity instanceof VillagerEntity) && !Villagers.getValue()) return true;

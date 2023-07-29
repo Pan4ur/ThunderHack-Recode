@@ -3,6 +3,7 @@ package thunder.hack.cmd.impl;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.MacroManager;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.utility.Macro;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
@@ -24,7 +25,11 @@ public class MacroCommand extends Command {
             }
             if (args[0].equals("list")) {
 
-                sendMessage("Макросы:");
+                if(MainSettings.language.getValue() == MainSettings.Language.RU) {
+                    sendMessage("Макросы:");
+                } else {
+                    sendMessage("Macro list:");
+                }
 
 
                 sendMessage(" ");

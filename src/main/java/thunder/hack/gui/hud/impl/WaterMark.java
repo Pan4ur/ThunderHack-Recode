@@ -42,7 +42,7 @@ public class WaterMark extends HudElement {
         } else if (mode.getValue() == Mode.Small){
             String info = "| " + mc.getSession().getUsername() + " | " + PingHud.getPing() + " ms | " + (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address);
             Render2DEngine.drawBlurredShadow(e.getMatrixStack(), getPosX(), getPosY(), FontRenderers.sf_bold.getStringWidth(info) + 5, 10, 4, HudEditor.getColor(270));
-            Render2DEngine.drawGradientRoundShader(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 1f, getPosY() - 1f,  FontRenderers.sf_bold.getStringWidth(info) + 7, 12, 3);
+            Render2DEngine.drawGradientRoundShader(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 1f, getPosY() - 1f,  FontRenderers.sf_bold.getStringWidth("ThunderHack " +info) + 7, 12, 3);
             Render2DEngine.drawRoundShader(e.getMatrixStack(), getPosX() - 0.5f, getPosY() - 0.5f,  FontRenderers.sf_bold.getStringWidth("ThunderHack " +info) + 6, 11, 3, HudEditor.plateColor.getValue().getColorObject());
             FontRenderers.sf_bold.drawGradientString(e.getMatrixStack(),"ThunderHack ",getPosX() + 2, getPosY() + 3,10);
             FontRenderers.sf_bold.drawString(e.getMatrixStack(),info,getPosX() + 2 + FontRenderers.sf_bold.getStringWidth("ThunderHack "), getPosY() + 3,HudEditor.textColor.getValue().getColor());

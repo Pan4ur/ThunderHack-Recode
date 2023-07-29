@@ -6,7 +6,6 @@ import club.minnced.discord.rpc.DiscordRichPresence;
 import thunder.hack.Thunderhack;
 import thunder.hack.setting.Setting;
 import thunder.hack.modules.Module;
-import thunder.hack.utility.Util;
 import net.minecraft.client.gui.screen.AddServerScreen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -91,8 +90,8 @@ class RPC extends Module {
 
 
                     if (nickname.getValue()) {
-                        presence.smallImageText = "logged as - " + Util.mc.getSession().getUsername();
-                        presence.smallImageKey = "https://minotar.net/helm/" +  Util.mc.getSession().getUsername()+ "/100.png";
+                        presence.smallImageText = "logged as - " + mc.getSession().getUsername();
+                        presence.smallImageKey = "https://minotar.net/helm/" +  mc.getSession().getUsername()+ "/100.png";
                     } else {
                         presence.smallImageText = "";
                         presence.smallImageKey = "";

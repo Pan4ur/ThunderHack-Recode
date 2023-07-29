@@ -1,16 +1,13 @@
 package thunder.hack.modules;
 
 import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.Render2DEvent;
 import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
-import thunder.hack.notification.NotificationManager;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.ThSoundPack;
-import thunder.hack.utility.Util;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Formatting;
@@ -23,7 +20,7 @@ import java.util.Objects;
 
 public class Module  {
     private final String description;
-    public static MinecraftClient mc = Util.mc;
+    public static MinecraftClient mc = MinecraftClient.getInstance();
     private final Category category;
     public Setting<Boolean> enabled = new Setting<>("Enabled", false);
     public String displayName;
@@ -174,7 +171,7 @@ public class Module  {
     }
 
     public static boolean fullNullCheck() {
-        return Util.mc.player == null || Util.mc.world == null;
+        return mc.player == null || mc.world == null;
     }
 
     public String getName() {

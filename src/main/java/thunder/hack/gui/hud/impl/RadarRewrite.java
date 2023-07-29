@@ -8,7 +8,6 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.utility.Util;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AstolfoAnimation;
 import net.minecraft.client.render.*;
@@ -26,26 +25,26 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class RadarRewrite extends HudElement {
 
     public static AstolfoAnimation astolfo = new AstolfoAnimation();
-    public Setting<Boolean> glow = new Setting("TracerGlow", false);
+    public static Setting<Boolean> glow = new Setting("TracerGlow", false);
 
     float xOffset2 = 0;
     float yOffset2 = 0;
 
     public Setting<Boolean> items = new Setting<>("Items", false);
     private final Setting<Float> width = new Setting<>("TracerHeight", 2.28f, 0.1f, 5f);
-    private final Setting<Float> rad22ius = new Setting<>("TracerDown", 3.63f, 0.1F, 20.0F);
-    private final Setting<Float> tracerA = new Setting<>("TracerWidth", 0.44F, 0.0F, 8.0F);
+    private static final Setting<Float> rad22ius = new Setting<>("TracerDown", 3.63f, 0.1F, 20.0F);
+    private static final Setting<Float> tracerA = new Setting<>("TracerWidth", 0.44F, 0.0F, 8.0F);
     private final Setting<Integer> xOffset = new Setting<>("TracerRadius", 68, 20, 100);
     private final Setting<Integer> maxup2 = new Setting<>("PitchLock", 42, -90, 90);
-    private final Setting<Integer> glowe = new Setting<>("GlowRadius", 10, 1, 20);
-    private final Setting<Integer> glowa = new Setting<>("GlowAlpha", 170, 0, 255);
+    private static final Setting<Integer> glowe = new Setting<>("GlowRadius", 10, 1, 20);
+    private static final Setting<Integer> glowa = new Setting<>("GlowAlpha", 170, 0, 255);
     private final Setting<triangleModeEn> triangleMode = new Setting<>("TracerCMode", triangleModeEn.Astolfo);
     private final Setting<mode2> Mode2 = new Setting<>("CircleCMode", mode2.Astolfo);
     private final Setting<Float> CRadius = new Setting<>("CompasRadius", 47F, 0.1F, 70.0F);
     private final Setting<Integer> fsef = new Setting<>("Correct", 12, -90, 90);
 
-    public final Setting<Integer> colorOffset1 = new Setting("ColorOffset", 10, 1, 20);
-    public final Setting<ColorSetting> cColor2 = new Setting<>("CompassColor2", new ColorSetting(0x2250b4b4));
+    public static final Setting<Integer> colorOffset1 = new Setting("ColorOffset", 10, 1, 20);
+    public static final Setting<ColorSetting> cColor2 = new Setting<>("CompassColor2", new ColorSetting(0x2250b4b4));
     private final Setting<ColorSetting> cColor = new Setting<>("CompassColor", new ColorSetting(0x2250b4b4));
 
     private final Setting<ColorSetting> ciColor = new Setting<>("CircleColor", new ColorSetting(0x2250b4b4));
@@ -109,8 +108,8 @@ public class RadarRewrite extends HudElement {
         rendercompass(event.getMatrixStack());
         event.getMatrixStack().pop();
 
-        xOffset2 = (Util.getScaledResolution().getScaledWidth() * getX());
-        yOffset2 = (Util.getScaledResolution().getScaledHeight() * getY());
+        xOffset2 = (mc.getWindow().getScaledWidth() * getX());
+        yOffset2 = (mc.getWindow().getScaledHeight() * getY());
 
         int color = 0;
         switch (triangleMode.getValue()) {
@@ -124,8 +123,8 @@ public class RadarRewrite extends HudElement {
                 color = Render2DEngine.rainbow(300, 1, 1).getRGB();
                 break;
         }
-        float xOffset = Util.getScaledResolution().getScaledWidth() * getX();
-        float yOffset = Util.getScaledResolution().getScaledHeight() * getY();
+        float xOffset = mc.getWindow().getScaledWidth() * getX();
+        float yOffset = mc.getWindow().getScaledHeight() * getY();
 
         event.getMatrixStack().push();
         event.getMatrixStack().translate(xOffset2, yOffset2, 0);
@@ -160,8 +159,8 @@ public class RadarRewrite extends HudElement {
     }
 
     public void rendercompass(MatrixStack matrices) {
-        float x = Util.getScaledResolution().getScaledWidth() * getX();
-        float y = Util.getScaledResolution().getScaledHeight() * getY();
+        float x = mc.getWindow().getScaledWidth() * getX();
+        float y = mc.getWindow().getScaledHeight() * getY();
 
         float nigga = Math.abs(90f / clamp2(mc.player.getPitch(), maxup2.getValue(), 90f));
 
@@ -181,7 +180,8 @@ public class RadarRewrite extends HudElement {
         }
         if (Mode2.getValue() == mode2.Astolfo) {
             drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2, ciColor.getValue().getColorObject(), false,Mode2.getValue());
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2.5f, ciColor.getValue().getColorObject(), false,Mode2.getValue());            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2, ciColor.getValue().getColorObject(), false,Mode2.getValue());
+            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2.5f, ciColor.getValue().getColorObject(), false,Mode2.getValue());
+            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2, ciColor.getValue().getColorObject(), false,Mode2.getValue());
             drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3.0f, ciColor.getValue().getColorObject(), false,Mode2.getValue());
             drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3.5f, ciColor.getValue().getColorObject(), false,Mode2.getValue());
         }
@@ -195,7 +195,7 @@ public class RadarRewrite extends HudElement {
         drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue(), cColor.getValue().getColorObject(), true,mode2.Custom);
      }
 
-    public void drawTracerPointer(MatrixStack matrices, float x, float y, float size, int color) {
+    public static void drawTracerPointer(MatrixStack matrices, float x, float y, float size, int color) {
         if (glow.getValue())
             Render2DEngine.drawBlurredShadow(matrices,x - size * tracerA.getValue(), y, (x + size * tracerA.getValue()) - (x - size * tracerA.getValue()), size, glowe.getValue(), Render2DEngine.injectAlpha(new Color(color), glowa.getValue()));
 
@@ -306,7 +306,7 @@ public class RadarRewrite extends HudElement {
             }  else if(cmode == RadarRewrite.mode2.Custom){
                 clr = color;
             } else {
-                clr = Render2DEngine.TwoColoreffect(color, Thunderhack.moduleManager.get(RadarRewrite.class).cColor2.getValue().getColorObject(), Math.abs(System.currentTimeMillis() / 10) / 100.0 + i * ((20f - Thunderhack.moduleManager.get(RadarRewrite.class).colorOffset1.getValue()) / 200) );
+                clr = Render2DEngine.TwoColoreffect(color, cColor2.getValue().getColorObject(), Math.abs(System.currentTimeMillis() / 10) / 100.0 + i * ((20f - colorOffset1.getValue()) / 200) );
             }
 
             int clr2 = clr.getRGB();

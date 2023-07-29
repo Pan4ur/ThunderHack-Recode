@@ -31,6 +31,7 @@ import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtil;
 import thunder.hack.utility.player.InventoryUtil;
 import thunder.hack.utility.player.PlaceUtility;
+import thunder.hack.utility.player.PlayerUtil;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
@@ -247,7 +248,7 @@ public class PistonAura extends Module {
                         mc.player.getInventory().selectedSlot = crystal_slot;
                         mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(crystal_slot));
                     }
-                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(mc.player.getOffHandStack().getItem() == Items.END_CRYSTAL ? Hand.OFF_HAND : Hand.MAIN_HAND, result, Util.getWorldActionId(mc.world)));
+                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(mc.player.getOffHandStack().getItem() == Items.END_CRYSTAL ? Hand.OFF_HAND : Hand.MAIN_HAND, result, PlayerUtil.getWorldActionId(mc.world)));
                     mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(mc.player.getOffHandStack().getItem() == Items.END_CRYSTAL ? Hand.OFF_HAND : Hand.MAIN_HAND));
                     mc.player.getInventory().selectedSlot = prev_slot;
                     mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prev_slot));

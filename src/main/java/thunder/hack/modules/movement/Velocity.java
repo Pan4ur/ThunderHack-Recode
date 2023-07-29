@@ -18,7 +18,7 @@ import net.minecraft.network.packet.s2c.play.*;
 public class Velocity extends Module {
     public Setting<Boolean> onlyAura = new Setting<>("OnlyAura", false);
     public Setting<Boolean> autoDisable = new Setting<>("DisableOnVerify", false);
-    public Setting<Boolean> noPush = new Setting<>("NoPush", false);
+    public static Setting<Boolean> noPush = new Setting<>("NoPush", false);
     private final Setting<modeEn> mode = new Setting<>("Mode", modeEn.Matrix);
     public Setting<Float> horizontal = new Setting<>("Horizontal", 0.0f, 0.0f, 100.0f, v -> mode.getValue() == modeEn.Custom);
     public Setting<Float> vertical = new Setting<>("Vertical", 0.0f, 0.0f, 100.0f, v -> mode.getValue() == modeEn.Custom);

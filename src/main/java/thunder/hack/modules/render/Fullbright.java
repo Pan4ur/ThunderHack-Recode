@@ -8,6 +8,6 @@ public class Fullbright extends Module {
         super("Fullbright", "Fullbright", Category.RENDER);
     }
 
-    public Setting<Integer> brightness = new Setting<>("Brightness", 15, 0, 15);
+    public static Setting<Integer> brightness = new Setting<>("Brightness", 15, 0, 15);
 
 }

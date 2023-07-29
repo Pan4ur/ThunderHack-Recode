@@ -18,11 +18,11 @@ import java.awt.*;
 
 public class Timer extends Module {
     public static double value;
-    public Setting<Mode> mode = new Setting<>("Mode", Mode.NORMAL);
-    public Setting<Float> speed = new Setting("Speed", 2.0f, 0.1f, 10.0f, v -> mode.getValue() != Mode.TICKSHIFT);
+    public static Setting<Mode> mode = new Setting<>("Mode", Mode.NORMAL);
+    public static Setting<Float> speed = new Setting("Speed", 2.0f, 0.1f, 10.0f, v -> mode.getValue() != Mode.TICKSHIFT);
     public Setting<Float> shiftTicks = new Setting("ShiftTicks", 10.0F, 1F, 40f, v -> mode.getValue() == Mode.TICKSHIFT);
-    public Setting<Float> addOnTheMove = new Setting("addOnTheMove", 0.0f, 0.0f, 1.0f, v -> mode.getValue() == Mode.SMART);
-    public Setting<Float> decreaseRate = new Setting("decreaseRate", 1.0f, 0.5f, 3.0f, v -> mode.getValue() == Mode.SMART);
+    public static Setting<Float> addOnTheMove = new Setting("addOnTheMove", 0.0f, 0.0f, 1.0f, v -> mode.getValue() == Mode.SMART);
+    public static Setting<Float> decreaseRate = new Setting("decreaseRate", 1.0f, 0.5f, 3.0f, v -> mode.getValue() == Mode.SMART);
 
 
     public Timer() {
@@ -50,15 +50,15 @@ public class Timer extends Module {
     }
 
     public static float violation = 0.0f;
-    private double prevPosX;
-    private double prevPosY;
-    private double prevPosZ;
+    private static double prevPosX;
+    private static double prevPosY;
+    private static double prevPosZ;
 
-    private float yaw;
-    private float pitch;
+    private static float yaw;
+    private static float pitch;
 
 
-    public void onEntitySync(EventSync e) {
+    public static void onEntitySync(EventSync e) {
         violation = notMoving() ? (float)(violation - (decreaseRate.getValue() + 0.4)) : violation - (addOnTheMove.getValue() / 10.0f);
         violation = (float) MathHelper.clamp(violation, 0.0, Math.floor(100f / Thunderhack.TICK_TIMER));
         prevPosX = mc.player.getX();
@@ -68,7 +68,7 @@ public class Timer extends Module {
         pitch = mc.player.getPitch();
     }
 
-    private boolean notMoving() {
+    private static boolean notMoving() {
         return prevPosX == mc.player.getX()
                 && prevPosY == mc.player.getY()
                 && prevPosZ == mc.player.getZ()

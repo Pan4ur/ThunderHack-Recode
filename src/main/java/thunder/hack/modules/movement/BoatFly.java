@@ -8,7 +8,6 @@ import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.Util;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.BoatEntity;
@@ -54,9 +53,9 @@ public class BoatFly extends Module {
     }
 
     public static double[] Method1330(double d) {
-        float f = Util.mc.player.input.movementForward;
-        float f2 = Util.mc.player.input.movementSideways;
-        float f3 = Util.mc.player.prevYaw + (Util.mc.player.getYaw() - Util.mc.player.prevYaw) * Util.mc.getTickDelta();
+        float f =mc.player.input.movementForward;
+        float f2 =mc.player.input.movementSideways;
+        float f3 =mc.player.prevYaw + (mc.player.getYaw() -mc.player.prevYaw) *mc.getTickDelta();
         if (f != 0.0f) {
             if (f2 > 0.0f) {
                 f3 += (f > 0.0f ? -45 : 45);
@@ -79,7 +78,7 @@ public class BoatFly extends Module {
 
     @Override
     public void onEnable() {
-        if (Util.mc.player == null || Util.mc.world == null) {
+        if (mc.player == null ||mc.world == null) {
             this.toggle();
             return;
         }
@@ -93,19 +92,19 @@ public class BoatFly extends Module {
         Thunderhack.TICK_TIMER = (1.0f);
         this.Field2263.clear();
         this.Field2266 = false;
-        if (Util.mc.player == null) {
+        if (mc.player == null) {
             return;
         }
         if ((this.phase.getValue()) && this.mode.getValue() == Mode.Motion) {
-            if (Util.mc.player.getControllingVehicle() != null) {
-                Util.mc.player.getControllingVehicle().noClip = false;
+            if (mc.player.getControllingVehicle() != null) {
+               mc.player.getControllingVehicle().noClip = false;
             }
-            Util.mc.player.noClip = false;
+           mc.player.noClip = false;
         }
-        if (Util.mc.player.getControllingVehicle() != null) {
-            Util.mc.player.getControllingVehicle().setNoGravity(false);
+        if (mc.player.getControllingVehicle() != null) {
+           mc.player.getControllingVehicle().setNoGravity(false);
         }
-        Util.mc.player.setNoGravity(false);
+       mc.player.setNoGravity(false);
     }
 
 
@@ -116,14 +115,14 @@ public class BoatFly extends Module {
 
     private void Method2875(VehicleMoveC2SPacket cPacketVehicleMove) {
         this.Field2263.add(cPacketVehicleMove);
-        Util.mc.player.networkHandler.sendPacket(cPacketVehicleMove);
+       mc.player.networkHandler.sendPacket(cPacketVehicleMove);
     }
 
     private void Method2876(Entity entity) {
         double d = entity.getY();
         BlockPos blockPos = BlockPos.ofFloored(entity.getPos());
         for (int i = 0; i < 255; ++i) {
-            if (Util.mc.world.getBlockState(blockPos).getBlock() == Blocks.WATER) {
+            if (mc.world.getBlockState(blockPos).getBlock() == Blocks.WATER) {
                 entity.setPosition(entity.getX(),blockPos.getY() + 1,entity.getZ());
                 if (this.debug.getValue()) {
                     Command.sendMessage("GroundY" + entity.getPos().getY());
@@ -137,9 +136,9 @@ public class BoatFly extends Module {
     }
 
     private void Method2868() {
-        for (Entity entity : Util.mc.world.getEntities()) {
-            if (!(entity instanceof BoatEntity) || !(Util.mc.player.squaredDistanceTo(entity) < 25.0f)) continue;
-            Util.mc.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket.interact(entity, false, Hand.MAIN_HAND));
+        for (Entity entity :mc.world.getEntities()) {
+            if (!(entity instanceof BoatEntity) || !(mc.player.squaredDistanceTo(entity) < 25.0f)) continue;
+           mc.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket.interact(entity, false, Hand.MAIN_HAND));
             break;
         }
     }
@@ -147,23 +146,23 @@ public class BoatFly extends Module {
     @Subscribe
     public void onPlayerTravel(EventPlayerTravel ev) {
         if(!ev.isPre()) return;
-        if (Util.mc.player == null || Util.mc.world == null) {
+        if (mc.player == null ||mc.world == null) {
             return;
         }
-        if (Util.mc.player.getControllingVehicle() == null) {
+        if (mc.player.getControllingVehicle() == null) {
             if (this.automount.getValue()) {
                 this.Method2868();
             }
             return;
         }
         if (this.phase.getValue() && this.mode.getValue() == Mode.Motion) {
-            Util.mc.player.getControllingVehicle().noClip = true;
-            Util.mc.player.getControllingVehicle().setNoGravity(true);
-            Util.mc.player.noClip = true;
+           mc.player.getControllingVehicle().noClip = true;
+           mc.player.getControllingVehicle().setNoGravity(true);
+           mc.player.noClip = true;
         }
         if (!this.Field2267) {
-            Util.mc.player.getControllingVehicle().setNoGravity(!(this.gravity.getValue()));
-            Util.mc.player.setNoGravity(!(this.gravity.getValue()));
+           mc.player.getControllingVehicle().setNoGravity(!(this.gravity.getValue()));
+           mc.player.setNoGravity(!(this.gravity.getValue()));
         }
         if (this.stop.getValue()) {
             if (this.Field2264 > this.enableticks.getValue() && !this.Field2266) {
@@ -179,12 +178,12 @@ public class BoatFly extends Module {
                 this.Field2266 = false;
             }
         }
-        Entity entity = Util.mc.player.getControllingVehicle();
+        Entity entity =mc.player.getControllingVehicle();
         if (this.debug.getValue()) {
             Command.sendMessage("Y" + entity.getY());
             Command.sendMessage("Fall" + entity.fallDistance);
         }
-        if ((!Util.mc.world.isChunkLoaded((int)entity.getPos().getX() >> 4, (int) entity.getPos().getZ() >> 4) || entity.getPos().getY() < 0) && this.stopunloaded.getValue()) {
+        if ((!mc.world.isChunkLoaded((int)entity.getPos().getX() >> 4, (int) entity.getPos().getZ() >> 4) || entity.getPos().getY() < 0) && this.stopunloaded.getValue()) {
             if (this.debug.getValue()) {
                 Command.sendMessage("Detected unloaded chunk!");
             }
@@ -199,7 +198,7 @@ public class BoatFly extends Module {
         double d = entity.getX() + dArray[0];
         double d2 = entity.getZ() + dArray[1];
         double d3 = entity.getY();
-        if ((!Util.mc.world.isChunkLoaded((int) d >> 4, (int) d2 >> 4) || entity.getPos().getY() < 0) && (this.stopunloaded.getValue())) {
+        if ((!mc.world.isChunkLoaded((int) d >> 4, (int) d2 >> 4) || entity.getPos().getY() < 0) && (this.stopunloaded.getValue())) {
             if (this.debug.getValue()) {
                 Command.sendMessage("Detected unloaded chunk!");
             }
@@ -211,7 +210,7 @@ public class BoatFly extends Module {
         if (this.mode.getValue() == Mode.Motion) {
             entity.setVelocity(dArray[0],entity.getVelocity().getY(),dArray[1]);
         }
-        if (Util.mc.options.jumpKey.isPressed()) {
+        if (mc.options.jumpKey.isPressed()) {
             if (!(this.ylimit.getValue()) || entity.getY() <= (this.height.getValue())) {
                 if (this.mode.getValue() == Mode.Motion) {
                     entity.setVelocity(entity.getVelocity().getX(),entity.getVelocity().getY() + (this.yspeed.getValue()),entity.getVelocity().getZ());
@@ -219,14 +218,14 @@ public class BoatFly extends Module {
                     d3 += (this.yspeed.getValue());
                 }
             }
-        } else if (Util.mc.options.sneakKey.isPressed()) {
+        } else if (mc.options.sneakKey.isPressed()) {
             if (this.mode.getValue() == Mode.Motion) {
                 entity.setVelocity(entity.getVelocity().getX(),entity.getVelocity().getY()  + (-(this.yspeed.getValue())),entity.getVelocity().getZ());
             } else {
                 d3 += (-(this.yspeed.getValue()));
             }
         }
-        if (Util.mc.player.input.movementSideways == 0.0f && Util.mc.player.input.movementForward == 0.0f) {
+        if (mc.player.input.movementSideways == 0.0f &&mc.player.input.movementForward == 0.0f) {
             entity.setVelocity(0,entity.getVelocity().getY(),0);
         }
         if ((this.ongroundpacket.getValue())) {
@@ -243,13 +242,13 @@ public class BoatFly extends Module {
         }
         if ((this.spoofpackets.getValue())) {
             Vec3d vec3d = entity.getPos().add(0.0, this.Method2874(), 0.0);
-            BoatEntity entityBoat = new BoatEntity(Util.mc.world, vec3d.x, vec3d.y, vec3d.z);
+            BoatEntity entityBoat = new BoatEntity(mc.world, vec3d.x, vec3d.y, vec3d.z);
             entityBoat.setYaw(entity.getYaw());
             entityBoat.setPitch(entity.getPitch());
             this.Method2875(new VehicleMoveC2SPacket(entityBoat));
         }
         if ((this.remount.getValue())) {
-            Util.mc.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket.interact(entity, false, Hand.MAIN_HAND));
+           mc.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket.interact(entity, false, Hand.MAIN_HAND));
         }
         ev.cancel();
         ++this.Field2264;
@@ -263,13 +262,13 @@ public class BoatFly extends Module {
         if (eventNetworkPrePacketEvent.getPacket() instanceof DisconnectS2CPacket) {
             this.toggle();
         }
-        if (!Util.mc.player.isRiding() || this.Field2267 || this.Field2266) {
+        if (!mc.player.isRiding() || this.Field2267 || this.Field2266) {
             return;
         }
-        if (eventNetworkPrePacketEvent.getPacket() instanceof VehicleMoveS2CPacket && Util.mc.player.isRiding() && (this.cancel.getValue())) {
+        if (eventNetworkPrePacketEvent.getPacket() instanceof VehicleMoveS2CPacket &&mc.player.isRiding() && (this.cancel.getValue())) {
             eventNetworkPrePacketEvent.cancel();
         }
-        if (eventNetworkPrePacketEvent.getPacket() instanceof PlayerPositionLookS2CPacket && Util.mc.player.isRiding() && (this.cancel.getValue())) {
+        if (eventNetworkPrePacketEvent.getPacket() instanceof PlayerPositionLookS2CPacket &&mc.player.isRiding() && (this.cancel.getValue())) {
             eventNetworkPrePacketEvent.cancel();
         }
         if (eventNetworkPrePacketEvent.getPacket() instanceof EntityS2CPacket && (this.cancel.getValue())) {
@@ -282,20 +281,20 @@ public class BoatFly extends Module {
 
     @Subscribe
     public void onPacketSend(PacketEvent.Send eventNetworkPostPacketEvent) {
-        if (Util.mc.player == null || Util.mc.world == null) {
+        if (mc.player == null ||mc.world == null) {
             return;
         }
-        if ((eventNetworkPostPacketEvent.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround && (this.cancelrotations.getValue()) || eventNetworkPostPacketEvent.getPacket() instanceof PlayerInputC2SPacket) && Util.mc.player.isRiding()) {
+        if ((eventNetworkPostPacketEvent.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround && (this.cancelrotations.getValue()) || eventNetworkPostPacketEvent.getPacket() instanceof PlayerInputC2SPacket) &&mc.player.isRiding()) {
             eventNetworkPostPacketEvent.cancel();
         }
         if (this.Field2267 && eventNetworkPostPacketEvent.getPacket() instanceof VehicleMoveC2SPacket) {
             eventNetworkPostPacketEvent.cancel();
         }
-        if (!Util.mc.player.isRiding() || this.Field2267 || this.Field2266) {
+        if (!mc.player.isRiding() || this.Field2267 || this.Field2266) {
             return;
         }
-        Entity entity = Util.mc.player.getControllingVehicle();
-        if ((!Util.mc.world.isChunkLoaded((int)entity.getPos().getX() >> 4, (int)entity.getPos().getZ() >> 4) || entity.getPos().getY() < 0) && (this.stopunloaded.getValue())) {
+        Entity entity =mc.player.getControllingVehicle();
+        if ((!mc.world.isChunkLoaded((int)entity.getPos().getX() >> 4, (int)entity.getPos().getZ() >> 4) || entity.getPos().getY() < 0) && (this.stopunloaded.getValue())) {
             return;
         }
         if (eventNetworkPostPacketEvent.getPacket() instanceof VehicleMoveC2SPacket && (this.limit.getValue()) && this.mode.getValue() == Mode.Packet) {

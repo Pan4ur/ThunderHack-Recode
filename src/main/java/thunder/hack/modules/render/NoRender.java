@@ -37,19 +37,19 @@ public class NoRender extends Module {
     public Setting<Boolean> explosions = new Setting<>("Explosions", false);
     public Setting<Boolean> campFire = new Setting<>("CampFire", false);
     public Setting<Boolean> fireworks = new Setting<>("Fireworks", false);
-    public Setting<Boolean> armor = new Setting<>("Armor", false);
-    public Setting<Boolean> bossbar = new Setting<>("Bossbar", false);
-    public Setting<Boolean> hurtCam = new Setting<>("HurtCam", false);
-    public Setting<Boolean> fireOverlay = new Setting<>("FireOverlay", false);
-    public Setting<Boolean> waterOverlay = new Setting<>("WaterOverlay", false);
-    public Setting<Boolean> blockOverlay = new Setting<>("BlockOverlay", false);
-    public Setting<Boolean> nausea = new Setting<>("Nausea", false);
-    public Setting<Boolean> blindness = new Setting<>("Blindness", false);
-    public Setting<Boolean> fog = new Setting<>("Fog", false);
-    public Setting<Boolean> darkness = new Setting<>("Darkness", false);
+    public static Setting<Boolean> armor = new Setting<>("Armor", false);
+    public static Setting<Boolean> bossbar = new Setting<>("Bossbar", false);
+    public static Setting<Boolean> hurtCam = new Setting<>("HurtCam", false);
+    public static Setting<Boolean> fireOverlay = new Setting<>("FireOverlay", false);
+    public static Setting<Boolean> waterOverlay = new Setting<>("WaterOverlay", false);
+    public static Setting<Boolean> blockOverlay = new Setting<>("BlockOverlay", false);
+    public static Setting<Boolean> nausea = new Setting<>("Nausea", false);
+    public static Setting<Boolean> blindness = new Setting<>("Blindness", false);
+    public static Setting<Boolean> fog = new Setting<>("Fog", false);
+    public static Setting<Boolean> darkness = new Setting<>("Darkness", false);
     public Setting<Boolean> items = new Setting<>("Items", false);
     public Setting<Boolean> crystals = new Setting<>("Crystals", false);
-    public Setting<Boolean> fireEntity = new Setting<>("FireEntity", true);
+    public static Setting<Boolean> fireEntity = new Setting<>("FireEntity", true);
     public Setting<Boolean> antiTitle = new Setting<>("AntiTitle", false);
 
 

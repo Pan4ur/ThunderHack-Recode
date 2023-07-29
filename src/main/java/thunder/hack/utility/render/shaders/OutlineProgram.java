@@ -21,15 +21,12 @@ public class OutlineProgram {
     int previousWidth, previousHeight;
 
     private OutlineProgram(Identifier ident, Consumer<OutlineProgram> init) {
-        PostEffectProcessor shader1;
         try {
             shader = new PostEffectProcessor(mc.getTextureManager(), mc.getResourceManager(), mc.getFramebuffer(), ident);
-          //  checkUpdateDimensions();
         } catch (Exception e){
             e.printStackTrace();
         }
         init.accept(this);
-        //checkUpdateDimensions();
     }
 
     public static OutlineProgram create(Consumer<OutlineProgram> callback) {

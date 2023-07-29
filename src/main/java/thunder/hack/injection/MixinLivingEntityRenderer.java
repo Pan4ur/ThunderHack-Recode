@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.render.Chams;
@@ -52,7 +53,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
             livingEntity.prevPitch = Thunderhack.playerManager.lastPitch;
         }
         lastEntity = livingEntity;
-        if (Thunderhack.moduleManager.get(Chams.class).isEnabled()) {
+        if (ModuleManager.chams.isEnabled()) {
           //  GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
           //  GL11.glPolygonOffset(1.0f, -1100000.0f);
         }
@@ -70,7 +71,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
             livingEntity.prevBodyYaw = originalPrevBodyYaw;
             livingEntity.prevPitch = originalPitch;
         }
-        if (Thunderhack.moduleManager.get(Chams.class).isEnabled()) {
+        if (ModuleManager.chams.isEnabled()) {
          //   GL11.glPolygonOffset(1.0f, 1100000.0f);
          //   GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
         }
@@ -79,8 +80,8 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/EntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;IIFFFF)V"))
     private void onRenderModel(EntityModel entityModel, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
-        if(Thunderhack.moduleManager.get(Chams.class).isEnabled()){
-            ColorSetting clr = Thunderhack.moduleManager.get(Chams.class).getEntityColor(lastEntity);
+        if(ModuleManager.chams.isEnabled()){
+            ColorSetting clr = Chams.getEntityColor(lastEntity);
             entityModel.render(matrices, vertices, light, overlay, clr.getRed() / 255F, clr.getGreen() / 255F, clr.getBlue() / 255F, clr.getAlpha() / 255F);
             return;
         }
@@ -91,8 +92,8 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
 
     @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;scale(FFF)V", ordinal = 0))
     private void onScale(Args args) {
-        if(Thunderhack.moduleManager.get(Chams.class).isEnabled()) {
-            float scale = Thunderhack.moduleManager.get(Chams.class).getEntityScale(lastEntity);
+        if(ModuleManager.chams.isEnabled()) {
+            float scale = Chams.getEntityScale(lastEntity);
             args.set(0, -scale);
             args.set(1, -scale);
             args.set(2, scale);

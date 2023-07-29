@@ -39,7 +39,7 @@ public class AntiBot extends Module {
                 if (mode.getValue() == Mode.MotionCheck) {
                     if (player != null) {
                         double speed = (player.getX() - player.prevX) * (player.getX() - player.prevX) + (player.getZ() - player.prevZ) * (player.getZ() - player.prevZ);
-                        if (player != mc.player && speed > 0.5 && MathUtil.getDistanceSq(player) <= Thunderhack.moduleManager.get(Aura.class).attackRange.getValue() * Thunderhack.moduleManager.get(Aura.class).attackRange.getValue() && !bots.contains(player)) {
+                        if (player != mc.player && speed > 0.5 && MathUtil.getDistanceSq(player) <= Aura.attackRange.getPow2Value() && !bots.contains(player)) {
                             if (!bots.contains(player)) {
                                 Command.sendMessage(player.getName().getString() + " is a bot!");
                                 ++botsNumber;

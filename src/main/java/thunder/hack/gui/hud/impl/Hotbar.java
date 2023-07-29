@@ -1,13 +1,10 @@
 package thunder.hack.gui.hud.impl;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.Util;
-import thunder.hack.utility.render.MSAAFramebuffer;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,31 +25,31 @@ public class Hotbar extends HudElement {
             if (playerEntity != null) {
 
                 MatrixStack matrices = context.getMatrices();
-                int i = Util.getScaledResolution().getScaledWidth() / 2;
-                int o = Util.getScaledResolution().getScaledHeight() - 16 - 3;
+                int i = mc.getWindow().getScaledWidth() / 2;
+                int o = mc.getWindow().getScaledHeight() - 16 - 3;
 
                 if(mc.player.getOffHandStack().isEmpty()) {
-                    Render2DEngine.drawGradientBlurredShadow(matrices, i - 91, Util.getScaledResolution().getScaledHeight() - 22 + 1 - 5, 182, 22, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
-                    Render2DEngine.drawGradientRoundShader(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 91, Util.getScaledResolution().getScaledHeight() - 22 + 1 - 5, 182, 22, HudEditor.hudRound.getValue());
-                    Render2DEngine.drawRoundShader(matrices, i - 90, Util.getScaledResolution().getScaledHeight() - 22 + 1 - 4, 180f, 20, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
-                    Render2DEngine.drawRoundShader(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, Util.getScaledResolution().getScaledHeight() - 24, 18, 18, 5f, HudEditor.plateColor.getValue().getColorObject().brighter().brighter().brighter());
+                    Render2DEngine.drawGradientBlurredShadow(matrices, i - 91, mc.getWindow().getScaledHeight() - 22 + 1 - 5, 182, 22, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+                    Render2DEngine.drawGradientRoundShader(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 91, mc.getWindow().getScaledHeight() - 22 + 1 - 5, 182, 22, HudEditor.hudRound.getValue());
+                    Render2DEngine.drawRoundShader(matrices, i - 90, mc.getWindow().getScaledHeight() - 22 + 1 - 4, 180f, 20, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+                    Render2DEngine.drawRoundShader(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, mc.getWindow().getScaledHeight() - 24, 18, 18, 5f, HudEditor.plateColor.getValue().getColorObject().brighter().brighter().brighter());
                 } else if(lmode.getValue() == Mode.Merged){
-                    Render2DEngine.drawGradientBlurredShadow(matrices, i - 110, Util.getScaledResolution().getScaledHeight() - 22 + 1 - 5, 200, 22, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
-                    Render2DEngine.drawGradientRoundShader(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 110, Util.getScaledResolution().getScaledHeight() - 22 + 1 - 5, 200, 22, HudEditor.hudRound.getValue());
-                    Render2DEngine.drawRoundShader(matrices, i - 109, Util.getScaledResolution().getScaledHeight() - 22 + 1 - 4, 198f, 20, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
-                    Render2DEngine.drawRoundShader(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, Util.getScaledResolution().getScaledHeight() - 24, 18, 18, 5f, HudEditor.plateColor.getValue().getColorObject().brighter().brighter().brighter());
+                    Render2DEngine.drawGradientBlurredShadow(matrices, i - 110, mc.getWindow().getScaledHeight() - 22 + 1 - 5, 200, 22, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+                    Render2DEngine.drawGradientRoundShader(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 110, mc.getWindow().getScaledHeight() - 22 + 1 - 5, 200, 22, HudEditor.hudRound.getValue());
+                    Render2DEngine.drawRoundShader(matrices, i - 109, mc.getWindow().getScaledHeight() - 22 + 1 - 4, 198f, 20, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+                    Render2DEngine.drawRoundShader(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, mc.getWindow().getScaledHeight() - 24, 18, 18, 5f, HudEditor.plateColor.getValue().getColorObject().brighter().brighter().brighter());
                     renderHotbarItem(context, i - 109, o - 5, tickDelta, playerEntity, (ItemStack) playerEntity.getOffHandStack(), -1);
-                    Render2DEngine.verticalGradient(matrices,i - 109 + 18, Util.getScaledResolution().getScaledHeight() - 22 + 1 - 4, i - 108 + 18 - 0.5, Util.getScaledResolution().getScaledHeight() - 11 + 1 - 4,Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(),0).getRGB(), HudEditor.textColor.getValue().getColorObject().getRGB());
-                    Render2DEngine.verticalGradient(matrices,i - 109 + 18, Util.getScaledResolution().getScaledHeight() - 11 - 4, i - 108 + 18 - 0.5, Util.getScaledResolution().getScaledHeight()  - 5, HudEditor.textColor.getValue().getColorObject().getRGB(),Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(),0).getRGB());
+                    Render2DEngine.verticalGradient(matrices,i - 109 + 18, mc.getWindow().getScaledHeight() - 22 + 1 - 4, i - 108 + 18 - 0.5, mc.getWindow().getScaledHeight() - 11 + 1 - 4,Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(),0).getRGB(), HudEditor.textColor.getValue().getColorObject().getRGB());
+                    Render2DEngine.verticalGradient(matrices,i - 109 + 18, mc.getWindow().getScaledHeight() - 11 - 4, i - 108 + 18 - 0.5, mc.getWindow().getScaledHeight()  - 5, HudEditor.textColor.getValue().getColorObject().getRGB(),Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(),0).getRGB());
                 } else {
-                    Render2DEngine.drawGradientBlurredShadow(matrices, i - 91, Util.getScaledResolution().getScaledHeight() - 22 + 1 - 5, 182, 22, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
-                    Render2DEngine.drawGradientRoundShader(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 91, Util.getScaledResolution().getScaledHeight() - 22 + 1 - 5, 182, 22, HudEditor.hudRound.getValue());
-                    Render2DEngine.drawRoundShader(matrices, i - 90, Util.getScaledResolution().getScaledHeight() - 22 + 1 - 4, 180f, 20, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
-                    Render2DEngine.drawRoundShader(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, Util.getScaledResolution().getScaledHeight() - 24, 18, 18, 5f, HudEditor.plateColor.getValue().getColorObject().brighter().brighter().brighter());
+                    Render2DEngine.drawGradientBlurredShadow(matrices, i - 91, mc.getWindow().getScaledHeight() - 22 + 1 - 5, 182, 22, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+                    Render2DEngine.drawGradientRoundShader(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 91, mc.getWindow().getScaledHeight() - 22 + 1 - 5, 182, 22, HudEditor.hudRound.getValue());
+                    Render2DEngine.drawRoundShader(matrices, i - 90, mc.getWindow().getScaledHeight() - 22 + 1 - 4, 180f, 20, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+                    Render2DEngine.drawRoundShader(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, mc.getWindow().getScaledHeight() - 24, 18, 18, 5f, HudEditor.plateColor.getValue().getColorObject().brighter().brighter().brighter());
 
-                    Render2DEngine.drawGradientBlurredShadow(matrices, i - 117, Util.getScaledResolution().getScaledHeight() - 22 + 1 - 5, 22, 22, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
-                    Render2DEngine.drawGradientRoundShader(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 117, Util.getScaledResolution().getScaledHeight() - 22 + 1 - 5, 22, 22, HudEditor.hudRound.getValue());
-                    Render2DEngine.drawRoundShader(matrices, i - 116, Util.getScaledResolution().getScaledHeight() - 22 + 1 - 4, 20f, 20, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+                    Render2DEngine.drawGradientBlurredShadow(matrices, i - 117, mc.getWindow().getScaledHeight() - 22 + 1 - 5, 22, 22, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+                    Render2DEngine.drawGradientRoundShader(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 117, mc.getWindow().getScaledHeight() - 22 + 1 - 5, 22, 22, HudEditor.hudRound.getValue());
+                    Render2DEngine.drawRoundShader(matrices, i - 116, mc.getWindow().getScaledHeight() - 22 + 1 - 4, 20f, 20, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
                     renderHotbarItem(context, i - 114, o - 5, tickDelta, playerEntity, (ItemStack) playerEntity.getOffHandStack(), -1);
                 }
 
@@ -100,8 +97,8 @@ public class Hotbar extends HudElement {
         if (mc.player.experienceLevel > 0) {
             mc.getProfiler().push("expLevel");
             String string = "" + mc.player.experienceLevel;
-            k = (int) ((Util.getScaledResolution().getScaledWidth() - FontRenderers.sf_bold_mini.getStringWidth(string)) / 2);
-            l = Util.getScaledResolution().getScaledHeight() - 31 - 4;
+            k = (int) ((mc.getWindow().getScaledWidth() - FontRenderers.sf_bold_mini.getStringWidth(string)) / 2);
+            l = mc.getWindow().getScaledHeight() - 31 - 4;
             FontRenderers.sf_bold_mini.drawString(matrices,string,k,l,8453920);
             mc.getProfiler().pop();
         }

@@ -21,10 +21,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import thunder.hack.modules.Module;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 public class PlayerManager {
     public float serverYaw, serverPitch;

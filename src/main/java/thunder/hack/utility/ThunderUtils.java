@@ -2,7 +2,8 @@ package thunder.hack.utility;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
+
 
 public class ThunderUtils {
     public static String solvename(String notsolved) {

@@ -39,10 +39,9 @@ public class PeekScreen extends ShulkerBoxScreen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE && focusedSlot != null && !focusedSlot.getStack().isEmpty() && client.player.playerScreenHandler.getCursorStack().isEmpty()) {
-            Tooltips toolips = Thunderhack.moduleManager.get(Tooltips.class);
             ItemStack itemStack = focusedSlot.getStack();
 
-            if (Tooltips.hasItems(itemStack) && toolips.middleClickOpen.getValue()) {
+            if (Tooltips.hasItems(itemStack) && Tooltips.middleClickOpen.getValue()) {
 
                 Arrays.fill(ITEMS, ItemStack.EMPTY);
                 NbtCompound nbt = itemStack.getNbt();

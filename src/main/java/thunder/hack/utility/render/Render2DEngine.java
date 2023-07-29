@@ -28,12 +28,11 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Stack;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 public class Render2DEngine {
     public static RoundedGradientProgram ROUNDED_GRADIENT_PROGRAM;
     public static RoundedProgram ROUNDED_PROGRAM;
-
 
     public static void addWindow(MatrixStack stack, Rectangle r1) {
         Matrix4f matrix = stack.peek().getPositionMatrix();
@@ -65,30 +64,6 @@ public class Render2DEngine {
     }
 
     final static Stack<Rectangle> clipStack = new Stack<>();
-
-    private static int stencilBit = 0xff;
-
-    public static void preStencil() {
-        GL11.glEnable(GL11.GL_STENCIL_TEST);
-        RenderSystem.colorMask(false, false, false, false);
-        RenderSystem.depthMask(false);
-        RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE);
-        RenderSystem.stencilFunc(GL11.GL_ALWAYS, stencilBit, stencilBit);
-        RenderSystem.stencilMask(stencilBit);
-        RenderSystem.clear(GL11.GL_STENCIL_BUFFER_BIT, false);
-    }
-
-    public static void postStencil() {
-        RenderSystem.colorMask(true, true, true, true);
-        RenderSystem.depthMask(true);
-        RenderSystem.stencilMask(0x00);
-        RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
-        RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilBit, stencilBit);
-    }
-
-    public static void disableStencil() {
-        GL11.glDisable(GL11.GL_STENCIL_TEST);
-    }
 
     public static void popWindow() {
         clipStack.pop();

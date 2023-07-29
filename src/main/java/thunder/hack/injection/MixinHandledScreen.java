@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.Core;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.gui.hud.impl.TargetHud;
 import thunder.hack.gui.misc.PeekScreen;
 import thunder.hack.modules.misc.ItemScroller;
@@ -43,8 +44,8 @@ import thunder.hack.utility.render.Render2DEngine;
 
 import java.util.*;
 
+import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.render.Tooltips.hasItems;
-import static thunder.hack.utility.Util.mc;
 
 @Mixin(value = {HandledScreen.class})
 public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen implements ScreenHandlerProvider<T> {
@@ -66,12 +67,10 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
     @Inject(method = "render", at = @At("HEAD"))
     private void drawScreenHook(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        ItemScroller scroller = Thunderhack.moduleManager.get(ItemScroller.class);
-
         for (int i1 = 0; i1 < mc.player.currentScreenHandler.slots.size(); ++i1) {
             Slot slot = mc.player.currentScreenHandler.slots.get(i1);
             if (isPointOverSlot(slot, mouseX, mouseY) && slot.isEnabled()) {
-                if (scroller.isEnabled() && shit() && attack() && delayTimer.passedMs(scroller.delay.getValue())) {
+                if (ModuleManager.itemScroller.isEnabled() && shit() && attack() && delayTimer.passedMs(ModuleManager.itemScroller.delay.getValue())) {
                     this.onMouseClick(slot, slot.id, 0, SlotActionType.QUICK_MOVE);
                     delayTimer.reset();
                 }
@@ -93,7 +92,6 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
     @Shadow protected int x;
     @Shadow protected int y;
 
-
     private static final Identifier CONTAINER_BACKGROUND = new Identifier("textures/container.png");
     private static final Identifier MAP_BACKGROUND = new Identifier("textures/map_background.png");
     private static final ItemStack[] ITEMS = new ItemStack[27];
@@ -102,13 +100,11 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        Tooltips toolips = Thunderhack.moduleManager.get(Tooltips.class);
-
         if (focusedSlot != null && !focusedSlot.getStack().isEmpty() && client.player.playerScreenHandler.getCursorStack().isEmpty()) {
-            if (hasItems(focusedSlot.getStack()) && toolips.storage.getValue()) {
+            if (hasItems(focusedSlot.getStack()) && ModuleManager.tooltips.storage.getValue()) {
                 renderShulkerToolTip(context,mouseX,mouseY,focusedSlot.getStack());
             }
-            else if (focusedSlot.getStack().getItem() == Items.FILLED_MAP && toolips.maps.getValue()) {
+            else if (focusedSlot.getStack().getItem() == Items.FILLED_MAP && ModuleManager.tooltips.maps.getValue()) {
                 drawMapPreview(context, focusedSlot.getStack(), mouseX, mouseY);
             }
         }
@@ -116,7 +112,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
         int yOffset = 20;
         int stage = 0;
 
-        if(toolips.isEnabled() && toolips.shulkerRegear.getValue()) {
+        if(ModuleManager.tooltips.isEnabled() && ModuleManager.tooltips.shulkerRegear.getValue()) {
             clickableRects.clear();
             for (int i1 = 0; i1 < mc.player.currentScreenHandler.slots.size(); ++i1) {
                 Slot slot = mc.player.currentScreenHandler.slots.get(i1);
@@ -174,7 +170,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
     @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"), cancellable = true)
     private void onDrawMouseoverTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
         if (focusedSlot != null && !focusedSlot.getStack().isEmpty() && client.player.playerScreenHandler.getCursorStack().isEmpty()) {
-            if (focusedSlot.getStack().getItem() == Items.FILLED_MAP && Thunderhack.moduleManager.get(Tooltips.class).maps.getValue()) ci.cancel();
+            if (focusedSlot.getStack().getItem() == Items.FILLED_MAP && Tooltips.maps.getValue()) ci.cancel();
         }
     }
 
@@ -248,10 +244,9 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE && focusedSlot != null && !focusedSlot.getStack().isEmpty() && client.player.playerScreenHandler.getCursorStack().isEmpty()) {
-            Tooltips toolips = (Tooltips) Thunderhack.moduleManager.get(Tooltips.class);
             ItemStack itemStack = focusedSlot.getStack();
 
-            if (hasItems(itemStack) && toolips.middleClickOpen.getValue()) {
+            if (hasItems(itemStack) && Tooltips.middleClickOpen.getValue()) {
 
                 Arrays.fill(ITEMS, ItemStack.EMPTY);
                 NbtCompound nbt = itemStack.getNbt();

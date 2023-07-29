@@ -3,13 +3,13 @@ package thunder.hack.modules.combat;
 import com.google.common.eventbus.Subscribe;
 import net.minecraft.item.BowItem;
 import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.Util;
 import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.player.PlayerUtil;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.entity.Entity;
@@ -23,7 +23,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -97,7 +96,7 @@ public class AimBot extends Module {
             rotationPitch = pitch;
         } else  if(mode.getValue() == Mode.CSAim){
             calcThread();
-            if(target != null && (mc.player.canSee(target) || ignoreWalls.getValue()) ) if(mc.player.age % delay.getValue() == 0) mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, Util.getWorldActionId(Util.mc.world)));
+            if(target != null && (mc.player.canSee(target) || ignoreWalls.getValue()) ) if(mc.player.age % delay.getValue() == 0) mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtil.getWorldActionId(mc.world)));
         } else {
             if (mc.crosshairTarget.getType() == ENTITY){
                 assistAcceleration = 0;
@@ -108,7 +107,7 @@ public class AimBot extends Module {
             assistAcceleration += aimStrength.getValue() / 10000f;
 
             if(nearestTarget != null){
-                rotationYaw = calcAngleVec(Thunderhack.moduleManager.get(Aura.class).getLegitLook(nearestTarget)).x;
+                rotationYaw = calcAngleVec(ModuleManager.aura.getLegitLook(nearestTarget)).x;
                 return;
             }
         }
@@ -268,7 +267,7 @@ public class AimBot extends Module {
         if(ent.isDead()) return true;
         if(!entity.isAlive()) return true;
         if(entity instanceof ArmorStandEntity) return true;
-        if(Thunderhack.moduleManager.get(AntiBot.class).isEnabled() && AntiBot.bots.contains(entity)) return true;
+        if(ModuleManager.antiBot.isEnabled() && AntiBot.bots.contains(entity)) return true;
         if(!(entity instanceof PlayerEntity)) return true;
         if(entity == mc.player) return true;
         if(entity.isInvisible() && ignoreInvisible.getValue()) return true;

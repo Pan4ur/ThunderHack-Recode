@@ -36,9 +36,9 @@ public class Tracker extends Module {
 
     protected final Set<BlockPos> placed = new ConcurrentSet<>();
     protected final AtomicInteger awaitingExp = new AtomicInteger();
-    protected final AtomicInteger crystals = new AtomicInteger();
-    protected final AtomicInteger exp = new AtomicInteger();
-    protected PlayerEntity trackedPlayer;
+    protected static final AtomicInteger crystals = new AtomicInteger();
+    protected static final AtomicInteger exp = new AtomicInteger();
+    protected static PlayerEntity trackedPlayer;
     protected boolean awaiting;
     protected int crystalStacks;
     protected int expStacks;
@@ -151,7 +151,7 @@ public class Tracker extends Module {
         }
     }
 
-    public void sendTrack() {
+    public static void sendTrack() {
         if (trackedPlayer != null) {
             int c = crystals.get();
             int e = exp.get();

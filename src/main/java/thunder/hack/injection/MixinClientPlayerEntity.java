@@ -3,6 +3,7 @@ package thunder.hack.injection;
 import com.mojang.authlib.GameProfile;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.Core;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.core.PlaceManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.modules.movement.Velocity;
@@ -20,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 @Mixin(value = ClientPlayerEntity.class,priority = 800)
 public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity {
@@ -39,8 +40,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Redirect(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"), require = 0 )
     private boolean tickMovementHook(ClientPlayerEntity player) {
-        NoSlow noSlow = Thunderhack.moduleManager.get(NoSlow.class);
-        if (noSlow.isEnabled() && noSlow.canNoSlow())
+        if (ModuleManager.noSlow.isEnabled())
             return false;
         return player.isUsingItem();
     }
@@ -120,8 +120,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "pushOutOfBlocks", at = @At("HEAD"), cancellable = true)
     private void onPushOutOfBlocksHook(double x, double d, CallbackInfo info) {
-        Velocity velocity = Thunderhack.moduleManager.get(Velocity.class);
-        if (velocity.isEnabled() && velocity.noPush.getValue()) {
+        if (ModuleManager.velocity.isEnabled() && Velocity.noPush.getValue()) {
             info.cancel();
         }
     }

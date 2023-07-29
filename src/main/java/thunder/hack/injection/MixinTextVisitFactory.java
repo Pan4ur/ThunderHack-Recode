@@ -2,12 +2,14 @@ package thunder.hack.injection;
 
 
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.misc.NameProtect;
 import net.minecraft.text.TextVisitFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import thunder.hack.utility.Util;
+
+import static thunder.hack.modules.Module.mc;
 
 @Mixin(value = {TextVisitFactory.class})
 public class MixinTextVisitFactory {
@@ -17,11 +19,11 @@ public class MixinTextVisitFactory {
     }
 
     private static String protect(String string) {
-        if (!Thunderhack.moduleManager.get(NameProtect.class).isEnabled() || Util.mc.player == null)
+        if (!ModuleManager.nameProtect.isEnabled() || mc.player == null)
             return string;
-        String me = Util.mc.getSession().getUsername();
+        String me = mc.getSession().getUsername();
         if (string.contains(me))
-            return string.replace(me, Thunderhack.moduleManager.get(NameProtect.class).newName.getValue());
+            return string.replace(me, NameProtect.newName.getValue());
 
         return string;
     }

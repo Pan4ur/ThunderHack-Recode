@@ -3,6 +3,7 @@ package thunder.hack.injection;
 
 import net.minecraft.client.MinecraftClient;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventHeldItemRenderer;
 import thunder.hack.modules.render.Animations;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -52,7 +53,7 @@ public abstract class MixinHeldItemRenderer {
     @Inject(method = "renderFirstPersonItem", at = @At(value = "HEAD"), cancellable = true)
     private void onRenderItemHook(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
 
-        if(Thunderhack.moduleManager != null && Thunderhack.moduleManager.get(Animations.class).isEnabled() && !(item.isEmpty()) && !(item.getItem() instanceof FilledMapItem)){
+        if(Thunderhack.moduleManager != null && ModuleManager.animations.isEnabled() && !(item.isEmpty()) && !(item.getItem() instanceof FilledMapItem)){
             ci.cancel();
             renderFirstPersonItemCustom(player,tickDelta,pitch,hand,swingProgress,item,equipProgress,matrices,vertexConsumers,light);
         }

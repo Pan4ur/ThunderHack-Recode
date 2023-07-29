@@ -6,7 +6,7 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
 import org.lwjgl.glfw.GLFW;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 public class StringElement extends AbstractElement {
     public StringElement(Setting setting) {

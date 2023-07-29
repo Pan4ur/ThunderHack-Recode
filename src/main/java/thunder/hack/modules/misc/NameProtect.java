@@ -8,6 +8,6 @@ public class NameProtect extends Module {
         super("NameProtect", Category.MISC);
     }
 
-    public Setting<String> newName = new Setting<>("name", "Hell_Raider");
+    public static Setting<String> newName = new Setting<>("name", "Hell_Raider");
 
 }

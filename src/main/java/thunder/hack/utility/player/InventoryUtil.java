@@ -4,9 +4,8 @@ import net.minecraft.block.Block;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.*;
-import net.minecraft.text.Text;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 public class InventoryUtil {
 
@@ -208,6 +207,14 @@ public class InventoryUtil {
             ItemStack itemStack = mc.player.getInventory().getStack(i);
             if (!(itemStack.getItem() == Items.HONEY_BOTTLE)) continue;
             if (!(itemStack.getName().getString().contains("Каппучино"))) continue;
+            return i;
+        }
+        return -1;
+    }
+
+    public static int findSoupAtHotbar() {
+        for (int i = 0; i < 9; ++i) {
+            if (mc.player.getInventory().getStack(i).getItem() != Items.MUSHROOM_STEW) continue;
             return i;
         }
         return -1;

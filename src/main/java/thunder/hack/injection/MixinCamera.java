@@ -1,6 +1,7 @@
 package thunder.hack.injection;
 
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.player.NoCameraClip;
 import net.minecraft.client.render.Camera;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,7 +24,7 @@ public abstract class MixinCamera {
 
     @Inject(method = "clipToSpace", at = @At("HEAD"), cancellable = true)
     private void onClipToSpace(double desiredCameraDistance, CallbackInfoReturnable<Double> info) {
-        if (Thunderhack.moduleManager.get(NoCameraClip.class).isOn()) {
+        if (ModuleManager.noCameraClip.isEnabled()) {
             info.setReturnValue(desiredCameraDistance);
         }
     }

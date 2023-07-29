@@ -19,7 +19,6 @@ import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
-import thunder.hack.utility.Util;
 
 import static thunder.hack.utility.player.MovementUtil.isMoving;
 
@@ -94,10 +93,10 @@ public class Strafe extends Module {
     }
 
     public float getAIMoveSpeed() {
-        boolean prevSprinting = Util.mc.player.isSprinting();
-        Util.mc.player.setSprinting(false);
-        float speed = Util.mc.player.getMovementSpeed() * 1.3f;
-        Util.mc.player.setSprinting(prevSprinting);
+        boolean prevSprinting = mc.player.isSprinting();
+        mc.player.setSprinting(false);
+        float speed = mc.player.getMovementSpeed() * 1.3f;
+        mc.player.setSprinting(prevSprinting);
         return speed;
     }
     
@@ -105,16 +104,16 @@ public class Strafe extends Module {
         if(elytra == -1) return;
         if (System.currentTimeMillis() - disableTime > 190L) {
             if (elytra != -2) {
-                Util.mc.interactionManager.clickSlot(0, elytra, 1, SlotActionType.PICKUP, Util.mc.player);
-                Util.mc.interactionManager.clickSlot(0, 6, 1,  SlotActionType.PICKUP, Util.mc.player);
+                mc.interactionManager.clickSlot(0, elytra, 1, SlotActionType.PICKUP, mc.player);
+                mc.interactionManager.clickSlot(0, 6, 1,  SlotActionType.PICKUP, mc.player);
             }
 
-            Util.mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(Util.mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
-            Util.mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(Util.mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+            mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+            mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
 
             if (elytra != -2) {
-                Util.mc.interactionManager.clickSlot(0, 6, 1, SlotActionType.PICKUP, Util.mc.player);
-                Util.mc.interactionManager.clickSlot(0, elytra, 1, SlotActionType.PICKUP, Util.mc.player);
+                mc.interactionManager.clickSlot(0, 6, 1, SlotActionType.PICKUP, mc.player);
+                mc.interactionManager.clickSlot(0, elytra, 1, SlotActionType.PICKUP, mc.player);
             }
             disableTime = System.currentTimeMillis();
         }
@@ -158,7 +157,7 @@ public class Strafe extends Module {
             int elytraSlot = InventoryUtil.getElytra();
 
             if (boost.getValue() == Boost.Elytra && elytraSlot != -1) {
-                if (isMoving() && !mc.player.isOnGround() && mc.world.getBlockCollisions(Util.mc.player, Util.mc.player.getBoundingBox().offset(0.0, event.get_y(), 0.0f)).iterator().hasNext() && disabled) {
+                if (isMoving() && !mc.player.isOnGround() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, event.get_y(), 0.0f)).iterator().hasNext() && disabled) {
                     oldSpeed = setSpeed.getValue();
                 }
             }
@@ -225,7 +224,7 @@ public class Strafe extends Module {
             }
         }
         if (needSwap) {
-            eventAction.setSprintState(!Util.mc.player.lastSprinting);
+            eventAction.setSprintState(!mc.player.lastSprinting);
             needSwap = false;
         }
     }

@@ -3,6 +3,7 @@ package thunder.hack.modules.misc;
 import com.google.common.eventbus.Subscribe;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
@@ -76,7 +77,7 @@ public class MiddleClick extends Module {
 
         if (ep.getValue() && timr.passedMs(500) && mc.currentScreen == null && mc.options.pickItemKey.isPressed()) {
 
-            if(Thunderhack.moduleManager.get(Aura.class).isEnabled() && Aura.target != null){
+            if(ModuleManager.aura.isEnabled() && Aura.target != null){
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(),mc.player.getPitch(),mc.player.isOnGround()));
             }
 
@@ -213,7 +214,7 @@ public class MiddleClick extends Module {
                     sleep(delay);
                 } catch (Exception ignored) {
                 }
-                if(Thunderhack.moduleManager.get(Aura.class).isEnabled() && Aura.target != null){
+                if(ModuleManager.aura.isEnabled() && Aura.target != null){
                     mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(),mc.player.getPitch(),mc.player.isOnGround()));
                 }
                 mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);

@@ -19,7 +19,7 @@ import java.net.URL;
 public class Thunderhack implements ModInitializer {
 
     public static EventBus EVENT_BUS = new EventBus();
-    public static String version = "1.2b270723";
+    public static String version = "1.2b290723";
     public static boolean oldVersion = false;
     public static float TICK_TIMER = 1f;
     public static BlockPos gps_position;
@@ -38,6 +38,7 @@ public class Thunderhack implements ModInitializer {
     public static AsyncManager asyncManager = new AsyncManager();
     public static MacroManager macroManager = new MacroManager();
     public static PlaceManager placeManager = new PlaceManager();
+    public static WayPointManager wayPointManager = new WayPointManager();
 
     public static Core core = new Core();
     /*--------------------------------------------------------*/
@@ -50,9 +51,11 @@ public class Thunderhack implements ModInitializer {
         Runtime.getRuntime().addShutdownHook(new Thread(()->{
             FriendManager.saveFriends();
             configManager.save(configManager.getCurrentConfig());
-            MacroManager.saveMacro();
+            wayPointManager.saveWayPoints();
+            macroManager.saveMacro();
         }));
         macroManager.onLoad();
+        wayPointManager.onLoad();
         Render2DEngine.ROUNDED_GRADIENT_PROGRAM = new RoundedGradientProgram();
         Render2DEngine.ROUNDED_PROGRAM = new RoundedProgram();
         ThSoundPack.registerSounds();

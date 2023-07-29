@@ -4,6 +4,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventAttack;
 import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
@@ -20,15 +21,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 @Mixin(value = PlayerEntity.class, priority = 800)
 public class MixinPlayerEntity{
 
     @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerEntity;noClip:Z", opcode = Opcodes.PUTFIELD))
     void noClipHook(PlayerEntity playerEntity, boolean value) {
-        if(Thunderhack.moduleManager.get(FreeCam.class).isEnabled() && !mc.player.isOnGround()){
+        if(ModuleManager.freeCam.isEnabled() && !mc.player.isOnGround()){
             playerEntity.noClip = true;
         } else {
             playerEntity.noClip = playerEntity.isSpectator();
@@ -38,16 +38,15 @@ public class MixinPlayerEntity{
 
     @Inject(method = "getDisplayName", at = @At("HEAD"), cancellable = true)
     public void getDisplayNameHook(CallbackInfoReturnable<Text> cir) {
-        if(Thunderhack.moduleManager.get(Media.class).isEnabled() && Thunderhack.moduleManager.get(Media.class).nickProtect.getValue()){
+        if(ModuleManager.media.isEnabled() && Media.nickProtect.getValue()){
             cir.setReturnValue(Text.of("Protected"));
         }
     }
 
     @Inject(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setSprinting(Z)V", shift = At.Shift.AFTER))
     public void attackAHook(CallbackInfo callbackInfo) {
-        AutoSprint ks = Thunderhack.moduleManager.get(AutoSprint.class);
-        if (ks.isEnabled() && ks.sprint.getValue()) {
-            final float multiplier = 0.6f + 0.4f * ks.motion.getValue();
+        if (ModuleManager.autoSprint.isEnabled() && AutoSprint.sprint.getValue()) {
+            final float multiplier = 0.6f + 0.4f * AutoSprint.motion.getValue();
             mc.player.setVelocity(mc.player.getVelocity().x / 0.6 * multiplier, mc.player.getVelocity().y, mc.player.getVelocity().z / 0.6 * multiplier);
             mc.player.setSprinting(true);
         }

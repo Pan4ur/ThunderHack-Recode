@@ -1,13 +1,9 @@
 package thunder.hack.modules.client;
 
-import thunder.hack.Thunderhack;
 import thunder.hack.gui.clickui.ClickUI;
-import thunder.hack.core.ConfigManager;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.PositionSetting;
-import thunder.hack.utility.Util;
 import thunder.hack.utility.render.Render2DEngine;
 
 
@@ -83,7 +79,7 @@ public class ClickGui extends Module {
 
     @Override
     public void onEnable() {
-        Util.mc.setScreen(ClickUI.getClickGui());
+        mc.setScreen(ClickUI.getClickGui());
     }
 
 

@@ -13,7 +13,8 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
+
 
 @Mixin(OtherClientPlayerEntity.class)
 public class MixinOtherClientPlayerEntity extends AbstractClientPlayerEntity implements IOtherClientPlayerEntity {

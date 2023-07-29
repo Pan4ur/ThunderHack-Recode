@@ -10,9 +10,9 @@ public class Tooltips extends Module {
         super("Tooltips", "Tooltips", Category.MISC);
     }
 
-    public final Setting<Boolean> middleClickOpen = new Setting<>("MiddleClickOpen", true);
-    public final Setting<Boolean> storage =  new Setting<>("Storage", true);
-    public final Setting<Boolean> maps =  new Setting<>("Maps", true);
+    public static final Setting<Boolean> middleClickOpen = new Setting<>("MiddleClickOpen", true);
+    public static final Setting<Boolean> storage =  new Setting<>("Storage", true);
+    public static final Setting<Boolean> maps =  new Setting<>("Maps", true);
     public final Setting<Boolean> shulkerRegear =  new Setting<>("ShulkerRegear", true);
 
 

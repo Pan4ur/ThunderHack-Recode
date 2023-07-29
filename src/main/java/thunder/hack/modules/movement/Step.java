@@ -20,6 +20,7 @@ public class Step extends Module {
     public Setting<Float> height = new Setting("Height", 2.0F, 1F, 2.5F,v-> !strict.getValue());
     public Setting<Boolean> entityStep = new Setting<>("EntityStep", false);
     public Setting<Boolean> useTimer = new Setting<>("Timer", true);
+    public Setting<Boolean> pauseIfShift = new Setting<>("PauseIfShift", false);
     public Setting<Integer> stepDelay = new Setting("StepDelay", 200, 0, 1000);
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
     private boolean timer;
@@ -43,6 +44,11 @@ public class Step extends Module {
 
     @Override
     public void onUpdate() {
+        if(pauseIfShift.getValue() && mc.options.sneakKey.isPressed()){
+            mc.player.setStepHeight(0.6F);
+            return;
+        }
+
         if (mc.player.getAbilities().flying || Thunderhack.moduleManager.get(FreeCam.class).isOn()) {
             mc.player.setStepHeight(0.6F);
             return;

@@ -26,7 +26,7 @@ public class TimerIndicator extends HudElement {
     public void onRender2D(Render2DEvent e) {
         super.onRender2D(e);
         int status;
-        float f4 = 100 / Thunderhack.moduleManager.get(Timer.class).speed.getValue();
+        float f4 = 100 / Timer.speed.getValue();
         float f5 = Math.min(Timer.violation, f4);
         status = (int) (((f4 - f5) / f4) * 100);
         status = MathUtil.clamp(status, 0, 100);
@@ -42,7 +42,7 @@ public class TimerIndicator extends HudElement {
         float timerStatus;
 
 
-        float f4 = 100 / Thunderhack.moduleManager.get(Timer.class).speed.getValue();
+        float f4 = 100 / Timer.speed.getValue();
         float f5 = Math.min(Timer.violation, f4);
         timerAnimation.setValue(((f4 - f5) / f4) * 61);
         timerStatus = (float) timerAnimation.getAnimationD();

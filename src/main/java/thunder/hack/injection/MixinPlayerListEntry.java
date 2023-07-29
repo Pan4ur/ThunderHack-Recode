@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.client.Media;
 import thunder.hack.modules.client.OptifineCapes;
 import thunder.hack.utility.OFCapesUtil;
@@ -38,18 +39,18 @@ public class MixinPlayerListEntry {
 
     @Inject(method = "getCapeTexture", at = @At("HEAD"))
     private void getCapeTextureHook(CallbackInfoReturnable<Identifier> cir) {
-        if(Thunderhack.moduleManager.get(OptifineCapes.class).isEnabled())
+        if(ModuleManager.optifineCapes.isEnabled())
             getTexture();
     }
 
     @Inject(method = "getElytraTexture", at = @At("HEAD"))
     private void getElytraTextureHook(CallbackInfoReturnable<Identifier> cir) {
-        if(Thunderhack.moduleManager.get(OptifineCapes.class).isEnabled())
+        if(ModuleManager.optifineCapes.isEnabled())
             getTexture();
     }
     @Inject(method = "getSkinTexture", at = @At("HEAD"), cancellable = true)
     public void getSkinTextureHook(CallbackInfoReturnable<Identifier> cir) {
-        if(Thunderhack.moduleManager.get(Media.class).isEnabled() && Thunderhack.moduleManager.get(Media.class).skinProtect.getValue()){
+        if(ModuleManager.media.isEnabled() && Media.skinProtect.getValue()){
             cir.setReturnValue(sunSkin);
         }
     }

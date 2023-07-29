@@ -2,8 +2,7 @@ package thunder.hack.utility.render.animation;
 
 import net.minecraft.util.math.MathHelper;
 
-import static thunder.hack.utility.Util.mc;
-import static thunder.hack.utility.render.animation.DynamicAnimation.createAnimation;
+import static thunder.hack.modules.Module.mc;
 
 public class BetterDynamicAnimation {
     private final int maxTicks;
@@ -21,6 +20,10 @@ public class BetterDynamicAnimation {
     public void update() {
         prevStep = step;
         step = MathHelper.clamp(step + 1, 0, maxTicks);
+    }
+
+    public static double createAnimation(double value) {
+        return Math.sqrt(1 - Math.pow(value - 1, 2));
     }
 
     public void setValue(double value) {

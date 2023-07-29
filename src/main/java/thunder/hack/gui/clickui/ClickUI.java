@@ -13,7 +13,6 @@ import thunder.hack.utility.render.MSAAFramebuffer;
 import thunder.hack.Thunderhack;
 import thunder.hack.modules.Module;
 import com.google.common.collect.Lists;
-import thunder.hack.utility.Util;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
@@ -83,7 +82,7 @@ public class ClickUI extends Screen {
 				windows.add(window);
 				offset += 110;
 
-				if (offset > Util.getScaledResolution().getScaledWidth()) {
+				if (offset > mc.getWindow().getScaledWidth()) {
 					offset = 0;
 				}
 				i++;
@@ -98,23 +97,23 @@ public class ClickUI extends Screen {
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 
 		if(Thunderhack.oldVersion && (mc.player.age % 20) > 10) {
-			FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", Util.getScaledResolution().getScaledWidth() / 2f + 1, Util.getScaledResolution().getScaledHeight() - 39 - FontRenderers.thglitch.getFontHeight("New version is available!"), Color.BLACK.getRGB());
-			FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", Util.getScaledResolution().getScaledWidth() / 2f, Util.getScaledResolution().getScaledHeight() - 40 - FontRenderers.thglitch.getFontHeight("New version is available!"), -1);
+			FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f + 1, mc.getWindow().getScaledHeight() - 39 - FontRenderers.thglitch.getFontHeight("New version is available!"), Color.BLACK.getRGB());
+			FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() - 40 - FontRenderers.thglitch.getFontHeight("New version is available!"), -1);
 		}
 
 		if(Module.fullNullCheck()) renderBackground(context);
 
 		for (AbstractWindow window : windows) {
-			if (InputUtil.isKeyPressed(Util.mc.getWindow().getHandle(), 264)) {
+			if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 264)) {
 				window.setY(window.getY() + 2);
 			}
-			if (InputUtil.isKeyPressed(Util.mc.getWindow().getHandle(), 265)) {
+			if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 265)) {
 				window.setY(window.getY() - 2);
 			}
-			if (InputUtil.isKeyPressed(Util.mc.getWindow().getHandle(), 262)) {
+			if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 262)) {
 				window.setX(window.getX() + 2);
 			}
-			if (InputUtil.isKeyPressed(Util.mc.getWindow().getHandle(), 263)) {
+			if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 263)) {
 				window.setX(window.getX() - 2);
 			}
 			if(scrollY != 0){
@@ -144,8 +143,8 @@ public class ClickUI extends Screen {
 			super.render(context,mouseX, mouseY, delta);
 		}
 		if(!setup && ConfigManager.firstLaunch){
-			float hx = Util.getScaledResolution().getScaledWidth() / 2f;
-			float hy = Util.getScaledResolution().getScaledHeight() / 2f;
+			float hx = mc.getWindow().getScaledWidth() / 2f;
+			float hy = mc.getWindow().getScaledHeight() / 2f;
 
 			Render2DEngine.drawGradientBlurredShadow(context.getMatrices(),hx + 1 - 100, hy - 100 + 1, 199, 199, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
 			Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90),hx - 100 - 0.5f, hy - 100 - 0.5f,  200 + 1,  200 + 1, HudEditor.hudRound.getValue());
@@ -266,8 +265,8 @@ public class ClickUI extends Screen {
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if(!setup && ConfigManager.firstLaunch) {
-			float hx = Util.getScaledResolution().getScaledWidth() / 2f;
-			float hy = Util.getScaledResolution().getScaledHeight() / 2f;
+			float hx = mc.getWindow().getScaledWidth() / 2f;
+			float hy = mc.getWindow().getScaledHeight() / 2f;
 			if(hstep == 0) {
 				if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 50, 180, 20)) {
 					MainSettings.language.setValue(MainSettings.Language.ENG);

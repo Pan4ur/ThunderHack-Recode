@@ -1,32 +1,42 @@
 package thunder.hack.injection;
 
 import net.minecraft.client.gl.PostEffectProcessor;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.util.math.MatrixStack;
+import org.joml.Matrix4f;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.render.Fullbright;
 import net.minecraft.client.render.WorldRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import thunder.hack.modules.render.Shaders;
-import thunder.hack.utility.Util;
 import thunder.hack.utility.render.shaders.ShaderManager;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
+
 
 @Mixin(WorldRenderer.class)
-public class MixinWorldRenderer {
+public abstract class MixinWorldRenderer {
+    @Shadow public abstract void render(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f positionMatrix);
+
     @ModifyVariable(method = "getLightmapCoordinates(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)I", at = @At(value = "STORE"), ordinal = 0)
     private static int getLightmapCoordinatesModifySkyLight(int sky) {
-        if(Thunderhack.moduleManager.get(Fullbright.class).isOn())
-            return  (Thunderhack.moduleManager.get(Fullbright.class).brightness.getValue());
+        if(ModuleManager.fullbright.isEnabled())
+            return  (Fullbright.brightness.getValue());
         return sky;
     }
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/PostEffectProcessor;render(F)V", ordinal = 0))
     void replaceShaderHook(PostEffectProcessor instance, float tickDelta) {
-        Shaders shaders = Thunderhack.moduleManager.get(Shaders.class);
+        Shaders shaders = ModuleManager.shaders;
         if (shaders.isEnabled() && mc.world != null) {
+            if(ShaderManager.fullNullCheck()) return;
             if(shaders.mode.getValue() == Shaders.Mode.Default) {
                 ShaderManager.OUTLINE.setAlpha(shaders.outlineColor.getValue().getAlpha(), shaders.glow.getValue());
                 ShaderManager.OUTLINE.setLineWidth(shaders.lineWidth.getValue());
@@ -49,7 +59,7 @@ public class MixinWorldRenderer {
                 ShaderManager.SMOKE.setFThird(shaders.fillColor3.getValue().getColorObject());
 
                 ShaderManager.SMOKE.setOctaves(shaders.octaves.getValue());
-                ShaderManager.SMOKE.setResolution(Util.getScaledResolution().getScaledWidth(),Util.getScaledResolution().getScaledHeight());
+                ShaderManager.SMOKE.setResolution(mc.getWindow().getScaledWidth(),mc.getWindow().getScaledHeight());
                 ShaderManager.SMOKE.setTime();
                 ShaderManager.SMOKE.render(tickDelta);
             } else if (shaders.mode.getValue() == Shaders.Mode.Gradient) {
@@ -61,7 +71,7 @@ public class MixinWorldRenderer {
                 ShaderManager.GRADIENT.setOctaves(shaders.octaves.getValue());
                 ShaderManager.GRADIENT.setMoreGradient(shaders.gradient.getValue());
                 ShaderManager.GRADIENT.setFactor(shaders.factor.getValue());
-                ShaderManager.GRADIENT.setResolution(Util.getScaledResolution().getScaledWidth(),Util.getScaledResolution().getScaledHeight());
+                ShaderManager.GRADIENT.setResolution(mc.getWindow().getScaledWidth(),mc.getWindow().getScaledHeight());
                 ShaderManager.GRADIENT.setTime();
                 ShaderManager.GRADIENT.render(tickDelta);
             }

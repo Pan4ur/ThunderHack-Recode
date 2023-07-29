@@ -2,6 +2,7 @@ package thunder.hack.injection;
 
 
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.player.AutoTool;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
@@ -22,14 +23,13 @@ public abstract class MixinAbstractBlock {
 
     @Inject(method = "calcBlockBreakingDelta", at = @At("HEAD"), cancellable = true)
     public void calcBlockBreakingDeltaHook(BlockState state, PlayerEntity player, BlockView world, BlockPos pos, CallbackInfoReturnable<Float> ci)  {
-        AutoTool autoTool = Thunderhack.moduleManager.get(AutoTool.class);
-        if(autoTool.isEnabled() && autoTool.silent.getValue()) {
+        if(ModuleManager.autoTool.isEnabled() && AutoTool.silent.getValue()) {
             float f = state.getHardness(world, pos);
             if (f < 0.0F) {
                 ci.setReturnValue(0.0f);
             } else {
-                float dig_speed = getDigSpeed(state, player.getInventory().getStack(autoTool.itemIndex)) / f;
-                ci.setReturnValue(player.getInventory().getStack(autoTool.itemIndex).isSuitableFor(state) ? dig_speed / 30.0F : dig_speed / 100.0F);
+                float dig_speed = getDigSpeed(state, player.getInventory().getStack(AutoTool.itemIndex)) / f;
+                ci.setReturnValue(player.getInventory().getStack(AutoTool.itemIndex).isSuitableFor(state) ? dig_speed / 30.0F : dig_speed / 100.0F);
             }
         }
     }

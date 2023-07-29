@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 public class PlaceUtility {
     public static ConcurrentHashMap<BlockPos, Long> ghostBlocks = new ConcurrentHashMap<>();

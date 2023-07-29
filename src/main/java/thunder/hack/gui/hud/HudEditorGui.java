@@ -11,13 +11,14 @@ import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.render.animation.Animation;
 import thunder.hack.utility.render.animation.DecelerateAnimation;
 import thunder.hack.utility.render.animation.Direction;
-import thunder.hack.utility.Util;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 
 import java.util.List;
+
+import static thunder.hack.modules.Module.mc;
 
 public class HudEditorGui extends Screen {
 
@@ -72,7 +73,7 @@ public class HudEditorGui extends Screen {
                 windows.add(window);
                 offset += 110;
 
-                if (offset > Util.getScaledResolution().getScaledWidth()) {
+                if (offset > mc.getWindow().getScaledWidth()) {
                     offset = 0;
                 }
                 i++;
@@ -90,7 +91,7 @@ public class HudEditorGui extends Screen {
 
         if (openAnimation.isDone() && openAnimation.getDirection().equals(Direction.BACKWARDS)) {
             windows.forEach(AbstractWindow::onClose);
-            Util.mc.currentScreen = null;
+            mc.currentScreen = null;
         }
 
 

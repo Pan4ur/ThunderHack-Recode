@@ -1,6 +1,6 @@
 package thunder.hack.utility.render.animation;
 
-import thunder.hack.utility.Util;
+import static thunder.hack.modules.Module.mc;
 
 public class AstolfoAnimation {
     private double value, prevValue;
@@ -57,7 +57,7 @@ public class AstolfoAnimation {
     }
 
     public int getColor(double offset) {
-        double hue = ((this.prevValue + (this.value - this.prevValue) * Util.mc.getTickDelta()) + offset) % 1.;
+        double hue = ((this.prevValue + (this.value - this.prevValue) * mc.getTickDelta()) + offset) % 1.;
         if (hue > 0.5F) {
             hue = 0.5F - (hue - 0.5F);
         }

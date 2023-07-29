@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.render.XRay;
 
 import java.util.Objects;
@@ -20,8 +21,8 @@ import java.util.Objects;
 public class MixinSodiumBlockOcclusionCache {
     @Inject(method = "shouldDrawSide", at = @At("RETURN"), cancellable = true)
     void shouldDrawSideHook(BlockState state, BlockView view, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
-        if (Objects.requireNonNull(Thunderhack.moduleManager.get(XRay.class)).isEnabled()) {
-            cir.setReturnValue(Thunderhack.moduleManager.get(XRay.class).isCheckableOre(state.getBlock()));
+        if (ModuleManager.xray.isEnabled()) {
+            cir.setReturnValue(XRay.isCheckableOre(state.getBlock()));
         }
     }
 }

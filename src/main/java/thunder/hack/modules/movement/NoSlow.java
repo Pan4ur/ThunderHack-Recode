@@ -1,22 +1,12 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.setting.Setting;
 import thunder.hack.modules.Module;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
-import thunder.hack.utility.Util;
 
 public class NoSlow extends Module {
     public static Setting<mode> Mode = new Setting<>("Mode", mode.NCP);

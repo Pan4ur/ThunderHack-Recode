@@ -10,13 +10,6 @@ import net.minecraft.client.render.WorldRenderer;
 
 @Mixin(WorldRenderer.class)
 public interface IWorldRenderer {
-
-    @Accessor
-    public abstract Frustum getFrustum();
-
-    @Accessor
-    public abstract void setFrustum(Frustum frustum);
-
     @Accessor("blockBreakingInfos")
     Int2ObjectMap<BlockBreakingInfo> getBlockBreakingInfos();
 }

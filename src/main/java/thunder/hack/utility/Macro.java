@@ -1,6 +1,6 @@
 package thunder.hack.utility;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 public class Macro {
 

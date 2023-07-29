@@ -24,7 +24,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 import static com.mojang.blaze3d.systems.RenderSystem.disableBlend;
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
 
 
 public class Render3DEngine {
@@ -554,4 +554,23 @@ public class Render3DEngine {
         e.getMatrixStack().pop();
     }
 
+    public static void renderCrosses(Box box, Color color, float lineWidth) {
+        setup();
+        MatrixStack matrices = matrixFrom(box.minX, box.minY, box.minZ);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        RenderSystem.disableCull();
+        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
+        RenderSystem.lineWidth(lineWidth);
+        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+
+        box = box.offset(new Vec3d(box.minX, box.minY, box.minZ).negate());
+
+        vertexLine(matrices, buffer, (float) box.maxX, (float) box.minY, (float) box.minZ, (float) box.minX, (float) box.minY, (float) box.maxZ, color);
+        vertexLine(matrices, buffer, (float) box.minX, (float) box.minY, (float) box.minZ, (float) box.maxX, (float) box.minY, (float) box.maxZ, color);
+
+        tessellator.draw();
+        RenderSystem.enableCull();
+        cleanup();
+    }
 }

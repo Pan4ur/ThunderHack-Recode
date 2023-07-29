@@ -5,6 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventStopUsingItem;
 import thunder.hack.modules.player.NoInteract;
@@ -26,14 +27,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Objects;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
+
 
 @Mixin(ClientPlayerInteractionManager.class)
 public class MixinClientPlayerInteractionManager{
     @Inject(method = "interactBlock", at = @At("HEAD"), cancellable = true)
     private void interactBlock(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> callback) {
         Block bs = mc.world.getBlockState(hitResult.getBlockPos()).getBlock();
-        if(Thunderhack.moduleManager.get(NoInteract.class).isEnabled() && (bs == Blocks.CHEST ||
+        if(ModuleManager.noInteract.isEnabled() && (bs == Blocks.CHEST ||
                 bs == Blocks.TRAPPED_CHEST ||
                 bs == Blocks.FURNACE ||
                 bs == Blocks.ANVIL ||
@@ -50,7 +52,7 @@ public class MixinClientPlayerInteractionManager{
 
     @Redirect(method = "updateBlockBreakingProgress", at = @At(value = "FIELD", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;blockBreakingCooldown:I", opcode = Opcodes.GETFIELD, ordinal = 0))
     public int updateBlockBreakingProgressHook(ClientPlayerInteractionManager clientPlayerInteractionManager) {
-        return Objects.requireNonNull(Thunderhack.moduleManager.get(SpeedMine.class)).isEnabled() ? 0 : this.blockBreakingCooldown;
+        return ModuleManager.speedMine.isEnabled() ? 0 : this.blockBreakingCooldown;
     }
 
     @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
@@ -69,14 +71,14 @@ public class MixinClientPlayerInteractionManager{
 
     @Inject(method = "getReachDistance", at = @At("HEAD"), cancellable = true)
     private void getReachDistanceHook(CallbackInfoReturnable<Float> cir) {
-        if (Thunderhack.moduleManager.get(Reach.class).isEnabled()) {
+        if (ModuleManager.reach.isEnabled()) {
             cir.setReturnValue(Reach.range.getValue());
         }
     }
 
     @Inject(method = "hasExtendedReach", at = @At("HEAD"), cancellable = true)
     private void hasExtendedReachHook(CallbackInfoReturnable<Boolean> cir) {
-        if (Thunderhack.moduleManager.get(Reach.class).isEnabled()) {
+        if (ModuleManager.reach.isEnabled()) {
             cir.setReturnValue(true);
         }
     }

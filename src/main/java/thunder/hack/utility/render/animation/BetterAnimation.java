@@ -1,16 +1,13 @@
 package thunder.hack.utility.render.animation;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.MathHelper;
 
-import static thunder.hack.utility.Util.mc;
+import static thunder.hack.modules.Module.mc;
+
 
 public class BetterAnimation {
     private int prevTick;
-
-    public void setTick(int tick) {
-        this.tick = tick;
-    }
-
     private int tick;
     private final int maxTick;
 

@@ -16,9 +16,9 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InventoryUtil;
 import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.Util;
 import thunder.hack.utility.math.ExplosionUtil;
 import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.player.PlayerUtil;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.Blocks;
@@ -398,7 +398,7 @@ public class AutoCrystal extends Module {
             if (autoSwap.getValue() != AutoSwapMode.None && !setCrystalSlot()) return false;
             if (autoSwap.getValue() != AutoSwapMode.Silent && (!isOffhand() && mc.player.getMainHandStack().getItem() != Items.END_CRYSTAL)) return false;
 
-            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(isOffhand() ? Hand.OFF_HAND : Hand.MAIN_HAND, result, Util.getWorldActionId(mc.world)));
+            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(isOffhand() ? Hand.OFF_HAND : Hand.MAIN_HAND, result, PlayerUtil.getWorldActionId(mc.world)));
           //  mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(isOffhand() ? Hand.OFF_HAND : Hand.MAIN_HAND));
             mc.player.swingHand(isOffhand() ? Hand.OFF_HAND : Hand.MAIN_HAND);
             placeLocations.put(result.getBlockPos(), System.currentTimeMillis());

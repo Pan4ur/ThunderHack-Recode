@@ -1,15 +1,24 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
+import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerAbilitiesS2CPacket;
+import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtil;
 import thunder.hack.utility.Timer;
 
+import java.sql.Time;
+
 public class AutoFlyme extends Module {
     public final Setting<Boolean> instantSpeed = new Setting<>("InstantSpeed", true);
     public final Setting<Boolean> hover = new Setting<>("hover", false);
+    public final Setting<Boolean> useTimer = new Setting<>("UseTimer", false);
+
     public Setting<Float> hoverY = new Setting("hoverY", 0.228f, 0.0f, 1.0f, v -> hover.getValue());
 
     private final Timer timer = new Timer();
@@ -22,12 +31,29 @@ public class AutoFlyme extends Module {
     public void onEnable() {
         if (!mc.player.getAbilities().flying) {
             mc.player.networkHandler.sendChatCommand("flyme");
-            mc.player.getAbilities().flying = true;
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        Thunderhack.TICK_TIMER = 1.f;
+    }
+
+    @Subscribe
+    public void onPacketReceive(PacketEvent.Receive e) {
+        if (e.getPacket() instanceof GameMessageS2CPacket) {
+            final GameMessageS2CPacket packet = e.getPacket();
+            if ((packet.content().getString().contains("Вы атаковали игрока") || packet.content().getString().contains("Возможность летать была удалена")) && timer.passedMs(1000)) {
+                mc.player.networkHandler.sendChatCommand("flyme");
+                mc.player.networkHandler.sendChatCommand("flyme");
+                timer.reset();
+            }
         }
     }
 
     @Override
     public void onUpdate() {
+        if(useTimer.getValue()) Thunderhack.TICK_TIMER = 1.088f;
         if (!mc.player.getAbilities().flying && timer.passedMs(1000) && !mc.player.isOnGround() && mc.player.input.jumping) {
             mc.player.networkHandler.sendChatCommand("flyme");
             timer.reset();
@@ -40,11 +66,7 @@ public class AutoFlyme extends Module {
     @Subscribe
     public void onUpdateWalkingPlayer(final EventSync event) {
         if (!instantSpeed.getValue() || !mc.player.getAbilities().flying) return;
-        if (MovementUtil.isMoving()) {
-            final double[] dir = MovementUtil.forward(1.05f);
-            mc.player.setVelocity(dir[0],mc.player.getVelocity().y,dir[1]);
-        } else {
-            mc.player.setVelocity(0,mc.player.getVelocity().y,0);
-        }
+        final double[] dir =  MovementUtil.isMoving() ? MovementUtil.forward(1.05f) : new double[]{0,0};
+        mc.player.setVelocity(dir[0],mc.player.getVelocity().y,dir[1]);
     }
 }

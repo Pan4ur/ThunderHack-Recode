@@ -3,13 +3,14 @@ package thunder.hack.notification;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.Util;
 import thunder.hack.utility.math.MathUtil;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterAnimation;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;
+
+import static thunder.hack.modules.Module.mc;
 
 public class Notification {
     private final String message;
@@ -34,7 +35,7 @@ public class Notification {
         timer.reset();
         width = FontRenderers.getRenderer().getStringWidth(message) + 38;
         animationX = width;
-        posY = Util.getScaledResolution().getScaledHeight() - height;
+        posY = mc.getWindow().getScaledHeight() - height;
     }
 
     public void render(MatrixStack matrix, float getY) {
@@ -46,7 +47,7 @@ public class Notification {
 
         posY = animate(posY, getY);
 
-        int x1 = (int) ((Util.getScaledResolution().getScaledWidth() - 6) - width + animationX);
+        int x1 = (int) ((mc.getWindow().getScaledWidth() - 6) - width + animationX);
         int y1 = (int) posY;
 
 

@@ -5,7 +5,6 @@ import com.google.common.eventbus.Subscribe;
 import thunder.hack.events.impl.Render2DEvent;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.Util;
 import thunder.hack.events.impl.EventMouse;
 import thunder.hack.modules.Module;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -30,11 +29,11 @@ public class HudElement extends Module {
     public final Setting<PositionSetting> pos = new Setting<>("Position", new PositionSetting(0.5f, 0.5f));
 
     public int normaliseX() {
-        return (int) (Util.mc.mouse.getX() / Util.mc.getWindow().getScaleFactor());
+        return (int) (mc.mouse.getX() / mc.getWindow().getScaleFactor());
     }
 
     public int normaliseY() {
-        return (int) (Util.mc.mouse.getY() / Util.mc.getWindow().getScaleFactor());
+        return (int) (mc.mouse.getY() / mc.getWindow().getScaleFactor());
     }
 
     public boolean isHovering() {
@@ -44,19 +43,19 @@ public class HudElement extends Module {
     private boolean m_butt = false;
 
     public void onRender2D(Render2DEvent e) {
-        y1 = Util.getScaledResolution().getScaledHeight() * pos.getValue().getY();
-        x1 = Util.getScaledResolution().getScaledWidth() * pos.getValue().getX();
+        y1 = mc.getWindow().getScaledHeight() * pos.getValue().getY();
+        x1 = mc.getWindow().getScaledWidth() * pos.getValue().getX();
 
         if (mc.currentScreen instanceof ChatScreen || mc.currentScreen instanceof HudEditorGui) {
             if (m_butt && mousestate) {
-                pos.getValue().setX((float) (normaliseX() - dragX) / Util.getScaledResolution().getScaledWidth());
-                pos.getValue().setY((float) (normaliseY() - dragY) / Util.getScaledResolution().getScaledHeight());
+                pos.getValue().setX((float) (normaliseX() - dragX) / mc.getWindow().getScaledWidth());
+                pos.getValue().setY((float) (normaliseY() - dragY) / mc.getWindow().getScaledHeight());
             }
         }
         if (m_butt) {
             if (!mousestate && isHovering()) {
-                dragX = (int) (normaliseX() - (pos.getValue().getX() * Util.getScaledResolution().getScaledWidth()));
-                dragY = (int) (normaliseY() - (pos.getValue().getY() * Util.getScaledResolution().getScaledHeight()));
+                dragX = (int) (normaliseX() - (pos.getValue().getX() * mc.getWindow().getScaledWidth()));
+                dragY = (int) (normaliseY() - (pos.getValue().getY() * mc.getWindow().getScaledHeight()));
                 mousestate = true;
             }
         } else {

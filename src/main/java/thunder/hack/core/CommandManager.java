@@ -30,11 +30,12 @@ public class CommandManager {
         this.commands.add(new VclipCommand());
         this.commands.add(new EclipCommand());
         this.commands.add(new TrackerCommand());
+        this.commands.add(new WayPointCommand());
 
     }
 
     public static String[] removeElement(String[] input, int indexToDelete) {
-        LinkedList<String> result = new LinkedList<String>();
+        LinkedList<String> result = new LinkedList<>();
         for (int i = 0; i < input.length; ++i) {
             if (i == indexToDelete) continue;
             result.add(input[i]);
@@ -74,7 +75,6 @@ public class CommandManager {
         return Formatting.WHITE  + "⌊" + Formatting.GOLD + "⚡"+ Formatting.WHITE +"⌉"+ Formatting.RESET ;
     }
 
-
     public String getPrefix() {
         return this.prefix;
     }
@@ -82,6 +82,5 @@ public class CommandManager {
     public void setPrefix(String prefix) {
         this.prefix = prefix;
     }
-
 }
 

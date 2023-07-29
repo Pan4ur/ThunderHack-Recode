@@ -10,14 +10,14 @@ import thunder.hack.core.Core;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui2;
 import thunder.hack.utility.render.Render2DEngine;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import thunder.hack.utility.Util;
 
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+
+import static thunder.hack.modules.Module.mc;
 
 
 public class FriendComponent {
@@ -144,7 +144,7 @@ public class FriendComponent {
 
         FontRenderers.modules.drawString(context.getMatrices(),name, posX + 37, posY + 6, Render2DEngine.applyOpacity(-1, getFadeFactor()), false);
 
-        boolean online = Util.mc.player.networkHandler.getPlayerList().contains(name);
+        boolean online = mc.player.networkHandler.getPlayerList().contains(name);
 
         FontRenderers.settings.drawString(context.getMatrices(),online ? "online" : "offline", posX + 37, posY + 17, online ? Render2DEngine.applyOpacity(new Color(0xFF0B7A00, true).getRGB(), getFadeFactor()) : Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
     }
