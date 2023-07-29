@@ -64,6 +64,7 @@ public class Surround extends Module {
     private int delayStep = 0;
 
     public static Timer inactivityTimer = new Timer();
+    public static Timer breakTimer = new Timer();
 
     private ConcurrentHashMap<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
 
@@ -156,14 +157,14 @@ public class Surround extends Module {
                 }
                 return;
             }
-            if(crystalBreaker.getValue())
+            if(crystalBreaker.getValue() && breakTimer.passedMs(100))
                 for (Entity entity : mc.world.getOtherEntities(null, new Box(targetPos))) {
                     if (entity instanceof EndCrystalEntity) {
-
                         PlayerInteractEntityC2SPacket attackPacket = PlayerInteractEntityC2SPacket.attack(mc.player, ((mc.player)).isSneaking());
                         AutoCrystal.changeId(attackPacket,entity.getId());
                         mc.player.networkHandler.sendPacket(attackPacket);
                         mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                        breakTimer.reset();
                     }
                 }
 
