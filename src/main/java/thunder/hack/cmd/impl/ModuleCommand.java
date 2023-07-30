@@ -125,9 +125,6 @@ public class ModuleCommand
                         ((PositionSetting) setting2.getValue()).setX(array3.get(0).getAsFloat());
                         ((PositionSetting) setting2.getValue()).setY(array3.get(1).getAsFloat());
                         return;
-                    case "SubBind":
-                        setting2.setValue((new SubBind.SubBindConverter()).doBackward(element));
-                        return;
                     case "Enum":
                         try {
                             EnumConverter converter = new EnumConverter(((Enum) setting2.getValue()).getClass());

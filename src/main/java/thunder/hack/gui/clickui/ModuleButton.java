@@ -10,10 +10,10 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.TargetHud;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.Module;
+import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.setting.impl.PositionSetting;
-import thunder.hack.setting.impl.SubBind;
 import thunder.hack.utility.render.Render2DEngine;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.gui.clickui.impl.*;
@@ -42,8 +42,8 @@ public class ModuleButton {
 				elements.add(new SliderElement(setting));
 			} else if (setting.isEnumSetting() && !(setting.getValue() instanceof Parent) && !(setting.getValue() instanceof PositionSetting)){
 				elements.add(new ModeElement(setting));
-			} else if (setting.getValue() instanceof SubBind) {
-				elements.add(new SubBindElement(setting));
+			} else if (setting.getValue() instanceof Bind && !setting.getName().equals("Keybind")) {
+				elements.add(new BindElement(setting));
 			}else if ((setting.getValue() instanceof String || setting.getValue() instanceof Character) && !setting.getName().equalsIgnoreCase("displayName")) {
 				elements.add(new StringElement(setting));
 			} else if (setting.getValue() instanceof Parent) {

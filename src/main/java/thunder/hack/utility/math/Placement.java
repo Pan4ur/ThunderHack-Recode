@@ -69,20 +69,8 @@ public class Placement {
                 PlaceManager.syncSneaking = true;
             }
 
-            Vec3d hitVec = new Vec3d(
-                    getNeighbour().getX() + 0.5,
-                    getNeighbour().getY() + 0.5,
-                    getNeighbour().getZ() + 0.5)
-                    .add(new Vec3d(getOpposite().getUnitVector()).multiply(0.5));
-
-
-            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND,
-                    new BlockHitResult(
-                            hitVec,
-                            getOpposite(),
-                            getNeighbour(),
-                            false));
-
+            Vec3d hitVec = new Vec3d(getNeighbour().getX() + 0.5, getNeighbour().getY() + 0.5, getNeighbour().getZ() + 0.5).add(new Vec3d(getOpposite().getUnitVector()).multiply(0.5));
+            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(hitVec, getOpposite(), getNeighbour(), false));
 
             mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(hand));
         };

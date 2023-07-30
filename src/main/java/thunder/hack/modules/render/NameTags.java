@@ -169,7 +169,9 @@ public class NameTags extends Module {
                                 e.getMatrixStack().translate(posX - 35 + item_offset, (float) (posY - 20), 0);
                                 e.getMatrixStack().scale(0.7f, 0.7f, 0.7f);
 
-                                int percent = (int) ((Math.ceil((double) (armorComponent.getMaxDamage() - armorComponent.getDamage()) / armorComponent.getMaxDamage())) * 100f);
+                                float durability = armorComponent.getMaxDamage() - armorComponent.getDamage();
+                                int percent = (int) ((durability / (float) armorComponent.getMaxDamage()) * 100F);
+
                                 Color color;
                                 if(percent < 33){
                                     color = Color.RED;

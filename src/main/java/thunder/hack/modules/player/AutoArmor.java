@@ -3,6 +3,8 @@ package thunder.hack.modules.player;
 import com.google.common.eventbus.Subscribe;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 
@@ -37,6 +39,8 @@ public class AutoArmor extends Module {
     @Subscribe
     public void onTick(PlayerUpdateEvent event) {
         if (mc.player.playerScreenHandler != mc.player.currentScreenHandler)
+            return;
+        if (ModuleManager.autoMend.isEnabled() && AutoMend.keyState)
             return;
 
         if(MovementUtil.isMoving() && noMove.getValue()) return;
@@ -82,6 +86,7 @@ public class AutoArmor extends Module {
                 } else if (mc.player.playerScreenHandler == mc.player.currentScreenHandler) {
                     int armorSlot = (e.getValue()[0] - 34) + (39 - e.getValue()[0]) * 2;
                     int newArmorslot = e.getValue()[2] < 9 ? 36 + e.getValue()[2] : e.getValue()[2];
+                    Command.sendMessage(armorSlot + "");
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, newArmorslot, 0, SlotActionType.PICKUP, mc.player);
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, armorSlot, 0, SlotActionType.PICKUP, mc.player);
                     if (e.getValue()[1] != -1)

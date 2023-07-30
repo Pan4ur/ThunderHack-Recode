@@ -288,9 +288,6 @@ public class ConfigManager  {
                             ((PositionSetting) setting2.getValue()).setX(array3.get(0).getAsFloat());
                             ((PositionSetting) setting2.getValue()).setY(array3.get(1).getAsFloat());
                             continue;
-                        case "SubBind":
-                            setting2.setValue((new SubBind.SubBindConverter()).doBackward(mobject.getAsJsonPrimitive(setting2.getName())));
-                            continue;
                         case "Enum":
                             try {
                                 EnumConverter converter = new EnumConverter(((Enum) setting2.getValue()).getClass());
@@ -340,14 +337,12 @@ public class ConfigManager  {
                     attribs.add(setting.getName(), array);
                     continue;
                 }
-
-                if(Objects.equals(setting.getName(), "Keybind")){
-
-                    if(m.getBind().isMouse())
-                        attribs.add("Keybind", jp.parse(m.getBind().getBind()));
+                if(setting.isBindSetting()) {
+                    Bind b = (Bind) setting.getValue();
+                    if (b.isMouse())
+                        attribs.add(setting.getName(), jp.parse(b.getBind()));
                     else
-                        attribs.add("Keybind",new JsonPrimitive(m.getBind().getKey()));
-
+                        attribs.add(setting.getName(), new JsonPrimitive(b.getKey()));
                     continue;
                 }
                 if (setting.isStringSetting()) {

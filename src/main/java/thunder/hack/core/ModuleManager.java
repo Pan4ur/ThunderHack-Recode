@@ -62,6 +62,7 @@ public class ModuleManager {
     public static ItemScroller itemScroller;
     public static ExtraTab extraTab;
     public static Animations animations;
+    public static AutoMend autoMend;
 
     public ModuleManager() {
         tracker = new Tracker();
@@ -98,6 +99,7 @@ public class ModuleManager {
         viewModel = new ViewModel();
         extraTab = new ExtraTab();
         animations = new Animations();
+        autoMend = new AutoMend();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -244,6 +246,7 @@ public class ModuleManager {
         modules.add(new VoidESP());
         modules.add(new PearlBait());
         modules.add(new XCarry());
+        modules.add(autoMend);
 
     }
 

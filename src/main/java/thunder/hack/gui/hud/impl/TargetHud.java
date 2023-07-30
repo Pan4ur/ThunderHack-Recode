@@ -182,8 +182,6 @@ public class TargetHud extends HudElement {
                     e.getMatrixStack().pop();
                 }
 
-
-
                 //Партиклы
                 for (final Particles p : particles) {
                     if (p.opacity > 4) p.render2D();

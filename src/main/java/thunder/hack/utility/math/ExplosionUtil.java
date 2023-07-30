@@ -17,6 +17,7 @@ import net.minecraft.stat.Stats;
 import net.minecraft.util.math.*;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.explosion.Explosion;
+import thunder.hack.modules.combat.AutoAnchor;
 import thunder.hack.modules.combat.AutoCrystal;
 
 
@@ -29,6 +30,7 @@ import static thunder.hack.modules.Module.mc;
 public class ExplosionUtil {
 
     public static boolean terrainIgnore = false;
+    public static BlockPos anchorIgnore = null;
 
     public static float getExplosionDamage2(Vec3d crysPos, PlayerEntity target) {
         if(AutoCrystal.predictTicks.getValue() == 0){
@@ -49,6 +51,30 @@ public class ExplosionUtil {
         copyEntity.setPosition(getEntityPosVec(target,AutoCrystal.predictTicks.getValue()));
         return getExplosionDamageWPredict(crysPos, target,copyEntity);
     }
+
+    public static float getAnchorExplosionDamage(BlockPos anchorPos, PlayerEntity target) {
+        float final_result;
+        anchorIgnore = anchorPos;
+        terrainIgnore = true;
+        if(AutoAnchor.predictTicks.getValue() == 0) {
+            final_result = getExplosionDamage1(anchorPos.up().toCenterPos(), target);
+        } else {
+            PlayerEntity copyEntity = new PlayerEntity(mc.world, target.getBlockPos(), target.getYaw(), new GameProfile(UUID.fromString("66123666-6666-6666-6666-667563866600"), "PredictEntity228")) {
+                @Override public boolean isSpectator() {
+                    return false;
+                }
+                @Override public boolean isCreative() {
+                    return false;
+                }
+            };
+            copyEntity.setPosition(getEntityPosVec(target, AutoAnchor.predictTicks.getValue()));
+            final_result = getExplosionDamageWPredict(anchorPos.toCenterPos(), target, copyEntity);
+        }
+        anchorIgnore = null;
+        terrainIgnore = false;
+        return final_result;
+    }
+
 
     public static float getSelfExplosionDamage(Vec3d explosionPos) {
         return getExplosionDamage1(explosionPos,mc.player);
@@ -82,7 +108,7 @@ public class ExplosionUtil {
 
         double maxDist = 12;
         if (!new Box(MathHelper.floor(explosionPos.x - maxDist - 1.0), MathHelper.floor(explosionPos.y - maxDist - 1.0), MathHelper.floor(explosionPos.z - maxDist - 1.0), MathHelper.floor(explosionPos.x + maxDist + 1.0), MathHelper.floor(explosionPos.y + maxDist + 1.0), MathHelper.floor(explosionPos.z + maxDist + 1.0)).intersects(target.getBoundingBox())) {
-            return 0f;
+           // return 0f;
         }
 
         if (!target.isImmuneToExplosion() && !target.isInvulnerable()) {

@@ -18,10 +18,12 @@ public class PlaceManager {
     private final static LinkedList<Action> actions = new LinkedList<>();
 
     private static float[] trailingRotation = null;
+
     public static Runnable trailingBreakAction = null;
     public static Runnable trailingPlaceAction = null;
-    
-    
+    public static Runnable trailingChargeAction = null;
+
+
     public static boolean syncSprinting;
     public static boolean syncSneaking;
 
@@ -69,14 +71,19 @@ public class PlaceManager {
             trailingRotation = null;
         }
 
+        if (trailingPlaceAction != null) {
+            trailingPlaceAction.run();
+            trailingPlaceAction = null;
+        }
+
         if (trailingBreakAction != null) {
             trailingBreakAction.run();
             trailingBreakAction = null;
         }
 
-        if (trailingPlaceAction != null) {
-            trailingPlaceAction.run();
-            trailingPlaceAction = null;
+        if (trailingChargeAction != null) {
+            trailingChargeAction.run();
+            trailingChargeAction = null;
         }
 
         if (mc.player.isSprinting() && syncSprinting) {

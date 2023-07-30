@@ -178,7 +178,7 @@ public class Setting<T> {
     }
 
     public boolean isEnumSetting() {
-        return !this.isPositionSetting()  && !this.isNumberSetting() && !(this.value instanceof PositionSetting)&& !(this.value instanceof JsonPrimitive)  && !(this.value instanceof String) && !(this.value instanceof ColorSetting) && !(this.value instanceof Parent) && !(this.value instanceof Bind) && !(this.value instanceof SubBind) && !(this.value instanceof Character) && !(this.value instanceof Boolean);
+        return !this.isPositionSetting()  && !this.isNumberSetting() && !(this.value instanceof PositionSetting)&& !(this.value instanceof JsonPrimitive)  && !(this.value instanceof String) && !(this.value instanceof ColorSetting) && !(this.value instanceof Parent) && !(this.value instanceof Bind) && !(this.value instanceof Character) && !(this.value instanceof Boolean);
     }
 
 
@@ -197,6 +197,7 @@ public class Setting<T> {
     public boolean isPositionSetting() {
         return this.value instanceof PositionSetting;
     }
+
 
     public T getDefaultValue() {
         return this.defaultValue;

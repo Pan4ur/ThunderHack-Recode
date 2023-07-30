@@ -1,24 +1,22 @@
 package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
+import org.lwjgl.glfw.GLFW;
+import thunder.hack.cmd.Command;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.SubBind;
-import net.minecraft.client.util.math.MatrixStack;
+import thunder.hack.setting.impl.Bind;
 
 import java.awt.*;
 
 
-public class SubBindElement extends AbstractElement {
-    public SubBindElement(Setting setting) {
+public class BindElement extends AbstractElement {
+    public BindElement(Setting setting) {
         super(setting);
     }
 
     public boolean isListening;
-
-
-
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
@@ -26,12 +24,17 @@ public class SubBindElement extends AbstractElement {
         if (this.isListening) {
             FontRenderers.getRenderer().drawString(context.getMatrices(),"...", (int) (x + 3), (int) (y + height / 2 - (6 / 2f)), new Color(-1).getRGB());
         } else {
-            FontRenderers.getRenderer().drawString(context.getMatrices(),"SubBind " + this.setting.getValue().toString().toUpperCase(), (int) (x + 3), (int) (y + height / 2 - (6 / 2f)), new Color(-1).getRGB());
+            FontRenderers.getRenderer().drawString(context.getMatrices(),setting.getName() + " " + ((Bind)setting.getValue()).getBind(), (int) (x + 3), (int) (y + height / 2 - (6 / 2f)), new Color(-1).getRGB());
         }
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
+        if (isListening) {
+            Bind b = new Bind(button,true);
+            setting.setValue(b);
+            isListening = false;
+        }
         if (hovered && button == 0) {
             isListening = !isListening;
         }
@@ -39,16 +42,15 @@ public class SubBindElement extends AbstractElement {
 
     @Override
     public void keyTyped(int keyCode) {
-        if (this.isListening) {
-            SubBind subBindbind = new SubBind(keyCode);
-            if (subBindbind.toString().equalsIgnoreCase("Escape")) {
-                return;
+        if (isListening) {
+            if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_SPACE || keyCode == GLFW.GLFW_KEY_DELETE) {
+                Bind b = new Bind(-1,false);
+                setting.setValue(b);
+            } else {
+                Bind b = new Bind(keyCode,false);
+                setting.setValue(b);
             }
-            if (subBindbind.toString().equalsIgnoreCase("Delete")) {
-                subBindbind = new SubBind(-1);
-            }
-            this.setting.setValue(subBindbind);
-            isListening = !isListening;
+            isListening = false;
         }
     }
 }

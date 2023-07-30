@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.*;
+import thunder.hack.modules.player.AutoMend;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -24,6 +25,34 @@ public class InventoryUtil {
         return n;
     }
 
+    public static int getExpCount() {
+        int expCount = 0;
+        for (int i = 0; i < 45; ++i) {
+            if (AutoMend.mc.player.getInventory().getStack(i).getItem().equals(Items.EXPERIENCE_BOTTLE)) {
+                expCount = expCount + AutoMend.mc.player.getInventory().getStack(i).getCount();
+            }
+        }
+        if (AutoMend.mc.player.getOffHandStack().getItem().equals(Items.EXPERIENCE_BOTTLE)) {
+            ++expCount;
+        }
+        return expCount;
+    }
+
+    public static int getXpSlot() {
+        ItemStack stack = mc.player.getMainHandStack();
+        if (!stack.isEmpty() && stack.getItem() instanceof ExperienceBottleItem) {
+            return mc.player.getInventory().selectedSlot;
+        } else {
+            for (int i = 0; i < 9; ++i) {
+                stack = mc.player.getInventory().getStack(i);
+                if (!stack.isEmpty() && stack.getItem() instanceof ExperienceBottleItem) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
     public static int getCrystalSlot() {
         int crystalSlot = -1;
 
@@ -41,6 +70,35 @@ public class InventoryUtil {
 
         return crystalSlot;
     }
+
+    public static int getAnchorSlot() {
+        int anchorSlot = -1;
+        if (mc.player.getMainHandStack().getItem() == Items.RESPAWN_ANCHOR) anchorSlot = mc.player.getInventory().selectedSlot;
+        if (anchorSlot == -1) {
+            for (int l = 0; l < 9; ++l) {
+                if (mc.player.getInventory().getStack(l).getItem() == Items.RESPAWN_ANCHOR) {
+                    anchorSlot = l;
+                    break;
+                }
+            }
+        }
+        return anchorSlot;
+    }
+
+    public static int getGlowStoneSlot() {
+        int glowSlot = -1;
+        if (mc.player.getMainHandStack().getItem() == Items.GLOWSTONE) glowSlot = mc.player.getInventory().selectedSlot;
+        if (glowSlot == -1) {
+            for (int l = 0; l < 9; ++l) {
+                if (mc.player.getInventory().getStack(l).getItem() == Items.GLOWSTONE) {
+                    glowSlot = l;
+                    break;
+                }
+            }
+        }
+        return glowSlot;
+    }
+
 
     public static int getBestAxe() {
         int b = -1;

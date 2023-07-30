@@ -1,8 +1,12 @@
 package thunder.hack.utility.player;
 
+import net.minecraft.entity.ExperienceOrbEntity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import thunder.hack.core.PlaceManager;
+import thunder.hack.modules.combat.AutoTrap;
 import thunder.hack.utility.math.Placement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -12,14 +16,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.modules.Module.mc;
@@ -221,46 +222,37 @@ public class PlaceUtility {
         return calculateAngle(hitVec);
     }
 
-    public static Placement forcePlace(BlockPos pos, boolean strictDirection, Hand hand, int slot,boolean ignoreEntities) {
+    public static Placement forcePlace(BlockPos pos, boolean strictDirection, Hand hand, int slot, boolean ignoreEntities) {
         if(!canPlaceBlock(pos,  strictDirection, ignoreEntities))return null;
         if(!mc.world.getBlockState(pos).isReplaceable()) return null;
         Direction side = Direction.DOWN;
-        if(strictDirection) {
-             side = getPlaceDirection(pos, true);
-        }
-
-        if (side == null) {
-            return null;
-        }
+        if(strictDirection) side = getPlaceDirection(pos, true);
+        if (side == null) return null;
         BlockPos neighbour = pos.offset(side);
         Direction opposite = side.getOpposite();
-        Vec3d hitVec = new Vec3d(neighbour.getX() + 0.5, neighbour.getY() + 0.5, neighbour.getZ() + 0.5).add(new Vec3d(opposite.getUnitVector()).multiply(0.5));
-        float[] angle = calculateAngle(hitVec);
-        Placement placement = new Placement(neighbour, opposite, angle[0], angle[1], hand, false, slot);
+        Placement placement = new Placement(neighbour, opposite, 0, 0, hand, false, slot);
         placement.getAction().run();
         return placement;
     }
 
-
-    public static boolean canPlaceBlock(BlockPos pos, boolean ignoreEntities) {
-        return canPlaceBlock(pos, false, ignoreEntities);
+    public static boolean canPlaceBlock(BlockPos pos, boolean strictDirection) {
+        return canPlaceBlock(pos, strictDirection, true);
     }
 
-    public static boolean canPlaceBlock(BlockPos pos, boolean strictDirection, boolean ignoreEntities) {
-        if (ghostBlocks.containsKey(pos)) {
-            if (System.currentTimeMillis() - ghostBlocks.get(pos) > 500) {
-                ghostBlocks.remove(pos);
-            } else {
+
+    public static boolean canPlaceBlock(BlockPos pos, boolean strictDirection, boolean checkEntities) {
+        if (!mc.world.getBlockState(pos).isReplaceable()) {
+            return false;
+        }
+        if (checkEntities) {
+            for (Entity entity : mc.world.getNonSpectatingEntities(Entity.class, new Box(pos))) {
+                if (entity instanceof ItemEntity || entity instanceof ExperienceOrbEntity) continue;
                 return false;
             }
         }
-        if (!mc.world.getBlockState(pos).isReplaceable()) return false;
-        if (strictDirection) {
-            if (getPlaceDirection(pos, true) == null) return false;
-        }
-        if (ignoreEntities) return true;
-        return mc.world.canPlace(Blocks.DIRT.getDefaultState(), pos, ShapeContext.absent());
+        return getPlaceDirection(pos, strictDirection) != null;
     }
+
 
     public static boolean canClick(BlockPos pos) {
         if (ghostBlocks.containsKey(pos)) {
