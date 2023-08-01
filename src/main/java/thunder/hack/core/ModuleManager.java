@@ -159,6 +159,7 @@ public class ModuleManager {
         modules.add(new HitSound());
         modules.add(new HitParticles());
         modules.add(new StorageEsp());
+        modules.add(new LagNotifier());
         modules.add(new AutoGApple());
         modules.add(itemScroller);
         modules.add(new TargetStrafe());

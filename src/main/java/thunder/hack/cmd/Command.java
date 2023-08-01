@@ -6,7 +6,7 @@ import net.minecraft.text.Text;
 
 import static thunder.hack.modules.Module.fullNullCheck;
 
-public abstract class Command  {
+public abstract class Command {
     protected String name;
 
     public static MinecraftClient mc;

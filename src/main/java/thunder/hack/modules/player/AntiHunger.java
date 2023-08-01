@@ -14,13 +14,13 @@ public class AntiHunger extends Module {
 
 
     @Subscribe
-    public void onPacketSend(PacketEvent.Send e){
-        if(e.getPacket() instanceof PlayerMoveC2SPacket pac){
+    public void onPacketSend(PacketEvent.Send e) {
+        if (e.getPacket() instanceof PlayerMoveC2SPacket pac) {
             ((IPlayerMoveC2SPacket) pac).setOnGround(false);
         }
 
-        if(e.getPacket() instanceof ClientCommandC2SPacket pac){
-            if(pac.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING){
+        if (e.getPacket() instanceof ClientCommandC2SPacket pac) {
+            if (pac.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING) {
                 e.cancel();
                 mc.player.setSprinting(false);
             }
