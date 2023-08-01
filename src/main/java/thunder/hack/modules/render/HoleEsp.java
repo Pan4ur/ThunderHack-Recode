@@ -39,15 +39,15 @@ public class HoleEsp extends Module {
 
 
     private enum Mode {
-         Fade, CubeOutline, CubeFill,CubeBoth
+        Fade, CubeOutline, CubeFill, CubeBoth
     }
 
 
     @Subscribe
-    public void onRender3D(Render3DEvent e){
-        if(positions.isEmpty()) return;
-        for(PosWithColor posWithColor : positions){
-            if(mode.getValue() == Mode.CubeOutline || mode.getValue() == Mode.CubeBoth){
+    public void onRender3D(Render3DEvent e) {
+        if (positions.isEmpty()) return;
+        for (PosWithColor posWithColor : positions) {
+            if (mode.getValue() == Mode.CubeOutline || mode.getValue() == Mode.CubeBoth) {
                 Render3DEngine.drawBoxOutline(
                         new Box(
                                 posWithColor.getBp().getX(),
@@ -59,8 +59,8 @@ public class HoleEsp extends Module {
                         ), posWithColor.getColor(), lineWith.getValue()
                 );
             }
-            if(mode.getValue() == Mode.CubeFill || mode.getValue() == Mode.CubeBoth) {
-                Render3DEngine.drawFilledBox( e.getMatrixStack(),
+            if (mode.getValue() == Mode.CubeFill || mode.getValue() == Mode.CubeBoth) {
+                Render3DEngine.drawFilledBox(e.getMatrixStack(),
                         new Box(
                                 posWithColor.getBp().getX(),
                                 posWithColor.getBp().getY(),
@@ -72,9 +72,9 @@ public class HoleEsp extends Module {
                 );
             }
 
-            if(mode.getValue() == Mode.Fade) {
+            if (mode.getValue() == Mode.Fade) {
                 RenderSystem.disableCull();
-                Render3DEngine.drawFilledFadeBox( e.getMatrixStack(),
+                Render3DEngine.drawFilledFadeBox(e.getMatrixStack(),
                         new Box(
                                 posWithColor.getBp().getX(),
                                 posWithColor.getBp().getY(),
@@ -100,11 +100,11 @@ public class HoleEsp extends Module {
     }
 
     @Override
-    public void onThread(){
-        if(fullNullCheck()) return;
-     //   long timer1 = System.currentTimeMillis();
+    public void onThread() {
+        if (fullNullCheck()) return;
+        //   long timer1 = System.currentTimeMillis();
         findHoles();
-      //  Command.sendMessage(System.currentTimeMillis() - timer1 + " ");
+        //  Command.sendMessage(System.currentTimeMillis() - timer1 + " ");
     }
 
     private void findHoles() {
@@ -115,28 +115,21 @@ public class HoleEsp extends Module {
                 for (int k = centerPos.getZ() - rangeXZ.getValue(); k < centerPos.getZ() + rangeXZ.getValue(); k++) {
                     BlockPos pos = new BlockPos(i, j, k);
                     if (validObi(pos)) {
-                        bloks.add(new PosWithColor(pos,false, false,obbyColor1.getValue().getColorObject()));
-                    } else
-                    if (validBedrock(pos)) {
-                        bloks.add(new PosWithColor(pos, false,false,bedrockColor1.getValue().getColorObject()));
-                    } else
-                    if (validTwoBlockBedrockXZ(pos)) {
-                        bloks.add(new PosWithColor(pos,true,false, bedrockColor1.getValue().getColorObject()));
-                    } else
-                    if (validTwoBlockObiXZ(pos)) {
-                        bloks.add(new PosWithColor(pos,true,false, obbyColor1.getValue().getColorObject()));
-                    } else
-                    if (validTwoBlockBedrockXZ1(pos)) {
-                        bloks.add(new PosWithColor(pos,false,true, bedrockColor1.getValue().getColorObject()));
-                    } else
-                    if (validTwoBlockObiXZ1(pos)) {
-                        bloks.add(new PosWithColor(pos,false,true, obbyColor1.getValue().getColorObject()));
-                    } else
-                    if (validQuadBedrock(pos)) {
-                        bloks.add(new PosWithColor(pos,true,true, bedrockColor1.getValue().getColorObject()));
-                    } else
-                    if (validQuadObby(pos)) {
-                        bloks.add(new PosWithColor(pos,true,true, obbyColor1.getValue().getColorObject()));
+                        bloks.add(new PosWithColor(pos, false, false, obbyColor1.getValue().getColorObject()));
+                    } else if (validBedrock(pos)) {
+                        bloks.add(new PosWithColor(pos, false, false, bedrockColor1.getValue().getColorObject()));
+                    } else if (validTwoBlockBedrockXZ(pos)) {
+                        bloks.add(new PosWithColor(pos, true, false, bedrockColor1.getValue().getColorObject()));
+                    } else if (validTwoBlockObiXZ(pos)) {
+                        bloks.add(new PosWithColor(pos, true, false, obbyColor1.getValue().getColorObject()));
+                    } else if (validTwoBlockBedrockXZ1(pos)) {
+                        bloks.add(new PosWithColor(pos, false, true, bedrockColor1.getValue().getColorObject()));
+                    } else if (validTwoBlockObiXZ1(pos)) {
+                        bloks.add(new PosWithColor(pos, false, true, obbyColor1.getValue().getColorObject()));
+                    } else if (validQuadBedrock(pos)) {
+                        bloks.add(new PosWithColor(pos, true, true, bedrockColor1.getValue().getColorObject()));
+                    } else if (validQuadObby(pos)) {
+                        bloks.add(new PosWithColor(pos, true, true, obbyColor1.getValue().getColorObject()));
                     }
                 }
             }
@@ -157,7 +150,7 @@ public class HoleEsp extends Module {
                 && isAir(pos.add(0, 2, 0));
     }
 
-    public static  boolean validBedrock(BlockPos pos) {
+    public static boolean validBedrock(BlockPos pos) {
         return isBedrock(pos.add(0, -1, 0))
                 && isBedrock(pos.add(1, 0, 0))
                 && isBedrock(pos.add(-1, 0, 0))
@@ -170,7 +163,7 @@ public class HoleEsp extends Module {
 
     public static boolean validTwoBlockObiXZ(BlockPos pos) {
         if (
-                (isObby(pos.down()) ||  isBedrock(pos.down()))
+                (isObby(pos.down()) || isBedrock(pos.down()))
                         && (isObby(pos.west()) || isBedrock(pos.west()))
                         && (isObby(pos.south()) || isBedrock(pos.south()))
                         && (isObby(pos.north()) || isBedrock(pos.north()))
@@ -212,33 +205,33 @@ public class HoleEsp extends Module {
         return false;
     }
 
-    public static boolean validQuadObby(BlockPos pos){
-        if(
+    public static boolean validQuadObby(BlockPos pos) {
+        if (
                 ((isObby(pos.down()) || isBedrock(pos.down())) && (isAir(pos)) && isAir(pos.up()) && isAir(pos.up(2)))
-                && ((isObby(pos.south().down()) || isBedrock(pos.south().down())) && (isAir(pos.south())) && isAir(pos.south().up()) && isAir(pos.south().up(2)))
-                && ((isObby(pos.east().down()) || isBedrock(pos.east().down())) && (isAir(pos.east())) && isAir(pos.east().up()) && isAir(pos.east().up(2)))
-                && ((isObby(pos.south().east().down()) || isBedrock(pos.south().east().down())) && (isAir(pos.south().east())) && isAir(pos.south().east().up()) && isAir(pos.south().east().up(2)))
+                        && ((isObby(pos.south().down()) || isBedrock(pos.south().down())) && (isAir(pos.south())) && isAir(pos.south().up()) && isAir(pos.south().up(2)))
+                        && ((isObby(pos.east().down()) || isBedrock(pos.east().down())) && (isAir(pos.east())) && isAir(pos.east().up()) && isAir(pos.east().up(2)))
+                        && ((isObby(pos.south().east().down()) || isBedrock(pos.south().east().down())) && (isAir(pos.south().east())) && isAir(pos.south().east().up()) && isAir(pos.south().east().up(2)))
 
-                &&((isObby(pos.north()) || isBedrock(pos.north())) && (isObby(pos.west()) || isBedrock(pos.west())))
-                &&((isObby(pos.east().north()) || isBedrock(pos.east().north())) && (isObby(pos.east().east()) || isBedrock(pos.east().east())))
-                &&((isObby(pos.south().west()) || isBedrock(pos.south().west())) && (isObby(pos.south().south()) || isBedrock(pos.south().south())))
-                &&((isObby(pos.east().south().south()) || isBedrock(pos.east().south().south())) && (isObby(pos.east().south().east()) || isBedrock(pos.east().south().east())))
+                        && ((isObby(pos.north()) || isBedrock(pos.north())) && (isObby(pos.west()) || isBedrock(pos.west())))
+                        && ((isObby(pos.east().north()) || isBedrock(pos.east().north())) && (isObby(pos.east().east()) || isBedrock(pos.east().east())))
+                        && ((isObby(pos.south().west()) || isBedrock(pos.south().west())) && (isObby(pos.south().south()) || isBedrock(pos.south().south())))
+                        && ((isObby(pos.east().south().south()) || isBedrock(pos.east().south().south())) && (isObby(pos.east().south().east()) || isBedrock(pos.east().south().east())))
         ) return true;
 
         return false;
     }
 
-    public static boolean validQuadBedrock(BlockPos pos){
-        if(
+    public static boolean validQuadBedrock(BlockPos pos) {
+        if (
                 ((isBedrock(pos.down())) && (isAir(pos)) && isAir(pos.up()) && isAir(pos.up(2)))
                         && ((isBedrock(pos.south().down())) && (isAir(pos.south())) && isAir(pos.south().up()) && isAir(pos.south().up(2)))
                         && ((isBedrock(pos.east().down())) && (isAir(pos.east())) && isAir(pos.east().up()) && isAir(pos.east().up(2)))
                         && ((isBedrock(pos.south().east().down())) && (isAir(pos.south().east())) && isAir(pos.south().east().up()) && isAir(pos.south().east().up(2)))
 
-                        &&(isBedrock(pos.north()) && isBedrock(pos.west()))
-                        &&(isBedrock(pos.east().north()) && isBedrock(pos.east().east()))
-                        &&(isBedrock(pos.south().west()) && isBedrock(pos.south().south()))
-                        &&(isBedrock(pos.east().south().south()) && isBedrock(pos.east().south().east()))
+                        && (isBedrock(pos.north()) && isBedrock(pos.west()))
+                        && (isBedrock(pos.east().north()) && isBedrock(pos.east().east()))
+                        && (isBedrock(pos.south().west()) && isBedrock(pos.south().south()))
+                        && (isBedrock(pos.east().south().south()) && isBedrock(pos.east().south().east()))
 
         ) return true;
 
@@ -289,25 +282,25 @@ public class HoleEsp extends Module {
         return false;
     }
 
-    private static boolean isObby(BlockPos bp){
+    private static boolean isObby(BlockPos bp) {
         return mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN;
     }
 
-    private static boolean isBedrock(BlockPos bp){
+    private static boolean isBedrock(BlockPos bp) {
         return mc.world.getBlockState(bp).getBlock() == Blocks.BEDROCK;
     }
 
-    private static boolean isAir(BlockPos bp){
+    private static boolean isAir(BlockPos bp) {
         return mc.world.getBlockState(bp).getBlock() == Blocks.AIR;
     }
 
-    public  class PosWithColor{
+    public class PosWithColor {
         private BlockPos bp;
         private boolean dirX;
         private boolean dirZ;
         private Color color;
 
-        public PosWithColor(BlockPos pos,boolean dirX,boolean dirZ, Color color){
+        public PosWithColor(BlockPos pos, boolean dirX, boolean dirZ, Color color) {
             this.bp = pos;
             this.dirX = dirX;
             this.dirZ = dirZ;
@@ -317,12 +310,15 @@ public class HoleEsp extends Module {
         public BlockPos getBp() {
             return bp;
         }
+
         public boolean checkDirX() {
             return dirX;
         }
+
         public boolean checkDirZ() {
             return dirZ;
         }
+
         public Color getColor() {
             return color;
         }

@@ -30,6 +30,8 @@ import thunder.hack.setting.Setting;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.PickaxeItem;
 import net.minecraft.item.ShovelItem;
+import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.math.MathUtil;
 import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.render.Render3DEngine;
@@ -40,16 +42,22 @@ public class SpeedMine extends Module {
     public SpeedMine() {
         super("SpeedMine", "SpeedMine", Category.PLAYER);
     }
-    public static final Setting<Mode> mode = new Setting("Mode", Mode.Packet);
-    public final Setting<Float> startDmg = new Setting("StartDmg", 0f, 0f, 1f);
-    public final Setting<Float> finishDmg = new Setting("FinishDmg", 1f, 0f, 1f);
+
+    public static final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
+    public final Setting<Float> startDmg = new Setting<>("StartDmg", 0f, 0f, 1f);
+    public final Setting<Float> finishDmg = new Setting<>("FinishDmg", 1f, 0f, 1f);
 
     private final Setting<Float> range = new Setting<>("Range", 4.2f, 3.0f, 10.0f);
     public Setting<Boolean> rotate = new Setting<>("Rotate", false);
-    public Setting<Boolean> render = new Setting<>("Render", false);
 
-    public Setting<Integer> breakAttemps = new Setting("BreakAttemps", 10, 1, 50, v -> mode.getValue() == Mode.Packet);
+    public Setting<Parent> render = new Setting<>("Render", new Parent(false, 0));
+    private final Setting<ColorSetting> startLineColor = new Setting<>("Start Line Color", new ColorSetting(new Color(255, 0, 0, 200))).withParent(render);
+    private final Setting<ColorSetting> endLineColor = new Setting<>("End Line Color", new ColorSetting(new Color(47, 255, 0, 200))).withParent(render);
+    private final Setting<Integer> lineWidth = new Setting<>("Line Width", 2, 1, 10).withParent(render);
+    private final Setting<ColorSetting> startFillColor = new Setting<>("Start Fill Color", new ColorSetting(new Color(255, 0, 0, 120))).withParent(render);
+    private final Setting<ColorSetting> endFillColor = new Setting<>("End Fill Color", new ColorSetting(new Color(47, 255, 0, 120))).withParent(render);
 
+    public Setting<Integer> breakAttempts = new Setting<>("BreakAttemps", 10, 1, 50, v -> mode.getValue() == Mode.Packet);
 
     public static BlockPos minePosition;
     private Direction mineFacing;
@@ -68,13 +76,13 @@ public class SpeedMine extends Module {
             } else if (mode.getValue() == Mode.Packet) {
 
                 if (minePosition != null) {
-                    if (mineBreaks >= breakAttemps.getValue() || mc.player.squaredDistanceTo(minePosition.toCenterPos()) > range.getPow2Value()) {
+                    if (mineBreaks >= breakAttempts.getValue() || mc.player.squaredDistanceTo(minePosition.toCenterPos()) > range.getPow2Value()) {
                         minePosition = null;
                         mineFacing = null;
                         progress = 0;
                         mineBreaks = 0;
                     }
-                    if(progress == 0 && !mc.world.isAir(minePosition)){
+                    if (progress == 0 && !mc.world.isAir(minePosition)) {
                         mc.interactionManager.attackBlock(minePosition, mineFacing);
                         mc.player.swingHand(Hand.MAIN_HAND);
                     }
@@ -84,7 +92,7 @@ public class SpeedMine extends Module {
                     int swapSlot = getTool(minePosition);
                     if (swapSlot == -1) return;
                     if (progress >= 1) {
-                        if(swapSlot < 9){
+                        if (swapSlot < 9) {
                             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 30, swapSlot, SlotActionType.SWAP, mc.player);
                             mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                         }
@@ -118,13 +126,13 @@ public class SpeedMine extends Module {
             return 0;
         }
         if (!canBreak(position)) {
-            return getDigSpeed(state,position) / hardness / 100F;
+            return getDigSpeed(state, position) / hardness / 100F;
         } else {
-            return getDigSpeed(state,position) / hardness / 30F;
+            return getDigSpeed(state, position) / hardness / 30F;
         }
     }
 
-    public float getDestroySpeed(BlockPos position,BlockState state) {
+    public float getDestroySpeed(BlockPos position, BlockState state) {
         float destroySpeed = 1;
         if (mc.player.getInventory().getStack(getTool(position)) != null && !mc.player.getInventory().getStack(getTool(position)).isEmpty()) {
             destroySpeed *= mc.player.getInventory().getStack(getTool(position)).getMiningSpeedMultiplier(state);
@@ -133,7 +141,7 @@ public class SpeedMine extends Module {
     }
 
     public float getDigSpeed(BlockState state, BlockPos position) {
-        float digSpeed = getDestroySpeed(position,state);
+        float digSpeed = getDestroySpeed(position, state);
         if (digSpeed > 1) {
             ItemStack itemstack = mc.player.getInventory().getStack(getTool(position));
             int efficiencyModifier = EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, itemstack);
@@ -173,8 +181,8 @@ public class SpeedMine extends Module {
     }
 
     @Subscribe
-    public void onPacketSend(PacketEvent.SendPost e){
-        if(e.getPacket() instanceof UpdateSelectedSlotC2SPacket){
+    public void onPacketSend(PacketEvent.SendPost e) {
+        if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket) {
             progress = 0;
         }
     }
@@ -191,19 +199,19 @@ public class SpeedMine extends Module {
     public void onRender3D(Render3DEvent e) {
         if (mode.getValue() == Mode.Packet) {
             if (minePosition != null && !mc.world.isAir(minePosition)) {
-                Box shrunkMineBox = new Box(minePosition.getX(),minePosition.getY(), minePosition.getZ(), minePosition.getX(),minePosition.getY(), minePosition.getZ());
+                Box shrunkMineBox = new Box(minePosition.getX(), minePosition.getY(), minePosition.getZ(), minePosition.getX(), minePosition.getY(), minePosition.getZ());
                 float noom = MathUtil.clamp(progress, 0f, 1f);
 
                 Render3DEngine.drawFilledBox(
                         e.getMatrixStack(),
-                        shrunkMineBox.shrink(noom,noom,noom).offset(0.5 + noom * 0.5,0.5 + noom * 0.5,0.5 + noom * 0.5),
-                        progress >= 0.95 ? new Color(47, 255, 0, 120) : new Color(255, 0, 0, 120)
+                        shrunkMineBox.shrink(noom, noom, noom).offset(0.5 + noom * 0.5, 0.5 + noom * 0.5, 0.5 + noom * 0.5),
+                        progress >= 0.95 ? endFillColor.getValue().getColorObject() : startFillColor.getValue().getColorObject()
                 );
 
                 Render3DEngine.drawBoxOutline(
-                        shrunkMineBox.shrink(noom,noom,noom).offset(0.5 + noom * 0.5,0.5 + noom * 0.5,0.5 + noom * 0.5),
-                        progress >= 0.95 ? new Color(47, 255, 0, 200) : new Color(255, 0, 0, 200),
-                        2f
+                        shrunkMineBox.shrink(noom, noom, noom).offset(0.5 + noom * 0.5, 0.5 + noom * 0.5, 0.5 + noom * 0.5),
+                        progress >= 0.95 ? endLineColor.getValue().getColorObject() : startLineColor.getValue().getColorObject(),
+                        lineWidth.getValue()
                 );
             }
         }

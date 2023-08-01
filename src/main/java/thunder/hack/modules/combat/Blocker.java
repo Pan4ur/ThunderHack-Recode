@@ -58,7 +58,7 @@ public class Blocker extends Module {
                 if (System.currentTimeMillis() - time > 500) {
                     renderBlocks.remove(pos);
                 } else {
-                    Render3DEngine.drawFilledBox(event.getMatrixStack(),new Box(pos), Render2DEngine.injectAlpha(HudEditor.getColor(0),100));
+                    Render3DEngine.drawFilledBox(event.getMatrixStack(), new Box(pos), Render2DEngine.injectAlpha(HudEditor.getColor(0), 100));
                     Render3DEngine.drawBoxOutline(new Box(pos), HudEditor.getColor(0), 2);
                 }
             });
@@ -82,25 +82,25 @@ public class Blocker extends Module {
 
         int blocksPlaced = 0;
 
-        if(placePositions.isEmpty()) return;
+        if (placePositions.isEmpty()) return;
 
         while (blocksPlaced < actionShift.getValue()) {
             BlockPos pos = StreamSupport.stream(placePositions.spliterator(), false)
-                    .filter(p -> PlaceUtility.canPlaceBlock(p, strictDirection.getValue(),true))
+                    .filter(p -> PlaceUtility.canPlaceBlock(p, strictDirection.getValue(), true))
                     .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5))))
                     .orElse(null);
 
             if (pos != null) {
 
-                if(crystalBreaker.getValue())
-                for (Entity entity : mc.world.getOtherEntities(null, new Box(pos))) {
-                    if (entity instanceof EndCrystalEntity) {
-                        mc.interactionManager.attackEntity(mc.player,entity);
-                        mc.player.swingHand(Hand.MAIN_HAND);
+                if (crystalBreaker.getValue())
+                    for (Entity entity : mc.world.getOtherEntities(null, new Box(pos))) {
+                        if (entity instanceof EndCrystalEntity) {
+                            mc.interactionManager.attackEntity(mc.player, entity);
+                            mc.player.swingHand(Hand.MAIN_HAND);
+                        }
                     }
-                }
 
-                if (PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, obbySlot == -1 ? eChestSlot : obbySlot,false) != null) {
+                if (PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, obbySlot == -1 ? eChestSlot : obbySlot, false) != null) {
                     blocksPlaced++;
                     renderBlocks.put(pos, System.currentTimeMillis());
                     PlaceUtility.ghostBlocks.put(pos, System.currentTimeMillis());
@@ -119,14 +119,15 @@ public class Blocker extends Module {
 
     @Subscribe
     public void onPacketReceive(PacketEvent.Receive e) {
-        if(fullNullCheck()) return;
+        if (fullNullCheck()) return;
         if (e.getPacket() instanceof BlockBreakingProgressS2CPacket && HoleEsp.validObi(BlockPos.ofFloored(mc.player.getPos()))) {
             BlockBreakingProgressS2CPacket packet = e.getPacket();
             BlockPos pos = packet.getPos();
 
-            if (mc.world.getBlockState(pos).getBlock() == Blocks.BEDROCK || mc.world.getBlockState(pos).getBlock() == Blocks.AIR) return;
+            if (mc.world.getBlockState(pos).getBlock() == Blocks.BEDROCK || mc.world.getBlockState(pos).getBlock() == Blocks.AIR)
+                return;
 
-            BlockPos playerPos =  BlockPos.ofFloored(mc.player.getPos());
+            BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
 
             boolean notif = false;
 
@@ -149,14 +150,14 @@ public class Blocker extends Module {
                 placePositions.add(playerPos.east().south());
                 notif = true;
             }
-            if (pos.equals(playerPos.west())){
+            if (pos.equals(playerPos.west())) {
                 placePositions.add(playerPos.west().add(0, 1, 0));
                 placePositions.add(playerPos.west().west());
                 placePositions.add(playerPos.west().north());
                 placePositions.add(playerPos.west().south());
                 notif = true;
             }
-            if (pos.equals(playerPos.south())){
+            if (pos.equals(playerPos.south())) {
                 placePositions.add(playerPos.south().south());
                 placePositions.add(playerPos.south().west());
                 placePositions.add(playerPos.south().east());
@@ -164,7 +165,7 @@ public class Blocker extends Module {
                 notif = true;
             }
 
-            if(notif && notifTimer.passedMs(2000)) {
+            if (notif && notifTimer.passedMs(2000)) {
                 Thunderhack.notificationManager.publicity("Blocker", "Нам пытаются сломать сарраунд! Блокирую..", 3, Notification.Type.SUCCESS);
                 notifTimer.reset();
             }
