@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(PlayerMoveC2SPacket.class)
 public interface IPlayerMoveC2SPacket {
-
+    @Mutable
     @Accessor("onGround")
     void setOnGround(boolean onGround);
 }
