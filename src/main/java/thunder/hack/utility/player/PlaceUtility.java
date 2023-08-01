@@ -1,17 +1,17 @@
 package thunder.hack.utility.player;
 
+import net.minecraft.block.*;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import thunder.hack.core.PlaceManager;
 import thunder.hack.modules.combat.AutoTrap;
 import thunder.hack.utility.math.Placement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -132,45 +132,6 @@ public class PlaceUtility {
         return new float[]{270.0f, 0.0f};
     }
 
-    public static Placement place(Block block, BlockPos pos, boolean rotate, boolean strictDirection, boolean ignoreEntities) {
-        Hand hand = null;
-        int slot = -1;
-
-        final ItemStack mainhandStack = mc.player.getMainHandStack();
-        if (mainhandStack != ItemStack.EMPTY && mainhandStack.getItem() instanceof BlockItem) {
-            final Block blockFromMainhandItem = ((BlockItem) mainhandStack.getItem()).getBlock();
-            if (blockFromMainhandItem == block) {
-                hand = Hand.MAIN_HAND;
-                slot = mc.player.getInventory().selectedSlot;
-            }
-        }
-
-        final ItemStack offhandStack = mc.player.getOffHandStack();
-        if (offhandStack != ItemStack.EMPTY && offhandStack.getItem() instanceof BlockItem) {
-            final Block blockFromOffhandItem = ((BlockItem) offhandStack.getItem()).getBlock();
-            if (blockFromOffhandItem == block) {
-                hand = Hand.OFF_HAND;
-            }
-        }
-
-        if (hand == null) {
-            for (int i = 0; i < 9; i++) {
-                final ItemStack stack = mc.player.getInventory().getStack(i);
-                if (stack != ItemStack.EMPTY && stack.getItem() instanceof BlockItem) {
-                    final Block blockFromItem = ((BlockItem) stack.getItem()).getBlock();
-                    if (blockFromItem == block) {
-                        hand = Hand.MAIN_HAND;
-                        slot = i;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (hand == null) return null;
-        return place(pos, rotate, strictDirection, hand, slot,ignoreEntities);
-    }
-
     public static boolean canSee(Entity entity) {
         Vec3d entityEyes = getEyesPos(entity);
         Vec3d entityPos = entity.getPos();
@@ -193,21 +154,16 @@ public class PlaceUtility {
         return false;
     }
 
-    public static Placement place(BlockPos pos, boolean rotate, boolean strictDirection, Hand hand, int slot,boolean ignoreEntities) {
-        if (!canPlaceBlock(pos,ignoreEntities)) return null;
+    public static boolean place(BlockPos pos, boolean rotate, boolean strictDirection, Hand hand, int slot, boolean ignoreEntities) {
+        if (!canPlaceBlock(pos,ignoreEntities)) return false;
         Direction side = getPlaceDirection(pos, strictDirection);
-        if (side == null) {
-            return null;
-        }
+        if (side == null) return false;
         BlockPos neighbour = pos.offset(side);
         Direction opposite = side.getOpposite();
         Vec3d hitVec = new Vec3d(neighbour.getX() + 0.5, neighbour.getY() + 0.5, neighbour.getZ() + 0.5).add(new Vec3d(opposite.getUnitVector()).multiply(0.5));
         float[] angle = calculateAngle(hitVec);
-        Placement placement = new Placement(neighbour, opposite, angle[0], angle[1], hand, rotate, slot);
-        if (PlaceManager.add(new Action(placement))) {
-            return placement;
-        }
-        return null;
+        PlaceManager.add(new Placement(neighbour, opposite, angle[0], angle[1], hand, rotate, slot));
+        return true;
     }
 
     public static float[] calcAngle(BlockPos pos, boolean strictDirection, boolean ignoreEntities){
@@ -222,23 +178,21 @@ public class PlaceUtility {
         return calculateAngle(hitVec);
     }
 
-    public static Placement forcePlace(BlockPos pos, boolean strictDirection, Hand hand, int slot, boolean ignoreEntities) {
-        if(!canPlaceBlock(pos,  strictDirection, ignoreEntities))return null;
-        if(!mc.world.getBlockState(pos).isReplaceable()) return null;
+    public static boolean forcePlace(BlockPos pos, boolean strictDirection, Hand hand, int slot, boolean ignoreEntities) {
+        if(!canPlaceBlock(pos,  strictDirection, ignoreEntities)) return false;
+        if(!mc.world.getBlockState(pos).isReplaceable()) return false;
         Direction side = Direction.DOWN;
         if(strictDirection) side = getPlaceDirection(pos, true);
-        if (side == null) return null;
+        if (side == null) return false;
         BlockPos neighbour = pos.offset(side);
         Direction opposite = side.getOpposite();
-        Placement placement = new Placement(neighbour, opposite, 0, 0, hand, false, slot);
-        placement.getAction().run();
-        return placement;
+        new Placement(neighbour, opposite, 0, 0, hand, false, slot).getAction().run();
+        return true;
     }
 
     public static boolean canPlaceBlock(BlockPos pos, boolean strictDirection) {
         return canPlaceBlock(pos, strictDirection, true);
     }
-
 
     public static boolean canPlaceBlock(BlockPos pos, boolean strictDirection, boolean checkEntities) {
         if (!mc.world.getBlockState(pos).isReplaceable()) {
@@ -252,7 +206,6 @@ public class PlaceUtility {
         }
         return getPlaceDirection(pos, strictDirection) != null;
     }
-
 
     public static boolean canClick(BlockPos pos) {
         if (ghostBlocks.containsKey(pos)) {
@@ -289,15 +242,13 @@ public class PlaceUtility {
 
             validFacings.add(side);
         }
-        return validFacings.stream()
-                .min(Comparator.comparing(facing ->
-                        getEyesPos(mc.player).distanceTo(
-                                new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)
-                                        .add(new Vec3d(facing.getUnitVector()).multiply(0.5)))))
-                .orElse(null);
+        return validFacings.stream().min(Comparator.comparing(facing -> getEyesPos(mc.player).distanceTo(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5).add(new Vec3d(facing.getUnitVector()).multiply(0.5))))).orElse(null);
     }
 
     public static Direction getBreakDirection(BlockPos pos, boolean strictDirection) {
+        if(!strictDirection){
+            return Direction.UP;
+        }
         ArrayList<Direction> validFacings = new ArrayList<>();
         validFacings.addAll(Arrays.asList(Direction.values()));
         return validFacings.stream().min(Comparator.comparing(facing -> getEyesPos(mc.player).distanceTo(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5).add(new Vec3d(facing.getUnitVector()).multiply(0.5))))).orElse(null);
@@ -339,5 +290,133 @@ public class PlaceUtility {
             pD = -90F;
         }
         return new float[]{yD, pD};
+    }
+
+    public static float[] getRotationForPlace(BlockPos bp, boolean strictDirection){
+        if(!mc.world.getBlockState(bp).isReplaceable()) return null;
+
+        ArrayList<BlockPosWithFacing> neighbours = new ArrayList<>();
+        neighbours.add(new BlockPosWithFacing(bp.up(),Direction.DOWN));
+        neighbours.add(new BlockPosWithFacing(bp.west(),Direction.EAST));
+        neighbours.add(new BlockPosWithFacing(bp.east(),Direction.WEST));
+        neighbours.add(new BlockPosWithFacing(bp.north(),Direction.SOUTH));
+        neighbours.add(new BlockPosWithFacing(bp.south(),Direction.NORTH));
+        neighbours.add(new BlockPosWithFacing(bp.down(),Direction.UP));
+
+        for (BlockPosWithFacing bp2 : neighbours){
+            if(mc.world.getBlockState(bp2.position).isReplaceable()) continue;
+            for(Vec3d point : getDirectionPoints(bp2.facing)){
+                Vec3d p = new Vec3d(bp2.position.getX() + point.getX(), bp2.position.getY() + point.getY(), bp2.position.getZ() + point.getZ());
+                BlockHitResult result = mc.world.raycast(new RaycastContext(getEyesPos(mc.player), p, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, ((mc.player))));
+                if (result != null && result.getType() == HitResult.Type.BLOCK && result.getBlockPos().equals(bp2.position) && result.getSide().equals(bp2.facing)) {
+                    return calculateAngle(p);
+                }
+            }
+        }
+        return null;
+    }
+
+    public static boolean placeBlock(BlockPos bp, boolean strictDirection){
+        if(!mc.world.getBlockState(bp).isReplaceable()) return false;
+
+        if(strictDirection) {
+            ArrayList<BlockPosWithFacing> neighbours = new ArrayList<>();
+            neighbours.add(new BlockPosWithFacing(bp.up(), Direction.DOWN));
+            neighbours.add(new BlockPosWithFacing(bp.west(), Direction.EAST));
+            neighbours.add(new BlockPosWithFacing(bp.east(), Direction.WEST));
+            neighbours.add(new BlockPosWithFacing(bp.north(), Direction.SOUTH));
+            neighbours.add(new BlockPosWithFacing(bp.south(), Direction.NORTH));
+            neighbours.add(new BlockPosWithFacing(bp.down(), Direction.UP));
+
+            for (BlockPosWithFacing bp2 : neighbours) {
+                if (mc.world.getBlockState(bp2.position).isReplaceable()) continue;
+                for (Vec3d point : getDirectionPoints(bp2.facing)) {
+                    Vec3d p = new Vec3d(bp2.position.getX() + point.getX(), bp2.position.getY() + point.getY(), bp2.position.getZ() + point.getZ());
+                    BlockHitResult result = mc.world.raycast(new RaycastContext(getEyesPos(mc.player), p, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, ((mc.player))));
+                    if (result != null && result.getType() == HitResult.Type.BLOCK && result.getBlockPos().equals(bp2.position)) {
+                        mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtil.getWorldActionId(mc.world)));
+                        mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                        break;
+                    }
+                }
+            }
+        } else {
+            BlockPos bp2 = bp.down();
+            Vec3d p = new Vec3d(bp2.getX() + 0.5, bp2.getY() + 1f, bp2.getZ() + 0.5f);
+            BlockHitResult result = new BlockHitResult(p, Direction.UP, bp2, false);
+            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtil.getWorldActionId(mc.world)));
+            mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+        }
+        return false;
+    }
+
+    public static Vec3d[] getDirectionPoints(Direction dir){
+        if(dir == Direction.DOWN) {
+            return new Vec3d[]{
+                    new Vec3d(0.05,0.05,0.05),
+                    new Vec3d(0.95,0.05,0.05),
+                    new Vec3d(0.95,0.05,0.95),
+                    new Vec3d(0.05,0.05,0.95),
+                    new Vec3d(0.5,0.05,0.05),
+                    new Vec3d(0.5,0.05,0.5),
+                    new Vec3d(0.05,0.05,0.5)
+            };
+        } else
+        if(dir == Direction.NORTH) {
+            return new Vec3d[]{
+                    new Vec3d(0.05,0.05,0.05),
+                    new Vec3d(0.05,0.95,0.05),
+                    new Vec3d(0.95,0.95,0.05),
+                    new Vec3d(0.95,0.05,0.05),
+                    new Vec3d(0.05,0.5,0.05),
+                    new Vec3d(0.5,0.5,0.05),
+                    new Vec3d(0.5,0.05,0.05)
+            };
+        } else
+        if(dir == Direction.EAST) {
+            return new Vec3d[]{
+                    new Vec3d(0.95,0.05,0.05),
+                    new Vec3d(0.95,0.95,0.05),
+                    new Vec3d(0.95,0.95,0.95),
+                    new Vec3d(0.95,0.05,0.95),
+                    new Vec3d(0.5,0.05,0),
+                    new Vec3d(0.5,0.5,0),
+                    new Vec3d(0.5,0.5,0.5),
+                    new Vec3d(0.5,0.05,0.5)
+            };
+        } else
+        if(dir == Direction.SOUTH) {
+            return new Vec3d[]{
+                    new Vec3d(0.05,0.05,1),
+                    new Vec3d(0.95,0.05,1),
+                    new Vec3d(0.05,0.95,1),
+                    new Vec3d(0.95,0.95,1),
+
+            };
+        } else
+        if(dir == Direction.WEST) {
+            return new Vec3d[]{
+                    new Vec3d(0.05,0.05,0.05),
+                    new Vec3d(0.05,0.05,0.95),
+                    new Vec3d(0.05,0.95,0.95),
+                    new Vec3d(0.05,0.95,0.05),
+                    new Vec3d(0.05,0.05,0.5),
+                    new Vec3d(0.05,0.5,0.5),
+                    new Vec3d(0.05,0.5,0.05)
+            };
+        } else {
+            return new Vec3d[]{
+                    new Vec3d(0.05,0.95,0.05),
+                    new Vec3d(0.95,0.95,0.05),
+                    new Vec3d(0.95,0.95,0.95),
+                    new Vec3d(0.05,0.95,0.95),
+                    new Vec3d(0.5,0.95,0.05),
+                    new Vec3d(0.5,0.95,0.5),
+                    new Vec3d(0.05,0.95,0.5)
+            };
+        }
+    }
+
+    public record BlockPosWithFacing(BlockPos position, Direction facing){
     }
 }

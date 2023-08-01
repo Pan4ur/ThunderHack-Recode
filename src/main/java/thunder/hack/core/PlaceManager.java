@@ -5,9 +5,9 @@ import net.minecraft.item.Items;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
-import thunder.hack.utility.player.Action;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import thunder.hack.utility.math.Placement;
 
 import java.util.LinkedList;
 
@@ -15,7 +15,7 @@ import static thunder.hack.modules.Module.mc;
 
 public class PlaceManager {
 
-    private final static LinkedList<Action> actions = new LinkedList<>();
+    private final static LinkedList<Placement> placements = new LinkedList<>();
 
     private static float[] trailingRotation = null;
 
@@ -36,9 +36,8 @@ public class PlaceManager {
         trailingRotation = rotation;
     }
 
-    public static boolean add(Action action) {
-        actions.add(action);
-        return true;
+    public static void add(Placement action) {
+        placements.add(action);
     }
 
     @Subscribe
@@ -49,20 +48,13 @@ public class PlaceManager {
     private void handleActions(EventSync event) {
         int startSlot = mc.player.getInventory().selectedSlot;
 
-        boolean ranAction = false;
-
-        while (!actions.isEmpty()) {
-            Action action = actions.pop();
-            if (ranAction && action.isOptional()) continue;
-
+        while (!placements.isEmpty()) {
+            Placement action = placements.pop();
             if (action.isRotate()) {
                 event.cancel();
                 rotate(action.getYaw(), action.getPitch());
             }
-
-            Runnable runnable = action.getAction();
-            if (runnable != null) runnable.run();
-            ranAction = true;
+            action.getAction().run();
         }
 
         if (trailingRotation != null) {
@@ -94,7 +86,7 @@ public class PlaceManager {
             mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
         }
 
-        if (mc.player.getInventory().getStack(mc.player.getInventory().selectedSlot).getItem() != Items.END_CRYSTAL && mc.player.getInventory().selectedSlot != startSlot) {
+        if (mc.player.getInventory().selectedSlot != startSlot) {
              mc.player.getInventory().selectedSlot = startSlot;
              mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(startSlot));
         }

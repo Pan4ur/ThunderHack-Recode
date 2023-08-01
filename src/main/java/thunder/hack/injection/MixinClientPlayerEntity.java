@@ -57,7 +57,6 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     boolean pre_sprint_state = false;
 
-
     @Inject(method = "sendMovementPackets", at = @At("HEAD"), cancellable = true)
     private void sendMovementPacketsHook(CallbackInfo info) {
         if(PlaceManager.isRotating) return;

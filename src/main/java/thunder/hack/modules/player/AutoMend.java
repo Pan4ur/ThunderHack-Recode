@@ -1,25 +1,15 @@
 package thunder.hack.modules.player;
 
 import com.google.common.eventbus.Subscribe;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Keyboard;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ExperienceBottleItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
-import org.lwjgl.opengl.GL40C;
-import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.gui.hud.impl.TargetHud;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -27,6 +17,7 @@ import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtil;
 import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterDynamicAnimation;
 
@@ -41,7 +32,6 @@ public class AutoMend extends Module {
     }
 
     public Setting<Bind> key = new Setting<>("Key", new Bind(-1,false));
-    private final Setting<Integer> threshold = new Setting<>("Percent", 100, 0, 100);
     private final Setting<Integer> dlay = new Setting<>("ThrowDelay", 100, 0, 100);
     private final Setting<Integer> armdlay = new Setting<>("ArmorDelay", 100, 0, 1000);
 
@@ -66,16 +56,13 @@ public class AutoMend extends Module {
         if(e.getButton() == key.getValue().getKey()) keyState = e.getAction() == 1;
     }
 
-    @Subscribe
-    public void onSync(EventSync event) {
-        if (keyState) mc.player.setPitch(90);
-    }
 
     @Subscribe
-    public void onPostSync(EventPostSync e) {
-        if(keyState) {
+    public void onSync(EventSync e) {
+
+        if(keyState && mc.currentScreen == null) {
+            mc.player.setPitch(90);
             int xp_slot = InventoryUtil.getXpSlot();
-
             ArrayList<ItemStack> stacks = new ArrayList();
             stacks.add(mc.player.getInventory().armor.get(3));
             stacks.add(mc.player.getInventory().armor.get(2));
@@ -124,7 +111,7 @@ public class AutoMend extends Module {
 
     @Subscribe
     public void onRender2D(Render2DEvent e) {
-        if (keyState) {
+        if (keyState && mc.currentScreen == null) {
             ArrayList<ItemStack> stacks = new ArrayList();
             stacks.add(mc.player.getInventory().armor.get(0));
             stacks.add(mc.player.getInventory().armor.get(1));
@@ -193,6 +180,11 @@ public class AutoMend extends Module {
                 e.getMatrixStack().pop();
                 xItemOffset += 12;
             }
+        }
+        float[] angle = PlaceUtility.getRotationForPlace(new BlockPos(0,-60,0),true);
+        if(angle != null) {
+            mc.player.setYaw(angle[0]);
+            mc.player.setPitch(angle[1]);
         }
     }
 

@@ -100,7 +100,7 @@ public class HoleFill extends Module {
             }
 
             if (pos != null) {
-                if (PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, slot,false) != null) {
+                if (PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, slot,false)) {
                     blocksPlaced++;
                     renderPoses.put(pos, System.currentTimeMillis());
                     PlaceUtility.ghostBlocks.put(pos, System.currentTimeMillis());

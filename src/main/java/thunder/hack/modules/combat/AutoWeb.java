@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
+import net.minecraft.util.Hand;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.events.impl.Render3DEvent;
@@ -8,6 +9,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.player.InventoryUtil;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
@@ -76,7 +78,7 @@ public class AutoWeb extends Module {
         while (blocksPlaced < actionShift.getValue()) {
             BlockPos nextPos = PlaceUtility.canPlaceBlock(feetPos,true) ? feetPos : head.getValue() ? PlaceUtility.canPlaceBlock(feetPos.up(),true) ? feetPos.up() : null : null;
             if (nextPos != null) {
-                if (PlaceUtility.place(Blocks.COBWEB, nextPos, rotate.getValue(),  strictDirection.getValue(),true) != null) {
+                if (PlaceUtility.place( nextPos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, InventoryUtil.findHotbarBlock(Blocks.COBWEB),false)) {
                     blocksPlaced++;
                     PlaceUtility.ghostBlocks.put(nextPos, System.currentTimeMillis());
                     renderPoses.put(nextPos, System.currentTimeMillis());

@@ -100,7 +100,7 @@ public class Blocker extends Module {
                     }
                 }
 
-                if (PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, obbySlot == -1 ? eChestSlot : obbySlot,false) != null) {
+                if (PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, obbySlot == -1 ? eChestSlot : obbySlot,false)) {
                     blocksPlaced++;
                     renderBlocks.put(pos, System.currentTimeMillis());
                     PlaceUtility.ghostBlocks.put(pos, System.currentTimeMillis());

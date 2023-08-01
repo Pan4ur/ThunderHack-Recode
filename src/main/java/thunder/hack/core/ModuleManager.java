@@ -63,6 +63,7 @@ public class ModuleManager {
     public static ExtraTab extraTab;
     public static Animations animations;
     public static AutoMend autoMend;
+    public static PotionHud potionHud;
 
     public ModuleManager() {
         tracker = new Tracker();
@@ -100,6 +101,7 @@ public class ModuleManager {
         extraTab = new ExtraTab();
         animations = new Animations();
         autoMend = new AutoMend();
+        potionHud = new PotionHud();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -146,7 +148,7 @@ public class ModuleManager {
         modules.add(new TargetHud());
         modules.add(new KeyBinds());
         modules.add(new WaterMark());
-        modules.add(new PotionHud());
+        modules.add(potionHud);
         modules.add(new MiddleClick());
         modules.add(new NoServerSlot());
         modules.add(new Trails());
@@ -248,6 +250,9 @@ public class ModuleManager {
         modules.add(new PearlBait());
         modules.add(new XCarry());
         modules.add(autoMend);
+        modules.add(new Spider());
+        modules.add(new HoleSnap());
+        modules.add(new ChatUtils());
 
     }
 

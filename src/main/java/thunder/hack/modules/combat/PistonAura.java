@@ -163,7 +163,7 @@ public class PistonAura extends Module {
                     trapPos.add(trapBase.add(0, 1, 0));
 
                     for(BlockPos bp : trapPos){
-                        if (PlaceUtility.place(Blocks.OBSIDIAN, bp,true, strictDirection.getValue(),false) != null) {
+                        if (PlaceUtility.place( bp,true, strictDirection.getValue(),Hand.MAIN_HAND,InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN),false)) {
                             if(bp == targetPos.add(0,2,0)){
                                 builtTrap = true;
                                 stage = Stage.Piston;
