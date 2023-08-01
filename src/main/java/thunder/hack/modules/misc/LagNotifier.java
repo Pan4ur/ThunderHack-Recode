@@ -12,6 +12,7 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
+import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render2DEngine;
 
@@ -19,6 +20,10 @@ import java.awt.*;
 import java.text.DecimalFormat;
 
 public class LagNotifier extends Module {
+    private final Setting<Boolean> rubberbandNotify = new Setting<>("rubberband", true);
+    private final Setting<Boolean> serverResponseNotify = new Setting<>("serverResponse", true);
+    private final Setting<Boolean> tpsNotify = new Setting<>("tps", true);
+
     private final Identifier ICON = new Identifier("textures/lagg.png");
 
     private Timer notifyTimer = new Timer();
@@ -59,8 +64,9 @@ public class LagNotifier extends Module {
         Render2DEngine.setupRender();
         RenderSystem.defaultBlendFunc();
 
-        if (!rubberbandTimer.passedMs(5000)) {
+        if (!rubberbandTimer.passedMs(5000) && rubberbandNotify.getValue()) {
             DecimalFormat decimalFormat = new DecimalFormat("#.#");
+
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
                 FontRenderers.modules.drawCenteredString(e.getMatrixStack(), "Обнаружен руббербенд! " + decimalFormat.format((5000f - (float) rubberbandTimer.getTimeMs()) / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
             } else {
@@ -68,24 +74,27 @@ public class LagNotifier extends Module {
             }
         }
 
-        if (packetTimer.passedMs(5000)) {
+        if (packetTimer.passedMs(5000) && serverResponseNotify.getValue()) {
             DecimalFormat decimalFormat = new DecimalFormat("#.#");
+
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
                 FontRenderers.modules.drawCenteredString(e.getMatrixStack(), "Сервер перестал отвечать! " + decimalFormat.format((float) packetTimer.getTimeMs() / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
             } else {
                 FontRenderers.modules.drawCenteredString(e.getMatrixStack(), "The server stopped responding! " + decimalFormat.format((float) packetTimer.getTimeMs() / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
             }
+
             RenderSystem.setShaderColor(1f, 0.87f, 0f, 1f);
             e.getContext().drawTexture(ICON, (int) ((float) mc.getWindow().getScaledWidth() / 2f - 40), (int) ((float) mc.getWindow().getScaledHeight() / 3f - 120), 0, 0, 80, 80, 80, 80);
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         }
 
-        if (Thunderhack.serverManager.getTPS() < 10 && notifyTimer.passedMs(60000) && Thunderhack.moduleManager.get("TpsSync").isDisabled()) {
+        if (Thunderhack.serverManager.getTPS() < 10 && notifyTimer.passedMs(60000) && tpsNotify.getValue()) {
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                Thunderhack.notificationManager.publicity("LagNotifier", "ТПС сервера ниже 10! Рекомендуется включить TPSSync", 8, Notification.Type.ERROR);
+                Thunderhack.notificationManager.publicity("LagNotifier", "ТПС сервера ниже 10!" + (Thunderhack.moduleManager.get("TpsSync").isDisabled() ? " Рекомендуется включить TPSSync" : ""), 8, Notification.Type.ERROR);
             } else {
-                Thunderhack.notificationManager.publicity("LagNotifier", "Server TPS is below 10! It is recommended to enable TPSSync", 8, Notification.Type.ERROR);
+                Thunderhack.notificationManager.publicity("LagNotifier", "Server TPS is below 10!" + (Thunderhack.moduleManager.get("TpsSync").isDisabled() ? " It is recommended to enable TPSSync" : ""), 8, Notification.Type.ERROR);
             }
+
             isLag = true;
             notifyTimer.reset();
         }
@@ -96,6 +105,7 @@ public class LagNotifier extends Module {
             } else {
                 Thunderhack.notificationManager.publicity("LagNotifier", "Server TPS has stabilized!", 8, Notification.Type.SUCCESS);
             }
+
             isLag = false;
         }
 
