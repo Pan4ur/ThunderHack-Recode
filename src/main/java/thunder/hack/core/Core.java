@@ -41,8 +41,9 @@ public class Core {
     public Core() {
         Thunderhack.EVENT_BUS.register(this);
     }
+
     public static boolean lock_sprint, serversprint;
-    public static Map<String , Identifier> heads = new ConcurrentHashMap<String, Identifier>();
+    public static Map<String, Identifier> heads = new ConcurrentHashMap<>();
 
     @Subscribe
     public void onTick(PlayerUpdateEvent event) {
@@ -53,7 +54,7 @@ public class Core {
         if (!fullNullCheck()) {
             if (ModuleManager.clickGui.getBind().getKey() == -1) {
                 Command.sendMessage(Formatting.RED + "Default clickgui keybind --> P");
-                ModuleManager.clickGui.setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(),false);
+                ModuleManager.clickGui.setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(), false);
             }
         }
         ThunderGui2.getInstance().onTick();
@@ -61,8 +62,8 @@ public class Core {
     }
 
     @Subscribe
-    public void onPacketSend(PacketEvent.Send e){
-        if(e.getPacket() instanceof ChatMessageC2SPacket){
+    public void onPacketSend(PacketEvent.Send e) {
+        if (e.getPacket() instanceof ChatMessageC2SPacket) {
             ChatMessageC2SPacket pac = e.getPacket();
             if (pac.chatMessage().startsWith(Command.getCommandPrefix())) {
                 e.setCancelled(true);
@@ -108,21 +109,16 @@ public class Core {
     }
 
     @Subscribe
-    public void onRender2D(Render2DEvent e){
+    public void onRender2D(Render2DEvent e) {
         drawLagNotify(e);
         drawGps(e);
         drawSkull(e);
     }
 
     @Subscribe
-    public void onPacketReceive(PacketEvent.Receive e){
-        if(fullNullCheck()) return;
-        if(e.getPacket() instanceof PlayerPositionLookS2CPacket){
-            rubberbandTimer.reset();
-        }
-        if (e.getPacket() instanceof WorldTimeUpdateS2CPacket) {
-            packetTimer.reset();
-        }
+    public void onPacketReceive(PacketEvent.Receive e) {
+        if (fullNullCheck()) return;
+
         if (e.getPacket() instanceof GameMessageS2CPacket) {
             final GameMessageS2CPacket packet = e.getPacket();
             if (packet.content().getString().contains("skull")) {
@@ -133,76 +129,38 @@ public class Core {
         }
     }
 
-    public void drawSkull(Render2DEvent e){
-        if(showSkull && !skullTimer.passedMs(3000)){
+    public void drawSkull(Render2DEvent e) {
+        if (showSkull && !skullTimer.passedMs(3000)) {
             int xPos = (int) (mc.getWindow().getScaledWidth() / 2f - 150);
             int yPos = (int) (mc.getWindow().getScaledHeight() / 2f - 150);
             float alpha = (1 - (skullTimer.getPassedTimeMs() / 3000f));
-            RenderSystem.setShaderColor(1f,1f,1f,alpha);
-            e.getContext().drawTexture(SKULL,xPos, yPos, 0, 0, 300, 300, 300, 300);
-            RenderSystem.setShaderColor(1f,1f,1f,1f);
+            RenderSystem.setShaderColor(1f, 1f, 1f, alpha);
+            e.getContext().drawTexture(SKULL, xPos, yPos, 0, 0, 300, 300, 300, 300);
+            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         } else {
             showSkull = false;
         }
     }
 
-    public void drawGps(Render2DEvent e){
+    public void drawGps(Render2DEvent e) {
         if (Thunderhack.gps_position != null) {
             float xOffset = mc.getWindow().getScaledWidth() / 2f;
             float yOffset = mc.getWindow().getScaledHeight() / 2f;
-            float yaw = getRotations(new Vec2f(Thunderhack.gps_position.getX(),Thunderhack.gps_position.getZ())) - mc.player.getYaw();
+            float yaw = getRotations(new Vec2f(Thunderhack.gps_position.getX(), Thunderhack.gps_position.getZ())) - mc.player.getYaw();
             e.getMatrixStack().translate(xOffset, yOffset, 0.0F);
             e.getMatrixStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
             e.getMatrixStack().translate(-xOffset, -yOffset, 0.0F);
-            RadarRewrite.drawTracerPointer(e.getMatrixStack(),xOffset, yOffset - 50, 12.5f, ClickGui.getInstance().getColor(1).getRGB());
+            RadarRewrite.drawTracerPointer(e.getMatrixStack(), xOffset, yOffset - 50, 12.5f, ClickGui.getInstance().getColor(1).getRGB());
             e.getMatrixStack().translate(xOffset, yOffset, 0.0F);
             e.getMatrixStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-yaw));
             e.getMatrixStack().translate(-xOffset, -yOffset, 0.0F);
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-            FontRenderers.modules.drawCenteredString(e.getMatrixStack(),"gps (" + getDistance(Thunderhack.gps_position) + "m)", (float) (Math.sin(Math.toRadians(yaw)) * 50f) + xOffset, (float) (yOffset - (Math.cos(Math.toRadians(yaw)) * 50f)) - 20, -1);
+            FontRenderers.modules.drawCenteredString(e.getMatrixStack(), "gps (" + getDistance(Thunderhack.gps_position) + "m)", (float) (Math.sin(Math.toRadians(yaw)) * 50f) + xOffset, (float) (yOffset - (Math.cos(Math.toRadians(yaw)) * 50f)) - 20, -1);
         }
     }
 
-    public void drawLagNotify(Render2DEvent e){
-        Render2DEngine.setupRender();
-        RenderSystem.defaultBlendFunc();
-        if(!rubberbandTimer.passedMs(5000)){
-            DecimalFormat decimalFormat = new DecimalFormat( "#.#" );
-            if(MainSettings.language.getValue() == MainSettings.Language.RU) {
-                FontRenderers.modules.drawCenteredString(e.getMatrixStack(), "Обнаружен руббербенд! " + decimalFormat.format((5000f - (float) rubberbandTimer.getTimeMs()) / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
-            } else {
-                FontRenderers.modules.drawCenteredString(e.getMatrixStack(), "Rubberband detected! " + decimalFormat.format((5000f - (float) rubberbandTimer.getTimeMs()) / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
-            }
-        }
-        if(packetTimer.passedMs(5000)){
-            DecimalFormat decimalFormat = new DecimalFormat( "#.#" );
-            if(MainSettings.language.getValue() == MainSettings.Language.RU) {
-                FontRenderers.modules.drawCenteredString(e.getMatrixStack(), "Сервер перестал отвечать! " + decimalFormat.format((float) packetTimer.getTimeMs() / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
-            } else {
-                FontRenderers.modules.drawCenteredString(e.getMatrixStack(), "The server stopped responding! " + decimalFormat.format((float) packetTimer.getTimeMs() / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
-            }
-            RenderSystem.setShaderColor(1f, 0.87f, 0f,1f);
-            e.getContext().drawTexture(ICON,(int) ((float) mc.getWindow().getScaledWidth() / 2f - 40), (int) ((float) mc.getWindow().getScaledHeight() / 3f - 120), 0, 0, 80, 80, 80, 80);
-            RenderSystem.setShaderColor(1f,1f,1f,1f);
-        }
-        if(Thunderhack.serverManager.getTPS() < 10 && notifTimer.passedMs(60000)){
-            if(MainSettings.language.getValue() == MainSettings.Language.RU) {
-                Thunderhack.notificationManager.publicity("LagNotifier", "ТПС сервера ниже 10! Рекомендуется включить TPSSync", 8, Notification.Type.ERROR);
-            } else {
-                Thunderhack.notificationManager.publicity("LagNotifier", "Server TPS is below 10! It is recommended to enable TPSSync", 8, Notification.Type.ERROR);
-            }
-            isLag = true;
-            notifTimer.reset();
-        }
-        if(Thunderhack.serverManager.getTPS() > 15 && isLag) {
-            if(MainSettings.language.getValue() == MainSettings.Language.RU) {
-                Thunderhack.notificationManager.publicity("LagNotifier", "ТПС сервера стабилизировался!", 8, Notification.Type.SUCCESS);
-            } else {
-                Thunderhack.notificationManager.publicity("LagNotifier", "Server TPS has stabilized!", 8, Notification.Type.SUCCESS);
-            }
-            isLag = false;
-        }
-        Render2DEngine.endRender();
+    public void drawLagNotify(Render2DEvent e) {
+
     }
 
     @Subscribe
@@ -218,11 +176,11 @@ public class Core {
     public static boolean hold_mouse0;
 
     @Subscribe
-    public void onMouse(EventMouse event){
-        if(event.getAction() == 0){
+    public void onMouse(EventMouse event) {
+        if (event.getAction() == 0) {
             hold_mouse0 = false;
         }
-        if(event.getAction() == 1){
+        if (event.getAction() == 1) {
             hold_mouse0 = true;
         }
     }
@@ -234,9 +192,9 @@ public class Core {
     }
 
     public static float getRotations(Vec2f vec) {
-        if(mc.player == null) return 0;
+        if (mc.player == null) return 0;
         double x = vec.x - mc.player.getPos().x;
-        double z = vec.y- mc.player.getPos().z;
+        double z = vec.y - mc.player.getPos().z;
         return (float) -(Math.atan2(x, z) * (180 / Math.PI));
     }
 
@@ -244,13 +202,8 @@ public class Core {
         return mc.player == null || mc.world == null;
     }
 
-    private final Identifier ICON = new Identifier("textures/lagg.png");
     private final Identifier SKULL = new Identifier("textures/skull.png");
 
-    private Timer notifTimer = new Timer();
-    private Timer packetTimer = new Timer();
-    private Timer rubberbandTimer = new Timer();
-    private Timer skullTimer = new Timer();
+    private final Timer skullTimer = new Timer();
     private boolean showSkull = false;
-    private boolean isLag = false;
 }
