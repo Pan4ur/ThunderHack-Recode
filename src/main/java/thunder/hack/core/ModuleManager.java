@@ -247,6 +247,7 @@ public class ModuleManager {
         modules.add(new AntiHunger());
         modules.add(new AutoSoup());
         modules.add(new VoidESP());
+        modules.add(new FOV());
         modules.add(new PearlBait());
         modules.add(new XCarry());
         modules.add(autoMend);

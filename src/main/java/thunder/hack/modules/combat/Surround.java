@@ -23,6 +23,8 @@ import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -36,6 +38,8 @@ public class Surround extends Module {
     private final Setting<Boolean> strict = new Setting<>("Strict", false);
     private final Setting<Boolean> center = new Setting<>("Center", true);
     private final Setting<Boolean> render = new Setting<>("Render", true);
+    private final Setting<Boolean> newBlocks = new Setting<>("1.16 Blocks", true);
+    private final Setting<Boolean> allowAnchors = new Setting<>("Allow Anchors", false, (value) -> newBlocks.getValue());
     private static final Setting<Parent> autoDisable = new Setting<>("Disable on", new Parent(false,0));
     public static final Setting<Boolean> disableOnYChange = new Setting<>("YChange", false).withParent(autoDisable);
     public static final Setting<Boolean> disableOnTP = new Setting<>("TP", true).withParent(autoDisable);
@@ -71,11 +75,12 @@ public class Surround extends Module {
     @Override
     public void onEnable() {
         inactivityTimer.reset();
-        prevY = mc.player.getY();
         if (mc.player == null || mc.world == null) {
             this.toggle();
             return;
         }
+
+        prevY = mc.player.getY();
         if (center.getValue()) {
             mc.player.updatePosition( MathHelper.floor(mc.player.getX()) + 0.5, mc.player.getY(), MathHelper.floor(mc.player.getZ()) + 0.5);
             mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.isOnGround()));
@@ -179,12 +184,19 @@ public class Surround extends Module {
     }
 
     private int getSlot() {
+        List<Block> canUseBlocks = new ArrayList<>(List.of(Blocks.OBSIDIAN, Blocks.ENDER_CHEST));
+        if (newBlocks.getValue()) {
+            canUseBlocks.addAll(List.of(Blocks.CRYING_OBSIDIAN, Blocks.NETHERITE_BLOCK));
+            if (allowAnchors.getValue()) canUseBlocks.add(Blocks.RESPAWN_ANCHOR);
+        }
+
+
         int slot = -1;
 
         final ItemStack mainhandStack = mc.player.getMainHandStack();
         if (mainhandStack != ItemStack.EMPTY && mainhandStack.getItem() instanceof BlockItem) {
             final Block blockFromMainhandItem = ((BlockItem) mainhandStack.getItem()).getBlock();
-            if (blockFromMainhandItem == Blocks.OBSIDIAN || blockFromMainhandItem == Blocks.ENDER_CHEST) {
+            if (canUseBlocks.contains(blockFromMainhandItem)) {
                 slot = mc.player.getInventory().selectedSlot;
             }
         }
@@ -194,7 +206,7 @@ public class Surround extends Module {
                 final ItemStack stack = mc.player.getInventory().getStack(i);
                 if (stack != ItemStack.EMPTY && stack.getItem() instanceof BlockItem) {
                     final Block blockFromItem = ((BlockItem) stack.getItem()).getBlock();
-                    if (blockFromItem == Blocks.OBSIDIAN || blockFromItem == Blocks.ENDER_CHEST) {
+                    if (canUseBlocks.contains(blockFromItem)) {
                         slot = i;
                         break;
                     }

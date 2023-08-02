@@ -1,11 +1,14 @@
 package thunder.hack.injection;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.logging.LogUtils;
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.render.Camera;
 import net.minecraft.item.SwordItem;
 import net.minecraft.resource.ResourceFactory;
 import com.mojang.datafixers.util.Pair;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
@@ -13,6 +16,7 @@ import thunder.hack.events.impl.PreRender3DEvent;
 import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.player.NoEntityTrace;
+import thunder.hack.modules.render.FOV;
 import thunder.hack.modules.render.NoRender;
 import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.render.MSAAFramebuffer;
@@ -90,5 +94,20 @@ public abstract class MixinGameRenderer {
     @Inject(method = "loadPrograms", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
     void loadAllTheShaders(ResourceFactory factory, CallbackInfo ci, List<ShaderStage> stages, List<Pair<ShaderProgram, Consumer<ShaderProgram>>> shadersToLoad) {
         GlProgram.forEachProgram(loader -> shadersToLoad.add(new Pair<>(loader.getLeft().apply(factory), loader.getRight())));
+    }
+
+    @Inject(at = @At("TAIL"), method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D", cancellable = true)
+    public void getFov(Camera camera, float tickDelta, boolean changingFov,
+                       CallbackInfoReturnable<Double> cb) {
+        FOV fovModule = Thunderhack.moduleManager.get(FOV.class);
+
+        if (fovModule.isEnabled()) {
+            if (cb.getReturnValue() == 70 && !fovModule.itemFov.getValue()) return;
+            else if (fovModule.itemFov.getValue() && cb.getReturnValue() == 70) {
+                cb.setReturnValue(fovModule.itemFovModifier.getValue().doubleValue());
+                return;
+            }
+            cb.setReturnValue(fovModule.fovModifier.getValue().doubleValue());
+        }
     }
 }
