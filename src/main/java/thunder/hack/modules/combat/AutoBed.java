@@ -164,7 +164,7 @@ public class AutoBed extends Module {
     }
 
     private void placeBed() {
-        if(PlaceUtility.forcePlace(finalPos, strictDirection.getValue(), isOffhand() ? Hand.OFF_HAND : Hand.MAIN_HAND,-1,true) != null) {
+        if(PlaceUtility.forcePlace(finalPos, strictDirection.getValue(), isOffhand() ? Hand.OFF_HAND : Hand.MAIN_HAND, -1, true)) {
             renderBlocks.put(finalPos, System.currentTimeMillis());
             placeTimer.reset();
             finalPos = null;

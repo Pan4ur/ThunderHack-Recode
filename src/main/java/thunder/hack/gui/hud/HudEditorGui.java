@@ -3,7 +3,7 @@ package thunder.hack.gui.hud;
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.Thunderhack;
-import thunder.hack.utility.math.EaseBackIn;
+import thunder.hack.utility.render.animation.EaseBackIn;
 import thunder.hack.gui.clickui.AbstractWindow;
 import thunder.hack.gui.clickui.ModuleWindow;
 import thunder.hack.modules.Module;

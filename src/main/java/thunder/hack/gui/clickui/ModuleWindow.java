@@ -10,9 +10,8 @@ import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.Animation;
 import thunder.hack.utility.render.animation.Direction;
-import thunder.hack.utility.math.EaseBackIn;
+import thunder.hack.utility.render.animation.EaseBackIn;
 import thunder.hack.modules.Module;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL11;
 

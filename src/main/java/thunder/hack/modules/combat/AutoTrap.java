@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
+import net.minecraft.util.Hand;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.events.impl.Render3DEvent;
@@ -8,6 +9,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.player.InventoryUtil;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
@@ -71,7 +73,7 @@ public class AutoTrap extends Module {
         while (blocksPlaced < actionShift.getValue()) {
             BlockPos nextPos = getNextPos(nearestTarget.getBlockPos());
             if (nextPos != null) {
-                if (PlaceUtility.place(Blocks.OBSIDIAN, nextPos, rotate.getValue(), strictDirection.getValue(),false) != null) {
+                if (PlaceUtility.place( nextPos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND,InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN),false)) {
                     blocksPlaced++;
                     PlaceUtility.ghostBlocks.put(nextPos, System.currentTimeMillis());
                     renderPoses.put(nextPos, System.currentTimeMillis());
@@ -113,37 +115,59 @@ public class AutoTrap extends Module {
     }
 
     private BlockPos getNextPos(BlockPos playerPos) {
-
+        Direction[] HORIZONTALS = new Direction[]{Direction.WEST, Direction.EAST, Direction.SOUTH, Direction.NORTH};
         for(BlockPos bp2 : getBlocks(playerPos)) {
-            Direction[] HORIZONTALS = new Direction[]{Direction.WEST, Direction.EAST, Direction.SOUTH, Direction.NORTH};
+            double furthestDistance = 0D;
             for (Direction enumFacing : HORIZONTALS) {
-                BlockPos block = null;
-                if (PlaceUtility.canPlaceBlock(bp2.offset(enumFacing).down(), true))
-                    block = bp2.offset(enumFacing).down();
-                if (block != null) return block;
+                BlockPos furthestBlock = null;
+                if (PlaceUtility.canPlaceBlock(bp2.offset(enumFacing).down(), strictDirection.getValue())) {
+                    BlockPos tempBlock = bp2.offset(enumFacing).down();
+                    double tempDistance = PlaceUtility.getEyesPos(mc.player).distanceTo(new Vec3d(tempBlock.getX() + 0.5, tempBlock.getY() + 0.5, tempBlock.getZ() + 0.5));
+                    if (tempDistance >= furthestDistance) {
+                        furthestBlock = tempBlock;
+                        furthestDistance = tempDistance;
+                    }
+                }
+                if (furthestBlock != null) return furthestBlock;
             }
 
             for (Direction enumFacing : HORIZONTALS) {
-                BlockPos block = null;
-                if (PlaceUtility.canPlaceBlock(bp2.offset(enumFacing), false))
-                    block = bp2.offset(enumFacing);
-                if (block != null) return block;
+                BlockPos furthestBlock = null;
+                if (PlaceUtility.canPlaceBlock(bp2.offset(enumFacing), strictDirection.getValue())) {
+                    BlockPos tempBlock = bp2.offset(enumFacing);
+                    double tempDistance = PlaceUtility.getEyesPos(mc.player).distanceTo(new Vec3d(tempBlock.getX() + 0.5, tempBlock.getY() + 0.5, tempBlock.getZ() + 0.5));
+                    if (tempDistance >= furthestDistance) {
+                        furthestBlock = tempBlock;
+                        furthestDistance = tempDistance;
+                    }
+                }
+                if (furthestBlock != null) return furthestBlock;
             }
 
             for (Direction enumFacing : HORIZONTALS) {
-                BlockPos block = null;
-                if (PlaceUtility.canPlaceBlock(bp2.up().offset(enumFacing), false))
-                    block = bp2.up().offset(enumFacing);
-                if (block != null) return block;
+                BlockPos furthestBlock = null;
+                if (PlaceUtility.canPlaceBlock(bp2.up().offset(enumFacing), strictDirection.getValue())) {
+                    BlockPos tempBlock = bp2.up().offset(enumFacing);;
+                    double tempDistance = PlaceUtility.getEyesPos(mc.player).distanceTo(new Vec3d(tempBlock.getX() + 0.5, tempBlock.getY() + 0.5, tempBlock.getZ() + 0.5));
+                    if (tempDistance >= furthestDistance) {
+                        furthestBlock = tempBlock;
+                        furthestDistance = tempDistance;
+                    }
+                }
+                if (furthestBlock != null) return furthestBlock;
             }
 
             if (top.getValue()) {
-                if (mc.world.getBlockState(bp2.up().up()).isReplaceable()) {
-                    BlockPos offsetPos = bp2.up().up().offset(Direction.fromHorizontal(MathHelper.floor((double) (mc.player.getYaw() * 4.0F / 360.0F) + 0.5D) & 3));
-                    if (PlaceUtility.canPlaceBlock(offsetPos, false)) {
-                        return offsetPos;
+                Block baseBlock = mc.world.getBlockState(bp2.up().up()).getBlock();
+                if (baseBlock instanceof AirBlock || baseBlock instanceof FluidBlock) {
+                    if (PlaceUtility.canPlaceBlock(bp2.up().up(), true)) {
+                        return bp2.up().up();
+                    } else {
+                        BlockPos offsetPos = bp2.up().up().offset(Direction.fromHorizontal(MathHelper.floor((double) (mc.player.getYaw() * 4.0F / 360.0F) + 0.5D) & 3));
+                        if (PlaceUtility.canPlaceBlock(offsetPos, strictDirection.getValue())) {
+                            return offsetPos;
+                        }
                     }
-                    return bp2.up().up();
                 }
             }
         }

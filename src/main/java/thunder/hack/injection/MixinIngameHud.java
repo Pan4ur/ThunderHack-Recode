@@ -36,6 +36,13 @@ public abstract class MixinIngameHud {
         }
     }
 
+    @Inject(at = @At(value = "HEAD"), method = "renderStatusEffectOverlay",cancellable = true)
+    public void renderStatusEffectOverlayHook(DrawContext context, CallbackInfo ci) {
+        if(ModuleManager.potionHud.isEnabled()){
+            ci.cancel();
+        }
+    }
+
     @Inject(method = "renderExperienceBar", at = @At(value = "HEAD"),cancellable = true)
     public void renderXpBarCustom(DrawContext context, int x, CallbackInfo ci) {
         if(ModuleManager.hotbar.isEnabled()){

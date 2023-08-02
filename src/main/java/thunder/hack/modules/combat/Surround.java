@@ -173,7 +173,7 @@ public class Surround extends Module {
                     }
                 }
 
-            if (PlaceUtility.place(targetPos, strict.getValue(), false,Hand.MAIN_HAND, slot,true) != null) {
+            if (PlaceUtility.place(targetPos, strict.getValue(), false,Hand.MAIN_HAND, slot,true)) {
                 renderPoses.put(targetPos, System.currentTimeMillis());
                 blocksPlaced++;
                 inactivityTimer.reset();

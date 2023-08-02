@@ -61,7 +61,7 @@ public class AntiSurround extends Module {
 
     public static float[] getRotations(BlockPos blockPos) {
         Vec3d vec3d2 = blockPos.toCenterPos();
-        return calcAngle(vec3d2.add(new Vec3d(PlaceUtility.getBreakDirection(blockPos,false).getUnitVector()).multiply(0.5)));
+        return calcAngle(vec3d2.add(new Vec3d(PlaceUtility.getBreakDirection(blockPos,true).getUnitVector()).multiply(0.5)));
     }
 
     @Override
@@ -115,7 +115,7 @@ public class AntiSurround extends Module {
                     if(ModuleManager.speedMine.isEnabled() && SpeedMine.progress != 0){
                         return;
                     }
-                    mc.interactionManager.attackBlock(blockpos2, PlaceUtility.getBreakDirection(blockpos2,false));
+                    mc.interactionManager.attackBlock(blockpos2, PlaceUtility.getBreakDirection(blockpos2,true));
                     mc.player.swingHand(Hand.MAIN_HAND);
                     this.blockpos = blockpos2;
                 }

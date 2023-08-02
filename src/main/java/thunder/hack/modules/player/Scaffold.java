@@ -2,6 +2,9 @@ package thunder.hack.modules.player;
 
 import com.google.common.eventbus.Subscribe;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.world.RaycastContext;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
@@ -11,7 +14,9 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.math.MathUtil;
 import thunder.hack.utility.player.PlaceUtility;
+import thunder.hack.utility.player.PlayerUtil;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.Block;
@@ -24,6 +29,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import org.joml.Vector3f;
+
+import java.util.ArrayList;
 
 
 public class Scaffold extends Module {
@@ -233,11 +240,12 @@ public class Scaffold extends Module {
     }
 
     private boolean isOffsetBBEmpty(double x, double z) {
-        return !mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(x,  -2, z)).iterator().hasNext();
+        return !mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.1,0,-0.1).offset(x,  -2, z)).iterator().hasNext();
     }
 
     @Subscribe
     public void onPre(EventSync event) {
+        if(strictRotate.getValue()) mc.player.setSprinting(false);
         if(strictRotate.getValue()){
             mc.player.setYaw(rotation[0]);
             mc.player.setPitch(rotation[1]);
@@ -250,6 +258,7 @@ public class Scaffold extends Module {
 
         if (mc.player.isSneaking() && !allowShift.getValue()) return;
 
+
         int n2 = findBlockToPlace();
         if (n2 == -1) return;
 
@@ -261,13 +270,16 @@ public class Scaffold extends Module {
 
         BlockPos blockPos2 = new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY()) - (fullBlock ? 1.0 : 0.01)), (int) Math.floor(mc.player.getZ()));
 
-        //  BlockPos blockPos2 = resolveBlockPos();
         if (!mc.world.getBlockState(blockPos2).isReplaceable()) return;
 
         currentblock = checkNearBlocksExtended(blockPos2);
         if (currentblock != null) {
             if (rotate.getValue()) {
-                float[] rotations = getRotations(currentblock.position, currentblock.facing);
+              //getRotations(currentblock.position, currentblock.facing);
+
+                Vec3d hitVec = new Vec3d(currentblock.position.getX() + 0.5, currentblock.position.getY() + 0.90, currentblock.position.getZ() + 0.5).add(new Vec3d(currentblock.facing.getUnitVector()).multiply(0.5));
+                float[] rotations = PlaceUtility.calculateAngle(hitVec);
+
                 if(strictRotate.getValue()){
                     rotation = rotations;
                 } else {
@@ -280,6 +292,7 @@ public class Scaffold extends Module {
 
     @Subscribe
     public void onPost(EventPostSync e) {
+        if(mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.2,0,-0.2).offset(0,  -0.5, 0)).iterator().hasNext()) return;
         if (currentblock == null) return;
         int prev_item = mc.player.getInventory().selectedSlot;
         if (!(mc.player.getMainHandStack().getItem() instanceof BlockItem)) {
@@ -301,27 +314,16 @@ public class Scaffold extends Module {
                     timer.reset();
                 }
             }
+            Vec3d hitVec = new Vec3d(currentblock.position.getX() + 0.5, currentblock.position.getY() + 0.90, currentblock.position.getZ() + 0.5).add(new Vec3d(currentblock.facing.getUnitVector()).multiply(0.5));
 
-            //  boolean sneak = mc.world.getBlockState(currentblock.getPosition()).getBlock()(mc.world, currentblock.getPosition(), mc.world.getBlockState(currentblock.getPosition()), mc.player, EnumHand.MAIN_HAND, EnumFacing.DOWN, 0.0f, 0.0f, 0.0f);
-            //  if (sneak)
-            //    mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_SNEAKING));
-
-            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND,
-                    new BlockHitResult(
-                            new Vec3d(
-                                    (double) currentblock.position.getX() + Math.random(),
-                                    currentblock.position.getY() + 0.99f,
-                                    (double) currentblock.position.getZ() + Math.random()
-                            ),
-                            currentblock.facing,
-                            currentblock.position,
-                            false));
+            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(hitVec, currentblock.facing, currentblock.position, false));
 
             mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-            // if (sneak)
-            //    mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
-            mc.player.getInventory().selectedSlot = prev_item;
-            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+
+            if(!strictRotate.getValue()) {
+                mc.player.getInventory().selectedSlot = prev_item;
+                mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+            }
         }
     }
 

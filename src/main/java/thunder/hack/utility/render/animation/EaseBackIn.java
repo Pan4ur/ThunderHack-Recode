@@ -1,7 +1,4 @@
-package thunder.hack.utility.math;
-
-import thunder.hack.utility.render.animation.Animation;
-import thunder.hack.utility.render.animation.Direction;
+package thunder.hack.utility.render.animation;
 
 public class EaseBackIn extends Animation {
     private final float easeAmount;
@@ -27,5 +24,4 @@ public class EaseBackIn extends Animation {
         float shrink = easeAmount + 1;
         return Math.max(0, 1 + shrink * Math.pow(x1 - 1, 3) + easeAmount * Math.pow(x1 - 1, 2));
     }
-
 }
