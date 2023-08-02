@@ -132,7 +132,7 @@ public class Aura extends Module {
 
         if (target != null && autoCrit() && (lookingAtHitbox || mode.getValue() != Mode.Universal)) {
             final Item selectedItem = mc.player.getInventory().getStack(mc.player.getInventory().selectedSlot).getItem();
-            if (onlyWeapon.getValue() && (selectedItem instanceof SwordItem || selectedItem instanceof AxeItem)) return;
+            if (onlyWeapon.getValue() && !(selectedItem instanceof SwordItem || selectedItem instanceof AxeItem)) return;
 
             boolean blocking = mc.player.isUsingItem() && mc.player.getActiveItem().getItem().getUseAction(mc.player.getActiveItem()) == BLOCK;
             if (blocking)
