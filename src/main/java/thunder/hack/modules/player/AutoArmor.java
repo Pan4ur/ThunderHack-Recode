@@ -86,7 +86,6 @@ public class AutoArmor extends Module {
                 } else if (mc.player.playerScreenHandler == mc.player.currentScreenHandler) {
                     int armorSlot = (e.getValue()[0] - 34) + (39 - e.getValue()[0]) * 2;
                     int newArmorslot = e.getValue()[2] < 9 ? 36 + e.getValue()[2] : e.getValue()[2];
-                    Command.sendMessage(armorSlot + "");
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, newArmorslot, 0, SlotActionType.PICKUP, mc.player);
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, armorSlot, 0, SlotActionType.PICKUP, mc.player);
                     if (e.getValue()[1] != -1)

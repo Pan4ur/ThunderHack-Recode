@@ -36,7 +36,7 @@ public class TimerIndicator extends HudElement {
     @Subscribe
     public void onRenderShader(RenderBlurEvent e){
 
-        Render2DEngine.drawBlurredShadow(e.getMatrixStack(),getPosX(), getPosY(), 62, 12, 6, HudEditor.getColor(270));
+        Render2DEngine.drawGradientGlow(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90),getPosX() + 0.5f, getPosY() + 0.5f, 61, 11,3,10);
 
         int status;
         float timerStatus;

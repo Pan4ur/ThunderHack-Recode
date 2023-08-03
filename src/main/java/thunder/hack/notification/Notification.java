@@ -1,12 +1,12 @@
 package thunder.hack.notification;
 
+import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtil;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterAnimation;
-import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;
 
@@ -50,39 +50,44 @@ public class Notification {
         int x1 = (int) ((mc.getWindow().getScaledWidth() - 6) - width + animationX);
         int y1 = (int) posY;
 
+        Render2DEngine.verticalGradient(matrix, x1 + 25, y1 + 1, x1 + 25.5, y1 + 12, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0).getRGB(), HudEditor.textColor.getValue().getColorObject().getRGB());
+        Render2DEngine.verticalGradient(matrix, x1 + 25, y1 + 11, x1 + 25.5, y1 + 22, HudEditor.textColor.getValue().getColorObject().getRGB(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0).getRGB());
 
-
-        Render2DEngine.drawGradientBlurredShadow(matrix,x1 + 2, y1 + 2, width - 4, height - 4, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
-        Render2DEngine.renderRoundedGradientRect(matrix, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90),x1 - 0.5f, y1 - 0.5f, width + 1, height + 1, 5f);
-        Render2DEngine.drawRound(matrix,x1, y1, width, height, 5f, HudEditor.plateColor.getValue().getColorObject());
-
-
-        Render2DEngine.verticalGradient(matrix,x1 + 25, y1 + 1, x1  + 25.5, y1 + 12,Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(),0).getRGB(), HudEditor.textColor.getValue().getColorObject().getRGB());
-        Render2DEngine.verticalGradient(matrix, x1 + 25, y1 + 11, x1 + 25.5, y1 + 22, HudEditor.textColor.getValue().getColorObject().getRGB(),Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(),0).getRGB());
-
-
-        FontRenderers.sf_bold_mini.drawString(matrix,title, x1 + 30, y1 + 6, HudEditor.textColor.getValue().getColor());
-        FontRenderers.sf_bold_mini.drawString(matrix,message, x1 + 30, (int) y1 + 15 , icolor2.getRGB());
+        FontRenderers.sf_bold_mini.drawString(matrix, title, x1 + 30, y1 + 6, HudEditor.textColor.getValue().getColor());
+        FontRenderers.sf_bold_mini.drawString(matrix, message, x1 + 30, (int) y1 + 15, icolor2.getRGB());
 
         String icon = "I";
-        switch (type){
+        switch (type) {
             case SUCCESS -> icon = "H";
             case INFO -> icon = "J";
-            case ENABLED ->  icon = "K";
-            case DISABLED ->  icon = "I";
-            case ERROR ->  icon = "I";
-            case WARNING ->  icon = "L";
+            case ENABLED -> icon = "K";
+            case DISABLED -> icon = "I";
+            case ERROR -> icon = "I";
+            case WARNING -> icon = "L";
         }
 
-
-        FontRenderers.mid_icons.drawString(matrix,icon, x1 + 5, y1 + 7,  icolor2.getRGB());
-
-
+        FontRenderers.mid_icons.drawString(matrix, icon, x1 + 5, y1 + 7, icolor2.getRGB());
 
         if (animationTimer.passedMs(50)) {
             animation.update(direction);
             animationTimer.reset();
         }
+    }
+
+    public void renderShaders(MatrixStack matrix, float getY) {
+        direction = isFinished();
+        animationX = (float) (width * animation.getAnimationd());
+
+        posY = animate(posY, getY);
+
+        int x1 = (int) ((mc.getWindow().getScaledWidth() - 6) - width + animationX);
+        int y1 = (int) posY;
+
+
+        Render2DEngine.drawGradientGlow(matrix, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90),x1, y1, width, height, 5f,10);
+        Render2DEngine.drawGradientRoundShader(matrix, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), x1 - 0.5f, y1 - 0.5f, width + 1, height + 1, 5f);
+        Render2DEngine.drawRoundShader(matrix, x1, y1, width, height, 5f, HudEditor.plateColor.getValue().getColorObject());
+
     }
 
 

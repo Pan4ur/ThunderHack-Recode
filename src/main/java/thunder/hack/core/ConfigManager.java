@@ -272,10 +272,21 @@ public class ConfigManager  {
                             setting2.setValue(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().replace("_", " "));
                             continue;
                         case "Bind":
-                            if(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().contains("M"))
-                                setting2.setValue( new Bind(Integer.parseInt(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().replace("M","")),true));
-                            else
-                                setting2.setValue( new Bind(mobject.getAsJsonPrimitive(setting2.getName()).getAsInt(),false));
+                            try {
+                                JsonArray bindArray = mobject.getAsJsonArray(setting2.getName());
+                                if (bindArray.get(0).getAsString().contains("M")) {
+                                    setting2.setValue(new Bind(Integer.parseInt(bindArray.get(0).getAsString().replace("M", "")), true, bindArray.get(1).getAsBoolean()));
+                                } else {
+                                    setting2.setValue(new Bind(Integer.parseInt(bindArray.get(0).getAsString()), false, bindArray.get(1).getAsBoolean()));
+                                }
+                            } catch (Exception e) {
+                                // чтоб не проебать бинды если до этого был конфиг
+                                // можно будет убрать спустя ~5 обнов
+                                if(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().contains("M"))
+                                    setting2.setValue( new Bind(Integer.parseInt(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().replace("M","")),true,false));
+                                else
+                                    setting2.setValue( new Bind(mobject.getAsJsonPrimitive(setting2.getName()).getAsInt(),false,false));
+                            }
                             continue;
                         case "ColorSetting":
                             JsonArray array = mobject.getAsJsonArray(setting2.getName());
@@ -339,10 +350,14 @@ public class ConfigManager  {
                 }
                 if(setting.isBindSetting()) {
                     Bind b = (Bind) setting.getValue();
+                    JsonArray array = new JsonArray();
+                    boolean hold = ((Bind) setting.getValue()).isHold();
                     if (b.isMouse())
-                        attribs.add(setting.getName(), jp.parse(b.getBind()));
+                        array.add(jp.parse(b.getBind()));
                     else
-                        attribs.add(setting.getName(), new JsonPrimitive(b.getKey()));
+                        array.add(new JsonPrimitive(b.getKey()));
+                    array.add(new JsonPrimitive(hold));
+                    attribs.add(setting.getName(), array);
                     continue;
                 }
                 if (setting.isStringSetting()) {

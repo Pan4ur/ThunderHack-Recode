@@ -54,7 +54,7 @@ public class Core {
         if (!fullNullCheck()) {
             if (ModuleManager.clickGui.getBind().getKey() == -1) {
                 Command.sendMessage(Formatting.RED + "Default clickgui keybind --> P");
-                ModuleManager.clickGui.setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(), false);
+                ModuleManager.clickGui.setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(), false,false);
             }
         }
         ThunderGui2.getInstance().onTick();

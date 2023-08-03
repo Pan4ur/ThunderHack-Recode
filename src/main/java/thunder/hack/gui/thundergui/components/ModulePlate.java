@@ -1,6 +1,7 @@
 package thunder.hack.gui.thundergui.components;
 
 
+import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.cmd.Command;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui2;
@@ -8,7 +9,6 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ThunderHackGui;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.render.Render2DEngine;
-import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;
 import java.util.Objects;
@@ -26,6 +26,7 @@ public class ModulePlate {
     private final int index;
     private boolean first_open = true;
     private boolean listening_bind = false;
+    private boolean holdbind = false;
 
 
     public ModulePlate(Module module, int posX, int posY, int index) {
@@ -51,34 +52,34 @@ public class ModulePlate {
             return;
         }
 
-        Render2DEngine.addWindow(stack,new Render2DEngine.Rectangle(posX + 1,posY + 1,posX + 90 , posY + 30));
+        Render2DEngine.addWindow(stack, new Render2DEngine.Rectangle(posX + 1, posY + 1, posX + 90, posY + 30));
 
         if (module.isOn()) {
-            Render2DEngine.drawGradientRound(stack,posX + 1, posY, 89, 30, 4f,
+            Render2DEngine.drawGradientRound(stack, posX + 1, posY, 89, 30, 4f,
                     Render2DEngine.applyOpacity(ThunderHackGui.onColor1.getValue().getColorObject(), getFadeFactor()),
                     Render2DEngine.applyOpacity(ThunderHackGui.onColor1.getValue().getColorObject(), getFadeFactor()),
                     Render2DEngine.applyOpacity(ThunderHackGui.onColor2.getValue().getColorObject(), getFadeFactor()),
                     Render2DEngine.applyOpacity(ThunderHackGui.onColor2.getValue().getColorObject(), getFadeFactor()));
         } else {
-            Render2DEngine.drawRound(stack,posX + 1, posY, 89, 30, 4f, Render2DEngine.applyOpacity(new Color(25, 20, 30, 255), getFadeFactor()));
+            Render2DEngine.drawRound(stack, posX + 1, posY, 89, 30, 4f, Render2DEngine.applyOpacity(new Color(25, 20, 30, 255), getFadeFactor()));
         }
 
         if (first_open) {
-            Render2DEngine.drawBlurredShadow(stack,MouseX - 20, MouseY - 20, 40, 40, 60, Render2DEngine.applyOpacity(new Color(0xC3555A7E, true), getFadeFactor()));
+            Render2DEngine.drawBlurredShadow(stack, MouseX - 20, MouseY - 20, 40, 40, 60, Render2DEngine.applyOpacity(new Color(0xC3555A7E, true), getFadeFactor()));
             first_open = false;
         }
 
         if (isHovered(MouseX, MouseY)) {
-            Render2DEngine.drawBlurredShadow(stack,MouseX - 20, MouseY - 20, 40, 40, 60, Render2DEngine.applyOpacity(new Color(0xC3555A7E, true), getFadeFactor()));
+            Render2DEngine.drawBlurredShadow(stack, MouseX - 20, MouseY - 20, 40, 40, 60, Render2DEngine.applyOpacity(new Color(0xC3555A7E, true), getFadeFactor()));
         }
 
 
-       // GL11.glPushMatrix();
-      //  Stencil.write(false);
-      //  Particles.roundedRect(posX - 0.5, posY - 0.5, 91, 31, 8, Render2DEngine.applyOpacity(new Color(0, 0, 0, 255), getFadeFactor()));
-       // Stencil.erase(true);
+        // GL11.glPushMatrix();
+        //  Stencil.write(false);
+        //  Particles.roundedRect(posX - 0.5, posY - 0.5, 91, 31, 8, Render2DEngine.applyOpacity(new Color(0, 0, 0, 255), getFadeFactor()));
+        // Stencil.erase(true);
         if (ThunderGui2.selected_plate != this)
-            FontRenderers.icons.drawString(stack,"H", (int) (posX + 80f), (int) (posY + 22f), Render2DEngine.applyOpacity(new Color(0xFFECECEC, true).getRGB(), getFadeFactor()));
+            FontRenderers.icons.drawString(stack, "H", (int) (posX + 80f), (int) (posY + 22f), Render2DEngine.applyOpacity(new Color(0xFFECECEC, true).getRGB(), getFadeFactor()));
         else {
             String gear = "H";
             switch (progress) {
@@ -98,55 +99,72 @@ public class ModulePlate {
                     gear = "Q";
                     break;
             }
-            FontRenderers.big_icons.drawString(stack,gear, (int) (posX + 80f), (int) (posY + 5f), Render2DEngine.applyOpacity(new Color(0xFF646464, true).getRGB(), getFadeFactor()));
+            FontRenderers.big_icons.drawString(stack, gear, (int) (posX + 80f), (int) (posY + 5f), Render2DEngine.applyOpacity(new Color(0xFF646464, true).getRGB(), getFadeFactor()));
         }
 
-        FontRenderers.sf_medium.drawString(stack,module.getName(), posX + 5, posY + 5, Render2DEngine.applyOpacity(-1, getFadeFactor()), false);
-
+        if (!listening_bind) {
+            FontRenderers.sf_medium.drawString(stack, module.getName(), posX + 5, posY + 5, Render2DEngine.applyOpacity(-1, getFadeFactor()), false);
+        }
 
         if (listening_bind) {
-            FontRenderers.modules.drawString(stack,"...", posX + 85 - FontRenderers.modules.getStringWidth(module.getBind().getBind()), posY + 5, Render2DEngine.applyOpacity(new Color(0xB0B0B0), getFadeFactor()).getRGB(), false);
+            FontRenderers.modules.drawString(stack, "PressKey", posX + 85 - FontRenderers.modules.getStringWidth("PressKey"), posY + 5, Render2DEngine.applyOpacity(new Color(0xB0B0B0), getFadeFactor()).getRGB(), false);
         } else if (!Objects.equals(module.getBind().getBind(), "None")) {
 
             String sbind = module.getBind().getBind();
-            if(sbind.equals("LEFT_CONTROL")){
+            if (sbind.equals("LEFT_CONTROL")) {
                 sbind = "LCtrl";
             }
-            if(sbind.equals("RIGHT_CONTROL")){
+            if (sbind.equals("RIGHT_CONTROL")) {
                 sbind = "RCtrl";
             }
-            if(sbind.equals("LEFT_SHIFT")){
+            if (sbind.equals("LEFT_SHIFT")) {
                 sbind = "LShift";
             }
-            if(sbind.equals("RIGHT_SHIFT")){
+            if (sbind.equals("RIGHT_SHIFT")) {
                 sbind = "RShift";
             }
-            if(sbind.equals("LEFT_ALT")){
+            if (sbind.equals("LEFT_ALT")) {
                 sbind = "LAlt";
             }
-            if(sbind.equals("RIGHT_ALT")){
+            if (sbind.equals("RIGHT_ALT")) {
                 sbind = "RAlt";
             }
 
-            FontRenderers.modules.drawString(stack,sbind, posX + 86 - FontRenderers.modules.getStringWidth(sbind), posY + 6, Render2DEngine.applyOpacity(new Color(0xB0B0B0), getFadeFactor()).getRGB(), false);
+            FontRenderers.modules.drawString(stack, sbind, posX + 86 - FontRenderers.modules.getStringWidth(sbind), posY + 6, Render2DEngine.applyOpacity(new Color(0xB0B0B0), getFadeFactor()).getRGB(), false);
         }
 
-        String[] splitString = module.getDescription().split("-");
-        if (splitString[0] != null && !splitString[0].equals("")) {
-            FontRenderers.settings.drawString(stack,splitString[0], posX + 5, posY + 14, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
-        }
-        if (splitString.length > 1) {
-            if (splitString[1] != null && !splitString[1].equals("")) {
-                FontRenderers.settings.drawString(stack,splitString[1], posX + 5, posY + 19, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
+        if (!listening_bind) {
+            String[] splitString = module.getDescription().split("-");
+            if (splitString[0] != null && !splitString[0].equals("")) {
+                FontRenderers.settings.drawString(stack, splitString[0], posX + 5, posY + 14, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
+            }
+            if (splitString.length > 1) {
+                if (splitString[1] != null && !splitString[1].equals("")) {
+                    FontRenderers.settings.drawString(stack, splitString[1], posX + 5, posY + 19, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
+                }
+            }
+            if (splitString.length == 3) {
+                if (splitString[2] != null && !splitString[2].equals("")) {
+                    FontRenderers.settings.drawString(stack, splitString[2], posX + 5, posY + 24, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
+                }
             }
         }
-        if (splitString.length == 3) {
-            if (splitString[2] != null && !splitString[2].equals("")) {
-                FontRenderers.settings.drawString(stack,splitString[2], posX + 5, posY + 24, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
+
+        if(listening_bind){
+            Render2DEngine.drawRound(stack,posX + 5, posY + 5,40,20,3,Color.BLACK);
+
+            if(!holdbind) {
+                Render2DEngine.drawRound(stack, posX + 6, posY + 6, 38, 8, 2, Render2DEngine.injectAlpha(ThunderHackGui.onColor1.getValue().getColorObject(), 170));
+                FontRenderers.settings.drawCenteredString(stack, "Toggle", posX + 25, posY + 7, -1);
+                FontRenderers.settings.drawCenteredString(stack, "Hold", posX + 25, posY + 17, new Color(0xA8FFFFFF, true).getRGB());
+            } else {
+                Render2DEngine.drawRound(stack, posX + 6, posY + 16, 38, 8, 2, Render2DEngine.injectAlpha(ThunderHackGui.onColor1.getValue().getColorObject(), 170));
+                FontRenderers.settings.drawCenteredString(stack, "Hold", posX + 25, posY + 17, -1);
+                FontRenderers.settings.drawCenteredString(stack, "Toggle", posX + 25, posY + 7, new Color(0xA8FFFFFF, true).getRGB());
             }
         }
+
         Render2DEngine.popWindow();
-
     }
 
     private float getFadeFactor() {
@@ -187,8 +205,18 @@ public class ModulePlate {
             return;
         }
         if (listening_bind) {
-            module.setBind(clickedButton,true);
-            Command.sendMessage( module.getName() + " бинд изменен на " + module.getBind().getBind());
+            if (mouseX > posX + 6 && mouseX < posX + 44 && mouseY > posY + 6 && mouseY < posY + 14) {
+                holdbind = false;
+                module.getBind().setHold(false);
+                return;
+            }
+            if (mouseX > posX + 6 && mouseX < posX + 44 && mouseY > posY + 16 && mouseY < posY + 24) {
+                holdbind = true;
+                module.getBind().setHold(true);
+                return;
+            }
+            module.setBind(clickedButton, true, holdbind);
+            Command.sendMessage(module.getName() + " бинд изменен на " + module.getBind().getBind());
             listening_bind = false;
         }
 
@@ -209,12 +237,12 @@ public class ModulePlate {
 
     public void keyTyped(String typedChar, int keyCode) {
         if (listening_bind) {
-            Bind bind = new Bind(keyCode,false);
+            Bind bind = new Bind(keyCode, false, holdbind);
             if (bind.getBind().equalsIgnoreCase("Escape")) {
                 return;
             }
             if (bind.getBind().equalsIgnoreCase("Delete")) {
-                bind = new Bind(-1,false);
+                bind = new Bind(-1, false, holdbind);
             }
             module.bind.setValue(bind);
             listening_bind = false;

@@ -2,19 +2,20 @@ package thunder.hack.gui.hud;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.Thunderhack;
-import thunder.hack.utility.render.animation.EaseBackIn;
 import thunder.hack.gui.clickui.AbstractWindow;
 import thunder.hack.gui.clickui.ModuleWindow;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
+import thunder.hack.utility.render.MSAAFramebuffer;
 import thunder.hack.utility.render.animation.Animation;
 import thunder.hack.utility.render.animation.DecelerateAnimation;
 import thunder.hack.utility.render.animation.Direction;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
-import org.lwjgl.glfw.GLFW;
-
+import thunder.hack.utility.render.animation.EaseBackIn;
 
 import java.util.List;
 
@@ -25,10 +26,8 @@ public class HudEditorGui extends Screen {
     private Animation openAnimation, bgAnimation, rAnimation;
     private final List<AbstractWindow> windows;
 
-    private double scrollSpeed;
     private boolean firstOpen;
     private double dWheel;
-    private double mamer;
 
     public HudEditorGui() {
         super(Text.of("HudEditorGui"));
@@ -67,7 +66,7 @@ public class HudEditorGui extends Screen {
 
             int i = 0;
             for (final Module.Category category : Thunderhack.moduleManager.getCategories()) {
-                if(!category.getName().contains("HUD")) continue;
+                if (!category.getName().contains("HUD")) continue;
                 ModuleWindow window = new ModuleWindow(category.getName(), Thunderhack.moduleManager.getModulesByCategory(category), i, x + offset, y, 108, windowHeight);
                 window.setOpen(true);
                 windows.add(window);
@@ -84,8 +83,6 @@ public class HudEditorGui extends Screen {
     }
 
 
-
-
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 
@@ -98,7 +95,6 @@ public class HudEditorGui extends Screen {
         double anim = (openAnimation.getOutput() + .6f);
 
 
-
         double centerX = width >> 1;
         double centerY = height >> 1;
 
@@ -107,37 +103,56 @@ public class HudEditorGui extends Screen {
         context.getMatrices().translate(-centerX, -centerY, 0);
 
         for (AbstractWindow window : windows) {
-			/*
-			if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
-				window.setY(window.getY() + 2);
-			else if (Keyboard.isKeyDown(Keyboard.KEY_UP))
-				window.setY(window.getY() - 2);
-			else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
-				window.setX(window.getX() - 2);
-			else if (GLFW.isKeyDown(Keyboard.KEY_RIGHT))
-				window.setX(window.getX() + 2);
-			 */
+            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 264)) {
+                window.setY(window.getY() + 2);
+            }
+            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 265)) {
+                window.setY(window.getY() - 2);
+            }
+            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 262)) {
+                window.setX(window.getX() + 2);
+            }
+            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 263)) {
+                window.setX(window.getX() - 2);
+            }
 
             if (dWheel != 0) {
-                window.setY(window.getY() + scrollSpeed);
-                dWheel = 0;
+                window.setY(window.getY() + dWheel);
             }
-            else
-                scrollSpeed = 0;
-
-            window.render(context,mouseX, mouseY, delta, ClickGui.getInstance().hcolor1.getValue().getColorObject());
         }
-        super.render(context,mouseX, mouseY, delta);
-    }
 
+        dWheel = 0;
+
+        if (ClickGui.getInstance().msaa.getValue()) {
+            if (!MSAAFramebuffer.framebufferInUse()) {
+                MSAAFramebuffer.use(() -> {
+                    for (AbstractWindow window : windows) {
+                        window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().hcolor1.getValue().getColorObject());
+                    }
+                    super.render(context, mouseX, mouseY, delta);
+                });
+            } else {
+                for (AbstractWindow window : windows) {
+                    window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().hcolor1.getValue().getColorObject());
+                }
+                super.render(context, mouseX, mouseY, delta);
+            }
+        } else {
+            for (AbstractWindow window : windows) {
+                window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().hcolor1.getValue().getColorObject());
+            }
+            super.render(context, mouseX, mouseY, delta);
+        }
+
+        super.render(context, mouseX, mouseY, delta);
+    }
 
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        dWheel = amount;
+        dWheel = (int) (amount * 5D);
         return super.mouseScrolled(mouseX, mouseY, amount);
     }
-
 
 
     @Override
@@ -155,7 +170,7 @@ public class HudEditorGui extends Screen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        windows.forEach(w -> w.mouseReleased((int)mouseX, (int) mouseY, button));
+        windows.forEach(w -> w.mouseReleased((int) mouseX, (int) mouseY, button));
         return super.mouseReleased(mouseX, mouseY, button);
     }
 

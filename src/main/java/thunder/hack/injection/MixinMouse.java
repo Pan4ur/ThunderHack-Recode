@@ -18,6 +18,9 @@ public class MixinMouse {
         if (window == mc.getWindow().getHandle()) {
             if(action == 1)
                 Thunderhack.moduleManager.onMoseKeyPressed(button);
+            if(action == 0)
+                Thunderhack.moduleManager.onMoseKeyPressed(button);
+
             Thunderhack.EVENT_BUS.post(new EventMouse(button,action));
         }
     }

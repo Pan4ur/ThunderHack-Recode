@@ -48,9 +48,9 @@ public class BindCommand
             return;
         }
         if(!rkey.equals("M") && rkey.contains("M")){
-            module.bind.setValue(new Bind(key, true));
+            module.bind.setValue(new Bind(key, true,false));
         } else {
-            module.bind.setValue(new Bind(key, false));
+            module.bind.setValue(new Bind(key, false,false));
         }
 
         BindCommand.sendMessage("Bind for " + Formatting.GREEN + module.getName() + Formatting.WHITE + " set to " + Formatting.GRAY + rkey.toUpperCase());

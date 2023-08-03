@@ -65,9 +65,13 @@ public class PotionHud extends HudElement {
             }
         }
 
-        Render2DEngine.drawGradientBlurredShadow(e.getMatrixStack(), getPosX() + 1, getPosY() + 1, max_width - 2, 18 + y_offset1, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+      //  Render2DEngine.drawGradientBlurredShadow(e.getMatrixStack(), getPosX() + 1, getPosY() + 1, max_width - 2, 18 + y_offset1, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+
+        Render2DEngine.drawGradientGlow(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90),getPosX(), getPosY(), max_width, 20 + y_offset1,HudEditor.hudRound.getValue(),10);
         Render2DEngine.drawGradientRoundShader(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, max_width + 1, 21 + y_offset1, HudEditor.hudRound.getValue());
         Render2DEngine.drawRoundShader(e.getMatrixStack(), getPosX(), getPosY(), max_width, 20 + y_offset1, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+
+
         Render2DEngine.horizontalGradient(e.getMatrixStack(), getPosX() + 2, getPosY() + 13.7, getPosX() + 2 + max_width / 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0).getRGB(), HudEditor.textColor.getValue().getColorObject().getRGB());
         Render2DEngine.horizontalGradient(e.getMatrixStack(), getPosX() + 2 + max_width / 2, getPosY() + 13.7, getPosX() + max_width - 2, getPosY() + 14, HudEditor.textColor.getValue().getColorObject().getRGB(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0).getRGB());
     }

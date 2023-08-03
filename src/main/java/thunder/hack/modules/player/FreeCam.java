@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.Vec3d;
+import thunder.hack.utility.player.MovementUtil;
 import thunder.hack.utility.player.PlaceUtility;
 
 import java.util.UUID;
@@ -153,6 +154,9 @@ public class FreeCam extends Module {
             return;
         }
         mc.player.setOnGround(false);
+        if(!MovementUtil.isMoving()){
+            mc.player.setVelocity(Vec3d.ZERO);
+        }
         mc.player.getAbilities().setFlySpeed((float) (speed.getValue() / 5));
         mc.player.getAbilities().flying = true;
         mc.player.setPose(EntityPose.STANDING);

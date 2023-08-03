@@ -7,6 +7,7 @@ import thunder.hack.utility.ThSoundPack;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.shaders.GradientGlowProgram;
 import thunder.hack.utility.render.shaders.RoundedGradientProgram;
 import thunder.hack.utility.render.shaders.RoundedProgram;
 
@@ -57,6 +58,8 @@ public class Thunderhack implements ModInitializer {
         wayPointManager.onLoad();
         Render2DEngine.ROUNDED_GRADIENT_PROGRAM = new RoundedGradientProgram();
         Render2DEngine.ROUNDED_PROGRAM = new RoundedProgram();
+        Render2DEngine.GRADIENT_GLOW_PROGRAM = new GradientGlowProgram();
+
         ThSoundPack.registerSounds();
         syncVersion();
         initTime = System.currentTimeMillis();

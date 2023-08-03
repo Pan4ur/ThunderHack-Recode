@@ -91,6 +91,10 @@ public class ThunderGui2 extends Screen {
         CategoryY = getCategoryY(new_category);
     }
 
+    @Override
+    public boolean shouldPause() {
+        return false;
+    }
 
     public static ThunderGui2 getInstance() {
         if (INSTANCE == null) {
