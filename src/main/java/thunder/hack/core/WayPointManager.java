@@ -1,7 +1,5 @@
 package thunder.hack.core;
 
-import thunder.hack.utility.Macro;
-
 import java.io.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -29,7 +27,7 @@ public class WayPointManager {
                         String z = line[2];
                         String name = line[3];
 
-                        addWayPoint(new WayPoint(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z),name));
+                        addWayPoint(new WayPoint(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z), name));
                     }
 
                 }
@@ -43,7 +41,7 @@ public class WayPointManager {
         try {
             new File("ThunderHackRecode").mkdirs();
             file.createNewFile();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -71,7 +69,6 @@ public class WayPointManager {
         return null;
     }
 
-    public record WayPoint(int x, int y, int z, String name){
-
+    public record WayPoint(int x, int y, int z, String name) {
     }
 }

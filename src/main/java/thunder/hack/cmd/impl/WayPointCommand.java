@@ -18,7 +18,6 @@ public class WayPointCommand extends Command {
             Command.sendMessage(usage());
         }
         if (args[0].equals("list")) {
-
             if(MainSettings.language.getValue() == MainSettings.Language.RU) {
                 sendMessage("Метки:");
             } else {
