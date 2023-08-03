@@ -9,9 +9,10 @@ public class Bind {
     private int key;
     private boolean hold, mouse;
 
-    public Bind(int key, boolean mouse) {
+    public Bind(int key, boolean mouse, boolean hold) {
         this.key = key;
         this.mouse = mouse;
+        this.hold = hold;
     }
 
     public int getKey() {

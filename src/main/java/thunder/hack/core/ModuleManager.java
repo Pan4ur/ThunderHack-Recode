@@ -370,6 +370,17 @@ public class ModuleManager {
         });
     }
 
+    public void onKeyReleased(int eventKey) {
+        if (eventKey == -1 || eventKey == 0 || mc.currentScreen instanceof ClickUI) {
+            return;
+        }
+        modules.forEach(module -> {
+            if (module.getBind().getKey() == eventKey && module.getBind().isHold()) {
+                module.disable();
+            }
+        });
+    }
+
     public void onMoseKeyPressed(int eventKey) {
         if (eventKey == -1 || mc.currentScreen instanceof ClickUI) {
             return;
@@ -377,6 +388,17 @@ public class ModuleManager {
         modules.forEach(module -> {
             if (Objects.equals(module.getBind().getBind(), "M" + eventKey)) {
                 module.toggle();
+            }
+        });
+    }
+
+    public void onMoseKeyReleased(int eventKey) {
+        if (eventKey == -1 || mc.currentScreen instanceof ClickUI) {
+            return;
+        }
+        modules.forEach(module -> {
+            if (Objects.equals(module.getBind().getBind(), "M" + eventKey) && module.getBind().isHold()) {
+                module.disable();
             }
         });
     }

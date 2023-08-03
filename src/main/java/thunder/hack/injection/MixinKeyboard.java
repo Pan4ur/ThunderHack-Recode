@@ -25,6 +25,10 @@ public class MixinKeyboard {
         if (action == 1) {
             Thunderhack.moduleManager.onKeyPressed(key);
         }
+        if (action == 0) {
+            Thunderhack.moduleManager.onKeyReleased(key);
+        }
+
         if (action == 2) action = 1;
         switch (action) {
             case 0 -> {

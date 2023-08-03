@@ -31,7 +31,7 @@ public class AutoMend extends Module {
         super("AutoMend", Category.PLAYER);
     }
 
-    public Setting<Bind> key = new Setting<>("Key", new Bind(-1,false));
+    public Setting<Bind> key = new Setting<>("Key", new Bind(-1,false,false));
     private final Setting<Integer> dlay = new Setting<>("ThrowDelay", 100, 0, 100);
     private final Setting<Integer> armdlay = new Setting<>("ArmorDelay", 100, 0, 1000);
 
@@ -180,11 +180,6 @@ public class AutoMend extends Module {
                 e.getMatrixStack().pop();
                 xItemOffset += 12;
             }
-        }
-        float[] angle = PlaceUtility.getRotationForPlace(new BlockPos(0,-60,0),true);
-        if(angle != null) {
-            mc.player.setYaw(angle[0]);
-            mc.player.setPitch(angle[1]);
         }
     }
 

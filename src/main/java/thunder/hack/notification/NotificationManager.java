@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.Render2DEvent;
+import thunder.hack.events.impl.RenderBlurEvent;
 import thunder.hack.modules.client.Notifications;
 import thunder.hack.setting.Setting;
 
@@ -31,13 +32,12 @@ public class NotificationManager {
         }
     }
 
-
     @Subscribe
     public void onRender2D(Render2DEvent event) {
         if(!ModuleManager.notifications.isEnabled()) return;
         if (notificationsnew.size() > 8)
             notificationsnew.remove(0);
-        float startY = (float) (mc.getWindow().getScaledHeight() * position.getValue() - 36f);
+        float startY = mc.getWindow().getScaledHeight() * position.getValue() - 36f;
         for (int i = 0; i < notificationsnew.size(); i++) {
             Notification notification = notificationsnew.get(i);
             notificationsnew.removeIf(Notification::shouldDelete);
@@ -45,4 +45,17 @@ public class NotificationManager {
             startY -= notification.getHeight() + 3;
         }
     }
+
+    @Subscribe
+    public void onRenderShader(RenderBlurEvent event) {
+        if(!ModuleManager.notifications.isEnabled()) return;
+        float startY = mc.getWindow().getScaledHeight() * position.getValue() - 36f;
+        for (int i = 0; i < notificationsnew.size(); i++) {
+            Notification notification = notificationsnew.get(i);
+            notification.renderShaders(event.getMatrixStack(),startY);
+            startY -= notification.getHeight() + 3;
+        }
+    }
+
+
 }

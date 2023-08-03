@@ -30,9 +30,9 @@ public class Flight extends Module {
         if (mode.getValue() == Mode.Vanilla) {
             if (MovementUtil.isMoving()) {
                 final double[] dir = MovementUtil.forward(this.speed.getValue());
-                mc.player.setVelocity(dir[0],mc.player.getVelocity().getY(),dir[1]);
+                mc.player.setVelocity(dir[0],0,dir[1]);
             } else {
-                mc.player.setVelocity(0,mc.player.getVelocity().getY(),0);
+                mc.player.setVelocity(0,0,0);
             }
             if (mc.options.jumpKey.isPressed()) mc.player.setVelocity(mc.player.getVelocity().add(0,speed.getValue(),0));
             if (mc.options.sneakKey.isPressed()) mc.player.setVelocity(mc.player.getVelocity().add(0,-speed.getValue(),0));

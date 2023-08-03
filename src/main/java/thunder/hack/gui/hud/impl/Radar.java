@@ -70,11 +70,11 @@ public class Radar extends HudElement {
     @Subscribe
     public void onRenderShader(RenderBlurEvent e){
         if(mode.getValue() == Mode.Rect) {
-            Render2DEngine.drawGradientBlurredShadow(e.getMatrixStack(), getPosX() + 1, getPosY() + 1, size.getValue() - 2, size.getValue() - 2, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+            Render2DEngine.drawGradientGlow(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90),getPosX(), getPosY(), size.getValue(), size.getValue(),HudEditor.hudRound.getValue(),10);
+            Render2DEngine.drawGradientRoundShader(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, size.getValue() + 1, size.getValue() + 1, HudEditor.hudRound.getValue());
+            Render2DEngine.drawRoundShader(e.getMatrixStack(), getPosX(), getPosY(), size.getValue(), size.getValue(), HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
 
-            Render2DEngine.drawGradientRoundShader(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), size.getValue(), size.getValue(), HudEditor.hudRound.getValue());
 
-            Render2DEngine.drawRoundShader(e.getMatrixStack(), getPosX() + 0.5f, getPosY() + 0.5f, size.getValue() - 1, size.getValue() - 1, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
 
             Render2DEngine.drawRectDumbWay(e.getMatrixStack(),
                     (float) (getPosX() + (size.getValue() / 2F - 0.5)),
