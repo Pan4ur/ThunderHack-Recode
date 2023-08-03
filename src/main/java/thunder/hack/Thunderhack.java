@@ -27,7 +27,6 @@ public class Thunderhack implements ModInitializer {
 
     /*-----------------    Managers  ---------------------*/
     public static NotificationManager notificationManager = new NotificationManager();
-    public static CommandManager commandManager = new CommandManager();
     public static FriendManager friendManager = new FriendManager();
     public static ModuleManager moduleManager = new ModuleManager();
     public static ServerManager serverManager = new ServerManager();
@@ -38,7 +37,7 @@ public class Thunderhack implements ModInitializer {
     public static MacroManager macroManager = new MacroManager();
     public static PlaceManager placeManager = new PlaceManager();
     public static WayPointManager wayPointManager = new WayPointManager();
-    public static CommandManager2 commandManager2 = new CommandManager2();
+    public static CommandManager commandManager = new CommandManager();
 
     public static Core core = new Core();
     /*--------------------------------------------------------*/

@@ -1,10 +1,13 @@
 package thunder.hack.cmd.impl;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.command.CommandSource;
+import net.minecraft.util.math.BlockPos;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
-import net.minecraft.util.math.BlockPos;
 
-import java.util.Objects;
+import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
 public class GpsCommand extends Command {
     public GpsCommand() {
@@ -12,16 +15,25 @@ public class GpsCommand extends Command {
     }
 
     @Override
-    public void execute(String[] commands) {
-        if (commands.length == 1) {
-            Command.sendMessage("Попробуй .gps off / .gps x y");
-        } else if (commands.length == 2) {
-            if (Objects.equals(commands[0], "off"))
-                Thunderhack.gps_position = null;
-        } else if (commands.length > 2) {
-            BlockPos pos = new BlockPos(Integer.parseInt(commands[0]), 0, Integer.parseInt(commands[1]));
-            Thunderhack.gps_position = pos;
-            Command.sendMessage("GPS настроен на X: " + pos.getX() + " Z: " + pos.getZ());
-        }
+    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+        builder.then(literal("off").executes(context -> {
+            Thunderhack.gps_position = null;
+            return SINGLE_SUCCESS;
+        }));
+
+        builder.then(arg("x", IntegerArgumentType.integer())
+                .then(arg("y", IntegerArgumentType.integer()).executes(context -> {
+                    final int x = context.getArgument("x", Integer.class);
+                    final int y = context.getArgument("y", Integer.class);
+                    Thunderhack.gps_position = new BlockPos(x, 0, y);
+
+                    sendMessage("GPS настроен на X: " + Thunderhack.gps_position.getX() + " Z: " + Thunderhack.gps_position.getZ());
+                    return SINGLE_SUCCESS;
+                })));
+
+        builder.executes(context -> {
+            sendMessage("Попробуй .gps off / .gps x y");
+            return SINGLE_SUCCESS;
+        });
     }
 }

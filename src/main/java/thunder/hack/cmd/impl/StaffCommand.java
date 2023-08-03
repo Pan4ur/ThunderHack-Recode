@@ -1,10 +1,15 @@
 package thunder.hack.cmd.impl;
 
-import thunder.hack.cmd.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
+import thunder.hack.cmd.Command;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
 public class StaffCommand extends Command {
     public static List<String> staffNames = new ArrayList<>();
@@ -14,8 +19,33 @@ public class StaffCommand extends Command {
     }
 
     @Override
-    public void execute(String[] commands) {
-        if (commands.length == 1) {
+    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+        builder.then(literal("reset").executes(context -> {
+            staffNames.clear();
+            sendMessage("staff list got reset.");
+
+            return SINGLE_SUCCESS;
+        }));
+
+        builder.then(literal("add").then(arg("name", StringArgumentType.word()).executes(context -> {
+            String name = context.getArgument("name", String.class);
+
+            staffNames.add(name);
+            sendMessage(Formatting.GREEN + name + " added to staff list");
+
+            return SINGLE_SUCCESS;
+        })));
+
+        builder.then(literal("del").then(arg("name", StringArgumentType.word())).executes(context -> {
+            String name = context.getArgument("name", String.class);
+
+            staffNames.remove(name);
+            sendMessage(Formatting.GREEN + name + " removed from staff list");
+
+            return SINGLE_SUCCESS;
+        }));
+
+        builder.executes(context -> {
             if (staffNames.isEmpty()) {
                 sendMessage("Staff list empty");
             } else {
@@ -28,30 +58,7 @@ public class StaffCommand extends Command {
                 }
                 sendMessage(f.toString());
             }
-            return;
-        }
-        if (commands.length == 2) {
-            if ("reset".equals(commands[0])) {
-                staffNames.clear();
-                sendMessage("staff list got reset.");
-                return;
-            }
-            return;
-        }
-        if (commands.length >= 2) {
-            switch (commands[0]) {
-                case "add": {
-                    staffNames.add(commands[1]);
-                    sendMessage(Formatting.GREEN + commands[1] + " added to staff list");
-                    return;
-                }
-                case "del": {
-                    staffNames.remove(commands[1]);
-                    sendMessage(Formatting.GREEN + commands[1] + " removed from staff list");
-                    return;
-                }
-            }
-            sendMessage("Unknown Command, try staff add/del (name)");
-        }
+            return SINGLE_SUCCESS;
+        });
     }
 }

@@ -1,11 +1,11 @@
-package thunder.hack.command.impl;
+package thunder.hack.cmd.impl;
 
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Formatting;
-import thunder.hack.command.Command;
+import thunder.hack.cmd.Command;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 

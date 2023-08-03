@@ -25,7 +25,7 @@ public class WayPoints extends Module {
 
     @Override
     public void onEnable(){
-        Command.sendMessage(Command.getCommandPrefix() + "waypoint add x y z name");
+        Command.sendMessage(Thunderhack.commandManager.getPrefix() + "waypoint add x y z name");
     }
 
     @Subscribe

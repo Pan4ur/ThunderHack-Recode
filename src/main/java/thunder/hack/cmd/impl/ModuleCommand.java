@@ -3,98 +3,106 @@ package thunder.hack.cmd.impl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.command.CommandSource;
+import net.minecraft.util.Formatting;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
+import thunder.hack.cmd.args.ModuleArgumentType;
 import thunder.hack.modules.Module;
-import net.minecraft.util.Formatting;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.*;
+import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.setting.impl.EnumConverter;
+import thunder.hack.setting.impl.PositionSetting;
 
 import java.util.Objects;
 
-public class ModuleCommand
-        extends Command {
+import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+
+public class ModuleCommand extends Command {
     public ModuleCommand() {
-        super("module");
+        super("module", "modules");
     }
 
     @Override
-    public void execute(String[] commands) {
-        Setting setting;
-        if (commands.length == 1) {
-            ModuleCommand.sendMessage("Modules: ");
-            for (Module.Category category : Thunderhack.moduleManager.getCategories()) {
-                String modules = category.getName() + ": ";
-                for (Module module1 : Thunderhack.moduleManager.getModulesByCategory(category)) {
-                    modules = modules + (module1.isEnabled() ? Formatting.GREEN : Formatting.RED) + module1.getName() + Formatting.WHITE + ", ";
-                }
-                ModuleCommand.sendMessage(modules);
-            }
-            return;
-        }
-        Module module = Thunderhack.moduleManager.getModuleByDisplayName(commands[0]);
-        if (module == null) {
-            module = Thunderhack.moduleManager.get(commands[0]);
-            if (module == null) {
-                ModuleCommand.sendMessage("This module doesnt exist.");
-                return;
-            }
-            ModuleCommand.sendMessage(" This is the original name of the module. Its current name is: " + module.getDisplayName());
-            return;
-        }
-        if (commands.length == 2) {
-            ModuleCommand.sendMessage(module.getDisplayName() + " : " + module.getDescription());
-            for (Setting setting2 : module.getSettings()) {
-                ModuleCommand.sendMessage(setting2.getName() + " : " + setting2.getValue());
-            }
-            return;
-        }
-        if (commands.length == 3) {
-            if (commands[1].equalsIgnoreCase("set")) {
-                ModuleCommand.sendMessage("Please specify a setting.");
-            } else if (commands[1].equalsIgnoreCase("reset")) {
-                for (Setting setting3 : module.getSettings()) {
-                    setting3.setValue(setting3.getDefaultValue());
-                }
-            } else {
-                ModuleCommand.sendMessage("This command doesnt exist.");
-            }
-            return;
-        }
-        if (commands.length == 4) {
-            ModuleCommand.sendMessage("Please specify a value.");
-            return;
-        }
-        if (commands.length == 5 && (setting = module.getSettingByName(commands[2])) != null) {
-            JsonParser jp = new JsonParser();
-            if (setting.getType().equalsIgnoreCase("String")) {
-                setting.setValue(commands[3]);
-                ModuleCommand.sendMessage(Formatting.DARK_GRAY + module.getName() + " " + setting.getName() + " has been set to " + commands[3] + ".");
-                return;
-            }
-            try {
-                if (setting.getName().equalsIgnoreCase("Enabled")) {
-                    if (commands[3].equalsIgnoreCase("true")) {
-                        module.enable();
-                    }
-                    if (commands[3].equalsIgnoreCase("false")) {
-                        module.disable();
-                    }
-                }
-              setCommandValue(module, setting, jp.parse(commands[3]));
-            } catch (Exception e) {
-                ModuleCommand.sendMessage("Bad Value! This setting requires a: " + setting.getType() + " value.");
-                return;
-            }
-            ModuleCommand.sendMessage(Formatting.GRAY + module.getName() + " " + setting.getName() + " has been set to " + commands[3] + ".");
-        }
-    }
+    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+        builder.then(arg("module", ModuleArgumentType.create()).executes(context -> {
+            Module module = context.getArgument("module", Module.class);
+            sendMessage(module.getDisplayName() + " : " + module.getDescription());
 
+            for (Setting setting2 : module.getSettings()) {
+                sendMessage(setting2.getName() + " : " + setting2.getValue());
+            }
+
+            return SINGLE_SUCCESS;
+        }));
+
+        builder.then(arg("module", ModuleArgumentType.create())
+                .then(literal("reset").executes(context -> {
+                    Module module = context.getArgument("module", Module.class);
+
+                    for (Setting setting3 : module.getSettings()) {
+                        setting3.setValue(setting3.getDefaultValue());
+                    }
+
+                    return SINGLE_SUCCESS;
+                })).then(arg("setting", StringArgumentType.word())
+                        .then(arg("settingValue", StringArgumentType.string()).executes(context -> {
+                            Module module = context.getArgument("module", Module.class);
+                            Setting setting = module.getSettingByName(context.getArgument("setting", String.class));
+                            String settingValue = context.getArgument("settingValue", String.class);
+
+                            if (setting == null) {
+                                sendMessage("No such setting");
+                                return SINGLE_SUCCESS;
+                            }
+
+                            JsonParser jp = new JsonParser();
+                            if (setting.getType().equalsIgnoreCase("String")) {
+                                setting.setValue(settingValue);
+                                sendMessage(Formatting.DARK_GRAY + module.getName() + " " + setting.getName() + " has been set to " + settingValue + ".");
+                                return SINGLE_SUCCESS;
+                            }
+                            try {
+                                if (setting.getName().equalsIgnoreCase("Enabled")) {
+                                    if (settingValue.equalsIgnoreCase("true")) {
+                                        module.enable();
+                                    }
+                                    if (settingValue.equalsIgnoreCase("false")) {
+                                        module.disable();
+                                    }
+                                }
+                                setCommandValue(module, setting, jp.parse(settingValue));
+                            } catch (Exception e) {
+                                sendMessage("Bad Value! This setting requires a: " + setting.getType() + " value.");
+                                return SINGLE_SUCCESS;
+                            }
+                            sendMessage(Formatting.GRAY + module.getName() + " " + setting.getName() + " has been set to " + settingValue + ".");
+                            return SINGLE_SUCCESS;
+                        }))));
+
+        builder.executes(context -> {
+            sendMessage("Modules: ");
+
+            for (Module.Category category : Thunderhack.moduleManager.getCategories()) {
+                StringBuilder modules = new StringBuilder(category.getName() + ": ");
+
+                for (Module module1 : Thunderhack.moduleManager.getModulesByCategory(category)) {
+                    modules.append(module1.isEnabled() ? Formatting.GREEN : Formatting.RED).append(module1.getName()).append(Formatting.WHITE).append(", ");
+                }
+
+                sendMessage(modules.toString());
+            }
+
+            return SINGLE_SUCCESS;
+        });
+    }
 
     public static void setCommandValue(Module feature, Setting setting, JsonElement element) {
         String str;
-        for(Setting setting2 : feature.getSettings()) {
-            if(Objects.equals(setting.getName(), setting2.getName())) {
+        for (Setting setting2 : feature.getSettings()) {
+            if (Objects.equals(setting.getName(), setting2.getName())) {
                 switch (setting2.getType()) {
                     case "Parent", "Bind":
                         return;
@@ -130,10 +138,10 @@ public class ModuleCommand
                             EnumConverter converter = new EnumConverter(((Enum) setting2.getValue()).getClass());
                             Enum value = converter.doBackward(element);
                             setting2.setValue((value == null) ? setting2.getDefaultValue() : value);
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                        }
                 }
             }
         }
     }
 }
-

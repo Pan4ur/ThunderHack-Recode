@@ -1,4 +1,4 @@
-package thunder.hack.command.impl;
+package thunder.hack.cmd.impl;
 
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -10,7 +10,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
-import thunder.hack.command.Command;
+import thunder.hack.cmd.Command;
 import thunder.hack.utility.player.InventoryUtil;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -25,14 +25,14 @@ public class EClipCommand extends Command {
         builder.then(literal("bedrock").executes(context -> {
             execute(-((float) MC.player.getY()) - 3.0f);
             return SINGLE_SUCCESS;
-        }).then(arg("number", FloatArgumentType.floatArg())).executes(context -> {
+        }).then(arg("number", FloatArgumentType.floatArg()).executes(context -> {
             float y = -((float) MC.player.getY()) - 3.0f;
 
             if (y == 0.0f) y = context.getArgument("number", Float.class);
             execute(y);
 
             return SINGLE_SUCCESS;
-        }));
+        })));
 
         builder.then(literal("down").executes(context -> {
             int i;
@@ -47,14 +47,14 @@ public class EClipCommand extends Command {
                 if (MC.world.getBlockState(BlockPos.ofFloored(MC.player.getPos()).add(0, -i, 0)) != Blocks.BEDROCK.getDefaultState())
                     continue;
 
-                thunder.hack.cmd.Command.sendMessage(Formatting.RED + " можно телепортироваться только под бедрок");
-                thunder.hack.cmd.Command.sendMessage(Formatting.RED + " eclip bedrock");
+                sendMessage(Formatting.RED + " можно телепортироваться только под бедрок");
+                sendMessage(Formatting.RED + " eclip bedrock");
                 return SINGLE_SUCCESS;
             }
 
             execute(y);
             return SINGLE_SUCCESS;
-        }).then(arg("number", FloatArgumentType.floatArg())).executes(context -> {
+        }).then(arg("number", FloatArgumentType.floatArg()).executes(context -> {
             int i;
             float y = 0.0f;
 
@@ -67,8 +67,8 @@ public class EClipCommand extends Command {
                 if (MC.world.getBlockState(BlockPos.ofFloored(MC.player.getPos()).add(0, -i, 0)) != Blocks.BEDROCK.getDefaultState())
                     continue;
 
-                thunder.hack.cmd.Command.sendMessage(Formatting.RED + " можно телепортироваться только под бедрок");
-                thunder.hack.cmd.Command.sendMessage(Formatting.RED + " eclip bedrock");
+                sendMessage(Formatting.RED + " можно телепортироваться только под бедрок");
+                sendMessage(Formatting.RED + " eclip bedrock");
                 return SINGLE_SUCCESS;
             }
 
@@ -76,7 +76,7 @@ public class EClipCommand extends Command {
 
             execute(y);
             return SINGLE_SUCCESS;
-        }));
+        })));
 
         builder.then(literal("up").executes(context -> {
             int i;
@@ -91,7 +91,7 @@ public class EClipCommand extends Command {
 
             execute(y);
             return SINGLE_SUCCESS;
-        }).then(arg("number", FloatArgumentType.floatArg())).executes(context -> {
+        }).then(arg("number", FloatArgumentType.floatArg()).executes(context -> {
             int i;
             float y = 0.0f;
 
@@ -106,9 +106,9 @@ public class EClipCommand extends Command {
             execute(y);
 
             return SINGLE_SUCCESS;
-        }));
+        })));
     }
-    
+
     private void execute(float y) {
         int elytra;
 

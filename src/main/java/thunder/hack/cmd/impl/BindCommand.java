@@ -1,59 +1,61 @@
 package thunder.hack.cmd.impl;
 
-import thunder.hack.cmd.Command;
-import thunder.hack.Thunderhack;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.client.MainSettings;
-import thunder.hack.setting.impl.Bind;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
+import thunder.hack.cmd.Command;
+import thunder.hack.cmd.args.ModuleArgumentType;
+import thunder.hack.modules.Module;
+import thunder.hack.setting.impl.Bind;
 
-public class BindCommand
-        extends Command {
+import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+
+public class BindCommand extends Command {
     public BindCommand() {
         super("bind");
     }
 
     @Override
-    public void execute(String[] commands) {
-        if (commands.length == 1) {
-            if(MainSettings.language.getValue() == MainSettings.Language.RU){
-                BindCommand.sendMessage("Укажи название модуля!");
-            } else {
-                BindCommand.sendMessage("Please specify a module!");
-            }
-            return;
-        }
-        String rkey = commands[1];
-        String moduleName = commands[0];
-        Module module = Thunderhack.moduleManager.get(moduleName);
-        if (module == null) {
-            if(MainSettings.language.getValue() == MainSettings.Language.RU){
-                BindCommand.sendMessage("Неизвестный модуль '" + module + "'!");
-            } else {
-                BindCommand.sendMessage("Unknown module '" + module + "'!");
-            }
-            return;
-        }
-        if (rkey == null) {
-            BindCommand.sendMessage(module.getName() + " is bound to " + Formatting.GRAY + module.getBind().getBind());
-            return;
-        }
-        int key = InputUtil.fromTranslationKey("key.keyboard." + rkey.toLowerCase()).getCode();
-        if (rkey.equalsIgnoreCase("none")) {
-            key = -1;
-        }
-        if (key == 0) {
-            BindCommand.sendMessage("Unknown key '" + rkey + "'!");
-            return;
-        }
-        if(!rkey.equals("M") && rkey.contains("M")){
-            module.bind.setValue(new Bind(key, true));
-        } else {
-            module.bind.setValue(new Bind(key, false));
-        }
+    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+        builder.then(arg("module", ModuleArgumentType.create())
+                .then(arg("key", StringArgumentType.word()).executes(context -> {
+                    final Module module = context.getArgument("module", Module.class);
+                    final String stringKey = context.getArgument("key", String.class);
 
-        BindCommand.sendMessage("Bind for " + Formatting.GREEN + module.getName() + Formatting.WHITE + " set to " + Formatting.GRAY + rkey.toUpperCase());
+                    if (stringKey == null) {
+                        sendMessage(module.getName() + " is bound to " + Formatting.GRAY + module.getBind().getBind());
+                        return SINGLE_SUCCESS;
+                    }
+
+                    int key;
+                    if (stringKey.equalsIgnoreCase("none") || stringKey.equalsIgnoreCase("null")) {
+                        key = -1;
+                    } else {
+                        try {
+                            key = InputUtil.fromTranslationKey("key.keyboard." + stringKey.toLowerCase()).getCode();
+                        } catch (NumberFormatException e) {
+                            sendMessage("Такой кнопки не существует!");
+                            return SINGLE_SUCCESS;
+                        }
+                    }
+
+
+                    if (key == 0) {
+                        sendMessage("Unknown key '" + stringKey + "'!");
+                        return SINGLE_SUCCESS;
+                    }
+                    if (!stringKey.equals("M") && stringKey.contains("M")) {
+                        module.bind.setValue(new Bind(key, true));
+                    } else {
+                        module.bind.setValue(new Bind(key, false));
+                    }
+
+                    sendMessage("Bind for " + Formatting.GREEN + module.getName() + Formatting.WHITE + " set to " + Formatting.GRAY + stringKey.toUpperCase());
+
+                    return SINGLE_SUCCESS;
+                }))
+        );
     }
 }
-

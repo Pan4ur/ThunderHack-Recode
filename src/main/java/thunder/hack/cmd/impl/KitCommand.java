@@ -2,6 +2,9 @@ package thunder.hack.cmd.impl;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.command.CommandSource;
 import net.minecraft.item.ItemStack;
 import thunder.hack.cmd.Command;
 
@@ -11,10 +14,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-public class KitCommand extends Command {
-    final static private String pathSave = "ThunderHackRecode/misc/kits/AutoGear.json";
+import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
-    private static final HashMap<String, String> errorMessage = new HashMap<>() {
+public class KitCommand extends Command {
+    final static private String PATH_TO_SAVE = "ThunderHackRecode/misc/kits/AutoGear.json";
+
+    private static final HashMap<String, String> ERROR_MESSAGES = new HashMap<>() {
         {
             put("NoPar", "Not enough parameters");
             put("Exist", "This kit arleady exist");
@@ -27,14 +32,44 @@ public class KitCommand extends Command {
         super("kit");
     }
 
+    @Override
+    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+        builder.then(literal("list").executes(context -> {
+            listMessage();
+
+            return SINGLE_SUCCESS;
+        }));
+
+        builder.then(literal("create").then(arg("name", StringArgumentType.word()).executes(context -> {
+            save(context.getArgument("name", String.class));
+            return SINGLE_SUCCESS;
+        })));
+
+        builder.then(literal("set").then(arg("name", StringArgumentType.word()).executes(context -> {
+            set(context.getArgument("name", String.class));
+            return SINGLE_SUCCESS;
+        })));
+
+        builder.then(literal("del").then(arg("name", StringArgumentType.word()).executes(context -> {
+            delete(context.getArgument("name", String.class));
+            return SINGLE_SUCCESS;
+        })));
+
+        builder.executes(context -> {
+            sendMessage("kit <create/set/del/list> <name>");
+
+            return SINGLE_SUCCESS;
+        });
+    }
+
     private static void errorMessage(String e) {
-        Command.sendMessage("Error: " + errorMessage.get(e));
+        sendMessage("Error: " + ERROR_MESSAGES.get(e));
     }
 
     public static String getCurrentSet() {
-        JsonObject completeJson = new JsonObject();
+        JsonObject completeJson;
         try {
-            completeJson = new JsonParser().parse(new FileReader(pathSave)).getAsJsonObject();
+            completeJson = new JsonParser().parse(new FileReader(PATH_TO_SAVE)).getAsJsonObject();
             if (!completeJson.get("pointer").getAsString().equals("none"))
                 return completeJson.get("pointer").getAsString();
 
@@ -45,10 +80,11 @@ public class KitCommand extends Command {
     }
 
     public static String getInventoryKit(String kit) {
-        JsonObject completeJson = new JsonObject();
+        JsonObject completeJson;
+
         try {
             // Read json
-            completeJson = new JsonParser().parse(new FileReader(pathSave)).getAsJsonObject();
+            completeJson = new JsonParser().parse(new FileReader(PATH_TO_SAVE)).getAsJsonObject();
             return completeJson.get(kit).getAsString();
 
 
@@ -59,48 +95,15 @@ public class KitCommand extends Command {
         return "";
     }
 
-    @Override
-    public void execute(String[] commands) {
-        if (commands.length == 1) {
-            Command.sendMessage("kit <create/set/del/list> <name>");
-            return;
-        }
-        if (commands.length == 2) {
-            if (commands[0].equals("list")) {
-                listMessage();
-                return;
-            }
-            return;
-        }
-
-        if (commands.length >= 2) {
-            switch (commands[0]) {
-                case "create": {
-                    save(commands[1]);
-                    return;
-                }
-                case "set": {
-                    set(commands[1]);
-                    return;
-                }
-                case "del": {
-                    delete(commands[1]);
-                    return;
-                }
-            }
-            KitCommand.sendMessage(".kit create/set/del");
-        }
-    }
-
     private void listMessage() {
         JsonObject completeJson = new JsonObject();
         try {
-            completeJson = new JsonParser().parse(new FileReader(pathSave)).getAsJsonObject();
+            completeJson = new JsonParser().parse(new FileReader(PATH_TO_SAVE)).getAsJsonObject();
             int lenghtJson = completeJson.entrySet().size();
             for (int i = 0; i < lenghtJson; i++) {
-                String item = new JsonParser().parse(new FileReader(pathSave)).getAsJsonObject().entrySet().toArray()[i].toString().split("=")[0];
+                String item = new JsonParser().parse(new FileReader(PATH_TO_SAVE)).getAsJsonObject().entrySet().toArray()[i].toString().split("=")[0];
                 if (!item.equals("pointer"))
-                    Command.sendMessage("Kit avaible: " + item);
+                    sendMessage("Kit avaible: " + item);
             }
         } catch (IOException e) {
             errorMessage("NoEx");
@@ -110,7 +113,7 @@ public class KitCommand extends Command {
     private void delete(String name) {
         JsonObject completeJson = new JsonObject();
         try {
-            completeJson = new JsonParser().parse(new FileReader(pathSave)).getAsJsonObject();
+            completeJson = new JsonParser().parse(new FileReader(PATH_TO_SAVE)).getAsJsonObject();
             if (completeJson.get(name) != null && !name.equals("pointer")) {
                 completeJson.remove(name);
                 if (completeJson.get("pointer").getAsString().equals(name))
@@ -124,9 +127,10 @@ public class KitCommand extends Command {
     }
 
     private void set(String name) {
-        JsonObject completeJson = new JsonObject();
+        JsonObject completeJson;
+
         try {
-            completeJson = new JsonParser().parse(new FileReader(pathSave)).getAsJsonObject();
+            completeJson = new JsonParser().parse(new FileReader(PATH_TO_SAVE)).getAsJsonObject();
             if (completeJson.get(name) != null && !name.equals("pointer")) {
                 completeJson.addProperty("pointer", name);
                 saveFile(completeJson, name, "selected");
@@ -139,8 +143,9 @@ public class KitCommand extends Command {
 
     private void save(String name) {
         JsonObject completeJson = new JsonObject();
+
         try {
-            completeJson = new JsonParser().parse(new FileReader(pathSave)).getAsJsonObject();
+            completeJson = new JsonParser().parse(new FileReader(PATH_TO_SAVE)).getAsJsonObject();
             if (completeJson.get(name) != null && !name.equals("pointer")) {
                 errorMessage("Exist");
                 return;
@@ -151,7 +156,7 @@ public class KitCommand extends Command {
 
         StringBuilder jsonInventory = new StringBuilder();
 
-        for (ItemStack item : mc.player.getInventory().main) {
+        for (ItemStack item : MC.player.getInventory().main) {
             jsonInventory.append(item.getTranslationKey()).append(" ");
         }
         completeJson.addProperty(name, jsonInventory.toString());
@@ -160,13 +165,12 @@ public class KitCommand extends Command {
 
     private void saveFile(JsonObject completeJson, String name, String operation) {
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(pathSave));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(PATH_TO_SAVE));
             bw.write(completeJson.toString());
             bw.close();
-            Command.sendMessage("Kit " + name + " " + operation);
+            thunder.hack.cmd.Command.sendMessage("Kit " + name + " " + operation);
         } catch (IOException e) {
             errorMessage("Saving");
         }
     }
-
 }

@@ -7,18 +7,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.Thunderhack;
-import thunder.hack.core.CommandManager2;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class MixinClientPlayNetworkHandler {
 
     @Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
     private void onSendChatMessage(String message, CallbackInfo ci) {
-        if (message.startsWith(String.valueOf(CommandManager2.PREFIX))) {
+        if (message.startsWith(Thunderhack.commandManager.getPrefix())) {
             try {
-                Thunderhack.commandManager2.getDispatcher().execute(
-                        message.substring(1),
-                        Thunderhack.commandManager2.getSource()
+                Thunderhack.commandManager.getDispatcher().execute(
+                        message.substring(Thunderhack.commandManager.getPrefix().length()),
+                        Thunderhack.commandManager.getSource()
                 );
             } catch (CommandSyntaxException ignored) {}
 
