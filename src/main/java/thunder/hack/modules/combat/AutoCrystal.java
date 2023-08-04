@@ -14,6 +14,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.player.InventoryUtil;
 import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.Timer;
@@ -78,10 +79,13 @@ public class AutoCrystal extends Module {
     public Setting<Boolean> rightClickGap = new Setting<>("RightClickGap", false, v -> pauseWhileGapping.getValue());
     public Setting<Boolean> pauseWhenAura = new Setting<>("PauseWhenAura", true);
     public Setting<Float> pauseHealth = new Setting<>("PauseHealth", 2f, 0f, 10f);
-    public Setting<Boolean> render = new Setting<>("Render", true);
-    public Setting<ColorSetting> fillColor = new Setting<>("Block Fill Color", new ColorSetting(HudEditor.getColor(0)), (value) -> render.getValue());
-    public Setting<ColorSetting> lineColor = new Setting<>("Block Line Color", new ColorSetting(HudEditor.getColor(0)), (value) -> render.getValue());
-    public Setting<ColorSetting> textColor = new Setting<>("Text Color", new ColorSetting(Color.WHITE), (value) -> render.getValue());
+
+    public Setting<Parent> render = new Setting<>("Render", new Parent(false, 1));
+    public Setting<Boolean> renderActive = new Setting<>("Render", true).withParent(render);
+    public Setting<ColorSetting> fillColor = new Setting<>("Block Fill Color", new ColorSetting(HudEditor.getColor(0)), (value) -> renderActive.getValue()).withParent(render);
+    public Setting<ColorSetting> lineColor = new Setting<>("Block Line Color", new ColorSetting(HudEditor.getColor(0)), (value) -> renderActive.getValue()).withParent(render);
+    public Setting<Integer> lineWidth = new Setting<>("Block Line Width", 2, 1, 10).withParent(render);
+    public Setting<ColorSetting> textColor = new Setting<>("Text Color", new ColorSetting(Color.WHITE), (value) -> renderActive.getValue()).withParent(render);
 
     private enum TimingMode {Sequential, Vanilla}
 
@@ -384,12 +388,12 @@ public class AutoCrystal extends Module {
 
     @Subscribe
     public void onRender3D(Render3DEvent event) {
-        if (render.getValue())
+        if (renderActive.getValue())
             placeLocations.forEach((pos, time) -> {
                 if (System.currentTimeMillis() - time < 500) {
                     int alpha = (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)));
                     Render3DEngine.drawFilledBox(event.getMatrixStack(), new Box(pos), Render2DEngine.injectAlpha(fillColor.getValue().getColorObject(), alpha));
-                    Render3DEngine.drawBoxOutline(new Box(pos), Render2DEngine.injectAlpha(lineColor.getValue().getColorObject(), alpha), 2);
+                    Render3DEngine.drawBoxOutline(new Box(pos), Render2DEngine.injectAlpha(lineColor.getValue().getColorObject(), alpha), lineWidth.getValue());
                     Render3DEngine.drawTextIn3D(String.valueOf(MathUtil.round2(renderDmg)), pos.toCenterPos(), 0, 0.1, 0, Render2DEngine.injectAlpha(textColor.getValue().getColorObject(), alpha));
                 }
             });

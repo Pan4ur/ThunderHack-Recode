@@ -140,6 +140,7 @@ public class ModuleManager {
         modules.add(new Surround());
         modules.add(new AutoTotem());
         modules.add(new Criticals());
+        modules.add(new CevBreaker());
         modules.add(fullbright);
         modules.add(noEntityTrace);
         modules.add(new EZbowPOP());

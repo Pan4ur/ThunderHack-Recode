@@ -19,7 +19,7 @@ public class CommandManager {
     private final List<Command> commands;
 
     public CommandManager() {
-        prefix = ".";
+        prefix = "@";
         commands = new ArrayList<>();
         dispatcher = new CommandDispatcher<>();
         source = new ClientCommandSource(null, MinecraftClient.getInstance());
