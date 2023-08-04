@@ -63,22 +63,6 @@ public class Core {
 
     @Subscribe
     public void onPacketSend(PacketEvent.Send e) {
-        if (e.getPacket() instanceof ChatMessageC2SPacket) {
-            ChatMessageC2SPacket pac = e.getPacket();
-            if (pac.chatMessage().startsWith(Command.getCommandPrefix())) {
-                e.setCancelled(true);
-                try {
-                    if (pac.chatMessage().length() > 1) {
-                        Thunderhack.commandManager.executeCommand(pac.chatMessage().substring(Command.getCommandPrefix().length() - 1));
-                    } else {
-                        Command.sendMessage("Неверная команда!");
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    Command.sendMessage(Formatting.RED + "Ошибка команды!");
-                }
-            }
-        }
         if (e.getPacket() instanceof PlayerMoveC2SPacket.PositionAndOnGround || e.getPacket() instanceof PlayerMoveC2SPacket.Full || e.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround) {
             lastPacket.reset();
         }

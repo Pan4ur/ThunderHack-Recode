@@ -1,70 +1,74 @@
 package thunder.hack.cmd.impl;
 
-
-import thunder.hack.cmd.Command;
-import thunder.hack.modules.render.Search;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.block.Block;
+import net.minecraft.command.CommandSource;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Formatting;
+import thunder.hack.cmd.Command;
+import thunder.hack.modules.render.Search;
 
-public class SearchCommand  extends Command {
+import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
+public class SearchCommand extends Command {
     public SearchCommand() {
         super("search");
     }
 
     @Override
-    public void execute(String[] commands) {
-        if (commands.length == 1) {
+    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+        builder.then(literal("reset").executes(context -> {
+            Search.defaultBlocks.clear();
+            sendMessage("Search got reset.");
+
+            MC.worldRenderer.reload();
+            return SINGLE_SUCCESS;
+        }));
+
+        builder.then(literal("add").then(arg("block", StringArgumentType.word()).executes(context -> {
+            String blockName = context.getArgument("block", String.class);
+
+            Search.defaultBlocks.add(getRegisteredBlock(blockName));
+            sendMessage(Formatting.GREEN + blockName + " added to search");
+            MC.worldRenderer.reload();
+
+            return SINGLE_SUCCESS;
+        })));
+
+        builder.then(literal("del").then(arg("block", StringArgumentType.word()).executes(context -> {
+            String blockName = context.getArgument("block", String.class);
+
+            Search.defaultBlocks.remove(getRegisteredBlock(blockName));
+            sendMessage(Formatting.RED + blockName + " removed from search");
+            MC.worldRenderer.reload();
+
+            return SINGLE_SUCCESS;
+        })));
+
+        builder.executes(context -> {
             if (Search.defaultBlocks.isEmpty()) {
                 sendMessage("Search list empty");
             } else {
-                String f = "Search list: ";
-                for (Block name :  Search.defaultBlocks) {
+                StringBuilder f = new StringBuilder("Search list: ");
+
+                for (Block name :  Search.defaultBlocks)
                     try {
-                        f = f + name.getTranslationKey() + ", ";
-                    } catch (Exception exception) {
+                        f.append(name.getTranslationKey()).append(", ");
+                    } catch (Exception ignored) {
                     }
-                }
-                sendMessage(f);
-            }
-            return;
-        }
-        if (commands.length == 2) {
-            if ("reset".equals(commands[0])) {
-                Search.defaultBlocks.clear();
-                sendMessage("Search got reset.");
-              //  mc.renderGlobal.loadRenderers();
-                mc.worldRenderer.reload();
-                return;
-            }
-            return;
-        }
 
-        if (commands.length >= 2) {
-            switch (commands[0]) {
-                case "add": {
-                    Search.defaultBlocks.add(getRegisteredBlock(commands[1]));
-                    sendMessage(Formatting.GREEN + commands[1] + " added to search");
-                    mc.worldRenderer.reload();
-                    return;
-                }
-                case "del": {
-                    Search.defaultBlocks.remove(getRegisteredBlock(commands[1]));
-                    sendMessage(Formatting.RED + commands[1] + " removed from search");
-                    mc.worldRenderer.reload();
-                    return;
-                }
+                sendMessage(f.toString());
             }
-            sendMessage("Unknown Command, try search add/del <block name>");
-        }
 
+            return SINGLE_SUCCESS;
+        });
     }
 
     public static Block getRegisteredBlock(String blockName) {
         for (Block block : Registries.BLOCK) {
             if (block.getTranslationKey().replace("block.minecraft.","").equalsIgnoreCase(blockName)) {
-                Command.sendMessage("Asdawd1");
+                sendMessage("Asdawd1");
                 return block;
             }
         }

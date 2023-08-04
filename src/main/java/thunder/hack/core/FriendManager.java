@@ -10,7 +10,7 @@ public class FriendManager  {
     public static List<String> friends = new ArrayList<>();
 
     public boolean isFriend(String name) {
-        return this.friends.stream().anyMatch(friend -> friend.equalsIgnoreCase(name));
+        return friends.stream().anyMatch(friend -> friend.equalsIgnoreCase(name));
     }
 
     public boolean isFriend(PlayerEntity player) {
@@ -51,11 +51,11 @@ public class FriendManager  {
     }
 
     public List<String> getFriends() {
-        return this.friends;
+        return friends;
     }
 
     public void addFriend(String friend) {
-        this.friends.add(friend);
+        friends.add(friend);
         try {
        //     ThunderUtils.saveUserAvatar("https://minotar.net/helm/" + friend + "/100.png", friend);
         } catch (Exception e){
