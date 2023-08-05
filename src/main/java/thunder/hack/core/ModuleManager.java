@@ -254,6 +254,7 @@ public class ModuleManager {
         modules.add(new HoleSnap());
         modules.add(new ChatUtils());
         modules.add(new ESP());
+        modules.add(new ElytraFix());
 
     }
 

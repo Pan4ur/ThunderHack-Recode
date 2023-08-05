@@ -27,7 +27,7 @@ public class VoidESP extends Module {
     @Subscribe
     public void onRender3D(Render3DEvent event) {
         for (BlockPos pos : holes) {
-            Render3DEngine.renderCrosses(down.getValue() ? new Box(pos.up()) : new Box(pos), new Color(255, 255, 255), 2.0f);
+            Render3DEngine.renderCrosses(down.getValue() ? new Box(pos.up()) : new Box(pos), color.getValue().getColorObject(), 2.0f);
         }
     }
 

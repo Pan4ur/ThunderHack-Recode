@@ -1,6 +1,12 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import thunder.hack.Thunderhack;
@@ -10,21 +16,15 @@ import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.player.Scaffold;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InventoryUtil;
 import thunder.hack.utility.player.MovementUtil;
-import thunder.hack.utility.Timer;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.util.math.BlockPos;
 
 import static thunder.hack.utility.player.MovementUtil.isMoving;
 
 public class Strafe extends Module {
     private final Setting<Boost> boost = new Setting<>("Boost", Boost.None);
-    public Setting<Float> setSpeed = new Setting<>("speed", 1.3F, 0.0F, 2f,v-> boost.getValue() == Boost.Elytra);
+    public Setting<Float> setSpeed = new Setting<>("speed", 1.3F, 0.0F, 2f, v -> boost.getValue() == Boost.Elytra);
     private final Setting<Float> velReduction = new Setting<>("Reduction", 6.0f, 0.1f, 10f, v -> boost.getValue() == Boost.Damage);
     private final Setting<Float> maxVelocitySpeed = new Setting<>("MaxVelocity", 0.8f, 0.1f, 2f, v -> boost.getValue() == Boost.Damage);
 
@@ -40,7 +40,7 @@ public class Strafe extends Module {
     public Strafe() {
         super("Strafe", "testMove", Category.MOVEMENT);
     }
-    
+
     public double calculateSpeed(EventMove move) {
         float speedAttributes = getAIMoveSpeed();
         final float frictionFactor = mc.world.getBlockState(new BlockPos.Mutable().set(mc.player.getX(), getBoundingBox().getMin(Direction.Axis.Y) - move.get_y(), mc.player.getZ())).getBlock().getSlipperiness() * 0.91F;
@@ -99,13 +99,13 @@ public class Strafe extends Module {
         mc.player.setSprinting(prevSprinting);
         return speed;
     }
-    
+
     public static void disabler(int elytra) {
-        if(elytra == -1) return;
+        if (elytra == -1) return;
         if (System.currentTimeMillis() - disableTime > 190L) {
             if (elytra != -2) {
                 mc.interactionManager.clickSlot(0, elytra, 1, SlotActionType.PICKUP, mc.player);
-                mc.interactionManager.clickSlot(0, 6, 1,  SlotActionType.PICKUP, mc.player);
+                mc.interactionManager.clickSlot(0, 6, 1, SlotActionType.PICKUP, mc.player);
             }
 
             mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
@@ -133,10 +133,10 @@ public class Strafe extends Module {
         if (mc.player.isInLava()) {
             return false;
         }
-        if(Thunderhack.moduleManager.get(Scaffold.class).isEnabled()){
+        if (Thunderhack.moduleManager.get(Scaffold.class).isEnabled()) {
             return false;
         }
-        if(Thunderhack.moduleManager.get(Speed.class).isEnabled()){
+        if (Thunderhack.moduleManager.get(Speed.class).isEnabled()) {
             return false;
         }
         if (mc.player.isSubmergedInWater() || waterTicks > 0) {
@@ -145,8 +145,8 @@ public class Strafe extends Module {
         return !mc.player.getAbilities().flying;
     }
 
-    public Box getBoundingBox(){
-        return new Box(mc.player.getX() - 0.1,mc.player.getY(),mc.player.getZ() - 0.1,mc.player.getX() + 0.1,mc.player.getY() + 1,mc.player.getZ() + 0.1);
+    public Box getBoundingBox() {
+        return new Box(mc.player.getX() - 0.1, mc.player.getY(), mc.player.getZ() - 0.1, mc.player.getX() + 0.1, mc.player.getY() + 1, mc.player.getZ() + 0.1);
     }
 
     static long disableTime;
@@ -154,28 +154,28 @@ public class Strafe extends Module {
 
     @Subscribe
     public void onMove(EventMove event) {
-            int elytraSlot = InventoryUtil.getElytra();
+        int elytraSlot = InventoryUtil.getElytra();
 
-            if (boost.getValue() == Boost.Elytra && elytraSlot != -1) {
-                if (isMoving() && !mc.player.isOnGround() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, event.get_y(), 0.0f)).iterator().hasNext() && disabled) {
-                    oldSpeed = setSpeed.getValue();
-                }
+        if (boost.getValue() == Boost.Elytra && elytraSlot != -1) {
+            if (isMoving() && !mc.player.isOnGround() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, event.get_y(), 0.0f)).iterator().hasNext() && disabled) {
+                oldSpeed = setSpeed.getValue();
             }
-            if (canStrafe()) {
-                if (isMoving()) {
-                    double[] motions = MovementUtil.forward(calculateSpeed(event));
+        }
+        if (canStrafe()) {
+            if (isMoving()) {
+                double[] motions = MovementUtil.forward(calculateSpeed(event));
 
-                    event.set_x(motions[0]);
-                    event.set_z(motions[1]);
-                } else {
-                    oldSpeed = 0;
-                    event.set_x(0);
-                    event.set_z(0);
-                }
-                event.cancel();
+                event.set_x(motions[0]);
+                event.set_z(motions[1]);
             } else {
                 oldSpeed = 0;
+                event.set_x(0);
+                event.set_z(0);
             }
+            event.cancel();
+        } else {
+            oldSpeed = 0;
+        }
 
     }
 
@@ -198,11 +198,11 @@ public class Strafe extends Module {
             oldSpeed = 0;
         }
         EntityVelocityUpdateS2CPacket velocity;
-        if (e.getPacket() instanceof EntityVelocityUpdateS2CPacket  && (velocity = e.getPacket()).getId() == mc.player.getId() && boost.getValue() == Boost.Damage) {
-            if(mc.player.isOnGround()) return;
+        if (e.getPacket() instanceof EntityVelocityUpdateS2CPacket && (velocity = e.getPacket()).getId() == mc.player.getId() && boost.getValue() == Boost.Damage) {
+            if (mc.player.isOnGround()) return;
 
-            int vX =  velocity.getVelocityX();
-            int vZ =  velocity.getVelocityZ();
+            int vX = velocity.getVelocityX();
+            int vZ = velocity.getVelocityZ();
 
             if (vX < 0) vX *= -1;
             if (vZ < 0) vZ *= -1;
@@ -237,6 +237,6 @@ public class Strafe extends Module {
     }
 
     private enum Boost {
-        None, Elytra, Damage
+        None, Elytra, Damage, FGLowRider
     }
 }

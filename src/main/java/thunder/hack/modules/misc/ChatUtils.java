@@ -153,7 +153,7 @@ public class ChatUtils extends Module {
     }
 
     public boolean antiBot(String s) {
-        if(s.contains("soon_") || s.contains("_npc") ){
+        if(s.contains("soon_") || s.contains("_npc") || s.contains("CIT-")){
             return true;
         }
         for (int i = 0; i < s.length(); i++) {
