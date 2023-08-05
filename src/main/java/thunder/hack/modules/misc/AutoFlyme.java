@@ -20,6 +20,9 @@ public class AutoFlyme extends Module {
     public final Setting<Boolean> useTimer = new Setting<>("UseTimer", false);
 
     public Setting<Float> hoverY = new Setting("hoverY", 0.228f, 0.0f, 1.0f, v -> hover.getValue());
+    public Setting<Float> speed = new Setting("speed", 1.05f, 0.0f, 8f, v -> hover.getValue());
+
+    //фаннигейм перешел на матрикс, и теперь можно летать со скоростью 582 км/ч :skull:
 
     private final Timer timer = new Timer();
 
@@ -66,7 +69,7 @@ public class AutoFlyme extends Module {
     @Subscribe
     public void onUpdateWalkingPlayer(final EventSync event) {
         if (!instantSpeed.getValue() || !mc.player.getAbilities().flying) return;
-        final double[] dir =  MovementUtil.isMoving() ? MovementUtil.forward(1.05f) : new double[]{0,0};
+        final double[] dir =  MovementUtil.isMoving() ? MovementUtil.forward(speed.getValue()) : new double[]{0,0};
         mc.player.setVelocity(dir[0],mc.player.getVelocity().y,dir[1]);
     }
 }

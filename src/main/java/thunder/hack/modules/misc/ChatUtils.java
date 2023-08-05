@@ -29,6 +29,7 @@ import thunder.hack.utility.Timer;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 import java.util.UUID;
 
 public class ChatUtils extends Module {
@@ -85,6 +86,7 @@ public class ChatUtils extends Module {
                 if (pck.getActions().contains(PlayerListS2CPacket.Action.ADD_PLAYER)) {
                     for (PlayerListS2CPacket.Entry ple : pck.getPlayerAdditionEntries()) {
                         if (antiBot(ple.profile().getName())) return;
+                        if (Objects.equals(ple.profile().getName(), mc.player.getName().getString())) return;
                         if (welcomer.getValue() == Welcomer.Server) {
                             mc.player.networkHandler.sendChatMessage(getPrefix() + string1 + ple.profile().getName());
                             antiSpam.reset();
@@ -99,6 +101,7 @@ public class ChatUtils extends Module {
                 for (UUID uuid2 : pac.profileIds) {
                     if (!nameMap.containsKey(uuid2)) return;
                     if (antiBot(nameMap.get(uuid2))) return;
+                    if (Objects.equals(nameMap.get(uuid2), mc.player.getName().getString())) return;
                     int n = (int) Math.floor(Math.random() * bb.length);
                     if (welcomer.getValue() == Welcomer.Server) {
                         mc.player.networkHandler.sendChatMessage(getPrefix() + bb[n] + nameMap.get(uuid2));
@@ -135,7 +138,7 @@ public class ChatUtils extends Module {
 
     @Subscribe
     public void onTotem(TotemPopEvent e){
-        if(totems.getValue() && antiSpam.passedMs(3000)){
+        if(totems.getValue() && antiSpam.passedMs(3000) && e.getEntity() != mc.player){
             int n = (int) Math.floor(Math.random() * popMessages.length);
             String s = popMessages[n].replace("<pop>", e.getPops()+"");
             mc.player.networkHandler.sendChatMessage(getPrefix() + e.getEntity().getName().getString() + s);

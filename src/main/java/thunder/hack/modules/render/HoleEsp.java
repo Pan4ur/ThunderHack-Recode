@@ -5,7 +5,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -18,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class HoleEsp extends Module {
+public class HoleESP extends Module {
 
-    public HoleEsp() {
-        super("HoleEsp", Category.RENDER);
+    public HoleESP() {
+        super("HoleESP", Category.RENDER);
     }
 
     private List<PosWithColor> positions = new CopyOnWriteArrayList<>();

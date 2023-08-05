@@ -35,19 +35,7 @@ public class FakePlayer extends Module {
         fakePlayer = new OtherClientPlayerEntity(mc.world, new GameProfile(UUID.fromString("66123666-6666-6666-6666-666666666600"), "Hell_Raider"));
         fakePlayer.copyPositionAndRotation(mc.player);
 
-        if (copyInventory.getValue()) {/*
-            fakePlayer.getInventory().armor.clear();
-            for (ItemStack itemStack : mc.player.getInventory().armor) {
-                fakePlayer.getInventory().armor.add(itemStack);
-            }
-            fakePlayer.getInventory().main.clear();
-            for (ItemStack itemStack : mc.player.getInventory().main) {
-                fakePlayer.getInventory().main.add(itemStack);
-            }
-            fakePlayer.getInventory().selectedSlot = mc.player.getInventory().selectedSlot;
-            fakePlayer.getInventory().setStack(mc.player.getInventory().selectedSlot, mc.player.getMainHandStack());
-            fakePlayer.getInventory().setStack(45, mc.player.getOffHandStack());
-            */
+        if (copyInventory.getValue()) {
             fakePlayer.getInventory().clone(mc.player.getInventory());
         }
 
