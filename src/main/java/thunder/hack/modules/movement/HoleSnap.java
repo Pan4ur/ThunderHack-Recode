@@ -1,26 +1,14 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.render.HoleEsp;
-import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.player.PlaceUtility;
-import thunder.hack.utility.player.PlayerUtil;
-import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.Render3DEngine;
 
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HoleSnap extends Module {
     public HoleSnap() {

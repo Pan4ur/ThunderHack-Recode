@@ -17,4 +17,8 @@ public class MainSettings extends Module {
         RU,
         ENG
     }
+
+    public static boolean isRu(){
+        return language.getValue() == Language.RU;
+    }
 }

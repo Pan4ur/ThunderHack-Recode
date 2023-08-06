@@ -18,10 +18,5 @@
 - [FabricApi 1.20.1](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files) - TH won't work without it.
 - [InGameAccountSwitcher](https://www.curseforge.com/minecraft/mc-mods/in-game-account-switcher) - To switch accounts in game
 
-## TODO
-- More modules (138 vs 220 in th+)
-- Freecam sync with ca and ka
-- Pitfight 16 is coming up, it would be nice to add modules for 2b2t
-
 ## ScreenShots
 ![image](https://cdn.discordapp.com/attachments/934396624111824900/1131601338925600920/image.png)

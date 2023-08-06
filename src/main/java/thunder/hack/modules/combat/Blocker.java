@@ -15,7 +15,7 @@ import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.render.HoleEsp;
+import thunder.hack.modules.render.HoleESP;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InventoryUtil;
@@ -120,7 +120,7 @@ public class Blocker extends Module {
     @Subscribe
     public void onPacketReceive(PacketEvent.Receive e) {
         if (fullNullCheck()) return;
-        if (e.getPacket() instanceof BlockBreakingProgressS2CPacket && HoleEsp.validIndestructible(BlockPos.ofFloored(mc.player.getPos()))) {
+        if (e.getPacket() instanceof BlockBreakingProgressS2CPacket && HoleESP.validObi(BlockPos.ofFloored(mc.player.getPos()))) {
             BlockBreakingProgressS2CPacket packet = e.getPacket();
             BlockPos pos = packet.getPos();
 

@@ -2,7 +2,6 @@ package thunder.hack.core;
 
 import com.google.common.eventbus.EventBus;
 import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.Render2DEvent;
 import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.gui.clickui.ClickUI;
@@ -192,7 +191,7 @@ public class ModuleManager {
         modules.add(new TestHud());
         modules.add(new BoatFly());
         modules.add(new HitBoxDesync());
-        modules.add(new HoleEsp());
+        modules.add(new HoleESP());
         modules.add(new ArmorHud());
         modules.add(new Step());
         modules.add(new ReverseStep());
@@ -255,6 +254,8 @@ public class ModuleManager {
         modules.add(new Spider());
         modules.add(new HoleSnap());
         modules.add(new ChatUtils());
+        modules.add(new ESP());
+        modules.add(new ElytraFix());
 
     }
 

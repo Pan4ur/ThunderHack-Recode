@@ -5,7 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.render.HoleEsp;
+import thunder.hack.modules.render.HoleESP;
 import thunder.hack.setting.Setting;
 
 public class HoleAnchor extends Module {
@@ -22,15 +22,15 @@ public class HoleAnchor extends Module {
     public void onPlayerUpdate(PlayerUpdateEvent e) {
         if (mc.player.getPitch() > pitch.getValue()) {
             if (
-                    HoleEsp.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(1))
-                    || HoleEsp.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(2))
-                    || HoleEsp.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(3))
-                    || HoleEsp.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(1))
-                    || HoleEsp.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(2))
-                    || HoleEsp.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(3))
-                    || HoleEsp.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(1))
-                    || HoleEsp.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(2))
-                    || HoleEsp.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(3))
+                    HoleESP.validObi( BlockPos.ofFloored(mc.player.getPos()).down(1))
+                    || HoleESP.validObi( BlockPos.ofFloored(mc.player.getPos()).down(2))
+                    || HoleESP.validObi( BlockPos.ofFloored(mc.player.getPos()).down(3))
+                    || HoleESP.validTwoBlockObiXZ( BlockPos.ofFloored(mc.player.getPos()).down(1))
+                    || HoleESP.validTwoBlockObiXZ( BlockPos.ofFloored(mc.player.getPos()).down(2))
+                    || HoleESP.validTwoBlockObiXZ( BlockPos.ofFloored(mc.player.getPos()).down(3))
+                    || HoleESP.validTwoBlockObiXZ1( BlockPos.ofFloored(mc.player.getPos()).down(1))
+                    || HoleESP.validTwoBlockObiXZ1( BlockPos.ofFloored(mc.player.getPos()).down(2))
+                    || HoleESP.validTwoBlockObiXZ1( BlockPos.ofFloored(mc.player.getPos()).down(3))
             ) {
                 if (!pull.getValue()) {
                     mc.player.setVelocity(0,mc.player.getVelocity().getY(),0);

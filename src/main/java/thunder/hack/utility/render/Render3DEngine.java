@@ -573,4 +573,52 @@ public class Render3DEngine {
         RenderSystem.enableCull();
         cleanup();
     }
+
+    public static void drawSphere(MatrixStack matrix, float radius, int slices, int stacks, int color) {
+        float drho = 3.1415927F / ((float)stacks);
+        float dtheta = 6.2831855F / ((float)slices - 1f);
+        float rho;
+        float theta;
+        float x;
+        float y;
+        float z;
+        int i;
+        int j;
+        Render3DEngine.setup();
+        for(i = 1; i < stacks; ++i) {
+            rho = (float)i * drho;
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder bufferBuilder = tessellator.getBuffer();
+            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+            bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
+
+            for(j = 0; j < slices; ++j) {
+                theta = (float)j * dtheta;
+                x = (float) (Math.cos(theta) * Math.sin(rho));
+                y = (float) (Math.sin(theta) * Math.sin(rho));
+                z = (float) Math.cos(rho);
+                bufferBuilder.vertex(matrix.peek().getPositionMatrix(), x * radius, y * radius, z * radius).color(color).next();
+            }
+            tessellator.draw();
+        }
+
+        for(j = 0; j < slices; ++j) {
+            theta = (float)j * dtheta;
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder bufferBuilder = tessellator.getBuffer();
+            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+            bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
+
+            for(i = 0; i <= stacks; ++i) {
+                rho = (float)i * drho;
+                x = (float) (Math.cos(theta) * Math.sin(rho));
+                y = (float) (Math.sin(theta) * Math.sin(rho));
+                z = (float) Math.cos(rho);
+                bufferBuilder.vertex(matrix.peek().getPositionMatrix(), x * radius, y * radius, z * radius).color(color).next();
+            }
+            tessellator.draw();
+        }
+        Render3DEngine.cleanup();
+    }
 }

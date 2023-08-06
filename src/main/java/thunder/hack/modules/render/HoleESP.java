@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class HoleEsp extends Module {
+public class HoleESP extends Module {
 
-    public HoleEsp() {
-        super("HoleEsp", Category.RENDER);
+    public HoleESP() {
+        super("HoleESP", Category.RENDER);
     }
 
     private final List<PosWithColor> positions = new CopyOnWriteArrayList<>();

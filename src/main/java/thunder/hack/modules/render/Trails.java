@@ -3,6 +3,7 @@ package thunder.hack.modules.render;
 import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
 import org.lwjgl.opengl.GL11;
+import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.PreRender3DEvent;
 import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.client.HudEditor;

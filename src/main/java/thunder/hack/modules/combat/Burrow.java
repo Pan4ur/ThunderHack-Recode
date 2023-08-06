@@ -177,7 +177,7 @@ public class Burrow extends Module {
             return;
         }
 
-        float[] r = PlaceUtility.calculateAngle(rEntity.getEyePos(),pos.toCenterPos());
+        float[] r = PlaceUtility.getRotationForPlace(pos,true);
 
         PlayerEntity finalREntity = rEntity;
 
@@ -199,7 +199,14 @@ public class Burrow extends Module {
         mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(finalREntity.getX(),  finalREntity.getY() + 1.01, finalREntity.getZ(), onGround.getValue()));
         mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(finalREntity.getX(),  finalREntity.getY() + 1.16, finalREntity.getZ(), onGround.getValue()));
 
-        PlaceUtility.forcePlace(pos, false, Hand.MAIN_HAND, slot, true);
+        int prev_slot = mc.player.getInventory().selectedSlot;
+        if(mc.player.getInventory().selectedSlot != slot){
+            mc.player.getInventory().selectedSlot = slot;
+            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(slot));
+        }
+        PlaceUtility.placeBlock(pos, true);
+        mc.player.getInventory().selectedSlot = prev_slot;
+        mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prev_slot));
 
         mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(slot == -2 ? Hand.OFF_HAND : Hand.MAIN_HAND));
 

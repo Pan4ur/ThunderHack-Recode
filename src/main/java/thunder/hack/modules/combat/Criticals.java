@@ -23,18 +23,13 @@ public class Criticals extends Module {
     public Setting<Mode> mode = new Setting<>("Mode", Mode.FunnyGame);
 
     private enum Mode {
-        Ncp, Strict, FunnyGame,FGNew
+        Ncp, Strict, FunnyGame, New2b2t
     }
 
     public static boolean cancelCrit;
 
-    int pauseTicks;
-
     @Subscribe
     public void onPacketSend(PacketEvent.Send event) {
-      //  if(pauseTicks-- > 0 && event.getPacket() instanceof PlayerMoveC2SPacket){
-      //      event.setCancelled(true);
-       //}
         if (event.getPacket() instanceof PlayerInteractEntityC2SPacket && getInteractType(event.getPacket()) == InteractType.ATTACK && !(getEntity(event.getPacket()) instanceof EndCrystalEntity)) {
             if(cancelCrit) return;
             doCrit();
@@ -55,7 +50,7 @@ public class Criticals extends Module {
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 0.00001058293536, mc.player.getZ(), false));
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 0.00000916580235, mc.player.getZ(), false));
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 0.00000010371854, mc.player.getZ(), false));
-            } else if (mode.getValue() == Mode.FGNew){
+            } else if (mode.getValue() == Mode.New2b2t){
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 0.000000271875, mc.player.getZ(), false));
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), false));
             }

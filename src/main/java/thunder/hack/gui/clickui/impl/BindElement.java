@@ -22,9 +22,9 @@ public class BindElement extends AbstractElement {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context,mouseX,mouseY,delta);
         if (this.isListening) {
-            FontRenderers.getRenderer().drawString(context.getMatrices(),"...", (int) (x + 3), (int) (y + height / 2 - (6 / 2f)), new Color(-1).getRGB());
+            FontRenderers.getRenderer().drawString(context.getMatrices(),"...", (int) (x + 6), (int) (y + height / 2 - (6 / 2f)), new Color(-1).getRGB());
         } else {
-            FontRenderers.getRenderer().drawString(context.getMatrices(),setting.getName() + " " + ((Bind)setting.getValue()).getBind(), (int) (x + 3), (int) (y + height / 2 - (6 / 2f)), new Color(-1).getRGB());
+            FontRenderers.getRenderer().drawString(context.getMatrices(),setting.getName() + " " + ((Bind)setting.getValue()).getBind(), (int) (x + 6), (int) (y + height / 2 - (6 / 2f)), new Color(-1).getRGB());
         }
     }
 

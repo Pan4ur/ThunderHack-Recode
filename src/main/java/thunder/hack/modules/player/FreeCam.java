@@ -107,16 +107,19 @@ public class FreeCam extends Module {
             if (result instanceof BlockHitResult && !mc.world.getBlockState(((BlockHitResult) result).getBlockPos()).isAir()) {
                 float[] rotations = PlaceUtility.calculateAngle(getPlayer().getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0), result.getPos());
                 getPlayer().setYaw(rotations[0]);
+                getPlayer().setHeadYaw(rotations[0]);
                 getPlayer().setPitch(rotations[1]);
             } else if(!(result instanceof BlockHitResult)) {
                 float[] rotations = PlaceUtility.calculateAngle(getPlayer().getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0), result.getPos());
                 getPlayer().setYaw(rotations[0]);
+                getPlayer().setHeadYaw(rotations[0]);
                 getPlayer().setPitch(rotations[1]);
             }
         }
 
         getPlayer().setStackInHand(Hand.MAIN_HAND, mc.player.getMainHandStack());
         getPlayer().setStackInHand(Hand.OFF_HAND, mc.player.getOffHandStack());
+
         prevPos = mc.player.getPos();
         prevRotate = new Vec2f(mc.player.getYaw(),mc.player.getPitch());
         mc.player.setPosition(getPlayer().getPos());

@@ -3,6 +3,8 @@ package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
 import net.minecraft.network.packet.s2c.play.PlayPingS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.util.math.MathHelper;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventSync;
@@ -10,11 +12,8 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.PostPlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import net.minecraft.util.math.MathHelper;
 import thunder.hack.utility.math.MathUtil;
 import thunder.hack.utility.player.MovementUtil;
-
-import java.awt.*;
 
 public class Timer extends Module {
     public static double value;
@@ -24,6 +23,8 @@ public class Timer extends Module {
     public static Setting<Float> addOnTheMove = new Setting("addOnTheMove", 0.0f, 0.0f, 1.0f, v -> mode.getValue() == Mode.SMART);
     public static Setting<Float> decreaseRate = new Setting("decreaseRate", 1.0f, 0.5f, 3.0f, v -> mode.getValue() == Mode.SMART);
 
+    private long cancelTime;
+    private PlayPingS2CPacket pingPacket;
 
     public Timer() {
         super("Timer", "Timer", Category.MOVEMENT);
@@ -33,6 +34,10 @@ public class Timer extends Module {
     @Override
     public void onUpdate() {
         if (mode.getValue() == Mode.SMART) {
+            if(!MovementUtil.isMoving()){
+                Thunderhack.TICK_TIMER = 1f;
+                return;
+            };
             Thunderhack.TICK_TIMER = speed.getValue();
             if (Thunderhack.TICK_TIMER <= 1.0f) {
                 return;
@@ -43,9 +48,17 @@ public class Timer extends Module {
             } else {
                 toggle();
             }
-        }
-        if (mode.getValue() == Mode.NORMAL) {
+        } else if (mode.getValue() == Mode.NORMAL) {
             Thunderhack.TICK_TIMER = speed.getValue();
+        } else {
+            if(!MovementUtil.isMoving() || violation > 39f) {
+                Thunderhack.TICK_TIMER = 1f;
+                return;
+            }
+
+            Thunderhack.TICK_TIMER = speed.getValue();
+            violation += 0.15f;
+            violation = MathHelper.clamp(violation, 0.0f, 40);
         }
     }
 
@@ -59,7 +72,10 @@ public class Timer extends Module {
 
 
     public static void onEntitySync(EventSync e) {
-        violation = notMoving() ? (float)(violation - (decreaseRate.getValue() + 0.4)) : violation - (addOnTheMove.getValue() / 10.0f);
+        if(mode.getValue() == Mode.GrimFunnyGame) {
+            return;
+        }
+        violation = notMoving() ? (float) (violation - (decreaseRate.getValue() + 0.4)) : violation - (addOnTheMove.getValue() / 10.0f);
         violation = (float) MathHelper.clamp(violation, 0.0, Math.floor(100f / Thunderhack.TICK_TIMER));
         prevPosX = mc.player.getX();
         prevPosY = mc.player.getY();
@@ -69,18 +85,36 @@ public class Timer extends Module {
     }
 
     private static boolean notMoving() {
-        return prevPosX == mc.player.getX()
-                && prevPosY == mc.player.getY()
-                && prevPosZ == mc.player.getZ()
-                && yaw == mc.player.getYaw()
-                && pitch == mc.player.getPitch();
+        return prevPosX == mc.player.getX() && prevPosY == mc.player.getY() && prevPosZ == mc.player.getZ() && yaw == mc.player.getYaw() && pitch == mc.player.getPitch();
     }
 
+    @Subscribe
+    public void onPacketReceive(PacketEvent.Receive e){
+        if(mode.getValue() == Mode.GrimFunnyGame) {
+            if (System.currentTimeMillis() - cancelTime > 55000) {
+                Command.sendMessage("Resetting..");
+                cancelTime = System.currentTimeMillis();
+                violation = 40f;
+                if(pingPacket != null)
+                    pingPacket.apply(mc.player.networkHandler);
+            }
+            if (e.getPacket() instanceof PlayPingS2CPacket) {
+                pingPacket = e.getPacket();
+                violation -= 0.8f;
+                violation = MathHelper.clamp(violation, 0.0f, 100f / speed.getValue());
+                Command.sendMessage("ping");
+                e.cancel();
+            }
+            if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
+                violation = 40f;
+            }
+        }
+    }
 
     @Subscribe
     public void onPostPlayerUpdate(PostPlayerUpdateEvent event) {
         if (mode.getValue() == Mode.TICKSHIFT) {
-            int status = MathUtil.clamp((int) ( 100 - Math.min(violation, 100)), 0, 100);
+            int status = MathUtil.clamp((int) (100 - Math.min(violation, 100)), 0, 100);
 
             if (status < 90f) {
                 Command.sendMessage("Перед повторным использованием необходимо постоять на месте!");
@@ -89,7 +123,7 @@ public class Timer extends Module {
             }
             event.setCancelled(true);
             event.setIterations(shiftTicks.getValue().intValue());
-            violation = 100;
+            violation = 40f;
             disable();
         }
     }
@@ -98,6 +132,11 @@ public class Timer extends Module {
     @Override
     public void onEnable() {
         Thunderhack.TICK_TIMER = 1f;
+        if(mode.getValue() == Mode.GrimFunnyGame) {
+            violation = 40f;
+            cancelTime = System.currentTimeMillis();
+        }
+
     }
 
     @Override
@@ -109,6 +148,7 @@ public class Timer extends Module {
     public enum Mode {
         NORMAL,
         SMART,
-        TICKSHIFT
+        TICKSHIFT,
+        GrimFunnyGame
     }
 }
