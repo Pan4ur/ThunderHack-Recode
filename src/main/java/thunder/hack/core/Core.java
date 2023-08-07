@@ -94,7 +94,6 @@ public class Core {
 
     @Subscribe
     public void onRender2D(Render2DEvent e) {
-        drawLagNotify(e);
         drawGps(e);
         drawSkull(e);
     }
@@ -141,10 +140,6 @@ public class Core {
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             FontRenderers.modules.drawCenteredString(e.getMatrixStack(), "gps (" + getDistance(Thunderhack.gps_position) + "m)", (float) (Math.sin(Math.toRadians(yaw)) * 50f) + xOffset, (float) (yOffset - (Math.cos(Math.toRadians(yaw)) * 50f)) - 20, -1);
         }
-    }
-
-    public void drawLagNotify(Render2DEvent e) {
-
     }
 
     @Subscribe

@@ -36,39 +36,39 @@ public class Nuker extends Module {
     private Block nukerTargetBlock;
     private BlockPosWithRotation nukerTargetBlockpos;
 
-    private Setting<Float> range = new Setting<>("Range",4.2f,0f,5f);
+    private Setting<Float> range = new Setting<>("Range", 4.2f, 0f, 5f);
 
     private final Setting<Mode> colorMode = new Setting<>("ColorMode", Mode.Sync);
     public final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x2250b4b4), v -> colorMode.getValue() == Mode.Custom);
 
     private enum Mode {
-        Custom,Sync
+        Custom, Sync
     }
 
 
     @Subscribe
-    public void onBlockInteract(EventAttackBlock e){
-        if(mc.world.isAir(e.getBlockPos())) return;
+    public void onBlockInteract(EventAttackBlock e) {
+        if (mc.world.isAir(e.getBlockPos())) return;
         nukerTargetBlock = mc.world.getBlockState(e.getBlockPos()).getBlock();
     }
 
     @Subscribe
-    public void onSync(EventSync e){
-        if(nukerTargetBlockpos != null){
-            if(mc.world.getBlockState(nukerTargetBlockpos.bp).getBlock() != nukerTargetBlock || mc.player.squaredDistanceTo(nukerTargetBlockpos.bp.toCenterPos()) > range.getPow2Value())
-                 nukerTargetBlockpos = null;
+    public void onSync(EventSync e) {
+        if (nukerTargetBlockpos != null) {
+            if (mc.world.getBlockState(nukerTargetBlockpos.bp).getBlock() != nukerTargetBlock || mc.player.squaredDistanceTo(nukerTargetBlockpos.bp.toCenterPos()) > range.getPow2Value())
+                nukerTargetBlockpos = null;
         }
 
-        if(nukerTargetBlockpos == null || mc.options.attackKey.isPressed()) return;
+        if (nukerTargetBlockpos == null || mc.options.attackKey.isPressed()) return;
 
         float[] angle = PlaceUtility.calculateAngle(nukerTargetBlockpos.vec3d);
         mc.player.setYaw(angle[0]);
         mc.player.setPitch(angle[1]);
-        Direction dir = PlaceUtility.getBreakDirection(nukerTargetBlockpos.bp,true);
-        if(dir == null) return;
+        Direction dir = PlaceUtility.getBreakDirection(nukerTargetBlockpos.bp, true);
+        if (dir == null) return;
 
-        if(ModuleManager.speedMine.isEnabled()){
-            if(SpeedMine.minePosition != nukerTargetBlockpos.bp) {
+        if (ModuleManager.speedMine.isEnabled()) {
+            if (SpeedMine.minePosition != nukerTargetBlockpos.bp) {
                 mc.interactionManager.attackBlock(nukerTargetBlockpos.bp, dir);
                 mc.player.swingHand(Hand.MAIN_HAND);
             }
@@ -79,33 +79,33 @@ public class Nuker extends Module {
     }
 
     @Subscribe
-    public void onRender3D(Render3DEvent e){
-        if(nukerTargetBlockpos != null && nukerTargetBlockpos.bp != null){
+    public void onRender3D(Render3DEvent e) {
+        if (nukerTargetBlockpos != null && nukerTargetBlockpos.bp != null) {
             Color color1 = colorMode.getValue() == Mode.Sync ? HudEditor.getColor(1) : color.getValue().getColorObject();
-            Render3DEngine.drawBoxOutline(new Box(nukerTargetBlockpos.bp),color1,2);
-            Render3DEngine.drawFilledBox(e.getMatrixStack(),new Box(nukerTargetBlockpos.bp), Render2DEngine.injectAlpha(color1,100));
+            Render3DEngine.drawBoxOutline(new Box(nukerTargetBlockpos.bp), color1, 2);
+            Render3DEngine.drawFilledBox(e.getMatrixStack(), new Box(nukerTargetBlockpos.bp), Render2DEngine.injectAlpha(color1, 100));
         }
     }
 
     @Override
-    public void onThread(){
-        if(nukerTargetBlock != null && !mc.options.attackKey.isPressed() && nukerTargetBlockpos == null) {
+    public void onThread() {
+        if (nukerTargetBlock != null && !mc.options.attackKey.isPressed() && nukerTargetBlockpos == null) {
             nukerTargetBlockpos = getNukerBlockPos();
         }
     }
 
-    public BlockPosWithRotation getNukerBlockPos(){
-        for(int x = (int) (mc.player.getX() - (range.getValue() + 1)); x < mc.player.getX() + (range.getValue() + 1); x++)
-            for(int y = (int) (mc.player.getY() - (range.getValue() + 1)); y < mc.player.getY() + (range.getValue() + 1); y++)
-                for(int z = (int) (mc.player.getZ() - (range.getValue() + 1)); z < mc.player.getZ() + (range.getValue() + 1); z++){
-                    BlockPos bp = BlockPos.ofFloored(x,y,z);
-                    if(mc.player.squaredDistanceTo(bp.toCenterPos()) > range.getPow2Value()) continue;
-                    if(mc.world.getBlockState(bp).getBlock() == nukerTargetBlock){
+    public BlockPosWithRotation getNukerBlockPos() {
+        for (int x = (int) (mc.player.getX() - (range.getValue() + 1)); x < mc.player.getX() + (range.getValue() + 1); x++)
+            for (int y = (int) (mc.player.getY() - (range.getValue() + 1)); y < mc.player.getY() + (range.getValue() + 1); y++)
+                for (int z = (int) (mc.player.getZ() - (range.getValue() + 1)); z < mc.player.getZ() + (range.getValue() + 1); z++) {
+                    BlockPos bp = BlockPos.ofFloored(x, y, z);
+                    if (mc.player.squaredDistanceTo(bp.toCenterPos()) > range.getPow2Value()) continue;
+                    if (mc.world.getBlockState(bp).getBlock() == nukerTargetBlock) {
                         for (Vec3d point : PlaceUtility.multiPoint) {
                             Vec3d p = new Vec3d(bp.getX() + point.getX(), bp.getY() + point.getY(), bp.getZ() + point.getZ());
                             BlockHitResult bhr = mc.world.raycast(new RaycastContext(PlaceUtility.getEyesPos(mc.player), p, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
                             if (bhr != null && bhr.getType() == HitResult.Type.BLOCK && bhr.getBlockPos().equals(bp)) {
-                                return new BlockPosWithRotation(bp,p);
+                                return new BlockPosWithRotation(bp, p);
                             }
                         }
                     }
@@ -113,5 +113,6 @@ public class Nuker extends Module {
         return null;
     }
 
-    public record BlockPosWithRotation(BlockPos bp,Vec3d vec3d){ }
+    public record BlockPosWithRotation(BlockPos bp, Vec3d vec3d) {
+    }
 }

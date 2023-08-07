@@ -256,6 +256,7 @@ public class ModuleManager {
         modules.add(new ChatUtils());
         modules.add(new ESP());
         modules.add(new ElytraFix());
+        modules.add(new AirPlace());
 
     }
 
