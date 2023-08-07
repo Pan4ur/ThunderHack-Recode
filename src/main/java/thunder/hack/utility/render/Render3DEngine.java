@@ -213,11 +213,6 @@ public class Render3DEngine {
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-     //   bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, minZ).color(c.getRGB()).next();
-      ///  bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, minZ).color(c.getRGB()).next();
-      //  bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, maxZ).color(c.getRGB()).next();
-      //  bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, maxZ).color(c.getRGB()).next();
-
         bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, minZ).color(c.getRGB()).next();
         bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, minZ).color(c1.getRGB()).next();
         bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, minZ).color(c1.getRGB()).next();

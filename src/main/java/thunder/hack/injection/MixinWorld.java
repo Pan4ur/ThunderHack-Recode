@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.utility.math.ExplosionUtil;
 
 import static thunder.hack.modules.Module.mc;
@@ -41,6 +42,4 @@ public abstract class MixinWorld {
             cir.setReturnValue(Blocks.AIR.getDefaultState());
         }
     }
-
-
 }

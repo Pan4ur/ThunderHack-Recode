@@ -47,11 +47,11 @@ public class AutoCrystal extends Module {
     }
 
     public Setting<TimingMode> timingMode = new Setting<>("Timing", TimingMode.Sequential);
-    public Setting<Boolean> rotate = new Setting<>("Rotate", true);
+    public Setting<RotateMode> rotate = new Setting<>("Rotate", RotateMode.OFF);
     public Setting<Boolean> inhibit = new Setting<>("Inhibit", true);
     public Setting<Boolean> limit = new Setting<>("Limit", false);
-    public Setting<YawStepMode> yawStep = new Setting<>("YawStep", YawStepMode.OnlyBreak, v -> rotate.getValue());
-    public Setting<Integer> yawAngle = new Setting<>("YawAngle", 54, 5, 180, v -> rotate.getValue() && yawStep.getValue() != YawStepMode.Off);
+    public Setting<YawStepMode> yawStep = new Setting<>("YawStep", YawStepMode.OnlyBreak, v -> rotate.getValue() != RotateMode.OFF);
+    public Setting<Integer> yawAngle = new Setting<>("YawAngle", 54, 5, 180, v -> rotate.getValue() != RotateMode.OFF && yawStep.getValue() != YawStepMode.Off);
     public Setting<Boolean> strictDirection = new Setting<>("StrictDirection", true);
     public Setting<Boolean> oldPlace = new Setting<>("1.12 Place", false);
     public Setting<ConfirmMode> confirm = new Setting<>("Confirm", ConfirmMode.OFF);
@@ -95,6 +95,8 @@ public class AutoCrystal extends Module {
 
     private enum AutoSwapMode {None, Normal, Silent}
 
+    private enum RotateMode {OFF, Normal, Grim}
+
 
     public static ConcurrentHashMap<Integer, Long> silentMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<BlockPos, Long> placeLocations = new ConcurrentHashMap<>();
@@ -121,6 +123,8 @@ public class AutoCrystal extends Module {
     public static Entity CAtarget;
 
     private float renderDmg;
+    private float grimFixYaw, prevClientYaw;
+
 
     @Override
     public void onEnable() {
@@ -186,7 +190,7 @@ public class AutoCrystal extends Module {
             }
         }
 
-        if (rotate.getValue() && rotations != null) {
+        if (rotate.getValue() != RotateMode.OFF && rotations != null) {
             float[] yp = PlaceUtility.calculateAngle(rotations);
             if ((yawStep.getValue() == YawStepMode.OnlyBreak && PlaceManager.trailingBreakAction != null) || yawStep.getValue() == YawStepMode.BreakPlace) {
                 float yawDiff = MathHelper.wrapDegrees(yp[0] - ((IClientPlayerEntity) ((mc.player))).getLastYaw());
@@ -200,9 +204,40 @@ public class AutoCrystal extends Module {
             double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
             yp[0] = (float) (yp[0] - (yp[0] - ((IClientPlayerEntity) ((mc.player))).getLastYaw()) % gcdFix);
             yp[1] = (float) (yp[1] - (yp[1] - ((IClientPlayerEntity) ((mc.player))).getLastYaw()) % gcdFix);
+            grimFixYaw = yp[0];
 
-            PlaceManager.setTrailingRotation(yp);
+
+            if(rotate.getValue() == RotateMode.Normal) {
+                PlaceManager.setTrailingRotation(yp);
+            } else {
+                mc.player.setYaw(yp[0]);
+                mc.player.setPitch(yp[1]);
+            }
             rotations = null;
+        }
+    }
+
+    @Subscribe
+    public void modifyVelocity(EventPlayerTravel e) {
+        if (rotate.getValue() == RotateMode.Grim && !placeTimer.passedMs(1000)) {
+            if (e.isPre()) {
+                prevClientYaw = mc.player.getYaw();
+                mc.player.setYaw(grimFixYaw);
+            } else {
+                mc.player.setYaw(prevClientYaw);
+            }
+        }
+    }
+
+    @Subscribe
+    public void modifyJump(EventPlayerJump e) {
+        if (rotate.getValue() == RotateMode.Grim && !placeTimer.passedMs(1000)) {
+            if (e.isPre()) {
+                prevClientYaw = mc.player.getYaw();
+                mc.player.setYaw(grimFixYaw);
+            } else {
+                mc.player.setYaw(prevClientYaw);
+            }
         }
     }
 
@@ -325,7 +360,7 @@ public class AutoCrystal extends Module {
             }
 
             if (closestPoint != null) {
-                if (rotate.getValue()) {
+                if (rotate.getValue() != RotateMode.OFF) {
                     rotations = closestPoint;
                 }
 
@@ -335,7 +370,7 @@ public class AutoCrystal extends Module {
             return null;
         }
 
-        if (rotate.getValue()) {
+        if (rotate.getValue() != RotateMode.OFF) {
             rotations = new Vec3d(pos.getX() + 0.5D, pos.getY() + 1D, pos.getZ() + 0.5D);
         }
         return new BlockHitResult(new Vec3d(pos.getX() + 0.5D, pos.getY() + 1D, pos.getZ() + 0.5D), Direction.UP, pos, false);
@@ -350,7 +385,7 @@ public class AutoCrystal extends Module {
 
         if (crystal != null) {
             if (crystal.age >= ticksExisted.getValue()) {
-                if (rotate.getValue()) {
+                if (rotate.getValue() != RotateMode.OFF) {
                     rotations = crystal.getPos();
                 }
                 if (breakTimer.passedMs(breakDelay.getValue() + 20)) {

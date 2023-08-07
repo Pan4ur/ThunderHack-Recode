@@ -28,14 +28,10 @@ public class Strafe extends Module {
     private final Setting<Float> velReduction = new Setting<>("Reduction", 6.0f, 0.1f, 10f, v -> boost.getValue() == Boost.Damage);
     private final Setting<Float> maxVelocitySpeed = new Setting<>("MaxVelocity", 0.8f, 0.1f, 2f, v -> boost.getValue() == Boost.Damage);
 
-    private float waterTicks = 0;
-    public static double oldSpeed, contextFriction;
-    public static boolean needSwap, needSprintState;
-    public static int noSlowTicks;
-    public static float jumpTicks = 0;
-
-    private final Timer elytraDelay = new Timer();
-    private final Timer startDelay = new Timer();
+    public static double oldSpeed, contextFriction, fovval;
+    public static boolean needSwap, needSprintState,disabled;
+    public static int noSlowTicks,waterTicks,jumpTicks;
+    static long disableTime;
 
     public Strafe() {
         super("Strafe", "testMove", Category.MOVEMENT);
@@ -120,10 +116,18 @@ public class Strafe extends Module {
         disabled = true;
     }
 
+
+
     @Override
     public void onEnable() {
         oldSpeed = 0.0;
-        startDelay.reset();
+        fovval = mc.options.getFovEffectScale().getValue();
+        mc.options.getFovEffectScale().setValue(0d);
+    }
+
+    @Override
+    public void onDisable(){
+        mc.options.getFovEffectScale().setValue(fovval);
     }
 
     public boolean canStrafe() {
@@ -148,9 +152,6 @@ public class Strafe extends Module {
     public Box getBoundingBox() {
         return new Box(mc.player.getX() - 0.1, mc.player.getY(), mc.player.getZ() - 0.1, mc.player.getX() + 0.1, mc.player.getY() + 1, mc.player.getZ() + 0.1);
     }
-
-    static long disableTime;
-    static boolean disabled;
 
     @Subscribe
     public void onMove(EventMove event) {

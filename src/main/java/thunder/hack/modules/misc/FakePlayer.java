@@ -22,15 +22,6 @@ public class FakePlayer extends Module {
     OtherClientPlayerEntity fakePlayer;
 
     @Override
-    public void onUpdate(){
-        if(mc.player.age % 12 == 0 && fakePlayer != null) {
-          //  new EntityStatusS2CPacket((Entity) fakePlayer, (byte) 35).apply(mc.getNetworkHandler());
-            Thunderhack.EVENT_BUS.post(new TotemPopEvent(fakePlayer,0));
-        }
-    }
-
-
-    @Override
     public void onEnable() {
         fakePlayer = new OtherClientPlayerEntity(mc.world, new GameProfile(UUID.fromString("66123666-6666-6666-6666-666666666600"), "Hell_Raider"));
         fakePlayer.copyPositionAndRotation(mc.player);
