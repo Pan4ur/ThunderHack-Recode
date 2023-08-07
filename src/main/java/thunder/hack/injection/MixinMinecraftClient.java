@@ -21,19 +21,19 @@ public class MixinMinecraftClient {
     @Inject(method = "<init>", at = @At("TAIL"))
     void postWindowInit(RunArgs args, CallbackInfo ci) {
         try {
-            FontRenderers.settings = FontRenderers.createDefault(12f,"comfortaa");
-            FontRenderers.modules = FontRenderers.createDefault(15f,"comfortaa");
-            FontRenderers.categories = FontRenderers.createDefault(18f,"comfortaa");
-            FontRenderers.thglitch = FontRenderers.createDefault(36f,"glitched");
-            FontRenderers.monsterrat = FontRenderers.createDefault(18f,"monsterrat");
-            FontRenderers.sf_bold = FontRenderers.createDefault(16f,"sf_bold");
-            FontRenderers.sf_medium = FontRenderers.createDefault(16f,"sf_medium");
-            FontRenderers.sf_medium_mini = FontRenderers.createDefault(12f,"sf_medium");
-            FontRenderers.sf_bold_mini = FontRenderers.createDefault(14f,"sf_bold");
+            FontRenderers.settings = FontRenderers.createDefault(12f, "comfortaa");
+            FontRenderers.modules = FontRenderers.createDefault(15f, "comfortaa");
+            FontRenderers.categories = FontRenderers.createDefault(18f, "comfortaa");
+            FontRenderers.thglitch = FontRenderers.createDefault(36f, "glitched");
+            FontRenderers.monsterrat = FontRenderers.createDefault(18f, "monsterrat");
+            FontRenderers.sf_bold = FontRenderers.createDefault(16f, "sf_bold");
+            FontRenderers.sf_medium = FontRenderers.createDefault(16f, "sf_medium");
+            FontRenderers.sf_medium_mini = FontRenderers.createDefault(12f, "sf_medium");
+            FontRenderers.sf_bold_mini = FontRenderers.createDefault(14f, "sf_bold");
             FontRenderers.icons = FontRenderers.createIcons(20);
             FontRenderers.mid_icons = FontRenderers.createIcons(46f);
             FontRenderers.big_icons = FontRenderers.createIcons(72f);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -41,12 +41,12 @@ public class MixinMinecraftClient {
 
     @Inject(method = "tick", at = @At("HEAD"))
     void preTickHook(CallbackInfo ci) {
-        if(!Module.fullNullCheck())Thunderhack.EVENT_BUS.post(new EventTick());
+        if (!Module.fullNullCheck()) Thunderhack.EVENT_BUS.post(new EventTick());
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
     void postTickHook(CallbackInfo ci) {
-        if(!Module.fullNullCheck())Thunderhack.EVENT_BUS.post(new EventPostTick());
+        if (!Module.fullNullCheck()) Thunderhack.EVENT_BUS.post(new EventPostTick());
     }
 
 

@@ -120,7 +120,7 @@ public class Blocker extends Module {
     @Subscribe
     public void onPacketReceive(PacketEvent.Receive e) {
         if (fullNullCheck()) return;
-        if (e.getPacket() instanceof BlockBreakingProgressS2CPacket && HoleESP.validObi(BlockPos.ofFloored(mc.player.getPos()))) {
+        if (e.getPacket() instanceof BlockBreakingProgressS2CPacket && HoleESP.validIndestructible(BlockPos.ofFloored(mc.player.getPos()))) {
             BlockBreakingProgressS2CPacket packet = e.getPacket();
             BlockPos pos = packet.getPos();
 

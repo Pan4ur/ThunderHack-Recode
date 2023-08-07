@@ -24,11 +24,12 @@ public class CfgArgumentType implements ArgumentType<String> {
 
     @Override
     public String parse(StringReader reader) throws CommandSyntaxException {
-        if (reader.readString() == null) throw new DynamicCommandExceptionType(
-                name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Модуля " + name.toString() + " не существует(" : "Module " + name.toString() + " does not exists(")
-        ).create(reader.readString());
+        String config = reader.readString();
+        if (!Thunderhack.configManager.getConfigList().contains(config)) throw new DynamicCommandExceptionType(
+                name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Конфига " + name.toString() + " не существует(" : "Config " + name.toString() + " does not exists(")
+        ).create(config);
 
-        return reader.readString();
+        return config;
     }
 
     @Override

@@ -22,15 +22,15 @@ public class HoleAnchor extends Module {
     public void onPlayerUpdate(PlayerUpdateEvent e) {
         if (mc.player.getPitch() > pitch.getValue()) {
             if (
-                    HoleESP.validObi( BlockPos.ofFloored(mc.player.getPos()).down(1))
-                    || HoleESP.validObi( BlockPos.ofFloored(mc.player.getPos()).down(2))
-                    || HoleESP.validObi( BlockPos.ofFloored(mc.player.getPos()).down(3))
-                    || HoleESP.validTwoBlockObiXZ( BlockPos.ofFloored(mc.player.getPos()).down(1))
-                    || HoleESP.validTwoBlockObiXZ( BlockPos.ofFloored(mc.player.getPos()).down(2))
-                    || HoleESP.validTwoBlockObiXZ( BlockPos.ofFloored(mc.player.getPos()).down(3))
-                    || HoleESP.validTwoBlockObiXZ1( BlockPos.ofFloored(mc.player.getPos()).down(1))
-                    || HoleESP.validTwoBlockObiXZ1( BlockPos.ofFloored(mc.player.getPos()).down(2))
-                    || HoleESP.validTwoBlockObiXZ1( BlockPos.ofFloored(mc.player.getPos()).down(3))
+                    HoleESP.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(1))
+                    || HoleESP.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(2))
+                    || HoleESP.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(3))
+                    || HoleESP.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(1))
+                    || HoleESP.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(2))
+                    || HoleESP.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(3))
+                    || HoleESP.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(1))
+                    || HoleESP.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(2))
+                    || HoleESP.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(3))
             ) {
                 if (!pull.getValue()) {
                     mc.player.setVelocity(0,mc.player.getVelocity().getY(),0);

@@ -39,10 +39,10 @@ public class PopChams extends Module {
 
     public final CopyOnWriteArrayList<Person> popList = new CopyOnWriteArrayList<>();
     public static Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
-    public  Setting<Integer> aSpeed = new Setting("AlphaSpeed", 5, 1, 100);
+    public Setting<Integer> aSpeed = new Setting("AlphaSpeed", 5, 1, 100);
 
 
-    public static void renderEntity(MatrixStack matrices, LivingEntity entity, BipedEntityModel<PlayerEntity> modelBase,int alpha) {
+    public static void renderEntity(MatrixStack matrices, LivingEntity entity, BipedEntityModel<PlayerEntity> modelBase, int alpha) {
         double x = entity.getX() - mc.getEntityRenderDispatcher().camera.getPos().getX();
         double y = entity.getY() - mc.getEntityRenderDispatcher().camera.getPos().getY();
         double z = entity.getZ() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
@@ -60,7 +60,7 @@ public class PopChams extends Module {
         RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        modelBase.render(matrices,buffer,10, 0, color.getValue().getRed() / 255f, color.getValue().getGreen() / 255f, color.getValue().getBlue() / 255f, alpha / 255f);
+        modelBase.render(matrices, buffer, 10, 0, color.getValue().getRed() / 255f, color.getValue().getGreen() / 255f, color.getValue().getBlue() / 255f, alpha / 255f);
         tessellator.draw();
         RenderSystem.disableBlend();
         matrices.pop();
@@ -74,8 +74,8 @@ public class PopChams extends Module {
 
     @Subscribe
     public void onTotemPop(TotemPopEvent e) {
-        if(e.getEntity().equals(mc.player)) return;
-        PlayerEntity entity = new PlayerEntity(mc.world, BlockPos.ORIGIN,e.getEntity().bodyYaw, new GameProfile(e.getEntity().getUuid(), e.getEntity().getName().getString())) {
+        if (e.getEntity().equals(mc.player)) return;
+        PlayerEntity entity = new PlayerEntity(mc.world, BlockPos.ORIGIN, e.getEntity().bodyYaw, new GameProfile(e.getEntity().getUuid(), e.getEntity().getName().getString())) {
             @Override
             public boolean isSpectator() {
                 return false;
@@ -110,7 +110,7 @@ public class PopChams extends Module {
             person.modelPlayer.rightSleeve.visible = false;
             person.modelPlayer.jacket.visible = false;
             person.modelPlayer.hat.visible = false;
-            renderEntity(e.getMatrixStack(),person.player, person.modelPlayer,person.getAlpha());
+            renderEntity(e.getMatrixStack(), person.player, person.modelPlayer, person.getAlpha());
         });
         RenderSystem.disableBlend();
         RenderSystem.depthMask(true);
@@ -118,10 +118,8 @@ public class PopChams extends Module {
 
 
     @Override
-    public void onUpdate(){
-        popList.forEach(person -> {
-            person.update(popList);
-        });
+    public void onUpdate() {
+        popList.forEach(person -> person.update(popList));
     }
 
 
@@ -130,8 +128,8 @@ public class PopChams extends Module {
         private final PlayerEntityModel modelPlayer;
         private int alpha;
 
-        public int getAlpha(){
-            return MathUtil.clamp(alpha,0,255);
+        public int getAlpha() {
+            return MathUtil.clamp(alpha, 0, 255);
         }
 
         public Person(PlayerEntity player) {

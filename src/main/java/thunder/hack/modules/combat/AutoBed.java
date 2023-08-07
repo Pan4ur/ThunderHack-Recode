@@ -38,19 +38,19 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AutoBed extends Module {
-    private Setting<Boolean> rotate = new Setting<>("Rotate", false);
-    private Setting<Boolean> airPlace = new Setting<>("AirPlace", false);
-    private Setting<Boolean> strictDirection = new Setting<>("StrictDirection", false);
-    private Setting<Float> breakRange = new Setting<>("BreakRange", 6f, 2f, 6f);
-    private Setting<Float> placeRange = new Setting<>("PlaceRange", 5f, 2f, 6f);
-    private Setting<Integer> breakDelay = new Setting<>("BreakDelay", 0, 0, 1000);
-    private Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 0, 0, 1000);
-    private Setting<Boolean> autoSwitch = new Setting<>("Swap", true);
-    private Setting<Boolean> autoMove = new Setting<>("AutoMove", true);
-    private Setting<Boolean> render = new Setting<>("Render", true);
+    private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
+    private final Setting<Boolean> airPlace = new Setting<>("AirPlace", false);
+    private final Setting<Boolean> strictDirection = new Setting<>("StrictDirection", false);
+    private final Setting<Float> breakRange = new Setting<>("BreakRange", 6f, 2f, 6f);
+    private final Setting<Float> placeRange = new Setting<>("PlaceRange", 5f, 2f, 6f);
+    private final Setting<Integer> breakDelay = new Setting<>("BreakDelay", 0, 0, 1000);
+    private final Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 0, 0, 1000);
+    private final Setting<Boolean> autoSwitch = new Setting<>("Swap", true);
+    private final Setting<Boolean> autoMove = new Setting<>("AutoMove", true);
+    private final Setting<Boolean> render = new Setting<>("Render", true);
 
-    private Timer hitTimer = new Timer();
-    private Timer placeTimer = new Timer();
+    private final Timer hitTimer = new Timer();
+    private final Timer placeTimer = new Timer();
     private final Timer angleInactivityTimer = new Timer();
     private static boolean isSpoofingAngles;
     private static float rotationYaw, rotationPitch;
