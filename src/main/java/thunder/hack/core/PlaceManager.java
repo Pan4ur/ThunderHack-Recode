@@ -1,7 +1,6 @@
 package thunder.hack.core;
 
 import com.google.common.eventbus.Subscribe;
-import net.minecraft.item.Items;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.injection.accesors.IClientPlayerEntity;

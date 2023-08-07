@@ -8,9 +8,7 @@ import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventStopUsingItem;
-import thunder.hack.modules.player.NoInteract;
 import thunder.hack.modules.player.Reach;
-import thunder.hack.modules.player.SpeedMine;
 import net.minecraft.block.*;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -24,8 +22,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
 

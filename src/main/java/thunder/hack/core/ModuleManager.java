@@ -63,6 +63,7 @@ public class ModuleManager {
     public static Animations animations;
     public static AutoMend autoMend;
     public static PotionHud potionHud;
+    public static AutoCrystal autoCrystal;
 
     public ModuleManager() {
         tracker = new Tracker();
@@ -101,6 +102,7 @@ public class ModuleManager {
         animations = new Animations();
         autoMend = new AutoMend();
         potionHud = new PotionHud();
+        autoCrystal = new AutoCrystal();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -130,7 +132,7 @@ public class ModuleManager {
         modules.add(new NoJumpDelay());
         modules.add(new BowSpam());
         modules.add(freeCam);
-        modules.add(new AutoCrystal());
+        modules.add(autoCrystal);
         modules.add(new FakePlayer());
         modules.add(new ModuleList());
         modules.add(nameTags);
@@ -257,7 +259,6 @@ public class ModuleManager {
         modules.add(new ESP());
         modules.add(new ElytraFix());
         modules.add(new AirPlace());
-
     }
 
     public Module get(String name) {

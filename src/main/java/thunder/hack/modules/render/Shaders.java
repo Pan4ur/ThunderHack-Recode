@@ -7,6 +7,7 @@ import thunder.hack.Thunderhack;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.utility.render.shaders.ShaderManager;
 
 public class Shaders extends Module {
 
@@ -72,5 +73,10 @@ public class Shaders extends Module {
             case AMBIENT -> ambients.getValue();
             default -> others.getValue();
         };
+    }
+
+    @Override
+    public void onDisable(){
+        ShaderManager.reload();
     }
 }

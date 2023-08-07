@@ -2,6 +2,7 @@ package thunder.hack.modules.movement;
 
 
 import com.google.common.eventbus.Subscribe;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.packet.s2c.play.PlayPingS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.MathHelper;
@@ -12,6 +13,7 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.PostPlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.math.MathUtil;
 import thunder.hack.utility.player.MovementUtil;
 
@@ -22,6 +24,7 @@ public class Timer extends Module {
     public Setting<Float> shiftTicks = new Setting("ShiftTicks", 10.0F, 1F, 40f, v -> mode.getValue() == Mode.TICKSHIFT);
     public static Setting<Float> addOnTheMove = new Setting("addOnTheMove", 0.0f, 0.0f, 1.0f, v -> mode.getValue() == Mode.SMART);
     public static Setting<Float> decreaseRate = new Setting("decreaseRate", 1.0f, 0.5f, 3.0f, v -> mode.getValue() == Mode.SMART);
+    public Setting<Bind> boostKey = new Setting<>("BoostKey", new Bind(-1,false,false), v -> mode.getValue() == Mode.GrimFunnyGame);
 
     private long cancelTime;
     private PlayPingS2CPacket pingPacket;
@@ -51,7 +54,7 @@ public class Timer extends Module {
         } else if (mode.getValue() == Mode.NORMAL) {
             Thunderhack.TICK_TIMER = speed.getValue();
         } else {
-            if(!MovementUtil.isMoving() || violation > 39f) {
+            if(!MovementUtil.isMoving() || violation > 39f || !InputUtil.isKeyPressed(mc.getWindow().getHandle(),boostKey.getValue().getKey())) {
                 Thunderhack.TICK_TIMER = 1f;
                 return;
             }
@@ -102,7 +105,6 @@ public class Timer extends Module {
                 pingPacket = e.getPacket();
                 violation -= 0.8f;
                 violation = MathHelper.clamp(violation, 0.0f, 100f / speed.getValue());
-                Command.sendMessage("ping");
                 e.cancel();
             }
             if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {

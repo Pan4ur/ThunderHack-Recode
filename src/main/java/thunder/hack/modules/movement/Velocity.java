@@ -23,6 +23,7 @@ public class Velocity extends Module {
     public Setting<Float> horizontal = new Setting<>("Horizontal", 0.0f, 0.0f, 100.0f, v -> mode.getValue() == modeEn.Custom);
     public Setting<Float> vertical = new Setting<>("Vertical", 0.0f, 0.0f, 100.0f, v -> mode.getValue() == modeEn.Custom);
     private boolean flag;
+    private int grimTicks = 0;
 
 
     public Velocity() {
@@ -67,6 +68,20 @@ public class Velocity extends Module {
                 ((IExplosionS2CPacket)velocity_).setMotionX(0);
                 ((IExplosionS2CPacket)velocity_).setMotionY(0);
                 ((IExplosionS2CPacket)velocity_).setMotionZ(0);
+            }
+        }
+
+        if(mode.getValue() == modeEn.OldGrim){
+            if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket ) {
+                EntityVelocityUpdateS2CPacket  var4 = event.getPacket();
+                if (var4.getId() == mc.player.getId()) {
+                    event.cancel();
+                    grimTicks = 6;
+                }
+            }
+            if (event.getPacket() instanceof PlayPingS2CPacket && grimTicks > 0) {
+                event.cancel();
+                grimTicks--;
             }
         }
 
@@ -118,6 +133,14 @@ public class Velocity extends Module {
                 mc.player.setSprinting(mc.player.age % 2 != 0);
             }
         }
+        if (grimTicks > 0) {
+            grimTicks--;
+        }
+    }
+
+    @Override
+    public void onEnable() {
+        grimTicks = 0;
     }
 
     @Subscribe
@@ -130,6 +153,6 @@ public class Velocity extends Module {
     }
 
     public enum modeEn {
-        Matrix, Cancel, Sunrise, Custom, Redirect
+        Matrix, Cancel, Sunrise, Custom, Redirect, OldGrim
     }
 }
