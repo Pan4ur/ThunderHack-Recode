@@ -150,12 +150,14 @@ public class Aura extends Module {
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, axe_slot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
                     mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                     mc.interactionManager.attackEntity(mc.player, target);
+                    mc.interactionManager.attackEntity(mc.player, target);
                     mc.player.swingHand(Hand.MAIN_HAND);
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, axe_slot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
                     mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                     notifySBreaker();
                 } else if (hotbar_axe_slot != -1) {
                     mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(hotbar_axe_slot));
+                    mc.interactionManager.attackEntity(mc.player, target);
                     mc.interactionManager.attackEntity(mc.player, target);
                     mc.player.swingHand(Hand.MAIN_HAND);
                     mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
@@ -170,7 +172,7 @@ public class Aura extends Module {
                 mc.interactionManager.attackEntity(mc.player, target);
                 Criticals.cancelCrit = false;
                 mc.player.swingHand(Hand.MAIN_HAND);
-                hitTicks = oldDelay.getValue() ? 1 + (int) (20f / MathUtil.random(minCPS.getValue(), maxCPS.getValue())) : 11;
+                hitTicks = oldDelay.getValue() ? 2 + (int) (20f / MathUtil.random(minCPS.getValue(), maxCPS.getValue())) : 11;
             }
 
             if (sprint)
