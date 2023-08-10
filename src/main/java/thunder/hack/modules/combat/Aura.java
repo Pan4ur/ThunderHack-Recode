@@ -136,7 +136,7 @@ public class Aura extends Module {
 
             boolean blocking = mc.player.isUsingItem() && mc.player.getActiveItem().getItem().getUseAction(mc.player.getActiveItem()) == BLOCK;
             if (blocking)
-                mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, mc.player.getHorizontalFacing()));
+                mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
 
             int axe_slot = InventoryUtil.getBestAxe();
             int hotbar_axe_slot = InventoryUtil.findItem(AxeItem.class);
@@ -172,7 +172,7 @@ public class Aura extends Module {
                 mc.interactionManager.attackEntity(mc.player, target);
                 Criticals.cancelCrit = false;
                 mc.player.swingHand(Hand.MAIN_HAND);
-                hitTicks = oldDelay.getValue() ? 2 + (int) (20f / MathUtil.random(minCPS.getValue(), maxCPS.getValue())) : 11;
+                hitTicks = oldDelay.getValue() ? 1 + (int) (20f / MathUtil.random(minCPS.getValue(), maxCPS.getValue())) : 11;
             }
 
             if (sprint)
