@@ -282,35 +282,35 @@ public class ClickUI extends Screen {
                 }
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 20, 180, 20)) {
                     hstep = 5;
-                    AsyncManager.run(() -> setup = true, 3000);
+                    Thunderhack.asyncManager.run(() -> setup = true, 3000);
                 }
             } else if (hstep == 2) {
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 20, 180, 20)) {
                     // strict
                     Thunderhack.configManager.loadDefault("strict");
                     hstep = 3;
-                    AsyncManager.run(() -> setup = true, 3000);
+                    Thunderhack.asyncManager.run(() -> setup = true, 3000);
                 }
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 50, 180, 20)) {
                     //cc
                     Thunderhack.configManager.loadDefault("cc");
                     hstep = 3;
-                    AsyncManager.run(() -> setup = true, 3000);
+                    Thunderhack.asyncManager.run(() -> setup = true, 3000);
                 }
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy + 10, 180, 20)) {
                     // fg
                     Thunderhack.configManager.loadDefault("fg");
                     hstep = 3;
-                    AsyncManager.run(() -> setup = true, 3000);
+                    Thunderhack.asyncManager.run(() -> setup = true, 3000);
                 }
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy + 40, 180, 20)) {
                     // grim
                     Thunderhack.configManager.loadDefault("grim");
                     hstep = 3;
-                    AsyncManager.run(() -> setup = true, 3000);
+                    Thunderhack.asyncManager.run(() -> setup = true, 3000);
                 }
             }
             return false;

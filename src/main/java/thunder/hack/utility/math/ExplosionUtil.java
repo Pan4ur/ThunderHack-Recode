@@ -108,7 +108,7 @@ public class ExplosionUtil {
 
         double maxDist = 12;
         if (!new Box(MathHelper.floor(explosionPos.x - maxDist - 1.0), MathHelper.floor(explosionPos.y - maxDist - 1.0), MathHelper.floor(explosionPos.z - maxDist - 1.0), MathHelper.floor(explosionPos.x + maxDist + 1.0), MathHelper.floor(explosionPos.y + maxDist + 1.0), MathHelper.floor(explosionPos.z + maxDist + 1.0)).intersects(target.getBoundingBox())) {
-           // return 0f;
+            return 0f;
         }
 
         if (!target.isImmuneToExplosion() && !target.isInvulnerable()) {

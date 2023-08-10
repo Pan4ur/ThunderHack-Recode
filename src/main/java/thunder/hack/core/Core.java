@@ -66,22 +66,19 @@ public class Core {
         if (e.getPacket() instanceof PlayerMoveC2SPacket.PositionAndOnGround || e.getPacket() instanceof PlayerMoveC2SPacket.Full || e.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround) {
             lastPacket.reset();
         }
-        if (e.getPacket() instanceof ClientCommandC2SPacket) {
-            ClientCommandC2SPacket ent = e.getPacket();
-            if (ent.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING) {
-                if (lock_sprint) {
-                    e.setCancelled(true);
-                    return;
-                }
+
+        if (e.getPacket() instanceof ClientCommandC2SPacket command) {
+
+            if (lock_sprint) {
+                e.setCancelled(true);
+                return;
+            }
+
+            if (command.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING)
                 serversprint = true;
-            }
-            if (ent.getMode() == ClientCommandC2SPacket.Mode.STOP_SPRINTING) {
-                if (lock_sprint) {
-                    e.setCancelled(true);
-                    return;
-                }
+
+            if (command.getMode() == ClientCommandC2SPacket.Mode.STOP_SPRINTING)
                 serversprint = false;
-            }
         }
     }
 

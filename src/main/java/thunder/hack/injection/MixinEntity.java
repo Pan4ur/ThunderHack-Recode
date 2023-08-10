@@ -1,9 +1,17 @@
 package thunder.hack.injection;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.World;
+import net.minecraft.world.border.WorldBorder;
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -11,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.PushEvent;
 import thunder.hack.modules.combat.HitBox;
@@ -32,9 +41,6 @@ import static thunder.hack.modules.Module.mc;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity implements IEntity {
-
-
-    @Shadow protected abstract void fall(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition);
 
     @Shadow private Box boundingBox;
 
@@ -72,8 +78,6 @@ public abstract class MixinEntity implements IEntity {
                 changeLookDirectionCustom(cursorDeltaX,cursorDeltaY);
             }
     }
-
-
 
     @Inject(method = {"getBoundingBox"}, at = {@At("HEAD")}, cancellable = true)
     public final void getBoundingBox(CallbackInfoReturnable<Box> cir) {

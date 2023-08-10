@@ -79,7 +79,7 @@ public class AsyncManager {
         }
     }
 
-    public static void run(Runnable runnable, long delay) {
+    public void run(Runnable runnable, long delay) {
         executor.execute(() -> {
             try {
                 Thread.sleep(delay);

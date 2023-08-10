@@ -1,7 +1,6 @@
 package thunder.hack.injection;
 import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
@@ -10,7 +9,6 @@ import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.modules.client.Media;
 import thunder.hack.modules.movement.AutoSprint;
-import thunder.hack.modules.player.FreeCam;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;

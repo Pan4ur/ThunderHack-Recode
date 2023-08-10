@@ -5,35 +5,32 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 public class OFCapesUtil {
-    // author:
-    //dragonostic
-    ///
-    //of-capes
+    /* author:
+        @dragonostic
+        of-capes
+     */
 
     public interface ReturnCapeTexture {
         void response(Identifier id);
     }
 
     public static void loadPlayerCape(GameProfile player, ReturnCapeTexture response) {
-
-            try {
-                String uuid = player.getId().toString();
-                NativeImageBackedTexture nIBT = getCapeFromURL(String.format("http://s.optifine.net/capes/%s.png", player.getName()));
-                Identifier capeTexture = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("th-cape-" + uuid, nIBT);
-                response.response(capeTexture);
-            } catch (Exception ignored) {
-            }
+        try {
+            String uuid = player.getId().toString();
+            NativeImageBackedTexture nIBT = getCapeFromURL(String.format("http://s.optifine.net/capes/%s.png", player.getName()));
+            Identifier capeTexture = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("th-cape-" + uuid, nIBT);
+            response.response(capeTexture);
+        } catch (Exception ignored) {
+        }
 
     }
+
 
     public static NativeImageBackedTexture getCapeFromURL(String capeStringURL) {
         try {
