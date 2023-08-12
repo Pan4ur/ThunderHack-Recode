@@ -11,8 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import thunder.hack.core.ModuleManager;
-import thunder.hack.utility.math.ExplosionUtil;
+import thunder.hack.utility.math.ExplosionUtility;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -23,12 +22,12 @@ public abstract class MixinWorld {
 
     @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)
     public void blockStat(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
-        if (ExplosionUtil.terrainIgnore && mc.world != null && !mc.world.isInBuildLimit(pos)) {
+        if (ExplosionUtility.terrainIgnore && mc.world != null && !mc.world.isInBuildLimit(pos)) {
             WorldChunk worldChunk = mc.world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
 
             BlockState tempState = worldChunk.getBlockState(pos);
 
-            if((ExplosionUtil.anchorIgnore != null && ExplosionUtil.anchorIgnore == pos)){
+            if((ExplosionUtility.anchorIgnore != null && ExplosionUtility.anchorIgnore == pos)){
                 cir.setReturnValue(Blocks.AIR.getDefaultState());
                 return;
             }

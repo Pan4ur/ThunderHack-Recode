@@ -29,7 +29,7 @@ import thunder.hack.modules.render.StorageEsp;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.ExplosionUtil;
+import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
@@ -188,7 +188,7 @@ public class AutoBed extends Module {
 
     private void checkTarget(BlockPos pos, boolean firstCheck) {
         if (mc.world.getBlockState(pos).getBlock() instanceof BedBlock) return;
-        if (ExplosionUtil.getSelfExplosionDamage(new Vec3d(pos.getX() + 0.5D, pos.getY() + 1D, pos.getZ() + 0.5D)) > mc.player.getHealth() + mc.player.getAbsorptionAmount() + 0.5) {
+        if (ExplosionUtility.getSelfExplosionDamage(new Vec3d(pos.getX() + 0.5D, pos.getY() + 1D, pos.getZ() + 0.5D)) > mc.player.getHealth() + mc.player.getAbsorptionAmount() + 0.5) {
             if (firstCheck && airPlace.getValue()) {
                 checkTarget(pos.up(), false);
             }
@@ -241,7 +241,7 @@ public class AutoBed extends Module {
 
 
     private boolean suicideCheck(BlockPos pos) {
-        return (mc.player.getHealth() + mc.player.getAbsorptionAmount() - ExplosionUtil.getSelfExplosionDamage(new Vec3d(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5)) > 0.5);
+        return (mc.player.getHealth() + mc.player.getAbsorptionAmount() - ExplosionUtility.getSelfExplosionDamage(new Vec3d(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5)) > 0.5);
     }
 
     public float[] calcBedBreakAngle(BlockPos bp){

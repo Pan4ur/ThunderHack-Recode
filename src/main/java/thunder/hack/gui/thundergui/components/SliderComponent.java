@@ -4,7 +4,7 @@ package thunder.hack.gui.thundergui.components;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui2;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
@@ -63,7 +63,7 @@ public class SliderComponent extends SettingElement {
 
         if (!listening) {
             if (setting.getValue() instanceof Float)
-                FontRenderers.modules.drawString(stack,String.valueOf(MathUtil.round((Float) setting.getValue(), 2)), (float) (x + 156), (float) (y + height - 9), new Color(0xBAFFFFFF, true).getRGB(), false);
+                FontRenderers.modules.drawString(stack,String.valueOf(MathUtility.round((Float) setting.getValue(), 2)), (float) (x + 156), (float) (y + height - 9), new Color(0xBAFFFFFF, true).getRGB(), false);
             if (setting.getValue() instanceof Integer)
                 FontRenderers.modules.drawString(stack,String.valueOf(setting.getValue()), (float) (x + 156), (float) (y + height - 9), new Color(0xBAFFFFFF, true).getRGB(), false);
         } else {
@@ -74,7 +74,7 @@ public class SliderComponent extends SettingElement {
             }
         }
 
-        animation = MathUtil.clamp(animation, 0, 1);
+        animation = MathUtility.clamp(animation, 0, 1);
 
         if (dragging)
             setValue(mouseX, x + 54, (90));

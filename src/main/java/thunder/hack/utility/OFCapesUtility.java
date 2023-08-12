@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-public class OFCapesUtil {
+public final class OFCapesUtility {
     /* author:
         @dragonostic
         of-capes

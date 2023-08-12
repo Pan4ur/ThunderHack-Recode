@@ -1,5 +1,6 @@
 package thunder.hack.modules.combat;
 
+
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
@@ -8,8 +9,11 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
@@ -21,6 +25,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -33,24 +38,36 @@ public class HoleFill extends Module {
         super("HoleFill", Category.COMBAT);
     }
 
-    private Setting<Boolean> rotate = new Setting<>("Rotate", true);
-    private  Setting<Boolean> strictDirection = new Setting<>("StrictDirection", false);
-    private  Setting<Float> placeRange = new Setting<>("Range", 5f, 1f, 6f);
-    private  Setting<Integer> actionShift = new Setting<>("ActionShift", 1, 1, 3);
-    private  Setting<Integer> actionInterval = new Setting<>("ActionInterval", 0, 0, 5);
-    private  Setting<Boolean> jumpDisable = new Setting<>("JumpDisable", false);
-    private  Setting<Boolean> onlyWebs = new Setting<>("OnlyWebs", false);
-    private  Setting<Mode> mode = new Setting<>("Mode", Mode.Always);
-    private  Setting<Float> rangeToTarget = new Setting<>("RangeToTarget", 2f, 1f, 5f,v-> mode.getValue() == Mode.Target);
-    private  Setting<Boolean> autoDisable = new Setting<>("AutoDisable", false);
+    private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
+    private final Setting<Boolean> strictDirection = new Setting<>("StrictDirection", false);
+    private final Setting<Float> placeRange = new Setting<>("Range", 5f, 1f, 6f);
+    private final Setting<Integer> actionShift = new Setting<>("ActionShift", 1, 1, 3);
+    private final Setting<Integer> actionInterval = new Setting<>("ActionInterval", 0, 0, 5);
+    private final Setting<Boolean> jumpDisable = new Setting<>("JumpDisable", false);
+    private final Setting<Boolean> onlyWebs = new Setting<>("OnlyWebs", false);
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Always);
+    private final Setting<Float> rangeToTarget = new Setting<>("RangeToTarget", 2f, 1f, 5f, v -> mode.getValue() == Mode.Target);
+    private final Setting<Boolean> autoDisable = new Setting<>("AutoDisable", false);
+
+    private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
+    private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Fade).withParent(renderCategory);
+    private final Setting<ColorSetting> renderFillColor = new Setting<>("Render Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
+    private final Setting<ColorSetting> renderLineColor = new Setting<>("Render Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
+    private final Setting<Integer> renderLineWidth = new Setting<>("Render Line Width", 2, 1, 5).withParent(renderCategory);
 
     public static Timer inactivityTimer = new Timer();
 
     private enum Mode {
-        Always, Target
+        Always,
+        Target
     }
-    
-    private Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
+
+    private enum RenderMode {
+        Fade,
+        Decrease
+    }
+
+    private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
 
     private int tickCounter = 0;
 
@@ -60,7 +77,19 @@ public class HoleFill extends Module {
             if (System.currentTimeMillis() - time > 500) {
                 renderPoses.remove(pos);
             } else {
-                Render3DEngine.drawBoxOutline(new Box(pos), HudEditor.getColor(0), 2);
+                switch (renderMode.getValue()) {
+                    case Fade -> {
+                        Render3DEngine.drawFilledBox(event.getMatrixStack(), new Box(pos), Render2DEngine.injectAlpha(renderFillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
+                        Render3DEngine.drawBoxOutline(new Box(pos), Render2DEngine.injectAlpha(renderLineColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))), renderLineWidth.getValue());
+                    }
+                    case Decrease -> {
+                        float scale = 1 - (float) (System.currentTimeMillis() - time) / 500;
+                        Box box = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
+
+                        Render3DEngine.drawFilledBox(event.getMatrixStack(), box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), Render2DEngine.injectAlpha(renderFillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
+                        Render3DEngine.drawBoxOutline(box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), renderLineColor.getValue().getColorObject(), renderLineWidth.getValue());
+                    }
+                }
             }
         });
     }
@@ -75,7 +104,7 @@ public class HoleFill extends Module {
 
         List<BlockPos> holes = findHoles();
 
-        PlayerEntity target = Thunderhack.combatManager.getTargets(placeRange.getValue()).stream().min(Comparator.comparing(e -> mc.player.squaredDistanceTo(e))).orElse(null);;
+        PlayerEntity target = Thunderhack.combatManager.getTargets(placeRange.getValue()).stream().min(Comparator.comparing(e -> mc.player.squaredDistanceTo(e))).orElse(null);
 
         if (mode.getValue() == Mode.Target && target == null) return;
 
@@ -83,7 +112,7 @@ public class HoleFill extends Module {
 
         while (blocksPlaced < actionShift.getValue()) {
             BlockPos pos;
-            if(mode.getValue() == Mode.Target){
+            if (mode.getValue() == Mode.Target) {
                 pos = StreamSupport.stream(holes.spliterator(), false)
                         .filter(this::isHole)
                         .filter(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5)) <= placeRange.getValue())
@@ -101,7 +130,7 @@ public class HoleFill extends Module {
             }
 
             if (pos != null) {
-                if (PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, slot,false)) {
+                if (PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, slot, false)) {
                     blocksPlaced++;
                     renderPoses.put(pos, System.currentTimeMillis());
                     PlaceUtility.ghostBlocks.put(pos, System.currentTimeMillis());
@@ -125,6 +154,7 @@ public class HoleFill extends Module {
         BlockPos centerPos = mc.player.getBlockPos();
         int r = (int) Math.ceil(placeRange.getValue()) + 1;
         int h = placeRange.getValue().intValue();
+
         for (int i = centerPos.getX() - r; i < centerPos.getX() + r; i++) {
             for (int j = centerPos.getY() - h; j < centerPos.getY() + h; j++) {
                 for (int k = centerPos.getZ() - r; k < centerPos.getZ() + r; k++) {

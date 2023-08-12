@@ -9,7 +9,7 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.Timer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -94,7 +94,7 @@ public class MiddleClick extends Module {
                         mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
                     }
                 } else {
-                    int epSlot = InventoryUtil.getItemSlot(Items.ENDER_PEARL);
+                    int epSlot = InventoryUtility.getItemSlot(Items.ENDER_PEARL);
                     if(epSlot != -1) {
                         mc.player.networkHandler.sendPacket( new PickFromInventoryC2SPacket(epSlot));
                         mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
@@ -109,7 +109,7 @@ public class MiddleClick extends Module {
                         new PearlThread(mc.player, epSlot, originalSlot,swapDelay.getValue(),false).start();
                     }
                 } else {
-                    int epSlot = InventoryUtil.getItemSlot(Items.ENDER_PEARL);
+                    int epSlot = InventoryUtility.getItemSlot(Items.ENDER_PEARL);
                     int currentItem = mc.player.getInventory().selectedSlot;
                     if(epSlot != -1) {
                         mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));

@@ -1,6 +1,5 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.OtherClientPlayerEntity;
@@ -38,9 +37,10 @@ import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
-import thunder.hack.utility.math.MathUtil;
-import thunder.hack.utility.player.InventoryUtil;
-import thunder.hack.utility.player.PlayerUtil;
+import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.PlayerUtility;
+
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.List;
@@ -146,8 +146,8 @@ public class Aura extends Module {
             if (blocking)
                 mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
 
-            int axe_slot = InventoryUtil.getBestAxe();
-            int hotbar_axe_slot = InventoryUtil.findItem(AxeItem.class);
+            int axe_slot = InventoryUtility.getAxe().slot();
+            int hotbar_axe_slot = InventoryUtility.findInHotBar(stack -> stack.getItem() instanceof AxeItem).slot();
 
             boolean sprint = Core.serversprint;
             if (sprint)
@@ -180,13 +180,13 @@ public class Aura extends Module {
                 mc.interactionManager.attackEntity(mc.player, target);
                 Criticals.cancelCrit = false;
                 mc.player.swingHand(Hand.MAIN_HAND);
-                hitTicks = oldDelay.getValue() ? 1 + (int) (20f / MathUtil.random(minCPS.getValue(), maxCPS.getValue())) : 11;
+                hitTicks = oldDelay.getValue() ? 1 + (int) (20f / MathUtility.random(minCPS.getValue(), maxCPS.getValue())) : 11;
             }
 
             if (sprint)
                 mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
             if (blocking)
-                mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtil.getWorldActionId(mc.world)));
+                mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
         }
         hitTicks--;
     }
@@ -292,10 +292,10 @@ public class Aura extends Module {
                     delta_yaw = delta_yaw - 180;
                 }
 
-                float deltaYaw = MathHelper.clamp(MathHelper.abs(delta_yaw), MathUtil.random(-75.0F, -85.0F), MathUtil.random(75.0F, 85.0F));
+                float deltaYaw = MathHelper.clamp(MathHelper.abs(delta_yaw), MathUtility.random(-75.0F, -85.0F), MathUtility.random(75.0F, 85.0F));
 
                 float newYaw = rotationYaw + (delta_yaw > 0 ? deltaYaw : -deltaYaw);
-                float pitch_speed = pitchAcceleration + MathUtil.random(-1f, 1f);
+                float pitch_speed = pitchAcceleration + MathUtility.random(-1f, 1f);
 
                 float newPitch = MathHelper.clamp(rotationPitch + (autoCrit() ? delta_pitch : MathHelper.clamp(delta_pitch, -pitch_speed, pitch_speed)), -90.0F, 90.0F);
 
@@ -337,6 +337,7 @@ public class Aura extends Module {
      */
 
     public Vec3d getLegitLook(Entity target) {
+
         // Задаем начальную скорость точки
         if (rotationMotion.equals(Vec3d.ZERO))
             rotationMotion = new Vec3d(MathUtil.random(-0.05f, 0.05f), MathUtil.random(-0.05f, 0.05f), MathUtil.random(-0.05f, 0.05f));
@@ -363,6 +364,7 @@ public class Aura extends Module {
         if (rotationPoint.x <= -(target.getBoundingBox().getXLength() - 0.05) / 2f) {
             rotationPoint = new Vec3d(MathUtil.random(0.003f, 0.03f), rotationPoint.getY(), rotationPoint.getZ());
         }
+
 
         // Сталкиваемся с хитбоксом по -Y
         if (rotationPoint.y <= 0.05) {

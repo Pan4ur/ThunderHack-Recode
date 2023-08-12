@@ -1,11 +1,12 @@
 package thunder.hack.modules.misc;
 
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
-import thunder.hack.core.AsyncManager;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.Timer;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.FishingRodItem;
@@ -17,10 +18,11 @@ public class AutoFish extends Module {
         super("AutoFish", "AutoFish", Category.MISC);
     }
 
-    public Setting<Boolean> rodSave = new Setting<>("RodSave", true);
-    public Setting<Boolean> changeRod = new Setting<>("ChangeRod", false);
-    public Setting<Boolean> autoSell = new Setting<>("AutoSell", false);
+    private final Setting<Boolean> rodSave = new Setting<>("RodSave", true);
+    private final Setting<Boolean> changeRod = new Setting<>("ChangeRod", false);
+    private final Setting<Boolean> autoSell = new Setting<>("AutoSell", false);
 
+    private boolean flag = false;
     private int rodSlot = -1;
     private final Timer timeout = new Timer();
 
@@ -31,7 +33,12 @@ public class AutoFish extends Module {
             toggle();
             return;
         }
-        rodSlot = InventoryUtil.findItem(FishingRodItem.class);
+        rodSlot = InventoryUtility.findInHotBar(stack -> stack.getItem() instanceof FishingRodItem).slot();
+    }
+
+    @Override
+    public void onDisable() {
+        flag = false;
     }
 
     @Override
@@ -41,9 +48,9 @@ public class AutoFish extends Module {
                 if (rodSave.getValue() && !changeRod.getValue()) {
                     Command.sendMessage("Saving rod...");
                     toggle();
-                } else if (changeRod.getValue() && InventoryUtil.getRodSlot() != -1) {
+                } else if (changeRod.getValue() && getRodSlot() != -1) {
                     Command.sendMessage("Swapped to a new rod");
-                    mc.player.getInventory().selectedSlot = (InventoryUtil.getRodSlot());
+                    mc.player.getInventory().selectedSlot = getRodSlot();
                 } else {
                     Command.sendMessage("Saving rod...");
                     toggle();
@@ -52,7 +59,7 @@ public class AutoFish extends Module {
         }
         if (timeout.passedMs(60000)) {
             if (rodSlot == -1)
-                rodSlot = InventoryUtil.findItem(FishingRodItem.class);
+                rodSlot = InventoryUtility.findInHotBar(stack -> stack.getItem() instanceof FishingRodItem).slot();
             if (rodSlot != -1) {
                 mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(rodSlot));
                 mc.player.getInventory().selectedSlot = rodSlot;
@@ -83,12 +90,14 @@ public class AutoFish extends Module {
         }
     }
 
+    private int getRodSlot() {
+        for (int i = 0; i < 9; i++) {
+            final ItemStack item = mc.player.getInventory().getStack(i);
+            if (item.getItem() == Items.FISHING_ROD && item.getDamage() < 52) {
+                return i;
+            }
+        }
 
-    boolean flag = false;
-
-    @Override
-    public void onDisable(){
-        flag = false;
+        return -1;
     }
-
 }

@@ -18,8 +18,9 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlaceUtility;
+import thunder.hack.utility.player.SearchInvResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,7 @@ public class AntiSurround extends Module {
 
     public static float[] getRotations(BlockPos blockPos) {
         Vec3d vec3d2 = blockPos.toCenterPos();
-        return calcAngle(vec3d2.add(new Vec3d(PlaceUtility.getBreakDirection(blockPos,true).getUnitVector()).multiply(0.5)));
+        return calcAngle(vec3d2.add(new Vec3d(PlaceUtility.getBreakDirection(blockPos, true).getUnitVector()).multiply(0.5)));
     }
 
     @Override
@@ -102,21 +103,22 @@ public class AntiSurround extends Module {
             }
 
             if (blockpos2 != null) {
-                if (switchbool.getValue() && (InventoryUtil.getPickaxe() != -1)) {
-                    mc.player.getInventory().selectedSlot = InventoryUtil.getPickaxe();
+                SearchInvResult pickaxeResult = InventoryUtility.getPickAxe();
+                if (switchbool.getValue()) {
+                    pickaxeResult.switchTo(InventoryUtility.SwitchMode.Normal);
                 }
 
-                if(rotate.getValue()) {
+                if (rotate.getValue()) {
                     float[] rotation = getRotations(blockpos2);
                     mc.player.setYaw(rotation[0]);
                     mc.player.setPitch(rotation[1]);
                 }
 
                 if (!requirepickaxe.getValue() || mc.player.getMainHandStack().getItem() instanceof PickaxeItem) {
-                    if(ModuleManager.speedMine.isEnabled() && SpeedMine.progress != 0){
+                    if (ModuleManager.speedMine.isEnabled() && SpeedMine.progress != 0) {
                         return;
                     }
-                    mc.interactionManager.attackBlock(blockpos2, PlaceUtility.getBreakDirection(blockpos2,true));
+                    mc.interactionManager.attackBlock(blockpos2, PlaceUtility.getBreakDirection(blockpos2, true));
                     mc.player.swingHand(Hand.MAIN_HAND);
                     this.blockpos = blockpos2;
                 }
@@ -145,14 +147,14 @@ public class AntiSurround extends Module {
         Block block5 = mc.world.getBlockState(blockPos.add(-1, 0, 0)).getBlock();
         if (mc.world.isAir(blockPos)) {
             if (mc.world.isAir(blockPos.add(0, 1, 0)) || !oldVers.getValue()) {
-                    if (checkValidBlock(block)) {
-                        if (checkValidBlock(block2)) {
-                            if (checkValidBlock(block3)) {
-                                if (checkValidBlock(block4)) {
-                                    return checkValidBlock(block5);
-                                }
+                if (checkValidBlock(block)) {
+                    if (checkValidBlock(block2)) {
+                        if (checkValidBlock(block3)) {
+                            if (checkValidBlock(block4)) {
+                                return checkValidBlock(block5);
                             }
                         }
+                    }
                 }
             }
         }

@@ -25,8 +25,7 @@ public class HoleESP extends Module {
 
     private final List<PosWithColor> positions = new CopyOnWriteArrayList<>();
 
-
-    private final Setting<Mode> mode = new Setting("Mode", Mode.CubeOutline);
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.CubeOutline);
     private final Setting<Integer> rangeXZ = new Setting<>("Range XY", 10, 1, 128);
     private final Setting<Integer> rangeY = new Setting<>("Range Y", 5, 1, 128);
 
@@ -34,16 +33,20 @@ public class HoleESP extends Module {
     public final Setting<ColorSetting> bedrockColor1 = new Setting<>("Bedrock Color", new ColorSetting(new Color(0x00FF51).getRGB()));
 
     private final Setting<Float> height = new Setting<>("Height", 1f, 0.01f, 5f);
-    private final Setting<Float> lineWith = new Setting<>("Line With", 0.5f, 0.01f, 5f);
+    private final Setting<Float> lineWith = new Setting<>("Line Width", 0.5f, 0.01f, 5f);
 
 
     private enum Mode {
-        Fade, CubeOutline, CubeFill, CubeBoth
+        Fade,
+        CubeOutline,
+        CubeFill,
+        CubeBoth
     }
 
 
     public void onRender3D(MatrixStack stack) {
         if (positions.isEmpty()) return;
+
         for (PosWithColor posWithColor : positions) {
             if (mode.getValue() == Mode.CubeOutline || mode.getValue() == Mode.CubeBoth) {
                 Render3DEngine.drawBoxOutline(

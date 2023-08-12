@@ -5,7 +5,7 @@ import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.MovementUtil;
+import thunder.hack.utility.player.MovementUtility;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
@@ -65,7 +65,7 @@ public class GuiMove extends Module {
             return;
         }
         if (e.getPacket() instanceof ClickSlotC2SPacket) {
-            if (clickBypass.getValue() && mc.player.isOnGround() && MovementUtil.isMoving() && !mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, 0.0656, 0.0)).iterator().hasNext()) {
+            if (clickBypass.getValue() && mc.player.isOnGround() && MovementUtility.isMoving() && !mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, 0.0656, 0.0)).iterator().hasNext()) {
                 if (mc.player.isSprinting()) {
                     mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
                 }

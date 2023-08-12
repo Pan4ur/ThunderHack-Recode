@@ -1,16 +1,15 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
+
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -40,7 +39,7 @@ public class AntiBot extends Module {
                 if (mode.getValue() == Mode.MotionCheck) {
                     if (player != null) {
                         double speed = (player.getX() - player.prevX) * (player.getX() - player.prevX) + (player.getZ() - player.prevZ) * (player.getZ() - player.prevZ);
-                        if (player != mc.player && speed > 0.5 && MathUtil.getDistanceSq(player) <= Aura.attackRange.getPow2Value() && !bots.contains(player)) {
+                        if (player != mc.player && speed > 0.5 && MathUtility.getDistanceSq(player) <= Aura.attackRange.getPow2Value() && !bots.contains(player)) {
                             if (!bots.contains(player)) {
                                 Command.sendMessage(player.getName().getString() + " is a bot!");
                                 ++botsNumber;

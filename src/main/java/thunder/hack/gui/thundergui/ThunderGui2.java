@@ -11,7 +11,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ThunderHackGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.MSAAFramebuffer;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterAnimation;
@@ -125,7 +125,7 @@ public class ThunderGui2 extends Screen {
     }
 
     public static float fast(float end, float start, float multiple) {
-        return (1 - MathUtil.clamp((float) (deltaTime() * multiple), 0, 1)) * end + MathUtil.clamp((float) (deltaTime() * multiple), 0, 1) * start;
+        return (1 - MathUtility.clamp((float) (deltaTime() * multiple), 0, 1)) * end + MathUtility.clamp((float) (deltaTime() * multiple), 0, 1) * start;
     }
 
     private void setInstance() {

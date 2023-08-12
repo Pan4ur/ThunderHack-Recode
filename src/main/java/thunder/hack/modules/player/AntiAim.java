@@ -6,7 +6,7 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 
 public class AntiAim extends Module {
     public AntiAim() {
@@ -43,11 +43,11 @@ public class AntiAim extends Module {
     public void onCalc(PlayerUpdateEvent e) {
         if (pitchMode.getValue() == Mode.RandomAngle)
             if (mc.player.age % Speed.getValue() == 0)
-                rotationPitch = MathUtil.random(90, -90);
+                rotationPitch = MathUtility.random(90, -90);
 
         if (yawMode.getValue() == Mode.RandomAngle)
             if (mc.player.age % Speed.getValue() == 0)
-                rotationYaw = MathUtil.random(0, 360);
+                rotationYaw = MathUtility.random(0, 360);
 
         if (yawMode.getValue() == Mode.Spin)
             if (mc.player.age % Speed.getValue() == 0) {
@@ -66,7 +66,7 @@ public class AntiAim extends Module {
         if (pitchMode.getValue() == Mode.Sinus) {
             pitch_sinus_step += Speed.getValue() / 10f;
             rotationPitch = (float) (mc.player.getPitch() + pitchDelta.getValue() * Math.sin(pitch_sinus_step));
-            rotationPitch = MathUtil.clamp(rotationPitch, -90, 90);
+            rotationPitch = MathUtility.clamp(rotationPitch, -90, 90);
         }
 
         if (yawMode.getValue() == Mode.Sinus) {
@@ -82,7 +82,7 @@ public class AntiAim extends Module {
 
         if (pitchMode.getValue() == Mode.Static) {
             rotationPitch = mc.player.getPitch() + pitchDelta.getValue();
-            rotationPitch = MathUtil.clamp(rotationPitch, -90, 90);
+            rotationPitch = MathUtility.clamp(rotationPitch, -90, 90);
         }
         if (yawMode.getValue() == Mode.Static)
             rotationYaw =  mc.player.getYaw() % 360 + yawDelta.getValue();

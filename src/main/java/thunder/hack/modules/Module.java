@@ -1,10 +1,13 @@
 package thunder.hack.modules;
 
+import net.minecraft.network.packet.Packet;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Formatting;
+
 import thunder.hack.Thunderhack;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
@@ -76,6 +79,12 @@ public class Module {
     }
 
     public void onUnload() {
+    }
+
+    protected void sendPacket(Packet<?> packet) {
+        if (mc.getNetworkHandler() == null) return;
+
+        mc.getNetworkHandler().sendPacket(packet);
     }
 
     public String getDisplayInfo() {

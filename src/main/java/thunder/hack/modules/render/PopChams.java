@@ -20,7 +20,7 @@ import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -40,7 +40,7 @@ public class PopChams extends Module {
         double z = entity.getZ() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
         matrices.push();
         matrices.translate((float) x, (float) y, (float) z);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotation(MathUtil.rad(180 - entity.bodyYaw)));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotation(MathUtility.rad(180 - entity.bodyYaw)));
         prepareScale(matrices);
 
         modelBase.animateModel((PlayerEntity) entity, entity.limbAnimator.getPos(), entity.limbAnimator.getSpeed(), mc.getTickDelta());
@@ -121,7 +121,7 @@ public class PopChams extends Module {
         private int alpha;
 
         public int getAlpha() {
-            return MathUtil.clamp(alpha, 0, 255);
+            return MathUtility.clamp(alpha, 0, 255);
         }
 
         public Person(PlayerEntity player) {

@@ -2,20 +2,29 @@
   "schemaVersion": 1,
   "id": "thunderhack",
   "version": "3.0",
-
+  "icon": "icon.png",
   "name": "ThunderHack",
   "description": "Player Assistance Mod",
   "authors": [
-    "Pan4ur#2144"
+    {
+      "name": "pan4ur",
+      "contact": {
+        "discord": "Pan4ur#2144"
+      }
+    }
   ],
-
   "license": "CC0-1.0",
   "accessWidener": "thunderhack.accesswidener",
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "main": [
       "thunder.hack.Thunderhack"
     ]
+  },
+  "contact": {
+    "sources": "https://github.com/Pan4ur/ThunderHack-Recode",
+    "homepage": "https://github.com/Pan4ur/ThunderHack-Recode",
+    "issues": "https://github.com/Pan4ur/ThunderHack-Recode/issues"
   },
   "mixins": [
     "thunderhack.mixins.json"
@@ -27,6 +36,10 @@
     "java": ">=17"
   },
   "suggests": {
-    "another-mod": "*"
+    "sodium": "*",
+    "lithium": "*",
+    "starlight": "*",
+    "ias": "*",
+    "viafabricplus": "*"
   }
 }

@@ -5,8 +5,7 @@ import java.util.Objects;
 
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.gui.clickui.AbstractElement;
-import thunder.hack.modules.client.MainSettings;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
 
@@ -45,10 +44,10 @@ public class SliderElement extends AbstractElement {
 		String value = "";
 
 		if (setting.getValue() instanceof Float)
-			value = String.valueOf(MathUtil.round((Float)setting.getValue(), 2));
+			value = String.valueOf(MathUtility.round((Float)setting.getValue(), 2));
 
 		if (setting.getValue() instanceof Integer)
-			value = String.valueOf(MathUtil.round((Integer)setting.getValue(), 2));
+			value = String.valueOf(MathUtility.round((Integer)setting.getValue(), 2));
 
 
 		FontRenderers.settings.drawString(matrixStack, setting.getName(), (int) (x + 6), (int) (y + 4), new Color(-1).getRGB());
@@ -67,7 +66,7 @@ public class SliderElement extends AbstractElement {
 		Render2DEngine.drawRound(matrixStack,(float) (x + 6), (float) (y + height - 6), (float) ((width - 12) * animation), 1, 0.5f, new Color(0xFFE1E1E1));
 		Render2DEngine.drawRound(matrixStack,(float) ((x + 6 + (width - 16) * animation)), (float) (y + height - 7.5f), 4, 4, 1.5f, new Color(0xFFE1E1E1));
 
-		animation = MathUtil.clamp(animation, 0, 1);
+		animation = MathUtility.clamp(animation, 0, 1);
 
 		if (dragging)
 			setValue(mouseX, x + 7, width - 14);

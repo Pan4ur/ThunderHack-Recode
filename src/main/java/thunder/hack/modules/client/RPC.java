@@ -17,26 +17,26 @@ public
 class RPC extends Module {
 
     public RPC() {
-        super ( "DiscordRPC" , "крутая рпс" , Category.CLIENT );
+        super("DiscordRPC", "крутая рпс", Category.CLIENT);
     }
 
     public Setting<mode> Mode = new Setting("Picture", mode.Recode);
-    public Setting < Boolean > showIP =  new Setting <> ( "ShowIP" , true);
+    public Setting<Boolean> showIP = new Setting<>("ShowIP", true);
     public Setting<smode> sMode = new Setting("StateMode", smode.Stats);
 
-    public Setting < String > state =  new Setting <> ( "State" , "Beta? Recode? NextGen?" );
-    public Setting < Boolean > nickname = new Setting <> ( "Nickname" , true);
+    public Setting<String> state = new Setting<>("State", "Beta? Recode? NextGen?");
+    public Setting<Boolean> nickname = new Setting<>("Nickname", true);
 
     public static boolean inQ = false;
     private static final DiscordRPC rpc = DiscordRPC.INSTANCE;
-    public static DiscordRichPresence presence = new DiscordRichPresence ( );
+    public static DiscordRichPresence presence = new DiscordRichPresence();
     private static Thread thread;
     public static boolean started;
     static String String1 = "none";
     public static String position = "";
 
     @Override
-    public void onLogout(){
+    public void onLogout() {
         inQ = false;
         position = "";
     }
@@ -52,10 +52,10 @@ class RPC extends Module {
     }
 
     @Override
-    public void onUpdate(){
-        if(!started){
+    public void onUpdate() {
+        if (!started) {
             started = true;
-            DiscordEventHandlers handlers = new DiscordEventHandlers ( );
+            DiscordEventHandlers handlers = new DiscordEventHandlers();
             rpc.Discord_Initialize("1093053626198523935", handlers, true, "");
             presence.startTimestamp = (System.currentTimeMillis() / 1000L);
             presence.largeImageText = "v" + Thunderhack.version + " by Pan4ur#2144";
@@ -66,32 +66,32 @@ class RPC extends Module {
 
                     rpc.Discord_RunCallbacks();
 
-                    if(inQ){
+                    if (inQ) {
                         presence.details = "In queue: " + RPC.position;
                     } else {
-                        if(mc.currentScreen instanceof TitleScreen){
+                        if (mc.currentScreen instanceof TitleScreen) {
                             presence.details = "В главном меню";
-                        } else if(mc.currentScreen instanceof MultiplayerScreen || mc.currentScreen instanceof AddServerScreen){
+                        } else if (mc.currentScreen instanceof MultiplayerScreen || mc.currentScreen instanceof AddServerScreen) {
                             presence.details = "Выбирает сервер";
-                        } else if(mc.getCurrentServerEntry() != null){
+                        } else if (mc.getCurrentServerEntry() != null) {
                             presence.details = (showIP.getValue() ? "Играет на " + mc.getCurrentServerEntry().address : "НН сервер");
-                        } else if(mc.isInSingleplayer()){
+                        } else if (mc.isInSingleplayer()) {
                             presence.details = "Читерит в одиночке";
                         }
                     }
 
-                    if(sMode.getValue() == smode.Custom){
+                    if (sMode.getValue() == smode.Custom) {
                         presence.state = state.getValue();
-                    } else if(sMode.getValue() == smode.Stats) {
-                        presence.state  = "Hacks: " + Thunderhack.moduleManager.getEnabledModules().size() + " / " + Thunderhack.moduleManager.modules.size();
+                    } else if (sMode.getValue() == smode.Stats) {
+                        presence.state = "Hacks: " + Thunderhack.moduleManager.getEnabledModules().size() + " / " + Thunderhack.moduleManager.modules.size();
                     } else {
-                        presence.state  = "v1.2 for mc 1.20.1";
+                        presence.state = "v1.2 for mc 1.20.1";
                     }
 
 
                     if (nickname.getValue()) {
                         presence.smallImageText = "logged as - " + mc.getSession().getUsername();
-                        presence.smallImageKey = "https://minotar.net/helm/" +  mc.getSession().getUsername()+ "/100.png";
+                        presence.smallImageKey = "https://minotar.net/helm/" + mc.getSession().getUsername() + "/100.png";
                     } else {
                         presence.smallImageText = "";
                         presence.smallImageKey = "";
@@ -99,7 +99,8 @@ class RPC extends Module {
 
                     switch (Mode.getValue()) {
                         case Recode -> presence.largeImageKey = "https://i.imgur.com/yY0z2Uq.gif";
-                        case MegaCute -> presence.largeImageKey = "https://media1.tenor.com/images/6bcbfcc0be97d029613b54f97845bc59/tenor.gif?itemid=26823781";
+                        case MegaCute ->
+                                presence.largeImageKey = "https://media1.tenor.com/images/6bcbfcc0be97d029613b54f97845bc59/tenor.gif?itemid=26823781";
                         case Custom -> {
                             readFile();
                             presence.largeImageKey = String1.split("SEPARATOR")[0];
@@ -109,7 +110,10 @@ class RPC extends Module {
                         }
                     }
                     rpc.Discord_UpdatePresence(presence);
-                    try {Thread.sleep(2000L);} catch (InterruptedException ignored) {}
+                    try {
+                        Thread.sleep(2000L);
+                    } catch (InterruptedException ignored) {
+                    }
                 }
             }, "RPC-Callback-Handler");
             thread.start();
@@ -117,17 +121,18 @@ class RPC extends Module {
     }
 
 
-    public static void readFile(){
+    public static void readFile() {
         try {
             File file = new File("ThunderHackRecode/misc/RPC.txt");
             if (file.exists()) {
                 try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                     while (reader.ready()) {
-                        String1 =  reader.readLine();
+                        String1 = reader.readLine();
                     }
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
 
@@ -136,13 +141,15 @@ class RPC extends Module {
         try {
             file.createNewFile();
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-                writer.write(url1 + "SEPARATOR"+ url2 + '\n');
-            } catch (Exception ignored){}
-        } catch (Exception ignored){}
+                writer.write(url1 + "SEPARATOR" + url2 + '\n');
+            } catch (Exception ignored) {
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     public enum mode {
-         Custom, MegaCute, Recode;
+        Custom, MegaCute, Recode;
     }
 
     public enum smode {

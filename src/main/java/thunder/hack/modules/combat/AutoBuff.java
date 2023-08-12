@@ -16,7 +16,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.util.Hand;
-import thunder.hack.utility.player.PlayerUtil;
+import thunder.hack.utility.player.PlayerUtility;
 
 public class AutoBuff extends Module {
 
@@ -129,7 +129,7 @@ public class AutoBuff extends Module {
     public void throwPotion(Potions potion) {
         int slot = getPotionSlot(potion);
         mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(slot));
-        mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtil.getWorldActionId(mc.world)));
+        mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
     }
 
     public enum Potions {

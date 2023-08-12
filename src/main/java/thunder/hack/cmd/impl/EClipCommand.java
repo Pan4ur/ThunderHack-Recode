@@ -11,7 +11,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.cmd.Command;
-import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtility;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
@@ -112,7 +112,7 @@ public class EClipCommand extends Command {
     private void execute(float y) {
         int elytra;
 
-        if ((elytra = InventoryUtil.getItemSlot(Items.ELYTRA)) == -1) {
+        if ((elytra = InventoryUtility.getItemSlot(Items.ELYTRA)) == -1) {
             sendMessage(Formatting.RED + "вам нужны элитры в инвентаре");
             return;
         }

@@ -10,7 +10,7 @@ import thunder.hack.injection.accesors.IWorldRenderer;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
@@ -40,7 +40,7 @@ public class BreakHighLight extends Module {
 
             float noom;
             if(mode.getValue() == Mode.Grow) {
-                noom = Render2DEngine.interpolateFloat(prevProgress, MathUtil.clamp(mc.interactionManager.currentBreakingProgress, 0f, 1f), mc.getTickDelta());
+                noom = Render2DEngine.interpolateFloat(prevProgress, MathUtility.clamp(mc.interactionManager.currentBreakingProgress, 0f, 1f), mc.getTickDelta());
             } else if(mode.getValue() == Mode.Shrink){
                 noom = 1f - Render2DEngine.interpolateFloat(prevProgress,mc.interactionManager.currentBreakingProgress, mc.getTickDelta());
             } else {
@@ -75,7 +75,7 @@ public class BreakHighLight extends Module {
 
                 float noom;
                 if(mode.getValue() == Mode.Grow) {
-                    noom = MathUtil.clamp((destroyBlockProgress.getStage() / 10f), 0f, 1f);
+                    noom = MathUtility.clamp((destroyBlockProgress.getStage() / 10f), 0f, 1f);
                 } else if(mode.getValue() == Mode.Shrink){
                     noom = 1f - (destroyBlockProgress.getStage() / 10f);
                 } else {

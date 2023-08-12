@@ -266,6 +266,7 @@ public class ModuleManager {
         modules.add(new ElytraFix());
         modules.add(new AirPlace());
         modules.add(noCommentExploit);
+        modules.add(new PistonPush());
     }
 
     public Module get(String name) {

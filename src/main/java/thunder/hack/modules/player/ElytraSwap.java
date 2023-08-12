@@ -5,7 +5,7 @@ import net.minecraft.item.Items;
 import net.minecraft.screen.slot.SlotActionType;
 import thunder.hack.cmd.Command;
 import thunder.hack.modules.Module;
-import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtility;
 
 public class ElytraSwap extends Module {
     public ElytraSwap() {
@@ -18,8 +18,8 @@ public class ElytraSwap extends Module {
     public static int getChestPlateSlot() {
         Item[] items = {Items.NETHERITE_CHESTPLATE,Items.DIAMOND_CHESTPLATE, Items.CHAINMAIL_CHESTPLATE, Items.IRON_CHESTPLATE, Items.GOLDEN_CHESTPLATE, Items.LEATHER_CHESTPLATE};
         for (Item item : items) {
-            if (InventoryUtil.getItemSlot(item) != -1) {
-                return InventoryUtil.getItemSlot(item);
+            if (InventoryUtility.getItemSlot(item) != -1) {
+                return InventoryUtility.getItemSlot(item);
             }
         }
         return -1;
@@ -63,8 +63,8 @@ public class ElytraSwap extends Module {
             } else {
                 Command.sendMessage("У тебя нет честплейта!");
             }
-        } else if (InventoryUtil.getItemSlot(Items.ELYTRA) != -1) {
-            int slot = InventoryUtil.getItemSlot(Items.ELYTRA);
+        } else if (InventoryUtility.getItemSlot(Items.ELYTRA) != -1) {
+            int slot = InventoryUtility.getItemSlot(Items.ELYTRA);
             clickSlot(slot);
             clickSlot(38);
             clickSlot(slot);

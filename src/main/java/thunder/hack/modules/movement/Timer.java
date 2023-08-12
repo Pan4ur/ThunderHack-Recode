@@ -15,8 +15,8 @@ import thunder.hack.events.impl.PostPlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
-import thunder.hack.utility.math.MathUtil;
-import thunder.hack.utility.player.MovementUtil;
+import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.MovementUtility;
 
 public class Timer extends Module {
     public static double value;
@@ -38,7 +38,7 @@ public class Timer extends Module {
     @Override
     public void onUpdate() {
         if (mode.getValue() == Mode.SMART) {
-            if(!MovementUtil.isMoving()){
+            if(!MovementUtility.isMoving()){
                 Thunderhack.TICK_TIMER = 1f;
                 return;
             };
@@ -55,7 +55,7 @@ public class Timer extends Module {
         } else if (mode.getValue() == Mode.NORMAL) {
             Thunderhack.TICK_TIMER = speed.getValue();
         } else {
-            if(!MovementUtil.isMoving() || violation > 39f || !InputUtil.isKeyPressed(mc.getWindow().getHandle(),boostKey.getValue().getKey())) {
+            if(!MovementUtility.isMoving() || violation > 39f || !InputUtil.isKeyPressed(mc.getWindow().getHandle(),boostKey.getValue().getKey())) {
                 Thunderhack.TICK_TIMER = 1f;
                 return;
             }
@@ -117,7 +117,7 @@ public class Timer extends Module {
     @EventHandler
     public void onPostPlayerUpdate(PostPlayerUpdateEvent event) {
         if (mode.getValue() == Mode.TICKSHIFT) {
-            int status = MathUtil.clamp((int) (100 - Math.min(violation, 100)), 0, 100);
+            int status = MathUtility.clamp((int) (100 - Math.min(violation, 100)), 0, 100);
 
             if (status < 90f) {
                 Command.sendMessage("Перед повторным использованием необходимо постоять на месте!");

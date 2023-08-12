@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
@@ -71,8 +71,8 @@ public class FontRenderer {
     }
 
     public void drawString(MatrixStack matrices, String s, float x, float y, float r, float g, float b, float a) {
-        float roundedX = (float) MathUtil.roundToDecimal(x, 1);
-        float roundedY = (float) MathUtil.roundToDecimal(y, 1);
+        float roundedX = (float) MathUtility.roundToDecimal(x, 1);
+        float roundedY = (float) MathUtility.roundToDecimal(y, 1);
         float r1 = r;
         float g1 = g;
         float b1 = b;
@@ -113,8 +113,8 @@ public class FontRenderer {
     }
 
     public void drawGradientString(MatrixStack matrices, String s, float x, float y, int offset) {
-        float roundedX = (float) MathUtil.roundToDecimal(x, 1);
-        float roundedY = (float) MathUtil.roundToDecimal(y, 1);
+        float roundedX = (float) MathUtility.roundToDecimal(x, 1);
+        float roundedY = (float) MathUtility.roundToDecimal(y, 1);
         float r1 = 0;
         float g1 = 0;
         float b1 = 0;

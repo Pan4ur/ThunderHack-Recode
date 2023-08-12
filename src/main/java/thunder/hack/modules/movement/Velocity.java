@@ -11,7 +11,7 @@ import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.MovementUtil;
+import thunder.hack.utility.player.MovementUtility;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
@@ -105,7 +105,7 @@ public class Velocity extends Module {
                     if (vX < 0) vX *= -1;
                     if (vZ < 0) vZ *= -1;
 
-                    double[] motion = MovementUtil.forward((vX + vZ));
+                    double[] motion = MovementUtility.forward((vX + vZ));
 
                     ((ISPacketEntityVelocity) pac).setMotionX((int) (motion[0]));
                     ((ISPacketEntityVelocity) pac).setMotionY(0);

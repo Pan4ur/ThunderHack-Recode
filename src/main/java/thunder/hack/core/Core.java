@@ -8,20 +8,14 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.RadarRewrite;
 import thunder.hack.gui.thundergui.ThunderGui2;
 import thunder.hack.modules.client.ClickGui;
-import thunder.hack.modules.client.MainSettings;
-import thunder.hack.notification.Notification;
 import thunder.hack.utility.Macro;
 import thunder.hack.utility.Timer;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
-import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Formatting;
@@ -29,8 +23,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
 import thunder.hack.events.impl.*;
 
-import java.awt.*;
-import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -52,7 +44,7 @@ public class Core {
         if (!fullNullCheck()) {
             if (ModuleManager.clickGui.getBind().getKey() == -1) {
                 Command.sendMessage(Formatting.RED + "Default clickgui keybind --> P");
-                ModuleManager.clickGui.setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(), false,false);
+                ModuleManager.clickGui.setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(), false, false);
             }
         }
         ThunderGui2.getInstance().onTick();

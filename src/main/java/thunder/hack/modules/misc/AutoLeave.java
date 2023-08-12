@@ -9,7 +9,7 @@ import thunder.hack.setting.impl.Parent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.text.Text;
-import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtility;
 
 public class AutoLeave extends Module {
     public AutoLeave() {
@@ -33,7 +33,7 @@ public class AutoLeave extends Module {
                 leave(MainSettings.language.getValue() == MainSettings.Language.RU ? "Ливнул т.к. рядом появился игрок" : "Leaved because there was a player");
             }
         }
-        if(totems.getValue() && InventoryUtil.getItemCount(Items.TOTEM_OF_UNDYING) <= totemsCount.getValue()){
+        if(totems.getValue() && InventoryUtility.getItemCount(Items.TOTEM_OF_UNDYING) <= totemsCount.getValue()){
             leave(MainSettings.language.getValue() == MainSettings.Language.RU ? "Ливнул т.к. кончились тотемы" : "Leaved because out of totems");
         }
         if(mc.player.getHealth() < leaveHp.getValue() && low_hp.getValue()){

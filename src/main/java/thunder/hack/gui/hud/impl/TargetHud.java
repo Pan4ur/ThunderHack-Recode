@@ -1,6 +1,9 @@
 package thunder.hack.gui.hud.impl;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.entity.LivingEntity;
+
+
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -15,6 +18,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL40C;
+
+
 import thunder.hack.core.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudEditorGui;
@@ -25,7 +30,7 @@ import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterAnimation;
 import thunder.hack.utility.render.animation.BetterDynamicAnimation;
@@ -320,6 +325,7 @@ public class TargetHud extends HudElement {
                 float health = Math.min(20, target.getHealth());
                 healthanimation.setValue(health);
                 health = (float) healthanimation.getAnimationD();
+
                 Render2DEngine.drawGradientRound(context.getMatrices(), getPosX() + 48, getPosY() + 32, 85, 11, 4f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
                 Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 48, getPosY() + 32, (int) MathUtil.clamp((85 * (health / 20)), 8, 85), 11, 4f);
 

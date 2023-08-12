@@ -10,15 +10,12 @@ import java.awt.*;
 public class ThunderHackGui extends Module {
     public static final Setting<ColorSetting> onColor1 = new Setting<>("OnColor1", new ColorSetting(new Color(71, 0, 117, 255).getRGB()));
     public static final Setting<ColorSetting> onColor2 = new Setting<>("OnColor2", new ColorSetting(new Color(32, 1, 96, 255).getRGB()));
-
-
-    public static final Setting<Float> scrollSpeed = new Setting("ScrollSpeed", 1f, 0.1F, 2.0F);
+    public static final Setting<Float> scrollSpeed = new Setting<>("ScrollSpeed", 1f, 0.1F, 2.0F);
 
 
     public ThunderHackGui() {
         super("ThunderGui", "новый клик гуи", Category.CLIENT);
     }
-
 
     @Override
     public void onEnable() {
@@ -26,7 +23,7 @@ public class ThunderHackGui extends Module {
         disable();
     }
 
-    public static final Color getColorByTheme(int id) {
+    public static Color getColorByTheme(int id) {
         return switch (id) {
             case 0 -> new Color(37, 27, 41, 250); // Основная плита
             case 1 -> new Color(50, 35, 60, 250); // плита лого
@@ -41,5 +38,4 @@ public class ThunderHackGui extends Module {
             default -> new Color(37, 27, 41, 250); // плита под категориями
         };
     }
-
 }

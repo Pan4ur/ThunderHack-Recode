@@ -1,12 +1,13 @@
 package thunder.hack.gui.hud.impl;
 
+
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.movement.Timer;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterDynamicAnimation;
 
@@ -44,8 +45,8 @@ public class TimerIndicator extends HudElement {
         timerAnimation.setValue(((f4 - f5) / f4) * 61);
         timerStatus = (float) timerAnimation.getAnimationD();
         status = (int) (((f4 - f5) / f4) * 100);
-        status = MathUtil.clamp(status, 0, 100);
-        timerStatus = MathUtil.clamp(timerStatus, 5, 61);
+        status = MathUtility.clamp(status, 0, 100);
+        timerStatus = MathUtility.clamp(timerStatus, 5, 61);
 
 
         Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), 62, 12, HudEditor.hudRound.getValue() - 3f, new Color(1));

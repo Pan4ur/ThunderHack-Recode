@@ -13,9 +13,7 @@ import java.util.Map;
 
 import static thunder.hack.modules.Module.mc;
 
-public class MathUtil {
-
-
+public final class MathUtility {
     public static double random(double min, double max) {
         return Math.random() * (max - min) + min;
     }
@@ -51,9 +49,8 @@ public class MathUtil {
         return bd.floatValue();
     }
 
-    public static double getDistanceSq(Entity ent)
-    {
-        return getDistanceSq(ent.getX(),ent.getY(),ent.getZ());
+    public static double getDistanceSq(Entity ent) {
+        return getDistanceSq(ent.getX(), ent.getY(), ent.getZ());
     }
 
     public static double roundToDecimal(double n, int point) {
@@ -149,7 +146,7 @@ public class MathUtil {
     }
 
     public static Vec3d direction(float yaw) {
-        return new Vec3d(Math.cos(MathUtil.degToRad(yaw + 90.0f)), 0.0, Math.sin(MathUtil.degToRad(yaw + 90.0f)));
+        return new Vec3d(Math.cos(MathUtility.degToRad(yaw + 90.0f)), 0.0, Math.sin(MathUtility.degToRad(yaw + 90.0f)));
     }
 
     public static float round(float value, int places) {

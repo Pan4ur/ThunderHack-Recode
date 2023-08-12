@@ -23,11 +23,12 @@ import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.ExplosionUtil;
-import thunder.hack.utility.math.MathUtil;
-import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.math.ExplosionUtility;
+import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlaceUtility;
-import thunder.hack.utility.player.PlayerUtil;
+import thunder.hack.utility.player.PlayerUtility;
+import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
@@ -77,7 +78,7 @@ public class AutoAnchor extends Module {
     public void onBlockPlace(EventPlaceBlock event) {
         if (mode.getValue() == Mode.Rage) return;
         if (event.getBlock() == Blocks.RESPAWN_ANCHOR && mc.options.useKey.isPressed()) {
-            int glowSlot = InventoryUtil.getItemSlotHotbar(Items.GLOWSTONE);
+            int glowSlot = InventoryUtility.getItemSlotHotbar(Items.GLOWSTONE);
             if (glowSlot == -1) return;
             new LegitThread(glowSlot, mc.player.getInventory().selectedSlot, swapDelay.getValue()).start();
         }
@@ -198,14 +199,14 @@ public class AutoAnchor extends Module {
 
         if (result == null) return false;
 
-        int anchorSlot = InventoryUtil.getAnchorSlot();
-        if (anchorSlot != -1) {
+
+        SearchInvResult anchorResult = InventoryUtility.getAnchor();
+        if (anchorResult.found()) {
             PlaceManager.trailingBreakAction = () -> {
                 BlockHitResult bhr = handleInteractRotation(result);
                 if (bhr != null) {
-                    mc.player.getInventory().selectedSlot = anchorSlot;
-                    mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(anchorSlot));
-                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bhr, PlayerUtil.getWorldActionId(mc.world)));
+                    anchorResult.switchTo();
+                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
                     mc.player.swingHand(Hand.MAIN_HAND);
                 }
             };
@@ -232,14 +233,14 @@ public class AutoAnchor extends Module {
 
         if (mc.world.getBlockState(result).get(CHARGES) > 0) return true;
 
-        int glowSlot = InventoryUtil.getGlowStoneSlot();
-        if (glowSlot != -1) {
+        SearchInvResult glowResult = InventoryUtility.getGlowStone();
+
+        if (glowResult.found()) {
             PlaceManager.trailingChargeAction = () -> {
-                mc.player.getInventory().selectedSlot = glowSlot;
-                mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(glowSlot));
+                glowResult.switchTo();
                 BlockHitResult bhr = handleInteractRotation(result);
                 if (bhr != null) {
-                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bhr, PlayerUtil.getWorldActionId(mc.world)));
+                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
                     mc.player.swingHand(Hand.MAIN_HAND);
                 }
             };
@@ -255,13 +256,11 @@ public class AutoAnchor extends Module {
 
     public boolean placeAnchor() {
         if (!placeTimer.passedMs(placeDelay.getValue())) return false;
-        if (threadedBp != null && InventoryUtil.getAnchorSlot() != -1) {
+        SearchInvResult anchorResult = InventoryUtility.getAnchor();
+        if (threadedBp != null && anchorResult.found()) {
             PlaceManager.trailingPlaceAction = () -> {
-                int slot = InventoryUtil.getAnchorSlot();
                 int prev_slot = mc.player.getInventory().selectedSlot;
-                mc.player.getInventory().selectedSlot = slot;
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
-
+                anchorResult.switchTo();
                 mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(new Vec3d(threadedBp.getX(), threadedBp.getY(), threadedBp.getZ()), PlaceUtility.getPlaceDirection(threadedBp, strictDirection.getValue()), threadedBp, false));
 
                 mc.player.getInventory().selectedSlot = prev_slot;
@@ -282,10 +281,11 @@ public class AutoAnchor extends Module {
     }
 
 
+
     public void onRender3D(MatrixStack e) {
         if (cachePos != null && mode.getValue() == Mode.Rage) {
             Render3DEngine.drawBoxOutline(new Box(cachePos), new Color(0xC7FFFFFF, true), 2f);
-            Render3DEngine.drawTextIn3D(String.valueOf(MathUtil.round2(renderDmg)), cachePos.toCenterPos(), 0, 0.1, 0, Render2DEngine.injectAlpha(Color.WHITE, 255));
+            Render3DEngine.drawTextIn3D(String.valueOf(MathUtility.round2(renderDmg)), cachePos.toCenterPos(), 0, 0.1, 0, Render2DEngine.injectAlpha(Color.WHITE, 255));
         }
 
     }
@@ -310,11 +310,11 @@ public class AutoAnchor extends Module {
         for (BlockPos block : blocks) {
             float damage = 0.0F;
             PlayerEntity target = null;
-            float damageToSelf = mc.player.isCreative() ? 0 : ExplosionUtil.getAnchorExplosionDamage(block, mc.player);
+            float damageToSelf = mc.player.isCreative() ? 0 : ExplosionUtility.getAnchorExplosionDamage(block, mc.player);
             if (mc.player.getHealth() + mc.player.getAbsorptionAmount() <= damageToSelf + 2F) continue;
             if (damageToSelf > maxSelfDamage.getValue()) continue;
             for (PlayerEntity player : targetss) {
-                float damageToTarget = ExplosionUtil.getAnchorExplosionDamage(block, player);
+                float damageToTarget = ExplosionUtility.getAnchorExplosionDamage(block, player);
 
                 if (damageToTarget > damage && (damageToTarget >= minDamage.getValue())) {
                     damage = damageToTarget;
@@ -363,7 +363,7 @@ public class AutoAnchor extends Module {
             return false;
         }
         if (!(mc.player.getInventory().getMainHandStack().getItem() == Items.RESPAWN_ANCHOR)) {
-            return InventoryUtil.getAnchorSlot() != -1 && InventoryUtil.getGlowStoneSlot() != -1;
+            return InventoryUtility.getAnchor().found() && InventoryUtility.getGlowStone().found();
         }
         return true;
     }
@@ -441,11 +441,11 @@ public class AutoAnchor extends Module {
         double bestDamage = 0.0D;
         for (BlockPos anchor : anchorsInRange) {
             if (((!charged) || mc.world.getBlockState(anchor).get(CHARGES) != 0)) {
-                double selfDamage = mc.player.isCreative() ? 0f : ExplosionUtil.getAnchorExplosionDamage(anchor, mc.player);
+                double selfDamage = mc.player.isCreative() ? 0f : ExplosionUtility.getAnchorExplosionDamage(anchor, mc.player);
                 if (selfDamage > maxSelfDamage.getValue()) continue;
                 double damage = 0.0D;
                 for (PlayerEntity target : targetsInRange) {
-                    double targetDamage = ExplosionUtil.getAnchorExplosionDamage(anchor, target);
+                    double targetDamage = ExplosionUtility.getAnchorExplosionDamage(anchor, target);
                     damage += targetDamage;
                 }
                 if (damage < minDamage.getValue() || damage < selfDamage) continue;
@@ -479,6 +479,6 @@ public class AutoAnchor extends Module {
 
     private boolean isValidAnchorTarget(BlockPos bp) {
         if (PlaceUtility.getEyesPos(((mc.player))).distanceTo(bp.toCenterPos()) > placeRange.getValue()) return false;
-        return !(ExplosionUtil.getAnchorExplosionDamage(bp, mc.player) + 2F >= mc.player.getHealth() + mc.player.getAbsorptionAmount());
+        return !(ExplosionUtility.getAnchorExplosionDamage(bp, mc.player) + 2F >= mc.player.getHealth() + mc.player.getAbsorptionAmount());
     }
 }

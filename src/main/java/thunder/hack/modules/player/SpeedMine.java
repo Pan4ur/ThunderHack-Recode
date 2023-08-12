@@ -26,7 +26,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
@@ -190,7 +190,7 @@ public class SpeedMine extends Module {
                 switch (renderMode.getValue()) {
                     case Shrink -> {
                         Box shrunkMineBox = new Box(minePosition.getX(), minePosition.getY(), minePosition.getZ(), minePosition.getX(), minePosition.getY(), minePosition.getZ());
-                        float noom = MathUtil.clamp(progress, 0f, 1f);
+                        float noom = MathUtility.clamp(progress, 0f, 1f);
 
                         Render3DEngine.drawFilledBox(
                                 stack,

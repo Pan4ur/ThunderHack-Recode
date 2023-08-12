@@ -1,4 +1,3 @@
-
 #version 330
 
 #ifdef GL_ES
@@ -68,10 +67,11 @@ vec3 getColor(vec4 centerCol) {
     vec4 temp = vec4(vec3(noise(p + vec2(1.0)), noise(p + factor * q + vec2(1.7, 9.2) + 0.15 * time2), noise(p + factor * q + vec2(8.3, 2.8) + 0.126 * time2)), alpha2);
     return vec3(temp[0], temp[1], temp[2]);
 }
+
 void main() {
     vec4 centerCol = texture(DiffuseSampler, texCoord);
 
-    if(centerCol.a != 0) {
+    if (centerCol.a != 0) {
         fragColor = vec4(getColor(centerCol), alpha2);
     } else {
 

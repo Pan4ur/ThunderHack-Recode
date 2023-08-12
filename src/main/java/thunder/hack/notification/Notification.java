@@ -4,7 +4,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterAnimation;
 
@@ -39,7 +39,7 @@ public class Notification {
     }
 
     public void render(MatrixStack matrix, float getY) {
-        Color icolor2 = new Color(170, 170, 170, (int) MathUtil.clamp((1 - animation.getAnimationd()), 0, 255));
+        Color icolor2 = new Color(170, 170, 170, (int) MathUtility.clamp((1 - animation.getAnimationd()), 0, 255));
 
 
         direction = isFinished();

@@ -3,7 +3,6 @@ package thunder.hack.utility;
 import static thunder.hack.modules.Module.mc;
 
 public class Macro {
-
     private final String name;
     private String text;
     private int bind;
@@ -15,8 +14,10 @@ public class Macro {
     }
 
     public void runMacro() {
-        if(text.contains("/")){
-            mc.player.networkHandler.sendChatCommand(text.replace("/",""));
+        if (mc.player == null) return;
+
+        if (text.contains("/")) {
+            mc.player.networkHandler.sendChatCommand(text.replace("/", ""));
         } else {
             mc.player.networkHandler.sendChatMessage(text);
         }

@@ -26,17 +26,8 @@ import java.util.function.Consumer;
 import static thunder.hack.modules.Module.mc;
 
 
-@Mixin(value = {SplashOverlay.class})
-public class MixinSplashOverlay {
-
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        ci.cancel();
-        renderCustom(context,mouseX,mouseY,delta);
-    }
-
-    final Identifier TH_LOGO = new Identifier("textures/th.png");
-
+@Mixin(SplashOverlay.class)
+public abstract class MixinSplashOverlay {
     @Final
     @Shadow
     private boolean reloading;
@@ -58,8 +49,16 @@ public class MixinSplashOverlay {
     @Shadow
     private Consumer<Optional<Throwable>> exceptionHandler;
 
+    @Shadow
+    protected abstract void renderProgressBar(DrawContext drawContext, int minX, int minY, int maxX, int maxY, float opacity);
 
+    private static final Identifier TH_LOGO = new Identifier("textures/th.png");
 
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        ci.cancel();
+        renderCustom(context, mouseX, mouseY, delta);
+    }
 
     public void renderCustom(DrawContext context, int mouseX, int mouseY, float delta) {
         int i = mc.getWindow().getScaledWidth();
@@ -69,8 +68,8 @@ public class MixinSplashOverlay {
             reloadStartTime = l;
         }
 
-        float f = reloadCompleteTime > -1L ? (float)(l - reloadCompleteTime) / 1000.0F : -1.0F;
-        float g = reloadStartTime > -1L ? (float)(l - reloadStartTime) / 500.0F : -1.0F;
+        float f = reloadCompleteTime > -1L ? (float) (l - reloadCompleteTime) / 1000.0F : -1.0F;
+        float g = reloadStartTime > -1L ? (float) (l - reloadStartTime) / 500.0F : -1.0F;
         float h;
         int k;
         if (f >= 1.0F) {
@@ -86,32 +85,43 @@ public class MixinSplashOverlay {
                 mc.currentScreen.render(context, mouseX, mouseY, delta);
             }
 
-            k = MathHelper.ceil(MathHelper.clamp((double)g, 0.15, 1.0) * 255.0);
-            context.fill( 0, 0, i, j, withAlpha(new Color(0x070015).getRGB(), k));
+            k = MathHelper.ceil(MathHelper.clamp((double) g, 0.15, 1.0) * 255.0);
+            context.fill(0, 0, i, j, withAlpha(new Color(0x070015).getRGB(), k));
             h = MathHelper.clamp(g, 0.0F, 1.0F);
         } else {
             k = new Color(0x070015).getRGB();
-            float m = (float)(k >> 16 & 255) / 255.0F;
-            float n = (float)(k >> 8 & 255) / 255.0F;
-            float o = (float)(k & 255) / 255.0F;
+            float m = (float) (k >> 16 & 255) / 255.0F;
+            float n = (float) (k >> 8 & 255) / 255.0F;
+            float o = (float) (k & 255) / 255.0F;
             GlStateManager._clearColor(m, n, o, 1.0F);
             GlStateManager._clear(16384, MinecraftClient.IS_SYSTEM_MAC);
             h = 1.0F;
         }
 
-        k = (int)((double)mc.getWindow().getScaledWidth() * 0.5);
-        int p = (int)((double)mc.getWindow().getScaledHeight() * 0.5);
+        k = (int) ((double) context.getScaledWindowWidth() * 0.5);
+        int p = (int) ((double) context.getScaledWindowHeight() * 0.5);
+        double d = Math.min((double) context.getScaledWindowWidth() * 0.75, context.getScaledWindowHeight()) * 0.25;
+        double e = d * 4.0;
+        int r = (int) (e * 0.5);
+
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(770, 1);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, h);
-        Render2DEngine.drawTexture(context,TH_LOGO, k - 150, p - 35, 300, 70);
+        Render2DEngine.drawTexture(context, TH_LOGO, k - 150, p - 35, 300, 70);
+
+        int s = (int) ((double) context.getScaledWindowHeight() * 0.8325);
+        float t = this.reload.getProgress();
+        this.progress = MathHelper.clamp(this.progress * 0.95F + t * 0.050000012F, 0.0F, 1.0F);
+        if (f < 1.0F) {
+            renderProgressBar(context, i / 2 - r, s - 5, i / 2 + r, s + 5, 1.0F - MathHelper.clamp(f, 0.0F, 1.0F));
+        }
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableBlend();
 
         if (f >= 2.0F) {
-            mc.setOverlay((Overlay)null);
+            mc.setOverlay(null);
         }
 
         if (reloadCompleteTime == -1L && reload.isComplete() && (!reloading || g >= 2.0F)) {

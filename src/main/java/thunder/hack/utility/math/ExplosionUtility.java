@@ -5,15 +5,8 @@ import net.minecraft.block.AirBlock;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageSources;
-import net.minecraft.entity.damage.DamageType;
-import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.stat.Stats;
 import net.minecraft.util.math.*;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.explosion.Explosion;
@@ -27,8 +20,7 @@ import java.util.UUID;
 import static thunder.hack.modules.Module.mc;
 
 
-public class ExplosionUtil {
-
+public final class ExplosionUtility {
     public static boolean terrainIgnore = false;
     public static BlockPos anchorIgnore = null;
 

@@ -9,7 +9,7 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.MovementUtil;
+import thunder.hack.utility.player.MovementUtility;
 
 public class Flight extends Module {
     public boolean pendingFlagApplyPacket = false;
@@ -29,8 +29,8 @@ public class Flight extends Module {
     @EventHandler
     public void onEventSync(EventSync event) {
         if (mode.getValue() == Mode.Vanilla) {
-            if (MovementUtil.isMoving()) {
-                final double[] dir = MovementUtil.forward(this.speed.getValue());
+            if (MovementUtility.isMoving()) {
+                final double[] dir = MovementUtility.forward(this.speed.getValue());
                 mc.player.setVelocity(dir[0],0,dir[1]);
             } else {
                 mc.player.setVelocity(0,0,0);
@@ -39,7 +39,7 @@ public class Flight extends Module {
             if (mc.options.sneakKey.isPressed()) mc.player.setVelocity(mc.player.getVelocity().add(0,-speed.getValue(),0));
 
         } else if (mode.getValue() == Mode.AirJump) {
-            if (MovementUtil.isMoving() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(0.5, 0.0, 0.5).offset(0.0, -1.0, 0.0)).iterator().hasNext()) {
+            if (MovementUtility.isMoving() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(0.5, 0.0, 0.5).offset(0.0, -1.0, 0.0)).iterator().hasNext()) {
                 mc.player.setOnGround(true);
                 mc.player.jump();
             }
@@ -58,7 +58,7 @@ public class Flight extends Module {
 
         if (mc.options.sneakKey.isPressed()) mc.player.setVelocity(mc.player.getVelocity().add(0,-vspeedValue.getValue(),0));
 
-        final double[] dir = MovementUtil.forward(speed.getValue());
+        final double[] dir = MovementUtility.forward(speed.getValue());
         mc.player.setVelocity(dir[0],mc.player.getVelocity().getY(),dir[1]);
     }
 

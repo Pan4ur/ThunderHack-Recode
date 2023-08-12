@@ -17,11 +17,10 @@ import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.player.Scaffold;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.Timer;
-import thunder.hack.utility.player.InventoryUtil;
-import thunder.hack.utility.player.MovementUtil;
+import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.MovementUtility;
 
-import static thunder.hack.utility.player.MovementUtil.isMoving;
+import static thunder.hack.utility.player.MovementUtility.isMoving;
 
 public class Strafe extends Module {
     private final Setting<Boost> boost = new Setting<>("Boost", Boost.None);
@@ -50,7 +49,7 @@ public class Strafe extends Module {
         if (mc.player.isOnGround()) {
             n8 = speedAttributes * n7;
             if (move.get_y() > 0) {
-                n8 += boost.getValue() == Boost.Elytra && InventoryUtil.getElytra() != -1 && disabled ? 0.65 : 0.2f;
+                n8 += boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && disabled ? 0.65 : 0.2f;
             }
             disabled = false;
         } else {
@@ -156,7 +155,7 @@ public class Strafe extends Module {
 
     @EventHandler
     public void onMove(EventMove event) {
-        int elytraSlot = InventoryUtil.getElytra();
+        int elytraSlot = InventoryUtility.getElytra();
 
         if (boost.getValue() == Boost.Elytra && elytraSlot != -1) {
             if (isMoving() && !mc.player.isOnGround() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, event.get_y(), 0.0f)).iterator().hasNext() && disabled) {
@@ -165,7 +164,7 @@ public class Strafe extends Module {
         }
         if (canStrafe()) {
             if (isMoving()) {
-                double[] motions = MovementUtil.forward(calculateSpeed(event));
+                double[] motions = MovementUtility.forward(calculateSpeed(event));
 
                 event.set_x(motions[0]);
                 event.set_z(motions[1]);
@@ -233,8 +232,8 @@ public class Strafe extends Module {
 
     @EventHandler
     public void onUpdate(PlayerUpdateEvent event) {
-        if ((boost.getValue() == Boost.Elytra && InventoryUtil.getElytra() != -1 && !mc.player.isOnGround() && mc.player.fallDistance > 0 && !disabled)) {
-            disabler(InventoryUtil.getElytra());
+        if ((boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && !mc.player.isOnGround() && mc.player.fallDistance > 0 && !disabled)) {
+            disabler(InventoryUtility.getElytra());
         }
     }
 

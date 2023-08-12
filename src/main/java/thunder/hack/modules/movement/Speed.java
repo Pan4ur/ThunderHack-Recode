@@ -5,16 +5,15 @@ import meteordevelopment.orbit.EventHandler;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventMove;
-import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.InventoryUtil;
-import thunder.hack.utility.player.MovementUtil;
+import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.MovementUtility;
 import net.minecraft.entity.effect.StatusEffects;
 
-import static thunder.hack.utility.player.MovementUtil.isMoving;
+import static thunder.hack.utility.player.MovementUtility.isMoving;
 
 public class Speed extends Module {
 
@@ -49,7 +48,7 @@ public class Speed extends Module {
     @EventHandler
     public void onPlayerUpdate(PlayerUpdateEvent e){
         if (mode.getValue() == Mode.MatrixJB) {
-            if (MovementUtil.isMoving() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(0.5, 0.0, 0.5).offset(0.0, -1.0, 0.0)).iterator().hasNext() && !flip) {
+            if (MovementUtility.isMoving() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(0.5, 0.0, 0.5).offset(0.0, -1.0, 0.0)).iterator().hasNext() && !flip) {
                 mc.player.setOnGround(true);
                 mc.player.jump();
             }
@@ -67,7 +66,7 @@ public class Speed extends Module {
                 return;
             }
             if (mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.29,0,-0.29).offset(0.0, -3, 0.0f)).iterator().hasNext() && elytraDelay.passedMs(150) && startDelay.passedMs(500)) {
-                int elytra = InventoryUtil.getElytra();
+                int elytra = InventoryUtility.getElytra();
                 if (elytra == -1) {
                     Command.sendMessage(MainSettings.isRu() ? "[Speed] Для этого режима нужна элитра!" : "[Speed] You need elytra for this mode!");
                     toggle();
@@ -76,7 +75,7 @@ public class Speed extends Module {
                 }
                 mc.player.setVelocity(mc.player.getVelocity().getX(),0f,mc.player.getVelocity().getZ());
                 if (isMoving()) {
-                    MovementUtil.setMotion(0.85);
+                    MovementUtility.setMotion(0.85);
                 }
                 elytraDelay.reset();
             }
@@ -92,15 +91,15 @@ public class Speed extends Module {
         if (event.isCancelled()) return;
         event.setCancelled(true);
 
-        if (MovementUtil.isMoving()) {
+        if (MovementUtility.isMoving()) {
             Thunderhack.TICK_TIMER = useTimer.getValue() ? 1.088f : 1f;
             if (stage == 1 && mc.player.isOnGround()) {
-                mc.player.setVelocity(mc.player.getVelocity().x, MovementUtil.getJumpSpeed(), mc.player.getVelocity().z);
-                event.setY(MovementUtil.getJumpSpeed());
+                mc.player.setVelocity(mc.player.getVelocity().x, MovementUtility.getJumpSpeed(), mc.player.getVelocity().z);
+                event.setY(MovementUtility.getJumpSpeed());
                 baseSpeed *= 2.149;
                 stage = 2;
             } else if (stage == 2) {
-                baseSpeed = Thunderhack.playerManager.currentPlayerSpeed - (0.66 * (Thunderhack.playerManager.currentPlayerSpeed - MovementUtil.getBaseMoveSpeed()));
+                baseSpeed = Thunderhack.playerManager.currentPlayerSpeed - (0.66 * (Thunderhack.playerManager.currentPlayerSpeed - MovementUtility.getBaseMoveSpeed()));
                 stage = 3;
             } else {
                 if ((mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, mc.player.getVelocity().getY(), 0.0)).iterator().hasNext() || mc.player.verticalCollision))
@@ -108,7 +107,7 @@ public class Speed extends Module {
                 baseSpeed = Thunderhack.playerManager.currentPlayerSpeed - Thunderhack.playerManager.currentPlayerSpeed / 159.0D;
             }
 
-            baseSpeed = Math.max(baseSpeed, MovementUtil.getBaseMoveSpeed());
+            baseSpeed = Math.max(baseSpeed, MovementUtility.getBaseMoveSpeed());
 
             double baseStrictSpeed = mode.getValue() == Mode.StrictStrafe || mc.player.input.movementForward < 1 ? 0.465 : 0.576;
             double baseRestrictedSpeed = mode.getValue() == Mode.StrictStrafe || mc.player.input.movementForward < 1 ? 0.44 : 0.57;
@@ -129,7 +128,7 @@ public class Speed extends Module {
 
             if (ticks++ > 50) ticks = 0;
 
-            MovementUtil.modifyEventSpeed(event, baseSpeed);
+            MovementUtility.modifyEventSpeed(event, baseSpeed);
         } else {
             Thunderhack.TICK_TIMER = 1f;
             event.set_x(0);
