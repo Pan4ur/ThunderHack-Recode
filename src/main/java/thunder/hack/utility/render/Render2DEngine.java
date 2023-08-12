@@ -241,6 +241,21 @@ public class Render2DEngine {
         endRender();
     }
 
+
+    public static void drawRectDumbWay(MatrixStack matrices, double x, double y, double x1, double y1, Color c1) {
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        setupRender();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        bufferBuilder.vertex(matrix, (float) x, (float) y1, 0.0F).color(c1.getRGB()).next();
+        bufferBuilder.vertex(matrix, (float) x1, (float) y1, 0.0F).color(c1.getRGB()).next();
+        bufferBuilder.vertex(matrix, (float) x1, (float) y, 0.0F).color(c1.getRGB()).next();
+        bufferBuilder.vertex(matrix, (float) x, (float) y, 0.0F).color(c1.getRGB()).next();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        endRender();
+    }
+
     public static void drawRectDumbWay(MatrixStack matrices, float x, float y, float x1, float y1, Color c1, Color c2, Color c3, Color c4) {
         Matrix4f matrix = matrices.peek().getPositionMatrix();
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();

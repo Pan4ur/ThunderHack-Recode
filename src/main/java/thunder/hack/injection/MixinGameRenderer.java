@@ -97,17 +97,14 @@ public abstract class MixinGameRenderer {
     }
 
     @Inject(at = @At("TAIL"), method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D", cancellable = true)
-    public void getFov(Camera camera, float tickDelta, boolean changingFov,
-                       CallbackInfoReturnable<Double> cb) {
-        FOV fovModule = Thunderhack.moduleManager.get(FOV.class);
-
-        if (fovModule.isEnabled()) {
-            if (cb.getReturnValue() == 70 && !fovModule.itemFov.getValue()) return;
-            else if (fovModule.itemFov.getValue() && cb.getReturnValue() == 70) {
-                cb.setReturnValue(fovModule.itemFovModifier.getValue().doubleValue());
+    public void getFov(Camera camera, float tickDelta, boolean changingFov, CallbackInfoReturnable<Double> cb) {
+        if (ModuleManager.fov.isEnabled()) {
+            if (cb.getReturnValue() == 70 && !ModuleManager.fov.itemFov.getValue()) return;
+            else if (ModuleManager.fov.itemFov.getValue() && cb.getReturnValue() == 70) {
+                cb.setReturnValue(ModuleManager.fov.itemFovModifier.getValue().doubleValue());
                 return;
             }
-            cb.setReturnValue(fovModule.fovModifier.getValue().doubleValue());
+            cb.setReturnValue(ModuleManager.fov.fovModifier.getValue().doubleValue());
         }
     }
 }

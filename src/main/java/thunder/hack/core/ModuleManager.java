@@ -64,6 +64,10 @@ public class ModuleManager {
     public static AutoMend autoMend;
     public static PotionHud potionHud;
     public static AutoCrystal autoCrystal;
+    public static FOV fov;
+    public static TpsSync tpsSync;
+    public static NoCommentExploit noCommentExploit;
+
 
     public ModuleManager() {
         tracker = new Tracker();
@@ -103,6 +107,9 @@ public class ModuleManager {
         autoMend = new AutoMend();
         potionHud = new PotionHud();
         autoCrystal = new AutoCrystal();
+        fov = new FOV();
+        tpsSync = new TpsSync();
+        noCommentExploit = new NoCommentExploit();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -114,7 +121,7 @@ public class ModuleManager {
         modules.add(autoSprint);
         modules.add(new Timer());
         modules.add(viewModel);
-        modules.add(new TpsSync());
+        modules.add(tpsSync);
         modules.add(new Scaffold());
         modules.add(notifications);
         modules.add(new FpsCounter());
@@ -249,7 +256,7 @@ public class ModuleManager {
         modules.add(new AntiHunger());
         modules.add(new AutoSoup());
         modules.add(new VoidESP());
-        modules.add(new FOV());
+        modules.add(fov);
         modules.add(new PearlBait());
         modules.add(new XCarry());
         modules.add(autoMend);
@@ -259,6 +266,7 @@ public class ModuleManager {
         modules.add(new ESP());
         modules.add(new ElytraFix());
         modules.add(new AirPlace());
+        modules.add(noCommentExploit);
     }
 
     public Module get(String name) {

@@ -149,20 +149,6 @@ public class AutoCrystal extends Module {
     }
 
     @Subscribe
-    public void onTick(EventTick event) {
-        if (timingMode.getValue() == TimingMode.Vanilla && check()) {
-            if (!generateBreak()) generatePlace(false);
-        }
-    }
-
-    @Subscribe
-    public void onPostTick(EventPostTick event) {
-        if (timingMode.getValue() == TimingMode.Vanilla && check()) {
-            if (!generateBreak()) generatePlace(false);
-        }
-    }
-
-    @Subscribe
     public void onEntitySync(EventSync event) {
         if (mc.player == null || mc.world == null) return;
         if (inv_timer++ >= 20) {
@@ -432,6 +418,9 @@ public class AutoCrystal extends Module {
                     Render3DEngine.drawTextIn3D(String.valueOf(MathUtil.round2(renderDmg)), pos.toCenterPos(), 0, 0.1, 0, Render2DEngine.injectAlpha(textColor.getValue().getColorObject(), alpha));
                 }
             });
+        if (timingMode.getValue() == TimingMode.Vanilla && check()) {
+            if (!generateBreak()) generatePlace(false);
+        }
     }
 
 

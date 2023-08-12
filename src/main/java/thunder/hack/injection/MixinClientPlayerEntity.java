@@ -1,13 +1,6 @@
 package thunder.hack.injection;
 
 import com.mojang.authlib.GameProfile;
-import thunder.hack.Thunderhack;
-import thunder.hack.core.Core;
-import thunder.hack.core.ModuleManager;
-import thunder.hack.core.PlaceManager;
-import thunder.hack.events.impl.*;
-import thunder.hack.modules.movement.Velocity;
-import thunder.hack.modules.movement.NoSlow;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -20,12 +13,19 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import thunder.hack.Thunderhack;
+import thunder.hack.core.Core;
+import thunder.hack.core.ModuleManager;
+import thunder.hack.core.PlaceManager;
+import thunder.hack.events.impl.*;
+import thunder.hack.modules.movement.Velocity;
 
 import static thunder.hack.modules.Module.mc;
 
-@Mixin(value = ClientPlayerEntity.class,priority = 800)
+@Mixin(value = ClientPlayerEntity.class, priority = 800)
 public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity {
-    @Shadow public abstract float getPitch(float tickDelta);
+    @Shadow
+    public abstract float getPitch(float tickDelta);
 
     public MixinClientPlayerEntity(ClientWorld world, GameProfile profile) {
         super(world, profile);
@@ -38,7 +38,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         }
     }
 
-    @Redirect(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"), require = 0 )
+    @Redirect(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"), require = 0)
     private boolean tickMovementHook(ClientPlayerEntity player) {
         if (ModuleManager.noSlow.isEnabled())
             return false;
@@ -47,10 +47,10 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"), cancellable = true)
     public void onMoveHook(MovementType movementType, Vec3d movement, CallbackInfo ci) {
-        EventMove event = new EventMove(movement.x,movement.y,movement.z);
+        EventMove event = new EventMove(movement.x, movement.y, movement.z);
         Thunderhack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
-            super.move(movementType, new Vec3d( event.get_x(),event.get_y(),event.get_z()));
+            super.move(movementType, new Vec3d(event.get_x(), event.get_y(), event.get_z()));
             ci.cancel();
         }
     }
@@ -59,8 +59,8 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "sendMovementPackets", at = @At("HEAD"), cancellable = true)
     private void sendMovementPacketsHook(CallbackInfo info) {
-        if(PlaceManager.isRotating) return;
-        EventSync event = new EventSync(getYaw(),getPitch());
+        if (PlaceManager.isRotating) return;
+        EventSync event = new EventSync(getYaw(), getPitch());
         Thunderhack.EVENT_BUS.post(event);
         EventSprint e = new EventSprint(isSprinting());
         Thunderhack.EVENT_BUS.post(e);
@@ -81,6 +81,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             info.cancel();
         }
     }
+
     @Inject(method = "sendMovementPackets", at = @At("RETURN"), cancellable = true)
     private void sendMovementPacketsPostHook(CallbackInfo info) {
         mc.player.lastSprinting = pre_sprint_state;

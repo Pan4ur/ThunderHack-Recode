@@ -6,6 +6,7 @@ import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.util.Identifier;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.Render2DEvent;
 import thunder.hack.gui.font.FontRenderers;
@@ -90,9 +91,9 @@ public class LagNotifier extends Module {
 
         if (Thunderhack.serverManager.getTPS() < 10 && notifyTimer.passedMs(60000) && tpsNotify.getValue()) {
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                Thunderhack.notificationManager.publicity("LagNotifier", "ТПС сервера ниже 10!" + (Thunderhack.moduleManager.get("TpsSync").isDisabled() ? " Рекомендуется включить TPSSync" : ""), 8, Notification.Type.ERROR);
+                Thunderhack.notificationManager.publicity("LagNotifier", "ТПС сервера ниже 10!" + (ModuleManager.tpsSync.isDisabled() ? " Рекомендуется включить TPSSync" : ""), 8, Notification.Type.ERROR);
             } else {
-                Thunderhack.notificationManager.publicity("LagNotifier", "Server TPS is below 10!" + (Thunderhack.moduleManager.get("TpsSync").isDisabled() ? " It is recommended to enable TPSSync" : ""), 8, Notification.Type.ERROR);
+                Thunderhack.notificationManager.publicity("LagNotifier", "Server TPS is below 10!" + (ModuleManager.tpsSync.isDisabled() ? " It is recommended to enable TPSSync" : ""), 8, Notification.Type.ERROR);
             }
 
             isLag = true;

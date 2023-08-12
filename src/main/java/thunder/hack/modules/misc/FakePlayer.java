@@ -33,6 +33,8 @@ public class FakePlayer extends Module {
         mc.world.addPlayer(22822854, fakePlayer);
     }
 
+
+
     @Override
     public void onDisable() {
         if(fakePlayer == null) return;

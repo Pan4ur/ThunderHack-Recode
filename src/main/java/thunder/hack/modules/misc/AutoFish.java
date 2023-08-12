@@ -1,5 +1,6 @@
 package thunder.hack.modules.misc;
 
+import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.AsyncManager;
 import thunder.hack.modules.Module;
@@ -70,7 +71,7 @@ public class AutoFish extends Module {
                     }
                 }
 
-                AsyncManager.run(() -> {
+                Thunderhack.asyncManager.run(() -> {
                     mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
                 }, 250);
 

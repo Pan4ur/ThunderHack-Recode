@@ -34,5 +34,4 @@ public abstract class MixinBlock {
             cir.setReturnValue(!XRay.isCheckableOre(state.getBlock()));
         }
     }
-
 }

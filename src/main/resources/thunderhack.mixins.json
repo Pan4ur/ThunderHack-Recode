@@ -68,7 +68,6 @@
     "MixinSplashOverlay",
     "MixinWorld",
     "accesors.IBeaconBlockEntity",
-    "accesors.IChatMessageC2SPacket",
     "accesors.IExplosionS2CPacket",
     "accesors.IGameMessageS2CPacket",
     "accesors.IHeldItemRenderer",

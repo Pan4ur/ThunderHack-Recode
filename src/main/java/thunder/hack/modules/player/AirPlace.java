@@ -11,6 +11,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import thunder.hack.core.PlaceManager;
 import thunder.hack.events.impl.Render3DEvent;
+import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -36,8 +37,6 @@ public class AirPlace extends Module {
 
     @Override
     public void onUpdate() {
-        if (fullNullCheck()) return;
-
         HitResult hitResult = mc.getCameraEntity().raycast(range.getValue(), 0, false);
 
         if (hitResult instanceof BlockHitResult) hit = (BlockHitResult) hitResult;
@@ -60,8 +59,8 @@ public class AirPlace extends Module {
             if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
             else mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         }
-
-        super.onUpdate();
+        // это чтоб не фастплейсило
+        ((IMinecraftClient)mc).setUseCooldown(4);
     }
 
     @Subscribe

@@ -14,13 +14,13 @@ public class PearlBait extends Module {
     }
 
     @Subscribe
-    public void OnEntitySpawn(EventEntitySpawn e){
-        if(e.getEntity() instanceof EnderPearlEntity)
+    public void OnEntitySpawn(EventEntitySpawn e) {
+        if (e.getEntity() instanceof EnderPearlEntity)
             mc.world.getPlayers().stream()
                     .min(Comparator.comparingDouble((p) -> p.squaredDistanceTo(e.getEntity().getPos())))
                     .ifPresent((player) -> {
                         if (player.equals(mc.player) && mc.player.isOnGround()) {
-                            mc.player.setVelocity(0,0,0);
+                            mc.player.setVelocity(0, 0, 0);
                             mc.player.input.movementForward = 0.0f;
                             mc.player.input.movementSideways = 0.0f;
                             mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 1.0, mc.player.getZ(), false));

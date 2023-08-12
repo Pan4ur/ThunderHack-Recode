@@ -54,7 +54,7 @@ public class SpeedMine extends Module {
     private final Setting<ColorSetting> startFillColor = new Setting<>("Start Fill Color", new ColorSetting(new Color(255, 0, 0, 120))).withParent(render);
     private final Setting<ColorSetting> endFillColor = new Setting<>("End Fill Color", new ColorSetting(new Color(47, 255, 0, 120))).withParent(render);
 
-    private final Setting<Integer> breakAttempts = new Setting<>("BreakAttemps", 10, 1, 50, v -> mode.getValue() == Mode.Packet);
+    private final Setting<Integer> breakAttempts = new Setting<>("BreakAttempts", 10, 1, 50, v -> mode.getValue() == Mode.Packet);
 
     public static BlockPos minePosition;
     private Direction mineFacing;

@@ -1,7 +1,6 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
-import com.mojang.logging.LogUtils;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.BlockBreakingInfo;
 import net.minecraft.entity.Entity;
@@ -26,7 +25,10 @@ import net.minecraft.world.RaycastContext;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.core.PlaceManager;
-import thunder.hack.events.impl.*;
+import thunder.hack.events.impl.EventEntityRemoved;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.injection.accesors.IWorldRenderer;
 import thunder.hack.modules.Module;
@@ -59,6 +61,8 @@ public class CevBreaker extends Module {
     private final Setting<Boolean> strictDirection = new Setting<>("Strict Direction", false);
     private final Setting<Integer> actionShift = new Setting<>("Place Per Tick", 1, 1, 5);
     private final Setting<Integer> actionInterval = new Setting<>("Delay", 0, 0, 5);
+    private final Setting<Integer> breakCrystalDelay = new Setting<>("BreakCrystalDelay", 50, 0, 500);
+
     private final Setting<BreakMode> breakMode = new Setting<>("Break Mode", BreakMode.Packet);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
 
@@ -105,12 +109,10 @@ public class CevBreaker extends Module {
         targetSurroundBlockPos = null;
 
         if (breakMode.getValue() == BreakMode.Packet && Thunderhack.moduleManager.get(SpeedMine.class).isDisabled()) {
-            Thunderhack.notificationManager.publicity(getName(), MainSettings.language.getValue() == MainSettings.Language.RU ? "Для использования пакетого копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine", 5, Notification.Type.ERROR);
+            Thunderhack.notificationManager.publicity(getName(), MainSettings.language.getValue() == MainSettings.Language.RU ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine", 5, Notification.Type.ERROR);
             disable();
             return;
         }
-
-        super.onEnable();
     }
 
     @Override
@@ -301,27 +303,31 @@ public class CevBreaker extends Module {
             BlockUpdateS2CPacket packet = e.getPacket();
             if (packet.getPos().equals(target.getBlockPos().add(0, 2, 0)) && packet.getState().getBlock().equals(Blocks.AIR)) {
                 for (Entity entity : mc.world.getEntities()) {
-                    if (entity instanceof EndCrystalEntity && entity.getBlockPos().equals(target.getBlockPos().add(0, 3, 0))) {
-                        // Breaking crystal
-                        if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS) && !(mc.player.getMainHandStack().getItem() instanceof SwordItem)) {
-
-                            int swordSlot = InventoryUtil.getBestSword();
-                            if (swordSlot != -1 && autoSwap.getValue()) {
-                                mc.player.getInventory().selectedSlot = swordSlot;
-                                mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(swordSlot));
-                            }
-                        }
-
-                        Criticals.cancelCrit = true;
-                        mc.interactionManager.attackEntity(mc.player, entity);
-                        mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-                        Criticals.cancelCrit = false;
-
-                        return;
+                    if (entity instanceof EndCrystalEntity endCrystal && entity.getBlockPos().equals(target.getBlockPos().add(0, 3, 0))) {
+                        breakCrystalThread(endCrystal);
                     }
                 }
             }
         }
+    }
+
+    public void breakCrystalThread(EndCrystalEntity endCrystal) {
+        Thunderhack.asyncManager.run(() -> {
+                    if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS) && !(mc.player.getMainHandStack().getItem() instanceof SwordItem)) {
+
+                        int swordSlot = InventoryUtil.getBestSword();
+                        if (swordSlot != -1 && autoSwap.getValue()) {
+                            mc.player.getInventory().selectedSlot = swordSlot;
+                            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(swordSlot));
+                        }
+                    }
+
+                    Criticals.cancelCrit = true;
+                    mc.interactionManager.attackEntity(mc.player, endCrystal);
+                    mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                    Criticals.cancelCrit = false;
+                },
+                breakCrystalDelay.getValue());
     }
 
     @Subscribe
@@ -387,9 +393,7 @@ public class CevBreaker extends Module {
     private void placeCrystal() {
         BlockPos pos = target.getBlockPos().add(0, 2, 0);
         for (Entity entity : mc.world.getEntities()) {
-            LogUtils.getLogger().warn(entity.getBlockPos() + " " + target.getBlockPos() + " " + entity.getName());
             if (entity instanceof EndCrystalEntity && entity.getBlockPos().equals(pos.add(0, 1, 0))) {
-                LogUtils.getLogger().warn("POMNNN");
                 return;
             }
         }

@@ -238,6 +238,6 @@ public class Strafe extends Module {
     }
 
     private enum Boost {
-        None, Elytra, Damage, FGLowRider
+        None, Elytra, Damage
     }
 }
