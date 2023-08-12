@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -40,7 +41,7 @@ public class EZbowPOP extends Module {
         super("EZbowPOP", "Шотает с лука", Category.COMBAT);
     }
 
-    @Subscribe
+    @EventHandler
     protected void onPacketSend(PacketEvent.Send event) {
         if (fullNullCheck() || !delayTimer.passedMs((long) (delay.getValue() * 1000))) return;
         if (event.getPacket() instanceof PlayerActionC2SPacket && ((PlayerActionC2SPacket) event.getPacket()).getAction() == PlayerActionC2SPacket.Action.RELEASE_USE_ITEM && (mc.player.getActiveItem().getItem() == Items.BOW && bow.getValue())

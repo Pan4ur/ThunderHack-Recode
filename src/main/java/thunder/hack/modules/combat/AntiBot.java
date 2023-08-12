@@ -1,6 +1,9 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
+
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
@@ -29,7 +32,7 @@ public class AntiBot extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync e) {
         if (!onlyAura.getValue()) {
             for (PlayerEntity player : AntiBot.mc.world.getPlayers()) {

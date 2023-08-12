@@ -1,6 +1,7 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import thunder.hack.Thunderhack;
@@ -20,7 +21,7 @@ public class MessageAppend extends Module {
 
     String skip;
 
-    @Subscribe
+    @EventHandler
     public void onPacketSend(PacketEvent.Send e) {
         if (fullNullCheck()) {
             return;

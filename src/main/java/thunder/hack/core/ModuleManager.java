@@ -1,9 +1,8 @@
 package thunder.hack.core;
 
-import com.google.common.eventbus.EventBus;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.Thunderhack;
-import thunder.hack.events.impl.Render2DEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.gui.clickui.ClickUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.*;
@@ -319,7 +318,7 @@ public class ModuleManager {
 
     public void onLoad() {
         modules.sort(Comparator.comparing(Module::getName));
-        modules.stream().filter(Module::listening).forEach(((EventBus) Thunderhack.EVENT_BUS)::register);
+        modules.stream().filter(Module::listening).forEach((Thunderhack.EVENT_BUS)::subscribe);
         modules.forEach(Module::onLoad);
 
         if(Thunderhack.configManager.firstLaunch){
@@ -337,12 +336,20 @@ public class ModuleManager {
         modules.stream().filter(Module::isEnabled).forEach(Module::onTick);
     }
 
-    public void onRender2D(Render2DEvent event) {
-        modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender2D(event));
+    public void onRender2D(DrawContext context) {
+        modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender2D(context));
     }
 
-    public void onRender3D(Render3DEvent event) {
-        modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender3D(event));
+    public void onRenderShaders(DrawContext context) {
+        modules.stream().filter(Module::isEnabled).forEach(module -> module.onRenderShaders(context));
+    }
+
+    public void onRender3D(MatrixStack stack) {
+        modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender3D(stack));
+    }
+
+    public void onPreRender3D(MatrixStack stack) {
+        modules.stream().filter(Module::isEnabled).forEach(module -> module.onPreRender3D(stack));
     }
 
     public void sortModules() {
@@ -360,7 +367,7 @@ public class ModuleManager {
     public void onUnload() {
         modules.forEach(module -> {
             if(module.isEnabled()){
-                Thunderhack.EVENT_BUS.unregister(module);
+                Thunderhack.EVENT_BUS.unsubscribe(module);
             }
         });
         modules.forEach(Module::onUnload);

@@ -1,6 +1,7 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerAbilitiesS2CPacket;
 import thunder.hack.Thunderhack;
@@ -42,7 +43,7 @@ public class AutoFlyme extends Module {
         Thunderhack.TICK_TIMER = 1.f;
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (e.getPacket() instanceof GameMessageS2CPacket) {
             final GameMessageS2CPacket packet = e.getPacket();
@@ -66,7 +67,7 @@ public class AutoFlyme extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onUpdateWalkingPlayer(final EventSync event) {
         if (!instantSpeed.getValue() || !mc.player.getAbilities().flying) return;
         final double[] dir =  MovementUtility.isMoving() ? MovementUtility.forward(speed.getValue()) : new double[]{0,0};

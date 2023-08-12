@@ -1,11 +1,11 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BowItem;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
@@ -64,7 +64,7 @@ public class AimBot extends Module {
     private float assistAcceleration;
 
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync event){
         if(mode.getValue() == Mode.BowAim){
             if (!(mc.player.getActiveItem().getItem() instanceof BowItem)) return;
@@ -134,9 +134,8 @@ public class AimBot extends Module {
         rotationPitch = mc.player.getPitch();
     }
 
-    @Subscribe
-    public void onRender3D(Render3DEvent e){
-        if(debug_box != null) Render3DEngine.drawFilledBox(e.getMatrixStack(),debug_box, new Color(0x3400FF41, true));
+    public void onRender3D(MatrixStack stack){
+        if(debug_box != null) Render3DEngine.drawFilledBox(stack,debug_box, new Color(0x3400FF41, true));
 
         if(mode.getValue() == Mode.AimAssist){
             if (Float.isNaN(rotationYaw)) return;

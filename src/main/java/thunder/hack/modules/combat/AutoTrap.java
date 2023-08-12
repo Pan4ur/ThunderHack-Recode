@@ -1,10 +1,10 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Hand;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.PlayerUpdateEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -40,8 +40,7 @@ public class AutoTrap extends Module {
 
     private ConcurrentHashMap<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
 
-    @Subscribe
-    public void onRender3D(Render3DEvent event) {
+    public void onRender3D(MatrixStack stack) {
         renderPoses.forEach((pos, time) -> {
             if (System.currentTimeMillis() - time > 500) {
                 renderPoses.remove(pos);
@@ -51,7 +50,7 @@ public class AutoTrap extends Module {
         });
     }
 
-    @Subscribe
+    @EventHandler
     public void onPlayerUpdateEvent(PlayerUpdateEvent event) {
         if (!mc.player.isOnGround()) return;
 

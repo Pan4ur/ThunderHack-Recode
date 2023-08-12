@@ -1,6 +1,7 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -59,7 +60,7 @@ public class FGHelper extends Module {
     private final Timer inviteTimer = new Timer();
 
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof GameMessageS2CPacket && photomath.getValue()) {
             final GameMessageS2CPacket packet = event.getPacket();
@@ -222,7 +223,7 @@ public class FGHelper extends Module {
         return checktimer.passedMs(3000) && (Objects.equals(ThunderUtility.solveName(checkstring), "FATAL ERROR"));
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketSend(PacketEvent.Send e) {
         if (e.getPacket() instanceof CommandExecutionC2SPacket) {
             checktimer.reset();

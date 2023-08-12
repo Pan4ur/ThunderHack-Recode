@@ -1,11 +1,9 @@
 package thunder.hack.modules.render;
 
-import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.util.math.MatrixStack;
 import org.lwjgl.opengl.GL11;
-import thunder.hack.cmd.Command;
-import thunder.hack.events.impl.PreRender3DEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.interfaces.IEntity;
 import thunder.hack.modules.Module;
@@ -27,7 +25,6 @@ import net.minecraft.world.RaycastContext;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Trails extends Module {
     public Trails() {
@@ -59,8 +56,7 @@ public class Trails extends Module {
     }
 
 
-    @Subscribe
-    public void onPreRender3D(PreRender3DEvent event) {
+    public void onPreRender3D(MatrixStack stack) {
         for (Entity en : asyncEntities) {
             if (en instanceof EnderPearlEntity && pearls.getValue()) {
                 calcTrajectory(en);
@@ -87,7 +83,7 @@ public class Trails extends Module {
 
 
                 if (((IEntity) entity).getTrails().size() > 0) {
-                    event.getMatrixStack().push();
+                    stack.push();
                     RenderSystem.disableCull();
                     Tessellator tessellator = Tessellator.getInstance();
                     BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -102,15 +98,15 @@ public class Trails extends Module {
                     for (int i = 0; i < ((IEntity) entity).getTrails().size(); i++) {
                         Trail ctx = ((IEntity) entity).getTrails().get(i);
                         Vec3d pos = ctx.interpolate(mc.getTickDelta());
-                        bufferBuilder.vertex(event.getMatrixStack().peek().getPositionMatrix(), (float) pos.x, (float) pos.y + down.getValue(), (float) pos.z).color(Render2DEngine.injectAlpha(((IEntity) entity).getTrails().get(i).color(), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
-                        bufferBuilder.vertex(event.getMatrixStack().peek().getPositionMatrix(), (float) pos.x, (float) pos.y + width.getValue()  + down.getValue(), (float) pos.z).color(Render2DEngine.injectAlpha(((IEntity) entity).getTrails().get(i).color(), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + down.getValue(), (float) pos.z).color(Render2DEngine.injectAlpha(((IEntity) entity).getTrails().get(i).color(), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + width.getValue()  + down.getValue(), (float) pos.z).color(Render2DEngine.injectAlpha(((IEntity) entity).getTrails().get(i).color(), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
                     }
 
                     tessellator.draw();
                     Render3DEngine.cleanup();
                     RenderSystem.enableCull();
                     RenderSystem.disableDepthTest();
-                    event.getMatrixStack().pop();
+                    stack.pop();
                 }
             }
         }

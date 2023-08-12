@@ -1,9 +1,9 @@
 package thunder.hack.modules.render;
 
-import com.google.common.eventbus.Subscribe;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
@@ -16,7 +16,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 import org.joml.Vector3f;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -65,7 +64,7 @@ public class PopChams extends Module {
         matrixStack.translate(0.0F, -1.501F, 0.0F);
     }
 
-    @Subscribe
+    @EventHandler
     public void onTotemPop(TotemPopEvent e) {
         if (e.getEntity().equals(mc.player)) return;
         PlayerEntity entity = new PlayerEntity(mc.world, BlockPos.ORIGIN, e.getEntity().bodyYaw, new GameProfile(e.getEntity().getUuid(), e.getEntity().getName().getString())) {
@@ -90,8 +89,8 @@ public class PopChams extends Module {
         popList.add(new Person(entity));
     }
 
-    @Subscribe
-    public void onRender3D(Render3DEvent e) {
+
+    public void onRender3D(MatrixStack stack) {
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
         RenderSystem.enableBlend();
@@ -103,7 +102,7 @@ public class PopChams extends Module {
             person.modelPlayer.rightSleeve.visible = false;
             person.modelPlayer.jacket.visible = false;
             person.modelPlayer.hat.visible = false;
-            renderEntity(e.getMatrixStack(), person.player, person.modelPlayer, person.getAlpha());
+            renderEntity(stack, person.player, person.modelPlayer, person.getAlpha());
         });
         RenderSystem.disableBlend();
         RenderSystem.depthMask(true);

@@ -193,6 +193,6 @@ public class HudEditorGui extends Screen {
 
     @Override
     public void removed() {
-        Thunderhack.EVENT_BUS.unregister(this);
+        Thunderhack.EVENT_BUS.unsubscribe(this);
     }
 }

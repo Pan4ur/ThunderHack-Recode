@@ -1,6 +1,7 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -259,7 +260,7 @@ public class ElytraPlus extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onMove(EventMove e) {
         if (mode.getValue() == Mode.FireWork) {
 
@@ -531,7 +532,7 @@ public class ElytraPlus extends Module {
 
     public static long lastStartFalling;
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) acceleration = 0;
     }

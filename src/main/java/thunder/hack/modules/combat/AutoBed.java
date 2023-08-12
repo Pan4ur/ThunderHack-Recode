@@ -1,8 +1,9 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.entity.BedBlockEntity;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BedItem;
 import net.minecraft.item.ItemStack;
@@ -22,7 +23,6 @@ import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.render.StorageEsp;
@@ -64,7 +64,7 @@ public class AutoBed extends Module {
         super("AutoBed", Category.COMBAT);
     }
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync event) {
         if (fullNullCheck()) return;
 
@@ -118,7 +118,7 @@ public class AutoBed extends Module {
         if (angleInactivityTimer.passedMs(450)) isSpoofingAngles = false;
     }
 
-    @Subscribe
+    @EventHandler
     public void onPostSync(EventPostSync event) {
         if (breakPos != null) breakBed(breakPos);
         else if (finalPos != null) placeBed();
@@ -149,14 +149,13 @@ public class AutoBed extends Module {
         hitTimer.reset();
     }
 
-    @Subscribe
-    public void onRender3D(Render3DEvent event) {
+    public void onRender3D(MatrixStack stack) {
         if (render.getValue()) {
             renderBlocks.forEach((pos, time) -> {
                 if (System.currentTimeMillis() - time > 500) {
                     renderBlocks.remove(pos);
                 } else {
-                    Render3DEngine.drawFilledBox(event.getMatrixStack(),new Box(pos), Render2DEngine.injectAlpha(HudEditor.getColor(0),100));
+                    Render3DEngine.drawFilledBox(stack,new Box(pos), Render2DEngine.injectAlpha(HudEditor.getColor(0),100));
                     Render3DEngine.drawBoxOutline(new Box(pos), HudEditor.getColor(0), 2);
                 }
             });

@@ -1,6 +1,7 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.events.impl.EventPlayerJump;
@@ -23,7 +24,7 @@ public class HoleSnap extends Module {
         hole = findHole();
     }
     
-    @Subscribe
+    @EventHandler
     public void modifyVelocity(EventPlayerTravel e){
         if(mc.player.age % 10 == 0) hole = findHole();
         if(hole != null){
@@ -36,7 +37,7 @@ public class HoleSnap extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void modifyJump(EventPlayerJump e){
         if(hole != null){
             if(e.isPre()){

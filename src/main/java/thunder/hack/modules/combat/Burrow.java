@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -70,7 +71,7 @@ public class Burrow extends Module {
         startPos = getPlayerPos();
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof ExplosionS2CPacket) {
             if (scaleExplosion.getValue()) {
@@ -109,7 +110,7 @@ public class Burrow extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onEntityUpdate(PlayerUpdateEvent e) {
         if (wait.getValue()) {
             BlockPos currentPos = getPlayerPos();

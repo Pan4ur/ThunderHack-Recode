@@ -1,7 +1,9 @@
 package thunder.hack.modules.player;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -10,7 +12,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import thunder.hack.core.PlaceManager;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -63,11 +64,10 @@ public class AirPlace extends Module {
         ((IMinecraftClient)mc).setUseCooldown(4);
     }
 
-    @Subscribe
-    private void onRender(Render3DEvent e) {
+    public void onRender3D(MatrixStack stack) {
         if (hit == null && !mc.world.getBlockState(hit.getBlockPos()).getBlock().equals(Blocks.AIR)) return;
 
-        Render3DEngine.drawFilledBox(e.getMatrixStack(), new Box(hit.getBlockPos()), fillColor.getValue().getColorObject());
+        Render3DEngine.drawFilledBox(stack, new Box(hit.getBlockPos()), fillColor.getValue().getColorObject());
         Render3DEngine.drawBoxOutline(new Box(hit.getBlockPos()), lineColor.getValue().getColorObject(), lineWidth.getValue());
     }
 }

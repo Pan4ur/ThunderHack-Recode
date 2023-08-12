@@ -2,6 +2,7 @@ package thunder.hack.modules.movement;
 
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.packet.s2c.play.PlayPingS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
@@ -91,7 +92,7 @@ public class Timer extends Module {
         return prevPosX == mc.player.getX() && prevPosY == mc.player.getY() && prevPosZ == mc.player.getZ() && yaw == mc.player.getYaw() && pitch == mc.player.getPitch();
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e){
         if(mode.getValue() == Mode.GrimFunnyGame) {
             if (System.currentTimeMillis() - cancelTime > 55000) {
@@ -113,7 +114,7 @@ public class Timer extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPostPlayerUpdate(PostPlayerUpdateEvent event) {
         if (mode.getValue() == Mode.TICKSHIFT) {
             int status = MathUtility.clamp((int) (100 - Math.min(violation, 100)), 0, 100);

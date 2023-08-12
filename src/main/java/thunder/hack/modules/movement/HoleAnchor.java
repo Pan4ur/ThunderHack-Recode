@@ -1,6 +1,7 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.events.impl.PlayerUpdateEvent;
@@ -18,7 +19,7 @@ public class HoleAnchor extends Module {
     private final Setting<Boolean> pull = new Setting<>("Pull", true);
 
 
-    @Subscribe
+    @EventHandler
     public void onPlayerUpdate(PlayerUpdateEvent e) {
         if (mc.player.getPitch() > pitch.getValue()) {
             if (

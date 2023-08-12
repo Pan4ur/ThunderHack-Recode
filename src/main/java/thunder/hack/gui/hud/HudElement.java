@@ -1,13 +1,13 @@
 package thunder.hack.gui.hud;
 
 
-import com.google.common.eventbus.Subscribe;
-import thunder.hack.events.impl.Render2DEvent;
-import thunder.hack.setting.impl.PositionSetting;
-import thunder.hack.setting.Setting;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.ChatScreen;
 import thunder.hack.events.impl.EventMouse;
 import thunder.hack.modules.Module;
-import net.minecraft.client.gui.screen.ChatScreen;
+import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.PositionSetting;
 
 
 public class HudElement extends Module {
@@ -20,7 +20,7 @@ public class HudElement extends Module {
     float y1 = 0;
 
 
-    public HudElement(String name, String description,int width, int height) {
+    public HudElement(String name, String description, int width, int height) {
         super(name, description, Category.HUD);
         this.height = height;
         this.width = width;
@@ -42,7 +42,7 @@ public class HudElement extends Module {
 
     private boolean m_butt = false;
 
-    public void onRender2D(Render2DEvent e) {
+    public void onRender2D(DrawContext context) {
         y1 = mc.getWindow().getScaledHeight() * pos.getValue().getY();
         x1 = mc.getWindow().getScaledWidth() * pos.getValue().getX();
 
@@ -63,34 +63,33 @@ public class HudElement extends Module {
         }
     }
 
-
-    @Subscribe
-    public void onMouse(EventMouse event){
-        if(event.getAction() == 0){
+    @EventHandler
+    public void onMouse(EventMouse event) {
+        if (event.getAction() == 0) {
             m_butt = false;
         }
-        if(event.getAction() == 1 && isHovering()){
+        if (event.getAction() == 1 && isHovering()) {
             m_butt = true;
         }
     }
 
-    public float getPosX(){
+    public float getPosX() {
         return x1;
     }
 
-    public float getPosY(){
+    public float getPosY() {
         return y1;
     }
 
-    public float getX(){
+    public float getX() {
         return pos.getValue().x;
     }
 
-    public float getY(){
+    public float getY() {
         return pos.getValue().y;
     }
 
-    public void setHeight(int h){
+    public void setHeight(int h) {
         this.height = h;
     }
 }

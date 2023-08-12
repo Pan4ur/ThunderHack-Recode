@@ -1,6 +1,7 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import thunder.hack.Thunderhack;
@@ -27,7 +28,7 @@ public class LongJump extends Module {
     private final Setting<Float> speed = new Setting("Speed", 4.48F, 0.0F, 10.0F);
 
     
-    @Subscribe
+    @EventHandler
     public void onMove(EventMove e) {
         if (Mode.getValue() == ModeEn.Normal) {
             doNormal(e);
@@ -36,7 +37,7 @@ public class LongJump extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             stage = 0;
@@ -151,7 +152,7 @@ public class LongJump extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onEntitySync(EventSync eventSync) {
         if(Mode.getValue() == ModeEn.Normal || Mode.getValue() == ModeEn.Pause) {
             if (MovementUtility.isMoving()) {

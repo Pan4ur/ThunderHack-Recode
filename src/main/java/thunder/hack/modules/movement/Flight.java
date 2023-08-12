@@ -2,6 +2,7 @@ package thunder.hack.modules.movement;
 
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import thunder.hack.events.impl.EventSync;
@@ -25,7 +26,7 @@ public class Flight extends Module {
         super("Flight", "Makes you fly.", Module.Category.MOVEMENT);
     }
 
-    @Subscribe
+    @EventHandler
     public void onEventSync(EventSync event) {
         if (mode.getValue() == Mode.Vanilla) {
             if (MovementUtility.isMoving()) {
@@ -61,7 +62,7 @@ public class Flight extends Module {
         mc.player.setVelocity(dir[0],mc.player.getVelocity().getY(),dir[1]);
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (mode.getValue() != Mode.MatrixJump) {
             return;
@@ -77,7 +78,7 @@ public class Flight extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketSend(PacketEvent.Send e) {
         if (mode.getValue() == Mode.MatrixJump) {
 

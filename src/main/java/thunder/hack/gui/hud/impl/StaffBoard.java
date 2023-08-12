@@ -1,18 +1,18 @@
 package thunder.hack.gui.hud.impl;
 
-import com.google.common.eventbus.Subscribe;
 import com.mojang.authlib.GameProfile;
-import thunder.hack.cmd.impl.StaffCommand;
-import thunder.hack.events.impl.Render2DEvent;
-import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.gui.hud.HudElement;
-import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.setting.Setting;
-import thunder.hack.utility.render.Render2DEngine;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
+import thunder.hack.cmd.impl.StaffCommand;
+import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.gui.hud.HudElement;
+import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.utility.render.Render2DEngine;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -32,7 +32,7 @@ public class StaffBoard extends HudElement {
     public StaffBoard() {
         super("StaffBoard", "StaffBoard", 50, 50);
     }
-    
+
 
     public static List<String> getOnlinePlayer() {
         return mc.player.networkHandler.getPlayerList().stream()
@@ -93,16 +93,15 @@ public class StaffBoard extends HudElement {
     }
 
     public static boolean check(String name) {
-        if(mc.getCurrentServerEntry() != null && mc.getCurrentServerEntry().address.contains("mcfunny")){
+        if (mc.getCurrentServerEntry() != null && mc.getCurrentServerEntry().address.contains("mcfunny")) {
             return name.contains("helper") || name.contains("moder") || name.contains("модер") || name.contains("хелпер");
         }
         return name.contains("helper") || name.contains("moder") || name.contains("admin") || name.contains("owner") || name.contains("curator") || name.contains("куратор") || name.contains("модер") || name.contains("админ") || name.contains("хелпер");
     }
 
 
-    @Subscribe
-    public void onRender2D(Render2DEvent e) {
-        super.onRender2D(e);
+    public void onRender2D(DrawContext context) {
+        super.onRender2D(context);
         int y_offset1 = 11;
         List<String> all = new java.util.ArrayList<>();
         all.addAll(players);
@@ -119,17 +118,17 @@ public class StaffBoard extends HudElement {
         }
 
 
-        Render2DEngine.drawBlurredShadow(e.getMatrixStack(),getPosX(), getPosY(), scale_x + 20, 20 + y_offset1, 20, shadowColor.getValue().getColorObject());
+        Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX(), getPosY(), scale_x + 20, 20 + y_offset1, 20, shadowColor.getValue().getColorObject());
 
-        Render2DEngine.drawRound(e.getMatrixStack(), getPosX(), getPosY(), scale_x + 20, 20 + y_offset1, 7f, color2.getValue().getColorObject());
-        FontRenderers.modules.drawCenteredString(e.getMatrixStack(),"StaffBoard", getPosX() + (scale_x + 20) / 2, getPosY() + 5, textColor.getValue().getColor());
-        Render2DEngine.drawRound(e.getMatrixStack(),getPosX() + 2, getPosY() + 13, scale_x + 16, 1, 0.5f, color3.getValue().getColorObject());
+        Render2DEngine.drawRound(context.getMatrices(), getPosX(), getPosY(), scale_x + 20, 20 + y_offset1, 7f, color2.getValue().getColorObject());
+        FontRenderers.modules.drawCenteredString(context.getMatrices(), "StaffBoard", getPosX() + (scale_x + 20) / 2, getPosY() + 5, textColor.getValue().getColor());
+        Render2DEngine.drawRound(context.getMatrices(), getPosX() + 2, getPosY() + 13, scale_x + 16, 1, 0.5f, color3.getValue().getColorObject());
 
 
         int y_offset = 11;
         for (String player : all) {
             String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "VANISH" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "VANISH " + Formatting.YELLOW + "(NEAR!)" : Formatting.GREEN + "ACTIVE");
-            FontRenderers.modules.drawString(e.getMatrixStack(),a, getPosX() + 5, getPosY() + 18 + y_offset, -1, false);
+            FontRenderers.modules.drawString(context.getMatrices(), a, getPosX() + 5, getPosY() + 18 + y_offset, -1, false);
             y_offset += 13;
         }
     }

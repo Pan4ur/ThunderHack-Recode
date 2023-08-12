@@ -1,6 +1,7 @@
 package thunder.hack.core;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.player.PlayerEntity;
@@ -21,13 +22,9 @@ import java.util.stream.Collectors;
 import static thunder.hack.modules.Module.mc;
 
 public class CombatManager {
-    public CombatManager(){
-        Thunderhack.EVENT_BUS.register(this);
-    }
-
     public HashMap<String, Integer> popList = new HashMap<>();
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if (Module.fullNullCheck()) return;
 
@@ -48,7 +45,7 @@ public class CombatManager {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPostTick(EventPostTick event) {
         if (Module.fullNullCheck()) {
             return;

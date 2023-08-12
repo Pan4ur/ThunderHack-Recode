@@ -2,6 +2,7 @@ package thunder.hack.modules.render;
 
 import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventHeldItemRenderer;
 import thunder.hack.modules.Module;
@@ -47,7 +48,7 @@ public class Chams extends Module {
     private static final Setting<Float> ambientScale = new Setting<>("AmbientScale", 1F, 0f, 5F).withParent(scales);
 
 
-    @Subscribe
+    @EventHandler
     public void onRenderHands(EventHeldItemRenderer e){
         if(handItems.getValue()){
             RenderSystem.setShaderColor(handItemsColor.getValue().getRed() / 255f,handItemsColor.getValue().getGreen() / 255f,handItemsColor.getValue().getBlue() / 255f,handItemsColor.getValue().getAlpha() / 255f);

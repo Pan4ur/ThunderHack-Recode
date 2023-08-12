@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.EventAfterRotate;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.modules.Module;
@@ -80,7 +81,7 @@ public class AutoBuff extends Module {
         return false;
     }
 
-    @Subscribe
+    @EventHandler
     public void onPostRotationSet(EventAfterRotate event) {
         if (Aura.target != null && mc.player.getAttackCooldownProgress(1) > 0.5f)
             return;
@@ -93,7 +94,7 @@ public class AutoBuff extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPostSync(EventPostSync e) {
         if (Aura.target != null && mc.player.getAttackCooldownProgress(1) > 0.5f)
             return;

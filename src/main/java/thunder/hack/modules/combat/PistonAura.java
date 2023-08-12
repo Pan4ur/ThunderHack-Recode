@@ -1,7 +1,8 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -21,7 +22,6 @@ import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import net.minecraft.util.math.BlockPos;
@@ -86,7 +86,7 @@ public class PistonAura extends Module {
         reset();
     }
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync event) {
         if (tickCounter < actionInterval.getValue()) tickCounter++;
 
@@ -106,7 +106,7 @@ public class PistonAura extends Module {
         handlePistonAura(false);
     }
 
-    @Subscribe
+    @EventHandler
     public void onPostSync(EventPostSync event) {
         if (postAction != null) {
             tickCounter = 0;
@@ -345,7 +345,7 @@ public class PistonAura extends Module {
     }
     private EndCrystalEntity lastCrystal;
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive event){
         if (event.getPacket() instanceof PlaySoundS2CPacket && ((PlaySoundS2CPacket) event.getPacket()).getCategory().equals(SoundCategory.BLOCKS) && ((PlaySoundS2CPacket) event.getPacket()).getSound().value().equals(SoundEvents.ENTITY_GENERIC_EXPLODE)) {
             if (lastCrystal == null || !lastCrystal.isAlive()) return;
@@ -373,17 +373,16 @@ public class PistonAura extends Module {
     }
 
 
-    @Subscribe
-    public void onRender3D(Render3DEvent event) {
+    public void onRender3D(MatrixStack stack) {
         if (pistonPos == null || crystalPos == null || redStonePos == null) {
             return;
         }
-        Render3DEngine.drawFilledBox(event.getMatrixStack(),new Box(pistonHeadPos.down()), Render2DEngine.injectAlpha(Color.CYAN,100));
-        Render3DEngine.drawFilledBox(event.getMatrixStack(),new Box(crystalPos), Render2DEngine.injectAlpha(Color.PINK,100));
-        Render3DEngine.drawFilledBox(event.getMatrixStack(),new Box(pistonPos.down()), Render2DEngine.injectAlpha(Color.GREEN,100));
-        Render3DEngine.drawFilledBox(event.getMatrixStack(),new Box(redStonePos.down()), Render2DEngine.injectAlpha(Color.RED,100));
+        Render3DEngine.drawFilledBox(stack,new Box(pistonHeadPos.down()), Render2DEngine.injectAlpha(Color.CYAN,100));
+        Render3DEngine.drawFilledBox(stack,new Box(crystalPos), Render2DEngine.injectAlpha(Color.PINK,100));
+        Render3DEngine.drawFilledBox(stack,new Box(pistonPos.down()), Render2DEngine.injectAlpha(Color.GREEN,100));
+        Render3DEngine.drawFilledBox(stack,new Box(redStonePos.down()), Render2DEngine.injectAlpha(Color.RED,100));
         if (firePos != null)
-            Render3DEngine.drawFilledBox(event.getMatrixStack(),new Box(firePos.down()), Render2DEngine.injectAlpha(Color.yellow,100));
+            Render3DEngine.drawFilledBox(stack,new Box(firePos.down()), Render2DEngine.injectAlpha(Color.yellow,100));
     }
 
     private void findPos(boolean disable) {

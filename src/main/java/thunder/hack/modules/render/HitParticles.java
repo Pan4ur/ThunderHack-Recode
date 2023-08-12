@@ -1,9 +1,8 @@
 package thunder.hack.modules.render;
 
-import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.Identifier;
-import thunder.hack.events.impl.PreRender3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.impl.ColorSetting;
@@ -63,16 +62,14 @@ public class HitParticles extends Module {
     }
 
 
-    @Subscribe
-    public void onPreRender3D(PreRender3DEvent event) {
+    public void onPreRender3D(MatrixStack stack) {
         RenderSystem.enableDepthTest();
         if (mc.player != null && mc.world != null) {
             for (Particle particle : particles) {
-                particle.render(event.getMatrixStack());
+                particle.render(stack);
             }
         }
         RenderSystem.disableDepthTest();
-
     }
 
     public class Particle {

@@ -1,20 +1,15 @@
 package thunder.hack.gui.hud.impl;
 
-import com.google.common.eventbus.Subscribe;
-import net.minecraft.entity.LivingEntity;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
-import thunder.hack.Thunderhack;
-import thunder.hack.events.impl.Render2DEvent;
-import thunder.hack.events.impl.RenderBlurEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.combat.Criticals;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
 
-import java.awt.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Radar extends HudElement {
@@ -27,6 +22,7 @@ public class Radar extends HudElement {
     private enum Mode {
         Rect, Text
     }
+
     public Setting<ColorMode> colorMode = new Setting<>("ColorMode", ColorMode.Sync);
 
     private enum ColorMode {
@@ -46,37 +42,33 @@ public class Radar extends HudElement {
         players.addAll(mc.world.getPlayers());
     }
 
-    @Subscribe
-    public void onRender2D(Render2DEvent e) {
-        super.onRender2D(e);
-        if(mode.getValue() == Mode.Text){
+    public void onRender2D(DrawContext context) {
+        super.onRender2D(context);
+        if (mode.getValue() == Mode.Text) {
             float offset_y = 0;
             for (PlayerEntity entityPlayer : players) {
                 if (entityPlayer == mc.player)
                     continue;
 
-
-                String str = entityPlayer.getName().getString() + " " + String.format("%.1f",(entityPlayer.getHealth() + entityPlayer.getAbsorptionAmount())) + " " + String.format("%.1f", mc.player.distanceTo(entityPlayer)) + " m";
-                if(colorMode.getValue() == ColorMode.Sync){
-                    FontRenderers.sf_bold.drawString(e.getMatrixStack(),str,getPosX(),getPosY() + offset_y,HudEditor.getColor((int) (offset_y * 2f)).getRGB());
+                String str = entityPlayer.getName().getString() + " " + String.format("%.1f", (entityPlayer.getHealth() + entityPlayer.getAbsorptionAmount())) + " " + String.format("%.1f", mc.player.distanceTo(entityPlayer)) + " m";
+                if (colorMode.getValue() == ColorMode.Sync) {
+                    FontRenderers.sf_bold.drawString(context.getMatrices(), str, getPosX(), getPosY() + offset_y, HudEditor.getColor((int) (offset_y * 2f)).getRGB());
                 } else {
-                    FontRenderers.sf_bold.drawString(e.getMatrixStack(),str,getPosX(),getPosY() + offset_y,color2.getValue().getColor());
+                    FontRenderers.sf_bold.drawString(context.getMatrices(), str, getPosX(), getPosY() + offset_y, color2.getValue().getColor());
                 }
                 offset_y += FontRenderers.sf_bold.getFontHeight(str);
             }
         }
     }
 
-    @Subscribe
-    public void onRenderShader(RenderBlurEvent e){
-        if(mode.getValue() == Mode.Rect) {
-            Render2DEngine.drawGradientGlow(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90),getPosX(), getPosY(), size.getValue(), size.getValue(),HudEditor.hudRound.getValue(),10);
-            Render2DEngine.drawGradientRoundShader(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, size.getValue() + 1, size.getValue() + 1, HudEditor.hudRound.getValue());
-            Render2DEngine.drawRoundShader(e.getMatrixStack(), getPosX(), getPosY(), size.getValue(), size.getValue(), HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+    public void onRenderShaders(DrawContext context) {
+        if (mode.getValue() == Mode.Rect) {
+            Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), size.getValue(), size.getValue(), HudEditor.hudRound.getValue(), 10);
+            Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, size.getValue() + 1, size.getValue() + 1, HudEditor.hudRound.getValue());
+            Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), size.getValue(), size.getValue(), HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
 
 
-
-            Render2DEngine.drawRectDumbWay(e.getMatrixStack(),
+            Render2DEngine.drawRectDumbWay(context.getMatrices(),
                     (float) (getPosX() + (size.getValue() / 2F - 0.5)),
                     (float) (getPosY() + 3.5),
                     (float) (getPosX() + (size.getValue() / 2F + 0.2)),
@@ -85,7 +77,7 @@ public class Radar extends HudElement {
             );
 
             Render2DEngine.drawRectDumbWay(
-                    e.getMatrixStack(),
+                    context.getMatrices(),
                     getPosX() + 3.5f,
                     getPosY() + (size.getValue() / 2F - 0.2f),
                     (getPosX() + size.getValue()) - 3.5f,
@@ -115,7 +107,7 @@ public class Radar extends HudElement {
                     rotX = -(size.getValue() / 2F - 5);
                 }
 
-                Render2DEngine.drawRound(e.getMatrixStack(), (getPosX() + size.getValue() / 2F + rotX) - 2, (getPosY() + size.getValue() / 2F + rotY) - 2, 4, 4, 2f, color3.getValue().getColorObject());
+                Render2DEngine.drawRound(context.getMatrices(), (getPosX() + size.getValue() / 2F + rotX) - 2, (getPosY() + size.getValue() / 2F + rotY) - 2, 4, 4, 2f, color3.getValue().getColorObject());
             }
         }
     }

@@ -1,6 +1,8 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.network.packet.s2c.play.*;
@@ -149,7 +151,7 @@ public class AutoCrystal extends Module {
         CAtarget = null;
     }
 
-    @Subscribe
+    @EventHandler
     public void onEntitySync(EventSync event) {
         if (mc.player == null || mc.world == null) return;
         if (inv_timer++ >= 20) {
@@ -208,7 +210,7 @@ public class AutoCrystal extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void modifyVelocity(EventPlayerTravel e) {
         if (rotate.getValue() == RotateMode.Grim && !placeTimer.passedMs(1000)) {
             if (e.isPre()) {
@@ -220,7 +222,7 @@ public class AutoCrystal extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void modifyJump(EventPlayerJump e) {
         if (rotate.getValue() == RotateMode.Grim && !placeTimer.passedMs(1000)) {
             if (e.isPre()) {
@@ -232,7 +234,7 @@ public class AutoCrystal extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketSend(PacketEvent.SendPost event) {
         if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket) noGhostTimer.reset();
     }
@@ -408,13 +410,12 @@ public class AutoCrystal extends Module {
         return false;
     }
 
-    @Subscribe
-    public void onRender3D(Render3DEvent event) {
+    public void onRender3D(MatrixStack stack) {
         if (renderActive.getValue())
             placeLocations.forEach((pos, time) -> {
                 if (System.currentTimeMillis() - time < 500) {
                     int alpha = (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)));
-                    Render3DEngine.drawFilledBox(event.getMatrixStack(), new Box(pos), Render2DEngine.injectAlpha(fillColor.getValue().getColorObject(), alpha));
+                    Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(fillColor.getValue().getColorObject(), alpha));
                     Render3DEngine.drawBoxOutline(new Box(pos), Render2DEngine.injectAlpha(lineColor.getValue().getColorObject(), alpha), lineWidth.getValue());
                     Render3DEngine.drawTextIn3D(String.valueOf(MathUtility.round2(renderDmg)), pos.toCenterPos(), 0, 0.1, 0, Render2DEngine.injectAlpha(textColor.getValue().getColorObject(), alpha));
                 }
@@ -608,14 +609,14 @@ public class AutoCrystal extends Module {
         });
     }
 
-    @Subscribe
+    @EventHandler
     public void onEntitySpawn(EventEntitySpawn e) {
         if (e.getEntity() instanceof EndCrystalEntity) {
             onSpawnCrystal(e.getEntity().getX(), e.getEntity().getY(), e.getEntity().getZ(), e.getEntity().getId());
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof EntitySpawnS2CPacket) {
             EntitySpawnS2CPacket packet = event.getPacket();

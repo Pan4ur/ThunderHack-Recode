@@ -1,7 +1,7 @@
 package thunder.hack.modules.render;
 
-import com.google.common.eventbus.Subscribe;
-import thunder.hack.events.impl.Render3DEvent;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
@@ -53,11 +53,8 @@ public class Search extends Module {
         blocks.addAll(bloks);
     }
 
-
-
-    @Subscribe
-    public void onRender3D(Render3DEvent event) {
-        if (mc.world == null || mc.player == null || blocks.isEmpty()) return;
+    public void onRender3D(MatrixStack stack) {
+        if (fullNullCheck() || blocks.isEmpty()) return;
 
         if (fill.getValue() || outline.getValue()) {
             for (BlockVec vec : blocks) {
@@ -69,7 +66,7 @@ public class Search extends Module {
                 BlockPos pos = new BlockPos((int) vec.x, (int) vec.y, (int) vec.z);
 
                 if (fill.getValue()) {
-                    Render3DEngine.drawFilledBox(event.getMatrixStack(), new Box(pos), color.getValue().getColorObject());
+                    Render3DEngine.drawFilledBox(stack, new Box(pos), color.getValue().getColorObject());
                 }
                 if(outline.getValue()){
                     Render3DEngine.drawBoxOutline(new Box(pos), color.getValue().getColorObject(),1f);

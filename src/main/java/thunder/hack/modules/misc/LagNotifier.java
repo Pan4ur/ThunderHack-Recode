@@ -1,14 +1,14 @@
 package thunder.hack.modules.misc;
 
-import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.util.Identifier;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.Render2DEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
@@ -47,7 +47,7 @@ public class LagNotifier extends Module {
         super.onEnable();
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (fullNullCheck()) return;
 
@@ -59,9 +59,8 @@ public class LagNotifier extends Module {
         }
     }
 
-    @Subscribe
-    @SuppressWarnings("unused")
-    private void onRender(Render2DEvent e) {
+
+    public void onRender2D(DrawContext context) {
         Render2DEngine.setupRender();
         RenderSystem.defaultBlendFunc();
 
@@ -69,9 +68,9 @@ public class LagNotifier extends Module {
             DecimalFormat decimalFormat = new DecimalFormat("#.#");
 
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                FontRenderers.modules.drawCenteredString(e.getMatrixStack(), "Обнаружен руббербенд! " + decimalFormat.format((5000f - (float) rubberbandTimer.getTimeMs()) / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
+                FontRenderers.modules.drawCenteredString(context.getMatrices(), "Обнаружен руббербенд! " + decimalFormat.format((5000f - (float) rubberbandTimer.getTimeMs()) / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
             } else {
-                FontRenderers.modules.drawCenteredString(e.getMatrixStack(), "Rubberband detected! " + decimalFormat.format((5000f - (float) rubberbandTimer.getTimeMs()) / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
+                FontRenderers.modules.drawCenteredString(context.getMatrices(), "Rubberband detected! " + decimalFormat.format((5000f - (float) rubberbandTimer.getTimeMs()) / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
             }
         }
 
@@ -79,13 +78,13 @@ public class LagNotifier extends Module {
             DecimalFormat decimalFormat = new DecimalFormat("#.#");
 
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                FontRenderers.modules.drawCenteredString(e.getMatrixStack(), "Сервер перестал отвечать! " + decimalFormat.format((float) packetTimer.getTimeMs() / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
+                FontRenderers.modules.drawCenteredString(context.getMatrices(), "Сервер перестал отвечать! " + decimalFormat.format((float) packetTimer.getTimeMs() / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
             } else {
-                FontRenderers.modules.drawCenteredString(e.getMatrixStack(), "The server stopped responding! " + decimalFormat.format((float) packetTimer.getTimeMs() / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
+                FontRenderers.modules.drawCenteredString(context.getMatrices(), "The server stopped responding! " + decimalFormat.format((float) packetTimer.getTimeMs() / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
             }
 
             RenderSystem.setShaderColor(1f, 0.87f, 0f, 1f);
-            e.getContext().drawTexture(ICON, (int) ((float) mc.getWindow().getScaledWidth() / 2f - 40), (int) ((float) mc.getWindow().getScaledHeight() / 3f - 120), 0, 0, 80, 80, 80, 80);
+            context.drawTexture(ICON, (int) ((float) mc.getWindow().getScaledWidth() / 2f - 40), (int) ((float) mc.getWindow().getScaledHeight() / 3f - 120), 0, 0, 80, 80, 80, 80);
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         }
 

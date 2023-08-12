@@ -1,6 +1,7 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Formatting;
 import thunder.hack.Thunderhack;
@@ -22,7 +23,7 @@ public class TotemPopCounter extends Module {
     public Setting<Boolean> notification = new Setting<>("Notification", true);
 
 
-    @Subscribe
+    @EventHandler
     public void onTotemPop(TotemPopEvent event) {
         if (event.getEntity() == mc.player) return;
         String s;

@@ -1,15 +1,20 @@
 package thunder.hack.gui.hud.impl;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.render.*;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.RotationAxis;
+import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
+
+import static thunder.hack.modules.Module.mc;
 
 public class Particles {
     public double x, y, deltaX, deltaY, size, opacity;
     public Color color;
 
-
+    private Identifier star = new Identifier("textures/star.png");
 
 
     public static Color mixColors(final Color color1, final Color color2, final double percent) {
@@ -21,59 +26,17 @@ public class Particles {
     }
 
 
-    public void render2D() {
-
-        size /= 2;
-        /*
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.disableDepthTest();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        final Tessellator tessellator = Tessellator.getInstance();
-        final BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
-        for (double i = 0; i <= 90; i++) {
-            final double angle = i * 4 * (Math.PI * 2) / 360;
-            bufferbuilder.vertex(x + (size * Math.cos(angle)) + size, y + (size * Math.sin(angle)) + size, 0f).color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1).next();
-        }
-     //   tessellator.draw();
-        BufferRenderer.drawWithGlobalProgram(bufferbuilder.end());
-
-        RenderSystem.enableDepthTest();
-        RenderSystem.disableBlend();
-        RenderSystem.enableCull();
-
-         */
-
-
-        drawPolygonPart(x,y, (int) size,360,color.getRGB(),-1);
+    public void render2D(MatrixStack matrixStack) {
+        drawStar(matrixStack, (float) x, (float) y, color);
     }
 
-
-
-    public static void drawPolygonPart(double x, double y, int radius, int part, int startColor, int endColor) {
-        float alpha = (float) (startColor >> 24 & 255) / 255.0F;
-        float red = (float) (startColor >> 16 & 255) / 255.0F;
-        float green = (float) (startColor >> 8 & 255) / 255.0F;
-        float blue = (float) (startColor & 255) / 255.0F;
-        float alpha1 = (float) (endColor >> 24 & 255) / 255.0F;
-        float red1 = (float) (endColor >> 16 & 255) / 255.0F;
-        float green1 = (float) (endColor >> 8 & 255) / 255.0F;
-        float blue1 = (float) (endColor & 255) / 255.0F;
+    public void drawStar(MatrixStack matrices, float x, float y, Color c) {
         RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        final Tessellator tessellator = Tessellator.getInstance();
-        final BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
-        bufferbuilder.vertex(x, y, 0).color(red, green, blue, alpha).next();
-        final double TWICE_PI = Math.PI * 2;
-        for (int i = part * 90; i <= part * 90 + 90; i++) {
-            double angle = (TWICE_PI * i / 360) + Math.toRadians(180);
-            bufferbuilder.vertex(x + Math.sin(angle) * radius, y + Math.cos(angle) * radius, 0).color(red1, green1, blue1, alpha1).next();
-        }
-        tessellator.draw();
+        RenderSystem.setShaderTexture(0, star);
+        RenderSystem.setShaderColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, (float) (opacity / 255f));
+        Render2DEngine.renderTexture(matrices, x, y, size, size, 0, 0, 256, 256, 256, 256);
         RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 
     public void updatePosition() {
@@ -82,6 +45,7 @@ public class Particles {
         deltaY *= 0.95;
         deltaX *= 0.95;
         opacity -= 2f;
+        size /= 1.1;
         if (opacity < 1) opacity = 1;
     }
 

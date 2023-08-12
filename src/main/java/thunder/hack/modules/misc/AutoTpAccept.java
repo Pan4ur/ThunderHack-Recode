@@ -1,6 +1,7 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -18,7 +19,7 @@ public class AutoTpAccept extends Module {
     public Setting<Boolean> onlyFriends = new Setting<>("onlyFriends", true);
 
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if(fullNullCheck()) return;
         if (event.getPacket() instanceof GameMessageS2CPacket) {

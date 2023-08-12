@@ -1,6 +1,7 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.player.PlayerEntity;
 import thunder.hack.events.impl.EventAttack;
 import thunder.hack.modules.Module;
@@ -51,7 +52,7 @@ public class EbatteSratte extends Module {
             "АЛО БОМЖАТИНА БЕЗ МАТЕРИ Я ТВОЮ МАТЬ ОБ СТОЛ УБИЛ ЧЕРЕП ЕЙ РАЗБИЛ НОГОЙ БАТЮ ТВОЕГО С ОКНА ВЫКИНУЛ СУКА ЧМО ЕБАННОЕ ОТВЕТЬ ЧМО ЕБЛАН ТВАРЬ ШАЛАВА"
     };
 
-    @Subscribe
+    @EventHandler
     public void onAttackEntity(EventAttack event) {
         if (event.getEntity() instanceof PlayerEntity) {
             if (timer.passedS(delay.getValue())) {

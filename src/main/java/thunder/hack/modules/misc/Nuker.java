@@ -1,8 +1,8 @@
 package thunder.hack.modules.misc;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -12,14 +12,11 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import thunder.hack.core.ModuleManager;
-import thunder.hack.core.PlaceManager;
 import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.player.SpeedMine;
-import thunder.hack.modules.render.Trails;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.player.PlaceUtility;
@@ -46,13 +43,13 @@ public class Nuker extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onBlockInteract(EventAttackBlock e) {
         if (mc.world.isAir(e.getBlockPos())) return;
         nukerTargetBlock = mc.world.getBlockState(e.getBlockPos()).getBlock();
     }
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync e) {
         if (nukerTargetBlockpos != null) {
             if (mc.world.getBlockState(nukerTargetBlockpos.bp).getBlock() != nukerTargetBlock || mc.player.squaredDistanceTo(nukerTargetBlockpos.bp.toCenterPos()) > range.getPow2Value())
@@ -78,12 +75,11 @@ public class Nuker extends Module {
         }
     }
 
-    @Subscribe
-    public void onRender3D(Render3DEvent e) {
+    public void onRender3D(MatrixStack stack) {
         if (nukerTargetBlockpos != null && nukerTargetBlockpos.bp != null) {
             Color color1 = colorMode.getValue() == Mode.Sync ? HudEditor.getColor(1) : color.getValue().getColorObject();
             Render3DEngine.drawBoxOutline(new Box(nukerTargetBlockpos.bp), color1, 2);
-            Render3DEngine.drawFilledBox(e.getMatrixStack(), new Box(nukerTargetBlockpos.bp), Render2DEngine.injectAlpha(color1, 100));
+            Render3DEngine.drawFilledBox(stack, new Box(nukerTargetBlockpos.bp), Render2DEngine.injectAlpha(color1, 100));
         }
     }
 

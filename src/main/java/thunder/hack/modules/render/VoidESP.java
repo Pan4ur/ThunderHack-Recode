@@ -1,10 +1,10 @@
 package thunder.hack.modules.render;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -24,8 +24,7 @@ public class VoidESP extends Module {
     public Setting<Boolean> down = new Setting<>("Up", false);
     private List<BlockPos> holes = new ArrayList<>();
 
-    @Subscribe
-    public void onRender3D(Render3DEvent event) {
+    public void onRender3D(MatrixStack stack) {
         for (BlockPos pos : holes) {
             Render3DEngine.renderCrosses(down.getValue() ? new Box(pos.up()) : new Box(pos), color.getValue().getColorObject(), 2.0f);
         }

@@ -1,6 +1,7 @@
 package thunder.hack;
 
-import com.google.common.eventbus.EventBus;
+import meteordevelopment.orbit.EventBus;
+import meteordevelopment.orbit.IEventBus;
 import thunder.hack.core.*;
 import thunder.hack.notification.NotificationManager;
 import thunder.hack.utility.ThSoundPack;
@@ -14,13 +15,14 @@ import thunder.hack.utility.render.shaders.RoundedProgram;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 
 
 public class Thunderhack implements ModInitializer {
-    public static final String MOD_ID = "thunderhack";
-    public static final EventBus EVENT_BUS = new EventBus();
 
+    public static final String MOD_ID = "thunderhack";
+    public static final IEventBus EVENT_BUS = new EventBus();
     public static String version = "1.2b70823";
     public static boolean oldVersion = false;
     public static float TICK_TIMER = 1f;
@@ -47,6 +49,16 @@ public class Thunderhack implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        EVENT_BUS.registerLambdaFactory("thunder.hack", (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
+
+        EVENT_BUS.subscribe(notificationManager);
+        EVENT_BUS.subscribe(serverManager);
+        EVENT_BUS.subscribe(playerManager);
+        EVENT_BUS.subscribe(combatManager);
+        EVENT_BUS.subscribe(asyncManager);
+        EVENT_BUS.subscribe(placeManager);
+        EVENT_BUS.subscribe(core);
+
         FriendManager.loadFriends();
         configManager.load(configManager.getCurrentConfig());
         moduleManager.onLoad();

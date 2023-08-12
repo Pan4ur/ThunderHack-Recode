@@ -1,6 +1,7 @@
 package thunder.hack.modules.player;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
 import net.minecraft.util.math.BlockPos;
@@ -18,7 +19,7 @@ public class PortalGodMode extends Module {
         confirmTimer.setMs(99999);
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketSend(PacketEvent.Send e) {
         if (e.getPacket() instanceof TeleportConfirmC2SPacket && confirmTimer.getPassedTimeMs() < 5000) {
             teleported = true;

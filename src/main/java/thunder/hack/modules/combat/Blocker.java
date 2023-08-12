@@ -1,7 +1,8 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
@@ -12,7 +13,6 @@ import net.minecraft.util.math.Vec3d;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.PlayerUpdateEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.render.HoleESP;
@@ -51,21 +51,20 @@ public class Blocker extends Module {
 
     public static Timer inactivityTimer = new Timer();
 
-    @Subscribe
-    public void onRender3D(Render3DEvent event) {
+    public void onRender3D(MatrixStack stack) {
         if (render.getValue()) {
             renderBlocks.forEach((pos, time) -> {
                 if (System.currentTimeMillis() - time > 500) {
                     renderBlocks.remove(pos);
                 } else {
-                    Render3DEngine.drawFilledBox(event.getMatrixStack(), new Box(pos), Render2DEngine.injectAlpha(HudEditor.getColor(0), 100));
+                    Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(HudEditor.getColor(0), 100));
                     Render3DEngine.drawBoxOutline(new Box(pos), HudEditor.getColor(0), 2);
                 }
             });
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onUpdate(PlayerUpdateEvent event) {
         if (tickCounter < actionInterval.getValue()) {
             tickCounter++;
@@ -117,7 +116,7 @@ public class Blocker extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (fullNullCheck()) return;
         if (e.getPacket() instanceof BlockBreakingProgressS2CPacket && HoleESP.validIndestructible(BlockPos.ofFloored(mc.player.getPos()))) {

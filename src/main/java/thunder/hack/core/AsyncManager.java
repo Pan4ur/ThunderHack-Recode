@@ -1,6 +1,7 @@
 package thunder.hack.core;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import thunder.hack.Thunderhack;
@@ -24,7 +25,7 @@ public class AsyncManager {
     private volatile Iterable<Entity> threadSafeEntityList = Collections.emptyList();
     private volatile List<AbstractClientPlayerEntity> threadSafePlayersList = Collections.emptyList();
 
-    @Subscribe
+    @EventHandler
     public void onTick(EventTick e){
         if(mc.world == null) return;
         threadSafeEntityList = mc.world.getEntities();
@@ -40,13 +41,12 @@ public class AsyncManager {
     }
 
     public AsyncManager() {
-        Thunderhack.EVENT_BUS.register(this);
         clientService.setName("ThunderHack-AsyncProcessor");
         clientService.setDaemon(true);
         clientService.start();
     }
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync e){
         if(!clientService.isAlive()){
             clientService = new ClientService();

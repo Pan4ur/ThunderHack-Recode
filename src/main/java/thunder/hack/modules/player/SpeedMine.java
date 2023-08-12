@@ -1,9 +1,10 @@
 package thunder.hack.modules.player;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.effect.StatusEffects;
@@ -20,7 +21,6 @@ import thunder.hack.core.PlayerManager;
 import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.injection.accesors.IInteractionManager;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -77,6 +77,7 @@ public class SpeedMine extends Module {
                         mineFacing = null;
                         progress = 0;
                         mineBreaks = 0;
+                        return;
                     }
                     if (progress == 0 && !mc.world.isAir(minePosition)) {
                         mc.interactionManager.attackBlock(minePosition, mineFacing);
@@ -168,7 +169,7 @@ public class SpeedMine extends Module {
         return (digSpeed < 0 ? 0 : digSpeed);
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketSend(PacketEvent.SendPost e) {
         if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket && resetOnSwitch.getValue()) {
             progress = 0;
@@ -183,8 +184,7 @@ public class SpeedMine extends Module {
         mineBreaks = 0;
     }
 
-    @Subscribe
-    public void onRender3D(Render3DEvent e) {
+    public void onRender3D(MatrixStack stack) {
         if (mode.getValue() == Mode.Packet) {
             if (minePosition != null && !mc.world.isAir(minePosition)) {
                 switch (renderMode.getValue()) {
@@ -193,7 +193,7 @@ public class SpeedMine extends Module {
                         float noom = MathUtility.clamp(progress, 0f, 1f);
 
                         Render3DEngine.drawFilledBox(
-                                e.getMatrixStack(),
+                                stack,
                                 shrunkMineBox.shrink(noom, noom, noom).offset(0.5 + noom * 0.5, 0.5 + noom * 0.5, 0.5 + noom * 0.5),
                                 progress >= 0.95 ? endFillColor.getValue().getColorObject() : startFillColor.getValue().getColorObject()
                         );
@@ -208,7 +208,7 @@ public class SpeedMine extends Module {
                         Box renderBox = new Box(minePosition);
 
                         Render3DEngine.drawFilledBox(
-                                e.getMatrixStack(),
+                                stack,
                                 renderBox,
                                 progress >= 0.95 ? endFillColor.getValue().getColorObject() : startFillColor.getValue().getColorObject()
                         );
@@ -224,7 +224,7 @@ public class SpeedMine extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onAttackBlock(EventAttackBlock event) {
         if (canBreak(event.getBlockPos()) && !mc.player.getAbilities().creativeMode) {
             if (mode.getValue() == Mode.Packet) {
@@ -242,7 +242,7 @@ public class SpeedMine extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onEntitySync(EventSync event) {
         if (rotate.getValue()) {
             if (progress > 0.95) {

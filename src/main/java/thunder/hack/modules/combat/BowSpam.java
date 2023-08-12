@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -19,7 +20,7 @@ public class BowSpam extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync event) {
         if ((mc.player.getOffHandStack().getItem() == Items.BOW || mc.player.getMainHandStack().getItem() == Items.BOW) && mc.player.isUsingItem()) {
             if (mc.player.getItemUseTime() >= this.ticks.getValue()) {

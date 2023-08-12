@@ -1,11 +1,11 @@
 package thunder.hack.modules.render;
 
-import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -44,8 +44,7 @@ public class HoleESP extends Module {
     }
 
 
-    @Subscribe
-    public void onRender3D(Render3DEvent e) {
+    public void onRender3D(MatrixStack stack) {
         if (positions.isEmpty()) return;
 
         for (PosWithColor posWithColor : positions) {
@@ -62,7 +61,7 @@ public class HoleESP extends Module {
                 );
             }
             if (mode.getValue() == Mode.CubeFill || mode.getValue() == Mode.CubeBoth) {
-                Render3DEngine.drawFilledBox(e.getMatrixStack(),
+                Render3DEngine.drawFilledBox(stack,
                         new Box(
                                 posWithColor.getBp().getX(),
                                 posWithColor.getBp().getY(),
@@ -76,7 +75,7 @@ public class HoleESP extends Module {
 
             if (mode.getValue() == Mode.Fade) {
                 RenderSystem.disableCull();
-                Render3DEngine.drawFilledFadeBox(e.getMatrixStack(),
+                Render3DEngine.drawFilledFadeBox(stack,
                         new Box(
                                 posWithColor.getBp().getX(),
                                 posWithColor.getBp().getY(),

@@ -1,9 +1,9 @@
 package thunder.hack.modules.player;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -39,7 +39,7 @@ public class Blink extends Module {
 
     private AtomicBoolean sending = new AtomicBoolean(false);
 
-    @Subscribe
+    @EventHandler
     public void onPacket(PacketEvent.Send event) {
         if(fullNullCheck()){
             return;
@@ -70,7 +70,7 @@ public class Blink extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onUpdate(EventTick event) {
         if(fullNullCheck()){
             return;
@@ -94,8 +94,8 @@ public class Blink extends Module {
     private Timer pulseTimer = new Timer();
 
 
-    @Subscribe
-    public void onRender3D(Render3DEvent event) {
+
+    public void onRender3D(MatrixStack stack) {
         if (mc.player == null || mc.world == null) return;
         if (render.getValue() && lastPos != null) {
             float[] hsb = Color.RGBtoHSB(circleColor.getValue().getRed(), circleColor.getValue().getGreen(), circleColor.getValue().getBlue(), null);

@@ -1,6 +1,7 @@
 package thunder.hack.modules.player;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IPlayerPositionLookS2CPacket;
@@ -11,7 +12,7 @@ public class NoServerRotate extends Module {
         super("NoServerRotate", Category.PLAYER);
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e){
         if(fullNullCheck()) return;
         if(e.getPacket() instanceof PlayerPositionLookS2CPacket pac){

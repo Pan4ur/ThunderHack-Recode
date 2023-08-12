@@ -1,6 +1,7 @@
 package thunder.hack.modules.player;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -91,7 +92,7 @@ public class FreeCam extends Module {
         return dummy;
     }
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync event) {
         if(fullNullCheck()){
             disable();
@@ -129,7 +130,7 @@ public class FreeCam extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onPostSync(EventPostSync event) {
         if(fullNullCheck()){
             disable();
@@ -141,7 +142,7 @@ public class FreeCam extends Module {
         mc.player.setPitch(prevRotate.y);
     }
 
-    @Subscribe
+    @EventHandler
     public void onMove(EventMove event) {
         if(fullNullCheck()){
             disable();
@@ -150,7 +151,7 @@ public class FreeCam extends Module {
         mc.player.noClip = true;
     }
 
-    @Subscribe
+    @EventHandler
     public void onTick(PlayerUpdateEvent event) {
         if(fullNullCheck()){
             disable();

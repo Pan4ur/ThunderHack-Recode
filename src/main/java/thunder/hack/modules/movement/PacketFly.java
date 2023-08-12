@@ -3,6 +3,7 @@ package thunder.hack.modules.movement;
 
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventSync;
@@ -119,7 +120,7 @@ public class PacketFly extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if (fullNullCheck()) return;
         if (mc.player != null && event.getPacket() instanceof PlayerPositionLookS2CPacket pac) {
@@ -144,7 +145,7 @@ public class PacketFly extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onPacketSend(PacketEvent.Send event) {
         if (event.getPacket() instanceof PlayerMoveC2SPacket) {
             if (movePackets.contains((PlayerMoveC2SPacket) event.getPacket())) {
@@ -164,7 +165,7 @@ public class PacketFly extends Module {
         return System.currentTimeMillis() - ((Teleport) ((Map.Entry) o).getValue()).time > TimeUnit.SECONDS.toMillis(30L);
     }
 
-    @Subscribe
+    @EventHandler
     public void onMove(EventMove event) {
         if (!event.isCancelled()) {
             if (mode.getValue() != Mode.Rubber && teleportId == 0) {
@@ -180,7 +181,7 @@ public class PacketFly extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync eventPlayerUpdateWalking) {
         if (timer.getValue() != 1.0) {
             Thunderhack.TICK_TIMER = timer.getValue();

@@ -1,12 +1,11 @@
 package thunder.hack.modules.render;
 
-import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -33,8 +32,7 @@ public class BreadCrumbs extends Module {
         Custom,Sync
     }
 
-    @Subscribe
-    public void onRender3D(Render3DEvent event) {
+    public void onRender3D(MatrixStack stack) {
         drawLine(2f,false);
         drawLine(5,false);
         drawLine(10,false);
@@ -77,7 +75,7 @@ public class BreadCrumbs extends Module {
         Render3DEngine.cleanup();
     }
 
-    @Subscribe
+    @EventHandler
     public void postSync(EventPostSync event) {
         if(positions.size() > limit.getValue()){
             positions.remove(0);

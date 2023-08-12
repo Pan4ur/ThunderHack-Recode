@@ -1,6 +1,7 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.PacketEvent;
@@ -40,7 +41,7 @@ public class AutoAuth extends Module {
         cpass.setValue("none");
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if(event.getPacket() instanceof GameMessageS2CPacket) {
             GameMessageS2CPacket pac = event.getPacket();

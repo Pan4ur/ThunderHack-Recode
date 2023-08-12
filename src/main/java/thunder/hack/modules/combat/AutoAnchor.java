@@ -1,8 +1,9 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RespawnAnchorBlock;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.EnchantedGoldenAppleItem;
 import net.minecraft.item.Items;
@@ -15,7 +16,8 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.PlaceManager;
-import thunder.hack.events.impl.*;
+import thunder.hack.events.impl.EventPlaceBlock;
+import thunder.hack.events.impl.EventSync;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
@@ -31,7 +33,8 @@ import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,7 +74,7 @@ public class AutoAnchor extends Module {
         Legit, Rage
     }
 
-    @Subscribe
+    @EventHandler
     public void onBlockPlace(EventPlaceBlock event) {
         if (mode.getValue() == Mode.Rage) return;
         if (event.getBlock() == Blocks.RESPAWN_ANCHOR && mc.options.useKey.isPressed()) {
@@ -153,7 +156,7 @@ public class AutoAnchor extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onEntitySync(EventSync event) {
 
         if (check() && mode.getValue() == Mode.Rage) if (!explodeAnchor()) if (!chargeAnchor()) placeAnchor();
@@ -195,6 +198,7 @@ public class AutoAnchor extends Module {
         }
 
         if (result == null) return false;
+
 
         SearchInvResult anchorResult = InventoryUtility.getAnchor();
         if (anchorResult.found()) {
@@ -257,7 +261,6 @@ public class AutoAnchor extends Module {
             PlaceManager.trailingPlaceAction = () -> {
                 int prev_slot = mc.player.getInventory().selectedSlot;
                 anchorResult.switchTo();
-
                 mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(new Vec3d(threadedBp.getX(), threadedBp.getY(), threadedBp.getZ()), PlaceUtility.getPlaceDirection(threadedBp, strictDirection.getValue()), threadedBp, false));
 
                 mc.player.getInventory().selectedSlot = prev_slot;
@@ -278,12 +281,11 @@ public class AutoAnchor extends Module {
     }
 
 
-    @Subscribe
-    public void onRender3D(Render3DEvent e) {
+
+    public void onRender3D(MatrixStack e) {
         if (cachePos != null && mode.getValue() == Mode.Rage) {
             Render3DEngine.drawBoxOutline(new Box(cachePos), new Color(0xC7FFFFFF, true), 2f);
             Render3DEngine.drawTextIn3D(String.valueOf(MathUtility.round2(renderDmg)), cachePos.toCenterPos(), 0, 0.1, 0, Render2DEngine.injectAlpha(Color.WHITE, 255));
-
         }
 
     }

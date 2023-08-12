@@ -1,12 +1,8 @@
 package thunder.hack.injection;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
-import thunder.hack.events.impl.Render2DEvent;
-import thunder.hack.events.impl.RenderBlurEvent;
-import thunder.hack.gui.hud.impl.Crosshair;
 import thunder.hack.gui.hud.impl.Hotbar;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.render.MSAAFramebuffer;
@@ -20,11 +16,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinIngameHud {
     @Inject(at = @At(value = "HEAD"), method = "render")
     public void render(DrawContext context, float tickDelta, CallbackInfo ci) {
-        Thunderhack.EVENT_BUS.post(new RenderBlurEvent(tickDelta,context));
+        Thunderhack.moduleManager.onRenderShaders(context);
+        Thunderhack.notificationManager.onRenderShader(context);
+
         if (ClickGui.getInstance().msaa.getValue()) {
-            MSAAFramebuffer.use(() -> Thunderhack.EVENT_BUS.post(new Render2DEvent(context.getMatrices(), context)));
+            MSAAFramebuffer.use(() -> {
+                Thunderhack.moduleManager.onRender2D(context);
+                Thunderhack.notificationManager.onRender2D(context);
+            });
         } else {
-            Thunderhack.EVENT_BUS.post(new Render2DEvent(context.getMatrices(), context));
+            Thunderhack.moduleManager.onRender2D(context);
+            Thunderhack.notificationManager.onRender2D(context);
         }
     }
 
