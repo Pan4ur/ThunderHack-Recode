@@ -250,7 +250,7 @@ public class TargetHud extends HudElement {
                 Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX() + 54, getPosY() + 34 - 14, 90, 10, blurRadius.getValue(), HudEditor.getColor(0));
 
                 Render2DEngine.drawGradientRound(context.getMatrices(), getPosX() + 55, getPosY() + 35 - 14, 90, 10, 2f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
-                Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 55, getPosY() + 35 - 14, (int) MathUtil.clamp((90 * (health / 20)), 3, 90), 10, 2f);
+                Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 55, getPosY() + 35 - 14, (int) MathUtility.clamp((90 * (health / 20)), 3, 90), 10, 2f);
 
 
                 if (hpMode.getValue() == HPmodeEn.HP) {
@@ -327,7 +327,7 @@ public class TargetHud extends HudElement {
                 health = (float) healthanimation.getAnimationD();
 
                 Render2DEngine.drawGradientRound(context.getMatrices(), getPosX() + 48, getPosY() + 32, 85, 11, 4f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
-                Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 48, getPosY() + 32, (int) MathUtil.clamp((85 * (health / 20)), 8, 85), 11, 4f);
+                Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 48, getPosY() + 32, (int) MathUtility.clamp((85 * (health / 20)), 8, 85), 11, 4f);
 
                 FontRenderers.modules.drawString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * target.getHealth()) / 10.0) : (((Math.round(10.0 * target.getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 85f, getPosY() + 37f, -1);
                 //

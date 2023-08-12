@@ -2,6 +2,7 @@ package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
@@ -9,7 +10,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.Thunderhack;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.render.HoleESP;
 import thunder.hack.setting.Setting;
@@ -103,13 +103,12 @@ public class PistonPush extends Module {
         super.onUpdate();
     }
 
-    @Subscribe
-    public void onRender(Render3DEvent event) {
+    public void onRender3D(MatrixStack stack) {
         renderPoses.forEach((pos, time) -> {
             if (System.currentTimeMillis() - time > 500) {
                 renderPoses.remove(pos);
             } else {
-                Render3DEngine.drawFilledBox(event.getMatrixStack(), new Box(pos), Render2DEngine.injectAlpha(fillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
+                Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(fillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
                 Render3DEngine.drawBoxOutline(new Box(pos), lineColor.getValue().getColorObject(), lineWidth.getValue());
             }
         });

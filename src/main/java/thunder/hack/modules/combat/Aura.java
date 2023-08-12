@@ -38,6 +38,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 
@@ -340,48 +341,48 @@ public class Aura extends Module {
 
         // Задаем начальную скорость точки
         if (rotationMotion.equals(Vec3d.ZERO))
-            rotationMotion = new Vec3d(MathUtil.random(-0.05f, 0.05f), MathUtil.random(-0.05f, 0.05f), MathUtil.random(-0.05f, 0.05f));
+            rotationMotion = new Vec3d(MathUtility.random(-0.05f, 0.05f), MathUtility.random(-0.05f, 0.05f), MathUtility.random(-0.05f, 0.05f));
 
         rotationPoint.add(rotationMotion);
 
 
         // Сталкиваемся с хитбоксом по X
         if (rotationPoint.x >= (target.getBoundingBox().getXLength() - 0.05) / 2f) {
-            rotationPoint = new Vec3d(MathUtil.random(-0.003f, -0.03f), rotationPoint.getY(), rotationPoint.getZ());
+            rotationPoint = new Vec3d(MathUtility.random(-0.003f, -0.03f), rotationPoint.getY(), rotationPoint.getZ());
         }
 
         // Сталкиваемся с хитбоксом по Y
         if (rotationPoint.y >= target.getBoundingBox().getYLength()) {
-            rotationPoint = new Vec3d(rotationPoint.getX(), MathUtil.random(-0.001f, -0.03f), rotationPoint.getZ());
+            rotationPoint = new Vec3d(rotationPoint.getX(), MathUtility.random(-0.001f, -0.03f), rotationPoint.getZ());
         }
 
         // Сталкиваемся с хитбоксом по Z
         if (rotationPoint.z >= (target.getBoundingBox().getZLength() - 0.05) / 2f) {
-            rotationPoint = new Vec3d(rotationPoint.getX(), rotationPoint.getY(), MathUtil.random(-0.003f, -0.03f));
+            rotationPoint = new Vec3d(rotationPoint.getX(), rotationPoint.getY(), MathUtility.random(-0.003f, -0.03f));
         }
 
         // Сталкиваемся с хитбоксом по -X
         if (rotationPoint.x <= -(target.getBoundingBox().getXLength() - 0.05) / 2f) {
-            rotationPoint = new Vec3d(MathUtil.random(0.003f, 0.03f), rotationPoint.getY(), rotationPoint.getZ());
+            rotationPoint = new Vec3d(MathUtility.random(0.003f, 0.03f), rotationPoint.getY(), rotationPoint.getZ());
         }
 
 
         // Сталкиваемся с хитбоксом по -Y
         if (rotationPoint.y <= 0.05) {
-            rotationPoint = new Vec3d(rotationPoint.getX(), MathUtil.random(0.001f, 0.03f), rotationPoint.getZ());
+            rotationPoint = new Vec3d(rotationPoint.getX(), MathUtility.random(0.001f, 0.03f), rotationPoint.getZ());
         }
 
         // Сталкиваемся с хитбоксом по -Z
         if (rotationPoint.z <= -(target.getBoundingBox().getZLength() - 0.05) / 2f) {
-            rotationPoint = new Vec3d(rotationPoint.getX(), rotationPoint.getY(), MathUtil.random(0.003f, 0.03f));
+            rotationPoint = new Vec3d(rotationPoint.getX(), rotationPoint.getY(), MathUtility.random(0.003f, 0.03f));
         }
 
         // Добавляем джиттер
-        rotationPoint.add(MathUtil.random(-0.03f, 0.03f), 0f, MathUtil.random(-0.03f, 0.03f));
+        rotationPoint.add(MathUtility.random(-0.03f, 0.03f), 0f, MathUtility.random(-0.03f, 0.03f));
 
         // Если мы используем обход ударов через стену и наша цель за стеной, то целимся в верхушку хитбокса т.к. матриксу поебать
         if (!mc.player.canSee(target) && wallsBypass.getValue())
-            return target.getPos().add(MathUtil.random(-0.15, 0.15), target.getBoundingBox().getYLength(), MathUtil.random(-0.15, 0.15));
+            return target.getPos().add(MathUtility.random(-0.15, 0.15), target.getBoundingBox().getYLength(), MathUtility.random(-0.15, 0.15));
 
         // Если мы перестали смотреть на цель
         if (!lookingAtHitbox && target instanceof PlayerEntity) {
@@ -392,7 +393,7 @@ public class Aura extends Module {
             if (distanceFromHead(target.getPos().add(0, target.getEyeHeight(target.getPose()) / 2f, 0)) <= attackRange.getPow2Value()
                     && Thunderhack.playerManager.checkRtx(rotation1[0], rotation1[1], attackRange.getValue(), false)) {
                 // наводим на центр
-                rotationPoint = new Vec3d(MathUtil.random(-0.1f, 0.1f), target.getEyeHeight(target.getPose()) / (MathUtil.random(1.8f, 2.5f)), MathUtil.random(-0.1f, 0.1f));
+                rotationPoint = new Vec3d(MathUtility.random(-0.1f, 0.1f), target.getEyeHeight(target.getPose()) / (MathUtility.random(1.8f, 2.5f)), MathUtility.random(-0.1f, 0.1f));
             } else {
                 // Сканим хитбокс на видимую точку
                 // В норме хитбокс 0.3 (половина хитбокса), но я сделал 0.25 чтоб не было флагов за хитбоксы
