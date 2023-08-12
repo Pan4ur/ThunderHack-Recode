@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Surround extends Module {
-    private final Setting<Integer> actionShift = new Setting<>("PlacePerTick", 4, 1, 8);
+    private final Setting<Integer> actionShift = new Setting<>("PlacePerTick", 4, 1, 15);
     private final Setting<Integer> tickDelay = new Setting<>("Delay", 0, 0, 5);
     private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
     private final Setting<Boolean> crystalBreaker = new Setting<>("Destroy Crystal", false);

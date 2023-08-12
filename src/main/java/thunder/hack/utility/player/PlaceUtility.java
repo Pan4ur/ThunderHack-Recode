@@ -152,7 +152,7 @@ public final class PlaceUtility {
     }
 
     public static boolean place(BlockPos pos, boolean rotate, boolean strictDirection, Hand hand, int slot, boolean ignoreEntities, PlaceMode mode) {
-        if (!canPlaceBlock(pos, ignoreEntities)) return false;
+        if (!canPlaceBlock(pos, strictDirection, ignoreEntities)) return false;
         Direction side = getPlaceDirection(pos, strictDirection);
         if (side == null) return false;
         BlockPos neighbour = pos.offset(side);
@@ -168,11 +168,15 @@ public final class PlaceUtility {
     }
 
     public static float[] calcAngle(BlockPos pos, boolean strictDirection, boolean ignoreEntities) {
-        if (!canPlaceBlock(pos, ignoreEntities)) return null;
+        if (!canPlaceBlock(pos, strictDirection, !ignoreEntities)) {
+            return null;
+        }
         Direction side = getPlaceDirection(pos, strictDirection);
+
         if (side == null) {
             return null;
         }
+
         BlockPos neighbour = pos.offset(side);
         Direction opposite = side.getOpposite();
         Vec3d hitVec = new Vec3d(neighbour.getX() + 0.5, neighbour.getY() + 0.5, neighbour.getZ() + 0.5).add(new Vec3d(opposite.getUnitVector()).multiply(0.5));
@@ -180,7 +184,7 @@ public final class PlaceUtility {
     }
 
     public static boolean forcePlace(BlockPos pos, boolean strictDirection, Hand hand, int slot, boolean ignoreEntities, PlaceMode mode) {
-        if (!canPlaceBlock(pos, strictDirection, ignoreEntities)) return false;
+        if (!canPlaceBlock(pos, strictDirection, !ignoreEntities)) return false;
         if (!mc.world.getBlockState(pos).isReplaceable()) return false;
         Direction side = Direction.DOWN;
         if (strictDirection) side = getPlaceDirection(pos, true);
@@ -188,6 +192,7 @@ public final class PlaceUtility {
         BlockPos neighbour = pos.offset(side);
         Direction opposite = side.getOpposite();
         new Placement(neighbour, opposite, 0, 0, hand, false, slot, mode).getAction().run();
+        ghostBlocks.put(pos, System.currentTimeMillis());
         return true;
     }
 
@@ -200,6 +205,7 @@ public final class PlaceUtility {
     }
 
     public static boolean canPlaceBlock(BlockPos pos, boolean strictDirection, boolean checkEntities) {
+        if(pos == null) return false;
         if (!mc.world.getBlockState(pos).isReplaceable()) {
             return false;
         }
@@ -223,7 +229,7 @@ public final class PlaceUtility {
 
         BlockState state = mc.world.getBlockState(pos);
 
-        return (!state.isAir() && state.getFluidState().isEmpty());
+        return (!state.isReplaceable() && state.getFluidState().isEmpty());
     }
 
     public static Direction getPlaceDirection(BlockPos pos, boolean strictDirection) {
@@ -244,7 +250,6 @@ public final class PlaceUtility {
                 validAxis.addAll(checkAxis(eyePos.z - blockCenter.z, Direction.NORTH, Direction.SOUTH, !isFullBox));
                 if (!validAxis.contains(side.getOpposite())) continue;
             }
-
             validFacings.add(side);
         }
         return validFacings.stream().min(Comparator.comparing(facing -> getEyesPos(mc.player).distanceTo(new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5).add(new Vec3d(facing.getUnitVector()).multiply(0.5))))).orElse(null);
@@ -418,7 +423,8 @@ public final class PlaceUtility {
         }
     }
 
-    public record BlockPosWithFacing(BlockPos position, Direction facing) {}
+    public record BlockPosWithFacing(BlockPos position, Direction facing) {
+    }
 
     public enum PlaceMode {
         Packet,

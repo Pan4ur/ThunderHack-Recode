@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
@@ -206,9 +207,10 @@ public class Aura extends Module {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPostSync(EventPostSync e){
-        //  lookingAtHitbox = Thunderhack.playerManager.checkRtx(mc.player.getYaw(), rotationPitch, attackRange.getValue(), ignoreWalls.getValue());
+        // завтры
+         // lookingAtHitbox = Thunderhack.playerManager.checkRtx(mc.player.getYaw(), rotationPitch, attackRange.getValue(), ignoreWalls.getValue());
     }
 
     @Override
@@ -304,6 +306,9 @@ public class Aura extends Module {
 
                 rotationYaw = (float) (newYaw - (newYaw - rotationYaw) % gcdFix);
                 rotationPitch = (float) (newPitch - (newPitch - rotationPitch) % gcdFix);
+
+                
+                lookingAtHitbox = Thunderhack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), ignoreWalls.getValue());
                 break;
             }
         }

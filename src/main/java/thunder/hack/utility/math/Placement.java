@@ -3,6 +3,7 @@ package thunder.hack.utility.math;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.PlaceManager;
 import net.minecraft.block.*;
 import net.minecraft.client.MinecraftClient;
@@ -14,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.utility.player.PlaceUtility;
+import thunder.hack.utility.player.PlayerUtility;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -77,12 +79,11 @@ public class Placement {
             BlockHitResult hitResult = new BlockHitResult(hitVec, getOpposite(), getNeighbour(), false);
 
             if (mode == PlaceUtility.PlaceMode.Packet || mode == PlaceUtility.PlaceMode.All) {
-                sendPacket(new PlayerInteractBlockC2SPacket(hand, hitResult, 1));
+                sendPacket(new PlayerInteractBlockC2SPacket(hand, hitResult, PlayerUtility.getWorldActionId(mc.world)));
             }
             if (mode == PlaceUtility.PlaceMode.Normal || mode == PlaceUtility.PlaceMode.All) {
                 mc.interactionManager.interactBlock(mc.player, hand, hitResult);
             }
-
             sendPacket(new HandSwingC2SPacket(hand));
         };
     }
