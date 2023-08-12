@@ -10,7 +10,6 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
@@ -27,7 +26,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
@@ -191,7 +190,7 @@ public class SpeedMine extends Module {
                 switch (renderMode.getValue()) {
                     case Shrink -> {
                         Box shrunkMineBox = new Box(minePosition.getX(), minePosition.getY(), minePosition.getZ(), minePosition.getX(), minePosition.getY(), minePosition.getZ());
-                        float noom = MathUtil.clamp(progress, 0f, 1f);
+                        float noom = MathUtility.clamp(progress, 0f, 1f);
 
                         Render3DEngine.drawFilledBox(
                                 e.getMatrixStack(),

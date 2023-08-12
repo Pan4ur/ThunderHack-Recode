@@ -4,16 +4,12 @@ import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
-import net.minecraft.util.math.MathHelper;
 import com.google.common.eventbus.Subscribe;
 import thunder.hack.events.impl.Render2DEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
 import net.minecraft.util.Formatting;
-import thunder.hack.utility.math.MathUtil;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import thunder.hack.utility.math.MathUtility;
 
 public class Speedometer extends HudElement {
     public float speed = 0f;
@@ -27,9 +23,9 @@ public class Speedometer extends HudElement {
         super.onRender2D(e);
         String str = "";
         if (!bps.getValue()) {
-            str = "Speed " + Formatting.WHITE + MathUtil.round(getSpeedKpH() * Thunderhack.TICK_TIMER) + " km/h";
+            str = "Speed " + Formatting.WHITE + MathUtility.round(getSpeedKpH() * Thunderhack.TICK_TIMER) + " km/h";
         } else {
-            str = "Speed " + Formatting.WHITE + MathUtil.round(getSpeedMpS() * Thunderhack.TICK_TIMER) + " b/s";
+            str = "Speed " + Formatting.WHITE + MathUtility.round(getSpeedMpS() * Thunderhack.TICK_TIMER) + " b/s";
         }
         FontRenderers.getRenderer2().drawString(e.getMatrixStack(),str, getPosX(), getPosY(), HudEditor.getColor(1).getRGB(), true);
     }

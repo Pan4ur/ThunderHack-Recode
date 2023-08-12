@@ -7,7 +7,7 @@ import thunder.hack.modules.Module;
 
 import static thunder.hack.modules.Module.mc;
 
-public class MovementUtil {
+public final class MovementUtility {
     public static boolean isMoving() {
         return mc.player.input.movementForward != 0.0 || mc.player.input.movementSideways != 0.0;
     }

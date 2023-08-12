@@ -19,9 +19,9 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.movement.Speed;
 import thunder.hack.modules.player.Scaffold;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtility;
 
-import static thunder.hack.utility.player.MovementUtil.isMoving;
+import static thunder.hack.utility.player.MovementUtility.isMoving;
 
 public class TargetStrafe extends Module {
 
@@ -115,7 +115,7 @@ public class TargetStrafe extends Module {
         if (mc.player.isOnGround()) {
             n8 = speedAttributes * n7;
             if (move.get_y() > 0) {
-                n8 += boost.getValue() == Boost.Elytra && InventoryUtil.getElytra() != -1 && disabled ? 0.65 : 0.2f;
+                n8 += boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && disabled ? 0.65 : 0.2f;
             }
             disabled = false;
         } else {
@@ -194,7 +194,7 @@ public class TargetStrafe extends Module {
 
     @Subscribe
     public void onMove(EventMove event) {
-        int elytraSlot = InventoryUtil.getElytra();
+        int elytraSlot = InventoryUtility.getElytra();
 
         if (boost.getValue() == Boost.Elytra && elytraSlot != -1) {
             if (isMoving() && !mc.player.isOnGround() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, event.get_y(), 0.0f)).iterator().hasNext() && disabled) {
@@ -246,8 +246,8 @@ public class TargetStrafe extends Module {
 
     @Subscribe
     public void onUpdate(PlayerUpdateEvent event) {
-        if ((boost.getValue() == Boost.Elytra && InventoryUtil.getElytra() != -1 && !mc.player.isOnGround() && mc.player.fallDistance > 0 && !disabled)) {
-            disabler(InventoryUtil.getElytra());
+        if ((boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && !mc.player.isOnGround() && mc.player.fallDistance > 0 && !disabled)) {
+            disabler(InventoryUtility.getElytra());
         }
     }
 

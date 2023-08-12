@@ -6,8 +6,7 @@ import com.google.gson.JsonPrimitive;
 
 import java.util.Arrays;
 
-public class EnumConverter
-        extends Converter<Enum, JsonElement> {
+public class EnumConverter extends Converter<Enum, JsonElement> {
     private final Class<? extends Enum> clazz;
 
     public EnumConverter(Class<? extends Enum> clazz) {
@@ -37,7 +36,7 @@ public class EnumConverter
         return clazz.getClass().getEnumConstants()[0];
     }
 
-    public static Enum setEnumInt(Enum clazz,int id) {
+    public static Enum setEnumInt(Enum clazz, int id) {
         for (int i = 0; i < clazz.getClass().getEnumConstants().length; ++i) {
             Enum e = clazz.getClass().getEnumConstants()[i];
             if (i != id) continue;

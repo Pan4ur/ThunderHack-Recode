@@ -9,7 +9,7 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.MovementUtil;
+import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.Timer;
 
 import java.sql.Time;
@@ -69,7 +69,7 @@ public class AutoFlyme extends Module {
     @Subscribe
     public void onUpdateWalkingPlayer(final EventSync event) {
         if (!instantSpeed.getValue() || !mc.player.getAbilities().flying) return;
-        final double[] dir =  MovementUtil.isMoving() ? MovementUtil.forward(speed.getValue()) : new double[]{0,0};
+        final double[] dir =  MovementUtility.isMoving() ? MovementUtility.forward(speed.getValue()) : new double[]{0,0};
         mc.player.setVelocity(dir[0],mc.player.getVelocity().y,dir[1]);
     }
 }

@@ -14,10 +14,10 @@ import thunder.hack.modules.movement.Speed;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.player.InventoryUtil;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
-import thunder.hack.utility.math.MathUtil;
-import thunder.hack.utility.player.PlayerUtil;
+import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.*;
 import net.minecraft.client.network.OtherClientPlayerEntity;
@@ -138,8 +138,8 @@ public class Aura extends Module {
             if (blocking)
                 mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
 
-            int axe_slot = InventoryUtil.getBestAxe();
-            int hotbar_axe_slot = InventoryUtil.findItem(AxeItem.class);
+            int axe_slot = InventoryUtility.getAxe().slot();
+            int hotbar_axe_slot = InventoryUtility.findInHotBar(stack -> stack.getItem() instanceof AxeItem).slot();
 
             boolean sprint = Core.serversprint;
             if (sprint)
@@ -172,13 +172,13 @@ public class Aura extends Module {
                 mc.interactionManager.attackEntity(mc.player, target);
                 Criticals.cancelCrit = false;
                 mc.player.swingHand(Hand.MAIN_HAND);
-                hitTicks = oldDelay.getValue() ? 1 + (int) (20f / MathUtil.random(minCPS.getValue(), maxCPS.getValue())) : 11;
+                hitTicks = oldDelay.getValue() ? 1 + (int) (20f / MathUtility.random(minCPS.getValue(), maxCPS.getValue())) : 11;
             }
 
             if (sprint)
                 mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
             if (blocking)
-                mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtil.getWorldActionId(mc.world)));
+                mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
         }
         hitTicks--;
     }
@@ -293,10 +293,10 @@ public class Aura extends Module {
                 }
 
 
-                float deltaYaw = MathHelper.clamp(MathHelper.abs(delta_yaw), MathUtil.random(-75.0F, -85.0F), MathUtil.random(75.0F, 85.0F));
+                float deltaYaw = MathHelper.clamp(MathHelper.abs(delta_yaw), MathUtility.random(-75.0F, -85.0F), MathUtility.random(75.0F, 85.0F));
 
                 float newYaw = rotationYaw + (delta_yaw > 0 ? deltaYaw : -deltaYaw);
-                float pitch_speed = pitchAcceleration + MathUtil.random(-1f, 1f);
+                float pitch_speed = pitchAcceleration + MathUtility.random(-1f, 1f);
 
                 float newPitch = MathHelper.clamp(rotationPitch + (autoCrit() ? delta_pitch : MathHelper.clamp(delta_pitch, -pitch_speed, pitch_speed)), -90.0F, 90.0F);
 
@@ -333,29 +333,29 @@ public class Aura extends Module {
 
     public Vec3d getLegitLook(Entity target) {
         if (pmx == 0f && pmy == 0f && pmz == 0f) {
-            pmx = MathUtil.random(-0.05f, 0.05f);
-            pmy = MathUtil.random(-0.05f, 0.05f);
-            pmz = MathUtil.random(-0.05f, 0.05f);
+            pmx = MathUtility.random(-0.05f, 0.05f);
+            pmy = MathUtility.random(-0.05f, 0.05f);
+            pmz = MathUtility.random(-0.05f, 0.05f);
         }
 
         ppx += pmx;
         ppz += pmz;
         ppy += pmy;
 
-        if (ppx >= (target.getBoundingBox().getXLength() - 0.05) / 2f) pmx = MathUtil.random(-0.003f, -0.03f);
-        if (ppy >= target.getBoundingBox().getYLength()) pmy = MathUtil.random(-0.001f, -0.03f);
-        if (ppz >= (target.getBoundingBox().getZLength() - 0.05) / 2f) pmz = MathUtil.random(-0.003f, -0.03f);
+        if (ppx >= (target.getBoundingBox().getXLength() - 0.05) / 2f) pmx = MathUtility.random(-0.003f, -0.03f);
+        if (ppy >= target.getBoundingBox().getYLength()) pmy = MathUtility.random(-0.001f, -0.03f);
+        if (ppz >= (target.getBoundingBox().getZLength() - 0.05) / 2f) pmz = MathUtility.random(-0.003f, -0.03f);
 
 
-        if (ppx <= -(target.getBoundingBox().getXLength() - 0.05) / 2f) pmx = MathUtil.random(0.003f, 0.03f);
-        if (ppy <= 0.05) pmy = MathUtil.random(0.001f, 0.03f);
-        if (ppz <= -(target.getBoundingBox().getZLength() - 0.05) / 2f) pmz = MathUtil.random(0.003f, 0.03f);
+        if (ppx <= -(target.getBoundingBox().getXLength() - 0.05) / 2f) pmx = MathUtility.random(0.003f, 0.03f);
+        if (ppy <= 0.05) pmy = MathUtility.random(0.001f, 0.03f);
+        if (ppz <= -(target.getBoundingBox().getZLength() - 0.05) / 2f) pmz = MathUtility.random(0.003f, 0.03f);
 
-        ppx += MathUtil.random(-0.03f, 0.03f);
-        ppz += MathUtil.random(-0.03f, 0.03f);
+        ppx += MathUtility.random(-0.03f, 0.03f);
+        ppz += MathUtility.random(-0.03f, 0.03f);
 
         if ((!mc.player.canSee(target) && wallsBypass.getValue()))
-            return target.getPos().add(MathUtil.random(-0.15, 0.15), target.getBoundingBox().getYLength(), MathUtil.random(-0.15, 0.15));
+            return target.getPos().add(MathUtility.random(-0.15, 0.15), target.getBoundingBox().getYLength(), MathUtility.random(-0.15, 0.15));
 
         if (!lookingAtHitbox && target instanceof PlayerEntity) {
             float[] rotation1 = Thunderhack.playerManager.calcAngle(target.getPos().add(0, target.getEyeHeight(target.getPose()) / 2f, 0));

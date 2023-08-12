@@ -9,7 +9,7 @@ import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import thunder.hack.utility.player.PlayerUtil;
+import thunder.hack.utility.player.PlayerUtility;
 
 public class BowSpam extends Module {
 
@@ -24,7 +24,7 @@ public class BowSpam extends Module {
         if ((mc.player.getOffHandStack().getItem() == Items.BOW || mc.player.getMainHandStack().getItem() == Items.BOW) && mc.player.isUsingItem()) {
             if (mc.player.getItemUseTime() >= this.ticks.getValue()) {
                 mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, mc.player.getHorizontalFacing()));
-                mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(mc.player.getOffHandStack().getItem() == Items.BOW ? Hand.OFF_HAND : Hand.MAIN_HAND, PlayerUtil.getWorldActionId(mc.world)));
+                mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(mc.player.getOffHandStack().getItem() == Items.BOW ? Hand.OFF_HAND : Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
                 mc.player.stopUsingItem();
             }
         }

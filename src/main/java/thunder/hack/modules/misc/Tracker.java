@@ -18,7 +18,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.player.FreeCam;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -164,7 +164,7 @@ public class Tracker extends Module {
             if (c % 64 == 0) {
                 builder.append(c / 64);
             } else {
-                builder.append(MathUtil.round(c / 64.0, 1));
+                builder.append(MathUtility.round(c / 64.0, 1));
             }
             if(MainSettings.language.getValue() == MainSettings.Language.RU) {
                 builder.append(Formatting.LIGHT_PURPLE).append(") кристаллов и ").append(Formatting.WHITE).append(e).append(Formatting.LIGHT_PURPLE).append(" (").append(Formatting.WHITE);
@@ -175,7 +175,7 @@ public class Tracker extends Module {
             if (e % 64 == 0) {
                 builder.append(e / 64);
             } else {
-                builder.append(MathUtil.round(e / 64.0, 1));
+                builder.append(MathUtility.round(e / 64.0, 1));
             }
             if(MainSettings.language.getValue() == MainSettings.Language.RU) {
                 builder.append(Formatting.LIGHT_PURPLE).append(") пузырьков опыта.");

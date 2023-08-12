@@ -3,7 +3,7 @@ package thunder.hack.utility;
 public class Timer {
     private long time;
 
-    public Timer(){
+    public Timer() {
         this.time = System.nanoTime();
     }
 

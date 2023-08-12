@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 
 import thunder.hack.modules.movement.ElytraPlus;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.MovementUtil;
+import thunder.hack.utility.player.MovementUtility;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.ProtectionEnchantment;
@@ -43,7 +43,7 @@ public class AutoArmor extends Module {
         if (ModuleManager.autoMend.isEnabled() && AutoMend.keyState)
             return;
 
-        if(MovementUtil.isMoving() && noMove.getValue()) return;
+        if(MovementUtility.isMoving() && noMove.getValue()) return;
         if(Thunderhack.moduleManager.get(ElytraPlus.class).isEnabled()) return;
 
         if (tickDelay > 0) {

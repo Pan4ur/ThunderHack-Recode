@@ -2,11 +2,11 @@ package thunder.hack.modules.player;
 
 import com.google.common.eventbus.Subscribe;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 import thunder.hack.events.impl.*;
 import thunder.hack.gui.font.FontRenderers;
@@ -15,9 +15,9 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.MathUtil;
-import thunder.hack.utility.player.InventoryUtil;
-import thunder.hack.utility.player.PlaceUtility;
+import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterDynamicAnimation;
 
@@ -31,7 +31,7 @@ public class AutoMend extends Module {
         super("AutoMend", Category.PLAYER);
     }
 
-    public Setting<Bind> key = new Setting<>("Key", new Bind(-1,false,false));
+    public Setting<Bind> key = new Setting<>("Key", new Bind(-1, false, false));
     private final Setting<Integer> dlay = new Setting<>("ThrowDelay", 100, 0, 100);
     private final Setting<Integer> armdlay = new Setting<>("ArmorDelay", 100, 0, 1000);
 
@@ -42,27 +42,27 @@ public class AutoMend extends Module {
     boolean need_repair = false;
 
     @Subscribe
-    public void onKeyPress(EventKeyPress e){
-        if(e.getKey() == key.getValue().getKey()) keyState = true;
+    public void onKeyPress(EventKeyPress e) {
+        if (e.getKey() == key.getValue().getKey()) keyState = true;
     }
 
     @Subscribe
-    public void onKeyRelease(EventKeyRelease e){
-        if(e.getKey() == key.getValue().getKey()) keyState = false;
+    public void onKeyRelease(EventKeyRelease e) {
+        if (e.getKey() == key.getValue().getKey()) keyState = false;
     }
 
     @Subscribe
-    public void onMouse(EventMouse e){
-        if(e.getButton() == key.getValue().getKey()) keyState = e.getAction() == 1;
+    public void onMouse(EventMouse e) {
+        if (e.getButton() == key.getValue().getKey()) keyState = e.getAction() == 1;
     }
 
 
     @Subscribe
     public void onSync(EventSync e) {
 
-        if(keyState && mc.currentScreen == null) {
+        if (keyState && mc.currentScreen == null) {
             mc.player.setPitch(90);
-            int xp_slot = InventoryUtil.getXpSlot();
+            SearchInvResult xpResult = InventoryUtility.getXp();
             ArrayList<ItemStack> stacks = new ArrayList();
             stacks.add(mc.player.getInventory().armor.get(3));
             stacks.add(mc.player.getInventory().armor.get(2));
@@ -71,8 +71,8 @@ public class AutoMend extends Module {
 
             need_repair = false;
 
-            for(ItemStack stack : stacks)
-                if(calculatePercentage(stack) < 100){
+            for (ItemStack stack : stacks)
+                if (calculatePercentage(stack) < 100) {
                     need_repair = true;
                     break;
                 }
@@ -80,10 +80,7 @@ public class AutoMend extends Module {
             if (need_repair) {
                 int prevItem = mc.player.getInventory().selectedSlot;
 
-                if(xp_slot != -1) {
-                    mc.player.getInventory().selectedSlot = xp_slot;
-                    mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(xp_slot));
-                }
+                xpResult.switchTo();
 
                 final ItemStack helm = mc.player.getInventory().getStack(36);
                 if (!helm.isEmpty() && calculatePercentage(helm) >= 100) takeOffSlot(8);
@@ -95,9 +92,9 @@ public class AutoMend extends Module {
                 if (!legging.isEmpty() && calculatePercentage(legging) >= 100) takeOffSlot(6);
 
                 final ItemStack feet = mc.player.getInventory().getStack(39);
-                if (!feet.isEmpty() &&  calculatePercentage(feet) >= 100) takeOffSlot(5);
+                if (!feet.isEmpty() && calculatePercentage(feet) >= 100) takeOffSlot(5);
 
-                if(xp_slot != -1) {
+                if (xpResult.found()) {
                     if (timer.passedMs(dlay.getValue())) {
                         mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
                         timer.reset();
@@ -120,37 +117,37 @@ public class AutoMend extends Module {
 
             int multiplier = 0;
             int totalarmor = 0;
-            for(ItemStack armor : stacks){
-                if(armor.isEmpty()) continue;
+            for (ItemStack armor : stacks) {
+                if (armor.isEmpty()) continue;
                 totalarmor += (int) calculatePercentage(armor);
                 multiplier++;
             }
             float progress = (float) totalarmor / (100f * multiplier);
 
-            final int expCount = InventoryUtil.getExpCount();
+            final int expCount = InventoryUtility.getItemCount(Items.EXPERIENCE_BOTTLE);
 
             float posX = mc.getWindow().getScaledWidth() / 2f - 69;
             float posY = mc.getWindow().getScaledHeight() / 2f + 50;
 
 
-            Render2DEngine.drawGradientBlurredShadow(e.getMatrixStack(),posX, posY, 137, 48,17, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
-            Render2DEngine.renderRoundedGradientRect(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90),posX, posY , 137, 47.5f,9);
-            Render2DEngine.drawRound(e.getMatrixStack(),posX + 0.5f, posY + 0.5f, 136f, 46,9, Render2DEngine.injectAlpha(Color.BLACK,220));
+            Render2DEngine.drawGradientBlurredShadow(e.getMatrixStack(), posX, posY, 137, 48, 17, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+            Render2DEngine.renderRoundedGradientRect(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), posX, posY, 137, 47.5f, 9);
+            Render2DEngine.drawRound(e.getMatrixStack(), posX + 0.5f, posY + 0.5f, 136f, 46, 9, Render2DEngine.injectAlpha(Color.BLACK, 220));
 
             float status = Math.min(100, progress * 100);
 
             mendAnimation.setValue(status);
             status = (float) mendAnimation.getAnimationD();
-            status = Math.max(10f,status);
-            Render2DEngine.drawGradientRound(e.getMatrixStack(),posX + 48, posY + 32, 85, 11, 4f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
+            status = Math.max(10f, status);
+            Render2DEngine.drawGradientRound(e.getMatrixStack(), posX + 48, posY + 32, 85, 11, 4f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
 
-            Render2DEngine.renderRoundedGradientRect(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270),posX + 48, posY + 32, MathUtil.clamp(85 * (status/100f),8,85), 11, 4f);
+            Render2DEngine.renderRoundedGradientRect(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), posX + 48, posY + 32, MathUtility.clamp(85 * (status / 100f), 8, 85), 11, 4f);
 
-            FontRenderers.modules.drawString( e.getMatrixStack(), (int)(progress * 100) + "%", posX + 85f, posY + 37f, -1);
+            FontRenderers.modules.drawString(e.getMatrixStack(), (int) (progress * 100) + "%", posX + 85f, posY + 37f, -1);
 
             String action = "Mending...  (" + expCount + " xp)";
-            if(InventoryUtil.getXpSlot() == -1) action = "No exp in hotbar!";
-            if(!need_repair) action = "Armor is OK!";
+            if (!InventoryUtility.getXp().found()) action = "No exp in hotbar!";
+            if (!need_repair) action = "Armor is OK!";
 
             FontRenderers.modules.drawString(e.getMatrixStack(), action, posX + 48, posY + 7, -1, false);
 
@@ -160,7 +157,7 @@ public class AutoMend extends Module {
             e.getMatrixStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees((mc.player.age % 360) * 3));
             e.getMatrixStack().translate(-(posX + 24), -(posY + 24), 0.0F);
 
-            FontRenderers.big_icons.drawString(e.getMatrixStack(),"Q",posX + 12, posY + 12, Render2DEngine.applyOpacity(new Color(0xFF646464, true).getRGB(), 170));
+            FontRenderers.big_icons.drawString(e.getMatrixStack(), "Q", posX + 12, posY + 12, Render2DEngine.applyOpacity(new Color(0xFF646464, true).getRGB(), 170));
 
             e.getMatrixStack().translate(posX + 24, posY + 24, 0.0F);
             e.getMatrixStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-((mc.player.age % 360)) * 3));
@@ -184,11 +181,11 @@ public class AutoMend extends Module {
     }
 
     private void takeOffSlot(int slot) {
-        if(!timer2.passedMs(armdlay.getValue())) return;
+        if (!timer2.passedMs(armdlay.getValue())) return;
 
         int target = -1;
         for (int i = 0; i < 36; i++) {
-            if (mc.player.getInventory().getStack(i).isEmpty()){
+            if (mc.player.getInventory().getStack(i).isEmpty()) {
                 target = i;
                 break;
             }

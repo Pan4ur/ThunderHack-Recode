@@ -9,7 +9,7 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.MovementUtil;
+import thunder.hack.utility.player.MovementUtility;
 
 
 public class LongJump extends Module {
@@ -77,13 +77,13 @@ public class LongJump extends Module {
     private boolean dropSync = false;
 
     private void doPause(EventMove eventPlayerMove) {
-        if (MovementUtil.isMoving()) {
+        if (MovementUtility.isMoving()) {
             if (usetimer.getValue()) {
                 Thunderhack.TICK_TIMER = timr.getValue();
             }
             switch (stage) {
                 case 0 -> {
-                    speedXZ = speed.getValue() * MovementUtil.getBaseMoveSpeed();
+                    speedXZ = speed.getValue() * MovementUtility.getBaseMoveSpeed();
                     distance = 0.0;
                     ++stage;
                 }
@@ -95,7 +95,7 @@ public class LongJump extends Module {
                     ++stage;
                 }
                 case 2 -> {
-                    double d = 0.66 * (distance - MovementUtil.getBaseMoveSpeed());
+                    double d = 0.66 * (distance - MovementUtility.getBaseMoveSpeed());
                     speedXZ = distance - d;
                     ++stage;
                 }
@@ -111,25 +111,25 @@ public class LongJump extends Module {
                 }
             }
         }
-        speedXZ = Math.max(MovementUtil.getBaseMoveSpeed(), speedXZ);
+        speedXZ = Math.max(MovementUtility.getBaseMoveSpeed(), speedXZ);
         eventPlayerMove.cancel();
-        MovementUtil.modifyEventSpeed(eventPlayerMove, speedXZ);
+        MovementUtility.modifyEventSpeed(eventPlayerMove, speedXZ);
     }
 
     private void doNormal(EventMove eventPlayerMove) {
-        if (MovementUtil.isMoving()) {
+        if (MovementUtility.isMoving()) {
             if (usetimer.getValue()) {
                 Thunderhack.TICK_TIMER = timr.getValue();
             }
             if (stage == 0) {
-                speedXZ = speed.getValue() * MovementUtil.getBaseMoveSpeed();
+                speedXZ = speed.getValue() * MovementUtility.getBaseMoveSpeed();
             } else if (stage == 1) {
                 eventPlayerMove.cancel();
                 mc.player.setVelocity(mc.player.getVelocity().getX(),0.42 + isJumpBoost(),mc.player.getVelocity().getZ());
                 eventPlayerMove.set_y(0.42 + isJumpBoost());
                 speedXZ *= 2.149;
             } else if (stage == 2) {
-                double d = 0.66 * (distance - MovementUtil.getBaseMoveSpeed());
+                double d = 0.66 * (distance - MovementUtility.getBaseMoveSpeed());
                 speedXZ = distance - d;
             } else {
                 if (mc.player.verticalCollision || mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.2, 0.0, -0.2).offset(0.0, mc.player.getVelocity().getY(), 0.0)).iterator().hasNext()) {
@@ -144,9 +144,9 @@ public class LongJump extends Module {
                 }
                 speedXZ = distance - distance / 159.0;
             }
-            speedXZ = Math.max(MovementUtil.getBaseMoveSpeed(), speedXZ);
+            speedXZ = Math.max(MovementUtility.getBaseMoveSpeed(), speedXZ);
             eventPlayerMove.cancel();
-            MovementUtil.modifyEventSpeed(eventPlayerMove, speedXZ);
+            MovementUtility.modifyEventSpeed(eventPlayerMove, speedXZ);
             ++stage;
         }
     }
@@ -154,7 +154,7 @@ public class LongJump extends Module {
     @Subscribe
     public void onEntitySync(EventSync eventSync) {
         if(Mode.getValue() == ModeEn.Normal || Mode.getValue() == ModeEn.Pause) {
-            if (MovementUtil.isMoving()) {
+            if (MovementUtility.isMoving()) {
                 double d = mc.player.getX() - mc.player.prevX;
                 double d2 = mc.player.getZ() - mc.player.prevZ;
                 distance = Math.sqrt(d * d + d2 * d2);

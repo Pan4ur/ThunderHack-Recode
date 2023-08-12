@@ -23,10 +23,10 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 
 
 public class Burrow extends Module {
@@ -103,9 +103,9 @@ public class Burrow extends Module {
                 z += mc.player.getZ();
             }
 
-            last_x = MathUtil.clamp(x, -3.0E7, 3.0E7);
+            last_x = MathUtility.clamp(x, -3.0E7, 3.0E7);
             last_y = y;
-            last_z = MathUtil.clamp(z, -3.0E7, 3.0E7);
+            last_z = MathUtility.clamp(z, -3.0E7, 3.0E7);
         }
     }
 
@@ -164,7 +164,7 @@ public class Burrow extends Module {
             }
         }
 
-        int slot = (InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN) == -1 || mc.world.getBlockState(pos.down()).getBlock() == Blocks.ENDER_CHEST ? InventoryUtil.findHotbarBlock(Blocks.ENDER_CHEST) : InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN));
+        int slot = (InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN) == -1 || mc.world.getBlockState(pos.down()).getBlock() == Blocks.ENDER_CHEST ? InventoryUtility.findHotbarBlock(Blocks.ENDER_CHEST) : InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN));
         int prevSlot = mc.player.getInventory().selectedSlot;
         if (slot == -1) {
             Command.sendMessage("No Block found!");

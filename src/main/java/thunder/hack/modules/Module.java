@@ -1,5 +1,6 @@
 package thunder.hack.modules;
 
+import net.minecraft.network.packet.Packet;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.Render2DEvent;
 import thunder.hack.events.impl.Render3DEvent;
@@ -70,6 +71,12 @@ public class Module  {
     }
 
     public void onUnload() {
+    }
+
+    protected void sendPacket(Packet<?> packet) {
+        if (mc.getNetworkHandler() == null) return;
+
+        mc.getNetworkHandler().sendPacket(packet);
     }
 
     public String getDisplayInfo() {

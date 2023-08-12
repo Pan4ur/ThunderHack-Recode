@@ -4,7 +4,6 @@ package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
 import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -16,7 +15,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.Vec3d;
-import thunder.hack.utility.player.MovementUtil;
+import thunder.hack.utility.player.MovementUtility;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -195,11 +194,11 @@ public class PacketFly extends Module {
         }
         boolean bl = mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.0625, -0.0625, -0.0625)).iterator().hasNext();
         double d = 0.0;
-        d = mc.player.input.jumping && (bl || !MovementUtil.isMoving()) ? ((antiKick.getValue()) && !bl ? getTickCounter(mode.getValue() == Mode.Rubber ? 10 : 20) ? -0.032 : 0.062 : 0.062) : (mc.player.input.sneaking ? -0.062 : (!bl ? (getTickCounter(4) ? ((antiKick.getValue()) ? -0.04 : 0.0) : 0.0) : 0.0));
-        if (phase.getValue() == Phase.Full && bl && MovementUtil.isMoving() && d != 0.0) {
+        d = mc.player.input.jumping && (bl || !MovementUtility.isMoving()) ? ((antiKick.getValue()) && !bl ? getTickCounter(mode.getValue() == Mode.Rubber ? 10 : 20) ? -0.032 : 0.062 : 0.062) : (mc.player.input.sneaking ? -0.062 : (!bl ? (getTickCounter(4) ? ((antiKick.getValue()) ? -0.04 : 0.0) : 0.0) : 0.0));
+        if (phase.getValue() == Phase.Full && bl && MovementUtility.isMoving() && d != 0.0) {
             d = mc.player.input.jumping ? (d /= 2.5) : (d /= 1.5);
         }
-        double[] dArray = MovementUtil.forward(phase.getValue() == Phase.Full && bl ? 0.034444444444444444 : (double) (speed.getValue()) * 0.26);
+        double[] dArray = MovementUtility.forward(phase.getValue() == Phase.Full && bl ? 0.034444444444444444 : (double) (speed.getValue()) * 0.26);
 
         int factorInt = 1;
         if (mode.getValue() == Mode.Factor && mc.player.age % increaseTicks.getValue() == 0) {

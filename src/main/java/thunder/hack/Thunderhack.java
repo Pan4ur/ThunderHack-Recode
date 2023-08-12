@@ -18,7 +18,9 @@ import java.net.URL;
 
 
 public class Thunderhack implements ModInitializer {
+    public static final String MOD_ID = "thunderhack";
     public static final EventBus EVENT_BUS = new EventBus();
+
     public static String version = "1.2b70823";
     public static boolean oldVersion = false;
     public static float TICK_TIMER = 1f;

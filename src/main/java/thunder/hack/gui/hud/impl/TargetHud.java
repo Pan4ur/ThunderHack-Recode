@@ -2,34 +2,24 @@ package thunder.hack.gui.hud.impl;
 
 import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.render.entity.MobEntityRenderer;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.item.SwordItem;
-import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.Render2DEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudEditorGui;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.client.Media;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterAnimation;
 import thunder.hack.utility.render.animation.BetterDynamicAnimation;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.effect.StatusEffect;
@@ -260,7 +250,7 @@ public class TargetHud extends HudElement {
                 Render2DEngine.drawBlurredShadow(e.getMatrixStack(),getPosX() + 54, getPosY() + 34 - 14, 90, 10, blurRadius.getValue(), HudEditor.getColor(0));
 
                 Render2DEngine.drawGradientRound(e.getMatrixStack(),getPosX() + 55, getPosY() + 35 - 14, 90, 10, 2f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
-                Render2DEngine.renderRoundedGradientRect(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270),getPosX() + 55, getPosY() + 35 - 14, (int) MathUtil.clamp((90 * (health / 20)),3,90), 10, 2f);
+                Render2DEngine.renderRoundedGradientRect(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270),getPosX() + 55, getPosY() + 35 - 14, (int) MathUtility.clamp((90 * (health / 20)),3,90), 10, 2f);
 
 
                 if (hpMode.getValue() == HPmodeEn.HP) {
@@ -339,7 +329,7 @@ public class TargetHud extends HudElement {
                 healthanimation.setValue(health);
                 health = (float) healthanimation.getAnimationD();
                 Render2DEngine.drawGradientRound(e.getMatrixStack(),getPosX() + 48, getPosY() + 32, 85, 11, 4f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
-                Render2DEngine.renderRoundedGradientRect(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270),getPosX() + 48, getPosY() + 32, (int) MathUtil.clamp((85 * (health / 20)),8,85), 11, 4f);
+                Render2DEngine.renderRoundedGradientRect(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270),getPosX() + 48, getPosY() + 32, (int) MathUtility.clamp((85 * (health / 20)),8,85), 11, 4f);
 
                 FontRenderers.modules.drawString( e.getMatrixStack(),hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * target.getHealth()) / 10.0) : (((Math.round(10.0 * target.getHealth()) / 10.0) / 20f) * 100 + "%" ), getPosX() + 85f, getPosY() + 37f, -1);
                 //

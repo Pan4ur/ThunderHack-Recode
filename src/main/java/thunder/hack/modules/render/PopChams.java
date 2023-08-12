@@ -4,7 +4,6 @@ import com.google.common.eventbus.Subscribe;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
@@ -15,20 +14,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import org.joml.Vector3f;
-import org.lwjgl.opengl.GL11;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.combat.AimBot;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.utility.math.MathUtil;
-import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.math.MathUtility;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -48,7 +41,7 @@ public class PopChams extends Module {
         double z = entity.getZ() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
         matrices.push();
         matrices.translate((float) x, (float) y, (float) z);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotation(MathUtil.rad(180 - entity.bodyYaw)));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotation(MathUtility.rad(180 - entity.bodyYaw)));
         prepareScale(matrices);
 
         modelBase.animateModel((PlayerEntity) entity, entity.limbAnimator.getPos(), entity.limbAnimator.getSpeed(), mc.getTickDelta());
@@ -129,7 +122,7 @@ public class PopChams extends Module {
         private int alpha;
 
         public int getAlpha() {
-            return MathUtil.clamp(alpha, 0, 255);
+            return MathUtility.clamp(alpha, 0, 255);
         }
 
         public Person(PlayerEntity player) {

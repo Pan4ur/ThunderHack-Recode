@@ -39,9 +39,10 @@ import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlaceUtility;
-import thunder.hack.utility.player.PlayerUtil;
+import thunder.hack.utility.player.PlayerUtility;
+import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
@@ -315,11 +316,8 @@ public class CevBreaker extends Module {
         Thunderhack.asyncManager.run(() -> {
                     if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS) && !(mc.player.getMainHandStack().getItem() instanceof SwordItem)) {
 
-                        int swordSlot = InventoryUtil.getBestSword();
-                        if (swordSlot != -1 && autoSwap.getValue()) {
-                            mc.player.getInventory().selectedSlot = swordSlot;
-                            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(swordSlot));
-                        }
+                        SearchInvResult swordResult = InventoryUtility.getSword();
+                        if (autoSwap.getValue()) swordResult.switchTo();
                     }
 
                     Criticals.cancelCrit = true;
@@ -335,9 +333,10 @@ public class CevBreaker extends Module {
         // Normal breaking block
         if (mine && !mc.world.getBlockState(currentMineBlockPos).getBlock().equals(Blocks.AIR)) {
             if (breakMode.getValue() == BreakMode.Normal) {
-                if (autoSwap.getValue())
-                    mc.player.getInventory().selectedSlot = InventoryUtil.findItem(PickaxeItem.class) != -1 ? InventoryUtil.findItem(PickaxeItem.class) : mc.player.getInventory().selectedSlot;
-
+                if (autoSwap.getValue()) {
+                    SearchInvResult pickResult = InventoryUtility.findInInventory(stack -> stack.getItem() instanceof PickaxeItem);
+                    mc.player.getInventory().selectedSlot = pickResult.found() ? pickResult.slot() : mc.player.getInventory().selectedSlot;
+                }
                 mc.interactionManager.updateBlockBreakingProgress(currentMineBlockPos,
                         PlaceUtility.getBreakDirection(currentMineBlockPos, strictDirection.getValue()));
                 if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
@@ -399,7 +398,7 @@ public class CevBreaker extends Module {
         }
 
         if (mc.player.getOffHandStack().getItem().equals(Items.END_CRYSTAL)) {
-            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, handlePlaceRotation(pos), PlayerUtil.getWorldActionId(mc.world)));
+            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, handlePlaceRotation(pos), PlayerUtility.getWorldActionId(mc.world)));
 
             if (swing.getValue()) mc.player.swingHand(Hand.OFF_HAND);
             return;
@@ -408,16 +407,12 @@ public class CevBreaker extends Module {
         int preSlot = mc.player.getInventory().selectedSlot;
 
         if (mc.player.getMainHandStack().getItem() != Items.END_CRYSTAL) {
-            int crystalSlot = InventoryUtil.getCrystalSlot();
-            if (crystalSlot == -1) return;
-
-            if (crystalSlot != mc.player.getInventory().selectedSlot) {
-                mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(crystalSlot));
-            }
+            SearchInvResult crystalResult = InventoryUtility.getCrystal();
+            crystalResult.switchTo();
         }
 
         // Place crystal
-        mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, handlePlaceRotation(pos), PlayerUtil.getWorldActionId(mc.world)));
+        mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, handlePlaceRotation(pos), PlayerUtility.getWorldActionId(mc.world)));
 
         if (preSlot != mc.player.getInventory().selectedSlot) {
             mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(preSlot));
@@ -471,7 +466,7 @@ public class CevBreaker extends Module {
     }
 
     private boolean placeObsidian(BlockPos pos) {
-        int slot = InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN);
+        int slot = InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN);
 
         if (slot != mc.player.getInventory().selectedSlot && !autoSwap.getValue()) return false;
 

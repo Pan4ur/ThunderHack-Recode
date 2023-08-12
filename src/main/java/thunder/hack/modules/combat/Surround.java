@@ -24,44 +24,50 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Surround extends Module {
-
-
-    public Surround() {
-        super("Surround", "окружает тебя обсой", Category.COMBAT);
-    }
-
-    private static final Setting<Integer> actionShift = new Setting<>("PlacePerTick", 4, 1, 8);
-    private static final Setting<Integer> tickDelay = new Setting<>("Delay", 0, 0, 5);
+    private final Setting<Integer> actionShift = new Setting<>("PlacePerTick", 4, 1, 8);
+    private final Setting<Integer> tickDelay = new Setting<>("Delay", 0, 0, 5);
+    private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
     private final Setting<Boolean> crystalBreaker = new Setting<>("Destroy Crystal", false);
     private final Setting<Boolean> strict = new Setting<>("Strict", false);
     private final Setting<Boolean> center = new Setting<>("Center", true);
-    private final Setting<Boolean> render = new Setting<>("Render", true);
     private final Setting<Boolean> newBlocks = new Setting<>("1.16 Blocks", true);
     private final Setting<Boolean> allowAnchors = new Setting<>("Allow Anchors", false, (value) -> newBlocks.getValue());
-    private static final Setting<Parent> autoDisable = new Setting<>("Disable on", new Parent(false, 0));
-    public static final Setting<Boolean> disableOnYChange = new Setting<>("YChange", false).withParent(autoDisable);
-    public static final Setting<Boolean> disableOnTP = new Setting<>("TP", true).withParent(autoDisable);
-    public static final Setting<Boolean> disableWhenDone = new Setting<>("Done", false).withParent(autoDisable);
+    private final Setting<Parent> autoDisable = new Setting<>("Disable on", new Parent(false, 0));
+    private final Setting<Boolean> disableOnYChange = new Setting<>("YChange", false).withParent(autoDisable);
+    private final Setting<Boolean> disableOnTP = new Setting<>("TP", true).withParent(autoDisable);
+    private final Setting<Boolean> disableWhenDone = new Setting<>("Done", false).withParent(autoDisable);
 
+    private final Setting<Parent> render = new Setting<>("Render", new Parent(false, 0));
+    private final Setting<ColorSetting> fillColor = new Setting<>("Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(render);
+    private final Setting<ColorSetting> lineColor = new Setting<>("Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(render);
+    private final Setting<Integer> lineWidth = new Setting<>("Line Width", 2, 1, 5).withParent(render);
+
+    public double prevY;
     private int offsetStep = 0;
     private int delayStep = 0;
 
     public static Timer inactivityTimer = new Timer();
     public static Timer breakTimer = new Timer();
 
-    private ConcurrentHashMap<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
+
+    public Surround() {
+        super("Surround", "окружает тебя обсой", Category.COMBAT);
+    }
 
     @Override
     public void onEnable() {
@@ -80,15 +86,14 @@ public class Surround extends Module {
 
     @Subscribe
     public void onRender3D(Render3DEvent event) {
-        if (render.getValue())
-            renderPoses.forEach((pos, time) -> {
-                if (System.currentTimeMillis() - time > 500) {
-                    renderPoses.remove(pos);
-                } else {
-                    Render3DEngine.drawFilledBox(event.getMatrixStack(), new Box(pos), Render2DEngine.injectAlpha(HudEditor.getColor(0), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
-                    Render3DEngine.drawBoxOutline(new Box(pos), HudEditor.getColor(0), 2);
-                }
-            });
+        renderPoses.forEach((pos, time) -> {
+            if (System.currentTimeMillis() - time > 500) {
+                renderPoses.remove(pos);
+            } else {
+                Render3DEngine.drawFilledBox(event.getMatrixStack(), new Box(pos), Render2DEngine.injectAlpha(fillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
+                Render3DEngine.drawBoxOutline(new Box(pos), lineColor.getValue().getColorObject(), lineWidth.getValue());
+            }
+        });
         handleSurround();
     }
 
@@ -96,8 +101,6 @@ public class Surround extends Module {
     public void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof PlayerPositionLookS2CPacket && disableOnTP.getValue()) toggle();
     }
-
-    public double prevY;
 
     public void handleSurround() {
         if (fullNullCheck()) {
@@ -145,19 +148,19 @@ public class Surround extends Module {
             if (crystalBreaker.getValue() && breakTimer.passedMs(100))
                 for (Entity entity : mc.world.getOtherEntities(null, new Box(targetPos))) {
                     if (entity instanceof EndCrystalEntity) {
-                        PlayerInteractEntityC2SPacket attackPacket = PlayerInteractEntityC2SPacket.attack(mc.player, ((mc.player)).isSneaking());
+                        PlayerInteractEntityC2SPacket attackPacket = PlayerInteractEntityC2SPacket.attack(mc.player, mc.player.isSneaking());
                         AutoCrystal.changeId(attackPacket, entity.getId());
                         mc.player.networkHandler.sendPacket(attackPacket);
                         mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                         entity.kill();
                         entity.setRemoved(Entity.RemovalReason.KILLED);
                         entity.onRemoved();
-                        PlaceUtility.forcePlace(targetPos, false, Hand.MAIN_HAND, slot, false);
+                        PlaceUtility.forcePlace(targetPos, false, Hand.MAIN_HAND, slot, false, placeMode.getValue());
                         breakTimer.reset();
                     }
                 }
 
-            if (PlaceUtility.place(targetPos, strict.getValue(), false, Hand.MAIN_HAND, slot, false)) {
+            if (PlaceUtility.place(targetPos, strict.getValue(), false, Hand.MAIN_HAND, slot, false, placeMode.getValue())) {
                 renderPoses.put(targetPos, System.currentTimeMillis());
                 PlaceUtility.ghostBlocks.put(targetPos, System.currentTimeMillis());
                 blocksPlaced++;

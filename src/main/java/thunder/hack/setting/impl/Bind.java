@@ -20,9 +20,9 @@ public class Bind {
     }
 
     public String getBind() {
-        if(mouse) return "M"+key;
+        if (mouse) return "M" + key;
 
-        String kn = this.key > 0 ? GLFW.glfwGetKeyName(this.key + 0, GLFW.glfwGetKeyScancode(this.key + 0)) : "None";
+        String kn = this.key > 0 ? GLFW.glfwGetKeyName(this.key, GLFW.glfwGetKeyScancode(this.key)) : "None";
         if (kn == null) {
             try {
                 for (Field declaredField : GLFW.class.getDeclaredFields()) {
@@ -35,7 +35,7 @@ public class Bind {
                     }
                 }
             } catch (Exception ignored) {
-                kn = "unknown." + (this.key + 0);
+                kn = "unknown." + this.key;
             }
         }
 

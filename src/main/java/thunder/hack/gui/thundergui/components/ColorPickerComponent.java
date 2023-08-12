@@ -5,7 +5,7 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui2;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.client.util.math.MatrixStack;
 
@@ -109,21 +109,21 @@ public class ColorPickerComponent extends SettingElement {
         Color value = Color.getHSBColor(hue, saturation, brightness);
 
         if (sbfocused) {
-            saturation = (float) (MathUtil.clamp(mouseX - (cx + 40), 0f, cw - 40) / (cw - 40));
+            saturation = (float) (MathUtility.clamp(mouseX - (cx + 40), 0f, cw - 40) / (cw - 40));
 
-            brightness = (float) ((ch - MathUtil.clamp((mouseY - cy), 0, ch)) / ch);
+            brightness = (float) ((ch - MathUtility.clamp((mouseY - cy), 0, ch)) / ch);
             value = Color.getHSBColor(hue, saturation, brightness);
             setColor(new Color(value.getRed(), value.getGreen(), value.getBlue(), alpha));
         }
 
         if (hfocused) {
-            hue = (float) -((ch - MathUtil.clamp((float) (mouseY - cy), 0, (float) ch)) / ch);
+            hue = (float) -((ch - MathUtility.clamp((float) (mouseY - cy), 0, (float) ch)) / ch);
             value = Color.getHSBColor(hue, saturation, brightness);
             setColor(new Color(value.getRed(), value.getGreen(), value.getBlue(), alpha));
         }
 
         if (afocused) {
-            alpha = (int) (((ch - MathUtil.clamp((float) (mouseY - cy), 0, (float) ch)) / ch) * 255);
+            alpha = (int) (((ch - MathUtility.clamp((float) (mouseY - cy), 0, (float) ch)) / ch) * 255);
             setColor(new Color(value.getRed(), value.getGreen(), value.getBlue(), alpha));
         }
 

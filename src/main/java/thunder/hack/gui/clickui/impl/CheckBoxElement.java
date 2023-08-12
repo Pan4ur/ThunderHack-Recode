@@ -2,14 +2,12 @@ package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.modules.client.ClickGui;
-import thunder.hack.modules.client.MainSettings;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.render.Render2DEngine;
-import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;
 
@@ -43,7 +41,7 @@ public class CheckBoxElement extends AbstractElement {
     }
 
     public static float fast(float end, float start, float multiple) {
-        return (1 - MathUtil.clamp((float) (deltaTime() * multiple), 0, 1)) * end + MathUtil.clamp((float) (deltaTime() * multiple), 0, 1) * start;
+        return (1 - MathUtility.clamp((float) (deltaTime() * multiple), 0, 1)) * end + MathUtility.clamp((float) (deltaTime() * multiple), 0, 1) * start;
     }
 
 }

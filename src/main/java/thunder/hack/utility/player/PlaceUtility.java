@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.modules.Module.mc;
 
-public class PlaceUtility {
+public final class PlaceUtility {
     public static ConcurrentHashMap<BlockPos, Long> ghostBlocks = new ConcurrentHashMap<>();
 
     public static final Vec3d[] multiPoint = new Vec3d[]{
@@ -151,7 +151,7 @@ public class PlaceUtility {
         return false;
     }
 
-    public static boolean place(BlockPos pos, boolean rotate, boolean strictDirection, Hand hand, int slot, boolean ignoreEntities) {
+    public static boolean place(BlockPos pos, boolean rotate, boolean strictDirection, Hand hand, int slot, boolean ignoreEntities, PlaceMode mode) {
         if (!canPlaceBlock(pos, ignoreEntities)) return false;
         Direction side = getPlaceDirection(pos, strictDirection);
         if (side == null) return false;
@@ -159,8 +159,12 @@ public class PlaceUtility {
         Direction opposite = side.getOpposite();
         Vec3d hitVec = new Vec3d(neighbour.getX() + 0.5, neighbour.getY() + 0.5, neighbour.getZ() + 0.5).add(new Vec3d(opposite.getUnitVector()).multiply(0.5));
         float[] angle = calculateAngle(hitVec);
-        PlaceManager.add(new Placement(neighbour, opposite, angle[0], angle[1], hand, rotate, slot));
+        PlaceManager.add(new Placement(neighbour, opposite, angle[0], angle[1], hand, rotate, slot, mode));
         return true;
+    }
+
+    public static boolean place(BlockPos pos, boolean rotate, boolean strictDirection, Hand hand, int slot, boolean ignoreEntities) {
+        return place(pos, rotate, strictDirection, hand, slot, ignoreEntities, PlaceMode.All);
     }
 
     public static float[] calcAngle(BlockPos pos, boolean strictDirection, boolean ignoreEntities) {
@@ -175,7 +179,7 @@ public class PlaceUtility {
         return calculateAngle(hitVec);
     }
 
-    public static boolean forcePlace(BlockPos pos, boolean strictDirection, Hand hand, int slot, boolean ignoreEntities) {
+    public static boolean forcePlace(BlockPos pos, boolean strictDirection, Hand hand, int slot, boolean ignoreEntities, PlaceMode mode) {
         if (!canPlaceBlock(pos, strictDirection, ignoreEntities)) return false;
         if (!mc.world.getBlockState(pos).isReplaceable()) return false;
         Direction side = Direction.DOWN;
@@ -183,8 +187,12 @@ public class PlaceUtility {
         if (side == null) return false;
         BlockPos neighbour = pos.offset(side);
         Direction opposite = side.getOpposite();
-        new Placement(neighbour, opposite, 0, 0, hand, false, slot).getAction().run();
+        new Placement(neighbour, opposite, 0, 0, hand, false, slot, mode).getAction().run();
         return true;
+    }
+
+    public static boolean forcePlace(BlockPos pos, boolean strictDirection, Hand hand, int slot, boolean ignoreEntities) {
+        return forcePlace(pos, strictDirection, hand, slot, ignoreEntities, PlaceMode.All);
     }
 
     public static boolean canPlaceBlock(BlockPos pos, boolean strictDirection) {
@@ -331,7 +339,7 @@ public class PlaceUtility {
                     Vec3d p = new Vec3d(bp2.position.getX() + point.getX(), bp2.position.getY() + point.getY(), bp2.position.getZ() + point.getZ());
                     BlockHitResult result = mc.world.raycast(new RaycastContext(getEyesPos(mc.player), p, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, ((mc.player))));
                     if (result != null && result.getType() == HitResult.Type.BLOCK && result.getBlockPos().equals(bp2.position)) {
-                        mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtil.getWorldActionId(mc.world)));
+                        mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
                         mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                         break;
                     }
@@ -341,7 +349,7 @@ public class PlaceUtility {
             BlockPos bp2 = bp.down();
             Vec3d p = new Vec3d(bp2.getX() + 0.5, bp2.getY() + 1f, bp2.getZ() + 0.5f);
             BlockHitResult result = new BlockHitResult(p, Direction.UP, bp2, false);
-            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtil.getWorldActionId(mc.world)));
+            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
             mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         }
         return false;
@@ -410,6 +418,11 @@ public class PlaceUtility {
         }
     }
 
-    public record BlockPosWithFacing(BlockPos position, Direction facing) {
+    public record BlockPosWithFacing(BlockPos position, Direction facing) {}
+
+    public enum PlaceMode {
+        Packet,
+        Normal,
+        All
     }
 }

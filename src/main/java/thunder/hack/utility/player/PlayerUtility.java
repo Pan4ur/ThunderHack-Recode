@@ -4,11 +4,11 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PendingUpdateManager;
 import net.minecraft.client.world.ClientWorld;
 import thunder.hack.injection.accesors.IClientWorldMixin;
+
 import static thunder.hack.modules.Module.mc;
 
-public class PlayerUtil {
-
-    public ClientPlayerEntity getPlayer(){
+public final class PlayerUtility {
+    public ClientPlayerEntity getPlayer() {
         return mc.player;
     }
 
@@ -18,6 +18,7 @@ public class PlayerUtil {
         pum.close();
         return p;
     }
+
     static PendingUpdateManager getUpdateManager(ClientWorld world) {
         return ((IClientWorldMixin) world).acquirePendingUpdateManager();
     }

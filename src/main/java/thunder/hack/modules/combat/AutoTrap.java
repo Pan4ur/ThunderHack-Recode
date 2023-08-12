@@ -9,7 +9,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
@@ -73,7 +73,7 @@ public class AutoTrap extends Module {
         while (blocksPlaced < actionShift.getValue()) {
             BlockPos nextPos = getNextPos(nearestTarget.getBlockPos());
             if (nextPos != null) {
-                if (PlaceUtility.place( nextPos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND,InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN),false)) {
+                if (PlaceUtility.place( nextPos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND,InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN),false)) {
                     blocksPlaced++;
                     PlaceUtility.ghostBlocks.put(nextPos, System.currentTimeMillis());
                     renderPoses.put(nextPos, System.currentTimeMillis());

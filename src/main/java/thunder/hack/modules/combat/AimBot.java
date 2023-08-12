@@ -8,8 +8,8 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.math.MathUtil;
-import thunder.hack.utility.player.PlayerUtil;
+import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.entity.Entity;
@@ -96,7 +96,7 @@ public class AimBot extends Module {
             rotationPitch = pitch;
         } else  if(mode.getValue() == Mode.CSAim){
             calcThread();
-            if(target != null && (mc.player.canSee(target) || ignoreWalls.getValue()) ) if(mc.player.age % delay.getValue() == 0) mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtil.getWorldActionId(mc.world)));
+            if(target != null && (mc.player.canSee(target) || ignoreWalls.getValue()) ) if(mc.player.age % delay.getValue() == 0) mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
         } else {
             if (mc.crosshairTarget.getType() == ENTITY){
                 assistAcceleration = 0;
@@ -210,10 +210,10 @@ public class AimBot extends Module {
             delta_yaw = delta_yaw - 180;
         }
 
-        float deltaYaw = MathHelper.clamp(MathHelper.abs(delta_yaw), MathUtil.random(-40.0F, -60.0F), MathUtil.random(40.0F, 60.0F));
+        float deltaYaw = MathHelper.clamp(MathHelper.abs(delta_yaw), MathUtility.random(-40.0F, -60.0F), MathUtility.random(40.0F, 60.0F));
 
-        float newYaw = rotationYaw + (delta_yaw > 0 ? deltaYaw : -deltaYaw) + MathUtil.random(-rotYawRandom.getValue(), rotYawRandom.getValue());
-        float newPitch = MathHelper.clamp(rotationPitch + MathHelper.clamp(delta_pitch, MathUtil.random(-10.0F, -20.0F), MathUtil.random(10,20)), -90.0F, 90.0F) + MathUtil.random(-rotPitchRandom.getValue(), rotPitchRandom.getValue());
+        float newYaw = rotationYaw + (delta_yaw > 0 ? deltaYaw : -deltaYaw) + MathUtility.random(-rotYawRandom.getValue(), rotYawRandom.getValue());
+        float newPitch = MathHelper.clamp(rotationPitch + MathHelper.clamp(delta_pitch, MathUtility.random(-10.0F, -20.0F), MathUtility.random(10,20)), -90.0F, 90.0F) + MathUtility.random(-rotPitchRandom.getValue(), rotPitchRandom.getValue());
 
         double gcdFix1 = mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2;
         double gcdFix2 = Math.pow(gcdFix1, 3.0) * 8.0;

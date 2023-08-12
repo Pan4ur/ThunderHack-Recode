@@ -3,13 +3,10 @@ package thunder.hack.modules.misc;
 import com.google.common.eventbus.Subscribe;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import thunder.hack.events.impl.EventAttack;
-import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.combat.Criticals;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.ThSoundPack;
-import thunder.hack.utility.math.MathUtil;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import thunder.hack.utility.math.MathUtility;
 import net.minecraft.sound.SoundCategory;
 
 public class HitSound extends Module {
@@ -38,7 +35,7 @@ public class HitSound extends Module {
                 mc.world.playSound(mc.player, mc.player.getBlockPos(), ThSoundPack.KEYPRESS_SOUNDEVENT, SoundCategory.BLOCKS, volume.getValue(), pitch.getValue());
             }
             if(mode.getValue() == Mode.MOAN){
-                int i = (int) (MathUtil.random(0,5));
+                int i = (int) (MathUtility.random(0,5));
                 if(i == 0){
                     mc.world.playSound(mc.player, mc.player.getBlockPos(), ThSoundPack.MOAN1_SOUNDEVENT, SoundCategory.BLOCKS, volume.getValue(), pitch.getValue());
                 }

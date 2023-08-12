@@ -2,10 +2,7 @@ package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.item.ElytraItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
@@ -21,9 +18,10 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
-import thunder.hack.utility.player.InventoryUtil;
-import thunder.hack.utility.player.MovementUtil;
-import thunder.hack.utility.player.PlayerUtil;
+import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.MovementUtility;
+import thunder.hack.utility.player.PlayerUtility;
+import thunder.hack.utility.player.SearchInvResult;
 
 import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.START_FALL_FLYING;
 
@@ -40,7 +38,7 @@ public class ElytraPlus extends Module {
     private final Setting<Boolean> stayMad = new Setting<>("StayOffTheGround", true, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> keepFlying = new Setting<>("Keep Flying", false, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> bowBomb = new Setting<>("BowBomb", false, v -> mode.getValue() == Mode.FireWork || mode.getValue() == Mode.Sunrise);
-    public Setting<Bind> bombKey = new Setting<>("BombKey", new Bind(-1,false,false), v -> mode.getValue() == Mode.Sunrise);
+    public Setting<Bind> bombKey = new Setting<>("BombKey", new Bind(-1, false, false), v -> mode.getValue() == Mode.Sunrise);
     private static boolean hasElytra = false;
     private final Setting<Boolean> instantFly = new Setting<>("InstantFly", true, v -> (mode.getValue() != Mode.FireWork && mode.getValue() != Mode.Sunrise));
     public Setting<Boolean> cruiseControl = new Setting<>("CruiseControl", false, v -> mode.getValue() == Mode.BOOST);
@@ -143,7 +141,7 @@ public class ElytraPlus extends Module {
     public void onUpdate() {
         if (mode.getValue() == Mode.FireWork) {
 
-            if (InventoryUtil.getFireWorks() == -1) {
+            if (InventoryUtility.findInHotBar(stack -> stack.getItem() instanceof FireworkRocketItem).found()) {
                 int fireworkSlot = getFireworks();
                 if (fireworkSlot != -1) {
                     mc.interactionManager.clickSlot(0, fireworkSlot, 0, SlotActionType.PICKUP, mc.player);
@@ -197,7 +195,7 @@ public class ElytraPlus extends Module {
 
                 setSpeed(Math.min((acceleration = (acceleration + 11.0F / xzSpeed.getValue())) / 100.0F, xzSpeed.getValue()));
 
-                if (!MovementUtil.isMoving()) acceleration = 0;
+                if (!MovementUtility.isMoving()) acceleration = 0;
 
                 if (!bowBomb.getValue() && !mc.player.isOnGround()) {
                     mc.player.setVelocity(mc.player.getVelocity().getX(), -0.01F - (mc.player.age % 2 == 0 ? 1.0E-4F : 0.006F), mc.player.getVelocity().getZ());
@@ -278,12 +276,12 @@ public class ElytraPlus extends Module {
                     useFireWork(); // юзаем фейерверк
                 }
 
-                if (!MovementUtil.isMoving()) {
+                if (!MovementUtility.isMoving()) {
                     e.set_x(0);
                     e.set_z(0);
                     acceleration = 0f; // сбрасываем множитель ускорения
                 } else { //
-                    double[] moveDirection = MovementUtil.forward(lerp(0f, xzSpeed.getValue(), Math.min(acceleration, 1f))); // расчитываем моушены исходя из ускорения и угла поворота камеры
+                    double[] moveDirection = MovementUtility.forward(lerp(0f, xzSpeed.getValue(), Math.min(acceleration, 1f))); // расчитываем моушены исходя из ускорения и угла поворота камеры
                     e.set_x(moveDirection[0]); // выставляем моушен X
                     e.set_z(moveDirection[1]); // выставляем моушен Z
                     acceleration += 0.1f; // увеличивам множитель ускорения
@@ -356,7 +354,7 @@ public class ElytraPlus extends Module {
                             e.set_z(e.get_z() - lookVec.z * rawUpSpeed / lookDist);
                             mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
                         } else {
-                            double[] dir = MovementUtil.forward(speed.getValue());
+                            double[] dir = MovementUtility.forward(speed.getValue());
                             e.set_x(dir[0]);
                             e.set_z(dir[1]);
                             mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
@@ -370,7 +368,7 @@ public class ElytraPlus extends Module {
                     }
 
                     if (mode.getValue() == Mode.CONTROL && !mc.player.input.jumping) {
-                        double[] dir = MovementUtil.forward(speed.getValue());
+                        double[] dir = MovementUtility.forward(speed.getValue());
                         e.set_x(dir[0]);
                         e.set_z(dir[1]);
                         mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
@@ -506,12 +504,13 @@ public class ElytraPlus extends Module {
 
 
     public void useFireWork() {
-        int firework_slot = InventoryUtil.getFireWorks();
+        SearchInvResult fireworkResult = InventoryUtility.findInHotBar(stack -> stack.getItem() instanceof FireworkRocketItem);
+
         if (mc.player.getOffHandStack().getItem() == Items.FIREWORK_ROCKET) {
-            mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtil.getWorldActionId(mc.world)));
-        } else if (firework_slot != -1) {
-            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(firework_slot));
-            mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtil.getWorldActionId(mc.world)));
+            mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
+        } else if (fireworkResult.found()) {
+            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(fireworkResult.slot()));
+            mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
             mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
         }
     }

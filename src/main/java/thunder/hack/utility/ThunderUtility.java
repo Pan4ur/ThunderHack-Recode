@@ -5,14 +5,15 @@ import java.util.concurrent.atomic.AtomicReference;
 import static thunder.hack.modules.Module.mc;
 
 
-public class ThunderUtils {
-    public static String solvename(String notsolved) {
+public final class ThunderUtility {
+    public static String solveName(String notSolved) {
         AtomicReference<String> mb = new AtomicReference<>("FATAL ERROR");
         mc.getNetworkHandler().getListedPlayerListEntries().forEach(player -> {
-            if (notsolved.contains(player.getProfile().getName())) {
+            if (notSolved.contains(player.getProfile().getName())) {
                 mb.set(player.getProfile().getName());
             }
         });
+
         return mb.get();
     }
 }

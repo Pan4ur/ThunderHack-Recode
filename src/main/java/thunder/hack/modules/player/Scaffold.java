@@ -2,9 +2,6 @@ package thunder.hack.modules.player;
 
 import com.google.common.eventbus.Subscribe;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.world.RaycastContext;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
@@ -14,9 +11,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.MathUtil;
 import thunder.hack.utility.player.PlaceUtility;
-import thunder.hack.utility.player.PlayerUtil;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.Block;
@@ -29,8 +24,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import org.joml.Vector3f;
-
-import java.util.ArrayList;
 
 
 public class Scaffold extends Module {

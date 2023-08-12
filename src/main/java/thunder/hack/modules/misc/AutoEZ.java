@@ -12,7 +12,7 @@ import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.ThunderUtils;
+import thunder.hack.utility.ThunderUtility;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -108,7 +108,7 @@ public class AutoEZ extends Module {
         if (e.getPacket() instanceof GameMessageS2CPacket) {
             final GameMessageS2CPacket packet = e.getPacket();
             if (packet.content().getString().contains("Вы убили игрока")) {
-                String name = ThunderUtils.solvename(packet.content().getString());
+                String name = ThunderUtility.solveName(packet.content().getString());
                 if(Objects.equals(name, "FATAL ERROR")) return;
 
                 String finalword;

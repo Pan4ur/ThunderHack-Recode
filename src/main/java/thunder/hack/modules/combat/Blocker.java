@@ -18,7 +18,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.render.HoleESP;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render2DEngine;
@@ -75,8 +75,8 @@ public class Blocker extends Module {
             return;
         }
 
-        int obbySlot = InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN);
-        int eChestSlot = InventoryUtil.findHotbarBlock(Blocks.ENDER_CHEST);
+        int obbySlot = InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN);
+        int eChestSlot = InventoryUtility.findHotbarBlock(Blocks.ENDER_CHEST);
 
         if (obbySlot == -1 && eChestSlot == 1) return;
 

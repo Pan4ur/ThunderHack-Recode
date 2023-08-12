@@ -5,14 +5,14 @@ import thunder.hack.gui.thundergui.ThunderGui2;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.FrameRateCounter;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.client.util.math.MatrixStack;
 
 
 import java.awt.*;
 
-import static thunder.hack.utility.math.MathUtil.clamp;
+import static thunder.hack.utility.math.MathUtility.clamp;
 
 public class BooleanComponent extends SettingElement {
 
@@ -27,7 +27,7 @@ public class BooleanComponent extends SettingElement {
     }
 
     public static float fast(float end, float start, float multiple) {
-        return (1 - MathUtil.clamp((float) (deltaTime() * multiple), 0, 1)) * end + MathUtil.clamp((float) (deltaTime() * multiple), 0, 1) * start;
+        return (1 - MathUtility.clamp((float) (deltaTime() * multiple), 0, 1)) * end + MathUtility.clamp((float) (deltaTime() * multiple), 0, 1) * start;
     }
 
     @Override

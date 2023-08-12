@@ -16,7 +16,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL40C;
 import thunder.hack.gui.font.Texture;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.shaders.GradientGlowProgram;
 import thunder.hack.utility.render.shaders.RoundedGradientProgram;
 import thunder.hack.utility.render.shaders.RoundedProgram;
@@ -94,7 +94,7 @@ public class Render2DEngine {
 
     public static void addWindow(MatrixStack stack, float x, float y, float x1, float y1, double animation_factor) {
         float h = y + y1;
-        float h2 = (float) (h * (1d - MathUtil.clamp(animation_factor, 0, 1.0025f)));
+        float h2 = (float) (h * (1d - MathUtility.clamp(animation_factor, 0, 1.0025f)));
 
         float x3 = x;
         float y3 = y + h2;

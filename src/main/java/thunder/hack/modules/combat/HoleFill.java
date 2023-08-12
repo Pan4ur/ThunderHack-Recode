@@ -54,7 +54,6 @@ public class HoleFill extends Module {
     private final Setting<ColorSetting> renderLineColor = new Setting<>("Render Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<Integer> renderLineWidth = new Setting<>("Render Line Width", 2, 1, 5).withParent(renderCategory);
 
-
     public static Timer inactivityTimer = new Timer();
 
     private enum Mode {

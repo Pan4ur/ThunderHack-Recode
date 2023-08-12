@@ -15,8 +15,8 @@ import net.minecraft.util.math.Vec3d;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.MovementUtil;
-import thunder.hack.utility.player.PlayerUtil;
+import thunder.hack.utility.player.MovementUtility;
+import thunder.hack.utility.player.PlayerUtility;
 
 public class Spider extends Module {
 
@@ -64,7 +64,7 @@ public class Spider extends Module {
             mc.player.setOnGround(true);
             mc.player.setVelocity(mc.player.getVelocity().offset(Direction.UP,0.481145141919180));
         }
-        if (mc.player.age % delay.getValue() == 0 && mc.player.horizontalCollision && MovementUtil.isMoving() && a.getValue() == mode.Blocks) {
+        if (mc.player.age % delay.getValue() == 0 && mc.player.horizontalCollision && MovementUtility.isMoving() && a.getValue() == mode.Blocks) {
             int find = -2;
             for (int i = 0; i <= 8; i++)
                 if (mc.player.getInventory().getStack(i).getItem() instanceof BlockItem) find = i;
@@ -76,7 +76,7 @@ public class Spider extends Module {
                 BlockPos neighbour = BlockPos.ofFloored(mc.player.getX(), mc.player.getY() + 2, mc.player.getZ()).offset(side);
                 Direction opposite = side.getOpposite();
                 Vec3d hitVec = new Vec3d(neighbour.getX() + 0.5, neighbour.getY() + 0.5, neighbour.getZ() + 0.5).add(new Vec3d(opposite.getUnitVector()).multiply(0.5));
-                mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket( Hand.MAIN_HAND, new BlockHitResult(hitVec, opposite, neighbour, false), PlayerUtil.getWorldActionId(mc.world)));
+                mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket( Hand.MAIN_HAND, new BlockHitResult(hitVec, opposite, neighbour, false), PlayerUtility.getWorldActionId(mc.world)));
                 mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
                 if (mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos()).add(0, 2, 0)).getBlock() != Blocks.AIR) {
                     mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, neighbour, opposite));

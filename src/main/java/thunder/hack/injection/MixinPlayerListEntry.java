@@ -12,11 +12,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.client.Media;
-import thunder.hack.modules.client.OptifineCapes;
-import thunder.hack.utility.OFCapesUtil;
+import thunder.hack.utility.OFCapesUtility;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -77,7 +75,7 @@ public class MixinPlayerListEntry {
             } catch (Exception ignored) {
             }
             Map<MinecraftProfileTexture.Type, Identifier> textures = this.textures;
-            OFCapesUtil.loadPlayerCape(this.profile, id -> {
+            OFCapesUtility.loadPlayerCape(this.profile, id -> {
                 textures.put(MinecraftProfileTexture.Type.CAPE, id);
             });
         });

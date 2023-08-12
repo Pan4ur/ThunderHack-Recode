@@ -7,9 +7,9 @@ import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.ExplosionUtil;
+import thunder.hack.utility.math.ExplosionUtility;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
@@ -102,9 +102,9 @@ public class AutoTotem extends Module {
 
     public int getItemSlot(){
         int itemSlot = -1;
-        int gappleSlot = InventoryUtil.getItemSlot(Items.ENCHANTED_GOLDEN_APPLE);
-        int crappleSlot = InventoryUtil.getItemSlot(Items.GOLDEN_APPLE);
-        int shieldSlot = InventoryUtil.getItemSlot(Items.SHIELD);
+        int gappleSlot = InventoryUtility.getItemSlot(Items.ENCHANTED_GOLDEN_APPLE);
+        int crappleSlot = InventoryUtility.getItemSlot(Items.GOLDEN_APPLE);
+        int shieldSlot = InventoryUtility.getItemSlot(Items.SHIELD);
         Item item = null;
         if (offhand.getValue() == OffHand.Totem) {
             if(!mc.player.getOffHandStack().getName().toString().toLowerCase().contains("руна") && !mc.player.getOffHandStack().getName().toString().toLowerCase().contains("шар")) {
@@ -171,14 +171,14 @@ public class AutoTotem extends Module {
                 if (entity == null || !entity.isAlive()) continue;
                 if (mc.player.squaredDistanceTo(entity) > 36) continue;
                 if (!(entity instanceof EndCrystalEntity)) continue;
-                if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) - ExplosionUtil.getSelfExplosionDamage(entity.getPos()) < 0.5) {
+                if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos()) < 0.5) {
                     item = Items.TOTEM_OF_UNDYING;
                     break;
                 }
             }
         }
 
-        if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) <= healthF.getValue() && InventoryUtil.getItemSlot(Items.TOTEM_OF_UNDYING) != -1)
+        if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) <= healthF.getValue() && InventoryUtility.getItemSlot(Items.TOTEM_OF_UNDYING) != -1)
             item = Items.TOTEM_OF_UNDYING;
 
         for (int i = 9; i < 45; i++) {

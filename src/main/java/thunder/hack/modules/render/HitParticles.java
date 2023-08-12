@@ -3,14 +3,12 @@ package thunder.hack.modules.render;
 import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.util.Identifier;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.PreRender3DEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.math.MathUtil;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.*;
@@ -55,9 +53,9 @@ public class HitParticles extends Module {
         for (PlayerEntity player : mc.world.getPlayers()) {
             if (!selfp.getValue() && player == mc.player) continue;
             if (player.hurtTime > 0) {
-                Color c = colorMode.getValue() == ColorMode.Sync ? HudEditor.getColor((int) MathUtil.random(1,228)) : colorrr.getValue().getColorObject();
+                Color c = colorMode.getValue() == ColorMode.Sync ? HudEditor.getColor((int) MathUtility.random(1,228)) : colorrr.getValue().getColorObject();
                 for(int i = 0; i < amount.getValue(); i++){
-                    particles.add(new Particle(player.getX(), MathUtil.random((float) (player.getY() + player.getHeight()), (float) player.getY()), player.getZ(), c));
+                    particles.add(new Particle(player.getX(), MathUtility.random((float) (player.getY() + player.getHeight()), (float) player.getY()), player.getZ(), c));
                 }
             }
             particles.removeIf(particle -> System.currentTimeMillis() - particle.getTime() > lifeTime.getValue() * 1000);
@@ -91,9 +89,9 @@ public class HitParticles extends Module {
             this.x = x;
             this.y = y;
             this.z = z;
-            motionX = MathUtil.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
-            motionY = MathUtil.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
-            motionZ = MathUtil.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
+            motionX = MathUtility.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
+            motionY = MathUtility.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
+            motionZ = MathUtility.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
             time = System.currentTimeMillis();
             this.color = color;
         }

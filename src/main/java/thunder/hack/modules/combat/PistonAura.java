@@ -24,14 +24,13 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.MathUtil;
-import thunder.hack.utility.player.InventoryUtil;
+import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlaceUtility;
-import thunder.hack.utility.player.PlayerUtil;
+import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
@@ -152,7 +151,7 @@ public class PistonAura extends Module {
                     final BlockPos offset = new BlockPos(crystalPos.getX() - targetPos.getX(), 0, crystalPos.getZ() - targetPos.getZ());
                     final BlockPos trapBase = targetPos.add(offset.getX() * -1, 0, offset.getZ() * -1);
 
-                    if (InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN) == -1) {
+                    if (InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN) == -1) {
                         disable();
                         return;
                     }
@@ -163,7 +162,7 @@ public class PistonAura extends Module {
                     trapPos.add(trapBase.add(0, 1, 0));
 
                     for(BlockPos bp : trapPos){
-                        if (PlaceUtility.place( bp,true, strictDirection.getValue(),Hand.MAIN_HAND,InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN),false)) {
+                        if (PlaceUtility.place( bp,true, strictDirection.getValue(),Hand.MAIN_HAND,InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN),false)) {
                             if(bp == targetPos.add(0,2,0)){
                                 builtTrap = true;
                                 stage = Stage.Piston;
@@ -176,7 +175,7 @@ public class PistonAura extends Module {
             case Piston -> {
                 BlockPos support = pistonPos.down();
                 if (mc.world.getBlockState(support).isReplaceable() && supportPlace.getValue()) {
-                    PlaceUtility.forcePlace(support, strictDirection.getValue(),Hand.MAIN_HAND,InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN), false);
+                    PlaceUtility.forcePlace(support, strictDirection.getValue(),Hand.MAIN_HAND,InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN), false);
                     return;
                 }
 
@@ -191,15 +190,15 @@ public class PistonAura extends Module {
 
                 postAction = () -> {
                     int piston_slot = -1;
-                    if (InventoryUtil.findHotbarBlock(Blocks.PISTON) == -1) {
-                        if (InventoryUtil.findHotbarBlock(Blocks.STICKY_PISTON) == -1) {
+                    if (InventoryUtility.findHotbarBlock(Blocks.PISTON) == -1) {
+                        if (InventoryUtility.findHotbarBlock(Blocks.STICKY_PISTON) == -1) {
                             disable();
                             return;
                         } else {
-                            piston_slot = InventoryUtil.findHotbarBlock(Blocks.STICKY_PISTON);
+                            piston_slot = InventoryUtility.findHotbarBlock(Blocks.STICKY_PISTON);
                         }
                     } else {
-                        piston_slot = InventoryUtil.findHotbarBlock(Blocks.PISTON);
+                        piston_slot = InventoryUtility.findHotbarBlock(Blocks.PISTON);
                     }
                     PlaceUtility.forcePlace(pistonPos, false, Hand.MAIN_HAND, piston_slot, false);
                     stage = isFire ? Stage.Fire : Stage.Crystal;
@@ -208,7 +207,7 @@ public class PistonAura extends Module {
             case Fire -> {
                 BlockPos support = firePos.down();
                 if (mc.world.getBlockState(support).isReplaceable() && supportPlace.getValue()) {
-                    PlaceUtility.forcePlace(support, strictDirection.getValue(),Hand.MAIN_HAND,InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN), false);
+                    PlaceUtility.forcePlace(support, strictDirection.getValue(),Hand.MAIN_HAND,InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN), false);
                     return;
                 }
 
@@ -221,13 +220,13 @@ public class PistonAura extends Module {
                     mc.player.setPitch(angle[1]);
                 }
                 postAction = () -> {
-                    PlaceUtility.forcePlace(firePos, strictDirection.getValue(),Hand.MAIN_HAND,InventoryUtil.getItemSlotHotbar(Items.FLINT_AND_STEEL), false);
+                    PlaceUtility.forcePlace(firePos, strictDirection.getValue(),Hand.MAIN_HAND,InventoryUtility.getItemSlotHotbar(Items.FLINT_AND_STEEL), false);
                     stage = Stage.Crystal;
                 };
             }
             case Crystal -> {
                 if (mc.world.getBlockState(crystalPos).isReplaceable() && supportPlace.getValue()) {
-                    PlaceUtility.forcePlace(crystalPos,  strictDirection.getValue(), Hand.MAIN_HAND,InventoryUtil.findHotbarBlock(Blocks.OBSIDIAN), false);
+                    PlaceUtility.forcePlace(crystalPos,  strictDirection.getValue(), Hand.MAIN_HAND,InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN), false);
                     return;
                 }
 
@@ -235,20 +234,20 @@ public class PistonAura extends Module {
                 if (result == null) return;
                 float[] angle = PlaceUtility.calculateAngle(rotations);
                 if (extra) {
-                    Thunderhack.placeManager.rotate(angle[0] + MathUtil.random(-0.2f, 0.2f), angle[1]);
+                    Thunderhack.placeManager.rotate(angle[0] + MathUtility.random(-0.2f, 0.2f), angle[1]);
                 } else {
-                    mc.player.setYaw(angle[0] + MathUtil.random(-0.2f, 0.2f));
+                    mc.player.setYaw(angle[0] + MathUtility.random(-0.2f, 0.2f));
                     mc.player.setPitch(angle[1]);
                 }
 
                 postAction = () -> {
-                    int crystal_slot = InventoryUtil.getItemSlotHotbar(Items.END_CRYSTAL);
+                    int crystal_slot = InventoryUtility.getItemSlotHotbar(Items.END_CRYSTAL);
                     int prev_slot = mc.player.getInventory().selectedSlot;
                     if (crystal_slot != -1) {
                         mc.player.getInventory().selectedSlot = crystal_slot;
                         mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(crystal_slot));
                     }
-                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(mc.player.getOffHandStack().getItem() == Items.END_CRYSTAL ? Hand.OFF_HAND : Hand.MAIN_HAND, result, PlayerUtil.getWorldActionId(mc.world)));
+                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(mc.player.getOffHandStack().getItem() == Items.END_CRYSTAL ? Hand.OFF_HAND : Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
                     mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(mc.player.getOffHandStack().getItem() == Items.END_CRYSTAL ? Hand.OFF_HAND : Hand.MAIN_HAND));
                     mc.player.getInventory().selectedSlot = prev_slot;
                     mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prev_slot));
@@ -258,7 +257,7 @@ public class PistonAura extends Module {
             case RedStone -> {
                 BlockPos support = redStonePos.down();
                 if (mc.world.getBlockState(support).isReplaceable() && supportPlace.getValue()) {
-                    PlaceUtility.forcePlace(support,  strictDirection.getValue(),Hand.MAIN_HAND, InventoryUtil.getItemSlotHotbar(Items.OBSIDIAN), false);
+                    PlaceUtility.forcePlace(support,  strictDirection.getValue(),Hand.MAIN_HAND, InventoryUtility.getItemSlotHotbar(Items.OBSIDIAN), false);
                 }
                 float[] angle = PlaceUtility.calcAngle(redStonePos,strictDirection.getValue(),true);
                 if(angle == null) return;
@@ -271,14 +270,14 @@ public class PistonAura extends Module {
 
                 postAction = () -> {
                     int redstone_slot = -1;
-                    if (InventoryUtil.findHotbarBlock(Blocks.REDSTONE_BLOCK) == -1) {
-                        if (InventoryUtil.findHotbarBlock(Blocks.REDSTONE_TORCH) == -1) {
+                    if (InventoryUtility.findHotbarBlock(Blocks.REDSTONE_BLOCK) == -1) {
+                        if (InventoryUtility.findHotbarBlock(Blocks.REDSTONE_TORCH) == -1) {
                             disable();
                         } else {
-                            redstone_slot = InventoryUtil.findHotbarBlock(Blocks.REDSTONE_TORCH);
+                            redstone_slot = InventoryUtility.findHotbarBlock(Blocks.REDSTONE_TORCH);
                         }
                     } else {
-                        redstone_slot = InventoryUtil.findHotbarBlock(Blocks.REDSTONE_BLOCK);
+                        redstone_slot = InventoryUtility.findHotbarBlock(Blocks.REDSTONE_BLOCK);
                     }
                     PlaceUtility.forcePlace(redStonePos, strictDirection.getValue(), Hand.MAIN_HAND, redstone_slot, false);
                     stage = Stage.Break;
@@ -334,7 +333,7 @@ public class PistonAura extends Module {
             if (!(ent instanceof EndCrystalEntity) || target.squaredDistanceTo(ent.getPos()) > 4 || ent.age < 2)
                 continue;
             float[] angle = PlaceUtility.calculateAngle(ent.getPos());
-            mc.player.setYaw(angle[0] + MathUtil.random(-3f,3f));
+            mc.player.setYaw(angle[0] + MathUtility.random(-3f,3f));
             mc.player.setPitch(angle[1]);
             if(attackTimer.passedMs(100)) {
                 mc.interactionManager.attackEntity(mc.player, ent);
