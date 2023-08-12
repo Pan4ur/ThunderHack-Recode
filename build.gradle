@@ -23,6 +23,10 @@ repositories {
 		name = 'swt-repo'
 		url = "https://maven-eclipse.github.io/maven"
 	}
+	maven {
+		name = "meteor-maven"
+		url = "https://maven.meteordev.org/releases"
+	}
 	mavenCentral()
 	jcenter()
 }
@@ -40,7 +44,8 @@ dependencies {
 	libImpl('club.minnced:java-discord-rpc:2.0.2') {
 		exclude module: 'jna'
 	}
-	
+	libImpl("meteordevelopment:orbit:0.2.3")
+
 	configurations.libImpl.dependencies.each {
 		implementation(it)
 	}
