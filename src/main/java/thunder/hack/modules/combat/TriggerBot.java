@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffects;
@@ -23,7 +24,7 @@ public class TriggerBot extends Module {
     public final Setting<Boolean> smartCrit = new Setting<>("SmartCrit", true);
     public final Setting<Boolean> ignoreWalls = new Setting<>("IgnoreWals", false);
 
-    @Subscribe
+    @EventHandler
     public void onAttack(PlayerUpdateEvent e){
         if(!autoCrit()) return;
         Entity ent = Thunderhack.playerManager.getRtxTarger(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());

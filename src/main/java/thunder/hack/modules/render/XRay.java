@@ -1,16 +1,15 @@
 package thunder.hack.modules.render;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.Render2DEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -77,7 +76,7 @@ public class XRay extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onReceivePacket(PacketEvent.Receive e) {
         if (e.getPacket() instanceof BlockUpdateS2CPacket pac) {
             if (isCheckableOre(pac.getState().getBlock())) {
@@ -94,54 +93,54 @@ public class XRay extends Module {
         */
     }
 
-    @Subscribe
-    public void onRender3D(Render3DEvent e) {
+
+    public void onRender3D(MatrixStack stack) {
         try {
             for (BlockPos pos : ores) {
                 Block block = mc.world.getBlockState(pos).getBlock();
                     if (block == Blocks.DIAMOND_ORE && diamond.getValue()) {
-                        Render3DEngine.drawFilledBox(e.getMatrixStack(),new Box(pos), new Color(0, 255, 255, 100));
+                        Render3DEngine.drawFilledBox(stack,new Box(pos), new Color(0, 255, 255, 100));
                         Render3DEngine.drawBoxOutline(new Box(pos), new Color(0, 255, 255, 200), 2);
                     }
                     if (block == Blocks.GOLD_ORE && gold.getValue()) {
-                        Render3DEngine.drawFilledBox(e.getMatrixStack(),new Box(pos), new Color(255, 215, 0, 100));
+                        Render3DEngine.drawFilledBox(stack,new Box(pos), new Color(255, 215, 0, 100));
                         Render3DEngine.drawBoxOutline(new Box(pos), new Color(255, 215, 0, 200), 2);
                     }
                     if (block == Blocks.IRON_ORE  && iron.getValue()) {
-                        Render3DEngine.drawFilledBox(e.getMatrixStack(),new Box(pos), new Color(213, 213, 213, 100));
+                        Render3DEngine.drawFilledBox(stack,new Box(pos), new Color(213, 213, 213, 100));
                         Render3DEngine.drawBoxOutline(new Box(pos), new Color(213, 213, 213, 200), 2);
                     }
                     if (block == Blocks.EMERALD_ORE  && emerald.getValue()) {
-                        Render3DEngine.drawFilledBox(e.getMatrixStack(),new Box(pos), new Color(0, 255, 77, 100));
+                        Render3DEngine.drawFilledBox(stack,new Box(pos), new Color(0, 255, 77, 100));
                         Render3DEngine.drawBoxOutline(new Box(pos), new Color(0, 255, 77, 200), 2);
                     }
                     if (block == Blocks.REDSTONE_ORE  && redstone.getValue()) {
-                        Render3DEngine.drawFilledBox(e.getMatrixStack(),new Box(pos), new Color(255, 0, 0, 100));
+                        Render3DEngine.drawFilledBox(stack,new Box(pos), new Color(255, 0, 0, 100));
                         Render3DEngine.drawBoxOutline(new Box(pos), new Color(255, 0, 0, 200), 2);
                     }
                     if (block == Blocks.COAL_ORE  && coal.getValue()) {
-                        Render3DEngine.drawFilledBox(e.getMatrixStack(),new Box(pos), new Color(0, 0, 0, 100));
+                        Render3DEngine.drawFilledBox(stack,new Box(pos), new Color(0, 0, 0, 100));
                         Render3DEngine.drawBoxOutline(new Box(pos), new Color(0, 0, 0, 200), 2);
                     }
                     if (block == Blocks.LAPIS_ORE  && lapis.getValue() ) {
-                        Render3DEngine.drawFilledBox(e.getMatrixStack(),new Box(pos), new Color(38, 97, 156, 100));
+                        Render3DEngine.drawFilledBox(stack,new Box(pos), new Color(38, 97, 156, 100));
                         Render3DEngine.drawBoxOutline(new Box(pos), new Color(38, 97, 156, 200), 2);
                     }
                     if (block == Blocks.ANCIENT_DEBRIS  && netherite.getValue() ) {
-                        Render3DEngine.drawFilledBox(e.getMatrixStack(),new Box(pos), new Color(255, 255, 255, 100));
+                        Render3DEngine.drawFilledBox(stack,new Box(pos), new Color(255, 255, 255, 100));
                         Render3DEngine.drawBoxOutline(new Box(pos), new Color(255, 255, 255, 200), 2);
                     }
             }
             if (displayBlock != null && (done != all)) {
-                Render3DEngine.drawFilledBox(e.getMatrixStack(),new Box(displayBlock), new Color(255, 0, 30));
+                Render3DEngine.drawFilledBox(stack,new Box(displayBlock), new Color(255, 0, 30));
                 Render3DEngine.drawBoxOutline(new Box(displayBlock), new Color(255, 0, 60), 2);
             }
         } catch (Exception ignored) {}
     }
 
-    @Subscribe
-    public void onRender2D(Render2DEvent e) {
-        FontRenderers.modules.drawCenteredString(e.getMatrixStack(),"Done: " + done + " / " + "All: " + all,mc.getWindow().getScaledWidth() / 2f, 50,-1);
+
+    public void onRender2D(MatrixStack stack) {
+        FontRenderers.modules.drawCenteredString(stack,"Done: " + done + " / " + "All: " + all,mc.getWindow().getScaledWidth() / 2f, 50,-1);
     }
 
     public static boolean isCheckableOre(Block block) {

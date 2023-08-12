@@ -1,6 +1,7 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.passive.LlamaEntity;
@@ -87,7 +88,7 @@ public class Step extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onStep(EventSync event) {
         if (mode.getValue().equals(Mode.NCP)) {
             double stepHeight = mc.player.getY() - mc.player.prevY;

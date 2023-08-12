@@ -1,7 +1,6 @@
 package thunder.hack.injection;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.logging.LogUtils;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.Camera;
 import net.minecraft.item.SwordItem;
@@ -12,11 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
-import thunder.hack.events.impl.PreRender3DEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.player.NoEntityTrace;
-import thunder.hack.modules.render.FOV;
 import thunder.hack.modules.render.NoRender;
 import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.render.MSAAFramebuffer;
@@ -58,8 +54,8 @@ public abstract class MixinGameRenderer {
         Render3DEngine.lastProjMat.set(RenderSystem.getProjectionMatrix());
         Render3DEngine.lastModMat.set(RenderSystem.getModelViewMatrix());
         Render3DEngine.lastWorldSpaceMatrix.set(matrix.peek().getPositionMatrix());
-        Thunderhack.EVENT_BUS.post(new PreRender3DEvent(matrix));
-        MSAAFramebuffer.use(() -> Thunderhack.EVENT_BUS.post(new Render3DEvent(matrix)));
+        Thunderhack.moduleManager.onPreRender3D(matrix);
+        MSAAFramebuffer.use(() -> Thunderhack.moduleManager.onRender3D(matrix));
     }
 
 

@@ -1,6 +1,7 @@
 package thunder.hack.core;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
@@ -26,11 +27,6 @@ public class PlaceManager {
     public static boolean syncSprinting;
     public static boolean syncSneaking;
 
-
-    public PlaceManager() {
-        Thunderhack.EVENT_BUS.register(this);
-    }
-
     public static void setTrailingRotation(float[] rotation) {
         trailingRotation = rotation;
     }
@@ -39,7 +35,7 @@ public class PlaceManager {
         placements.add(action);
     }
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync event) {
         handleActions(event);
     }

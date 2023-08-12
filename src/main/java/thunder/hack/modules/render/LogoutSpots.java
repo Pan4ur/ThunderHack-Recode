@@ -1,8 +1,9 @@
 package thunder.hack.modules.render;
 
 import com.google.common.collect.Maps;
-import com.google.common.eventbus.Subscribe;
-import com.mojang.authlib.GameProfile;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
@@ -10,8 +11,6 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Vector4d;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.Render2DEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -32,7 +31,7 @@ public class LogoutSpots extends Module {
         super("LogoutSpots", Category.RENDER);
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e){
         if(e.getPacket() instanceof PlayerListS2CPacket pac){
             if(pac.getActions().contains(PlayerListS2CPacket.Action.ADD_PLAYER)){
@@ -75,16 +74,14 @@ public class LogoutSpots extends Module {
         }
     }
 
-    @Subscribe
-    public void onRender3D(Render3DEvent event) {
+    public void onRender3D(MatrixStack event) {
         for (UUID uuid : logoutCache.keySet()) {
             final PlayerEntity data = logoutCache.get(uuid);
             Render3DEngine.drawBoxOutline(data.getBoundingBox(),color.getValue().getColorObject(),2);
         }
     }
 
-    @Subscribe
-    public void onRender2D(Render2DEvent e){
+    public void onRender2D(DrawContext context){
         for (UUID uuid : logoutCache.keySet()) {
             final PlayerEntity data = logoutCache.get(uuid);
 
@@ -107,8 +104,8 @@ public class LogoutSpots extends Module {
                 float textWidth = (FontRenderers.sf_bold.getStringWidth(string) * 1);
                 float tagX = (float) ((position.x + diff - textWidth / 2) * 1);
 
-                Render2DEngine.drawRect(e.getMatrixStack(),tagX -2 , (float) (position.y - 13f), textWidth + 4, 11,new Color(0x99000001, true));
-                FontRenderers.sf_bold.drawString(e.getMatrixStack(), string, tagX, (float) position.y - 10, -1);
+                Render2DEngine.drawRect(context.getMatrices(),tagX -2 , (float) (position.y - 13f), textWidth + 4, 11,new Color(0x99000001, true));
+                FontRenderers.sf_bold.drawString(context.getMatrices(), string, tagX, (float) position.y - 10, -1);
             }
         }
     }

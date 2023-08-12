@@ -1,6 +1,7 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.setting.Setting;
@@ -36,7 +37,7 @@ public class NoSlow extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onTick(EventSync event) {
         if (mc.player.isUsingItem()) {
             if (Mode.getValue() == mode.StrictNCP || Mode.getValue() == mode.NCP) {

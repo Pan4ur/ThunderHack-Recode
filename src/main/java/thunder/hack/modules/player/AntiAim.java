@@ -1,6 +1,7 @@
 package thunder.hack.modules.player;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
@@ -26,7 +27,7 @@ public class AntiAim extends Module {
 
     private float rotationYaw, rotationPitch, pitch_sinus_step, yaw_sinus_step;
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync e) {
         if(allowInteract.getValue() && (mc.options.attackKey.isPressed() || mc.options.attackKey.isPressed())) return;
         if (yawMode.getValue() != Mode.None) {
@@ -38,7 +39,7 @@ public class AntiAim extends Module {
             mc.player.setPitch(rotationPitch);
     }
 
-    @Subscribe
+    @EventHandler
     public void onCalc(PlayerUpdateEvent e) {
         if (pitchMode.getValue() == Mode.RandomAngle)
             if (mc.player.age % Speed.getValue() == 0)

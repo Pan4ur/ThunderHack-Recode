@@ -2,6 +2,7 @@ package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
 import io.netty.util.internal.ConcurrentSet;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventPlayerTravel;
@@ -48,6 +49,7 @@ public class BoatFly extends Module {
     private boolean Field2266 = false;
     private boolean Field2267 = false;
     private boolean Field2268 = false;
+
     public BoatFly() {
         super("BoatFly", "полёт на лодке и мобах", Category.MOVEMENT);
     }
@@ -143,7 +145,7 @@ public class BoatFly extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPlayerTravel(EventPlayerTravel ev) {
         if(!ev.isPre()) return;
         if (mc.player == null ||mc.world == null) {
@@ -254,7 +256,7 @@ public class BoatFly extends Module {
         ++this.Field2264;
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive eventNetworkPrePacketEvent) {
         if (fullNullCheck()) {
             return;
@@ -279,7 +281,7 @@ public class BoatFly extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketSend(PacketEvent.Send eventNetworkPostPacketEvent) {
         if (mc.player == null ||mc.world == null) {
             return;

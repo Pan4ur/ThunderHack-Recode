@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ChatScreen;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventPostSync;
@@ -38,7 +39,7 @@ public class AutoTotem extends Module {
         super("AutoTotem", "AutoTotem", Category.COMBAT);
     }
 
-    @Subscribe
+    @EventHandler
     public void onPostMotion(EventPostSync e) {
         if (mc.currentScreen == null || mc.currentScreen instanceof ChatScreen) {
             int itemSlot = getItemSlot();
@@ -86,7 +87,7 @@ public class AutoTotem extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onPacketSend(PacketEvent.Send e){
         if(e.getPacket() instanceof UpdateSelectedSlotC2SPacket){
             if(mc.player.isUsingItem() && (mc.player.getMainHandStack().getItem() == Items.GOLDEN_APPLE  || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)) mc.player.stopUsingItem();

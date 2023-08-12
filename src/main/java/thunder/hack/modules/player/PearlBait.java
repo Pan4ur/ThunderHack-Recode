@@ -1,6 +1,7 @@
 package thunder.hack.modules.player;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import thunder.hack.events.impl.EventEntitySpawn;
@@ -13,7 +14,7 @@ public class PearlBait extends Module {
         super("PearlBait", Category.PLAYER);
     }
 
-    @Subscribe
+    @EventHandler
     public void OnEntitySpawn(EventEntitySpawn e) {
         if (e.getEntity() instanceof EnderPearlEntity)
             mc.world.getPlayers().stream()

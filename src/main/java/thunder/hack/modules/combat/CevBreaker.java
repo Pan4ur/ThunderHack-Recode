@@ -1,8 +1,9 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.BlockBreakingInfo;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
@@ -28,7 +29,6 @@ import thunder.hack.core.PlaceManager;
 import thunder.hack.events.impl.EventEntityRemoved;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.injection.accesors.IWorldRenderer;
 import thunder.hack.modules.Module;
@@ -259,14 +259,13 @@ public class CevBreaker extends Module {
         }
     }
 
-    @Subscribe
-    private void onRender(Render3DEvent e) {
+    private void onRender(MatrixStack stack) {
         if (renderTrap.getValue()) {
             renderTrapPoses.forEach((pos, time) -> {
                 if (System.currentTimeMillis() - time > 500) {
                     renderTrapPoses.remove(pos);
                 } else {
-                    Render3DEngine.drawFilledBox(e.getMatrixStack(), new Box(pos), Render2DEngine.injectAlpha(trapFillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
+                    Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(trapFillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
                     Render3DEngine.drawBoxOutline(new Box(pos), trapLineColor.getValue().getColorObject(), trapLineWidth.getValue());
                 }
             });
@@ -276,18 +275,18 @@ public class CevBreaker extends Module {
                 if (System.currentTimeMillis() - time > 500) {
                     renderTrapPoses.remove(pos);
                 } else {
-                    Render3DEngine.drawFilledBox(e.getMatrixStack(), new Box(pos), Render2DEngine.injectAlpha(structureFillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
+                    Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(structureFillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
                     Render3DEngine.drawBoxOutline(new Box(pos), structureLineColor.getValue().getColorObject(), structureLineWidth.getValue());
                 }
             });
         }
         if (renderTarget.getValue()) {
-            Render3DEngine.drawFilledBox(e.getMatrixStack(), new Box(target.getBlockPos().add(0, 3, 0)), targetFillColor.getValue().getColorObject());
+            Render3DEngine.drawFilledBox(stack, new Box(target.getBlockPos().add(0, 3, 0)), targetFillColor.getValue().getColorObject());
             Render3DEngine.drawBoxOutline(new Box(target.getBlockPos().add(0, 3, 0)), targetLineColor.getValue().getColorObject(), targetLineWidth.getValue());
         }
     }
 
-    @Subscribe
+    @EventHandler
     private void onEntityRemove(EventEntityRemoved e) {
         if (e.entity == null) return;
 
@@ -297,7 +296,7 @@ public class CevBreaker extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     private void onPacket(PacketEvent.Receive e) {
         if (e.getPacket() instanceof BlockUpdateS2CPacket) {
             BlockUpdateS2CPacket packet = e.getPacket();
@@ -330,7 +329,7 @@ public class CevBreaker extends Module {
                 breakCrystalDelay.getValue());
     }
 
-    @Subscribe
+    @EventHandler
     private void onSync(EventSync e) {
         // Normal breaking block
         if (mine && !mc.world.getBlockState(currentMineBlockPos).getBlock().equals(Blocks.AIR)) {

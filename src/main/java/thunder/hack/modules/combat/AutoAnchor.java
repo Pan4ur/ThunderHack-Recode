@@ -1,8 +1,9 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RespawnAnchorBlock;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.EnchantedGoldenAppleItem;
 import net.minecraft.item.Items;
@@ -15,7 +16,8 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.PlaceManager;
-import thunder.hack.events.impl.*;
+import thunder.hack.events.impl.EventPlaceBlock;
+import thunder.hack.events.impl.EventSync;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
@@ -30,7 +32,8 @@ import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,44 +47,44 @@ public class AutoAnchor extends Module {
 
 
     public static Setting<Mode> mode = new Setting<>("Mode", Mode.Legit);
-    public Setting<Integer> swapDelay = new Setting<>("SwapDelay", 100, 0, 1000,v-> mode.getValue() == Mode.Legit);
-    public Setting<Integer> charge = new Setting<>("Charge", 5, 1, 5,v-> mode.getValue() == Mode.Legit);
+    public Setting<Integer> swapDelay = new Setting<>("SwapDelay", 100, 0, 1000, v -> mode.getValue() == Mode.Legit);
+    public Setting<Integer> charge = new Setting<>("Charge", 5, 1, 5, v -> mode.getValue() == Mode.Legit);
 
-    public Setting<Boolean> rotate = new Setting<>("Rotate", true,v-> mode.getValue() == Mode.Rage);
-    public Setting<YawStepMode> yawStep = new Setting<>("YawStep", YawStepMode.Off, v-> rotate.getValue() && mode.getValue() == Mode.Rage);
-    public Setting<Integer> yawAngle = new Setting<>("YawAngle", 54, 5, 180, v-> rotate.getValue() && yawStep.getValue() != YawStepMode.Off && mode.getValue() == Mode.Rage);
-    public Setting<Boolean> strictDirection = new Setting<>("StrictDirection", true,v-> mode.getValue() == Mode.Rage);
-    public Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 0, 0, 1000,v-> mode.getValue() == Mode.Rage);
-    public Setting<Integer> chargeDelay = new Setting<>("ChargeDelay", 0, 0, 1000,v-> mode.getValue() == Mode.Rage);
-    public Setting<Integer> explodeDelay = new Setting<>("ExplodeDelay", 0, 0, 1000,v-> mode.getValue() == Mode.Rage);
-    public Setting<Float> placeRange = new Setting<>("Range", 4F, 1F, 6F,v-> mode.getValue() == Mode.Rage);
-    public Setting<PriorityMode> priorityMode = new Setting<>("PlacePriority", PriorityMode.MaxDamage,v-> mode.getValue() == Mode.Rage);
-    public Setting<Float> enemyRange = new Setting<>("TargetRange", 8F, 4F, 20F,v-> mode.getValue() == Mode.Rage);
-    public static Setting<Integer> predictTicks = new Setting<>("PredictTicks", 3, 0, 10,v-> mode.getValue() == Mode.Rage);
-    public Setting<Float> minDamage = new Setting<>("MinDamage", 6F, 0F, 20F,v-> mode.getValue() == Mode.Rage);
-    public Setting<Float> maxSelfDamage = new Setting<>("MaxSelfDmg", 12F, 0F, 20F,v-> mode.getValue() == Mode.Rage);
-    public Setting<Boolean> pauseWhileMining = new Setting<>("PauseWhenMining", false,v-> mode.getValue() == Mode.Rage);
-    public Setting<Boolean> pauseWhileGapping = new Setting<>("PauseWhenGapping", false,v-> mode.getValue() == Mode.Rage);
-    public Setting<Boolean> pauseWhenAura = new Setting<>("PauseWhenAura", true,v-> mode.getValue() == Mode.Rage);
-    public Setting<Float> pauseHealth = new Setting<>("PauseHealth", 2f, 0f, 10f,v-> mode.getValue() == Mode.Rage);
-    public Setting<Boolean> render = new Setting<>("Render", true,v-> mode.getValue() == Mode.Rage);
+    public Setting<Boolean> rotate = new Setting<>("Rotate", true, v -> mode.getValue() == Mode.Rage);
+    public Setting<YawStepMode> yawStep = new Setting<>("YawStep", YawStepMode.Off, v -> rotate.getValue() && mode.getValue() == Mode.Rage);
+    public Setting<Integer> yawAngle = new Setting<>("YawAngle", 54, 5, 180, v -> rotate.getValue() && yawStep.getValue() != YawStepMode.Off && mode.getValue() == Mode.Rage);
+    public Setting<Boolean> strictDirection = new Setting<>("StrictDirection", true, v -> mode.getValue() == Mode.Rage);
+    public Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 0, 0, 1000, v -> mode.getValue() == Mode.Rage);
+    public Setting<Integer> chargeDelay = new Setting<>("ChargeDelay", 0, 0, 1000, v -> mode.getValue() == Mode.Rage);
+    public Setting<Integer> explodeDelay = new Setting<>("ExplodeDelay", 0, 0, 1000, v -> mode.getValue() == Mode.Rage);
+    public Setting<Float> placeRange = new Setting<>("Range", 4F, 1F, 6F, v -> mode.getValue() == Mode.Rage);
+    public Setting<PriorityMode> priorityMode = new Setting<>("PlacePriority", PriorityMode.MaxDamage, v -> mode.getValue() == Mode.Rage);
+    public Setting<Float> enemyRange = new Setting<>("TargetRange", 8F, 4F, 20F, v -> mode.getValue() == Mode.Rage);
+    public static Setting<Integer> predictTicks = new Setting<>("PredictTicks", 3, 0, 10, v -> mode.getValue() == Mode.Rage);
+    public Setting<Float> minDamage = new Setting<>("MinDamage", 6F, 0F, 20F, v -> mode.getValue() == Mode.Rage);
+    public Setting<Float> maxSelfDamage = new Setting<>("MaxSelfDmg", 12F, 0F, 20F, v -> mode.getValue() == Mode.Rage);
+    public Setting<Boolean> pauseWhileMining = new Setting<>("PauseWhenMining", false, v -> mode.getValue() == Mode.Rage);
+    public Setting<Boolean> pauseWhileGapping = new Setting<>("PauseWhenGapping", false, v -> mode.getValue() == Mode.Rage);
+    public Setting<Boolean> pauseWhenAura = new Setting<>("PauseWhenAura", true, v -> mode.getValue() == Mode.Rage);
+    public Setting<Float> pauseHealth = new Setting<>("PauseHealth", 2f, 0f, 10f, v -> mode.getValue() == Mode.Rage);
+    public Setting<Boolean> render = new Setting<>("Render", true, v -> mode.getValue() == Mode.Rage);
 
-    private enum Mode{
+    private enum Mode {
         Legit, Rage
     }
 
-    @Subscribe
-    public void onBlockPlace(EventPlaceBlock event){
-        if(mode.getValue() == Mode.Rage) return;
-        if(event.getBlock() == Blocks.RESPAWN_ANCHOR && mc.options.useKey.isPressed()){
+    @EventHandler
+    public void onBlockPlace(EventPlaceBlock event) {
+        if (mode.getValue() == Mode.Rage) return;
+        if (event.getBlock() == Blocks.RESPAWN_ANCHOR && mc.options.useKey.isPressed()) {
             int glowSlot = InventoryUtil.getItemSlotHotbar(Items.GLOWSTONE);
-            if(glowSlot == -1 ) return;
-            new LegitThread(glowSlot,mc.player.getInventory().selectedSlot,swapDelay.getValue()).start();
+            if (glowSlot == -1) return;
+            new LegitThread(glowSlot, mc.player.getInventory().selectedSlot, swapDelay.getValue()).start();
         }
     }
 
     public class LegitThread extends Thread {
-        int glowSlot,originalSlot,delay;
+        int glowSlot, originalSlot, delay;
 
         public LegitThread(int glowSlot, int originalSlot, int delay) {
             this.glowSlot = glowSlot;
@@ -91,22 +94,34 @@ public class AutoAnchor extends Module {
 
         @Override
         public void run() {
-            try {sleep(delay);} catch (Exception ignored) {}
-
-            mc.player.getInventory().selectedSlot= glowSlot;
-            mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(glowSlot));
-            try {sleep(delay);} catch (Exception ignored) {}
-            for (int i = 0; i < charge.getValue(); i++) {
-                ((IMinecraftClient)mc).idoItemUse();
+            try {
+                sleep(delay);
+            } catch (Exception ignored) {
             }
 
-            try {sleep(delay);} catch (Exception ignored) {}
+            mc.player.getInventory().selectedSlot = glowSlot;
+            mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(glowSlot));
+            try {
+                sleep(delay);
+            } catch (Exception ignored) {
+            }
+            for (int i = 0; i < charge.getValue(); i++) {
+                ((IMinecraftClient) mc).idoItemUse();
+            }
+
+            try {
+                sleep(delay);
+            } catch (Exception ignored) {
+            }
 
             mc.player.getInventory().selectedSlot = originalSlot;
             mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
 
-            try {sleep(delay);} catch (Exception ignored) {}
-            if(charge.getValue() < 5) ((IMinecraftClient)mc).idoItemUse();
+            try {
+                sleep(delay);
+            } catch (Exception ignored) {
+            }
+            if (charge.getValue() < 5) ((IMinecraftClient) mc).idoItemUse();
 
             super.run();
         }
@@ -114,6 +129,7 @@ public class AutoAnchor extends Module {
 
 
     private enum YawStepMode {Off, On}
+
     private enum PriorityMode {MaxDamage, Balance}
 
     private BlockPos threadedBp = null;
@@ -127,7 +143,7 @@ public class AutoAnchor extends Module {
     private float renderDmg;
 
     @Override
-    public void onEnable(){
+    public void onEnable() {
         placeTimer.reset();
         chargeTimer.reset();
         explodeTimer.reset();
@@ -139,7 +155,7 @@ public class AutoAnchor extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onEntitySync(EventSync event) {
 
         if (check() && mode.getValue() == Mode.Rage) if (!explodeAnchor()) if (!chargeAnchor()) placeAnchor();
@@ -160,30 +176,30 @@ public class AutoAnchor extends Module {
             yp[0] = (float) (yp[0] - (yp[0] - ((IClientPlayerEntity) ((mc.player))).getLastYaw()) % gcdFix);
             yp[1] = (float) (yp[1] - (yp[1] - ((IClientPlayerEntity) ((mc.player))).getLastYaw()) % gcdFix);
             PlaceManager.setTrailingRotation(yp);
-            if(placeTimer.passedMs(2000)) rotations = null;
+            if (placeTimer.passedMs(2000)) rotations = null;
         }
     }
 
 
     @Override
     public void onThread() {
-        if(mode.getValue() == Mode.Rage) threadedBp = findPlacePosition();
+        if (mode.getValue() == Mode.Rage) threadedBp = findPlacePosition();
     }
 
-    public boolean explodeAnchor(){
-        if(!explodeTimer.passedMs(explodeDelay.getValue())) return false;
+    public boolean explodeAnchor() {
+        if (!explodeTimer.passedMs(explodeDelay.getValue())) return false;
 
         BlockPos result;
-        if(cachePos != null && mc.world.getBlockState(cachePos).getBlock() instanceof RespawnAnchorBlock && mc.world.getBlockState(cachePos).get(CHARGES) != 0){
+        if (cachePos != null && mc.world.getBlockState(cachePos).getBlock() instanceof RespawnAnchorBlock && mc.world.getBlockState(cachePos).get(CHARGES) != 0) {
             result = cachePos;
         } else {
-            result = findAnchorTarget(getTargetsInRange(),true);
+            result = findAnchorTarget(getTargetsInRange(), true);
         }
 
-        if(result == null) return false;
+        if (result == null) return false;
 
         int anchorSlot = InventoryUtil.getAnchorSlot();
-        if(anchorSlot != -1){
+        if (anchorSlot != -1) {
             PlaceManager.trailingBreakAction = () -> {
                 BlockHitResult bhr = handleInteractRotation(result);
                 if (bhr != null) {
@@ -202,22 +218,22 @@ public class AutoAnchor extends Module {
         return false;
     }
 
-    public boolean chargeAnchor(){
-        if(!chargeTimer.passedMs(chargeDelay.getValue())) return false;
+    public boolean chargeAnchor() {
+        if (!chargeTimer.passedMs(chargeDelay.getValue())) return false;
 
         BlockPos result;
-        if(cachePos != null && mc.world.getBlockState(cachePos).getBlock() instanceof RespawnAnchorBlock){
+        if (cachePos != null && mc.world.getBlockState(cachePos).getBlock() instanceof RespawnAnchorBlock) {
             result = cachePos;
         } else {
             result = findAnchorTarget(getTargetsInRange(), false);
         }
 
-        if(result == null) return false;
+        if (result == null) return false;
 
-        if(mc.world.getBlockState(result).get(CHARGES) > 0) return true;
+        if (mc.world.getBlockState(result).get(CHARGES) > 0) return true;
 
         int glowSlot = InventoryUtil.getGlowStoneSlot();
-        if(glowSlot != -1){
+        if (glowSlot != -1) {
             PlaceManager.trailingChargeAction = () -> {
                 mc.player.getInventory().selectedSlot = glowSlot;
                 mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(glowSlot));
@@ -237,20 +253,20 @@ public class AutoAnchor extends Module {
         return false;
     }
 
-    public boolean placeAnchor(){
-        if(!placeTimer.passedMs(placeDelay.getValue())) return false;
-        if(threadedBp != null && InventoryUtil.getAnchorSlot() != -1){
+    public boolean placeAnchor() {
+        if (!placeTimer.passedMs(placeDelay.getValue())) return false;
+        if (threadedBp != null && InventoryUtil.getAnchorSlot() != -1) {
             PlaceManager.trailingPlaceAction = () -> {
-                    int slot = InventoryUtil.getAnchorSlot();
-                    int prev_slot = mc.player.getInventory().selectedSlot;
-                    mc.player.getInventory().selectedSlot = slot;
-                    mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
+                int slot = InventoryUtil.getAnchorSlot();
+                int prev_slot = mc.player.getInventory().selectedSlot;
+                mc.player.getInventory().selectedSlot = slot;
+                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
 
-                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(new Vec3d(threadedBp.getX(), threadedBp.getY(), threadedBp.getZ()), PlaceUtility.getPlaceDirection(threadedBp, strictDirection.getValue()), threadedBp, false));
+                mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(new Vec3d(threadedBp.getX(), threadedBp.getY(), threadedBp.getZ()), PlaceUtility.getPlaceDirection(threadedBp, strictDirection.getValue()), threadedBp, false));
 
-                    mc.player.getInventory().selectedSlot = prev_slot;
-                    mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(prev_slot));
-                    rotations = new Vec3d(threadedBp.getX() + 0.5D, threadedBp.getY() + 1D, threadedBp.getZ() + 0.5D);
+                mc.player.getInventory().selectedSlot = prev_slot;
+                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(prev_slot));
+                rotations = new Vec3d(threadedBp.getX() + 0.5D, threadedBp.getY() + 1D, threadedBp.getZ() + 0.5D);
 
             };
 
@@ -266,13 +282,11 @@ public class AutoAnchor extends Module {
     }
 
 
-    @Subscribe
-    public void onRender3D(Render3DEvent e){
-            if(cachePos != null && mode.getValue() == Mode.Rage) {
-                Render3DEngine.drawBoxOutline(new Box(cachePos), new Color(0xC7FFFFFF, true), 2f);
-                Render3DEngine.drawTextIn3D(String.valueOf(MathUtil.round2(renderDmg)),cachePos.toCenterPos(),0,0.1,0,Render2DEngine.injectAlpha(Color.WHITE, 255));
-
-            }
+    public void onRender3D(MatrixStack e) {
+        if (cachePos != null && mode.getValue() == Mode.Rage) {
+            Render3DEngine.drawBoxOutline(new Box(cachePos), new Color(0xC7FFFFFF, true), 2f);
+            Render3DEngine.drawTextIn3D(String.valueOf(MathUtil.round2(renderDmg)), cachePos.toCenterPos(), 0, 0.1, 0, Render2DEngine.injectAlpha(Color.WHITE, 255));
+        }
 
     }
 
@@ -281,7 +295,7 @@ public class AutoAnchor extends Module {
 
         List<BlockPos> blocks = findAnchorBlocks();
 
-        if(blocks == null) return null;
+        if (blocks == null) return null;
 
         BlockPos bestPos = null;
 
@@ -300,7 +314,7 @@ public class AutoAnchor extends Module {
             if (mc.player.getHealth() + mc.player.getAbsorptionAmount() <= damageToSelf + 2F) continue;
             if (damageToSelf > maxSelfDamage.getValue()) continue;
             for (PlayerEntity player : targetss) {
-                float damageToTarget = ExplosionUtil.getAnchorExplosionDamage(block,player);
+                float damageToTarget = ExplosionUtil.getAnchorExplosionDamage(block, player);
 
                 if (damageToTarget > damage && (damageToTarget >= minDamage.getValue())) {
                     damage = damageToTarget;
@@ -348,7 +362,7 @@ public class AutoAnchor extends Module {
         if (pauseWhileGapping.getValue() && mc.options.useKey.isPressed()) {
             return false;
         }
-        if ( !(mc.player.getInventory().getMainHandStack().getItem() == Items.RESPAWN_ANCHOR)) {
+        if (!(mc.player.getInventory().getMainHandStack().getItem() == Items.RESPAWN_ANCHOR)) {
             return InventoryUtil.getAnchorSlot() != -1 && InventoryUtil.getGlowStoneSlot() != -1;
         }
         return true;
@@ -363,7 +377,7 @@ public class AutoAnchor extends Module {
             for (int j = centerPos.getY() - h; j < centerPos.getY() + h; j++) {
                 for (int k = centerPos.getZ() - r; k < centerPos.getZ() + r; k++) {
                     BlockPos pos = new BlockPos(i, j, k);
-                    if (mc.player.squaredDistanceTo(pos.toCenterPos()) < placeRange.getPow2Value() + 2 && PlaceUtility.canPlaceBlock(pos,strictDirection.getValue(),true)) {
+                    if (mc.player.squaredDistanceTo(pos.toCenterPos()) < placeRange.getPow2Value() + 2 && PlaceUtility.canPlaceBlock(pos, strictDirection.getValue(), true)) {
                         positions.add(pos);
                     }
                 }

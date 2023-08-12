@@ -1,9 +1,10 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -53,8 +54,8 @@ public class HoleFill extends Module {
 
     private int tickCounter = 0;
 
-    @Subscribe
-    public void onRender3D(Render3DEvent event) {
+
+    public void onRender3D(MatrixStack stack) {
         renderPoses.forEach((pos, time) -> {
             if (System.currentTimeMillis() - time > 500) {
                 renderPoses.remove(pos);
@@ -64,7 +65,7 @@ public class HoleFill extends Module {
         });
     }
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync event) {
         if (jumpDisable.getValue() && mc.player.prevY < mc.player.getY()) toggle();
         if (tickCounter < actionInterval.getValue()) tickCounter++;

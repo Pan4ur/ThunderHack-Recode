@@ -2,6 +2,7 @@ package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
 import io.netty.buffer.Unpooled;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -28,7 +29,7 @@ public class Criticals extends Module {
 
     public static boolean cancelCrit;
 
-    @Subscribe
+    @EventHandler
     public void onPacketSend(PacketEvent.Send event) {
         if (event.getPacket() instanceof PlayerInteractEntityC2SPacket && getInteractType(event.getPacket()) == InteractType.ATTACK && !(getEntity(event.getPacket()) instanceof EndCrystalEntity)) {
             if(cancelCrit) return;

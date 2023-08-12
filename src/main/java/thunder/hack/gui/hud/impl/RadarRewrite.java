@@ -1,15 +1,8 @@
 package thunder.hack.gui.hud.impl;
 
-import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
-import thunder.hack.Thunderhack;
-import thunder.hack.events.impl.Render2DEvent;
-import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.setting.Setting;
-import thunder.hack.gui.hud.HudElement;
-import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.animation.AstolfoAnimation;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -18,6 +11,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.RotationAxis;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
+import thunder.hack.Thunderhack;
+import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.gui.hud.HudElement;
+import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.animation.AstolfoAnimation;
 
 import java.awt.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -53,7 +53,7 @@ public class RadarRewrite extends HudElement {
     private final Setting<ColorSetting> colors = new Setting<>("TracerColor", new ColorSetting(0x2250b4b4));
 
     public RadarRewrite() {
-        super("AkrienRadar", "стрелочки", 50,50);
+        super("AkrienRadar", "стрелочки", 50, 50);
     }
 
     public static float clamp2(float num, float min, float max) {
@@ -65,12 +65,11 @@ public class RadarRewrite extends HudElement {
     }
 
     public static float getRotations(Entity entity) {
-        if(mc.player == null) return 0;
+        if (mc.player == null) return 0;
         double x = interp(entity.getPos().x, entity.prevX) - interp(mc.player.getPos().x, mc.player.prevX);
         double z = interp(entity.getPos().z, entity.prevZ) - interp(mc.player.getPos().z, mc.player.prevZ);
         return (float) -(Math.atan2(x, z) * (180 / Math.PI));
     }
-
 
 
     public static double interp(double d, double d2) {
@@ -86,27 +85,26 @@ public class RadarRewrite extends HudElement {
 
     @Override
     public void onUpdate() {
-        if(fullNullCheck()) return;
+        if (fullNullCheck()) return;
         players.clear();
-        for(Entity ent : mc.world.getEntities()){
-            if(ent instanceof PlayerEntity){
+        for (Entity ent : mc.world.getEntities()) {
+            if (ent instanceof PlayerEntity) {
                 players.add(ent);
             }
-            if(ent instanceof ItemEntity && items.getValue()){
+            if (ent instanceof ItemEntity && items.getValue()) {
                 players.add(ent);
             }
         }
         astolfo.update();
     }
-    
-    @Subscribe
-    public void onRender2D(Render2DEvent event) {
-        super.onRender2D(event);
-        if(fullNullCheck()) return;
 
-        event.getMatrixStack().push();
-        rendercompass(event.getMatrixStack());
-        event.getMatrixStack().pop();
+    public void onRender2D(DrawContext context) {
+        super.onRender2D(context);
+        if (fullNullCheck()) return;
+
+        context.getMatrices().push();
+        rendercompass(context.getMatrices());
+        context.getMatrices().pop();
 
         xOffset2 = (mc.getWindow().getScaledWidth() * getX());
         yOffset2 = (mc.getWindow().getScaledHeight() * getY());
@@ -126,36 +124,36 @@ public class RadarRewrite extends HudElement {
         float xOffset = mc.getWindow().getScaledWidth() * getX();
         float yOffset = mc.getWindow().getScaledHeight() * getY();
 
-        event.getMatrixStack().push();
-        event.getMatrixStack().translate(xOffset2, yOffset2, 0);
-        event.getMatrixStack().multiply(RotationAxis.POSITIVE_X.rotationDegrees(90f / Math.abs(90f / clamp2(mc.player.getPitch(), maxup2.getValue(), 90f)) - 90 - fsef.getValue()));
-        event.getMatrixStack().translate(-xOffset2, -yOffset2, 0);
+        context.getMatrices().push();
+        context.getMatrices().translate(xOffset2, yOffset2, 0);
+        context.getMatrices().multiply(RotationAxis.POSITIVE_X.rotationDegrees(90f / Math.abs(90f / clamp2(mc.player.getPitch(), maxup2.getValue(), 90f)) - 90 - fsef.getValue()));
+        context.getMatrices().translate(-xOffset2, -yOffset2, 0);
 
 
         for (Entity e : players) {
             if (e != mc.player) {
-                event.getMatrixStack().push();
+                context.getMatrices().push();
                 float yaw = getRotations(e) - mc.player.getYaw();
-                event.getMatrixStack().translate(xOffset, yOffset, 0.0F);
-                event.getMatrixStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
-                event.getMatrixStack().translate(-xOffset, -yOffset, 0.0F);
+                context.getMatrices().translate(xOffset, yOffset, 0.0F);
+                context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
+                context.getMatrices().translate(-xOffset, -yOffset, 0.0F);
 
                 if (Thunderhack.friendManager.isFriend(e.getName().getString())) {
-                    drawTracerPointer(event.getMatrixStack(),xOffset, yOffset - this.xOffset.getValue(), width.getValue() * 5F, colorf.getValue().getColor());
+                    drawTracerPointer(context.getMatrices(), xOffset, yOffset - this.xOffset.getValue(), width.getValue() * 5F, colorf.getValue().getColor());
                 } else {
-                    if(e instanceof ItemEntity){
-                        drawTracerPointer(event.getMatrixStack(), xOffset, yOffset - this.xOffset.getValue(), width.getValue() * 5F, icolor.getValue().getColor());
+                    if (e instanceof ItemEntity) {
+                        drawTracerPointer(context.getMatrices(), xOffset, yOffset - this.xOffset.getValue(), width.getValue() * 5F, icolor.getValue().getColor());
                     } else {
-                        drawTracerPointer(event.getMatrixStack(), xOffset, yOffset - this.xOffset.getValue(), width.getValue() * 5F, color);
+                        drawTracerPointer(context.getMatrices(), xOffset, yOffset - this.xOffset.getValue(), width.getValue() * 5F, color);
                     }
                 }
-                event.getMatrixStack().translate(xOffset, yOffset, 0.0F);
-                event.getMatrixStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-yaw));
-                event.getMatrixStack().translate(-xOffset, -yOffset, 0.0F);
-                event.getMatrixStack().pop();
+                context.getMatrices().translate(xOffset, yOffset, 0.0F);
+                context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-yaw));
+                context.getMatrices().translate(-xOffset, -yOffset, 0.0F);
+                context.getMatrices().pop();
             }
         }
-        event.getMatrixStack().pop();
+        context.getMatrices().pop();
     }
 
     public void rendercompass(MatrixStack matrices) {
@@ -165,39 +163,39 @@ public class RadarRewrite extends HudElement {
         float nigga = Math.abs(90f / clamp2(mc.player.getPitch(), maxup2.getValue(), 90f));
 
         if (Mode2.getValue() == mode2.Custom) {
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2, ciColor.getValue().getColorObject(), false,Mode2.getValue());
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2.5f, ciColor.getValue().getColorObject(), false,Mode2.getValue());
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3, ciColor.getValue().getColorObject(), false,Mode2.getValue());
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3.5f, ciColor.getValue().getColorObject(), false,Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2, ciColor.getValue().getColorObject(), false, Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2.5f, ciColor.getValue().getColorObject(), false, Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3, ciColor.getValue().getColorObject(), false, Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3.5f, ciColor.getValue().getColorObject(), false, Mode2.getValue());
 
         }
         if (Mode2.getValue() == mode2.Rainbow) {
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2, Render2DEngine.rainbow(300, 1, 1), false,Mode2.getValue());
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2.5f, Render2DEngine.rainbow(300, 1, 1), false,Mode2.getValue());
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3.0f, Render2DEngine.rainbow(300, 1, 1), false,Mode2.getValue());
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3.5f, Render2DEngine.rainbow(300, 1, 1), false,Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2, Render2DEngine.rainbow(300, 1, 1), false, Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2.5f, Render2DEngine.rainbow(300, 1, 1), false, Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3.0f, Render2DEngine.rainbow(300, 1, 1), false, Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3.5f, Render2DEngine.rainbow(300, 1, 1), false, Mode2.getValue());
 
         }
         if (Mode2.getValue() == mode2.Astolfo) {
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2, ciColor.getValue().getColorObject(), false,Mode2.getValue());
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2.5f, ciColor.getValue().getColorObject(), false,Mode2.getValue());
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2, ciColor.getValue().getColorObject(), false,Mode2.getValue());
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3.0f, ciColor.getValue().getColorObject(), false,Mode2.getValue());
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3.5f, ciColor.getValue().getColorObject(), false,Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2, ciColor.getValue().getColorObject(), false, Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2.5f, ciColor.getValue().getColorObject(), false, Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2, ciColor.getValue().getColorObject(), false, Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3.0f, ciColor.getValue().getColorObject(), false, Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3.5f, ciColor.getValue().getColorObject(), false, Mode2.getValue());
         }
         if (Mode2.getValue() == mode2.TwoColor) {
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2, ciColor.getValue().getColorObject(), false,Mode2.getValue());
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2.5f, ciColor.getValue().getColorObject(), false,Mode2.getValue());
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3, ciColor.getValue().getColorObject(), false,Mode2.getValue());
-            drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3.5f, ciColor.getValue().getColorObject(), false,Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2, ciColor.getValue().getColorObject(), false, Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 2.5f, ciColor.getValue().getColorObject(), false, Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3, ciColor.getValue().getColorObject(), false, Mode2.getValue());
+            drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue() - 3.5f, ciColor.getValue().getColorObject(), false, Mode2.getValue());
 
         }
-        drawEllipsCompas(matrices,-(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue(), cColor.getValue().getColorObject(), true,mode2.Custom);
-     }
+        drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, nigga, 1f, CRadius.getValue(), cColor.getValue().getColorObject(), true, mode2.Custom);
+    }
 
     public static void drawTracerPointer(MatrixStack matrices, float x, float y, float size, int color) {
         if (glow.getValue())
-            Render2DEngine.drawBlurredShadow(matrices,x - size * tracerA.getValue(), y, (x + size * tracerA.getValue()) - (x - size * tracerA.getValue()), size, glowe.getValue(), Render2DEngine.injectAlpha(new Color(color), glowa.getValue()));
+            Render2DEngine.drawBlurredShadow(matrices, x - size * tracerA.getValue(), y, (x + size * tracerA.getValue()) - (x - size * tracerA.getValue()), size, glowe.getValue(), Render2DEngine.injectAlpha(new Color(color), glowa.getValue()));
 
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -223,10 +221,10 @@ public class RadarRewrite extends HudElement {
 
         color = Render2DEngine.darker(new Color(color), 0.8f).getRGB();
 
-         f = (float) (color >> 24 & 255) / 255.0F;
-         g = (float) (color >> 16 & 255) / 255.0F;
-         h = (float) (color >> 8 & 255) / 255.0F;
-         k = (float) (color & 255) / 255.0F;
+        f = (float) (color >> 24 & 255) / 255.0F;
+        g = (float) (color >> 16 & 255) / 255.0F;
+        h = (float) (color >> 8 & 255) / 255.0F;
+        k = (float) (color & 255) / 255.0F;
 
         Render2DEngine.setupRender();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -248,7 +246,7 @@ public class RadarRewrite extends HudElement {
         Render2DEngine.setupRender();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        bufferBuilder.vertex(matrix,(x - size * tracerA.getValue()), (y + size), 0.0F).color(g, h, k, f).next();
+        bufferBuilder.vertex(matrix, (x - size * tracerA.getValue()), (y + size), 0.0F).color(g, h, k, f).next();
         bufferBuilder.vertex(matrix, (x + size * tracerA.getValue()), (y + size), 0.0F).color(g, h, k, f).next();
         bufferBuilder.vertex(matrix, x, (y + size - rad22ius.getValue()), 0.0F).color(g, h, k, f).next();
         bufferBuilder.vertex(matrix, (x - size * tracerA.getValue()), (y + size), 0.0F).color(g, h, k, f).next();
@@ -257,24 +255,24 @@ public class RadarRewrite extends HudElement {
         matrices.pop();
 
 
-       // RenderSystem.setShaderColor(1f,1f,1f,1f);
+        // RenderSystem.setShaderColor(1f,1f,1f,1f);
     }
 
-    public static void drawEllipsCompas(MatrixStack matrices,int yaw, float x, float y, float x2, float y2, float radius, Color color, boolean Dir, RadarRewrite.mode2 mode) {
+    public static void drawEllipsCompas(MatrixStack matrices, int yaw, float x, float y, float x2, float y2, float radius, Color color, boolean Dir, RadarRewrite.mode2 mode) {
         if (Dir) {
-            drawElipse(matrices,x, y, x2, y2, 15 + yaw, 75 + yaw, radius, color, 0,mode);
-            drawElipse(matrices,x, y, x2, y2, 105 + yaw, 165 + yaw, radius, color, 1,mode);
-            drawElipse(matrices,x, y, x2, y2, 195 + yaw, 255 + yaw, radius, color, 2,mode);
-            drawElipse(matrices,x, y, x2, y2, 285 + yaw, 345 + yaw, radius, color, 3,mode);
+            drawElipse(matrices, x, y, x2, y2, 15 + yaw, 75 + yaw, radius, color, 0, mode);
+            drawElipse(matrices, x, y, x2, y2, 105 + yaw, 165 + yaw, radius, color, 1, mode);
+            drawElipse(matrices, x, y, x2, y2, 195 + yaw, 255 + yaw, radius, color, 2, mode);
+            drawElipse(matrices, x, y, x2, y2, 285 + yaw, 345 + yaw, radius, color, 3, mode);
         } else {
-            drawElipse(matrices,x, y, x2, y2, 15 + yaw, 75 + yaw, radius, color, -1,mode);
-            drawElipse(matrices,x, y, x2, y2, 105 + yaw, 165 + yaw, radius, color, -1,mode);
-            drawElipse(matrices,x, y, x2, y2, 195 + yaw, 255 + yaw, radius, color, -1,mode);
-            drawElipse(matrices,x, y, x2, y2, 285 + yaw, 345 + yaw, radius, color, -1,mode);
+            drawElipse(matrices, x, y, x2, y2, 15 + yaw, 75 + yaw, radius, color, -1, mode);
+            drawElipse(matrices, x, y, x2, y2, 105 + yaw, 165 + yaw, radius, color, -1, mode);
+            drawElipse(matrices, x, y, x2, y2, 195 + yaw, 255 + yaw, radius, color, -1, mode);
+            drawElipse(matrices, x, y, x2, y2, 285 + yaw, 345 + yaw, radius, color, -1, mode);
         }
     }
 
-    public static void drawElipse(MatrixStack matrices,float x, float y, float rx, float ry, float start, float end, float radius, Color color, int stage1, RadarRewrite.mode2 cmode) {
+    public static void drawElipse(MatrixStack matrices, float x, float y, float rx, float ry, float start, float end, float radius, Color color, int stage1, RadarRewrite.mode2 cmode) {
         float sin;
         float cos;
         float i;
@@ -299,14 +297,14 @@ public class RadarRewrite extends HudElement {
             double stage = (i - start) / 360;
             Color clr = null;
 
-            if(cmode == RadarRewrite.mode2.Astolfo) {
+            if (cmode == RadarRewrite.mode2.Astolfo) {
                 clr = new Color(astolfo.getColor(stage));
-            }else if(cmode == RadarRewrite.mode2.Rainbow){
+            } else if (cmode == RadarRewrite.mode2.Rainbow) {
                 clr = color;
-            }  else if(cmode == RadarRewrite.mode2.Custom){
+            } else if (cmode == RadarRewrite.mode2.Custom) {
                 clr = color;
             } else {
-                clr = Render2DEngine.TwoColoreffect(color, cColor2.getValue().getColorObject(), Math.abs(System.currentTimeMillis() / 10) / 100.0 + i * ((20f - colorOffset1.getValue()) / 200) );
+                clr = Render2DEngine.TwoColoreffect(color, cColor2.getValue().getColorObject(), Math.abs(System.currentTimeMillis() / 10) / 100.0 + i * ((20f - colorOffset1.getValue()) / 200));
             }
 
             int clr2 = clr.getRGB();
@@ -330,26 +328,26 @@ public class RadarRewrite extends HudElement {
 
             switch (stage1) {
                 case 0 -> {
-                   // FontRender.drawCentString3("W", (x + cos), (y + sin), -1);
-                    FontRenderers.getRenderer2().drawString(matrices,"W", (x + cos), (y + sin), -1);
+                    // FontRender.drawCentString3("W", (x + cos), (y + sin), -1);
+                    FontRenderers.getRenderer2().drawString(matrices, "W", (x + cos), (y + sin), -1);
                 }
                 case 1 -> {
-                    FontRenderers.getRenderer2().drawString(matrices,"N", (x + cos), (y + sin), -1);
+                    FontRenderers.getRenderer2().drawString(matrices, "N", (x + cos), (y + sin), -1);
 
                 }
                 case 2 -> {
-                    FontRenderers.getRenderer2().drawString(matrices,"E", (x + cos), (y + sin), -1);
+                    FontRenderers.getRenderer2().drawString(matrices, "E", (x + cos), (y + sin), -1);
 
                 }
                 case 3 -> {
-                    FontRenderers.getRenderer2().drawString(matrices,"S", (x + cos), (y + sin), -1);
+                    FontRenderers.getRenderer2().drawString(matrices, "S", (x + cos), (y + sin), -1);
                 }
             }
         }
     }
 
     public enum mode2 {
-        Custom, Rainbow, Astolfo,TwoColor
+        Custom, Rainbow, Astolfo, TwoColor
     }
 
     public enum triangleModeEn {

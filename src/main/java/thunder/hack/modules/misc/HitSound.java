@@ -1,6 +1,7 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import thunder.hack.events.impl.EventAttack;
 import thunder.hack.events.impl.PacketEvent;
@@ -25,7 +26,7 @@ public class HitSound extends Module {
         UWU, MOAN, SKEET, KEYBOARD
     }
 
-    @Subscribe
+    @EventHandler
     public void onAttack(EventAttack event) {
         if (!(event.getEntity() instanceof EndCrystalEntity)) {
             if(mode.getValue() == Mode.UWU){

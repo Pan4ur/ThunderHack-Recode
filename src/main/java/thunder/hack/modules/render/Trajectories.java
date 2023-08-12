@@ -1,13 +1,9 @@
 package thunder.hack.modules.render;
 
-import com.google.common.eventbus.Subscribe;
-import com.mojang.authlib.GameProfile;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.network.OtherClientPlayerEntity;
-import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.*;
 import net.minecraft.util.Hand;
@@ -15,8 +11,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
-import thunder.hack.cmd.Command;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -61,8 +55,7 @@ public class Trajectories extends Module {
     }
 
 
-    @Subscribe
-    public void onRender3D(Render3DEvent event) {
+    public void onRender3D(MatrixStack stack) {
         if (mc.player == null || mc.world == null || !mc.options.getPerspective().isFirstPerson())
             return;
         Hand hand;
@@ -74,7 +67,7 @@ public class Trajectories extends Module {
 
         boolean prev_bob = mc.options.getBobView().getValue();
         mc.options.getBobView().setValue(false);
-        calcTrajectory(hand == Hand.OFF_HAND ? mc.player.getOffHandStack().getItem() : mc.player.getMainHandStack().getItem(), event.getMatrixStack());
+        calcTrajectory(hand == Hand.OFF_HAND ? mc.player.getOffHandStack().getItem() : mc.player.getMainHandStack().getItem(), stack);
         mc.options.getBobView().setValue(prev_bob);
     }
 

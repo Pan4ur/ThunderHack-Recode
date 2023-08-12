@@ -1,12 +1,12 @@
 package thunder.hack.modules.player;
 
-import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import thunder.hack.Thunderhack;
-import thunder.hack.events.impl.Render2DEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
@@ -60,19 +60,18 @@ public class DurabilityAlert extends Module {
 
     }
 
-    @Subscribe
-    public void onRender2D(Render2DEvent e){
+    public void onRender2D(DrawContext context){
         if(need_alert) {
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                FontRenderers.sf_bold.drawCenteredString(e.getMatrixStack(),"Срочно чини броню!", (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
+                FontRenderers.sf_bold.drawCenteredString(context.getMatrices(),"Срочно чини броню!", (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
             } else {
-                FontRenderers.sf_bold.drawCenteredString(e.getMatrixStack(),"Repair your armor immediately!", (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
+                FontRenderers.sf_bold.drawCenteredString(context.getMatrices(),"Repair your armor immediately!", (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
 
                 //new Color(0xFFDF00)
             }
             Color c1 = new Color(0xFFDF00);
             RenderSystem.setShaderColor(c1.getRed() / 255f,c1.getGreen() / 255f,c1.getBlue()/255f,1f);
-            e.getContext().drawTexture(ICON, (int) (mc.getWindow().getScaledWidth() / 2f - 40), (int) (mc.getWindow().getScaledHeight() / 3f - 120), 80, 80,0,0,80,80,80,80);
+            context.drawTexture(ICON, (int) (mc.getWindow().getScaledWidth() / 2f - 40), (int) (mc.getWindow().getScaledHeight() / 3f - 120), 80, 80,0,0,80,80,80,80);
             RenderSystem.setShaderColor(1f,1f,1f,1f);
         }
     }

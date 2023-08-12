@@ -1,11 +1,10 @@
 package thunder.hack.gui.hud.impl;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import thunder.hack.events.impl.Render2DEvent;
-import thunder.hack.events.impl.RenderBlurEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
@@ -20,25 +19,23 @@ public class PVPResources extends HudElement {
         super("PVPResources", "PAwdwad", 60, 60);
     }
 
-    @Subscribe
-    public void onRender2D(Render2DEvent e) {
-        super.onRender2D(e);
+    public void onRender2D(DrawContext context) {
+        super.onRender2D(context);
     }
 
-    @Subscribe
-    public void onRenderShader(RenderBlurEvent e) {
+    public void onRenderShaders(DrawContext context) {
 
 
-        Render2DEngine.drawGradientGlow(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 50, 50, HudEditor.hudRound.getValue(), 10);
-        Render2DEngine.drawGradientRoundShader(e.getMatrixStack(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, 51, 51, HudEditor.hudRound.getValue());
-        Render2DEngine.drawRoundShader(e.getMatrixStack(), getPosX(), getPosY(), 50, 50, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+        Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 50, 50, HudEditor.hudRound.getValue(), 10);
+        Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, 51, 51, HudEditor.hudRound.getValue());
+        Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), 50, 50, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
 
 
-        Render2DEngine.horizontalGradient(e.getMatrixStack(), getPosX() + 2, getPosY() + 24.5, getPosX() + 26, getPosY() + 25, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0).getRGB(), HudEditor.textColor.getValue().getColorObject().getRGB());
-        Render2DEngine.horizontalGradient(e.getMatrixStack(), getPosX() + 26, getPosY() + 24.5, getPosX() + 48, getPosY() + 25, HudEditor.textColor.getValue().getColorObject().getRGB(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0).getRGB());
+        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 24.5, getPosX() + 26, getPosY() + 25, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0).getRGB(), HudEditor.textColor.getValue().getColorObject().getRGB());
+        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 26, getPosY() + 24.5, getPosX() + 48, getPosY() + 25, HudEditor.textColor.getValue().getColorObject().getRGB(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0).getRGB());
 
-        Render2DEngine.verticalGradient(e.getMatrixStack(), getPosX() + 25.5, getPosY() + 2, getPosX() + 26, getPosY() + 23, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0).getRGB(), HudEditor.textColor.getValue().getColorObject().getRGB());
-        Render2DEngine.verticalGradient(e.getMatrixStack(), getPosX() + 25.5, getPosY() + 23, getPosX() + 26, getPosY() + 48, HudEditor.textColor.getValue().getColorObject().getRGB(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0).getRGB());
+        Render2DEngine.verticalGradient(context.getMatrices(), getPosX() + 25.5, getPosY() + 2, getPosX() + 26, getPosY() + 23, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0).getRGB(), HudEditor.textColor.getValue().getColorObject().getRGB());
+        Render2DEngine.verticalGradient(context.getMatrices(), getPosX() + 25.5, getPosY() + 23, getPosX() + 26, getPosY() + 48, HudEditor.textColor.getValue().getColorObject().getRGB(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0).getRGB());
 
 
         int totemCount = getItemCount(Items.TOTEM_OF_UNDYING);
@@ -57,9 +54,8 @@ public class PVPResources extends HudElement {
         for (int i = 0; i < list.size(); ++i) {
             int offsetX = i % 2 * 25;
             int offsetY = i / 2 * 25;
-            e.getDrawContext().drawItem(list.get(i), (int) (getPosX() + offsetX + 4), (int) (getPosY() + offsetY + 2));
-            //  e.getContext().drawItemInSlot(mc.textRenderer,list.get(i),(int) (getPosX() + offsetX + 4), (int) (getPosY() + offsetY + 4));
-            FontRenderers.sf_bold_mini.drawCenteredString(e.getMatrixStack(), String.valueOf(list.get(i).getCount()), (int) (getPosX() + offsetX + 12), (int) (getPosY() + offsetY + 16), HudEditor.textColor.getValue().getColor());
+            context.drawItem(list.get(i), (int) (getPosX() + offsetX + 4), (int) (getPosY() + offsetY + 2));
+            FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), String.valueOf(list.get(i).getCount()), (int) (getPosX() + offsetX + 12), (int) (getPosY() + offsetY + 16), HudEditor.textColor.getValue().getColor());
         }
     }
 

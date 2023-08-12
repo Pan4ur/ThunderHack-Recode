@@ -1,6 +1,7 @@
 package thunder.hack.core;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.math.Vec2f;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventPostSync;
@@ -29,11 +30,7 @@ public class PlayerManager {
     public float lastYaw, lastPitch;
     public double currentPlayerSpeed;
 
-    public PlayerManager() {
-        Thunderhack.EVENT_BUS.register(this);
-    }
-
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync event) {
         if (Module.fullNullCheck()) return;
 
@@ -49,14 +46,14 @@ public class PlayerManager {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void postSync(EventPostSync event) {
         if (Module.fullNullCheck()) return;
         mc.player.setYaw(this.yaw);
         mc.player.setPitch(this.pitch);
     }
 
-    @Subscribe
+    @EventHandler
     public void onSyncWithServer(PacketEvent.Send event){
         if(event.getPacket() instanceof PlayerMoveC2SPacket){
             serverYaw = ((PlayerMoveC2SPacket) event.getPacket()).getYaw(serverYaw);
@@ -76,7 +73,7 @@ public class PlayerManager {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void getServerPosLook(PacketEvent.Receive event){
         if(event.getPacket() instanceof PlayerPositionLookS2CPacket){
             serverYaw = ((PlayerPositionLookS2CPacket) event.getPacket()).getYaw();

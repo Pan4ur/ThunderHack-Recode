@@ -1,6 +1,7 @@
 package thunder.hack.core;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.utility.Timer;
@@ -22,7 +23,6 @@ public class ServerManager {
     public ServerManager() {
         this.tpsResult = new ArrayDeque<>(20);
         this.timeDelay = new Timer();
-        Thunderhack.EVENT_BUS.register(this);
     }
 
 
@@ -56,7 +56,7 @@ public class ServerManager {
         return bd.floatValue();
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if (!(event.getPacket() instanceof ChatMessageS2CPacket)) {
             getDelayTimer().reset();

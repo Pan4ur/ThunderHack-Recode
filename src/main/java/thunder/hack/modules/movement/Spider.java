@@ -1,6 +1,7 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -58,7 +59,7 @@ public class Spider extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync event) {
         if (mc.options.jumpKey.isPressed() && mc.player.getVelocity().getY() <= -0.3739040364667221 && a.getValue() == mode.MatrixNew) {
             mc.player.setOnGround(true);

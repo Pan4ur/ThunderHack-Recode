@@ -1,10 +1,10 @@
 package thunder.hack.modules.render;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 
 public class WorldTweaks extends Module {
 
@@ -27,7 +27,7 @@ public class WorldTweaks extends Module {
         mc.world.setTimeOfDay(oldTime);
     }
 
-    @Subscribe
+    @EventHandler
     private void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof WorldTimeUpdateS2CPacket && ctime.getValue()) {
             oldTime = ((WorldTimeUpdateS2CPacket) event.getPacket()).getTime();
@@ -37,6 +37,6 @@ public class WorldTweaks extends Module {
 
     @Override
     public void onUpdate() {
-        if(ctime.getValue()) mc.world.setTimeOfDay(ctimeVal.getValue() * 1000);
+        if (ctime.getValue()) mc.world.setTimeOfDay(ctimeVal.getValue() * 1000);
     }
 }

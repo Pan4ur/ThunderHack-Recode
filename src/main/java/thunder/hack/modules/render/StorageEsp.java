@@ -1,7 +1,7 @@
 package thunder.hack.modules.render;
 
-import com.google.common.eventbus.Subscribe;
-import thunder.hack.events.impl.Render3DEvent;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
@@ -47,8 +47,7 @@ public class StorageEsp extends Module {
 
     //  private final Setting<ColorSetting> minecartColor = new Setting<>("MinecartColor", new ColorSetting(0x8800FF00)));
 
-    @Subscribe
-    public void onRender3D(Render3DEvent event) {
+    public void onRender3D(MatrixStack stack) {
         for (BlockEntity blockEntity : getBlockEntities()) {
             Color color = null;
 
@@ -84,10 +83,10 @@ public class StorageEsp extends Module {
             if(fill.getValue()) {
                 if(blockEntity instanceof ChestBlockEntity){
 
-                    Render3DEngine.drawFilledBox(event.getMatrixStack(), chestbox, color);
+                    Render3DEngine.drawFilledBox(stack, chestbox, color);
                 } else if(blockEntity instanceof EnderChestBlockEntity){
-                    Render3DEngine.drawFilledBox(event.getMatrixStack(), chestbox, color);
-                } else Render3DEngine.drawFilledBox(event.getMatrixStack(), new Box(blockEntity.getPos()), color);
+                    Render3DEngine.drawFilledBox(stack, chestbox, color);
+                } else Render3DEngine.drawFilledBox(stack, new Box(blockEntity.getPos()), color);
             }
             if(outline.getValue()) {
                 if (blockEntity instanceof ChestBlockEntity) {

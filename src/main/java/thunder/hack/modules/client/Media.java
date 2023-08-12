@@ -1,6 +1,7 @@
 package thunder.hack.modules.client;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.text.Text;
@@ -17,7 +18,7 @@ public class Media extends Module {
     public static Setting<Boolean> skinProtect = new Setting<>("SkinProtect", true);
     public static Setting<Boolean> nickProtect = new Setting<>("NickProtect", true);
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e){
         if(e.getPacket() instanceof GameMessageS2CPacket pac && nickProtect.getValue()) {
             for (PlayerListEntry ple : mc.player.networkHandler.getPlayerList()){

@@ -1,6 +1,7 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventMove;
@@ -45,7 +46,7 @@ public class Speed extends Module {
         startDelay.reset();
     }
 
-    @Subscribe
+    @EventHandler
     public void onPlayerUpdate(PlayerUpdateEvent e){
         if (mode.getValue() == Mode.MatrixJB) {
             if (MovementUtil.isMoving() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(0.5, 0.0, 0.5).offset(0.0, -1.0, 0.0)).iterator().hasNext() && !flip) {
@@ -82,7 +83,7 @@ public class Speed extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onMove(EventMove event) {
         if (mode.getValue() == Mode.MatrixJB || mode.getValue() == Mode.FGLowRider) return;
         if (mc.player.getAbilities().flying) return;

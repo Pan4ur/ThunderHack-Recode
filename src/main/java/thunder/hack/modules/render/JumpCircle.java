@@ -1,14 +1,12 @@
 package thunder.hack.modules.render;
 
-import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
-import thunder.hack.events.impl.PreRender3DEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.render.animation.AstolfoAnimation;
@@ -57,8 +55,7 @@ public class JumpCircle extends Module {
     }
 
 
-    @Subscribe
-    public void onPreRender3D(PreRender3DEvent event) {
+    public void onPreRender3D(MatrixStack stack) {
         Collections.reverse(circles);
         try {
             for (Circle c : circles) {
@@ -69,8 +66,8 @@ public class JumpCircle extends Module {
                 float start = k * 2.2f;
                 float middle = (start + k) / 2;
 
-                event.getMatrixStack().push();
-                event.getMatrixStack().translate(x,y,z);
+                stack.push();
+                stack.translate(x,y,z);
                 Tessellator tessellator = Tessellator.getInstance();
                 BufferBuilder bufferBuilder = tessellator.getBuffer();
                 Render3DEngine.setup();
@@ -81,8 +78,8 @@ public class JumpCircle extends Module {
                     int clr = getColor(i);
                     double v = Math.sin(Math.toRadians(i));
                     double u = Math.cos(Math.toRadians(i));
-                    bufferBuilder.vertex(event.getMatrixStack().peek().getPositionMatrix(), (float) u * start, (float) 0, (float) v * start).color(Render2DEngine.injectAlpha(new Color(clr),0).getRGB()).next();
-                    bufferBuilder.vertex(event.getMatrixStack().peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(clr), (int) (150f * (1.0F - (float) c.timer.getPassedTimeMs() / (float) (lifetime.getValue() * 1000)))).getRGB()).next();
+                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * start, (float) 0, (float) v * start).color(Render2DEngine.injectAlpha(new Color(clr),0).getRGB()).next();
+                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(clr), (int) (150f * (1.0F - (float) c.timer.getPassedTimeMs() / (float) (lifetime.getValue() * 1000)))).getRGB()).next();
                 }
                 tessellator.draw();
                 RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -92,8 +89,8 @@ public class JumpCircle extends Module {
                     double v = Math.sin(Math.toRadians(i));
                     double u = Math.cos(Math.toRadians(i));
 
-                    bufferBuilder.vertex(event.getMatrixStack().peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(clr),(int) (150  * (1.0F - (float) c.timer.getPassedTimeMs() / (float) (lifetime.getValue() * 1000)))).getRGB()).next();
-                    bufferBuilder.vertex(event.getMatrixStack().peek().getPositionMatrix(), (float) u * k, (float) 0, (float) v * k).color(Render2DEngine.injectAlpha(new Color(clr), 0).getRGB()).next();
+                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(clr),(int) (150  * (1.0F - (float) c.timer.getPassedTimeMs() / (float) (lifetime.getValue() * 1000)))).getRGB()).next();
+                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * k, (float) 0, (float) v * k).color(Render2DEngine.injectAlpha(new Color(clr), 0).getRGB()).next();
                 }
                 tessellator.draw();
 
@@ -104,15 +101,15 @@ public class JumpCircle extends Module {
                     double v = Math.sin(Math.toRadians(i));
                     double u = Math.cos(Math.toRadians(i));
 
-                    bufferBuilder.vertex(event.getMatrixStack().peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(clr),(int) (255f  * (1.0F - (float) c.timer.getPassedTimeMs() / (float) (lifetime.getValue() * 1000)))).getRGB()).next();
-                    bufferBuilder.vertex(event.getMatrixStack().peek().getPositionMatrix(), (float) u * (middle - 0.04f), (float) 0, (float) v * (middle - 0.04f)).color(Render2DEngine.injectAlpha(new Color(clr), 0).getRGB()).next();
+                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(clr),(int) (255f  * (1.0F - (float) c.timer.getPassedTimeMs() / (float) (lifetime.getValue() * 1000)))).getRGB()).next();
+                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * (middle - 0.04f), (float) 0, (float) v * (middle - 0.04f)).color(Render2DEngine.injectAlpha(new Color(clr), 0).getRGB()).next();
                 }
                 tessellator.draw();
 
                 Render3DEngine.cleanup();
                 RenderSystem.enableDepthTest();
-                event.getMatrixStack().translate(-x,-y,-z);
-                event.getMatrixStack().pop();
+                stack.translate(-x,-y,-z);
+                stack.pop();
             }
         } catch (Exception e) {}
         Collections.reverse(circles);

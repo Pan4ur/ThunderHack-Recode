@@ -1,6 +1,7 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
@@ -73,7 +74,7 @@ public class ChatUtils extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if(welcomer.getValue() != Welcomer.Off && antiSpam.passedMs(3000)) {
             if (e.getPacket() instanceof PlayerListS2CPacket pck) {
@@ -126,7 +127,7 @@ public class ChatUtils extends Module {
             }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketSend(PacketEvent.Send e){
         if(e.getPacket() instanceof ChatMessageC2SPacket pac && antiCoordLeak.getValue()){
             if(antiCoordLeak.getValue() && pac.chatMessage.replaceAll("\\D", "").length() >= 6) {
@@ -136,7 +137,7 @@ public class ChatUtils extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onTotem(TotemPopEvent e){
         if(totems.getValue() && antiSpam.passedMs(3000) && e.getEntity() != mc.player){
             int n = (int) Math.floor(Math.random() * popMessages.length);

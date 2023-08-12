@@ -1,6 +1,7 @@
 package thunder.hack.modules.player;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
@@ -36,7 +37,7 @@ public class AutoArmor extends Module {
     public final Setting<Integer> delay = new Setting("Delay", 5, 1, 10);
 
 
-    @Subscribe
+    @EventHandler
     public void onTick(PlayerUpdateEvent event) {
         if (mc.player.playerScreenHandler != mc.player.currentScreenHandler)
             return;

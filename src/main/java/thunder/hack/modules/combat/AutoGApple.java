@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.PostPlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -19,7 +20,7 @@ public class AutoGApple extends Module {
     private boolean isActive;
     private final Timer useDelay = new Timer();
 
-    @Subscribe
+    @EventHandler
     public void onUpdate(PostPlayerUpdateEvent e) {
         if (fullNullCheck()) return;
         if (GapInOffHand()) {

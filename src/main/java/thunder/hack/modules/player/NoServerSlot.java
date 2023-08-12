@@ -1,6 +1,7 @@
 package thunder.hack.modules.player;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
@@ -12,7 +13,7 @@ public class NoServerSlot extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof UpdateSelectedSlotS2CPacket) {
             event.setCancelled(true);

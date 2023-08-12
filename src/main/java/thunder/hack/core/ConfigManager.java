@@ -134,7 +134,7 @@ public class ConfigManager  {
     public void load(String name) {
         File file = new File(ConfigsFolder, name + ".th");
         if (!file.exists()) {
-            if(MainSettings.language.getValue() == MainSettings.Language.RU) {
+            if(MainSettings.isRu()) {
                 Command.sendMessage("Конфига " + name + " не существует!");
             } else {
                 Command.sendMessage("Config " + name + " does not exist!");
@@ -181,7 +181,7 @@ public class ConfigManager  {
                 });
             }
 
-            if(MainSettings.language.getValue() == MainSettings.Language.RU) {
+            if(MainSettings.isRu()) {
                 Command.sendMessage("Загружен конфиг " + config.getName());
             } else {
                 Command.sendMessage("Loaded " + config.getName());
@@ -199,7 +199,7 @@ public class ConfigManager  {
         File file = new File(ConfigsFolder, name + ".th");
 
         if (file.exists()) {
-            if(MainSettings.language.getValue() == MainSettings.Language.RU) {
+            if(MainSettings.isRu()) {
                 Command.sendMessage("Конфиг " + name + " уже существует!");
             } else {
                 Command.sendMessage("Config " + name + " already exists!");
@@ -208,7 +208,7 @@ public class ConfigManager  {
         }
 
         save(file);
-        if(MainSettings.language.getValue() == MainSettings.Language.RU) {
+        if(MainSettings.isRu()) {
             Command.sendMessage("Конфиг " + name + " успешно сохранен!");
         } else {
             Command.sendMessage("Config " + name + " successfully saved!");

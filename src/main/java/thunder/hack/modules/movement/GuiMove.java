@@ -1,6 +1,7 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -57,7 +58,7 @@ public class GuiMove extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketSend(PacketEvent.Send e) {
         if(pause){
             pause = false;
@@ -73,7 +74,7 @@ public class GuiMove extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketSendPost(PacketEvent.SendPost e) {
         if (e.getPacket() instanceof ClickSlotC2SPacket) {
             if (mc.player.isSprinting()) {

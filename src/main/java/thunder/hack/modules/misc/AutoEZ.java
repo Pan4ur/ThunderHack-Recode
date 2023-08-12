@@ -1,6 +1,7 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
@@ -101,7 +102,7 @@ public class AutoEZ extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (fullNullCheck()) return;
         if(server.getValue() == ServerMode.Universal) return;
@@ -134,7 +135,7 @@ public class AutoEZ extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onPacket(PacketEvent.Receive e){
         if(!(e.getPacket() instanceof EntityStatusS2CPacket pac)) return;
         if(pac.getStatus() == EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES) {

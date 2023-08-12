@@ -172,11 +172,9 @@ public class ClickUI extends Screen {
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "English", hx, hy - 45, -1);
                 FontRenderers.modules.drawCenteredString(context.getMatrices(), "ThunderHack v" + Thunderhack.version, hx, hy + 90, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70).getRGB());
             } else if (hstep == 1) {
-                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), MainSettings.language.getValue() == MainSettings.Language.ENG ?
-                                "Hi! Thanks for using ThunderHack 1.20.1" : "Привет! Спс что скачал ThunderHack 1.20.1"
+                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !MainSettings.isRu() ? "Hi! Thanks for using ThunderHack 1.20.1" : "Привет! Спс что скачал ThunderHack 1.20.1"
                         , hx, hy - 80, -1);
-                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), MainSettings.language.getValue() == MainSettings.Language.ENG ?
-                                "Do you need help with the config?" : "Те помочь с кфг?"
+                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !MainSettings.isRu() ? "Do you need help with the config?" : "Те помочь с кфг?"
                         , hx, hy - 70, -1);
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 20, 180, 20)) {
@@ -198,7 +196,7 @@ public class ClickUI extends Screen {
                 context.drawTexture(pic1, (int) hx - 45, (int) hy + 10, 0, 0, 80, 75, 80, 75);
 
             } else if (hstep == 2) {
-                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), MainSettings.language.getValue() == MainSettings.Language.ENG ?
+                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !MainSettings.isRu() ?
                                 "Choose your server" : "На какой сервер?"
                         , hx, hy - 80, -1);
 
@@ -235,7 +233,7 @@ public class ClickUI extends Screen {
 
                 FontRenderers.modules.drawCenteredString(context.getMatrices(), "ThunderHack v" + Thunderhack.version, hx, hy + 90, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70).getRGB());
             } else if (hstep == 3) {
-                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), MainSettings.language.getValue() == MainSettings.Language.ENG ?
+                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !MainSettings.isRu() ?
                                 "ThunderHack is set up" : "Вперед, сносить кабины))0)"
                         , hx, hy - 80, -1);
                 FontRenderers.modules.drawCenteredString(context.getMatrices(), "ThunderHack v" + Thunderhack.version, hx, hy + 90, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70).getRGB());
@@ -349,7 +347,7 @@ public class ClickUI extends Screen {
 
     @Override
     public void removed() {
-        Thunderhack.EVENT_BUS.unregister(this);
+        Thunderhack.EVENT_BUS.unsubscribe(this);
     }
 
 }

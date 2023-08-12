@@ -2,6 +2,7 @@ package thunder.hack.modules.render;
 
 import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.EventHeldItemRenderer;
 import thunder.hack.injection.accesors.IHeldItemRenderer;
 import thunder.hack.modules.Module;
@@ -63,7 +64,7 @@ public class ViewModel extends Module {
         return value - speed <= 180 && value - speed > -180 ? value - speed : 180;
     }
 
-    @Subscribe
+    @EventHandler
     private void onHeldItemRender(EventHeldItemRenderer event) {
         if (event.getHand() == Hand.MAIN_HAND) {
             if (animateMainX.getValue()) rotationMainX.setValue((float) changeRotate(rotationMainX.getValue(), speedAnimateMain.getValue()));

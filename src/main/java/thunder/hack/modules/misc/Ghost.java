@@ -1,6 +1,7 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -34,7 +35,7 @@ public class Ghost extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketSend(PacketEvent.Send event) {
         if (bypass && event.getPacket() instanceof PlayerMoveC2SPacket) event.cancel();
     }

@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -192,7 +193,7 @@ public class TargetStrafe extends Module {
         return Math.toDegrees(Math.atan2(diffZ, diffX)) - 90;
     }
 
-    @Subscribe
+    @EventHandler
     public void onMove(EventMove event) {
         int elytraSlot = InventoryUtil.getElytra();
 
@@ -229,7 +230,7 @@ public class TargetStrafe extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void updateValues(EventSync e) {
         oldSpeed = Math.hypot(mc.player.getX() - mc.player.prevX, mc.player.getZ() - mc.player.prevZ) * contextFriction;
 
@@ -244,7 +245,7 @@ public class TargetStrafe extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onUpdate(PlayerUpdateEvent event) {
         if ((boost.getValue() == Boost.Elytra && InventoryUtil.getElytra() != -1 && !mc.player.isOnGround() && mc.player.fallDistance > 0 && !disabled)) {
             disabler(InventoryUtil.getElytra());
@@ -252,7 +253,7 @@ public class TargetStrafe extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             oldSpeed = 0;
@@ -277,7 +278,7 @@ public class TargetStrafe extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void actionEvent(EventSprint eventAction) {
         if (canStrafe()) {
             if (Core.serversprint != needSprintState) {

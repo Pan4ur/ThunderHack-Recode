@@ -1,6 +1,7 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -22,7 +23,7 @@ public class ReverseStep extends Module {
         super("ReverseStep", "быстро падать", Category.MOVEMENT);
     }
 
-    @Subscribe
+    @EventHandler
     public void onEntitySync(EventSync eventPlayerUpdateWalking) {
         if (Thunderhack.moduleManager.get(PacketFly.class).isEnabled()) return;
 

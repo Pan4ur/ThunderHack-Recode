@@ -1,6 +1,7 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -39,7 +40,7 @@ public class Velocity extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceived(PacketEvent.Receive event) {
 
         if (fullNullCheck()) return;
@@ -123,7 +124,7 @@ public class Velocity extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync e) {
         if (mode.getValue() == modeEn.Matrix) {
             if (mc.player.hurtTime > 0 && !mc.player.isOnGround()) {
@@ -143,7 +144,7 @@ public class Velocity extends Module {
         grimTicks = 0;
     }
 
-    @Subscribe
+    @EventHandler
     public void onPush(PushEvent event) {
         if(noPush.getValue()) {
             event.setPushX(event.getPushX() * 0);

@@ -1,16 +1,16 @@
 package thunder.hack.modules;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.Formatting;
 import thunder.hack.Thunderhack;
-import thunder.hack.events.impl.Render2DEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.ThSoundPack;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.Formatting;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class Module  {
+public class Module {
     private final String description;
     public static MinecraftClient mc = MinecraftClient.getInstance();
     private final Category category;
     public Setting<Boolean> enabled = new Setting<>("Enabled", false);
     public String displayName;
-    public Setting<Bind> bind = new Setting<>("Keybind", new Bind(-1,false,false));
+    public Setting<Bind> bind = new Setting<>("Keybind", new Bind(-1, false, false));
     public Setting<Boolean> drawn = new Setting<>("Drawn", true);
 
 
@@ -63,10 +63,16 @@ public class Module  {
     public void onUpdate() {
     }
 
-    public void onRender2D(Render2DEvent event) {
+    public void onRenderShaders(DrawContext context) {
     }
 
-    public void onRender3D(Render3DEvent event) {
+    public void onRender2D(DrawContext event) {
+    }
+
+    public void onRender3D(MatrixStack event) {
+    }
+
+    public void onPreRender3D(MatrixStack stack) {
     }
 
     public void onUnload() {
@@ -96,11 +102,11 @@ public class Module  {
         this.enabled.setValue(true);
         this.onEnable();
         if (this.isOn()) {
-            Thunderhack.EVENT_BUS.register(this);
+            Thunderhack.EVENT_BUS.subscribe(this);
         }
-        if(fullNullCheck()) return;
+        if (fullNullCheck()) return;
         if ((!Objects.equals(this.getDisplayName(), "ClickGui")) && (!Objects.equals(this.getDisplayName(), "ThunderGui"))) {
-            if(MainSettings.language.getValue() == MainSettings.Language.RU) {
+            if (MainSettings.language.getValue() == MainSettings.Language.RU) {
                 Thunderhack.notificationManager.publicity(this.getDisplayName(), "Модуль включен!", 2, Notification.Type.ENABLED);
             } else {
                 Thunderhack.notificationManager.publicity(this.getDisplayName(), "Was Enabled!", 2, Notification.Type.ENABLED);
@@ -111,16 +117,16 @@ public class Module  {
 
     public void disable() {
         try {
-            Thunderhack.EVENT_BUS.unregister(this);
-        } catch (Exception e){
+            Thunderhack.EVENT_BUS.unsubscribe(this);
+        } catch (Exception e) {
         }
- 
-        if(fullNullCheck()) return;
+
+        if (fullNullCheck()) return;
 
         this.enabled.setValue(false);
         this.onDisable();
         if ((!Objects.equals(this.getDisplayName(), "ClickGui")) && (!Objects.equals(this.getDisplayName(), "ThunderGui"))) {
-            if(MainSettings.language.getValue() == MainSettings.Language.RU) {
+            if (MainSettings.language.getValue() == MainSettings.Language.RU) {
                 Thunderhack.notificationManager.publicity(this.getDisplayName(), "Модуль выключен!", 2, Notification.Type.DISABLED);
             } else {
                 Thunderhack.notificationManager.publicity(this.getDisplayName(), "Was Disabled!", 2, Notification.Type.DISABLED);
@@ -158,8 +164,8 @@ public class Module  {
         return this.bind.getValue();
     }
 
-    public void setBind(int key, boolean mouse,boolean hold) {
-        this.bind.setValue(new Bind(key, mouse,hold));
+    public void setBind(int key, boolean mouse, boolean hold) {
+        this.bind.setValue(new Bind(key, mouse, hold));
     }
 
     public boolean listening() {

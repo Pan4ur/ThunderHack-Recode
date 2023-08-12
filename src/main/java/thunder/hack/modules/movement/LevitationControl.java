@@ -1,6 +1,7 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.effect.StatusEffects;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.modules.Module;
@@ -13,7 +14,7 @@ public class LevitationControl extends Module {
         super("LevitCtrl", Category.MOVEMENT);
     }
 
-    @Subscribe
+    @EventHandler
     public void onMove(EventMove e) {
         if (mc.player.hasStatusEffect(StatusEffects.LEVITATION)) {
             int amplifier = mc.player.getStatusEffect(StatusEffects.LEVITATION).getAmplifier();

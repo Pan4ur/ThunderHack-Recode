@@ -1,6 +1,7 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.ModuleManager;
@@ -54,7 +55,7 @@ public class MiddleClick extends Module {
     }
 
 
-    @Subscribe
+    @EventHandler
     public void onPreMotion(EventSync event) {
         if (fullNullCheck()) return;
 

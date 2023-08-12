@@ -1,6 +1,7 @@
 package thunder.hack.modules.player;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -17,7 +18,7 @@ public class ElytraFix extends Module {
 
     private Timer delay = new Timer();
 
-    @Subscribe
+    @EventHandler
     public void onPlayerEvent(PlayerUpdateEvent event){
         ItemStack stack = mc.player.currentScreenHandler.getCursorStack();
         if (stack.getItem() instanceof ArmorItem && delay.passedMs(300)) {

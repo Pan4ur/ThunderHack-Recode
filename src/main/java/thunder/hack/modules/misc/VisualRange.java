@@ -1,6 +1,7 @@
 package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -30,7 +31,7 @@ public class VisualRange extends Module {
     public Setting<Boolean> soundpl = new Setting<>("Sound", true);
     public Setting<mode> Mode = new Setting<>("Mode", mode.Notification);
 
-    @Subscribe
+    @EventHandler
     public void onEntityAdded(EventEntitySpawn event) {
         if (!isValid(event.getEntity())) return;
 
@@ -41,7 +42,7 @@ public class VisualRange extends Module {
         if (enter.getValue()) notify(event.getEntity(), true);
     }
 
-    @Subscribe
+    @EventHandler
     public void onEntityRemoved(EventEntityRemoved event) {
         if (!isValid(event.entity)) return;
 

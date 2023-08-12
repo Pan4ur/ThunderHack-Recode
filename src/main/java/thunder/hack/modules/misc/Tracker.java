@@ -2,6 +2,7 @@ package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
 import io.netty.util.internal.ConcurrentSet;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
@@ -60,7 +61,7 @@ public class Tracker extends Module {
         return trackedPlayer == null ? null : trackedPlayer.getName().getString();
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if(event.getPacket() instanceof GameMessageS2CPacket pac) {
 
@@ -82,7 +83,7 @@ public class Tracker extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onEntitySpawn(EventEntitySpawn e){
         if(e.getEntity() instanceof EndCrystalEntity){
             if (!placed.remove(BlockPos.ofFloored(e.getEntity().getX(), e.getEntity().getY() - 1, e.getEntity().getZ()))) {
@@ -186,7 +187,7 @@ public class Tracker extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketSend(PacketEvent.Send event) {
         if (event.getPacket() instanceof PlayerInteractItemC2SPacket) {
             if (mc.player.getMainHandStack().getItem() == Items.EXPERIENCE_BOTTLE || mc.player.getOffHandStack().getItem() == Items.EXPERIENCE_BOTTLE) {

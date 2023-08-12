@@ -1,6 +1,7 @@
 package thunder.hack.modules.render;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventSync;
@@ -56,14 +57,14 @@ public class NoRender extends Module {
     int potionCouter, xpCounter, arrowCounter, itemsCounter;
 
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e){
         if(e.getPacket() instanceof TitleS2CPacket && antiTitle.getValue()){
             e.cancel();
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onSync(EventSync e){
         for(Entity ent : mc.world.getEntities()){
             if(ent instanceof PotionEntity){
@@ -134,7 +135,7 @@ public class NoRender extends Module {
 
 
 
-    @Subscribe
+    @EventHandler
     public void onParticle(ParticleEvent.AddParticle event) {
         if (elderGuardian.getValue() && event.particle instanceof ElderGuardianAppearanceParticle) {
             event.setCancelled(true);

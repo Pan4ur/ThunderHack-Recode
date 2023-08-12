@@ -1,6 +1,7 @@
 package thunder.hack.modules.movement;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
@@ -153,7 +154,7 @@ public class Strafe extends Module {
         return new Box(mc.player.getX() - 0.1, mc.player.getY(), mc.player.getZ() - 0.1, mc.player.getX() + 0.1, mc.player.getY() + 1, mc.player.getZ() + 0.1);
     }
 
-    @Subscribe
+    @EventHandler
     public void onMove(EventMove event) {
         int elytraSlot = InventoryUtil.getElytra();
 
@@ -180,7 +181,7 @@ public class Strafe extends Module {
 
     }
 
-    @Subscribe
+    @EventHandler
     public void updateValues(EventSync e) {
         oldSpeed = Thunderhack.playerManager.currentPlayerSpeed * contextFriction;
         if (mc.player.isSubmergedInWater()) {
@@ -193,7 +194,7 @@ public class Strafe extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             oldSpeed = 0;
@@ -217,7 +218,7 @@ public class Strafe extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void actionEvent(EventSprint eventAction) {
         if (canStrafe()) {
             if (Core.serversprint != needSprintState) {
@@ -230,7 +231,7 @@ public class Strafe extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onUpdate(PlayerUpdateEvent event) {
         if ((boost.getValue() == Boost.Elytra && InventoryUtil.getElytra() != -1 && !mc.player.isOnGround() && mc.player.fallDistance > 0 && !disabled)) {
             disabler(InventoryUtil.getElytra());

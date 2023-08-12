@@ -15,8 +15,6 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import thunder.hack.Thunderhack;
-import thunder.hack.events.impl.Render2DEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
 
@@ -471,7 +469,7 @@ public class Render3DEngine {
         disableBlend();
     }
 
-    public static void drawTargetEsp(Render3DEvent e, Entity target){
+    public static void drawTargetEsp(MatrixStack stack, Entity target){
         ArrayList<Vec3d> vecs = new ArrayList<>();
         ArrayList<Vec3d> vecs1 = new ArrayList<>();
         ArrayList<Vec3d> vecs2 = new ArrayList<>();
@@ -502,8 +500,8 @@ public class Render3DEngine {
         }
 
 
-        e.getMatrixStack().push();
-        e.getMatrixStack().translate(x,y,z);
+        stack.push();
+        stack.translate(x,y,z);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -519,8 +517,8 @@ public class Render3DEngine {
         bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
         for (int j = 0; j < vecs.size() - 1; ++j) {
             float alpha = 1f - ( (  (float) j + ((System.currentTimeMillis() - Thunderhack.initTime) / 5f)) % 360) / 60f;
-            bufferBuilder.vertex(e.getMatrixStack().peek().getPositionMatrix(), (float) vecs.get(j).x, (float) vecs.get(j).y, (float) vecs.get(j).z).color(Render2DEngine.injectAlpha(HudEditor.getColor((int) (j / 20f)), (int) (alpha * 255)).getRGB()).next();
-            bufferBuilder.vertex(e.getMatrixStack().peek().getPositionMatrix(), (float) vecs.get(j + 1).x, (float) vecs.get(j + 1).y + 0.1f, (float) vecs.get(j + 1).z).color(Render2DEngine.injectAlpha(HudEditor.getColor((int) (j / 20f)), (int) (alpha  * 255f)).getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) vecs.get(j).x, (float) vecs.get(j).y, (float) vecs.get(j).z).color(Render2DEngine.injectAlpha(HudEditor.getColor((int) (j / 20f)), (int) (alpha * 255)).getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) vecs.get(j + 1).x, (float) vecs.get(j + 1).y + 0.1f, (float) vecs.get(j + 1).z).color(Render2DEngine.injectAlpha(HudEditor.getColor((int) (j / 20f)), (int) (alpha  * 255f)).getRGB()).next();
         }
         tessellator.draw();
 
@@ -528,8 +526,8 @@ public class Render3DEngine {
         bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
         for (int j = 0; j < vecs1.size() - 1; ++j) {
             float alpha = 1f - ( (  (float) j + ((System.currentTimeMillis() - Thunderhack.initTime) / 5f)) % 360) / 60f;
-            bufferBuilder.vertex(e.getMatrixStack().peek().getPositionMatrix(), (float) vecs1.get(j).x, (float) vecs1.get(j).y, (float) vecs1.get(j).z).color(Render2DEngine.injectAlpha(HudEditor.getColor((int) (j / 20f)), (int) (alpha * 255)).getRGB()).next();
-            bufferBuilder.vertex(e.getMatrixStack().peek().getPositionMatrix(), (float) vecs1.get(j + 1).x, (float) vecs1.get(j + 1).y + 0.1f, (float) vecs1.get(j + 1).z).color(Render2DEngine.injectAlpha(HudEditor.getColor((int) (j / 20f)), (int) (alpha  * 255f)).getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) vecs1.get(j).x, (float) vecs1.get(j).y, (float) vecs1.get(j).z).color(Render2DEngine.injectAlpha(HudEditor.getColor((int) (j / 20f)), (int) (alpha * 255)).getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) vecs1.get(j + 1).x, (float) vecs1.get(j + 1).y + 0.1f, (float) vecs1.get(j + 1).z).color(Render2DEngine.injectAlpha(HudEditor.getColor((int) (j / 20f)), (int) (alpha  * 255f)).getRGB()).next();
         }
         tessellator.draw();
 
@@ -537,16 +535,16 @@ public class Render3DEngine {
         bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
         for (int j = 0; j < vecs2.size() - 1; ++j) {
             float alpha = 1f - ( (  (float) j + ((System.currentTimeMillis() - Thunderhack.initTime) / 5f)) % 360) / 60f;
-            bufferBuilder.vertex(e.getMatrixStack().peek().getPositionMatrix(), (float) vecs2.get(j).x, (float) vecs2.get(j).y, (float) vecs2.get(j).z).color(Render2DEngine.injectAlpha(HudEditor.getColor((int) (j / 20f)), (int) (alpha * 255)).getRGB()).next();
-            bufferBuilder.vertex(e.getMatrixStack().peek().getPositionMatrix(), (float) vecs2.get(j + 1).x, (float) vecs2.get(j + 1).y + 0.1f, (float) vecs2.get(j + 1).z).color(Render2DEngine.injectAlpha(HudEditor.getColor((int) (j / 20f)), (int) (alpha  * 255f)).getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) vecs2.get(j).x, (float) vecs2.get(j).y, (float) vecs2.get(j).z).color(Render2DEngine.injectAlpha(HudEditor.getColor((int) (j / 20f)), (int) (alpha * 255)).getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) vecs2.get(j + 1).x, (float) vecs2.get(j + 1).y + 0.1f, (float) vecs2.get(j + 1).z).color(Render2DEngine.injectAlpha(HudEditor.getColor((int) (j / 20f)), (int) (alpha  * 255f)).getRGB()).next();
         }
         tessellator.draw();
 
 
         RenderSystem.enableCull();
-        e.getMatrixStack().translate(-x,-y,-z);
+        stack.translate(-x,-y,-z);
         Render3DEngine.cleanup();
-        e.getMatrixStack().pop();
+        stack.pop();
     }
 
     public static void renderCrosses(Box box, Color color, float lineWidth) {

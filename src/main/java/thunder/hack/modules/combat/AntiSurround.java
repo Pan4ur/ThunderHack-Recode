@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -69,7 +70,7 @@ public class AntiSurround extends Module {
         blockpos = null;
     }
 
-    @Subscribe
+    @EventHandler
     public void onPreMotion(EventSync event) {
         if (!switchbool.getValue() || checkPickaxe()) {
             if (blockpos != null) {

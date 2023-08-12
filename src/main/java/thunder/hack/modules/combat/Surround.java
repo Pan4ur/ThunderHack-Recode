@@ -1,8 +1,9 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,7 +20,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.Render3DEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.client.MainSettings;
@@ -66,8 +66,8 @@ public class Surround extends Module {
     @Override
     public void onEnable() {
         inactivityTimer.reset();
-        if (mc.player == null || mc.world == null) {
-            this.toggle();
+        if (fullNullCheck()) {
+            disable();
             return;
         }
 
@@ -78,21 +78,20 @@ public class Surround extends Module {
         }
     }
 
-    @Subscribe
-    public void onRender3D(Render3DEvent event) {
+    public void onRender3D(MatrixStack stack) {
         if (render.getValue())
             renderPoses.forEach((pos, time) -> {
                 if (System.currentTimeMillis() - time > 500) {
                     renderPoses.remove(pos);
                 } else {
-                    Render3DEngine.drawFilledBox(event.getMatrixStack(), new Box(pos), Render2DEngine.injectAlpha(HudEditor.getColor(0), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
+                    Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(HudEditor.getColor(0), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
                     Render3DEngine.drawBoxOutline(new Box(pos), HudEditor.getColor(0), 2);
                 }
             });
         handleSurround();
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof PlayerPositionLookS2CPacket && disableOnTP.getValue()) toggle();
     }
