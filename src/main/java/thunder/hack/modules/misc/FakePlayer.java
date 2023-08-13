@@ -19,7 +19,7 @@ public class FakePlayer extends Module {
     }
     public Setting<Boolean> copyInventory = new Setting<>("CopyInventory", false);
 
-    OtherClientPlayerEntity fakePlayer;
+    public static OtherClientPlayerEntity fakePlayer;
 
     @Override
     public void onEnable() {
@@ -29,7 +29,6 @@ public class FakePlayer extends Module {
         if (copyInventory.getValue()) {
             fakePlayer.getInventory().clone(mc.player.getInventory());
         }
-
         mc.world.addPlayer(22822854, fakePlayer);
     }
 

@@ -1,12 +1,13 @@
 package thunder.hack.utility.player;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -108,27 +109,6 @@ public final class PlaceUtility {
             new Vec3d(1, 0.24, 0.5)
     };
 
-    public static float[] rotationToDirection(Direction facing) {
-        switch (facing) {
-            case DOWN -> {
-                return new float[]{mc.player.getYaw(), 90.0f};
-            }
-            case UP -> {
-                return new float[]{mc.player.getYaw(), -90.0f};
-            }
-            case NORTH -> {
-                return new float[]{180.0f, 0.0f};
-            }
-            case SOUTH -> {
-                return new float[]{0.0f, 0.0f};
-            }
-            case WEST -> {
-                return new float[]{90.0f, 0.0f};
-            }
-        }
-        return new float[]{270.0f, 0.0f};
-    }
-
     public static boolean canSee(Entity entity) {
         Vec3d entityEyes = getEyesPos(entity);
         Vec3d entityPos = entity.getPos();
@@ -163,20 +143,10 @@ public final class PlaceUtility {
         return true;
     }
 
-    public static boolean place(BlockPos pos, boolean rotate, boolean strictDirection, Hand hand, int slot, boolean ignoreEntities) {
-        return place(pos, rotate, strictDirection, hand, slot, ignoreEntities, PlaceMode.All);
-    }
-
     public static float[] calcAngle(BlockPos pos, boolean strictDirection, boolean ignoreEntities) {
-        if (!canPlaceBlock(pos, strictDirection, !ignoreEntities)) {
-            return null;
-        }
+        if (!canPlaceBlock(pos, strictDirection, !ignoreEntities)) return null;
         Direction side = getPlaceDirection(pos, strictDirection);
-
-        if (side == null) {
-            return null;
-        }
-
+        if (side == null) return null;
         BlockPos neighbour = pos.offset(side);
         Direction opposite = side.getOpposite();
         Vec3d hitVec = new Vec3d(neighbour.getX() + 0.5, neighbour.getY() + 0.5, neighbour.getZ() + 0.5).add(new Vec3d(opposite.getUnitVector()).multiply(0.5));
@@ -191,7 +161,31 @@ public final class PlaceUtility {
         if (side == null) return false;
         BlockPos neighbour = pos.offset(side);
         Direction opposite = side.getOpposite();
-        new Placement(neighbour, opposite, 0, 0, hand, false, slot, mode).getAction().run();
+        boolean sneak = false;
+        boolean sprint = false;
+        if (hand == Hand.MAIN_HAND && slot != -1 && mc.player.getInventory().selectedSlot != slot) {
+            mc.player.getInventory().selectedSlot = slot;
+            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(slot));
+        }
+        if (mc.player.isSprinting() && !PlaceManager.syncSprinting) {
+            mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+            sprint = true;
+        }
+        if (!mc.player.isSneaking() && !PlaceManager.syncSneaking && shouldSneakWhileClicking(mc.world.getBlockState(neighbour).getBlock())) {
+            mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
+            sneak = true;
+        }
+        Vec3d hitVec = new Vec3d(neighbour.getX() + 0.5, neighbour.getY() + 0.5, neighbour.getZ() + 0.5).add(new Vec3d(opposite.getUnitVector()).multiply(0.5));
+        BlockHitResult hitResult = new BlockHitResult(hitVec, opposite, neighbour, false);
+        if (mode == PlaceUtility.PlaceMode.Packet || mode == PlaceUtility.PlaceMode.All)
+            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(hand, hitResult, PlayerUtility.getWorldActionId(mc.world)));
+        if (mode == PlaceUtility.PlaceMode.Normal || mode == PlaceUtility.PlaceMode.All)
+            mc.interactionManager.interactBlock(mc.player, hand, hitResult);
+        mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(hand));
+        if (sneak)
+            mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
+        if (sprint)
+            mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
         ghostBlocks.put(pos, System.currentTimeMillis());
         return true;
     }
@@ -205,7 +199,7 @@ public final class PlaceUtility {
     }
 
     public static boolean canPlaceBlock(BlockPos pos, boolean strictDirection, boolean checkEntities) {
-        if(pos == null) return false;
+        if (pos == null) return false;
         if (!mc.world.getBlockState(pos).isReplaceable()) {
             return false;
         }
@@ -430,5 +424,9 @@ public final class PlaceUtility {
         Packet,
         Normal,
         All
+    }
+
+    public static boolean shouldSneakWhileClicking(Block block) {
+        return block instanceof EnderChestBlock || block instanceof AnvilBlock || block instanceof ButtonBlock || block instanceof AbstractPressurePlateBlock || block instanceof BlockWithEntity || block instanceof CraftingTableBlock || block instanceof DoorBlock || block instanceof FenceGateBlock || block instanceof NoteBlock || block instanceof TrapdoorBlock;
     }
 }

@@ -8,15 +8,24 @@ import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.render.Chams;
-import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.render.Render2DEngine;
+
+import java.awt.*;
+
+import static thunder.hack.modules.Module.mc;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extends EntityModel<T>> {
@@ -48,14 +57,14 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
             livingEntity.bodyYaw = ((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw();
             livingEntity.setPitch(((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastPitch());
             livingEntity.prevYaw = Thunderhack.playerManager.lastYaw;
-            livingEntity.prevHeadYaw =  Thunderhack.playerManager.lastYaw;
+            livingEntity.prevHeadYaw = Thunderhack.playerManager.lastYaw;
             livingEntity.prevBodyYaw = Thunderhack.playerManager.lastYaw;
             livingEntity.prevPitch = Thunderhack.playerManager.lastPitch;
         }
         lastEntity = livingEntity;
         if (ModuleManager.chams.isEnabled()) {
-          //  GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
-          //  GL11.glPolygonOffset(1.0f, -1100000.0f);
+            //  GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
+            //  GL11.glPolygonOffset(1.0f, -1100000.0f);
         }
     }
 
@@ -72,27 +81,29 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
             livingEntity.prevPitch = originalPitch;
         }
         if (ModuleManager.chams.isEnabled()) {
-         //   GL11.glPolygonOffset(1.0f, 1100000.0f);
-         //   GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
+            //   GL11.glPolygonOffset(1.0f, 1100000.0f);
+            //   GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
         }
     }
 
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/EntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;IIFFFF)V"))
     private void onRenderModel(EntityModel entityModel, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
-        if(ModuleManager.chams.isEnabled()){
-            ColorSetting clr = Chams.getEntityColor(lastEntity);
-            entityModel.render(matrices, vertices, light, overlay, clr.getRed() / 255F, clr.getGreen() / 255F, clr.getBlue() / 255F, clr.getAlpha() / 255F);
-            return;
+
+        Color newColor = new Color(red, green, blue, alpha);
+        if (ModuleManager.chams.isEnabled()) {
+            newColor = Chams.getEntityColor(lastEntity);
         }
-      //  RenderSystem.enableDepthTest();
-       // RenderSystem.depthFunc(GL30.GL_ALWAYS);
-        entityModel.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.antiPlayerCollision.getValue() && lastEntity != mc.player) {
+            float overrideAlpha = (float) (mc.player.squaredDistanceTo(lastEntity.getPos()) / 3f) + 0.2f;
+            newColor = Render2DEngine.injectAlpha(newColor, (int) (255f * MathUtility.clamp(overrideAlpha, 0f, 1f)));
+        }
+        entityModel.render(matrices, vertices, light, overlay, newColor.getRed() / 255F, newColor.getGreen() / 255F, newColor.getBlue() / 255F, newColor.getAlpha() / 255F);
     }
 
     @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;scale(FFF)V", ordinal = 0))
     private void onScale(Args args) {
-        if(ModuleManager.chams.isEnabled()) {
+        if (ModuleManager.chams.isEnabled()) {
             float scale = Chams.getEntityScale(lastEntity);
             args.set(0, -scale);
             args.set(1, -scale);

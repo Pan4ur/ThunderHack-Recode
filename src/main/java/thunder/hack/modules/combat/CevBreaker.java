@@ -67,6 +67,8 @@ public class CevBreaker extends Module {
     private final Setting<BreakMode> breakMode = new Setting<>("Break Mode", BreakMode.Packet);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
 
+    private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
+
     private final Setting<Parent> render = new Setting<>("Render", new Parent(false, 1));
 
     private final Setting<Boolean> renderTrap = new Setting<>("Render Trap", false).withParent(render);
@@ -93,6 +95,7 @@ public class CevBreaker extends Module {
     private PlayerEntity target;
     private Vec3d rotations;
     private BlockPos targetSurroundBlockPos;
+    private boolean canPlaceBlock;
 
     private final ConcurrentHashMap<BlockPos, Long> renderTrapPoses = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<BlockPos, Long> renderStructurePoses = new ConcurrentHashMap<>();
@@ -108,6 +111,7 @@ public class CevBreaker extends Module {
         newCycle = true;
         placeCrystalProgress = .9;
         targetSurroundBlockPos = null;
+        canPlaceBlock = true;
 
         if (breakMode.getValue() == BreakMode.Packet && Thunderhack.moduleManager.get(SpeedMine.class).isDisabled()) {
             Thunderhack.notificationManager.publicity(getName(), MainSettings.language.getValue() == MainSettings.Language.RU ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine", 5, Notification.Type.ERROR);
@@ -260,7 +264,7 @@ public class CevBreaker extends Module {
         }
     }
 
-    private void onRender(MatrixStack stack) {
+    public void onRender3D(MatrixStack stack) {
         if (renderTrap.getValue()) {
             renderTrapPoses.forEach((pos, time) -> {
                 if (System.currentTimeMillis() - time > 500) {
@@ -304,6 +308,7 @@ public class CevBreaker extends Module {
             if (packet.getPos().equals(target.getBlockPos().add(0, 2, 0)) && packet.getState().getBlock().equals(Blocks.AIR)) {
                 for (Entity entity : mc.world.getEntities()) {
                     if (entity instanceof EndCrystalEntity endCrystal && entity.getBlockPos().equals(target.getBlockPos().add(0, 3, 0))) {
+                        canPlaceBlock = false;
                         breakCrystalThread(endCrystal);
                     }
                 }
@@ -323,6 +328,7 @@ public class CevBreaker extends Module {
                     mc.interactionManager.attackEntity(mc.player, endCrystal);
                     mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                     Criticals.cancelCrit = false;
+                    canPlaceBlock = true;
                 },
                 breakCrystalDelay.getValue());
     }
@@ -465,6 +471,8 @@ public class CevBreaker extends Module {
     }
 
     private boolean placeObsidian(BlockPos pos) {
+        if (!canPlaceBlock) return false;
+
         int slot = InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN);
 
         if (slot != mc.player.getInventory().selectedSlot && !autoSwap.getValue()) return false;
@@ -475,7 +483,7 @@ public class CevBreaker extends Module {
             return false;
         }
 
-        return PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, slot, false);
+        return PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, slot, false, placeMode.getValue());
     }
 
     public enum BreakMode {

@@ -224,7 +224,7 @@ public class AutoBed extends Module {
         float[] rotation;
 
         if (rotate.getValue()) rotation = PlaceUtility.calcAngle(finalPos, strictDirection.getValue(), true);
-        else rotation = PlaceUtility.rotationToDirection(finalFacing);
+        else rotation = rotationToDirection(finalFacing);
 
         if(rotation == null) return;
 
@@ -239,6 +239,26 @@ public class AutoBed extends Module {
         return PlaceUtility.calculateAngle(new Vec3d(pos.getX() + 0.5 + facing.getVector().getX() * 0.5, pos.getY() + 0.5 + facing.getVector().getY() * 0.5, pos.getZ() + 0.5 + facing.getVector().getZ() * 0.5));
     }
 
+    public static float[] rotationToDirection(Direction facing) {
+        switch (facing) {
+            case DOWN -> {
+                return new float[]{mc.player.getYaw(), 90.0f};
+            }
+            case UP -> {
+                return new float[]{mc.player.getYaw(), -90.0f};
+            }
+            case NORTH -> {
+                return new float[]{180.0f, 0.0f};
+            }
+            case SOUTH -> {
+                return new float[]{0.0f, 0.0f};
+            }
+            case WEST -> {
+                return new float[]{90.0f, 0.0f};
+            }
+        }
+        return new float[]{270.0f, 0.0f};
+    }
 
     private boolean suicideCheck(BlockPos pos) {
         return (mc.player.getHealth() + mc.player.getAbsorptionAmount() - ExplosionUtility.getSelfExplosionDamage(new Vec3d(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5)) > 0.5);

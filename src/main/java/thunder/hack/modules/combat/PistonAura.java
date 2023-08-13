@@ -63,6 +63,7 @@ public class PistonAura extends Module {
     public Setting<Float> targetRange = new Setting<>("Target Range", 10.0f, 0.0f, 20.0f);
     public Setting<Float> placeRange = new Setting<>("PlaceRange", 10.0f, 1.0f, 20.0f);
     public Setting<Float> wallRange = new Setting<>("WallRange", 10.0f, 1.0f, 20.0f);
+    private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
 
     public PlayerEntity target;
     public BlockPos pistonPos;
@@ -173,7 +174,7 @@ public class PistonAura extends Module {
                     trapPos.add(trapBase.add(0, 1, 0));
 
                     for (BlockPos bp : trapPos) {
-                        if (PlaceUtility.place(bp, true, strictDirection.getValue(), Hand.MAIN_HAND, InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN), false)) {
+                        if (PlaceUtility.place(bp, true, strictDirection.getValue(), Hand.MAIN_HAND, InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN), false, placeMode.getValue())) {
                             if (bp == targetPos.add(0, 2, 0)) {
                                 builtTrap = true;
                                 stage = Stage.Piston;

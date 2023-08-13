@@ -48,6 +48,7 @@ public class HoleFill extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Always);
     private final Setting<Float> rangeToTarget = new Setting<>("RangeToTarget", 2f, 1f, 5f, v -> mode.getValue() == Mode.Target);
     private final Setting<Boolean> autoDisable = new Setting<>("AutoDisable", false);
+    private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
 
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
     private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Fade).withParent(renderCategory);
@@ -130,7 +131,7 @@ public class HoleFill extends Module {
             }
 
             if (pos != null) {
-                if (PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, slot, false)) {
+                if (PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, slot, false, placeMode.getValue())) {
                     blocksPlaced++;
                     renderPoses.put(pos, System.currentTimeMillis());
                     PlaceUtility.ghostBlocks.put(pos, System.currentTimeMillis());

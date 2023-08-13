@@ -18,6 +18,8 @@ import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.render.Chams;
 import thunder.hack.setting.impl.ColorSetting;
 
+import java.awt.*;
+
 @Mixin(EndCrystalEntityRenderer.class)
 public class MixinEndCrystalEntityRenderer {
     private EndCrystalEntity lastEntity;
@@ -30,7 +32,7 @@ public class MixinEndCrystalEntityRenderer {
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelPart;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V"))
     public void onRenderPart(ModelPart modelPart, MatrixStack matrices, VertexConsumer vertices, int light, int overlay) {
         if(ModuleManager.chams.isEnabled()){
-            ColorSetting clr = Chams.getEntityColor(lastEntity);
+            Color clr = Chams.getEntityColor(lastEntity);
             modelPart.render(matrices, vertices, light, overlay, clr.getRed() / 255F, clr.getGreen() / 255F, clr.getBlue() / 255F, clr.getAlpha() / 255F);
             return;
         }
