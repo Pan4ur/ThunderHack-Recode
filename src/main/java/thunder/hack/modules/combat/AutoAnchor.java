@@ -7,6 +7,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.EnchantedGoldenAppleItem;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
@@ -15,6 +16,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.PlaceManager;
 import thunder.hack.events.impl.EventPlaceBlock;
 import thunder.hack.events.impl.EventSync;
@@ -69,6 +71,8 @@ public class AutoAnchor extends Module {
     public Setting<Boolean> pauseWhenAura = new Setting<>("PauseWhenAura", true, v -> mode.getValue() == Mode.Rage);
     public Setting<Float> pauseHealth = new Setting<>("PauseHealth", 2f, 0f, 10f, v -> mode.getValue() == Mode.Rage);
     public Setting<Boolean> render = new Setting<>("Render", true, v -> mode.getValue() == Mode.Rage);
+
+    private ArrayList<BlockPos> chargedAnchors = new ArrayList<>();
 
     private enum Mode {
         Legit, Rage
@@ -159,7 +163,10 @@ public class AutoAnchor extends Module {
     @EventHandler
     public void onEntitySync(EventSync event) {
 
-        if (check() && mode.getValue() == Mode.Rage) if (!explodeAnchor()) if (!chargeAnchor()) placeAnchor();
+        if (check() && mode.getValue() == Mode.Rage)
+            if (!explodeAnchor())
+                if (!chargeAnchor())
+                    placeAnchor();
 
         if (rotate.getValue() && rotations != null && mode.getValue() == Mode.Rage) {
             float[] yp = PlaceUtility.calculateAngle(rotations);
@@ -170,7 +177,6 @@ public class AutoAnchor extends Module {
                     PlaceManager.trailingBreakAction = null;
                     PlaceManager.trailingPlaceAction = null;
                     PlaceManager.trailingChargeAction = null;
-
                 }
             }
             double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
@@ -184,7 +190,8 @@ public class AutoAnchor extends Module {
 
     @Override
     public void onThread() {
-        if (mode.getValue() == Mode.Rage) threadedBp = findPlacePosition();
+        if (mode.getValue() == Mode.Rage)
+            threadedBp = findPlacePosition();
     }
 
     public boolean explodeAnchor() {
@@ -199,15 +206,15 @@ public class AutoAnchor extends Module {
 
         if (result == null) return false;
 
-
         SearchInvResult anchorResult = InventoryUtility.getAnchor();
         if (anchorResult.found()) {
             PlaceManager.trailingBreakAction = () -> {
                 BlockHitResult bhr = handleInteractRotation(result);
                 if (bhr != null) {
                     anchorResult.switchTo();
-                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
-                    mc.player.swingHand(Hand.MAIN_HAND);
+                    mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
+                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
+                    mc.player.swingHand(Hand.OFF_HAND);
                 }
             };
 
@@ -220,16 +227,23 @@ public class AutoAnchor extends Module {
     }
 
     public boolean chargeAnchor() {
-        if (!chargeTimer.passedMs(chargeDelay.getValue())) return false;
+        if (!chargeTimer.passedMs(chargeDelay.getValue())) return true;
 
         BlockPos result;
-        if (cachePos != null && mc.world.getBlockState(cachePos).getBlock() instanceof RespawnAnchorBlock) {
+        if (cachePos != null && mc.world.getBlockState(cachePos).getBlock() instanceof RespawnAnchorBlock && mc.player.squaredDistanceTo(cachePos.toCenterPos()) < placeRange.getPow2Value()) {
             result = cachePos;
         } else {
             result = findAnchorTarget(getTargetsInRange(), false);
         }
 
-        if (result == null) return false;
+        if (result == null) {
+            return false;
+        }
+
+        if (chargedAnchors.contains(result)) {
+            chargedAnchors.remove(result);
+            return true;
+        }
 
         if (mc.world.getBlockState(result).get(CHARGES) > 0) return true;
 
@@ -240,10 +254,13 @@ public class AutoAnchor extends Module {
                 glowResult.switchTo();
                 BlockHitResult bhr = handleInteractRotation(result);
                 if (bhr != null) {
+                    mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                     mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
                     mc.player.swingHand(Hand.MAIN_HAND);
                 }
             };
+
+            chargedAnchors.add(result);
 
             chargeTimer.reset();
             placeTimer.reset();
@@ -256,17 +273,17 @@ public class AutoAnchor extends Module {
 
     public boolean placeAnchor() {
         if (!placeTimer.passedMs(placeDelay.getValue())) return false;
+        if (cachePos != null && mc.world.getBlockState(cachePos).getBlock() instanceof RespawnAnchorBlock && isValidAnchorTarget(cachePos))
+            return false;
         SearchInvResult anchorResult = InventoryUtility.getAnchor();
         if (threadedBp != null && anchorResult.found()) {
             PlaceManager.trailingPlaceAction = () -> {
                 int prev_slot = mc.player.getInventory().selectedSlot;
-                anchorResult.switchTo();
-                mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(new Vec3d(threadedBp.getX(), threadedBp.getY(), threadedBp.getZ()), PlaceUtility.getPlaceDirection(threadedBp, strictDirection.getValue()), threadedBp, false));
-
+                PlaceUtility.forcePlace(threadedBp, strictDirection.getValue(), Hand.MAIN_HAND, anchorResult.slot(), false, PlaceUtility.PlaceMode.Normal);
+                if (threadedBp != null)
+                    rotations = PlaceUtility.calcVector(threadedBp, strictDirection.getValue(), false);
                 mc.player.getInventory().selectedSlot = prev_slot;
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(prev_slot));
-                rotations = new Vec3d(threadedBp.getX() + 0.5D, threadedBp.getY() + 1D, threadedBp.getZ() + 0.5D);
-
             };
 
             chargeTimer.reset();
@@ -281,7 +298,6 @@ public class AutoAnchor extends Module {
     }
 
 
-
     public void onRender3D(MatrixStack e) {
         if (cachePos != null && mode.getValue() == Mode.Rage) {
             Render3DEngine.drawBoxOutline(new Box(cachePos), new Color(0xC7FFFFFF, true), 2f);
@@ -290,57 +306,54 @@ public class AutoAnchor extends Module {
 
     }
 
+
     private BlockPos findPlacePosition() {
-        List<PlayerEntity> targetss = getTargetsInRange();
+        PlayerEntity target = Thunderhack.combatManager.getNearestTarget(enemyRange.getValue());
+
+        if (target == null)
+            return null;
+
+        BlockPos targetBp = BlockPos.ofFloored(target.getPos());
+
+        if (PlaceUtility.canPlaceBlock(targetBp.up().up(), strictDirection.getValue(), true) || mc.world.getBlockState(targetBp.up().up()).getBlock() instanceof RespawnAnchorBlock)
+            return targetBp.up().up();
 
         List<BlockPos> blocks = findAnchorBlocks();
 
-        if (blocks == null) return null;
+        if (blocks.isEmpty())
+            return null;
 
         BlockPos bestPos = null;
-
-        PlayerEntity bestTarget = null;
 
         float bestDamage = 0.0f;
 
         float bestBalance = 0.0f;
 
-        if (targetss.isEmpty()) return null;
-
         for (BlockPos block : blocks) {
-            float damage = 0.0F;
-            PlayerEntity target = null;
             float damageToSelf = mc.player.isCreative() ? 0 : ExplosionUtility.getAnchorExplosionDamage(block, mc.player);
             if (mc.player.getHealth() + mc.player.getAbsorptionAmount() <= damageToSelf + 2F) continue;
             if (damageToSelf > maxSelfDamage.getValue()) continue;
-            for (PlayerEntity player : targetss) {
-                float damageToTarget = ExplosionUtility.getAnchorExplosionDamage(block, player);
 
-                if (damageToTarget > damage && (damageToTarget >= minDamage.getValue())) {
-                    damage = damageToTarget;
-                    target = player;
-                }
-            }
+            float damageToTarget = ExplosionUtility.getAnchorExplosionDamage(block, target);
+
+            if ((damageToTarget < minDamage.getValue())) continue;
+
+
             if (priorityMode.getValue() == PriorityMode.MaxDamage) {
-                if (damage > bestDamage) {
-                    bestDamage = damage;
+                if (damageToTarget > bestDamage) {
+                    bestDamage = damageToTarget;
                     bestPos = block;
-                    bestTarget = target;
                 }
             } else {
-                if (damage / damageToSelf > bestBalance) {
-                    bestDamage = damage;
-                    bestBalance = damage / damageToSelf;
+                if (damageToTarget / damageToSelf > bestBalance) {
+                    bestDamage = damageToTarget;
+                    bestBalance = damageToTarget / damageToSelf;
                     bestPos = block;
-                    bestTarget = target;
                 }
             }
         }
-        if (bestTarget != null && bestPos != null) {
-            // CAtarget = bestTarget;
+        if (bestPos != null) {
             renderDmg = bestDamage;
-        } else {
-            // CAtarget = null;
         }
         return bestPos;
     }

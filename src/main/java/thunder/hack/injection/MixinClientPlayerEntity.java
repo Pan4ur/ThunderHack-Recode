@@ -20,6 +20,7 @@ import thunder.hack.core.PlaceManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.modules.movement.Velocity;
 
+import static thunder.hack.modules.Module.fullNullCheck;
 import static thunder.hack.modules.Module.mc;
 
 @Mixin(value = ClientPlayerEntity.class, priority = 800)
@@ -60,6 +61,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Inject(method = "sendMovementPackets", at = @At("HEAD"), cancellable = true)
     private void sendMovementPacketsHook(CallbackInfo info) {
         if (PlaceManager.isRotating) return;
+        if(fullNullCheck()) return;
         EventSync event = new EventSync(getYaw(), getPitch());
         Thunderhack.EVENT_BUS.post(event);
         EventSprint e = new EventSprint(isSprinting());
@@ -84,6 +86,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "sendMovementPackets", at = @At("RETURN"), cancellable = true)
     private void sendMovementPacketsPostHook(CallbackInfo info) {
+        if(fullNullCheck()) return;
         mc.player.lastSprinting = pre_sprint_state;
         Core.lock_sprint = false;
         EventPostSync event = new EventPostSync();

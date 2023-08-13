@@ -98,7 +98,7 @@ public class PistonPush extends Module {
             delay = 0;
             postAction.run();
             postAction = null;
-            int extraBlocks = 0;
+            int extraBlocks = 1;
             while (extraBlocks < actionShift.getValue()) {
                 handlePistonPush(true);
                 if (postAction != null) {

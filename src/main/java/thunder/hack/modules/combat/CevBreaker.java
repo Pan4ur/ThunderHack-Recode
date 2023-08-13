@@ -127,9 +127,10 @@ public class CevBreaker extends Module {
         // Find target
         if (target == null || target.isDead()
                 || target.getHealth() + target.getAbsorptionAmount() <= 0
-                || target.distanceTo(((mc.player))) > range.getValue())
+                || target.distanceTo(((mc.player))) > range.getValue()) {
             findTarget();
-
+            return;
+        }
         if (delay < actionInterval.getValue()) {
             delay++;
             return;
@@ -328,9 +329,14 @@ public class CevBreaker extends Module {
                     mc.interactionManager.attackEntity(mc.player, endCrystal);
                     mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                     Criticals.cancelCrit = false;
+                    try {
+                        Thread.sleep(breakCrystalDelay.getValue() / 2);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     canPlaceBlock = true;
                 },
-                breakCrystalDelay.getValue());
+                breakCrystalDelay.getValue() / 2);
     }
 
     @EventHandler
@@ -365,7 +371,8 @@ public class CevBreaker extends Module {
                 }
 
                 mc.interactionManager.attackBlock(pos, PlaceUtility.getBreakDirection(pos, strictDirection.getValue()));
-                if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
+                if (swing.getValue())
+                    mc.player.swingHand(Hand.MAIN_HAND);
             }
         }
     }

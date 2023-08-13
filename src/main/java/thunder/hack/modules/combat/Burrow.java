@@ -188,10 +188,12 @@ public class Burrow extends Module {
         }
 
         if (rotate.getValue()) {
-            if (finalREntity.getPos().equals(new Vec3d(last_x, last_y, last_z))) {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(r[0],r[1],onGround.getValue()));
-            } else {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(finalREntity.getX(), finalREntity.getY(), finalREntity.getZ(),r[0],r[1],onGround.getValue()));
+            if(r != null) {
+                if (finalREntity.getPos().equals(new Vec3d(last_x, last_y, last_z))) {
+                    mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(r[0], r[1], onGround.getValue()));
+                } else {
+                    mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(finalREntity.getX(), finalREntity.getY(), finalREntity.getZ(), r[0], r[1], onGround.getValue()));
+                }
             }
         }
 

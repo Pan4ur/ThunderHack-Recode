@@ -9,6 +9,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Formatting;
 
 import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
@@ -122,6 +123,11 @@ public class Module {
             }
             mc.world.playSound(mc.player, mc.player.getBlockPos(), ThSoundPack.ENABLE_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
         }
+    }
+
+    public void disable(String reason){
+        Command.sendMessage("[" + getDisplayName() + "] " + reason);
+        disable();
     }
 
     public void disable() {
@@ -242,6 +248,7 @@ public class Module {
     public boolean isDisabled() {
         return !this.isEnabled();
     }
+
 
     public Setting getSettingByName(String name) {
         for (Setting setting : getSettings()) {

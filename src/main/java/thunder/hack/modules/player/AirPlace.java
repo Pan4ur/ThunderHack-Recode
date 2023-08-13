@@ -59,9 +59,10 @@ public class AirPlace extends Module {
 
             if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
             else mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+
+            // это чтоб не фастплейсило
+            ((IMinecraftClient)mc).setUseCooldown(4);
         }
-        // это чтоб не фастплейсило
-        ((IMinecraftClient)mc).setUseCooldown(4);
     }
 
     public void onRender3D(MatrixStack stack) {

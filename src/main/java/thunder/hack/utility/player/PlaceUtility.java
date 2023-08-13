@@ -153,6 +153,16 @@ public final class PlaceUtility {
         return calculateAngle(hitVec);
     }
 
+    public static Vec3d calcVector(BlockPos pos, boolean strictDirection, boolean ignoreEntities) {
+        if (!canPlaceBlock(pos, strictDirection, !ignoreEntities)) return null;
+        Direction side = getPlaceDirection(pos, strictDirection);
+        if (side == null) return null;
+        BlockPos neighbour = pos.offset(side);
+        Direction opposite = side.getOpposite();
+        Vec3d hitVec = new Vec3d(neighbour.getX() + 0.5, neighbour.getY() + 0.5, neighbour.getZ() + 0.5).add(new Vec3d(opposite.getUnitVector()).multiply(0.5));
+        return hitVec;
+    }
+
     public static boolean forcePlace(BlockPos pos, boolean strictDirection, Hand hand, int slot, boolean ignoreEntities, PlaceMode mode) {
         if (!canPlaceBlock(pos, strictDirection, !ignoreEntities)) return false;
         if (!mc.world.getBlockState(pos).isReplaceable()) return false;
