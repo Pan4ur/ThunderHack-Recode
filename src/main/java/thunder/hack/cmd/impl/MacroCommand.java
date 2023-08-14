@@ -53,7 +53,7 @@ public class MacroCommand extends Command {
         builder.then(literal("add")
                 .then(arg("name", StringArgumentType.word())
                         .then(arg("bind", StringArgumentType.word())
-                                .then(arg("args", StringArgumentType.string()).executes(context -> {
+                                .then(arg("args", StringArgumentType.greedyString()).executes(context -> {
                                     String name = context.getArgument("name", String.class);
                                     String bind = context.getArgument("bind", String.class).toUpperCase();
                                     String args = context.getArgument("args", String.class);
