@@ -7,7 +7,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import java.awt.*;
 
 public abstract class AbstractWindow {
-
 	private String name;
 	public double animationY;
 	protected double prevTargetX;

@@ -137,5 +137,4 @@ public class EbatteSratte extends Module {
     public void onEnable() {
         loadEZ();
     }
-
 }

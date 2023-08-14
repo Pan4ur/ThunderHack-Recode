@@ -48,5 +48,10 @@
     "sounds": [
       "thunderhack:skeet"
     ]
+  },
+  "orthodox": {
+    "sounds": [
+      "thunderhack:orthodox"
+    ]
   }
 }

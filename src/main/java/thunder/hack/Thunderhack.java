@@ -20,7 +20,6 @@ import java.net.URL;
 
 
 public class Thunderhack implements ModInitializer {
-
     public static final String MOD_ID = "thunderhack";
     public static final IEventBus EVENT_BUS = new EventBus();
     public static String version = "1.2b70823";
@@ -62,12 +61,14 @@ public class Thunderhack implements ModInitializer {
         FriendManager.loadFriends();
         configManager.load(configManager.getCurrentConfig());
         moduleManager.onLoad();
+
         Runtime.getRuntime().addShutdownHook(new Thread(()->{
             FriendManager.saveFriends();
             configManager.save(configManager.getCurrentConfig());
             wayPointManager.saveWayPoints();
             macroManager.saveMacro();
         }));
+
         macroManager.onLoad();
         wayPointManager.onLoad();
 

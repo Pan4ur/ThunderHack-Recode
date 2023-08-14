@@ -71,7 +71,8 @@ public class AutoAnchor extends Module {
     public Setting<Boolean> render = new Setting<>("Render", true, v -> mode.getValue() == Mode.Rage);
 
     private enum Mode {
-        Legit, Rage
+        Legit,
+        Rage
     }
 
     @EventHandler
@@ -181,7 +182,6 @@ public class AutoAnchor extends Module {
         }
     }
 
-
     @Override
     public void onThread() {
         if (mode.getValue() == Mode.Rage) threadedBp = findPlacePosition();
@@ -279,7 +279,6 @@ public class AutoAnchor extends Module {
         }
         return false;
     }
-
 
 
     public void onRender3D(MatrixStack e) {

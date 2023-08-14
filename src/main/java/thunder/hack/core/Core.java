@@ -1,6 +1,5 @@
 package thunder.hack.core;
 
-import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
@@ -28,8 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.modules.Module.mc;
 
-public class Core {
-
+public final class Core {
     Timer lastPacket = new Timer();
 
     public static boolean lock_sprint, serversprint;

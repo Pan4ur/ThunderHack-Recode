@@ -65,7 +65,7 @@ public class AirPlace extends Module {
     }
 
     public void onRender3D(MatrixStack stack) {
-        if (hit == null && !mc.world.getBlockState(hit.getBlockPos()).getBlock().equals(Blocks.AIR)) return;
+        if (hit == null || !mc.world.getBlockState(hit.getBlockPos()).getBlock().equals(Blocks.AIR)) return;
 
         Render3DEngine.drawFilledBox(stack, new Box(hit.getBlockPos()), fillColor.getValue().getColorObject());
         Render3DEngine.drawBoxOutline(new Box(hit.getBlockPos()), lineColor.getValue().getColorObject(), lineWidth.getValue());

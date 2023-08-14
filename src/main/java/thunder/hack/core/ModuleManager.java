@@ -267,6 +267,7 @@ public class ModuleManager {
         modules.add(new AirPlace());
         modules.add(noCommentExploit);
         modules.add(new PistonPush());
+        modules.add(new KillEffect());
     }
 
     public Module get(String name) {

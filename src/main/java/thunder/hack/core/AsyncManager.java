@@ -1,6 +1,5 @@
 package thunder.hack.core;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.entity.Entity;
@@ -18,7 +17,6 @@ import java.util.concurrent.Executors;
 import static thunder.hack.modules.Module.mc;
 
 public class AsyncManager {
-
     private ClientService clientService = new ClientService();
     public static ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -26,8 +24,8 @@ public class AsyncManager {
     private volatile List<AbstractClientPlayerEntity> threadSafePlayersList = Collections.emptyList();
 
     @EventHandler
-    public void onTick(EventTick e){
-        if(mc.world == null) return;
+    public void onTick(EventTick e) {
+        if (mc.world == null) return;
         threadSafeEntityList = mc.world.getEntities();
         threadSafePlayersList = mc.world.getPlayers();
     }
@@ -47,8 +45,8 @@ public class AsyncManager {
     }
 
     @EventHandler
-    public void onSync(EventSync e){
-        if(!clientService.isAlive()){
+    public void onSync(EventSync e) {
+        if (!clientService.isAlive()) {
             clientService = new ClientService();
             clientService.setName("ThunderHack-AsyncProcessor");
             clientService.setDaemon(true);
@@ -71,7 +69,7 @@ public class AsyncManager {
                     } else {
                         Thread.yield();
                     }
-                } catch(Exception exception) {
+                } catch (Exception exception) {
                     exception.printStackTrace();
                     Command.sendMessage(exception.getMessage());
                 }
