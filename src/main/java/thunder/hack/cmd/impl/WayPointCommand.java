@@ -12,6 +12,7 @@ import thunder.hack.core.WayPointManager;
 import thunder.hack.modules.client.MainSettings;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static thunder.hack.modules.Module.mc;
 
 public class WayPointCommand extends Command {
     public WayPointCommand() {
@@ -25,7 +26,7 @@ public class WayPointCommand extends Command {
             else sendMessage("WayPoints:");
 
             sendMessage(" ");
-            Thunderhack.wayPointManager.getWayPoints().forEach(wp -> sendMessage(wp.name() + "X: " + wp.x() + " Y: " + wp.y() + " Z: " + wp.z()));
+            Thunderhack.wayPointManager.getWayPoints().forEach(wp -> sendMessage(wp.name() + "X: " + wp.x() + " Y: " + wp.y() + " Z: " + wp.z() + " Server: " + wp.server()));
 
             return SINGLE_SUCCESS;
         }));
@@ -46,7 +47,7 @@ public class WayPointCommand extends Command {
 
         builder.then(literal("add").then(arg("name", StringArgumentType.word()).executes(context -> {
             String name = context.getArgument("name", String.class);
-            WayPointManager.WayPoint wp = new WayPointManager.WayPoint((int) MC.player.getX(), (int) MC.player.getY(), (int) MC.player.getZ(), name);
+            WayPointManager.WayPoint wp = new WayPointManager.WayPoint((int) MC.player.getX(), (int) MC.player.getY(), (int) MC.player.getZ(), name, (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address));
             Thunderhack.wayPointManager.addWayPoint(wp);
 
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
@@ -62,7 +63,7 @@ public class WayPointCommand extends Command {
                             String name = context.getArgument("name", String.class);
                             BlockPos pos = new BlockPos(context.getArgument("x", Integer.class), context.getArgument("y", Integer.class), context.getArgument("z", Integer.class));
 
-                            WayPointManager.WayPoint wp = new WayPointManager.WayPoint(pos.getX(), pos.getY(), pos.getZ(), name);
+                            WayPointManager.WayPoint wp = new WayPointManager.WayPoint(pos.getX(), pos.getY(), pos.getZ(), name, (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address));
                             Thunderhack.wayPointManager.addWayPoint(wp);
 
                             if (MainSettings.language.getValue() == MainSettings.Language.RU) {

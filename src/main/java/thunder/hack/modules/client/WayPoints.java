@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector4d;
 import thunder.hack.Thunderhack;
@@ -12,7 +13,10 @@ import thunder.hack.cmd.Command;
 import thunder.hack.core.WayPointManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
+import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.render.Render3DEngine;
+
+import java.util.Objects;
 
 public class WayPoints extends Module {
 
@@ -32,10 +36,18 @@ public class WayPoints extends Module {
         if(!Thunderhack.wayPointManager.getWayPoints().isEmpty()){
             for(WayPointManager.WayPoint wp : Thunderhack.wayPointManager.getWayPoints()){
                 if(wp.name() == null ) continue;
+                if(!mc.getNetworkHandler().getServerInfo().address.contains(wp.server())) continue;
+
+                double difX = wp.x() - mc.player.getPos().x;
+                double difZ = wp.z() - mc.player.getPos().z;
+                float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);
+                double plYaw = MathHelper.wrapDegrees(mc.player.getYaw());
+                if(Math.abs(yaw - plYaw) > 90) continue;
+
                 Vec3d vector = new Vec3d(wp.x(),wp.y(),wp.z());
                 Vector4d position = null;
                 vector = Render3DEngine.worldSpaceToScreenSpace( new Vec3d(vector.x, vector.y, vector.z));
-                if (vector != null && vector.z > 0 && vector.z < 1) {
+                if (vector != null) {
                     position = new Vector4d(vector.x, vector.y, vector.z, 0);
                     position.x = Math.min(vector.x, position.x);
                     position.y = Math.min(vector.y, position.y);
