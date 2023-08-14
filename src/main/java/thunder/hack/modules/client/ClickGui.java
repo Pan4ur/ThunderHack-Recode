@@ -89,9 +89,8 @@ public class ClickGui extends Module {
 
     @Override
     public void onTick() {
-        if (!(ClickGui.mc.currentScreen instanceof ClickUI)) {
-            this.disable();
-        }
+        if (!(ClickGui.mc.currentScreen instanceof ClickUI))
+            disable();
     }
 
     public enum colorModeEn {

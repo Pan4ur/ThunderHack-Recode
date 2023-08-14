@@ -57,6 +57,6 @@ public class HudEditor extends Module{
     @Override
     public void onEnable(){
         mc.setScreen(HudEditorGui.getHudGui());
-        toggle();
+        disable();
     }
 }

@@ -5,6 +5,7 @@ import net.minecraft.item.Items;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.Timer;
@@ -30,7 +31,7 @@ public class AutoFish extends Module {
     @Override
     public void onEnable() {
         if (fullNullCheck()) {
-            toggle();
+            disable("NPE protection");
             return;
         }
         rodSlot = InventoryUtility.findInHotBar(stack -> stack.getItem() instanceof FishingRodItem).slot();
@@ -46,14 +47,12 @@ public class AutoFish extends Module {
         if (mc.player.getMainHandStack().getItem() instanceof FishingRodItem) {
             if (mc.player.getMainHandStack().getDamage() > 52) {
                 if (rodSave.getValue() && !changeRod.getValue()) {
-                    Command.sendMessage("Saving rod...");
-                    toggle();
+                    disable(MainSettings.isRu() ? "Удочка почти сломалась!" : "Saving rod...");
                 } else if (changeRod.getValue() && getRodSlot() != -1) {
                     Command.sendMessage("Swapped to a new rod");
                     mc.player.getInventory().selectedSlot = getRodSlot();
                 } else {
-                    Command.sendMessage("Saving rod...");
-                    toggle();
+                    disable(MainSettings.isRu() ? "Удочка почти сломалась!" : "Saving rod...");
                 }
             }
         }

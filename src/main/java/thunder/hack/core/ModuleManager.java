@@ -315,8 +315,8 @@ public class ModuleManager {
         modules.forEach(Module::onLoad);
 
         if(Thunderhack.configManager.firstLaunch){
-            ModuleManager.notifications.setEnabled(true);
-            Thunderhack.moduleManager.get(RPC.class).setEnabled(true);
+            ModuleManager.notifications.enable();
+            Thunderhack.moduleManager.get(RPC.class).enable();
         }
     }
 

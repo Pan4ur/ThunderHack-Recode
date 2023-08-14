@@ -16,7 +16,7 @@ public class Flight extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Vanilla);
     public Setting<Float> speed = new Setting("Speed", 0.1f, 0.0f, 10.0f, v -> mode.getValue() == Mode.Vanilla);
     public Setting<Float> vspeedValue = new Setting<>("Vertical", 0.78F, 0.0F, 5F, v -> mode.getValue() == Mode.MatrixJump);
-    public Setting<Boolean> aboba = new Setting<>("AutoToggle", false, v -> mode.getValue() == Mode.MatrixJump);
+    public Setting<Boolean> autoToggle = new Setting<>("AutoToggle", false, v -> mode.getValue() == Mode.MatrixJump);
     private double lastMotionX = 0.0;
     private double lastMotionY = 0.0;
     private double lastMotionZ = 0.0;
@@ -86,9 +86,8 @@ public class Flight extends Module {
                 if (pendingFlagApplyPacket) {
                     mc.player.setVelocity(lastMotionX,lastMotionY,lastMotionZ);
                     pendingFlagApplyPacket = false;
-                    if (aboba.getValue()) {
-                        this.toggle();
-                    }
+                    if (autoToggle.getValue())
+                        disable();
                 }
             }
         }

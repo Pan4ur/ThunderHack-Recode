@@ -68,8 +68,7 @@ public class Speed extends Module {
             if (mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.29,0,-0.29).offset(0.0, -3, 0.0f)).iterator().hasNext() && elytraDelay.passedMs(150) && startDelay.passedMs(500)) {
                 int elytra = InventoryUtility.getElytra();
                 if (elytra == -1) {
-                    Command.sendMessage(MainSettings.isRu() ? "[Speed] Для этого режима нужна элитра!" : "[Speed] You need elytra for this mode!");
-                    toggle();
+                    disable(MainSettings.isRu() ? "Для этого режима нужна элитра!" : "You need elytra for this mode!");
                 } else {
                     Strafe.disabler(elytra);
                 }

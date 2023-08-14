@@ -132,7 +132,7 @@ public class Blink extends Module {
     @Override
     public void onEnable() {
         if (mc.player == null || mc.world == null || mc.isIntegratedServerRunning()) {
-            this.toggle();
+            disable();
             return;
         }
         lastPos = mc.player.getPos();

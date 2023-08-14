@@ -89,7 +89,7 @@ public class AutoWeb extends Module {
                 }
             } else {
                 if (toggelable.getValue()) {
-                    toggle();
+                    disable();
                 }
                 break;
             }

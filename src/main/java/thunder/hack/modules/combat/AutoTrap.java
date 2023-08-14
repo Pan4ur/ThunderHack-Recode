@@ -84,7 +84,7 @@ public class AutoTrap extends Module {
                 }
             } else {
                 if (toggelable.getValue()) {
-                    toggle();
+                    disable();
                     return;
                 }
                 break;

@@ -114,9 +114,8 @@ public class CevBreaker extends Module {
         canPlaceBlock = true;
 
         if (breakMode.getValue() == BreakMode.Packet && Thunderhack.moduleManager.get(SpeedMine.class).isDisabled()) {
-            Thunderhack.notificationManager.publicity(getName(), MainSettings.language.getValue() == MainSettings.Language.RU ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine", 5, Notification.Type.ERROR);
-            disable();
-            return;
+            Thunderhack.notificationManager.publicity(getName(), MainSettings.isRu() ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine", 5, Notification.Type.ERROR);
+            disable("MainSettings.isRu() ? \"Для использования пакетного копания необходимо включить и настроить модуль SpeedMine\" : \"For using packet mine is necessary to enable and config SpeedMine\"");
         }
     }
 
@@ -394,9 +393,8 @@ public class CevBreaker extends Module {
             }
 
             if (target == null) {
-                Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.language.getValue() == MainSettings.Language.RU ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.", 5, Notification.Type.ERROR);
-
-                disable();
+                Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.", 5, Notification.Type.ERROR);
+                disable(MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.");
             }
         } else target = (PlayerEntity) AutoCrystal.CAtarget;
     }
@@ -485,8 +483,8 @@ public class CevBreaker extends Module {
         if (slot != mc.player.getInventory().selectedSlot && !autoSwap.getValue()) return false;
 
         if (slot == -1) {
-            Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.language.getValue() == MainSettings.Language.RU ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar", 5, Notification.Type.ERROR);
-            disable();
+            Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar", 5, Notification.Type.ERROR);
+            disable(MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar");
             return false;
         }
 

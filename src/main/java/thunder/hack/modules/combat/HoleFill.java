@@ -97,7 +97,8 @@ public class HoleFill extends Module {
 
     @EventHandler
     public void onSync(EventSync event) {
-        if (jumpDisable.getValue() && mc.player.prevY < mc.player.getY()) toggle();
+        if (jumpDisable.getValue() && mc.player.prevY < mc.player.getY())
+            disable();
         if (tickCounter < actionInterval.getValue()) tickCounter++;
         if (tickCounter < actionInterval.getValue()) return;
         int slot = getBlockSlot();
@@ -143,7 +144,7 @@ public class HoleFill extends Module {
                 }
             } else {
                 if (autoDisable.getValue()) {
-                    toggle();
+                    disable();
                 }
                 break;
             }

@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.utility.player.PlaceUtility;
 
 import java.util.ArrayList;
@@ -88,7 +89,7 @@ public class HoleSnap extends Module {
         BlockPos fbp = null;
         for(BlockPos bp : bloks){
             if(BlockPos.ofFloored(mc.player.getPos()).equals(bp)) {
-                disable();
+                disable(MainSettings.isRu() ? "Ты в холке! Отключаю.." : "You're in the hole! Disabling..");
                 return null;
             }
             if(mc.player.squaredDistanceTo(bp.toCenterPos()) < nearestDistance){

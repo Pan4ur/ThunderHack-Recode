@@ -67,11 +67,7 @@ public class Tracker extends Module {
 
             String s = pac.content().getString();
             if (!s.contains("<") && (s.contains("has accepted your duel request") || s.contains("Accepted the duel request from"))) {
-                if(MainSettings.language.getValue() == MainSettings.Language.RU){
-                    Command.sendMessage("[Tracker] " + Formatting.LIGHT_PURPLE + "Дуель принята! Обновляю цель...");
-                } else {
-                    Command.sendMessage("[Tracker] " + Formatting.LIGHT_PURPLE + "Duel accepted! Resetting target...");
-                }
+                sendMessage(MainSettings.isRu() ? "Дуель принята! Обновляю цель..." : "Duel accepted! Resetting target...");
                 trackedPlayer = null;
                 awaitingExp.set(0);
                 crystals.set(0);
@@ -110,16 +106,11 @@ public class Tracker extends Module {
             if (player == null || player.equals(mc.player) || FreeCam.dummy == player) continue;
 
             if (found && only1v1.getValue()) {
-                if(MainSettings.language.getValue() == MainSettings.Language.RU) {
-                    Command.sendMessage("[Tracker] Ты не в дуели! Отключаю..");
-                } else {
-                    Command.sendMessage("[Tracker] Disabled, you are not in a 1v1!");
-                }
-                disable();
+                disable(MainSettings.isRu() ? "Ты не в дуели! Отключаю.." : "Disabled, you are not in a 1v1!");
                 return;
             }
             if (trackedPlayer == null) {
-                if(MainSettings.language.getValue() == MainSettings.Language.RU) {
+                if(MainSettings.isRu()) {
                     Command.sendMessage("[Tracker] " + Formatting.LIGHT_PURPLE + "Следим за " + Formatting.DARK_PURPLE + player.getName().getString() + Formatting.LIGHT_PURPLE + "!");
                 } else {
                     Command.sendMessage("[Tracker] " + Formatting.LIGHT_PURPLE + "Now tracking " + Formatting.DARK_PURPLE + player.getName().getString() + Formatting.LIGHT_PURPLE + "!");

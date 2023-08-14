@@ -674,7 +674,7 @@ public class PistonAura extends Module {
                     targetPos = structure.targetPos;
                     target = structure.getTarget();
                 } else {
-                    disable(isRu() ? "Нет цели или цель не в холке!" : "No target or target is not in hole!");
+                    disable(isRu() ? "Нет цели или места!" : "No target or free space!");
                 }
             } else {
                 isFire = true;
@@ -699,7 +699,7 @@ public class PistonAura extends Module {
                 targetPos = structure.targetPos;
                 target = structure.getTarget();
             } else {
-                disable(isRu() ? "Нет цели или цель не в холке!" : "No target or target is not in hole!");
+                disable(isRu() ? "Нет цели или места!" : "No target or free space!");
             }
         }
     }

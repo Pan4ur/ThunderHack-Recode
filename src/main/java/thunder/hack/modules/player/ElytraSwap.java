@@ -5,6 +5,7 @@ import net.minecraft.item.Items;
 import net.minecraft.screen.slot.SlotActionType;
 import thunder.hack.cmd.Command;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.utility.player.InventoryUtility;
 
 public class ElytraSwap extends Module {
@@ -61,7 +62,8 @@ public class ElytraSwap extends Module {
                 clickSlot(slot);
                 swap = 1;
             } else {
-                Command.sendMessage("У тебя нет честплейта!");
+                disable(MainSettings.isRu() ? "У тебя нет нагрудника!" : "You don't have chestplate!");
+                return;
             }
         } else if (InventoryUtility.getItemSlot(Items.ELYTRA) != -1) {
             int slot = InventoryUtility.getItemSlot(Items.ELYTRA);
@@ -70,8 +72,9 @@ public class ElytraSwap extends Module {
             clickSlot(slot);
             swap = 2;
         } else {
-            Command.sendMessage("У тебя нет элитры!");
+            disable(MainSettings.isRu() ? "У тебя нет элитры!" : "You don't have elytra!");
+            return;
         }
-        disable();
+        disable(MainSettings.isRu() ? "Свапнул! Отключаю.." : "Swapped! Disabling..");
     }
 }
