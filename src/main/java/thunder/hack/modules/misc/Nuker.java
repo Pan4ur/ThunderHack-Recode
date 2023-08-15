@@ -33,8 +33,8 @@ public class Nuker extends Module {
     private Block nukerTargetBlock;
     private BlockPosWithRotation nukerTargetBlockpos;
 
+    private Setting<Boolean> flatten = new Setting<>("Flatten", false);
     private Setting<Float> range = new Setting<>("Range", 4.2f, 0f, 5f);
-
     private final Setting<Mode> colorMode = new Setting<>("ColorMode", Mode.Sync);
     public final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x2250b4b4), v -> colorMode.getValue() == Mode.Custom);
 
@@ -91,8 +91,11 @@ public class Nuker extends Module {
     }
 
     public BlockPosWithRotation getNukerBlockPos() {
+
+        int startY = flatten.getValue() ? (int) mc.player.getY() : (int) (mc.player.getY() - (range.getValue() + 1));
+
         for (int x = (int) (mc.player.getX() - (range.getValue() + 1)); x < mc.player.getX() + (range.getValue() + 1); x++)
-            for (int y = (int) (mc.player.getY() - (range.getValue() + 1)); y < mc.player.getY() + (range.getValue() + 1); y++)
+            for (int y = startY; y < mc.player.getY() + (range.getValue() + 1); y++)
                 for (int z = (int) (mc.player.getZ() - (range.getValue() + 1)); z < mc.player.getZ() + (range.getValue() + 1); z++) {
                     BlockPos bp = BlockPos.ofFloored(x, y, z);
                     if (mc.player.squaredDistanceTo(bp.toCenterPos()) > range.getPow2Value()) continue;

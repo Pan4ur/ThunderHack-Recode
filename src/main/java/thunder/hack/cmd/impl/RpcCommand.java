@@ -15,14 +15,14 @@ public class RpcCommand extends Command {
 
     @Override
     public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
-        builder.then(arg("bigImg", StringArgumentType.word()).executes(context -> {
+        builder.then(arg("bigImg", StringArgumentType.greedyString()).executes(context -> {
             String bigImg = context.getArgument("bigImg", String.class);
 
             RPC.WriteFile(bigImg, "none");
             sendMessage("Большая картинка RPC изменена на " + bigImg);
 
             return SINGLE_SUCCESS;
-        }).then(arg("littleImg", StringArgumentType.word()).executes(context -> {
+        }).then(arg("littleImg", StringArgumentType.greedyString()).executes(context -> {
             String bigImg = context.getArgument("bigImg", String.class);
             String littleImg = context.getArgument("littleImg", String.class);
 
