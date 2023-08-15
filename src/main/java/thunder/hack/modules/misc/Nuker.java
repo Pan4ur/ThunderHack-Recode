@@ -53,7 +53,7 @@ public class Nuker extends Module {
         if (mc.world.isAir(e.getBlockPos())) return;
         if (blocks.getValue().equals(Blocks.Select) && nukerTargetBlock != mc.world.getBlockState(e.getBlockPos()).getBlock()) {
             nukerTargetBlock = mc.world.getBlockState(e.getBlockPos()).getBlock();
-            sendMessage(MainSettings.isRu() ? "Выбран блок: " + Formatting.AQUA + nukerTargetBlock.getName().getString() : "Selected block: " + Formatting.AQUA + nukerTargetBlock.getName().getString());
+            sendMessage((MainSettings.isRu()? "Выбран блок: ": "Selected block: ") + Formatting.AQUA + nukerTargetBlock.getName().getString());
         }
     }
 
@@ -102,8 +102,8 @@ public class Nuker extends Module {
 
         int startY = flatten.getValue() ? (int) mc.player.getY() : (int) (mc.player.getY() - (range.getValue() + 1));
 
-        for (int x = (int) (mc.player.getX() - (range.getValue() + 1)); x < mc.player.getX() + (range.getValue() + 1); x++)
-            for (int y = startY; y < mc.player.getY() + (range.getValue() + 1); y++)
+        for (int x = (int) (mc.player.getX() - (range.getValue() + 1)); x < mc.player.getX() + (range.getValue() + 1); x++) {
+            for (int y = startY; y < mc.player.getY() + (range.getValue() + 1); y++) {
                 for (int z = (int) (mc.player.getZ() - (range.getValue() + 1)); z < mc.player.getZ() + (range.getValue() + 1); z++) {
                     BlockPos bp = BlockPos.ofFloored(x, y, z);
                     if (mc.player.squaredDistanceTo(bp.toCenterPos()) > range.getPow2Value()) continue;
@@ -117,6 +117,8 @@ public class Nuker extends Module {
                         }
                     }
                 }
+            }
+        }
         return null;
     }
 
