@@ -15,9 +15,11 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.render.HoleESP;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.Timer;
@@ -40,15 +42,22 @@ public class Blocker extends Module {
     private final Setting<Integer> actionInterval = new Setting<>("Delay", 0, 0, 5);
     private final Setting<Boolean> crystalBreaker = new Setting<>("Destroy Crystal", false);
 
+    public final Setting<Parent> logic = new Setting<>("Logic", new Parent(false,0));
+    private final Setting<Boolean> antiCev = new Setting<>("Anti Cev", true).withParent(logic);
+    private final Setting<Boolean> antiCiv = new Setting<>("Anti Civ", true).withParent(logic);
+    private final Setting<Boolean> diagonal = new Setting<>("Diagonal", true).withParent(logic);
+    private final Setting<Boolean> expand = new Setting<>("Expand", true).withParent(logic);
+
+
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
     private final Setting<Boolean> render = new Setting<>("Render", true);
     private final Setting<Boolean> strictDirection = new Setting<>("Strict Direction", false);
+    private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
+
 
     private final List<BlockPos> placePositions = new CopyOnWriteArrayList<>();
     private final Map<BlockPos, Long> renderBlocks = new ConcurrentHashMap<>();
     private int tickCounter = 0;
-    private Timer notifTimer = new Timer();
-
     public static Timer inactivityTimer = new Timer();
 
     public void onRender3D(MatrixStack stack) {
@@ -99,7 +108,7 @@ public class Blocker extends Module {
                         }
                     }
 
-                if (PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, obbySlot == -1 ? eChestSlot : obbySlot, false)) {
+                if (PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, obbySlot == -1 ? eChestSlot : obbySlot, false, placeMode.getValue())) {
                     blocksPlaced++;
                     renderBlocks.put(pos, System.currentTimeMillis());
                     PlaceUtility.ghostBlocks.put(pos, System.currentTimeMillis());
@@ -118,7 +127,6 @@ public class Blocker extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
-        if (fullNullCheck()) return;
         if (e.getPacket() instanceof BlockBreakingProgressS2CPacket && HoleESP.validIndestructible(BlockPos.ofFloored(mc.player.getPos()))) {
             BlockBreakingProgressS2CPacket packet = e.getPacket();
             BlockPos pos = packet.getPos();
@@ -128,45 +136,68 @@ public class Blocker extends Module {
 
             BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
 
-            boolean notif = false;
-
-            if (pos.equals(playerPos.up().up())) {
+            if (antiCev.getValue() && pos.equals(playerPos.up().up())) {
                 placePositions.add(playerPos.up().up().up());
-                notif = true;
             }
 
             if (pos.equals(playerPos.north())) {
                 placePositions.add(playerPos.north().add(0, 1, 0));
-                placePositions.add(playerPos.north().north());
-                placePositions.add(playerPos.north().east());
-                placePositions.add(playerPos.north().west());
-                notif = true;
+
+                if(expand.getValue())
+                    placePositions.add(playerPos.north().north());
+
+                if(diagonal.getValue()) {
+                    placePositions.add(playerPos.north().east());
+                    placePositions.add(playerPos.north().west());
+                }
             }
             if (pos.equals(playerPos.east())) {
                 placePositions.add(playerPos.east().add(0, 1, 0));
-                placePositions.add(playerPos.east().east());
-                placePositions.add(playerPos.east().north());
-                placePositions.add(playerPos.east().south());
-                notif = true;
+
+                if(expand.getValue())
+                    placePositions.add(playerPos.east().east());
+
+                if(diagonal.getValue()) {
+                    placePositions.add(playerPos.east().north());
+                    placePositions.add(playerPos.east().south());
+                }
             }
             if (pos.equals(playerPos.west())) {
                 placePositions.add(playerPos.west().add(0, 1, 0));
-                placePositions.add(playerPos.west().west());
-                placePositions.add(playerPos.west().north());
-                placePositions.add(playerPos.west().south());
-                notif = true;
+
+                if(expand.getValue())
+                    placePositions.add(playerPos.west().west());
+
+                if(diagonal.getValue()) {
+                    placePositions.add(playerPos.west().north());
+                    placePositions.add(playerPos.west().south());
+                }
             }
             if (pos.equals(playerPos.south())) {
-                placePositions.add(playerPos.south().south());
-                placePositions.add(playerPos.south().west());
-                placePositions.add(playerPos.south().east());
                 placePositions.add(playerPos.south().add(0, 1, 0));
-                notif = true;
+
+                if(expand.getValue())
+                    placePositions.add(playerPos.south().south());
+
+                if(diagonal.getValue()) {
+                    placePositions.add(playerPos.south().west());
+                    placePositions.add(playerPos.south().east());
+                }
             }
 
-            if (notif && notifTimer.passedMs(2000)) {
-                Thunderhack.notificationManager.publicity("Blocker", "Нам пытаются сломать сарраунд! Блокирую..", 3, Notification.Type.SUCCESS);
-                notifTimer.reset();
+            if(antiCiv.getValue()) {
+                if (pos.equals(playerPos.north().up())) {
+                    placePositions.add(playerPos.north().add(0, 2, 0));
+                }
+                if (pos.equals(playerPos.east().up())) {
+                    placePositions.add(playerPos.east().add(0, 2, 0));
+                }
+                if (pos.equals(playerPos.west().up())) {
+                    placePositions.add(playerPos.west().add(0, 2, 0));
+                }
+                if (pos.equals(playerPos.south().up())) {
+                    placePositions.add(playerPos.south().add(0, 2, 0));
+                }
             }
         }
     }

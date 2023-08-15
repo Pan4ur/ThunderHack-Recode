@@ -17,6 +17,7 @@ import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.player.InventoryUtility;
@@ -153,12 +154,11 @@ public class ElytraPlus extends Module {
                 }
                 Command.sendMessage("Нет фейерверков!");
                 if (!keepFlying.getValue())
-                    this.toggle();
+                    disable();
                 return;
             }
             if (getElytra() == -1 && mc.player.getInventory().getStack(38).getItem() != Items.ELYTRA) {
-                Command.sendMessage("Нет элитр!");
-                toggle();
+                disable(MainSettings.isRu() ? "Нет элитр!" : "No Elytra!");
                 return;
             }
 

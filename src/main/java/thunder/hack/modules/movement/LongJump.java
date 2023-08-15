@@ -9,6 +9,7 @@ import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
 
@@ -42,7 +43,7 @@ public class LongJump extends Module {
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             stage = 0;
             distance = 0.0;
-            disable();
+            disable(MainSettings.isRu() ? "Тебя флагнуло! Отключаю.." : "You've been flagged! Disabling..");
         }
     }
 
@@ -103,7 +104,7 @@ public class LongJump extends Module {
                 case 3 -> {
                     if (mc.player.verticalCollision || mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.2, 0.0, -0.2).offset(0.0, mc.player.getVelocity().getY(), 0.0)).iterator().hasNext()) {
                         if(jumpDisable.getValue()){
-                            disable();
+                            disable(MainSettings.isRu() ? "Прыжок выполнен! Отключаю.." : "Jump complete! Disabling..");
                         }
                         stage = 0;
                         distance = 0.0;
@@ -140,7 +141,7 @@ public class LongJump extends Module {
                         stage = 0;
                     }
                     if(jumpDisable.getValue()){
-                        disable();
+                        disable(MainSettings.isRu() ? "Прыжок выполнен! Отключаю.." : "Jump complete! Disabling..");
                     }
                 }
                 speedXZ = distance - distance / 159.0;

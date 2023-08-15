@@ -1,6 +1,7 @@
 package thunder.hack.core;
 
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.util.math.Vec2f;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
@@ -44,7 +45,7 @@ public class PlayerManager {
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void postSync(EventPostSync event) {
         if (Module.fullNullCheck()) return;
         mc.player.setYaw(this.yaw);

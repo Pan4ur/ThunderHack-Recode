@@ -56,26 +56,26 @@ public class Chams extends Module {
     }
 
 
-    public static ColorSetting getEntityColor(Entity entity) {
+    public static Color getEntityColor(Entity entity) {
         if (entity instanceof PlayerEntity) {
             if (Thunderhack.friendManager.isFriend((PlayerEntity) entity)) {
-                return friend.getValue();
+                return friend.getValue().getColorObject();
             }
 
-            return player.getValue();
+            return player.getValue().getColorObject();
         }
 
         if (entity instanceof EndCrystalEntity) {
-            return crystal.getValue();
+            return crystal.getValue().getColorObject();
         }
 
         switch (entity.getType().getSpawnGroup()) {
             case CREATURE:
             case WATER_AMBIENT:
-            case WATER_CREATURE: return creature.getValue();
-            case MONSTER: return monster.getValue();
-            case AMBIENT: return ambient.getValue();
-            default: return new ColorSetting(0xFFFFFFFF);
+            case WATER_CREATURE: return creature.getValue().getColorObject();
+            case MONSTER: return monster.getValue().getColorObject();
+            case AMBIENT: return ambient.getValue().getColorObject();
+            default: return new ColorSetting(0xFFFFFFFF).getColorObject();
         }
     }
 

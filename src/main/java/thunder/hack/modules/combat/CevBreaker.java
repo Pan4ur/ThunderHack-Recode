@@ -67,6 +67,8 @@ public class CevBreaker extends Module {
     private final Setting<BreakMode> breakMode = new Setting<>("Break Mode", BreakMode.Packet);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
 
+    private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
+
     private final Setting<Parent> render = new Setting<>("Render", new Parent(false, 1));
 
     private final Setting<Boolean> renderTrap = new Setting<>("Render Trap", false).withParent(render);
@@ -93,6 +95,7 @@ public class CevBreaker extends Module {
     private PlayerEntity target;
     private Vec3d rotations;
     private BlockPos targetSurroundBlockPos;
+    private boolean canPlaceBlock;
 
     private final ConcurrentHashMap<BlockPos, Long> renderTrapPoses = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<BlockPos, Long> renderStructurePoses = new ConcurrentHashMap<>();
@@ -108,11 +111,11 @@ public class CevBreaker extends Module {
         newCycle = true;
         placeCrystalProgress = .9;
         targetSurroundBlockPos = null;
+        canPlaceBlock = true;
 
         if (breakMode.getValue() == BreakMode.Packet && Thunderhack.moduleManager.get(SpeedMine.class).isDisabled()) {
-            Thunderhack.notificationManager.publicity(getName(), MainSettings.language.getValue() == MainSettings.Language.RU ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine", 5, Notification.Type.ERROR);
-            disable();
-            return;
+            Thunderhack.notificationManager.publicity(getName(), MainSettings.isRu() ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine", 5, Notification.Type.ERROR);
+            disable("MainSettings.isRu() ? \"Для использования пакетного копания необходимо включить и настроить модуль SpeedMine\" : \"For using packet mine is necessary to enable and config SpeedMine\"");
         }
     }
 
@@ -123,9 +126,10 @@ public class CevBreaker extends Module {
         // Find target
         if (target == null || target.isDead()
                 || target.getHealth() + target.getAbsorptionAmount() <= 0
-                || target.distanceTo(((mc.player))) > range.getValue())
+                || target.distanceTo(((mc.player))) > range.getValue()) {
             findTarget();
-
+            return;
+        }
         if (delay < actionInterval.getValue()) {
             delay++;
             return;
@@ -260,7 +264,7 @@ public class CevBreaker extends Module {
         }
     }
 
-    private void onRender(MatrixStack stack) {
+    public void onRender3D(MatrixStack stack) {
         if (renderTrap.getValue()) {
             renderTrapPoses.forEach((pos, time) -> {
                 if (System.currentTimeMillis() - time > 500) {
@@ -304,6 +308,7 @@ public class CevBreaker extends Module {
             if (packet.getPos().equals(target.getBlockPos().add(0, 2, 0)) && packet.getState().getBlock().equals(Blocks.AIR)) {
                 for (Entity entity : mc.world.getEntities()) {
                     if (entity instanceof EndCrystalEntity endCrystal && entity.getBlockPos().equals(target.getBlockPos().add(0, 3, 0))) {
+                        canPlaceBlock = false;
                         breakCrystalThread(endCrystal);
                     }
                 }
@@ -323,8 +328,14 @@ public class CevBreaker extends Module {
                     mc.interactionManager.attackEntity(mc.player, endCrystal);
                     mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                     Criticals.cancelCrit = false;
+                    try {
+                        Thread.sleep(breakCrystalDelay.getValue() / 2);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    canPlaceBlock = true;
                 },
-                breakCrystalDelay.getValue());
+                breakCrystalDelay.getValue() / 2);
     }
 
     @EventHandler
@@ -359,7 +370,8 @@ public class CevBreaker extends Module {
                 }
 
                 mc.interactionManager.attackBlock(pos, PlaceUtility.getBreakDirection(pos, strictDirection.getValue()));
-                if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
+                if (swing.getValue())
+                    mc.player.swingHand(Hand.MAIN_HAND);
             }
         }
     }
@@ -381,9 +393,8 @@ public class CevBreaker extends Module {
             }
 
             if (target == null) {
-                Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.language.getValue() == MainSettings.Language.RU ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.", 5, Notification.Type.ERROR);
-
-                disable();
+                Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.", 5, Notification.Type.ERROR);
+                disable(MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.");
             }
         } else target = (PlayerEntity) AutoCrystal.CAtarget;
     }
@@ -465,17 +476,19 @@ public class CevBreaker extends Module {
     }
 
     private boolean placeObsidian(BlockPos pos) {
+        if (!canPlaceBlock) return false;
+
         int slot = InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN);
 
         if (slot != mc.player.getInventory().selectedSlot && !autoSwap.getValue()) return false;
 
         if (slot == -1) {
-            Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.language.getValue() == MainSettings.Language.RU ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar", 5, Notification.Type.ERROR);
-            disable();
+            Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar", 5, Notification.Type.ERROR);
+            disable(MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar");
             return false;
         }
 
-        return PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, slot, false);
+        return PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, slot, false, placeMode.getValue());
     }
 
     public enum BreakMode {

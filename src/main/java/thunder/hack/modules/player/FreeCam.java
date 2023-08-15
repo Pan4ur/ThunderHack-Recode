@@ -95,11 +95,11 @@ public class FreeCam extends Module {
     @EventHandler
     public void onSync(EventSync event) {
         if(fullNullCheck()){
-            disable();
+            disable("NPE protection");
             return;
         }
         if(dummy == null){
-            disable();
+            disable("NPE protection");
             return;
         }
         HitResult result = mc.crosshairTarget;
@@ -133,7 +133,7 @@ public class FreeCam extends Module {
     @EventHandler
     public void onPostSync(EventPostSync event) {
         if(fullNullCheck()){
-            disable();
+            disable("NPE protection");
             return;
         }
         if(prevPos == null || prevRotate == null) return;
@@ -145,7 +145,7 @@ public class FreeCam extends Module {
     @EventHandler
     public void onMove(EventMove event) {
         if(fullNullCheck()){
-            disable();
+            disable("NPE protection");
             return;
         }
         mc.player.noClip = true;
@@ -154,7 +154,7 @@ public class FreeCam extends Module {
     @EventHandler
     public void onTick(PlayerUpdateEvent event) {
         if(fullNullCheck()){
-            disable();
+            disable("NPE protection");
             return;
         }
         mc.player.setOnGround(false);

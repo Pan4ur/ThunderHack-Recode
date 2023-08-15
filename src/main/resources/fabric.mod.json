@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "thunderhack",
-  "version": "3.0",
+  "version": "1.2",
   "icon": "icon.png",
   "name": "ThunderHack",
   "description": "Player Assistance Mod",
@@ -9,7 +9,13 @@
     {
       "name": "pan4ur",
       "contact": {
-        "discord": "Pan4ur#2144"
+        "discord": "pan4ur"
+      }
+    },
+    {
+      "name": "06ED",
+      "contact": {
+        "discord": "breakfisting"
       }
     }
   ],

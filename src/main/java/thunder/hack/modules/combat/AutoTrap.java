@@ -33,6 +33,7 @@ public class AutoTrap extends Module {
     private  Setting<Float> placeRange = new Setting<>("TargetRange", 3.5F, 1F, 6F);
     private  Setting<Boolean> top = new Setting<>("Top", true);
     private  Setting<Boolean> toggelable = new Setting<>("DisableWhenDone", false);
+    private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
 
     public static Timer inactivityTimer = new Timer();
 
@@ -72,7 +73,7 @@ public class AutoTrap extends Module {
         while (blocksPlaced < actionShift.getValue()) {
             BlockPos nextPos = getNextPos(nearestTarget.getBlockPos());
             if (nextPos != null) {
-                if (PlaceUtility.place( nextPos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND,InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN),false)) {
+                if (PlaceUtility.place( nextPos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND,InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN),false, placeMode.getValue())) {
                     blocksPlaced++;
                     PlaceUtility.ghostBlocks.put(nextPos, System.currentTimeMillis());
                     renderPoses.put(nextPos, System.currentTimeMillis());
@@ -83,7 +84,7 @@ public class AutoTrap extends Module {
                 }
             } else {
                 if (toggelable.getValue()) {
-                    toggle();
+                    disable();
                     return;
                 }
                 break;

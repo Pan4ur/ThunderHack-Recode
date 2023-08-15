@@ -1,14 +1,14 @@
 package thunder.hack.modules;
 
-import net.minecraft.network.packet.Packet;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-
 import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
@@ -99,14 +99,6 @@ public class Module {
         return !this.enabled.getValue();
     }
 
-    public void setEnabled(boolean enabled) {
-        if (enabled) {
-            this.enable();
-        } else {
-            this.disable();
-        }
-    }
-
     public void enable() {
         this.enabled.setValue(true);
         this.onEnable();
@@ -124,6 +116,13 @@ public class Module {
         }
     }
 
+    public void disable(String reason) {
+        Command.sendMessage(Formatting.GRAY +  "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + reason);
+        disable();
+    }
+
+
+    @Deprecated
     public void disable() {
         try {
             Thunderhack.EVENT_BUS.unsubscribe(this);
@@ -132,20 +131,24 @@ public class Module {
 
         if (fullNullCheck()) return;
 
-        this.enabled.setValue(false);
-        this.onDisable();
-        if ((!Objects.equals(this.getDisplayName(), "ClickGui")) && (!Objects.equals(this.getDisplayName(), "ThunderGui"))) {
+        enabled.setValue(false);
+        onDisable();
+        if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                Thunderhack.notificationManager.publicity(this.getDisplayName(), "Модуль выключен!", 2, Notification.Type.DISABLED);
+                Thunderhack.notificationManager.publicity(getDisplayName(), "Модуль выключен!", 2, Notification.Type.DISABLED);
             } else {
-                Thunderhack.notificationManager.publicity(this.getDisplayName(), "Was Disabled!", 2, Notification.Type.DISABLED);
+                Thunderhack.notificationManager.publicity(getDisplayName(), "Was Disabled!", 2, Notification.Type.DISABLED);
             }
             mc.world.playSound(mc.player, mc.player.getBlockPos(), ThSoundPack.DISABLE_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
         }
     }
 
     public void toggle() {
-        this.setEnabled(!this.isEnabled());
+        if (enabled.getValue()) {
+            disable();
+        } else {
+            enable();
+        }
     }
 
     public String getDisplayName() {
@@ -241,6 +244,12 @@ public class Module {
 
     public boolean isDisabled() {
         return !this.isEnabled();
+    }
+
+
+    public void sendMessage(String message) {
+        if (fullNullCheck()) return;
+        mc.player.sendMessage(Text.of(Thunderhack.commandManager.getClientMessage() + " " + Formatting.GRAY +  "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + message));
     }
 
     public Setting getSettingByName(String name) {

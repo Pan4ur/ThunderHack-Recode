@@ -30,14 +30,14 @@ public class AutoLeave extends Module {
     public void onUpdate(){
         for(PlayerEntity pl : mc.world.getPlayers()){
             if(pl != mc.player && !Thunderhack.friendManager.isFriend(pl) && playerNear.getValue()){
-                leave(MainSettings.language.getValue() == MainSettings.Language.RU ? "Ливнул т.к. рядом появился игрок" : "Leaved because there was a player");
+                leave(MainSettings.isRu() ? "Ливнул т.к. рядом появился игрок" : "Leaved because there was a player");
             }
         }
         if(totems.getValue() && InventoryUtility.getItemCount(Items.TOTEM_OF_UNDYING) <= totemsCount.getValue()){
-            leave(MainSettings.language.getValue() == MainSettings.Language.RU ? "Ливнул т.к. кончились тотемы" : "Leaved because out of totems");
+            leave(MainSettings.isRu() ? "Ливнул т.к. кончились тотемы" : "Leaved because out of totems");
         }
         if(mc.player.getHealth() < leaveHp.getValue() && low_hp.getValue()){
-            leave(MainSettings.language.getValue() == MainSettings.Language.RU ? "Ливнул т.к. мало хп" : "Leaved because ur hp is low");
+            leave(MainSettings.isRu() ? "Ливнул т.к. мало хп" : "Leaved because ur hp is low");
         }
     }
 
@@ -47,6 +47,6 @@ public class AutoLeave extends Module {
         } else {
             mc.player.networkHandler.getConnection().disconnect(Text.of("[AutoLeave] " + message));
         }
-        disable();
+        disable(message);
     }
 }

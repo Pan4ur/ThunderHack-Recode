@@ -15,7 +15,6 @@ public class Macro {
 
     public void runMacro() {
         if (mc.player == null) return;
-
         if (text.contains("/")) {
             mc.player.networkHandler.sendChatCommand(text.replace("/", ""));
         } else {

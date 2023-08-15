@@ -16,6 +16,7 @@ import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InventoryUtility;
@@ -77,7 +78,7 @@ public class AntiSurround extends Module {
             if (blockpos != null) {
                 if (mc.world.getBlockState(blockpos).getBlock().equals(Blocks.AIR)) {
                     if (autodisable.getValue()) {
-                        disable();
+                        disable(MainSettings.isRu() ? "Сарраунд сломан! Выключаю..." : "Surround has been broken! Turning off...");
                         return;
                     }
                     blockpos = null;

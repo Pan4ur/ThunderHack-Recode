@@ -23,6 +23,7 @@ import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlaceUtility;
@@ -115,7 +116,7 @@ public class Burrow extends Module {
         if (wait.getValue()) {
             BlockPos currentPos = getPlayerPos();
             if (!currentPos.equals(startPos)) {
-                disable();
+                disable(MainSettings.isRu() ? "Отключен из-за движения!" : "Disabled due to move!");
                 return;
             }
         }
@@ -129,7 +130,7 @@ public class Burrow extends Module {
         BlockPos pos = getPosition(rEntity);
         if (!mc.world.getBlockState(pos).isReplaceable()) {
             if (!wait.getValue())
-                disable();
+                disable(MainSettings.isRu() ? "Невозможно поставить блок! Отключаю.." : "Can't place the block on! Disabling..");
             return;
         }
 
@@ -150,7 +151,8 @@ public class Burrow extends Module {
                     entity.onRemoved();
                     continue;
                 }
-                if (!wait.getValue()) disable();
+                if (!wait.getValue())
+                    disable(MainSettings.isRu() ? "Невозможно поставить блок! Отключаю.." : "Can't place the block on! Disabling..");
                 return;
             }
         }
@@ -160,7 +162,7 @@ public class Burrow extends Module {
             BlockState upState = mc.world.getBlockState(upUp);
             if (upState.blocksMovement()) {
                 if (!wait.getValue())
-                    disable();
+                    disable(MainSettings.isRu() ? "Над головой блок, невозможно забурровиться! Отключаю.." : "Above the head block, impossible to burrow! Disabling..");
                 return;
             }
         }
@@ -168,8 +170,7 @@ public class Burrow extends Module {
         int slot = (InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN) == -1 || mc.world.getBlockState(pos.down()).getBlock() == Blocks.ENDER_CHEST ? InventoryUtility.findHotbarBlock(Blocks.ENDER_CHEST) : InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN));
         int prevSlot = mc.player.getInventory().selectedSlot;
         if (slot == -1) {
-            Command.sendMessage("No Block found!");
-            disable();
+            disable(MainSettings.isRu() ? "Нет блоков!" : "No Block found!");
             return;
         }
 
@@ -183,15 +184,17 @@ public class Burrow extends Module {
         PlayerEntity finalREntity = rEntity;
 
         if (mc.isInSingleplayer()) {
-            disable();
+            disable(MainSettings.isRu() ? "Дебил! Ты в одиночке.." : "Retard! You're in singleplayer..");
             return;
         }
 
         if (rotate.getValue()) {
-            if (finalREntity.getPos().equals(new Vec3d(last_x, last_y, last_z))) {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(r[0],r[1],onGround.getValue()));
-            } else {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(finalREntity.getX(), finalREntity.getY(), finalREntity.getZ(),r[0],r[1],onGround.getValue()));
+            if(r != null) {
+                if (finalREntity.getPos().equals(new Vec3d(last_x, last_y, last_z))) {
+                    mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(r[0], r[1], onGround.getValue()));
+                } else {
+                    mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(finalREntity.getX(), finalREntity.getY(), finalREntity.getZ(), r[0], r[1], onGround.getValue()));
+                }
             }
         }
 
@@ -216,7 +219,7 @@ public class Burrow extends Module {
 
         mc.player.getInventory().selectedSlot = prevSlot;
         mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
-        if (!wait.getValue() || placeDisable.getValue()) disable();
+        if (!wait.getValue() || placeDisable.getValue()) disable(MainSettings.isRu() ? "Успешно забурровился! Отключаю.." : "Successfully burrowed! Disabling..");
     }
 
     public double getY(Entity entity, OffsetMode mode) {

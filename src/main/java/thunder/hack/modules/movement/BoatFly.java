@@ -80,8 +80,8 @@ public class BoatFly extends Module {
 
     @Override
     public void onEnable() {
-        if (mc.player == null ||mc.world == null) {
-            this.toggle();
+        if (fullNullCheck()) {
+            disable();
             return;
         }
         if ((this.automount.getValue())) {
@@ -262,7 +262,7 @@ public class BoatFly extends Module {
             return;
         }
         if (eventNetworkPrePacketEvent.getPacket() instanceof DisconnectS2CPacket) {
-            this.toggle();
+            disable();
         }
         if (!mc.player.isRiding() || this.Field2267 || this.Field2266) {
             return;

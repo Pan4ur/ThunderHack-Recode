@@ -48,7 +48,7 @@ public class Velocity extends Module {
         if (event.getPacket() instanceof GameMessageS2CPacket && autoDisable.getValue()) {
             String text = ((GameMessageS2CPacket) event.getPacket()).content().getString();
             if (text.contains("Тебя проверяют на чит АКБ, ник хелпера - ")) {
-                toggle();
+                disable();
             }
         }
 

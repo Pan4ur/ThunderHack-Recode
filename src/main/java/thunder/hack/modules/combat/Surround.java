@@ -38,8 +38,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Surround extends Module {
-    private final Setting<Integer> actionShift = new Setting<>("PlacePerTick", 4, 1, 8);
-    private final Setting<Integer> tickDelay = new Setting<>("Delay", 0, 0, 20);
+    private final Setting<Integer> actionShift = new Setting<>("PlacePerTick", 4, 1, 15);
+    private final Setting<Integer> tickDelay = new Setting<>("Delay", 0, 0, 5);
     private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
     private final Setting<Boolean> crystalBreaker = new Setting<>("Destroy Crystal", false);
     private final Setting<Boolean> strict = new Setting<>("Strict", false);
@@ -73,7 +73,7 @@ public class Surround extends Module {
     public void onEnable() {
         inactivityTimer.reset();
         if (fullNullCheck()) {
-            disable();
+            disable("NPE protection");
             return;
         }
 
@@ -99,21 +99,22 @@ public class Surround extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
-        if (event.getPacket() instanceof PlayerPositionLookS2CPacket && disableOnTP.getValue()) toggle();
+        if (event.getPacket() instanceof PlayerPositionLookS2CPacket && disableOnTP.getValue())
+            disable();
     }
 
     public void handleSurround() {
         if (fullNullCheck()) {
-            toggle();
+            disable("NPE protection");
             return;
         }
 
         if (disableOnYChange.getValue() && mc.player.getY() != prevY) {
-            toggle();
+            disable();
         }
 
         if (disableWhenDone.getValue() && inactivityTimer.passedMs(650)) {
-            toggle();
+            disable();
             return;
         }
 
@@ -140,8 +141,7 @@ public class Surround extends Module {
             int slot = getSlot();
 
             if (slot == -1) {
-                disable();
-                Command.sendMessage(MainSettings.language.getValue() == MainSettings.Language.RU ? "[Surround] Нет блоков!" : "[Surround] No blocks!");
+                disable(MainSettings.isRu() ? "Нет блоков!" : "No blocks!");
                 return;
             }
 

@@ -3,6 +3,7 @@
 </p>
 
 ## Info
+- [Discord](https://discord.gg/VgsrEvJjn)
 - Minecraft version: ```fabric``` 1.20.1
 - Client version: v 1.2
 - Default ClickGui keybind - **```P```**

@@ -120,9 +120,9 @@ public class AutoEZ extends Module {
                 } else {
                     if (EZWORDS.isEmpty()) {
                         if(MainSettings.language.getValue() == MainSettings.Language.RU){
-                            Command.sendMessage("Файл с AutoEZ пустой!");
+                            sendMessage("Файл с AutoEZ пустой!");
                         } else {
-                            Command.sendMessage("AutoEZ.txt is empty!");
+                            sendMessage("AutoEZ.txt is empty!");
                         }
                         return;
                     }
@@ -163,9 +163,9 @@ public class AutoEZ extends Module {
         } else {
             if (EZWORDS.isEmpty()) {
                 if(MainSettings.language.getValue() == MainSettings.Language.RU){
-                    Command.sendMessage("Файл с AutoEZ пустой!");
+                    sendMessage("Файл с AutoEZ пустой!");
                 } else {
-                    Command.sendMessage("AutoEZ.txt is empty!");
+                    sendMessage("AutoEZ.txt is empty!");
                 }
                 return;
             }

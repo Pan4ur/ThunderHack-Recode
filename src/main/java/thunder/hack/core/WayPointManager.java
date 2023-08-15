@@ -26,8 +26,9 @@ public class WayPointManager {
                         String y = line[1];
                         String z = line[2];
                         String name = line[3];
+                        String server = line[4];
 
-                        addWayPoint(new WayPoint(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z), name));
+                        addWayPoint(new WayPoint(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z), name, server));
                     }
 
                 }
@@ -45,8 +46,8 @@ public class WayPointManager {
 
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            for (WayPoint macro : wayPoints) {
-                writer.write(macro.x + ":" + macro.y + ":" + macro.z + ":" + macro.name + "\n");
+            for (WayPoint wayPoint : wayPoints) {
+                writer.write(wayPoint.x + ":" + wayPoint.y + ":" + wayPoint.z + ":" + wayPoint.name + ":" + wayPoint.server +"\n");
             }
         } catch (Exception ignored) {
         }
@@ -69,6 +70,6 @@ public class WayPointManager {
         return null;
     }
 
-    public record WayPoint(int x, int y, int z, String name) {
+    public record WayPoint(int x, int y, int z, String name, String server) {
     }
 }

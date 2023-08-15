@@ -3,6 +3,7 @@ package thunder.hack.modules.misc;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -16,6 +17,7 @@ import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -32,9 +34,9 @@ public class Nuker extends Module {
 
     private Block nukerTargetBlock;
     private BlockPosWithRotation nukerTargetBlockpos;
-
+    private final Setting<Blocks> blocks = new Setting<>("Blocks", Blocks.Select);
+    private Setting<Boolean> flatten = new Setting<>("Flatten", false);
     private Setting<Float> range = new Setting<>("Range", 4.2f, 0f, 5f);
-
     private final Setting<Mode> colorMode = new Setting<>("ColorMode", Mode.Sync);
     public final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x2250b4b4), v -> colorMode.getValue() == Mode.Custom);
 
@@ -42,17 +44,23 @@ public class Nuker extends Module {
         Custom, Sync
     }
 
+    private enum Blocks {
+        Select, All
+    }
 
     @EventHandler
     public void onBlockInteract(EventAttackBlock e) {
         if (mc.world.isAir(e.getBlockPos())) return;
-        nukerTargetBlock = mc.world.getBlockState(e.getBlockPos()).getBlock();
+        if (blocks.getValue().equals(Blocks.Select) && nukerTargetBlock != mc.world.getBlockState(e.getBlockPos()).getBlock()) {
+            nukerTargetBlock = mc.world.getBlockState(e.getBlockPos()).getBlock();
+            sendMessage((MainSettings.isRu()? "Выбран блок: ": "Selected block: ") + Formatting.AQUA + nukerTargetBlock.getName().getString());
+        }
     }
 
     @EventHandler
     public void onSync(EventSync e) {
         if (nukerTargetBlockpos != null) {
-            if (mc.world.getBlockState(nukerTargetBlockpos.bp).getBlock() != nukerTargetBlock || mc.player.squaredDistanceTo(nukerTargetBlockpos.bp.toCenterPos()) > range.getPow2Value())
+            if ((mc.world.getBlockState(nukerTargetBlockpos.bp).getBlock() != nukerTargetBlock && blocks.getValue().equals(Blocks.Select)) || mc.player.squaredDistanceTo(nukerTargetBlockpos.bp.toCenterPos()) > range.getPow2Value() || mc.world.isAir(nukerTargetBlockpos.bp))
                 nukerTargetBlockpos = null;
         }
 
@@ -85,18 +93,21 @@ public class Nuker extends Module {
 
     @Override
     public void onThread() {
-        if (nukerTargetBlock != null && !mc.options.attackKey.isPressed() && nukerTargetBlockpos == null) {
+        if ((nukerTargetBlock != null || blocks.getValue().equals(Blocks.All)) && !mc.options.attackKey.isPressed() && nukerTargetBlockpos == null) {
             nukerTargetBlockpos = getNukerBlockPos();
         }
     }
 
     public BlockPosWithRotation getNukerBlockPos() {
-        for (int x = (int) (mc.player.getX() - (range.getValue() + 1)); x < mc.player.getX() + (range.getValue() + 1); x++)
-            for (int y = (int) (mc.player.getY() - (range.getValue() + 1)); y < mc.player.getY() + (range.getValue() + 1); y++)
+
+        int startY = flatten.getValue() ? (int) mc.player.getY() : (int) (mc.player.getY() - (range.getValue() + 1));
+
+        for (int x = (int) (mc.player.getX() - (range.getValue() + 1)); x < mc.player.getX() + (range.getValue() + 1); x++) {
+            for (int y = startY; y < mc.player.getY() + (range.getValue() + 1); y++) {
                 for (int z = (int) (mc.player.getZ() - (range.getValue() + 1)); z < mc.player.getZ() + (range.getValue() + 1); z++) {
                     BlockPos bp = BlockPos.ofFloored(x, y, z);
                     if (mc.player.squaredDistanceTo(bp.toCenterPos()) > range.getPow2Value()) continue;
-                    if (mc.world.getBlockState(bp).getBlock() == nukerTargetBlock) {
+                    if (mc.world.getBlockState(bp).getBlock() == nukerTargetBlock || blocks.getValue().equals(Blocks.All)) {
                         for (Vec3d point : PlaceUtility.multiPoint) {
                             Vec3d p = new Vec3d(bp.getX() + point.getX(), bp.getY() + point.getY(), bp.getZ() + point.getZ());
                             BlockHitResult bhr = mc.world.raycast(new RaycastContext(PlaceUtility.getEyesPos(mc.player), p, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
@@ -106,6 +117,8 @@ public class Nuker extends Module {
                         }
                     }
                 }
+            }
+        }
         return null;
     }
 

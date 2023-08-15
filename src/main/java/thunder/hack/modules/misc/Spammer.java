@@ -2,6 +2,7 @@ package thunder.hack.modules.misc;
 
 import thunder.hack.cmd.Command;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 
@@ -87,8 +88,7 @@ public class Spammer extends Module {
     public void onUpdate() {
         if (timer_delay.passedS(delay.getValue())) {
             if (SpamList.isEmpty()) {
-                Command.sendMessage("Файл spammer пустой!");
-                this.toggle();
+                disable(MainSettings.isRu() ? "Файл spammer пустой!" : "The spammer file is empty!");
                 return;
             }
             String c = SpamList.get(new Random().nextInt(SpamList.size()));

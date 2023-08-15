@@ -172,7 +172,7 @@ public class AimBot extends Module {
 
 
     private float calculateArc(PlayerEntity target, double duration, double coeff) {
-        double yArc = target.getY() + (double)(target.getEyeHeight(target.getPose()) / 2.0f) - (mc.player.getY() + (double)mc.player.getEyeHeight(mc.player.getPose()));
+        double yArc = target.getY() + (double)(target.getEyeHeight(target.getPose())) - (mc.player.getY() + (double)mc.player.getEyeHeight(mc.player.getPose()));
         double dX = target.getX() - mc.player.getX();
         double dZ = target.getZ() - mc.player.getZ();
         double dirRoot = Math.sqrt(dX * dX + dZ * dZ);

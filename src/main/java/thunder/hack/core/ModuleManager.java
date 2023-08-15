@@ -278,18 +278,11 @@ public class ModuleManager {
         return null;
     }
 
+    @Deprecated
     public <T extends Module> T get(Class<T> clazz) {
         for (Module module : modules) {
             if (!clazz.isInstance(module)) continue;
             return (T) module;
-        }
-        return null;
-    }
-
-    public Module getModuleByDisplayName(String displayName) {
-        for (Module module : modules) {
-            if (!module.getDisplayName().equalsIgnoreCase(displayName)) continue;
-            return module;
         }
         return null;
     }
@@ -323,8 +316,8 @@ public class ModuleManager {
         modules.forEach(Module::onLoad);
 
         if(Thunderhack.configManager.firstLaunch){
-            ModuleManager.notifications.setEnabled(true);
-            Thunderhack.moduleManager.get(RPC.class).setEnabled(true);
+            ModuleManager.notifications.enable();
+            Thunderhack.moduleManager.get(RPC.class).enable();
         }
     }
 

@@ -52,6 +52,7 @@ public class NoRender extends Module {
     public Setting<Boolean> crystals = new Setting<>("Crystals", false);
     public static Setting<Boolean> fireEntity = new Setting<>("FireEntity", true);
     public Setting<Boolean> antiTitle = new Setting<>("AntiTitle", false);
+    public Setting<Boolean> antiPlayerCollision = new Setting<>("AntiPlayerCollision", true);
 
 
     int potionCouter, xpCounter, arrowCounter, itemsCounter;

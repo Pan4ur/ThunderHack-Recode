@@ -35,6 +35,7 @@ public class AutoWeb extends Module {
     private  Setting<Float> placeRange = new Setting<>("TargetRange", 3.5F, 1f, 6f);
     private  Setting<Boolean> head = new Setting<>("Head", true);
     private  Setting<Boolean> toggelable = new Setting<>("DisableWhenDone", false);
+    private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
 
     public static Timer inactivityTimer = new Timer();
 
@@ -75,9 +76,9 @@ public class AutoWeb extends Module {
         int blocksPlaced = 0;
 
         while (blocksPlaced < actionShift.getValue()) {
-            BlockPos nextPos = PlaceUtility.canPlaceBlock(feetPos,true) ? feetPos : head.getValue() ? PlaceUtility.canPlaceBlock(feetPos.up(),true) ? feetPos.up() : null : null;
+            BlockPos nextPos = PlaceUtility.canPlaceBlock(feetPos,strictDirection.getValue()) ? feetPos : head.getValue() ? PlaceUtility.canPlaceBlock(feetPos.up(),true) ? feetPos.up() : null : null;
             if (nextPos != null) {
-                if (PlaceUtility.place( nextPos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, InventoryUtility.findHotbarBlock(Blocks.COBWEB),false)) {
+                if (PlaceUtility.place( nextPos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, InventoryUtility.findHotbarBlock(Blocks.COBWEB),false, placeMode.getValue())) {
                     blocksPlaced++;
                     PlaceUtility.ghostBlocks.put(nextPos, System.currentTimeMillis());
                     renderPoses.put(nextPos, System.currentTimeMillis());
@@ -88,7 +89,7 @@ public class AutoWeb extends Module {
                 }
             } else {
                 if (toggelable.getValue()) {
-                    toggle();
+                    disable();
                 }
                 break;
             }

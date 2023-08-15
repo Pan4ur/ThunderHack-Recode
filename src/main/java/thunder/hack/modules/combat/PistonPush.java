@@ -1,15 +1,20 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.PistonBlock;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
+import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.render.HoleESP;
 import thunder.hack.setting.Setting;
@@ -25,13 +30,14 @@ import java.awt.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PistonPush extends Module {
-    private final Setting<Float> range = new Setting<>("Target Range", 5.f, 0.f, 7.f);
-    private final Setting<Integer> actionShift = new Setting<>("Place Per Tick", 1, 1, 15);
+    private final Setting<Float> range = new Setting<>("Target Range", 5.f, 1.5f, 7.f);
+    private final Setting<Integer> actionShift = new Setting<>("Place Per Tick", 2, 1, 2);
     private final Setting<Integer> actionInterval = new Setting<>("Delay", 0, 0, 5);
     private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
     private final Setting<Boolean> strictDirection = new Setting<>("Strict Direction", false);
-    private final Setting<LogicType> logicType = new Setting<>("Logic Type", LogicType.All);
+    //  я тут сломал немного
+    //  private final Setting<LogicType> logicType = new Setting<>("Logic Type", LogicType.All);
     private final Setting<ChargeType> chargeType = new Setting<>("Charge Type", ChargeType.All);
     private final Setting<PistonType> pistonType = new Setting<>("Piston Type", PistonType.All);
     private final Setting<Boolean> autoSwap = new Setting<>("Auto Swap", true);
@@ -45,13 +51,13 @@ public class PistonPush extends Module {
     private PlayerEntity target;
     private BlockPos pistonPos;
     private BlockPos chargePos;
-    private LogicType currentLogic;
+    private boolean firstPlace;
     private int delay;
 
     private final ConcurrentHashMap<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
 
     public PistonPush() {
-        super("PistonPush", "Выталкивает чела из холки с помощью поршней", Category.COMBAT);
+        super("PistonPush", "Выталкивает чела-из холки помощью-поршней", Category.COMBAT);
     }
 
     @Override
@@ -59,48 +65,60 @@ public class PistonPush extends Module {
         target = null;
         pistonPos = null;
         chargePos = null;
-        currentLogic = null;
+        postAction = null;
         delay = 0;
-
-        super.onEnable();
+        firstPlace = true;
     }
 
-    @Override
-    public void onUpdate() {
-        if (fullNullCheck()) return;
+    private Runnable postAction = null;
+
+    @EventHandler
+    public void onSync(EventSync event) {
         if (!isPlayerTargetCorrect(target)) {
             findTarget();
             return;
         }
-        if (delay != actionInterval.getValue()) {
-            delay++;
-            return;
-        }
-
-        delay = 0;
-        int actions = 0;
 
         if (pistonPos == null || chargePos == null) {
             findPlacePoses();
             return;
         }
 
-        switch (currentLogic) {
-            case ChargePlace -> {
-                placeCharge();
-                actions++;
-                if (actions >= actionShift.getValue()) return;
-                placePiston();
-            }
-            case PlaceCharge -> {
-                placePiston();
-                actions++;
-                if (actions >= actionShift.getValue()) return;
-                placeCharge();
-            }
+        if (delay < actionInterval.getValue()) {
+            delay++;
+            return;
         }
 
-        super.onUpdate();
+        handlePistonPush(false);
+    }
+
+    @EventHandler
+    public void onPostSync(EventPostSync event) {
+        if (postAction != null) {
+            delay = 0;
+            postAction.run();
+            postAction = null;
+            int extraBlocks = 1;
+            while (extraBlocks < actionShift.getValue()) {
+                handlePistonPush(true);
+                if (postAction != null) {
+                    postAction.run();
+                    postAction = null;
+                } else {
+                    return;
+                }
+                extraBlocks++;
+            }
+        }
+        postAction = null;
+    }
+
+    public void handlePistonPush(boolean extra) {
+        if (firstPlace) {
+            placePiston(extra);
+        } else {
+            placeCharge(extra);
+        }
     }
 
     public void onRender3D(MatrixStack stack) {
@@ -114,33 +132,70 @@ public class PistonPush extends Module {
         });
     }
 
-    private void placeCharge() {
+    private void placeCharge(boolean extra) {
         if (getChargeSlot() == -1
                 || (!autoSwap.getValue()
                 && getChargeSlot() != mc.player.getInventory().selectedSlot)) return;
 
-        PlaceUtility.place(chargePos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, getChargeSlot(), false, placeMode.getValue());
-        if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
-        renderPoses.put(chargePos, System.currentTimeMillis());
+        if (rotate.getValue()) {
+            final float[] angle = PlaceUtility.calcAngle(chargePos, strictDirection.getValue(), true);
+            if (angle == null) {
+                return;
+            }
+            if (extra) {
+                Thunderhack.placeManager.rotate(angle[0], angle[1]);
+            } else {
+                mc.player.setYaw(angle[0]);
+                mc.player.setPitch(angle[1]);
+            }
+        }
+
+        postAction = () -> {
+            int prevSlot = mc.player.getInventory().selectedSlot;
+            PlaceUtility.forcePlace(chargePos, strictDirection.getValue(), Hand.MAIN_HAND, getChargeSlot(), true, placeMode.getValue());
+            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
+            mc.player.getInventory().selectedSlot = prevSlot;
+            firstPlace = true;
+            if (swing.getValue())
+                mc.player.swingHand(Hand.MAIN_HAND);
+            renderPoses.put(chargePos, System.currentTimeMillis());
+        };
     }
 
-    private void placePiston() {
-        if (getPistonSlot() == -1
-                || (!autoSwap.getValue()
-                && getPistonSlot() != mc.player.getInventory().selectedSlot)) return;
-        doPistonRotate();
-        PlaceUtility.forcePlace(pistonPos, strictDirection.getValue(), Hand.MAIN_HAND, getPistonSlot(), true, placeMode.getValue());
-        if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
-        renderPoses.put(pistonPos, System.currentTimeMillis());
-    }
+    private void placePiston(boolean extra) {
+        if (getPistonSlot() == -1 || (!autoSwap.getValue() && getPistonSlot() != mc.player.getInventory().selectedSlot))
+            return;
 
-    private void doPistonRotate() {
-        Vec3d rotateVec = new Vec3d(0, 0, 0);
-        // FIXME piston rotations
-
-        // Do rotation
-        final float[] angle = PlaceUtility.calculateAngle(rotateVec);
-        sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
+        if (rotate.getValue()) {
+            final float[] angle = PlaceUtility.calcAngle(pistonPos, strictDirection.getValue(), true);
+            if (angle == null) {
+                return;
+            }
+            if (extra) {
+                Thunderhack.placeManager.rotate(angle[0], angle[1]);
+            } else {
+                mc.player.setYaw(angle[0]);
+                mc.player.setPitch(angle[1]);
+            }
+        }
+        postAction = () -> {
+            // без комментариев
+            final float angle = PlaceUtility.calculateAngle(target.getEyePos(), pistonPos.toCenterPos())[0];
+            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle, 0, mc.player.isOnGround()));
+            float prevYaw = mc.player.getYaw();
+            mc.player.setYaw(angle);
+            mc.player.prevYaw = angle;
+            ((IClientPlayerEntity) mc.player).setLastYaw(angle);
+            int prevSlot = mc.player.getInventory().selectedSlot;
+            PlaceUtility.forcePlace(pistonPos, strictDirection.getValue(), Hand.MAIN_HAND, getPistonSlot(), true);
+            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
+            mc.player.getInventory().selectedSlot = prevSlot;
+            mc.player.setYaw(prevYaw);
+            firstPlace = false;
+            if (swing.getValue())
+                mc.player.swingHand(Hand.MAIN_HAND);
+            renderPoses.put(pistonPos, System.currentTimeMillis());
+        };
     }
 
     private int getPistonSlot() {
@@ -172,11 +227,13 @@ public class PistonPush extends Module {
     }
 
     private void findPlacePoses() {
+        BlockPos targetBP = BlockPos.ofFloored(target.getPos());
+
         BlockPos[] surroundPoses = {
-                target.getBlockPos().add(1, 1, 0),
-                target.getBlockPos().add(-1, 1, 0),
-                target.getBlockPos().add(0, 1, 1),
-                target.getBlockPos().add(0, 1, -1)
+                targetBP.add(1, 1, 0),
+                targetBP.add(-1, 1, 0),
+                targetBP.add(0, 1, 1),
+                targetBP.add(0, 1, -1)
         };
 
         for (BlockPos pos : surroundPoses) {
@@ -192,30 +249,21 @@ public class PistonPush extends Module {
             };
 
             for (BlockPos chPos : chargePoses) {
-                if (target.getBlockX() != chPos.getX() && target.getBlockZ() != chPos.getZ()) {
-                    if (PlaceUtility.canPlaceBlock(chPos, strictDirection.getValue())
-                            && (logicType.getValue() == LogicType.All
-                            || logicType.getValue() == LogicType.ChargePlace)) {
-                        chargePos = chPos;
-                        pistonPos = pos;
-                        currentLogic = LogicType.ChargePlace;
-                        return;
-                    } else if (mc.world.getBlockState(chPos).getBlock().equals(Blocks.AIR)
-                            && (logicType.getValue() == LogicType.All
-                            || logicType.getValue() == LogicType.PlaceCharge)) {
-                        if (chargeType.getValue() == ChargeType.Torch) {
-                            if (PlaceUtility.canPlaceBlock(pos, strictDirection.getValue())) {
-                                chargePos = chPos;
-                                pistonPos = pos;
-                                currentLogic = LogicType.PlaceCharge;
-                                return;
-                            }
-                        } else {
+                if (chPos == targetBP) continue;
+                if (mc.world.getBlockState(chPos).isReplaceable()) {
+                    if (chargeType.getValue() == ChargeType.Torch) {
+
+                        if(chPos == pos.up()) continue;
+
+                        if (PlaceUtility.canPlaceBlock(pos, strictDirection.getValue())) {
                             chargePos = chPos;
                             pistonPos = pos;
-                            currentLogic = LogicType.PlaceCharge;
                             return;
                         }
+                    } else {
+                        chargePos = chPos;
+                        pistonPos = pos;
+                        return;
                     }
                 }
             }

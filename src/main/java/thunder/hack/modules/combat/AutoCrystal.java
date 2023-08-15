@@ -1,11 +1,27 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.c2s.play.*;
-import net.minecraft.network.packet.s2c.play.*;
+import net.minecraft.item.EnchantedGoldenAppleItem;
+import net.minecraft.item.EndCrystalItem;
+import net.minecraft.item.Items;
+import net.minecraft.item.SwordItem;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.*;
+import net.minecraft.world.RaycastContext;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.PlaceManager;
 import thunder.hack.events.impl.*;
@@ -17,30 +33,20 @@ import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.player.InventoryUtility;
-import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.*;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.*;
-import net.minecraft.world.RaycastContext;
 
 import java.awt.*;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -102,7 +108,7 @@ public class AutoCrystal extends Module {
 
     private enum AutoSwapMode {None, Normal, Silent}
 
-    private enum RotateMode {OFF, Normal, Grim}
+    private enum RotateMode {OFF, Normal, Client}
 
 
     public static ConcurrentHashMap<Integer, Long> silentMap = new ConcurrentHashMap<>();
@@ -130,7 +136,7 @@ public class AutoCrystal extends Module {
     public static Entity CAtarget;
 
     private float renderDmg;
-    private float grimFixYaw, prevClientYaw;
+    private float grimFixYaw, grimFixPitch, prevClientYaw;
 
 
     @Override
@@ -197,42 +203,18 @@ public class AutoCrystal extends Module {
             double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
             yp[0] = (float) (yp[0] - (yp[0] - ((IClientPlayerEntity) ((mc.player))).getLastYaw()) % gcdFix);
             yp[1] = (float) (yp[1] - (yp[1] - ((IClientPlayerEntity) ((mc.player))).getLastYaw()) % gcdFix);
-            grimFixYaw = yp[0];
 
 
-            if(rotate.getValue() == RotateMode.Normal) {
+            if (rotate.getValue() == RotateMode.Normal) {
                 PlaceManager.setTrailingRotation(yp);
             } else {
-                mc.player.setYaw(yp[0]);
-                mc.player.setPitch(yp[1]);
+                grimFixYaw = yp[0];
+                grimFixPitch = yp[1];
             }
             rotations = null;
         }
     }
 
-    @EventHandler
-    public void modifyVelocity(EventPlayerTravel e) {
-        if (rotate.getValue() == RotateMode.Grim && !placeTimer.passedMs(1000)) {
-            if (e.isPre()) {
-                prevClientYaw = mc.player.getYaw();
-                mc.player.setYaw(grimFixYaw);
-            } else {
-                mc.player.setYaw(prevClientYaw);
-            }
-        }
-    }
-
-    @EventHandler
-    public void modifyJump(EventPlayerJump e) {
-        if (rotate.getValue() == RotateMode.Grim && !placeTimer.passedMs(1000)) {
-            if (e.isPre()) {
-                prevClientYaw = mc.player.getYaw();
-                mc.player.setYaw(grimFixYaw);
-            } else {
-                mc.player.setYaw(prevClientYaw);
-            }
-        }
-    }
 
     @EventHandler
     public void onPacketSend(PacketEvent.SendPost event) {
@@ -420,8 +402,14 @@ public class AutoCrystal extends Module {
                     Render3DEngine.drawTextIn3D(String.valueOf(MathUtility.round2(renderDmg)), pos.toCenterPos(), 0, 0.1, 0, Render2DEngine.injectAlpha(textColor.getValue().getColorObject(), alpha));
                 }
             });
+
         if (timingMode.getValue() == TimingMode.Vanilla && check()) {
             if (!generateBreak()) generatePlace(false);
+        }
+
+        if (rotate.getValue() == RotateMode.Client && !placeTimer.passedMs(1000)) {
+            mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.prevYaw,grimFixYaw,mc.getTickDelta()));
+            mc.player.setPitch((float) Render2DEngine.interpolate(mc.player.prevPitch,grimFixPitch,mc.getTickDelta()));
         }
     }
 
@@ -663,7 +651,8 @@ public class AutoCrystal extends Module {
 
         if (oldPlace.getValue() && !(mc.world.getBlockState(blockPos.up().up()).getBlock() == Blocks.AIR)) return false;
 
-        if (!PlaceUtility.canSee(new Vec3d(blockPos.getX() + 0.5, blockPos.getY() + 1.7, blockPos.getZ() + 0.5), new Vec3d(blockPos.getX() + 0.5, blockPos.getY() + 1.0, blockPos.getZ() + 0.5))) {
+        if (!PlaceUtility.canSee(new Vec3d(blockPos.getX() + 0.5, blockPos.getY() + 1.7, blockPos.getZ() + 0.5),
+                new Vec3d(blockPos.getX() + 0.5, blockPos.getY() + 1.0, blockPos.getZ() + 0.5))) {
             if (PlaceUtility.getEyesPos(((mc.player))).distanceTo(new Vec3d(blockPos.getX() + 0.5, blockPos.getY() + 1.0, blockPos.getZ() + 0.5)) > breakWallsRange.getValue()) {
                 return false;
             }

@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
@@ -26,22 +27,22 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.Core;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
+import thunder.hack.modules.misc.FakePlayer;
 import thunder.hack.modules.movement.Speed;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
 import thunder.hack.utility.math.MathUtility;
-import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
-
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.List;
@@ -88,7 +89,8 @@ public class Aura extends Module {
     private float rotationYaw, rotationPitch, prevClientYaw;
     private float pitchAcceleration = 1f;
 
-    private Vec3d rotationPoint, rotationMotion;
+    private Vec3d rotationPoint = Vec3d.ZERO;
+    private Vec3d rotationMotion = Vec3d.ZERO;
 
     private int hitTicks;
     public static boolean lookingAtHitbox;
@@ -206,9 +208,9 @@ public class Aura extends Module {
         }
     }
 
-    @EventHandler
-    public void onPostSync(EventPostSync e){
-        //  lookingAtHitbox = Thunderhack.playerManager.checkRtx(mc.player.getYaw(), rotationPitch, attackRange.getValue(), ignoreWalls.getValue());
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPostSync(EventPostSync e) {
+        lookingAtHitbox = Thunderhack.playerManager.checkRtx(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());
     }
 
     @Override
@@ -293,17 +295,18 @@ public class Aura extends Module {
                     delta_yaw = delta_yaw - 180;
                 }
 
-                float deltaYaw = MathHelper.clamp(MathHelper.abs(delta_yaw), MathUtility.random(-75.0F, -85.0F), MathUtility.random(75.0F, 85.0F));
+                float deltaYaw = MathHelper.clamp(MathHelper.abs(delta_yaw), MathUtility.random(-65f, -75f), MathUtility.random(65f, 75f));
 
                 float newYaw = rotationYaw + (delta_yaw > 0 ? deltaYaw : -deltaYaw);
                 float pitch_speed = pitchAcceleration + MathUtility.random(-1f, 1f);
 
-                float newPitch = MathHelper.clamp(rotationPitch + (autoCrit() ? delta_pitch : MathHelper.clamp(delta_pitch, -pitch_speed, pitch_speed)), -90.0F, 90.0F);
+                float newPitch = MathHelper.clamp(rotationPitch + MathHelper.clamp(delta_pitch, -pitch_speed, pitch_speed), -90.0F, 90.0F);
 
                 double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
 
                 rotationYaw = (float) (newYaw - (newYaw - rotationYaw) % gcdFix);
                 rotationPitch = (float) (newPitch - (newPitch - rotationPitch) % gcdFix);
+
                 break;
             }
         }
@@ -339,43 +342,49 @@ public class Aura extends Module {
 
     public Vec3d getLegitLook(Entity target) {
 
+        float minMotionXZ = 0.003f;
+        float maxMotionXZ = 0.03f;
+
+        float minMotionY= 0.001f;
+        float maxMotionY = 0.03f;
+
+
         // Задаем начальную скорость точки
         if (rotationMotion.equals(Vec3d.ZERO))
             rotationMotion = new Vec3d(MathUtility.random(-0.05f, 0.05f), MathUtility.random(-0.05f, 0.05f), MathUtility.random(-0.05f, 0.05f));
 
-        rotationPoint.add(rotationMotion);
 
+        rotationPoint = rotationPoint.add(rotationMotion);
 
         // Сталкиваемся с хитбоксом по X
-        if (rotationPoint.x >= (target.getBoundingBox().getXLength() - 0.05) / 2f) {
-            rotationPoint = new Vec3d(MathUtility.random(-0.003f, -0.03f), rotationPoint.getY(), rotationPoint.getZ());
-        }
+        if (rotationPoint.x >= (target.getBoundingBox().getXLength() - 0.05) / 2f)
+            rotationMotion = new Vec3d(-MathUtility.random(minMotionXZ, maxMotionXZ), rotationMotion.getY(), rotationMotion.getZ());
+
 
         // Сталкиваемся с хитбоксом по Y
-        if (rotationPoint.y >= target.getBoundingBox().getYLength()) {
-            rotationPoint = new Vec3d(rotationPoint.getX(), MathUtility.random(-0.001f, -0.03f), rotationPoint.getZ());
-        }
+        if (rotationPoint.y >= target.getBoundingBox().getYLength())
+            rotationMotion = new Vec3d(rotationMotion.getX(), -MathUtility.random(minMotionY, maxMotionY), rotationMotion.getZ());
+
 
         // Сталкиваемся с хитбоксом по Z
-        if (rotationPoint.z >= (target.getBoundingBox().getZLength() - 0.05) / 2f) {
-            rotationPoint = new Vec3d(rotationPoint.getX(), rotationPoint.getY(), MathUtility.random(-0.003f, -0.03f));
-        }
+        if (rotationPoint.z >= (target.getBoundingBox().getZLength() - 0.05) / 2f)
+            rotationMotion = new Vec3d(rotationMotion.getX(), rotationMotion.getY(), -MathUtility.random(minMotionXZ, maxMotionXZ));
+
 
         // Сталкиваемся с хитбоксом по -X
-        if (rotationPoint.x <= -(target.getBoundingBox().getXLength() - 0.05) / 2f) {
-            rotationPoint = new Vec3d(MathUtility.random(0.003f, 0.03f), rotationPoint.getY(), rotationPoint.getZ());
-        }
+        if (rotationPoint.x <= -(target.getBoundingBox().getXLength() - 0.05) / 2f)
+            rotationMotion = new Vec3d(MathUtility.random(minMotionXZ, 0.03f), rotationMotion.getY(), rotationMotion.getZ());
 
 
         // Сталкиваемся с хитбоксом по -Y
-        if (rotationPoint.y <= 0.05) {
-            rotationPoint = new Vec3d(rotationPoint.getX(), MathUtility.random(0.001f, 0.03f), rotationPoint.getZ());
-        }
+        if (rotationPoint.y <= 0.05)
+            rotationMotion = new Vec3d(rotationMotion.getX(), MathUtility.random(minMotionY, maxMotionY), rotationMotion.getZ());
+
 
         // Сталкиваемся с хитбоксом по -Z
-        if (rotationPoint.z <= -(target.getBoundingBox().getZLength() - 0.05) / 2f) {
-            rotationPoint = new Vec3d(rotationPoint.getX(), rotationPoint.getY(), MathUtility.random(0.003f, 0.03f));
-        }
+        if (rotationPoint.z <= -(target.getBoundingBox().getZLength() - 0.05) / 2f)
+            rotationMotion = new Vec3d(rotationMotion.getX(), rotationMotion.getY(), MathUtility.random(minMotionXZ, maxMotionXZ));
+
 
         // Добавляем джиттер
         rotationPoint.add(MathUtility.random(-0.03f, 0.03f), 0f, MathUtility.random(-0.03f, 0.03f));
@@ -385,7 +394,7 @@ public class Aura extends Module {
             return target.getPos().add(MathUtility.random(-0.15, 0.15), target.getBoundingBox().getYLength(), MathUtility.random(-0.15, 0.15));
 
         // Если мы перестали смотреть на цель
-        if (!lookingAtHitbox && target instanceof PlayerEntity) {
+        if (!lookingAtHitbox) {
 
             float[] rotation1 = Thunderhack.playerManager.calcAngle(target.getPos().add(0, target.getEyeHeight(target.getPose()) / 2f, 0));
 
@@ -396,9 +405,10 @@ public class Aura extends Module {
                 rotationPoint = new Vec3d(MathUtility.random(-0.1f, 0.1f), target.getEyeHeight(target.getPose()) / (MathUtility.random(1.8f, 2.5f)), MathUtility.random(-0.1f, 0.1f));
             } else {
                 // Сканим хитбокс на видимую точку
-                // В норме хитбокс 0.3 (половина хитбокса), но я сделал 0.25 чтоб не было флагов за хитбоксы
-                for (float x1 = -0.25f; x1 < 0.25f; x1 += 0.05f) {
-                    for (float z1 = -0.25f; z1 < 0.25f; z1 += 0.05f) {
+                float halfBox = (float) (target.getBoundingBox().getXLength() / 2.3f);
+
+                for (float x1 = -halfBox; x1 < halfBox; x1 += 0.05f) {
+                    for (float z1 = -halfBox; z1 < halfBox; z1 += 0.05f) {
                         for (float y1 = 0.05f; y1 < target.getEyeHeight(target.getPose()); y1 += 0.1f) {
 
                             Vec3d v1 = new Vec3d(target.getPos().getX() + x1, target.getPos().getY() + y1, target.getPos().getZ() + z1);

@@ -13,6 +13,7 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.PostPlayerUpdateEvent;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.math.MathUtility;
@@ -50,7 +51,7 @@ public class Timer extends Module {
                 violation += decreaseRate.getValue();
                 violation = MathHelper.clamp(violation, 0.0f, 100f / speed.getValue());
             } else {
-                toggle();
+                disable(MainSettings.isRu() ? "Заряд таймера кончился! Отключаю.." : "Timer's out of charge! Disabling..");
             }
         } else if (mode.getValue() == Mode.NORMAL) {
             Thunderhack.TICK_TIMER = speed.getValue();
@@ -120,14 +121,13 @@ public class Timer extends Module {
             int status = MathUtility.clamp((int) (100 - Math.min(violation, 100)), 0, 100);
 
             if (status < 90f) {
-                Command.sendMessage("Перед повторным использованием необходимо постоять на месте!");
-                disable();
+                disable(MainSettings.isRu() ? "Перед повторным использованием необходимо постоять на месте!" : "Standing still is required before reuse!");
                 return;
             }
             event.setCancelled(true);
             event.setIterations(shiftTicks.getValue().intValue());
             violation = 40f;
-            disable();
+            disable(MainSettings.isRu() ? "Тики пропущены! Отключаю.." : "Ticks shifted! Disabling..");
         }
     }
 
