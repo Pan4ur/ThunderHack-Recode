@@ -2,6 +2,8 @@ package thunder.hack;
 
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.IEventBus;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.metadata.ModMetadata;
 import thunder.hack.core.*;
 import thunder.hack.notification.NotificationManager;
 import thunder.hack.utility.ThSoundPack;
@@ -20,8 +22,10 @@ import java.net.URL;
 
 
 public class Thunderhack implements ModInitializer {
+    public static final ModMetadata MOD_META;
     public static final String MOD_ID = "thunderhack";
     public static final IEventBus EVENT_BUS = new EventBus();
+
     public static String version = "1.2b70823";
     public static boolean oldVersion = false;
     public static float TICK_TIMER = 1f;
@@ -46,6 +50,13 @@ public class Thunderhack implements ModInitializer {
     public static Core core = new Core();
     /*--------------------------------------------------------*/
 
+    static {
+        MOD_META = FabricLoader.getInstance()
+                .getModContainer(MOD_ID)
+                .orElseThrow()
+                .getMetadata();
+    }
+
     @Override
     public void onInitialize() {
         EVENT_BUS.registerLambdaFactory("thunder.hack", (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
@@ -62,7 +73,7 @@ public class Thunderhack implements ModInitializer {
         configManager.load(configManager.getCurrentConfig());
         moduleManager.onLoad();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(()->{
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             FriendManager.saveFriends();
             configManager.save(configManager.getCurrentConfig());
             wayPointManager.saveWayPoints();
@@ -85,7 +96,8 @@ public class Thunderhack implements ModInitializer {
         try {
             if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersion.txt").openStream())).readLine().equals(version))
                 oldVersion = true;
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
 }

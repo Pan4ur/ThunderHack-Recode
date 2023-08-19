@@ -13,6 +13,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.PlaceUtility;
+import thunder.hack.utility.world.HoleUtility;
 
 import java.util.ArrayList;
 
@@ -109,21 +110,21 @@ public class HoleSnap extends Module {
             for (int j = centerPos.getY() - 4; j < centerPos.getY() + 2; j++) {
                 for (int k = centerPos.getZ() - 3; k < centerPos.getZ() + 3; k++) {
                     BlockPos pos = new BlockPos(i, j, k);
-                    if (validObi(pos)) {
+                    if (HoleUtility.validIndestructible(pos)) {
                         bloks.add(new BlockPos(pos));
-                    } else if (validBedrock(pos)) {
+                    } else if (HoleUtility.validBedrock(pos)) {
                         bloks.add(new BlockPos(pos));
-                    } else if (validTwoBlockBedrockXZ(pos)) {
+                    } else if (HoleUtility.validTwoBlockBedrockXZ(pos)) {
                         bloks.add(new BlockPos(pos));
-                    } else if (validTwoBlockObiXZ(pos)) {
+                    } else if (HoleUtility.validTwoBlockIndestructibleXZ(pos)) {
                         bloks.add(new BlockPos(pos));
-                    } else if (validTwoBlockBedrockXZ1(pos)) {
+                    } else if (HoleUtility.validTwoBlockBedrockXZ1(pos)) {
                         bloks.add(new BlockPos(pos));
-                    } else if (validTwoBlockObiXZ1(pos)) {
+                    } else if (HoleUtility.validTwoBlockIndestructibleXZ1(pos)) {
                         bloks.add(new BlockPos(pos));
-                    } else if (validQuadBedrock(pos)) {
+                    } else if (HoleUtility.validQuadBedrock(pos)) {
                         bloks.add(new BlockPos(pos));
-                    } else if (validQuadObby(pos)) {
+                    } else if (HoleUtility.validQuadIndestructible(pos)) {
                         bloks.add(new BlockPos(pos));
                     }
                 }
@@ -143,132 +144,5 @@ public class HoleSnap extends Module {
             }
         }
         return fbp;
-    }
-
-    public static boolean validObi(BlockPos pos) {
-        return !validBedrock(pos)
-                && (isObby(pos.add(0, -1, 0)) || isBedrock(pos.add(0, -1, 0)))
-                && (isObby(pos.add(1, 0, 0)) || isBedrock(pos.add(1, 0, 0)))
-                && (isObby(pos.add(-1, 0, 0)) || isBedrock(pos.add(-1, 0, 0)))
-                && (isObby(pos.add(0, 0, 1)) || isBedrock(pos.add(0, 0, 1)))
-                && (isObby(pos.add(0, 0, -1)) || isBedrock(pos.add(0, 0, -1)))
-                && isAir(pos)
-                && isAir(pos.add(0, 1, 0))
-                && isAir(pos.add(0, 2, 0));
-    }
-
-    public static boolean validBedrock(BlockPos pos) {
-        return isBedrock(pos.add(0, -1, 0))
-                && isBedrock(pos.add(1, 0, 0))
-                && isBedrock(pos.add(-1, 0, 0))
-                && isBedrock(pos.add(0, 0, 1))
-                && isBedrock(pos.add(0, 0, -1))
-                && isAir(pos)
-                && isAir(pos.add(0, 1, 0))
-                && isAir(pos.add(0, 2, 0));
-    }
-
-    public static boolean validTwoBlockObiXZ(BlockPos pos) {
-        return (isObby(pos.down()) || isBedrock(pos.down()))
-                && (isObby(pos.west()) || isBedrock(pos.west()))
-                && (isObby(pos.south()) || isBedrock(pos.south()))
-                && (isObby(pos.north()) || isBedrock(pos.north()))
-                && isAir(pos)
-                && isAir(pos.up())
-                && isAir(pos.up(2))
-                && (isObby(pos.east().down()) || isBedrock(pos.east().down()))
-                && (isObby(pos.east(2)) || isBedrock(pos.east(2)))
-                && (isObby(pos.east().south()) || isBedrock(pos.east().south()))
-                && (isObby(pos.east().north()) || isBedrock(pos.east().north()))
-                && isAir(pos.east())
-                && isAir(pos.east().up())
-                && isAir(pos.east().up(2));
-    }
-
-    public static boolean validTwoBlockObiXZ1(BlockPos pos) {
-        return (isObby(pos.down()) || isBedrock(pos.down()))
-                && (isObby(pos.west()) || isBedrock(pos.west()))
-                && (isObby(pos.east()) || isBedrock(pos.east()))
-                && (isObby(pos.north()) || isBedrock(pos.north()))
-                && isAir(pos)
-                && isAir(pos.up())
-                && isAir(pos.up(2))
-                && (isObby(pos.south().down()) || isBedrock(pos.south().down()))
-                && (isObby(pos.south(2)) || isBedrock(pos.south(2)))
-                && (isObby(pos.south().east()) || isBedrock(pos.south().east()))
-                && (isObby(pos.south().west()) || isBedrock(pos.south().west()))
-                && isAir(pos.south())
-                && isAir(pos.south().up())
-                && isAir(pos.south().up(2));
-    }
-
-    public static boolean validQuadObby(BlockPos pos) {
-        return ((isObby(pos.down()) || isBedrock(pos.down())) && (isAir(pos)) && isAir(pos.up()) && isAir(pos.up(2)))
-                && ((isObby(pos.south().down()) || isBedrock(pos.south().down())) && (isAir(pos.south())) && isAir(pos.south().up()) && isAir(pos.south().up(2)))
-                && ((isObby(pos.east().down()) || isBedrock(pos.east().down())) && (isAir(pos.east())) && isAir(pos.east().up()) && isAir(pos.east().up(2)))
-                && ((isObby(pos.south().east().down()) || isBedrock(pos.south().east().down())) && (isAir(pos.south().east())) && isAir(pos.south().east().up()) && isAir(pos.south().east().up(2)))
-
-                && ((isObby(pos.north()) || isBedrock(pos.north())) && (isObby(pos.west()) || isBedrock(pos.west())))
-                && ((isObby(pos.east().north()) || isBedrock(pos.east().north())) && (isObby(pos.east().east()) || isBedrock(pos.east().east())))
-                && ((isObby(pos.south().west()) || isBedrock(pos.south().west())) && (isObby(pos.south().south()) || isBedrock(pos.south().south())))
-                && ((isObby(pos.east().south().south()) || isBedrock(pos.east().south().south())) && (isObby(pos.east().south().east()) || isBedrock(pos.east().south().east())));
-    }
-
-    public static boolean validQuadBedrock(BlockPos pos) {
-        return ((isBedrock(pos.down())) && (isAir(pos)) && isAir(pos.up()) && isAir(pos.up(2)))
-                && ((isBedrock(pos.south().down())) && (isAir(pos.south())) && isAir(pos.south().up()) && isAir(pos.south().up(2)))
-                && ((isBedrock(pos.east().down())) && (isAir(pos.east())) && isAir(pos.east().up()) && isAir(pos.east().up(2)))
-                && ((isBedrock(pos.south().east().down())) && (isAir(pos.south().east())) && isAir(pos.south().east().up()) && isAir(pos.south().east().up(2)))
-
-                && (isBedrock(pos.north()) && isBedrock(pos.west()))
-                && (isBedrock(pos.east().north()) && isBedrock(pos.east().east()))
-                && (isBedrock(pos.south().west()) && isBedrock(pos.south().south()))
-                && (isBedrock(pos.east().south().south()) && isBedrock(pos.east().south().east()));
-    }
-
-    public static boolean validTwoBlockBedrockXZ(BlockPos pos) {
-        return (isBedrock(pos.down()))
-                && (isBedrock(pos.west()))
-                && (isBedrock(pos.south()))
-                && (isBedrock(pos.north()))
-                && isAir(pos)
-                && isAir(pos.up())
-                && isAir(pos.up(2))
-                && (isBedrock(pos.east().down()))
-                && (isBedrock(pos.east(2)))
-                && (isBedrock(pos.east().south()))
-                && (isBedrock(pos.east().north()))
-                && isAir(pos.east())
-                && isAir(pos.east().up())
-                && isAir(pos.east().up(2));
-    }
-
-    public static boolean validTwoBlockBedrockXZ1(BlockPos pos) {
-        return (isBedrock(pos.down()))
-                && (isBedrock(pos.west()))
-                && (isBedrock(pos.east()))
-                && (isBedrock(pos.north()))
-                && isAir(pos)
-                && isAir(pos.up())
-                && isAir(pos.up(2))
-                && (isBedrock(pos.south().down()))
-                && (isBedrock(pos.south(2)))
-                && (isBedrock(pos.south().east()))
-                && (isBedrock(pos.south().west()))
-                && isAir(pos.south())
-                && isAir(pos.south().up())
-                && isAir(pos.south().up(2));
-    }
-
-    private static boolean isObby(BlockPos bp) {
-        return mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN;
-    }
-
-    private static boolean isBedrock(BlockPos bp) {
-        return mc.world.getBlockState(bp).getBlock() == Blocks.BEDROCK;
-    }
-
-    private static boolean isAir(BlockPos bp) {
-        return mc.world.getBlockState(bp).getBlock() == Blocks.AIR;
     }
 }

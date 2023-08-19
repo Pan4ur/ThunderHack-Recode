@@ -25,6 +25,7 @@ import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.world.HoleUtility;
 
 import java.awt.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,8 +37,7 @@ public class PistonPush extends Module {
     private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
     private final Setting<Boolean> strictDirection = new Setting<>("Strict Direction", false);
-    //  я тут сломал немного
-    //  private final Setting<LogicType> logicType = new Setting<>("Logic Type", LogicType.All);
+
     private final Setting<ChargeType> chargeType = new Setting<>("Charge Type", ChargeType.All);
     private final Setting<PistonType> pistonType = new Setting<>("Piston Type", PistonType.All);
     private final Setting<Boolean> autoSwap = new Setting<>("Auto Swap", true);
@@ -48,6 +48,7 @@ public class PistonPush extends Module {
     private final Setting<ColorSetting> lineColor = new Setting<>("Line Color", new ColorSetting(new Color(255, 0, 0, 200))).withParent(render);
     private final Setting<Integer> lineWidth = new Setting<>("Line Width", 2, 1, 5).withParent(render);
 
+    private Runnable postAction = null;
     private PlayerEntity target;
     private BlockPos pistonPos;
     private BlockPos chargePos;
@@ -69,8 +70,6 @@ public class PistonPush extends Module {
         delay = 0;
         firstPlace = true;
     }
-
-    private Runnable postAction = null;
 
     @EventHandler
     public void onSync(EventSync event) {
@@ -279,14 +278,7 @@ public class PistonPush extends Module {
                 && player.distanceTo(((mc.player))) <= range.getValue()
                 && !player.isDead()
                 && player.getHealth() + player.getAbsorptionAmount() > 0
-                && (HoleESP.validBedrock(player.getBlockPos())
-                || HoleESP.validIndestructible(player.getBlockPos())
-                || HoleESP.validTwoBlockIndestructibleXZ(player.getBlockPos())
-                || HoleESP.validTwoBlockBedrockXZ(player.getBlockPos())
-                || HoleESP.validTwoBlockIndestructibleXZ1(player.getBlockPos())
-                || HoleESP.validTwoBlockBedrockXZ1(player.getBlockPos())
-                || HoleESP.validQuadIndestructible(player.getBlockPos())
-                || HoleESP.validBedrock(player.getBlockPos()));
+                && HoleUtility.isHole(player.getBlockPos());
     }
 
     private void findTarget() {

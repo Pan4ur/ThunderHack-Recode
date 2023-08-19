@@ -72,8 +72,8 @@ public final class Core {
 
     @EventHandler
     public void onSync(EventSync event) {
-        if (fullNullCheck())
-            return;
+        if (fullNullCheck()) return;
+
         thunder.hack.modules.movement.Timer.onEntitySync(event);
     }
 

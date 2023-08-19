@@ -27,7 +27,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventEntityRemoved;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
@@ -58,7 +57,7 @@ public class PistonAura extends Module {
 
     public Setting<Integer> actionInterval = new Setting<>("ActionInterval", 1, 0, 25);
     public Setting<Integer> actionShift = new Setting<>("ActionShift", 3, 1, 4);
-    public Setting<patterns> patternsSetting = new Setting<>("Pattern", patterns.All);
+    public Setting<Patterns> patternsSetting = new Setting<>("Pattern", Patterns.All);
     protected Setting<Boolean> supportPlace = (new Setting<>("SupportPlace", false));
     public Setting<Boolean> bypass = new Setting<>("FireBypass", false);
     protected Setting<Boolean> strictDirection = (new Setting<>("StrictDirection", false));
@@ -100,7 +99,7 @@ public class PistonAura extends Module {
         postAction = null;
     }
 
-    public enum patterns {
+    public enum Patterns {
         Small,
         Cross,
         Liner,
@@ -132,6 +131,8 @@ public class PistonAura extends Module {
 
     @EventHandler
     public void onPostSync(EventPostSync event) {
+        if (fullNullCheck()) return;
+
         if (postAction != null) {
             tickCounter = 0;
             postAction.run();
@@ -153,22 +154,22 @@ public class PistonAura extends Module {
 
 
     public void handlePistonAura(boolean extra) {
-        if(!InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN).found() && (trap.getValue() || supportPlace.getValue())){
+        if (!InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN).found() && (trap.getValue() || supportPlace.getValue())) {
             disable(isRu() ? "Нет обсидиана!" : "No obsidian!");
             return;
         }
 
-        if(!InventoryUtility.findBlockInHotBar(Blocks.REDSTONE_BLOCK).found() && !InventoryUtility.findBlockInHotBar(Blocks.REDSTONE_TORCH).found()){
+        if (!InventoryUtility.findBlockInHotBar(Blocks.REDSTONE_BLOCK).found() && !InventoryUtility.findBlockInHotBar(Blocks.REDSTONE_TORCH).found()) {
             disable(isRu() ? "Нет редстоуна!" : "No redstone!");
             return;
         }
 
-        if(!InventoryUtility.findItemInHotBar(Items.END_CRYSTAL).found() && mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL){
+        if (!InventoryUtility.findItemInHotBar(Items.END_CRYSTAL).found() && mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL) {
             disable(isRu() ? "Нет кристаллов!" : "No crystals!");
             return;
         }
 
-        if(!(InventoryUtility.findItemInHotBar(Items.PISTON).found() || InventoryUtility.findItemInHotBar(Items.STICKY_PISTON).found())){
+        if (!(InventoryUtility.findItemInHotBar(Items.PISTON).found() || InventoryUtility.findItemInHotBar(Items.STICKY_PISTON).found())) {
             disable(isRu() ? "Нет поршней!" : "No pistons!");
             return;
         }
@@ -321,7 +322,7 @@ public class PistonAura extends Module {
                 postAction = () -> {
                     boolean offHand = mc.player.getOffHandStack().getItem() == Items.END_CRYSTAL;
                     int prev_slot = -1;
-                    if(!offHand) {
+                    if (!offHand) {
                         int crystal_slot = InventoryUtility.findItemInHotBar(Items.END_CRYSTAL).slot();
                         prev_slot = mc.player.getInventory().selectedSlot;
                         if (crystal_slot != -1) {
@@ -332,7 +333,7 @@ public class PistonAura extends Module {
                     mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(offHand ? Hand.OFF_HAND : Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
                     mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(offHand ? Hand.OFF_HAND : Hand.MAIN_HAND));
 
-                    if(!offHand) {
+                    if (!offHand) {
                         mc.player.getInventory().selectedSlot = prev_slot;
                         mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prev_slot));
                     }
@@ -365,14 +366,14 @@ public class PistonAura extends Module {
 
                 postAction = () -> {
                     int redstone_slot = -1;
-                    if (InventoryUtility.findHotbarBlock(Blocks.REDSTONE_BLOCK) == -1) {
-                        if (InventoryUtility.findHotbarBlock(Blocks.REDSTONE_TORCH) == -1) {
+                    if (!InventoryUtility.findBlockInHotBar(Blocks.REDSTONE_BLOCK).found()) {
+                        if (!InventoryUtility.findBlockInHotBar(Blocks.REDSTONE_TORCH).found()) {
                             disable(isRu() ? "Нет редстоуна!" : "No redstone!");
                         } else {
-                            redstone_slot = InventoryUtility.findHotbarBlock(Blocks.REDSTONE_TORCH);
+                            redstone_slot = InventoryUtility.findBlockInHotBar(Blocks.REDSTONE_TORCH).slot();
                         }
                     } else {
-                        redstone_slot = InventoryUtility.findHotbarBlock(Blocks.REDSTONE_BLOCK);
+                        redstone_slot = InventoryUtility.findBlockInHotBar(Blocks.REDSTONE_BLOCK).slot();
                     }
                     PlaceUtility.forcePlace(redStonePos, strictDirection.getValue(), Hand.MAIN_HAND, redstone_slot, false);
                     stage = Stage.Break;
@@ -386,7 +387,7 @@ public class PistonAura extends Module {
     }
 
     private BlockHitResult handlePlaceRotation(BlockPos pos) {
-        Vec3d eyesPos = PlaceUtility.getEyesPos(((mc.player)));
+        Vec3d eyesPos = PlaceUtility.getEyesPos(mc.player);
 
         if (strictDirection.getValue()) {
             Vec3d closestPoint = null;
@@ -491,9 +492,10 @@ public class PistonAura extends Module {
 
     private void findPos() {
         ArrayList<Structure> list = new ArrayList<>();
+
         for (PlayerEntity target : Objects.requireNonNull(getPlayersSorted(targetRange.getValue()))) {
             for (int i = 0; i <= 2; i++) {
-                if (patternsSetting.getValue() == patterns.Small || patternsSetting.getValue() == patterns.All) {
+                if (patternsSetting.getValue() == Patterns.Small || patternsSetting.getValue() == Patterns.All) {
                     list.add(new Structure(
                             target,
                             new BlockPos(1, i, 0),//crystal
@@ -559,7 +561,7 @@ public class PistonAura extends Module {
                             new BlockPos[]{new BlockPos(-1, i, 0), new BlockPos(-1, i, -1), new BlockPos(-1, 1 + i, 0)})//fire
                     );
                 }
-                if (patternsSetting.getValue() == patterns.Cross || patternsSetting.getValue() == patterns.All) {
+                if (patternsSetting.getValue() == Patterns.Cross || patternsSetting.getValue() == Patterns.All) {
                     list.add(new Structure(
                             target,
                             new BlockPos(1, i, 0),//crystal
@@ -617,7 +619,7 @@ public class PistonAura extends Module {
                             new BlockPos[]{new BlockPos(-1, i, 0), new BlockPos(1, i, 0), new BlockPos(1, i, -1), new BlockPos(-1, 1 + i, 0), new BlockPos(1, 1 + i, 0)})//fire
                     );
                 }
-                if (patternsSetting.getValue() == patterns.Liner || patternsSetting.getValue() == patterns.All) {
+                if (patternsSetting.getValue() == Patterns.Liner || patternsSetting.getValue() == Patterns.All) {
                     list.add(new Structure(
                             target,
                             new BlockPos(1, i, 0),//crystal
@@ -808,12 +810,12 @@ public class PistonAura extends Module {
             if (!(mc.world.getBlockState(blockPos.up().up()).getBlock() == Blocks.AIR)) return false;
 
             if (!PlaceUtility.canSee(new Vec3d(blockPos.getX() + 0.5, blockPos.getY() + 1.7, blockPos.getZ() + 0.5), new Vec3d(blockPos.getX() + 0.5, blockPos.getY() + 1.0, blockPos.getZ() + 0.5))) {
-                if (PlaceUtility.getEyesPos(((mc.player))).distanceTo(new Vec3d(blockPos.getX() + 0.5, blockPos.getY() + 1.0, blockPos.getZ() + 0.5)) > wallRange.getValue()) {
+                if (PlaceUtility.getEyesPos(mc.player).distanceTo(new Vec3d(blockPos.getX() + 0.5, blockPos.getY() + 1.0, blockPos.getZ() + 0.5)) > wallRange.getValue()) {
                     return false;
                 }
             }
 
-            Vec3d playerEyes = PlaceUtility.getEyesPos(((mc.player)));
+            Vec3d playerEyes = PlaceUtility.getEyesPos(mc.player);
             boolean canPlace = false;
 
             if (strictDirection.getValue()) {

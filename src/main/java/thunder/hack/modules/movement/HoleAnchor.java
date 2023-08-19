@@ -8,6 +8,7 @@ import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.render.HoleESP;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.world.HoleUtility;
 
 public class HoleAnchor extends Module {
     public HoleAnchor() {
@@ -23,15 +24,15 @@ public class HoleAnchor extends Module {
     public void onPlayerUpdate(PlayerUpdateEvent e) {
         if (mc.player.getPitch() > pitch.getValue()) {
             if (
-                    HoleESP.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(1))
-                    || HoleESP.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(2))
-                    || HoleESP.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(3))
-                    || HoleESP.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(1))
-                    || HoleESP.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(2))
-                    || HoleESP.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(3))
-                    || HoleESP.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(1))
-                    || HoleESP.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(2))
-                    || HoleESP.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(3))
+                    HoleUtility.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(1))
+                    || HoleUtility.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(2))
+                    || HoleUtility.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(3))
+                    || HoleUtility.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(1))
+                    || HoleUtility.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(2))
+                    || HoleUtility.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(3))
+                    || HoleUtility.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(1))
+                    || HoleUtility.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(2))
+                    || HoleUtility.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(3))
             ) {
                 if (!pull.getValue()) {
                     mc.player.setVelocity(0,mc.player.getVelocity().getY(),0);

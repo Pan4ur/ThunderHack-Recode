@@ -1,5 +1,6 @@
 package thunder.hack.modules.combat;
 
+import com.mojang.logging.LogUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -12,17 +13,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import thunder.hack.cmd.Command;
+import org.jetbrains.annotations.NotNull;
+import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.client.MainSettings;
+import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
@@ -30,12 +33,13 @@ import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.world.HoleUtility;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class Surround extends Module {
     private final Setting<Integer> actionShift = new Setting<>("PlacePerTick", 4, 1, 15);
@@ -60,8 +64,8 @@ public class Surround extends Module {
     private int offsetStep = 0;
     private int delayStep = 0;
 
-    public static Timer inactivityTimer = new Timer();
-    public static Timer breakTimer = new Timer();
+    public static final Timer inactivityTimer = new Timer();
+    private final Timer breakTimer = new Timer();
 
     private final ConcurrentHashMap<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
 
@@ -94,13 +98,45 @@ public class Surround extends Module {
                 Render3DEngine.drawBoxOutline(new Box(pos), lineColor.getValue().getColorObject(), lineWidth.getValue());
             }
         });
+
         handleSurround();
     }
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
+        LogUtils.getLogger().warn("DDDDDDDDDDDD");
         if (event.getPacket() instanceof PlayerPositionLookS2CPacket && disableOnTP.getValue())
-            disable();
+            disable(isRu() ? "Вы телепортировались! Выключение..." : "You are teleported! Disabling...");
+        else if (event.getPacket() instanceof BlockUpdateS2CPacket) {
+            BlockUpdateS2CPacket packet = event.getPacket();
+
+            LogUtils.getLogger().warn("CCCCCCCCCC");
+            // Small optimisation
+            if (mc.world.getBlockState(packet.getPos()).isAir()
+                    && mc.player.squaredDistanceTo(
+                    packet.getPos().getX(),
+                    packet.getPos().getY(),
+                    packet.getPos().getZ()) >= 16) {
+                LogUtils.getLogger().warn("BBBBBBBBBBB");
+                if (!HoleUtility.isHole(mc.player.getBlockPos())) {
+                    handleSurround();
+                } else if (HoleUtility.getSurroundPoses(mc.player.getBlockPos()).contains(packet.getPos())) {
+                    LogUtils.getLogger().warn("AAAAAAAAAAAAAAA");
+                    Thunderhack.notificationManager.publicity("AAAAAAAAAAAA", "E", 5, Notification.Type.INFO);
+                    BlockPos targetPos = packet.getPos();
+                    int slot = getSlot();
+
+                    if (slot == -1) return;
+                    if (PlaceUtility.place(targetPos, strict.getValue(), false, Hand.MAIN_HAND, slot, false, placeMode.getValue())) {
+                        renderPoses.put(targetPos, System.currentTimeMillis());
+                        PlaceUtility.ghostBlocks.put(targetPos, System.currentTimeMillis());
+                        inactivityTimer.reset();
+                    }
+                } else {
+                    handleSurround();
+                }
+            }
+        }
     }
 
     public void handleSurround() {
@@ -108,13 +144,12 @@ public class Surround extends Module {
             disable("NPE protection");
             return;
         }
-
         if (disableOnYChange.getValue() && mc.player.getY() != prevY) {
-            disable();
+            disable(isRu() ? "Вы изменили положение по Y! Выключение..." : "You changed Y position! Disabling...");
+            return;
         }
-
         if (disableWhenDone.getValue() && inactivityTimer.passedMs(650)) {
-            disable();
+            disable(isRu() ? "Сараунд постоен! Выключение..." : "Surround are built! Disabling...");
             return;
         }
 
@@ -126,10 +161,8 @@ public class Surround extends Module {
         }
 
         int blocksPlaced = 0;
-
         List<BlockPos> abp = getNextPos();
         int maxSteps = abp.size();
-
 
         while (blocksPlaced < actionShift.getValue()) {
             if (offsetStep >= maxSteps) {
@@ -141,7 +174,7 @@ public class Surround extends Module {
             int slot = getSlot();
 
             if (slot == -1) {
-                disable(MainSettings.isRu() ? "Нет блоков!" : "No blocks!");
+                disable(isRu() ? "Нет блоков!" : "No blocks!");
                 return;
             }
 
@@ -178,13 +211,11 @@ public class Surround extends Module {
             if (allowAnchors.getValue()) canUseBlocks.add(Blocks.RESPAWN_ANCHOR);
         }
 
-
         int slot = -1;
-
-        final ItemStack mainhandStack = mc.player.getMainHandStack();
-        if (mainhandStack != ItemStack.EMPTY && mainhandStack.getItem() instanceof BlockItem) {
-            final Block blockFromMainhandItem = ((BlockItem) mainhandStack.getItem()).getBlock();
-            if (canUseBlocks.contains(blockFromMainhandItem)) {
+        final ItemStack mainHandStack = mc.player.getMainHandStack();
+        if (mainHandStack != ItemStack.EMPTY && mainHandStack.getItem() instanceof BlockItem) {
+            final Block blockFromMainHandItem = ((BlockItem) mainHandStack.getItem()).getBlock();
+            if (canUseBlocks.contains(blockFromMainHandItem)) {
                 slot = mc.player.getInventory().selectedSlot;
             }
         }
@@ -225,7 +256,7 @@ public class Surround extends Module {
         return abp;
     }
 
-    private List<BlockPos> getBlocks(BlockPos center) {
+    private @NotNull List<BlockPos> getBlocks(BlockPos center) {
         List<BlockPos> tempPos = new ArrayList<>();
         tempPos.add(center);
         tempPos.add(center.north());

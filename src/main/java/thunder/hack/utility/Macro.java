@@ -45,7 +45,7 @@ public class Macro {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Macro) {
-            return (this.getName().equalsIgnoreCase(((Macro) obj).getName()));
+            return (name.equalsIgnoreCase(((Macro) obj).getName()));
         } else {
             return false;
         }

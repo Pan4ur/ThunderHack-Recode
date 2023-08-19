@@ -34,7 +34,6 @@ import thunder.hack.injection.accesors.IWorldRenderer;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.player.SpeedMine;
-import thunder.hack.modules.render.HoleESP;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -45,6 +44,7 @@ import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.world.HoleUtility;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -66,11 +66,9 @@ public class CevBreaker extends Module {
 
     private final Setting<BreakMode> breakMode = new Setting<>("Break Mode", BreakMode.Packet);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
-
     private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
 
-    private final Setting<Parent> render = new Setting<>("Render", new Parent(false, 1));
-
+    private final Setting<Parent> render = new Setting<>("Render", new Parent(false, 0));
     private final Setting<Boolean> renderTrap = new Setting<>("Render Trap", false).withParent(render);
     private final Setting<ColorSetting> trapFillColor = new Setting<>("Trap Fill Color", new ColorSetting(new Color(255, 0, 0, 50)), value -> renderTrap.getValue()).withParent(render);
     private final Setting<ColorSetting> trapLineColor = new Setting<>("Trap Line Color", new ColorSetting(new Color(255, 0, 0, 200)), value -> renderTrap.getValue()).withParent(render);
@@ -85,6 +83,11 @@ public class CevBreaker extends Module {
     private final Setting<ColorSetting> targetFillColor = new Setting<>("Target Fill Color", new ColorSetting(new Color(255, 111, 0, 50)), value -> renderTarget.getValue()).withParent(render);
     private final Setting<ColorSetting> targetLineColor = new Setting<>("Target Line Color", new ColorSetting(new Color(255, 111, 0, 200)), value -> renderTarget.getValue()).withParent(render);
     private final Setting<Integer> targetLineWidth = new Setting<>("Target Line Width", 2, 1, 5, value -> renderTarget.getValue()).withParent(render);
+
+    private enum BreakMode {
+        Packet,
+        Normal
+    }
 
     private BlockPos currentMineBlockPos;
     private boolean mine = false;
@@ -377,7 +380,7 @@ public class CevBreaker extends Module {
     }
 
     private void findTarget() {
-        if (!(AutoCrystal.CAtarget instanceof PlayerEntity) || (!HoleESP.validBedrock(AutoCrystal.CAtarget.getBlockPos()) && !HoleESP.validIndestructible(AutoCrystal.CAtarget.getBlockPos())) || AutoCrystal.CAtarget.distanceTo(((mc.player))) > range.getValue()) {
+        if (!(AutoCrystal.CAtarget instanceof PlayerEntity) || (!HoleUtility.validBedrock(AutoCrystal.CAtarget.getBlockPos()) && !HoleUtility.validIndestructible(AutoCrystal.CAtarget.getBlockPos())) || AutoCrystal.CAtarget.distanceTo(((mc.player))) > range.getValue()) {
 
             for (PlayerEntity player : Thunderhack.asyncManager.getAsyncPlayers()) {
                 if (Thunderhack.friendManager.isFriend(player)) continue;
@@ -385,7 +388,7 @@ public class CevBreaker extends Module {
                 if (player.distanceTo(((mc.player))) > range.getValue()) continue;
                 if (player.isDead()) continue;
                 if (player.getHealth() + player.getAbsorptionAmount() <= 0) continue;
-                if (!HoleESP.validBedrock(player.getBlockPos()) && !HoleESP.validIndestructible(player.getBlockPos()))
+                if (!HoleUtility.validBedrock(player.getBlockPos()) && !HoleUtility.validIndestructible(player.getBlockPos()))
                     continue;
 
                 target = player;
@@ -489,10 +492,5 @@ public class CevBreaker extends Module {
         }
 
         return PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, slot, false, placeMode.getValue());
-    }
-
-    public enum BreakMode {
-        Packet,
-        Normal
     }
 }

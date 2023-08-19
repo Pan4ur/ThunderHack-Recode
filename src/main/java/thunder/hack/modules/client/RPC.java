@@ -3,6 +3,8 @@ package thunder.hack.modules.client;
 import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
+import net.fabricmc.loader.api.metadata.Person;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.Thunderhack;
 import thunder.hack.setting.Setting;
 import thunder.hack.modules.Module;
@@ -11,6 +13,7 @@ import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 
 import java.io.*;
+import java.util.List;
 import java.util.Objects;
 
 public
@@ -58,7 +61,7 @@ class RPC extends Module {
             DiscordEventHandlers handlers = new DiscordEventHandlers();
             rpc.Discord_Initialize("1093053626198523935", handlers, true, "");
             presence.startTimestamp = (System.currentTimeMillis() / 1000L);
-            presence.largeImageText = "v" + Thunderhack.version + " by Pan4ur#2144";
+            presence.largeImageText = "v" + Thunderhack.version + " by " + getAuthors();
             rpc.Discord_UpdatePresence(presence);
 
             thread = new Thread(() -> {
@@ -146,6 +149,15 @@ class RPC extends Module {
             }
         } catch (Exception ignored) {
         }
+    }
+
+    private @NotNull String getAuthors() {
+        List<String> names = Thunderhack.MOD_META.getAuthors()
+                .stream()
+                .map(Person::getName)
+                .toList();
+
+        return String.join(", ", names);
     }
 
     public enum mode {

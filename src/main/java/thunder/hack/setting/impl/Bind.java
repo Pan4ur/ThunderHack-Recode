@@ -6,8 +6,9 @@ import org.lwjgl.glfw.GLFW;
 import java.lang.reflect.Field;
 
 public class Bind {
-    private int key;
-    private boolean hold, mouse;
+    private final int key;
+    private boolean hold;
+    private final boolean mouse;
 
     public Bind(int key, boolean mouse, boolean hold) {
         this.key = key;

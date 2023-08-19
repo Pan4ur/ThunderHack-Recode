@@ -10,14 +10,9 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import thunder.hack.Thunderhack;
-import thunder.hack.modules.Module;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static thunder.hack.modules.Module.fullNullCheck;
 
 public abstract class Command {
     protected static final CommandRegistryAccess REGISTRY_ACCESS = CommandManager.createRegistryAccess(BuiltinRegistries.createWrapperLookup());
@@ -33,12 +28,12 @@ public abstract class Command {
 
     @Deprecated
     public static void sendMessage(String message) {
-        if (fullNullCheck()) return;
-        MC.player.sendMessage(Text.of(Thunderhack.commandManager.getClientMessage() + " "  + message));
+        if (MC.player == null) return;
+        MC.player.sendMessage(Text.of(thunder.hack.core.CommandManager.getClientMessage() + " "  + message));
     }
 
     public static void sendMessageWithoutTH(String message) {
-        if (fullNullCheck()) return;
+        if (MC.player == null) return;
         MC.player.sendMessage(Text.of(message));
     }
 
