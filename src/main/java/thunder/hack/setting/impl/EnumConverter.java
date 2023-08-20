@@ -22,10 +22,6 @@ public class EnumConverter extends Converter<Enum, JsonElement> {
         return -1;
     }
 
-    public static int getEnumInt(Enum clazz) {
-        return clazz.getClass().getEnumConstants().length;
-    }
-
     public static Enum increaseEnum(Enum clazz) {
         int index = EnumConverter.currentEnum(clazz);
         for (int i = 0; i < clazz.getClass().getEnumConstants().length; ++i) {
@@ -48,16 +44,6 @@ public class EnumConverter extends Converter<Enum, JsonElement> {
 
     public static String[] getNames(Enum clazz) {
         return Arrays.stream(clazz.getClass().getEnumConstants()).map(Enum::name).toArray(String[]::new);
-    }
-
-    public static Enum naoborot(Enum clazz) {
-        int index = EnumConverter.currentEnum(clazz);
-        for (int i = 0; i < clazz.getClass().getEnumConstants().length; ++i) {
-            Enum e = clazz.getClass().getEnumConstants()[i];
-            if (i != index - 1) continue;
-            return e;
-        }
-        return clazz.getClass().getEnumConstants()[0];
     }
 
     public static String getProperName(Enum clazz) {

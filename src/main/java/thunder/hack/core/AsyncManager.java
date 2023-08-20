@@ -18,7 +18,6 @@ import java.util.concurrent.Executors;
 import static thunder.hack.modules.Module.mc;
 
 public class AsyncManager {
-
     private ClientService clientService = new ClientService();
     public static ExecutorService executor = Executors.newCachedThreadPool();
 

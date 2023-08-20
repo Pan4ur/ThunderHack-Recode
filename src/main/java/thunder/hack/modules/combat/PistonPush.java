@@ -2,7 +2,6 @@ package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.PistonBlock;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
@@ -11,7 +10,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
@@ -21,7 +19,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.player.InventoryUtility;
-import thunder.hack.utility.player.PlaceUtility;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
@@ -31,11 +29,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PistonPush extends Module {
     private final Setting<Float> range = new Setting<>("Target Range", 5.f, 1.5f, 7.f);
-    private final Setting<Integer> actionShift = new Setting<>("Place Per Tick", 2, 1, 2);
-    private final Setting<Integer> actionInterval = new Setting<>("Delay", 0, 0, 5);
-    private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
+    private final Setting<Integer> blocksPerTick = new Setting<>("Blocks/Tick", 2, 1, 2);
+    private final Setting<Integer> delayPerPlace = new Setting<>("Delay/Place", 0, 0, 5);
+    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.All);
+    private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
+
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
-    private final Setting<Boolean> strictDirection = new Setting<>("Strict Direction", false);
     //  я тут сломал немного
     //  private final Setting<LogicType> logicType = new Setting<>("Logic Type", LogicType.All);
     private final Setting<ChargeType> chargeType = new Setting<>("Charge Type", ChargeType.All);
@@ -65,12 +64,12 @@ public class PistonPush extends Module {
         target = null;
         pistonPos = null;
         chargePos = null;
-        postAction = null;
+        placeRunnable = null;
         delay = 0;
         firstPlace = true;
     }
 
-    private Runnable postAction = null;
+    private Runnable placeRunnable = null;
 
     @EventHandler
     public void onSync(EventSync event) {
@@ -84,7 +83,7 @@ public class PistonPush extends Module {
             return;
         }
 
-        if (delay < actionInterval.getValue()) {
+        if (delay < delayPerPlace.getValue()) {
             delay++;
             return;
         }
@@ -94,30 +93,25 @@ public class PistonPush extends Module {
 
     @EventHandler
     public void onPostSync(EventPostSync event) {
-        if (postAction != null) {
-            delay = 0;
-            postAction.run();
-            postAction = null;
-            int extraBlocks = 1;
-            while (extraBlocks < actionShift.getValue()) {
-                handlePistonPush(true);
-                if (postAction != null) {
-                    postAction.run();
-                    postAction = null;
-                } else {
-                    return;
-                }
-                extraBlocks++;
+        int blocksPlaced = 0;
+        while (blocksPlaced < blocksPerTick.getValue()) {
+            handlePistonPush(true);
+            if (placeRunnable != null) {
+                placeRunnable.run();
+                placeRunnable = null;
+            } else {
+                return;
             }
+            blocksPlaced++;
         }
-        postAction = null;
+        delay = 0;
     }
 
-    public void handlePistonPush(boolean extra) {
+    public void handlePistonPush(boolean onSync) {
         if (firstPlace) {
-            placePiston(extra);
+            placePiston(onSync);
         } else {
-            placeCharge(extra);
+            placeCharge(onSync);
         }
     }
 
@@ -132,27 +126,25 @@ public class PistonPush extends Module {
         });
     }
 
-    private void placeCharge(boolean extra) {
-        if (getChargeSlot() == -1
-                || (!autoSwap.getValue()
-                && getChargeSlot() != mc.player.getInventory().selectedSlot)) return;
+    private void placeCharge(boolean onSync) {
+        if (!getChargeSlot().found() || (!autoSwap.getValue() && !getChargeSlot().isHolding())) return;
 
         if (rotate.getValue()) {
-            final float[] angle = PlaceUtility.calcAngle(chargePos, strictDirection.getValue(), true);
+            final float[] angle = InteractionUtility.getPlaceAngle(chargePos, interact.getValue());
             if (angle == null) {
                 return;
             }
-            if (extra) {
-                Thunderhack.placeManager.rotate(angle[0], angle[1]);
+            if (onSync) {
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
             } else {
                 mc.player.setYaw(angle[0]);
                 mc.player.setPitch(angle[1]);
             }
         }
 
-        postAction = () -> {
+        placeRunnable = () -> {
             int prevSlot = mc.player.getInventory().selectedSlot;
-            PlaceUtility.forcePlace(chargePos, strictDirection.getValue(), Hand.MAIN_HAND, getChargeSlot(), true, placeMode.getValue());
+            InteractionUtility.placeBlock(chargePos, false,interact.getValue(), placeMode.getValue(), getChargeSlot(), true);
             mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
             mc.player.getInventory().selectedSlot = prevSlot;
             firstPlace = true;
@@ -163,31 +155,31 @@ public class PistonPush extends Module {
     }
 
     private void placePiston(boolean extra) {
-        if (getPistonSlot() == -1 || (!autoSwap.getValue() && getPistonSlot() != mc.player.getInventory().selectedSlot))
+        if (!getPistonSlot().found() || (!autoSwap.getValue() && !getPistonSlot().isHolding()))
             return;
 
         if (rotate.getValue()) {
-            final float[] angle = PlaceUtility.calcAngle(pistonPos, strictDirection.getValue(), true);
+            final float[] angle = InteractionUtility.getPlaceAngle(pistonPos, interact.getValue());
             if (angle == null) {
                 return;
             }
             if (extra) {
-                Thunderhack.placeManager.rotate(angle[0], angle[1]);
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
             } else {
                 mc.player.setYaw(angle[0]);
                 mc.player.setPitch(angle[1]);
             }
         }
-        postAction = () -> {
+        placeRunnable = () -> {
             // без комментариев
-            final float angle = PlaceUtility.calculateAngle(target.getEyePos(), pistonPos.toCenterPos())[0];
+            final float angle = InteractionUtility.calculateAngle(target.getEyePos(), pistonPos.toCenterPos())[0];
             mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle, 0, mc.player.isOnGround()));
             float prevYaw = mc.player.getYaw();
             mc.player.setYaw(angle);
             mc.player.prevYaw = angle;
             ((IClientPlayerEntity) mc.player).setLastYaw(angle);
             int prevSlot = mc.player.getInventory().selectedSlot;
-            PlaceUtility.forcePlace(pistonPos, strictDirection.getValue(), Hand.MAIN_HAND, getPistonSlot(), true);
+            InteractionUtility.placeBlock(pistonPos, false, interact.getValue(),placeMode.getValue(), getPistonSlot(), true);
             mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
             mc.player.getInventory().selectedSlot = prevSlot;
             mc.player.setYaw(prevYaw);
@@ -198,32 +190,32 @@ public class PistonPush extends Module {
         };
     }
 
-    private int getPistonSlot() {
+    private SearchInvResult getPistonSlot() {
         final SearchInvResult stickyPistonSlot = InventoryUtility.findBlockInHotBar(Blocks.STICKY_PISTON);
         final SearchInvResult pistonSlot = InventoryUtility.findBlockInHotBar(Blocks.PISTON);
-        int finalSlot = -1;
+        SearchInvResult finalResult = null;
 
         switch (pistonType.getValue()) {
-            case Normal -> finalSlot = pistonSlot.slot();
-            case Sticky -> finalSlot = stickyPistonSlot.slot();
-            case All -> finalSlot = pistonSlot.found() ? pistonSlot.slot() : stickyPistonSlot.slot();
+            case Normal -> finalResult = pistonSlot;
+            case Sticky -> finalResult = stickyPistonSlot;
+            case All -> finalResult = pistonSlot.found() ? pistonSlot : stickyPistonSlot;
         }
 
-        return finalSlot;
+        return finalResult;
     }
 
-    private int getChargeSlot() {
+    private SearchInvResult getChargeSlot() {
         final SearchInvResult redstoneTorchSlot = InventoryUtility.findBlockInHotBar(Blocks.REDSTONE_TORCH);
         final SearchInvResult redstoneBlockSlot = InventoryUtility.findBlockInHotBar(Blocks.REDSTONE_BLOCK);
-        int finalSlot = -1;
+        SearchInvResult finalResult = null;
 
         switch (chargeType.getValue()) {
-            case Block -> finalSlot = redstoneBlockSlot.slot();
-            case Torch -> finalSlot = redstoneTorchSlot.slot();
-            case All -> finalSlot = redstoneTorchSlot.found() ? redstoneTorchSlot.slot() : redstoneBlockSlot.slot();
+            case Block -> finalResult = redstoneBlockSlot;
+            case Torch -> finalResult = redstoneTorchSlot;
+            case All -> finalResult = redstoneTorchSlot.found() ? redstoneTorchSlot : redstoneBlockSlot;
         }
 
-        return finalSlot;
+        return finalResult;
     }
 
     private void findPlacePoses() {
@@ -237,7 +229,7 @@ public class PistonPush extends Module {
         };
 
         for (BlockPos pos : surroundPoses) {
-            if (!PlaceUtility.canPlaceBlock(pos, strictDirection.getValue())) continue;
+            if (!InteractionUtility.canPlaceBlock(pos, interact.getValue())) continue;
 
             BlockPos[] chargePoses = {
                     pos.add(0, 1, 0),
@@ -255,7 +247,7 @@ public class PistonPush extends Module {
 
                         if(chPos == pos.up()) continue;
 
-                        if (PlaceUtility.canPlaceBlock(pos, strictDirection.getValue())) {
+                        if (InteractionUtility.canPlaceBlock(pos, interact.getValue())) {
                             chargePos = chPos;
                             pistonPos = pos;
                             return;

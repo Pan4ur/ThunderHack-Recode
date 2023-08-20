@@ -1,6 +1,5 @@
 package thunder.hack.modules.movement;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -8,7 +7,7 @@ import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
-import thunder.hack.utility.player.PlaceUtility;
+import thunder.hack.utility.player.InteractionUtility;
 
 import java.util.ArrayList;
 
@@ -31,7 +30,7 @@ public class HoleSnap extends Module {
         if(hole != null){
             if(e.isPre()){
                 prevClientYaw = mc.player.getYaw();
-                mc.player.setYaw(PlaceUtility.calculateAngle(hole.toCenterPos())[0]);
+                mc.player.setYaw(InteractionUtility.calculateAngle(hole.toCenterPos())[0]);
             } else {
                 mc.player.setYaw(prevClientYaw);
             }
@@ -43,7 +42,7 @@ public class HoleSnap extends Module {
         if(hole != null){
             if(e.isPre()){
                 prevClientYaw = mc.player.getYaw();
-                mc.player.setYaw(PlaceUtility.calculateAngle(hole.toCenterPos())[0]);
+                mc.player.setYaw(InteractionUtility.calculateAngle(hole.toCenterPos())[0]);
             } else {
                 mc.player.setYaw(prevClientYaw);
             }

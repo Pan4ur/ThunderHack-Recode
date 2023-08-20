@@ -16,7 +16,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.Core;
 import thunder.hack.core.ModuleManager;
-import thunder.hack.core.PlaceManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.modules.movement.Velocity;
 
@@ -60,7 +59,6 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "sendMovementPackets", at = @At("HEAD"), cancellable = true)
     private void sendMovementPacketsHook(CallbackInfo info) {
-        if (PlaceManager.isRotating) return;
         if(fullNullCheck()) return;
         EventSync event = new EventSync(getYaw(), getPitch());
         Thunderhack.EVENT_BUS.post(event);

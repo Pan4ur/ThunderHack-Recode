@@ -29,7 +29,6 @@ public class ModuleManager {
     public static Tracker tracker;
     public static ClickGui clickGui;
     public static NoRender noRender;
-    public static Chams chams;
     public static Notifications notifications;
     public static Aura aura;
     public static Media media;
@@ -66,13 +65,17 @@ public class ModuleManager {
     public static FOV fov;
     public static TpsSync tpsSync;
     public static NoCommentExploit noCommentExploit;
+    public static Surround surround;
+    public static AutoTrap autoTrap;
+    public static Blocker blocker;
+    public static HoleFill holeFill;
+    public static PistonAura pistonAura;
 
 
     public ModuleManager() {
         tracker = new Tracker();
         clickGui = new ClickGui();
         noRender = new NoRender();
-        chams = new Chams();
         notifications = new Notifications();
         aura = new Aura();
         media = new Media();
@@ -109,6 +112,11 @@ public class ModuleManager {
         fov = new FOV();
         tpsSync = new TpsSync();
         noCommentExploit = new NoCommentExploit();
+        surround = new Surround();
+        autoTrap = new AutoTrap();
+        blocker = new Blocker();
+        holeFill = new HoleFill();
+        pistonAura = new PistonAura();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -144,7 +152,7 @@ public class ModuleManager {
         modules.add(nameTags);
         modules.add(new PacketFly());
         modules.add(new Strafe());
-        modules.add(new Surround());
+        modules.add(surround);
         modules.add(new AutoTotem());
         modules.add(new Criticals());
         modules.add(new CevBreaker());
@@ -192,9 +200,9 @@ public class ModuleManager {
         modules.add(new ChorusExploit());
         modules.add(hotbar);
         modules.add(new Blink());
-        modules.add(new AutoTrap());
+        modules.add(autoTrap);
         modules.add(new AutoWeb());
-        modules.add(new HoleFill());
+        modules.add(holeFill);
         modules.add(nameProtect);
         modules.add(new TestHud());
         modules.add(new BoatFly());
@@ -208,16 +216,15 @@ public class ModuleManager {
         modules.add(new AntiFriendAttack());
         modules.add(new AutoAnchor());
         modules.add(new PVPResources());
-        modules.add(new Blocker());
+        modules.add(blocker);
         modules.add(noPitchLimit);
         modules.add(new HotbarReplenish());
         modules.add(new HoleAnchor());
         modules.add(new PopChams());
-        modules.add(new PistonAura());
+        modules.add(pistonAura);
         modules.add(new Burrow());
         modules.add(new AntiSurround());
         modules.add(new LongJump());
-        modules.add(chams);
         modules.add(new ThunderHackGui());
         modules.add(new NoServerRotate());
         modules.add(new AutoEZ());
@@ -267,6 +274,8 @@ public class ModuleManager {
         modules.add(new AirPlace());
         modules.add(noCommentExploit);
         modules.add(new PistonPush());
+        modules.add(new PlacementTest());
+
     }
 
     public Module get(String name) {

@@ -1,17 +1,13 @@
 package thunder.hack.modules.misc;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.combat.Aura;
-import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.ThunderUtility;
 
@@ -144,9 +140,9 @@ public class AutoEZ extends Module {
                 sayEZ(pac.getEntity(mc.world).getName().getString());
                 return;
             }
-            if (AutoCrystal.CAtarget != null && AutoCrystal.CAtarget == pac.getEntity(mc.world)) {
-                sayEZ(pac.getEntity(mc.world).getName().getString());
-            }
+          //  if (AutoCrystal.CAtarget != null && AutoCrystal.CAtarget == pac.getEntity(mc.world)) {
+            //    sayEZ(pac.getEntity(mc.world).getName().getString());
+            //}
         }
         if(pac.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING) {
 

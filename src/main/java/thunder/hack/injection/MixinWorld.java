@@ -18,10 +18,9 @@ import static thunder.hack.modules.Module.mc;
 
 @Mixin(World.class)
 public abstract class MixinWorld {
-    @Shadow public abstract boolean removeBlock(BlockPos pos, boolean move);
 
     @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)
-    public void blockStat(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
+    public void blockStateHook(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
         if (ExplosionUtility.terrainIgnore && mc.world != null && !mc.world.isInBuildLimit(pos)) {
             WorldChunk worldChunk = mc.world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
 
@@ -31,13 +30,11 @@ public abstract class MixinWorld {
                 cir.setReturnValue(Blocks.AIR.getDefaultState());
                 return;
             }
-
             if (tempState.getBlock() == Blocks.OBSIDIAN
                     || tempState.getBlock() == Blocks.BEDROCK
                     || tempState.getBlock() == Blocks.ENDER_CHEST
                     || tempState.getBlock() == Blocks.RESPAWN_ANCHOR
-            )
-                return;
+            ) return;
             cir.setReturnValue(Blocks.AIR.getDefaultState());
         }
     }

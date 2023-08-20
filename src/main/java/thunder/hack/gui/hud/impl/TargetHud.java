@@ -4,13 +4,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.entity.LivingEntity;
 
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -26,7 +24,6 @@ import thunder.hack.gui.hud.HudEditorGui;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.combat.Aura;
-import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.Timer;
@@ -115,8 +112,8 @@ public class TargetHud extends HudElement {
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
         //таргеты
-
-        if (AutoCrystal.CAtarget != null) {
+/*
+        if (AutoCrystal.ta != null) {
             if (AutoCrystal.CAtarget instanceof LivingEntity) {
                 target = (LivingEntity) AutoCrystal.CAtarget;
                 direction = true;
@@ -124,7 +121,12 @@ public class TargetHud extends HudElement {
                 target = null;
                 direction = false;
             }
-        } else if (Aura.target != null) {
+        } else
+
+
+ */
+
+            if (Aura.target != null) {
             if (Aura.target instanceof LivingEntity) {
                 target = (LivingEntity) Aura.target;
                 direction = true;

@@ -16,8 +16,17 @@ public record SearchInvResult(int slot, boolean found, ItemStack stack) {
         return new SearchInvResult(999, true, stack);
     }
 
+    public boolean isHolding(){
+        return mc.player.getInventory().selectedSlot == slot;
+    }
+
     public void switchTo() {
         switchTo(InventoryUtility.SwitchMode.All);
+    }
+
+    public void switchIfFound() {
+        if(found)
+            switchTo(InventoryUtility.SwitchMode.All);
     }
 
     public void switchTo(InventoryUtility.SwitchMode switchMode) {

@@ -184,6 +184,14 @@ public class SpeedMine extends Module {
         mineBreaks = 0;
     }
 
+    @Override
+    public void onEnable() {
+        minePosition = null;
+        mineFacing = null;
+        progress = 0;
+        mineBreaks = 0;
+    }
+
     public void onRender3D(MatrixStack stack) {
         if (mode.getValue() == Mode.Packet) {
             if (minePosition != null && !mc.world.isAir(minePosition)) {

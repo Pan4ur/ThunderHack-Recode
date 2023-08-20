@@ -84,4 +84,15 @@ public class CombatManager {
                 .min(Comparator.comparing(t -> mc.player.distanceTo(t))).orElse(null);
     }
 
+    public PlayerEntity getTargetByHP(float range){
+        return mc.world.getPlayers()
+                .stream()
+                .filter(e -> e != mc.player)
+                .filter(e -> !e.isDead())
+                .filter(e -> !Thunderhack.friendManager.isFriend(e.getName().getString()))
+                .filter(e -> e.getHealth() > 0)
+                .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
+                .min(Comparator.comparing(t -> (t.getHealth() + t.getAbsorptionAmount()))).orElse(null);
+    }
+
 }

@@ -10,19 +10,17 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import thunder.hack.Thunderhack;
+import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.render.HoleESP;
-import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
-import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
@@ -38,26 +36,23 @@ public class Blocker extends Module {
         super("Blocker", Category.COMBAT);
     }
 
-    private final Setting<Integer> actionShift = new Setting<>("PlacePerTick", 1, 1, 5);
-    private final Setting<Integer> actionInterval = new Setting<>("Delay", 0, 0, 5);
+    private final Setting<Integer> blocksPerTick = new Setting<>("Block/Tick", 1, 1, 5);
+    private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 0, 0, 10);
     private final Setting<Boolean> crystalBreaker = new Setting<>("Destroy Crystal", false);
-
+    private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
+    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("PlaceMode", InteractionUtility.PlaceMode.Normal);
     public final Setting<Parent> logic = new Setting<>("Logic", new Parent(false,0));
     private final Setting<Boolean> antiCev = new Setting<>("Anti Cev", true).withParent(logic);
     private final Setting<Boolean> antiCiv = new Setting<>("Anti Civ", true).withParent(logic);
     private final Setting<Boolean> diagonal = new Setting<>("Diagonal", true).withParent(logic);
     private final Setting<Boolean> expand = new Setting<>("Expand", true).withParent(logic);
-
-
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
     private final Setting<Boolean> render = new Setting<>("Render", true);
-    private final Setting<Boolean> strictDirection = new Setting<>("Strict Direction", false);
-    private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
 
 
     private final List<BlockPos> placePositions = new CopyOnWriteArrayList<>();
     private final Map<BlockPos, Long> renderBlocks = new ConcurrentHashMap<>();
-    private int tickCounter = 0;
+    private int delay = 0;
     public static Timer inactivityTimer = new Timer();
 
     public void onRender3D(MatrixStack stack) {
@@ -74,27 +69,25 @@ public class Blocker extends Module {
     }
 
     @EventHandler
-    public void onUpdate(PlayerUpdateEvent event) {
-        if (tickCounter < actionInterval.getValue()) {
-            tickCounter++;
+    public void onPostSync(EventPostSync event) {
+        if (delay < placeDelay.getValue()) {
+            delay++;
         }
 
-        if (tickCounter < actionInterval.getValue()) {
+        if (delay < placeDelay.getValue()) {
             return;
         }
 
-        int obbySlot = InventoryUtility.findHotbarBlock(Blocks.OBSIDIAN);
-        int eChestSlot = InventoryUtility.findHotbarBlock(Blocks.ENDER_CHEST);
 
-        if (obbySlot == -1 && eChestSlot == 1) return;
 
         int blocksPlaced = 0;
 
         if (placePositions.isEmpty()) return;
 
-        while (blocksPlaced < actionShift.getValue()) {
+        InventoryUtility.saveSlot();
+        while (blocksPlaced < blocksPerTick.getValue()) {
             BlockPos pos = StreamSupport.stream(placePositions.spliterator(), false)
-                    .filter(p -> PlaceUtility.canPlaceBlock(p, strictDirection.getValue(), true))
+                    .filter(p -> InteractionUtility.canPlaceBlock(p, interact.getValue()))
                     .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5))))
                     .orElse(null);
 
@@ -108,14 +101,16 @@ public class Blocker extends Module {
                         }
                     }
 
-                if (PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, obbySlot == -1 ? eChestSlot : obbySlot, false, placeMode.getValue())) {
+                if (InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), placeMode.getValue(), getBlock(), false)) {
                     blocksPlaced++;
                     renderBlocks.put(pos, System.currentTimeMillis());
-                    PlaceUtility.ghostBlocks.put(pos, System.currentTimeMillis());
-                    tickCounter = 0;
+                    delay = 0;
                     placePositions.remove(pos);
                     inactivityTimer.reset();
-                    if (!mc.player.isOnGround()) return;
+                    if (!mc.player.isOnGround()) {
+                        InventoryUtility.returnSlot();
+                        return;
+                    }
                 } else {
                     break;
                 }
@@ -123,6 +118,7 @@ public class Blocker extends Module {
                 break;
             }
         }
+        InventoryUtility.returnSlot();
     }
 
     @EventHandler
@@ -200,5 +196,12 @@ public class Blocker extends Module {
                 }
             }
         }
+    }
+
+    private SearchInvResult getBlock() {
+        final SearchInvResult obby = InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN);
+        final SearchInvResult chest = InventoryUtility.findBlockInHotBar(Blocks.ENDER_CHEST);
+        SearchInvResult finalResult = obby.found() ? obby : chest;
+        return finalResult;
     }
 }

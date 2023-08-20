@@ -11,7 +11,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.player.PlaceUtility;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.Block;
@@ -23,7 +23,9 @@ import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
-import org.joml.Vector3f;
+
+import static thunder.hack.utility.player.InteractionUtility.checkNearBlocks;
+import static thunder.hack.utility.player.InteractionUtility.BlockPosWithFacing;
 
 
 public class Scaffold extends Module {
@@ -43,20 +45,6 @@ public class Scaffold extends Module {
 
     public Scaffold() {
         super("Scaffold", "лучший скафф", Module.Category.PLAYER);
-    }
-
-    private BlockPosWithFacing checkNearBlocks(BlockPos blockPos) {
-        if (mc.world.getBlockState(blockPos.add(0, -1, 0)).isSolid())
-            return new BlockPosWithFacing(blockPos.add(0, -1, 0), Direction.UP);
-        else if (mc.world.getBlockState(blockPos.add(-1, 0, 0)).isSolid())
-            return new BlockPosWithFacing(blockPos.add(-1, 0, 0), Direction.EAST);
-        else if (mc.world.getBlockState(blockPos.add(1, 0, 0)).isSolid())
-            return new BlockPosWithFacing(blockPos.add(1, 0, 0), Direction.WEST);
-        else if (mc.world.getBlockState(blockPos.add(0, 0, 1)).isSolid())
-            return new BlockPosWithFacing(blockPos.add(0, 0, 1), Direction.NORTH);
-        else if (mc.world.getBlockState(blockPos.add(0, 0, -1)).isSolid())
-            return new BlockPosWithFacing(blockPos.add(0, 0, -1), Direction.SOUTH);
-        return null;
     }
 
     private int findBlockToPlace() {
@@ -147,27 +135,6 @@ public class Scaffold extends Module {
         return n2;
     }
 
-    private float[] getRotations(BlockPos blockPos, Direction enumFacing) {
-        Vec3d vec3d = new Vec3d((double) blockPos.getX() + 0.5,  blockPos.getY() + 0.99 , (double) blockPos.getZ() + 0.5);
-        vec3d = vec3d.add(new Vec3d(new Vector3f(enumFacing.getVector().getX(),enumFacing.getVector().getY(),enumFacing.getVector().getZ())).multiply(0.5));
-
-        Vec3d vec3d2 = PlaceUtility.getEyesPos(mc.player);
-
-        double d = vec3d.x - vec3d2.x;
-        double d2 = vec3d.y - vec3d2.y;
-        double d3 = vec3d.z - vec3d2.z;
-        double d6 = Math.sqrt(d * d + d3 * d3);
-
-        float f = (float) (Math.toDegrees(Math.atan2(d3, d)) - 90.0f);
-        float f2 = (float) (-Math.toDegrees(Math.atan2(d2, d6)));
-
-        float[] ret = new float[2];
-        ret[0] = mc.player.getYaw() + MathHelper.wrapDegrees(f - mc.player.getYaw());
-        ret[1] = mc.player.getPitch() + MathHelper.wrapDegrees(f2 - mc.player.getPitch());
-
-        return ret;
-    }
-
     private void doSafeWalk(EventMove event) {
         double x = event.get_x();
         double y = event.get_y();
@@ -226,8 +193,8 @@ public class Scaffold extends Module {
 
     public void onRender3D(MatrixStack stack) {
         if (render.getValue() && currentblock != null) {
-            Render3DEngine.drawFilledBox(stack,new Box(currentblock.position), Render2DEngine.injectAlpha(HudEditor.getColor(0), 150));
-            Render3DEngine.drawBoxOutline(new Box(currentblock.position), Render2DEngine.injectAlpha(HudEditor.getColor(0), 230), 2);
+            Render3DEngine.drawFilledBox(stack,new Box(currentblock.position()), Render2DEngine.injectAlpha(HudEditor.getColor(0), 150));
+            Render3DEngine.drawBoxOutline(new Box(currentblock.position()), Render2DEngine.injectAlpha(HudEditor.getColor(0), 230), 2);
         }
     }
 
@@ -267,10 +234,9 @@ public class Scaffold extends Module {
         currentblock = checkNearBlocksExtended(blockPos2);
         if (currentblock != null) {
             if (rotate.getValue()) {
-              //getRotations(currentblock.position, currentblock.facing);
 
-                Vec3d hitVec = new Vec3d(currentblock.position.getX() + 0.5, currentblock.position.getY() + 0.90, currentblock.position.getZ() + 0.5).add(new Vec3d(currentblock.facing.getUnitVector()).multiply(0.5));
-                float[] rotations = PlaceUtility.calculateAngle(hitVec);
+                Vec3d hitVec = new Vec3d(currentblock.position().getX() + 0.5, currentblock.position().getY() + 0.90, currentblock.position().getZ() + 0.5).add(new Vec3d(currentblock.facing().getUnitVector()).multiply(0.5));
+                float[] rotations = InteractionUtility.calculateAngle(hitVec);
 
                 if(strictRotate.getValue()){
                     rotation = rotations;
@@ -306,9 +272,9 @@ public class Scaffold extends Module {
                     timer.reset();
                 }
             }
-            Vec3d hitVec = new Vec3d(currentblock.position.getX() + 0.5, currentblock.position.getY() + 0.90, currentblock.position.getZ() + 0.5).add(new Vec3d(currentblock.facing.getUnitVector()).multiply(0.5));
+            Vec3d hitVec = new Vec3d(currentblock.position().getX() + 0.5, currentblock.position().getY() + 0.90, currentblock.position().getZ() + 0.5).add(new Vec3d(currentblock.facing().getUnitVector()).multiply(0.5));
 
-            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(hitVec, currentblock.facing, currentblock.position, false));
+            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(hitVec, currentblock.facing(), currentblock.position(), false));
 
             mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
@@ -317,9 +283,5 @@ public class Scaffold extends Module {
                 mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
             }
         }
-    }
-
-
-    public record BlockPosWithFacing(BlockPos position, Direction facing){
     }
 }
