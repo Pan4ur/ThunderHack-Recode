@@ -70,6 +70,7 @@ public class ModuleManager {
     public static Blocker blocker;
     public static HoleFill holeFill;
     public static PistonAura pistonAura;
+    public static ElytraFix elytraFix;
 
 
     public ModuleManager() {
@@ -117,6 +118,7 @@ public class ModuleManager {
         blocker = new Blocker();
         holeFill = new HoleFill();
         pistonAura = new PistonAura();
+        elytraFix = new ElytraFix();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -270,7 +272,7 @@ public class ModuleManager {
         modules.add(new HoleSnap());
         modules.add(new ChatUtils());
         modules.add(new ESP());
-        modules.add(new ElytraFix());
+        modules.add(elytraFix);
         modules.add(new AirPlace());
         modules.add(noCommentExploit);
         modules.add(new PistonPush());

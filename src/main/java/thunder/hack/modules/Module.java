@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -246,6 +247,10 @@ public class Module {
         return !this.isEnabled();
     }
 
+    public static void clickSlot(int id) {
+        if (id != -1)
+            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, id, 0, SlotActionType.PICKUP, mc.player);
+    }
 
     public void sendMessage(String message) {
         if (fullNullCheck()) return;

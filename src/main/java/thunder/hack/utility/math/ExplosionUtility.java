@@ -33,9 +33,8 @@ public final class ExplosionUtility {
 
     public static float getExplosionDamage2(Vec3d crysPos, PlayerEntity target) {
         try {
-            if (AutoCrystal.predictTicks.getValue() == 0) {
+            if (AutoCrystal.predictTicks.getValue() == 0)
                 return getExplosionDamage1(crysPos, target);
-            }
 
             PlayerEntity copyEntity = new PlayerEntity(mc.world, target.getBlockPos(), target.getYaw(), new GameProfile(UUID.fromString("66123666-6666-6666-6666-667563866600"), "PredictEntity228")) {
                 @Override public boolean isSpectator() {
@@ -74,6 +73,16 @@ public final class ExplosionUtility {
         return final_result;
     }
 
+    public static float getMinedDamage(BlockPos anchorPos, PlayerEntity target) {
+        float final_result;
+        anchorIgnore = anchorPos;
+        terrainIgnore = true;
+        final_result = getExplosionDamage1(anchorPos.up().toCenterPos().add(0f,0.5f,0f), target);
+        anchorIgnore = null;
+        terrainIgnore = false;
+        return final_result;
+    }
+
 
     public static float getSelfExplosionDamage(Vec3d explosionPos) {
         return getExplosionDamage1(explosionPos,mc.player);
@@ -93,9 +102,7 @@ public final class ExplosionUtility {
             if (mc.world.getBlockState( BlockPos.ofFloored(entity.getX() + dX * i, entity.getY(), entity.getZ() + dZ * i)).getBlock() instanceof AirBlock) {
                 entityMotionPosX = dX * i;
                 entityMotionPosZ = dZ * i;
-            } else {
-                break;
-            }
+            } else break;
         }
         return new Vec3d(entityMotionPosX, 0, entityMotionPosZ);
     }

@@ -4,10 +4,12 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
@@ -17,6 +19,9 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.core.PlayerManager;
 import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventSync;
@@ -26,6 +31,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
+import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
@@ -117,22 +123,39 @@ public class SpeedMine extends Module {
         }
     }
 
+    public  boolean isWorth() {
+        if (    isDisabled()
+                || mode.getValue() != Mode.Packet
+                || minePosition == null
+                || progress < 0.95
+                || mc.world.getBlockState(minePosition).getBlock() != Blocks.OBSIDIAN
+        ) return false;
+
+        for (PlayerEntity pl : Thunderhack.asyncManager.getAsyncPlayers()) {
+            if (pl == null) continue;
+            if (pl == mc.player) continue;
+            mc.world.removeBlock(minePosition, false);
+            float dmg = ExplosionUtility.getExplosionDamage1(minePosition.toCenterPos(), pl);
+            mc.world.setBlockState(minePosition, Blocks.OBSIDIAN.getDefaultState());
+            ExplosionUtility.anchorIgnore = null;
+            if(Thunderhack.friendManager.isFriend(pl.getEntityName())) continue;
+            if(dmg > 7.5f) return true;
+        }
+
+        return false;
+    }
+
     public float getBlockStrength(BlockState state, BlockPos position) {
         float hardness = state.getHardness(mc.world, position);
-        if (hardness < 0) {
-            return 0;
-        }
-        if (!canBreak(position)) {
-            return getDigSpeed(state, position) / hardness / 100F;
-        } else {
-            return getDigSpeed(state, position) / hardness / 30F;
-        }
+        if (hardness < 0) return 0;
+        return getDigSpeed(state, position) / hardness / (canBreak(position) ? 30f : 100f);
     }
 
     public float getDestroySpeed(BlockPos position, BlockState state) {
         float destroySpeed = 1;
-        if (mc.player.getInventory().getStack(getTool(position)) != null && !mc.player.getInventory().getStack(getTool(position)).isEmpty()) {
-            destroySpeed *= mc.player.getInventory().getStack(getTool(position)).getMiningSpeedMultiplier(state);
+        int slot = getTool(position);
+        if (slot != -1 && mc.player.getInventory().getStack(slot) != null && !mc.player.getInventory().getStack(slot).isEmpty()) {
+            destroySpeed *= mc.player.getInventory().getStack(slot).getMiningSpeedMultiplier(state);
         }
         return destroySpeed;
     }
