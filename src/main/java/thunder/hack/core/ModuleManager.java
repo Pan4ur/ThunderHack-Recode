@@ -71,6 +71,7 @@ public class ModuleManager {
     public static HoleFill holeFill;
     public static PistonAura pistonAura;
     public static ElytraFix elytraFix;
+    public static ElytraRecast elytraRecast;
 
 
     public ModuleManager() {
@@ -119,6 +120,7 @@ public class ModuleManager {
         holeFill = new HoleFill();
         pistonAura = new PistonAura();
         elytraFix = new ElytraFix();
+        elytraRecast = new ElytraRecast();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -277,6 +279,8 @@ public class ModuleManager {
         modules.add(noCommentExploit);
         modules.add(new PistonPush());
         modules.add(new PlacementTest());
+        modules.add(elytraRecast);
+        modules.add(new ViewLock());
 
     }
 

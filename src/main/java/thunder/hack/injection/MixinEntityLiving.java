@@ -1,7 +1,11 @@
 package thunder.hack.injection;
 
+import net.minecraft.entity.MovementType;
+import net.minecraft.util.math.Vec3d;
+import org.spongepowered.asm.mixin.Unique;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
+import thunder.hack.events.impl.EventTravel;
 import thunder.hack.modules.render.ViewModel;
 import thunder.hack.utility.interfaces.IEntityLiving;
 import net.minecraft.entity.LivingEntity;
@@ -12,6 +16,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import static thunder.hack.modules.Module.mc;
 
 @Mixin(LivingEntity.class)
 public class MixinEntityLiving implements IEntityLiving {
@@ -50,5 +56,44 @@ public class MixinEntityLiving implements IEntityLiving {
     @Override
     public double getPrevServerZ() {
         return prevServerZ;
+    }
+
+    @Unique
+    private boolean prevFlying = false;
+
+
+
+
+    @Inject(method = "isFallFlying", at = @At("TAIL"), cancellable = true)
+    public void isFallFlyingHook(CallbackInfoReturnable<Boolean> cir) {
+        if (ModuleManager.elytraRecast.isEnabled()) {
+            boolean elytra = cir.getReturnValue();
+            if (prevFlying && !cir.getReturnValue()) {
+                cir.setReturnValue(ModuleManager.elytraRecast.castElytra());
+            }
+            prevFlying = elytra;
+        }
+    }
+
+    @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
+    public void travelHook(Vec3d movementInput, CallbackInfo ci) {
+        if((LivingEntity)(Object)this != mc.player) return;
+        final EventTravel event = new EventTravel(movementInput,true);
+        Thunderhack.EVENT_BUS.post(event);
+        if (event.isCancelled()) {
+            mc.player.move(MovementType.SELF, mc.player.getVelocity());
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "travel", at = @At("RETURN"), cancellable = true)
+    public void travelPostHook(Vec3d movementInput, CallbackInfo ci) {
+        if((LivingEntity)(Object)this != mc.player) return;
+        final EventTravel event = new EventTravel(movementInput,false);
+        Thunderhack.EVENT_BUS.post(event);
+        if (event.isCancelled()) {
+            mc.player.move(MovementType.SELF, mc.player.getVelocity());
+            ci.cancel();
+        }
     }
 }
