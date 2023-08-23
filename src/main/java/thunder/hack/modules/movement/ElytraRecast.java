@@ -27,6 +27,7 @@ public class ElytraRecast extends Module {
     public Setting<Float> pitchValue = new Setting<>("PitchValue", 55f, -90f, 90f, v -> changePitch.getValue());
     public Setting<Boolean> autoWalk = new Setting<>("AutoWalk", true);
     public Setting<Boolean> autoJump = new Setting<>("AutoJump", true);
+    public Setting<Boolean> allowBroken = new Setting<>("AllowBroken", true);
 
     private float prevClientPitch;
 
@@ -64,7 +65,7 @@ public class ElytraRecast extends Module {
     private boolean checkElytra() {
         if (mc.player.input.jumping && !mc.player.getAbilities().flying && !mc.player.hasVehicle() && !mc.player.isClimbing()) {
             ItemStack is = mc.player.getEquippedStack(EquipmentSlot.CHEST);
-            return is.isOf(Items.ELYTRA) && ElytraItem.isUsable(is);
+            return is.isOf(Items.ELYTRA) && (ElytraItem.isUsable(is) || allowBroken.getValue());
         }
         return false;
     }
