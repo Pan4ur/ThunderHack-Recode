@@ -72,6 +72,7 @@ public class ModuleManager {
     public static PistonAura pistonAura;
     public static ElytraFix elytraFix;
     public static ElytraRecast elytraRecast;
+    public static ElytraPlus elytraPlus;
 
 
     public ModuleManager() {
@@ -121,6 +122,7 @@ public class ModuleManager {
         pistonAura = new PistonAura();
         elytraFix = new ElytraFix();
         elytraRecast = new ElytraRecast();
+        elytraPlus = new ElytraPlus();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -198,7 +200,7 @@ public class ModuleManager {
         modules.add(new ItemESP());
         modules.add(new AutoLeave());
         modules.add(new FGHelper());
-        modules.add(new ElytraPlus());
+        modules.add(elytraPlus);
         modules.add(new AutoArmor());
         modules.add(new TimerIndicator());
         modules.add(new ChorusExploit());

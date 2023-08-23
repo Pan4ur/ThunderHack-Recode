@@ -24,8 +24,8 @@ public class XRay extends Module {
     public static int all;
     public Setting<Boolean> brutForce = new Setting<>("OreDeobf", false);
     public Setting<Integer> checkSpeed = new Setting<>("CheckSpeed", 4, 1, 5, v -> brutForce.getValue());
-    public Setting<Integer> rxz = new Setting<>("RadiusXZ", 20, 5, 200, v -> brutForce.getValue());
-    public Setting<Integer> ry = new Setting<>("RadiusY", 6, 2, 50, v -> brutForce.getValue());
+    public Setting<Integer> rxz = new Setting<>("RadiusXZ", 5, 5, 64, v -> brutForce.getValue());
+    public Setting<Integer> ry = new Setting<>("RadiusY", 5, 2, 50, v -> brutForce.getValue());
     public static Setting<Boolean> netherite = new Setting<>("Netherite", false);
     public static Setting<Boolean> diamond = new Setting<>("Diamond ", false);
     public static Setting<Boolean> gold = new Setting<>("Gold", false);

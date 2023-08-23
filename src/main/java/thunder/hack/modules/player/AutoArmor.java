@@ -106,6 +106,9 @@ public class AutoArmor extends Module {
                 if (!ElytraItem.isUsable(is))
                     return 0;
                 prot = 1;
+                if(ModuleManager.elytraRecast.isEnabled() || ModuleManager.elytraPlus.isEnabled()){
+                    prot = 999;
+                }
             }
             if (is.hasEnchantments()) {
                 for (Entry<Enchantment, Integer> e: EnchantmentHelper.get(is).entrySet()) {
