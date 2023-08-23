@@ -3,6 +3,7 @@ package thunder.hack.modules.render;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 public class XRay extends Module {
     public static int done;
     public static int all;
-    public Setting<Boolean> brutForce = new Setting<>("BrutForce", false);
+    public Setting<Boolean> brutForce = new Setting<>("OreDeobf", false);
     public Setting<Integer> checkSpeed = new Setting<>("CheckSpeed", 4, 1, 5, v -> brutForce.getValue());
     public Setting<Integer> rxz = new Setting<>("RadiusXZ", 20, 5, 200, v -> brutForce.getValue());
     public Setting<Integer> ry = new Setting<>("RadiusY", 6, 2, 50, v -> brutForce.getValue());
@@ -48,9 +49,8 @@ public class XRay extends Module {
     public void onEnable() {
         ores.clear();
         toCheck.clear();
-        ArrayList<BlockPos> blockPositions = getBlocks();
-        for (BlockPos pos : blockPositions) {
-            if (!isCheckableOre(mc.world.getBlockState(pos).getBlock())) continue;
+        for (BlockPos pos : getBlocks()) {
+            if(mc.world.isAir(pos)) continue;
             toCheck.add(pos);
         }
         all = toCheck.size();
@@ -65,6 +65,7 @@ public class XRay extends Module {
 
     @Override
     public void onUpdate() {
+        if(!brutForce.getValue()) return;
         for (int i = 0; i < checkSpeed.getValue(); ++i) {
             if (toCheck.size() < 1) {
                 return;
@@ -82,15 +83,7 @@ public class XRay extends Module {
             if (isCheckableOre(pac.getState().getBlock())) {
                 ores.add(pac.getPos());
             }
-        } /*
-        else if (e.getPacket() instanceof BlockUpdateS2CPacket) {
-            SPacketMultiBlockChange p = e.getPacket();
-            for (SPacketMultiBlockChange.BlockUpdateData dat : p.getChangedBlocks()) {
-                if (!isEnabledOre(Block.getIdFromBlock(dat.getBlockState().getBlock()))) continue;
-                ores.add(dat.getPos());
-            }
         }
-        */
     }
 
 
@@ -139,38 +132,38 @@ public class XRay extends Module {
     }
 
 
-    public void onRender2D(MatrixStack stack) {
-        FontRenderers.modules.drawCenteredString(stack,"Done: " + done + " / " + "All: " + all,mc.getWindow().getScaledWidth() / 2f, 50,-1);
+    public void onRender2D(DrawContext context) {
+        FontRenderers.modules.drawCenteredString(context.getMatrices(),"Done: " + done + " / " + "All: " + all,mc.getWindow().getScaledWidth() / 2f, 50,-1);
     }
 
     public static boolean isCheckableOre(Block block) {
-        if (diamond.getValue() && block == Blocks.DIAMOND_ORE) {
+        if (diamond.getValue() && block == Blocks.DIAMOND_ORE)
             return true;
-        }
-        if (gold.getValue() && block == Blocks.GOLD_ORE) {
+
+        if (gold.getValue() && block == Blocks.GOLD_ORE)
             return true;
-        }
-        if (iron.getValue() && block == Blocks.IRON_ORE) {
+
+        if (iron.getValue() && block == Blocks.IRON_ORE)
             return true;
-        }
-        if (emerald.getValue() && block == Blocks.EMERALD_ORE) {
+
+        if (emerald.getValue() && block == Blocks.EMERALD_ORE)
             return true;
-        }
-        if (redstone.getValue() && block == Blocks.REDSTONE_ORE) {
+
+        if (redstone.getValue() && block == Blocks.REDSTONE_ORE)
             return true;
-        }
-        if (coal.getValue() && block == Blocks.COAL_ORE) {
+
+        if (coal.getValue() && block == Blocks.COAL_ORE)
             return true;
-        }
-        if (netherite.getValue() && block == Blocks.ANCIENT_DEBRIS) {
+
+        if (netherite.getValue() && block == Blocks.ANCIENT_DEBRIS)
             return true;
-        }
-        if (water.getValue() && block == Blocks.WATER) {
+
+        if (water.getValue() && block == Blocks.WATER)
             return true;
-        }
-        if (lava.getValue() && block == Blocks.LAVA) {
+
+        if (lava.getValue() && block == Blocks.LAVA)
             return true;
-        }
+
         return lapis.getValue() && block == Blocks.LAPIS_ORE;
     }
 
