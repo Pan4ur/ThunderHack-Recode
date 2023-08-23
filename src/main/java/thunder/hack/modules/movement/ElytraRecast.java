@@ -73,7 +73,7 @@ public class ElytraRecast extends Module {
     private boolean check() {
         if (!mc.player.isTouchingWater() && !mc.player.hasStatusEffect(StatusEffects.LEVITATION)) {
             ItemStack is = mc.player.getEquippedStack(EquipmentSlot.CHEST);
-            if (is.isOf(Items.ELYTRA) && ElytraItem.isUsable(is)) {
+            if (is.isOf(Items.ELYTRA) && (ElytraItem.isUsable(is) || allowBroken.getValue()) ) {
                 mc.player.startFallFlying();
                 return true;
             }
