@@ -9,5 +9,4 @@ public interface IEntity {
     List<Trails.Trail> getTrails();
 
     List<Vec3d> getPrevPositions();
-
 }

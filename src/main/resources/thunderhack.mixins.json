@@ -70,6 +70,7 @@
     "accesors.IExplosionS2CPacket",
     "accesors.IGameMessageS2CPacket",
     "accesors.IHeldItemRenderer",
+    "accesors.IEntity",
     "accesors.ILivingEntity",
     "accesors.IPlayerMoveC2SPacket",
     "accesors.IPlayerPositionLookS2CPacket",

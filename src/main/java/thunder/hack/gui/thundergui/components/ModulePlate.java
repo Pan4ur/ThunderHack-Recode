@@ -244,7 +244,7 @@ public class ModulePlate {
             if (bind.getBind().equalsIgnoreCase("Delete")) {
                 bind = new Bind(-1, false, holdbind);
             }
-            module.bind.setValue(bind);
+            module.setBind(bind);
             listening_bind = false;
         }
     }

@@ -9,12 +9,10 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -61,31 +59,30 @@ public class Surround extends Module {
     private final Setting<ColorSetting> renderLineColor = new Setting<>("Render Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<Integer> renderLineWidth = new Setting<>("Render Line Width", 2, 1, 5).withParent(renderCategory);
 
-
-    private ArrayList sequentialBlocks = new ArrayList<>();
-    public static Timer inactivityTimer = new Timer();
-
-
-    private int delay;
-
-
     private enum PlaceTiming {
-        Default, Vanilla, Sequential
+        Default,
+        Vanilla,
+        Sequential
     }
 
 
     private enum Center {
-        Packet, Motion, None
+        Packet,
+        Motion,
+        None
     }
 
 
     private enum RenderMode {
-        Fade, Decrease
+        Fade,
+        Decrease
     }
 
-
+    private final List<BlockPos> sequentialBlocks = new ArrayList<>();
     private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
+    private int delay;
 
+    public static final Timer inactivityTimer = new Timer();
 
     public void onRender3D(MatrixStack stack) {
         renderPoses.forEach((pos, time) -> {
@@ -157,7 +154,7 @@ public class Surround extends Module {
     }
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.Receive e) {
+    public void onPacketReceive(PacketEvent.@NotNull Receive e) {
         if (e.getPacket() instanceof BlockUpdateS2CPacket pac) {
             if (placeTiming.getValue() == PlaceTiming.Sequential && !sequentialBlocks.isEmpty()) {
                 if (sequentialBlocks.contains(pac.getPos())) {
@@ -196,8 +193,7 @@ public class Surround extends Module {
         }
     }
 
-    private BlockPos getSequentialPos() {
-        List<BlockPos> blocks = new ArrayList<>();
+    private @Nullable BlockPos getSequentialPos() {
         for (BlockPos bp : getBlocks()) {
             if (InteractionUtility.canPlaceBlock(bp, interact.getValue()) && mc.world.isAir(bp)) {
                 return bp;
@@ -206,7 +202,7 @@ public class Surround extends Module {
         return null;
     }
 
-    private List<BlockPos> getBlocks() {
+    private @NotNull List<BlockPos> getBlocks() {
         List<BlockPos> blocks = new ArrayList<>();
         for (BlockPos bp : getPlayerBlocks()) {
             blocks.add(bp.east());
@@ -225,7 +221,7 @@ public class Surround extends Module {
         return blocks;
     }
 
-    private List<BlockPos> getPlayerBlocks() {
+    private @NotNull List<BlockPos> getPlayerBlocks() {
         List<BlockPos> tempPos = new ArrayList<>();
         BlockPos center = getPlayerPos();
         tempPos.add(center);
@@ -294,10 +290,7 @@ public class Surround extends Module {
         return slot;
     }
 
-    private BlockPos getPlayerPos() {
+    private @NotNull BlockPos getPlayerPos() {
         return BlockPos.ofFloored(mc.player.getX(), mc.player.getY() - Math.floor(mc.player.getY()) > 0.8 ? Math.floor(mc.player.getY()) + 1.0 : Math.floor(mc.player.getY()), mc.player.getZ());
     }
-
-    private Vec2f[] CenterPoints = new Vec2f[]{new Vec2f(0.35f, 0.35f), new Vec2f(0.35f, 0.65f), new Vec2f(0.65f, 0.35f), new Vec2f(0.65f, 0.65f), new Vec2f(0.5f, 0.5f)};
-
 }

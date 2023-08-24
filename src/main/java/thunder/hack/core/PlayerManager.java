@@ -1,10 +1,8 @@
 package thunder.hack.core;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.util.math.Vec2f;
-import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -55,40 +53,40 @@ public class PlayerManager {
     }
 
     @EventHandler
-    public void onSyncWithServer(PacketEvent.Send event){
-        if(event.getPacket() instanceof PlayerMoveC2SPacket){
+    public void onSyncWithServer(PacketEvent.Send event) {
+        if (event.getPacket() instanceof PlayerMoveC2SPacket) {
             serverYaw = ((PlayerMoveC2SPacket) event.getPacket()).getYaw(serverYaw);
             serverPitch = ((PlayerMoveC2SPacket) event.getPacket()).getPitch(serverPitch);
         }
-        if(event.getPacket() instanceof PlayerMoveC2SPacket.PositionAndOnGround){
+        if (event.getPacket() instanceof PlayerMoveC2SPacket.PositionAndOnGround) {
             serverYaw = ((PlayerMoveC2SPacket) event.getPacket()).getYaw(serverYaw);
             serverPitch = ((PlayerMoveC2SPacket) event.getPacket()).getPitch(serverPitch);
         }
-        if(event.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround){
+        if (event.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround) {
             serverYaw = ((PlayerMoveC2SPacket) event.getPacket()).getYaw(serverYaw);
             serverPitch = ((PlayerMoveC2SPacket) event.getPacket()).getPitch(serverPitch);
         }
-        if(event.getPacket() instanceof PlayerMoveC2SPacket.Full){
+        if (event.getPacket() instanceof PlayerMoveC2SPacket.Full) {
             serverYaw = ((PlayerMoveC2SPacket) event.getPacket()).getYaw(serverYaw);
             serverPitch = ((PlayerMoveC2SPacket) event.getPacket()).getPitch(serverPitch);
         }
     }
 
     @EventHandler
-    public void getServerPosLook(PacketEvent.Receive event){
-        if(event.getPacket() instanceof PlayerPositionLookS2CPacket){
+    public void getServerPosLook(PacketEvent.Receive event) {
+        if (event.getPacket() instanceof PlayerPositionLookS2CPacket) {
             serverYaw = ((PlayerPositionLookS2CPacket) event.getPacket()).getYaw();
             serverPitch = ((PlayerPositionLookS2CPacket) event.getPacket()).getPitch();
         }
     }
 
     public boolean checkRtx(float yaw, float pitch, float distance, boolean ignoreWalls) {
-        Entity targetedEntity = null;
+        Entity targetedEntity;
         HitResult result = ignoreWalls ? null : rayTrace(distance, yaw, pitch);
-        Vec3d vec3d = mc.player.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()),0);
-        double distancePow2 = Math.pow(distance,2);
+        Vec3d vec3d = mc.player.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
+        double distancePow2 = Math.pow(distance, 2);
         if (result != null) distancePow2 = result.getPos().squaredDistanceTo(vec3d);
-        Vec3d vec3d2 = getRotationVector(pitch,yaw);
+        Vec3d vec3d2 = getRotationVector(pitch, yaw);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * distance, vec3d2.y * distance, vec3d2.z * distance);
         Box box = mc.player.getBoundingBox().stretch(vec3d2.multiply(distance)).expand(1.0, 1.0, 1.0);
         EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator(), distancePow2);
@@ -99,7 +97,7 @@ public class PlayerManager {
             if (g < distancePow2 || result == null) {
                 if (entity2 instanceof LivingEntity) {
                     targetedEntity = entity2;
-                    if(targetedEntity == Aura.target) return true;
+                    if (targetedEntity == Aura.target) return true;
                 }
             }
         }
@@ -109,10 +107,10 @@ public class PlayerManager {
     public Entity getRtxTarger(float yaw, float pitch, float distance, boolean ignoreWalls) {
         Entity targetedEntity = null;
         HitResult result = ignoreWalls ? null : rayTrace(distance, yaw, pitch);
-        Vec3d vec3d = mc.player.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()),0);
-        double distancePow2 = Math.pow(distance,2);
+        Vec3d vec3d = mc.player.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
+        double distancePow2 = Math.pow(distance, 2);
         if (result != null) distancePow2 = result.getPos().squaredDistanceTo(vec3d);
-        Vec3d vec3d2 = getRotationVector(pitch,yaw);
+        Vec3d vec3d2 = getRotationVector(pitch, yaw);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * distance, vec3d2.y * distance, vec3d2.z * distance);
         Box box = mc.player.getBoundingBox().stretch(vec3d2.multiply(distance)).expand(1.0, 1.0, 1.0);
         EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator(), distancePow2);
@@ -132,7 +130,7 @@ public class PlayerManager {
 
     public HitResult rayTrace(double dst, float yaw, float pitch) {
         Vec3d vec3d = mc.player.getCameraPosVec(mc.getTickDelta());
-        Vec3d vec3d2 = getRotationVector( pitch,  yaw);
+        Vec3d vec3d2 = getRotationVector(pitch, yaw);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * dst, vec3d2.y * dst, vec3d2.z * dst);
         return mc.world.raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
     }
@@ -155,7 +153,7 @@ public class PlayerManager {
         return new Vec2f((float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0), (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difY, dist))));
     }
 
-    private Vec3d getRotationVector(float yaw, float pitch){
+    private Vec3d getRotationVector(float yaw, float pitch) {
         return new Vec3d(MathHelper.sin(-pitch * 0.017453292F) * MathHelper.cos(yaw * 0.017453292F), -MathHelper.sin(yaw * 0.017453292F), MathHelper.cos(-pitch * 0.017453292F) * MathHelper.cos(yaw * 0.017453292F));
     }
 

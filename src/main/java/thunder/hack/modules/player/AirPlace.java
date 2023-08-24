@@ -1,5 +1,6 @@
 package thunder.hack.modules.player;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -13,6 +14,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
@@ -39,18 +41,27 @@ public class AirPlace extends Module {
         if (hitResult instanceof BlockHitResult) hit = (BlockHitResult) hitResult;
         else return;
 
-        if (mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() instanceof BlockItem) {
+        if (mc.options.useKey.isPressed()
+                && mc.player.getMainHandStack().getItem() instanceof BlockItem) {
+            if (mc.player.isSprinting()) {
+                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+            }
+
+            if (!mc.player.isSneaking()) {
+                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
+            }
+
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hit);
 
             if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
             else mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-            // это чтоб не фастплейсило
-            ((IMinecraftClient)mc).setUseCooldown(4);
         }
+
+        ((IMinecraftClient)mc).setUseCooldown(4);
     }
 
     public void onRender3D(MatrixStack stack) {
-        if (hit == null || !mc.world.isAir(hit.getBlockPos())) return;
+        if (hit == null || !mc.world.getBlockState(hit.getBlockPos()).getBlock().equals(Blocks.AIR)) return;
 
         Render3DEngine.drawFilledBox(stack, new Box(hit.getBlockPos()), fillColor.getValue().getColorObject());
         Render3DEngine.drawBoxOutline(new Box(hit.getBlockPos()), lineColor.getValue().getColorObject(), lineWidth.getValue());

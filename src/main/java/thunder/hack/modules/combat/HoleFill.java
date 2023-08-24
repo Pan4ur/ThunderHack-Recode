@@ -1,23 +1,13 @@
 package thunder.hack.modules.combat;
 
-
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.Thunderhack;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.render.HoleESP;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
@@ -26,55 +16,56 @@ import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import thunder.hack.utility.world.HoleUtility;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-import static thunder.hack.modules.render.HoleESP.*;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class HoleFill extends Module {
-    public HoleFill() {
-        super("HoleFill", Category.COMBAT);
-    }
-    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Area);
-    private final Setting<PlaceTiming> placeTiming = new Setting<>("PlaceTiming", PlaceTiming.Default);
-    private final Setting<Integer> blocksPerTick = new Setting<>("Block/Tick", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
-    private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10, v -> placeTiming.getValue() != PlaceTiming.Sequential);
-    private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
-    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("PlaceMode", InteractionUtility.PlaceMode.Normal);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
-    private final Setting<Parent> blocks = new Setting<>("Blocks", new Parent(false, 0));
-    private final Setting<Boolean> obsidian = new Setting<>("Obsidian", true).withParent(blocks);
-    private final Setting<Boolean> anchor = new Setting<>("Anchor", false).withParent(blocks);
-    private final Setting<Boolean> enderChest = new Setting<>("EnderChest", true).withParent(blocks);
-    private final Setting<Boolean> netherite = new Setting<>("Netherite", false).withParent(blocks);
-    private final Setting<Boolean> cryingObsidian = new Setting<>("CryingObsidian", true).withParent(blocks);
-    private final Setting<Boolean> dirt = new Setting<>("Dirt", false).withParent(blocks);
-    private final Setting<Boolean> web = new Setting<>("Web", false).withParent(blocks);
+    private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
+    private final Setting<Float> placeRange = new Setting<>("Range", 5f, 1f, 6f);
+    private final Setting<Integer> actionShift = new Setting<>("BLock Per Tick", 1, 1, 4);
+    private final Setting<Integer> actionInterval = new Setting<>("Delay", 0, 0, 5);
+    private final Setting<Boolean> jumpDisable = new Setting<>("Jump Disable", false);
+    private final Setting<FillBlocks> blocks = new Setting<>("Blocks", FillBlocks.All);
+
+    private final Setting<Parent> fill = new Setting<>("Fill Holes", new Parent(true, 0));
+    private final Setting<Boolean> fillSingle = new Setting<>("Single", true).withParent(fill);
+    private final Setting<Boolean> fillDouble = new Setting<>("Double", false).withParent(fill);
+    private final Setting<Boolean> fillQuad = new Setting<>("Quad", false).withParent(fill);
+
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Always);
+    private final Setting<Float> rangeToTarget = new Setting<>("Range To Target", 2f, 1f, 5f, v -> mode.getValue() == Mode.Target);
+    private final Setting<Boolean> autoDisable = new Setting<>("Auto Disable", false);
+    private final Setting<InventoryUtility.SwitchMode> switchMode = new Setting<>("Switch Mode", InventoryUtility.SwitchMode.Packet);
+    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.All);
+
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
     private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Fade).withParent(renderCategory);
     private final Setting<ColorSetting> renderFillColor = new Setting<>("Render Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<ColorSetting> renderLineColor = new Setting<>("Render Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<Integer> renderLineWidth = new Setting<>("Render Line Width", 2, 1, 5).withParent(renderCategory);
-    private final Setting<Float> rangeXZ = new Setting<>("Range", 5f, 2f, 7f);
-    private final Setting<Float> rangeToTarget = new Setting<>("RangeToTarget", 3f, 1f, 5f, v-> mode.getValue() == Mode.UnderTarget);
-
-    private final ArrayList<BlockPos> sequentialBlocks = new ArrayList<>();
-    public static Timer inactivityTimer = new Timer();
-    private final List<BlockPos> positions = new CopyOnWriteArrayList<>();
-
-    private enum PlaceTiming {
-        Default, Vanilla, Sequential
-    }
 
     private enum Mode {
-        Area,
-        UnderTarget
+        Always,
+        Target
+    }
+
+    private enum FillBlocks {
+        All,
+        Webs,
+        Obsidian,
+        Indestrictible
     }
 
     private enum RenderMode {
@@ -83,10 +74,14 @@ public class HoleFill extends Module {
     }
 
     private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
+    public static final Timer inactivityTimer = new Timer();
+    private int tickCounter = 0;
 
-    private int delay = 0;
+    public HoleFill() {
+        super("HoleFill", Category.COMBAT);
+    }
 
-
+    @Override
     public void onRender3D(MatrixStack stack) {
         renderPoses.forEach((pos, time) -> {
             if (System.currentTimeMillis() - time > 500) {
@@ -94,8 +89,9 @@ public class HoleFill extends Module {
             } else {
                 switch (renderMode.getValue()) {
                     case Fade -> {
-                        Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(renderFillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
-                        Render3DEngine.drawBoxOutline(new Box(pos), Render2DEngine.injectAlpha(renderLineColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))), renderLineWidth.getValue());
+                        Box box = new Box(pos);
+                        Render3DEngine.drawFilledBox(stack, box, Render2DEngine.injectAlpha(renderFillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
+                        Render3DEngine.drawBoxOutline(box, Render2DEngine.injectAlpha(renderLineColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))), renderLineWidth.getValue());
                     }
                     case Decrease -> {
                         float scale = 1 - (float) (System.currentTimeMillis() - time) / 500;
@@ -109,178 +105,154 @@ public class HoleFill extends Module {
         });
     }
 
-
-    @Override
-    public void onEnable() {
-        sequentialBlocks.clear();
-        renderPoses.clear();
-    }
-
     @EventHandler
-    public void onPostSync(EventPostSync e) {
-        BlockPos targetBlock1 = getSequentialPos();
-        if (targetBlock1 == null) return;
+    public void onSync(EventSync event) {
+        if (fullNullCheck()) return;
+        if (jumpDisable.getValue() && mc.player.prevY < mc.player.getY())
+            disable(isRu() ? "Вы прыгнули! Выключаю..." : "You jumped! Disabling...");
 
-        if (delay > 0) {
-            delay--;
+        if (tickCounter < actionInterval.getValue()) {
+            tickCounter++;
             return;
         }
+        int slot = getBlockSlot();
+        if (slot == -1) return;
 
-        InventoryUtility.saveSlot();
-        if (placeTiming.getValue() == PlaceTiming.Default) {
-            int placed = 0;
-            while (placed < blocksPerTick.getValue()) {
-                BlockPos targetBlock = getSequentialPos();
-                if (targetBlock == null)
-                    break;
-                if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false)) {
-                    placed++;
-                    renderPoses.put(targetBlock, System.currentTimeMillis());
-                    delay = placeDelay.getValue();
-                }
+        List<BlockPos> holes = findHoles();
+
+        PlayerEntity target = Thunderhack.combatManager.getTargets(placeRange.getValue()).stream()
+                .min(Comparator.comparing(e -> mc.player.squaredDistanceTo(e)))
+                .orElse(null);
+
+        if (mode.getValue() == Mode.Target && target == null) return;
+
+        int blocksPlaced = 0;
+
+        while (blocksPlaced < actionShift.getValue()) {
+            BlockPos pos;
+            if (mode.getValue() == Mode.Target) {
+                pos = holes.stream()
+                        .filter(this::isHole)
+                        .filter(p -> mc.player.getPos().distanceTo(p.toCenterPos()) <= placeRange.getValue())
+                        .filter(p -> InteractionUtility.canPlaceBlock(p, interactMode.getValue()))
+                        .filter(p -> target.getPos().distanceTo(p.toCenterPos()) <= rangeToTarget.getValue())
+                        .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(p.toCenterPos())))
+                        .orElse(null);
+            } else {
+                pos = holes.stream()
+                        .filter(this::isHole)
+                        .filter(p -> mc.player.getPos().distanceTo(p.toCenterPos()) <= placeRange.getValue())
+                        .filter(p -> {
+                            InteractionUtility.checkEntities = true;
+                            boolean canPlace = InteractionUtility.canPlaceBlock(p, interactMode.getValue());
+                            InteractionUtility.checkEntities = false;
+                            return canPlace;
+                        })
+                        .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(p.toCenterPos())))
+                        .orElse(null);
             }
-        } else if (placeTiming.getValue() == PlaceTiming.Vanilla || placeTiming.getValue() == PlaceTiming.Sequential) {
-            BlockPos targetBlock = getSequentialPos();
-            if (targetBlock == null)
-                return;
 
-            if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false)) {
-                sequentialBlocks.add(targetBlock);
-                renderPoses.put(targetBlock, System.currentTimeMillis());
-                delay = placeDelay.getValue();
-            }
-        }
-        InventoryUtility.returnSlot();
-    }
+            if (pos != null) {
+                List<BlockPos> poses = Arrays.stream(HoleUtility.getHolePoses(pos)).filter(blockPos -> mc.player.getPos().distanceTo(blockPos.toCenterPos()) <= placeRange.getValue()).toList();
+                boolean broke = false;
 
-    @EventHandler
-    public void onPacketReceive(PacketEvent.Receive e) {
-        if (e.getPacket() instanceof BlockUpdateS2CPacket pac) {
-            if (placeTiming.getValue() == PlaceTiming.Sequential && !sequentialBlocks.isEmpty()) {
-                if (sequentialBlocks.contains(pac.getPos())) {
-                    BlockPos bp = getSequentialPos();
-                    if (bp != null) {
-                        InventoryUtility.saveSlot();
-                        if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false)) {
-                            sequentialBlocks.add(bp);
-                            sequentialBlocks.remove(pac.getPos());
-                            InventoryUtility.returnSlot();
-                            inactivityTimer.reset();
-                            return;
-                        }
-                        InventoryUtility.returnSlot();
-                    }
-                }
-            }
-        }
-    }
-
-    private BlockPos getSequentialPos() {
-        if(positions.isEmpty()) return null;
-        if(mode.getValue() == Mode.Area) {
-            for (BlockPos bp : positions) {
-                if (InteractionUtility.canPlaceBlock(bp, interact.getValue()) && mc.world.isAir(bp)) {
-                    return bp;
-                }
-            }
-        } else {
-            PlayerEntity target = Thunderhack.combatManager.getNearestTarget(7);
-            if(target != null){
-                for (BlockPos bp : positions) {
-                    if(target.getBlockPos().getSquaredDistance(bp.toCenterPos()) > rangeToTarget.getPow2Value()) continue;
-                    if (InteractionUtility.canPlaceBlock(bp, interact.getValue()) && mc.world.isAir(bp)) {
-                        return bp;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void onThread(){
-        findHoles();
-    }
-
-    private void findHoles() {
-        ArrayList<BlockPos> bloks = new ArrayList<>();
-        BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
-        for (int i = (int) Math.floor(playerPos.getX() - rangeXZ.getValue()); i <= Math.ceil(playerPos.getX() + rangeXZ.getValue()); i++) {
-            for (int j = (int) Math.floor(playerPos.getY() - rangeXZ.getValue()); j <= Math.ceil(playerPos.getY() + rangeXZ.getValue()); j++) {
-                for (int k = (int) Math.floor(playerPos.getZ() - rangeXZ.getValue()); k <= Math.ceil(playerPos.getZ() + rangeXZ.getValue()); k++) {
-                    BlockPos pos = new BlockPos(i, j, k);
-                    if (validIndestructible(pos)) {
-                        bloks.add(pos);
-                    } else if (validBedrock(pos)) {
-                        bloks.add(pos);
-                    } else if (validTwoBlockBedrockXZ(pos)) {
-                        bloks.add(pos);
-                    } else if (validTwoBlockIndestructibleXZ(pos)) {
-                        bloks.add(pos);
-                    } else if (validTwoBlockBedrockXZ1(pos)) {
-                        bloks.add(pos);
-                    } else if (validTwoBlockIndestructibleXZ1(pos)) {
-                        bloks.add(pos);
-                    } else if (validQuadBedrock(pos)) {
-                        bloks.add(pos);
-                    } else if (validQuadIndestructible(pos)) {
-                        bloks.add(pos);
-                    }
-                }
-            }
-        }
-        positions.clear();
-        positions.addAll(bloks);
-    }
-
-
-    private int getSlot() {
-        List<Block> canUseBlocks = new ArrayList<>();
-
-        if (obsidian.getValue()) {
-            canUseBlocks.add(Blocks.OBSIDIAN);
-        }
-        if (enderChest.getValue()) {
-            canUseBlocks.add(Blocks.ENDER_CHEST);
-        }
-        if (cryingObsidian.getValue()) {
-            canUseBlocks.add(Blocks.CRYING_OBSIDIAN);
-        }
-        if (netherite.getValue()) {
-            canUseBlocks.add(Blocks.NETHERITE_BLOCK);
-        }
-        if (anchor.getValue()) {
-            canUseBlocks.add(Blocks.RESPAWN_ANCHOR);
-        }
-        if (dirt.getValue()) {
-            canUseBlocks.add(Blocks.DIRT);
-        }
-        if (web.getValue()) {
-            canUseBlocks.add(Blocks.COBWEB);
-        }
-
-        int slot = -1;
-
-        final ItemStack mainhandStack = mc.player.getMainHandStack();
-        if (mainhandStack != ItemStack.EMPTY && mainhandStack.getItem() instanceof BlockItem) {
-            final Block blockFromMainhandItem = ((BlockItem) mainhandStack.getItem()).getBlock();
-            if (canUseBlocks.contains(blockFromMainhandItem)) {
-                slot = mc.player.getInventory().selectedSlot;
-            }
-        }
-
-        if (slot == -1) {
-            for (int i = 0; i < 9; i++) {
-                final ItemStack stack = mc.player.getInventory().getStack(i);
-                if (stack != ItemStack.EMPTY && stack.getItem() instanceof BlockItem) {
-                    final Block blockFromItem = ((BlockItem) stack.getItem()).getBlock();
-                    if (canUseBlocks.contains(blockFromItem)) {
-                        slot = i;
+                for (BlockPos blockPos : poses) {
+                    int preSlot = mc.player.getInventory().selectedSlot;
+                    InventoryUtility.switchTo(slot, switchMode.getValue());
+                    if (InteractionUtility.placeBlock(blockPos, rotate.getValue(), interactMode.getValue(), placeMode.getValue())) {
+                        blocksPlaced++;
+                        // InteractionUtility.ghostBlocks.put(blockPos, System.currentTimeMillis());
+                        tickCounter = 0;
+                        renderPoses.put(blockPos, System.currentTimeMillis());
+                        if (!mc.player.isOnGround()) return;
+                        inactivityTimer.reset();
+                    } else {
+                        broke = true;
                         break;
                     }
+                    InventoryUtility.switchTo(preSlot, switchMode.getValue());
+                }
+
+
+                if (broke) break;
+            } else {
+                if (autoDisable.getValue()) {
+                    disable(isRu() ? "Все холки заполнены!" : "All holes are filled!");
+                }
+                break;
+            }
+        }
+    }
+
+    private @NotNull List<BlockPos> findHoles() {
+        List<BlockPos> positions = new ArrayList<>();
+        BlockPos centerPos = mc.player.getBlockPos();
+        int r = (int) Math.ceil(placeRange.getValue()) + 1;
+        int h = placeRange.getValue().intValue();
+
+        for (int i = centerPos.getX() - r; i < centerPos.getX() + r; i++) {
+            for (int j = centerPos.getY() - h; j < centerPos.getY() + h; j++) {
+                for (int k = centerPos.getZ() - r; k < centerPos.getZ() + r; k++) {
+                    BlockPos pos = new BlockPos(i, j, k);
+
+                    if (isHole(pos) && !isFillingNow(pos)) positions.add(pos);
                 }
             }
         }
-        return slot;
+
+        return positions;
+    }
+
+
+    private int getBlockSlot() {
+        ItemStack stack = mc.player.getMainHandStack();
+
+        if (!stack.isEmpty() && isValidItem(stack.getItem())) {
+            return mc.player.getInventory().selectedSlot;
+        } else {
+            for (int i = 0; i < 9; ++i) {
+                stack = mc.player.getInventory().getStack(i);
+                if (!stack.isEmpty() && isValidItem(stack.getItem())) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private boolean isFillingNow(BlockPos pos) {
+        for (BlockPos checkPos : renderPoses.keySet()) {
+            if (checkPos.equals(pos)) return true;
+        }
+
+        return false;
+    }
+
+    private boolean isValidItem(Item item) {
+        if (item instanceof BlockItem) {
+            Block block = ((BlockItem) item).getBlock();
+            boolean isCorrectBlock;
+
+            switch (blocks.getValue()) {
+                case Webs -> isCorrectBlock = block == Blocks.COBWEB;
+                case Obsidian -> isCorrectBlock = block == Blocks.OBSIDIAN;
+                case Indestrictible -> isCorrectBlock = block == Blocks.OBSIDIAN
+                        || block == Blocks.CRYING_OBSIDIAN
+                        || block == Blocks.NETHERITE_BLOCK
+                        || block == Blocks.RESPAWN_ANCHOR;
+                default -> isCorrectBlock = true;
+            }
+
+            return isCorrectBlock;
+        }
+
+        return false;
+    }
+
+    private boolean isHole(BlockPos pos) {
+        return ((HoleUtility.validTwoBlockIndestructibleXZ(pos) || HoleUtility.validTwoBlockIndestructibleXZ(pos)
+                || HoleUtility.validTwoBlockBedrockXZ1(pos) || HoleUtility.validTwoBlockBedrockXZ(pos)) && fillDouble.getValue())
+                || ((HoleUtility.validQuadBedrock(pos) || HoleUtility.validQuadIndestructible(pos)) && fillQuad.getValue())
+                || ((HoleUtility.validBedrock(pos) || HoleUtility.validIndestructible(pos)) && fillSingle.getValue());
     }
 }

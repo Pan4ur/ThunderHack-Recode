@@ -15,7 +15,7 @@ public class HudEditor extends Module{
     }
 
 
-    public static final Setting<ClickGui.colorModeEn> colorMode = new Setting("ColorMode", ClickGui.colorModeEn.Static);
+    public static final Setting<ClickGui.colorModeEn> colorMode = new Setting<>("ColorMode", ClickGui.colorModeEn.Static);
     public static final Setting<Integer> colorSpeed = new Setting<>("ColorSpeed", 18, 2, 54);
     public static final Setting <Boolean> glow =  new Setting <>( "Glow" , true );
     public static final Setting<ColorSetting> hcolor1 = new Setting<>("Color", new ColorSetting(-6974059));

@@ -1,6 +1,5 @@
 package thunder.hack.modules.misc;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;

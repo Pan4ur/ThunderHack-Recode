@@ -1,6 +1,5 @@
 package thunder.hack.notification;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.setting.Setting;

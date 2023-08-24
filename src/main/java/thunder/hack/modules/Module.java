@@ -178,7 +178,11 @@ public class Module {
     }
 
     public void setBind(int key, boolean mouse, boolean hold) {
-        this.bind.setValue(new Bind(key, mouse, hold));
+        setBind(new Bind(key, mouse, hold));
+    }
+
+    public void setBind(Bind bind) {
+        this.bind.setValue(bind);
     }
 
     public boolean listening() {

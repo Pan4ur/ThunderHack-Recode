@@ -1,6 +1,5 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
@@ -13,12 +12,11 @@ import net.minecraft.util.math.BlockPos;
 import thunder.hack.utility.player.PlayerUtility;
 
 public class BowSpam extends Module {
+    private final Setting<Integer> ticks = new Setting<>("Delay", 3, 0, 20);
 
-    public Setting<Integer> ticks = new Setting<>("Delay", 3, 0, 20);
     public BowSpam() {
         super("BowSpam", "Спамит стрелами", Module.Category.COMBAT);
     }
-
 
     @EventHandler
     public void onSync(EventSync event) {

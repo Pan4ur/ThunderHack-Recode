@@ -16,7 +16,6 @@ public class Setting<T> {
     private T max;
     private Setting<Parent> parent = null;
 
-
     private boolean hasRestriction;
     private Predicate<T> visibility;
     private Module module;

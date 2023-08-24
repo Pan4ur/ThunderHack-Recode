@@ -46,11 +46,7 @@ public class BindCommand extends Command {
                         sendMessage("Unknown key '" + stringKey + "'!");
                         return SINGLE_SUCCESS;
                     }
-                    if (!stringKey.equals("M") && stringKey.contains("M")) {
-                        module.bind.setValue(new Bind(key, true, false));
-                    } else {
-                        module.bind.setValue(new Bind(key, false, false));
-                    }
+                    module.setBind(key, !stringKey.equals("M") && stringKey.contains("M"), false);
 
                     sendMessage("Bind for " + Formatting.GREEN + module.getName() + Formatting.WHITE + " set to " + Formatting.GRAY + stringKey.toUpperCase());
 

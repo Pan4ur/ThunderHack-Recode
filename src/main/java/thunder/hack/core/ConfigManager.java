@@ -26,33 +26,32 @@ import java.util.stream.Collectors;
 import static thunder.hack.modules.Module.mc;
 
 
-public class ConfigManager  {
-
-        public static  File MainFolder = new File(mc.runDirectory, "ThunderHackRecode");
-        public static  File ConfigsFolder = new File(MainFolder, "configs");
-        public static  File CustomImages = new File(MainFolder, "images");
-        public static  File TempFolder = new File(MainFolder, "temp");
-            public static  File SkinsFolder = new File(TempFolder, "skins");
-            public static  File CapesFolder = new File(TempFolder, "capes");
-            public static  File HeadsFolder = new File(TempFolder, "heads");
-            public static  File DiscordEmbeds = new File(TempFolder, "embeds");
-        public static  File MiscFolder = new File(MainFolder, "misc");
-            public static  File KitsFolder = new File(MiscFolder, "kits");
-            //friends
-            //enemies
-            //webhook
-            //rpc
-            //autoEz
-            //currentcfg
-            //macro
-            //search
-            //alts
+public class ConfigManager {
+    public static File MainFolder = new File(mc.runDirectory, "ThunderHackRecode");
+    public static File ConfigsFolder = new File(MainFolder, "configs");
+    public static File CustomImages = new File(MainFolder, "images");
+    public static File TempFolder = new File(MainFolder, "temp");
+    public static File SkinsFolder = new File(TempFolder, "skins");
+    public static File CapesFolder = new File(TempFolder, "capes");
+    public static File HeadsFolder = new File(TempFolder, "heads");
+    public static File DiscordEmbeds = new File(TempFolder, "embeds");
+    public static File MiscFolder = new File(MainFolder, "misc");
+    public static File KitsFolder = new File(MiscFolder, "kits");
+    //friends
+    //enemies
+    //webhook
+    //rpc
+    //autoEz
+    //currentcfg
+    //macro
+    //search
+    //alts
 
     public static boolean firstLaunch = false;
 
 
-    public ConfigManager(){
-        if (!MainFolder.exists()){
+    public ConfigManager() {
+        if (!MainFolder.exists()) {
             MainFolder.mkdirs();
             firstLaunch = true;
         }
@@ -92,11 +91,13 @@ public class ConfigManager  {
         Path path = Paths.get("ThunderHackRecode/configs/" + name + ".th");
         try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("cfg/" + name + ".th");
              OutputStream out = Files.newOutputStream(path)) {
-            if (in  == null) return;
+            if (in == null) return;
             IOUtils.copy(in, out);
             load(name);
             MainSettings.language.setValue(prevLang);
-        } catch (IOException e) {e.printStackTrace();}
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -134,7 +135,7 @@ public class ConfigManager  {
     public void load(String name) {
         File file = new File(ConfigsFolder, name + ".th");
         if (!file.exists()) {
-            if(MainSettings.isRu()) {
+            if (MainSettings.isRu()) {
                 Command.sendMessage("Конфига " + name + " не существует!");
             } else {
                 Command.sendMessage("Config " + name + " does not exist!");
@@ -142,7 +143,7 @@ public class ConfigManager  {
             return;
         }
 
-        if(currentConfig != null){
+        if (currentConfig != null) {
             save(currentConfig);
         }
 
@@ -170,7 +171,8 @@ public class ConfigManager  {
             try {
                 JsonObject modulesObject = (JsonObject) array.get(0);
                 modules = modulesObject.getAsJsonArray("Modules");
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
             if (modules != null) {
                 modules.forEach(m -> {
                     try {
@@ -181,7 +183,7 @@ public class ConfigManager  {
                 });
             }
 
-            if(MainSettings.isRu()) {
+            if (MainSettings.isRu()) {
                 Command.sendMessage("Загружен конфиг " + config.getName());
             } else {
                 Command.sendMessage("Loaded " + config.getName());
@@ -199,7 +201,7 @@ public class ConfigManager  {
         File file = new File(ConfigsFolder, name + ".th");
 
         if (file.exists()) {
-            if(MainSettings.isRu()) {
+            if (MainSettings.isRu()) {
                 Command.sendMessage("Конфиг " + name + " уже существует!");
             } else {
                 Command.sendMessage("Config " + name + " already exists!");
@@ -208,7 +210,7 @@ public class ConfigManager  {
         }
 
         save(file);
-        if(MainSettings.isRu()) {
+        if (MainSettings.isRu()) {
             Command.sendMessage("Конфиг " + name + " успешно сохранен!");
         } else {
             Command.sendMessage("Config " + name + " successfully saved!");
@@ -241,7 +243,6 @@ public class ConfigManager  {
     }
 
 
-
     private void parseModule(JsonObject object) throws NullPointerException {
 
         Module module = Thunderhack.moduleManager.modules.stream()
@@ -251,7 +252,7 @@ public class ConfigManager  {
         if (module != null) {
             JsonObject mobject = object.getAsJsonObject(module.getName());
 
-            for(Setting setting2 : module.getSettings()){
+            for (Setting setting2 : module.getSettings()) {
                 try {
                     switch (setting2.getType()) {
                         case "Parent":
@@ -282,10 +283,10 @@ public class ConfigManager  {
                             } catch (Exception e) {
                                 // чтоб не проебать бинды если до этого был конфиг
                                 // можно будет убрать спустя ~5 обнов
-                                if(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().contains("M"))
-                                    setting2.setValue( new Bind(Integer.parseInt(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().replace("M","")),true,false));
+                                if (mobject.getAsJsonPrimitive(setting2.getName()).getAsString().contains("M"))
+                                    setting2.setValue(new Bind(Integer.parseInt(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().replace("M", "")), true, false));
                                 else
-                                    setting2.setValue( new Bind(mobject.getAsJsonPrimitive(setting2.getName()).getAsInt(),false,false));
+                                    setting2.setValue(new Bind(mobject.getAsJsonPrimitive(setting2.getName()).getAsInt(), false, false));
                             }
                             continue;
                         case "ColorSetting":
@@ -307,7 +308,7 @@ public class ConfigManager  {
                             } catch (Exception ignored) {
                             }
                     }
-                } catch (Exception e){
+                } catch (Exception e) {
                     System.out.println(module.getName());
                     System.out.println(setting2);
                     e.printStackTrace();
@@ -328,52 +329,52 @@ public class ConfigManager  {
         JsonObject attribs = new JsonObject();
         JsonParser jp = new JsonParser();
 
-            for (Setting setting : m.getSettings()) {
+        for (Setting setting : m.getSettings()) {
 
-                if(setting.isColorSetting()){
-                    JsonArray array = new JsonArray();
-                    array.add(new JsonPrimitive(((ColorSetting) setting.getValue()).getRawColor()));
-                    array.add(new JsonPrimitive(((ColorSetting) setting.getValue()).isCycle()));
-                    array.add(new JsonPrimitive(((ColorSetting) setting.getValue()).getGlobalOffset()));
-                    attribs.add(setting.getName(), array);
-                    continue;
-                }
-                if(setting.isPositionSetting()){
-                    JsonArray array = new JsonArray();
-                    float num2 = ((PositionSetting) setting.getValue()).getX();
-                    float num1 = ((PositionSetting) setting.getValue()).getY();
-                    array.add(new JsonPrimitive(num2));
-                    array.add(new JsonPrimitive(num1));
-
-                    attribs.add(setting.getName(), array);
-                    continue;
-                }
-                if(setting.isBindSetting()) {
-                    Bind b = (Bind) setting.getValue();
-                    JsonArray array = new JsonArray();
-                    boolean hold = ((Bind) setting.getValue()).isHold();
-                    if (b.isMouse())
-                        array.add(jp.parse(b.getBind()));
-                    else
-                        array.add(new JsonPrimitive(b.getKey()));
-                    array.add(new JsonPrimitive(hold));
-                    attribs.add(setting.getName(), array);
-                    continue;
-                }
-                if (setting.isStringSetting()) {
-                    String str = (String) setting.getValue();
-                    setting.setValue(str.replace(" ", "_"));
-                }
-                if (setting.isEnumSetting()) {
-                    EnumConverter converter = new EnumConverter(((Enum) setting.getValue()).getClass());
-                    attribs.add(setting.getName(), converter.doForward((Enum) setting.getValue()));
-                    continue;
-                }
-                try {
-                    attribs.add(setting.getName(), jp.parse(setting.getValueAsString()));
-                } catch (Exception ignored) {
-                }
+            if (setting.isColorSetting()) {
+                JsonArray array = new JsonArray();
+                array.add(new JsonPrimitive(((ColorSetting) setting.getValue()).getRawColor()));
+                array.add(new JsonPrimitive(((ColorSetting) setting.getValue()).isCycle()));
+                array.add(new JsonPrimitive(((ColorSetting) setting.getValue()).getGlobalOffset()));
+                attribs.add(setting.getName(), array);
+                continue;
             }
+            if (setting.isPositionSetting()) {
+                JsonArray array = new JsonArray();
+                float num2 = ((PositionSetting) setting.getValue()).getX();
+                float num1 = ((PositionSetting) setting.getValue()).getY();
+                array.add(new JsonPrimitive(num2));
+                array.add(new JsonPrimitive(num1));
+
+                attribs.add(setting.getName(), array);
+                continue;
+            }
+            if (setting.isBindSetting()) {
+                Bind b = (Bind) setting.getValue();
+                JsonArray array = new JsonArray();
+                boolean hold = ((Bind) setting.getValue()).isHold();
+                if (b.isMouse())
+                    array.add(jp.parse(b.getBind()));
+                else
+                    array.add(new JsonPrimitive(b.getKey()));
+                array.add(new JsonPrimitive(hold));
+                attribs.add(setting.getName(), array);
+                continue;
+            }
+            if (setting.isStringSetting()) {
+                String str = (String) setting.getValue();
+                setting.setValue(str.replace(" ", "_"));
+            }
+            if (setting.isEnumSetting()) {
+                EnumConverter converter = new EnumConverter(((Enum) setting.getValue()).getClass());
+                attribs.add(setting.getName(), converter.doForward((Enum) setting.getValue()));
+                continue;
+            }
+            try {
+                attribs.add(setting.getName(), jp.parse(setting.getValueAsString()));
+            } catch (Exception ignored) {
+            }
+        }
 
         JsonObject moduleObject = new JsonObject();
         moduleObject.add(m.getName(), attribs);
@@ -399,8 +400,8 @@ public class ConfigManager  {
         List<String> list = new ArrayList<>();
 
         if (ConfigsFolder.listFiles() != null) {
-            for(File file : Arrays.stream(ConfigsFolder.listFiles()).filter(f -> f.getName().endsWith(".th")).collect(Collectors.toList())){
-                list.add(file.getName().replace(".th",""));
+            for (File file : Arrays.stream(ConfigsFolder.listFiles()).filter(f -> f.getName().endsWith(".th")).collect(Collectors.toList())) {
+                list.add(file.getName().replace(".th", ""));
             }
         }
         return list;
@@ -412,12 +413,12 @@ public class ConfigManager  {
         try {
             if (file.exists()) {
                 FileWriter writer = new FileWriter(file);
-                writer.write(currentConfig.getName().replace(".th",""));
+                writer.write(currentConfig.getName().replace(".th", ""));
                 writer.close();
             } else {
                 file.createNewFile();
                 FileWriter writer = new FileWriter(file);
-                writer.write(currentConfig.getName().replace(".th",""));
+                writer.write(currentConfig.getName().replace(".th", ""));
                 writer.close();
             }
         } catch (Exception e) {
@@ -438,7 +439,7 @@ public class ConfigManager  {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        currentConfig = new File(ConfigsFolder,name + ".th");
+        currentConfig = new File(ConfigsFolder, name + ".th");
         return currentConfig;
     }
 }

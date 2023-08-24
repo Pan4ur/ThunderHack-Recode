@@ -1,6 +1,5 @@
 package thunder.hack.modules.misc;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import thunder.hack.events.impl.EventAttack;
@@ -15,7 +14,7 @@ public class HitSound extends Module {
         super("HitSound", "HitSound", Category.MISC);
     }
 
-    private Setting<Mode> mode = new Setting("Sound", Mode.MOAN);
+    private Setting<Mode> mode = new Setting<>("Sound", Mode.MOAN);
     public Setting<Float> volume = new Setting<>("Volume", 1f, 0.1f, 10f);
     public Setting<Float> pitch = new Setting<>("Pitch", 1f, 0.1f, 10f);
 

@@ -123,7 +123,10 @@ public class AutoCrystal extends Module {
     public Setting<Integer> slideDelay = new Setting<>("Slide Delay", 200, 1, 1000, v -> page.getValue() == Pages.Render);
     public Setting<ColorSetting> textColor = new Setting<>("Text Color", new ColorSetting(Color.WHITE), v -> page.getValue() == Pages.Render);
 
-    private enum Pages {Place, Break, Pause, Render, Damages, Main, Switch}
+    private enum Pages {
+        Place,
+        Break,
+        Pause, Render, Damages, Main, Switch}
 
     private enum Switch {NONE, NORMAL, SILENT, INVENTORY}
 
@@ -150,7 +153,6 @@ public class AutoCrystal extends Module {
 
     // id кристаллa и кол-во ударов
     private final List<AttackData> attackedCrystals = new CopyOnWriteArrayList<>();
-
 
     private float renderDamage = 0;
 

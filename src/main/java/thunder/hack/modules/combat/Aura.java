@@ -27,14 +27,12 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.core.Core;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
-import thunder.hack.modules.misc.FakePlayer;
 import thunder.hack.modules.movement.Speed;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
@@ -52,11 +50,9 @@ import static net.minecraft.util.UseAction.BLOCK;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
 
 public class Aura extends Module {
-
     public Aura() {
         super("Aura", "Запомните блядь-киллка тх не мисает-а дает шанс убежать", Category.COMBAT);
     }
-
 
     public static final Setting<Float> attackRange = new Setting<>("Attack Range", 3.1f, 1f, 7.0f);
     public static final Setting<Mode> mode = new Setting<>("Rotation", Mode.Universal);
@@ -82,7 +78,8 @@ public class Aura extends Module {
     public final Setting<Boolean> ignoreShield = new Setting<>("IgnoreShield", true).withParent(targets);
 
     public enum Mode {
-        Universal, None
+        Universal,
+        None
     }
 
     public enum Grim {
@@ -287,45 +284,41 @@ public class Aura extends Module {
             return;
         }
 
-        switch (mode.getValue()) {
-            case Universal: {
-                Vec3d targetVec = getLegitLook(target);
-                if (targetVec == null) {
-                    return;
-                }
-                float delta_yaw = wrapDegrees((float) wrapDegrees(Math.toDegrees(Math.atan2(targetVec.z - mc.player.getZ(), (targetVec.x - mc.player.getX()))) - 90) - rotationYaw);
-                float delta_pitch = ((float) (-Math.toDegrees(Math.atan2(targetVec.y - (mc.player.getPos().y + mc.player.getEyeHeight(mc.player.getPose())), Math.sqrt(Math.pow((targetVec.x - mc.player.getX()), 2) + Math.pow(targetVec.z - mc.player.getZ(), 2))))) - rotationPitch);
-                if (!lookingAtHitbox) {
-                    if (pitchAcceleration < 8f) {
-                        pitchAcceleration *= 1.65;
-                    } else {
-                        pitchAcceleration = 1f;
-                    }
-                    if (pitchAcceleration <= 0) {
-                        pitchAcceleration = 1f;
-                    }
+        if (mode.getValue() == Mode.Universal) {
+            Vec3d targetVec = getLegitLook(target);
+            if (targetVec == null) {
+                return;
+            }
+            float delta_yaw = wrapDegrees((float) wrapDegrees(Math.toDegrees(Math.atan2(targetVec.z - mc.player.getZ(), (targetVec.x - mc.player.getX()))) - 90) - rotationYaw);
+            float delta_pitch = ((float) (-Math.toDegrees(Math.atan2(targetVec.y - (mc.player.getPos().y + mc.player.getEyeHeight(mc.player.getPose())), Math.sqrt(Math.pow((targetVec.x - mc.player.getX()), 2) + Math.pow(targetVec.z - mc.player.getZ(), 2))))) - rotationPitch);
+            if (!lookingAtHitbox) {
+                if (pitchAcceleration < 8f) {
+                    pitchAcceleration *= 1.65;
                 } else {
                     pitchAcceleration = 1f;
                 }
-
-                if (delta_yaw > 180) {
-                    delta_yaw = delta_yaw - 180;
+                if (pitchAcceleration <= 0) {
+                    pitchAcceleration = 1f;
                 }
-
-                float deltaYaw = MathHelper.clamp(MathHelper.abs(delta_yaw), MathUtility.random(-65f, -75f), MathUtility.random(65f, 75f));
-
-                float newYaw = rotationYaw + (delta_yaw > 0 ? deltaYaw : -deltaYaw);
-                float pitch_speed = pitchAcceleration + MathUtility.random(-1f, 1f);
-
-                float newPitch = MathHelper.clamp(rotationPitch + MathHelper.clamp(delta_pitch, -pitch_speed, pitch_speed), -90.0F, 90.0F);
-
-                double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
-
-                rotationYaw = (float) (newYaw - (newYaw - rotationYaw) % gcdFix);
-                rotationPitch = (float) (newPitch - (newPitch - rotationPitch) % gcdFix);
-
-                break;
+            } else {
+                pitchAcceleration = 1f;
             }
+
+            if (delta_yaw > 180) {
+                delta_yaw = delta_yaw - 180;
+            }
+
+            float deltaYaw = MathHelper.clamp(MathHelper.abs(delta_yaw), MathUtility.random(-65f, -75f), MathUtility.random(65f, 75f));
+
+            float newYaw = rotationYaw + (delta_yaw > 0 ? deltaYaw : -deltaYaw);
+            float pitch_speed = pitchAcceleration + MathUtility.random(-1f, 1f);
+
+            float newPitch = MathHelper.clamp(rotationPitch + MathHelper.clamp(delta_pitch, -pitch_speed, pitch_speed), -90.0F, 90.0F);
+
+            double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
+
+            rotationYaw = (float) (newYaw - (newYaw - rotationYaw) % gcdFix);
+            rotationPitch = (float) (newPitch - (newPitch - rotationPitch) % gcdFix);
         }
     }
 

@@ -3,7 +3,6 @@ package thunder.hack.setting.impl;
 import java.awt.*;
 
 public final class ColorSetting {
-
     private int color;
     private boolean cycle = false;
     private int globalOffset = 0;
@@ -38,8 +37,7 @@ public final class ColorSetting {
     }
 
     public static int parseColor(String nm) throws NumberFormatException {
-        Integer intval = Integer.decode(nm);
-        return intval;
+        return Integer.decode(nm);
     }
 
     public int getColor() {
@@ -153,5 +151,4 @@ public final class ColorSetting {
     public void toggleCycle() {
         this.cycle = !this.cycle;
     }
-
 }

@@ -23,6 +23,7 @@ import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.world.HoleUtility;
 
 import java.awt.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -271,14 +272,7 @@ public class PistonPush extends Module {
                 && player.distanceTo(((mc.player))) <= range.getValue()
                 && !player.isDead()
                 && player.getHealth() + player.getAbsorptionAmount() > 0
-                && (HoleESP.validBedrock(player.getBlockPos())
-                || HoleESP.validIndestructible(player.getBlockPos())
-                || HoleESP.validTwoBlockIndestructibleXZ(player.getBlockPos())
-                || HoleESP.validTwoBlockBedrockXZ(player.getBlockPos())
-                || HoleESP.validTwoBlockIndestructibleXZ1(player.getBlockPos())
-                || HoleESP.validTwoBlockBedrockXZ1(player.getBlockPos())
-                || HoleESP.validQuadIndestructible(player.getBlockPos())
-                || HoleESP.validBedrock(player.getBlockPos()));
+                && HoleUtility.isHole(player.getBlockPos());
     }
 
     private void findTarget() {
