@@ -3,6 +3,7 @@ package thunder.hack.modules.client;
 import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
+import net.minecraft.client.MinecraftClient;
 import thunder.hack.Thunderhack;
 import thunder.hack.setting.Setting;
 import thunder.hack.modules.Module;
@@ -16,8 +17,13 @@ import java.util.Objects;
 public
 class RPC extends Module {
 
+    private static DiscordRPC rpc;
+
     public RPC() {
         super("DiscordRPC", "крутая рпс", Category.CLIENT);
+        if(!MinecraftClient.IS_SYSTEM_MAC){
+            rpc = DiscordRPC.INSTANCE;
+        }
     }
 
     public Setting<mode> Mode = new Setting("Picture", mode.Recode);
@@ -28,7 +34,6 @@ class RPC extends Module {
     public Setting<Boolean> nickname = new Setting<>("Nickname", true);
 
     public static boolean inQ = false;
-    private static final DiscordRPC rpc = DiscordRPC.INSTANCE;
     public static DiscordRichPresence presence = new DiscordRichPresence();
     private static Thread thread;
     public static boolean started;
