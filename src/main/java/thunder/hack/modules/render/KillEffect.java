@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class KillEffect extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Orthodox);
 
-    private final Setting<Integer> speed = new Setting<>("Speed", 0, -10, 10, value -> mode.getValue() == Mode.Orthodox);
+    private final Setting<Integer> speed = new Setting<>("Y Speed", 0, -10, 10, value -> mode.getValue() == Mode.Orthodox);
     private final Setting<Boolean> playSound = new Setting<>("Play Sound", true, value -> mode.getValue() == Mode.Orthodox);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(new Color(255, 255, 0, 150)), value -> mode.getValue() == Mode.Orthodox);
 
@@ -35,6 +35,8 @@ public class KillEffect extends Module {
 
     @Override
     public void onRender3D(MatrixStack stack) {
+        if (mc.world == null) return;
+
         switch (mode.getValue()) {
             case Orthodox -> renderEntities.forEach((entity, time) -> {
                 if (System.currentTimeMillis() - time > 3000) {

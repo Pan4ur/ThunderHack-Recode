@@ -1,7 +1,6 @@
 package thunder.hack.modules.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.Identifier;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;

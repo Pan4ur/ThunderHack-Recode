@@ -2,7 +2,6 @@ package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.Thunderhack;
@@ -12,8 +11,9 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.player.PlaceUtility;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.Blocks;
@@ -21,23 +21,18 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import thunder.hack.utility.world.HoleUtility;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class HoleFill extends Module {
     private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
-    private final Setting<Boolean> strictDirection = new Setting<>("StrictDirection", false);
+    private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
     private final Setting<Float> placeRange = new Setting<>("Range", 5f, 1f, 6f);
     private final Setting<Integer> actionShift = new Setting<>("BLock Per Tick", 1, 1, 4);
     private final Setting<Integer> actionInterval = new Setting<>("Delay", 0, 0, 5);
@@ -52,7 +47,8 @@ public class HoleFill extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Always);
     private final Setting<Float> rangeToTarget = new Setting<>("Range To Target", 2f, 1f, 5f, v -> mode.getValue() == Mode.Target);
     private final Setting<Boolean> autoDisable = new Setting<>("Auto Disable", false);
-    private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
+    private final Setting<InventoryUtility.SwitchMode> switchMode = new Setting<>("Switch Mode", InventoryUtility.SwitchMode.Packet);
+    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.All);
 
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
     private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Fade).withParent(renderCategory);
@@ -137,28 +133,35 @@ public class HoleFill extends Module {
             if (mode.getValue() == Mode.Target) {
                 pos = holes.stream()
                         .filter(this::isHole)
-                        .filter(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5)) <= placeRange.getValue())
-                        .filter(p -> PlaceUtility.canPlaceBlock(p, strictDirection.getValue()))
-                        .filter(p -> target.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5)) <= rangeToTarget.getValue())
-                        .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5))))
+                        .filter(p -> mc.player.getPos().distanceTo(p.toCenterPos()) <= placeRange.getValue())
+                        .filter(p -> InteractionUtility.canPlaceBlock(p, interactMode.getValue()))
+                        .filter(p -> target.getPos().distanceTo(p.toCenterPos()) <= rangeToTarget.getValue())
+                        .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(p.toCenterPos())))
                         .orElse(null);
             } else {
                 pos = holes.stream()
                         .filter(this::isHole)
-                        .filter(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5)) <= placeRange.getValue())
-                        .filter(p -> PlaceUtility.canPlaceBlock(p, strictDirection.getValue()))
-                        .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5))))
+                        .filter(p -> mc.player.getPos().distanceTo(p.toCenterPos()) <= placeRange.getValue())
+                        .filter(p -> {
+                            InteractionUtility.checkEntities = true;
+                            boolean canPlace = InteractionUtility.canPlaceBlock(p, interactMode.getValue());
+                            InteractionUtility.checkEntities = false;
+                            return canPlace;
+                        })
+                        .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(p.toCenterPos())))
                         .orElse(null);
             }
 
             if (pos != null) {
-                BlockPos[] poses = HoleUtility.getHolePoses(pos);
+                List<BlockPos> poses = Arrays.stream(HoleUtility.getHolePoses(pos)).filter(blockPos -> mc.player.getPos().distanceTo(blockPos.toCenterPos()) <= placeRange.getValue()).toList();
                 boolean broke = false;
 
                 for (BlockPos blockPos : poses) {
-                    if (PlaceUtility.place(blockPos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, slot, false, placeMode.getValue())) {
+                    int preSlot = mc.player.getInventory().selectedSlot;
+                    InventoryUtility.switchTo(slot, switchMode.getValue());
+                    if (InteractionUtility.placeBlock(blockPos, rotate.getValue(), interactMode.getValue(), placeMode.getValue())) {
                         blocksPlaced++;
-                        PlaceUtility.ghostBlocks.put(blockPos, System.currentTimeMillis());
+                        // InteractionUtility.ghostBlocks.put(blockPos, System.currentTimeMillis());
                         tickCounter = 0;
                         renderPoses.put(blockPos, System.currentTimeMillis());
                         if (!mc.player.isOnGround()) return;
@@ -167,7 +170,9 @@ public class HoleFill extends Module {
                         broke = true;
                         break;
                     }
+                    InventoryUtility.switchTo(preSlot, switchMode.getValue());
                 }
+
 
                 if (broke) break;
             } else {

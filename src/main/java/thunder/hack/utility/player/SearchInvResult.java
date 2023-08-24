@@ -2,6 +2,7 @@ package thunder.hack.utility.player;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import org.jetbrains.annotations.NotNull;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -12,11 +13,13 @@ public record SearchInvResult(int slot, boolean found, ItemStack stack) {
         return NOT_FOUND_RESULT;
     }
 
-    public static SearchInvResult inOffhand(ItemStack stack) {
+    public static @NotNull SearchInvResult inOffhand(ItemStack stack) {
         return new SearchInvResult(999, true, stack);
     }
 
-    public boolean isHolding(){
+    public boolean isHolding() {
+        if (mc.player == null) return false;
+
         return mc.player.getInventory().selectedSlot == slot;
     }
 
@@ -25,7 +28,7 @@ public record SearchInvResult(int slot, boolean found, ItemStack stack) {
     }
 
     public void switchIfFound() {
-        if(found)
+        if (found)
             switchTo(InventoryUtility.SwitchMode.All);
     }
 

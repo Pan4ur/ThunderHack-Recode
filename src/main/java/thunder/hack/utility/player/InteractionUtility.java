@@ -222,12 +222,13 @@ public final class InteractionUtility {
         return visibleSides;
     }
 
-    public static BreakData getBreakData(BlockPos bp, Interact interact) {
+    public static @Nullable BreakData getBreakData(BlockPos bp, Interact interact) {
         if (interact == Interact.Vanilla) return new BreakData(Direction.UP, bp.toCenterPos().add(0, 0.5, 0));
         if (interact == Interact.Strict) {
             float bestDistance = 999f;
             Direction bestDirection = Direction.UP;
             Vec3d bestVector = null;
+
             for (Direction dir : Direction.values()) {
                 Vec3d directionVec = new Vec3d(bp.getX() + 0.5 + dir.getVector().getX() * 0.5, bp.getY() + 0.5 + dir.getVector().getY() * 0.5, bp.getZ() + 0.5 + dir.getVector().getZ() * 0.5);
                 float distance = squaredDistanceFromEyes(directionVec);
@@ -237,9 +238,11 @@ public final class InteractionUtility {
                     bestDistance = distance;
                 }
             }
+
             if (bestVector == null) return null;
             return new BreakData(bestDirection, bestVector);
         }
+
         if (interact == Interact.Legit) {
             float bestDistance = 999f;
             BreakData bestData = null;

@@ -5,12 +5,15 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
@@ -18,15 +21,15 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
-import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.world.HoleUtility;
 
-import java.util.Arrays;
+import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -38,14 +41,17 @@ public class Blocker extends Module {
     private final Setting<Integer> actionInterval = new Setting<>("Delay", 0, 0, 5);
     private final Setting<Boolean> crystalBreaker = new Setting<>("Destroy Crystal", false);
 
+    private final Setting<Boolean> newBlocks = new Setting<>("1.16 Blocks", true);
+    private final Setting<Boolean> allowAnchors = new Setting<>("Allow Anchors", false, (value) -> newBlocks.getValue());
+
     private final Setting<Parent> logic = new Setting<>("Logic", new Parent(false, 0));
     private final Setting<Boolean> antiCev = new Setting<>("Anti Cev", true).withParent(logic);
     private final Setting<Boolean> antiCiv = new Setting<>("Anti Civ", true).withParent(logic);
     private final Setting<Boolean> expand = new Setting<>("Expand", true).withParent(logic);
 
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
-    private final Setting<Boolean> strictDirection = new Setting<>("Strict Direction", false);
-    private final Setting<PlaceUtility.PlaceMode> placeMode = new Setting<>("Place Mode", PlaceUtility.PlaceMode.All);
+    private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
+    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.All);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
 
     private final Setting<Parent> render = new Setting<>("Render", new Parent(false, 0));
@@ -72,6 +78,11 @@ public class Blocker extends Module {
                 Render3DEngine.drawBoxOutline(new Box(pos), lineColor.getValue().getColorObject(), lineWidth.getValue());
             }
         });
+        if (HoleUtility.isHole(mc.player.getBlockPos())) {
+            for (BlockPos pos : HoleUtility.getSurroundPoses(mc.player.getBlockPos())) {
+                Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(Color.BLUE, 100));
+            }
+        }
     }
 
     @EventHandler
@@ -84,10 +95,13 @@ public class Blocker extends Module {
             tickCounter = 0;
         }
 
-        SearchInvResult obsidianResult = InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN);
-        SearchInvResult eChestResult = InventoryUtility.findBlockInHotBar(Blocks.ENDER_CHEST);
+        SearchInvResult searchResult = InventoryUtility.findInInventory(stack -> {
+            Item item = stack.getItem();
+            return item == Items.OBSIDIAN || item == Items.ENDER_CHEST
+                    || (newBlocks.getValue() && (item == Items.CRYING_OBSIDIAN || item == Items.NETHERITE_BLOCK || (allowAnchors.getValue() && item == Items.RESPAWN_ANCHOR)));
+        });
 
-        if (!obsidianResult.found() && !eChestResult.found()) return;
+        if (!searchResult.found()) return;
 
         int blocksPlaced = 0;
 
@@ -95,12 +109,17 @@ public class Blocker extends Module {
 
         while (blocksPlaced < actionShift.getValue()) {
             BlockPos pos = placePositions.stream()
-                    .filter(p -> PlaceUtility.canPlaceBlock(p, strictDirection.getValue(), true))
+                    .filter(p -> {
+                        InteractionUtility.checkEntities = true;
+                        boolean canPlace = InteractionUtility.canPlaceBlock(p, interactMode.getValue());
+                        InteractionUtility.checkEntities = false;
+
+                        return canPlace;
+                    })
                     .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5))))
                     .orElse(null);
 
             if (pos != null) {
-
                 if (crystalBreaker.getValue())
                     for (Entity entity : mc.world.getOtherEntities(null, new Box(pos))) {
                         if (entity instanceof EndCrystalEntity) {
@@ -110,13 +129,13 @@ public class Blocker extends Module {
                         }
                     }
 
-                if (PlaceUtility.place(pos, rotate.getValue(), strictDirection.getValue(), Hand.MAIN_HAND, !obsidianResult.found() ? eChestResult.slot() : obsidianResult.slot(), false, placeMode.getValue())) {
+                if (InteractionUtility.placeBlock(pos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), searchResult, true)) {
                     if (swing.getValue())
                         mc.player.swingHand(Hand.MAIN_HAND);
 
                     blocksPlaced++;
                     renderBlocks.put(pos, System.currentTimeMillis());
-                    PlaceUtility.ghostBlocks.put(pos, System.currentTimeMillis());
+                    // InteractionUtility.ghostBlocks.put(pos, System.currentTimeMillis());
                     tickCounter = 0;
                     placePositions.remove(pos);
                     inactivityTimer.reset();
@@ -131,7 +150,7 @@ public class Blocker extends Module {
     }
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.Receive e) {
+    public void onPacketReceive(PacketEvent.@NotNull Receive e) {
         BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
         if (e.getPacket() instanceof BlockBreakingProgressS2CPacket
                 && (HoleUtility.validIndestructible(playerPos)
@@ -149,31 +168,24 @@ public class Blocker extends Module {
                 placePositions.add(playerPos.up().up().up());
             }
 
-            sendMessage(Arrays.toString(HoleUtility.getSurroundPoses(playerPos).toArray()) + " ::: " + pos);
             if (HoleUtility.getSurroundPoses(playerPos).contains(pos)) {
-                placePositions.add(pos.add(0, 1, 0));
+                placePositions.add(pos.up());
 
                 if (expand.getValue()) {
                     for (Vec3i vec : HoleUtility.VECTOR_PATTERN) {
-                        if (PlaceUtility.canPlaceBlock(pos.add(vec), strictDirection.getValue(), true)) {
+                        InteractionUtility.checkEntities = true;
+                        if (InteractionUtility.canPlaceBlock(pos.add(vec), interactMode.getValue())) {
                             placePositions.add(pos.add(vec));
                         }
+                        InteractionUtility.checkEntities = false;
                     }
                 }
             }
 
             if (antiCiv.getValue()) {
-                if (pos.equals(playerPos.north().up())) {
-                    placePositions.add(playerPos.north().add(0, 2, 0));
-                }
-                if (pos.equals(playerPos.east().up())) {
-                    placePositions.add(playerPos.east().add(0, 2, 0));
-                }
-                if (pos.equals(playerPos.west().up())) {
-                    placePositions.add(playerPos.west().add(0, 2, 0));
-                }
-                if (pos.equals(playerPos.south().up())) {
-                    placePositions.add(playerPos.south().add(0, 2, 0));
+                for (BlockPos checkPos : HoleUtility.getSurroundPoses(playerPos)) {
+                    if (checkPos.up().equals(pos))
+                        playerPos.add(checkPos.add(0, 2, 0));
                 }
             }
         }

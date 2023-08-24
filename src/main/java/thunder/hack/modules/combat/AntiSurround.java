@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
@@ -19,8 +20,8 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
-import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.world.HoleUtility;
 
@@ -96,7 +97,10 @@ public class AntiSurround extends Module {
                 if (ModuleManager.speedMine.isEnabled() && SpeedMine.progress != 0) {
                     return;
                 }
-                mc.interactionManager.attackBlock(minePos, PlaceUtility.getBreakDirection(minePos, true));
+                InteractionUtility.BreakData data = InteractionUtility.getBreakData(minePos, InteractionUtility.Interact.Strict);
+                if (data == null) return;
+
+                mc.interactionManager.attackBlock(minePos, data.dir());
                 mc.player.swingHand(Hand.MAIN_HAND);
                 this.blockPos = minePos;
             }
@@ -117,9 +121,12 @@ public class AntiSurround extends Module {
         return fArray;
     }
 
-    public static float @NotNull [] getRotations(@NotNull BlockPos blockPos) {
+    public static float @Nullable [] getRotations(@NotNull BlockPos blockPos) {
         Vec3d vec3d2 = blockPos.toCenterPos();
-        return calcAngle(vec3d2.add(new Vec3d(PlaceUtility.getBreakDirection(blockPos, true).getUnitVector()).multiply(0.5)));
+        InteractionUtility.BreakData data = InteractionUtility.getBreakData(blockPos, InteractionUtility.Interact.Strict);
+        if (data == null) return null;
+
+        return calcAngle(vec3d2.add(new Vec3d(data.dir().getUnitVector()).multiply(0.5)));
     }
 
     public boolean checkPickaxe() {

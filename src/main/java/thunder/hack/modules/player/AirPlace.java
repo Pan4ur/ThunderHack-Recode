@@ -9,12 +9,12 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
-import thunder.hack.core.PlaceManager;
 import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
@@ -43,14 +43,12 @@ public class AirPlace extends Module {
 
         if (mc.options.useKey.isPressed()
                 && mc.player.getMainHandStack().getItem() instanceof BlockItem) {
-            if (mc.player.isSprinting() && !PlaceManager.syncSprinting) {
+            if (mc.player.isSprinting()) {
                 mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
-                PlaceManager.syncSprinting = true;
             }
 
-            if (!mc.player.isSneaking() && !PlaceManager.syncSneaking) {
+            if (!mc.player.isSneaking()) {
                 mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
-                PlaceManager.syncSneaking = true;
             }
 
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hit);
@@ -58,7 +56,7 @@ public class AirPlace extends Module {
             if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
             else mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         }
-        // это чтоб не фастплейсило
+
         ((IMinecraftClient)mc).setUseCooldown(4);
     }
 

@@ -17,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 import org.joml.Vector3f;
 import thunder.hack.events.impl.TotemPopEvent;
+import thunder.hack.injection.accesors.IEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -25,19 +26,75 @@ import thunder.hack.utility.math.MathUtility;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PopChams extends Module {
+    private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
+    private final Setting<Integer> ySpeed = new Setting<>("Y Speed", 0, -10, 10);
+    private final Setting<Integer> aSpeed = new Setting<>("Alpha Speed", 5, 1, 100);
+
+    private final CopyOnWriteArrayList<Person> popList = new CopyOnWriteArrayList<>();
+
     public PopChams() {
         super("PopChams", Category.RENDER);
     }
 
-    public final CopyOnWriteArrayList<Person> popList = new CopyOnWriteArrayList<>();
-    public static Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
-    public Setting<Integer> aSpeed = new Setting("AlphaSpeed", 5, 1, 100);
+    @Override
+    public void onUpdate() {
+        popList.forEach(person -> person.update(popList));
+    }
 
+    @Override
+    public void onRender3D(MatrixStack stack) {
+        RenderSystem.depthMask(false);
+        RenderSystem.disableDepthTest();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(770, 771, 0, 1);
 
-    public static void renderEntity(MatrixStack matrices, LivingEntity entity, BipedEntityModel<PlayerEntity> modelBase, int alpha) {
+        popList.forEach(person -> {
+            person.modelPlayer.leftPants.visible = false;
+            person.modelPlayer.rightPants.visible = false;
+            person.modelPlayer.leftSleeve.visible = false;
+            person.modelPlayer.rightSleeve.visible = false;
+            person.modelPlayer.jacket.visible = false;
+            person.modelPlayer.hat.visible = false;
+            renderEntity(stack, person.player, person.modelPlayer, person.getAlpha());
+        });
+
+        RenderSystem.disableBlend();
+        RenderSystem.depthMask(true);
+    }
+
+    @EventHandler
+    public void onTotemPop(TotemPopEvent e) {
+        if (e.getEntity().equals(mc.player) || mc.world == null) return;
+
+        PlayerEntity entity = new PlayerEntity(mc.world, BlockPos.ORIGIN, e.getEntity().bodyYaw, new GameProfile(e.getEntity().getUuid(), e.getEntity().getName().getString())) {
+            @Override
+            public boolean isSpectator() {
+                return false;
+            }
+
+            @Override
+            public boolean isCreative() {
+                return false;
+            }
+        };
+
+        entity.copyPositionAndRotation(e.getEntity());
+        entity.bodyYaw = e.getEntity().bodyYaw;
+        entity.headYaw = e.getEntity().headYaw;
+        entity.handSwingProgress = e.getEntity().handSwingProgress;
+        entity.handSwingTicks = e.getEntity().handSwingTicks;
+        entity.setSneaking(e.getEntity().isSneaking());
+        entity.limbAnimator.setSpeed(e.getEntity().limbAnimator.getSpeed());
+        entity.limbAnimator.pos = e.getEntity().limbAnimator.getPos();
+        popList.add(new Person(entity));
+    }
+
+    private void renderEntity(MatrixStack matrices, LivingEntity entity, BipedEntityModel<PlayerEntity> modelBase, int alpha) {
         double x = entity.getX() - mc.getEntityRenderDispatcher().camera.getPos().getX();
         double y = entity.getY() - mc.getEntityRenderDispatcher().camera.getPos().getY();
         double z = entity.getZ() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
+        ((IEntity) entity).setPos(entity.getPos().add(0, (double) ySpeed.getValue() / 50, 0));
+
         matrices.push();
         matrices.translate((float) x, (float) y, (float) z);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotation(MathUtility.rad(180 - entity.bodyYaw)));
@@ -64,69 +121,14 @@ public class PopChams extends Module {
         matrixStack.translate(0.0F, -1.501F, 0.0F);
     }
 
-    @EventHandler
-    public void onTotemPop(TotemPopEvent e) {
-        if (e.getEntity().equals(mc.player)) return;
-        PlayerEntity entity = new PlayerEntity(mc.world, BlockPos.ORIGIN, e.getEntity().bodyYaw, new GameProfile(e.getEntity().getUuid(), e.getEntity().getName().getString())) {
-            @Override
-            public boolean isSpectator() {
-                return false;
-            }
-
-            @Override
-            public boolean isCreative() {
-                return false;
-            }
-        };
-        entity.copyPositionAndRotation(e.getEntity());
-        entity.bodyYaw = e.getEntity().bodyYaw;
-        entity.headYaw = e.getEntity().headYaw;
-        entity.handSwingProgress = e.getEntity().handSwingProgress;
-        entity.handSwingTicks = e.getEntity().handSwingTicks;
-        entity.setSneaking(e.getEntity().isSneaking());
-        entity.limbAnimator.setSpeed(e.getEntity().limbAnimator.getSpeed());
-        entity.limbAnimator.pos = e.getEntity().limbAnimator.getPos();
-        popList.add(new Person(entity));
-    }
-
-
-    public void onRender3D(MatrixStack stack) {
-        RenderSystem.depthMask(false);
-        RenderSystem.disableDepthTest();
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(770, 771, 0, 1);
-        popList.forEach(person -> {
-            person.modelPlayer.leftPants.visible = false;
-            person.modelPlayer.rightPants.visible = false;
-            person.modelPlayer.leftSleeve.visible = false;
-            person.modelPlayer.rightSleeve.visible = false;
-            person.modelPlayer.jacket.visible = false;
-            person.modelPlayer.hat.visible = false;
-            renderEntity(stack, person.player, person.modelPlayer, person.getAlpha());
-        });
-        RenderSystem.disableBlend();
-        RenderSystem.depthMask(true);
-    }
-
-
-    @Override
-    public void onUpdate() {
-        popList.forEach(person -> person.update(popList));
-    }
-
-
-    public class Person {
+    private class Person {
         private final PlayerEntity player;
-        private final PlayerEntityModel modelPlayer;
+        private final PlayerEntityModel<PlayerEntity> modelPlayer;
         private int alpha;
-
-        public int getAlpha() {
-            return MathUtility.clamp(alpha, 0, 255);
-        }
 
         public Person(PlayerEntity player) {
             this.player = player;
-            modelPlayer = new PlayerEntityModel(new EntityRendererFactory.Context(mc.getEntityRenderDispatcher(), mc.getItemRenderer(), mc.getBlockRenderManager(), mc.getEntityRenderDispatcher().getHeldItemRenderer(), mc.getResourceManager(), mc.getEntityModelLoader(), mc.textRenderer).getPart(EntityModelLayers.PLAYER), false);
+            modelPlayer = new PlayerEntityModel<>(new EntityRendererFactory.Context(mc.getEntityRenderDispatcher(), mc.getItemRenderer(), mc.getBlockRenderManager(), mc.getEntityRenderDispatcher().getHeldItemRenderer(), mc.getResourceManager(), mc.getEntityModelLoader(), mc.textRenderer).getPart(EntityModelLayers.PLAYER), false);
             modelPlayer.getHead().scale(new Vector3f(-0.3f, -0.3f, -0.3f));
             alpha = color.getValue().getAlpha();
         }
@@ -140,6 +142,10 @@ public class PopChams extends Module {
                 return;
             }
             alpha -= aSpeed.getValue();
+        }
+
+        public int getAlpha() {
+            return MathUtility.clamp(alpha, 0, 255);
         }
     }
 }

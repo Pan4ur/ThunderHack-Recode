@@ -25,6 +25,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
+import org.jetbrains.annotations.Nullable;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventEntityRemoved;
@@ -48,6 +49,7 @@ import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.world.HoleUtility;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -295,7 +297,7 @@ public class CevBreaker extends Module {
     @EventHandler
     private void onEntityRemove(EventEntityRemoved e) {
         if (e.entity == null) return;
-        if(target == null) return;
+        if (target == null) return;
         if (e.entity.getBlockPos().equals(target.getBlockPos().add(0, 3, 0))
                 && e.entity instanceof EndCrystalEntity) {
             newCycle = true;
@@ -304,7 +306,7 @@ public class CevBreaker extends Module {
 
     @EventHandler
     private void onPacket(PacketEvent.Receive e) {
-        if(target == null) return;
+        if (target == null) return;
         if (e.getPacket() instanceof BlockUpdateS2CPacket pac) {
             if (pac.getPos().equals(target.getBlockPos().add(0, 2, 0)) && pac.getState().getBlock().equals(Blocks.AIR)) {
                 for (Entity entity : Thunderhack.asyncManager.getAsyncEntities()) {
@@ -350,7 +352,7 @@ public class CevBreaker extends Module {
                 }
 
                 InteractionUtility.BreakData bData = InteractionUtility.getBreakData(currentMineBlockPos, InteractionUtility.Interact.Strict);
-                if(bData == null) return;
+                if (bData == null) return;
                 mc.interactionManager.updateBlockBreakingProgress(currentMineBlockPos, bData.dir());
                 if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
             }
@@ -373,7 +375,7 @@ public class CevBreaker extends Module {
                 }
 
                 InteractionUtility.BreakData bData = InteractionUtility.getBreakData(pos, interact.getValue());
-                if(bData == null) return;
+                if (bData == null) return;
 
                 mc.interactionManager.attackBlock(pos, bData.dir());
                 if (swing.getValue())
@@ -383,26 +385,23 @@ public class CevBreaker extends Module {
     }
 
     private void findTarget() {
-       // if ((!HoleESP.validBedrock(AutoCrystal.CAtarget.getBlockPos()) && !HoleESP.validIndestructible(AutoCrystal.CAtarget.getBlockPos())) || AutoCrystal.CAtarget.distanceTo(((mc.player))) > range.getValue()) {
+        for (PlayerEntity player : Thunderhack.asyncManager.getAsyncPlayers()) {
+            if (Thunderhack.friendManager.isFriend(player)) continue;
+            if (player == mc.player) continue;
+            if (player.distanceTo(((mc.player))) > range.getValue()) continue;
+            if (player.isDead()) continue;
+            if (player.getHealth() + player.getAbsorptionAmount() <= 0) continue;
+            if (!HoleUtility.validBedrock(player.getBlockPos()) && !HoleUtility.validIndestructible(player.getBlockPos()))
+                continue;
 
-            for (PlayerEntity player : Thunderhack.asyncManager.getAsyncPlayers()) {
-                if (Thunderhack.friendManager.isFriend(player)) continue;
-                if (player == mc.player) continue;
-                if (player.distanceTo(((mc.player))) > range.getValue()) continue;
-                if (player.isDead()) continue;
-                if (player.getHealth() + player.getAbsorptionAmount() <= 0) continue;
-                if (!HoleESP.validBedrock(player.getBlockPos()) && !HoleESP.validIndestructible(player.getBlockPos()))
-                    continue;
+            target = player;
+            break;
+        }
 
-                target = player;
-                break;
-            }
-
-            if (target == null) {
-                Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.", 5, Notification.Type.ERROR);
-                disable(MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.");
-            }
-      //  } else target = (PlayerEntity) AutoCrystal.CAtarget;
+        if (target == null) {
+            Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.", 5, Notification.Type.ERROR);
+            disable(MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.");
+        }
     }
 
     private void placeCrystal() {
@@ -438,15 +437,15 @@ public class CevBreaker extends Module {
 
     }
 
-    private SearchInvResult getObby(){
+    private @Nullable SearchInvResult getObby() {
         SearchInvResult result = InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN);
 
         if (!result.isHolding() && !autoSwap.getValue())
             return null;
 
         if (!result.found()) {
-            Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar", 5, Notification.Type.ERROR);
-            disable(MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar");
+            Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!", 5, Notification.Type.ERROR);
+            disable(MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!");
             return null;
         }
         return result;
@@ -455,9 +454,9 @@ public class CevBreaker extends Module {
     private boolean placeObsidian(BlockPos pos) {
         if (!canPlaceBlock) return false;
         SearchInvResult result = getObby();
-        if(result == null) return  false;
-        if(!result.found()) return false;
-        return InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(),placeMode.getValue(), result, false);
+        if (result == null) return false;
+        if (!result.found()) return false;
+        return InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), placeMode.getValue(), result, false);
     }
 
     public BlockHitResult getPlaceData(BlockPos bp) {
