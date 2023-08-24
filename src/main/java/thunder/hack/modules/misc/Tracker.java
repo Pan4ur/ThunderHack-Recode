@@ -1,6 +1,5 @@
 package thunder.hack.modules.misc;
 
-import com.google.common.eventbus.Subscribe;
 import io.netty.util.internal.ConcurrentSet;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -17,7 +16,7 @@ import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
-import thunder.hack.modules.player.FreeCam;
+import thunder.hack.modules.render.FreeCam;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
 

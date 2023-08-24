@@ -1,14 +1,12 @@
 package thunder.hack.gui.hud.impl;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.entity.LivingEntity;
-
-
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -16,14 +14,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL40C;
-
-
 import thunder.hack.core.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudEditorGui;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.combat.Aura;
+import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.Timer;
@@ -112,21 +109,15 @@ public class TargetHud extends HudElement {
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
         //таргеты
-/*
-        if (AutoCrystal.ta != null) {
-            if (AutoCrystal.CAtarget instanceof LivingEntity) {
-                target = (LivingEntity) AutoCrystal.CAtarget;
-                direction = true;
-            } else {
-                target = null;
-                direction = false;
+
+        if (AutoCrystal.target != null) {
+            target = AutoCrystal.target;
+            direction = true;
+            if(AutoCrystal.target.isDead()){
+                AutoCrystal.target = null;
+                return;
             }
-        } else
-
-
- */
-
-            if (Aura.target != null) {
+        } else if (Aura.target != null) {
             if (Aura.target instanceof LivingEntity) {
                 target = (LivingEntity) Aura.target;
                 direction = true;
@@ -380,6 +371,7 @@ public class TargetHud extends HudElement {
                 RenderSystem.setShaderColor(1f, 1f - hurtPercent, 1f - hurtPercent, 1f);
                 Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 3.5f + hurtPercent, getPosY() + 3.5f + hurtPercent, 40 - hurtPercent * 2, 40 - hurtPercent * 2, 8, 8, 8, 8, 64, 64);
                 Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 3.5f + hurtPercent, getPosY() + 3.5f + hurtPercent, 40 - hurtPercent * 2, 40 - hurtPercent * 2, 40, 8, 8, 8, 64, 64);
+                RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
                 FontRenderers.modules.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : target.getName().getString(), getPosX() + 50, getPosY() + 7, -1, false);
                 FontRenderers.modules.drawString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * target.getHealth()) / 10.0) : (((Math.round(10.0 * target.getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 74f, getPosY() + 34f, -1);

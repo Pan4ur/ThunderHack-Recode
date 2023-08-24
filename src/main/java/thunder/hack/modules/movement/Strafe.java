@@ -1,6 +1,5 @@
 package thunder.hack.modules.movement;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -15,7 +14,6 @@ import thunder.hack.core.Core;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.player.Scaffold;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;

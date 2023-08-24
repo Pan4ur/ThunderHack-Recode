@@ -1,4 +1,4 @@
-package thunder.hack.modules.player;
+package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.math.MatrixStack;
@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Blink extends Module {
     public Blink() {
-        super("Blink", Category.PLAYER);
+        super("Blink", Category.MOVEMENT);
     }
 
 

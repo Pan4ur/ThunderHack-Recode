@@ -212,7 +212,7 @@ public class ModuleManager {
         modules.add(nameProtect);
         modules.add(new TestHud());
         modules.add(new BoatFly());
-        modules.add(new HitBoxDesync());
+        modules.add(new HitBoxTricks());
         modules.add(new HoleESP());
         modules.add(new ArmorHud());
         modules.add(new Step());

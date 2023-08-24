@@ -1,11 +1,9 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
@@ -18,7 +16,7 @@ import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.movement.Speed;
-import thunder.hack.modules.player.Scaffold;
+import thunder.hack.modules.movement.Scaffold;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InventoryUtility;
 

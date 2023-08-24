@@ -115,7 +115,7 @@ public abstract class MixinHeldItemRenderer {
                             break;
                         case EAT:
                         case DRINK:
-                            this.applyEatOrDrinkTransformation(matrices, tickDelta, arm, item);
+                            applyEatOrDrinkTransformationCustom(matrices, tickDelta, arm, item);
                             this.applyEquipOffset(matrices, arm, equipProgress);
                             break;
                         case BLOCK:
@@ -286,7 +286,7 @@ public abstract class MixinHeldItemRenderer {
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) i * -45.0F));
     }
 
-    private void applyEatOrDrinkTransformation(MatrixStack matrices, float tickDelta, Arm arm, ItemStack stack) {
+    private void applyEatOrDrinkTransformationCustom(MatrixStack matrices, float tickDelta, Arm arm, ItemStack stack) {
         float f = (float) mc.player.getItemUseTimeLeft() - tickDelta + 1.0F;
         float g = f / (float) stack.getMaxUseTime();
         float h;
@@ -295,13 +295,22 @@ public abstract class MixinHeldItemRenderer {
             matrices.translate(0.0F, h, 0.0F);
         }
 
-        h = 1.0F - (float) Math.pow((double) g, 27.0);
+        h = 1.0F - (float) Math.pow(g, 27.0);
         int i = arm == Arm.RIGHT ? 1 : -1;
-        matrices.translate(h * 0.6F * (float) i, h * -0.5F, h * 0.0F);
+        matrices.translate(h * 0.6F * (float) i * ModuleManager.viewModel.eatX.getValue(), h * -0.5F * ModuleManager.viewModel.eatY.getValue(), h * 0.0F);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) i * h * 90.0F));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(h * 10.0F));
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) i * h * 30.0F));
     }
+
+    @Inject(method = {"applyEatOrDrinkTransformation"}, at = {@At(value = "HEAD")}, cancellable = true)
+    private void applyEatOrDrinkTransformationHook(MatrixStack matrices, float tickDelta, Arm arm, ItemStack stack, CallbackInfo ci) {
+        if (ModuleManager.animations.isEnabled()) {
+            applyEatOrDrinkTransformationCustom(matrices,tickDelta,arm,stack);
+            ci.cancel();
+        }
+    }
+
 
     private void applyBrushTransformation(MatrixStack matrices, float tickDelta, Arm arm, ItemStack stack, float equipProgress) {
         this.applyEquipOffset(matrices, arm, equipProgress);

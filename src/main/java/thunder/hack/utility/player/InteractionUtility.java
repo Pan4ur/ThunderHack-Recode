@@ -90,9 +90,13 @@ public final class InteractionUtility {
         float[] angle = calculateAngle(result.getPos());
         if (rotate)
             mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
-        if (mode == PlaceMode.Normal) mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
-        else
-            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
+
+        if (mode == PlaceMode.Normal || mode == PlaceMode.All)
+            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
+
+        if (mode == PlaceMode.Packet || mode == PlaceMode.All)
+            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND,result,PlayerUtility.getWorldActionId(mc.world)));
+
         if (sneak)
             mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
         if (sprint)
@@ -117,6 +121,7 @@ public final class InteractionUtility {
             for (Entity entity : mc.world.getNonSpectatingEntities(Entity.class, new Box(bp)))
                 if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity))
                     return null;
+        if(!mc.world.getBlockState(bp).isReplaceable()) return null;
         ArrayList<BlockPosWithFacing> supports = getSupportBlocks(bp);
         for (BlockPosWithFacing support : supports) {
             if (interact != Interact.Vanilla) {
