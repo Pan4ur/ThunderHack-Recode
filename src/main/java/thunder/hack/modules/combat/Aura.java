@@ -64,7 +64,7 @@ public class Aura extends Module {
     public static final Setting<Boolean> oldDelay = new Setting<>("OldDelay", false);
     public static final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 15, v -> oldDelay.getValue());
     public static final Setting<Integer> maxCPS = new Setting<>("MaxCPS", 12, 1, 15, v -> oldDelay.getValue());
-    public final Setting<Boolean> grimAC = new Setting<>("GrimAC", false);
+    public final Setting<Grim> grimAC = new Setting<>("GrimAC", Grim.None);
     public final Setting<Boolean> esp = new Setting<>("ESP", true);
 
     public final Setting<Parent> targets = new Setting<>("Targets", new Parent(false, 0));
@@ -82,6 +82,10 @@ public class Aura extends Module {
         None
     }
 
+    public enum Grim {
+        None, MoveFix, SilentTest
+    }
+
     public static Entity target;
     private float rotationYaw, rotationPitch, prevClientYaw;
     private float pitchAcceleration = 1f;
@@ -91,10 +95,11 @@ public class Aura extends Module {
 
     private int hitTicks;
     public static boolean lookingAtHitbox;
+    public static boolean rotateAllowed;
 
     @EventHandler
     public void modifyVelocity(EventPlayerTravel e) {
-        if (target != null && grimAC.getValue()) {
+        if (target != null && grimAC.getValue() == Grim.MoveFix) {
             if (e.isPre()) {
                 prevClientYaw = mc.player.getYaw();
                 mc.player.setYaw(rotationYaw);
@@ -106,7 +111,7 @@ public class Aura extends Module {
 
     @EventHandler
     public void modifyJump(EventPlayerJump e) {
-        if (target != null && grimAC.getValue()) {
+        if (target != null && grimAC.getValue() == Grim.MoveFix) {
             if (e.isPre()) {
                 prevClientYaw = mc.player.getYaw();
                 mc.player.setYaw(rotationYaw);
@@ -116,9 +121,22 @@ public class Aura extends Module {
         }
     }
 
-
     @EventHandler
-    public void onAttack(PlayerUpdateEvent e) {
+    public void onPlayerUpdate(PlayerUpdateEvent e) {
+        if(grimAC.getValue() != Grim.SilentTest){
+            auraLogic();
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPostSync(EventPostSync e) {
+        if(grimAC.getValue() == Grim.SilentTest){
+            auraLogic();
+        }
+        lookingAtHitbox = Thunderhack.playerManager.checkRtx(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());
+    }
+
+    public void auraLogic() {
         if (target != null && (((LivingEntity) target).getHealth() <= 0 || ((LivingEntity) target).isDead())) {
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
                 Thunderhack.notificationManager.publicity("Aura", "Цель успешно нейтрализована!", 3, Notification.Type.SUCCESS);
@@ -137,7 +155,7 @@ public class Aura extends Module {
             if (player instanceof OtherClientPlayerEntity) ((IOtherClientPlayerEntity) player).releaseResolver();
         }
 
-        if (target != null && autoCrit() && (lookingAtHitbox || mode.getValue() != Mode.Universal)) {
+        if (target != null && autoCrit() && (lookingAtHitbox || mode.getValue() != Mode.Universal || grimAC.getValue() == Grim.SilentTest)) {
             final Item selectedItem = mc.player.getInventory().getStack(mc.player.getInventory().selectedSlot).getItem();
             if (onlyWeapon.getValue() && !(selectedItem instanceof SwordItem || selectedItem instanceof AxeItem))
                 return;
@@ -191,23 +209,22 @@ public class Aura extends Module {
         hitTicks--;
     }
 
-
     @EventHandler
     public void onSync(EventSync e) {
         if (target != null) {
             if (mode.getValue() != Mode.None) {
-                mc.player.setYaw(rotationYaw);
-                mc.player.setPitch(rotationPitch);
+                if(grimAC.getValue() == Grim.SilentTest && target != null && autoCrit()){
+                    mc.player.setYaw(rotationYaw);
+                    mc.player.setPitch(rotationPitch);
+                } else if(grimAC.getValue() != Grim.SilentTest) {
+                    mc.player.setYaw(rotationYaw);
+                    mc.player.setPitch(rotationPitch);
+                }
             }
         } else {
             rotationYaw = mc.player.getYaw();
             rotationPitch = mc.player.getPitch();
         }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onPostSync(EventPostSync e) {
-        lookingAtHitbox = Thunderhack.playerManager.checkRtx(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());
     }
 
     @Override
@@ -321,6 +338,7 @@ public class Aura extends Module {
         float dst = attackRange.getValue();
         dst += 2f;
         if (mc.player.isFallFlying() && target != null) dst += 15f;
+        if(grimAC.getValue() == Grim.SilentTest) dst = attackRange.getValue();
         return dst;
     }
 

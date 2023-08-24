@@ -21,7 +21,9 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
 import thunder.hack.events.impl.*;
+import thunder.hack.utility.player.InteractionUtility;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -47,6 +49,15 @@ public final class Core {
         }
         ThunderGui2.getInstance().onTick();
         Thunderhack.moduleManager.onTick();
+
+        HashMap<BlockPos, Long> cache = new HashMap<>(InteractionUtility.awaiting);
+        if(!cache.isEmpty()){
+            cache.forEach((bp, time) -> {
+                if(System.currentTimeMillis() - time > 1000){
+                    InteractionUtility.awaiting.remove(bp);
+                }
+            });
+        }
     }
 
     @EventHandler

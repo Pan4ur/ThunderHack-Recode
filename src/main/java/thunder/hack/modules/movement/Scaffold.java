@@ -1,4 +1,4 @@
-package thunder.hack.modules.player;
+package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.math.MatrixStack;
@@ -44,7 +44,7 @@ public class Scaffold extends Module {
     float[] rotation = new float[2];
 
     public Scaffold() {
-        super("Scaffold", "лучший скафф", Module.Category.PLAYER);
+        super("Scaffold", "лучший скафф", Category.MOVEMENT);
     }
 
     private int findBlockToPlace() {

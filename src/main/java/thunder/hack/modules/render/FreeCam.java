@@ -1,4 +1,4 @@
-package thunder.hack.modules.player;
+package thunder.hack.modules.render;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.Hand;
@@ -23,7 +23,7 @@ public class FreeCam extends Module {
     public Setting<Float> speed = new Setting<>("Speed", 1f, 0.0f, 5.0f);
 
     public FreeCam() {
-        super("Freecam", "Freecam", Category.PLAYER);
+        super("Freecam", "Freecam", Category.RENDER);
     }
 
     public static PlayerCopyEntity dummy;

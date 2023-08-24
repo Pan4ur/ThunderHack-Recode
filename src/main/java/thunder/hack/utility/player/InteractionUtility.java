@@ -18,14 +18,14 @@ import org.jetbrains.annotations.Nullable;
 import thunder.hack.cmd.Command;
 import thunder.hack.utility.math.ExplosionUtility;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static thunder.hack.modules.Module.mc;
 
 public final class InteractionUtility {
     public static boolean checkEntities = false;
+    public static Map<BlockPos, Long> awaiting = new HashMap<>();
 
     public static boolean canSee(Entity entity) {
         Vec3d entityEyes = getEyesPos(entity);
@@ -90,9 +90,15 @@ public final class InteractionUtility {
         float[] angle = calculateAngle(result.getPos());
         if (rotate)
             mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
-        if (mode == PlaceMode.Normal) mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
-        else
-            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
+
+        if (mode == PlaceMode.Normal || mode == PlaceMode.All)
+            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
+
+        if (mode == PlaceMode.Packet || mode == PlaceMode.All)
+            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND,result,PlayerUtility.getWorldActionId(mc.world)));
+
+        awaiting.put(bp, System.currentTimeMillis());
+
         if (sneak)
             mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
         if (sprint)
@@ -117,6 +123,7 @@ public final class InteractionUtility {
             for (Entity entity : mc.world.getNonSpectatingEntities(Entity.class, new Box(bp)))
                 if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity))
                     return null;
+        if(!mc.world.getBlockState(bp).isReplaceable()) return null;
         ArrayList<BlockPosWithFacing> supports = getSupportBlocks(bp);
         for (BlockPosWithFacing support : supports) {
             if (interact != Interact.Vanilla) {
@@ -144,22 +151,22 @@ public final class InteractionUtility {
     public static ArrayList<BlockPosWithFacing> getSupportBlocks(BlockPos bp) {
         ArrayList<BlockPosWithFacing> list = new ArrayList<>();
 
-        if (mc.world.getBlockState(bp.add(0, -1, 0)).isSolid())
+        if (mc.world.getBlockState(bp.add(0, -1, 0)).isSolid() || awaiting.containsKey(bp.add(0, -1, 0)))
             list.add(new BlockPosWithFacing(bp.add(0, -1, 0), Direction.UP));
 
-        if (mc.world.getBlockState(bp.add(0, 1, 0)).isSolid())
+        if (mc.world.getBlockState(bp.add(0, 1, 0)).isSolid() || awaiting.containsKey(bp.add(0, 1, 0)))
             list.add(new BlockPosWithFacing(bp.add(0, 1, 0), Direction.DOWN));
 
-        if (mc.world.getBlockState(bp.add(-1, 0, 0)).isSolid())
+        if (mc.world.getBlockState(bp.add(-1, 0, 0)).isSolid() || awaiting.containsKey(bp.add(-1, 0, 0)))
             list.add(new BlockPosWithFacing(bp.add(-1, 0, 0), Direction.EAST));
 
-        if (mc.world.getBlockState(bp.add(1, 0, 0)).isSolid())
+        if (mc.world.getBlockState(bp.add(1, 0, 0)).isSolid() || awaiting.containsKey(bp.add(1, 0, 0)))
             list.add(new BlockPosWithFacing(bp.add(1, 0, 0), Direction.WEST));
 
-        if (mc.world.getBlockState(bp.add(0, 0, 1)).isSolid())
+        if (mc.world.getBlockState(bp.add(0, 0, 1)).isSolid() || awaiting.containsKey(bp.add(0, 0, 1)))
             list.add(new BlockPosWithFacing(bp.add(0, 0, 1), Direction.NORTH));
 
-        if (mc.world.getBlockState(bp.add(0, 0, -1)).isSolid())
+        if (mc.world.getBlockState(bp.add(0, 0, -1)).isSolid()|| awaiting.containsKey(bp.add(0, 0, -1)))
             list.add(new BlockPosWithFacing(bp.add(0, 0, -1), Direction.SOUTH));
 
         return list;

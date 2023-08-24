@@ -306,11 +306,11 @@ public class AutoAnchor extends Module {
 
         SearchInvResult anchorResult = InventoryUtility.getAnchor();
         if (anchorResult.found()) {
-            BlockHitResult bhr = getPlaceData(result);
-            if (bhr != null) {
+            InteractionUtility.BreakData data = InteractionUtility.getBreakData(result, interact.getValue());
+            if (data != null && data.vector() != null) {
                 anchorResult.switchTo();
                 mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-                mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
+                mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, new BlockHitResult(data.vector(),data.dir(),result,false), PlayerUtility.getWorldActionId(mc.world)));
                 mc.player.swingHand(Hand.OFF_HAND);
             }
             chargeTimer.reset();
@@ -346,10 +346,10 @@ public class AutoAnchor extends Module {
 
         if (glowResult.found()) {
             glowResult.switchTo();
-            BlockHitResult bhr = getPlaceData(result);
-            if (bhr != null) {
+            InteractionUtility.BreakData data = InteractionUtility.getBreakData(result, interact.getValue());
+            if (data != null && data.vector() != null) {
                 mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-                mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
+                mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(data.vector(), data.dir(), result, false), PlayerUtility.getWorldActionId(mc.world)));
                 mc.player.swingHand(Hand.MAIN_HAND);
             }
 

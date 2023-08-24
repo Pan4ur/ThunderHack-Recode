@@ -1,6 +1,5 @@
 package thunder.hack.modules.movement;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.HorseEntity;
@@ -11,7 +10,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.player.FreeCam;
+import thunder.hack.modules.render.FreeCam;
 import thunder.hack.setting.Setting;
 
 public class Step extends Module {

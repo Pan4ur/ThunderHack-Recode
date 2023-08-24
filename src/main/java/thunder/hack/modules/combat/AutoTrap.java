@@ -162,6 +162,7 @@ public class AutoTrap extends Module {
         for (BlockPos bp : getBlocks()) {
             InteractionUtility.checkEntities = true;
             if (InteractionUtility.canPlaceBlock(bp, interact.getValue()) && mc.world.isAir(bp)) {
+                InteractionUtility.checkEntities = false;
                 return bp;
             }
         }
