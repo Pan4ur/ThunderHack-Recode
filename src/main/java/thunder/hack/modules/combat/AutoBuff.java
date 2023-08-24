@@ -1,6 +1,5 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.EventAfterRotate;
 import thunder.hack.events.impl.EventPostSync;

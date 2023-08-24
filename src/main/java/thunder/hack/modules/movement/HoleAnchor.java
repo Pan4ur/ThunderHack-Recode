@@ -1,6 +1,5 @@
 package thunder.hack.modules.movement;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -8,7 +7,6 @@ import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.render.HoleESP;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.world.HoleUtility;
 
 public class HoleAnchor extends Module {
     public HoleAnchor() {
@@ -24,15 +22,15 @@ public class HoleAnchor extends Module {
     public void onPlayerUpdate(PlayerUpdateEvent e) {
         if (mc.player.getPitch() > pitch.getValue()) {
             if (
-                    HoleUtility.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(1))
-                    || HoleUtility.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(2))
-                    || HoleUtility.validIndestructible( BlockPos.ofFloored(mc.player.getPos()).down(3))
-                    || HoleUtility.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(1))
-                    || HoleUtility.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(2))
-                    || HoleUtility.validTwoBlockIndestructibleXZ( BlockPos.ofFloored(mc.player.getPos()).down(3))
-                    || HoleUtility.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(1))
-                    || HoleUtility.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(2))
-                    || HoleUtility.validTwoBlockIndestructibleXZ1( BlockPos.ofFloored(mc.player.getPos()).down(3))
+                    (HoleESP.validIndestructible(BlockPos.ofFloored(mc.player.getPos()).down(1)) || HoleESP.validBedrock(BlockPos.ofFloored(mc.player.getPos()).down(1)))
+                            || (HoleESP.validIndestructible(BlockPos.ofFloored(mc.player.getPos()).down(2)) || HoleESP.validBedrock(BlockPos.ofFloored(mc.player.getPos()).down(2)))
+                            || (HoleESP.validIndestructible(BlockPos.ofFloored(mc.player.getPos()).down(3)) || HoleESP.validBedrock(BlockPos.ofFloored(mc.player.getPos()).down(3)))
+                            || (HoleESP.validTwoBlockIndestructibleXZ(BlockPos.ofFloored(mc.player.getPos()).down(1)) || HoleESP.validTwoBlockBedrockXZ(BlockPos.ofFloored(mc.player.getPos()).down(1)))
+                            || (HoleESP.validTwoBlockIndestructibleXZ(BlockPos.ofFloored(mc.player.getPos()).down(2)) || HoleESP.validTwoBlockBedrockXZ(BlockPos.ofFloored(mc.player.getPos()).down(2)))
+                            || (HoleESP.validTwoBlockIndestructibleXZ(BlockPos.ofFloored(mc.player.getPos()).down(3)) || HoleESP.validTwoBlockBedrockXZ(BlockPos.ofFloored(mc.player.getPos()).down(3)))
+                            || (HoleESP.validTwoBlockIndestructibleXZ1(BlockPos.ofFloored(mc.player.getPos()).down(1)) || HoleESP.validTwoBlockBedrockXZ1(BlockPos.ofFloored(mc.player.getPos()).down(1)))
+                            || (HoleESP.validTwoBlockIndestructibleXZ1(BlockPos.ofFloored(mc.player.getPos()).down(2)) || HoleESP.validTwoBlockBedrockXZ1(BlockPos.ofFloored(mc.player.getPos()).down(2)))
+                            || (HoleESP.validTwoBlockIndestructibleXZ1(BlockPos.ofFloored(mc.player.getPos()).down(3)) || HoleESP.validTwoBlockBedrockXZ1(BlockPos.ofFloored(mc.player.getPos()).down(3)))
             ) {
                 if (!pull.getValue()) {
                     mc.player.setVelocity(0,mc.player.getVelocity().getY(),0);

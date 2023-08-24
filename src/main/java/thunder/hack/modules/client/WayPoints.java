@@ -1,8 +1,6 @@
 package thunder.hack.modules.client;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -13,10 +11,7 @@ import thunder.hack.cmd.Command;
 import thunder.hack.core.WayPointManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
-import thunder.hack.utility.player.PlaceUtility;
 import thunder.hack.utility.render.Render3DEngine;
-
-import java.util.Objects;
 
 public class WayPoints extends Module {
 
@@ -36,6 +31,7 @@ public class WayPoints extends Module {
         if(!Thunderhack.wayPointManager.getWayPoints().isEmpty()){
             for(WayPointManager.WayPoint wp : Thunderhack.wayPointManager.getWayPoints()){
                 if(wp.name() == null ) continue;
+                if(mc.isInSingleplayer()) continue;
                 if(!mc.getNetworkHandler().getServerInfo().address.contains(wp.server())) continue;
 
                 double difX = wp.x() - mc.player.getPos().x;

@@ -111,6 +111,7 @@ public class Timer extends Module {
             }
             if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
                 violation = 40f;
+                disable(MainSettings.isRu() ? "выключен т.к. ты получил велосити!" : "disabled because you got velocity packet!");
             }
         }
     }

@@ -33,7 +33,6 @@ public class NoRender extends Module {
     public Setting<Boolean> xp = new Setting<>("XP", false);
     public Setting<Boolean> arrows = new Setting<>("Arrows", false);
     public Setting<Boolean> eggs = new Setting<>("Eggs", false);
-
     public Setting<Boolean> elderGuardian = new Setting<>("Guardian", false);
     public Setting<Boolean> explosions = new Setting<>("Explosions", false);
     public Setting<Boolean> campFire = new Setting<>("CampFire", false);

@@ -15,11 +15,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.client.MainSettings;
-import thunder.hack.modules.render.Chams;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 
@@ -39,7 +37,6 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
     private float originalPrevYaw;
     private float originalPrevHeadYaw;
     private float originalPrevBodyYaw;
-    private float originalPrevPitch;
 
     @Inject(method = "render", at = @At("HEAD"))
     public void onRenderPre(T livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
@@ -51,7 +48,6 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
             originalPrevYaw = livingEntity.prevYaw;
             originalPrevHeadYaw = livingEntity.prevHeadYaw;
             originalPrevBodyYaw = livingEntity.prevBodyYaw;
-            originalPrevPitch = livingEntity.prevPitch;
             livingEntity.setYaw(((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw());
             livingEntity.headYaw = ((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw();
             livingEntity.bodyYaw = ((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw();
@@ -62,10 +58,6 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
             livingEntity.prevPitch = Thunderhack.playerManager.lastPitch;
         }
         lastEntity = livingEntity;
-        if (ModuleManager.chams.isEnabled()) {
-            //  GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
-            //  GL11.glPolygonOffset(1.0f, -1100000.0f);
-        }
     }
 
     @Inject(method = "render", at = @At("TAIL"))
@@ -80,34 +72,16 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
             livingEntity.prevBodyYaw = originalPrevBodyYaw;
             livingEntity.prevPitch = originalPitch;
         }
-        if (ModuleManager.chams.isEnabled()) {
-            //   GL11.glPolygonOffset(1.0f, 1100000.0f);
-            //   GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
-        }
     }
 
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/EntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;IIFFFF)V"))
     private void onRenderModel(EntityModel entityModel, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
-
         Color newColor = new Color(red, green, blue, alpha);
-        if (ModuleManager.chams.isEnabled()) {
-            newColor = Chams.getEntityColor(lastEntity);
-        }
         if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.antiPlayerCollision.getValue() && lastEntity != mc.player) {
             float overrideAlpha = (float) (mc.player.squaredDistanceTo(lastEntity.getPos()) / 3f) + 0.2f;
             newColor = Render2DEngine.injectAlpha(newColor, (int) (255f * MathUtility.clamp(overrideAlpha, 0f, 1f)));
         }
         entityModel.render(matrices, vertices, light, overlay, newColor.getRed() / 255F, newColor.getGreen() / 255F, newColor.getBlue() / 255F, newColor.getAlpha() / 255F);
-    }
-
-    @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;scale(FFF)V", ordinal = 0))
-    private void onScale(Args args) {
-        if (ModuleManager.chams.isEnabled()) {
-            float scale = Chams.getEntityScale(lastEntity);
-            args.set(0, -scale);
-            args.set(1, -scale);
-            args.set(2, scale);
-        }
     }
 }

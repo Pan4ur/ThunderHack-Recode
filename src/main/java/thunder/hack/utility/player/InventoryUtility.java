@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.*;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -12,6 +13,9 @@ import java.util.List;
 import static thunder.hack.modules.Module.mc;
 
 public final class InventoryUtility {
+    private static int cachedSlot = -1;
+
+
     public static int getItemCount(Item item) {
         if (mc.player == null) return 0;
 
@@ -117,6 +121,27 @@ public final class InventoryUtility {
         int slot = -1;
         float f = 1.0F;
         for (int b1 = 9; b1 < 45; b1++) {
+            ItemStack itemStack = mc.player.getInventory().getStack(b1);
+            if (itemStack != null && itemStack.getItem() instanceof SwordItem sword) {
+                float f1 = sword.getMaxDamage();
+                f1 += EnchantmentHelper.getLevel(Enchantments.SHARPNESS, itemStack);
+                if (f1 > f) {
+                    f = f1;
+                    slot = b1;
+                }
+            }
+        }
+
+        if (slot == -1) return SearchInvResult.notFound();
+        return new SearchInvResult(slot, true, mc.player.getInventory().getStack(slot));
+    }
+
+    public static SearchInvResult getSwordHotbar() {
+        if (mc.player == null) return SearchInvResult.notFound();
+
+        int slot = -1;
+        float f = 1.0F;
+        for (int b1 = 0; b1 < 9; b1++) {
             ItemStack itemStack = mc.player.getInventory().getStack(b1);
             if (itemStack != null && itemStack.getItem() instanceof SwordItem sword) {
                 float f1 = sword.getMaxDamage();
@@ -248,6 +273,33 @@ public final class InventoryUtility {
 
     public static SearchInvResult findBlockInInventory(Block... blocks) {
         return findItemInInventory(Arrays.stream(blocks).map(Block::asItem).toList());
+    }
+
+    public static void saveSlot() {
+        cachedSlot = mc.player.getInventory().selectedSlot;
+    }
+
+    public static void returnSlot(){
+        if(cachedSlot != -1)
+            switchTo(cachedSlot);
+        cachedSlot = -1;
+    }
+
+    public static void switchTo(int slot) {
+        if(mc.player.getInventory().selectedSlot != slot)
+            switchTo(slot, SwitchMode.All);
+    }
+
+    public static void switchTo(int slot, InventoryUtility.SwitchMode switchMode) {
+        if(mc.player.getInventory().selectedSlot == slot)
+            return;
+
+        if (switchMode == InventoryUtility.SwitchMode.Normal || switchMode == InventoryUtility.SwitchMode.All) {
+            mc.player.getInventory().selectedSlot = slot;
+        }
+        if (switchMode == InventoryUtility.SwitchMode.Packet || switchMode == InventoryUtility.SwitchMode.All) {
+            mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
+        }
     }
 
     public interface Searcher {

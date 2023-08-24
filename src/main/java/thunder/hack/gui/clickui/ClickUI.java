@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec2f;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.AsyncManager;
@@ -89,6 +90,7 @@ public class ClickUI extends Screen {
         }
         windows.forEach(AbstractWindow::init);
     }
+
 
     @Override
     public boolean shouldPause() {

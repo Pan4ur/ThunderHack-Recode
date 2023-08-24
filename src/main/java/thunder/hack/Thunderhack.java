@@ -43,7 +43,6 @@ public class Thunderhack implements ModInitializer {
     public static ConfigManager configManager = new ConfigManager();
     public static AsyncManager asyncManager = new AsyncManager();
     public static MacroManager macroManager = new MacroManager();
-    public static PlaceManager placeManager = new PlaceManager();
     public static WayPointManager wayPointManager = new WayPointManager();
     public static CommandManager commandManager = new CommandManager();
 
@@ -66,7 +65,6 @@ public class Thunderhack implements ModInitializer {
         EVENT_BUS.subscribe(playerManager);
         EVENT_BUS.subscribe(combatManager);
         EVENT_BUS.subscribe(asyncManager);
-        EVENT_BUS.subscribe(placeManager);
         EVENT_BUS.subscribe(core);
 
         FriendManager.loadFriends();

@@ -4,6 +4,7 @@ import thunder.hack.gui.clickui.ClickUI;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
 
 
@@ -23,15 +24,18 @@ public class ClickGui extends Module {
     public Setting<Boolean> msaa = new Setting<>("MSAA", true);
 
 /*
-    private final Setting<PositionSetting> combatCat = this.register(new Setting<>("combatCat", new PositionSetting(0.5f, 0.5f)));
-    private final Setting<PositionSetting> miscCat = this.register(new Setting<>("miscCat", new PositionSetting(0.5f, 0.5f)));
-    private final Setting<PositionSetting> renderCat = this.register(new Setting<>("renderCat", new PositionSetting(0.5f, 0.5f)));
-    private final Setting<PositionSetting> movementCat = this.register(new Setting<>("movementCat", new PositionSetting(0.5f, 0.5f)));
-    private final Setting<PositionSetting> playerCat = this.register(new Setting<>("playerCat", new PositionSetting(0.5f, 0.5f)));
-    private final Setting<PositionSetting> clientCat = this.register(new Setting<>("clientCat", new PositionSetting(0.5f, 0.5f)));
-    private final Setting<PositionSetting> hudCat = this.register(new Setting<>("hudCat", new PositionSetting(0.5f, 0.5f)));
+    я хотел, а потом опять забил
+    private final Setting<PositionSetting> combatCat = new Setting<>("combatCat", new PositionSetting(0.5f, 0.5f));
+    private final Setting<PositionSetting> miscCat = new Setting<>("miscCat", new PositionSetting(0.5f, 0.5f));
+    private final Setting<PositionSetting> renderCat = new Setting<>("renderCat", new PositionSetting(0.5f, 0.5f));
+    private final Setting<PositionSetting> movementCat = new Setting<>("movementCat", new PositionSetting(0.5f, 0.5f));
+    private final Setting<PositionSetting> playerCat = new Setting<>("playerCat", new PositionSetting(0.5f, 0.5f));
+    private final Setting<PositionSetting> clientCat = new Setting<>("clientCat", new PositionSetting(0.5f, 0.5f));
+    private final Setting<PositionSetting> hudCat = new Setting<>("hudCat", new PositionSetting(0.5f, 0.5f));
 
  */
+
+
 
 
     public ClickGui() {

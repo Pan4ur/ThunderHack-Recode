@@ -1,6 +1,5 @@
 package thunder.hack.modules.player;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -15,7 +14,7 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.utility.player.MovementUtility;
-import thunder.hack.utility.player.PlaceUtility;
+import thunder.hack.utility.player.InteractionUtility;
 
 import java.util.UUID;
 
@@ -106,12 +105,12 @@ public class FreeCam extends Module {
         if (result != null )
         {
             if (result instanceof BlockHitResult && !mc.world.getBlockState(((BlockHitResult) result).getBlockPos()).isAir()) {
-                float[] rotations = PlaceUtility.calculateAngle(getPlayer().getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0), result.getPos());
+                float[] rotations = InteractionUtility.calculateAngle(getPlayer().getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0), result.getPos());
                 getPlayer().setYaw(rotations[0]);
                 getPlayer().setHeadYaw(rotations[0]);
                 getPlayer().setPitch(rotations[1]);
             } else if(!(result instanceof BlockHitResult)) {
-                float[] rotations = PlaceUtility.calculateAngle(getPlayer().getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0), result.getPos());
+                float[] rotations = InteractionUtility.calculateAngle(getPlayer().getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0), result.getPos());
                 getPlayer().setYaw(rotations[0]);
                 getPlayer().setHeadYaw(rotations[0]);
                 getPlayer().setPitch(rotations[1]);
