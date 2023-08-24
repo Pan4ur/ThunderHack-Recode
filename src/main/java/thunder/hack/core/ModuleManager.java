@@ -73,6 +73,7 @@ public class ModuleManager {
     public static ElytraFix elytraFix;
     public static ElytraRecast elytraRecast;
     public static ElytraPlus elytraPlus;
+    public static KillEffect killEffect;
 
 
     public ModuleManager() {
@@ -123,6 +124,7 @@ public class ModuleManager {
         elytraFix = new ElytraFix();
         elytraRecast = new ElytraRecast();
         elytraPlus = new ElytraPlus();
+        killEffect = new KillEffect();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -283,6 +285,7 @@ public class ModuleManager {
         modules.add(new PlacementTest());
         modules.add(elytraRecast);
         modules.add(new ViewLock());
+        modules.add(killEffect);
 
     }
 

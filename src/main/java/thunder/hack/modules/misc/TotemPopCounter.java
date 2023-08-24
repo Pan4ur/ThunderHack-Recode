@@ -43,9 +43,9 @@ public class TotemPopCounter extends Module {
             if (player == mc.player || AntiBot.bots.contains(player) || player.getHealth() > 0 || !Thunderhack.combatManager.popList.containsKey(player.getName().getString())) continue;
             String s;
             if(MainSettings.language.getValue() == MainSettings.Language.RU) {
-                s = Formatting.GREEN + player.getName().getString() + Formatting.WHITE + " попнул " + (Thunderhack.combatManager.popList.get(player.getName().getString()) > 1 ? Thunderhack.combatManager.popList.get(player.getName().getString()) + "" + Formatting.WHITE + "тотемов и сдох!" : Formatting.WHITE + "тотем и сдох!");
+                s = Formatting.GREEN + player.getName().getString() + Formatting.WHITE + " попнул " + (Thunderhack.combatManager.popList.get(player.getName().getString()) > 1 ? Thunderhack.combatManager.popList.get(player.getName().getString()) + "" + Formatting.WHITE + " тотемов и сдох!" : Formatting.WHITE + "тотем и сдох!");
             } else {
-                s = Formatting.GREEN + player.getName().getString() + Formatting.WHITE + " popped " + (Thunderhack.combatManager.popList.get(player.getName().getString()) > 1 ? Thunderhack.combatManager.popList.get(player.getName().getString()) + "" + Formatting.WHITE + "totems and died EZ LMAO!" : Formatting.WHITE + "totem and died EZ LMAO!");
+                s = Formatting.GREEN + player.getName().getString() + Formatting.WHITE + " popped " + (Thunderhack.combatManager.popList.get(player.getName().getString()) > 1 ? Thunderhack.combatManager.popList.get(player.getName().getString()) + "" + Formatting.WHITE + " totems and died EZ LMAO!" : Formatting.WHITE + "totem and died EZ LMAO!");
             }
             Command.sendMessage(s);
             if(notification.getValue())

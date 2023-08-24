@@ -62,6 +62,12 @@ public class KillEffect extends Module {
     }
 
     @Override
+    public void onEnable(){
+        mc.world.playSound(mc.player, mc.player.getBlockPos(), ThSoundPack.ORTHODOX_SOUNDEVENT, SoundCategory.BLOCKS, 10f, 1f);
+    }
+
+
+    @Override
     public void onUpdate() {
         mc.world.getEntities().forEach(entity -> {
             if (!(entity instanceof PlayerEntity)) return;
@@ -69,7 +75,7 @@ public class KillEffect extends Module {
             if (entity.isAlive() || ((PlayerEntity) entity).getHealth() != 0) return;
 
             if (playSound.getValue() && mode.getValue() == Mode.Orthodox)
-                mc.world.playSound(mc.player, entity.getBlockPos(), ThSoundPack.ORTHODOX_SOUNDEVENT, SoundCategory.MUSIC, 100000f, 90f);
+                mc.world.playSound(mc.player, entity.getBlockPos(), ThSoundPack.ORTHODOX_SOUNDEVENT, SoundCategory.BLOCKS, 10f, 1f);
             renderEntities.put(entity, System.currentTimeMillis());
         });
     }
