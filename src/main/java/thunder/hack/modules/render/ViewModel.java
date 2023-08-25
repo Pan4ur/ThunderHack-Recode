@@ -74,11 +74,11 @@ public class ViewModel extends Module {
                 rotationMainY.setValue((float) changeRotate(rotationMainY.getValue(), speedAnimateMain.getValue()));
             if (animateMainZ.getValue())
                 rotationMainZ.setValue((float) changeRotate(rotationMainZ.getValue(), speedAnimateMain.getValue()));
+            event.getStack().translate(positionMainX.getValue(), positionMainY.getValue(), positionMainZ.getValue());
+            event.getStack().scale((float) scaleMainX.getValue(), (float) scaleMainY.getValue(), (float) scaleMainZ.getValue());
             event.getStack().multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) rotationMainX.getValue()));
             event.getStack().multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) rotationMainY.getValue()));
             event.getStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) rotationMainZ.getValue()));
-            event.getStack().scale((float) scaleMainX.getValue(), (float) scaleMainY.getValue(), (float) scaleMainZ.getValue());
-            event.getStack().translate(positionMainX.getValue(), positionMainY.getValue(), positionMainZ.getValue());
         } else {
             if (animateOffX.getValue())
                 rotationOffX.setValue((float) changeRotate(rotationOffX.getValue(), speedAnimateOff.getValue()));
@@ -86,11 +86,11 @@ public class ViewModel extends Module {
                 rotationOffY.setValue((float) changeRotate(rotationOffY.getValue(), speedAnimateOff.getValue()));
             if (animateOffZ.getValue())
                 rotationOffZ.setValue((float) changeRotate(rotationOffZ.getValue(), speedAnimateOff.getValue()));
+            event.getStack().translate(positionOffX.getValue(), positionOffY.getValue(), positionOffZ.getValue());
+            event.getStack().scale((float) scaleOffX.getValue(), (float) scaleOffY.getValue(), (float) scaleOffZ.getValue());
             event.getStack().multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) rotationOffX.getValue()));
             event.getStack().multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) rotationOffY.getValue()));
             event.getStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) rotationOffZ.getValue()));
-            event.getStack().scale((float) scaleOffX.getValue(), (float) scaleOffY.getValue(), (float) scaleOffZ.getValue());
-            event.getStack().translate(positionOffX.getValue(), positionOffY.getValue(), positionOffZ.getValue());
         }
     }
 
