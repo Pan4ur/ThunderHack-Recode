@@ -19,12 +19,7 @@ import thunder.hack.utility.player.InteractionUtility;
 import java.util.UUID;
 
 public class FreeCam extends Module {
-
-    public Setting<Float> speed = new Setting<>("Speed", 1f, 0.0f, 5.0f);
-
-    public FreeCam() {
-        super("Freecam", "Freecam", Category.RENDER);
-    }
+    private final Setting<Float> speed = new Setting<>("Speed", 1f, 0.0f, 5.0f);
 
     public static PlayerCopyEntity dummy;
     private Vec3d playerPos;
@@ -37,6 +32,9 @@ public class FreeCam extends Module {
     public Vec3d prevPos;
     public Vec2f prevRotate;
 
+    public FreeCam() {
+        super("Freecam", "Freecam", Category.RENDER);
+    }
 
     @Override
     public void onEnable() {
@@ -65,51 +63,45 @@ public class FreeCam extends Module {
 
     @Override
     public void onDisable() {
-        if(fullNullCheck()){
+        if (fullNullCheck() || dummy == null) {
             return;
         }
-        if(dummy == null){
-            return;
+
+        mc.chunkCullingEnabled = true;
+
+        dummy.despawn();
+        mc.player.noClip = false;
+        mc.player.getAbilities().flying = prevFlying;
+        mc.player.getAbilities().setFlySpeed(prevFlySpeed);
+
+        mc.player.refreshPositionAndAngles(playerPos.getX(), playerPos.getY(), playerPos.getZ(), playerRot.x, playerRot.y);
+        mc.player.setVelocity(Vec3d.ZERO);
+
+        if (riding != null && mc.world.getEntityById(riding.getId()) != null) {
+            mc.player.startRiding(riding);
         }
-            mc.chunkCullingEnabled = true;
-
-            dummy.despawn();
-            mc.player.noClip = false;
-            mc.player.getAbilities().flying = prevFlying;
-            mc.player.getAbilities().setFlySpeed(prevFlySpeed);
-
-            mc.player.refreshPositionAndAngles(playerPos.getX(), playerPos.getY(), playerPos.getZ(), playerRot.x, playerRot.y);
-            mc.player.setVelocity(Vec3d.ZERO);
-
-            if (riding != null && mc.world.getEntityById(riding.getId()) != null) {
-                mc.player.startRiding(riding);
-            }
 
     }
 
-    public static OtherClientPlayerEntity getPlayer(){
+    public static OtherClientPlayerEntity getPlayer() {
         return dummy;
     }
 
     @EventHandler
     public void onSync(EventSync event) {
-        if(fullNullCheck()){
+        if (fullNullCheck() || dummy == null) {
             disable("NPE protection");
             return;
         }
-        if(dummy == null){
-            disable("NPE protection");
-            return;
-        }
+
         HitResult result = mc.crosshairTarget;
-        if (result != null )
-        {
+        if (result != null) {
             if (result instanceof BlockHitResult && !mc.world.getBlockState(((BlockHitResult) result).getBlockPos()).isAir()) {
                 float[] rotations = InteractionUtility.calculateAngle(getPlayer().getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0), result.getPos());
                 getPlayer().setYaw(rotations[0]);
                 getPlayer().setHeadYaw(rotations[0]);
                 getPlayer().setPitch(rotations[1]);
-            } else if(!(result instanceof BlockHitResult)) {
+            } else if (!(result instanceof BlockHitResult)) {
                 float[] rotations = InteractionUtility.calculateAngle(getPlayer().getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0), result.getPos());
                 getPlayer().setYaw(rotations[0]);
                 getPlayer().setHeadYaw(rotations[0]);
@@ -121,7 +113,8 @@ public class FreeCam extends Module {
         getPlayer().setStackInHand(Hand.OFF_HAND, mc.player.getOffHandStack());
 
         prevPos = mc.player.getPos();
-        prevRotate = new Vec2f(mc.player.getYaw(),mc.player.getPitch());
+        prevRotate = new Vec2f(mc.player.getYaw(), mc.player.getPitch());
+
         mc.player.setPosition(getPlayer().getPos());
         mc.player.setYaw(getPlayer().getYaw());
         mc.player.setPitch(getPlayer().getPitch());
@@ -131,11 +124,11 @@ public class FreeCam extends Module {
 
     @EventHandler
     public void onPostSync(EventPostSync event) {
-        if(fullNullCheck()){
+        if (fullNullCheck()) {
             disable("NPE protection");
             return;
         }
-        if(prevPos == null || prevRotate == null) return;
+        if (prevPos == null || prevRotate == null) return;
         mc.player.setPosition(prevPos);
         mc.player.setYaw(prevRotate.x);
         mc.player.setPitch(prevRotate.y);
@@ -143,7 +136,7 @@ public class FreeCam extends Module {
 
     @EventHandler
     public void onMove(EventMove event) {
-        if(fullNullCheck()){
+        if (fullNullCheck()) {
             disable("NPE protection");
             return;
         }
@@ -152,12 +145,12 @@ public class FreeCam extends Module {
 
     @EventHandler
     public void onTick(PlayerUpdateEvent event) {
-        if(fullNullCheck()){
+        if (fullNullCheck()) {
             disable("NPE protection");
             return;
         }
         mc.player.setOnGround(false);
-        if(!MovementUtility.isMoving()){
+        if (!MovementUtility.isMoving()) {
             mc.player.setVelocity(Vec3d.ZERO);
         }
         mc.player.getAbilities().setFlySpeed((float) (speed.getValue() / 5));

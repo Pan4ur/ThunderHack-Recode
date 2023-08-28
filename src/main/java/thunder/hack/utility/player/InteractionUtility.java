@@ -34,13 +34,14 @@ public final class InteractionUtility {
     }
 
     public static boolean canSee(Vec3d entityEyes, Vec3d entityPos) {
+        if (mc.player == null || mc.world == null) return false;
+
         Vec3d playerEyes = getEyesPos(mc.player);
         if (mc.world.raycast(new RaycastContext(playerEyes, entityEyes, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.MISS)
             return true;
 
         if (playerEyes.getY() > entityPos.getY())
-            if (mc.world.raycast(new RaycastContext(playerEyes, entityPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.MISS)
-                return true;
+            return mc.world.raycast(new RaycastContext(playerEyes, entityPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.MISS;
         return false;
     }
 
@@ -95,7 +96,7 @@ public final class InteractionUtility {
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
 
         if (mode == PlaceMode.Packet || mode == PlaceMode.All)
-            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND,result,PlayerUtility.getWorldActionId(mc.world)));
+            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
 
         awaiting.put(bp, System.currentTimeMillis());
 
@@ -119,11 +120,11 @@ public final class InteractionUtility {
 
     @Nullable
     public static BlockHitResult getPlaceResult(BlockPos bp, Interact interact) {
-        if(checkEntities)
+        if (checkEntities)
             for (Entity entity : mc.world.getNonSpectatingEntities(Entity.class, new Box(bp)))
                 if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity))
                     return null;
-        if(!mc.world.getBlockState(bp).isReplaceable()) return null;
+        if (!mc.world.getBlockState(bp).isReplaceable()) return null;
         ArrayList<BlockPosWithFacing> supports = getSupportBlocks(bp);
         for (BlockPosWithFacing support : supports) {
             if (interact != Interact.Vanilla) {
@@ -166,7 +167,7 @@ public final class InteractionUtility {
         if (mc.world.getBlockState(bp.add(0, 0, 1)).isSolid() || awaiting.containsKey(bp.add(0, 0, 1)))
             list.add(new BlockPosWithFacing(bp.add(0, 0, 1), Direction.NORTH));
 
-        if (mc.world.getBlockState(bp.add(0, 0, -1)).isSolid()|| awaiting.containsKey(bp.add(0, 0, -1)))
+        if (mc.world.getBlockState(bp.add(0, 0, -1)).isSolid() || awaiting.containsKey(bp.add(0, 0, -1)))
             list.add(new BlockPosWithFacing(bp.add(0, 0, -1), Direction.SOUTH));
 
         return list;
@@ -261,7 +262,7 @@ public final class InteractionUtility {
                     }
                 }
             }
-            if(bestData == null) return null;
+            if (bestData == null) return null;
             if (bestData.vector == null || bestData.dir == null) return null;
             return bestData;
         }

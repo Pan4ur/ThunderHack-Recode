@@ -1,6 +1,5 @@
 package thunder.hack.modules.movement;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventSync;

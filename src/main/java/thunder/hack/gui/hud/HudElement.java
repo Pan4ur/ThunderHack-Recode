@@ -11,14 +11,12 @@ import thunder.hack.setting.impl.PositionSetting;
 
 
 public class HudElement extends Module {
-
     int height;
     int width;
     int dragX, dragY = 0;
     private boolean mousestate = false;
     float x1 = 0;
     float y1 = 0;
-
 
     public HudElement(String name, String description, int width, int height) {
         super(name, description, Category.HUD);
