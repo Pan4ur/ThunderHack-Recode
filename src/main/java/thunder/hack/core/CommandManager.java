@@ -43,6 +43,7 @@ public class CommandManager {
         add(new TrackerCommand());
         add(new VClipCommand());
         add(new WayPointCommand());
+        add(new OpenFolderCommand());
     }
 
     private void add(Command command) {

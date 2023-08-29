@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import thunder.hack.Thunderhack;
@@ -20,20 +21,21 @@ public class DurabilityAlert extends Module {
         super("DurabilityAlert", "durability alert", Category.PLAYER);
     }
 
-    public Setting<Boolean> friends = new Setting<>("Friend message", true);
-    public Setting<Integer> percent = new Setting<>("Percent", 20, 1, 100);
+    private final Setting<Boolean> friends = new Setting<>("Friend message", true);
+    private final Setting<Integer> percent = new Setting<>("Percent", 20, 1, 100);
+
     private final Identifier ICON = new Identifier("textures/broken_shield.png");
     private boolean need_alert = false;
-    private Timer timer = new Timer();
+    private final Timer timer = new Timer();
 
     @Override
     public void onUpdate() {
-        if(friends.getValue()) {
+        if (friends.getValue()) {
             for (PlayerEntity player : mc.world.getPlayers()) {
                 if (!Thunderhack.friendManager.isFriend(player)) continue;
                 if (player == mc.player) continue;
                 for (ItemStack stack : player.getInventory().armor) {
-                    if (stack.isEmpty()) continue;
+                    if (stack.isEmpty() || !(stack.getItem() instanceof ArmorItem)) continue;
                     if (getDurability(stack) < percent.getValue() && timer.passedMs(30000)) {
                         if (MainSettings.language.getValue() == MainSettings.Language.RU) {
                             mc.player.networkHandler.sendChatCommand("msg " + player.getName().getString() + " Срочно чини броню!");
@@ -49,30 +51,29 @@ public class DurabilityAlert extends Module {
         boolean flag = false;
         for (ItemStack stack : mc.player.getInventory().armor) {
             if (stack.isEmpty()) continue;
-            if(getDurability(stack) < percent.getValue()){
+            if (getDurability(stack) < percent.getValue()) {
                 need_alert = true;
                 flag = true;
             }
         }
-        if(!flag && need_alert){
+        if (!flag && need_alert) {
             need_alert = false;
         }
 
     }
 
-    public void onRender2D(DrawContext context){
-        if(need_alert) {
+    public void onRender2D(DrawContext context) {
+        if (need_alert) {
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                FontRenderers.sf_bold.drawCenteredString(context.getMatrices(),"Срочно чини броню!", (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
+                FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "Срочно чини броню!", (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
             } else {
-                FontRenderers.sf_bold.drawCenteredString(context.getMatrices(),"Repair your armor immediately!", (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
-
-                //new Color(0xFFDF00)
+                FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "Repair your armor immediately!", (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
             }
+
             Color c1 = new Color(0xFFDF00);
-            RenderSystem.setShaderColor(c1.getRed() / 255f,c1.getGreen() / 255f,c1.getBlue()/255f,1f);
-            context.drawTexture(ICON, (int) (mc.getWindow().getScaledWidth() / 2f - 40), (int) (mc.getWindow().getScaledHeight() / 3f - 120), 80, 80,0,0,80,80,80,80);
-            RenderSystem.setShaderColor(1f,1f,1f,1f);
+            RenderSystem.setShaderColor(c1.getRed() / 255f, c1.getGreen() / 255f, c1.getBlue() / 255f, 1f);
+            context.drawTexture(ICON, (int) (mc.getWindow().getScaledWidth() / 2f - 40), (int) (mc.getWindow().getScaledHeight() / 3f - 120), 80, 80, 0, 0, 80, 80, 80, 80);
+            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         }
     }
 

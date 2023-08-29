@@ -19,11 +19,12 @@ public class HitBoxTricks extends Module {
 
     private static final double MAGIC_OFFSET = .200009968835369999878673424677777777777761;
 
-    public final Setting<Mode> mode = new Setting<>("GrimAC", Mode.Desync);
-    private Setting<Integer> interval = new Setting<>("Interval", 5, 1, 10, v-> mode.getValue() == Mode.City);
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Desync);
+    private final Setting<Integer> interval = new Setting<>("Interval", 5, 1, 10, v-> mode.getValue() == Mode.City);
 
     private enum Mode {
-        Desync, City
+        Desync,
+        City
     }
 
     @Override

@@ -38,18 +38,13 @@ import thunder.hack.utility.render.Render3DEngine;
 import java.awt.*;
 
 public class SpeedMine extends Module {
-    public SpeedMine() {
-        super("SpeedMine", "SpeedMine", Category.PLAYER);
-    }
-
-    public static final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
-    public final Setting<Float> startDmg = new Setting<>("StartDmg", 0f, 0f, 1f);
-    public final Setting<Float> finishDmg = new Setting<>("FinishDmg", 1f, 0f, 1f);
-
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
+    private final Setting<Float> startDmg = new Setting<>("StartDmg", 0f, 0f, 1f);
+    private final Setting<Float> finishDmg = new Setting<>("FinishDmg", 1f, 0f, 1f);
     private final Setting<Float> range = new Setting<>("Range", 4.2f, 3.0f, 10.0f);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
-
     private final Setting<Boolean> resetOnSwitch = new Setting<>("On Switch", true);
+    private final Setting<Integer> breakAttempts = new Setting<>("BreakAttempts", 10, 1, 50, v -> mode.getValue() == Mode.Packet);
 
     private final Setting<Parent> render = new Setting<>("Render", new Parent(false, 0));
     private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Shrink).withParent(render);
@@ -59,13 +54,14 @@ public class SpeedMine extends Module {
     private final Setting<ColorSetting> startFillColor = new Setting<>("Start Fill Color", new ColorSetting(new Color(255, 0, 0, 120))).withParent(render);
     private final Setting<ColorSetting> endFillColor = new Setting<>("End Fill Color", new ColorSetting(new Color(47, 255, 0, 120))).withParent(render);
 
-    private final Setting<Integer> breakAttempts = new Setting<>("BreakAttempts", 10, 1, 50, v -> mode.getValue() == Mode.Packet);
-
     public static BlockPos minePosition;
     private Direction mineFacing;
     private int mineBreaks;
     public static float progress;
 
+    public SpeedMine() {
+        super("SpeedMine", "SpeedMine", Category.PLAYER);
+    }
 
     @Override
     public void onUpdate() {
@@ -123,8 +119,8 @@ public class SpeedMine extends Module {
         }
     }
 
-    public  boolean isWorth() {
-        if (    isDisabled()
+    public boolean isWorth() {
+        if (isDisabled()
                 || mode.getValue() != Mode.Packet
                 || minePosition == null
                 || progress < 0.95
@@ -138,8 +134,8 @@ public class SpeedMine extends Module {
             float dmg = ExplosionUtility.getExplosionDamage1(minePosition.toCenterPos(), pl);
             mc.world.setBlockState(minePosition, Blocks.OBSIDIAN.getDefaultState());
             ExplosionUtility.anchorIgnore = null;
-            if(Thunderhack.friendManager.isFriend(pl.getEntityName())) continue;
-            if(dmg > 7.5f) return true;
+            if (Thunderhack.friendManager.isFriend(pl.getEntityName())) continue;
+            if (dmg > 7.5f) return true;
         }
 
         return false;

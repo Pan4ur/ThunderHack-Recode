@@ -1,25 +1,21 @@
 package thunder.hack.modules.misc;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
-import thunder.hack.Thunderhack;
-import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
 
 import java.util.UUID;
 
 public class FakePlayer extends Module {
+    private final Setting<Boolean> copyInventory = new Setting<>("CopyInventory", false);
+
+    public static OtherClientPlayerEntity fakePlayer;
 
     public FakePlayer() {
         super("FakePlayer", "FakePlayer", Category.MISC);
     }
-    public Setting<Boolean> copyInventory = new Setting<>("CopyInventory", false);
-
-    public static OtherClientPlayerEntity fakePlayer;
 
     @Override
     public void onEnable() {
@@ -33,12 +29,13 @@ public class FakePlayer extends Module {
     }
 
 
-
     @Override
     public void onDisable() {
-        if(fakePlayer == null) return;
+        if (fakePlayer == null) return;
+
         fakePlayer.kill();
         fakePlayer.setRemoved(Entity.RemovalReason.KILLED);
         fakePlayer.onRemoved();
+        fakePlayer = null;
     }
 }

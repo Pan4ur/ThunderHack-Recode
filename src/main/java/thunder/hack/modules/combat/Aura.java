@@ -29,10 +29,12 @@ import net.minecraft.util.math.Vec3d;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.Core;
 import thunder.hack.core.ModuleManager;
+import thunder.hack.core.PlayerManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
+import thunder.hack.modules.misc.FakePlayer;
 import thunder.hack.modules.movement.Speed;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
@@ -50,10 +52,6 @@ import static net.minecraft.util.UseAction.BLOCK;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
 
 public class Aura extends Module {
-    public Aura() {
-        super("Aura", "Запомните блядь-киллка тх не мисает-а дает шанс убежать", Category.COMBAT);
-    }
-
     public static final Setting<Float> attackRange = new Setting<>("Attack Range", 3.1f, 1f, 7.0f);
     public static final Setting<Mode> mode = new Setting<>("Rotation", Mode.Universal);
     private final Setting<Boolean> onlyWeapon = new Setting<>("Only Weapon", false);
@@ -97,6 +95,10 @@ public class Aura extends Module {
     public static boolean lookingAtHitbox;
     public static boolean rotateAllowed;
 
+    public Aura() {
+        super("Aura", "Запомните блядь-киллка тх не мисает-а дает шанс убежать", Category.COMBAT);
+    }
+
     @EventHandler
     public void modifyVelocity(EventPlayerTravel e) {
         if (target != null && grimAC.getValue() == Grim.MoveFix) {
@@ -123,14 +125,14 @@ public class Aura extends Module {
 
     @EventHandler
     public void onPlayerUpdate(PlayerUpdateEvent e) {
-        if(grimAC.getValue() != Grim.SilentTest){
+        if (grimAC.getValue() != Grim.SilentTest) {
             auraLogic();
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPostSync(EventPostSync e) {
-        if(grimAC.getValue() == Grim.SilentTest){
+        if (grimAC.getValue() == Grim.SilentTest) {
             auraLogic();
         }
         lookingAtHitbox = Thunderhack.playerManager.checkRtx(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());
@@ -162,31 +164,31 @@ public class Aura extends Module {
 
             boolean blocking = mc.player.isUsingItem() && mc.player.getActiveItem().getItem().getUseAction(mc.player.getActiveItem()) == BLOCK;
             if (blocking)
-                mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
+                sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
 
             int axe_slot = InventoryUtility.getAxe().slot();
             int hotbar_axe_slot = InventoryUtility.findInHotBar(stack -> stack.getItem() instanceof AxeItem).slot();
 
             boolean sprint = Core.serversprint;
             if (sprint)
-                mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+                sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
 
             if (shieldBreaker.getValue() && target instanceof PlayerEntity && (((PlayerEntity) target).isUsingItem() && (((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD || ((PlayerEntity) target).getMainHandStack().getItem() == Items.SHIELD) && (axe_slot != -1 || hotbar_axe_slot != -1))) {
                 if (axe_slot != -1) {
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, axe_slot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                    mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                     mc.interactionManager.attackEntity(mc.player, target);
                     mc.interactionManager.attackEntity(mc.player, target);
                     mc.player.swingHand(Hand.MAIN_HAND);
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, axe_slot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                    mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                     Thunderhack.notificationManager.publicity("Aura", MainSettings.isRu() ? ("Ломаем щит игроку " + target.getName().getString()) : ("Breaking " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
                 } else if (hotbar_axe_slot != -1) {
-                    mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(hotbar_axe_slot));
+                    sendPacket(new UpdateSelectedSlotC2SPacket(hotbar_axe_slot));
                     mc.interactionManager.attackEntity(mc.player, target);
                     mc.interactionManager.attackEntity(mc.player, target);
                     mc.player.swingHand(Hand.MAIN_HAND);
-                    mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+                    sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
                     Thunderhack.notificationManager.publicity("Aura", MainSettings.isRu() ? ("Ломаем щит игроку " + target.getName().getString()) : ("Breaking " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
                 }
             } else if (!(target instanceof PlayerEntity) || !(((PlayerEntity) target).isUsingItem() && ((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD) || ignoreShield.getValue()) {
@@ -202,9 +204,9 @@ public class Aura extends Module {
             }
 
             if (sprint)
-                mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+                sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
             if (blocking)
-                mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
         }
         hitTicks--;
     }
@@ -213,10 +215,10 @@ public class Aura extends Module {
     public void onSync(EventSync e) {
         if (target != null) {
             if (mode.getValue() != Mode.None) {
-                if(grimAC.getValue() == Grim.SilentTest && target != null && autoCrit()){
+                if (grimAC.getValue() == Grim.SilentTest && target != null && autoCrit()) {
                     mc.player.setYaw(rotationYaw);
                     mc.player.setPitch(rotationPitch);
-                } else if(grimAC.getValue() != Grim.SilentTest) {
+                } else if (grimAC.getValue() != Grim.SilentTest) {
                     mc.player.setYaw(rotationYaw);
                     mc.player.setPitch(rotationPitch);
                 }
@@ -338,7 +340,7 @@ public class Aura extends Module {
         float dst = attackRange.getValue();
         dst += 2f;
         if (mc.player.isFallFlying() && target != null) dst += 15f;
-        if(grimAC.getValue() == Grim.SilentTest) dst = attackRange.getValue();
+        if (grimAC.getValue() == Grim.SilentTest) dst = attackRange.getValue();
         return dst;
     }
 
@@ -356,7 +358,7 @@ public class Aura extends Module {
         float minMotionXZ = 0.003f;
         float maxMotionXZ = 0.03f;
 
-        float minMotionY= 0.001f;
+        float minMotionY = 0.001f;
         float maxMotionY = 0.03f;
 
 
@@ -407,7 +409,7 @@ public class Aura extends Module {
         // Если мы перестали смотреть на цель
         if (!lookingAtHitbox) {
 
-            float[] rotation1 = Thunderhack.playerManager.calcAngle(target.getPos().add(0, target.getEyeHeight(target.getPose()) / 2f, 0));
+            float[] rotation1 = PlayerManager.calcAngle(target.getPos().add(0, target.getEyeHeight(target.getPose()) / 2f, 0));
 
             // Проверяем видимость центра игрока
             if (distanceFromHead(target.getPos().add(0, target.getEyeHeight(target.getPose()) / 2f, 0)) <= attackRange.getPow2Value()
@@ -458,6 +460,7 @@ public class Aura extends Module {
                 best_distance = temp_dst;
             }
         }
+
         target = best_entity;
     }
 

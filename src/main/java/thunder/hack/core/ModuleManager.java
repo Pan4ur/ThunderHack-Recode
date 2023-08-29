@@ -212,7 +212,6 @@ public class ModuleManager {
         modules.add(new AutoWeb());
         modules.add(holeFill);
         modules.add(nameProtect);
-        modules.add(new TestHud());
         modules.add(new BoatFly());
         modules.add(new HitBoxTricks());
         modules.add(new HoleESP());
@@ -334,14 +333,14 @@ public class ModuleManager {
         modules.stream().filter(Module::listening).forEach((Thunderhack.EVENT_BUS)::subscribe);
         modules.forEach(Module::onLoad);
 
-        if(Thunderhack.configManager.firstLaunch){
+        if (ConfigManager.firstLaunch) {
             ModuleManager.notifications.enable();
             Thunderhack.moduleManager.get(RPC.class).enable();
         }
     }
 
     public void onUpdate() {
-        if(Module.fullNullCheck()) return;
+        if (Module.fullNullCheck()) return;
         modules.stream().filter(Module::isEnabled).forEach(Module::onUpdate);
     }
 
@@ -379,7 +378,7 @@ public class ModuleManager {
 
     public void onUnload() {
         modules.forEach(module -> {
-            if(module.isEnabled()){
+            if (module.isEnabled()) {
                 Thunderhack.EVENT_BUS.unsubscribe(module);
             }
         });
