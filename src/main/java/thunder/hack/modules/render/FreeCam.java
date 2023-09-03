@@ -8,20 +8,18 @@ import net.minecraft.util.math.Vec2f;
 import thunder.hack.events.impl.*;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.InteractionUtility;
-
-import java.util.UUID;
+import thunder.hack.utility.player.PlayerEntityCopy;
 
 public class FreeCam extends Module {
     private final Setting<Float> speed = new Setting<>("Speed", 1f, 0.0f, 5.0f);
 
-    public static PlayerCopyEntity dummy;
+    public static PlayerEntityCopy dummy;
     private Vec3d playerPos;
     private Vec2f playerRot;
     private Entity riding;
@@ -43,7 +41,7 @@ public class FreeCam extends Module {
         playerPos = new Vec3d(mc.player.getX(), mc.player.getY(), mc.player.getZ());
         playerRot = new Vec2f(mc.player.getYaw(), mc.player.getPitch());
 
-        dummy = new PlayerCopyEntity();
+        dummy = new PlayerEntityCopy();
 
         dummy.spawn();
 
@@ -69,7 +67,7 @@ public class FreeCam extends Module {
 
         mc.chunkCullingEnabled = true;
 
-        dummy.despawn();
+        dummy.deSpawn();
         mc.player.noClip = false;
         mc.player.getAbilities().flying = prevFlying;
         mc.player.getAbilities().setFlySpeed(prevFlySpeed);
@@ -83,7 +81,7 @@ public class FreeCam extends Module {
 
     }
 
-    public static OtherClientPlayerEntity getPlayer() {
+    public static PlayerEntityCopy getPlayer() {
         return dummy;
     }
 
@@ -128,6 +126,7 @@ public class FreeCam extends Module {
             disable("NPE protection");
             return;
         }
+
         if (prevPos == null || prevRotate == null) return;
         mc.player.setPosition(prevPos);
         mc.player.setYaw(prevRotate.x);
@@ -140,6 +139,7 @@ public class FreeCam extends Module {
             disable("NPE protection");
             return;
         }
+
         mc.player.noClip = true;
     }
 
@@ -149,6 +149,7 @@ public class FreeCam extends Module {
             disable("NPE protection");
             return;
         }
+
         mc.player.setOnGround(false);
         if (!MovementUtility.isMoving()) {
             mc.player.setVelocity(Vec3d.ZERO);
@@ -156,25 +157,5 @@ public class FreeCam extends Module {
         mc.player.getAbilities().setFlySpeed((float) (speed.getValue() / 5));
         mc.player.getAbilities().flying = true;
         mc.player.setPose(EntityPose.STANDING);
-    }
-
-
-    public class PlayerCopyEntity extends OtherClientPlayerEntity {
-        public PlayerCopyEntity() {
-            super(mc.world, mc.player.getGameProfile());
-            copyFrom(mc.player);
-            getPlayerListEntry();
-            dataTracker.set(PLAYER_MODEL_PARTS, mc.player.getDataTracker().get(PLAYER_MODEL_PARTS));
-            setUuid(UUID.randomUUID());
-        }
-
-        public void spawn() {
-            unsetRemoved();
-            mc.world.addEntity(this.getId(), this);
-        }
-
-        public void despawn() {
-            mc.world.removeEntity(this.getId(), RemovalReason.DISCARDED);
-        }
     }
 }

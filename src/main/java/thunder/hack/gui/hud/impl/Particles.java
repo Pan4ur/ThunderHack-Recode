@@ -14,7 +14,7 @@ public class Particles {
     public double x, y, deltaX, deltaY, size, opacity;
     public Color color;
 
-    private Identifier star = new Identifier("textures/star.png");
+    private final Identifier star = new Identifier("textures/star.png");
 
 
     public static Color mixColors(final Color color1, final Color color2, final double percent) {

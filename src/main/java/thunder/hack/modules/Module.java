@@ -10,6 +10,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
+import thunder.hack.core.CommandManager;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
@@ -118,7 +119,7 @@ public class Module {
     }
 
     public void disable(String reason) {
-        Command.sendMessage(Formatting.GRAY +  "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + reason);
+        sendMessage(Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + reason);
         disable();
     }
 
@@ -127,7 +128,7 @@ public class Module {
     public void disable() {
         try {
             Thunderhack.EVENT_BUS.unsubscribe(this);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         if (fullNullCheck()) return;
@@ -252,13 +253,14 @@ public class Module {
     }
 
     public static void clickSlot(int id) {
-        if (id != -1)
-            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, id, 0, SlotActionType.PICKUP, mc.player);
+        if (id == -1 || mc.interactionManager == null || mc.player == null) return;
+
+        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, id, 0, SlotActionType.PICKUP, mc.player);
     }
 
     public void sendMessage(String message) {
         if (fullNullCheck()) return;
-        mc.player.sendMessage(Text.of(Thunderhack.commandManager.getClientMessage() + " " + Formatting.GRAY +  "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + message));
+        mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + message));
     }
 
     public Setting getSettingByName(String name) {

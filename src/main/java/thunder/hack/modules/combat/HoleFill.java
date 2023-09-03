@@ -153,7 +153,9 @@ public class HoleFill extends Module {
             }
 
             if (pos != null) {
-                List<BlockPos> poses = Arrays.stream(HoleUtility.getHolePoses(pos)).filter(blockPos -> mc.player.getPos().distanceTo(blockPos.toCenterPos()) <= placeRange.getValue()).toList();
+                List<BlockPos> poses = HoleUtility.getHolePoses(pos).stream()
+                        .filter(blockPos -> mc.player.getPos().distanceTo(blockPos.toCenterPos()) <= placeRange.getValue())
+                        .toList();
                 boolean broke = false;
 
                 for (BlockPos blockPos : poses) {

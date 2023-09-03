@@ -90,8 +90,11 @@ public class Setting<T> {
     }
 
     public float getPow2Value() {
-        if (this.value instanceof Float) {
-            return ((Float) this.value).floatValue() * ((Float) this.value).floatValue();
+        if (value instanceof Float) {
+            return (float) value * (float) value;
+        }
+        if (value instanceof Integer) {
+            return (int) value * (int) value;
         }
         return 0;
     }

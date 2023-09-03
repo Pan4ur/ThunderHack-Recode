@@ -1,6 +1,5 @@
 package thunder.hack.modules.misc;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,20 +15,18 @@ import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class VisualRange extends Module {
+    private static final ArrayList<String> entities = new ArrayList<>();
+    private final Setting<Boolean> leave = new Setting<>("Leave", true);
+    private final Setting<Boolean> enter = new Setting<>("Enter", true);
+    private final Setting<Boolean> friends = new Setting<>("Friends", true);
+    private final Setting<Boolean> soundpl = new Setting<>("Sound", true);
+    private final Setting<mode> Mode = new Setting<>("Mode", mode.Notification);
 
     public VisualRange() {
         super("VisualRange", Category.MISC);
     }
-
-    private static final ArrayList<String> entities = new ArrayList<>();
-    public Setting<Boolean> leave = new Setting<>("Leave", true);
-    public Setting<Boolean> enter = new Setting<>("Enter", true);
-    public Setting<Boolean> friends = new Setting<>("Friends", true);
-    public Setting<Boolean> soundpl = new Setting<>("Sound", true);
-    public Setting<mode> Mode = new Setting<>("Mode", mode.Notification);
 
     @EventHandler
     public void onEntityAdded(EventEntitySpawn event) {

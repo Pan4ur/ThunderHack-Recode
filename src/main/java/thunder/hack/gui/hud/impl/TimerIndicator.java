@@ -1,8 +1,7 @@
 package thunder.hack.gui.hud.impl;
 
-
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
@@ -14,13 +13,13 @@ import thunder.hack.utility.render.animation.BetterDynamicAnimation;
 import java.awt.*;
 
 public class TimerIndicator extends HudElement {
+    private final BetterDynamicAnimation timerAnimation = new BetterDynamicAnimation();
+
     public TimerIndicator() {
         super("TimerIndicator", "TimerIndicator", 65, 15);
     }
 
-    public static BetterDynamicAnimation timerAnimation = new BetterDynamicAnimation();
-
-
+    @Override
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
         int status;
@@ -31,9 +30,8 @@ public class TimerIndicator extends HudElement {
         FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), status >= 99 ? "100%" : status + "%", getPosX() + 31, getPosY() + 2, new Color(200, 200, 200, 255).getRGB());
     }
 
-
-    public void onRenderShaders(DrawContext context) {
-
+    @Override
+    public void onRenderShaders(@NotNull DrawContext context) {
         Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() + 0.5f, getPosY() + 0.5f, 61, 11, 3, 10);
 
         int status;

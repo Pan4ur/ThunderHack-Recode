@@ -20,7 +20,6 @@ public class GradientProgram {
     public float time = 0;
 
     private GradientProgram(Identifier ident, Consumer<GradientProgram> init) {
-        PostEffectProcessor shader1;
         try {
             shader = new PostEffectProcessor(mc.getTextureManager(), mc.getResourceManager(), mc.getFramebuffer(), ident);
             //  checkUpdateDimensions();
@@ -32,7 +31,7 @@ public class GradientProgram {
     }
 
     public static GradientProgram create(Consumer<GradientProgram> callback) {
-        return new GradientProgram(new Identifier("thunderhack","shaders/post/gradient.json"), callback);
+        return new GradientProgram(new Identifier("minecraft", "shaders/post/gradient.json"), callback);
     }
 
     void checkUpdateDimensions() {

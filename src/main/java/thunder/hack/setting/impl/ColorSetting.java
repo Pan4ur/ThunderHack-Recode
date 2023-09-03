@@ -1,5 +1,7 @@
 package thunder.hack.setting.impl;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.*;
 
 public final class ColorSetting {
@@ -7,7 +9,7 @@ public final class ColorSetting {
     private boolean cycle = false;
     private int globalOffset = 0;
 
-    public ColorSetting(Color color) {
+    public ColorSetting(@NotNull Color color) {
         this.color = color.getRGB();
     }
 
@@ -26,7 +28,7 @@ public final class ColorSetting {
         this.globalOffset = globalOffset;
     }
 
-    public ColorSetting withAlpha(int alpha) {
+    public @NotNull ColorSetting withAlpha(int alpha) {
         int red = (getColor() >> 16) & 0xFF;
         int green = (getColor() >> 8) & 0xFF;
         int blue = (getColor()) & 0xFF;
@@ -125,7 +127,7 @@ public final class ColorSetting {
         return (color >> 24) & 0xff;
     }
 
-    public Color getColorObject() {
+    public @NotNull Color getColorObject() {
         int color = getColor();
         int alpha = (color >> 24) & 0xff;
         int red = (color >> 16) & 0xFF;

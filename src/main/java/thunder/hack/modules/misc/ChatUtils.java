@@ -1,30 +1,23 @@
 package thunder.hack.modules.misc;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.injection.accesors.IGameMessageS2CPacket;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
-import thunder.hack.modules.movement.Spider;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.ThSoundPack;
 import thunder.hack.utility.Timer;
 
 import java.text.SimpleDateFormat;
@@ -40,10 +33,12 @@ public class ChatUtils extends Module {
 
 
     private final Setting<Welcomer> welcomer = new Setting("Welcomer", Welcomer.Off);
-    private enum Welcomer{Off, Server, Client}
+
+    private enum Welcomer {Off, Server, Client}
 
     private final Setting<Prefix> prefix = new Setting("Prefix", Prefix.None);
-    private enum Prefix{Green, Global, None}
+
+    private enum Prefix {Green, Global, None}
 
     public final Setting<Boolean> totems = new Setting<>("Totems", false);
     public final Setting<Boolean> time = new Setting<>("Time", false);
@@ -53,7 +48,6 @@ public class ChatUtils extends Module {
     private final Timer timer = new Timer();
     private final Timer antiSpam = new Timer();
 
-    private String string1 = "server";
     private final LinkedHashMap<UUID, String> nameMap = new LinkedHashMap<>();
 
 
@@ -76,9 +70,10 @@ public class ChatUtils extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
-        if(welcomer.getValue() != Welcomer.Off && antiSpam.passedMs(3000)) {
+        if (welcomer.getValue() != Welcomer.Off && antiSpam.passedMs(3000)) {
             if (e.getPacket() instanceof PlayerListS2CPacket pck) {
                 int n2 = (int) Math.floor(Math.random() * qq.length);
+                String string1 = "server";
                 if (mc.player.networkHandler.getServerInfo() != null) {
                     string1 = qq[n2].replace("SERVERIP1D5A9E", mc.player.networkHandler.getServerInfo().address);
                 } else {
@@ -92,7 +87,7 @@ public class ChatUtils extends Module {
                             mc.player.networkHandler.sendChatMessage(getPrefix() + string1 + ple.profile().getName());
                             antiSpam.reset();
                         } else {
-                            Command.sendMessage(string1 + ple.profile().getName());
+                            sendMessage(string1 + ple.profile().getName());
                         }
                         nameMap.put(ple.profile().getId(), ple.profile().getName());
                     }
@@ -108,53 +103,53 @@ public class ChatUtils extends Module {
                         mc.player.networkHandler.sendChatMessage(getPrefix() + bb[n] + nameMap.get(uuid2));
                         antiSpam.reset();
                     } else {
-                        Command.sendMessage(bb[n] + nameMap.get(uuid2));
+                        sendMessage(bb[n] + nameMap.get(uuid2));
                     }
                     nameMap.remove(uuid2);
                 }
             }
         }
-            if(e.getPacket() instanceof GameMessageS2CPacket pac && time.getValue()) {
-                IGameMessageS2CPacket pac2 = (IGameMessageS2CPacket) e.getPacket();
-                pac2.setContent(Text.of("[" + Formatting.GRAY + new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime()) + Formatting.RESET + "] ").copy().append(pac.content));
-            }
+        if (e.getPacket() instanceof GameMessageS2CPacket pac && time.getValue()) {
+            IGameMessageS2CPacket pac2 = (IGameMessageS2CPacket) e.getPacket();
+            pac2.setContent(Text.of("[" + Formatting.GRAY + new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime()) + Formatting.RESET + "] ").copy().append(pac.content));
+        }
 
-            if(e.getPacket() instanceof GameMessageS2CPacket pac && mention.getValue()) {
-                if(pac.content.getString().contains(mc.player.getName().getString())){
-                    Thunderhack.notificationManager.publicity("ChatUtils", MainSettings.language.getValue() == MainSettings.Language.RU ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
-                    mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 5f, 1f);
-                }
+        if (e.getPacket() instanceof GameMessageS2CPacket pac && mention.getValue()) {
+            if (pac.content.getString().contains(mc.player.getName().getString())) {
+                Thunderhack.notificationManager.publicity("ChatUtils", MainSettings.language.getValue() == MainSettings.Language.RU ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
+                mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 5f, 1f);
             }
+        }
     }
 
     @EventHandler
-    public void onPacketSend(PacketEvent.Send e){
-        if(e.getPacket() instanceof ChatMessageC2SPacket pac && antiCoordLeak.getValue()){
-            if(antiCoordLeak.getValue() && pac.chatMessage.replaceAll("\\D", "").length() >= 6) {
-                Command.sendMessage("[ChatUtils] " + (MainSettings.language.getValue() == MainSettings.Language.RU ? "В сообщении содержатся координаты!" : "The message contains coordinates!"));
+    public void onPacketSend(PacketEvent.Send e) {
+        if (e.getPacket() instanceof ChatMessageC2SPacket pac && antiCoordLeak.getValue()) {
+            if (antiCoordLeak.getValue() && pac.chatMessage.replaceAll("\\D", "").length() >= 6) {
+                sendMessage("[ChatUtils] " + (MainSettings.language.getValue() == MainSettings.Language.RU ? "В сообщении содержатся координаты!" : "The message contains coordinates!"));
                 e.cancel();
             }
         }
     }
 
     @EventHandler
-    public void onTotem(TotemPopEvent e){
-        if(totems.getValue() && antiSpam.passedMs(3000) && e.getEntity() != mc.player){
+    public void onTotem(TotemPopEvent e) {
+        if (totems.getValue() && antiSpam.passedMs(3000) && e.getEntity() != mc.player) {
             int n = (int) Math.floor(Math.random() * popMessages.length);
-            String s = popMessages[n].replace("<pop>", e.getPops()+"");
+            String s = popMessages[n].replace("<pop>", e.getPops() + "");
             mc.player.networkHandler.sendChatMessage(getPrefix() + e.getEntity().getName().getString() + s);
             antiSpam.reset();
         }
     }
 
-    private String getPrefix(){
-        if(prefix.getValue() == Prefix.Green) return ">";
-        if(prefix.getValue() == Prefix.Global) return "!";
+    private String getPrefix() {
+        if (prefix.getValue() == Prefix.Green) return ">";
+        if (prefix.getValue() == Prefix.Global) return "!";
         return "";
     }
 
     public boolean antiBot(String s) {
-        if(s.contains("soon_") || s.contains("_npc") || s.contains("CIT-")){
+        if (s.contains("soon_") || s.contains("_npc") || s.contains("CIT-")) {
             return true;
         }
         for (int i = 0; i < s.length(); i++) {
@@ -185,7 +180,7 @@ public class ChatUtils extends Module {
             "Welcome to SERVERIP1D5A9E, "
     };
 
-    private final  String[] popMessages = new String[]{
+    private final String[] popMessages = new String[]{
             " EZZZ POP <pop> TIMES PIECE OF SHIT GET GOOD",
             " ez pop <pop> times fuckin unbrain",
             " pop <pop> times get good kiddo ",

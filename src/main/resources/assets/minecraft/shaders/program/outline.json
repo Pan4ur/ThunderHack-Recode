@@ -5,7 +5,7 @@
     "dstrgb": "1-srcalpha"
   },
   "vertex": "sobel",
-  "fragment": "thunderhack:outline",
+  "fragment": "outline",
   "attributes": [
     "Position"
   ],

@@ -42,15 +42,16 @@ import static thunder.hack.modules.Module.mc;
 @Mixin(Entity.class)
 public abstract class MixinEntity implements IEntity {
 
-    @Shadow private Box boundingBox;
+    @Shadow
+    private Box boundingBox;
 
     @Override
-    public List<Trails.Trail> getTrails(){
+    public List<Trails.Trail> getTrails() {
         return trails;
     }
 
     @Override
-    public List<Vec3d> getPrevPositions(){
+    public List<Vec3d> getPrevPositions() {
         return backPositions;
     }
 
@@ -73,29 +74,29 @@ public abstract class MixinEntity implements IEntity {
 
     @Inject(method = {"changeLookDirection"}, at = {@At("HEAD")}, cancellable = true)
     public void changeLookDirectionHook(double cursorDeltaX, double cursorDeltaY, CallbackInfo ci) {
-            if(ModuleManager.noPitchLimit.isEnabled()){
-                ci.cancel();
-                changeLookDirectionCustom(cursorDeltaX,cursorDeltaY);
-            }
+        if (ModuleManager.noPitchLimit.isEnabled()) {
+            ci.cancel();
+            changeLookDirectionCustom(cursorDeltaX, cursorDeltaY);
+        }
     }
 
     @Inject(method = {"getBoundingBox"}, at = {@At("HEAD")}, cancellable = true)
     public final void getBoundingBox(CallbackInfoReturnable<Box> cir) {
-       if(ModuleManager.hitBox.isEnabled() && ((Entity)(Object)this) != mc.player){
-           cir.setReturnValue(new Box(this.boundingBox.minX - HitBox.XZExpand.getValue() / 2f,this.boundingBox.minY - HitBox.YExpand.getValue() / 2f,this.boundingBox.minZ - HitBox.XZExpand.getValue() / 2f,this.boundingBox.maxX + HitBox.XZExpand.getValue() / 2f,this.boundingBox.maxY + HitBox.YExpand.getValue() / 2f,this.boundingBox.maxZ + HitBox.XZExpand.getValue() / 2f));
-       }
+        if (ModuleManager.hitBox.isEnabled() && (Object) this != mc.player) {
+            cir.setReturnValue(new Box(this.boundingBox.minX - HitBox.XZExpand.getValue() / 2f, this.boundingBox.minY - HitBox.YExpand.getValue() / 2f, this.boundingBox.minZ - HitBox.XZExpand.getValue() / 2f, this.boundingBox.maxX + HitBox.XZExpand.getValue() / 2f, this.boundingBox.maxY + HitBox.YExpand.getValue() / 2f, this.boundingBox.maxZ + HitBox.XZExpand.getValue() / 2f));
+        }
     }
 
     @Unique
     public void changeLookDirectionCustom(double cursorDeltaX, double cursorDeltaY) {
-        float f = (float)cursorDeltaY * 0.15F;
-        float g = (float)cursorDeltaX * 0.15F;
-        ((Entity)(Object)this).setPitch(((Entity)(Object)this).getPitch() + f);
-        ((Entity)(Object)this).setYaw(((Entity)(Object)this).getYaw() + g);
-        ((Entity)(Object)this).prevPitch += f;
-        ((Entity)(Object)this).prevYaw += g;
-        if (((Entity)(Object)this).getVehicle() != null) {
-            ((Entity)(Object)this).getVehicle().onPassengerLookAround(((Entity)(Object)this));
+        float f = (float) cursorDeltaY * 0.15F;
+        float g = (float) cursorDeltaX * 0.15F;
+        ((Entity) (Object) this).setPitch(((Entity) (Object) this).getPitch() + f);
+        ((Entity) (Object) this).setYaw(((Entity) (Object) this).getYaw() + g);
+        ((Entity) (Object) this).prevPitch += f;
+        ((Entity) (Object) this).prevYaw += g;
+        if (((Entity) (Object) this).getVehicle() != null) {
+            ((Entity) (Object) this).getVehicle().onPassengerLookAround(((Entity) (Object) this));
         }
     }
 
