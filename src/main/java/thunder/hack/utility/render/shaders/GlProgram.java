@@ -20,7 +20,6 @@ import java.util.function.Function;
 
 
 public class GlProgram {
-
     private static final List<Pair<Function<ResourceFactory, ShaderProgram>, Consumer<ShaderProgram>>> REGISTERED_PROGRAMS = new ArrayList<>();
 
     protected ShaderProgram backingProgram;
@@ -35,20 +34,20 @@ public class GlProgram {
                     }
                 },
                 program -> {
-                    this.backingProgram = program;
-                    this.setup();
+                    backingProgram = program;
+                    setup();
                 }
         ));
     }
 
     public void use() {
-        RenderSystem.setShader(() -> this.backingProgram);
+        RenderSystem.setShader(() -> backingProgram);
     }
 
     protected void setup() {}
 
     protected @Nullable GlUniform findUniform(String name) {
-        return ((ShaderProgramAccessor) this.backingProgram).getUniformsHook().get(name);
+        return ((ShaderProgramAccessor) backingProgram).getUniformsHook().get(name);
     }
 
     @ApiStatus.Internal

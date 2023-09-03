@@ -29,7 +29,6 @@ import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.world.HoleUtility;
 
-import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -78,11 +77,6 @@ public class Blocker extends Module {
                 Render3DEngine.drawBoxOutline(new Box(pos), lineColor.getValue().getColorObject(), lineWidth.getValue());
             }
         });
-        if (HoleUtility.isHole(mc.player.getBlockPos())) {
-            for (BlockPos pos : HoleUtility.getSurroundPoses(mc.player.getBlockPos())) {
-                Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(Color.BLUE, 100));
-            }
-        }
     }
 
     @EventHandler
@@ -151,13 +145,8 @@ public class Blocker extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.@NotNull Receive e) {
-        BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
-        if (e.getPacket() instanceof BlockBreakingProgressS2CPacket
-                && (HoleUtility.validIndestructible(playerPos)
-                || HoleUtility.validTwoBlockIndestructibleXZ(playerPos)
-                || HoleUtility.validTwoBlockIndestructibleXZ1(playerPos)
-                || HoleUtility.validQuadIndestructible(playerPos))) {
-
+        BlockPos playerPos = mc.player.getBlockPos();
+        if (e.getPacket() instanceof BlockBreakingProgressS2CPacket) {
             BlockBreakingProgressS2CPacket packet = e.getPacket();
             BlockPos pos = packet.getPos();
 
@@ -185,7 +174,7 @@ public class Blocker extends Module {
             if (antiCiv.getValue()) {
                 for (BlockPos checkPos : HoleUtility.getSurroundPoses(playerPos)) {
                     if (checkPos.up().equals(pos))
-                        playerPos.add(checkPos.add(0, 2, 0));
+                        placePositions.add(playerPos.add(checkPos.add(0, 2, 0)));
                 }
             }
         }

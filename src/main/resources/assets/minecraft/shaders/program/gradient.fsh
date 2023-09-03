@@ -74,7 +74,6 @@ void main() {
     if (centerCol.a != 0) {
         fragColor = vec4(getColor(centerCol), alpha2);
     } else {
-
         float alphaOutline = 0;
         vec3 colorFinal = vec3(-1);
 
@@ -102,7 +101,3 @@ void main() {
         fragColor = vec4(colorFinal, alphaOutline);
     }
 }
-
-
-
-

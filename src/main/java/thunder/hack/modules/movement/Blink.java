@@ -9,6 +9,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.player.PlayerEntityCopy;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.*;
@@ -34,8 +35,8 @@ public class Blink extends Module {
         Both
     }
 
+    private PlayerEntityCopy blinkPlayer;
     private Vec3d lastPos = new Vec3d(0, 0, 0);
-    private final Timer pulseTimer = new Timer();
     private final Queue<Packet<?>> storedPackets = new LinkedList<>();
     private final AtomicBoolean sending = new AtomicBoolean(false);
 
@@ -45,10 +46,14 @@ public class Blink extends Module {
 
     @Override
     public void onEnable() {
-        if (mc.player == null || mc.world == null || mc.isIntegratedServerRunning()) {
+        if (mc.player == null
+                || mc.world == null
+                || mc.isIntegratedServerRunning()
+                || mc.getNetworkHandler() == null) {
             disable();
             return;
         }
+
         lastPos = mc.player.getPos();
         mc.world.spawnEntity(new ClientPlayerEntity(mc, mc.world, mc.getNetworkHandler(), mc.player.getStatHandler(), mc.player.getRecipeBook(), mc.player.lastSprinting, mc.player.isSneaking()));
         sending.set(false);
@@ -61,6 +66,11 @@ public class Blink extends Module {
         while (!storedPackets.isEmpty()) {
             mc.player.networkHandler.sendPacket(storedPackets.poll());
         }
+
+        if (blinkPlayer != null) {
+            blinkPlayer.deSpawn();
+        }
+        blinkPlayer = null;
     }
 
     @Override
@@ -77,16 +87,7 @@ public class Blink extends Module {
         if (pulse.getValue()) {
             if (packet instanceof PlayerMoveC2SPacket) {
                 if (strict.getValue() && !((PlayerMoveC2SPacket) packet).isOnGround()) {
-                    sending.set(true);
-                    while (!storedPackets.isEmpty()) {
-                        Packet<?> pckt = storedPackets.poll();
-                        mc.player.networkHandler.sendPacket(pckt);
-                        if (pckt instanceof PlayerMoveC2SPacket && !(pckt instanceof PlayerMoveC2SPacket.LookAndOnGround)) {
-                            lastPos = new Vec3d(((PlayerMoveC2SPacket) pckt).getX(mc.player.getX()), ((PlayerMoveC2SPacket) pckt).getY(mc.player.getY()), ((PlayerMoveC2SPacket) pckt).getZ(mc.player.getZ()));
-                        }
-                    }
-                    sending.set(false);
-                    storedPackets.clear();
+                    sendPackets();
                 } else {
                     event.cancel();
                     storedPackets.add(packet);
@@ -104,41 +105,63 @@ public class Blink extends Module {
 
         if (pulse.getValue()) {
             if (storedPackets.size() >= factor.getValue() * 10F) {
-                sending.set(true);
-                while (!storedPackets.isEmpty()) {
-                    Packet<?> pckt = storedPackets.poll();
-                    mc.player.networkHandler.sendPacket(pckt);
-                    if (pckt instanceof PlayerMoveC2SPacket && !(pckt instanceof PlayerMoveC2SPacket.LookAndOnGround)) {
-                        lastPos = new Vec3d(((PlayerMoveC2SPacket) pckt).getX(mc.player.getX()), ((PlayerMoveC2SPacket) pckt).getY(mc.player.getY()), ((PlayerMoveC2SPacket) pckt).getZ(mc.player.getZ()));
-                    }
-                }
-                sending.set(false);
-                storedPackets.clear();
+                sendPackets();
             }
         }
+    }
+
+    private void sendPackets() {
+        if (mc.player == null) return;
+        sending.set(true);
+
+        while (!storedPackets.isEmpty()) {
+            Packet<?> packet = storedPackets.poll();
+            sendPacket(packet);
+            if (packet instanceof PlayerMoveC2SPacket && !(packet instanceof PlayerMoveC2SPacket.LookAndOnGround)) {
+                lastPos = new Vec3d(((PlayerMoveC2SPacket) packet).getX(mc.player.getX()), ((PlayerMoveC2SPacket) packet).getY(mc.player.getY()), ((PlayerMoveC2SPacket) packet).getZ(mc.player.getZ()));
+
+                if (renderMode.getValue() == RenderMode.Model || renderMode.getValue() == RenderMode.Both) {
+                    blinkPlayer.deSpawn();
+                    blinkPlayer = new PlayerEntityCopy();
+                    blinkPlayer.spawn();
+                }
+            }
+        }
+
+        sending.set(false);
+        storedPackets.clear();
     }
 
     public void onRender3D(MatrixStack stack) {
         if (mc.player == null || mc.world == null) return;
-        if (render.getValue() && lastPos != null && (renderMode.getValue() == RenderMode.Circle || renderMode.getValue() == RenderMode.Both)) {
-            float[] hsb = Color.RGBtoHSB(circleColor.getValue().getRed(), circleColor.getValue().getGreen(), circleColor.getValue().getBlue(), null);
-            float hue = (float) (System.currentTimeMillis() % 7200L) / 7200F;
-            int rgb = Color.getHSBColor(hue, hsb[1], hsb[2]).getRGB();
-            ArrayList<Vec3d> vecs = new ArrayList<>();
-            double x = lastPos.x;
-            double y = lastPos.y;
-            double z = lastPos.z;
+        if (render.getValue() && lastPos != null) {
+            if (renderMode.getValue() == RenderMode.Circle || renderMode.getValue() == RenderMode.Both) {
+                float[] hsb = Color.RGBtoHSB(circleColor.getValue().getRed(), circleColor.getValue().getGreen(), circleColor.getValue().getBlue(), null);
+                float hue = (float) (System.currentTimeMillis() % 7200L) / 7200F;
+                int rgb = Color.getHSBColor(hue, hsb[1], hsb[2]).getRGB();
+                ArrayList<Vec3d> vecs = new ArrayList<>();
+                double x = lastPos.x;
+                double y = lastPos.y;
+                double z = lastPos.z;
 
-            for (int i = 0; i <= 360; ++i) {
-                Vec3d vec = new Vec3d(x + Math.sin((double) i * Math.PI / 180.0) * 0.5D, y + 0.01, z + Math.cos((double) i * Math.PI / 180.0) * 0.5D);
-                vecs.add(vec);
+                for (int i = 0; i <= 360; ++i) {
+                    Vec3d vec = new Vec3d(x + Math.sin((double) i * Math.PI / 180.0) * 0.5D, y + 0.01, z + Math.cos((double) i * Math.PI / 180.0) * 0.5D);
+                    vecs.add(vec);
+                }
+
+                for (int j = 0; j < vecs.size() - 1; ++j) {
+                    Render3DEngine.drawLine(vecs.get(j).x, vecs.get(j).y, vecs.get(j).z, vecs.get(j + 1).x, vecs.get(j + 1).y, vecs.get(j + 1).z, new Color(rgb), 2f);
+                    hue += (1F / 360F);
+                    rgb = Color.getHSBColor(hue, hsb[1], hsb[2]).getRGB();
+                }
             }
-
-            for (int j = 0; j < vecs.size() - 1; ++j) {
-                Render3DEngine.drawLine(vecs.get(j).x, vecs.get(j).y, vecs.get(j).z, vecs.get(j + 1).x, vecs.get(j + 1).y, vecs.get(j + 1).z, new Color(rgb), 2f);
-                hue += (1F / 360F);
-                rgb = Color.getHSBColor(hue, hsb[1], hsb[2]).getRGB();
+            if (renderMode.getValue() == RenderMode.Model || renderMode.getValue() == RenderMode.Both) {
+                if (blinkPlayer == null) {
+                    blinkPlayer = new PlayerEntityCopy();
+                    blinkPlayer.spawn();
+                }
             }
         }
     }
 }
+

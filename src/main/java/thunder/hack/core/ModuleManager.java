@@ -283,14 +283,12 @@ public class ModuleManager {
         modules.add(new AirPlace());
         modules.add(noCommentExploit);
         modules.add(new PistonPush());
-        modules.add(new PlacementTest());
         modules.add(elytraRecast);
         modules.add(new ViewLock());
         modules.add(killEffect);
         modules.add(new ElytraReplace());
         modules.add(new TickShift());
         modules.add(antiWeb);
-
     }
 
     public Module get(String name) {

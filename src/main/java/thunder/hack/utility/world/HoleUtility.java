@@ -5,9 +5,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -23,70 +25,69 @@ public final class HoleUtility {
         List<BlockPos> surroundPoses = new ArrayList<>();
         if (mc.world == null) return surroundPoses;
 
-        for (BlockPos checkPos : getHolePoses(from))
+        getHolePoses(from).forEach(checkPos -> {
             for (Vec3i pattern : VECTOR_PATTERN) {
                 BlockPos newPos = checkPos.add(pattern);
 
-                if (!mc.world.getBlockState(newPos).getBlock().equals(Blocks.AIR))
+                if (!mc.world.getBlockState(newPos).isAir())
                     surroundPoses.add(newPos);
             }
+        });
 
         return surroundPoses;
     }
 
-    public static BlockPos[] getHolePoses(BlockPos from) {
-        if (validQuadBedrock(from) || validQuadIndestructible(from)) {
-            return findQuadPoses(from);
-        }
-        if (validTwoBlockBedrockXZ1(from) || validTwoBlockBedrockXZ(from)
-                || validTwoBlockIndestructibleXZ1(from) || validTwoBlockIndestructibleXZ(from)) {
-            return findDoublePoses(from);
-        }
+    public static @NotNull List<BlockPos> getHolePoses(BlockPos from) {
+        final List<BlockPos> checkQuad = findQuadPoses(from);
+        final List<BlockPos> checkDouble = findDoublePoses(from);
 
-        return new BlockPos[]{from};
+        if (checkQuad != null && checkQuad.size() == 4) return checkQuad;
+        if (checkDouble != null && checkDouble.size() == 2) return checkDouble;
+
+        return List.of(from);
     }
 
-    public static BlockPos @Nullable [] findQuadPoses(BlockPos checkFrom) {
+    public static @Nullable List<BlockPos> findQuadPoses(BlockPos checkFrom) {
         if (mc.world == null) return null;
-        final BlockPos[] quadPoses = new BlockPos[4];
+        final List<BlockPos> quadPoses = new ArrayList<>();
 
-        quadPoses[0] = checkFrom;
+        quadPoses.add(checkFrom);
 
         if (mc.world.getBlockState(checkFrom.add(1, 0, 1)).getBlock().equals(Blocks.AIR)) {
-            quadPoses[1] = checkFrom.add(1, 0, 1);
-            quadPoses[2] = checkFrom.add(1, 0, 0);
-            quadPoses[3] = checkFrom.add(0, 0, 1);
+            quadPoses.add(checkFrom.add(1, 0, 1));
+            quadPoses.add(checkFrom.add(1, 0, 0));
+            quadPoses.add(checkFrom.add(0, 0, 1));
         } else if (mc.world.getBlockState(checkFrom.add(1, 0, -1)).getBlock().equals(Blocks.AIR)) {
-            quadPoses[1] = checkFrom.add(1, 0, -1);
-            quadPoses[2] = checkFrom.add(1, 0, 0);
-            quadPoses[3] = checkFrom.add(0, 0, -1);
+            quadPoses.add(checkFrom.add(1, 0, -1));
+            quadPoses.add(checkFrom.add(1, 0, 0));
+            quadPoses.add(checkFrom.add(0, 0, -1));
         } else if (mc.world.getBlockState(checkFrom.add(-1, 0, 1)).getBlock().equals(Blocks.AIR)) {
-            quadPoses[1] = checkFrom.add(-1, 0, 1);
-            quadPoses[2] = checkFrom.add(-1, 0, 0);
-            quadPoses[3] = checkFrom.add(0, 0, 1);
+            quadPoses.add(checkFrom.add(-1, 0, 1));
+            quadPoses.add(checkFrom.add(-1, 0, 0));
+            quadPoses.add(checkFrom.add(0, 0, 1));
         } else if (mc.world.getBlockState(checkFrom.add(-1, 0, -1)).getBlock().equals(Blocks.AIR)) {
-            quadPoses[1] = checkFrom.add(-1, 0, -1);
-            quadPoses[2] = checkFrom.add(-1, 0, 0);
-            quadPoses[3] = checkFrom.add(0, 0, -1);
+            quadPoses.add(checkFrom.add(-1, 0, -1));
+            quadPoses.add(checkFrom.add(-1, 0, 0));
+            quadPoses.add(checkFrom.add(0, 0, -1));
         }
 
         return quadPoses;
     }
 
-    public static BlockPos @Nullable [] findDoublePoses(BlockPos checkFrom) {
+    public static @Nullable List<BlockPos> findDoublePoses(BlockPos checkFrom) {
         if (mc.world == null) return null;
-        final BlockPos[] doublePoses = new BlockPos[2];
+        final List<BlockPos> doublePoses = new ArrayList<>();
 
-        doublePoses[0] = checkFrom;
+        doublePoses.add(checkFrom);
 
         if (mc.world.getBlockState(checkFrom.add(1, 0, 0)).getBlock().equals(Blocks.AIR))
-            doublePoses[1] = checkFrom.add(1, 0, 0);
+            doublePoses.add(checkFrom.add(1, 0, 0));
         else if (mc.world.getBlockState(checkFrom.add(-1, 0, 0)).getBlock().equals(Blocks.AIR))
-            doublePoses[1] = checkFrom.add(-1, 0, 0);
+            doublePoses.add(checkFrom.add(-1, 0, 0));
         else if (mc.world.getBlockState(checkFrom.add(0, 0, 1)).getBlock().equals(Blocks.AIR))
-            doublePoses[1] = checkFrom.add(0, 0, 1);
+            doublePoses.add(checkFrom.add(0, 0, 1));
         else if (mc.world.getBlockState(checkFrom.add(0, 0, -1)).getBlock().equals(Blocks.AIR))
-            doublePoses[1] = checkFrom.add(0, 0, -1);
+            doublePoses.add(checkFrom.add(0, 0, -1));
 
 
         return doublePoses;

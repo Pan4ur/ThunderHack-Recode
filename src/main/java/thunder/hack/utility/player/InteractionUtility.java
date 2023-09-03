@@ -72,10 +72,15 @@ public final class InteractionUtility {
     }
 
     public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, SearchInvResult invResult, boolean returnSlot) {
+        return placeBlock(bp, rotate, interact, mode, invResult, returnSlot, InventoryUtility.SwitchMode.All);
+    }
+
+    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, SearchInvResult invResult, boolean returnSlot, InventoryUtility.SwitchMode switchMode) {
         int prevItem = mc.player.getInventory().selectedSlot;
-        invResult.switchIfFound();
+        invResult.switchTo(switchMode);
         boolean result = placeBlock(bp, rotate, interact, mode);
-        if (returnSlot) InventoryUtility.switchTo(prevItem);
+        if (returnSlot) InventoryUtility.switchTo(prevItem, switchMode);
+
         return result;
     }
 

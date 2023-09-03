@@ -77,7 +77,7 @@ public class AutoAnchor extends Module {
     public Setting<Float> pauseHealth = new Setting<>("PauseHealth", 2f, 0f, 10f, v -> mode.getValue() == Mode.Rage);
     public Setting<Boolean> render = new Setting<>("Render", true, v -> mode.getValue() == Mode.Rage);
 
-    private ArrayList<BlockPos> chargedAnchors = new ArrayList<>();
+    private final ArrayList<BlockPos> chargedAnchors = new ArrayList<>();
 
     private enum Mode {
         Legit, Rage
@@ -310,7 +310,7 @@ public class AutoAnchor extends Module {
             if (data != null && data.vector() != null) {
                 anchorResult.switchTo();
                 mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-                mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, new BlockHitResult(data.vector(),data.dir(),result,false), PlayerUtility.getWorldActionId(mc.world)));
+                mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, new BlockHitResult(data.vector(), data.dir(), result, false), PlayerUtility.getWorldActionId(mc.world)));
                 mc.player.swingHand(Hand.OFF_HAND);
             }
             chargeTimer.reset();
@@ -371,10 +371,10 @@ public class AutoAnchor extends Module {
         SearchInvResult anchorResult = InventoryUtility.getAnchor();
         if (threadedBp != null && anchorResult.found()) {
             int prev_slot = mc.player.getInventory().selectedSlot;
-            InteractionUtility.placeBlock(threadedBp,false,interact.getValue(),placeMode.getValue(),anchorResult,false);
+            InteractionUtility.placeBlock(threadedBp, false, interact.getValue(), placeMode.getValue(), anchorResult, false);
             if (threadedBp != null) {
                 BlockHitResult result = InteractionUtility.getPlaceResult(threadedBp, interact.getValue());
-                if(result != null)
+                if (result != null)
                     rotations = result.getPos();
             }
             mc.player.getInventory().selectedSlot = prev_slot;
@@ -550,7 +550,8 @@ public class AutoAnchor extends Module {
     }
 
     private boolean isValidAnchorTarget(BlockPos bp) {
-        if (InteractionUtility.getEyesPos(((mc.player))).distanceTo(bp.toCenterPos()) > placeRange.getValue()) return false;
+        if (InteractionUtility.getEyesPos(((mc.player))).distanceTo(bp.toCenterPos()) > placeRange.getValue())
+            return false;
         return !(ExplosionUtility.getAnchorExplosionDamage(bp, mc.player) + 2F >= mc.player.getHealth() + mc.player.getAbsorptionAmount());
     }
 }

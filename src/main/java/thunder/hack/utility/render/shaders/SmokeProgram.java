@@ -5,6 +5,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.PostEffectPass;
 import net.minecraft.client.gl.PostEffectProcessor;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 import thunder.hack.utility.interfaces.IShaderEffect;
 
@@ -32,8 +34,8 @@ public class SmokeProgram {
         //checkUpdateDimensions();
     }
 
-    public static SmokeProgram create(Consumer<SmokeProgram> callback) {
-        return new SmokeProgram(new Identifier("thunderhack","shaders/post/smoke.json"), callback);
+    public static @NotNull SmokeProgram create(Consumer<SmokeProgram> callback) {
+        return new SmokeProgram(new Identifier("minecraft", "shaders/post/smoke.json"), callback);
     }
 
     void checkUpdateDimensions() {

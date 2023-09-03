@@ -30,7 +30,7 @@ public class OutlineProgram {
     }
 
     public static OutlineProgram create(Consumer<OutlineProgram> callback) {
-        return new OutlineProgram(new Identifier("thunderhack","shaders/post/outline.json"), callback);
+        return new OutlineProgram(new Identifier("minecraft", "shaders/post/outline.json"), callback);
     }
 
     void checkUpdateDimensions() {
