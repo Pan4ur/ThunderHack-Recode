@@ -75,10 +75,6 @@ public class Shaders extends Module {
         };
     }
 
-    @Override
-    public void onEnable() {
-        disable();
-    }
 
     @Override
     public void onDisable(){

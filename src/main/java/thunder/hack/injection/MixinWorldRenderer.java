@@ -7,8 +7,8 @@ import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.render.Fullbright;
 import net.minecraft.client.render.WorldRenderer;
@@ -25,6 +25,9 @@ import static thunder.hack.modules.Module.mc;
 public abstract class MixinWorldRenderer {
     @Shadow public abstract void render(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f positionMatrix);
 
+    @Unique
+    public float stime = 0;
+
     @ModifyVariable(method = "getLightmapCoordinates(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)I", at = @At(value = "STORE"), ordinal = 0)
     private static int getLightmapCoordinatesModifySkyLight(int sky) {
         if(ModuleManager.fullbright.isEnabled())
@@ -38,42 +41,44 @@ public abstract class MixinWorldRenderer {
         if (shaders.isEnabled() && mc.world != null) {
             if(ShaderManager.fullNullCheck()) return;
             if(shaders.mode.getValue() == Shaders.Mode.Default) {
-                ShaderManager.OUTLINE.setAlpha(shaders.outlineColor.getValue().getAlpha(), shaders.glow.getValue());
-                ShaderManager.OUTLINE.setLineWidth(shaders.lineWidth.getValue());
-                ShaderManager.OUTLINE.setQuality(shaders.quality.getValue());
-                ShaderManager.OUTLINE.setColor(shaders.fillColor1.getValue().getColorObject());
-                ShaderManager.OUTLINE.setOutlineColor(shaders.outlineColor.getValue().getColorObject());
+                ShaderManager.OUTLINE.setSamplerUniform("outline", mc.worldRenderer.getEntityOutlinesFramebuffer());
+                ShaderManager.OUTLINE.setUniformValue("alpha0", shaders.glow.getValue() ? -1.0f : shaders.outlineColor.getValue().getAlpha() / 255.0f);
+                ShaderManager.OUTLINE.setUniformValue("lineWidth", shaders.lineWidth.getValue());
+                ShaderManager.OUTLINE.setUniformValue("quality", shaders.quality.getValue());
+                ShaderManager.OUTLINE.setUniformValue("color", shaders.fillColor1.getValue().getRed() / 255f,shaders.fillColor1.getValue().getGreen() / 255f,shaders.fillColor1.getValue().getBlue() / 255f,shaders.fillColor1.getValue().getAlpha() / 255f);
+                ShaderManager.OUTLINE.setUniformValue("outlinecolor", shaders.outlineColor.getValue().getRed() / 255f,shaders.outlineColor.getValue().getGreen() / 255f,shaders.outlineColor.getValue().getBlue() / 255f,shaders.outlineColor.getValue().getAlpha() / 255f);
                 ShaderManager.OUTLINE.render(tickDelta);
             } else if (shaders.mode.getValue() == Shaders.Mode.Smoke) {
-                ShaderManager.SMOKE.setAlpha(shaders.outlineColor.getValue().getAlpha(), shaders.glow.getValue());
-                ShaderManager.SMOKE.setAlpha1(shaders.fillAlpha.getValue());
-                ShaderManager.SMOKE.setLineWidth(shaders.lineWidth.getValue());
-                ShaderManager.SMOKE.setQuality(shaders.quality.getValue());
-
-                ShaderManager.SMOKE.setFirst(shaders.outlineColor.getValue().getColorObject());
-                ShaderManager.SMOKE.setSecond(shaders.outlineColor1.getValue().getColorObject());
-                ShaderManager.SMOKE.setThird(shaders.outlineColor2.getValue().getColorObject());
-
-                ShaderManager.SMOKE.setFFirst(shaders.fillColor1.getValue().getColorObject());
-                ShaderManager.SMOKE.setFSecond(shaders.fillColor2.getValue().getColorObject());
-                ShaderManager.SMOKE.setFThird(shaders.fillColor3.getValue().getColorObject());
-
-                ShaderManager.SMOKE.setOctaves(shaders.octaves.getValue());
-                ShaderManager.SMOKE.setResolution(mc.getWindow().getScaledWidth(),mc.getWindow().getScaledHeight());
-                ShaderManager.SMOKE.setTime();
+                ShaderManager.SMOKE.setSamplerUniform("smoke", mc.worldRenderer.getEntityOutlinesFramebuffer());
+                ShaderManager.SMOKE.setUniformValue("alpha0", shaders.glow.getValue() ? -1.0f : shaders.outlineColor.getValue().getAlpha() / 255.0f);
+                ShaderManager.SMOKE.setUniformValue("alpha1",shaders.fillAlpha.getValue() / 255f);
+                ShaderManager.SMOKE.setUniformValue("lineWidth", shaders.lineWidth.getValue());
+                ShaderManager.SMOKE.setUniformValue("quality", shaders.quality.getValue());
+                ShaderManager.SMOKE.setUniformValue("first", shaders.outlineColor.getValue().getRed() / 255f,shaders.outlineColor.getValue().getGreen() / 255f,shaders.outlineColor.getValue().getBlue() / 255f,shaders.outlineColor.getValue().getAlpha() / 255f);
+                ShaderManager.SMOKE.setUniformValue("second", shaders.outlineColor1.getValue().getRed() / 255f,shaders.outlineColor1.getValue().getGreen() / 255f,shaders.outlineColor1.getValue().getBlue() / 255f);
+                ShaderManager.SMOKE.setUniformValue("third", shaders.outlineColor2.getValue().getRed() / 255f,shaders.outlineColor2.getValue().getGreen() / 255f,shaders.outlineColor2.getValue().getBlue() / 255f);
+                ShaderManager.SMOKE.setUniformValue("ffirst", shaders.fillColor1.getValue().getRed() / 255f,shaders.fillColor1.getValue().getGreen() / 255f,shaders.fillColor1.getValue().getBlue() / 255f,shaders.fillColor1.getValue().getAlpha() / 255f);
+                ShaderManager.SMOKE.setUniformValue("fsecond", shaders.fillColor2.getValue().getRed() / 255f,shaders.fillColor2.getValue().getGreen() / 255f,shaders.fillColor2.getValue().getBlue() / 255f);
+                ShaderManager.SMOKE.setUniformValue("fthird", shaders.fillColor3.getValue().getRed() / 255f,shaders.fillColor3.getValue().getGreen() / 255f,shaders.fillColor3.getValue().getBlue() / 255f);
+                ShaderManager.SMOKE.setUniformValue("oct", shaders.octaves.getValue());
+                ShaderManager.SMOKE.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
+                ShaderManager.SMOKE.setUniformValue("time", stime);
                 ShaderManager.SMOKE.render(tickDelta);
+                stime += 0.008f;
             } else if (shaders.mode.getValue() == Shaders.Mode.Gradient) {
-                ShaderManager.GRADIENT.setAlpha(shaders.outlineColor.getValue().getAlpha(), shaders.glow.getValue());
-                ShaderManager.GRADIENT.setAlpha1(shaders.fillAlpha.getValue());
-                ShaderManager.GRADIENT.setAlpha2(shaders.alpha2.getValue());
-                ShaderManager.GRADIENT.setLineWidth(shaders.lineWidth.getValue());
-                ShaderManager.GRADIENT.setQuality(shaders.quality.getValue());
-                ShaderManager.GRADIENT.setOctaves(shaders.octaves.getValue());
-                ShaderManager.GRADIENT.setMoreGradient(shaders.gradient.getValue());
-                ShaderManager.GRADIENT.setFactor(shaders.factor.getValue());
-                ShaderManager.GRADIENT.setResolution(mc.getWindow().getScaledWidth(),mc.getWindow().getScaledHeight());
-                ShaderManager.GRADIENT.setTime();
+                ShaderManager.GRADIENT.setSamplerUniform("gradient", mc.worldRenderer.getEntityOutlinesFramebuffer());
+                ShaderManager.GRADIENT.setUniformValue("alpha0", shaders.glow.getValue() ? -1.0f : shaders.outlineColor.getValue().getAlpha() / 255.0f);
+                ShaderManager.GRADIENT.setUniformValue("alpha1",shaders.fillAlpha.getValue() / 255f);
+                ShaderManager.GRADIENT.setUniformValue("alpha2",shaders.alpha2.getValue() / 255f);
+                ShaderManager.GRADIENT.setUniformValue("lineWidth", shaders.lineWidth.getValue());
+                ShaderManager.GRADIENT.setUniformValue("oct", shaders.octaves.getValue());
+                ShaderManager.GRADIENT.setUniformValue("quality", shaders.quality.getValue());
+                ShaderManager.GRADIENT.setUniformValue("factor", shaders.factor.getValue());
+                ShaderManager.GRADIENT.setUniformValue("moreGradient", shaders.gradient.getValue());
+                ShaderManager.GRADIENT.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
+                ShaderManager.GRADIENT.setUniformValue("time", stime);
                 ShaderManager.GRADIENT.render(tickDelta);
+                stime += 0.008f;
             }
         } else {
             instance.render(tickDelta);
