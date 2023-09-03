@@ -1,5 +1,6 @@
 package thunder.hack.modules.combat;
 
+import io.netty.buffer.Unpooled;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.Blocks;
@@ -8,6 +9,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
@@ -19,7 +21,9 @@ import net.minecraft.item.AxeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.item.SwordItem;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -34,7 +38,6 @@ import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
-import thunder.hack.modules.misc.FakePlayer;
 import thunder.hack.modules.movement.Speed;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
@@ -45,6 +48,7 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -54,17 +58,19 @@ import static net.minecraft.util.math.MathHelper.wrapDegrees;
 public class Aura extends Module {
     public static final Setting<Float> attackRange = new Setting<>("Attack Range", 3.1f, 1f, 7.0f);
     public static final Setting<Mode> mode = new Setting<>("Rotation", Mode.Universal);
-    private final Setting<Boolean> onlyWeapon = new Setting<>("Only Weapon", false);
-    public final Setting<Boolean> smartCrit = new Setting<>("Smart Crit", true);
-    public final Setting<Boolean> ignoreWalls = new Setting<>("Ignore Walls", true);
+    private final Setting<Boolean> onlyWeapon = new Setting<>("OnlyWeapon", false);
+    public final Setting<Boolean> smartCrit = new Setting<>("SmartCrit", true);
+    public final Setting<Boolean> ignoreWalls = new Setting<>("IgnoreWalls", true);
     public final Setting<Boolean> wallsBypass = new Setting<>("WallsBypass", false, v -> ignoreWalls.getValue());
-    public final Setting<Boolean> shieldBreaker = new Setting<>("Shield Breaker", false);
+    public final Setting<Boolean> shieldBreaker = new Setting<>("ShieldBreaker", true);
+    public final Setting<Boolean> unpressShield = new Setting<>("UnpressShield", true);
+    public final Setting<Boolean> pauseInInventory = new Setting<>("PauseInInventory", true);
     public static final Setting<Boolean> oldDelay = new Setting<>("OldDelay", false);
     public static final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 15, v -> oldDelay.getValue());
     public static final Setting<Integer> maxCPS = new Setting<>("MaxCPS", 12, 1, 15, v -> oldDelay.getValue());
     public final Setting<Grim> grimAC = new Setting<>("GrimAC", Grim.None);
     public final Setting<Boolean> esp = new Setting<>("ESP", true);
-
+    public static final Setting<Sort> sort = new Setting<>("Sort", Sort.Distance);
     public final Setting<Parent> targets = new Setting<>("Targets", new Parent(false, 0));
     public final Setting<Boolean> Players = new Setting<>("Players", true).withParent(targets);
     public final Setting<Boolean> Mobs = new Setting<>("Mobs", true).withParent(targets);
@@ -80,6 +86,12 @@ public class Aura extends Module {
         None
     }
 
+    public enum Sort {
+        Distance,
+        Health,
+        FOV
+    }
+
     public enum Grim {
         None, MoveFix, SilentTest
     }
@@ -93,7 +105,7 @@ public class Aura extends Module {
 
     private int hitTicks;
     public static boolean lookingAtHitbox;
-    public static boolean rotateAllowed;
+    public static boolean attackAllowed;
 
     public Aura() {
         super("Aura", "Запомните блядь-киллка тх не мисает-а дает шанс убежать", Category.COMBAT);
@@ -157,41 +169,27 @@ public class Aura extends Module {
             if (player instanceof OtherClientPlayerEntity) ((IOtherClientPlayerEntity) player).releaseResolver();
         }
 
-        if (target != null && autoCrit() && (lookingAtHitbox || mode.getValue() != Mode.Universal || grimAC.getValue() == Grim.SilentTest)) {
+        boolean readyForAttack = autoCrit() && (lookingAtHitbox || mode.getValue() != Mode.Universal);
+
+        if (target != null && (readyForAttack || attackAllowed)) {
+            if (shieldBreaker(false)) {
+                hitTicks = 10;
+                return;
+            }
+            attackAllowed = false;
             final Item selectedItem = mc.player.getInventory().getStack(mc.player.getInventory().selectedSlot).getItem();
             if (onlyWeapon.getValue() && !(selectedItem instanceof SwordItem || selectedItem instanceof AxeItem))
                 return;
 
             boolean blocking = mc.player.isUsingItem() && mc.player.getActiveItem().getItem().getUseAction(mc.player.getActiveItem()) == BLOCK;
-            if (blocking)
+            if (blocking && unpressShield.getValue())
                 sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
-
-            int axe_slot = InventoryUtility.getAxe().slot();
-            int hotbar_axe_slot = InventoryUtility.findInHotBar(stack -> stack.getItem() instanceof AxeItem).slot();
 
             boolean sprint = Core.serversprint;
             if (sprint)
                 sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
 
-            if (shieldBreaker.getValue() && target instanceof PlayerEntity && (((PlayerEntity) target).isUsingItem() && (((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD || ((PlayerEntity) target).getMainHandStack().getItem() == Items.SHIELD) && (axe_slot != -1 || hotbar_axe_slot != -1))) {
-                if (axe_slot != -1) {
-                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, axe_slot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                    mc.interactionManager.attackEntity(mc.player, target);
-                    mc.interactionManager.attackEntity(mc.player, target);
-                    mc.player.swingHand(Hand.MAIN_HAND);
-                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, axe_slot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                    Thunderhack.notificationManager.publicity("Aura", MainSettings.isRu() ? ("Ломаем щит игроку " + target.getName().getString()) : ("Breaking " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
-                } else if (hotbar_axe_slot != -1) {
-                    sendPacket(new UpdateSelectedSlotC2SPacket(hotbar_axe_slot));
-                    mc.interactionManager.attackEntity(mc.player, target);
-                    mc.interactionManager.attackEntity(mc.player, target);
-                    mc.player.swingHand(Hand.MAIN_HAND);
-                    sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
-                    Thunderhack.notificationManager.publicity("Aura", MainSettings.isRu() ? ("Ломаем щит игроку " + target.getName().getString()) : ("Breaking " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
-                }
-            } else if (!(target instanceof PlayerEntity) || !(((PlayerEntity) target).isUsingItem() && ((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD) || ignoreShield.getValue()) {
+            if (!(target instanceof PlayerEntity) || !(((PlayerEntity) target).isUsingItem() && ((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD) || ignoreShield.getValue()) {
                 Criticals.cancelCrit = true;
 
                 if (Thunderhack.moduleManager.get(Criticals.class).isEnabled())
@@ -205,7 +203,7 @@ public class Aura extends Module {
 
             if (sprint)
                 sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
-            if (blocking)
+            if (blocking && unpressShield.getValue())
                 sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
         }
         hitTicks--;
@@ -218,6 +216,7 @@ public class Aura extends Module {
                 if (grimAC.getValue() == Grim.SilentTest && target != null && autoCrit()) {
                     mc.player.setYaw(rotationYaw);
                     mc.player.setPitch(rotationPitch);
+                    attackAllowed = true;
                 } else if (grimAC.getValue() != Grim.SilentTest) {
                     mc.player.setYaw(rotationYaw);
                     mc.player.setPitch(rotationPitch);
@@ -229,6 +228,29 @@ public class Aura extends Module {
         }
     }
 
+    @EventHandler
+    public void onPacketReceive(PacketEvent.Receive e) {
+        if (e.getPacket() instanceof EntityStatusS2CPacket status) {
+            if(status.getStatus() == 30 && status.getEntity(mc.world) != null && target != null && status.getEntity(mc.world) == target)
+                Thunderhack.notificationManager.publicity("Aura", MainSettings.isRu() ? ("Успешно сломали щит игроку " + target.getName().getString()) : ("Succesfully destroyed " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
+        }
+        /*
+        if(e.getPacket() instanceof EntityTrackerUpdateS2CPacket attrib){
+            for(DataTracker.SerializedEntry<?> a : attrib.trackedValues()){
+                if(a.id() == 8 && a.value().equals((byte) 3)){
+                    PacketByteBuf packetBuf = new PacketByteBuf(Unpooled.buffer());
+                    attrib.write(packetBuf);
+                    Entity ent = mc.world.getEntityById(packetBuf.readVarInt());
+                    if(target != null && ent != null && ent.getId() == target.getId()) {
+                        shieldBreaker(true);
+                        hitTicks = 10;
+                    }
+                }
+            }
+        }
+         */
+    }
+
     @Override
     public void onEnable() {
         target = null;
@@ -237,6 +259,7 @@ public class Aura extends Module {
         rotationMotion = Vec3d.ZERO;
         rotationYaw = mc.player.getYaw();
         rotationPitch = mc.player.getPitch();
+        attackAllowed = false;
     }
 
     private boolean autoCrit() {
@@ -244,7 +267,10 @@ public class Aura extends Module {
 
         if (hitTicks > 0) return false;
 
+        // FIXME я хз почему оно не критует когда фд больше 1.14
         if (mc.player.fallDistance > 1 && mc.player.fallDistance < 1.14) return false;
+
+        if (pauseInInventory.getValue() && Thunderhack.playerManager.inInventory) return false;
 
         if (!oldDelay.getValue()) {
             if (!(MathHelper.clamp(((float) ((ILivingEntity) mc.player).getLastAttackedTicks() + 0.5f) / getAttackCooldownProgressPerTick(), 0.0F, 1.0F) >= (mc.options.jumpKey.isPressed() ? 0.93f : 0.93f)))
@@ -260,10 +286,35 @@ public class Aura extends Module {
 
         if (!mc.options.jumpKey.isPressed() && isAboveWater()) return true;
 
-        double d2 = (double) ((int) mc.player.getY()) - mc.player.getY();
-        if ((d2 == -0.01250004768371582 || d2 == -0.1875) && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, mc.player.getEyeHeight(mc.player.getPose()), 0.0)).iterator().hasNext() && !mc.player.isSneaking())
+        double fallDelta = (double) ((int) mc.player.getY()) - mc.player.getY();
+        if ((fallDelta == -0.01250004768371582 || fallDelta == -0.1875) && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, mc.player.getEyeHeight(mc.player.getPose()), 0.0)).iterator().hasNext() && !mc.player.isSneaking())
             return true;
         if (!reasonForSkipCrit) return !mc.player.isOnGround() && mc.player.fallDistance > 0.0f;
+        return true;
+    }
+
+    private boolean shieldBreaker(boolean instant) {
+        int axeSlot = InventoryUtility.getAxe().slot();
+        if (axeSlot == -1) return false;
+        if (!shieldBreaker.getValue()) return false;
+        if (!(target instanceof PlayerEntity)) return false;
+        if (!((PlayerEntity) target).isUsingItem() && !instant) return false;
+        if (((PlayerEntity) target).getOffHandStack().getItem() != Items.SHIELD && ((PlayerEntity) target).getMainHandStack().getItem() != Items.SHIELD)
+            return false;
+
+        if (axeSlot >= 9) {
+            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, axeSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+            sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+            mc.interactionManager.attackEntity(mc.player, target);
+            mc.player.swingHand(Hand.MAIN_HAND);
+            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, axeSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+            sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+        } else {
+            sendPacket(new UpdateSelectedSlotC2SPacket(axeSlot));
+            mc.interactionManager.attackEntity(mc.player, target);
+            mc.player.swingHand(Hand.MAIN_HAND);
+            sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+        }
         return true;
     }
 
@@ -279,6 +330,10 @@ public class Aura extends Module {
         if (target == null) {
             findTarget();
             return;
+        }
+
+        if(sort.getValue() == Sort.FOV){
+            findTarget();
         }
 
         if (skipEntity(target)) {
@@ -306,16 +361,18 @@ public class Aura extends Module {
                 pitchAcceleration = 1f;
             }
 
+            float yawStep = grimAC.getValue() == Grim.SilentTest ? 360f : MathUtility.random(65f, 75f);
+            float pitchStep = grimAC.getValue() == Grim.SilentTest ? 180f : pitchAcceleration + MathUtility.random(-1f, 1f);
+
             if (delta_yaw > 180) {
                 delta_yaw = delta_yaw - 180;
             }
 
-            float deltaYaw = MathHelper.clamp(MathHelper.abs(delta_yaw), MathUtility.random(-65f, -75f), MathUtility.random(65f, 75f));
+            float deltaYaw = MathHelper.clamp(MathHelper.abs(delta_yaw), -yawStep, yawStep);
+            float deltaPitch = MathHelper.clamp(delta_pitch, -pitchStep, pitchStep);
 
             float newYaw = rotationYaw + (delta_yaw > 0 ? deltaYaw : -deltaYaw);
-            float pitch_speed = pitchAcceleration + MathUtility.random(-1f, 1f);
-
-            float newPitch = MathHelper.clamp(rotationPitch + MathHelper.clamp(delta_pitch, -pitch_speed, pitch_speed), -90.0F, 90.0F);
+            float newPitch = MathHelper.clamp(rotationPitch + deltaPitch, -90.0F, 90.0F);
 
             double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
 
@@ -444,24 +501,17 @@ public class Aura extends Module {
     }
 
     public void findTarget() {
-        List<Entity> first_stage = new CopyOnWriteArrayList<>();
+        List<LivingEntity> first_stage = new CopyOnWriteArrayList<>();
         for (Entity entity : mc.world.getEntities()) {
             if (skipEntity(entity)) continue;
-            first_stage.add(entity);
+            first_stage.add((LivingEntity) entity);
         }
 
-        float best_distance = 144;
-        Entity best_entity = null;
-
-        for (Entity ent : first_stage) {
-            float temp_dst = distanceFromHead(ent.getPos());
-            if (temp_dst < best_distance) {
-                best_entity = ent;
-                best_distance = temp_dst;
-            }
+        switch (sort.getValue()) {
+            case Distance -> target = first_stage.stream().min(Comparator.comparing(e -> (mc.player.squaredDistanceTo(e.getPos())))).orElse(null);
+            case FOV -> target = first_stage.stream().min(Comparator.comparing(e -> (getFOVAngle(e)))).orElse(null);
+            case Health -> target = first_stage.stream().min(Comparator.comparing(e -> (e.getHealth() + e.getAbsorptionAmount()))).orElse(null);
         }
-
-        target = best_entity;
     }
 
     private boolean skipEntity(Entity entity) {
@@ -481,6 +531,14 @@ public class Aura extends Module {
         if ((entity instanceof PlayerEntity) && entity.isInvisible() && ignoreInvisible.getValue()) return true;
         if ((entity instanceof PlayerEntity) && Thunderhack.friendManager.isFriend((PlayerEntity) entity)) return true;
         return distanceFromHead(entity.getPos()) > getRotateDistance() * getRotateDistance();
+    }
+
+    private float getFOVAngle(LivingEntity e) {;
+        double difX = e.getX() - mc.player.getPos().x;
+        double difZ = e.getZ() - mc.player.getPos().z;
+        float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);
+        double plYaw = MathHelper.wrapDegrees(mc.player.getYaw());
+        return (float) Math.abs(yaw - plYaw);
     }
 
     private float distanceFromHead(Vec3d vec) {

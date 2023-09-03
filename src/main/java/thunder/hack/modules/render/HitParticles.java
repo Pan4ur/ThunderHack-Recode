@@ -1,9 +1,11 @@
 package thunder.hack.modules.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.entity.FlyingItemEntity;
 import net.minecraft.util.Identifier;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
@@ -20,18 +22,22 @@ import java.awt.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HitParticles extends Module {
+    private final Setting<Mode> mode = new Setting("Mode", Mode.Stars);
+    private final Setting<Physics> physics = new Setting("Physics", Physics.Fall);
     public final Setting<ColorSetting> colorrr = new Setting<>("Color", new ColorSetting(0x8800FF00));
     public Setting<Boolean> selfp = new Setting("Self", false);
     public Setting<Integer> amount = new Setting<>("Amount", 2, 1, 5);
     public Setting<Integer> lifeTime = new Setting<>("LifeTime", 2, 1, 10);
     public Setting<Integer> speed = new Setting<>("Speed", 2, 1, 20);
     CopyOnWriteArrayList<Particle> particles = new CopyOnWriteArrayList<>();
-    public Setting<Integer> starsScale = new Setting<>("StarsScale", 3, 1, 10);
+    public Setting<Integer> starsScale = new Setting<>("Scale", 3, 1, 10, v-> mode.getValue() != Mode.Orbiz);
 
-    private final Setting<Mode> mode = new Setting("Mode", Mode.Stars);
+    public enum Physics {
+        Fall, Fly
+    }
 
     public enum Mode {
-        Orbiz, Stars
+        Orbiz, Stars, Hearts
     }
 
     private final Setting<ColorMode> colorMode = new Setting("ColorMode", ColorMode.Sync);
@@ -40,7 +46,8 @@ public class HitParticles extends Module {
         Custom, Sync
     }
 
-    private Identifier star = new Identifier("textures/star.png");
+    private final Identifier star = new Identifier("textures/star.png");
+    private final Identifier heart = new Identifier("textures/heart.png");
 
     public HitParticles() {
         super("HitParticles", "HitParticles", Category.RENDER);
@@ -56,8 +63,8 @@ public class HitParticles extends Module {
                     particles.add(new Particle(player.getX(), MathUtility.random((float) (player.getY() + player.getHeight()), (float) player.getY()), player.getZ(), c));
                 }
             }
-            particles.removeIf(particle -> System.currentTimeMillis() - particle.getTime() > lifeTime.getValue() * 1000);
         }
+        particles.removeIf(particle -> System.currentTimeMillis() - particle.getTime() > lifeTime.getValue() * 1000);
     }
 
 
@@ -101,8 +108,10 @@ public class HitParticles extends Module {
             double sp = Math.sqrt(motionX * motionX + motionZ * motionZ) * 1;
             x += motionX;
             y += motionY;
+            z += motionZ;
 
-            if (posBlock(x, y, z)) {
+
+            if (posBlock(x, y - starsScale.getValue() / 10f, z)) {
                 motionY = -motionY / 1.1;
             } else {
                 if (posBlock(x, y, z) || posBlock(x, y, z) || posBlock(x, y, z) || posBlock(x - sp, y, z - sp)
@@ -117,7 +126,8 @@ public class HitParticles extends Module {
                     motionZ = -motionZ;
                 }
             }
-            z += motionZ;
+
+            if(physics.getValue() == Physics.Fall) motionY -= 0.0005f;
             motionX /= 1.005;
             motionZ /= 1.005;
             motionY /= 1.005;
@@ -141,8 +151,10 @@ public class HitParticles extends Module {
                 drawOrbiz(matrixStack, 0.0f, 0.7,color);
                 drawOrbiz(matrixStack, 0.1f, 1.4,color);
                 drawOrbiz(matrixStack, 0.2f, 2.3, color);
-            } else {
+            } else if(mode.getValue() == Mode.Stars) {
                 drawStar(matrixStack,color);
+            } else {
+                drawHeart(matrixStack,color);
             }
 
             matrixStack.scale(0.8f, 0.8f, 0.8f);
@@ -174,7 +186,17 @@ public class HitParticles extends Module {
         RenderSystem.setShaderTexture(0,star);
         RenderSystem.setShaderColor(c.getRed() / 255f,c.getGreen() / 255f,c.getBlue() / 255f,c.getAlpha() / 255f);
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(mc.player.age * 2));
-        Render2DEngine.renderTexture(matrices,0, 0,starsScale.getValue(),starsScale.getValue(),0,0,256,256,256,256);
+        Render2DEngine.renderTexture(matrices,0, 0,starsScale.getValue(),starsScale.getValue(),0,0,128,128,128,128);
+        RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1f,1f,1f,1f);
+    }
+
+    public void drawHeart(MatrixStack matrices, Color c) {
+        RenderSystem.enableBlend();
+        RenderSystem.setShaderTexture(0,heart);
+        RenderSystem.setShaderColor(c.getRed() / 255f,c.getGreen() / 255f,c.getBlue() / 255f,c.getAlpha() / 255f);
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(mc.player.age * 2));
+        Render2DEngine.renderTexture(matrices,0, 0,starsScale.getValue(),starsScale.getValue(),0,0,128,128,128,128);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f,1f,1f,1f);
     }

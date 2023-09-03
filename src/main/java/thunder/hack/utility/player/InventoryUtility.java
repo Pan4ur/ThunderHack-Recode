@@ -79,7 +79,7 @@ public final class InventoryUtility {
         float f = 1.0F;
 
         for (int b1 = 9; b1 < 45; b1++) {
-            ItemStack itemStack = mc.player.getInventory().getStack(b1);
+            ItemStack itemStack = mc.player.getInventory().getStack(b1 >= 36 ? b1 - 36 : b1);
             if (itemStack != null && itemStack.getItem() instanceof AxeItem axe) {
                 float f1 = axe.getMaxDamage();
                 f1 += EnchantmentHelper.getLevel(Enchantments.SHARPNESS, itemStack);
@@ -89,6 +89,8 @@ public final class InventoryUtility {
                 }
             }
         }
+
+        if(slot >= 36) slot = slot - 36;
 
         if (slot == -1) return SearchInvResult.notFound();
         return new SearchInvResult(slot, true, mc.player.getInventory().getStack(slot));

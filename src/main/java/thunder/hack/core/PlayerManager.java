@@ -2,6 +2,8 @@ package thunder.hack.core;
 
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
+import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.util.math.Vec2f;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
@@ -29,6 +31,10 @@ public class PlayerManager {
     public float lastYaw, lastPitch;
     public double currentPlayerSpeed;
 
+    // Мы можем зайти в инвентарь, и сервер этого не узнает, пока мы не начнем кликать
+    // Юзать везде!
+    public boolean inInventory;
+
     @EventHandler
     public void onSync(EventSync event) {
         if (Module.fullNullCheck()) return;
@@ -42,6 +48,7 @@ public class PlayerManager {
         double d3 = mc.player.getZ() - mc.player.prevZ;
         double d4 = d2 * d2 + d3 * d3;
         currentPlayerSpeed = Math.sqrt(d4);
+        if(mc.currentScreen == null) inInventory = false;
     }
 
 
@@ -54,6 +61,12 @@ public class PlayerManager {
 
     @EventHandler
     public void onSyncWithServer(PacketEvent.Send event) {
+        if(event.getPacket() instanceof ClickSlotC2SPacket){
+            inInventory = true;
+        }
+        if(event.getPacket() instanceof CloseHandledScreenC2SPacket){
+            inInventory = false;
+        }
         if (event.getPacket() instanceof PlayerMoveC2SPacket) {
             serverYaw = ((PlayerMoveC2SPacket) event.getPacket()).getYaw(serverYaw);
             serverPitch = ((PlayerMoveC2SPacket) event.getPacket()).getPitch(serverPitch);

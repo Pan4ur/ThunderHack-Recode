@@ -3,6 +3,7 @@ package thunder.hack.modules.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.ColorSetting;
@@ -14,9 +15,9 @@ import net.minecraft.client.render.*;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.modules.movement.ElytraPlus.lerp;
 
@@ -33,25 +34,33 @@ public class JumpCircle extends Module {
         super("JumpCircle", "JumpCircle", Category.RENDER);
     }
 
-    boolean check = false;
     public static AstolfoAnimation astolfo = new AstolfoAnimation();
     static List<Circle> circles = new ArrayList<>();
+    private Map<PlayerEntity, Boolean> cache = new ConcurrentHashMap<>();
 
     @Override
     public void onUpdate() {
-        if (mc.player.isOnGround() && check) {
-            circles.add(new JumpCircle.Circle(new Vec3d(mc.player.getX(), mc.player.getY() + 0.0625, mc.player.getZ())));
-            check = false;
+
+        for(PlayerEntity pl : mc.world.getPlayers()){
+            if(!cache.containsKey(pl) && pl.isOnGround())
+                cache.put(pl, true);
         }
-        if(!mc.player.isOnGround() && !check){
-            check = true;
-        }
+
+        cache.forEach((pl, pg) -> {
+            if(pl != null){
+                if(!pl.isOnGround()){
+                    circles.add(new Circle(new Vec3d(pl.getX(),pl.getY() - 0.3f,pl.getZ())));
+                    cache.remove(pl);
+                }
+            }
+        });
+
         astolfo.update();
         for (Circle circle : circles) {
             circle.update();
         }
         circles.removeIf(Circle::update);
-        mc.player.distanceTraveled = 4f;
+       // mc.player.distanceTraveled = 4f;
     }
 
 

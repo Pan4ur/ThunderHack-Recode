@@ -14,7 +14,7 @@ import thunder.hack.utility.player.MovementUtility;
 public class Flight extends Module {
     public boolean pendingFlagApplyPacket = false;
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Vanilla);
-    public Setting<Float> speed = new Setting("Speed", 0.1f, 0.0f, 10.0f, v -> mode.getValue() == Mode.Vanilla);
+    public Setting<Float> speed = new Setting<>("Speed", 0.1f, 0.0f, 10.0f, v -> mode.getValue() == Mode.Vanilla);
     public Setting<Float> vspeedValue = new Setting<>("Vertical", 0.78F, 0.0F, 5F, v -> mode.getValue() == Mode.MatrixJump);
     public Setting<Boolean> autoToggle = new Setting<>("AutoToggle", false, v -> mode.getValue() == Mode.MatrixJump);
     private double lastMotionX = 0.0;

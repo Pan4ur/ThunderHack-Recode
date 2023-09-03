@@ -74,6 +74,7 @@ public class ModuleManager {
     public static ElytraRecast elytraRecast;
     public static ElytraPlus elytraPlus;
     public static KillEffect killEffect;
+    public static AntiWeb antiWeb;
 
 
     public ModuleManager() {
@@ -125,6 +126,7 @@ public class ModuleManager {
         elytraRecast = new ElytraRecast();
         elytraPlus = new ElytraPlus();
         killEffect = new KillEffect();
+        antiWeb = new AntiWeb();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -285,6 +287,9 @@ public class ModuleManager {
         modules.add(elytraRecast);
         modules.add(new ViewLock());
         modules.add(killEffect);
+        modules.add(new ElytraReplace());
+        modules.add(new TickShift());
+        modules.add(antiWeb);
 
     }
 

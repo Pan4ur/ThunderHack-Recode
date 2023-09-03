@@ -2,12 +2,15 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
@@ -20,6 +23,7 @@ import thunder.hack.events.impl.EventTravel;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
+import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.math.MathUtility;
@@ -65,7 +69,6 @@ public class ElytraPlus extends Module {
     private final Setting<Float> infiniteMaxSpeed = new Setting<>("InfiniteMaxSpeed", 150f, 50f, 170f, v -> mode.getValue() == Mode.Pitch40Infinite);
     private final Setting<Float> infiniteMinSpeed = new Setting<>("InfiniteMinSpeed", 25f, 10f, 70f, v -> mode.getValue() == Mode.Pitch40Infinite);
     private final Setting<Integer> infiniteMaxHeight = new Setting<>("InfiniteMaxHeight", 200, 50, 360, v -> mode.getValue() == Mode.Pitch40Infinite);
-
 
     private boolean hasElytra = false;
     private boolean infiniteFlag = false;
@@ -146,8 +149,16 @@ public class ElytraPlus extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        if (mode.getValue() == Mode.Pitch40Infinite)
-            mc.player.setPitch(getInfinitePitch());
+        if (mode.getValue() == Mode.Pitch40Infinite) {
+            ItemStack is = mc.player.getEquippedStack(EquipmentSlot.CHEST);
+            if(is.isOf(Items.ELYTRA)) {
+                mc.player.setPitch(getInfinitePitch());
+            }
+            if(is.isOf(Items.ELYTRA) && is.getDamage() > 380 && mc.player.age % 100 == 0){
+                Thunderhack.notificationManager.publicity("Elytra+", MainSettings.isRu() ? "Элитра скоро сломается!" : "Elytra is about to break down!",2, Notification.Type.WARNING);
+                mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.AMBIENT, 10.0f, 1.0F);
+            }
+        }
     }
 
     private float getInfinitePitch() {

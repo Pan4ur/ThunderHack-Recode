@@ -3,6 +3,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventAttack;
 import thunder.hack.events.impl.EventPlayerJump;
@@ -83,7 +84,6 @@ public class MixinPlayerEntity{
     private void onJumpPre(CallbackInfo ci) {
         final EventPlayerJump event = new EventPlayerJump(true);
         Thunderhack.EVENT_BUS.post(event);
-
     }
 
     @Inject(method = "jump", at = @At("RETURN"))

@@ -56,9 +56,7 @@ public class Glyph {
         Graphics2D g = bufferedImage.createGraphics();
 
         g.setFont(f);
-        // Set Color to Transparent
         g.setColor(new Color(255, 255, 255, 0));
-        // Set the image background to transparent
         g.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
 
         g.setColor(Color.white);
