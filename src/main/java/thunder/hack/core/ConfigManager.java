@@ -199,22 +199,13 @@ public class ConfigManager {
 
     public void save(String name) {
         File file = new File(ConfigsFolder, name + ".th");
-
         if (file.exists()) {
-            if (MainSettings.isRu()) {
-                Command.sendMessage("Конфиг " + name + " уже существует!");
-            } else {
-                Command.sendMessage("Config " + name + " already exists!");
-            }
-            return;
-        }
-
-        save(file);
-        if (MainSettings.isRu()) {
-            Command.sendMessage("Конфиг " + name + " успешно сохранен!");
+            Command.sendMessage(MainSettings.isRu() ? "Перезаписываем " + name + "..." : "Overwriting " + name + "...");
+            file.delete();
         } else {
-            Command.sendMessage("Config " + name + " successfully saved!");
+            Command.sendMessage(MainSettings.isRu() ? "Конфиг " + name + " успешно сохранен!" : "Config " + name + " successfully saved!");
         }
+        save(file);
     }
 
 

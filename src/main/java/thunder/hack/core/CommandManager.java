@@ -44,6 +44,7 @@ public class CommandManager {
         add(new VClipCommand());
         add(new WayPointCommand());
         add(new OpenFolderCommand());
+        add(new ResetBindsCommand());
     }
 
     private void add(Command command) {

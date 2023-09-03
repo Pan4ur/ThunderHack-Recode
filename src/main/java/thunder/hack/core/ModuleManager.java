@@ -75,6 +75,7 @@ public class ModuleManager {
     public static ElytraPlus elytraPlus;
     public static KillEffect killEffect;
     public static AntiWeb antiWeb;
+    public static LegacyHud legacyHud;
 
 
     public ModuleManager() {
@@ -127,6 +128,7 @@ public class ModuleManager {
         elytraPlus = new ElytraPlus();
         killEffect = new KillEffect();
         antiWeb = new AntiWeb();
+        legacyHud = new LegacyHud();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -230,6 +232,7 @@ public class ModuleManager {
         modules.add(new HotbarReplenish());
         modules.add(new HoleAnchor());
         modules.add(new PopChams());
+        modules.add(new Chams());
         modules.add(pistonAura);
         modules.add(new Burrow());
         modules.add(new AntiSurround());
@@ -289,6 +292,7 @@ public class ModuleManager {
         modules.add(new ElytraReplace());
         modules.add(new TickShift());
         modules.add(antiWeb);
+        modules.add(legacyHud);
     }
 
     public Module get(String name) {
