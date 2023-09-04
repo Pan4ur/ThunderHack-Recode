@@ -76,6 +76,7 @@ public class ModuleManager {
     public static KillEffect killEffect;
     public static AntiWeb antiWeb;
     public static LegacyHud legacyHud;
+    public static RPC rpc;
 
 
     public ModuleManager() {
@@ -129,10 +130,11 @@ public class ModuleManager {
         killEffect = new KillEffect();
         antiWeb = new AntiWeb();
         legacyHud = new LegacyHud();
+        rpc = new RPC();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
-        modules.add(new RPC());
+        modules.add(rpc);
         modules.add(new HudEditor());
         modules.add(new RadarRewrite());
         modules.add(new GuiMove());

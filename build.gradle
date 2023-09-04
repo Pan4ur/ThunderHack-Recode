@@ -53,10 +53,6 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modImplementation "org.ladysnake:satin:1.14.0"
-
-	libImpl('club.minnced:java-discord-rpc:2.0.2') {
-		exclude module: 'jna'
-	}
 	libImpl("meteordevelopment:orbit:0.2.3")
 	/*
 	libImpl("org.ladysnake:satin:1.14.0"){

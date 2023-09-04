@@ -87,6 +87,7 @@ public class Thunderhack implements ModInitializer {
 
         ThSoundPack.registerSounds();
         syncVersion();
+        ModuleManager.rpc.startRpc();
         initTime = System.currentTimeMillis();
     }
 
