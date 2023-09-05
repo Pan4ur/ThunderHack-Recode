@@ -19,12 +19,10 @@ import thunder.hack.cmd.Command;
 import thunder.hack.utility.math.ExplosionUtility;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static thunder.hack.modules.Module.mc;
 
 public final class InteractionUtility {
-    public static boolean checkEntities = false;
     public static Map<BlockPos, Long> awaiting = new HashMap<>();
 
     public static boolean canSee(Entity entity) {
@@ -63,29 +61,31 @@ public final class InteractionUtility {
         return new float[]{yD, pD};
     }
 
-    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, int slot, boolean returnSlot) {
+    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, int slot, boolean returnSlot, boolean ignoreEntities) {
         int prevItem = mc.player.getInventory().selectedSlot;
-        if (slot != -1) InventoryUtility.switchTo(slot);
-        boolean result = placeBlock(bp, rotate, interact, mode);
+        if (slot != -1) {
+            InventoryUtility.switchTo(slot);
+        } else return false;
+        boolean result = placeBlock(bp, rotate, interact, mode, ignoreEntities);
         if (returnSlot) InventoryUtility.switchTo(prevItem);
         return result;
     }
 
-    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, SearchInvResult invResult, boolean returnSlot) {
-        return placeBlock(bp, rotate, interact, mode, invResult, returnSlot, InventoryUtility.SwitchMode.All);
+    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, SearchInvResult invResult, boolean returnSlot, boolean ignoreEntities) {
+        return placeBlock(bp, rotate, interact, mode, invResult, returnSlot, InventoryUtility.SwitchMode.All, ignoreEntities);
     }
 
-    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, SearchInvResult invResult, boolean returnSlot, InventoryUtility.SwitchMode switchMode) {
+    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, SearchInvResult invResult, boolean returnSlot, InventoryUtility.SwitchMode switchMode, boolean ignoreEntities) {
         int prevItem = mc.player.getInventory().selectedSlot;
         invResult.switchTo(switchMode);
-        boolean result = placeBlock(bp, rotate, interact, mode);
+        boolean result = placeBlock(bp, rotate, interact, mode, ignoreEntities);
         if (returnSlot) InventoryUtility.switchTo(prevItem, switchMode);
 
         return result;
     }
 
-    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode) {
-        BlockHitResult result = getPlaceResult(bp, interact);
+    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, boolean ignoreEntities) {
+        BlockHitResult result = getPlaceResult(bp, interact, ignoreEntities);
         if (result == null) return false;
         boolean sprint = mc.player.isSprinting();
         boolean sneak = needSneak(mc.world.getBlockState(result.getBlockPos()).getBlock()) && !mc.player.isSneaking();
@@ -113,19 +113,19 @@ public final class InteractionUtility {
         return true;
     }
 
-    public static boolean canPlaceBlock(BlockPos bp, Interact interact) {
-        return getPlaceResult(bp, interact) != null;
+    public static boolean canPlaceBlock(BlockPos bp, Interact interact, boolean ignoreEntities) {
+        return getPlaceResult(bp, interact, ignoreEntities) != null;
     }
 
-    public static float @Nullable [] getPlaceAngle(BlockPos bp, Interact interact) {
-        BlockHitResult result = getPlaceResult(bp, interact);
+    public static float @Nullable [] getPlaceAngle(BlockPos bp, Interact interact, boolean ignoreEntities) {
+        BlockHitResult result = getPlaceResult(bp, interact, ignoreEntities);
         if (result != null) return calculateAngle(result.getPos());
         return null;
     }
 
     @Nullable
-    public static BlockHitResult getPlaceResult(BlockPos bp, Interact interact) {
-        if (checkEntities)
+    public static BlockHitResult getPlaceResult(BlockPos bp, Interact interact, boolean ignoreEntities) {
+        if (!ignoreEntities)
             for (Entity entity : mc.world.getNonSpectatingEntities(Entity.class, new Box(bp)))
                 if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity))
                     return null;

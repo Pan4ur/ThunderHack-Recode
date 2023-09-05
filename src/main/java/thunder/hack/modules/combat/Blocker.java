@@ -104,10 +104,7 @@ public class Blocker extends Module {
         while (blocksPlaced < actionShift.getValue()) {
             BlockPos pos = placePositions.stream()
                     .filter(p -> {
-                        InteractionUtility.checkEntities = true;
-                        boolean canPlace = InteractionUtility.canPlaceBlock(p, interactMode.getValue());
-                        InteractionUtility.checkEntities = false;
-
+                        boolean canPlace = InteractionUtility.canPlaceBlock(p, interactMode.getValue(),false);
                         return canPlace;
                     })
                     .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5))))
@@ -123,7 +120,7 @@ public class Blocker extends Module {
                         }
                     }
 
-                if (InteractionUtility.placeBlock(pos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), searchResult, true)) {
+                if (InteractionUtility.placeBlock(pos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), searchResult, true,false)) {
                     if (swing.getValue())
                         mc.player.swingHand(Hand.MAIN_HAND);
 
@@ -162,11 +159,9 @@ public class Blocker extends Module {
 
                 if (expand.getValue()) {
                     for (Vec3i vec : HoleUtility.VECTOR_PATTERN) {
-                        InteractionUtility.checkEntities = true;
-                        if (InteractionUtility.canPlaceBlock(pos.add(vec), interactMode.getValue())) {
+                        if (InteractionUtility.canPlaceBlock(pos.add(vec), interactMode.getValue(),false)) {
                             placePositions.add(pos.add(vec));
                         }
-                        InteractionUtility.checkEntities = false;
                     }
                 }
             }

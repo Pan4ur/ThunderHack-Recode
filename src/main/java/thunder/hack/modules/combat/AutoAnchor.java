@@ -371,9 +371,9 @@ public class AutoAnchor extends Module {
         SearchInvResult anchorResult = InventoryUtility.getAnchor();
         if (threadedBp != null && anchorResult.found()) {
             int prev_slot = mc.player.getInventory().selectedSlot;
-            InteractionUtility.placeBlock(threadedBp, false, interact.getValue(), placeMode.getValue(), anchorResult, false);
+            InteractionUtility.placeBlock(threadedBp, false, interact.getValue(), placeMode.getValue(), anchorResult, false,false);
             if (threadedBp != null) {
-                BlockHitResult result = InteractionUtility.getPlaceResult(threadedBp, interact.getValue());
+                BlockHitResult result = InteractionUtility.getPlaceResult(threadedBp, interact.getValue(),false);
                 if (result != null)
                     rotations = result.getPos();
             }
@@ -409,7 +409,7 @@ public class AutoAnchor extends Module {
 
         BlockPos targetBp = BlockPos.ofFloored(target.getPos());
 
-        if (InteractionUtility.canPlaceBlock(targetBp.up().up(), interact.getValue()) || mc.world.getBlockState(targetBp.up().up()).getBlock() instanceof RespawnAnchorBlock)
+        if (InteractionUtility.canPlaceBlock(targetBp.up().up(), interact.getValue(),false) || mc.world.getBlockState(targetBp.up().up()).getBlock() instanceof RespawnAnchorBlock)
             return targetBp.up().up();
 
         List<BlockPos> blocks = findAnchorBlocks();
@@ -484,7 +484,7 @@ public class AutoAnchor extends Module {
             for (int j = centerPos.getY() - h; j < centerPos.getY() + h; j++) {
                 for (int k = centerPos.getZ() - r; k < centerPos.getZ() + r; k++) {
                     BlockPos pos = new BlockPos(i, j, k);
-                    if (mc.player.squaredDistanceTo(pos.toCenterPos()) < placeRange.getPow2Value() + 2 && InteractionUtility.canPlaceBlock(pos, interact.getValue())) {
+                    if (mc.player.squaredDistanceTo(pos.toCenterPos()) < placeRange.getPow2Value() + 2 && InteractionUtility.canPlaceBlock(pos, interact.getValue(),false)) {
                         positions.add(pos);
                     }
                 }

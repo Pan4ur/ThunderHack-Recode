@@ -167,7 +167,7 @@ public class AnchorAura2 extends Module {
             for (int j = centerPos.getY() - h; j < centerPos.getY() + h; j++) {
                 for (int k = centerPos.getZ() - r; k < centerPos.getZ() + r; k++) {
                     BlockPos pos = new BlockPos(i, j, k);
-                    if (mc.player.squaredDistanceTo(pos.toCenterPos()) <= placeRange.getPow2Value() + 2 && InteractionUtility.canPlaceBlock(pos, interactMode.getValue())) {
+                    if (mc.player.squaredDistanceTo(pos.toCenterPos()) <= placeRange.getPow2Value() + 2 && InteractionUtility.canPlaceBlock(pos, interactMode.getValue(), false)) {
                         positions.add(pos);
                     }
                 }
@@ -200,7 +200,7 @@ public class AnchorAura2 extends Module {
                 disable(isRu() ? "В хотбаре не найдены якоря возрождения! Выключение..." : "No respawn anchors in hotbar! Disabling...");
             }
 
-            boolean result = InteractionUtility.placeBlock(targetPos, placeRotate.getValue(), interactMode.getValue(), placeMode.getValue(), anchor, switchBack.getValue(), switchMode.getValue());
+            boolean result = InteractionUtility.placeBlock(targetPos, placeRotate.getValue(), interactMode.getValue(), placeMode.getValue(), anchor, switchBack.getValue(), switchMode.getValue(), false);
             if (result)
                 ownAnchors.add(targetPos);
 

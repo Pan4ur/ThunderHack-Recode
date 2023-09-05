@@ -14,12 +14,11 @@ import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.render.HoleESP;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.InteractionUtility;
+import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
@@ -131,7 +130,7 @@ public class PistonPush extends Module {
         if (!getChargeSlot().found() || (!autoSwap.getValue() && !getChargeSlot().isHolding())) return;
 
         if (rotate.getValue()) {
-            final float[] angle = InteractionUtility.getPlaceAngle(chargePos, interact.getValue());
+            final float[] angle = InteractionUtility.getPlaceAngle(chargePos, interact.getValue(), false);
             if (angle == null) {
                 return;
             }
@@ -145,7 +144,7 @@ public class PistonPush extends Module {
 
         placeRunnable = () -> {
             int prevSlot = mc.player.getInventory().selectedSlot;
-            InteractionUtility.placeBlock(chargePos, false,interact.getValue(), placeMode.getValue(), getChargeSlot(), true);
+            InteractionUtility.placeBlock(chargePos, false, interact.getValue(), placeMode.getValue(), getChargeSlot(), true, false);
             mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
             mc.player.getInventory().selectedSlot = prevSlot;
             firstPlace = true;
@@ -160,7 +159,7 @@ public class PistonPush extends Module {
             return;
 
         if (rotate.getValue()) {
-            final float[] angle = InteractionUtility.getPlaceAngle(pistonPos, interact.getValue());
+            final float[] angle = InteractionUtility.getPlaceAngle(pistonPos, interact.getValue(), false);
             if (angle == null) {
                 return;
             }
@@ -180,7 +179,7 @@ public class PistonPush extends Module {
             mc.player.prevYaw = angle;
             ((IClientPlayerEntity) mc.player).setLastYaw(angle);
             int prevSlot = mc.player.getInventory().selectedSlot;
-            InteractionUtility.placeBlock(pistonPos, false, interact.getValue(),placeMode.getValue(), getPistonSlot(), true);
+            InteractionUtility.placeBlock(pistonPos, false, interact.getValue(), placeMode.getValue(), getPistonSlot(), true, false);
             mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
             mc.player.getInventory().selectedSlot = prevSlot;
             mc.player.setYaw(prevYaw);
@@ -230,7 +229,7 @@ public class PistonPush extends Module {
         };
 
         for (BlockPos pos : surroundPoses) {
-            if (!InteractionUtility.canPlaceBlock(pos, interact.getValue())) continue;
+            if (!InteractionUtility.canPlaceBlock(pos, interact.getValue(), false)) continue;
 
             BlockPos[] chargePoses = {
                     pos.add(0, 1, 0),
@@ -246,9 +245,9 @@ public class PistonPush extends Module {
                 if (mc.world.getBlockState(chPos).isReplaceable()) {
                     if (chargeType.getValue() == ChargeType.Torch) {
 
-                        if(chPos == pos.up()) continue;
+                        if (chPos == pos.up()) continue;
 
-                        if (InteractionUtility.canPlaceBlock(pos, interact.getValue())) {
+                        if (InteractionUtility.canPlaceBlock(pos, interact.getValue(), false)) {
                             chargePos = chPos;
                             pistonPos = pos;
                             return;

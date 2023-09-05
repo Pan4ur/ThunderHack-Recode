@@ -373,6 +373,11 @@ public class ModuleManager {
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onPreRender3D(stack));
     }
 
+    public void onPostRender3D(MatrixStack stack) {
+        modules.stream().filter(Module::isEnabled).forEach(module -> module.onPostRender3D(stack));
+        Thunderhack.shaderManager.renderShaders();
+    }
+
     public void sortModules() {
         sortedModules = getEnabledModules().stream().filter(Module::isDrawn).sorted(Comparator.comparing(module -> FontRenderers.getRenderer().getStringWidth(module.getFullArrayString()) * -1)).collect(Collectors.toList());
     }

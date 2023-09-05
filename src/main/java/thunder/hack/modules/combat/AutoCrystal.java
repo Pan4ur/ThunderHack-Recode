@@ -71,6 +71,7 @@ public class AutoCrystal extends Module {
     public Setting<Float> yawAngle = new Setting<>("YawAngle", 180.0f, 1.0f, 180.0f, v -> rotate.getValue() && yawStep.getValue() && page.getValue() == Pages.Main);
     private final Setting<TargetLogic> targetLogic = new Setting<>("TargetLogic", TargetLogic.Distance, v -> page.getValue() == Pages.Main);
     public Setting<Float> targetRange = new Setting<>("TargetRange", 10.0f, 1.0f, 15f, v -> page.getValue() == Pages.Main);
+    private final Setting<Boolean> calcThread = new Setting<>("CalcThread", true, v -> page.getValue() == Pages.Main);
 
     /*   PLACE   */
     private final Setting<Interact> interact = new Setting<>("Interact", Interact.Default, v -> page.getValue() == Pages.Place);
@@ -152,9 +153,6 @@ public class AutoCrystal extends Module {
 
 
     private float renderDamage = 0;
-
-    private float[] rotation = new float[]{0f, 0f};
-
     private int prev_crystals_ammount, crys_speed, inv_timer;
 
     private boolean rotated;
@@ -167,7 +165,6 @@ public class AutoCrystal extends Module {
     public void onEnable() {
         rotated = false;
         renderDamage = 0;
-        rotation = new float[]{mc.player.getYaw(), mc.player.getPitch()};
         attackedCrystals.clear();
         placedCrystals.clear();
         switchTimer.reset();
@@ -195,13 +192,15 @@ public class AutoCrystal extends Module {
             target = Thunderhack.combatManager.getTargetByHP(targetRange.getValue());
         }
 
-        if (target == null) {
-            rotation = new float[]{mc.player.getYaw(), mc.player.getPitch()};
-        }
-
         if (target != null && (target.isDead() || target.getHealth() < 0)) {
             target = null;
             return;
+        }
+
+        if(calcThread.getValue()) {
+            new Thread(this::calcPosition).start();
+        } else {
+            calcPosition();
         }
 
         if (renderPositions.isEmpty()) attackedCrystals.clear();
@@ -236,7 +235,6 @@ public class AutoCrystal extends Module {
                 double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
                 mc.player.setYaw((float) (angle[0] - (angle[0] - ((IClientPlayerEntity) ((mc.player))).getLastYaw()) % gcdFix));
                 mc.player.setPitch((float) (angle[1] - (angle[1] - ((IClientPlayerEntity) ((mc.player))).getLastPitch()) % gcdFix));
-                rotation = angle;
                 rotated = mc.player.getYaw() == angle[0] && mc.player.getPitch() == angle[1];
             }
         }
@@ -374,8 +372,7 @@ public class AutoCrystal extends Module {
     }
 
 
-    @Override
-    public void onThread() {
+    public void calcPosition() {
         if (ModuleManager.speedMine.isWorth()) {
             PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
             if (autoMineData != null) {

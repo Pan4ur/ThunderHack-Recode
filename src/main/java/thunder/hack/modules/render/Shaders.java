@@ -1,13 +1,15 @@
 package thunder.hack.modules.render;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import thunder.hack.Thunderhack;
+import thunder.hack.core.ShaderManager;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.utility.render.shaders.ShaderManager;
+import thunder.hack.setting.impl.Parent;
 
 public class Shaders extends Module {
 
@@ -15,48 +17,50 @@ public class Shaders extends Module {
         super("Shaders", Category.RENDER);
     }
 
+
 /*
         Thanks to @0x3C50 for Shader rendering example
  */
 
-    public Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
+    public Setting<ShaderManager.Shader> mode = new Setting<>("Mode", ShaderManager.Shader.Default);
+    public Setting<ShaderManager.Shader> handsMode = new Setting<>("HandsMode", ShaderManager.Shader.Default);
 
-    public enum Mode{
-        Default, Smoke, Gradient
-    }
     public final Setting<Integer> maxRange = new Setting<>("MaxRange", 64, 16, 256);
-    private final Setting<Boolean> players = new Setting<>("Players", true);
-    private final Setting<Boolean> friends = new Setting<>("Friends", true);
-    private final Setting<Boolean> crystals = new Setting<>("Crystals", true);
-    private final Setting<Boolean> creatures = new Setting<>("Creatures", false);
-    private final Setting<Boolean> monsters = new Setting<>("Monsters", false);
-    private final Setting<Boolean> ambients = new Setting<>("Ambients", false);
-    private final Setting<Boolean> others = new Setting<>("Others", false);
+
+    private final Setting<Parent> select = new Setting<>("Select", new Parent(false, 0));
+    private final Setting<Boolean> hands = new Setting<>("Hands", true).withParent(select);
+    private final Setting<Boolean> players = new Setting<>("Players", true).withParent(select);
+    private final Setting<Boolean> friends = new Setting<>("Friends", true).withParent(select);
+    private final Setting<Boolean> crystals = new Setting<>("Crystals", true).withParent(select);
+    private final Setting<Boolean> creatures = new Setting<>("Creatures", false).withParent(select);
+    private final Setting<Boolean> monsters = new Setting<>("Monsters", false).withParent(select);
+    private final Setting<Boolean> ambients = new Setting<>("Ambients", false).withParent(select);
+    private final Setting<Boolean> others = new Setting<>("Others", false).withParent(select);
+
+    public final Setting<Float> factor = new Setting<>("GradientFactor", 2f, 0f, 20f);
+    public final Setting<Float> gradient = new Setting<>("Gradient", 2f, 0f, 20f);
+    public final Setting<Integer> alpha2 = new Setting<>("GradientAlpha", 170, 0, 255);
     public final Setting<Integer> lineWidth = new Setting<>("LineWidth", 2, 0, 20);
     public final Setting<Integer> quality = new Setting<>("Quality", 10, 5, 30);
-    public final Setting<Integer> octaves = new Setting<>("Octaves", 10, 5, 30,v->mode.getValue() == Mode.Smoke);
-    public final Setting<Integer> fillAlpha = new Setting<>("FillAlpha", 170, 0, 255,v->mode.getValue() != Mode.Default);
-    public final Setting<Boolean> glow = new Setting<>("Glow", true, v->mode.getValue() == Mode.Smoke);
+    public final Setting<Integer> octaves = new Setting<>("SmokeOctaves", 10, 5, 30);
+    public final Setting<Integer> fillAlpha = new Setting<>("FillAlpha", 170, 0, 255);
+    public final Setting<Boolean> glow = new Setting<>("SmokeGlow", true);
 
-  //  public final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00),v->mode.getValue() == Mode.Default);
-
-    public final Setting<ColorSetting> outlineColor = new Setting<>("OutlineColor1", new ColorSetting(0x8800FF00),v->mode.getValue() != Mode.Gradient);
-    public final Setting<ColorSetting> outlineColor1 = new Setting<>("OutlineColor2", new ColorSetting(0x8800FF00),v->mode.getValue() == Mode.Smoke);
-    public final Setting<ColorSetting> outlineColor2 = new Setting<>("OutlineColor3", new ColorSetting(0x8800FF00),v->mode.getValue() == Mode.Smoke);
-
-    public final Setting<ColorSetting> fillColor1 = new Setting<>("FillColor1", new ColorSetting(0x8800FF00),v->mode.getValue() != Mode.Gradient);
-    public final Setting<ColorSetting> fillColor2 = new Setting<>("FillColor2", new ColorSetting(0x8800FF00),v->mode.getValue() == Mode.Smoke);
-    public final Setting<ColorSetting> fillColor3 = new Setting<>("FillColor3", new ColorSetting(0x8800FF00),v->mode.getValue() == Mode.Smoke);
+    private final Setting<Parent> colors = new Setting<>("Colors", new Parent(false, 0));
+    public final Setting<ColorSetting> outlineColor = new Setting<>("Outline", new ColorSetting(0x8800FF00)).withParent(colors);
+    public final Setting<ColorSetting> outlineColor1 = new Setting<>("SmokeOutline", new ColorSetting(0x8800FF00)).withParent(colors);
+    public final Setting<ColorSetting> outlineColor2 = new Setting<>("SmokeOutline2", new ColorSetting(0x8800FF00)).withParent(colors);
+    public final Setting<ColorSetting> fillColor1 = new Setting<>("Fill", new ColorSetting(0x8800FF00)).withParent(colors);
+    public final Setting<ColorSetting> fillColor2 = new Setting<>("SmokeFill", new ColorSetting(0x8800FF00)).withParent(colors);
+    public final Setting<ColorSetting> fillColor3 = new Setting<>("SmokeFil2", new ColorSetting(0x8800FF00)).withParent(colors);
 
 
-    public final Setting<Float> factor = new Setting<>("Factor", 2f, 0f, 20f,v->mode.getValue() == Mode.Gradient);
-    public final Setting<Float> gradient = new Setting<>("Gradient", 2f, 0f, 20f,v->mode.getValue() == Mode.Gradient);
-    public final Setting<Integer> alpha2 = new Setting<>("Alpha2", 170, 0, 255,v->mode.getValue() == Mode.Gradient);
 
 
     public boolean shouldRender(Entity entity) {
         if (entity == null) return false;
-      //  if(mc.player.squaredDistanceTo(entity.getPos()) > maxRange.getPow2Value()) return false;
+        if(mc.player == null) return false;
+        if(mc.player.squaredDistanceTo(entity.getPos()) > maxRange.getPow2Value()) return false;
         if (entity instanceof PlayerEntity) {
             if (entity == mc.player) return false;
             if (Thunderhack.friendManager.isFriend((PlayerEntity) entity)) {
@@ -75,9 +79,13 @@ public class Shaders extends Module {
         };
     }
 
+    public void onRender3D(MatrixStack matrices){
+        if(hands.getValue())
+            Thunderhack.shaderManager.renderShader(()-> mc.gameRenderer.renderHand(matrices, mc.gameRenderer.getCamera(), mc.getTickDelta()), handsMode.getValue());
+    }
 
     @Override
     public void onDisable(){
-        ShaderManager.reload();
+        Thunderhack.shaderManager.reloadShaders();
     }
 }

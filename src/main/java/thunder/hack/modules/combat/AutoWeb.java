@@ -8,8 +8,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.RaycastContext;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -31,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static thunder.hack.modules.render.HoleESP.*;
+import static thunder.hack.utility.player.InteractionUtility.squaredDistanceFromEyes;
 
 public class AutoWeb extends Module {
     public AutoWeb() {
@@ -38,6 +43,7 @@ public class AutoWeb extends Module {
     }
 
     private final Setting<Integer> range = new Setting<>("Range", 5, 1, 7);
+    private final Setting<Integer> placeWallRange = new Setting<>("WallRange", 5, 1, 7);
     private final Setting<PlaceTiming> placeTiming = new Setting<>("PlaceTiming", PlaceTiming.Default);
     private final Setting<Integer> blocksPerTick = new Setting<>("Block/Tick", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10, v -> placeTiming.getValue() != PlaceTiming.Sequential);
@@ -114,7 +120,7 @@ public class AutoWeb extends Module {
                 BlockPos targetBlock = getSequentialPos();
                 if (targetBlock == null)
                     break;
-                if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false)) {
+                if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
                     placed++;
                     renderPoses.put(targetBlock, System.currentTimeMillis());
                     delay = placeDelay.getValue();
@@ -126,7 +132,7 @@ public class AutoWeb extends Module {
             if (targetBlock == null)
                 return;
 
-            if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false)) {
+            if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
                 sequentialBlocks.add(targetBlock);
                 renderPoses.put(targetBlock, System.currentTimeMillis());
                 delay = placeDelay.getValue();
@@ -144,7 +150,7 @@ public class AutoWeb extends Module {
                     BlockPos bp = getSequentialPos();
                     if (bp != null) {
                         InventoryUtility.saveSlot();
-                        if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false)) {
+                        if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
                             sequentialBlocks.add(bp);
                             sequentialBlocks.remove(pac.getPos());
                             InventoryUtility.returnSlot();
@@ -173,7 +179,11 @@ public class AutoWeb extends Module {
             positions.add(targetBp.north());
 
             for (BlockPos bp : positions) {
-                if (InteractionUtility.canPlaceBlock(bp, interact.getValue()) && mc.world.isAir(bp)) {
+                BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), bp.toCenterPos().offset(Direction.UP,0.5f), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
+                if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != bp)
+                    if (squaredDistanceFromEyes(bp.toCenterPos()) > placeWallRange.getPow2Value())
+                        continue;
+                if (InteractionUtility.canPlaceBlock(bp, interact.getValue(), false) && mc.world.isAir(bp)) {
                     return bp;
                 }
             }

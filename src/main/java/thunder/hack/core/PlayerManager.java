@@ -2,6 +2,8 @@ package thunder.hack.core;
 
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.util.math.Vec2f;
@@ -30,6 +32,7 @@ public class PlayerManager {
     private float yaw, pitch;
     public float lastYaw, lastPitch;
     public double currentPlayerSpeed;
+    public int ticksElytraFlying;
 
     // Мы можем зайти в инвентарь, и сервер этого не узнает, пока мы не начнем кликать
     // Юзать везде!
@@ -49,6 +52,9 @@ public class PlayerManager {
         double d4 = d2 * d2 + d3 * d3;
         currentPlayerSpeed = Math.sqrt(d4);
         if(mc.currentScreen == null) inInventory = false;
+        if(mc.player.isFallFlying() && mc.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA){
+            ticksElytraFlying++;
+        } else ticksElytraFlying = 0;
     }
 
 

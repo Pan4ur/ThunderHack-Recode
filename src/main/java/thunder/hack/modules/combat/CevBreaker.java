@@ -456,7 +456,7 @@ public class CevBreaker extends Module {
         SearchInvResult result = getObby();
         if (result == null) return false;
         if (!result.found()) return false;
-        return InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), placeMode.getValue(), result, false);
+        return InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), placeMode.getValue(), result, false, false);
     }
 
     public BlockHitResult getPlaceData(BlockPos bp) {

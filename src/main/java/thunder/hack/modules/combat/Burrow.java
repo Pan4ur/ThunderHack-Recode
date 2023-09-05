@@ -175,9 +175,8 @@ public class Burrow extends Module {
         if (Double.isNaN(y)) {
             return;
         }
-        InteractionUtility.checkEntities = false;
-        float[] r = InteractionUtility.getPlaceAngle(pos, InteractionUtility.Interact.Strict);
-        InteractionUtility.checkEntities = true;
+
+        float[] r = InteractionUtility.getPlaceAngle(pos, InteractionUtility.Interact.Strict, true);
 
 
         PlayerEntity finalREntity = rEntity;
@@ -204,9 +203,7 @@ public class Burrow extends Module {
             sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(finalREntity.getX(), finalREntity.getY() + 1.16, finalREntity.getZ(), onGround.getValue()));
 
             InventoryUtility.saveSlot();
-            InteractionUtility.checkEntities = false;
-            InteractionUtility.placeBlock(pos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Packet, slot,false);
-            InteractionUtility.checkEntities = true;
+            InteractionUtility.placeBlock(pos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Packet, slot,false, true);
             mc.player.swingHand(Hand.MAIN_HAND);
             sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(rEntity.getX(), y, rEntity.getZ(), false));
             timer.reset();

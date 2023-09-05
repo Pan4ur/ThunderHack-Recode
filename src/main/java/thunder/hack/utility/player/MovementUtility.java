@@ -3,6 +3,7 @@ package thunder.hack.utility.player;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.MathHelper;
 import thunder.hack.events.impl.EventMove;
+import thunder.hack.events.impl.EventTravel;
 import thunder.hack.modules.Module;
 
 import static thunder.hack.modules.Module.mc;
@@ -76,6 +77,36 @@ public final class MovementUtility {
     }
 
     public static void modifyEventSpeed(EventMove event, double d) {
+        double d2 = mc.player.input.movementForward;
+        double d3 = mc.player.input.movementSideways;
+        float f = mc.player.getYaw();
+        if (d2 == 0.0 && d3 == 0.0) {
+            event.set_x(0.0);
+            event.set_z(0.0);
+        } else {
+            if (d2 != 0.0) {
+                if (d3 > 0.0) {
+                    f += (float) (d2 > 0.0 ? -45 : 45);
+                } else if (d3 < 0.0) {
+                    f += (float) (d2 > 0.0 ? 45 : -45);
+                }
+
+                d3 = 0.0;
+                if (d2 > 0.0) {
+                    d2 = 1.0;
+                } else if (d2 < 0.0) {
+                    d2 = -1.0;
+                }
+            }
+            double sin = Math.sin(Math.toRadians(f + 90.0F));
+            double cos = Math.cos(Math.toRadians(f + 90.0F));
+
+            event.set_x(d2 * d * cos + d3 * d * sin);
+            event.set_z(d2 * d * sin - d3 * d * cos);
+        }
+    }
+
+    public static void modifyEventSpeed(EventTravel event, double d) {
         double d2 = mc.player.input.movementForward;
         double d3 = mc.player.input.movementSideways;
         float f = mc.player.getYaw();

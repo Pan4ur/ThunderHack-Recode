@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.combat.Aura;
+import thunder.hack.modules.movement.AutoSprint;
 import thunder.hack.modules.player.NoEntityTrace;
 import thunder.hack.modules.render.NoRender;
 import thunder.hack.utility.math.FrameRateCounter;
@@ -56,6 +57,11 @@ public abstract class MixinGameRenderer {
         Render3DEngine.lastWorldSpaceMatrix.set(matrix.peek().getPositionMatrix());
         Thunderhack.moduleManager.onPreRender3D(matrix);
         MSAAFramebuffer.use(() -> Thunderhack.moduleManager.onRender3D(matrix));
+    }
+
+    @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V", shift = At.Shift.AFTER))
+    public void postRender3dHook(float tickDelta, long limitTime, MatrixStack matrix, CallbackInfo ci) {
+        Thunderhack.moduleManager.onPostRender3D(matrix);
     }
 
 

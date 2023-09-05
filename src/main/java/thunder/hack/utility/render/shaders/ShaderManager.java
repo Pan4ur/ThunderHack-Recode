@@ -8,6 +8,7 @@ import thunder.hack.utility.interfaces.IShaderEffect;
 import static thunder.hack.modules.Module.mc;
 
 public class ShaderManager {
+
     public static ManagedShaderEffect OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/outline.json"), managedShaderEffect -> {
         ((IShaderEffect) managedShaderEffect.getShaderEffect()).addFakeTargetHook("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
         ((IShaderEffect) managedShaderEffect.getShaderEffect()).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
@@ -23,10 +24,7 @@ public class ShaderManager {
         ((IShaderEffect) managedShaderEffect.getShaderEffect()).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
     });
 
-    public static boolean fullNullCheck(){
-        if(GRADIENT == null || SMOKE == null || OUTLINE == null) return true;
-        return  false;
-    }
+
 
     public static void reload(){
         OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/outline.json"), managedShaderEffect -> {
@@ -43,5 +41,6 @@ public class ShaderManager {
             ((IShaderEffect) managedShaderEffect.getShaderEffect()).addFakeTargetHook("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
             ((IShaderEffect) managedShaderEffect.getShaderEffect()).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
         });
+
     }
 }

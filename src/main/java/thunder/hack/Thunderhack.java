@@ -45,6 +45,7 @@ public class Thunderhack implements ModInitializer {
     public static MacroManager macroManager = new MacroManager();
     public static WayPointManager wayPointManager = new WayPointManager();
     public static CommandManager commandManager = new CommandManager();
+    public static ShaderManager shaderManager = new ShaderManager();
 
     public static Core core = new Core();
     /*--------------------------------------------------------*/

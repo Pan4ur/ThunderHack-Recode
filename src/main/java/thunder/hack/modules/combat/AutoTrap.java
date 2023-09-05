@@ -111,7 +111,7 @@ public class AutoTrap extends Module {
                 BlockPos targetBlock = getSequentialPos();
                 if (targetBlock == null)
                     break;
-                if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false)) {
+                if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false,false)) {
                     placed++;
                     delay = placeDelay.getValue();
                     inactivityTimer.reset();
@@ -123,7 +123,7 @@ public class AutoTrap extends Module {
             if (targetBlock == null)
                 return;
 
-            if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false)) {
+            if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false,false)) {
                 sequentialBlocks.add(targetBlock);
                 delay = placeDelay.getValue();
                 inactivityTimer.reset();
@@ -141,7 +141,7 @@ public class AutoTrap extends Module {
                     BlockPos bp = getSequentialPos();
                     if (bp != null) {
                         InventoryUtility.saveSlot();
-                        if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false)) {
+                        if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false,false)) {
                             sequentialBlocks.add(bp);
                             sequentialBlocks.remove(pac.getPos());
                             InventoryUtility.returnSlot();
@@ -160,9 +160,7 @@ public class AutoTrap extends Module {
         List<BlockPos> list = getBlocks();
         if(list.isEmpty()) return null;
         for (BlockPos bp : getBlocks()) {
-            InteractionUtility.checkEntities = true;
-            if (InteractionUtility.canPlaceBlock(bp, interact.getValue()) && mc.world.isAir(bp)) {
-                InteractionUtility.checkEntities = false;
+            if (InteractionUtility.canPlaceBlock(bp, interact.getValue(),false) && mc.world.isAir(bp)) {
                 return bp;
             }
         }
@@ -190,7 +188,7 @@ public class AutoTrap extends Module {
             blocks.add(bp.north().down());
             blocks.add(bp.up().up());
 
-            if(!InteractionUtility.canPlaceBlock(bp.up().up(), interact.getValue())){
+            if(!InteractionUtility.canPlaceBlock(bp.up().up(), interact.getValue(),false)){
                 Direction dir = mc.player.getHorizontalFacing();
                 if(dir != null){
                     blocks.add(bp.up().up().offset(dir,1));

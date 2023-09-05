@@ -5,6 +5,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.BarrierBlock;
 import net.minecraft.block.Block;
@@ -51,6 +52,7 @@ public class Search extends Module {
         }
         blocks.clear();
         blocks.addAll(bloks);
+        if(FrameRateCounter.INSTANCE.getFps() < 10) disable("Saving ur pc :)");
     }
 
     public void onRender3D(MatrixStack stack) {

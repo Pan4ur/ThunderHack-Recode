@@ -62,8 +62,6 @@ public class MixinEntityLiving implements IEntityLiving {
     private boolean prevFlying = false;
 
 
-
-
     @Inject(method = "isFallFlying", at = @At("TAIL"), cancellable = true)
     public void isFallFlyingHook(CallbackInfoReturnable<Boolean> cir) {
         if (ModuleManager.elytraRecast.isEnabled()) {
@@ -78,10 +76,10 @@ public class MixinEntityLiving implements IEntityLiving {
     @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
     public void travelHook(Vec3d movementInput, CallbackInfo ci) {
         if((LivingEntity)(Object)this != mc.player) return;
-        final EventTravel event = new EventTravel(movementInput,true);
+        final EventTravel event = new EventTravel(mc.player.getVelocity(),true);
         Thunderhack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
-            mc.player.move(MovementType.SELF, mc.player.getVelocity());
+            mc.player.move(MovementType.SELF, event.getmVec());
             ci.cancel();
         }
     }

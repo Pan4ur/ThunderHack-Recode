@@ -119,7 +119,7 @@ public class Module {
     }
 
     public void disable(String reason) {
-        sendMessage(Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + reason);
+        sendMessage(reason);
         disable();
     }
 
@@ -272,6 +272,9 @@ public class Module {
     }
 
     public void onThread() {
+    }
+
+    public void onPostRender3D(MatrixStack stack) {
     }
 
     public enum Category {

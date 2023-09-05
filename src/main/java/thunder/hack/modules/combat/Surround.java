@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import thunder.hack.events.impl.*;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
@@ -28,6 +29,7 @@ import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -127,7 +129,6 @@ public class Surround extends Module {
 
     public static EndCrystalEntity getEntity(BlockPos blockPos) {
         if (blockPos == null) return null;
-
         return hasEntity(new Box(blockPos), entity -> entity instanceof EndCrystalEntity) ?
                 (EndCrystalEntity) mc.world.getOtherEntities(null, new Box(blockPos), entity -> entity instanceof EndCrystalEntity).get(0) : null;
     }
@@ -150,6 +151,8 @@ public class Surround extends Module {
             return;
         }
 
+        if(getSlot() == -1) disable(MainSettings.isRu() ? "Нет блоков!" : "No blocks!");
+
         InventoryUtility.saveSlot();
         if (placeTiming.getValue() == PlaceTiming.Default) {
             int placed = 0;
@@ -168,12 +171,12 @@ public class Surround extends Module {
                     }
                 }
 
-                if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false)) {
+                if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, true)) {
                     placed++;
                     delay = placeDelay.getValue();
                     inactivityTimer.reset();
                     renderPoses.put(targetBlock, System.currentTimeMillis());
-                }
+                } else break;
             }
         } else if (placeTiming.getValue() == PlaceTiming.Vanilla || placeTiming.getValue() == PlaceTiming.Sequential) {
             BlockPos targetBlock = getSequentialPos();
@@ -190,7 +193,7 @@ public class Surround extends Module {
                 }
             }
 
-            if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false)) {
+            if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, true)) {
                 sequentialBlocks.add(targetBlock);
                 delay = placeDelay.getValue();
                 inactivityTimer.reset();
@@ -202,6 +205,7 @@ public class Surround extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.@NotNull Receive e) {
+        if(getSlot() == -1) disable(MainSettings.isRu() ? "Нет блоков!" : "No blocks!");
         if (e.getPacket() instanceof BlockUpdateS2CPacket pac) {
             if (placeTiming.getValue() == PlaceTiming.Sequential && !sequentialBlocks.isEmpty()) {
                 if (sequentialBlocks.contains(pac.getPos())) {
@@ -218,7 +222,7 @@ public class Surround extends Module {
                         }
 
                         InventoryUtility.saveSlot();
-                        if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false)) {
+                        if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, true)) {
                             sequentialBlocks.add(bp);
                             sequentialBlocks.remove(pac.getPos());
                             InventoryUtility.returnSlot();
@@ -245,15 +249,12 @@ public class Surround extends Module {
                     }
 
                     InventoryUtility.saveSlot();
-                    InteractionUtility.checkEntities = false;
-                    if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false)) {
+                    if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, true)) {
                         InventoryUtility.returnSlot();
-                        InteractionUtility.checkEntities = true;
                         inactivityTimer.reset();
                         renderPoses.put(bp, System.currentTimeMillis());
                         return;
                     }
-                    InteractionUtility.checkEntities = true;
                     InventoryUtility.returnSlot();
                 }
             }
@@ -262,53 +263,117 @@ public class Surround extends Module {
 
     private @Nullable BlockPos getSequentialPos() {
         for (BlockPos bp : getBlocks()) {
-            if (InteractionUtility.canPlaceBlock(bp, interact.getValue()) && mc.world.isAir(bp)) {
+            if(new Box(bp).intersects(mc.player.getBoundingBox())) continue;
+            if (InteractionUtility.canPlaceBlock(bp, interact.getValue(), true) && mc.world.isAir(bp)) {
                 return bp;
             }
         }
         return null;
     }
 
-    private @NotNull List<BlockPos> getBlocks() {
-        List<BlockPos> blocks = new ArrayList<>();
-        for (BlockPos bp : getPlayerBlocks()) {
-            blocks.add(bp.east());
-            blocks.add(bp.west());
-            blocks.add(bp.south());
-            blocks.add(bp.north());
-            blocks.add(bp.down());
+    List<BlockPos> getBlocks() {
+        BlockPos playerPos = this.getPlayerPos();
+        ArrayList<BlockPos> offsets = new ArrayList<BlockPos>();
+        if (!center.getValue()) {
+            int z;
+            int x;
+            double decimalX = Math.abs(mc.player.getX()) - Math.floor(Math.abs(mc.player.getX()));
+            double decimalZ = Math.abs(mc.player.getZ()) - Math.floor(Math.abs(mc.player.getZ()));
+            int lengthXPos = this.calcLength(decimalX, false);
+            int lengthXNeg = this.calcLength(decimalX, true);
+            int lengthZPos = this.calcLength(decimalZ, false);
+            int lengthZNeg = this.calcLength(decimalZ, true);
+            ArrayList<BlockPos> tempOffsets = new ArrayList<>();
+            offsets.addAll(this.getOverlapPos());
+            for (x = 1; x < lengthXPos + 1; ++x) {
+                tempOffsets.add(this.addToPlayer(playerPos, x, 0.0, 1 + lengthZPos));
+                tempOffsets.add(this.addToPlayer(playerPos, x, 0.0, -(1 + lengthZNeg)));
+            }
+            for (x = 0; x <= lengthXNeg; ++x) {
+                tempOffsets.add(this.addToPlayer(playerPos, -x, 0.0, 1 + lengthZPos));
+                tempOffsets.add(this.addToPlayer(playerPos, -x, 0.0, -(1 + lengthZNeg)));
+            }
+            for (z = 1; z < lengthZPos + 1; ++z) {
+                tempOffsets.add(this.addToPlayer(playerPos, 1 + lengthXPos, 0.0, z));
+                tempOffsets.add(this.addToPlayer(playerPos, -(1 + lengthXNeg), 0.0, z));
+            }
+            for (z = 0; z <= lengthZNeg; ++z) {
+                tempOffsets.add(this.addToPlayer(playerPos, 1 + lengthXPos, 0.0, -z));
+                tempOffsets.add(this.addToPlayer(playerPos, -(1 + lengthXNeg), 0.0, -z));
+            }
+            for (BlockPos pos : tempOffsets) {
+                if (getDown(pos)) {
+                    offsets.add(pos.add(0, -1, 0));
+                }
+                offsets.add(pos);
+            }
+        } else {
+            offsets.add(playerPos.add(0, -1, 0));
+            for (int[] surround : new int[][]{
+                    {1, 0},
+                    {0, 1},
+                    {-1, 0},
+                    {0, -1}
+            }) {
+                if (getDown(playerPos.add(surround[0], 0, surround[1])))
+                    offsets.add(playerPos.add(surround[0], -1, surround[1]));
 
-            if (support.getValue()) {
-                blocks.add(bp.east().down());
-                blocks.add(bp.west().down());
-                blocks.add(bp.south().down());
-                blocks.add(bp.north().down());
+                offsets.add(playerPos.add(surround[0], 0, surround[1]));
             }
         }
-        return blocks;
+        return offsets;
     }
 
-    private @NotNull List<BlockPos> getPlayerBlocks() {
-        List<BlockPos> tempPos = new ArrayList<>();
-        BlockPos center = getPlayerPos();
-        tempPos.add(center);
-        tempPos.add(center.north());
-        tempPos.add(center.north().east());
-        tempPos.add(center.west());
-        tempPos.add(center.west().north());
-        tempPos.add(center.south());
-        tempPos.add(center.south().west());
-        tempPos.add(center.east());
-        tempPos.add(center.east().south());
+    public static boolean getDown(BlockPos pos) {
 
-        List<BlockPos> tempPos2 = new ArrayList<>();
+        for (Direction e : Direction.values())
+            if (!mc.world.isAir(pos.add(e.getVector())))
+                return false;
 
-        for (BlockPos bp : tempPos) {
-            if (!mc.world.getNonSpectatingEntities(PlayerEntity.class, new Box(bp)).isEmpty()) {
-                tempPos2.add(bp);
+        return true;
+
+    }
+
+    int calcOffset(double dec) {
+        return dec >= 0.7 ? 1 : (dec <= 0.3 ? -1 : 0);
+    }
+
+    BlockPos addToPlayer(BlockPos playerPos, double x, double y, double z) {
+        if (playerPos.getX() < 0) {
+            x = -x;
+        }
+        if (playerPos.getY() < 0) {
+            y = -y;
+        }
+        if (playerPos.getZ() < 0) {
+            z = -z;
+        }
+        return playerPos.add(BlockPos.ofFloored(x,y,z));
+    }
+
+    List<BlockPos> getOverlapPos() {
+        ArrayList<BlockPos> positions = new ArrayList<>();
+        double decimalX = mc.player.getX() - Math.floor(mc.player.getX());
+        double decimalZ = mc.player.getZ() - Math.floor(mc.player.getZ());
+        int offX = this.calcOffset(decimalX);
+        int offZ = this.calcOffset(decimalZ);
+        positions.add(this.getPlayerPos());
+        for (int x = 0; x <= Math.abs(offX); ++x) {
+            for (int z = 0; z <= Math.abs(offZ); ++z) {
+                int properX = x * offX;
+                int properZ = z * offZ;
+                positions.add(this.getPlayerPos().add(properX, -1, properZ));
             }
         }
-        return tempPos2;
+        return positions;
+    }
+
+
+    int calcLength(double decimal, boolean negative) {
+        if (negative) {
+            return decimal <= 0.3 ? 1 : 0;
+        }
+        return decimal >= 0.7 ? 1 : 0;
     }
 
     private int getSlot() {
