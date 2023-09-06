@@ -4,12 +4,17 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ShaderManager;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
+import thunder.hack.utility.render.Render3DEngine;
+
+import java.awt.*;
 
 public class Shaders extends Module {
 
@@ -83,6 +88,7 @@ public class Shaders extends Module {
         if(hands.getValue())
             Thunderhack.shaderManager.renderShader(()-> mc.gameRenderer.renderHand(matrices, mc.gameRenderer.getCamera(), mc.getTickDelta()), handsMode.getValue());
     }
+
 
     @Override
     public void onDisable(){

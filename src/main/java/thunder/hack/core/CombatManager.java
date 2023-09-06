@@ -4,8 +4,10 @@ import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityStatuses;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.util.math.MathHelper;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventPostTick;
 import thunder.hack.events.impl.EventTick;
@@ -95,4 +97,22 @@ public class CombatManager {
                 .min(Comparator.comparing(t -> (t.getHealth() + t.getAbsorptionAmount()))).orElse(null);
     }
 
+    public PlayerEntity getTargetByFOV(float range){
+        return mc.world.getPlayers()
+                .stream()
+                .filter(e -> e != mc.player)
+                .filter(e -> !e.isDead())
+                .filter(e -> !Thunderhack.friendManager.isFriend(e.getName().getString()))
+                .filter(e -> e.getHealth() > 0)
+                .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
+                .min(Comparator.comparing(this::getFOVAngle)).orElse(null);
+    }
+
+    private float getFOVAngle(LivingEntity e) {;
+        double difX = e.getX() - mc.player.getPos().x;
+        double difZ = e.getZ() - mc.player.getPos().z;
+        float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);
+        double plYaw = MathHelper.wrapDegrees(mc.player.getYaw());
+        return (float) Math.abs(yaw - plYaw);
+    }
 }

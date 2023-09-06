@@ -109,6 +109,7 @@ public class Surround extends Module {
     @Override
     public void onEnable() {
         currentPlacePos = null;
+        delay = 0;
         if (center.getValue()) {
             mc.player.updatePosition(MathHelper.floor(mc.player.getX()) + 0.5, mc.player.getY(), MathHelper.floor(mc.player.getZ()) + 0.5);
             sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.isOnGround()));
