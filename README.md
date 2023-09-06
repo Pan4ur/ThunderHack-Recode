@@ -2,8 +2,15 @@
     <img src="https://i.imgur.com/ZiJ0r7y.png" style="width: 69%">
 </p>
 
+<div align="center">
+    
+[![Discord Mine](https://img.shields.io/discord/1140266441082404924?label=discord&logo=discord&logoColor=white)](https://discord.gg/bJajFP3kCX)
+![Downloads](https://img.shields.io/github/downloads/Pan4ur/ThunderHack-Recode/total.svg)
+
+</div>
+
+
 ## Info
-- [Discord](https://discord.gg/VgsrEvJjn)
 - Minecraft version: ```fabric``` 1.20.1
 - Client version: v 1.2
 - Default ClickGui keybind - **```P```**
@@ -17,4 +24,4 @@
 - [InGameAccountSwitcher](https://www.curseforge.com/minecraft/mc-mods/in-game-account-switcher) - To switch accounts in game
 
 ## ScreenShots
-![image](https://cdn.discordapp.com/attachments/934396624111824900/1131601338925600920/image.png)
+![image](https://cdn.discordapp.com/attachments/934396624111824900/1149001329675604048/2023-09-06_18.06.52.png)
