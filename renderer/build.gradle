@@ -1,0 +1,14 @@
+plugins {
+    id "io.github.arc-blroth.cargo-wrapper" version "1.1.0"
+}
+
+group = rootProject.group
+version = rootProject.version
+
+cargo {
+    crate = projectDir.path
+    outputs = [
+            '': System.mapLibraryName(project.library_name)
+    ]
+    profile = 'release'
+}

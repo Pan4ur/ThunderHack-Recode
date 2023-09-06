@@ -46,6 +46,7 @@ public class Thunderhack implements ModInitializer {
     public static WayPointManager wayPointManager = new WayPointManager();
     public static CommandManager commandManager = new CommandManager();
     public static ShaderManager shaderManager = new ShaderManager();
+    public static NativeManager nativeManager = new NativeManager();
 
     public static Core core = new Core();
     /*--------------------------------------------------------*/
@@ -81,6 +82,7 @@ public class Thunderhack implements ModInitializer {
 
         macroManager.onLoad();
         wayPointManager.onLoad();
+        nativeManager.setupNatives();
 
         Render2DEngine.ROUNDED_GRADIENT_PROGRAM = new RoundedGradientProgram();
         Render2DEngine.ROUNDED_PROGRAM = new RoundedProgram();

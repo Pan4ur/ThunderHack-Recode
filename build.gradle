@@ -45,9 +45,16 @@ repositories {
 configurations {
 	libImpl
 	modImpl
+
+	backend {
+		canBeConsumed false
+		canBeResolved true
+	}
 }
 
 dependencies {
+	backend(project(":renderer"))
+
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
@@ -56,13 +63,6 @@ dependencies {
 	include "org.ladysnake:satin:1.14.0"
 
 	libImpl("meteordevelopment:orbit:0.2.3")
-	/*
-	libImpl("org.ladysnake:satin:1.14.0"){
-		exclude module: 'fabric-api'
-		exclude module: 'fabric-loader'
-	}
-
-	 */
 
 	configurations.libImpl.dependencies.each {
 		implementation(it)
@@ -74,6 +74,7 @@ dependencies {
 }
 
 processResources {
+	from(configurations.backend)
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
