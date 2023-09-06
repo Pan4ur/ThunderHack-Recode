@@ -10,6 +10,7 @@ import thunder.hack.cmd.Command;
 import thunder.hack.modules.render.Search;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class SearchCommand extends Command {
     public SearchCommand() {
@@ -29,8 +30,14 @@ public class SearchCommand extends Command {
         builder.then(literal("add").then(arg("block", StringArgumentType.word()).executes(context -> {
             String blockName = context.getArgument("block", String.class);
 
-            Search.defaultBlocks.add(getRegisteredBlock(blockName));
-            sendMessage(Formatting.GREEN + blockName + " added to search");
+            Block result = getRegisteredBlock(blockName);
+            if(result != null){
+                Search.defaultBlocks.add(result);
+                sendMessage(Formatting.GREEN + blockName + (isRu() ? " добавлен в Search" : " added to Search"));
+            } else {
+                sendMessage(Formatting.RED + (isRu() ? "Такого блока нет!" : "There is no such block!"));
+            }
+
             MC.worldRenderer.reload();
 
             return SINGLE_SUCCESS;
@@ -39,8 +46,14 @@ public class SearchCommand extends Command {
         builder.then(literal("del").then(arg("block", StringArgumentType.word()).executes(context -> {
             String blockName = context.getArgument("block", String.class);
 
-            Search.defaultBlocks.remove(getRegisteredBlock(blockName));
-            sendMessage(Formatting.RED + blockName + " removed from search");
+            Block result = getRegisteredBlock(blockName);
+            if(result != null){
+                Search.defaultBlocks.remove(result);
+                sendMessage(Formatting.GREEN + blockName + (isRu() ? " удален из Search" : " removed from Search"));
+            } else {
+                sendMessage(Formatting.RED + (isRu() ? "Такого блока нет!" : "There is no such block!"));
+            }
+
             MC.worldRenderer.reload();
 
             return SINGLE_SUCCESS;
@@ -68,7 +81,6 @@ public class SearchCommand extends Command {
     public static Block getRegisteredBlock(String blockName) {
         for (Block block : Registries.BLOCK) {
             if (block.getTranslationKey().replace("block.minecraft.","").equalsIgnoreCase(blockName)) {
-                sendMessage("Asdawd1");
                 return block;
             }
         }

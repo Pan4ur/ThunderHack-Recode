@@ -51,7 +51,6 @@ public class NoSlow extends Module {
 
             if (Mode.getValue() == mode.Matrix) {
                 if (!Thunderhack.moduleManager.get(Strafe.class).isEnabled()) {
-
                     if (mc.player.isOnGround() && !mc.options.jumpKey.isPressed()) {
                         mc.player.setVelocity(mc.player.getVelocity().x * 0.3, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.3);
                     } else if (mc.player.fallDistance > 0.2f)

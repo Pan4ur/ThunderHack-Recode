@@ -13,9 +13,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
+import thunder.hack.modules.render.Search;
 import thunder.hack.modules.render.XRay;
 
 import java.util.Objects;
+
+import static thunder.hack.modules.Module.mc;
 
 @Mixin(Block.class)
 public abstract class MixinBlock {
@@ -25,6 +28,7 @@ public abstract class MixinBlock {
         if (ModuleManager.xray.isEnabled()) {
             cir.setReturnValue(XRay.isCheckableOre(state.getBlock()));
         }
+
     }
 
     @Inject(method = "isTransparent", at = @At("HEAD"), cancellable = true)

@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
+import thunder.hack.modules.render.Search;
 import thunder.hack.modules.render.XRay;
 
 import java.util.Objects;

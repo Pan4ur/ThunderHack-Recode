@@ -77,6 +77,7 @@ public class ModuleManager {
     public static AntiWeb antiWeb;
     public static LegacyHud legacyHud;
     public static RPC rpc;
+    public static Search search;
 
 
     public ModuleManager() {
@@ -131,6 +132,7 @@ public class ModuleManager {
         antiWeb = new AntiWeb();
         legacyHud = new LegacyHud();
         rpc = new RPC();
+        search = new Search();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -200,7 +202,7 @@ public class ModuleManager {
         modules.add(new AimBot());
         modules.add(new StaffBoard());
         modules.add(autoTool);
-        modules.add(new Search());
+        modules.add(search);
         modules.add(new ChestStealer());
         modules.add(tooltips);
         modules.add(new AutoFish());

@@ -2,7 +2,12 @@ package thunder.hack.modules.render;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.world.chunk.WorldChunk;
+import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
+import thunder.hack.core.AsyncManager;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.FrameRateCounter;
@@ -19,11 +24,13 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static thunder.hack.modules.render.StorageEsp.getLoadedChunks;
+
 public class Search extends Module {
 
     public static CopyOnWriteArrayList<BlockVec> blocks = new CopyOnWriteArrayList<>();
     public static ArrayList<Block> defaultBlocks = new ArrayList<>();
-    private final Setting<Float> range = new Setting<>("Range", 100f, 1f, 500f);
+    private final Setting<Integer> range = new Setting<>("Range", 100, 1, 128);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0xFF00FFFF));
     private final Setting<Boolean> illegals = new Setting<>("Illegals", true);
     private final Setting<Boolean> tracers = new Setting<>("Tracers", false);
@@ -35,28 +42,36 @@ public class Search extends Module {
         super("Search", "подсветка блоков", Category.RENDER);
     }
 
+    private SearchThread searchThread = new SearchThread();
+
+
     @Override
     public void onEnable() {
         blocks.clear();
+        searchThread = new SearchThread();
+        searchThread.setName("ThunderHack-SearchThread");
+        searchThread.setDaemon(true);
+        searchThread.start();
     }
 
+    @Override
+    public void onDisable() {
+        searchThread.interrupt();
+    }
 
     @Override
-    public void onThread() {
-        if (mc.world == null || mc.player == null) return;
-        ArrayList<BlockVec> bloks = new ArrayList<>();
-        for (BlockPos pos : BlockPos.iterateOutwards(mc.player.getBlockPos(), (int) (float) range.getValue(), 128,  (int) (float)range.getValue())) {
-            if (shouldAdd(mc.world.getBlockState(pos).getBlock(), pos)) {
-                bloks.add(new BlockVec(pos.getX(), pos.getY(), pos.getZ()));
-            }
+    public void onUpdate() {
+        if (!searchThread.isAlive()) {
+            searchThread = new SearchThread();
+            searchThread.setName("ThunderHack-SearchThread");
+            searchThread.setDaemon(true);
+            searchThread.start();
         }
-        blocks.clear();
-        blocks.addAll(bloks);
-        if(FrameRateCounter.INSTANCE.getFps() < 10) disable("Saving ur pc :)");
     }
 
     public void onRender3D(MatrixStack stack) {
         if (fullNullCheck() || blocks.isEmpty()) return;
+        if(FrameRateCounter.INSTANCE.getFps() < 10 && mc.player.age > 100) disable("Saving ur pc :)");
 
         if (fill.getValue() || outline.getValue()) {
             for (BlockVec vec : blocks) {
@@ -151,6 +166,35 @@ public class Search extends Module {
             double dz = z - v.z;
 
             return Math.sqrt(dx * dx + dy * dy + dz * dz);
+        }
+    }
+
+    public class SearchThread extends Thread {
+        @Override
+        public void run() {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    if (!Module.fullNullCheck()) {
+                        ArrayList<BlockVec> bloks = new ArrayList<>();
+                        for (int x = (int) Math.floor(mc.player.getX() - range.getValue()); x <= Math.ceil(mc.player.getX() + range.getValue()); x++) {
+                            for (int y = mc.world.getBottomY() + 1; y <= mc.world.getTopY(); y++) {
+                                for (int z = (int) Math.floor(mc.player.getZ() - range.getValue()); z <= Math.ceil(mc.player.getZ() + range.getValue()); z++) {
+                                    BlockPos pos = new BlockPos(x,y,z);
+                                    if(mc.world.isAir(pos)) continue;
+                                    if (shouldAdd(mc.world.getBlockState(pos).getBlock(), pos)) {
+                                        bloks.add(new BlockVec(pos.getX(), pos.getY(), pos.getZ()));
+                                    }
+                                }
+                            }
+                        }
+
+                        blocks.clear();
+                        blocks.addAll(bloks);
+                    } else {
+                        Thread.yield();
+                    }
+                } catch (Exception exception) {}
+            }
         }
     }
 }
