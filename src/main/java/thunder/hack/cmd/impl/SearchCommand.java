@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.command.CommandSource;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.FriendArgumentType;
 import thunder.hack.cmd.args.SearchArgumentType;
@@ -20,7 +21,7 @@ public class SearchCommand extends Command {
     }
 
     @Override
-    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+    public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("reset").executes(context -> {
             Search.defaultBlocks.clear();
             sendMessage("Search got reset.");

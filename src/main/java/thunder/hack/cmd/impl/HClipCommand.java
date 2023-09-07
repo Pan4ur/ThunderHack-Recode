@@ -6,6 +6,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -16,7 +17,7 @@ public class HClipCommand extends Command {
     }
 
     @Override
-    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+    public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("s").executes(context -> {
             final double x = -(MathHelper.sin(MC.player.getYaw() * MathHelper.RADIANS_PER_DEGREE) * 0.8);
             final double z = MathHelper.cos(MC.player.getYaw() * MathHelper.RADIANS_PER_DEGREE) * 0.8;

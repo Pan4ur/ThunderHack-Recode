@@ -27,7 +27,6 @@ public class AutoFish extends Module {
     private int rodSlot = -1;
     private final Timer timeout = new Timer();
 
-
     @Override
     public void onEnable() {
         if (fullNullCheck()) {
@@ -49,7 +48,7 @@ public class AutoFish extends Module {
                 if (rodSave.getValue() && !changeRod.getValue()) {
                     disable(MainSettings.isRu() ? "Удочка почти сломалась!" : "Saving rod...");
                 } else if (changeRod.getValue() && getRodSlot() != -1) {
-                    Command.sendMessage("Swapped to a new rod");
+                    sendMessage("Swapped to a new rod");
                     mc.player.getInventory().selectedSlot = getRodSlot();
                 } else {
                     disable(MainSettings.isRu() ? "Удочка почти сломалась!" : "Saving rod...");
@@ -60,7 +59,7 @@ public class AutoFish extends Module {
             if (rodSlot == -1)
                 rodSlot = InventoryUtility.findInHotBar(stack -> stack.getItem() instanceof FishingRodItem).slot();
             if (rodSlot != -1) {
-                mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(rodSlot));
+                sendPacket(new UpdateSelectedSlotC2SPacket(rodSlot));
                 mc.player.getInventory().selectedSlot = rodSlot;
                 mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
                 timeout.reset();

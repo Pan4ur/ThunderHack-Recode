@@ -3,6 +3,7 @@ package thunder.hack.cmd.impl;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.FriendArgumentType;
@@ -11,11 +12,11 @@ import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
 public class FriendCommand extends Command {
     public FriendCommand() {
-        super("friend");
+        super("friend", "friends");
     }
 
     @Override
-    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+    public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("reset").executes(context -> {
             Thunderhack.friendManager.clear();
             sendMessage("Friends got reset.");
@@ -48,7 +49,7 @@ public class FriendCommand extends Command {
 
         builder.executes(context -> {
             if (Thunderhack.friendManager.getFriends().isEmpty()) {
-                thunder.hack.cmd.impl.FriendCommand.sendMessage("Friend list empty D:.");
+                sendMessage("Friend list empty D:");
             } else {
                 StringBuilder f = new StringBuilder("Friends: ");
                 for (String friend : Thunderhack.friendManager.getFriends()) {
@@ -57,7 +58,7 @@ public class FriendCommand extends Command {
                     } catch (Exception ignored) {
                     }
                 }
-                thunder.hack.cmd.impl.FriendCommand.sendMessage(f.toString());
+                sendMessage(f.toString());
             }
             return SINGLE_SUCCESS;
         });

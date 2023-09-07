@@ -10,6 +10,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +27,6 @@ public abstract class Command {
 
     public abstract void executeBuild(LiteralArgumentBuilder<CommandSource> builder);
 
-    @Deprecated
     public static void sendMessage(String message) {
         if (MC.player == null) return;
         MC.player.sendMessage(Text.of(thunder.hack.core.CommandManager.getClientMessage() + " "  + message));
@@ -37,12 +37,11 @@ public abstract class Command {
         MC.player.sendMessage(Text.of(message));
     }
 
-
-    protected static <T> RequiredArgumentBuilder<CommandSource, T> arg(final String name, final ArgumentType<T> type) {
+    protected static <T> @NotNull RequiredArgumentBuilder<CommandSource, T> arg(final String name, final ArgumentType<T> type) {
         return RequiredArgumentBuilder.argument(name, type);
     }
 
-    protected static LiteralArgumentBuilder<CommandSource> literal(final String name) {
+    protected static @NotNull LiteralArgumentBuilder<CommandSource> literal(final String name) {
         return LiteralArgumentBuilder.literal(name);
     }
 

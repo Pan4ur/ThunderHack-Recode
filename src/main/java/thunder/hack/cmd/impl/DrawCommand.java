@@ -3,6 +3,7 @@ package thunder.hack.cmd.impl;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.ModuleArgumentType;
 import thunder.hack.gui.clickui.ClickUI;
@@ -16,7 +17,7 @@ public class DrawCommand extends Command {
     }
 
     @Override
-    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+    public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(arg("module", ModuleArgumentType.create()).executes(context -> {
             Module module = context.getArgument("module", Module.class);
 

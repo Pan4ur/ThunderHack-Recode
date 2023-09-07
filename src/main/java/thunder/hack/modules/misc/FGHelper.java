@@ -132,7 +132,7 @@ public class FGHelper extends Module {
                     if (entity == mc.player) continue;
                     log.append(entity.getName().getString()).append(" ");
                 }
-                Command.sendMessage(String.valueOf(log));
+                sendMessage(String.valueOf(log));
 
                 mc.player.networkHandler.sendCommand("back");
                 flag = false;

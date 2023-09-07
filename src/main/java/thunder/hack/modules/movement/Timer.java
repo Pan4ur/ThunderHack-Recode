@@ -92,7 +92,7 @@ public class Timer extends Module {
     public void onPacketReceive(PacketEvent.Receive e) {
         if (mode.getValue() == Mode.GrimFunnyGame) {
             if (System.currentTimeMillis() - cancelTime > 55000) {
-                Command.sendMessage("Resetting..");
+                sendMessage("Resetting..");
                 cancelTime = System.currentTimeMillis();
                 violation = 40f;
                 if (pingPacket != null)

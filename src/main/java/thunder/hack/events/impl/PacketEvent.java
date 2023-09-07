@@ -15,8 +15,7 @@ public class PacketEvent extends Event {
         return (T) this.packet;
     }
 
-    public static class Send
-            extends PacketEvent {
+    public static class Send extends PacketEvent {
         public Send(Packet<?> packet) {
             super(packet);
         }

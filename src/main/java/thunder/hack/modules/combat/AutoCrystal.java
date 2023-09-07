@@ -60,10 +60,6 @@ import java.util.List;
 import java.util.Map;
 
 public class AutoCrystal extends Module {
-    public AutoCrystal() {
-        super("AutoCrystal", Category.COMBAT);
-    }
-
     // я ебал (не спастил btw)
 
     /*   MAIN   */
@@ -71,63 +67,63 @@ public class AutoCrystal extends Module {
     private final Setting<Timing> timing = new Setting<>("Timing", Timing.NORMAL, v -> page.getValue() == Pages.Main);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", true, v -> page.getValue() == Pages.Main);
     private final Setting<Boolean> yawStep = new Setting<>("YawStep", false, v -> rotate.getValue() && page.getValue() == Pages.Main);
-    public Setting<Float> yawAngle = new Setting<>("YawAngle", 180.0f, 1.0f, 180.0f, v -> rotate.getValue() && yawStep.getValue() && page.getValue() == Pages.Main);
+    private final Setting<Float> yawAngle = new Setting<>("YawAngle", 180.0f, 1.0f, 180.0f, v -> rotate.getValue() && yawStep.getValue() && page.getValue() == Pages.Main);
     private final Setting<TargetLogic> targetLogic = new Setting<>("TargetLogic", TargetLogic.Distance, v -> page.getValue() == Pages.Main);
-    public Setting<Float> targetRange = new Setting<>("TargetRange", 10.0f, 1.0f, 15f, v -> page.getValue() == Pages.Main);
+    private final Setting<Float> targetRange = new Setting<>("TargetRange", 10.0f, 1.0f, 15f, v -> page.getValue() == Pages.Main);
 
     /*   PLACE   */
     private final Setting<Interact> interact = new Setting<>("Interact", Interact.Default, v -> page.getValue() == Pages.Place);
-    public Setting<Boolean> oldVer = new Setting<>("1.12", false, v -> page.getValue() == Pages.Place);
-    public Setting<Boolean> ccPlace = new Setting<>("CC", true, v -> page.getValue() == Pages.Place);
-    public Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 0, 0, 1000, v -> page.getValue() == Pages.Place);
-    public Setting<Float> placeRange = new Setting<>("PlaceRange", 5f, 1.0f, 6f, v -> page.getValue() == Pages.Place);
-    public Setting<Float> placeWallRange = new Setting<>("PlaceWallRange", 3.5f, 1.0f, 6f, v -> page.getValue() == Pages.Place);
-    public static Setting<Integer> predictTicks = new Setting<>("PredictTicks", 3, 0, 10, v -> page.getValue() == Pages.Place);
+    private final Setting<Boolean> oldVer = new Setting<>("1.12", false, v -> page.getValue() == Pages.Place);
+    private final Setting<Boolean> ccPlace = new Setting<>("CC", true, v -> page.getValue() == Pages.Place);
+    private final Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 0, 0, 1000, v -> page.getValue() == Pages.Place);
+    private final Setting<Float> placeRange = new Setting<>("PlaceRange", 5f, 1.0f, 6f, v -> page.getValue() == Pages.Place);
+    private final Setting<Float> placeWallRange = new Setting<>("PlaceWallRange", 3.5f, 1.0f, 6f, v -> page.getValue() == Pages.Place);
+    public static final Setting<Integer> predictTicks = new Setting<>("PredictTicks", 3, 0, 10, v -> page.getValue() == Pages.Place);
 
     /*   BREAK   */
-    public Setting<Integer> breakDelay = new Setting<>("BreakDelay", 0, 0, 1000, v -> page.getValue() == Pages.Break);
-    public Setting<Float> explodeRange = new Setting<>("BreakRange", 5.0f, 1.0f, 6f, v -> page.getValue() == Pages.Break);
-    public Setting<Float> explodeWallRange = new Setting<>("BreakWallRange", 3.5f, 1.0f, 6f, v -> page.getValue() == Pages.Break);
-    public Setting<Integer> crystalAge = new Setting<>("CrystalAge", 0, 0, 20, v -> page.getValue() == Pages.Break);
-    public Setting<Integer> limitAttacks = new Setting<>("LimitAttacks", 2, 0, 10, v -> page.getValue() == Pages.Break);
+    private final Setting<Integer> breakDelay = new Setting<>("BreakDelay", 0, 0, 1000, v -> page.getValue() == Pages.Break);
+    private final Setting<Float> explodeRange = new Setting<>("BreakRange", 5.0f, 1.0f, 6f, v -> page.getValue() == Pages.Break);
+    private final Setting<Float> explodeWallRange = new Setting<>("BreakWallRange", 3.5f, 1.0f, 6f, v -> page.getValue() == Pages.Break);
+    private final Setting<Integer> crystalAge = new Setting<>("CrystalAge", 0, 0, 20, v -> page.getValue() == Pages.Break);
+    private final Setting<Integer> limitAttacks = new Setting<>("LimitAttacks", 2, 0, 10, v -> page.getValue() == Pages.Break);
 
     /*   PAUSE   */
-    public Setting<Boolean> mining = new Setting<>("Mining", true, v -> page.getValue() == Pages.Pause);
-    public Setting<Boolean> eating = new Setting<>("Eating", true, v -> page.getValue() == Pages.Pause);
-    public Setting<Boolean> aura = new Setting<>("Aura", false, v -> page.getValue() == Pages.Pause);
-    public Setting<Boolean> pistonAura = new Setting<>("PistonAura", true, v -> page.getValue() == Pages.Pause);
-    public Setting<Boolean> surround = new Setting<>("Surround", true, v -> page.getValue() == Pages.Pause);
-    public Setting<Float> pauseHP = new Setting<>("HP", 8.0f, 2.0f, 10f, v -> page.getValue() == Pages.Pause);
-    public Setting<Boolean> switchPause = new Setting<>("SwitchPause", true, v -> page.getValue() == Pages.Pause);
-    public Setting<Integer> switchDelay = new Setting<>("SwitchDelay", 100, 0, 1000, v -> page.getValue() == Pages.Pause && switchPause.getValue());
+    private final Setting<Boolean> mining = new Setting<>("Mining", true, v -> page.getValue() == Pages.Pause);
+    private final Setting<Boolean> eating = new Setting<>("Eating", true, v -> page.getValue() == Pages.Pause);
+    private final Setting<Boolean> aura = new Setting<>("Aura", false, v -> page.getValue() == Pages.Pause);
+    private final Setting<Boolean> pistonAura = new Setting<>("PistonAura", true, v -> page.getValue() == Pages.Pause);
+    private final Setting<Boolean> surround = new Setting<>("Surround", true, v -> page.getValue() == Pages.Pause);
+    private final Setting<Float> pauseHP = new Setting<>("HP", 8.0f, 2.0f, 10f, v -> page.getValue() == Pages.Pause);
+    private final Setting<Boolean> switchPause = new Setting<>("SwitchPause", true, v -> page.getValue() == Pages.Pause);
+    private final Setting<Integer> switchDelay = new Setting<>("SwitchDelay", 100, 0, 1000, v -> page.getValue() == Pages.Pause && switchPause.getValue());
 
     /*   DAMAGES   */
-    public Setting<Float> minDamage = new Setting<>("MinDamage", 6.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
-    public Setting<Float> maxSelfDamage = new Setting<>("MaxSelfDamage", 10.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
+    private final Setting<Float> minDamage = new Setting<>("MinDamage", 6.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
+    private final Setting<Float> maxSelfDamage = new Setting<>("MaxSelfDamage", 10.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
     private final Setting<Safety> safety = new Setting<>("Safety", Safety.NONE, v -> page.getValue() == Pages.Damages);
-    public Setting<Float> safetyBalance = new Setting<>("SafetyBalance", 1.1f, 0.1f, 3f, v -> page.getValue() == Pages.Damages && safety.getValue() == Safety.BALANCE);
-    public Setting<Boolean> protectFriends = new Setting<>("ProtectFriends", true, v -> page.getValue() == Pages.Damages);
-    public Setting<Boolean> overrideSelfDamage = new Setting<>("OverrideSelfDamage", true, v -> page.getValue() == Pages.Damages);
-    public Setting<Float> lethalMultiplier = new Setting<>("LethalMultiplier", 1.0f, 0.0f, 5f, v -> page.getValue() == Pages.Damages);
-    public Setting<Boolean> armorBreaker = new Setting<>("ArmorBreaker", true, v -> page.getValue() == Pages.Damages);
-    public Setting<Float> armorScale = new Setting<>("ArmorScale", 5.0f, 0.0f, 40f, v -> armorBreaker.getValue() && page.getValue() == Pages.Damages);
-    public Setting<Float> facePlaceHp = new Setting<>("FacePlaceHp", 5.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
+    private final Setting<Float> safetyBalance = new Setting<>("SafetyBalance", 1.1f, 0.1f, 3f, v -> page.getValue() == Pages.Damages && safety.getValue() == Safety.BALANCE);
+    private final Setting<Boolean> protectFriends = new Setting<>("ProtectFriends", true, v -> page.getValue() == Pages.Damages);
+    private final Setting<Boolean> overrideSelfDamage = new Setting<>("OverrideSelfDamage", true, v -> page.getValue() == Pages.Damages);
+    private final Setting<Float> lethalMultiplier = new Setting<>("LethalMultiplier", 1.0f, 0.0f, 5f, v -> page.getValue() == Pages.Damages);
+    private final Setting<Boolean> armorBreaker = new Setting<>("ArmorBreaker", true, v -> page.getValue() == Pages.Damages);
+    private final Setting<Float> armorScale = new Setting<>("ArmorScale", 5.0f, 0.0f, 40f, v -> armorBreaker.getValue() && page.getValue() == Pages.Damages);
+    private final Setting<Float> facePlaceHp = new Setting<>("FacePlaceHp", 5.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
     private final Setting<Bind> facePlaceButton = new Setting<>("FacePlaceButton", new Bind(GLFW.GLFW_KEY_LEFT_SHIFT, false, false), v -> page.getValue() == Pages.Damages);
 
     /*   SWITCH   */
-    public Setting<Boolean> autoGapple = new Setting<>("AutoGapple", true, v -> page.getValue() == Pages.Switch);
+    private final Setting<Boolean> autoGapple = new Setting<>("AutoGapple", true, v -> page.getValue() == Pages.Switch);
     private final Setting<Switch> autoSwitch = new Setting<>("Switch", Switch.NORMAL, v -> page.getValue() == Pages.Switch);
     private final Setting<Switch> antiWeakness = new Setting<>("AntiWeakness", Switch.SILENT, v -> page.getValue() == Pages.Switch);
 
     /*   RENDER   */
-    public Setting<Boolean> render = new Setting<>("Render", true, v -> page.getValue() == Pages.Render);
+    private final Setting<Boolean> render = new Setting<>("Render", true, v -> page.getValue() == Pages.Render);
     private final Setting<Render> renderMode = new Setting<>("RenderMode", Render.Fade, v -> page.getValue() == Pages.Render);
-    public Setting<Boolean> rselfDamage = new Setting<>("SelfDamage", true, v -> page.getValue() == Pages.Render);
-    public Setting<ColorSetting> fillColor = new Setting<>("Block Fill Color", new ColorSetting(HudEditor.getColor(0)), v -> page.getValue() == Pages.Render);
-    public Setting<ColorSetting> lineColor = new Setting<>("Block Line Color", new ColorSetting(HudEditor.getColor(0)), v -> page.getValue() == Pages.Render);
-    public Setting<Integer> lineWidth = new Setting<>("Block Line Width", 2, 1, 10, v -> page.getValue() == Pages.Render);
-    public Setting<Integer> slideDelay = new Setting<>("Slide Delay", 200, 1, 1000, v -> page.getValue() == Pages.Render);
-    public Setting<ColorSetting> textColor = new Setting<>("Text Color", new ColorSetting(Color.WHITE), v -> page.getValue() == Pages.Render);
+    private final Setting<Boolean> rselfDamage = new Setting<>("SelfDamage", true, v -> page.getValue() == Pages.Render);
+    private final Setting<ColorSetting> fillColor = new Setting<>("Block Fill Color", new ColorSetting(HudEditor.getColor(0)), v -> page.getValue() == Pages.Render);
+    private final Setting<ColorSetting> lineColor = new Setting<>("Block Line Color", new ColorSetting(HudEditor.getColor(0)), v -> page.getValue() == Pages.Render);
+    private final Setting<Integer> lineWidth = new Setting<>("Block Line Width", 2, 1, 10, v -> page.getValue() == Pages.Render);
+    private final Setting<Integer> slideDelay = new Setting<>("Slide Delay", 200, 1, 1000, v -> page.getValue() == Pages.Render);
+    private final Setting<ColorSetting> textColor = new Setting<>("Text Color", new ColorSetting(Color.WHITE), v -> page.getValue() == Pages.Render);
 
     private enum Pages {Place, Break, Pause, Render, Damages, Main, Switch}
 
@@ -157,17 +153,24 @@ public class AutoCrystal extends Module {
     // id кристаллa и кол-во ударов
     private final Map<Integer, Integer> attackedCrystals = new HashMap<>();
 
-
     private float renderDamage = 0;
     private float renderSelfDamage = 0;
 
-    private int prevCrystalsAmmount, crysSpeed, invTimer;
+    private int prevCrystalsAmount, crystalSpeed, invTimer;
 
     private boolean rotated, tickBusy;
 
     private BlockPos renderPos, prevRenderPos;
     private long renderMultiplier;
     private final Map<BlockPos, Long> renderPositions = new HashMap<>();
+
+    // Threads
+    private PlaceThread placeThread;
+    private BreakThread breakThread;
+
+    public AutoCrystal() {
+        super("AutoCrystal", Category.COMBAT);
+    }
 
     @Override
     public void onEnable() {
@@ -186,11 +189,24 @@ public class AutoCrystal extends Module {
         target = null;
         renderMultiplier = 0;
         renderPositions.clear();
+
+        placeThread = new PlaceThread();
+        breakThread = new BreakThread();
+
+        placeThread.start();
+        breakThread.start();
     }
 
     @Override
     public void onDisable() {
         target = null;
+
+        if (placeThread != null && !placeThread.isInterrupted()) {
+            placeThread.interrupt();
+        }
+        if (breakThread != null && !breakThread.isInterrupted()) {
+            breakThread.interrupt();
+        }
     }
 
     @EventHandler
@@ -198,7 +214,7 @@ public class AutoCrystal extends Module {
         switch (targetLogic.getValue()) {
             case HP -> target = Thunderhack.combatManager.getTargetByHP(targetRange.getValue());
             case Distance -> target = Thunderhack.combatManager.getNearestTarget(targetRange.getValue());
-            case FOV -> Thunderhack.combatManager.getTargetByFOV(targetRange.getValue());
+            case FOV -> target = Thunderhack.combatManager.getTargetByFOV(targetRange.getValue());
         }
 
         if (target != null && (target.isDead() || target.getHealth() < 0)) {
@@ -206,7 +222,7 @@ public class AutoCrystal extends Module {
             return;
         }
 
-        new Thread(this::calcPosition).start();
+        calcPosition();
 
         if (renderPositions.isEmpty()) attackedCrystals.clear();
 
@@ -217,8 +233,8 @@ public class AutoCrystal extends Module {
         }
 
         if (invTimer++ >= 20) {
-            crysSpeed = prevCrystalsAmmount - InventoryUtility.getItemCount(Items.END_CRYSTAL);
-            prevCrystalsAmmount = InventoryUtility.getItemCount(Items.END_CRYSTAL);
+            crystalSpeed = prevCrystalsAmount - InventoryUtility.getItemCount(Items.END_CRYSTAL);
+            prevCrystalsAmount = InventoryUtility.getItemCount(Items.END_CRYSTAL);
             invTimer = 0;
         }
 
@@ -241,6 +257,7 @@ public class AutoCrystal extends Module {
                     rotated = false;
                 } else rotated = true;
             } else rotated = true;
+
             double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
             mc.player.setYaw((float) (angle[0] - (angle[0] - ((IClientPlayerEntity) ((mc.player))).getLastYaw()) % gcdFix));
             mc.player.setPitch((float) (angle[1] - (angle[1] - ((IClientPlayerEntity) ((mc.player))).getLastPitch()) % gcdFix));
@@ -249,9 +266,9 @@ public class AutoCrystal extends Module {
 
     @Override
     public String getDisplayInfo() {
-        String info = crysSpeed + " c/s";
+        String info = crystalSpeed + " c/s";
         if (bestPosition != null)
-            info = crysSpeed + " c/s | " + bestPosition.getSide().toString().toUpperCase();
+            info = crystalSpeed + " c/s | " + bestPosition.getSide().toString().toUpperCase();
         return info;
     }
 
@@ -262,7 +279,7 @@ public class AutoCrystal extends Module {
             for (Entity crystal : Thunderhack.asyncManager.getAsyncEntities()) {
                 if (!(crystal instanceof EndCrystalEntity))
                     continue;
-                if (crystal == null || !crystal.isAlive() || crystal.squaredDistanceTo(sound.getX() + 0.5, sound.getY() + 0.5, sound.getZ() + 0.5) > 121)
+                if (!crystal.isAlive() || crystal.squaredDistanceTo(sound.getX() + 0.5, sound.getY() + 0.5, sound.getZ() + 0.5) > 121)
                     continue;
                 onDestroyPacket((EndCrystalEntity) crystal);
             }
@@ -292,7 +309,7 @@ public class AutoCrystal extends Module {
         }
     }
 
-    private void onDestroyPacket(EndCrystalEntity ent) {
+    private void onDestroyPacket(@NotNull EndCrystalEntity ent) {
         HashMap<Integer, Integer> cache = new HashMap<>(attackedCrystals);
         if (cache.containsKey(ent.getId())) {
             attackedCrystals.remove(ent.getId());
@@ -302,7 +319,7 @@ public class AutoCrystal extends Module {
         }
     }
 
-    private void onSpawnPacket(EntitySpawnS2CPacket spawn) {
+    private void onSpawnPacket(@NotNull EntitySpawnS2CPacket spawn) {
         if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
             if (!placedCrystals.isEmpty()) {
                 Map<BlockPos, Long> cachedList = new HashMap<>(placedCrystals);
@@ -321,7 +338,7 @@ public class AutoCrystal extends Module {
     }
 
     @EventHandler
-    public void onPacketSend(PacketEvent.Send e) {
+    public void onPacketSend(PacketEvent.@NotNull Send e) {
         if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket) switchTimer.reset();
     }
 
@@ -329,18 +346,6 @@ public class AutoCrystal extends Module {
     @EventHandler
     public void onPostSync(EventPostSync e) {
         tickBusy = false;
-        handleAutoCrystal();
-    }
-
-    public void handleAutoCrystal() {
-        if (bestPosition != null)
-            if (placeTimer.passedMs(placeDelay.getValue()) || placeDelay.getValue() == 0)
-                if (placeCrystal(bestPosition))
-                    placeTimer.reset();
-
-        if (bestCrystal != null)
-            if (breakTimer.passedMs(breakDelay.getValue()) || breakDelay.getValue() == 0)
-                attackCrystal(bestCrystal);
     }
 
     public void onRender3D(MatrixStack stack) {
@@ -373,7 +378,6 @@ public class AutoCrystal extends Module {
                 Render3DEngine.drawTextIn3D(dmg, interpolatedBox.getCenter(), 0, 0.1, 0, textColor.getValue().getColorObject());
             }
         }
-        if(timing.getValue() == Timing.NORMAL) handleAutoCrystal();
     }
 
     public boolean canDoAC() {
@@ -449,33 +453,38 @@ public class AutoCrystal extends Module {
         if (antiWeakness.getValue() != Switch.NONE) {
             if (weaknessEffect != null && (strengthEffect == null || strengthEffect.getAmplifier() < weaknessEffect.getAmplifier())) {
                 if (!(mc.player.getMainHandStack().getItem() instanceof SwordItem)) {
-                    prevSlot = mc.player.getInventory().selectedSlot;
-                    if (antiWeakness.getValue() != Switch.INVENTORY) {
-                        swordResult.switchIfFound();
-                    } else if (swordResultInv.found()) {
-                        prevSlot = swordResultInv.slot();
-                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                        mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                    }
+                    prevSlot = doAntiWeakness(swordResult, swordResultInv, antiWeakness);
                 }
             }
         }
 
-        mc.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket.attack(crystal, mc.player.isSneaking()));
-        mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+        sendPacket(PlayerInteractEntityC2SPacket.attack(crystal, mc.player.isSneaking()));
+        sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         tickBusy = true;
         breakTimer.reset();
 
         if (prevSlot != -1) {
             if (antiWeakness.getValue() == Switch.SILENT) {
                 mc.player.getInventory().selectedSlot = prevSlot;
-                mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
+                sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
             }
             if (antiWeakness.getValue() == Switch.INVENTORY) {
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
             }
         }
+    }
+
+    private int doAntiWeakness(SearchInvResult swordResult, SearchInvResult swordResultInv, @NotNull Setting<Switch> antiWeakness) {
+        int prevSlot = mc.player.getInventory().selectedSlot;
+        if (antiWeakness.getValue() != Switch.INVENTORY) {
+            swordResult.switchIfFound();
+        } else if (swordResultInv.found()) {
+            prevSlot = swordResultInv.slot();
+            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+            sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+        }
+        return prevSlot;
     }
 
     public boolean placeCrystal(BlockHitResult bhr) {
@@ -506,14 +515,7 @@ public class AutoCrystal extends Module {
 
         if (autoSwitch.getValue() != Switch.NONE) {
             if (mc.player.getMainHandStack().getItem() != Items.END_CRYSTAL && mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL) {
-                prevSlot = mc.player.getInventory().selectedSlot;
-                if (autoSwitch.getValue() != Switch.INVENTORY) {
-                    crystalResult.switchIfFound();
-                } else if (crystalResultInv.found()) {
-                    prevSlot = crystalResultInv.slot();
-                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                    mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                }
+                prevSlot = doAntiWeakness(crystalResult, crystalResultInv, autoSwitch);
             }
         }
 
@@ -522,7 +524,7 @@ public class AutoCrystal extends Module {
 
         boolean offhand = mc.player.getOffHandStack().getItem() instanceof EndCrystalItem;
 
-        mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
+        sendPacket(new PlayerInteractBlockC2SPacket(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
         mc.player.swingHand(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND);
 
         if (!bhr.getBlockPos().equals(renderPos)) {
@@ -537,12 +539,12 @@ public class AutoCrystal extends Module {
 
         if (autoSwitch.getValue() == Switch.SILENT && prevSlot != -1) {
             mc.player.getInventory().selectedSlot = prevSlot;
-            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
+            sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
         }
 
         if (autoSwitch.getValue() == Switch.INVENTORY && prevSlot != -1) {
             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-            mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+            sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
         }
         return true;
     }
@@ -606,21 +608,16 @@ public class AutoCrystal extends Module {
         for (Entity ent : Thunderhack.asyncManager.getAsyncEntities()) {
             if (!(ent instanceof EndCrystalEntity))
                 continue;
-
             if (squaredDistanceFromEyes(ent.getPos()) > explodeRange.getPow2Value())
                 continue;
-
             if (!InteractionUtility.canSee(ent) && squaredDistanceFromEyes(ent.getPos()) > explodeWallRange.getPow2Value())
                 continue;
-
             if (!ent.isAlive())
                 continue;
 
             float damage = ExplosionUtility.getExplosionDamage2(ent.getPos(), target);
             float selfDamage = ExplosionUtility.getSelfExplosionDamage(ent.getPos());
-
             boolean overrideDamage = false;
-
 
             if (overrideSelfDamage.getValue()) {
                 boolean canPop = target != null
@@ -774,7 +771,7 @@ public class AutoCrystal extends Module {
             if (ent.getBoundingBox().intersects(posBoundingBox)) {
                 if (ent instanceof ExperienceOrbEntity)
                     continue;
-                if (ent instanceof EndCrystalEntity){
+                if (ent instanceof EndCrystalEntity) {
                     continue;
                 }
                 return null;
@@ -907,7 +904,9 @@ public class AutoCrystal extends Module {
         }
     }
 
-    public float squaredDistanceFromEyes(Vec3d vec) {
+    public float squaredDistanceFromEyes(@NotNull Vec3d vec) {
+        if (mc.player == null) return 0;
+
         double d0 = vec.x - mc.player.getX();
         double d1 = vec.z - mc.player.getZ();
         double d2 = vec.y - (mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose()));
@@ -918,5 +917,28 @@ public class AutoCrystal extends Module {
     }
 
     private record CrystalData(EndCrystalEntity crystal, float damage, float selfDamage, boolean overrideDamage) {
+    }
+
+    private class PlaceThread extends Thread {
+        @Override
+        public synchronized void run() {
+            while (true) {
+                if (bestPosition != null)
+                    if (placeTimer.passedMs(placeDelay.getValue()) || placeDelay.getValue() == 0)
+                        if (placeCrystal(bestPosition))
+                            placeTimer.reset();
+            }
+        }
+    }
+
+    private class BreakThread extends Thread {
+        @Override
+        public synchronized void run() {
+            while (true) {
+                if (bestCrystal != null)
+                    if (breakTimer.passedMs(breakDelay.getValue()) || breakDelay.getValue() == 0)
+                        attackCrystal(bestCrystal);
+            }
+        }
     }
 }

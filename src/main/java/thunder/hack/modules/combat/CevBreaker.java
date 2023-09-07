@@ -25,6 +25,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
@@ -37,7 +38,6 @@ import thunder.hack.injection.accesors.IWorldRenderer;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.player.SpeedMine;
-import thunder.hack.modules.render.HoleESP;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -71,8 +71,14 @@ public class CevBreaker extends Module {
     private final Setting<BreakMode> breakMode = new Setting<>("Break Mode", BreakMode.Packet);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
 
+    private final Setting<InventoryUtility.SwitchMode> switchMode = new Setting<>("Switch Mode", InventoryUtility.SwitchMode.All);
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.All);
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
+
+    private final Setting<Parent> pause = new Setting<>("Pause", new Parent(false, 0));
+    private final Setting<Boolean> onEat = new Setting<>("Pause On Eat", false).withParent(pause);
+    private final Setting<Boolean> onMine = new Setting<>("Pause On Mine", false).withParent(pause);
+    private final Setting<Boolean> onAura = new Setting<>("Pause On Aura", false).withParent(pause);
 
     private final Setting<Parent> render = new Setting<>("Render", new Parent(false, 1));
 
@@ -126,7 +132,7 @@ public class CevBreaker extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        if (fullNullCheck()) return;
+        if (fullNullCheck() || shouldPause()) return;
 
         // Find target
         if (target == null || target.isDead()
@@ -267,6 +273,12 @@ public class CevBreaker extends Module {
         }
     }
 
+    private boolean shouldPause() {
+        return (onAura.getValue() && ModuleManager.aura.isEnabled())
+                || (onMine.getValue() && PlayerUtility.isMining())
+                || (onEat.getValue() && PlayerUtility.isEating());
+    }
+
     public void onRender3D(MatrixStack stack) {
         if (renderTrap.getValue()) {
             renderTrapPoses.forEach((pos, time) -> {
@@ -295,7 +307,7 @@ public class CevBreaker extends Module {
     }
 
     @EventHandler
-    private void onEntityRemove(EventEntityRemoved e) {
+    private void onEntityRemove(@NotNull EventEntityRemoved e) {
         if (e.entity == null) return;
         if (target == null) return;
         if (e.entity.getBlockPos().equals(target.getBlockPos().add(0, 3, 0))
@@ -343,6 +355,8 @@ public class CevBreaker extends Module {
 
     @EventHandler
     private void onPostSync(EventPostSync e) {
+        if (shouldPause()) return;
+
         // Normal breaking block
         if (mine && !mc.world.getBlockState(currentMineBlockPos).getBlock().equals(Blocks.AIR)) {
             if (breakMode.getValue() == BreakMode.Normal) {
@@ -415,7 +429,7 @@ public class CevBreaker extends Module {
         BlockHitResult pData = getPlaceData(pos);
 
         if (mc.player.getOffHandStack().getItem().equals(Items.END_CRYSTAL)) {
-            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, pData, PlayerUtility.getWorldActionId(mc.world)));
+            sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, pData, PlayerUtility.getWorldActionId(mc.world)));
 
             if (swing.getValue()) mc.player.swingHand(Hand.OFF_HAND);
             return;
@@ -429,34 +443,34 @@ public class CevBreaker extends Module {
         }
 
         // Place crystal
-        mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, pData, PlayerUtility.getWorldActionId(mc.world)));
+        sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, pData, PlayerUtility.getWorldActionId(mc.world)));
 
         if (preSlot != mc.player.getInventory().selectedSlot) {
-            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(preSlot));
+            sendPacket(new UpdateSelectedSlotC2SPacket(preSlot));
         }
 
     }
 
-    private @Nullable SearchInvResult getObby() {
+    private @Nullable SearchInvResult getObsidian() {
         SearchInvResult result = InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN);
 
         if (!result.isHolding() && !autoSwap.getValue())
             return null;
-
         if (!result.found()) {
             Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!", 5, Notification.Type.ERROR);
             disable(MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!");
             return null;
         }
+
         return result;
     }
 
     private boolean placeObsidian(BlockPos pos) {
         if (!canPlaceBlock) return false;
-        SearchInvResult result = getObby();
+        SearchInvResult result = getObsidian();
         if (result == null) return false;
         if (!result.found()) return false;
-        return InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), placeMode.getValue(), result, false, false);
+        return InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), placeMode.getValue(), result, false, switchMode.getValue(), false);
     }
 
     public BlockHitResult getPlaceData(BlockPos bp) {
