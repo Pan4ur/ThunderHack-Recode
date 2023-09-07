@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -15,7 +16,7 @@ public class VClipCommand extends Command {
     }
 
     @Override
-    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+    public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(arg("count", DoubleArgumentType.doubleArg()).executes(context -> {
             final double count = context.getArgument("count", Double.class);
 

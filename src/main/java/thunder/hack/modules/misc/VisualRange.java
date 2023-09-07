@@ -65,7 +65,7 @@ public class VisualRange extends Module {
         }
 
         if (Mode.getValue() == mode.Chat) {
-            Command.sendMessage(message);
+            sendMessage(message);
         }
         if (Mode.getValue() == mode.Notification) {
             Thunderhack.notificationManager.publicity("VisualRange",message, 2, Notification.Type.WARNING);

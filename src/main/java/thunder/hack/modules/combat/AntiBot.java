@@ -41,7 +41,7 @@ public class AntiBot extends Module {
                         double speed = (player.getX() - player.prevX) * (player.getX() - player.prevX) + (player.getZ() - player.prevZ) * (player.getZ() - player.prevZ);
                         if (player != mc.player && speed > 0.5 && MathUtility.getDistanceSq(player) <= Aura.attackRange.getPow2Value() && !bots.contains(player)) {
                             if (!bots.contains(player)) {
-                                Command.sendMessage(player.getName().getString() + " is a bot!");
+                                sendMessage(player.getName().getString() + " is a bot!");
                                 ++botsNumber;
                                 bots.add(player);
                             }
@@ -50,14 +50,14 @@ public class AntiBot extends Module {
                 } else {
                     if (!player.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + player.getName().getString()).getBytes(StandardCharsets.UTF_8))) && player instanceof OtherClientPlayerEntity) {
                         if (!bots.contains(player)) {
-                            Command.sendMessage(player.getName().getString() + " is a bot!");
+                            sendMessage(player.getName().getString() + " is a bot!");
                             ++botsNumber;
                             bots.add(player);
                         }
                     }
                     if (!player.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + player.getName().getString()).getBytes(StandardCharsets.UTF_8))) && player.isInvisible() && player instanceof OtherClientPlayerEntity) {
                         if (!bots.contains(player)) {
-                            Command.sendMessage(player.getName().getString() + " is a bot!");
+                            sendMessage(player.getName().getString() + " is a bot!");
                             ++botsNumber;
                             bots.add(player);
                         }
@@ -71,7 +71,7 @@ public class AntiBot extends Module {
                         double speed = (Aura.target.getX() - Aura.target.prevX) * (Aura.target.getX() - Aura.target.prevX) + (Aura.target.getZ() - Aura.target.prevZ) * (Aura.target.getZ() - Aura.target.prevZ);
                         if (speed > 0.5 && !bots.contains(Aura.target)) {
                             if (ticks >= checkticks.getValue()) {
-                                Command.sendMessage(Aura.target.getName().getString() + " is a bot!");
+                                sendMessage(Aura.target.getName().getString() + " is a bot!");
                                 ++botsNumber;
                                 bots.add((PlayerEntity) Aura.target);
                             }
@@ -79,12 +79,12 @@ public class AntiBot extends Module {
                         }
                     } else {
                         if (!Aura.target.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + Aura.target.getName().getString()).getBytes(StandardCharsets.UTF_8))) && Aura.target instanceof OtherClientPlayerEntity) {
-                            Command.sendMessage(Aura.target.getName().getString() + " is a bot!");
+                            sendMessage(Aura.target.getName().getString() + " is a bot!");
                             ++botsNumber;
                             bots.add((PlayerEntity) Aura.target);
                         }
                         if (!Aura.target.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + Aura.target.getName().getString()).getBytes(StandardCharsets.UTF_8))) && Aura.target.isInvisible() && Aura.target instanceof OtherClientPlayerEntity) {
-                            Command.sendMessage(Aura.target.getName().getString() + " is a bot!");
+                            sendMessage(Aura.target.getName().getString() + " is a bot!");
                             ++botsNumber;
                             bots.add((PlayerEntity) Aura.target);
                         }

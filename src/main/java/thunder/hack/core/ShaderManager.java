@@ -6,10 +6,10 @@ import ladysnake.satin.api.managed.ManagedShaderEffect;
 import ladysnake.satin.api.managed.ShaderEffectManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.gl.SimpleFramebuffer;
+import net.minecraft.client.gl.PostEffectProcessor;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL30C;
-import thunder.hack.cmd.Command;
 import thunder.hack.modules.render.Shaders;
 import thunder.hack.utility.interfaces.IShaderEffect;
 
@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import static thunder.hack.modules.Module.mc;
 
 public class ShaderManager {
-
     private final static LinkedList<RenderTask> tasks = new LinkedList<>();
     private ThunderHackFramebuffer shaderBuffer;
 
@@ -32,20 +31,19 @@ public class ShaderManager {
     public static ManagedShaderEffect SMOKE;
     public static ManagedShaderEffect GRADIENT;
 
-
-    public void renderShader(Runnable runnable, Shader mode){
+    public void renderShader(Runnable runnable, Shader mode) {
         tasks.add(new RenderTask(runnable, mode));
     }
 
-
-    public void renderShaders(){
-        if(DEFAULT == null) {
+    public void renderShaders() {
+        if (DEFAULT == null) {
             shaderBuffer = new ThunderHackFramebuffer(mc.getFramebuffer().textureWidth, mc.getFramebuffer().textureHeight);
             reloadShaders();
-        };
+        }
+
         while (!tasks.isEmpty()) {
             RenderTask task = tasks.pop();
-            applyShader(task.task(),task.shader);
+            applyShader(task.task(), task.shader);
         }
     }
 
@@ -62,7 +60,11 @@ public class ShaderManager {
         mcBuffer.beginWrite(false);
         ManagedShaderEffect shader = getShader(mode);
         Framebuffer mainBuffer = MinecraftClient.getInstance().getFramebuffer();
-        ((IShaderEffect) shader.getShaderEffect()).addFakeTargetHook("bufIn", shaderBuffer);
+        PostEffectProcessor effect = shader.getShaderEffect();
+        if (effect != null) {
+            ((IShaderEffect) effect).addFakeTargetHook("bufIn", shaderBuffer);
+        }
+
         Framebuffer outBuffer = shader.getShaderEffect().getSecondaryTarget("bufOut");
         setupShader(mode, shader);
         shaderBuffer.clear(false);
@@ -76,8 +78,8 @@ public class ShaderManager {
         RenderSystem.disableBlend();
     }
 
-    public ManagedShaderEffect getShader(Shader mode){
-        switch (mode){
+    public ManagedShaderEffect getShader(@NotNull Shader mode) {
+        switch (mode) {
             case Smoke -> {
                 return SMOKE;
             }
@@ -91,8 +93,8 @@ public class ShaderManager {
         return DEFAULT;
     }
 
-    public ManagedShaderEffect getShaderOutline(Shader mode){
-        switch (mode){
+    public ManagedShaderEffect getShaderOutline(@NotNull Shader mode) {
+        switch (mode) {
             case Smoke -> {
                 return SMOKE_OUTLINE;
             }
@@ -106,12 +108,12 @@ public class ShaderManager {
         return DEFAULT_OUTLINE;
     }
 
-    public void setupShader(Shader shader, ManagedShaderEffect effect){
+    public void setupShader(Shader shader, ManagedShaderEffect effect) {
         Shaders shaders = ModuleManager.shaders;
-        if(shader == Shader.Gradient){
+        if (shader == Shader.Gradient) {
             effect.setUniformValue("alpha0", shaders.glow.getValue() ? -1.0f : shaders.outlineColor.getValue().getAlpha() / 255.0f);
-            effect.setUniformValue("alpha1",shaders.fillAlpha.getValue() / 255f);
-            effect.setUniformValue("alpha2",shaders.alpha2.getValue() / 255f);
+            effect.setUniformValue("alpha1", shaders.fillAlpha.getValue() / 255f);
+            effect.setUniformValue("alpha2", shaders.alpha2.getValue() / 255f);
             effect.setUniformValue("lineWidth", shaders.lineWidth.getValue());
             effect.setUniformValue("oct", shaders.octaves.getValue());
             effect.setUniformValue("quality", shaders.quality.getValue());
@@ -121,54 +123,63 @@ public class ShaderManager {
             effect.setUniformValue("time", time);
             effect.render(mc.getTickDelta());
             time += 0.008f;
-        } else if(shader == Shader.Smoke){
+        } else if (shader == Shader.Smoke) {
             effect.setUniformValue("alpha0", shaders.glow.getValue() ? -1.0f : shaders.outlineColor.getValue().getAlpha() / 255.0f);
-            effect.setUniformValue("alpha1",shaders.fillAlpha.getValue() / 255f);
+            effect.setUniformValue("alpha1", shaders.fillAlpha.getValue() / 255f);
             effect.setUniformValue("lineWidth", shaders.lineWidth.getValue());
             effect.setUniformValue("quality", shaders.quality.getValue());
-            effect.setUniformValue("first", shaders.outlineColor.getValue().getRed() / 255f,shaders.outlineColor.getValue().getGreen() / 255f,shaders.outlineColor.getValue().getBlue() / 255f,shaders.outlineColor.getValue().getAlpha() / 255f);
-            effect.setUniformValue("second", shaders.outlineColor1.getValue().getRed() / 255f,shaders.outlineColor1.getValue().getGreen() / 255f,shaders.outlineColor1.getValue().getBlue() / 255f);
-            effect.setUniformValue("third", shaders.outlineColor2.getValue().getRed() / 255f,shaders.outlineColor2.getValue().getGreen() / 255f,shaders.outlineColor2.getValue().getBlue() / 255f);
-            effect.setUniformValue("ffirst", shaders.fillColor1.getValue().getRed() / 255f,shaders.fillColor1.getValue().getGreen() / 255f,shaders.fillColor1.getValue().getBlue() / 255f,shaders.fillColor1.getValue().getAlpha() / 255f);
-            effect.setUniformValue("fsecond", shaders.fillColor2.getValue().getRed() / 255f,shaders.fillColor2.getValue().getGreen() / 255f,shaders.fillColor2.getValue().getBlue() / 255f);
-            effect.setUniformValue("fthird", shaders.fillColor3.getValue().getRed() / 255f,shaders.fillColor3.getValue().getGreen() / 255f,shaders.fillColor3.getValue().getBlue() / 255f);
+            effect.setUniformValue("first", shaders.outlineColor.getValue().getRed() / 255f, shaders.outlineColor.getValue().getGreen() / 255f, shaders.outlineColor.getValue().getBlue() / 255f, shaders.outlineColor.getValue().getAlpha() / 255f);
+            effect.setUniformValue("second", shaders.outlineColor1.getValue().getRed() / 255f, shaders.outlineColor1.getValue().getGreen() / 255f, shaders.outlineColor1.getValue().getBlue() / 255f);
+            effect.setUniformValue("third", shaders.outlineColor2.getValue().getRed() / 255f, shaders.outlineColor2.getValue().getGreen() / 255f, shaders.outlineColor2.getValue().getBlue() / 255f);
+            effect.setUniformValue("ffirst", shaders.fillColor1.getValue().getRed() / 255f, shaders.fillColor1.getValue().getGreen() / 255f, shaders.fillColor1.getValue().getBlue() / 255f, shaders.fillColor1.getValue().getAlpha() / 255f);
+            effect.setUniformValue("fsecond", shaders.fillColor2.getValue().getRed() / 255f, shaders.fillColor2.getValue().getGreen() / 255f, shaders.fillColor2.getValue().getBlue() / 255f);
+            effect.setUniformValue("fthird", shaders.fillColor3.getValue().getRed() / 255f, shaders.fillColor3.getValue().getGreen() / 255f, shaders.fillColor3.getValue().getBlue() / 255f);
             effect.setUniformValue("oct", shaders.octaves.getValue());
             effect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
             effect.setUniformValue("time", time);
             effect.render(mc.getTickDelta());
             time += 0.008f;
-        } else if(shader == Shader.Default){
+        } else if (shader == Shader.Default) {
             effect.setUniformValue("alpha0", shaders.glow.getValue() ? -1.0f : shaders.outlineColor.getValue().getAlpha() / 255.0f);
             effect.setUniformValue("lineWidth", shaders.lineWidth.getValue());
             effect.setUniformValue("quality", shaders.quality.getValue());
-            effect.setUniformValue("color", shaders.fillColor1.getValue().getRed() / 255f,shaders.fillColor1.getValue().getGreen() / 255f,shaders.fillColor1.getValue().getBlue() / 255f,shaders.fillColor1.getValue().getAlpha() / 255f);
-            effect.setUniformValue("outlinecolor", shaders.outlineColor.getValue().getRed() / 255f,shaders.outlineColor.getValue().getGreen() / 255f,shaders.outlineColor.getValue().getBlue() / 255f,shaders.outlineColor.getValue().getAlpha() / 255f);
+            effect.setUniformValue("color", shaders.fillColor1.getValue().getRed() / 255f, shaders.fillColor1.getValue().getGreen() / 255f, shaders.fillColor1.getValue().getBlue() / 255f, shaders.fillColor1.getValue().getAlpha() / 255f);
+            effect.setUniformValue("outlinecolor", shaders.outlineColor.getValue().getRed() / 255f, shaders.outlineColor.getValue().getGreen() / 255f, shaders.outlineColor.getValue().getBlue() / 255f, shaders.outlineColor.getValue().getAlpha() / 255f);
             effect.render(mc.getTickDelta());
         }
     }
 
-    public void reloadShaders(){
+    public void reloadShaders() {
         DEFAULT = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/outline.json"));
         SMOKE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/smoke.json"));
         GRADIENT = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/gradient.json"));
 
         DEFAULT_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/outline.json"), managedShaderEffect -> {
-            ((IShaderEffect) managedShaderEffect.getShaderEffect()).addFakeTargetHook("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
-            ((IShaderEffect) managedShaderEffect.getShaderEffect()).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
+            PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
+            if (effect == null) return;
+
+            ((IShaderEffect) effect).addFakeTargetHook("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
+            ((IShaderEffect) effect).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
         });
 
         SMOKE_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/smoke.json"), managedShaderEffect -> {
-            ((IShaderEffect) managedShaderEffect.getShaderEffect()).addFakeTargetHook("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
-            ((IShaderEffect) managedShaderEffect.getShaderEffect()).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
+            PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
+            if (effect == null) return;
+
+            ((IShaderEffect) effect).addFakeTargetHook("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
+            ((IShaderEffect) effect).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
         });
 
         GRADIENT_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/gradient.json"), managedShaderEffect -> {
-            ((IShaderEffect) managedShaderEffect.getShaderEffect()).addFakeTargetHook("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
-            ((IShaderEffect) managedShaderEffect.getShaderEffect()).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
+            PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
+            if (effect == null) return;
+
+            ((IShaderEffect) effect).addFakeTargetHook("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
+            ((IShaderEffect) effect).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
         });
     }
 
-    public class ThunderHackFramebuffer extends Framebuffer {
+    public static class ThunderHackFramebuffer extends Framebuffer {
         public ThunderHackFramebuffer(int width, int height) {
             super(false);
             RenderSystem.assertOnRenderThreadOrInit();
@@ -177,19 +188,22 @@ public class ShaderManager {
         }
     }
 
-    public boolean fullNullCheck(){
-        if(GRADIENT == null || SMOKE == null || DEFAULT == null){
+    public boolean fullNullCheck() {
+        if (GRADIENT == null || SMOKE == null || DEFAULT == null) {
             shaderBuffer = new ThunderHackFramebuffer(mc.getFramebuffer().textureWidth, mc.getFramebuffer().textureHeight);
             reloadShaders();
             return true;
-        };
-        return  false;
+        }
+
+        return false;
     }
 
-    public record RenderTask(Runnable task, Shader shader){
+    public record RenderTask(Runnable task, Shader shader) {
     }
 
-    public enum Shader{
-        Default, Smoke, Gradient
+    public enum Shader {
+        Default,
+        Smoke,
+        Gradient
     }
 }

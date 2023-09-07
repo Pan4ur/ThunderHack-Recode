@@ -3,6 +3,7 @@ package thunder.hack.cmd.impl;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Util;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 
 import java.io.File;
@@ -15,7 +16,7 @@ public class OpenFolderCommand extends Command {
     }
 
     @Override
-    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+    public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
             Util.getOperatingSystem().open(new File("ThunderHackRecode/configs/"));
             return SINGLE_SUCCESS;

@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 
@@ -15,7 +16,7 @@ public class GpsCommand extends Command {
     }
 
     @Override
-    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+    public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("off").executes(context -> {
             Thunderhack.gps_position = null;
             return SINGLE_SUCCESS;

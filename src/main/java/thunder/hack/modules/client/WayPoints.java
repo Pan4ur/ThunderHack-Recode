@@ -14,35 +14,34 @@ import thunder.hack.modules.Module;
 import thunder.hack.utility.render.Render3DEngine;
 
 public class WayPoints extends Module {
+    private final Identifier icon = new Identifier("textures/waypoint.png");
 
     public WayPoints() {
         super("WayPoints", Category.CLIENT);
     }
 
-    private Identifier icon = new Identifier("textures/waypoint.png");
-
     @Override
-    public void onEnable(){
-        Command.sendMessage(Thunderhack.commandManager.getPrefix() + "waypoint add x y z name");
+    public void onEnable() {
+        sendMessage(Thunderhack.commandManager.getPrefix() + "waypoint add x y z name");
     }
 
 
-    public void onRender2D(DrawContext context){
-        if(!Thunderhack.wayPointManager.getWayPoints().isEmpty()){
-            for(WayPointManager.WayPoint wp : Thunderhack.wayPointManager.getWayPoints()){
-                if(wp.name() == null ) continue;
-                if(mc.isInSingleplayer()) continue;
-                if(!mc.getNetworkHandler().getServerInfo().address.contains(wp.server())) continue;
+    public void onRender2D(DrawContext context) {
+        if (!Thunderhack.wayPointManager.getWayPoints().isEmpty()) {
+            for (WayPointManager.WayPoint wp : Thunderhack.wayPointManager.getWayPoints()) {
+                if (wp.name() == null) continue;
+                if (mc.isInSingleplayer()) continue;
+                if (!mc.getNetworkHandler().getServerInfo().address.contains(wp.server())) continue;
 
                 double difX = wp.x() - mc.player.getPos().x;
                 double difZ = wp.z() - mc.player.getPos().z;
                 float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);
                 double plYaw = MathHelper.wrapDegrees(mc.player.getYaw());
-                if(Math.abs(yaw - plYaw) > 90) continue;
+                if (Math.abs(yaw - plYaw) > 90) continue;
 
-                Vec3d vector = new Vec3d(wp.x(),wp.y(),wp.z());
+                Vec3d vector = new Vec3d(wp.x(), wp.y(), wp.z());
                 Vector4d position = null;
-                vector = Render3DEngine.worldSpaceToScreenSpace( new Vec3d(vector.x, vector.y, vector.z));
+                vector = Render3DEngine.worldSpaceToScreenSpace(new Vec3d(vector.x, vector.y, vector.z));
                 if (vector != null) {
                     position = new Vector4d(vector.x, vector.y, vector.z, 0);
                     position.x = Math.min(vector.x, position.x);
@@ -61,12 +60,12 @@ public class WayPoints extends Module {
                     String coords = wp.x() + " " + wp.z();
                     float tagX2 = (float) ((posX + diff - FontRenderers.sf_bold_mini.getStringWidth(coords) / 2) * 1);
 
-                    String distance = String.format("%.0f",Math.sqrt(mc.player.squaredDistanceTo(wp.x(),wp.y(),wp.z()))) + "m";
+                    String distance = String.format("%.0f", Math.sqrt(mc.player.squaredDistanceTo(wp.x(), wp.y(), wp.z()))) + "m";
                     float tagX3 = (float) ((posX + diff - FontRenderers.sf_bold_mini.getStringWidth(distance) / 2) * 1);
 
                     context.getMatrices().push();
-                    context.getMatrices().translate( posX - 10, (posY - 35),0);
-                    context.drawTexture(icon, 0, 0, 20, 20,0,0,20,20,20,20);
+                    context.getMatrices().translate(posX - 10, (posY - 35), 0);
+                    context.drawTexture(icon, 0, 0, 20, 20, 0, 0, 20, 20, 20, 20);
                     context.getMatrices().pop();
 
                     FontRenderers.sf_bold_mini.drawString(context.getMatrices(), wp.name(), tagX, (float) posY - 10, -1);

@@ -1,13 +1,11 @@
 package thunder.hack.modules.misc;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.notification.Notification;
-import thunder.hack.notification.NotificationManager;
 import thunder.hack.setting.Setting;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.util.Formatting;
@@ -21,7 +19,7 @@ public class AutoAuth extends Module {
 
     private String password;
     private final Setting<Mode> passwordMode = new Setting<>("Password Mode", Mode.Custom);
-    public Setting < String > cpass = new Setting <> ( "Password" , "babidjon777" ,v-> passwordMode.getValue() == Mode.Custom);
+    public Setting<String> cpass = new Setting<>("Password", "babidjon777", v -> passwordMode.getValue() == Mode.Custom);
     public Setting<Boolean> showPasswordInChat = new Setting<>("Show Pass In Chat", true);
 
     private enum Mode {
@@ -29,21 +27,21 @@ public class AutoAuth extends Module {
     }
 
     @Override
-    public void onEnable(){
-        Command.sendMessage(Formatting.RED + "Внимание!!! " + Formatting.RESET + "Пароль сохраняется в конфиге, перед передачей конфига " + Formatting.RED +  " ВЫКЛЮЧИ МОДУЛЬ!");
-        Command.sendMessage(Formatting.RED + "Внимание!!! " + Formatting.RESET + "Пароль сохраняется в конфиге, перед передачей конфига " + Formatting.RED +  " ВЫКЛЮЧИ МОДУЛЬ!");
-        Command.sendMessage(Formatting.RED + "Внимание!!! " + Formatting.RESET + "Пароль сохраняется в конфиге, перед передачей конфига " + Formatting.RED +  " ВЫКЛЮЧИ МОДУЛЬ!");
+    public void onEnable() {
+        sendMessage(Formatting.RED + "Внимание!!! " + Formatting.RESET + "Пароль сохраняется в конфиге, перед передачей конфига " + Formatting.RED + " ВЫКЛЮЧИ МОДУЛЬ!");
+        sendMessage(Formatting.RED + "Внимание!!! " + Formatting.RESET + "Пароль сохраняется в конфиге, перед передачей конфига " + Formatting.RED + " ВЫКЛЮЧИ МОДУЛЬ!");
+        sendMessage(Formatting.RED + "Внимание!!! " + Formatting.RESET + "Пароль сохраняется в конфиге, перед передачей конфига " + Formatting.RED + " ВЫКЛЮЧИ МОДУЛЬ!");
     }
 
     @Override
-    public void onDisable(){
-        Command.sendMessage(Formatting.RED +  "AutoAuth " + Formatting.RESET + "reseting password...");
+    public void onDisable() {
+        sendMessage("Resetting password...");
         cpass.setValue("none");
     }
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.Receive event) {
-        if(event.getPacket() instanceof GameMessageS2CPacket) {
+    public void onPacketReceive(PacketEvent.@NotNull Receive event) {
+        if (event.getPacket() instanceof GameMessageS2CPacket) {
             GameMessageS2CPacket pac = event.getPacket();
             if (passwordMode.getValue() == Mode.Custom) {
                 this.password = cpass.getValue();
@@ -59,11 +57,11 @@ public class AutoAuth extends Module {
             if (pac.content().getString().contains("/reg") || pac.content().getString().contains("/register") || pac.content().getString().contains("Зарегистрируйтесь")) {
                 mc.getNetworkHandler().sendChatCommand("reg " + this.password + " " + this.password);
                 if (this.showPasswordInChat.getValue())
-                    Command.sendMessage("Твой пароль: " + Formatting.RED + this.password);
-                Thunderhack.notificationManager.publicity("AutoAuth","Выполнена регистрация!", 4, Notification.Type.SUCCESS);
+                    sendMessage("Твой пароль: " + Formatting.RED + this.password);
+                Thunderhack.notificationManager.publicity("AutoAuth", "Выполнена регистрация!", 4, Notification.Type.SUCCESS);
             } else if (pac.content().getString().contains("Авторизуйтесь") || pac.content().getString().contains("/l")) {
                 mc.getNetworkHandler().sendChatCommand("login " + this.password);
-                Thunderhack.notificationManager.publicity("AutoAuth","Выполнен вход!", 4, Notification.Type.SUCCESS);
+                Thunderhack.notificationManager.publicity("AutoAuth", "Выполнен вход!", 4, Notification.Type.SUCCESS);
             }
         }
     }

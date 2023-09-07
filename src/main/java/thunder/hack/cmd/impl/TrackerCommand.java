@@ -2,6 +2,7 @@ package thunder.hack.cmd.impl;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.misc.Tracker;
@@ -14,10 +15,10 @@ public class TrackerCommand extends Command {
     }
 
     @Override
-    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+    public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            if(ModuleManager.tracker.isEnabled()){
-                Tracker.sendTrack();
+            if (ModuleManager.tracker.isEnabled()) {
+                ModuleManager.tracker.sendTrack();
             }
 
             return SINGLE_SUCCESS;

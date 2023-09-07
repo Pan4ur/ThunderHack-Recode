@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 
 import java.io.BufferedWriter;
@@ -33,7 +34,7 @@ public class KitCommand extends Command {
     }
 
     @Override
-    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+    public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("list").executes(context -> {
             listMessage();
 
@@ -62,11 +63,11 @@ public class KitCommand extends Command {
         });
     }
 
-    private static void errorMessage(String e) {
+    private void errorMessage(String e) {
         sendMessage("Error: " + ERROR_MESSAGES.get(e));
     }
 
-    public static String getCurrentSet() {
+    public String getCurrentSet() {
         JsonObject completeJson;
         try {
             completeJson = new JsonParser().parse(new FileReader(PATH_TO_SAVE)).getAsJsonObject();
@@ -74,12 +75,12 @@ public class KitCommand extends Command {
                 return completeJson.get("pointer").getAsString();
 
 
-        } catch (IOException e) {}
+        } catch (IOException ignored) {}
         errorMessage("NoEx");
         return "";
     }
 
-    public static String getInventoryKit(String kit) {
+    public String getInventoryKit(String kit) {
         JsonObject completeJson;
 
         try {
@@ -88,15 +89,15 @@ public class KitCommand extends Command {
             return completeJson.get(kit).getAsString();
 
 
-        } catch (IOException e) {
-            // Case not found, reset
+        } catch (IOException ignored) {
         }
+
         errorMessage("NoEx");
         return "";
     }
 
     private void listMessage() {
-        JsonObject completeJson = new JsonObject();
+        JsonObject completeJson;
         try {
             completeJson = new JsonParser().parse(new FileReader(PATH_TO_SAVE)).getAsJsonObject();
             int lenghtJson = completeJson.entrySet().size();
@@ -111,7 +112,7 @@ public class KitCommand extends Command {
     }
 
     private void delete(String name) {
-        JsonObject completeJson = new JsonObject();
+        JsonObject completeJson;
         try {
             completeJson = new JsonParser().parse(new FileReader(PATH_TO_SAVE)).getAsJsonObject();
             if (completeJson.get(name) != null && !name.equals("pointer")) {
@@ -163,12 +164,12 @@ public class KitCommand extends Command {
         saveFile(completeJson, name, "saved");
     }
 
-    private void saveFile(JsonObject completeJson, String name, String operation) {
+    private void saveFile(@NotNull JsonObject completeJson, String name, String operation) {
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(PATH_TO_SAVE));
             bw.write(completeJson.toString());
             bw.close();
-            thunder.hack.cmd.Command.sendMessage("Kit " + name + " " + operation);
+            sendMessage("Kit " + name + " " + operation);
         } catch (IOException e) {
             errorMessage("Saving");
         }

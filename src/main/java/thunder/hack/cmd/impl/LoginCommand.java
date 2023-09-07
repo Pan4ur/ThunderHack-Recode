@@ -10,6 +10,7 @@ import net.minecraft.client.util.ProfileKeys;
 import net.minecraft.client.util.Session;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Uuids;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 import thunder.hack.injection.accesors.IMinecraftClient;
 
@@ -23,7 +24,7 @@ public class LoginCommand extends Command {
     }
 
     @Override
-    public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
+    public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(arg("name", StringArgumentType.word()).executes(context -> {
             login(context.getArgument("name", String.class));
             sendMessage("Аккаунт изменен на: " + MC.getSession().getUsername());

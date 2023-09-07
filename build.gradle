@@ -45,16 +45,9 @@ repositories {
 configurations {
 	libImpl
 	modImpl
-
-	backend {
-		canBeConsumed false
-		canBeResolved true
-	}
 }
 
 dependencies {
-	backend(project(":renderer"))
-
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
@@ -74,7 +67,6 @@ dependencies {
 }
 
 processResources {
-	from(configurations.backend)
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {

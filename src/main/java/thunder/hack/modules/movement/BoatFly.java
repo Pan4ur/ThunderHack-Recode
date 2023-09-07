@@ -14,6 +14,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventPlayerTravel;
@@ -104,8 +105,8 @@ public class BoatFly extends Module {
         for (int i = 0; i < 255; ++i) {
             if (mc.world.getBlockState(blockPos).getBlock() == Blocks.WATER) {
                 entity.setPosition(entity.getX(), blockPos.getY() + 1, entity.getZ());
-                if (debug.getValue()) 
-                    Command.sendMessage("GroundY" + entity.getPos().getY());
+                if (debug.getValue())
+                    sendMessage("GroundY" + entity.getPos().getY());
 
                 Method2875(new VehicleMoveC2SPacket(entity));
                 entity.setPosition(entity.getX(), entity.getY(), entity.getZ());
@@ -124,7 +125,7 @@ public class BoatFly extends Module {
     }
 
     @EventHandler
-    public void onPlayerTravel(EventPlayerTravel ev) {
+    public void onPlayerTravel(@NotNull EventPlayerTravel ev) {
         if (!ev.isPre()) return;
         if (mc.player == null || mc.world == null) {
             return;
@@ -160,12 +161,12 @@ public class BoatFly extends Module {
         }
         Entity entity = mc.player.getControllingVehicle();
         if (debug.getValue()) {
-            Command.sendMessage("Y" + entity.getY());
-            Command.sendMessage("Fall" + entity.fallDistance);
+            sendMessage("Y" + entity.getY());
+            sendMessage("Fall" + entity.fallDistance);
         }
         if ((!mc.world.isChunkLoaded((int) entity.getPos().getX() >> 4, (int) entity.getPos().getZ() >> 4) || entity.getPos().getY() < 0) && stopunloaded.getValue()) {
             if (debug.getValue())
-                Command.sendMessage("Detected unloaded chunk!");
+                sendMessage("Detected unloaded chunk!");
             Field2267 = true;
             return;
         }

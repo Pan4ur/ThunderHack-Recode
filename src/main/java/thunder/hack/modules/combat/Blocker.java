@@ -49,6 +49,7 @@ public class Blocker extends Module {
     private final Setting<Boolean> expand = new Setting<>("Expand", true).withParent(logic);
 
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
+    private final Setting<InventoryUtility.SwitchMode> switchMode = new Setting<>("Switch Mode", InventoryUtility.SwitchMode.All);
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.All);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
@@ -103,10 +104,7 @@ public class Blocker extends Module {
 
         while (blocksPlaced < actionShift.getValue()) {
             BlockPos pos = placePositions.stream()
-                    .filter(p -> {
-                        boolean canPlace = InteractionUtility.canPlaceBlock(p, interactMode.getValue(),false);
-                        return canPlace;
-                    })
+                    .filter(p -> InteractionUtility.canPlaceBlock(p, interactMode.getValue(), false))
                     .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5))))
                     .orElse(null);
 
@@ -120,13 +118,12 @@ public class Blocker extends Module {
                         }
                     }
 
-                if (InteractionUtility.placeBlock(pos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), searchResult, true,false)) {
+                if (InteractionUtility.placeBlock(pos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), searchResult, true, switchMode.getValue(), false)) {
                     if (swing.getValue())
                         mc.player.swingHand(Hand.MAIN_HAND);
 
                     blocksPlaced++;
                     renderBlocks.put(pos, System.currentTimeMillis());
-                    // InteractionUtility.ghostBlocks.put(pos, System.currentTimeMillis());
                     tickCounter = 0;
                     placePositions.remove(pos);
                     inactivityTimer.reset();
@@ -159,7 +156,7 @@ public class Blocker extends Module {
 
                 if (expand.getValue()) {
                     for (Vec3i vec : HoleUtility.VECTOR_PATTERN) {
-                        if (InteractionUtility.canPlaceBlock(pos.add(vec), interactMode.getValue(),false)) {
+                        if (InteractionUtility.canPlaceBlock(pos.add(vec), interactMode.getValue(), false)) {
                             placePositions.add(pos.add(vec));
                         }
                     }

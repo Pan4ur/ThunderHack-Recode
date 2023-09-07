@@ -216,45 +216,45 @@ public class AnchorAura2 extends Module {
     private final class ChargeThread extends Thread {
         @Override
         public void run() {
-            try {
-                sleep(chargeTimeout.getValue());
-            } catch (InterruptedException ignored) {
-            }
-
-            if (target == null || targetPos == null || fullNullCheck()) return;
-            if (!isCorrectPos(targetPos) || shouldPause()) return;
-
-            SearchInvResult glowResult = InventoryUtility.getGlowStone();
-            if (glowStoneDisable.getValue() && !glowResult.found()) {
-                disable(isRu() ? "В хотбаре не найден светящийся камень! Выключение..." : "No glowstone in hotbar! Disabling...");
-            }
-
-            // Charging
-            int preSlot = mc.player.getInventory().selectedSlot;
-            glowResult.switchTo(switchMode.getValue());
-            InteractionUtility.BreakData data = InteractionUtility.getBreakData(targetPos, interactMode.getValue());
-
-            if (data != null && data.vector() != null) {
-                if (chargeRotate.getValue()) {
-                    final float[] angles = InteractionUtility.calculateAngle(targetPos.toCenterPos());
-                    sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angles[0], angles[1], mc.player.isOnGround()));
+            while (true) {
+                try {
+                    sleep(chargeTimeout.getValue());
+                } catch (InterruptedException ignored) {
                 }
 
-                BlockHitResult result = new BlockHitResult(data.vector(), data.dir(), targetPos, false);
-                if (chargeMode.getValue() == InteractMode.Packet && chargeMode.getValue() == InteractMode.Both) {
-                    sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-                    sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
-                } else if (chargeMode.getValue() == InteractMode.Vanilla && chargeMode.getValue() == InteractMode.Both) {
-                    mc.player.setSneaking(false);
-                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
+                if (target == null || targetPos == null || fullNullCheck()) return;
+                if (!isCorrectPos(targetPos) || shouldPause()) return;
+
+                SearchInvResult glowResult = InventoryUtility.getGlowStone();
+                if (glowStoneDisable.getValue() && !glowResult.found()) {
+                    disable(isRu() ? "В хотбаре не найден светящийся камень! Выключение..." : "No glowstone in hotbar! Disabling...");
                 }
-                if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
+
+                // Charging
+                int preSlot = mc.player.getInventory().selectedSlot;
+                glowResult.switchTo(switchMode.getValue());
+                InteractionUtility.BreakData data = InteractionUtility.getBreakData(targetPos, interactMode.getValue());
+
+                if (data != null && data.vector() != null) {
+                    if (chargeRotate.getValue()) {
+                        final float[] angles = InteractionUtility.calculateAngle(targetPos.toCenterPos());
+                        sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angles[0], angles[1], mc.player.isOnGround()));
+                    }
+
+                    BlockHitResult result = new BlockHitResult(data.vector(), data.dir(), targetPos, false);
+                    if (chargeMode.getValue() == InteractMode.Packet && chargeMode.getValue() == InteractMode.Both) {
+                        sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
+                        sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
+                    } else if (chargeMode.getValue() == InteractMode.Vanilla && chargeMode.getValue() == InteractMode.Both) {
+                        mc.player.setSneaking(false);
+                        mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
+                    }
+                    if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
+                }
+
+                if (switchBack.getValue())
+                    InventoryUtility.switchTo(preSlot, switchMode.getValue());
             }
-
-            if (switchBack.getValue())
-                InventoryUtility.switchTo(preSlot, switchMode.getValue());
-
-            super.run();
         }
 
         private synchronized boolean isCorrectPos(@NotNull BlockPos pos) {
@@ -271,42 +271,42 @@ public class AnchorAura2 extends Module {
     private final class ExplodeThread extends Thread {
         @Override
         public void run() {
-            try {
-                sleep(explodeTimeout.getValue());
-            } catch (InterruptedException ignored) {
-            }
-
-            if (target == null || targetPos == null || fullNullCheck()) return;
-            if (!isCorrectPos(targetPos) || shouldPause()) return;
-            if (antiSelfPop.getValue() && mc.player.getHealth() - ExplosionUtility.getAnchorExplosionDamage(targetPos, mc.player) <= 0)
-                return;
-
-            int preSlot = mc.player.getInventory().selectedSlot;
-            if (mc.player.getMainHandStack().getItem().equals(Items.GLOWSTONE)) {
-                SearchInvResult result = InventoryUtility.findInHotBar(stack -> !stack.getItem().equals(Items.GLOWSTONE));
-                result.switchTo(switchMode.getValue());
-            }
-
-            InteractionUtility.BreakData data = InteractionUtility.getBreakData(targetPos, interactMode.getValue());
-            if (data != null && data.vector() != null) {
-                if (explodeRotate.getValue()) {
-                    final float[] angles = InteractionUtility.calculateAngle(targetPos.toCenterPos());
-                    sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angles[0], angles[1], mc.player.isOnGround()));
+            while (true) {
+                try {
+                    sleep(explodeTimeout.getValue());
+                } catch (InterruptedException ignored) {
                 }
 
-                BlockHitResult result = new BlockHitResult(data.vector(), data.dir(), targetPos, false);
-                if (explodeMode.getValue() == InteractMode.Packet && explodeMode.getValue() == InteractMode.Both) {
-                    sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
-                } else if (explodeMode.getValue() == InteractMode.Vanilla && explodeMode.getValue() == InteractMode.Both) {
-                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
+                if (target == null || targetPos == null || fullNullCheck()) return;
+                if (!isCorrectPos(targetPos) || shouldPause()) return;
+                if (antiSelfPop.getValue() && mc.player.getHealth() - ExplosionUtility.getAnchorExplosionDamage(targetPos, mc.player) <= 0)
+                    return;
+
+                int preSlot = mc.player.getInventory().selectedSlot;
+                if (mc.player.getMainHandStack().getItem().equals(Items.GLOWSTONE)) {
+                    SearchInvResult result = InventoryUtility.findInHotBar(stack -> !stack.getItem().equals(Items.GLOWSTONE));
+                    result.switchTo(switchMode.getValue());
                 }
-                if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
+
+                InteractionUtility.BreakData data = InteractionUtility.getBreakData(targetPos, interactMode.getValue());
+                if (data != null && data.vector() != null) {
+                    if (explodeRotate.getValue()) {
+                        final float[] angles = InteractionUtility.calculateAngle(targetPos.toCenterPos());
+                        sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angles[0], angles[1], mc.player.isOnGround()));
+                    }
+
+                    BlockHitResult result = new BlockHitResult(data.vector(), data.dir(), targetPos, false);
+                    if (explodeMode.getValue() == InteractMode.Packet && explodeMode.getValue() == InteractMode.Both) {
+                        sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
+                    } else if (explodeMode.getValue() == InteractMode.Vanilla && explodeMode.getValue() == InteractMode.Both) {
+                        mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
+                    }
+                    if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
+                }
+
+                if (switchBack.getValue())
+                    InventoryUtility.switchTo(preSlot, switchMode.getValue());
             }
-
-            if (switchBack.getValue())
-                InventoryUtility.switchTo(preSlot, switchMode.getValue());
-
-            super.run();
         }
 
         private synchronized boolean isCorrectPos(@NotNull BlockPos pos) {

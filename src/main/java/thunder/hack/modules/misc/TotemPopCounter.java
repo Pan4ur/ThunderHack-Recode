@@ -27,29 +27,30 @@ public class TotemPopCounter extends Module {
     public void onTotemPop(TotemPopEvent event) {
         if (event.getEntity() == mc.player) return;
         String s;
-        if(MainSettings.language.getValue() == MainSettings.Language.RU){
-            s =  Formatting.GREEN + event.getEntity().getName().getString() + Formatting.WHITE + " попнул " + Formatting.AQUA + (event.getPops() > 1 ? event.getPops() + "" + Formatting.WHITE + " тотемов!" :  Formatting.WHITE + "тотем!");
+        if (MainSettings.language.getValue() == MainSettings.Language.RU) {
+            s = Formatting.GREEN + event.getEntity().getName().getString() + Formatting.WHITE + " попнул " + Formatting.AQUA + (event.getPops() > 1 ? event.getPops() + "" + Formatting.WHITE + " тотемов!" : Formatting.WHITE + "тотем!");
         } else {
-            s =  Formatting.GREEN + event.getEntity().getName().getString() + Formatting.WHITE + " popped " + Formatting.AQUA + (event.getPops() > 1 ? event.getPops() + "" + Formatting.WHITE + " totems!" :  Formatting.WHITE + "totem!");
+            s = Formatting.GREEN + event.getEntity().getName().getString() + Formatting.WHITE + " popped " + Formatting.AQUA + (event.getPops() > 1 ? event.getPops() + "" + Formatting.WHITE + " totems!" : Formatting.WHITE + "totem!");
         }
-        Command.sendMessage(s);
-        if(notification.getValue())
-            Thunderhack.notificationManager.publicity("TotemPopCounter", s,2, Notification.Type.INFO);
+        sendMessage(s);
+        if (notification.getValue())
+            Thunderhack.notificationManager.publicity("TotemPopCounter", s, 2, Notification.Type.INFO);
     }
 
     @Override
     public void onUpdate() {
         for (PlayerEntity player : mc.world.getPlayers()) {
-            if (player == mc.player || AntiBot.bots.contains(player) || player.getHealth() > 0 || !Thunderhack.combatManager.popList.containsKey(player.getName().getString())) continue;
+            if (player == mc.player || AntiBot.bots.contains(player) || player.getHealth() > 0 || !Thunderhack.combatManager.popList.containsKey(player.getName().getString()))
+                continue;
             String s;
-            if(MainSettings.language.getValue() == MainSettings.Language.RU) {
+            if (MainSettings.language.getValue() == MainSettings.Language.RU) {
                 s = Formatting.GREEN + player.getName().getString() + Formatting.WHITE + " попнул " + (Thunderhack.combatManager.popList.get(player.getName().getString()) > 1 ? Thunderhack.combatManager.popList.get(player.getName().getString()) + "" + Formatting.WHITE + " тотемов и сдох!" : Formatting.WHITE + "тотем и сдох!");
             } else {
                 s = Formatting.GREEN + player.getName().getString() + Formatting.WHITE + " popped " + (Thunderhack.combatManager.popList.get(player.getName().getString()) > 1 ? Thunderhack.combatManager.popList.get(player.getName().getString()) + "" + Formatting.WHITE + " totems and died EZ LMAO!" : Formatting.WHITE + "totem and died EZ LMAO!");
             }
-            Command.sendMessage(s);
-            if(notification.getValue())
-                Thunderhack.notificationManager.publicity("TotemPopCounter", s,2, Notification.Type.INFO);
+            sendMessage(s);
+            if (notification.getValue())
+                Thunderhack.notificationManager.publicity("TotemPopCounter", s, 2, Notification.Type.INFO);
         }
     }
 }
