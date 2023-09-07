@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.InputUtil;
@@ -33,9 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -58,6 +57,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class AutoCrystal extends Module {
     // я ебал (не спастил btw)
@@ -167,6 +169,8 @@ public class AutoCrystal extends Module {
     // Threads
     private PlaceThread placeThread;
     private BreakThread breakThread;
+    private final AtomicBoolean ticking = new AtomicBoolean(false);
+    private final AtomicBoolean threading = new AtomicBoolean(false);
 
     public AutoCrystal() {
         super("AutoCrystal", Category.COMBAT);
@@ -222,8 +226,6 @@ public class AutoCrystal extends Module {
             return;
         }
 
-        calcPosition();
-
         if (renderPositions.isEmpty()) attackedCrystals.clear();
 
         if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL && autoGapple.getValue()
@@ -276,7 +278,10 @@ public class AutoCrystal extends Module {
     public void onPacketReceive(PacketEvent.Receive e) {
         if (target == null) return;
         if (e.getPacket() instanceof PlaySoundS2CPacket sound && sound.getCategory().equals(SoundCategory.BLOCKS) && sound.getSound().value().equals(SoundEvents.ENTITY_GENERIC_EXPLODE)) {
-            for (Entity crystal : Thunderhack.asyncManager.getAsyncEntities()) {
+            List<Entity> cache =
+                    StreamSupport.stream(Thunderhack.asyncManager.getAsyncEntities().spliterator(), false)
+                            .collect(Collectors.toList());
+            for (Entity crystal : cache) {
                 if (!(crystal instanceof EndCrystalEntity))
                     continue;
                 if (!crystal.isAlive() || crystal.squaredDistanceTo(sound.getX() + 0.5, sound.getY() + 0.5, sound.getZ() + 0.5) > 121)
@@ -286,7 +291,10 @@ public class AutoCrystal extends Module {
         }
 
         if (e.getPacket() instanceof ExplosionS2CPacket expl) {
-            for (Entity crystal : Thunderhack.asyncManager.getAsyncEntities()) {
+            List<Entity> cache =
+                    StreamSupport.stream(Thunderhack.asyncManager.getAsyncEntities().spliterator(), false)
+                            .collect(Collectors.toList());
+            for (Entity crystal : cache) {
                 if (crystal == null || !crystal.isAlive() || !(crystal instanceof EndCrystalEntity))
                     continue;
                 if (crystal.squaredDistanceTo(expl.getX() + 0.5, expl.getY() + 0.5, expl.getZ() + 0.5) > expl.getRadius() * expl.getRadius())
@@ -328,7 +336,6 @@ public class AutoCrystal extends Module {
                         if (timing.getValue() == Timing.NORMAL && (breakDelay.getValue() == 0 || breakTimer.passedMs(breakDelay.getValue()))) {
                             EndCrystalEntity fakeCrystal = new EndCrystalEntity(mc.world, spawn.getX(), spawn.getY(), spawn.getZ());
                             fakeCrystal.setId(spawn.getId());
-                            sendMessage("spawn");
                             attackCrystal(fakeCrystal);
                         }
                         placedCrystals.remove(bp);
@@ -500,8 +507,10 @@ public class AutoCrystal extends Module {
 
         if (!ccPlace.getValue())
             posBoundingBox = posBoundingBox.expand(0, 1f, 0);
-
-        for (Entity ent : Thunderhack.asyncManager.getAsyncEntities()) {
+        List<Entity> cache =
+                StreamSupport.stream(Thunderhack.asyncManager.getAsyncEntities().spliterator(), false)
+                        .collect(Collectors.toList());
+        for (Entity ent : cache) {
             if (ent == null) continue;
             if (ent.getBoundingBox().intersects(posBoundingBox)) {
                 if (ent instanceof ExperienceOrbEntity)
@@ -566,7 +575,6 @@ public class AutoCrystal extends Module {
         }
         List<PlaceData> rawList = getPossibleBlocks(target);
         List<PlaceData> clearedList = new ArrayList<>();
-        bestCrystal = getCrystalToExplode(target);
 
         for (PlaceData data : rawList) {
             double safetyIndex = 1;
@@ -605,7 +613,10 @@ public class AutoCrystal extends Module {
 
     public List<CrystalData> getPossibleCrystals(PlayerEntity target) {
         List<CrystalData> crystals = new ArrayList<>();
-        for (Entity ent : Thunderhack.asyncManager.getAsyncEntities()) {
+        List<Entity> cache =
+                StreamSupport.stream(Thunderhack.asyncManager.getAsyncEntities().spliterator(), false)
+                        .collect(Collectors.toList());
+        for (Entity ent : cache) {
             if (!(ent instanceof EndCrystalEntity))
                 continue;
             if (squaredDistanceFromEyes(ent.getPos()) > explodeRange.getPow2Value())
@@ -765,8 +776,10 @@ public class AutoCrystal extends Module {
 
         if (!ccPlace.getValue())
             posBoundingBox = posBoundingBox.expand(0, 1f, 0);
-
-        for (Entity ent : Thunderhack.asyncManager.getAsyncEntities()) {
+        List<Entity> cache =
+                StreamSupport.stream(Thunderhack.asyncManager.getAsyncEntities().spliterator(), false)
+                        .collect(Collectors.toList());
+        for (Entity ent : cache) {
             if (ent == null) continue;
             if (ent.getBoundingBox().intersects(posBoundingBox)) {
                 if (ent instanceof ExperienceOrbEntity)
@@ -921,8 +934,11 @@ public class AutoCrystal extends Module {
 
     private class PlaceThread extends Thread {
         @Override
-        public synchronized void run() {
-            while (true) {
+        public void run() {
+            while (!this.isInterrupted()) {
+                while (ticking.get()) {
+                }
+                calcPosition();
                 if (bestPosition != null)
                     if (placeTimer.passedMs(placeDelay.getValue()) || placeDelay.getValue() == 0)
                         if (placeCrystal(bestPosition))
@@ -931,14 +947,31 @@ public class AutoCrystal extends Module {
         }
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onTick(EventTick e){
+        ticking.set(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPostTick(EventPostTick e){
+        ticking.set(false);
+    }
+
     private class BreakThread extends Thread {
         @Override
-        public synchronized void run() {
-            while (true) {
+        public void run() {
+            while (!this.isInterrupted()) {
+                while (ticking.get()) {
+                }
+                bestCrystal = getCrystalToExplode(target);
                 if (bestCrystal != null)
                     if (breakTimer.passedMs(breakDelay.getValue()) || breakDelay.getValue() == 0)
                         attackCrystal(bestCrystal);
             }
         }
+    }
+
+    private boolean canDoThread(){
+        return mc.isOnThread() || !ticking.get() && !threading.get();
     }
 }

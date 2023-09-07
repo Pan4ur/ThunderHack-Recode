@@ -85,7 +85,7 @@ public class AutoTotem extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e){
-        if(e.getPacket() instanceof EntitySpawnS2CPacket spawn){
+        if(e.getPacket() instanceof EntitySpawnS2CPacket spawn && griefInstant.getValue()){
             if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
                 if(mc.player.squaredDistanceTo(spawn.getX(),spawn.getY(),spawn.getZ()) < 36){
                     runInstant();
@@ -100,7 +100,7 @@ public class AutoTotem extends Module {
             }
         }
         if(e.getPacket() instanceof InventoryS2CPacket pac){
-            sendMessage(pac.toString());
+       //     sendMessage(pac.toString());
         }
     }
 
