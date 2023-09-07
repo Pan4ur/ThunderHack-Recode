@@ -9,9 +9,9 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandSource;
+import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
-import thunder.hack.Thunderhack;
 import thunder.hack.modules.client.MainSettings;
 
 import java.util.ArrayList;
@@ -19,25 +19,25 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class SearchArgumentType implements ArgumentType<String> {
-    private static final List<String> EXAMPLES = getRegisteredBlocks().stream().limit(5).toList();
+public class ChestStealerArgumentType implements ArgumentType<String> {
+    private static final List<String> EXAMPLES = getRegistered().stream().limit(5).toList();
 
-    public static SearchArgumentType create() {
-        return new SearchArgumentType();
+    public static ChestStealerArgumentType create() {
+        return new ChestStealerArgumentType();
     }
 
     @Override
     public String parse(StringReader reader) throws CommandSyntaxException {
         String blockName = reader.readString();
-        if (!getRegisteredBlocks().contains(blockName)) throw new DynamicCommandExceptionType(
-                name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Такого блока нет!" : "There is no such block!")
+        if (!getRegistered().contains(blockName)) throw new DynamicCommandExceptionType(
+                name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Такого предмета нет!" : "There is no such item!")
         ).create(blockName);
         return blockName;
     }
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(getRegisteredBlocks(), builder);
+        return CommandSource.suggestMatching(getRegistered(), builder);
     }
 
     @Override
@@ -45,10 +45,15 @@ public class SearchArgumentType implements ArgumentType<String> {
         return EXAMPLES;
     }
 
-    public static List<String> getRegisteredBlocks() {
+
+    public static List<String> getRegistered() {
         List<String> result = new ArrayList<>();
+
         for (Block block : Registries.BLOCK) {
             result.add(block.getTranslationKey().replace("block.minecraft.",""));
+        }
+        for (Item item : Registries.ITEM) {
+            result.add(item.getTranslationKey().replace("item.minecraft.",""));
         }
         return result;
     }

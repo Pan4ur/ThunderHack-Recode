@@ -71,12 +71,14 @@ public class Thunderhack implements ModInitializer {
         FriendManager.loadFriends();
         configManager.load(configManager.getCurrentConfig());
         moduleManager.onLoad();
+        configManager.loadChestStealer();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             FriendManager.saveFriends();
             configManager.save(configManager.getCurrentConfig());
             wayPointManager.saveWayPoints();
             macroManager.saveMacro();
+            configManager.saveChestStealer();
         }));
 
         macroManager.onLoad();

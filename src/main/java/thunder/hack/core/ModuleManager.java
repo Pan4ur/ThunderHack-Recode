@@ -79,6 +79,7 @@ public class ModuleManager {
     public static RPC rpc;
     public static Search search;
     public static WaterSpeed waterSpeed;
+    public static ChestStealer chestStealer;
 
 
     public ModuleManager() {
@@ -135,6 +136,7 @@ public class ModuleManager {
         rpc = new RPC();
         search = new Search();
         waterSpeed = new WaterSpeed();
+        chestStealer = new ChestStealer();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -205,7 +207,7 @@ public class ModuleManager {
         modules.add(new StaffBoard());
         modules.add(autoTool);
         modules.add(search);
-        modules.add(new ChestStealer());
+        modules.add(chestStealer);
         modules.add(tooltips);
         modules.add(new AutoFish());
         modules.add(new WorldTweaks());

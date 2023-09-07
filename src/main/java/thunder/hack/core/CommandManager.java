@@ -45,6 +45,8 @@ public class CommandManager {
         add(new WayPointCommand());
         add(new OpenFolderCommand());
         add(new ResetBindsCommand());
+        add(new ChestStealerCommand());
+
     }
 
     private void add(Command command) {

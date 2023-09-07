@@ -433,4 +433,33 @@ public class ConfigManager {
         currentConfig = new File(ConfigsFolder, name + ".th");
         return currentConfig;
     }
+
+    public void loadChestStealer(){
+        try {
+            File file = new File("ThunderHackRecode/misc/search.txt");
+
+            if (file.exists()) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    while (reader.ready()) {
+                        ModuleManager.chestStealer.items.add(reader.readLine());
+                    }
+
+                }
+            }
+        } catch (Exception ignored) {}
+    }
+
+    public void saveChestStealer() {
+        File file = new File("ThunderHackRecode/misc/search.txt");
+        try {
+            file.createNewFile();
+        } catch (Exception ignored){
+
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (String item : ModuleManager.chestStealer.items) {
+                writer.write(item + "\n");
+            }
+        } catch (Exception ignored){}
+    }
 }
