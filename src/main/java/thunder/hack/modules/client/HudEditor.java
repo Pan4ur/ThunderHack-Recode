@@ -42,7 +42,7 @@ public class HudEditor extends Module{
                 return Render2DEngine.fade((int) colorSpeed.getValue(), index, hcolor1.getValue().getColorObject(), 1);
             }
             case DoubleColor -> {
-                return Render2DEngine.TwoColoreffect(hcolor1.getValue().getColorObject(), acolor.getValue().getColorObject(), Math.abs(System.currentTimeMillis() / 10) / 100.0 + 3.0F * (count * 2.55) / 60);
+                return Render2DEngine.TwoColoreffect(hcolor1.getValue().getColorObject(), acolor.getValue().getColorObject(), Math.abs(System.currentTimeMillis() / 10) / 100.0 + (count));
             }
             case Analogous -> {
                 Color analogous = Render2DEngine.getAnalogousColor(acolor.getValue().getColorObject());

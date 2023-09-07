@@ -19,6 +19,7 @@ import net.minecraft.item.SwordItem;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -34,6 +35,7 @@ import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.SearchInvResult;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,31 +61,14 @@ public class AutoTotem extends Module {
     private enum OffHand {Totem, Crystal, GApple, Shield}
 
     private int delay;
-    private boolean freeze;
 
     public AutoTotem() {
         super("AutoTotem", "AutoTotem", Category.COMBAT);
     }
 
-    @Override
-    public void onEnable(){
-        freeze = false;
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onMove(EventMove move){
-        if(stopMotion.getValue() && freeze){
-            move.cancel();
-            move.set_x(0);
-            move.set_z(0);
-        }
-    }
-
     @EventHandler
     public void onSync(EventSync e) {
-        if (mc.currentScreen == null || mc.currentScreen instanceof ChatScreen) {
-            swapTo(getItemSlot());
-        }
+        swapTo(getItemSlot());
         delay--;
     }
 
@@ -103,48 +88,44 @@ public class AutoTotem extends Module {
         if(e.getPacket() instanceof EntitySpawnS2CPacket spawn){
             if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
                 if(mc.player.squaredDistanceTo(spawn.getX(),spawn.getY(),spawn.getZ()) < 36){
-                    for (int i = 9; i < 45; i++) {
-                        if (mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING) return;
-                        if (mc.player.getInventory().getStack(i >= 36 ? i - 36 : i).getItem().equals(Items.TOTEM_OF_UNDYING)) {
-                            sendMessage("detected EntitySpawnS2CPacket");
-                            if(!griefInstant.getValue()) {
-                                swapTo(i >= 36 ? i - 36 : i);
-                            } else {
-                                mc.player.networkHandler.sendPacket( new PickFromInventoryC2SPacket(i >= 36 ? i - 36 : i));
-                                mc.player.networkHandler.sendPacket( new PickFromInventoryC2SPacket(i >= 36 ? i - 36 : i));
-                            }
-                            delay = 20;
-                            break;
-                        }
-                    }
+                    runInstant();
                 }
             }
         }
         if(e.getPacket() instanceof BlockUpdateS2CPacket blockUpdate){
             if(blockUpdate.getState().getBlock() == Blocks.OBSIDIAN && onObsidianPlace.getValue()){
-                if(mc.player.squaredDistanceTo(blockUpdate.getPos().toCenterPos()) < 36){
-                    for (int i = 9; i < 45; i++) {
-                        if (mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING) return;
-                        if (mc.player.getInventory().getStack(i >= 36 ? i - 36 : i).getItem().equals(Items.TOTEM_OF_UNDYING)) {
-                            sendMessage("detected BlockUpdateS2CPacket");
-                            if(!griefInstant.getValue()) {
-                                swapTo(i >= 36 ? i - 36 : i);
-                            } else {
-                                mc.player.networkHandler.sendPacket( new PickFromInventoryC2SPacket(i >= 36 ? i - 36 : i));
-                                mc.player.networkHandler.sendPacket( new PickFromInventoryC2SPacket(i >= 36 ? i - 36 : i));
-                            }
-                            delay = 20;
-                            break;
-                        }
-                    }
+                if(mc.player.squaredDistanceTo(blockUpdate.getPos().toCenterPos()) < 36 && delay <= 0){
+                    runInstant();
                 }
             }
+        }
+        if(e.getPacket() instanceof InventoryS2CPacket pac){
+            sendMessage(pac.toString());
+        }
+    }
+
+    private void runInstant() {
+        SearchInvResult hotbarResult = InventoryUtility.findItemInHotBar(Items.TOTEM_OF_UNDYING);
+        SearchInvResult invResult = InventoryUtility.findItemInInventory(Items.TOTEM_OF_UNDYING);
+        if(hotbarResult.found()) {
+            hotbarResult.switchTo();
+            delay = 20;
+        } else if(invResult.found()) {
+            int slot = invResult.slot() >= 36 ? invResult.slot() - 36 : invResult.slot();
+            if(!griefInstant.getValue()) {
+                swapTo(slot);
+            } else {
+                mc.interactionManager.pickFromInventory(slot);
+            }
+            delay = 20;
         }
     }
 
     public void swapTo(int slot){
         if (slot != -1 && delay <= 0) {
-            freeze = true;
+            if(stopMotion.getValue())
+                mc.player.setVelocity(0,mc.player.getVelocity().getY(),0);
+
             int nearest_slot = findNearestCurrentItem();
             int prevCurrentItem = mc.player.getInventory().selectedSlot;
             if (slot >= 9) {
@@ -179,7 +160,6 @@ public class AutoTotem extends Module {
                 mc.player.resetLastAttackedTicks();
             }
             delay = 5;
-            freeze = false;
         }
     }
 

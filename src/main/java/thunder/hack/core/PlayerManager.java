@@ -99,7 +99,7 @@ public class PlayerManager {
         }
     }
 
-    public boolean checkRtx(float yaw, float pitch, float distance, boolean ignoreWalls) {
+    public boolean checkRtx(float yaw, float pitch, float distance, boolean ignoreWalls, Aura.RayTrace rt) {
         Entity targetedEntity;
         HitResult result = ignoreWalls ? null : rayTrace(distance, yaw, pitch);
         Vec3d vec3d = mc.player.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
@@ -114,10 +114,9 @@ public class PlayerManager {
             Vec3d vec3d4 = entityHitResult.getPos();
             double g = vec3d.squaredDistanceTo(vec3d4);
             if (g < distancePow2 || result == null) {
-                if (entity2 instanceof LivingEntity) {
                     targetedEntity = entity2;
-                    if (targetedEntity == Aura.target) return true;
-                }
+                    if (targetedEntity == Aura.target || rt == Aura.RayTrace.OnlyTarget) return true;
+
             }
         }
         return false;

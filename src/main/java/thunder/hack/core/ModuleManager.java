@@ -78,6 +78,7 @@ public class ModuleManager {
     public static LegacyHud legacyHud;
     public static RPC rpc;
     public static Search search;
+    public static WaterSpeed waterSpeed;
 
 
     public ModuleManager() {
@@ -133,6 +134,7 @@ public class ModuleManager {
         legacyHud = new LegacyHud();
         rpc = new RPC();
         search = new Search();
+        waterSpeed = new WaterSpeed();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -297,6 +299,7 @@ public class ModuleManager {
         modules.add(new TickShift());
         modules.add(antiWeb);
         modules.add(legacyHud);
+        modules.add(waterSpeed);
     }
 
     public Module get(String name) {
@@ -361,6 +364,7 @@ public class ModuleManager {
 
     public void onRender2D(DrawContext context) {
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender2D(context));
+        Thunderhack.core.onRender2D(context);
     }
 
     public void onRenderShaders(DrawContext context) {

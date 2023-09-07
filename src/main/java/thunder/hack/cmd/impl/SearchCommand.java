@@ -7,6 +7,8 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Formatting;
 import thunder.hack.cmd.Command;
+import thunder.hack.cmd.args.FriendArgumentType;
+import thunder.hack.cmd.args.SearchArgumentType;
 import thunder.hack.modules.render.Search;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -27,7 +29,7 @@ public class SearchCommand extends Command {
             return SINGLE_SUCCESS;
         }));
 
-        builder.then(literal("add").then(arg("block", StringArgumentType.word()).executes(context -> {
+        builder.then(literal("add").then(arg("block", SearchArgumentType.create()).executes(context -> {
             String blockName = context.getArgument("block", String.class);
 
             Block result = getRegisteredBlock(blockName);
@@ -43,7 +45,7 @@ public class SearchCommand extends Command {
             return SINGLE_SUCCESS;
         })));
 
-        builder.then(literal("del").then(arg("block", StringArgumentType.word()).executes(context -> {
+        builder.then(literal("del").then(arg("block", SearchArgumentType.create()).executes(context -> {
             String blockName = context.getArgument("block", String.class);
 
             Block result = getRegisteredBlock(blockName);

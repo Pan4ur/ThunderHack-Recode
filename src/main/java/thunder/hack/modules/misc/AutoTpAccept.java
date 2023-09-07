@@ -2,12 +2,21 @@ package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.entity.player.PlayerEntity;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.gui.font.FontRenderer;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.movement.ElytraPlus;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.ThunderUtility;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
+import thunder.hack.utility.math.MathUtility;
+
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class AutoTpAccept extends Module {
 
@@ -17,36 +26,63 @@ public class AutoTpAccept extends Module {
 
     public Setting<Boolean> grief = new Setting<>("Grief", false);
     public Setting<Boolean> onlyFriends = new Setting<>("onlyFriends", true);
+    public Setting<Boolean> duo = new Setting<>("Duo", true);
+    private final Setting<Integer> timeOut = new Setting<>("TimeOut", 60, 1, 180, v -> duo.getValue());
 
+    private TpTask tpTask;
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if(fullNullCheck()) return;
         if (event.getPacket() instanceof GameMessageS2CPacket) {
             final GameMessageS2CPacket packet = event.getPacket();
-            if (mc.player == null) {
-                return;
-            }
             if (packet.content().getString().contains("телепортироваться")) {
                 if (onlyFriends.getValue()) {
                     if (Thunderhack.friendManager.isFriend(ThunderUtility.solveName(packet.content().getString()))) {
-                        if(grief.getValue()){
-                            mc.getNetworkHandler().sendChatCommand("tpaccept " + ThunderUtility.solveName(packet.content().getString()));
-                        } else {
-                            mc.getNetworkHandler().sendChatCommand("tpaccept");
-                        }
+                        if(!duo.getValue())
+                            acceptRequest(packet.content().getString());
+                        else
+                            tpTask = new TpTask(() -> acceptRequest(packet.content.getString()), System.currentTimeMillis());
                     }
                 } else {
-                    if(grief.getValue()){
-                        mc.getNetworkHandler().sendChatCommand("tpaccept " + ThunderUtility.solveName(packet.content().getString()));
-                    } else {
-                        mc.getNetworkHandler().sendChatCommand("tpaccept");
-                    }
+                    acceptRequest(packet.content().getString());
                 }
-
             }
         }
     }
 
+    public void onRender2D(DrawContext context) {
+        if (duo.getValue() && tpTask != null) {
+            String text = (isRu() ? "Ждем таргета " : "Awaiting target ") + MathUtility.round((timeOut.getValue() * 1000 - (System.currentTimeMillis() - tpTask.time())) / 1000f, 1);
+            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(),text,mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() / 2f + 30, HudEditor.getColor(1).getRGB());
+        }
+    }
+
+    @Override
+    public void onUpdate(){
+        if(duo.getValue() && tpTask != null){
+            if(System.currentTimeMillis() - tpTask.time > timeOut.getValue() * 1000){
+                tpTask = null;
+                return;
+            }
+            for(PlayerEntity pl : mc.world.getPlayers()){
+                if(pl == mc.player) continue;
+                if(Thunderhack.friendManager.isFriend(pl)) continue;
+                tpTask.task.run();
+                tpTask = null;
+                break;
+            }
+        }
+    }
+
+    public void acceptRequest(String name){
+        if(grief.getValue())
+            mc.getNetworkHandler().sendChatCommand("tpaccept " + ThunderUtility.solveName(name));
+        else
+            mc.getNetworkHandler().sendChatCommand("tpaccept");
+    }
+
+    private record TpTask(Runnable task, long time){
+    }
 
 }

@@ -33,6 +33,8 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.PlayerUtility;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
+
 public class ElytraPlus extends Module {
     public ElytraPlus() {
         super("Elytra+", Category.MOVEMENT);
@@ -45,6 +47,7 @@ public class ElytraPlus extends Module {
     private final Setting<Float> fireDelay = new Setting<>("FireDelay", 1.5f, 0f, 1.5f, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> stayMad = new Setting<>("GroundSafe", false, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> keepFlying = new Setting<>("KeepFlying", false, v -> mode.getValue() == Mode.FireWork);
+    private final Setting<Boolean> disableOnFlag = new Setting<>("DisableOnFlag", false, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> allowFireSwap = new Setting<>("AllowFireSwap", false, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> bowBomb = new Setting<>("BowBomb", false, v -> mode.getValue() == Mode.FireWork || mode.getValue() == Mode.Sunrise);
     public Setting<Bind> bombKey = new Setting<>("BombKey", new Bind(-1, false, false), v -> mode.getValue() == Mode.Sunrise);
@@ -91,7 +94,7 @@ public class ElytraPlus extends Module {
     @Override
     public void onEnable() {
         if (mc.player.getY() < infiniteMaxHeight.getValue() && mode.getValue() == Mode.Pitch40Infinite) {
-            disable(MainSettings.isRu() ? "Поднимись выше " + Formatting.AQUA + infiniteMaxHeight.getValue() + Formatting.GRAY + " высоты!" : "Rise above " + Formatting.AQUA + infiniteMaxHeight.getValue() + Formatting.GRAY + " high!");
+            disable(isRu() ? "Поднимись выше " + Formatting.AQUA + infiniteMaxHeight.getValue() + Formatting.GRAY + " высоты!" : "Rise above " + Formatting.AQUA + infiniteMaxHeight.getValue() + Formatting.GRAY + " high!");
         }
 
         infiniteFlag = false;
@@ -147,7 +150,7 @@ public class ElytraPlus extends Module {
                 mc.player.setPitch(getInfinitePitch());
             }
             if (is.isOf(Items.ELYTRA) && is.getDamage() > 380 && mc.player.age % 100 == 0) {
-                Thunderhack.notificationManager.publicity("Elytra+", MainSettings.isRu() ? "Элитра скоро сломается!" : "Elytra is about to break down!", 2, Notification.Type.WARNING);
+                Thunderhack.notificationManager.publicity("Elytra+", isRu() ? "Элитра скоро сломается!" : "Elytra is about to break down!", 2, Notification.Type.WARNING);
                 mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.AMBIENT, 10.0f, 1.0F);
             }
         }
@@ -215,8 +218,10 @@ public class ElytraPlus extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
-        if (e.getPacket() instanceof PlayerPositionLookS2CPacket)
+        if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             acceleration = 0;
+            if(disableOnFlag.getValue() && mode.getValue() == Mode.FireWork) disable(isRu() ? "Выключен из-за флага!" : "Disabled due to flag!");
+        }
     }
 
     private void doPreLegacy() {

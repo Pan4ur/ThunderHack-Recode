@@ -1,24 +1,14 @@
 package thunder.hack.modules.misc;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.CommandExecutionC2SPacket;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
-import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.modules.Module;
-import thunder.hack.notification.Notification;
-import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.InventoryUtility;
-import thunder.hack.utility.ThunderUtility;
-import thunder.hack.utility.Timer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.CommandExecutionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
@@ -28,6 +18,14 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.StringUtils;
+import thunder.hack.Thunderhack;
+import thunder.hack.cmd.Command;
+import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.modules.Module;
+import thunder.hack.notification.Notification;
+import thunder.hack.setting.Setting;
+import thunder.hack.utility.ThunderUtility;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.PlayerUtility;
 
 import java.util.ArrayList;
@@ -65,20 +63,25 @@ public class FGHelper extends Module {
         if (event.getPacket() instanceof GameMessageS2CPacket && photomath.getValue()) {
             final GameMessageS2CPacket packet = event.getPacket();
             if (packet.content().getString().contains("Решите: ") && Objects.equals(ThunderUtility.solveName(packet.content().getString()), "FATAL ERROR")) {
-                int solve = Integer.parseInt(StringUtils.substringBetween(packet.content().getString(), "Решите: ", " + ")) + Integer.parseInt(StringUtils.substringBetween(packet.content().getString(), " + ", " кто первый"));
-                for (int i = 0; i < (spam.getValue() ? 9 : 1); i++)
-                    mc.player.networkHandler.sendChatMessage(String.valueOf(solve));
+                try {
+                    int solve = Integer.parseInt(StringUtils.substringBetween(packet.content().getString(), "Решите: ", " + ")) + Integer.parseInt(StringUtils.substringBetween(packet.content().getString(), " + ", " кто первый"));
+                    for (int i = 0; i < (spam.getValue() ? 9 : 1); i++)
+                        mc.player.networkHandler.sendChatMessage(String.valueOf(solve));
+                } catch (Exception ignored) {
+                }
             }
         }
         if (event.getPacket() instanceof GameMessageS2CPacket && airDropWay.getValue()) {
             final GameMessageS2CPacket packet = event.getPacket();
-
             if (packet.content().getString().contains("Аирдроп")) {
-                int xCord = Integer.parseInt(StringUtils.substringBetween(packet.content().getString(), "координаты X: ", " Y:"));
-                int yCord = Integer.parseInt(StringUtils.substringBetween(packet.content().getString(), "Y: ", " Z:"));
-                int zCord = Integer.parseInt(StringUtils.substringBetween(packet.content().getString() + "nigga", "Z: ", "nigga"));
-                Thunderhack.gps_position = new BlockPos(xCord, yCord, zCord);
-                Thunderhack.notificationManager.publicity("FGHelper", "Поставлена метка на аирдроп! X: " + xCord + " Y: " + yCord + " Z: " + zCord, 5, Notification.Type.SUCCESS);
+                try {
+                    int xCord = Integer.parseInt(StringUtils.substringBetween(packet.content().getString(), "координаты X: ", " Y:"));
+                    int yCord = Integer.parseInt(StringUtils.substringBetween(packet.content().getString(), "Y: ", " Z:"));
+                    int zCord = Integer.parseInt(StringUtils.substringBetween(packet.content().getString() + "nigga", "Z: ", "nigga"));
+                    Thunderhack.gps_position = new BlockPos(xCord, yCord, zCord);
+                    Thunderhack.notificationManager.publicity("FGHelper", "Поставлена метка на аирдроп! X: " + xCord + " Y: " + yCord + " Z: " + zCord, 5, Notification.Type.SUCCESS);
+                } catch (Exception ignored) {
+                }
             }
         }
         if (event.getPacket() instanceof GameMessageS2CPacket && antiTpHere.getValue()) {

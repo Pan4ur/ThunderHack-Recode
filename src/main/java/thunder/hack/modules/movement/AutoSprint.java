@@ -5,6 +5,7 @@ import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.player.MovementUtility;
 
 public class AutoSprint extends Module {
     public AutoSprint() {
@@ -17,6 +18,11 @@ public class AutoSprint extends Module {
     @EventHandler
     public void onTick(PlayerUpdateEvent event) {
         if (mc.player.getHungerManager().getFoodLevel() <= 6) return;
-        mc.player.setSprinting(mc.player.input.movementForward > 0 && !mc.player.isSneaking());
+        if(mc.player.horizontalCollision) return;
+        if(mc.player.input.movementForward < 0) return;
+        if(mc.player.isSneaking()) return;
+        if(!MovementUtility.isMoving()) return;
+
+        mc.player.setSprinting(true);
     }
 }

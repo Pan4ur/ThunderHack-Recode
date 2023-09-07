@@ -8,6 +8,7 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
@@ -35,6 +36,9 @@ public class Render2DEngine {
     public static RoundedGradientProgram ROUNDED_GRADIENT_PROGRAM;
     public static RoundedProgram ROUNDED_PROGRAM;
     public static GradientGlowProgram GRADIENT_GLOW_PROGRAM;
+
+    private static final Identifier star = new Identifier("textures/star.png");
+    private static final Identifier heart = new Identifier("textures/heart.png");
 
     public static void addWindow(MatrixStack stack, Rectangle r1) {
         Matrix4f matrix = stack.peek().getPositionMatrix();
@@ -878,7 +882,8 @@ public class Render2DEngine {
         buffer.vertex(matrix, x, y + height, 0).next();
         buffer.vertex(matrix, x + width, y + height, 0).next();
         buffer.vertex(matrix, x + width, y, 0).next();
-        ROUNDED_GRADIENT_PROGRAM.setParameters(x, y, width, height, radius, color2, color1, color3, color4);
+        ROUNDED_GRADIENT_PROGRAM.setParameters(x, y, width, height, radius, color1, color2, color3, color4);
+
         ROUNDED_GRADIENT_PROGRAM.use();
         Tessellator.getInstance().draw();
         RenderSystem.disableBlend();
@@ -894,10 +899,45 @@ public class Render2DEngine {
         buffer.vertex(matrix, x - 10, y + height + 20, 0).next();
         buffer.vertex(matrix, x + width + 20, y + height + 20, 0).next();
         buffer.vertex(matrix, x + width + 20, y -10, 0).next();
-        GRADIENT_GLOW_PROGRAM.setParameters(x, y, width, height, radius, softness, color2, color1, color3, color4);
+        GRADIENT_GLOW_PROGRAM.setParameters(x, y, width, height, radius, softness, color1, color2, color3, color4);
         GRADIENT_GLOW_PROGRAM.use();
         Tessellator.getInstance().draw();
         RenderSystem.disableBlend();
+    }
+
+    public static void drawOrbiz(MatrixStack matrices,float z, final double r, Color c) {
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
+        RenderSystem.enableBlend();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+        for (int i = 0; i <= 20; i++) {
+            final double x2 = Math.sin(((i * 18 * Math.PI) / 180)) * r;
+            final double y2 = Math.cos(((i * 18 * Math.PI) / 180)) * r;
+            bufferBuilder.vertex(matrix, (float) (x2), (float) (y2), z).color(c.getRed() / 255f,c.getGreen() / 255f,c.getBlue() / 255f,0.4f).next();
+        }
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        RenderSystem.disableBlend();
+    }
+
+    public static void drawStar(MatrixStack matrices, Color c, float scale) {
+        RenderSystem.enableBlend();
+        RenderSystem.setShaderTexture(0,star);
+        RenderSystem.setShaderColor(c.getRed() / 255f,c.getGreen() / 255f,c.getBlue() / 255f,c.getAlpha() / 255f);
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(mc.player.age * 2));
+        Render2DEngine.renderTexture(matrices,0, 0,scale,scale,0,0,128,128,128,128);
+        RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1f,1f,1f,1f);
+    }
+
+    public static void drawHeart(MatrixStack matrices, Color c, float scale) {
+        RenderSystem.enableBlend();
+        RenderSystem.setShaderTexture(0,heart);
+        RenderSystem.setShaderColor(c.getRed() / 255f,c.getGreen() / 255f,c.getBlue() / 255f,c.getAlpha() / 255f);
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(mc.player.age * 2));
+        Render2DEngine.renderTexture(matrices,0, 0,scale, scale,0,0,128,128,128,128);
+        RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1f,1f,1f,1f);
     }
 
     public static class BlurredShadow {

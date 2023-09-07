@@ -1,5 +1,8 @@
 package thunder.hack.injection;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import org.spongepowered.asm.mixin.Shadow;
 import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.PacketEvent;
 
@@ -14,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientConnection.class)
 public class MixinClientConnection {
+
     @Inject(method = "handlePacket", at = @At("HEAD"), cancellable = true)
     private static <T extends PacketListener> void onHandlePacket(Packet<T> packet, PacketListener listener, CallbackInfo info) {
         if(Module.fullNullCheck()) return;

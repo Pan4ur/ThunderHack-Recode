@@ -6,6 +6,7 @@ import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.Vector2f;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -17,6 +18,9 @@ import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.FireballEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -48,6 +52,8 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -58,6 +64,7 @@ import static net.minecraft.util.math.MathHelper.wrapDegrees;
 public class Aura extends Module {
     public static final Setting<Float> attackRange = new Setting<>("Attack Range", 3.1f, 1f, 7.0f);
     public static final Setting<Mode> mode = new Setting<>("Rotation", Mode.Universal);
+    public static final Setting<RayTrace> rayTrace = new Setting<>("RayTrace", RayTrace.OnlyTarget);
     private final Setting<Boolean> onlyWeapon = new Setting<>("OnlyWeapon", false);
     public final Setting<Boolean> smartCrit = new Setting<>("SmartCrit", true);
     public final Setting<Boolean> ignoreWalls = new Setting<>("IgnoreWalls", true);
@@ -77,6 +84,7 @@ public class Aura extends Module {
     public final Setting<Boolean> Animals = new Setting<>("Animals", true).withParent(targets);
     public final Setting<Boolean> Villagers = new Setting<>("Villagers", true).withParent(targets);
     public final Setting<Boolean> Slimes = new Setting<>("Slimes", true).withParent(targets);
+    public final Setting<Boolean> Projectiles = new Setting<>("Projectiles", true).withParent(targets);
     public final Setting<Boolean> ignoreInvisible = new Setting<>("IgnoreInvis", false).withParent(targets);
     public final Setting<Boolean> ignoreCreativ = new Setting<>("IgnoreCreative", true).withParent(targets);
     public final Setting<Boolean> ignoreShield = new Setting<>("IgnoreShield", true).withParent(targets);
@@ -84,6 +92,12 @@ public class Aura extends Module {
     public enum Mode {
         Universal,
         None
+    }
+
+    public enum RayTrace {
+        OFF,
+        OnlyTarget,
+        AllEntities
     }
 
     public enum Sort {
@@ -147,11 +161,10 @@ public class Aura extends Module {
         if (grimAC.getValue() == Grim.SilentTest) {
             auraLogic();
         }
-        lookingAtHitbox = Thunderhack.playerManager.checkRtx(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());
     }
 
     public void auraLogic() {
-        if (target != null && (((LivingEntity) target).getHealth() <= 0 || ((LivingEntity) target).isDead())) {
+        if (target != null && target instanceof LivingEntity && (((LivingEntity) target).getHealth() <= 0 || ((LivingEntity) target).isDead())) {
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
                 Thunderhack.notificationManager.publicity("Aura", "Цель успешно нейтрализована!", 3, Notification.Type.SUCCESS);
             } else {
@@ -169,7 +182,7 @@ public class Aura extends Module {
             if (player instanceof OtherClientPlayerEntity) ((IOtherClientPlayerEntity) player).releaseResolver();
         }
 
-        boolean readyForAttack = autoCrit() && (lookingAtHitbox || mode.getValue() != Mode.Universal);
+        boolean readyForAttack = autoCrit() && (lookingAtHitbox || mode.getValue() != Mode.Universal || rayTrace.getValue() == RayTrace.OFF);
 
         if (target != null && (readyForAttack || attackAllowed)) {
             if (shieldBreaker(false)) {
@@ -273,7 +286,7 @@ public class Aura extends Module {
         if (pauseInInventory.getValue() && Thunderhack.playerManager.inInventory) return false;
 
         if (!oldDelay.getValue()) {
-            if (!(MathHelper.clamp(((float) ((ILivingEntity) mc.player).getLastAttackedTicks() + 0.5f) / getAttackCooldownProgressPerTick(), 0.0F, 1.0F) >= (mc.options.jumpKey.isPressed() ? 0.93f : 0.93f)))
+            if (!(MathHelper.clamp(((float) ((ILivingEntity) mc.player).getLastAttackedTicks() + 0.5f) / getAttackCooldownProgressPerTick(), 0.0F, 1.0F) >= 0.93f))
                 return false;
         } else {
             if (minCPS.getValue() > maxCPS.getValue()) minCPS.setValue(maxCPS.getValue());
@@ -327,14 +340,21 @@ public class Aura extends Module {
     }
 
     private void calcThread() {
+        Entity candidat = findTarget();
+
         if (target == null) {
-            findTarget();
+            target = candidat;
             return;
         }
 
-        if(sort.getValue() == Sort.FOV){
-            findTarget();
-        }
+        if(sort.getValue() == Sort.FOV)
+            target = candidat;
+
+        if(candidat instanceof ProjectileEntity)
+            target = candidat;
+
+
+
 
         if (skipEntity(target)) {
             target = null;
@@ -343,23 +363,14 @@ public class Aura extends Module {
 
         if (mode.getValue() == Mode.Universal) {
             Vec3d targetVec = getLegitLook(target);
-            if (targetVec == null) {
+
+            if (targetVec == null)
                 return;
-            }
+
             float delta_yaw = wrapDegrees((float) wrapDegrees(Math.toDegrees(Math.atan2(targetVec.z - mc.player.getZ(), (targetVec.x - mc.player.getX()))) - 90) - rotationYaw);
             float delta_pitch = ((float) (-Math.toDegrees(Math.atan2(targetVec.y - (mc.player.getPos().y + mc.player.getEyeHeight(mc.player.getPose())), Math.sqrt(Math.pow((targetVec.x - mc.player.getX()), 2) + Math.pow(targetVec.z - mc.player.getZ(), 2))))) - rotationPitch);
-            if (!lookingAtHitbox) {
-                if (pitchAcceleration < 8f) {
-                    pitchAcceleration *= 1.65;
-                } else {
-                    pitchAcceleration = 1f;
-                }
-                if (pitchAcceleration <= 0) {
-                    pitchAcceleration = 1f;
-                }
-            } else {
-                pitchAcceleration = 1f;
-            }
+
+            pitchAcceleration = lookingAtHitbox ? 1f : pitchAcceleration < 8f ? pitchAcceleration * 1.65f : 1f;
 
             float yawStep = grimAC.getValue() == Grim.SilentTest ? 360f : MathUtility.random(65f, 75f);
             float pitchStep = grimAC.getValue() == Grim.SilentTest ? 180f : pitchAcceleration + MathUtility.random(-1f, 1f);
@@ -378,6 +389,7 @@ public class Aura extends Module {
 
             rotationYaw = (float) (newYaw - (newYaw - rotationYaw) % gcdFix);
             rotationPitch = (float) (newPitch - (newPitch - rotationPitch) % gcdFix);
+            lookingAtHitbox = Thunderhack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), ignoreWalls.getValue(), rayTrace.getValue());
         }
     }
 
@@ -470,7 +482,7 @@ public class Aura extends Module {
 
             // Проверяем видимость центра игрока
             if (distanceFromHead(target.getPos().add(0, target.getEyeHeight(target.getPose()) / 2f, 0)) <= attackRange.getPow2Value()
-                    && Thunderhack.playerManager.checkRtx(rotation1[0], rotation1[1], attackRange.getValue(), false)) {
+                    && Thunderhack.playerManager.checkRtx(rotation1[0], rotation1[1], attackRange.getValue(), false, rayTrace.getValue())) {
                 // наводим на центр
                 rotationPoint = new Vec3d(MathUtility.random(-0.1f, 0.1f), target.getEyeHeight(target.getPose()) / (MathUtility.random(1.8f, 2.5f)), MathUtility.random(-0.1f, 0.1f));
             } else {
@@ -487,7 +499,7 @@ public class Aura extends Module {
                             if (distanceFromHead(v1) > attackRange.getPow2Value()) continue;
 
                             float[] rotation = Thunderhack.playerManager.calcAngle(v1);
-                            if (Thunderhack.playerManager.checkRtx(rotation[0], rotation[1], attackRange.getValue(), false)) {
+                            if (Thunderhack.playerManager.checkRtx(rotation[0], rotation[1], attackRange.getValue(), false, rayTrace.getValue())) {
                                 // Наводимся, если видим эту точку
                                 rotationPoint = new Vec3d(x1, y1, z1);
                                 break;
@@ -500,21 +512,39 @@ public class Aura extends Module {
         return target.getPos().add(rotationPoint);
     }
 
-    public void findTarget() {
+    public Entity findTarget() {
         List<LivingEntity> first_stage = new CopyOnWriteArrayList<>();
-        for (Entity entity : mc.world.getEntities()) {
-            if (skipEntity(entity)) continue;
-            first_stage.add((LivingEntity) entity);
+        for (Entity ent : mc.world.getEntities()) {
+            if ((ent instanceof ShulkerBulletEntity || ent instanceof FireballEntity)
+                    && ent.isAlive()
+                    && distanceFromHead(ent.getPos()) < getRotateDistance() * getRotateDistance()
+                    && Projectiles.getValue()){
+                return ent;
+            }
+            if (skipEntity(ent)) continue;
+            first_stage.add((LivingEntity) ent);
         }
 
         switch (sort.getValue()) {
-            case Distance -> target = first_stage.stream().min(Comparator.comparing(e -> (mc.player.squaredDistanceTo(e.getPos())))).orElse(null);
-            case FOV -> target = first_stage.stream().min(Comparator.comparing(e -> (getFOVAngle(e)))).orElse(null);
-            case Health -> target = first_stage.stream().min(Comparator.comparing(e -> (e.getHealth() + e.getAbsorptionAmount()))).orElse(null);
+            case Distance -> {
+                return first_stage.stream().min(Comparator.comparing(e -> (mc.player.squaredDistanceTo(e.getPos())))).orElse(null);
+            }
+            case FOV -> {
+                return first_stage.stream().min(Comparator.comparing(e -> (getFOVAngle(e)))).orElse(null);
+            }
+            case Health -> {
+                return first_stage.stream().min(Comparator.comparing(e -> (e.getHealth() + e.getAbsorptionAmount()))).orElse(null);
+            }
         }
+        return null;
     }
 
     private boolean skipEntity(Entity entity) {
+        if ((entity instanceof ShulkerBulletEntity || entity instanceof FireballEntity)
+                && entity.isAlive()
+                && distanceFromHead(entity.getPos()) < getRotateDistance() * getRotateDistance()
+                && Projectiles.getValue())
+            return false;
         if (!(entity instanceof LivingEntity ent)) return true;
         if (ent.isDead()) return true;
         if (!entity.isAlive()) return true;
