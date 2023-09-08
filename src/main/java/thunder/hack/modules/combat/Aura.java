@@ -280,7 +280,7 @@ public class Aura extends Module {
 
         if (hitTicks > 0) return false;
 
-        // FIXME я хз почему оно не критует когда фд больше 1.14
+        // я хз почему оно не критует когда фд больше 1.14
         if (mc.player.fallDistance > 1 && mc.player.fallDistance < 1.14) return false;
 
         if (pauseInInventory.getValue() && Thunderhack.playerManager.inInventory) return false;
@@ -563,7 +563,7 @@ public class Aura extends Module {
         return distanceFromHead(entity.getPos()) > getRotateDistance() * getRotateDistance();
     }
 
-    private float getFOVAngle(LivingEntity e) {;
+    private float getFOVAngle(LivingEntity e) {
         double difX = e.getX() - mc.player.getPos().x;
         double difZ = e.getZ() - mc.player.getPos().z;
         float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);

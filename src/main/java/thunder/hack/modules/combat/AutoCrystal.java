@@ -332,38 +332,44 @@ public class AutoCrystal extends Module {
         if (mc.interactionManager.isBreakingBlock() && !offhand && mining.getValue())
             return false;
 
-        if (tickBusy && timing.getValue() == Timing.SEQUENTIAL)
-            return false;
-
         if (mc.player.isUsingItem() && eating.getValue() && !offhand)
             return false;
 
+        if(rotationMarkedDirty())
+            return false;
+
+        if (tickBusy && timing.getValue() == Timing.SEQUENTIAL)
+            return false;
+
         if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < pauseHP.getValue())
-            return false;
-
-        if (ModuleManager.surround.isEnabled() && !Surround.inactivityTimer.passedMs(500) && surround.getValue())
-            return false;
-
-        if (ModuleManager.autoTrap.isEnabled() && !AutoTrap.inactivityTimer.passedMs(500))
-            return false;
-
-        if (ModuleManager.blocker.isEnabled() && !Blocker.inactivityTimer.passedMs(500))
-            return false;
-
-        if (ModuleManager.holeFill.isEnabled() && !HoleFill.inactivityTimer.passedMs(500))
-            return false;
-
-        if (ModuleManager.aura.isEnabled() && aura.getValue())
-            return false;
-
-        if (ModuleManager.pistonAura.isEnabled() && pistonAura.getValue())
             return false;
 
         if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL && autoGapple.getValue() && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE) {
             return false;
         }
 
-        return !switchPause.getValue() || switchTimer.passedMs(switchDelay.getValue()) || autoSwitch.getValue() == Switch.SILENT || antiWeakness.getValue() == Switch.SILENT || autoSwitch.getValue() == Switch.INVENTORY || antiWeakness.getValue() == Switch.INVENTORY;
+        boolean silent = autoSwitch.getValue() == Switch.SILENT || antiWeakness.getValue() == Switch.SILENT || autoSwitch.getValue() == Switch.INVENTORY || antiWeakness.getValue() == Switch.INVENTORY;
+
+        return !switchPause.getValue() || switchTimer.passedMs(switchDelay.getValue()) || silent;
+    }
+
+    public boolean rotationMarkedDirty(){
+        if (ModuleManager.surround.isEnabled() && !Surround.inactivityTimer.passedMs(500) && surround.getValue())
+            return true;
+
+        if (ModuleManager.autoTrap.isEnabled() && !AutoTrap.inactivityTimer.passedMs(500))
+            return true;
+
+        if (ModuleManager.blocker.isEnabled() && !Blocker.inactivityTimer.passedMs(500))
+            return true;
+
+        if (ModuleManager.holeFill.isEnabled() && !HoleFill.inactivityTimer.passedMs(500))
+            return true;
+
+        if (ModuleManager.aura.isEnabled() && aura.getValue())
+            return true;
+
+        return ModuleManager.pistonAura.isEnabled() && pistonAura.getValue();
     }
 
     public void attackCrystal(EndCrystalEntity crystal) {
@@ -379,20 +385,7 @@ public class AutoCrystal extends Module {
             return;
         }
 
-        if (attackedCrystals.containsKey(crystal.getId())) {
-            if (attackedCrystals.get(crystal.getId()) != null) {
-                int attacks = attackedCrystals.get(crystal.getId());
-                if (attacks >= limitAttacks.getValue()) {
-                    return;
-                }
-                attackedCrystals.remove(crystal.getId());
-                attackedCrystals.put(crystal.getId(), attacks + 1);
-            } else {
-                attackedCrystals.put(crystal.getId(), 1);
-            }
-        } else {
-            attackedCrystals.put(crystal.getId(), 1);
-        }
+        if(checkAttackedBefore(crystal.getId())) return;
 
         int prevSlot = -1;
         SearchInvResult swordResult = InventoryUtility.getSwordHotbar();
@@ -422,6 +415,24 @@ public class AutoCrystal extends Module {
         }
     }
 
+    private boolean checkAttackedBefore(int id){
+        if (attackedCrystals.containsKey(id)) {
+            if (attackedCrystals.get(id) != null) {
+                int attacks = attackedCrystals.get(id);
+                if (attacks >= limitAttacks.getValue()) {
+                    return true;
+                }
+                attackedCrystals.remove(id);
+                attackedCrystals.put(id, attacks + 1);
+            } else {
+                attackedCrystals.put(id, 1);
+            }
+        } else {
+            attackedCrystals.put(id, 1);
+        }
+        return false;
+    }
+
     private int doAntiWeakness(SearchInvResult swordResult, SearchInvResult swordResultInv, @NotNull Setting<Switch> antiWeakness) {
         int prevSlot = mc.player.getInventory().selectedSlot;
         if (antiWeakness.getValue() != Switch.INVENTORY) {
@@ -448,7 +459,6 @@ public class AutoCrystal extends Module {
         if (!ccPlace.getValue())
             posBoundingBox = posBoundingBox.expand(0, 1f, 0);
 
-        //TODO
         for (Entity ent : mc.world.getEntities()) {
             if (ent == null) continue;
             if (ent.getBoundingBox().intersects(posBoundingBox)) {
@@ -875,8 +885,7 @@ public class AutoCrystal extends Module {
                     bestPosition = calcPosition();
                     if (bestPosition != null && placeCrystal(bestPosition)) placeTimer.reset();
                     if (stopThreads.get()) placeThread.interrupt();
-                } catch (Exception e) {
-                }
+                } catch (Exception ignored) {}
             }
         }
     }
@@ -890,8 +899,7 @@ public class AutoCrystal extends Module {
                     bestCrystal = getCrystalToExplode(target);
                     if (bestCrystal != null) attackCrystal(bestCrystal);
                     if (stopThreads.get()) breakThread.interrupt();
-                } catch (Exception e) {
-                }
+                } catch (Exception ignored) {}
             }
         }
     }
