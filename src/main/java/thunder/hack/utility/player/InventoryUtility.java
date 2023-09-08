@@ -1,6 +1,7 @@
 package thunder.hack.utility.player;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.SkullBlock;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.*;
@@ -117,6 +118,25 @@ public final class InventoryUtility {
         return new SearchInvResult(slot, true, mc.player.getInventory().getStack(slot));
     }
 
+    public static SearchInvResult getSkull() {
+        if (mc.player == null) return SearchInvResult.notFound();
+        int slot = -1;
+        for (int b1 = 0; b1 < 9; b1++) {
+            ItemStack itemStack = mc.player.getInventory().getStack(b1);
+            if (itemStack != null &&
+                    (itemStack.getItem().equals(Items.SKELETON_SKULL)
+                            || itemStack.getItem().equals(Items.WITHER_SKELETON_SKULL)
+                            || itemStack.getItem().equals(Items.CREEPER_HEAD)
+                            || itemStack.getItem().equals(Items.PLAYER_HEAD)
+                            || itemStack.getItem().equals(Items.ZOMBIE_HEAD))) {
+                slot = b1;
+                break;
+            }
+        }
+        if (slot == -1) return SearchInvResult.notFound();
+        return new SearchInvResult(slot, true, mc.player.getInventory().getStack(slot));
+    }
+
     public static SearchInvResult getSword() {
         if (mc.player == null) return SearchInvResult.notFound();
 
@@ -157,19 +177,6 @@ public final class InventoryUtility {
 
         if (slot == -1) return SearchInvResult.notFound();
         return new SearchInvResult(slot, true, mc.player.getInventory().getStack(slot));
-    }
-
-    // Replace with findBlockInHotBar
-    @Deprecated
-    public static int findHotbarBlock(Block blockIn) {
-        for (int i = 0; i < 9; ++i) {
-            Block block;
-            ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack == ItemStack.EMPTY || !(stack.getItem() instanceof BlockItem) || (block = ((BlockItem) stack.getItem()).getBlock()) != blockIn)
-                continue;
-            return i;
-        }
-        return -1;
     }
 
     // Needs rewrite

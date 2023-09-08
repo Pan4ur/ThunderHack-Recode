@@ -137,7 +137,7 @@ public class Surround extends Module {
     public static boolean hasEntity(Box box, Predicate<Entity> predicate) {
         try {
             return !mc.world.getOtherEntities(null, box, predicate).isEmpty();
-        } catch (java.util.ConcurrentModificationException ex) {}
+        } catch (java.util.ConcurrentModificationException ignored) {}
 
         return false;
     }
@@ -209,55 +209,62 @@ public class Surround extends Module {
         if(getSlot() == -1) disable(MainSettings.isRu() ? "Нет блоков!" : "No blocks!");
         if (e.getPacket() instanceof BlockUpdateS2CPacket pac) {
             if (placeTiming.getValue() == PlaceTiming.Sequential && !sequentialBlocks.isEmpty()) {
-                if (sequentialBlocks.contains(pac.getPos())) {
-                    BlockPos bp = getSequentialPos();
-                    if (bp != null) {
-                        currentPlacePos = bp;
-                        if (breakCrystal.getValue() && breakCrystalTick.getValue()) {
-                            Entity entity = getEntity(bp);
-
-                            if (entity != null) {
-                                if (breakCrystalPacket.getValue()) mc.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
-                                else mc.interactionManager.attackEntity(mc.player, entity);
-                            }
-                        }
-
-                        InventoryUtility.saveSlot();
-                        if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, true)) {
-                            sequentialBlocks.add(bp);
-                            sequentialBlocks.remove(pac.getPos());
-                            InventoryUtility.returnSlot();
-                            inactivityTimer.reset();
-                            renderPoses.put(bp, System.currentTimeMillis());
-                            return;
-                        }
-                        InventoryUtility.returnSlot();
-                    }
-                }
+                handleSequential(pac.getPos());
             }
             if (mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < 9 && pac.getState() == Blocks.AIR.getDefaultState()) {
-                BlockPos bp = getSequentialPos();
+                handleSurroundBreak();
+            }
+        }
+    }
 
-                if (bp != null) {
-                    currentPlacePos = bp;
-                    if (breakCrystal.getValue() && breakCrystalTick.getValue()) {
-                        Entity entity = getEntity(bp);
+    private void handleSurroundBreak() {
+        BlockPos bp = getSequentialPos();
+        if (bp != null) {
+            currentPlacePos = bp;
+            if (breakCrystal.getValue() && breakCrystalTick.getValue()) {
+                Entity entity = getEntity(bp);
 
-                        if (entity != null) {
-                            if (breakCrystalPacket.getValue()) mc.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
-                            else mc.interactionManager.attackEntity(mc.player, entity);
-                        }
-                    }
-
-                    InventoryUtility.saveSlot();
-                    if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, true)) {
-                        InventoryUtility.returnSlot();
-                        inactivityTimer.reset();
-                        renderPoses.put(bp, System.currentTimeMillis());
-                        return;
-                    }
-                    InventoryUtility.returnSlot();
+                if (entity != null) {
+                    if (breakCrystalPacket.getValue()) mc.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
+                    else mc.interactionManager.attackEntity(mc.player, entity);
                 }
+            }
+
+            InventoryUtility.saveSlot();
+            if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, true)) {
+                InventoryUtility.returnSlot();
+                inactivityTimer.reset();
+                renderPoses.put(bp, System.currentTimeMillis());
+                return;
+            }
+            InventoryUtility.returnSlot();
+        }
+    }
+
+    public void handleSequential(BlockPos pos){
+        if (sequentialBlocks.contains(pos)) {
+            BlockPos bp = getSequentialPos();
+            if (bp != null) {
+                currentPlacePos = bp;
+                if (breakCrystal.getValue() && breakCrystalTick.getValue()) {
+                    Entity entity = getEntity(bp);
+
+                    if (entity != null) {
+                        if (breakCrystalPacket.getValue()) mc.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
+                        else mc.interactionManager.attackEntity(mc.player, entity);
+                    }
+                }
+
+                InventoryUtility.saveSlot();
+                if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, true)) {
+                    sequentialBlocks.add(bp);
+                    sequentialBlocks.remove(pos);
+                    InventoryUtility.returnSlot();
+                    inactivityTimer.reset();
+                    renderPoses.put(bp, System.currentTimeMillis());
+                    return;
+                }
+                InventoryUtility.returnSlot();
             }
         }
     }

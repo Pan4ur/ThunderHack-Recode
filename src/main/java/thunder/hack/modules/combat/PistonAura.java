@@ -38,6 +38,7 @@ import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
+import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
@@ -179,205 +180,19 @@ public class PistonAura extends Module {
                 stage = Stage.Trap;
             }
             case Trap -> {
-                if (!trap.getValue()) {
-                    stage = Stage.Piston;
-                    return;
-                }
-                if (mc.world.getBlockState(targetPos.add(0, 2, 0)).getBlock() == Blocks.OBSIDIAN || pistonPos.getY() >= targetPos.add(0, 2, 0).getY()) {
-                    stage = Stage.Piston;
-                    return;
-                }
-
-                if (!builtTrap) {
-                    final BlockPos offset = new BlockPos(crystalPos.getX() - targetPos.getX(), 0, crystalPos.getZ() - targetPos.getZ());
-                    final BlockPos trapBase = targetPos.add(offset.getX() * -1, 0, offset.getZ() * -1);
-
-                    List<BlockPos> trapPos = new ArrayList<>();
-                    trapPos.add(targetPos.add(0, 2, 0));
-                    trapPos.add(trapBase.add(0, 2, 0));
-                    trapPos.add(trapBase.add(0, 1, 0));
-
-                    InventoryUtility.saveSlot();
-                    for (BlockPos bp : trapPos) {
-                        if (InteractionUtility.placeBlock(bp, true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false)) {
-                            if (bp == targetPos.add(0, 2, 0)) {
-                                builtTrap = true;
-                                stage = Stage.Piston;
-                            }
-                            break;
-                        }
-                    }
-                    InventoryUtility.returnSlot();
-                }
+                buildTrap();
             }
             case Piston -> {
-                if (pistonPos == null) {
-                    stage = Stage.Searching;
-                    return;
-                }
-
-                if (pistonHeadPos == null) {
-                    stage = Stage.Searching;
-                    return;
-                }
-
-                if (mc.world.getBlockState(pistonPos).getBlock() instanceof PistonBlock) {
-                    stage = isFire ? Stage.Fire : Stage.Crystal;
-                }
-
-                if (mc.world.getBlockState(pistonPos.down()).isReplaceable() && supportPlace.getValue()) {
-                    InteractionUtility.placeBlock(pistonPos.down(), true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
-                    return;
-                }
-
-                final float[] angle = InteractionUtility.getPlaceAngle(pistonPos, interact.getValue(), false);
-                if (angle == null) return;
-                if (extra) {
-                    sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
-                } else {
-                    mc.player.setYaw(angle[0]);
-                    mc.player.setPitch(angle[1]);
-                }
-
-
-                postAction = () -> {
-                    int piston_slot;
-                    if (!InventoryUtility.findBlockInHotBar(Blocks.PISTON).found()) {
-                        if (!InventoryUtility.findBlockInHotBar(Blocks.STICKY_PISTON).found()) {
-                            disable(isRu() ? "Нет поршней!" : "No pistons!");
-                            return;
-                        } else {
-                            piston_slot = InventoryUtility.findBlockInHotBar(Blocks.STICKY_PISTON).slot();
-                        }
-                    } else {
-                        piston_slot = InventoryUtility.findBlockInHotBar(Blocks.PISTON).slot();
-                    }
-
-
-                    final float angle2 = InteractionUtility.calculateAngle(pistonHeadPos.toCenterPos(), pistonPos.toCenterPos())[0];
-
-                    mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle2, 0, mc.player.isOnGround()));
-                    float prevYaw = mc.player.getYaw();
-                    mc.player.setYaw(angle2);
-                    mc.player.prevYaw = angle2;
-                    ((IClientPlayerEntity) mc.player).setLastYaw(angle2);
-                    int prevSlot = mc.player.getInventory().selectedSlot;
-                    InteractionUtility.placeBlock(pistonPos, false, interact.getValue(), placeMode.getValue(), piston_slot, false, false);
-                    mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
-                    mc.player.getInventory().selectedSlot = prevSlot;
-                    mc.player.setYaw(prevYaw);
-
-                    stage = isFire ? Stage.Fire : Stage.Crystal;
-                };
+                placePiston(extra);
             }
             case Fire -> {
-                if (firePos == null) {
-                    stage = Stage.Searching;
-                    return;
-                }
-
-                if (mc.world.getBlockState(firePos).getBlock() instanceof FireBlock) {
-                    stage = Stage.Crystal;
-                }
-
-                if (mc.world.getBlockState(firePos.down()).isReplaceable() && supportPlace.getValue()) {
-                    InteractionUtility.placeBlock(firePos.down(), true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
-                    return;
-                }
-
-                float[] angle = InteractionUtility.getPlaceAngle(firePos, interact.getValue(), false);
-                if (angle == null) return;
-                if (extra) {
-                    sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
-                } else {
-                    mc.player.setYaw(angle[0]);
-                    mc.player.setPitch(angle[1]);
-                }
-                postAction = () -> {
-                    InteractionUtility.placeBlock(firePos, false, interact.getValue(), placeMode.getValue(), InventoryUtility.getItemSlotHotbar(Items.FLINT_AND_STEEL), false, false);
-                    stage = Stage.Crystal;
-                };
+                placeFire(extra);
             }
             case Crystal -> {
-                if (crystalPos == null) {
-                    stage = Stage.Searching;
-                    return;
-                }
-
-                if (mc.world.getBlockState(crystalPos).isReplaceable() && supportPlace.getValue()) {
-                    InteractionUtility.placeBlock(crystalPos, true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
-                    return;
-                }
-
-                BlockHitResult result = getPlaceData(crystalPos);
-                if (result == null) return;
-                float[] angle = InteractionUtility.calculateAngle(rotations);
-                if (extra) {
-                    sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0] + MathUtility.random(-0.2f, 0.2f), angle[1], mc.player.isOnGround()));
-                } else {
-                    mc.player.setYaw(angle[0] + MathUtility.random(-0.2f, 0.2f));
-                    mc.player.setPitch(angle[1]);
-                }
-
-                postAction = () -> {
-                    boolean offHand = mc.player.getOffHandStack().getItem() == Items.END_CRYSTAL;
-                    int prev_slot = -1;
-                    if (!offHand) {
-                        int crystal_slot = InventoryUtility.findItemInHotBar(Items.END_CRYSTAL).slot();
-                        prev_slot = mc.player.getInventory().selectedSlot;
-                        if (crystal_slot != -1) {
-                            mc.player.getInventory().selectedSlot = crystal_slot;
-                            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(crystal_slot));
-                        }
-                    }
-                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(offHand ? Hand.OFF_HAND : Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
-                    mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(offHand ? Hand.OFF_HAND : Hand.MAIN_HAND));
-
-                    if (!offHand) {
-                        mc.player.getInventory().selectedSlot = prev_slot;
-                        mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prev_slot));
-                    }
-
-                    stage = Stage.RedStone;
-                };
+                placeCrystal(extra);
             }
             case RedStone -> {
-                if (redStonePos == null) {
-                    stage = Stage.Searching;
-                    return;
-                }
-
-                if (mc.world.getBlockState(redStonePos).getBlock() instanceof RedstoneBlock) {
-                    stage = Stage.Break;
-                }
-
-                if (mc.world.getBlockState(redStonePos.down()).isReplaceable() && supportPlace.getValue()) {
-                    InteractionUtility.placeBlock(redStonePos.down(), true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
-                }
-
-                float[] angle = InteractionUtility.getPlaceAngle(redStonePos, interact.getValue(), false);
-                if (angle == null) return;
-                if (extra) {
-                    sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
-                } else {
-                    mc.player.setYaw(angle[0]);
-                    mc.player.setPitch(angle[1]);
-                }
-
-                postAction = () -> {
-                    int redstone_slot = -1;
-                    if (InventoryUtility.findHotbarBlock(Blocks.REDSTONE_BLOCK) == -1) {
-                        if (InventoryUtility.findHotbarBlock(Blocks.REDSTONE_TORCH) == -1) {
-                            disable(isRu() ? "Нет редстоуна!" : "No redstone!");
-                        } else {
-                            redstone_slot = InventoryUtility.findHotbarBlock(Blocks.REDSTONE_TORCH);
-                        }
-                    } else {
-                        redstone_slot = InventoryUtility.findHotbarBlock(Blocks.REDSTONE_BLOCK);
-                    }
-                    InteractionUtility.placeBlock(redStonePos, false, interact.getValue(), placeMode.getValue(), redstone_slot, false, false);
-                    stage = Stage.Break;
-                };
+                placeRedstone(extra);
             }
             case Break -> {
                 if (isFire)
@@ -386,107 +201,342 @@ public class PistonAura extends Module {
         }
     }
 
+    private void placeRedstone(boolean extra) {
+        if (redStonePos == null) {
+            stage = Stage.Searching;
+            return;
+        }
+
+        if (mc.world.getBlockState(redStonePos).getBlock() instanceof RedstoneBlock) {
+            stage = Stage.Break;
+        }
+
+        if (mc.world.getBlockState(redStonePos.down()).isReplaceable() && supportPlace.getValue()) {
+            InteractionUtility.placeBlock(redStonePos.down(), true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
+        }
+
+        float[] angle = InteractionUtility.getPlaceAngle(redStonePos, interact.getValue(), false);
+        if (angle == null) return;
+        if (extra) {
+            sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
+        } else {
+            mc.player.setYaw(angle[0]);
+            mc.player.setPitch(angle[1]);
+        }
+
+        postAction = () -> {
+            int redstone_slot = -1;
+
+            SearchInvResult redBlockResult = InventoryUtility.findBlockInHotBar(Blocks.REDSTONE_BLOCK);
+            SearchInvResult redtorchResult = InventoryUtility.findBlockInHotBar(Blocks.REDSTONE_TORCH);
+
+            if (!redBlockResult.found()) {
+                if (!redtorchResult.found()) {
+                    disable(isRu() ? "Нет редстоуна!" : "No redstone!");
+                } else {
+                    redstone_slot = redtorchResult.slot();
+                }
+            } else {
+                redstone_slot = redBlockResult.slot();
+            }
+            InteractionUtility.placeBlock(redStonePos, false, interact.getValue(), placeMode.getValue(), redstone_slot, false, false);
+            stage = Stage.Break;
+        };
+    }
+
+    private void placeCrystal(boolean extra) {
+        if (crystalPos == null) {
+            stage = Stage.Searching;
+            return;
+        }
+
+        if (mc.world.getBlockState(crystalPos).isReplaceable() && supportPlace.getValue()) {
+            InteractionUtility.placeBlock(crystalPos, true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
+            return;
+        }
+
+        BlockHitResult result = getPlaceData(crystalPos);
+        if (result == null) return;
+        float[] angle = InteractionUtility.calculateAngle(rotations);
+        if (extra) {
+            sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0] + MathUtility.random(-0.2f, 0.2f), angle[1], mc.player.isOnGround()));
+        } else {
+            mc.player.setYaw(angle[0] + MathUtility.random(-0.2f, 0.2f));
+            mc.player.setPitch(angle[1]);
+        }
+
+        postAction = () -> {
+            boolean offHand = mc.player.getOffHandStack().getItem() == Items.END_CRYSTAL;
+            int prev_slot = -1;
+            if (!offHand) {
+                int crystal_slot = InventoryUtility.findItemInHotBar(Items.END_CRYSTAL).slot();
+                prev_slot = mc.player.getInventory().selectedSlot;
+                if (crystal_slot != -1) {
+                    mc.player.getInventory().selectedSlot = crystal_slot;
+                    mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(crystal_slot));
+                }
+            }
+            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(offHand ? Hand.OFF_HAND : Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
+            mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(offHand ? Hand.OFF_HAND : Hand.MAIN_HAND));
+
+            if (!offHand) {
+                mc.player.getInventory().selectedSlot = prev_slot;
+                mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prev_slot));
+            }
+
+            stage = Stage.RedStone;
+        };
+    }
+
+    private void placeFire(boolean extra) {
+        if (firePos == null) {
+            stage = Stage.Searching;
+            return;
+        }
+
+        if (mc.world.getBlockState(firePos).getBlock() instanceof FireBlock) {
+            stage = Stage.Crystal;
+        }
+
+        if (mc.world.getBlockState(firePos.down()).isReplaceable() && supportPlace.getValue()) {
+            InteractionUtility.placeBlock(firePos.down(), true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
+            return;
+        }
+
+        float[] angle = InteractionUtility.getPlaceAngle(firePos, interact.getValue(), false);
+        if (angle == null) return;
+        if (extra) {
+            sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
+        } else {
+            mc.player.setYaw(angle[0]);
+            mc.player.setPitch(angle[1]);
+        }
+        postAction = () -> {
+            InteractionUtility.placeBlock(firePos, false, interact.getValue(), placeMode.getValue(), InventoryUtility.getItemSlotHotbar(Items.FLINT_AND_STEEL), false, false);
+            stage = Stage.Crystal;
+        };
+    }
+
+    public void buildTrap(){
+        if (!trap.getValue()) {
+            stage = Stage.Piston;
+            return;
+        }
+        if (mc.world.getBlockState(targetPos.add(0, 2, 0)).getBlock() == Blocks.OBSIDIAN || pistonPos.getY() >= targetPos.add(0, 2, 0).getY()) {
+            stage = Stage.Piston;
+            return;
+        }
+
+        if (!builtTrap) {
+            final BlockPos offset = new BlockPos(crystalPos.getX() - targetPos.getX(), 0, crystalPos.getZ() - targetPos.getZ());
+            final BlockPos trapBase = targetPos.add(offset.getX() * -1, 0, offset.getZ() * -1);
+
+            List<BlockPos> trapPos = new ArrayList<>();
+            trapPos.add(targetPos.add(0, 2, 0));
+            trapPos.add(trapBase.add(0, 2, 0));
+            trapPos.add(trapBase.add(0, 1, 0));
+
+            InventoryUtility.saveSlot();
+            for (BlockPos bp : trapPos) {
+                if (InteractionUtility.placeBlock(bp, true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false)) {
+                    if (bp == targetPos.add(0, 2, 0)) {
+                        builtTrap = true;
+                        stage = Stage.Piston;
+                    }
+                    break;
+                }
+            }
+            InventoryUtility.returnSlot();
+        }
+    }
+
+    public void placePiston(boolean extra){
+        if (pistonPos == null) {
+            stage = Stage.Searching;
+            return;
+        }
+
+        if (pistonHeadPos == null) {
+            stage = Stage.Searching;
+            return;
+        }
+
+        if (mc.world.getBlockState(pistonPos).getBlock() instanceof PistonBlock) {
+            stage = isFire ? Stage.Fire : Stage.Crystal;
+        }
+
+        if (mc.world.getBlockState(pistonPos.down()).isReplaceable() && supportPlace.getValue()) {
+            InteractionUtility.placeBlock(pistonPos.down(), true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
+            return;
+        }
+
+        final float[] angle = InteractionUtility.getPlaceAngle(pistonPos, interact.getValue(), false);
+        if (angle == null) return;
+        if (extra) {
+            sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
+        } else {
+            mc.player.setYaw(angle[0]);
+            mc.player.setPitch(angle[1]);
+        }
+
+
+        postAction = () -> {
+            int piston_slot;
+            if (!InventoryUtility.findBlockInHotBar(Blocks.PISTON).found()) {
+                if (!InventoryUtility.findBlockInHotBar(Blocks.STICKY_PISTON).found()) {
+                    disable(isRu() ? "Нет поршней!" : "No pistons!");
+                    return;
+                } else {
+                    piston_slot = InventoryUtility.findBlockInHotBar(Blocks.STICKY_PISTON).slot();
+                }
+            } else {
+                piston_slot = InventoryUtility.findBlockInHotBar(Blocks.PISTON).slot();
+            }
+
+
+            final float angle2 = InteractionUtility.calculateAngle(pistonHeadPos.toCenterPos(), pistonPos.toCenterPos())[0];
+
+            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle2, 0, mc.player.isOnGround()));
+            float prevYaw = mc.player.getYaw();
+            mc.player.setYaw(angle2);
+            mc.player.prevYaw = angle2;
+            ((IClientPlayerEntity) mc.player).setLastYaw(angle2);
+            int prevSlot = mc.player.getInventory().selectedSlot;
+            InteractionUtility.placeBlock(pistonPos, false, interact.getValue(), placeMode.getValue(), piston_slot, false, false);
+            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
+            mc.player.getInventory().selectedSlot = prevSlot;
+            mc.player.setYaw(prevYaw);
+
+            stage = isFire ? Stage.Fire : Stage.Crystal;
+        };
+    }
+
     public BlockHitResult getPlaceData(BlockPos bp) {
-        Block block = mc.world.getBlockState(bp).getBlock();
+        Block base = mc.world.getBlockState(bp).getBlock();
         Block freeSpace = mc.world.getBlockState(bp.up()).getBlock();
         Block legacyFreeSpace = mc.world.getBlockState(bp.up().up()).getBlock();
 
-        if (block != Blocks.OBSIDIAN && block != Blocks.BEDROCK)
+        if (base != Blocks.OBSIDIAN && base != Blocks.BEDROCK)
             return null;
 
         if (!(freeSpace == Blocks.AIR && (!oldVersion.getValue() || legacyFreeSpace == Blocks.AIR)))
             return null;
 
-        Box posBoundingBox = new Box(bp.up());
+        if(checkEntities(bp)) return null;
 
-        if (oldVersion.getValue())
-            posBoundingBox.expand(0, 1f, 0);
+        Vec3d crystalVec = new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ());
 
-        for (Entity ent : Thunderhack.asyncManager.getAsyncEntities()) {
+        BlockHitResult interactResult = null;
+
+        switch (interact.getValue()){
+            case Vanilla -> interactResult = getDefaultInteract(crystalVec, bp);
+            case Strict -> interactResult = getStrictInteract(bp);
+            case Legit -> interactResult = getLegitInteract(bp);
+        }
+
+        if(interactResult == null) return null;
+
+        return interactResult;
+    }
+
+    private boolean checkEntities(BlockPos base) {
+        Box posBoundingBox = new Box(base.up());
+
+        posBoundingBox = posBoundingBox.expand(0, 1f, 0);
+
+        for (Entity ent : mc.world.getEntities()) {
             if (ent == null) continue;
             if (ent.getBoundingBox().intersects(posBoundingBox)) {
                 if (ent instanceof ExperienceOrbEntity)
                     continue;
-                if (ent instanceof EndCrystalEntity)
+                if (ent instanceof EndCrystalEntity) {
                     continue;
-                return null;
+                }
+                return true;
             }
         }
-
-        Vec3d crystalvector = new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ());
-
-        if (interact.getValue() == InteractionUtility.Interact.Vanilla) {
-            if (squaredDistanceFromEyes(crystalvector) > placeRange.getPow2Value())
-                return null;
-
-            BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), crystalvector, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
-
-            if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != bp)
-                if (squaredDistanceFromEyes(crystalvector) > wallRange.getPow2Value())
-                    return null;
-
-            return new BlockHitResult(crystalvector, Direction.DOWN, bp, false);
-        } else if (interact.getValue() == InteractionUtility.Interact.Strict) {
-            float bestDistance = 999f;
-            Direction bestDirection = null;
-            Vec3d bestVector = null;
-
-            if (mc.player.getEyePos().getY() > bp.up().getY()) {
-                bestDirection = Direction.UP;
-                bestVector = new Vec3d(bp.getX() + 0.5, bp.getY() + 1, bp.getZ() + 0.5);
-            } else if (mc.player.getEyePos().getY() < bp.getY()) {
-                bestDirection = Direction.DOWN;
-                bestVector = new Vec3d(bp.getX() + 0.5, bp.getY(), bp.getZ() + 0.5);
-            } else {
-                for (Direction dir : Direction.values()) {
-                    Vec3d directionVec = new Vec3d(bp.getX() + 0.5 + dir.getVector().getX() * 0.5, bp.getY() + 0.5 + dir.getVector().getY() * 0.5, bp.getZ() + 0.5 + dir.getVector().getZ() * 0.5);
-                    float distance = squaredDistanceFromEyes(directionVec);
-                    if (bestDistance > distance) {
-                        bestDirection = dir;
-                        bestVector = directionVec;
-                        bestDistance = distance;
-                    }
-                }
-            }
-
-            if (bestVector == null) return null;
-
-            if (squaredDistanceFromEyes(bestVector) > placeRange.getPow2Value())
-                return null;
-
-            BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), bestVector, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
-
-            if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != bp)
-                if (squaredDistanceFromEyes(bestVector) > wallRange.getPow2Value())
-                    return null;
-
-            return new BlockHitResult(bestVector, bestDirection, bp, false);
-        } else {
-            float bestDistance = 999f;
-            BlockHitResult bestData = null;
-            for (float x = 0f; x <= 1f; x += 0.05f) {
-                for (float y = 0f; y <= 1; y += 0.05f) {
-                    for (float z = 0f; z <= 1; z += 0.05f) {
-                        Vec3d point = new Vec3d(bp.getX() + x, bp.getY() + y, bp.getZ() + z);
-                        BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), point, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
-                        if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != bp)
-                            if (squaredDistanceFromEyes(point) > wallRange.getPow2Value())
-                                continue;
-
-                        BlockHitResult result = ExplosionUtility.rayCastBlock(new RaycastContext(InteractionUtility.getEyesPos(mc.player), point, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player), bp);
-                        if (squaredDistanceFromEyes(point) > placeRange.getPow2Value())
-                            continue;
-
-                        if (squaredDistanceFromEyes(point) < bestDistance)
-                            if (result != null && result.getType() == HitResult.Type.BLOCK)
-                                bestData = result;
-                    }
-                }
-            }
-            return bestData;
-        }
+        return false;
     }
 
+    private BlockHitResult getDefaultInteract(Vec3d crystalVector, BlockPos bp) {
+        if (PlayerUtility.squaredDistanceFromEyes(crystalVector) > placeRange.getPow2Value())
+            return null;
+
+        BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), crystalVector, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
+
+        if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != bp)
+            if (PlayerUtility.squaredDistanceFromEyes(crystalVector) > wallRange.getPow2Value())
+                return null;
+
+        return new BlockHitResult(crystalVector, Direction.DOWN, bp, false);
+    }
+
+    public BlockHitResult getStrictInteract(BlockPos bp){
+        float bestDistance = 999f;
+        Direction bestDirection = null;
+        Vec3d bestVector = null;
+
+        if (mc.player.getEyePos().getY() > bp.up().getY()) {
+            bestDirection = Direction.UP;
+            bestVector = new Vec3d(bp.getX() + 0.5, bp.getY() + 1, bp.getZ() + 0.5);
+        } else if (mc.player.getEyePos().getY() < bp.getY()) {
+            bestDirection = Direction.DOWN;
+            bestVector = new Vec3d(bp.getX() + 0.5, bp.getY(), bp.getZ() + 0.5);
+        } else {
+            for (Direction dir : Direction.values()) {
+                Vec3d directionVec = new Vec3d(bp.getX() + 0.5 + dir.getVector().getX() * 0.5, bp.getY() + 0.5 + dir.getVector().getY() * 0.5, bp.getZ() + 0.5 + dir.getVector().getZ() * 0.5);
+                float distance = PlayerUtility.squaredDistanceFromEyes(directionVec);
+                if (bestDistance > distance) {
+                    bestDirection = dir;
+                    bestVector = directionVec;
+                    bestDistance = distance;
+                }
+            }
+        }
+
+        if (bestVector == null) return null;
+
+        if (PlayerUtility.squaredDistanceFromEyes(bestVector) > placeRange.getPow2Value())
+            return null;
+
+        BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), bestVector, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
+
+        if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != bp)
+            if (PlayerUtility.squaredDistanceFromEyes(bestVector) > wallRange.getPow2Value())
+                return null;
+
+        return new BlockHitResult(bestVector, bestDirection, bp, false);
+    }
+
+    public BlockHitResult getLegitInteract(BlockPos bp){
+        float bestDistance = 999f;
+        BlockHitResult bestResult = null;
+        for (float x = 0f; x <= 1f; x += 0.2f) {
+            for (float y = 0f; y <= 1f; y += 0.2f) {
+                for (float z = 0f; z <= 1f; z += 0.2f) {
+                    Vec3d point = new Vec3d(bp.getX() + x, bp.getY() + y, bp.getZ() + z);
+                    float distance = PlayerUtility.squaredDistanceFromEyes(point);
+
+                    BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), point, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
+                    if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != bp)
+                        if (distance > wallRange.getPow2Value())
+                            continue;
+
+                    BlockHitResult result = ExplosionUtility.rayCastBlock(new RaycastContext(InteractionUtility.getEyesPos(mc.player), point, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player), bp);
+                    if (distance > placeRange.getPow2Value())
+                        continue;
+
+                    if (distance < bestDistance) {
+                        if (result != null && result.getType() == HitResult.Type.BLOCK) {
+                            bestResult = result;
+                            bestDistance = distance;
+                        }
+                    }
+                }
+            }
+        }
+        return bestResult;
+    }
 
     public void breakCrystal() {
         for (Entity ent : mc.world.getEntities()) {
