@@ -681,52 +681,28 @@ public class AutoCrystal extends Module {
     }
 
     public PlaceData getPlaceData(BlockPos bp, PlayerEntity target) {
-        Block block = mc.world.getBlockState(bp).getBlock();
+        Block base = mc.world.getBlockState(bp).getBlock();
         Block freeSpace = mc.world.getBlockState(bp.up()).getBlock();
         Block legacyFreeSpace = mc.world.getBlockState(bp.up().up()).getBlock();
 
-        if (block != Blocks.OBSIDIAN && block != Blocks.BEDROCK)
+        if (base != Blocks.OBSIDIAN && base != Blocks.BEDROCK)
             return null;
 
         if (!(freeSpace == Blocks.AIR && (!oldVer.getValue() || legacyFreeSpace == Blocks.AIR)))
             return null;
 
-        Box posBoundingBox = new Box(bp.up());
+        if(checkEntities(bp)) return null;
 
-        if (!ccPlace.getValue())
-            posBoundingBox = posBoundingBox.expand(0, 1f, 0);
+        Vec3d crystalVec = new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ());
 
-
-        for (Entity ent : mc.world.getEntities()) {
-            if (ent == null) continue;
-            if (ent.getBoundingBox().intersects(posBoundingBox)) {
-                if (ent instanceof ExperienceOrbEntity)
-                    continue;
-                if (ent instanceof EndCrystalEntity) {
-                    continue;
-                }
-                return null;
-            }
-        }
-
-        Vec3d crystalvector = new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ());
-
-        float damage;
-
-        if (target == null) {
-            damage = 10;
-        } else {
-            damage = ExplosionUtility.getExplosionDamage2(crystalvector, target);
-        }
-
-        float selfDamage = ExplosionUtility.getSelfExplosionDamage(crystalvector);
-
+        float damage = target == null ? 10f : ExplosionUtility.getExplosionDamage2(crystalVec, target);
+        float selfDamage = ExplosionUtility.getSelfExplosionDamage(crystalVec);
         boolean overrideDamage = shouldOverrideDamage(damage, selfDamage);
 
         if (protectFriends.getValue()) {
             for (PlayerEntity pl : mc.world.getPlayers()) {
                 if (!Thunderhack.friendManager.isFriend(pl)) continue;
-                float fdamage = ExplosionUtility.getExplosionDamage2(crystalvector, pl);
+                float fdamage = ExplosionUtility.getExplosionDamage2(crystalVec, pl);
                 if (fdamage > selfDamage) {
                     selfDamage = fdamage;
                 }
@@ -739,7 +715,7 @@ public class AutoCrystal extends Module {
         BlockHitResult interactResult = null;
 
         switch (interact.getValue()){
-            case Default -> interactResult = getDefaultInteract(crystalvector, bp);
+            case Default -> interactResult = getDefaultInteract(crystalVec, bp);
             case Strict -> interactResult = getStrictInteract(bp);
             case Legit -> interactResult = getLegitInteract(bp);
         }
@@ -749,29 +725,48 @@ public class AutoCrystal extends Module {
         return new PlaceData(interactResult, damage, selfDamage, overrideDamage);
     }
 
+    private boolean checkEntities(BlockPos base) {
+        Box posBoundingBox = new Box(base.up());
+
+        if (!ccPlace.getValue())
+            posBoundingBox = posBoundingBox.expand(0, 1f, 0);
+
+        for (Entity ent : mc.world.getEntities()) {
+            if (ent == null) continue;
+            if (ent.getBoundingBox().intersects(posBoundingBox)) {
+                if (ent instanceof ExperienceOrbEntity)
+                    continue;
+                if (ent instanceof EndCrystalEntity) {
+                    continue;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean shouldOverrideDamage(float damage, float selfDamage){
-        if (overrideSelfDamage.getValue()) {
-            boolean canPop = target != null
-                    && damage + 0.5 > target.getHealth() + target.getAbsorptionAmount()
-                    && (target.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING
+        if (overrideSelfDamage.getValue() && target != null) {
+            boolean targetSafe = (target.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING
                     || target.getMainHandStack().getItem() == Items.TOTEM_OF_UNDYING);
 
-            boolean canKill = target != null
-                    && damage + 0.5 > target.getHealth() + target.getAbsorptionAmount()
-                    && target.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING
-                    && target.getMainHandStack().getItem() != Items.TOTEM_OF_UNDYING;
-
-            boolean canPopSelf = selfDamage + 0.5 > mc.player.getHealth() + mc.player.getAbsorptionAmount()
-                    && (mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING
+            boolean playerSafe = (mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING
                     || mc.player.getMainHandStack().getItem() == Items.TOTEM_OF_UNDYING);
 
-            boolean canKillSelf = selfDamage + 0.5 > mc.player.getHealth() + mc.player.getAbsorptionAmount()
-                    && mc.player.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING
-                    && mc.player.getMainHandStack().getItem() != Items.TOTEM_OF_UNDYING;
+            float targetHp = target.getHealth() + target.getAbsorptionAmount() - 1f;
 
-            if (canPopSelf && canKill && !canKillSelf)
+            float playerHp = mc.player.getHealth() + mc.player.getAbsorptionAmount() - 1f;
+
+            boolean canPop = damage > targetHp && targetSafe;
+
+            boolean canKill = damage > targetHp && !targetSafe;
+
+            boolean canPopSelf = selfDamage > playerHp && playerSafe;
+
+            boolean canKillSelf = selfDamage > playerHp && !playerSafe;
+
+            if (canPopSelf && canKill)
                 return true;
-
 
             if (selfDamage > maxSelfDamage.getValue() && canPop && !canKillSelf && !canPopSelf)
                 return true;

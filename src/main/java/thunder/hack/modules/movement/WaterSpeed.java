@@ -17,23 +17,18 @@ public class WaterSpeed extends Module {
         HollyWorld/*, Ignore*/
     }
 
-    private boolean hasBefore = false;
 
     @Override
-    public void onEnable() {
+    public void onUpdate() {
         if(mode.getValue() == Mode.HollyWorld) {
-            hasBefore = mc.player.hasStatusEffect(StatusEffects.DOLPHINS_GRACE);
-            if (!hasBefore)
-                mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, 999999));
+            mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, 2));
         }
     }
-
 
     @Override
     public void onDisable() {
         if(mode.getValue() == Mode.HollyWorld) {
-            if (!hasBefore)
-                mc.player.removeStatusEffect(StatusEffects.DOLPHINS_GRACE);
+            mc.player.removeStatusEffect(StatusEffects.DOLPHINS_GRACE);
         }
     }
 }
