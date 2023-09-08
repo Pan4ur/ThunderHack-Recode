@@ -1,9 +1,8 @@
 package thunder.hack.modules.movement;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.entity.effect.StatusEffects;
 import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
@@ -11,7 +10,6 @@ import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
-import net.minecraft.entity.effect.StatusEffects;
 
 import static thunder.hack.utility.player.MovementUtility.isMoving;
 
@@ -23,6 +21,7 @@ public class Speed extends Module {
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
     public Setting<Boolean> useTimer = new Setting<>("Use Timer", false);
+    public final Setting<Integer> hurttime = new Setting<>("Hurttime", 0, 0, 10, v-> mode.getValue() == Mode.MatrixDamage);
 
     public boolean flip;
     public double baseSpeed;
@@ -30,7 +29,9 @@ public class Speed extends Module {
     private thunder.hack.utility.Timer elytraDelay = new thunder.hack.utility.Timer();
     private thunder.hack.utility.Timer startDelay = new thunder.hack.utility.Timer();
 
-    public enum Mode {StrictStrafe, MatrixJB, NCP,FGLowRider}
+    public enum Mode {
+        StrictStrafe, MatrixJB, NCP, FGLowRider, MatrixDamage
+    }
 
     @Override
     public void onDisable() {
@@ -46,14 +47,15 @@ public class Speed extends Module {
     }
 
     @EventHandler
-    public void onPlayerUpdate(PlayerUpdateEvent e){
+    public void onPlayerUpdate(PlayerUpdateEvent e) {
         if (mode.getValue() == Mode.MatrixJB) {
             if (MovementUtility.isMoving() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(0.5, 0.0, 0.5).offset(0.0, -1.0, 0.0)).iterator().hasNext() && !flip) {
                 mc.player.setOnGround(true);
                 mc.player.jump();
             }
             if (mc.player.fallDistance > 0) flip = true;
-            if (mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0,  -0.2, 0.0)).iterator().hasNext() && flip) flip = false;
+            if (mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, -0.2, 0.0)).iterator().hasNext() && flip)
+                flip = false;
         }
     }
 
@@ -65,25 +67,36 @@ public class Speed extends Module {
                 mc.player.jump();
                 return;
             }
-            if (mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.29,0,-0.29).offset(0.0, -3, 0.0f)).iterator().hasNext() && elytraDelay.passedMs(150) && startDelay.passedMs(500)) {
+            if (mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.29, 0, -0.29).offset(0.0, -3, 0.0f)).iterator().hasNext() && elytraDelay.passedMs(150) && startDelay.passedMs(500)) {
                 int elytra = InventoryUtility.getElytra();
                 if (elytra == -1) {
                     disable(MainSettings.isRu() ? "Для этого режима нужна элитра!" : "You need elytra for this mode!");
                 } else {
                     Strafe.disabler(elytra);
                 }
-                mc.player.setVelocity(mc.player.getVelocity().getX(),0f,mc.player.getVelocity().getZ());
+                mc.player.setVelocity(mc.player.getVelocity().getX(), 0f, mc.player.getVelocity().getZ());
                 if (isMoving()) {
                     MovementUtility.setMotion(0.85);
                 }
                 elytraDelay.reset();
             }
         }
+        if(mode.getValue() == Mode.MatrixDamage){
+            if (MovementUtility.isMoving() && mc.player.hurtTime > hurttime.getValue()) {
+                if (mc.player.isOnGround()) {
+                    MovementUtility.setMotion(0.387f);
+                } else if (mc.player.isTouchingWater()) {
+                    MovementUtility.setMotion(0.346f);
+                } else if (!mc.player.isOnGround()) {
+                    MovementUtility.setMotion(0.448f);
+                }
+            }
+        }
     }
 
     @EventHandler
     public void onMove(EventMove event) {
-        if (mode.getValue() == Mode.MatrixJB || mode.getValue() == Mode.FGLowRider) return;
+        if (mode.getValue() == Mode.MatrixJB || mode.getValue() == Mode.FGLowRider || mode.getValue() == Mode.MatrixDamage) return;
         if (mc.player.getAbilities().flying) return;
         if (mc.player.isFallFlying()) return;
         if (mc.player.getHungerManager().getFoodLevel() <= 6) return;

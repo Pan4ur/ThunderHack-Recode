@@ -1,16 +1,13 @@
 package thunder.hack.modules.combat;
 
-import io.netty.buffer.Unpooled;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector2f;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
@@ -25,9 +22,8 @@ import net.minecraft.item.AxeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.item.SwordItem;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.*;
-import net.minecraft.network.packet.s2c.play.*;
+import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -52,8 +48,6 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -71,6 +65,7 @@ public class Aura extends Module {
     public final Setting<Boolean> wallsBypass = new Setting<>("WallsBypass", false, v -> ignoreWalls.getValue());
     public final Setting<Boolean> shieldBreaker = new Setting<>("ShieldBreaker", true);
     public final Setting<Boolean> unpressShield = new Setting<>("UnpressShield", true);
+    public final Setting<Boolean> dropSprint = new Setting<>("DropSprint", true);
     public final Setting<Boolean> pauseInInventory = new Setting<>("PauseInInventory", true);
     public static final Setting<Boolean> oldDelay = new Setting<>("OldDelay", false);
     public static final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 15, v -> oldDelay.getValue());
@@ -90,20 +85,15 @@ public class Aura extends Module {
     public final Setting<Boolean> ignoreShield = new Setting<>("IgnoreShield", true).withParent(targets);
 
     public enum Mode {
-        Universal,
-        None
+        Universal, None
     }
 
     public enum RayTrace {
-        OFF,
-        OnlyTarget,
-        AllEntities
+        OFF, OnlyTarget, AllEntities
     }
 
     public enum Sort {
-        Distance,
-        Health,
-        FOV
+        Distance, Health, FOV
     }
 
     public enum Grim {
@@ -199,7 +189,7 @@ public class Aura extends Module {
                 sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
 
             boolean sprint = Core.serversprint;
-            if (sprint)
+            if (sprint && dropSprint.getValue())
                 sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
 
             if (!(target instanceof PlayerEntity) || !(((PlayerEntity) target).isUsingItem() && ((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD) || ignoreShield.getValue()) {
@@ -214,7 +204,7 @@ public class Aura extends Module {
                 hitTicks = oldDelay.getValue() ? 1 + (int) (20f / MathUtility.random(minCPS.getValue(), maxCPS.getValue())) : 11;
             }
 
-            if (sprint)
+            if (sprint && dropSprint.getValue())
                 sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
             if (blocking && unpressShield.getValue())
                 sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
@@ -244,7 +234,7 @@ public class Aura extends Module {
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (e.getPacket() instanceof EntityStatusS2CPacket status) {
-            if(status.getStatus() == 30 && status.getEntity(mc.world) != null && target != null && status.getEntity(mc.world) == target)
+            if (status.getStatus() == 30 && status.getEntity(mc.world) != null && target != null && status.getEntity(mc.world) == target)
                 Thunderhack.notificationManager.publicity("Aura", MainSettings.isRu() ? ("Успешно сломали щит игроку " + target.getName().getString()) : ("Succesfully destroyed " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
         }
         /*
@@ -347,13 +337,11 @@ public class Aura extends Module {
             return;
         }
 
-        if(sort.getValue() == Sort.FOV)
+        if (sort.getValue() == Sort.FOV)
             target = candidat;
 
-        if(candidat instanceof ProjectileEntity)
+        if (candidat instanceof ProjectileEntity)
             target = candidat;
-
-
 
 
         if (skipEntity(target)) {
@@ -518,7 +506,7 @@ public class Aura extends Module {
             if ((ent instanceof ShulkerBulletEntity || ent instanceof FireballEntity)
                     && ent.isAlive()
                     && distanceFromHead(ent.getPos()) < getRotateDistance() * getRotateDistance()
-                    && Projectiles.getValue()){
+                    && Projectiles.getValue()) {
                 return ent;
             }
             if (skipEntity(ent)) continue;
