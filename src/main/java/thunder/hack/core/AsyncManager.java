@@ -1,10 +1,12 @@
 package thunder.hack.core;
 
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
+import thunder.hack.events.impl.EventPostTick;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.modules.Module;
@@ -23,8 +25,8 @@ public class AsyncManager {
     private volatile Iterable<Entity> threadSafeEntityList = Collections.emptyList();
     private volatile List<AbstractClientPlayerEntity> threadSafePlayersList = Collections.emptyList();
 
-    @EventHandler
-    public void onTick(EventTick e) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPostTick(EventPostTick e) {
         if (mc.world == null) return;
         threadSafeEntityList = mc.world.getEntities();
         threadSafePlayersList = mc.world.getPlayers();

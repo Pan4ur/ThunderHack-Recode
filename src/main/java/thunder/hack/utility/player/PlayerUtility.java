@@ -4,6 +4,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PendingUpdateManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.injection.accesors.IClientWorldMixin;
 
@@ -21,6 +22,15 @@ public final class PlayerUtility {
         if (mc.interactionManager == null) return false;
 
         return mc.interactionManager.isBreakingBlock();
+    }
+
+    public static float squaredDistanceFromEyes(@NotNull Vec3d vec) {
+        if (mc.player == null) return 0;
+
+        double d0 = vec.x - mc.player.getX();
+        double d1 = vec.z - mc.player.getZ();
+        double d2 = vec.y - (mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose()));
+        return (float) (d0 * d0 + d1 * d1 + d2 * d2);
     }
 
     public static float squaredDistance2d(@NotNull Vec2f point) {

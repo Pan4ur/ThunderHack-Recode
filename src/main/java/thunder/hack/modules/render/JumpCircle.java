@@ -65,7 +65,7 @@ public class JumpCircle extends Module {
                 double y = c.position().y - mc.getEntityRenderDispatcher().camera.getPos().getY();
                 double z = c.position().z - mc.getEntityRenderDispatcher().camera.getPos().getZ();
                 float k = (float) c.timer.getPassedTimeMs() / (float) (lifetime.getValue() * 1000);
-                float start = k * 2.2f;
+                float start = k * 1.6f;
                 float middle = (start + k) / 2;
 
                 stack.push();
@@ -160,7 +160,7 @@ public class JumpCircle extends Module {
         }
 
         public boolean update() {
-            return timer.passedMs(lifetime.getValue() * 10000);
+            return timer.passedMs(lifetime.getValue() * 1000);
         }
     }
 }

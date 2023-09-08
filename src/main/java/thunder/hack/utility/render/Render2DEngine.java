@@ -646,8 +646,8 @@ public class Render2DEngine {
     }
 
     public static Color injectAlpha(final Color color, final int alpha) {
-        int alph = MathHelper.clamp(alpha, 0, 255);
-        return new Color(color.getRed(), color.getGreen(), color.getBlue(), alph);
+        // 5 - минимальное для фонтрендерера
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(), MathHelper.clamp(alpha, 5, 255));
     }
 
     public static Color TwoColoreffect(Color cl1, Color cl2, double speed) {

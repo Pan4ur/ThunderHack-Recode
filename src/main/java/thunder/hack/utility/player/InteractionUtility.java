@@ -252,9 +252,9 @@ public final class InteractionUtility {
         if (interact == Interact.Legit) {
             float bestDistance = 999f;
             BreakData bestData = null;
-            for (float x = 0f; x <= 1f; x += 0.05f) {
-                for (float y = 0f; y <= 1; y += 0.05f) {
-                    for (float z = 0f; z <= 1; z += 0.05f) {
+            for (float x = 0f; x <= 1f; x += 0.2f) {
+                for (float y = 0f; y <= 1; y += 0.2f) {
+                    for (float z = 0f; z <= 1; z += 0.2f) {
                         Vec3d point = new Vec3d(bp.getX() + x, bp.getY() + y, bp.getZ() + z);
                         BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), point, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
                         if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != bp)
