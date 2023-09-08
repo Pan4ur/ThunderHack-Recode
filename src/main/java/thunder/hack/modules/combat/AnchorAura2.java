@@ -2,26 +2,30 @@ package thunder.hack.modules.combat;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RespawnAnchorBlock;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
+import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,15 +86,15 @@ public class AnchorAura2 extends Module {
         Both
     }
 
-    private final Timer logicTimer = new Timer();
     private final List<BlockPos> ownAnchors = new ArrayList<>();
     private PlayerEntity target;
     private BlockPos targetPos;
 
     // Threads
-    private final PlaceThread placeThread = new PlaceThread();
-    private final ChargeThread chargeThread = new ChargeThread();
-    private final ExplodeThread explodeThread = new ExplodeThread();
+    private LogicThread logicThread;
+    private PlaceThread placeThread;
+    private ChargeThread chargeThread;
+    private ExplodeThread explodeThread;
 
     public AnchorAura2() {
         super("AnchorAura228", "Ебашит якоря как героин", Category.COMBAT);
@@ -103,6 +107,12 @@ public class AnchorAura2 extends Module {
             disable(isRu() ? "В данном измерении не работают якоря возрожденя! Выключение..." : "There are respawn anchors don't work! Disabling...");
         }
 
+        logicThread = new LogicThread();
+        placeThread = new PlaceThread();
+        chargeThread = new ChargeThread();
+        explodeThread = new ExplodeThread();
+
+        logicThread.start();
         placeThread.start();
         chargeThread.start();
         explodeThread.start();
@@ -112,48 +122,33 @@ public class AnchorAura2 extends Module {
 
     @Override
     public void onDisable() {
-        placeThread.interrupt();
-        chargeThread.interrupt();
-        explodeThread.interrupt();
+        if (placeThread != null && !placeThread.isInterrupted()) {
+            placeThread.interrupt();
+            placeThread = null;
+        }
+        if (chargeThread != null && !chargeThread.isInterrupted()) {
+            chargeThread.interrupt();
+            chargeThread = null;
+        }
+        if (explodeThread != null && !explodeThread.isInterrupted()) {
+            explodeThread.interrupt();
+            explodeThread = null;
+        }
+        if (logicThread != null && !logicThread.isInterrupted()) {
+            logicThread.interrupt();
+            logicThread = null;
+        }
 
         super.onDisable();
     }
 
     @Override
-    public synchronized void onThread() {
-        if (fullNullCheck()) return;
-        if (logicTimer.passedMs(logicTimeout.getValue())) logicTimer.reset();
-        else return;
-
-        if (target.getPos().squaredDistanceTo(mc.player.getEyePos()) > targetRange.getValue() * targetRange.getValue()) {
-            target = null;
-        }
-        if (target == null) {
-            target = Thunderhack.combatManager.getNearestTarget(targetRange.getValue());
+    public void onRender3D(MatrixStack event) {
+        if (targetPos != null) {
+            Render3DEngine.drawBoxOutline(new Box(targetPos), HudEditor.getColor(0), 2);
         }
 
-        // Finding new best target pos
-        BlockPos best = null;
-        for (BlockPos blockPos : findAnchorBlocks()) {
-            if (ExplosionUtility.getAnchorExplosionDamage(blockPos, mc.player) <= maxDamage.getValue()
-                    && ExplosionUtility.getAnchorExplosionDamage(blockPos, target) >= minDamage.getValue()) {
-                if (best == null) {
-                    best = blockPos;
-                } else if (ExplosionUtility.getAnchorExplosionDamage(best, mc.player) >= ExplosionUtility.getAnchorExplosionDamage(blockPos, mc.player)
-                        && ExplosionUtility.getAnchorExplosionDamage(best, target) <= ExplosionUtility.getAnchorExplosionDamage(blockPos, target)) {
-                    best = blockPos;
-                }
-            }
-        }
-
-        if (mc.player.squaredDistanceTo(targetPos.toCenterPos()) > placeRange.getPow2Value()) {
-            if (ExplosionUtility.getAnchorExplosionDamage(targetPos, mc.player) >= ExplosionUtility.getAnchorExplosionDamage(best, mc.player)
-                    && ExplosionUtility.getAnchorExplosionDamage(targetPos, target) <= ExplosionUtility.getAnchorExplosionDamage(best, target)) {
-                targetPos = best;
-            }
-        }
-
-        super.onThread();
+        super.onRender3D(event);
     }
 
     private @NotNull List<BlockPos> findAnchorBlocks() {
@@ -184,27 +179,85 @@ public class AnchorAura2 extends Module {
                 || (onEat.getValue() && PlayerUtility.isEating());
     }
 
+    private void interact(BlockHitResult result, @NotNull Setting<InteractMode> explodeMode) {
+        if (explodeMode.getValue() == InteractMode.Packet || explodeMode.getValue() == InteractMode.Both) {
+            sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
+        }
+        if (explodeMode.getValue() == InteractMode.Vanilla || explodeMode.getValue() == InteractMode.Both) {
+            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
+        }
+
+        if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
+        else sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+    }
+
+    private final class LogicThread extends Thread {
+        @Override
+        public synchronized void run() {
+            while (true) {
+                try {
+                    sleep(logicTimeout.getValue());
+                } catch (InterruptedException ignored) {
+                }
+
+                if (fullNullCheck()) return;
+
+                if (target == null) {
+                    target = Thunderhack.combatManager.getNearestTarget(targetRange.getValue());
+                    return;
+                }
+                if (target.getPos().squaredDistanceTo(mc.player.getEyePos()) > targetRange.getValue() * targetRange.getValue()) {
+                    target = null;
+                }
+
+                // Finding new best target pos
+                BlockPos best = null;
+                for (BlockPos blockPos : findAnchorBlocks()) {
+                    if (ExplosionUtility.getAnchorExplosionDamage(blockPos, mc.player) <= maxDamage.getValue()
+                            && ExplosionUtility.getAnchorExplosionDamage(blockPos, target) >= minDamage.getValue()) {
+                        if (best == null) {
+                            best = blockPos;
+                        } else if (ExplosionUtility.getAnchorExplosionDamage(best, mc.player) >= ExplosionUtility.getAnchorExplosionDamage(blockPos, mc.player)
+                                && ExplosionUtility.getAnchorExplosionDamage(best, target) <= ExplosionUtility.getAnchorExplosionDamage(blockPos, target)) {
+                            best = blockPos;
+                        }
+                    }
+                }
+
+                if (targetPos == null) {
+                    targetPos = best;
+                } else if (mc.player.squaredDistanceTo(targetPos.toCenterPos()) <= placeRange.getPow2Value()
+                        || !InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false)) {
+                    if ((ExplosionUtility.getAnchorExplosionDamage(targetPos, mc.player) >= ExplosionUtility.getAnchorExplosionDamage(best, mc.player)
+                            && ExplosionUtility.getAnchorExplosionDamage(targetPos, target) <= ExplosionUtility.getAnchorExplosionDamage(best, target))) {
+                        targetPos = best;
+                    }
+                }
+            }
+        }
+    }
+
     private final class PlaceThread extends Thread {
         @Override
         public void run() {
-            try {
-                sleep(placeTimeout.getValue());
-            } catch (InterruptedException ignored) {
+            while (true) {
+                try {
+                    sleep(placeTimeout.getValue());
+                } catch (InterruptedException ignored) {
+                }
+
+                if (target == null || targetPos == null) return;
+                if (!isCorrectPos(targetPos) || shouldPause()) return;
+
+                SearchInvResult anchor = InventoryUtility.getAnchor();
+                if (!anchor.found() && anchorDisable.getValue()) {
+                    disable(isRu() ? "В хотбаре не найдены якоря возрождения! Выключение..." : "No respawn anchors in hotbar! Disabling...");
+                }
+
+                boolean result = InteractionUtility.placeBlock(targetPos, placeRotate.getValue(), interactMode.getValue(), placeMode.getValue(), anchor, switchBack.getValue(), switchMode.getValue(), false);
+                if (result)
+                    ownAnchors.add(targetPos);
             }
-
-            if (target == null || targetPos == null) return;
-            if (!isCorrectPos(targetPos) || shouldPause()) return;
-
-            SearchInvResult anchor = InventoryUtility.getAnchor();
-            if (!anchor.found() && anchorDisable.getValue()) {
-                disable(isRu() ? "В хотбаре не найдены якоря возрождения! Выключение..." : "No respawn anchors in hotbar! Disabling...");
-            }
-
-            boolean result = InteractionUtility.placeBlock(targetPos, placeRotate.getValue(), interactMode.getValue(), placeMode.getValue(), anchor, switchBack.getValue(), switchMode.getValue(), false);
-            if (result)
-                ownAnchors.add(targetPos);
-
-            super.run();
         }
 
         private synchronized boolean isCorrectPos(@NotNull BlockPos pos) {
@@ -242,14 +295,9 @@ public class AnchorAura2 extends Module {
                     }
 
                     BlockHitResult result = new BlockHitResult(data.vector(), data.dir(), targetPos, false);
-                    if (chargeMode.getValue() == InteractMode.Packet && chargeMode.getValue() == InteractMode.Both) {
-                        sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-                        sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
-                    } else if (chargeMode.getValue() == InteractMode.Vanilla && chargeMode.getValue() == InteractMode.Both) {
-                        mc.player.setSneaking(false);
-                        mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
-                    }
-                    if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
+
+                    sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
+                    interact(result, chargeMode);
                 }
 
                 if (switchBack.getValue())
@@ -296,12 +344,9 @@ public class AnchorAura2 extends Module {
                     }
 
                     BlockHitResult result = new BlockHitResult(data.vector(), data.dir(), targetPos, false);
-                    if (explodeMode.getValue() == InteractMode.Packet && explodeMode.getValue() == InteractMode.Both) {
-                        sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
-                    } else if (explodeMode.getValue() == InteractMode.Vanilla && explodeMode.getValue() == InteractMode.Both) {
-                        mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
-                    }
-                    if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
+
+                    sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
+                    interact(result, explodeMode);
                 }
 
                 if (switchBack.getValue())

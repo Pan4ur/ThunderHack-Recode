@@ -141,6 +141,7 @@ public class ModuleManager {
         modules.add(clickGui);
         modules.add(new MainSettings());
         modules.add(rpc);
+        modules.add(new AnchorAura2());
         modules.add(new HudEditor());
         modules.add(new RadarRewrite());
         modules.add(new GuiMove());

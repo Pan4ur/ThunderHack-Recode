@@ -9,7 +9,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.core.CommandManager;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
@@ -50,7 +49,6 @@ public class Module {
 
     public void onDisable() {
     }
-
 
     public void onLoad() {
     }
@@ -135,6 +133,7 @@ public class Module {
 
         enabled.setValue(false);
         onDisable();
+
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
                 Thunderhack.notificationManager.publicity(getDisplayName(), "Модуль выключен!", 2, Notification.Type.DISABLED);
@@ -173,7 +172,6 @@ public class Module {
         return this.category;
     }
 
-
     public Bind getBind() {
         return this.bind.getValue();
     }
@@ -203,14 +201,14 @@ public class Module {
     }
 
 
-    public List<Setting> getSettings() {
-        ArrayList<Setting> settingList = new ArrayList<>();
+    public List<Setting<?>> getSettings() {
+        ArrayList<Setting<?>> settingList = new ArrayList<>();
 
         for (Field field : this.getClass().getDeclaredFields()) {
             if (Setting.class.isAssignableFrom(field.getType())) {
                 field.setAccessible(true);
                 try {
-                    settingList.add((Setting) field.get(this));
+                    settingList.add((Setting<?>) field.get(this));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -263,11 +261,12 @@ public class Module {
         mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + message));
     }
 
-    public Setting getSettingByName(String name) {
-        for (Setting setting : getSettings()) {
+    public Setting<?> getSettingByName(String name) {
+        for (Setting<?> setting : getSettings()) {
             if (!setting.getName().equalsIgnoreCase(name)) continue;
             return setting;
         }
+
         return null;
     }
 

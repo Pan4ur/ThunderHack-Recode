@@ -230,11 +230,7 @@ public class HoleFill extends Module {
     }
 
     private boolean isFillingNow(BlockPos pos) {
-        for (BlockPos checkPos : renderPoses.keySet()) {
-            if (checkPos.equals(pos)) return true;
-        }
-
-        return false;
+        return renderPoses.containsKey(pos);
     }
 
     private boolean isValidItem(Item item) {
