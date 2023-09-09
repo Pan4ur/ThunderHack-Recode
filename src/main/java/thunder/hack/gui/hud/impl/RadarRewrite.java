@@ -1,7 +1,6 @@
 package thunder.hack.gui.hud.impl;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -11,7 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.RotationAxis;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.setting.Setting;
@@ -138,7 +137,7 @@ public class RadarRewrite extends HudElement {
                 context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
                 context.getMatrices().translate(-xOffset, -yOffset, 0.0F);
 
-                if (Thunderhack.friendManager.isFriend(e.getName().getString())) {
+                if (ThunderHack.friendManager.isFriend(e.getName().getString())) {
                     drawTracerPointer(context.getMatrices(), xOffset, yOffset - this.xOffset.getValue(), width.getValue() * 5F, colorf.getValue().getColor());
                 } else {
                     if (e instanceof ItemEntity) {

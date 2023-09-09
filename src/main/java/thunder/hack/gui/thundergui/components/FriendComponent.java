@@ -5,7 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui2;
@@ -179,7 +179,7 @@ public class FriendComponent {
             return;
         }
         if (Render2DEngine.isHovered(MouseX, MouseY, posX + 268, posY + 10, 10, 10)) {
-            Thunderhack.friendManager.removeFriend(name);
+            ThunderHack.friendManager.removeFriend(name);
             ThunderGui2.getInstance().loadFriends();
         }
     }

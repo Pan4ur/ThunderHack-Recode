@@ -1,7 +1,7 @@
 package thunder.hack.modules.misc;
 
 import net.minecraft.item.Items;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
@@ -29,7 +29,7 @@ public class AutoLeave extends Module {
     @Override
     public void onUpdate(){
         for(PlayerEntity pl : mc.world.getPlayers()){
-            if(pl != mc.player && !Thunderhack.friendManager.isFriend(pl) && playerNear.getValue()){
+            if(pl != mc.player && !ThunderHack.friendManager.isFriend(pl) && playerNear.getValue()){
                 leave(MainSettings.isRu() ? "Ливнул т.к. рядом появился игрок" : "Leaved because there was a player");
             }
         }

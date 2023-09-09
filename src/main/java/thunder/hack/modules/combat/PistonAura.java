@@ -24,7 +24,6 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
-import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.EventEntityRemoved;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
@@ -48,7 +47,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.utility.player.InteractionUtility.squaredDistanceFromEyes;
 
 public class PistonAura extends Module {
 
@@ -66,7 +64,7 @@ public class PistonAura extends Module {
     public Setting<Float> targetRange = new Setting<>("Target Range", 10.0f, 0.0f, 12.0f);
     public Setting<Float> placeRange = new Setting<>("PlaceRange", 4.0f, 1.0f, 7.0f);
     public Setting<Float> wallRange = new Setting<>("WallRange", 4.0f, 1.0f, 7.0f);
-    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.All);
+    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Normal);
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
 
     public PlayerEntity target;

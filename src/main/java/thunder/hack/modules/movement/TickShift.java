@@ -3,7 +3,7 @@ package thunder.hack.modules.movement;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -30,7 +30,7 @@ public class TickShift extends Module {
     @EventHandler
     public void onSync(EventSync e) {
         if (notMoving()) {
-            Thunderhack.TICK_TIMER = 1.0f;
+            ThunderHack.TICK_TIMER = 1.0f;
             ticks = ticks >= packets.getValue() ? packets.getValue() : ticks + 1;
         }
 
@@ -43,7 +43,7 @@ public class TickShift extends Module {
         if (mc.player == null || mc.world == null || !lagTimer.passedMs(lagTime.getValue())) {
             reset();
         } else if (ticks <= 0 || !MovementUtility.isMoving() || !sneaking.getValue() && mc.player.isSneaking()) {
-            Thunderhack.TICK_TIMER = 1.0f;
+            ThunderHack.TICK_TIMER = 1.0f;
         }
     }
 
@@ -92,12 +92,12 @@ public class TickShift extends Module {
     private void shift(PacketEvent.Send event, boolean moving) {
         if (event.isCancelled()) return;
         if (moving && MovementUtility.isMoving() &&ticks > 0 && (sneaking.getValue() || !mc.player.isSneaking()))
-            Thunderhack.TICK_TIMER = timer.getValue();
+            ThunderHack.TICK_TIMER = timer.getValue();
         ticks = ticks <= 0 ? 0 : ticks - 1;
     }
 
     public void reset() {
-        Thunderhack.TICK_TIMER = 1.0f;
+        ThunderHack.TICK_TIMER = 1.0f;
         ticks = 0;
     }
 }

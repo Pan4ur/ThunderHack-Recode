@@ -14,7 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.RaycastContext;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -32,9 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-import static thunder.hack.modules.render.HoleESP.*;
 import static thunder.hack.utility.player.InteractionUtility.squaredDistanceFromEyes;
 
 public class AutoWeb extends Module {
@@ -165,7 +163,7 @@ public class AutoWeb extends Module {
     }
 
     private BlockPos getSequentialPos() {
-        PlayerEntity target = Thunderhack.combatManager.getNearestTarget(range.getValue());
+        PlayerEntity target = ThunderHack.combatManager.getNearestTarget(range.getValue());
         if (target != null) {
 
             BlockPos targetBp = BlockPos.ofFloored(target.getPos());

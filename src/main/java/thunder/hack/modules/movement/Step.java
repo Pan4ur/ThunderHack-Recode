@@ -7,7 +7,7 @@ import net.minecraft.entity.passive.LlamaEntity;
 import net.minecraft.entity.passive.MuleEntity;
 import net.minecraft.entity.passive.PigEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.render.FreeCam;
@@ -49,7 +49,7 @@ public class Step extends Module {
             return;
         }
 
-        if (mc.player.getAbilities().flying || Thunderhack.moduleManager.get(FreeCam.class).isOn()) {
+        if (mc.player.getAbilities().flying || ThunderHack.moduleManager.get(FreeCam.class).isOn()) {
             mc.player.setStepHeight(0.6F);
             return;
         }
@@ -58,7 +58,7 @@ public class Step extends Module {
             return;
         }
         if (timer && mc.player.isOnGround()) {
-            Thunderhack.TICK_TIMER = 1f;
+            ThunderHack.TICK_TIMER = 1f;
             timer = false;
         }
 
@@ -99,7 +99,7 @@ public class Step extends Module {
             double[] offsets = getOffset(stepHeight);
             if (offsets != null && offsets.length > 1) {
                 if (useTimer.getValue()) {
-                    Thunderhack.TICK_TIMER = 1F / offsets.length;
+                    ThunderHack.TICK_TIMER = 1F / offsets.length;
                     timer = true;
                 }
                 for (double offset : offsets) {

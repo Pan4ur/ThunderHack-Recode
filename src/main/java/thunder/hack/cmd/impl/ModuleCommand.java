@@ -8,7 +8,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.ModuleArgumentType;
 import thunder.hack.modules.Module;
@@ -86,10 +86,10 @@ public class ModuleCommand extends Command {
         builder.executes(context -> {
             sendMessage("Modules: ");
 
-            for (Module.Category category : Thunderhack.moduleManager.getCategories()) {
+            for (Module.Category category : ThunderHack.moduleManager.getCategories()) {
                 StringBuilder modules = new StringBuilder(category.getName() + ": ");
 
-                for (Module module1 : Thunderhack.moduleManager.getModulesByCategory(category)) {
+                for (Module module1 : ThunderHack.moduleManager.getModulesByCategory(category)) {
                     modules.append(module1.isEnabled() ? Formatting.GREEN : Formatting.RED).append(module1.getName()).append(Formatting.WHITE).append(", ");
                 }
 

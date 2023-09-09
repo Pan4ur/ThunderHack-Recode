@@ -21,10 +21,9 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.*;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
@@ -123,7 +122,7 @@ public class ElytraPlus extends Module {
             }
         }
         if (mode.getValue() == Mode.FireWork) {
-            if (Thunderhack.playerManager.ticksElytraFlying < 4) {
+            if (ThunderHack.playerManager.ticksElytraFlying < 4) {
                 if (e.isPre()) {
                     prevClientPitch = mc.player.getPitch();
                     mc.player.setPitch(-45f);
@@ -150,7 +149,7 @@ public class ElytraPlus extends Module {
                 mc.player.setPitch(getInfinitePitch());
             }
             if (is.isOf(Items.ELYTRA) && is.getDamage() > 380 && mc.player.age % 100 == 0) {
-                Thunderhack.notificationManager.publicity("Elytra+", isRu() ? "Элитра скоро сломается!" : "Elytra is about to break down!", 2, Notification.Type.WARNING);
+                ThunderHack.notificationManager.publicity("Elytra+", isRu() ? "Элитра скоро сломается!" : "Elytra is about to break down!", 2, Notification.Type.WARNING);
                 mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.AMBIENT, 10.0f, 1.0F);
             }
         }
@@ -162,9 +161,9 @@ public class ElytraPlus extends Module {
 
     private float getInfinitePitch() {
         if (mc.player.getY() < infiniteMaxHeight.getValue()) {
-            if (Thunderhack.playerManager.currentPlayerSpeed * 72f < infiniteMinSpeed.getValue() && !infiniteFlag)
+            if (ThunderHack.playerManager.currentPlayerSpeed * 72f < infiniteMinSpeed.getValue() && !infiniteFlag)
                 infiniteFlag = true;
-            if (Thunderhack.playerManager.currentPlayerSpeed * 72f > infiniteMaxSpeed.getValue() && infiniteFlag)
+            if (ThunderHack.playerManager.currentPlayerSpeed * 72f > infiniteMaxSpeed.getValue() && infiniteFlag)
                 infiniteFlag = false;
         } else {
             infiniteFlag = true;
@@ -180,7 +179,7 @@ public class ElytraPlus extends Module {
 
     @Override
     public void onDisable() {
-        Thunderhack.TICK_TIMER = 1.0f;
+        ThunderHack.TICK_TIMER = 1.0f;
         hasElytra = false;
         if (mc.player != null) {
             if (!mc.player.isCreative()) mc.player.getAbilities().allowFlying = false;
@@ -236,10 +235,10 @@ public class ElytraPlus extends Module {
             } else hasElytra = false;
         }
 
-        if (strictTimer.passedMs(1500) && !strictTimer.passedMs(2000)) Thunderhack.TICK_TIMER = 1.0f;
+        if (strictTimer.passedMs(1500) && !strictTimer.passedMs(2000)) ThunderHack.TICK_TIMER = 1.0f;
 
         if (!mc.player.isFallFlying()) {
-            if (hasTouchedGround && BoostTimer.getValue() && !mc.player.isOnGround()) Thunderhack.TICK_TIMER = 0.3f;
+            if (hasTouchedGround && BoostTimer.getValue() && !mc.player.isOnGround()) ThunderHack.TICK_TIMER = 0.3f;
 
             if (!mc.player.isOnGround() && instantFly.getValue() && mc.player.getVelocity().getY() < 0D) {
                 if (!instantFlyTimer.passedMs((long) (1000 * timeout.getValue()))) return;
@@ -312,7 +311,7 @@ public class ElytraPlus extends Module {
                 height = manualHeight.getValue();
             }
 
-            double horizSpeed = Thunderhack.playerManager.currentPlayerSpeed;
+            double horizSpeed = ThunderHack.playerManager.currentPlayerSpeed;
             double horizPct = MathHelper.clamp(horizSpeed / 1.7, 0.0, 1.0);
             double heightPct = 1 - Math.sqrt(horizPct);
             double minAngle = 0.6;
@@ -712,7 +711,7 @@ public class ElytraPlus extends Module {
             sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
             startFallFlying = true;
         }
-        if (Thunderhack.playerManager.ticksElytraFlying < 4) {
+        if (ThunderHack.playerManager.ticksElytraFlying < 4) {
             mc.options.jumpKey.setPressed(false);
         }
         doFireWork(true);
@@ -722,7 +721,7 @@ public class ElytraPlus extends Module {
         if (!MovementUtility.isMoving() && mc.options.jumpKey.isPressed() && mc.player.isFallFlying() && flying)
             mc.player.setPitch(-90f);
 
-        if (Thunderhack.playerManager.ticksElytraFlying < 5) {
+        if (ThunderHack.playerManager.ticksElytraFlying < 5) {
             mc.player.setPitch(-45f);
         }
     }
@@ -730,7 +729,7 @@ public class ElytraPlus extends Module {
 
     public void fireworkOnMove(EventMove e) {
         if (mc.player.isFallFlying() && flying) {
-            if (Thunderhack.playerManager.ticksElytraFlying < 4) {
+            if (ThunderHack.playerManager.ticksElytraFlying < 4) {
                 e.set_y(0.2f);
                 e.cancel();
                 return;
@@ -745,7 +744,7 @@ public class ElytraPlus extends Module {
                 e.set_y((float) (mc.player.age % 2 == 0 ? (double) 0.08f : (double) -0.08f));
             }
             MovementUtility.modifyEventSpeed(e, xzSpeed.getValue() * Math.min((float) (currentSpeed += 9) / 100.0f, 1.0f));
-            if (stayMad.getValue() && !checkGround(3.0f) && Thunderhack.playerManager.ticksElytraFlying > 10) {
+            if (stayMad.getValue() && !checkGround(3.0f) && ThunderHack.playerManager.ticksElytraFlying > 10) {
                 e.set_y(0.42f);
             }
             e.cancel();
@@ -783,18 +782,18 @@ public class ElytraPlus extends Module {
         if (keepFlying.getValue()) return;
         new Thread(() -> {
             sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
-            Thunderhack.TICK_TIMER = 0.1f;
+            ThunderHack.TICK_TIMER = 0.1f;
             returnItem();
             reset();
             try {
                 Thread.sleep(200L);
             } catch (InterruptedException interruptedException) {
-                Thunderhack.TICK_TIMER = 1f;
+                ThunderHack.TICK_TIMER = 1f;
                 interruptedException.printStackTrace();
             }
             returnChestPlate();
             resetPrevItems();
-            Thunderhack.TICK_TIMER = 1f;
+            ThunderHack.TICK_TIMER = 1f;
         }).start();
     }
 }

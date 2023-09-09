@@ -10,11 +10,9 @@ import net.minecraft.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.client.MainSettings;
@@ -52,10 +50,10 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
             livingEntity.headYaw = ((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw();
             livingEntity.bodyYaw = ((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw();
             livingEntity.setPitch(((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastPitch());
-            livingEntity.prevYaw = Thunderhack.playerManager.lastYaw;
-            livingEntity.prevHeadYaw = Thunderhack.playerManager.lastYaw;
-            livingEntity.prevBodyYaw = Thunderhack.playerManager.lastYaw;
-            livingEntity.prevPitch = Thunderhack.playerManager.lastPitch;
+            livingEntity.prevYaw = ThunderHack.playerManager.lastYaw;
+            livingEntity.prevHeadYaw = ThunderHack.playerManager.lastYaw;
+            livingEntity.prevBodyYaw = ThunderHack.playerManager.lastYaw;
+            livingEntity.prevPitch = ThunderHack.playerManager.lastPitch;
         }
         lastEntity = livingEntity;
     }

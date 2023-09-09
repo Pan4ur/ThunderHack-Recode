@@ -1,21 +1,12 @@
 package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.RaycastContext;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.InteractionUtility;
-import thunder.hack.utility.player.PlayerUtility;
 
 public class NoSlow extends Module {
     public static Setting<mode> Mode = new Setting<>("Mode", mode.NCP);
@@ -50,7 +41,7 @@ public class NoSlow extends Module {
             }
 
             if (Mode.getValue() == mode.Matrix) {
-                if (!Thunderhack.moduleManager.get(Strafe.class).isEnabled()) {
+                if (!ThunderHack.moduleManager.get(Strafe.class).isEnabled()) {
                     if (mc.player.isOnGround() && !mc.options.jumpKey.isPressed()) {
                         mc.player.setVelocity(mc.player.getVelocity().x * 0.3, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.3);
                     } else if (mc.player.fallDistance > 0.2f)

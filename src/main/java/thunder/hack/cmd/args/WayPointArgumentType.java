@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.WayPointManager;
 import thunder.hack.modules.client.MainSettings;
 
@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 public class WayPointArgumentType implements ArgumentType<WayPointManager.WayPoint> {
-    private static final Collection<String> EXAMPLES = Thunderhack.wayPointManager.getWayPoints().stream().map(WayPointManager.WayPoint::name).limit(5).toList();
+    private static final Collection<String> EXAMPLES = ThunderHack.wayPointManager.getWayPoints().stream().map(WayPointManager.WayPoint::name).limit(5).toList();
 
     public static WayPointArgumentType create() {
         return new WayPointArgumentType();
@@ -25,7 +25,7 @@ public class WayPointArgumentType implements ArgumentType<WayPointManager.WayPoi
 
     @Override
     public WayPointManager.WayPoint parse(StringReader reader) throws CommandSyntaxException {
-        WayPointManager.WayPoint wp = Thunderhack.wayPointManager.getWayPointByName(reader.readString());
+        WayPointManager.WayPoint wp = ThunderHack.wayPointManager.getWayPointByName(reader.readString());
 
         if (wp == null) throw new DynamicCommandExceptionType(
                 name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Вейпоинта " + name.toString() + " не существует(" : "Waypoint " + name.toString() + " does not exists(")
@@ -36,7 +36,7 @@ public class WayPointArgumentType implements ArgumentType<WayPointManager.WayPoi
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(Thunderhack.wayPointManager.getWayPoints().stream().map(WayPointManager.WayPoint::name), builder);
+        return CommandSource.suggestMatching(ThunderHack.wayPointManager.getWayPoints().stream().map(WayPointManager.WayPoint::name), builder);
     }
 
     @Override

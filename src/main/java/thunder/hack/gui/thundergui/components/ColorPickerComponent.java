@@ -1,6 +1,6 @@
 package thunder.hack.gui.thundergui.components;
 
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui2;
 import thunder.hack.setting.impl.ColorSetting;
@@ -180,9 +180,9 @@ public class ColorPickerComponent extends SettingElement {
 
 
         if (rainbow_focused) getColorSetting().setCycle(!getColorSetting().isCycle());
-        if (copy_focused) Thunderhack.copy_color = getColorSetting().getColorObject();
+        if (copy_focused) ThunderHack.copy_color = getColorSetting().getColorObject();
         if (paste_focused)
-            setColor(Thunderhack.copy_color == null ? getColorSetting().getColorObject() : Thunderhack.copy_color);
+            setColor(ThunderHack.copy_color == null ? getColorSetting().getColorObject() : ThunderHack.copy_color);
     }
 
     @Override

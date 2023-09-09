@@ -5,7 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.modules.client.MainSettings;
 
@@ -20,7 +20,7 @@ public class PrefixCommand extends Command {
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("set").then(arg("prefix", StringArgumentType.word()).executes(context -> {
             String prefix = context.getArgument("prefix", String.class);
-            Thunderhack.commandManager.setPrefix(prefix);
+            ThunderHack.commandManager.setPrefix(prefix);
             if (MainSettings.language.getValue() == MainSettings.Language.RU)
                 sendMessage(Formatting.GREEN + "Префикс изменен на " + prefix);
             else sendMessage(Formatting.GREEN + "Prefix changed to " + prefix);
@@ -30,8 +30,8 @@ public class PrefixCommand extends Command {
 
         builder.executes(context -> {
             if (MainSettings.language.getValue() == MainSettings.Language.RU)
-                sendMessage(Formatting.GREEN + "Текущий префикс:" + Thunderhack.commandManager.getPrefix());
-            else sendMessage(Formatting.GREEN + "Current prefix:" + Thunderhack.commandManager.getPrefix());
+                sendMessage(Formatting.GREEN + "Текущий префикс:" + ThunderHack.commandManager.getPrefix());
+            else sendMessage(Formatting.GREEN + "Current prefix:" + ThunderHack.commandManager.getPrefix());
             return SINGLE_SUCCESS;
         });
     }

@@ -1,19 +1,14 @@
 package thunder.hack.modules.misc;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerAbilitiesS2CPacket;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.Timer;
-
-import java.sql.Time;
 
 public class AutoFlyme extends Module {
     public final Setting<Boolean> instantSpeed = new Setting<>("InstantSpeed", true);
@@ -40,7 +35,7 @@ public class AutoFlyme extends Module {
 
     @Override
     public void onDisable() {
-        Thunderhack.TICK_TIMER = 1.f;
+        ThunderHack.TICK_TIMER = 1.f;
     }
 
     @EventHandler
@@ -57,7 +52,7 @@ public class AutoFlyme extends Module {
 
     @Override
     public void onUpdate() {
-        if(useTimer.getValue()) Thunderhack.TICK_TIMER = 1.088f;
+        if(useTimer.getValue()) ThunderHack.TICK_TIMER = 1.088f;
         if (!mc.player.getAbilities().flying && timer.passedMs(1000) && !mc.player.isOnGround() && mc.player.input.jumping) {
             mc.player.networkHandler.sendChatCommand("flyme");
             timer.reset();

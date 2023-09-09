@@ -1,13 +1,7 @@
 package thunder.hack.modules.render;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.world.chunk.WorldChunk;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
-import thunder.hack.core.AsyncManager;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.FrameRateCounter;
@@ -23,8 +17,6 @@ import net.minecraft.util.math.Vec3d;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import static thunder.hack.modules.render.StorageEsp.getLoadedChunks;
 
 public class Search extends Module {
 

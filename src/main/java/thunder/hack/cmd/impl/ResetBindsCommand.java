@@ -3,7 +3,7 @@ package thunder.hack.cmd.impl;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.Bind;
@@ -18,7 +18,7 @@ public class ResetBindsCommand extends Command {
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            for (Module mod : Thunderhack.moduleManager.modules) mod.setBind(new Bind(-1, false, false));
+            for (Module mod : ThunderHack.moduleManager.modules) mod.setBind(new Bind(-1, false, false));
             return SINGLE_SUCCESS;
         });
     }

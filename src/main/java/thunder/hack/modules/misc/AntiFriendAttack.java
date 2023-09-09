@@ -4,7 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 
@@ -20,7 +20,7 @@ public class AntiFriendAttack extends Module {
         if (e.getPacket() instanceof PlayerInteractEntityC2SPacket pac) {
             Entity entity = getEntity(pac);
             if (entity == null) return;
-            if (Thunderhack.friendManager.isFriend(entity.getName().getString())) e.cancel();
+            if (ThunderHack.friendManager.isFriend(entity.getName().getString())) e.cancel();
         }
     }
 }

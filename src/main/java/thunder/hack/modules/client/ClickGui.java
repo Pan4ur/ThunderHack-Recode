@@ -14,6 +14,10 @@ import java.awt.*;
 public class ClickGui extends Module {
 
     private static ClickGui INSTANCE = new ClickGui();
+
+    public Setting<scrollModeEn> scrollMode = new Setting<>("ScrollMode", scrollModeEn.New);
+    public Setting<Integer> catHeight = new Setting<Integer>("CategoryHeight", 300, 100, 720);
+
     private Setting<colorModeEn> colorMode = new Setting<>("ColorMode", colorModeEn.Static);
     public final Setting<ColorSetting> hcolor1 = new Setting<>("MainColor", new ColorSetting(-6974059));
     public final Setting<ColorSetting> acolor = new Setting<>("MainColor2", new ColorSetting(-8365735));
@@ -106,6 +110,9 @@ public class ClickGui extends Module {
         DoubleColor,
         Analogous
     }
-
+    public enum scrollModeEn {
+        New,
+        Old
+    }
 }
 

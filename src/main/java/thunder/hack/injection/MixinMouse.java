@@ -1,6 +1,6 @@
 package thunder.hack.injection;
 
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventMouse;
 import net.minecraft.client.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,11 +17,11 @@ public class MixinMouse {
     public void onMouseButtonHook(long window, int button, int action, int mods, CallbackInfo ci) {
         if (window == mc.getWindow().getHandle()) {
             if(action == 1)
-                Thunderhack.moduleManager.onMoseKeyPressed(button);
+                ThunderHack.moduleManager.onMoseKeyPressed(button);
             if(action == 0)
-                Thunderhack.moduleManager.onMoseKeyReleased(button);
+                ThunderHack.moduleManager.onMoseKeyReleased(button);
 
-            Thunderhack.EVENT_BUS.post(new EventMouse(button,action));
+            ThunderHack.EVENT_BUS.post(new EventMouse(button,action));
         }
     }
 

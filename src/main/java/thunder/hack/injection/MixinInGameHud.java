@@ -1,7 +1,7 @@
 package thunder.hack.injection;
 
 import net.minecraft.client.gui.DrawContext;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.gui.hud.impl.Hotbar;
 import thunder.hack.modules.client.ClickGui;
@@ -16,17 +16,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinInGameHud {
     @Inject(at = @At(value = "HEAD"), method = "render")
     public void render(DrawContext context, float tickDelta, CallbackInfo ci) {
-        Thunderhack.moduleManager.onRenderShaders(context);
-        Thunderhack.notificationManager.onRenderShader(context);
+        ThunderHack.moduleManager.onRenderShaders(context);
+        ThunderHack.notificationManager.onRenderShader(context);
 
         if (ClickGui.getInstance().msaa.getValue()) {
             MSAAFramebuffer.use(() -> {
-                Thunderhack.moduleManager.onRender2D(context);
-                Thunderhack.notificationManager.onRender2D(context);
+                ThunderHack.moduleManager.onRender2D(context);
+                ThunderHack.notificationManager.onRender2D(context);
             });
         } else {
-            Thunderhack.moduleManager.onRender2D(context);
-            Thunderhack.notificationManager.onRender2D(context);
+            ThunderHack.moduleManager.onRender2D(context);
+            ThunderHack.notificationManager.onRender2D(context);
         }
     }
 

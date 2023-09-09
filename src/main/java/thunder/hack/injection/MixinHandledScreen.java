@@ -2,13 +2,9 @@ package thunder.hack.injection;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.core.Core;
 import thunder.hack.core.ModuleManager;
-import thunder.hack.gui.hud.impl.TargetHud;
 import thunder.hack.gui.misc.PeekScreen;
-import thunder.hack.modules.misc.ItemScroller;
 import thunder.hack.modules.render.Tooltips;
 import thunder.hack.utility.Timer;
 import net.minecraft.block.ShulkerBoxBlock;

@@ -20,7 +20,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import org.joml.Vector4d;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -108,8 +108,8 @@ public class NameTags extends Module {
             if (distance.getValue()) {
                 final_string += String.format("%.1f", mc.player.distanceTo(p)) + "m ";
             }
-            if (pops.getValue() && Thunderhack.combatManager.getPops(p) != 0) {
-                final_string += (Formatting.RESET + "" + Thunderhack.combatManager.getPops(p));
+            if (pops.getValue() && ThunderHack.combatManager.getPops(p) != 0) {
+                final_string += (Formatting.RESET + "" + ThunderHack.combatManager.getPops(p));
             }
             if (position != null) {
                 double posX = position.x;

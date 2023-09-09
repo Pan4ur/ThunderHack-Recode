@@ -13,7 +13,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
@@ -61,9 +61,9 @@ public class AntiSurround extends Module {
 
         BlockPos minePos = null;
 
-        for (Entity player : Thunderhack.combatManager
+        for (Entity player : ThunderHack.combatManager
                 .getTargets(range.getValue()).stream()
-                .filter(player -> player != mc.player && !Thunderhack.friendManager.isFriend(player))
+                .filter(player -> player != mc.player && !ThunderHack.friendManager.isFriend(player))
                 .toList()) {
             BlockPos pos = BlockPos.ofFloored(player.getPos());
             if (!checkBlockPos(pos)) continue;

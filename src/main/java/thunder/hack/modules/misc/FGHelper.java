@@ -18,8 +18,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.StringUtils;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.notification.Notification;
@@ -78,8 +77,8 @@ public class FGHelper extends Module {
                     int xCord = Integer.parseInt(StringUtils.substringBetween(packet.content().getString(), "координаты X: ", " Y:"));
                     int yCord = Integer.parseInt(StringUtils.substringBetween(packet.content().getString(), "Y: ", " Z:"));
                     int zCord = Integer.parseInt(StringUtils.substringBetween(packet.content().getString() + "nigga", "Z: ", "nigga"));
-                    Thunderhack.gps_position = new BlockPos(xCord, yCord, zCord);
-                    Thunderhack.notificationManager.publicity("FGHelper", "Поставлена метка на аирдроп! X: " + xCord + " Y: " + yCord + " Z: " + zCord, 5, Notification.Type.SUCCESS);
+                    ThunderHack.gps_position = new BlockPos(xCord, yCord, zCord);
+                    ThunderHack.notificationManager.publicity("FGHelper", "Поставлена метка на аирдроп! X: " + xCord + " Y: " + yCord + " Z: " + zCord, 5, Notification.Type.SUCCESS);
                 } catch (Exception ignored) {
                 }
             }

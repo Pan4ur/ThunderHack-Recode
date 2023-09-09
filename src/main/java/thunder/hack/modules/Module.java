@@ -8,7 +8,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.CommandManager;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class Module {
+public abstract class Module {
     private final String description;
     public static MinecraftClient mc = MinecraftClient.getInstance();
     private final Category category;
@@ -43,6 +43,7 @@ public class Module {
         this.description = name;
         this.category = category;
     }
+
 
     public void onEnable() {
     }
@@ -103,14 +104,14 @@ public class Module {
         this.enabled.setValue(true);
         this.onEnable();
         if (this.isOn()) {
-            Thunderhack.EVENT_BUS.subscribe(this);
+            ThunderHack.EVENT_BUS.subscribe(this);
         }
         if (fullNullCheck()) return;
         if ((!Objects.equals(this.getDisplayName(), "ClickGui")) && (!Objects.equals(this.getDisplayName(), "ThunderGui"))) {
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                Thunderhack.notificationManager.publicity(this.getDisplayName(), "Модуль включен!", 2, Notification.Type.ENABLED);
+                ThunderHack.notificationManager.publicity(this.getDisplayName(), "Модуль включен!", 2, Notification.Type.ENABLED);
             } else {
-                Thunderhack.notificationManager.publicity(this.getDisplayName(), "Was Enabled!", 2, Notification.Type.ENABLED);
+                ThunderHack.notificationManager.publicity(this.getDisplayName(), "Was Enabled!", 2, Notification.Type.ENABLED);
             }
             mc.world.playSound(mc.player, mc.player.getBlockPos(), ThSoundPack.ENABLE_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
         }
@@ -125,7 +126,7 @@ public class Module {
     @Deprecated
     public void disable() {
         try {
-            Thunderhack.EVENT_BUS.unsubscribe(this);
+            ThunderHack.EVENT_BUS.unsubscribe(this);
         } catch (Exception ignored) {
         }
 
@@ -136,9 +137,9 @@ public class Module {
 
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                Thunderhack.notificationManager.publicity(getDisplayName(), "Модуль выключен!", 2, Notification.Type.DISABLED);
+                ThunderHack.notificationManager.publicity(getDisplayName(), "Модуль выключен!", 2, Notification.Type.DISABLED);
             } else {
-                Thunderhack.notificationManager.publicity(getDisplayName(), "Was Disabled!", 2, Notification.Type.DISABLED);
+                ThunderHack.notificationManager.publicity(getDisplayName(), "Was Disabled!", 2, Notification.Type.DISABLED);
             }
             mc.world.playSound(mc.player, mc.player.getBlockPos(), ThSoundPack.DISABLE_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
         }

@@ -1,6 +1,5 @@
 package thunder.hack.injection;
 
-import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.render.NoRender;
 import net.minecraft.client.MinecraftClient;

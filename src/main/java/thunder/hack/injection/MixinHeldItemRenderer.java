@@ -20,11 +20,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventHeldItemRenderer;
-import thunder.hack.modules.render.Shaders;
-import thunder.hack.utility.render.shaders.ShaderManager;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -34,7 +32,7 @@ public abstract class MixinHeldItemRenderer {
     @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/HeldItemRenderer;renderItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"), cancellable = true)
     private void onRenderItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         EventHeldItemRenderer event = new EventHeldItemRenderer(hand, item, equipProgress, matrices);
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
     }
 
     @Shadow
@@ -43,7 +41,7 @@ public abstract class MixinHeldItemRenderer {
 
     @Inject(method = "renderFirstPersonItem", at = @At(value = "HEAD"), cancellable = true)
     private void onRenderItemHook(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if (Thunderhack.moduleManager != null && ModuleManager.animations.isEnabled() && !(item.isEmpty()) && !(item.getItem() instanceof FilledMapItem)) {
+        if (ThunderHack.moduleManager != null && ModuleManager.animations.isEnabled() && !(item.isEmpty()) && !(item.getItem() instanceof FilledMapItem)) {
             ci.cancel();
             renderFirstPersonItemCustom(player, tickDelta, pitch, hand, swingProgress, item, equipProgress, matrices, vertexConsumers, light);
         }
@@ -101,7 +99,7 @@ public abstract class MixinHeldItemRenderer {
                 }
 
                 EventHeldItemRenderer event = new EventHeldItemRenderer(hand, item, equipProgress, matrices);
-                Thunderhack.EVENT_BUS.post(event);
+                ThunderHack.EVENT_BUS.post(event);
                 this.renderItem(player, item, bl3 ? ModelTransformationMode.FIRST_PERSON_RIGHT_HAND : ModelTransformationMode.FIRST_PERSON_LEFT_HAND, !bl3, matrices, vertexConsumers, light);
             } else {
                 bl2 = arm == Arm.RIGHT;
@@ -264,7 +262,7 @@ public abstract class MixinHeldItemRenderer {
 
 
                 EventHeldItemRenderer event = new EventHeldItemRenderer(hand, item, equipProgress, matrices);
-                Thunderhack.EVENT_BUS.post(event);
+                ThunderHack.EVENT_BUS.post(event);
                 this.renderItem(player, item, bl2 ? ModelTransformationMode.FIRST_PERSON_RIGHT_HAND : ModelTransformationMode.FIRST_PERSON_LEFT_HAND, !bl2, matrices, vertexConsumers, light);
             }
             matrices.pop();

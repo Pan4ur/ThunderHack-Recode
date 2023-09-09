@@ -1,8 +1,6 @@
 package thunder.hack.core;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
-import thunder.hack.Thunderhack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.utility.Timer;
 import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;

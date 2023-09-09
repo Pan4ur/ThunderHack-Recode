@@ -1,8 +1,5 @@
 package thunder.hack.injection;
 
-import ladysnake.satin.api.managed.ManagedShaderEffect;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.PostEffectProcessor;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -10,9 +7,8 @@ import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.core.ShaderManager;
 import thunder.hack.modules.render.Fullbright;
@@ -20,8 +16,6 @@ import net.minecraft.client.render.WorldRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import thunder.hack.modules.render.Shaders;
-import thunder.hack.utility.interfaces.IShaderEffect;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -41,8 +35,8 @@ public abstract class MixinWorldRenderer {
     void replaceShaderHook(PostEffectProcessor instance, float tickDelta) {
         ShaderManager.Shader shaders = ModuleManager.shaders.mode.getValue();
         if (ModuleManager.shaders.isEnabled() && mc.world != null) {
-            if(Thunderhack.shaderManager.fullNullCheck()) return;
-            Thunderhack.shaderManager.setupShader(shaders, Thunderhack.shaderManager.getShaderOutline(shaders));
+            if(ThunderHack.shaderManager.fullNullCheck()) return;
+            ThunderHack.shaderManager.setupShader(shaders, ThunderHack.shaderManager.getShaderOutline(shaders));
         } else {
             instance.render(tickDelta);
         }

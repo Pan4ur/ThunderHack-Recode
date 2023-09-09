@@ -19,9 +19,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
-import thunder.hack.core.ModuleManager;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.PlayerManager;
 import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventSync;
@@ -127,14 +125,14 @@ public class SpeedMine extends Module {
                 || mc.world.getBlockState(minePosition).getBlock() != Blocks.OBSIDIAN
         ) return false;
 
-        for (PlayerEntity pl : Thunderhack.asyncManager.getAsyncPlayers()) {
+        for (PlayerEntity pl : ThunderHack.asyncManager.getAsyncPlayers()) {
             if (pl == null) continue;
             if (pl == mc.player) continue;
             mc.world.removeBlock(minePosition, false);
             float dmg = ExplosionUtility.getExplosionDamage1(minePosition.toCenterPos(), pl);
             mc.world.setBlockState(minePosition, Blocks.OBSIDIAN.getDefaultState());
             ExplosionUtility.anchorIgnore = null;
-            if (Thunderhack.friendManager.isFriend(pl.getEntityName())) continue;
+            if (ThunderHack.friendManager.isFriend(pl.getEntityName())) continue;
             if (dmg > 7.5f) return true;
         }
 

@@ -3,7 +3,7 @@ package thunder.hack.modules.combat;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BowItem;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
@@ -69,7 +69,7 @@ public class AimBot extends Module {
         if(mode.getValue() == Mode.BowAim){
             if (!(mc.player.getActiveItem().getItem() instanceof BowItem)) return;
 
-            PlayerEntity nearestTarget = Thunderhack.combatManager.getNearestTarget(aimRange.getValue());
+            PlayerEntity nearestTarget = ThunderHack.combatManager.getNearestTarget(aimRange.getValue());
 
             if (nearestTarget == null) return;
 
@@ -103,7 +103,7 @@ public class AimBot extends Module {
                 return;
             }
             rotationYaw = Float.NaN;
-            PlayerEntity nearestTarget = Thunderhack.combatManager.getNearestTarget(5);
+            PlayerEntity nearestTarget = ThunderHack.combatManager.getNearestTarget(5);
             assistAcceleration += aimStrength.getValue() / 10000f;
 
             if(nearestTarget != null){
@@ -270,7 +270,7 @@ public class AimBot extends Module {
         if(!(entity instanceof PlayerEntity)) return true;
         if(entity == mc.player) return true;
         if(entity.isInvisible() && ignoreInvisible.getValue()) return true;
-        if(Thunderhack.friendManager.isFriend((PlayerEntity) entity)) return true;
+        if(ThunderHack.friendManager.isFriend((PlayerEntity) entity)) return true;
         if(Math.abs(getYawToEntityNew(entity)) > fov.getValue()) return true;
         return mc.player.squaredDistanceTo(getResolvedPos(entity)) > aimRange.getPow2Value();
     }

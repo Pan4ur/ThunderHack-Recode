@@ -3,7 +3,7 @@ package thunder.hack.injection;
 import net.minecraft.entity.MovementType;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Unique;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventTravel;
 import thunder.hack.modules.render.ViewModel;
@@ -77,7 +77,7 @@ public class MixinEntityLiving implements IEntityLiving {
     public void travelHook(Vec3d movementInput, CallbackInfo ci) {
         if((LivingEntity)(Object)this != mc.player) return;
         final EventTravel event = new EventTravel(mc.player.getVelocity(),true);
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
             mc.player.move(MovementType.SELF, event.getmVec());
             ci.cancel();
@@ -88,7 +88,7 @@ public class MixinEntityLiving implements IEntityLiving {
     public void travelPostHook(Vec3d movementInput, CallbackInfo ci) {
         if((LivingEntity)(Object)this != mc.player) return;
         final EventTravel event = new EventTravel(movementInput,false);
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
             mc.player.move(MovementType.SELF, mc.player.getVelocity());
             ci.cancel();

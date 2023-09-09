@@ -1,7 +1,7 @@
 package thunder.hack.gui.font;
 
 
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 
 import java.awt.*;
 import java.io.IOException;
@@ -30,10 +30,10 @@ public class FontRenderers {
     }
 
     public static RendererFontAdapter createDefault(float size,String name) throws IOException, FontFormatException {
-        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, Thunderhack.class.getClassLoader().getResourceAsStream(name + ".ttf")).deriveFont(Font.PLAIN, size * 2), size * 2);
+        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, ThunderHack.class.getClassLoader().getResourceAsStream(name + ".ttf")).deriveFont(Font.PLAIN, size * 2), size * 2);
     }
 
     public static RendererFontAdapter createIcons(float size) throws IOException, FontFormatException {
-        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, Thunderhack.class.getClassLoader().getResourceAsStream("icons.ttf")).deriveFont(Font.PLAIN, size * 2), size * 2);
+        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, ThunderHack.class.getClassLoader().getResourceAsStream("icons.ttf")).deriveFont(Font.PLAIN, size * 2), size * 2);
     }
 }

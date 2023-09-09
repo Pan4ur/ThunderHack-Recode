@@ -24,7 +24,7 @@ public class ModuleButton {
     private final List<AbstractElement> elements;
     private final Module module;
     private double x, y, width, height;
-    private double offsetY;
+    private double offsetY, scrollAnimation, scrollPosY, prevY;
     private boolean open;
     private boolean hovered;
 

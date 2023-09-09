@@ -1,9 +1,6 @@
 package thunder.hack.injection;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import org.spongepowered.asm.mixin.Shadow;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.PacketEvent;
 
 import thunder.hack.modules.Module;
@@ -22,7 +19,7 @@ public class MixinClientConnection {
     private static <T extends PacketListener> void onHandlePacket(Packet<T> packet, PacketListener listener, CallbackInfo info) {
         if(Module.fullNullCheck()) return;
         PacketEvent.Receive event = new PacketEvent.Receive(packet);
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
             info.cancel();
         }
@@ -32,7 +29,7 @@ public class MixinClientConnection {
     private static <T extends PacketListener> void onHandlePacketPost(Packet<T> packet, PacketListener listener, CallbackInfo info) {
         if(Module.fullNullCheck()) return;
         PacketEvent.ReceivePost event = new PacketEvent.ReceivePost(packet);
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
             info.cancel();
         }
@@ -41,14 +38,14 @@ public class MixinClientConnection {
     @Inject(method = "send(Lnet/minecraft/network/packet/Packet;)V", at = @At("HEAD"),cancellable = true)
     private void onSendPacketPre(Packet<?> packet, CallbackInfo info) {
         PacketEvent.Send event = new PacketEvent.Send(packet);
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) info.cancel();
     }
 
     @Inject(method = "send(Lnet/minecraft/network/packet/Packet;)V", at = @At("RETURN"),cancellable = true)
     private void onSendPacketPost(Packet<?> packet, CallbackInfo info) {
         PacketEvent.SendPost event = new PacketEvent.SendPost(packet);
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) info.cancel();
     }
 }

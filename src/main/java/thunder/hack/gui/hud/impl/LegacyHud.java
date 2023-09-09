@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -56,13 +56,13 @@ public class LegacyHud extends Module {
         int height = mc.getWindow().getScaledHeight();
         color = colorSetting.getValue().getColor();
         if (waterMark.getValue()) {
-            String string = "thunderhack v" + Thunderhack.version;
+            String string = "thunderhack v" + ThunderHack.version;
             context.drawText(mc.textRenderer, Text.of(string), 2, waterMarkY.getValue(), color, true);
         }
         int j = (mc.currentScreen instanceof ChatScreen && !renderingUp.getValue()) ? 14 : 0;
         if (arrayList.getValue())
             if (renderingUp.getValue()) {
-                for (Module module : Thunderhack.moduleManager.getEnabledModules().stream().filter(Module::isDrawn).sorted(Comparator.comparing(module -> mc.textRenderer.getWidth(module.getFullArrayString()) * -1)).collect(Collectors.toList())) {
+                for (Module module : ThunderHack.moduleManager.getEnabledModules().stream().filter(Module::isDrawn).sorted(Comparator.comparing(module -> mc.textRenderer.getWidth(module.getFullArrayString()) * -1)).collect(Collectors.toList())) {
                     if (!module.isDrawn()) {
                         continue;
                     }
@@ -71,7 +71,7 @@ public class LegacyHud extends Module {
                     j++;
                 }
             } else {
-                for (Module module : Thunderhack.moduleManager.getEnabledModules().stream().filter(Module::isDrawn).sorted(Comparator.comparing(module -> mc.textRenderer.getWidth(module.getFullArrayString()) * -1)).collect(Collectors.toList())) {
+                for (Module module : ThunderHack.moduleManager.getEnabledModules().stream().filter(Module::isDrawn).sorted(Comparator.comparing(module -> mc.textRenderer.getWidth(module.getFullArrayString()) * -1)).collect(Collectors.toList())) {
                     if (!module.isDrawn()) {
                         continue;
                     }
@@ -106,7 +106,7 @@ public class LegacyHud extends Module {
                 }
             }
             if (speed.getValue()) {
-                String str = "Speed " + Formatting.WHITE + MathUtility.round((float) (Thunderhack.playerManager.currentPlayerSpeed * 72f))  + " km/h";
+                String str = "Speed " + Formatting.WHITE + MathUtility.round((float) (ThunderHack.playerManager.currentPlayerSpeed * 72f))  + " km/h";
                 i += 10;
                 context.drawText(mc.textRenderer, Text.of(str), (width - getStringWidth(str) - 2), (height - 2 - i), color, true);
             }
@@ -116,7 +116,7 @@ public class LegacyHud extends Module {
                 context.drawText(mc.textRenderer, Text.of(str), (width - getStringWidth(str) - 2), (height - 2 - i), color, true);
             }
             if (tps.getValue()) {
-                String str = "TPS " + Formatting.WHITE + Thunderhack.serverManager.getTPS();
+                String str = "TPS " + Formatting.WHITE + ThunderHack.serverManager.getTPS();
                 i += 10;
                 context.drawText(mc.textRenderer, Text.of(str), (width - getStringWidth(str) - 2), (height - 2 - i), color, true);
             }
@@ -164,7 +164,7 @@ public class LegacyHud extends Module {
                 }
             }
             if (speed.getValue()) {
-                String str = "Speed " + Formatting.WHITE + MathUtility.round((float) (Thunderhack.playerManager.currentPlayerSpeed * 72f)) + " km/h";
+                String str = "Speed " + Formatting.WHITE + MathUtility.round((float) (ThunderHack.playerManager.currentPlayerSpeed * 72f)) + " km/h";
                 context.drawText(mc.textRenderer, Text.of(str), (width - getStringWidth(str) - 2), (2 + i++ * 10), color, true);
             }
             if (time.getValue()) {
@@ -172,7 +172,7 @@ public class LegacyHud extends Module {
                 context.drawText(mc.textRenderer, Text.of(str), (width - getStringWidth(str) - 2), (2 + i++ * 10), color, true);
             }
             if (tps.getValue()) {
-                String str = "TPS " + Formatting.WHITE + Thunderhack.serverManager.getTPS();
+                String str = "TPS " + Formatting.WHITE + ThunderHack.serverManager.getTPS();
                 context.drawText(mc.textRenderer, Text.of(str), (width - getStringWidth(str) - 2), (2 + i++ * 10), color, true);
             }
             String fpsText = "FPS " + Formatting.WHITE + FrameRateCounter.INSTANCE.getFps();

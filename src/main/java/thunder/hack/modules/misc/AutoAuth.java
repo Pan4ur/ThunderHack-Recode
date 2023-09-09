@@ -2,7 +2,7 @@ package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.notification.Notification;
@@ -58,10 +58,10 @@ public class AutoAuth extends Module {
                 mc.getNetworkHandler().sendChatCommand("reg " + this.password + " " + this.password);
                 if (this.showPasswordInChat.getValue())
                     sendMessage("Твой пароль: " + Formatting.RED + this.password);
-                Thunderhack.notificationManager.publicity("AutoAuth", "Выполнена регистрация!", 4, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("AutoAuth", "Выполнена регистрация!", 4, Notification.Type.SUCCESS);
             } else if (pac.content().getString().contains("Авторизуйтесь") || pac.content().getString().contains("/l")) {
                 mc.getNetworkHandler().sendChatCommand("login " + this.password);
-                Thunderhack.notificationManager.publicity("AutoAuth", "Выполнен вход!", 4, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("AutoAuth", "Выполнен вход!", 4, Notification.Type.SUCCESS);
             }
         }
     }

@@ -2,7 +2,6 @@ package thunder.hack.gui.misc;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
-import thunder.hack.Thunderhack;
 import thunder.hack.modules.render.Tooltips;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.block.Block;

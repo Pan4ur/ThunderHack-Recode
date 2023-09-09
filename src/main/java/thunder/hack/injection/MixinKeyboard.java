@@ -1,7 +1,7 @@
 package thunder.hack.injection;
 
 
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventKeyPress;
 import thunder.hack.events.impl.EventKeyRelease;
 import thunder.hack.gui.clickui.ClickUI;
@@ -23,10 +23,10 @@ public class MixinKeyboard {
         boolean whitelist = mc.currentScreen == null || mc.currentScreen instanceof ClickUI || mc.currentScreen instanceof HudEditorGui;
         if (!whitelist) return;
         if (action == 1) {
-            Thunderhack.moduleManager.onKeyPressed(key);
+            ThunderHack.moduleManager.onKeyPressed(key);
         }
         if (action == 0) {
-            Thunderhack.moduleManager.onKeyReleased(key);
+            ThunderHack.moduleManager.onKeyReleased(key);
         }
 
         if (action == 2) action = 1;
@@ -35,14 +35,14 @@ public class MixinKeyboard {
                 EventKeyRelease event = new EventKeyRelease(key, scanCode);
                // mc.world.playSound(mc.player, mc.player.getBlockPos(), Thunderhack.KEYRELEASE_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
 
-                Thunderhack.EVENT_BUS.post(event);
+                ThunderHack.EVENT_BUS.post(event);
                 if (event.isCancelled()) ci.cancel();
             }
             case 1 -> {
                 EventKeyPress event = new EventKeyPress(key, scanCode);
               //  mc.world.playSound(mc.player, mc.player.getBlockPos(), Thunderhack.KEYPRESS_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
 
-                Thunderhack.EVENT_BUS.post(event);
+                ThunderHack.EVENT_BUS.post(event);
                 if (event.isCancelled()) ci.cancel();
             }
         }

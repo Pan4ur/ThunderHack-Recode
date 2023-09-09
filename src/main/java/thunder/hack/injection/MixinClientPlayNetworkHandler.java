@@ -6,18 +6,18 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class MixinClientPlayNetworkHandler {
 
     @Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
     private void onSendChatMessage(String message, CallbackInfo ci) {
-        if (message.startsWith(Thunderhack.commandManager.getPrefix())) {
+        if (message.startsWith(ThunderHack.commandManager.getPrefix())) {
             try {
-                Thunderhack.commandManager.getDispatcher().execute(
-                        message.substring(Thunderhack.commandManager.getPrefix().length()),
-                        Thunderhack.commandManager.getSource()
+                ThunderHack.commandManager.getDispatcher().execute(
+                        message.substring(ThunderHack.commandManager.getPrefix().length()),
+                        ThunderHack.commandManager.getSource()
                 );
             } catch (CommandSyntaxException ignored) {}
 

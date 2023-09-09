@@ -1,9 +1,8 @@
 package thunder.hack.gui.hud.impl;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
@@ -33,7 +32,7 @@ public class WaterMark extends HudElement {
             FontRenderers.sf_bold.drawGradientString(context.getMatrices(), "ThunderHack ", getPosX() + 2, getPosY() + 3, 10);
             FontRenderers.sf_bold.drawString(context.getMatrices(), info, getPosX() + 2 + FontRenderers.sf_bold.getStringWidth("ThunderHack "), getPosY() + 3, HudEditor.textColor.getValue().getColor());
         } else {
-            FontRenderers.monsterrat.drawGradientString(context.getMatrices(), "ThunderHack v" + Thunderhack.version, getPosX() + 5.5f, getPosY() + 5, 10);
+            FontRenderers.monsterrat.drawGradientString(context.getMatrices(), "ThunderHack v" + ThunderHack.version, getPosX() + 5.5f, getPosY() + 5, 10);
         }
     }
 

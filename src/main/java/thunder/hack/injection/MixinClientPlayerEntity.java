@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.*;
@@ -34,7 +34,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Inject(method = "tick", at = @At("HEAD"))
     public void tickHook(CallbackInfo info) {
         if (mc.player != null && mc.world != null) {
-            Thunderhack.EVENT_BUS.post(new PlayerUpdateEvent());
+            ThunderHack.EVENT_BUS.post(new PlayerUpdateEvent());
         }
     }
 
@@ -48,7 +48,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Inject(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"), cancellable = true)
     public void onMoveHook(MovementType movementType, Vec3d movement, CallbackInfo ci) {
         EventMove event = new EventMove(movement.x, movement.y, movement.z);
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
             super.move(movementType, new Vec3d(event.get_x(), event.get_y(), event.get_z()));
             ci.cancel();
@@ -61,11 +61,11 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     private void sendMovementPacketsHook(CallbackInfo info) {
         if(fullNullCheck()) return;
         EventSync event = new EventSync(getYaw(), getPitch());
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
         EventSprint e = new EventSprint(isSprinting());
-        Thunderhack.EVENT_BUS.post(e);
+        ThunderHack.EVENT_BUS.post(e);
         EventAfterRotate ear = new EventAfterRotate();
-        Thunderhack.EVENT_BUS.post(ear);
+        ThunderHack.EVENT_BUS.post(ear);
         if (e.getSprintState() != mc.player.lastSprinting) {
             if (e.getSprintState()) {
                 mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(this, ClientCommandC2SPacket.Mode.START_SPRINTING));
@@ -88,7 +88,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         mc.player.lastSprinting = pre_sprint_state;
         Core.lock_sprint = false;
         EventPostSync event = new EventPostSync();
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
             info.cancel();
         }
@@ -105,7 +105,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             return;
         }
         PostPlayerUpdateEvent playerUpdateEvent = new PostPlayerUpdateEvent();
-        Thunderhack.EVENT_BUS.post(playerUpdateEvent);
+        ThunderHack.EVENT_BUS.post(playerUpdateEvent);
         if (playerUpdateEvent.isCancelled()) {
             info.cancel();
             if (playerUpdateEvent.getIterations() > 0) {

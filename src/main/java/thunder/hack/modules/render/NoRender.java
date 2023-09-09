@@ -1,15 +1,13 @@
 package thunder.hack.modules.render;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.ParticleEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.notification.Notification;
-import thunder.hack.notification.NotificationManager;
 import thunder.hack.setting.Setting;
 import net.minecraft.client.particle.CampfireSmokeParticle;
 import net.minecraft.client.particle.ElderGuardianAppearanceParticle;
@@ -100,16 +98,16 @@ public class NoRender extends Module {
 
 
             if(arrowCounter > 64){
-                Thunderhack.notificationManager.publicity("NoRender","Превышен лимит стрел! Удаляю...",3, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("NoRender","Превышен лимит стрел! Удаляю...",3, Notification.Type.SUCCESS);
             }
             if(itemsCounter > 16){
-                Thunderhack.notificationManager.publicity("NoRender","Превышен лимит вещей! Удаляю...",3, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("NoRender","Превышен лимит вещей! Удаляю...",3, Notification.Type.SUCCESS);
             }
             if(xpCounter > 16){
-                Thunderhack.notificationManager.publicity("NoRender","Превышен лимит пузырьков опыта! Удаляю...",3, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("NoRender","Превышен лимит пузырьков опыта! Удаляю...",3, Notification.Type.SUCCESS);
             }
             if(potionCouter > 8){
-                Thunderhack.notificationManager.publicity("NoRender","Превышен лимит зелий! Удаляю...",3, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("NoRender","Превышен лимит зелий! Удаляю...",3, Notification.Type.SUCCESS);
             }
 
             for(Entity ent : mc.world.getEntities()){

@@ -9,7 +9,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ISPacketEntityVelocity;
@@ -135,10 +135,10 @@ public class Strafe extends Module {
         if (mc.player.isInLava()) {
             return false;
         }
-        if (Thunderhack.moduleManager.get(Scaffold.class).isEnabled()) {
+        if (ThunderHack.moduleManager.get(Scaffold.class).isEnabled()) {
             return false;
         }
-        if (Thunderhack.moduleManager.get(Speed.class).isEnabled()) {
+        if (ThunderHack.moduleManager.get(Speed.class).isEnabled()) {
             return false;
         }
         if (mc.player.isSubmergedInWater() || waterTicks > 0) {
@@ -180,7 +180,7 @@ public class Strafe extends Module {
 
     @EventHandler
     public void updateValues(EventSync e) {
-        oldSpeed = Thunderhack.playerManager.currentPlayerSpeed * contextFriction;
+        oldSpeed = ThunderHack.playerManager.currentPlayerSpeed * contextFriction;
         if (mc.player.isSubmergedInWater()) {
             waterTicks = 10;
         } else {

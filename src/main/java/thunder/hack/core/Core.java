@@ -3,13 +3,13 @@ package thunder.hack.core;
 import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
+import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.RadarRewrite;
 import thunder.hack.gui.thundergui.ThunderGui2;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.Macro;
 import thunder.hack.utility.Timer;
-import thunder.hack.Thunderhack;
 import thunder.hack.cmd.Command;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -38,8 +38,8 @@ public final class Core {
     @EventHandler
     public void onTick(PlayerUpdateEvent event) {
         if (!fullNullCheck()) {
-            Thunderhack.moduleManager.onUpdate();
-            Thunderhack.moduleManager.sortModules();
+            ThunderHack.moduleManager.onUpdate();
+            ThunderHack.moduleManager.sortModules();
         }
         if (!fullNullCheck()) {
             if (ModuleManager.clickGui.getBind().getKey() == -1) {
@@ -48,7 +48,7 @@ public final class Core {
             }
         }
         ThunderGui2.getInstance().onTick();
-        Thunderhack.moduleManager.onTick();
+        ThunderHack.moduleManager.onTick();
 
         HashMap<BlockPos, Long> cache = new HashMap<>(InteractionUtility.awaiting);
         if(!cache.isEmpty()){
@@ -121,10 +121,10 @@ public final class Core {
     }
 
     public void drawGps(DrawContext e) {
-        if (Thunderhack.gps_position != null) {
+        if (ThunderHack.gps_position != null) {
             float xOffset = mc.getWindow().getScaledWidth() / 2f;
             float yOffset = mc.getWindow().getScaledHeight() / 2f;
-            float yaw = getRotations(new Vec2f(Thunderhack.gps_position.getX(), Thunderhack.gps_position.getZ())) - mc.player.getYaw();
+            float yaw = getRotations(new Vec2f(ThunderHack.gps_position.getX(), ThunderHack.gps_position.getZ())) - mc.player.getYaw();
             e.getMatrices().translate(xOffset, yOffset, 0.0F);
             e.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
             e.getMatrices().translate(-xOffset, -yOffset, 0.0F);
@@ -133,14 +133,14 @@ public final class Core {
             e.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-yaw));
             e.getMatrices().translate(-xOffset, -yOffset, 0.0F);
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-            FontRenderers.modules.drawCenteredString(e.getMatrices(), "gps (" + getDistance(Thunderhack.gps_position) + "m)", (float) (Math.sin(Math.toRadians(yaw)) * 50f) + xOffset, (float) (yOffset - (Math.cos(Math.toRadians(yaw)) * 50f)) - 20, -1);
+            FontRenderers.modules.drawCenteredString(e.getMatrices(), "gps (" + getDistance(ThunderHack.gps_position) + "m)", (float) (Math.sin(Math.toRadians(yaw)) * 50f) + xOffset, (float) (yOffset - (Math.cos(Math.toRadians(yaw)) * 50f)) - 20, -1);
         }
     }
 
     @EventHandler
     public void onKeyPress(EventKeyPress event) {
         if (event.getKey() == -1) return;
-        for (Macro m : Thunderhack.macroManager.getMacros()) {
+        for (Macro m : ThunderHack.macroManager.getMacros()) {
             if (m.getBind() == event.getKey()) {
                 m.runMacro();
             }

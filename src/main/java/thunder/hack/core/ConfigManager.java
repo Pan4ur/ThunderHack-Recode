@@ -2,7 +2,7 @@ package thunder.hack.core;
 
 import com.google.gson.*;
 import org.apache.commons.io.IOUtils;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 
 import thunder.hack.modules.client.MainSettings;
@@ -147,10 +147,10 @@ public class ConfigManager {
             save(currentConfig);
         }
 
-        Thunderhack.moduleManager.onUnload();
-        Thunderhack.moduleManager.onUnloadPost();
+        ThunderHack.moduleManager.onUnload();
+        ThunderHack.moduleManager.onUnloadPost();
         load(file);
-        Thunderhack.moduleManager.onLoad();
+        ThunderHack.moduleManager.onLoad();
 
     }
 
@@ -236,7 +236,7 @@ public class ConfigManager {
 
     private void parseModule(JsonObject object) throws NullPointerException {
 
-        Module module = Thunderhack.moduleManager.modules.stream()
+        Module module = ThunderHack.moduleManager.modules.stream()
                 .filter(m -> object.getAsJsonObject(m.getName()) != null)
                 .findFirst().orElse(null);
 
@@ -310,7 +310,7 @@ public class ConfigManager {
 
     private JsonArray getModuleArray() {
         JsonArray modulesArray = new JsonArray();
-        for (Module m : Thunderhack.moduleManager.modules) {
+        for (Module m : ThunderHack.moduleManager.modules) {
             modulesArray.add(getModuleObject(m));
         }
         return modulesArray;

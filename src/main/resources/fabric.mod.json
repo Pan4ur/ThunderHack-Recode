@@ -24,7 +24,7 @@
   "environment": "client",
   "entrypoints": {
     "main": [
-      "thunder.hack.Thunderhack"
+      "thunder.hack.ThunderHack"
     ]
   },
   "contact": {
