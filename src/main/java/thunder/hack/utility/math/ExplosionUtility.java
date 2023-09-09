@@ -17,6 +17,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.explosion.Explosion;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.modules.combat.AutoAnchor;
 import thunder.hack.modules.combat.AutoCrystal;
 
@@ -37,16 +38,20 @@ public final class ExplosionUtility {
                 return getExplosionDamage1(crysPos, target);
 
             PlayerEntity copyEntity = new PlayerEntity(mc.world, target.getBlockPos(), target.getYaw(), new GameProfile(UUID.fromString("66123666-6666-6666-6666-667563866600"), "PredictEntity228")) {
-                @Override public boolean isSpectator() {
+                @Override
+                public boolean isSpectator() {
                     return false;
                 }
-                @Override public boolean isCreative() {
+
+                @Override
+                public boolean isCreative() {
                     return false;
                 }
             };
             copyEntity.setPosition(getEntityPosVec(target, AutoCrystal.predictTicks.getValue()));
             return getExplosionDamageWPredict(crysPos, target, copyEntity);
-        } catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
         return 0f;
     }
 
@@ -54,14 +59,17 @@ public final class ExplosionUtility {
         float final_result;
         anchorIgnore = anchorPos;
         terrainIgnore = true;
-        if(AutoAnchor.predictTicks.getValue() == 0) {
+        if (AutoAnchor.predictTicks.getValue() == 0) {
             final_result = getExplosionDamage1(anchorPos.up().toCenterPos(), target);
         } else {
             PlayerEntity copyEntity = new PlayerEntity(mc.world, target.getBlockPos(), target.getYaw(), new GameProfile(UUID.fromString("66123666-6666-6666-6666-667563866600"), "PredictEntity228")) {
-                @Override public boolean isSpectator() {
+                @Override
+                public boolean isSpectator() {
                     return false;
                 }
-                @Override public boolean isCreative() {
+
+                @Override
+                public boolean isCreative() {
                     return false;
                 }
             };
@@ -73,11 +81,11 @@ public final class ExplosionUtility {
         return final_result;
     }
 
-    public static float getMinedDamage(BlockPos anchorPos, PlayerEntity target) {
+    public static float getMinedDamage(@NotNull BlockPos anchorPos, PlayerEntity target) {
         float final_result;
         anchorIgnore = anchorPos;
         terrainIgnore = true;
-        final_result = getExplosionDamage1(anchorPos.up().toCenterPos().add(0f,0.5f,0f), target);
+        final_result = getExplosionDamage1(anchorPos.up().toCenterPos().add(0f, 0.5f, 0f), target);
         anchorIgnore = null;
         terrainIgnore = false;
         return final_result;
@@ -85,7 +93,7 @@ public final class ExplosionUtility {
 
 
     public static float getSelfExplosionDamage(Vec3d explosionPos) {
-        return getExplosionDamage1(explosionPos,mc.player);
+        return getExplosionDamage1(explosionPos, mc.player);
     }
 
 
@@ -99,7 +107,7 @@ public final class ExplosionUtility {
         double entityMotionPosX = 0;
         double entityMotionPosZ = 0;
         for (int i = 1; i <= ticks; i++) {
-            if (mc.world.getBlockState( BlockPos.ofFloored(entity.getX() + dX * i, entity.getY(), entity.getZ() + dZ * i)).getBlock() instanceof AirBlock) {
+            if (mc.world.getBlockState(BlockPos.ofFloored(entity.getX() + dX * i, entity.getY(), entity.getZ() + dZ * i)).getBlock() instanceof AirBlock) {
                 entityMotionPosX = dX * i;
                 entityMotionPosZ = dZ * i;
             } else break;
@@ -109,8 +117,6 @@ public final class ExplosionUtility {
 
     public static float getExplosionDamage1(Vec3d explosionPos, PlayerEntity target) {
         try {
-
-
             if (mc.world.getDifficulty() == Difficulty.PEACEFUL) return 0f;
 
             Explosion explosion = new Explosion(mc.world, null, explosionPos.x, explosionPos.y, explosionPos.z, 6f, false, Explosion.DestructionType.DESTROY);
@@ -161,13 +167,13 @@ public final class ExplosionUtility {
                     }
                 }
             }
-        } catch (Exception e){
-
+        } catch (Exception ignored) {
         }
+
         return 0f;
     }
 
-    public static float getExplosionDamageWPredict(Vec3d explosionPos, PlayerEntity target,PlayerEntity predict) {
+    public static float getExplosionDamageWPredict(Vec3d explosionPos, PlayerEntity target, PlayerEntity predict) {
         if (mc.world.getDifficulty() == Difficulty.PEACEFUL) return 0f;
 
         Explosion explosion = new Explosion(mc.world, null, explosionPos.x, explosionPos.y, explosionPos.z, 6f, false, Explosion.DestructionType.DESTROY);

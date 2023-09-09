@@ -94,7 +94,7 @@ public class Thunderhack implements ModInitializer {
         initTime = System.currentTimeMillis();
     }
 
-    public static void syncVersion() {
+    private void syncVersion() {
         try {
             if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersion.txt").openStream())).readLine().equals(version))
                 oldVersion = true;

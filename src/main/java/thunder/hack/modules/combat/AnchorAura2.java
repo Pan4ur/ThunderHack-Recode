@@ -2,6 +2,7 @@ package thunder.hack.modules.combat;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RespawnAnchorBlock;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
@@ -39,6 +40,7 @@ public class AnchorAura2 extends Module {
     private final Setting<Boolean> onlyOwn = new Setting<>("Only Own", false);
     private final Setting<Integer> minDamage = new Setting<>("Min Target Damage", 5, 1, 36);
     private final Setting<Integer> maxDamage = new Setting<>("Max Self Damage", 8, 0, 36);
+    private final Setting<Integer> maxFDamage = new Setting<>("Max Friend Damage", 12, 0, 36);
     private final Setting<Boolean> antiSelfPop = new Setting<>("Anti Self Pop", true);
     private final Setting<Boolean> antiFriendPop = new Setting<>("Anti Friend Pop", false);
     private final Setting<InventoryUtility.SwitchMode> switchMode = new Setting<>("Switch Mode", InventoryUtility.SwitchMode.All);
@@ -56,7 +58,7 @@ public class AnchorAura2 extends Module {
 
     // Charge
     private final Setting<Parent> charge = new Setting<>("Charge", new Parent(false, 0));
-    private final Setting<InteractMode> chargeMode = new Setting<>("Charge Mode", InteractMode.Both).withParent(charge);
+    private final Setting<InteractMode> chargeMode = new Setting<>("Charge Mode", InteractMode.All).withParent(charge);
     private final Setting<Boolean> chargeRotate = new Setting<>("Charge Rotate", false).withParent(charge);
     private final Setting<Integer> chargeCount = new Setting<>("Charge Count", 1, 1, 4).withParent(charge);
     private final Setting<Float> chargeRange = new Setting<>("Charge Range", 5f, 1f, 7f).withParent(charge);
@@ -64,7 +66,7 @@ public class AnchorAura2 extends Module {
 
     // Explode
     private final Setting<Parent> explode = new Setting<>("Explode", new Parent(false, 0));
-    private final Setting<InteractMode> explodeMode = new Setting<>("Explode Mode", InteractMode.Both).withParent(explode);
+    private final Setting<InteractMode> explodeMode = new Setting<>("Explode Mode", InteractMode.All).withParent(explode);
     private final Setting<Boolean> explodeRotate = new Setting<>("Explode Rotate", false).withParent(charge);
     private final Setting<Float> explodeRange = new Setting<>("Explode Range", 5f, 1f, 7f).withParent(explode);
     private final Setting<Integer> explodeTimeout = new Setting<>("Explode Timeout", 25, 0, 1000).withParent(explode);
@@ -84,8 +86,8 @@ public class AnchorAura2 extends Module {
 
     private enum InteractMode {
         Packet,
-        Vanilla,
-        Both
+        Normal,
+        All
     }
 
     private final List<BlockPos> ownAnchors = new ArrayList<>();
@@ -100,7 +102,7 @@ public class AnchorAura2 extends Module {
     @Override
     public void onEnable() {
         if (mc.world == null) return;
-        if (dimensionDisable.getValue() && !mc.world.getDimension().respawnAnchorWorks()) {
+        if (dimensionDisable.getValue() && mc.world.getDimension().respawnAnchorWorks()) {
             disable(isRu() ? "В данном измерении не работают якоря возрожденя! Выключение..." : "There are respawn anchors don't work! Disabling...");
         }
 
@@ -155,10 +157,10 @@ public class AnchorAura2 extends Module {
     }
 
     private void interact(BlockHitResult result, @NotNull Setting<InteractMode> explodeMode) {
-        if (explodeMode.getValue() == InteractMode.Packet || explodeMode.getValue() == InteractMode.Both) {
+        if (explodeMode.getValue() == InteractMode.Packet || explodeMode.getValue() == InteractMode.All) {
             sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
         }
-        if (explodeMode.getValue() == InteractMode.Vanilla || explodeMode.getValue() == InteractMode.Both) {
+        if (explodeMode.getValue() == InteractMode.Normal || explodeMode.getValue() == InteractMode.All) {
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
         }
 
@@ -189,8 +191,16 @@ public class AnchorAura2 extends Module {
                 // Finding new best target pos
                 BlockPos best = null;
                 for (BlockPos blockPos : findAnchorBlocks()) {
+                    boolean friendDamageCorrect = true;
+                    for (AbstractClientPlayerEntity player : Thunderhack.friendManager.getOnlineFriends()) {
+                        if (ExplosionUtility.getAnchorExplosionDamage(blockPos, player) > maxFDamage.getValue()) {
+                            friendDamageCorrect = false;
+                            break;
+                        }
+                    }
                     if (ExplosionUtility.getAnchorExplosionDamage(blockPos, mc.player) <= maxDamage.getValue()
-                            && ExplosionUtility.getAnchorExplosionDamage(blockPos, target) >= minDamage.getValue()) {
+                            && ExplosionUtility.getAnchorExplosionDamage(blockPos, target) >= minDamage.getValue()
+                            && friendDamageCorrect) {
                         if (best == null) {
                             best = blockPos;
                         } else if (ExplosionUtility.getAnchorExplosionDamage(best, mc.player) >= ExplosionUtility.getAnchorExplosionDamage(blockPos, mc.player)
@@ -228,6 +238,7 @@ public class AnchorAura2 extends Module {
                 SearchInvResult anchor = InventoryUtility.getAnchor();
                 if (!anchor.found() && anchorDisable.getValue()) {
                     disable(isRu() ? "В хотбаре не найдены якоря возрождения! Выключение..." : "No respawn anchors in hotbar! Disabling...");
+                    return;
                 }
 
                 boolean result = InteractionUtility.placeBlock(targetPos, placeRotate.getValue(), interactMode.getValue(), placeMode.getValue(), anchor, switchBack.getValue(), switchMode.getValue(), false);
@@ -257,6 +268,7 @@ public class AnchorAura2 extends Module {
                 SearchInvResult glowResult = InventoryUtility.getGlowStone();
                 if (glowStoneDisable.getValue() && !glowResult.found()) {
                     disable(isRu() ? "В хотбаре не найден светящийся камень! Выключение..." : "No glowstone in hotbar! Disabling...");
+                    return;
                 }
 
                 // Charging
@@ -277,7 +289,7 @@ public class AnchorAura2 extends Module {
 
                     charges.put(targetPos,
                             charges.containsKey(targetPos) ?
-                            charges.get(targetPos) + 1 : 1);
+                                    charges.get(targetPos) + 1 : 1);
                 }
 
                 if (switchBack.getValue())
@@ -309,6 +321,18 @@ public class AnchorAura2 extends Module {
                 if (!isCorrectPos(targetPos) || shouldPause()) continue;
                 if (antiSelfPop.getValue() && mc.player.getHealth() - ExplosionUtility.getAnchorExplosionDamage(targetPos, mc.player) <= 0)
                     continue;
+                if (antiFriendPop.getValue()) {
+                    boolean shouldContinue = false;
+
+                    for (AbstractClientPlayerEntity entity : Thunderhack.friendManager.getOnlineFriends()) {
+                        if (entity.getHealth() - ExplosionUtility.getAnchorExplosionDamage(targetPos, entity) <= 0) {
+                            shouldContinue = true;
+                            break;
+                        }
+                    }
+
+                    if (shouldContinue) continue;
+                }
 
                 int preSlot = mc.player.getInventory().selectedSlot;
                 if (mc.player.getMainHandStack().getItem().equals(Items.GLOWSTONE)) {
@@ -327,6 +351,7 @@ public class AnchorAura2 extends Module {
 
                     sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
                     interact(result, explodeMode);
+                    sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                 }
 
                 if (switchBack.getValue())
