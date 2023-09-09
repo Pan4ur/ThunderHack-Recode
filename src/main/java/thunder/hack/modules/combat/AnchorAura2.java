@@ -28,7 +28,9 @@ import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
@@ -87,14 +89,9 @@ public class AnchorAura2 extends Module {
     }
 
     private final List<BlockPos> ownAnchors = new ArrayList<>();
+    private final Map<BlockPos, Integer> charges = new HashMap<>();
     private PlayerEntity target;
     private BlockPos targetPos;
-
-    // Threads
-    private LogicThread logicThread;
-    private PlaceThread placeThread;
-    private ChargeThread chargeThread;
-    private ExplodeThread explodeThread;
 
     public AnchorAura2() {
         super("AnchorAura228", "Ебашит якоря как героин", Category.COMBAT);
@@ -107,39 +104,17 @@ public class AnchorAura2 extends Module {
             disable(isRu() ? "В данном измерении не работают якоря возрожденя! Выключение..." : "There are respawn anchors don't work! Disabling...");
         }
 
-        logicThread = new LogicThread();
-        placeThread = new PlaceThread();
-        chargeThread = new ChargeThread();
-        explodeThread = new ExplodeThread();
+        target = null;
+        targetPos = null;
+        charges.clear();
 
-        logicThread.start();
-        placeThread.start();
-        chargeThread.start();
-        explodeThread.start();
+        // Threads
+        new LogicThread().start();
+        new PlaceThread().start();
+        new ChargeThread().start();
+        new ExplodeThread().start();
 
         super.onEnable();
-    }
-
-    @Override
-    public void onDisable() {
-        if (placeThread != null && !placeThread.isInterrupted()) {
-            placeThread.interrupt();
-            placeThread = null;
-        }
-        if (chargeThread != null && !chargeThread.isInterrupted()) {
-            chargeThread.interrupt();
-            chargeThread = null;
-        }
-        if (explodeThread != null && !explodeThread.isInterrupted()) {
-            explodeThread.interrupt();
-            explodeThread = null;
-        }
-        if (logicThread != null && !logicThread.isInterrupted()) {
-            logicThread.interrupt();
-            logicThread = null;
-        }
-
-        super.onDisable();
     }
 
     @Override
@@ -194,20 +169,21 @@ public class AnchorAura2 extends Module {
     private final class LogicThread extends Thread {
         @Override
         public synchronized void run() {
-            while (true) {
+            while (isEnabled()) {
                 try {
                     sleep(logicTimeout.getValue());
                 } catch (InterruptedException ignored) {
                 }
 
-                if (fullNullCheck()) return;
+                if (fullNullCheck()) continue;
 
                 if (target == null) {
                     target = Thunderhack.combatManager.getNearestTarget(targetRange.getValue());
-                    return;
+                    continue;
                 }
                 if (target.getPos().squaredDistanceTo(mc.player.getEyePos()) > targetRange.getValue() * targetRange.getValue()) {
                     target = null;
+                    continue;
                 }
 
                 // Finding new best target pos
@@ -227,7 +203,7 @@ public class AnchorAura2 extends Module {
                 if (targetPos == null) {
                     targetPos = best;
                 } else if (mc.player.squaredDistanceTo(targetPos.toCenterPos()) <= placeRange.getPow2Value()
-                        || !InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false)) {
+                        || !InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false) && !mc.world.getBlockState(targetPos).getBlock().equals(Blocks.RESPAWN_ANCHOR)) {
                     if ((ExplosionUtility.getAnchorExplosionDamage(targetPos, mc.player) >= ExplosionUtility.getAnchorExplosionDamage(best, mc.player)
                             && ExplosionUtility.getAnchorExplosionDamage(targetPos, target) <= ExplosionUtility.getAnchorExplosionDamage(best, target))) {
                         targetPos = best;
@@ -240,14 +216,14 @@ public class AnchorAura2 extends Module {
     private final class PlaceThread extends Thread {
         @Override
         public void run() {
-            while (true) {
+            while (isEnabled()) {
                 try {
                     sleep(placeTimeout.getValue());
                 } catch (InterruptedException ignored) {
                 }
 
-                if (target == null || targetPos == null) return;
-                if (!isCorrectPos(targetPos) || shouldPause()) return;
+                if (target == null || targetPos == null) continue;
+                if (!isCorrectPos(targetPos) || shouldPause()) continue;
 
                 SearchInvResult anchor = InventoryUtility.getAnchor();
                 if (!anchor.found() && anchorDisable.getValue()) {
@@ -269,14 +245,14 @@ public class AnchorAura2 extends Module {
     private final class ChargeThread extends Thread {
         @Override
         public void run() {
-            while (true) {
+            while (isEnabled()) {
                 try {
                     sleep(chargeTimeout.getValue());
                 } catch (InterruptedException ignored) {
                 }
 
-                if (target == null || targetPos == null || fullNullCheck()) return;
-                if (!isCorrectPos(targetPos) || shouldPause()) return;
+                if (target == null || targetPos == null || fullNullCheck()) continue;
+                if (!isCorrectPos(targetPos) || shouldPause()) continue;
 
                 SearchInvResult glowResult = InventoryUtility.getGlowStone();
                 if (glowStoneDisable.getValue() && !glowResult.found()) {
@@ -298,6 +274,10 @@ public class AnchorAura2 extends Module {
 
                     sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                     interact(result, chargeMode);
+
+                    charges.put(targetPos,
+                            charges.containsKey(targetPos) ?
+                            charges.get(targetPos) + 1 : 1);
                 }
 
                 if (switchBack.getValue())
@@ -319,16 +299,16 @@ public class AnchorAura2 extends Module {
     private final class ExplodeThread extends Thread {
         @Override
         public void run() {
-            while (true) {
+            while (isEnabled()) {
                 try {
                     sleep(explodeTimeout.getValue());
                 } catch (InterruptedException ignored) {
                 }
 
-                if (target == null || targetPos == null || fullNullCheck()) return;
-                if (!isCorrectPos(targetPos) || shouldPause()) return;
+                if (target == null || targetPos == null || fullNullCheck()) continue;
+                if (!isCorrectPos(targetPos) || shouldPause()) continue;
                 if (antiSelfPop.getValue() && mc.player.getHealth() - ExplosionUtility.getAnchorExplosionDamage(targetPos, mc.player) <= 0)
-                    return;
+                    continue;
 
                 int preSlot = mc.player.getInventory().selectedSlot;
                 if (mc.player.getMainHandStack().getItem().equals(Items.GLOWSTONE)) {
@@ -357,7 +337,8 @@ public class AnchorAura2 extends Module {
         private synchronized boolean isCorrectPos(@NotNull BlockPos pos) {
             if (mc.player == null || mc.world == null) return false;
             if (mc.world.getBlockState(pos).getBlock() == Blocks.RESPAWN_ANCHOR
-                    && mc.world.getBlockState(pos).get(RespawnAnchorBlock.CHARGES) >= chargeCount.getValue()) {
+                    && (mc.world.getBlockState(pos).get(RespawnAnchorBlock.CHARGES) >= chargeCount.getValue()
+                    || (charges.containsKey(pos) && charges.get(pos) >= chargeCount.getValue()))) {
                 if (onlyOwn.getValue() && !ownAnchors.contains(pos)) return false;
                 return mc.player.squaredDistanceTo(pos.toCenterPos()) <= explodeRange.getPow2Value();
             }
