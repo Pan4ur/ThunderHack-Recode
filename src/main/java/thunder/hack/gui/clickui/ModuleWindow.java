@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.gui.DrawContext;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.render.Render2DEngine;
@@ -17,17 +18,17 @@ import org.lwjgl.opengl.GL11;
 
 public class ModuleWindow extends AbstractWindow {
 
-	private final List<ModuleButton> buttons;
 	private final Identifier ICON;
 
 	private final Animation animation = new EaseBackIn(270, 1f, 1.03f, Direction.BACKWARDS);
 
 	private boolean scrollHover; // scroll hover
+	private List<ModuleButton> buttons;
 
 	public ModuleWindow(String name, List<Module> features, int index, double x, double y, double width, double height) {
 		super(name, x, y, width, height);
 		buttons = new ArrayList<>();
-		ICON = new Identifier("textures/"+ name.toLowerCase() + ".png");
+		ICON = new Identifier("textures/" + name.toLowerCase() + ".png");
 		features.forEach(feature -> {
 			ModuleButton button = new ModuleButton(feature);
 			button.setHeight(17);
@@ -49,30 +50,40 @@ public class ModuleWindow extends AbstractWindow {
 		animation.setDirection(isOpen() ? Direction.FORWARDS : Direction.BACKWARDS);
 		context.getMatrices().push();
 
-
+		boolean popStack = false;
 		//RoundedShader.drawRoundDoubleColor(matrixStack,(float) x + 2, (float) (y + height - 8), (float) width - 4, (float) ((getButtonsHeight() + 11) * animation.getOutput()), 3, ClickGui.getInstance().getColor(200),ClickGui.getInstance().getColor(0));
-		Render2DEngine.drawRound(context.getMatrices(),(float) x + 3, (float) (y + height - 6), (float) width - 6, (float) ((getButtonsHeight() + 8) * animation.getOutput()), 3, ClickGui.getInstance().plateColor.getValue().getColorObject());
+		if(ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old || (getButtonsHeight() + 8) < ModuleManager.clickGui.catHeight.getValue()){
+			Render2DEngine.drawRound(context.getMatrices(),(float) x + 3, (float) (y + height - 6), (float) width - 6, (float) ((getButtonsHeight() + 8) * animation.getOutput()), 3, ClickGui.getInstance().plateColor.getValue().getColorObject());
+		} else {
+			Render2DEngine.drawRound(context.getMatrices(),(float) x + 3, (float) (y + height - 6), (float) width - 6, (float) ((ModuleManager.clickGui.catHeight.getValue()) * animation.getOutput()), 3, ClickGui.getInstance().plateColor.getValue().getColorObject());
+			Render2DEngine.addWindow(context.getMatrices(), (float) x + 3, (float) (y + height - 6), (float) (x + 3 + (float) width - 6), (float) ((y + height - 6) + (float) (float) ((ModuleManager.clickGui.catHeight.getValue())  * animation.getOutput())), 1f);
+			popStack = true;
+		}
 
 		if (animation.finished(Direction.FORWARDS)) {
-
 			Render2DEngine.drawBlurredShadow(context.getMatrices(),(int) x + 4, (int) (y + height - 6), (int) width - 8, 8, 7, new Color(0, 0, 0, 180));
-
 			for (ModuleButton button : buttons) {
 				button.setX(x + 2);
-				button.setY(y + height);
+				if(popStack && !(buttons.get(0).getY() > y + height)){
+					button.setY(y + height + moduleOffset);
+				} else {
+					button.setY(y + height);
+					moduleOffset = 0f;
+				}
 				button.setWidth(width - 4);
 				button.setHeight(17);
-
 				button.render(context,mouseX, mouseY, delta, color);
 			}
 		}
-		GL11.glEnable(GL11.GL_LINE_SMOOTH);
+
+		if(popStack)
+			Render2DEngine.popWindow();
+
 		Render2DEngine.drawRoundD(context.getMatrices(),x + 2, y - 3, width - 4, height, 4,ClickGui.getInstance().catColor.getValue().getColorObject());
 
 		Render2DEngine.drawTexture(context,ICON, (int) (x + 7), (int) (y + (height - 18) / 2), 12, 12);
 
 		FontRenderers.categories.drawCenteredString(context.getMatrices(),getName(), ((int) x + 2 + (width - 4) / 2), (int) y + (int) height / 2f - 7, new Color(-1).getRGB());
-		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 		context.getMatrices().pop();
 		updatePosition();
 	}

@@ -1,10 +1,8 @@
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
-import meteordevelopment.orbit.EventPriority;
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.TntEntity;
@@ -16,7 +14,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.SwordItem;
-import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
@@ -25,20 +25,14 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import thunder.hack.Thunderhack;
-import thunder.hack.events.impl.EventMove;
-import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.SearchInvResult;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class AutoTotem extends Module {
     public Setting<OffHand> offhand = new Setting<>("Item", OffHand.Totem);
@@ -84,35 +78,35 @@ public class AutoTotem extends Module {
      */
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.Receive e){
-        if(e.getPacket() instanceof EntitySpawnS2CPacket spawn && griefInstant.getValue()){
+    public void onPacketReceive(PacketEvent.Receive e) {
+        if (e.getPacket() instanceof EntitySpawnS2CPacket spawn && griefInstant.getValue()) {
             if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
-                if(mc.player.squaredDistanceTo(spawn.getX(),spawn.getY(),spawn.getZ()) < 36){
+                if (mc.player.squaredDistanceTo(spawn.getX(), spawn.getY(), spawn.getZ()) < 36) {
                     runInstant();
                 }
             }
         }
-        if(e.getPacket() instanceof BlockUpdateS2CPacket blockUpdate){
-            if(blockUpdate.getState().getBlock() == Blocks.OBSIDIAN && onObsidianPlace.getValue()){
-                if(mc.player.squaredDistanceTo(blockUpdate.getPos().toCenterPos()) < 36 && delay <= 0){
+        if (e.getPacket() instanceof BlockUpdateS2CPacket blockUpdate) {
+            if (blockUpdate.getState().getBlock() == Blocks.OBSIDIAN && onObsidianPlace.getValue()) {
+                if (mc.player.squaredDistanceTo(blockUpdate.getPos().toCenterPos()) < 36 && delay <= 0) {
                     runInstant();
                 }
             }
         }
-        if(e.getPacket() instanceof InventoryS2CPacket pac){
-       //     sendMessage(pac.toString());
+        if (e.getPacket() instanceof InventoryS2CPacket pac) {
+            //     sendMessage(pac.toString());
         }
     }
 
     private void runInstant() {
         SearchInvResult hotbarResult = InventoryUtility.findItemInHotBar(Items.TOTEM_OF_UNDYING);
         SearchInvResult invResult = InventoryUtility.findItemInInventory(Items.TOTEM_OF_UNDYING);
-        if(hotbarResult.found()) {
+        if (hotbarResult.found()) {
             hotbarResult.switchTo();
             delay = 20;
-        } else if(invResult.found()) {
+        } else if (invResult.found()) {
             int slot = invResult.slot() >= 36 ? invResult.slot() - 36 : invResult.slot();
-            if(!griefInstant.getValue()) {
+            if (!griefInstant.getValue()) {
                 swapTo(slot);
             } else {
                 mc.interactionManager.pickFromInventory(slot);
@@ -121,16 +115,21 @@ public class AutoTotem extends Module {
         }
     }
 
-    public void swapTo(int slot){
+    public void swapTo(int slot) {
         if (slot != -1 && delay <= 0) {
-            if(stopMotion.getValue())
-                mc.player.setVelocity(0,mc.player.getVelocity().getY(),0);
+            if (mc.currentScreen instanceof GenericContainerScreen) {
+                return;
+            }
+
+            if (stopMotion.getValue())
+                mc.player.setVelocity(0, mc.player.getVelocity().getY(), 0);
 
             int nearest_slot = findNearestCurrentItem();
             int prevCurrentItem = mc.player.getInventory().selectedSlot;
             if (slot >= 9) {
                 if (matrix.getValue()) {
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
+                    mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                     sendPacket(new UpdateSelectedSlotC2SPacket(nearest_slot));
                     mc.player.getInventory().selectedSlot = nearest_slot;
                     ItemStack itemstack = mc.player.getOffHandStack();
@@ -239,7 +238,7 @@ public class AutoTotem extends Module {
         if (onCrystalInHand.getValue()) {
             for (PlayerEntity pl : Thunderhack.asyncManager.getAsyncPlayers()) {
                 if (Thunderhack.friendManager.isFriend(pl)) continue;
-                if(pl == mc.player) continue;
+                if (pl == mc.player) continue;
                 if (mc.player.squaredDistanceTo(pl) < 36) {
                     if (pl.getMainHandStack().getItem() == Items.OBSIDIAN
                             || pl.getMainHandStack().getItem() == Items.END_CRYSTAL

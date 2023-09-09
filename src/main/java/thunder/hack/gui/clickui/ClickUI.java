@@ -12,6 +12,7 @@ import org.lwjgl.glfw.GLFW;
 import thunder.hack.Thunderhack;
 import thunder.hack.core.AsyncManager;
 import thunder.hack.core.ConfigManager;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
@@ -107,23 +108,32 @@ public class ClickUI extends Screen {
 
         if (Module.fullNullCheck()) renderBackground(context);
 
-        for (AbstractWindow window : windows) {
-            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 264)) {
-                window.setY(window.getY() + 2);
+        if(ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old) {
+            for (AbstractWindow window : windows) {
+                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 264)) {
+                    window.setY(window.getY() + 2);
+                }
+                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 265)) {
+                    window.setY(window.getY() - 2);
+                }
+                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 262)) {
+                    window.setX(window.getX() + 2);
+                }
+                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 263)) {
+                    window.setX(window.getX() - 2);
+                }
+                if (scrollY != 0) {
+                    window.setY(window.getY() + scrollY);
+                }
             }
-            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 265)) {
-                window.setY(window.getY() - 2);
-            }
-            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 262)) {
-                window.setX(window.getX() + 2);
-            }
-            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 263)) {
-                window.setX(window.getX() - 2);
-            }
-            if (scrollY != 0) {
-                window.setY(window.getY() + scrollY);
+        } else {
+            for (AbstractWindow window : windows) {
+                if (scrollY != 0) {
+                    window.setModuleOffset(scrollY, mouseX, mouseY);
+                }
             }
         }
+
         scrollY = 0;
 
         if (ClickGui.getInstance().msaa.getValue()) {

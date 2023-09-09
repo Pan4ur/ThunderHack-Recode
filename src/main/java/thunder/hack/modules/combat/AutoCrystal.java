@@ -630,7 +630,7 @@ public class AutoCrystal extends Module {
                         break;
                     }
 
-            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), facePlaceButton.getValue().getKey()))
+            if (facePlaceButton.getValue().getKey() != -1 && InputUtil.isKeyPressed(mc.getWindow().getHandle(), facePlaceButton.getValue().getKey()))
                 override = true;
 
             if ((target.getHealth() + target.getAbsorptionAmount()) - (data.damage * lethalMultiplier.getValue()) < 0.5)

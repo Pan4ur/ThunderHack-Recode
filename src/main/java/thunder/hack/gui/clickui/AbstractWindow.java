@@ -1,10 +1,12 @@
 package thunder.hack.gui.clickui;
 
 import net.minecraft.client.gui.DrawContext;
+import thunder.hack.cmd.Command;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;
+import java.util.List;
 
 public abstract class AbstractWindow {
 	private String name;
@@ -15,6 +17,7 @@ public abstract class AbstractWindow {
 	private double prevX, prevY;
 	protected boolean hovered;
 	public boolean dragging;
+	public float moduleOffset;
 
 	private boolean open;
 
@@ -107,5 +110,11 @@ public abstract class AbstractWindow {
 
 	public void setHeight(double height) {
 		this.height = height;
+	}
+
+	public void setModuleOffset(float v, float mx, float my) {
+		if(Render2DEngine.isHovered(mx, my, x, y, width, height + 1000)) {
+			moduleOffset = moduleOffset + v;
+		}
 	}
 }

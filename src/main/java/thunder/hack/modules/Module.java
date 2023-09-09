@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class Module {
+public abstract class Module {
     private final String description;
     public static MinecraftClient mc = MinecraftClient.getInstance();
     private final Category category;
@@ -43,6 +43,7 @@ public class Module {
         this.description = name;
         this.category = category;
     }
+
 
     public void onEnable() {
     }
