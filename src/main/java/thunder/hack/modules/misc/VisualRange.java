@@ -6,8 +6,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Formatting;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventEntityRemoved;
 import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.modules.Module;
@@ -52,7 +51,7 @@ public class VisualRange extends Module {
 
     public void notify(Entity entity, boolean enter) {
         String message = "";
-        if (Thunderhack.friendManager.isFriend(entity.getName().getString())) {
+        if (ThunderHack.friendManager.isFriend(entity.getName().getString())) {
             message = Formatting.AQUA + entity.getName().getString();
         } else {
             message = Formatting.GRAY + entity.getName().getString();
@@ -68,7 +67,7 @@ public class VisualRange extends Module {
             sendMessage(message);
         }
         if (Mode.getValue() == mode.Notification) {
-            Thunderhack.notificationManager.publicity("VisualRange",message, 2, Notification.Type.WARNING);
+            ThunderHack.notificationManager.publicity("VisualRange",message, 2, Notification.Type.WARNING);
         }
 
         if (soundpl.getValue()) {
@@ -84,7 +83,7 @@ public class VisualRange extends Module {
 
     public boolean isValid(Entity entity) {
         if (!(entity instanceof PlayerEntity)) return false;
-        if (entity == mc.player || (Thunderhack.friendManager.isFriend(entity.getName().getString()) && !friends.getValue())) return false;
+        if (entity == mc.player || (ThunderHack.friendManager.isFriend(entity.getName().getString()) && !friends.getValue())) return false;
         return true;
     }
 

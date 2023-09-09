@@ -2,9 +2,8 @@ package thunder.hack.modules.movement;
 
 
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -62,7 +61,7 @@ public class PacketFly extends Module {
 
     @Override
     public void onDisable() {
-        Thunderhack.TICK_TIMER = (1.0f);
+        ThunderHack.TICK_TIMER = (1.0f);
     }
 
     public boolean getTickCounter(int n) {
@@ -184,7 +183,7 @@ public class PacketFly extends Module {
     @EventHandler
     public void onSync(EventSync eventPlayerUpdateWalking) {
         if (timer.getValue() != 1.0) {
-            Thunderhack.TICK_TIMER = timer.getValue();
+            ThunderHack.TICK_TIMER = timer.getValue();
         }
         mc.player.setVelocity(0.0, 0.0, 0.0);
         if (mode.getValue() != Mode.Rubber && teleportId == 0) {

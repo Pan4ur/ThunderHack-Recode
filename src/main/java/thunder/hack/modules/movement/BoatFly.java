@@ -15,8 +15,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -71,7 +70,7 @@ public class BoatFly extends Module {
 
     @Override
     public void onDisable() {
-        Thunderhack.TICK_TIMER = (1.0f);
+        ThunderHack.TICK_TIMER = (1.0f);
         vehiclePackets.clear();
         Field2266 = false;
         if (mc.player == null) {
@@ -171,7 +170,7 @@ public class BoatFly extends Module {
             return;
         }
         if (timer.getValue() != 1.0f) {
-            Thunderhack.TICK_TIMER = (timer.getValue());
+            ThunderHack.TICK_TIMER = (timer.getValue());
         }
         entity.setYaw(mc.player.getYaw());
 

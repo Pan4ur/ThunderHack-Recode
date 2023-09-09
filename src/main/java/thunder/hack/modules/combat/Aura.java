@@ -30,7 +30,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.core.PlayerManager;
@@ -156,9 +156,9 @@ public class Aura extends Module {
     public void auraLogic() {
         if (target != null && target instanceof LivingEntity && (((LivingEntity) target).getHealth() <= 0 || ((LivingEntity) target).isDead())) {
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                Thunderhack.notificationManager.publicity("Aura", "Цель успешно нейтрализована!", 3, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("Aura", "Цель успешно нейтрализована!", 3, Notification.Type.SUCCESS);
             } else {
-                Thunderhack.notificationManager.publicity("Aura", "Target successfully neutralized!", 3, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("Aura", "Target successfully neutralized!", 3, Notification.Type.SUCCESS);
             }
         }
 
@@ -195,8 +195,8 @@ public class Aura extends Module {
             if (!(target instanceof PlayerEntity) || !(((PlayerEntity) target).isUsingItem() && ((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD) || ignoreShield.getValue()) {
                 Criticals.cancelCrit = true;
 
-                if (Thunderhack.moduleManager.get(Criticals.class).isEnabled())
-                    Thunderhack.moduleManager.get(Criticals.class).doCrit();
+                if (ThunderHack.moduleManager.get(Criticals.class).isEnabled())
+                    ThunderHack.moduleManager.get(Criticals.class).doCrit();
 
                 mc.interactionManager.attackEntity(mc.player, target);
                 Criticals.cancelCrit = false;
@@ -235,7 +235,7 @@ public class Aura extends Module {
     public void onPacketReceive(PacketEvent.Receive e) {
         if (e.getPacket() instanceof EntityStatusS2CPacket status) {
             if (status.getStatus() == 30 && status.getEntity(mc.world) != null && target != null && status.getEntity(mc.world) == target)
-                Thunderhack.notificationManager.publicity("Aura", MainSettings.isRu() ? ("Успешно сломали щит игроку " + target.getName().getString()) : ("Succesfully destroyed " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("Aura", MainSettings.isRu() ? ("Успешно сломали щит игроку " + target.getName().getString()) : ("Succesfully destroyed " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
         }
         /*
         if(e.getPacket() instanceof EntityTrackerUpdateS2CPacket attrib){
@@ -273,7 +273,7 @@ public class Aura extends Module {
         // я хз почему оно не критует когда фд больше 1.14
         if (mc.player.fallDistance > 1 && mc.player.fallDistance < 1.14) return false;
 
-        if (pauseInInventory.getValue() && Thunderhack.playerManager.inInventory) return false;
+        if (pauseInInventory.getValue() && ThunderHack.playerManager.inInventory) return false;
 
         if (!oldDelay.getValue()) {
             if (!(MathHelper.clamp(((float) ((ILivingEntity) mc.player).getLastAttackedTicks() + 0.5f) / getAttackCooldownProgressPerTick(), 0.0F, 1.0F) >= 0.93f))
@@ -282,7 +282,7 @@ public class Aura extends Module {
             if (minCPS.getValue() > maxCPS.getValue()) minCPS.setValue(maxCPS.getValue());
         }
 
-        if (!mc.options.jumpKey.isPressed() && (!Thunderhack.moduleManager.get(TargetStrafe.class).isEnabled() && !Thunderhack.moduleManager.get(Speed.class).isEnabled()))
+        if (!mc.options.jumpKey.isPressed() && (!ThunderHack.moduleManager.get(TargetStrafe.class).isEnabled() && !ThunderHack.moduleManager.get(Speed.class).isEnabled()))
             return true;
 
         if (mc.player.isInLava()) return true;
@@ -326,7 +326,7 @@ public class Aura extends Module {
     }
 
     static float getAttackCooldownProgressPerTick() {
-        return (float) (1.0 / mc.player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_SPEED) * (20.0 * Thunderhack.TICK_TIMER));
+        return (float) (1.0 / mc.player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_SPEED) * (20.0 * ThunderHack.TICK_TIMER));
     }
 
     private void calcThread() {
@@ -377,7 +377,7 @@ public class Aura extends Module {
 
             rotationYaw = (float) (newYaw - (newYaw - rotationYaw) % gcdFix);
             rotationPitch = (float) (newPitch - (newPitch - rotationPitch) % gcdFix);
-            lookingAtHitbox = Thunderhack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), ignoreWalls.getValue(), rayTrace.getValue());
+            lookingAtHitbox = ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), ignoreWalls.getValue(), rayTrace.getValue());
         }
     }
 
@@ -470,7 +470,7 @@ public class Aura extends Module {
 
             // Проверяем видимость центра игрока
             if (distanceFromHead(target.getPos().add(0, target.getEyeHeight(target.getPose()) / 2f, 0)) <= attackRange.getPow2Value()
-                    && Thunderhack.playerManager.checkRtx(rotation1[0], rotation1[1], attackRange.getValue(), false, rayTrace.getValue())) {
+                    && ThunderHack.playerManager.checkRtx(rotation1[0], rotation1[1], attackRange.getValue(), false, rayTrace.getValue())) {
                 // наводим на центр
                 rotationPoint = new Vec3d(MathUtility.random(-0.1f, 0.1f), target.getEyeHeight(target.getPose()) / (MathUtility.random(1.8f, 2.5f)), MathUtility.random(-0.1f, 0.1f));
             } else {
@@ -486,8 +486,8 @@ public class Aura extends Module {
                             // Скипаем, если вне досягаемости
                             if (distanceFromHead(v1) > attackRange.getPow2Value()) continue;
 
-                            float[] rotation = Thunderhack.playerManager.calcAngle(v1);
-                            if (Thunderhack.playerManager.checkRtx(rotation[0], rotation[1], attackRange.getValue(), false, rayTrace.getValue())) {
+                            float[] rotation = ThunderHack.playerManager.calcAngle(v1);
+                            if (ThunderHack.playerManager.checkRtx(rotation[0], rotation[1], attackRange.getValue(), false, rayTrace.getValue())) {
                                 // Наводимся, если видим эту точку
                                 rotationPoint = new Vec3d(x1, y1, z1);
                                 break;
@@ -547,7 +547,7 @@ public class Aura extends Module {
         if ((entity instanceof PlayerEntity) && ((PlayerEntity) entity).isCreative() && ignoreCreativ.getValue())
             return true;
         if ((entity instanceof PlayerEntity) && entity.isInvisible() && ignoreInvisible.getValue()) return true;
-        if ((entity instanceof PlayerEntity) && Thunderhack.friendManager.isFriend((PlayerEntity) entity)) return true;
+        if ((entity instanceof PlayerEntity) && ThunderHack.friendManager.isFriend((PlayerEntity) entity)) return true;
         return distanceFromHead(entity.getPos()) > getRotateDistance() * getRotateDistance();
     }
 

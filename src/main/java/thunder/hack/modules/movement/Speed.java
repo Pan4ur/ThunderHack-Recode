@@ -2,7 +2,7 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.effect.StatusEffects;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
@@ -35,7 +35,7 @@ public class Speed extends Module {
 
     @Override
     public void onDisable() {
-        Thunderhack.TICK_TIMER = 1f;
+        ThunderHack.TICK_TIMER = 1f;
     }
 
     @Override
@@ -104,19 +104,19 @@ public class Speed extends Module {
         event.setCancelled(true);
 
         if (MovementUtility.isMoving()) {
-            Thunderhack.TICK_TIMER = useTimer.getValue() ? 1.088f : 1f;
+            ThunderHack.TICK_TIMER = useTimer.getValue() ? 1.088f : 1f;
             if (stage == 1 && mc.player.isOnGround()) {
                 mc.player.setVelocity(mc.player.getVelocity().x, MovementUtility.getJumpSpeed(), mc.player.getVelocity().z);
                 event.setY(MovementUtility.getJumpSpeed());
                 baseSpeed *= 2.149;
                 stage = 2;
             } else if (stage == 2) {
-                baseSpeed = Thunderhack.playerManager.currentPlayerSpeed - (0.66 * (Thunderhack.playerManager.currentPlayerSpeed - MovementUtility.getBaseMoveSpeed()));
+                baseSpeed = ThunderHack.playerManager.currentPlayerSpeed - (0.66 * (ThunderHack.playerManager.currentPlayerSpeed - MovementUtility.getBaseMoveSpeed()));
                 stage = 3;
             } else {
                 if ((mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, mc.player.getVelocity().getY(), 0.0)).iterator().hasNext() || mc.player.verticalCollision))
                     stage = 1;
-                baseSpeed = Thunderhack.playerManager.currentPlayerSpeed - Thunderhack.playerManager.currentPlayerSpeed / 159.0D;
+                baseSpeed = ThunderHack.playerManager.currentPlayerSpeed - ThunderHack.playerManager.currentPlayerSpeed / 159.0D;
             }
 
             baseSpeed = Math.max(baseSpeed, MovementUtility.getBaseMoveSpeed());
@@ -142,7 +142,7 @@ public class Speed extends Module {
 
             MovementUtility.modifyEventSpeed(event, baseSpeed);
         } else {
-            Thunderhack.TICK_TIMER = 1f;
+            ThunderHack.TICK_TIMER = 1f;
             event.set_x(0);
             event.set_z(0);
         }

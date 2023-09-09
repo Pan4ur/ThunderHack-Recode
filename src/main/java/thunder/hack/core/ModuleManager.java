@@ -2,7 +2,7 @@ package thunder.hack.core;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.ClickUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.*;
@@ -74,7 +74,6 @@ public class ModuleManager {
     public static BreadCrumbs breadCrumbs = new BreadCrumbs();
     public static AutoRespawn autoRespawn = new AutoRespawn();
     public static AutoCrystal autoCrystal = new AutoCrystal();
-    public static AnchorAura2 anchorAura2 = new AnchorAura2();
     public static WaterSpeed waterSpeed = new WaterSpeed();
     public static TriggerBot triggerBot = new TriggerBot();
     public static TPSCounter tpsCounter = new TPSCounter();
@@ -249,12 +248,12 @@ public class ModuleManager {
 
     public void onLoad() {
         modules.sort(Comparator.comparing(Module::getName));
-        modules.stream().filter(Module::listening).forEach((Thunderhack.EVENT_BUS)::subscribe);
+        modules.stream().filter(Module::listening).forEach((ThunderHack.EVENT_BUS)::subscribe);
         modules.forEach(Module::onLoad);
 
         if (ConfigManager.firstLaunch) {
             ModuleManager.notifications.enable();
-            Thunderhack.moduleManager.get(RPC.class).enable();
+            ThunderHack.moduleManager.get(RPC.class).enable();
         }
     }
 
@@ -269,7 +268,7 @@ public class ModuleManager {
 
     public void onRender2D(DrawContext context) {
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender2D(context));
-        Thunderhack.core.onRender2D(context);
+        ThunderHack.core.onRender2D(context);
     }
 
     public void onRenderShaders(DrawContext context) {
@@ -286,7 +285,7 @@ public class ModuleManager {
 
     public void onPostRender3D(MatrixStack stack) {
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onPostRender3D(stack));
-        Thunderhack.shaderManager.renderShaders();
+        ThunderHack.shaderManager.renderShaders();
     }
 
     public void sortModules() {
@@ -304,7 +303,7 @@ public class ModuleManager {
     public void onUnload() {
         modules.forEach(module -> {
             if (module.isEnabled()) {
-                Thunderhack.EVENT_BUS.unsubscribe(module);
+                ThunderHack.EVENT_BUS.unsubscribe(module);
             }
         });
         modules.forEach(Module::onUnload);

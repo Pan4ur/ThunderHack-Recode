@@ -1,12 +1,6 @@
 package thunder.hack.injection;
 
 
-import net.minecraft.block.ShapeContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.player.AutoTool;
 import net.minecraft.block.AbstractBlock;
@@ -21,10 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Objects;
-
 import static net.minecraft.enchantment.Enchantments.EFFICIENCY;
-import static thunder.hack.modules.Module.mc;
 
 @Mixin({AbstractBlock.class})
 public abstract class MixinAbstractBlock {

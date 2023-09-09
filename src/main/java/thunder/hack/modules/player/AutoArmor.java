@@ -1,10 +1,8 @@
 package thunder.hack.modules.player;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
@@ -45,7 +43,7 @@ public class AutoArmor extends Module {
             return;
 
         if(MovementUtility.isMoving() && noMove.getValue()) return;
-        if(Thunderhack.moduleManager.get(ElytraPlus.class).isEnabled()) return;
+        if(ThunderHack.moduleManager.get(ElytraPlus.class).isEnabled()) return;
 
         if (tickDelay > 0) {
             tickDelay--;

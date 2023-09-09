@@ -5,8 +5,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.packet.s2c.play.PlayPingS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.MathHelper;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.PostPlayerUpdateEvent;
@@ -43,7 +42,7 @@ public class Timer extends Module {
 
     @Override
     public void onEnable() {
-        Thunderhack.TICK_TIMER = 1f;
+        ThunderHack.TICK_TIMER = 1f;
         if (mode.getValue() == Mode.GrimFunnyGame) {
             violation = 40f;
             cancelTime = System.currentTimeMillis();
@@ -53,19 +52,19 @@ public class Timer extends Module {
 
     @Override
     public void onDisable() {
-        Thunderhack.TICK_TIMER = 1f;
+        ThunderHack.TICK_TIMER = 1f;
     }
 
     @Override
     public void onUpdate() {
         if (mode.getValue() == Mode.SMART) {
             if (!MovementUtility.isMoving()) {
-                Thunderhack.TICK_TIMER = 1f;
+                ThunderHack.TICK_TIMER = 1f;
                 return;
             }
 
-            Thunderhack.TICK_TIMER = speed.getValue();
-            if (Thunderhack.TICK_TIMER <= 1.0f) {
+            ThunderHack.TICK_TIMER = speed.getValue();
+            if (ThunderHack.TICK_TIMER <= 1.0f) {
                 return;
             }
             if (violation < 90f / speed.getValue()) {
@@ -75,14 +74,14 @@ public class Timer extends Module {
                 disable(MainSettings.isRu() ? "Заряд таймера кончился! Отключаю.." : "Timer's out of charge! Disabling..");
             }
         } else if (mode.getValue() == Mode.NORMAL) {
-            Thunderhack.TICK_TIMER = speed.getValue();
+            ThunderHack.TICK_TIMER = speed.getValue();
         } else {
             if (!MovementUtility.isMoving() || violation > 39f || !InputUtil.isKeyPressed(mc.getWindow().getHandle(), boostKey.getValue().getKey())) {
-                Thunderhack.TICK_TIMER = 1f;
+                ThunderHack.TICK_TIMER = 1f;
                 return;
             }
 
-            Thunderhack.TICK_TIMER = speed.getValue();
+            ThunderHack.TICK_TIMER = speed.getValue();
             violation += 0.15f;
             violation = MathHelper.clamp(violation, 0.0f, 40);
         }
@@ -132,7 +131,7 @@ public class Timer extends Module {
             return;
         }
         violation = notMoving() ? (float) (violation - (decreaseRate.getValue() + 0.4)) : violation - (addOnTheMove.getValue() / 10.0f);
-        violation = (float) MathHelper.clamp(violation, 0.0, Math.floor(100f / Thunderhack.TICK_TIMER));
+        violation = (float) MathHelper.clamp(violation, 0.0, Math.floor(100f / ThunderHack.TICK_TIMER));
         prevPosX = mc.player.getX();
         prevPosY = mc.player.getY();
         prevPosZ = mc.player.getZ();

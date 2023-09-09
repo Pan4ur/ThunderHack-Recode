@@ -2,9 +2,6 @@ package thunder.hack.injection;
 
 import com.mojang.authlib.GameProfile;
 import org.spongepowered.asm.mixin.Unique;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
-import thunder.hack.modules.combat.Aura;
 import thunder.hack.utility.interfaces.IEntityLiving;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
 import net.minecraft.client.network.AbstractClientPlayerEntity;

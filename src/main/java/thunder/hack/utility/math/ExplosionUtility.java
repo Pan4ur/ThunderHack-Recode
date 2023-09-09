@@ -50,13 +50,13 @@ public final class ExplosionUtility {
         return 0f;
     }
 
-    public static float getAnchorExplosionDamage(BlockPos anchorPos, PlayerEntity target) {
+    public synchronized static float getAnchorExplosionDamage(BlockPos anchorPos, PlayerEntity target) {
         float final_result;
-      //  anchorIgnore = anchorPos;
-       // terrainIgnore = true;
+        anchorIgnore = anchorPos;
+        terrainIgnore = true;
 
-        boolean prevAnchor = mc.world.getBlockState(anchorPos).getBlock() == Blocks.RESPAWN_ANCHOR;
-        mc.world.removeBlock(anchorPos, false);
+      //  boolean prevAnchor = mc.world.getBlockState(anchorPos).getBlock() == Blocks.RESPAWN_ANCHOR;
+      //  mc.world.removeBlock(anchorPos, false);
 
         if(AutoAnchor.predictTicks.getValue() == 0) {
             final_result = getExplosionDamage1(anchorPos.up().toCenterPos(), target);
@@ -72,10 +72,10 @@ public final class ExplosionUtility {
             copyEntity.setPosition(getEntityPosVec(target, AutoAnchor.predictTicks.getValue()));
             final_result = getExplosionDamageWPredict(anchorPos.toCenterPos(), target, copyEntity);
         }
-        if(prevAnchor)
-            mc.world.setBlockState(anchorPos, Blocks.RESPAWN_ANCHOR.getDefaultState());
-      //  anchorIgnore = null;
-      //  terrainIgnore = false;
+       // if(prevAnchor)
+        //    mc.world.setBlockState(anchorPos, Blocks.RESPAWN_ANCHOR.getDefaultState());
+        anchorIgnore = null;
+        terrainIgnore = false;
         return final_result;
     }
 

@@ -1,7 +1,7 @@
 package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
@@ -62,11 +62,11 @@ public class MiddleClick extends Module {
         }
 
         if (friend.getValue() && mc.currentScreen == null && mc.options.pickItemKey.isPressed() && mc.targetedEntity != null && mc.targetedEntity instanceof PlayerEntity entity && timer.passedMs(800)) {
-            if (Thunderhack.friendManager.isFriend(entity.getName().getString())) {
-                Thunderhack.friendManager.removeFriend(entity.getName().getString());
+            if (ThunderHack.friendManager.isFriend(entity.getName().getString())) {
+                ThunderHack.friendManager.removeFriend(entity.getName().getString());
                 sendMessage("§b" + entity.getName().getString() + "§r удален из друзей!");
             } else {
-                Thunderhack.friendManager.addFriend(entity.getName().getString());
+                ThunderHack.friendManager.addFriend(entity.getName().getString());
                 sendMessage("Добавлен друг §b" + entity.getName().getString());
             }
             timer.reset();

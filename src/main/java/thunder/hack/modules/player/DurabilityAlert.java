@@ -1,13 +1,12 @@
 package thunder.hack.modules.player;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
@@ -32,7 +31,7 @@ public class DurabilityAlert extends Module {
     public void onUpdate() {
         if (friends.getValue()) {
             for (PlayerEntity player : mc.world.getPlayers()) {
-                if (!Thunderhack.friendManager.isFriend(player)) continue;
+                if (!ThunderHack.friendManager.isFriend(player)) continue;
                 if (player == mc.player) continue;
                 for (ItemStack stack : player.getInventory().armor) {
                     if (stack.isEmpty() || !(stack.getItem() instanceof ArmorItem)) continue;

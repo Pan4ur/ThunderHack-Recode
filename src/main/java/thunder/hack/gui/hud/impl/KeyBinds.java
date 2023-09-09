@@ -1,9 +1,8 @@
 package thunder.hack.gui.hud.impl;
 
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.Module;
@@ -27,7 +26,7 @@ public class KeyBinds extends HudElement {
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
         float max_width = 40;
-        for (Module feature : Thunderhack.moduleManager.modules) {
+        for (Module feature : ThunderHack.moduleManager.modules) {
             if (feature.isDisabled() && onlyEnabled.getValue()) continue;
             if (!Objects.equals(feature.getBind().getBind(), "None") && !feature.getName().equalsIgnoreCase("clickgui") && !feature.getName().equalsIgnoreCase("thundergui")) {
                 String sbind = feature.getBind().getBind();
@@ -60,7 +59,7 @@ public class KeyBinds extends HudElement {
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + max_width / 2f - 2, getPosY() + 13.7, getPosX() + 2 + max_width - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject().getRGB(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0).getRGB());
 
         int y_offset = 2;
-        for (Module feature : Thunderhack.moduleManager.modules) {
+        for (Module feature : ThunderHack.moduleManager.modules) {
             if (feature.isDisabled() && onlyEnabled.getValue()) continue;
             if (!Objects.equals(feature.getBind().getBind(), "None") && !feature.getName().equalsIgnoreCase("clickgui") && !feature.getName().equalsIgnoreCase("thundergui")) {
                 String sbind = feature.getBind().getBind();
@@ -93,7 +92,7 @@ public class KeyBinds extends HudElement {
     public void onRenderShaders(DrawContext context) {
         int y_offset1 = 0;
         float max_width = 40;
-        for (Module feature : Thunderhack.moduleManager.modules) {
+        for (Module feature : ThunderHack.moduleManager.modules) {
             if (feature.isDisabled() && onlyEnabled.getValue()) continue;
             if (!Objects.equals(feature.getBind().getBind(), "None") && !feature.getName().equalsIgnoreCase("clickgui") && !feature.getName().equalsIgnoreCase("thundergui")) {
                 y_offset1 += 10;

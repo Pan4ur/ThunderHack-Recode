@@ -9,7 +9,7 @@ import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
@@ -31,7 +31,7 @@ public class PistonPush extends Module {
     private final Setting<Float> range = new Setting<>("Target Range", 5.f, 1.5f, 7.f);
     private final Setting<Integer> blocksPerTick = new Setting<>("Blocks/Tick", 2, 1, 2);
     private final Setting<Integer> delayPerPlace = new Setting<>("Delay/Place", 0, 0, 5);
-    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.All);
+    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Normal);
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
 
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
@@ -266,7 +266,7 @@ public class PistonPush extends Module {
     private boolean isPlayerTargetCorrect(PlayerEntity player) {
         if (player == null) return false;
 
-        return !Thunderhack.friendManager.isFriend(player)
+        return !ThunderHack.friendManager.isFriend(player)
                 && player != mc.player
                 && player.distanceTo(((mc.player))) <= range.getValue()
                 && !player.isDead()
@@ -275,7 +275,7 @@ public class PistonPush extends Module {
     }
 
     private void findTarget() {
-        for (PlayerEntity player : Thunderhack.asyncManager.getAsyncPlayers()) {
+        for (PlayerEntity player : ThunderHack.asyncManager.getAsyncPlayers()) {
             if (!isPlayerTargetCorrect(player)) continue;
 
             target = player;

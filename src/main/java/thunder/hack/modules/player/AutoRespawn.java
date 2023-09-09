@@ -2,8 +2,7 @@ package thunder.hack.modules.player;
 
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.util.Formatting;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
+import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
@@ -36,7 +35,7 @@ public class AutoRespawn extends Module {
                 mc.player.requestRespawn();
                 mc.setScreen(null);
 
-                Thunderhack.asyncManager.run(()-> {
+                ThunderHack.asyncManager.run(()-> {
                     if (autokit.getValue()) {
                         mc.player.networkHandler.sendChatCommand("kit " + kit.getValue());
                     }

@@ -15,7 +15,7 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import org.lwjgl.opengl.GL11;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -65,19 +65,19 @@ public class Trails extends Module {
 
 
     public void onPreRender3D(MatrixStack stack) {
-        for (Entity en : Thunderhack.asyncManager.getAsyncEntities()) {
+        for (Entity en : ThunderHack.asyncManager.getAsyncEntities()) {
             if (en instanceof EnderPearlEntity && pearls.getValue()) {
                 calcTrajectory(en);
             }
         }
 
-        for (Entity en : Thunderhack.asyncManager.getAsyncEntities()) {
+        for (Entity en : ThunderHack.asyncManager.getAsyncEntities()) {
             if (en instanceof ArrowEntity && arrows.getValue()) {
                 calcTrajectory(en);
             }
         }
 
-        for (Entity en : Thunderhack.asyncManager.getAsyncEntities()) {
+        for (Entity en : ThunderHack.asyncManager.getAsyncEntities()) {
             if (en instanceof ExperienceBottleEntity && xp.getValue()) {
                 calcTrajectory(en);
             }
@@ -144,7 +144,7 @@ public class Trails extends Module {
             ((IEntity) player).getTrails().removeIf(Trail::update);
         }
 
-        if (Thunderhack.playerManager.currentPlayerSpeed != 0) {
+        if (ThunderHack.playerManager.currentPlayerSpeed != 0) {
             ((IEntity) mc.player).getTrails().add(new Trail(new Vec3d(mc.player.prevX, mc.player.prevY, mc.player.prevZ), mc.player.getPos(), color.getValue().getColorObject()));
             for (int i = 0; i < amount.getValue(); i++) {
                 particles.add(new Particle(mc.player.getX(), MathUtility.random((float) (mc.player.getY() + mc.player.getHeight()), (float) mc.player.getY()), mc.player.getZ(), c));

@@ -21,7 +21,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.URL;
 
 
-public class Thunderhack implements ModInitializer {
+public class ThunderHack implements ModInitializer {
     public static final ModMetadata MOD_META;
     public static final String MOD_ID = "thunderhack";
     public static final IEventBus EVENT_BUS = new EventBus();

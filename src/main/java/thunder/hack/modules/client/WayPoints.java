@@ -6,8 +6,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector4d;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.WayPointManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
@@ -22,13 +21,13 @@ public class WayPoints extends Module {
 
     @Override
     public void onEnable() {
-        sendMessage(Thunderhack.commandManager.getPrefix() + "waypoint add x y z name");
+        sendMessage(ThunderHack.commandManager.getPrefix() + "waypoint add x y z name");
     }
 
 
     public void onRender2D(DrawContext context) {
-        if (!Thunderhack.wayPointManager.getWayPoints().isEmpty()) {
-            for (WayPointManager.WayPoint wp : Thunderhack.wayPointManager.getWayPoints()) {
+        if (!ThunderHack.wayPointManager.getWayPoints().isEmpty()) {
+            for (WayPointManager.WayPoint wp : ThunderHack.wayPointManager.getWayPoints()) {
                 if (wp.name() == null) continue;
                 if (mc.isInSingleplayer()) continue;
                 if (!mc.getNetworkHandler().getServerInfo().address.contains(wp.server())) continue;

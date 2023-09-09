@@ -1,16 +1,14 @@
 package thunder.hack.modules.player;
 
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
 import thunder.hack.utility.player.InventoryUtility;
-import thunder.hack.utility.player.SearchInvResult;
 
 public class ElytraReplace extends Module {
     public ElytraReplace() {
@@ -27,7 +25,7 @@ public class ElytraReplace extends Module {
                 clickSlot(6);
                 clickSlot(result);
                 mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                Thunderhack.notificationManager.publicity("ElytraReplace", MainSettings.isRu() ? "Меняем элитру на новую!" : "Swapping the elytra for a new one!",2, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("ElytraReplace", MainSettings.isRu() ? "Меняем элитру на новую!" : "Swapping the elytra for a new one!",2, Notification.Type.SUCCESS);
             }
         }
     }

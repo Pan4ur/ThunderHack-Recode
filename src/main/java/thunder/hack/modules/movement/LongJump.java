@@ -1,10 +1,9 @@
 package thunder.hack.modules.movement;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -49,7 +48,7 @@ public class LongJump extends Module {
 
     @Override
     public void onDisable() {
-        Thunderhack.TICK_TIMER = 1f;
+        ThunderHack.TICK_TIMER = 1f;
         speedXZ = 0;
         distance = 0;
         stage = 0;
@@ -57,7 +56,7 @@ public class LongJump extends Module {
 
     @Override
     public void onEnable() {
-        Thunderhack.TICK_TIMER = 1f;
+        ThunderHack.TICK_TIMER = 1f;
         speedXZ = 0;
         distance = 0;
         stage = 0;
@@ -81,7 +80,7 @@ public class LongJump extends Module {
     private void doPause(EventMove eventPlayerMove) {
         if (MovementUtility.isMoving()) {
             if (usetimer.getValue()) {
-                Thunderhack.TICK_TIMER = timr.getValue();
+                ThunderHack.TICK_TIMER = timr.getValue();
             }
             switch (stage) {
                 case 0 -> {
@@ -121,7 +120,7 @@ public class LongJump extends Module {
     private void doNormal(EventMove eventPlayerMove) {
         if (MovementUtility.isMoving()) {
             if (usetimer.getValue()) {
-                Thunderhack.TICK_TIMER = timr.getValue();
+                ThunderHack.TICK_TIMER = timr.getValue();
             }
             if (stage == 0) {
                 speedXZ = speed.getValue() * MovementUtility.getBaseMoveSpeed();

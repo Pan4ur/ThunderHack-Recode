@@ -27,7 +27,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
@@ -206,9 +206,9 @@ public class AutoCrystal extends Module {
     @EventHandler
     public void onSync(EventSync e) {
         switch (targetLogic.getValue()) {
-            case HP -> target = Thunderhack.combatManager.getTargetByHP(targetRange.getValue());
-            case Distance -> target = Thunderhack.combatManager.getNearestTarget(targetRange.getValue());
-            case FOV -> target = Thunderhack.combatManager.getTargetByFOV(targetRange.getValue());
+            case HP -> target = ThunderHack.combatManager.getTargetByHP(targetRange.getValue());
+            case Distance -> target = ThunderHack.combatManager.getNearestTarget(targetRange.getValue());
+            case FOV -> target = ThunderHack.combatManager.getTargetByFOV(targetRange.getValue());
         }
 
         if (target != null && (target.isDead() || target.getHealth() < 0)) {
@@ -578,7 +578,7 @@ public class AutoCrystal extends Module {
 
             if (protectFriends.getValue()) {
                 for (PlayerEntity pl : mc.world.getPlayers()) {
-                    if (!Thunderhack.friendManager.isFriend(pl)) continue;
+                    if (!ThunderHack.friendManager.isFriend(pl)) continue;
                     float fdamage = ExplosionUtility.getExplosionDamage2(ent.getPos(), pl);
                     if (fdamage > selfDamage) {
                         selfDamage = fdamage;
@@ -701,7 +701,7 @@ public class AutoCrystal extends Module {
 
         if (protectFriends.getValue()) {
             for (PlayerEntity pl : mc.world.getPlayers()) {
-                if (!Thunderhack.friendManager.isFriend(pl)) continue;
+                if (!ThunderHack.friendManager.isFriend(pl)) continue;
                 float fdamage = ExplosionUtility.getExplosionDamage2(crystalVec, pl);
                 if (fdamage > selfDamage) {
                     selfDamage = fdamage;

@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.CommandManager;
 
 import java.util.Objects;
@@ -36,10 +36,10 @@ public abstract class MixinScreen {
 
     @Inject(method = "handleTextClick", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;error(Ljava/lang/String;Ljava/lang/Object;)V", ordinal = 1, remap = false), cancellable = true)
     private void onRunCommand(Style style, CallbackInfoReturnable<Boolean> cir) {
-        if (Objects.requireNonNull(style.getClickEvent()).getValue().startsWith(Thunderhack.commandManager.getPrefix()))
+        if (Objects.requireNonNull(style.getClickEvent()).getValue().startsWith(ThunderHack.commandManager.getPrefix()))
             try {
-                CommandManager manager = Thunderhack.commandManager;
-                manager.getDispatcher().execute(style.getClickEvent().getValue().substring(Thunderhack.commandManager.getPrefix().length()), manager.getSource());
+                CommandManager manager = ThunderHack.commandManager;
+                manager.getDispatcher().execute(style.getClickEvent().getValue().substring(ThunderHack.commandManager.getPrefix().length()), manager.getSource());
                 cir.setReturnValue(true);
             } catch (CommandSyntaxException ignored) {
             }

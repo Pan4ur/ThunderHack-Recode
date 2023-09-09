@@ -11,7 +11,7 @@ import org.lwjgl.system.MemoryUtil;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventPostTick;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.gui.font.FontRenderers;
@@ -58,12 +58,12 @@ public class MixinMinecraftClient {
 
     @Inject(method = "tick", at = @At("HEAD"))
     void preTickHook(CallbackInfo ci) {
-        if (!Module.fullNullCheck()) Thunderhack.EVENT_BUS.post(new EventTick());
+        if (!Module.fullNullCheck()) ThunderHack.EVENT_BUS.post(new EventTick());
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
     void postTickHook(CallbackInfo ci) {
-        if (!Module.fullNullCheck()) Thunderhack.EVENT_BUS.post(new EventPostTick());
+        if (!Module.fullNullCheck()) ThunderHack.EVENT_BUS.post(new EventPostTick());
     }
 
 
@@ -78,7 +78,7 @@ public class MixinMinecraftClient {
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/Window;setIcon(Lnet/minecraft/resource/ResourcePack;Lnet/minecraft/client/util/Icons;)V"))
     private void onChangeIcon(Window instance, ResourcePack resourcePack, Icons icons) {
-        setWindowIcon(Thunderhack.class.getResourceAsStream("/icon.png"), Thunderhack.class.getResourceAsStream("/icon.png"));
+        setWindowIcon(ThunderHack.class.getResourceAsStream("/icon.png"), ThunderHack.class.getResourceAsStream("/icon.png"));
     }
 
     public void setWindowIcon(InputStream img16x16, InputStream img32x32) {

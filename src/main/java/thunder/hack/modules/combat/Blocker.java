@@ -51,7 +51,7 @@ public class Blocker extends Module {
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
     private final Setting<InventoryUtility.SwitchMode> switchMode = new Setting<>("Switch Mode", InventoryUtility.SwitchMode.All);
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
-    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.All);
+    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Normal);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
 
     private final Setting<Parent> render = new Setting<>("Render", new Parent(false, 0));

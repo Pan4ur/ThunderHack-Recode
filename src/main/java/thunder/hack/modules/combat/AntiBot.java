@@ -2,9 +2,6 @@ package thunder.hack.modules.combat;
 
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;

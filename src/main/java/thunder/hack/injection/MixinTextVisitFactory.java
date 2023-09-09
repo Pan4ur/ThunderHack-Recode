@@ -1,7 +1,6 @@
 package thunder.hack.injection;
 
 
-import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.misc.NameProtect;
 import net.minecraft.text.TextVisitFactory;

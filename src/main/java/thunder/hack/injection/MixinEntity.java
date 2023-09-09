@@ -1,29 +1,17 @@
 package thunder.hack.injection;
 
-import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.World;
-import net.minecraft.world.border.WorldBorder;
-import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.PushEvent;
 import thunder.hack.modules.combat.HitBox;
-import thunder.hack.modules.player.NoPitchLimit;
 import thunder.hack.modules.render.NoRender;
 import thunder.hack.modules.render.Shaders;
 import thunder.hack.utility.interfaces.IEntity;
@@ -59,7 +47,7 @@ public abstract class MixinEntity implements IEntity {
     private void pushAwayFromHook(Args args) {
         if ((Object) this == MinecraftClient.getInstance().player) {
             PushEvent event = new PushEvent(args.get(0), args.get(1), args.get(2));
-            Thunderhack.EVENT_BUS.post(event);
+            ThunderHack.EVENT_BUS.post(event);
             args.set(0, event.getPushX());
             args.set(1, event.getPushY());
             args.set(2, event.getPushZ());

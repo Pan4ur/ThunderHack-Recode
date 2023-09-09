@@ -1,6 +1,5 @@
 package thunder.hack.core;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityStatuses;
@@ -8,9 +7,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.util.math.MathHelper;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventPostTick;
-import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.modules.Module;
@@ -42,7 +40,7 @@ public class CombatManager {
                 } else if (popList.get(ent.getName().getString()) != null) {
                     popList.put(ent.getName().getString(),  popList.get(ent.getName().getString()) + 1);
                 }
-                Thunderhack.EVENT_BUS.post(new TotemPopEvent((PlayerEntity) ent, popList.get(ent.getName().getString())));
+                ThunderHack.EVENT_BUS.post(new TotemPopEvent((PlayerEntity) ent, popList.get(ent.getName().getString())));
             }
         }
     }
@@ -68,7 +66,7 @@ public class CombatManager {
     public List<PlayerEntity> getTargets(float range) {
         return mc.world.getPlayers().stream()
                 .filter(e -> !e.isDead())
-                .filter(entityPlayer -> !Thunderhack.friendManager.isFriend(entityPlayer.getName().getString()))
+                .filter(entityPlayer -> !ThunderHack.friendManager.isFriend(entityPlayer.getName().getString()))
                 .filter(entityPlayer -> entityPlayer != mc.player)
                 .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
                 .sorted(Comparator.comparing(e -> mc.player.distanceTo(e)))
@@ -80,7 +78,7 @@ public class CombatManager {
                 .stream()
                 .filter(e -> e != mc.player)
                 .filter(e -> !e.isDead())
-                .filter(e -> !Thunderhack.friendManager.isFriend(e.getName().getString()))
+                .filter(e -> !ThunderHack.friendManager.isFriend(e.getName().getString()))
                 .filter(e -> e.getHealth() > 0)
                 .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
                 .min(Comparator.comparing(t -> mc.player.distanceTo(t))).orElse(null);
@@ -91,7 +89,7 @@ public class CombatManager {
                 .stream()
                 .filter(e -> e != mc.player)
                 .filter(e -> !e.isDead())
-                .filter(e -> !Thunderhack.friendManager.isFriend(e.getName().getString()))
+                .filter(e -> !ThunderHack.friendManager.isFriend(e.getName().getString()))
                 .filter(e -> e.getHealth() > 0)
                 .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
                 .min(Comparator.comparing(t -> (t.getHealth() + t.getAbsorptionAmount()))).orElse(null);
@@ -102,7 +100,7 @@ public class CombatManager {
                 .stream()
                 .filter(e -> e != mc.player)
                 .filter(e -> !e.isDead())
-                .filter(e -> !Thunderhack.friendManager.isFriend(e.getName().getString()))
+                .filter(e -> !ThunderHack.friendManager.isFriend(e.getName().getString()))
                 .filter(e -> e.getHealth() > 0)
                 .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
                 .min(Comparator.comparing(this::getFOVAngle)).orElse(null);

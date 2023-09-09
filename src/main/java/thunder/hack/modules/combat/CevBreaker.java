@@ -27,7 +27,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventEntityRemoved;
 import thunder.hack.events.impl.EventPostSync;
@@ -72,7 +72,7 @@ public class CevBreaker extends Module {
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
 
     private final Setting<InventoryUtility.SwitchMode> switchMode = new Setting<>("Switch Mode", InventoryUtility.SwitchMode.All);
-    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.All);
+    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Normal);
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
 
     private final Setting<Parent> pause = new Setting<>("Pause", new Parent(false, 0));
@@ -124,8 +124,8 @@ public class CevBreaker extends Module {
         targetSurroundBlockPos = null;
         canPlaceBlock = true;
 
-        if (breakMode.getValue() == BreakMode.Packet && Thunderhack.moduleManager.get(SpeedMine.class).isDisabled()) {
-            Thunderhack.notificationManager.publicity(getName(), MainSettings.isRu() ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine", 5, Notification.Type.ERROR);
+        if (breakMode.getValue() == BreakMode.Packet && ThunderHack.moduleManager.get(SpeedMine.class).isDisabled()) {
+            ThunderHack.notificationManager.publicity(getName(), MainSettings.isRu() ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine", 5, Notification.Type.ERROR);
             disable("MainSettings.isRu() ? \"Для использования пакетного копания необходимо включить и настроить модуль SpeedMine\" : \"For using packet mine is necessary to enable and config SpeedMine\"");
         }
     }
@@ -321,7 +321,7 @@ public class CevBreaker extends Module {
         if (target == null) return;
         if (e.getPacket() instanceof BlockUpdateS2CPacket pac) {
             if (pac.getPos().equals(target.getBlockPos().add(0, 2, 0)) && pac.getState().getBlock().equals(Blocks.AIR)) {
-                for (Entity entity : Thunderhack.asyncManager.getAsyncEntities()) {
+                for (Entity entity : ThunderHack.asyncManager.getAsyncEntities()) {
                     if (entity instanceof EndCrystalEntity endCrystal && entity.getBlockPos().equals(target.getBlockPos().add(0, 3, 0))) {
                         canPlaceBlock = false;
                         breakCrystalThread(endCrystal);
@@ -332,7 +332,7 @@ public class CevBreaker extends Module {
     }
 
     public void breakCrystalThread(EndCrystalEntity endCrystal) {
-        Thunderhack.asyncManager.run(() -> {
+        ThunderHack.asyncManager.run(() -> {
                     if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS) && !(mc.player.getMainHandStack().getItem() instanceof SwordItem)) {
 
                         SearchInvResult swordResult = InventoryUtility.getSword();
@@ -399,8 +399,8 @@ public class CevBreaker extends Module {
     }
 
     private void findTarget() {
-        for (PlayerEntity player : Thunderhack.asyncManager.getAsyncPlayers()) {
-            if (Thunderhack.friendManager.isFriend(player)) continue;
+        for (PlayerEntity player : ThunderHack.asyncManager.getAsyncPlayers()) {
+            if (ThunderHack.friendManager.isFriend(player)) continue;
             if (player == mc.player) continue;
             if (player.distanceTo(((mc.player))) > range.getValue()) continue;
             if (player.isDead()) continue;
@@ -413,7 +413,7 @@ public class CevBreaker extends Module {
         }
 
         if (target == null) {
-            Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.", 5, Notification.Type.ERROR);
+            ThunderHack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.", 5, Notification.Type.ERROR);
             disable(MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.");
         }
     }
@@ -457,7 +457,7 @@ public class CevBreaker extends Module {
         if (!result.isHolding() && !autoSwap.getValue())
             return null;
         if (!result.found()) {
-            Thunderhack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!", 5, Notification.Type.ERROR);
+            ThunderHack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!", 5, Notification.Type.ERROR);
             disable(MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!");
             return null;
         }
@@ -489,7 +489,7 @@ public class CevBreaker extends Module {
         if (oldMode.getValue())
             posBoundingBox.expand(0, 1f, 0);
 
-        for (Entity ent : Thunderhack.asyncManager.getAsyncEntities()) {
+        for (Entity ent : ThunderHack.asyncManager.getAsyncEntities()) {
             if (ent == null) continue;
             if (ent.getBoundingBox().intersects(posBoundingBox)) {
                 if (ent instanceof ExperienceOrbEntity)

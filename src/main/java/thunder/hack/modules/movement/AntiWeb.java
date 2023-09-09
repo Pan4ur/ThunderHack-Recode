@@ -5,7 +5,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.CobwebBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShapes;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventCollision;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
@@ -30,9 +30,9 @@ public class AntiWeb extends Module {
         if (mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos())).getBlock() == Blocks.COBWEB) {
             if (mode.getValue() == Mode.Timer) {
                 if (mc.player.isOnGround()) {
-                    Thunderhack.TICK_TIMER = 1f;
+                    ThunderHack.TICK_TIMER = 1f;
                 } else {
-                    Thunderhack.TICK_TIMER = timer.getValue();
+                    ThunderHack.TICK_TIMER = timer.getValue();
                 }
             }
             if (mode.getValue() == Mode.Fly) {

@@ -6,7 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.AbstractWindow;
 import thunder.hack.gui.clickui.ModuleWindow;
 import thunder.hack.modules.Module;
@@ -65,9 +65,9 @@ public class HudEditorGui extends Screen {
             int windowHeight = 18;
 
             int i = 0;
-            for (final Module.Category category : Thunderhack.moduleManager.getCategories()) {
+            for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
                 if (!category.getName().contains("HUD")) continue;
-                ModuleWindow window = new ModuleWindow(category.getName(), Thunderhack.moduleManager.getModulesByCategory(category), i, x + offset, y, 108, windowHeight);
+                ModuleWindow window = new ModuleWindow(category.getName(), ThunderHack.moduleManager.getModulesByCategory(category), i, x + offset, y, 108, windowHeight);
                 window.setOpen(true);
                 windows.add(window);
                 offset += 110;
@@ -193,6 +193,6 @@ public class HudEditorGui extends Screen {
 
     @Override
     public void removed() {
-        Thunderhack.EVENT_BUS.unsubscribe(this);
+        ThunderHack.EVENT_BUS.unsubscribe(this);
     }
 }

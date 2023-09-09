@@ -4,7 +4,6 @@ package thunder.hack.injection;
 import java.util.Iterator;
 
 
-import thunder.hack.Thunderhack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.movement.Velocity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.util.math.Direction;
-import thunder.hack.modules.movement.WaterSpeed;
 
 @Mixin(FlowableFluid.class)
 public class MixinFlowableFluid {

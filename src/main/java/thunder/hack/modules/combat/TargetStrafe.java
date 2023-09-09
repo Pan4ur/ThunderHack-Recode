@@ -10,7 +10,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ISPacketEntityVelocity;
@@ -58,10 +58,10 @@ public class TargetStrafe extends Module {
         if (mc.player.isInLava()) {
             return false;
         }
-        if (Thunderhack.moduleManager.get(Scaffold.class).isEnabled()) {
+        if (ThunderHack.moduleManager.get(Scaffold.class).isEnabled()) {
             return false;
         }
-        if (Thunderhack.moduleManager.get(Speed.class).isEnabled()) {
+        if (ThunderHack.moduleManager.get(Speed.class).isEnabled()) {
             return false;
         }
         if (mc.player.isSubmergedInWater() || waterTicks > 0) {
@@ -202,7 +202,7 @@ public class TargetStrafe extends Module {
         }
 
         if (canStrafe()) {
-            if (Aura.target != null && Thunderhack.moduleManager.get(Aura.class).isEnabled()) {
+            if (Aura.target != null && ThunderHack.moduleManager.get(Aura.class).isEnabled()) {
                 double speed = calculateSpeed(event);
 
                 double wrap = Math.atan2(mc.player.getZ() - Aura.target.getZ(), mc.player.getX() - Aura.target.getX());

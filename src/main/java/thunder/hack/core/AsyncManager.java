@@ -4,11 +4,10 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.entity.Entity;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventPostTick;
 import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.EventTick;
 import thunder.hack.modules.Module;
 
 import java.util.Collections;
@@ -62,7 +61,7 @@ public class AsyncManager {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     if (!Module.fullNullCheck()) {
-                        for (Module module : Thunderhack.moduleManager.modules) {
+                        for (Module module : ThunderHack.moduleManager.modules) {
                             if (module.isEnabled()) {
                                 module.onThread();
                             }

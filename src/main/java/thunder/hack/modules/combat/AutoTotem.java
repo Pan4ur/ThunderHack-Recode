@@ -24,7 +24,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -236,8 +236,8 @@ public class AutoTotem extends Module {
             item = Items.TOTEM_OF_UNDYING;
 
         if (onCrystalInHand.getValue()) {
-            for (PlayerEntity pl : Thunderhack.asyncManager.getAsyncPlayers()) {
-                if (Thunderhack.friendManager.isFriend(pl)) continue;
+            for (PlayerEntity pl : ThunderHack.asyncManager.getAsyncPlayers()) {
+                if (ThunderHack.friendManager.isFriend(pl)) continue;
                 if (pl == mc.player) continue;
                 if (mc.player.squaredDistanceTo(pl) < 36) {
                     if (pl.getMainHandStack().getItem() == Items.OBSIDIAN

@@ -1,7 +1,7 @@
 package thunder.hack.injection;
 
 
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,7 +20,7 @@ public class MixinRenderTickCounter {
 
     @Inject(method = "beginRenderTick", at = @At("HEAD"), cancellable = true)
     private void beginRenderTick(long timeMillis, CallbackInfoReturnable<Integer> ci) {
-        this.lastFrameDuration = ((timeMillis - this.prevTimeMillis) / this.tickTime) * Thunderhack.TICK_TIMER;
+        this.lastFrameDuration = ((timeMillis - this.prevTimeMillis) / this.tickTime) * ThunderHack.TICK_TIMER;
         this.prevTimeMillis = timeMillis;
         this.tickDelta += this.lastFrameDuration;
         int i = (int) this.tickDelta;

@@ -2,8 +2,7 @@ package thunder.hack.injection;
 import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import thunder.hack.Thunderhack;
-import thunder.hack.cmd.Command;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventAttack;
 import thunder.hack.events.impl.EventPlayerJump;
@@ -54,7 +53,7 @@ public class MixinPlayerEntity{
     @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
     private void attackAHook2(Entity target, CallbackInfo ci) {
         final EventAttack event = new EventAttack(target);
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
             ci.cancel();
         }
@@ -63,7 +62,7 @@ public class MixinPlayerEntity{
     @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
     private void onTravelhookPre(Vec3d movementInput, CallbackInfo ci) {
         final EventPlayerTravel event = new EventPlayerTravel(movementInput,true);
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
             mc.player.move(MovementType.SELF, mc.player.getVelocity());
             ci.cancel();
@@ -73,7 +72,7 @@ public class MixinPlayerEntity{
     @Inject(method = "travel", at = @At("RETURN"), cancellable = true)
     private void onTravelhookPost(Vec3d movementInput, CallbackInfo ci) {
         final EventPlayerTravel event = new EventPlayerTravel(movementInput,false);
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
             mc.player.move(MovementType.SELF, mc.player.getVelocity());
             ci.cancel();
@@ -83,12 +82,12 @@ public class MixinPlayerEntity{
     @Inject(method = "jump", at = @At("HEAD"))
     private void onJumpPre(CallbackInfo ci) {
         final EventPlayerJump event = new EventPlayerJump(true);
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
     }
 
     @Inject(method = "jump", at = @At("RETURN"))
     private void onJumpPost(CallbackInfo ci) {
         final EventPlayerJump event = new EventPlayerJump(false);
-        Thunderhack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(event);
     }
 }

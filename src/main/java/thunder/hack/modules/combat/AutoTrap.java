@@ -7,9 +7,8 @@ import net.minecraft.client.util.math.MatrixStack;
 
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -19,7 +18,6 @@ import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InventoryUtility;
-import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.entity.player.PlayerEntity;
@@ -168,7 +166,7 @@ public class AutoTrap extends Module {
     }
 
     private List<BlockPos> getBlocks() {
-        PlayerEntity pl = Thunderhack.combatManager.getNearestTarget(range.getValue());
+        PlayerEntity pl = ThunderHack.combatManager.getNearestTarget(range.getValue());
         if(pl == null) return new ArrayList<>();
         List<BlockPos> blocks = new ArrayList<>();
         for (BlockPos bp : getPlayerBlocks(pl)) {

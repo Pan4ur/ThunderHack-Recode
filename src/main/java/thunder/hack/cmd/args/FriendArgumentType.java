@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.modules.client.MainSettings;
 
 import java.util.Collection;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class FriendArgumentType implements ArgumentType<String> {
-    private static final List<String> EXAMPLES = Thunderhack.friendManager.getFriends().stream().limit(5).toList();
+    private static final List<String> EXAMPLES = ThunderHack.friendManager.getFriends().stream().limit(5).toList();
 
     public static FriendArgumentType create() {
         return new FriendArgumentType();
@@ -26,7 +26,7 @@ public class FriendArgumentType implements ArgumentType<String> {
     @Override
     public String parse(StringReader reader) throws CommandSyntaxException {
         String friend = reader.getString();
-        if (!Thunderhack.friendManager.isFriend(friend)) throw new DynamicCommandExceptionType(
+        if (!ThunderHack.friendManager.isFriend(friend)) throw new DynamicCommandExceptionType(
                 name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Друга с именем " + name.toString() + " не существует(" : "Friend with name " + name.toString() + " does not exists(")
         ).create(reader.readString());
 
@@ -35,7 +35,7 @@ public class FriendArgumentType implements ArgumentType<String> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(Thunderhack.friendManager.getFriends(), builder);
+        return CommandSource.suggestMatching(ThunderHack.friendManager.getFriends(), builder);
     }
 
     @Override

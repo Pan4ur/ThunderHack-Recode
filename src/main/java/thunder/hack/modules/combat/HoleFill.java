@@ -8,7 +8,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -54,7 +54,7 @@ public class HoleFill extends Module {
     private final Setting<Float> rangeToTarget = new Setting<>("Range To Target", 2f, 1f, 5f, v -> mode.getValue() == Mode.Target);
     private final Setting<Boolean> autoDisable = new Setting<>("Auto Disable", false);
     private final Setting<InventoryUtility.SwitchMode> switchMode = new Setting<>("Switch Mode", InventoryUtility.SwitchMode.Packet);
-    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.All);
+    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Normal);
 
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
     private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Fade).withParent(renderCategory);
@@ -126,7 +126,7 @@ public class HoleFill extends Module {
 
         List<BlockPos> holes = findHoles();
 
-        PlayerEntity target = Thunderhack.combatManager.getTargets(placeRange.getValue()).stream()
+        PlayerEntity target = ThunderHack.combatManager.getTargets(placeRange.getValue()).stream()
                 .min(Comparator.comparing(e -> mc.player.squaredDistanceTo(e)))
                 .orElse(null);
 

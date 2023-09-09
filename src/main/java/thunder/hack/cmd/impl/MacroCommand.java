@@ -6,7 +6,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.MacroArgumentType;
 import thunder.hack.core.MacroManager;
@@ -33,7 +33,7 @@ public class MacroCommand extends Command {
 
 
             sendMessage(" ");
-            Thunderhack.macroManager.getMacros().forEach(macro -> sendMessage(macro.getName() + (macro.getBind() != -1 ? " [" + toString(macro.getBind()) + "]" : "") + " {" + macro.getText() + "}"));
+            ThunderHack.macroManager.getMacros().forEach(macro -> sendMessage(macro.getName() + (macro.getBind() != -1 ? " [" + toString(macro.getBind()) + "]" : "") + " {" + macro.getText() + "}"));
 
             return SINGLE_SUCCESS;
         }));
@@ -45,7 +45,7 @@ public class MacroCommand extends Command {
                 return SINGLE_SUCCESS;
             }
 
-            Thunderhack.macroManager.removeMacro(macro);
+            ThunderHack.macroManager.removeMacro(macro);
             sendMessage("Удален макрос " + macro.getName());
 
             return SINGLE_SUCCESS;

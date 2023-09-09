@@ -11,7 +11,6 @@ import net.minecraft.block.Block;
 import net.minecraft.command.CommandSource;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
-import thunder.hack.Thunderhack;
 import thunder.hack.modules.client.MainSettings;
 
 import java.util.ArrayList;

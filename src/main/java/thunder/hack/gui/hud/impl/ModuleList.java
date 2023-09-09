@@ -1,9 +1,8 @@
 package thunder.hack.gui.hud.impl;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.Module;
@@ -44,15 +43,15 @@ public class ModuleList extends HudElement {
         int offset2 = 0;
 
         int yTotal = 0;
-        for (int i = 0; i < Thunderhack.moduleManager.sortedModules.size(); ++i) {
+        for (int i = 0; i < ThunderHack.moduleManager.sortedModules.size(); ++i) {
             yTotal += FontRenderers.modules.getFontHeight() + 3;
         }
         setHeight(yTotal);
 
         // Если режим - ЦветнойТекст, то мы рендерим сначала эффект свечения, а затем плитки
         if (mode.getValue() == Mode.ColorText) {
-            for (int k = 0; k < Thunderhack.moduleManager.sortedModules.size(); k++) {
-                Module module = Thunderhack.moduleManager.sortedModules.get(k);
+            for (int k = 0; k < ThunderHack.moduleManager.sortedModules.size(); k++) {
+                Module module = ThunderHack.moduleManager.sortedModules.get(k);
                 if (!module.isDrawn()) {
                     continue;
                 }
@@ -85,8 +84,8 @@ public class ModuleList extends HudElement {
         }
         //
 
-        for (int k = 0; k < Thunderhack.moduleManager.sortedModules.size(); k++) {
-            Module module = Thunderhack.moduleManager.sortedModules.get(k);
+        for (int k = 0; k < ThunderHack.moduleManager.sortedModules.size(); k++) {
+            Module module = ThunderHack.moduleManager.sortedModules.get(k);
             if (!module.isDrawn()) {
                 continue;
             }
