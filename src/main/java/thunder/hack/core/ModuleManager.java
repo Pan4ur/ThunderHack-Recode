@@ -80,6 +80,7 @@ public class ModuleManager {
     public static Search search;
     public static WaterSpeed waterSpeed;
     public static ChestStealer chestStealer;
+    public static Burrow burrow;
 
 
     public ModuleManager() {
@@ -137,6 +138,7 @@ public class ModuleManager {
         search = new Search();
         waterSpeed = new WaterSpeed();
         chestStealer = new ChestStealer();
+        burrow = new Burrow();
 
         modules.add(clickGui);
         modules.add(new MainSettings());
@@ -243,7 +245,7 @@ public class ModuleManager {
         modules.add(new PopChams());
         modules.add(new Chams());
         modules.add(pistonAura);
-        modules.add(new Burrow());
+        modules.add(burrow);
         modules.add(new AntiSurround());
         modules.add(new LongJump());
         modules.add(new ThunderHackGui());
@@ -303,6 +305,7 @@ public class ModuleManager {
         modules.add(antiWeb);
         modules.add(legacyHud);
         modules.add(waterSpeed);
+        modules.add(new AutoSex());
     }
 
     public Module get(String name) {

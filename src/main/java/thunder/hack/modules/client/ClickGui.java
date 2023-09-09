@@ -14,7 +14,7 @@ import java.awt.*;
 public class ClickGui extends Module {
 
     private static ClickGui INSTANCE = new ClickGui();
-    private Setting<colorModeEn> colorMode = new Setting("ColorMode", colorModeEn.Static);
+    private Setting<colorModeEn> colorMode = new Setting<>("ColorMode", colorModeEn.Static);
     public final Setting<ColorSetting> hcolor1 = new Setting<>("MainColor", new ColorSetting(-6974059));
     public final Setting<ColorSetting> acolor = new Setting<>("MainColor2", new ColorSetting(-8365735));
     public final Setting<ColorSetting> plateColor = new Setting<>("PlateColor", new ColorSetting(-14474718));
