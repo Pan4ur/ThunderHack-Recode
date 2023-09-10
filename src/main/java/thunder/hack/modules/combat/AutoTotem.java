@@ -130,14 +130,15 @@ public class AutoTotem extends Module {
                 if (matrix.getValue()) {
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
                     mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+
                     sendPacket(new UpdateSelectedSlotC2SPacket(nearest_slot));
                     mc.player.getInventory().selectedSlot = nearest_slot;
-                    ItemStack itemstack = mc.player.getOffHandStack();
-                    mc.player.setStackInHand(Hand.OFF_HAND, mc.player.getMainHandStack());
-                    mc.player.setStackInHand(Hand.MAIN_HAND, itemstack);
+
                     sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+
                     sendPacket(new UpdateSelectedSlotC2SPacket(prevCurrentItem));
                     mc.player.getInventory().selectedSlot = prevCurrentItem;
+
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
                     mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                     mc.player.resetLastAttackedTicks();
@@ -150,10 +151,9 @@ public class AutoTotem extends Module {
             } else {
                 sendPacket(new UpdateSelectedSlotC2SPacket(slot));
                 mc.player.getInventory().selectedSlot = slot;
-                ItemStack itemstack = mc.player.getOffHandStack();
-                mc.player.setStackInHand(Hand.OFF_HAND, mc.player.getMainHandStack());
-                mc.player.setStackInHand(Hand.MAIN_HAND, itemstack);
+
                 sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+
                 sendPacket(new UpdateSelectedSlotC2SPacket(prevCurrentItem));
                 mc.player.getInventory().selectedSlot = prevCurrentItem;
                 mc.player.resetLastAttackedTicks();

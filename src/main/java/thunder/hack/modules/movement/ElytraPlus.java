@@ -53,7 +53,7 @@ public class ElytraPlus extends Module {
     private final Setting<Boolean> instantFly = new Setting<>("InstantFly", true, v -> (mode.getValue() != Mode.FireWork && mode.getValue() != Mode.Sunrise && mode.getValue() != Mode.Pitch40Infinite));
     public Setting<Boolean> cruiseControl = new Setting<>("CruiseControl", false, v -> mode.getValue() == Mode.Boost);
     public Setting<Float> factor = new Setting<>("Factor", 1.5f, 0.1f, 50.0f, v -> (mode.getValue() != Mode.FireWork && mode.getValue() != Mode.Sunrise && mode.getValue() != Mode.Pitch40Infinite));
-    public Setting<Float> upFactor = new Setting<>("UpFactor", 1.0f, 0.0f, 10.0f, v -> (mode.getValue() != Mode.FireWork && mode.getValue() != Mode.Sunrise && mode.getValue() != Mode.Pitch40Infinite));
+    public Setting<Float> upFactor = new Setting<>("UpFactor", 1.0f, 0.0f, 10.0f, v -> mode.getValue() != Mode.Boost);
     public Setting<Float> downFactor = new Setting<>("DownFactor", 1.0f, 0.0f, 10.0f, v -> (mode.getValue() != Mode.FireWork && mode.getValue() != Mode.Sunrise && mode.getValue() != Mode.Pitch40Infinite));
     public Setting<Boolean> stopMotion = new Setting<>("StopMotion", true, v -> mode.getValue() == Mode.Boost);
     public Setting<Float> minUpSpeed = new Setting<>("MinUpSpeed", 0.5f, 0.1f, 5.0f, v -> mode.getValue() == Mode.Boost && cruiseControl.getValue());

@@ -43,7 +43,7 @@ public class AutoArmor extends Module {
             return;
 
         if(MovementUtility.isMoving() && noMove.getValue()) return;
-        if(ThunderHack.moduleManager.get(ElytraPlus.class).isEnabled()) return;
+        if(ModuleManager.elytraPlus.isEnabled()) return;
 
         if (tickDelay > 0) {
             tickDelay--;

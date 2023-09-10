@@ -1,6 +1,7 @@
 package thunder.hack.gui.thundergui.components;
 
 
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui2;
@@ -132,25 +133,26 @@ public class SliderComponent extends SettingElement {
 
         if (this.listening) {
             switch (keyCode) {
-                case 1: {
+                case GLFW.GLFW_KEY_ESCAPE: {
                     listening = false;
                     Stringnumber = "";
                     return;
                 }
-                case 28: {
+                case GLFW.GLFW_KEY_ENTER: {
                     try {
-                        this.searchNumber();
-
+                        searchNumber();
                     } catch (Exception e) {
                         Stringnumber = "";
                         listening = false;
                     }
+                    return;
                 }
-                case 14: {
-                    this.Stringnumber = removeLastChar(this.Stringnumber);
+                case GLFW.GLFW_KEY_BACKSPACE: {
+                    Stringnumber = removeLastChar(Stringnumber);
+                    return;
                 }
             }
-            this.Stringnumber = this.Stringnumber + typedChar;
+            Stringnumber = Stringnumber + GLFW.glfwGetKeyName(keyCode, 0);
         }
     }
 

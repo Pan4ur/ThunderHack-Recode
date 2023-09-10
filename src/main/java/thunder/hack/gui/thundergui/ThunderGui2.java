@@ -595,7 +595,7 @@ public class ThunderGui2 extends Screen {
 
     public void keyTyped(String typedChar, int keyCode) throws IOException {
 
-        if(ThunderHack.currentKeyListener != ThunderHack.KeyListening.ThunderGui)
+        if(ThunderHack.currentKeyListener != ThunderHack.KeyListening.Sliders && ThunderHack.currentKeyListener != ThunderHack.KeyListening.ThunderGui)
             return;
 
         if (keyCode == 1) {

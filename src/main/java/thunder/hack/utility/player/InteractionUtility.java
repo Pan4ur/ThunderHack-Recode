@@ -14,7 +14,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.cmd.Command;
 import thunder.hack.utility.math.ExplosionUtility;
@@ -76,18 +75,9 @@ public final class InteractionUtility {
         return placeBlock(bp, rotate, interact, mode, invResult, returnSlot, InventoryUtility.SwitchMode.All, ignoreEntities);
     }
 
-    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, @NotNull SearchInvResult invResult, boolean returnSlot, InventoryUtility.SwitchMode switchMode, boolean ignoreEntities) {
+    public synchronized static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, SearchInvResult invResult, boolean returnSlot, InventoryUtility.SwitchMode switchMode, boolean ignoreEntities) {
         int prevItem = mc.player.getInventory().selectedSlot;
         invResult.switchTo(switchMode);
-        boolean result = placeBlock(bp, rotate, interact, mode, ignoreEntities);
-        if (returnSlot) InventoryUtility.switchTo(prevItem, switchMode);
-
-        return result;
-    }
-
-    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, int slot, boolean returnSlot, InventoryUtility.SwitchMode switchMode, boolean ignoreEntities) {
-        int prevItem = mc.player.getInventory().selectedSlot;
-        InventoryUtility.switchTo(slot, switchMode);
         boolean result = placeBlock(bp, rotate, interact, mode, ignoreEntities);
         if (returnSlot) InventoryUtility.switchTo(prevItem, switchMode);
 
@@ -107,10 +97,10 @@ public final class InteractionUtility {
         if (rotate)
             mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
 
-        if (mode == PlaceMode.Normal || mode == PlaceMode.All)
+        if (mode == PlaceMode.Normal)
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
 
-        if (mode == PlaceMode.Packet || mode == PlaceMode.All)
+        if (mode == PlaceMode.Packet)
             mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
 
         awaiting.put(bp, System.currentTimeMillis());
@@ -360,8 +350,7 @@ public final class InteractionUtility {
 
     public enum PlaceMode {
         Packet,
-        Normal,
-        All
+        Normal
     }
 
     public enum Interact {
