@@ -1,7 +1,7 @@
 package thunder.hack.modules.player;
 
 import net.minecraft.entity.player.PlayerEntity;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
@@ -43,7 +43,7 @@ public class AutoSex extends Module {
     public void onUpdate() {
         if (fullNullCheck()) return;
         if (target == null) {
-            target = Thunderhack.combatManager.getNearestTarget(targetRange.getValue());
+            target = ThunderHack.combatManager.getNearestTarget(targetRange.getValue());
             return;
         }
         if (target.getPos().squaredDistanceTo(mc.player.getPos()) >= targetRange.getValue()) {

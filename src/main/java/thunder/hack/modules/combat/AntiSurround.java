@@ -89,8 +89,11 @@ public class AntiSurround extends Module {
 
             if (rotate.getValue()) {
                 float[] rotation = getRotations(minePos);
-                mc.player.setYaw(rotation[0]);
-                mc.player.setPitch(rotation[1]);
+
+                if (rotation != null) {
+                    mc.player.setYaw(rotation[0]);
+                    mc.player.setPitch(rotation[1]);
+                }
             }
 
             if (!requirePickaxe.getValue() || mc.player.getMainHandStack().getItem() instanceof PickaxeItem) {

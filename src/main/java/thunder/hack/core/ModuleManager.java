@@ -191,6 +191,7 @@ public class ModuleManager {
     public static RPC rpc = new RPC();
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
+    public static AutoSex autoSex = new AutoSex();
 
 
     public ModuleManager() {

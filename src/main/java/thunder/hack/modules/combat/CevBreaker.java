@@ -234,7 +234,6 @@ public class CevBreaker extends Module {
                     // Place obsidian under target's head
                     if (placeObsidian(targetedPos)) {
                         renderStructurePoses.put(targetedPos, System.currentTimeMillis());
-
                         startMine(targetedPos);
 
                         newCycle = false;

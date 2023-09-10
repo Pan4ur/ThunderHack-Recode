@@ -12,19 +12,12 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import thunder.hack.events.impl.EventEntitySpawn;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.*;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
@@ -37,18 +30,13 @@ import thunder.hack.utility.render.Render3DEngine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 
 public class Surround extends Module {
-
-    public Surround() {
-        super("Surround", "окружает тебя обсой", Category.COMBAT);
-    }
-
     private final Setting<PlaceTiming> placeTiming = new Setting<>("PlaceTiming", PlaceTiming.Default);
     private final Setting<Integer> blocksPerTick = new Setting<>("Block/Tick", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10, v -> placeTiming.getValue() != PlaceTiming.Sequential);
@@ -59,6 +47,7 @@ public class Surround extends Module {
     private final Setting<Boolean> breakCrystalTick = new Setting<>("BreakCrystalTick", true);
     private final Setting<Boolean> breakCrystalPacket = new Setting<>("BreakCrystalPacket", true);
     private final Setting<Boolean> center = new Setting<>("Center", true);
+
     private final Setting<Parent> blocks = new Setting<>("Blocks", new Parent(false, 0));
     private final Setting<Boolean> obsidian = new Setting<>("Obsidian", true).withParent(blocks);
     private final Setting<Boolean> anchor = new Setting<>("Anchor", false).withParent(blocks);
@@ -66,9 +55,11 @@ public class Surround extends Module {
     private final Setting<Boolean> netherite = new Setting<>("Netherite", false).withParent(blocks);
     private final Setting<Boolean> cryingObsidian = new Setting<>("CryingObsidian", true).withParent(blocks);
     private final Setting<Boolean> dirt = new Setting<>("Dirt", false).withParent(blocks);
+
     private final Setting<Parent> autoDisable = new Setting<>("AutoDisable", new Parent(false, 0));
     private final Setting<Boolean> onYChange = new Setting<>("onYChange", true).withParent(autoDisable);
     private final Setting<Boolean> onTp = new Setting<>("onTp", true).withParent(autoDisable);
+
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
     private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Fade).withParent(renderCategory);
     private final Setting<ColorSetting> renderFillColor = new Setting<>("Render Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
@@ -93,6 +84,10 @@ public class Surround extends Module {
     private double prevY;
 
     public static final Timer inactivityTimer = new Timer();
+
+    public Surround() {
+        super("Surround", "окружает тебя обсой", Category.COMBAT);
+    }
 
     public void onRender3D(MatrixStack stack) {
         renderPoses.forEach((pos, time) -> {
@@ -133,7 +128,8 @@ public class Surround extends Module {
             Entity entity = getEntity(currentPlacePos);
 
             if (entity != null) {
-                if (breakCrystalPacket.getValue()) sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
+                if (breakCrystalPacket.getValue())
+                    sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
                 else mc.interactionManager.attackEntity(mc.player, entity);
             }
         }
@@ -156,7 +152,7 @@ public class Surround extends Module {
 
     @EventHandler
     public void onStep(EventSync event) {
-        if(onYChange.getValue() && mc.player.getY() != prevY)
+        if (onYChange.getValue() && mc.player.getY() != prevY)
             disable(isRu() ? "Выключен из-за изменения Y!" : "Disabled due to Y change!");
     }
 
@@ -173,7 +169,6 @@ public class Surround extends Module {
         if (getSlot() == -1) disable(isRu() ? "Нет блоков!" : "No blocks!");
 
 
-
         InventoryUtility.saveSlot();
         if (placeTiming.getValue() == PlaceTiming.Default) {
             int placed = 0;
@@ -187,7 +182,8 @@ public class Surround extends Module {
                     Entity entity = getEntity(targetBlock);
 
                     if (entity != null) {
-                        if (breakCrystalPacket.getValue()) sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
+                        if (breakCrystalPacket.getValue())
+                            sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
                         else mc.interactionManager.attackEntity(mc.player, entity);
                     }
                 }
@@ -236,7 +232,7 @@ public class Surround extends Module {
                 handleSurroundBreak();
             }
         }
-        if(e.getPacket() instanceof PlayerPositionLookS2CPacket && onTp.getValue())
+        if (e.getPacket() instanceof PlayerPositionLookS2CPacket && onTp.getValue())
             disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to teleport!");
     }
 
@@ -248,7 +244,8 @@ public class Surround extends Module {
                 Entity entity = getEntity(bp);
 
                 if (entity != null) {
-                    if (breakCrystalPacket.getValue()) sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
+                    if (breakCrystalPacket.getValue())
+                        sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
                     else mc.interactionManager.attackEntity(mc.player, entity);
                 }
             }
@@ -273,7 +270,8 @@ public class Surround extends Module {
                     Entity entity = getEntity(bp);
 
                     if (entity != null) {
-                        if (breakCrystalPacket.getValue()) sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
+                        if (breakCrystalPacket.getValue())
+                            sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
                         else mc.interactionManager.attackEntity(mc.player, entity);
                     }
                 }
@@ -304,7 +302,8 @@ public class Surround extends Module {
 
     List<BlockPos> getBlocks() {
         BlockPos playerPos = this.getPlayerPos();
-        ArrayList<BlockPos> offsets = new ArrayList<BlockPos>();
+        ArrayList<BlockPos> offsets = new ArrayList<>();
+
         if (!center.getValue()) {
             int z;
             int x;
@@ -369,7 +368,7 @@ public class Surround extends Module {
         return dec >= 0.7 ? 1 : (dec <= 0.3 ? -1 : 0);
     }
 
-    BlockPos addToPlayer(BlockPos playerPos, double x, double y, double z) {
+    BlockPos addToPlayer(@NotNull BlockPos playerPos, double x, double y, double z) {
         if (playerPos.getX() < 0) {
             x = -x;
         }

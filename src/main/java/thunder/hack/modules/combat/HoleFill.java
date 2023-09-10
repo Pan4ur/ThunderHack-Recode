@@ -9,7 +9,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.Thunderhack;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
@@ -35,7 +35,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.utility.player.InteractionUtility.squaredDistanceFromEyes;
 
 public class HoleFill extends Module {
     private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
@@ -88,6 +87,7 @@ public class HoleFill extends Module {
         Trap
     }
 
+    private boolean burrowWasEnabled = false;
     private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
     public static final Timer inactivityTimer = new Timer();
     private int tickCounter = 0;
@@ -99,9 +99,8 @@ public class HoleFill extends Module {
 
     @Override
     public void onEnable() {
+        burrowWasEnabled = false;
         selfFillNeed = false;
-
-        super.onEnable();
     }
 
     @Override
@@ -138,12 +137,15 @@ public class HoleFill extends Module {
             tickCounter++;
             return;
         }
+        if (HoleUtility.isHole(mc.player.getBlockPos()) && mc.world.getBlockState(mc.player.getBlockPos()).isAir()) {
+            burrowWasEnabled = false;
+        }
         int slot = getBlockSlot();
         if (slot == -1) return;
 
         List<BlockPos> holes = findHoles();
 
-        PlayerEntity target = Thunderhack.combatManager.getTargets(placeRange.getValue()).stream()
+        PlayerEntity target = ThunderHack.combatManager.getTargets(placeRange.getValue()).stream()
                 .min(Comparator.comparing(e -> mc.player.squaredDistanceTo(e)))
                 .orElse(null);
 
@@ -191,16 +193,19 @@ public class HoleFill extends Module {
                 if (selfFillNeed && HoleUtility.isHole(mc.player.getBlockPos())) {
                     switch (selfFillMode.getValue()) {
                         case Burrow -> {
-                            if (ModuleManager.burrow.isEnabled())
+                            if (ModuleManager.burrow.isEnabled() || burrowWasEnabled) {
                                 return;
+                            }
+
                             ModuleManager.burrow.enable();
                             selfFillNeed = false;
                             return;
                         }
                         case Trap -> {
-                            BlockPos headPos = mc.player.getBlockPos().up(2);
-                            if (!mc.world.getBlockState(headPos).isAir()) {
+                            BlockPos headPos = BlockPos.ofFloored(mc.player.getPos()).up(2);
+                            if (mc.world.getBlockState(headPos).isReplaceable() && InteractionUtility.canPlaceBlock(headPos, interactMode.getValue(), false)) {
                                 selfFillNeed = false;
+                                InteractionUtility.placeBlock(headPos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), slot, true, switchMode.getValue(), false);
                                 renderPoses.put(headPos, System.currentTimeMillis());
 
                                 tickCounter = 0;
@@ -208,11 +213,13 @@ public class HoleFill extends Module {
                                 return;
                             } else {
                                 boolean placed = false;
-                                for (int i = 0; i < 2; i++) {
+                                for (int i = 0; i < 3; i++) {
                                     for (Vec3i vecAdd : HoleUtility.VECTOR_PATTERN) {
                                         BlockPos checkPos = headPos.add(vecAdd).down(i);
-                                        if (mc.world.getBlockState(checkPos).isAir()
-                                                && InteractionUtility.canPlaceBlock(checkPos, interactMode.getValue(), false)) {
+                                        if (!mc.world.getBlockState(checkPos).isReplaceable()) {
+                                            continue;
+                                        }
+                                        if (InteractionUtility.canPlaceBlock(checkPos, interactMode.getValue(), false)) {
                                             InteractionUtility.placeBlock(checkPos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), slot, true, switchMode.getValue(), false);
                                             blocksPlaced++;
                                             tickCounter = 0;
@@ -230,9 +237,7 @@ public class HoleFill extends Module {
                 }
 
                 for (BlockPos blockPos : poses) {
-                    int preSlot = mc.player.getInventory().selectedSlot;
-                    InventoryUtility.switchTo(slot, switchMode.getValue());
-                    if (InteractionUtility.placeBlock(blockPos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), false)) {
+                    if (InteractionUtility.placeBlock(blockPos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), slot, true, switchMode.getValue(), false)) {
                         blocksPlaced++;
                         tickCounter = 0;
                         renderPoses.put(blockPos, System.currentTimeMillis());
@@ -242,7 +247,6 @@ public class HoleFill extends Module {
                         broke = true;
                         break;
                     }
-                    InventoryUtility.switchTo(preSlot, switchMode.getValue());
                 }
                 if (broke)
                     break;
@@ -268,7 +272,7 @@ public class HoleFill extends Module {
                     if (isHole(pos) && !isFillingNow(pos)) {
                         BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), pos.toCenterPos().offset(Direction.UP, 0.5f), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
                         if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != pos)
-                            if (squaredDistanceFromEyes(pos.toCenterPos()) > placeWallRange.getPow2Value())
+                            if (InteractionUtility.squaredDistanceFromEyes(pos.toCenterPos()) > placeWallRange.getPow2Value())
                                 continue;
                         positions.add(pos);
                     }

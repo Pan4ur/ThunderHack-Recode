@@ -5,11 +5,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -29,7 +27,7 @@ public final class HoleUtility {
             for (Vec3i pattern : VECTOR_PATTERN) {
                 BlockPos newPos = checkPos.add(pattern);
 
-                if (!mc.world.getBlockState(newPos).isAir())
+                if (!mc.world.getBlockState(newPos).isReplaceable())
                     surroundPoses.add(newPos);
             }
         });
@@ -53,19 +51,19 @@ public final class HoleUtility {
 
         quadPoses.add(checkFrom);
 
-        if (mc.world.getBlockState(checkFrom.add(1, 0, 1)).getBlock().equals(Blocks.AIR)) {
+        if (mc.world.getBlockState(checkFrom.add(1, 0, 1)).isReplaceable()) {
             quadPoses.add(checkFrom.add(1, 0, 1));
             quadPoses.add(checkFrom.add(1, 0, 0));
             quadPoses.add(checkFrom.add(0, 0, 1));
-        } else if (mc.world.getBlockState(checkFrom.add(1, 0, -1)).getBlock().equals(Blocks.AIR)) {
+        } else if (mc.world.getBlockState(checkFrom.add(1, 0, -1)).isReplaceable()) {
             quadPoses.add(checkFrom.add(1, 0, -1));
             quadPoses.add(checkFrom.add(1, 0, 0));
             quadPoses.add(checkFrom.add(0, 0, -1));
-        } else if (mc.world.getBlockState(checkFrom.add(-1, 0, 1)).getBlock().equals(Blocks.AIR)) {
+        } else if (mc.world.getBlockState(checkFrom.add(-1, 0, 1)).isReplaceable()) {
             quadPoses.add(checkFrom.add(-1, 0, 1));
             quadPoses.add(checkFrom.add(-1, 0, 0));
             quadPoses.add(checkFrom.add(0, 0, 1));
-        } else if (mc.world.getBlockState(checkFrom.add(-1, 0, -1)).getBlock().equals(Blocks.AIR)) {
+        } else if (mc.world.getBlockState(checkFrom.add(-1, 0, -1)).isReplaceable()) {
             quadPoses.add(checkFrom.add(-1, 0, -1));
             quadPoses.add(checkFrom.add(-1, 0, 0));
             quadPoses.add(checkFrom.add(0, 0, -1));
@@ -80,13 +78,13 @@ public final class HoleUtility {
 
         doublePoses.add(checkFrom);
 
-        if (mc.world.getBlockState(checkFrom.add(1, 0, 0)).getBlock().equals(Blocks.AIR))
+        if (mc.world.getBlockState(checkFrom.add(1, 0, 0)).isReplaceable())
             doublePoses.add(checkFrom.add(1, 0, 0));
-        else if (mc.world.getBlockState(checkFrom.add(-1, 0, 0)).getBlock().equals(Blocks.AIR))
+        else if (mc.world.getBlockState(checkFrom.add(-1, 0, 0)).isReplaceable())
             doublePoses.add(checkFrom.add(-1, 0, 0));
-        else if (mc.world.getBlockState(checkFrom.add(0, 0, 1)).getBlock().equals(Blocks.AIR))
+        else if (mc.world.getBlockState(checkFrom.add(0, 0, 1)).isReplaceable())
             doublePoses.add(checkFrom.add(0, 0, 1));
-        else if (mc.world.getBlockState(checkFrom.add(0, 0, -1)).getBlock().equals(Blocks.AIR))
+        else if (mc.world.getBlockState(checkFrom.add(0, 0, -1)).isReplaceable())
             doublePoses.add(checkFrom.add(0, 0, -1));
 
 
