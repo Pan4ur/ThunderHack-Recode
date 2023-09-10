@@ -8,6 +8,7 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.RadarRewrite;
 import thunder.hack.gui.thundergui.ThunderGui2;
 import thunder.hack.modules.client.ClickGui;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.utility.Macro;
 import thunder.hack.utility.Timer;
 import thunder.hack.cmd.Command;
@@ -25,6 +26,7 @@ import thunder.hack.utility.player.InteractionUtility;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.modules.Module.mc;
@@ -47,6 +49,11 @@ public final class Core {
                 ModuleManager.clickGui.setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(), false, false);
             }
         }
+
+        if (!Objects.equals(ThunderHack.commandManager.getPrefix(), MainSettings.prefix.getValue().toString())) {
+            ThunderHack.commandManager.setPrefix(MainSettings.prefix.getValue());
+        }
+
         ThunderGui2.getInstance().onTick();
         ThunderHack.moduleManager.onTick();
 

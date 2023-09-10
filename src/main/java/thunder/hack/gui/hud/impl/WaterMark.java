@@ -25,7 +25,7 @@ public class WaterMark extends HudElement {
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
         if (mode.getValue() == Mode.Big) {
-            FontRenderers.thGlitch.drawString(context.getMatrices(), "THUNDERHACK", getPosX() + 5.5, getPosY() + 5, -1);
+            FontRenderers.thglitch.drawString(context.getMatrices(), "THUNDERHACK", getPosX() + 5.5, getPosY() + 5, -1);
             FontRenderers.monsterrat.drawGradientString(context.getMatrices(), "recode", getPosX() + 35.5f, getPosY() + 21f, 1, true);
         } else if (mode.getValue() == Mode.Small) {
             String info = Formatting.GRAY + "| " + Formatting.RESET + mc.getSession().getUsername() + Formatting.GRAY + " | " + Formatting.RESET + PingHud.getPing() + " ms" + Formatting.GRAY + " | " + Formatting.RESET + (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address);

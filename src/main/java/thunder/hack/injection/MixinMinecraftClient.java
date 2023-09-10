@@ -41,7 +41,7 @@ public class MixinMinecraftClient {
             FontRenderers.settings = FontRenderers.createDefault(12f, "comfortaa");
             FontRenderers.modules = FontRenderers.createDefault(15f, "comfortaa");
             FontRenderers.categories = FontRenderers.createDefault(18f, "comfortaa");
-            FontRenderers.thGlitch = FontRenderers.createDefault(36f, "glitched");
+            FontRenderers.thglitch = FontRenderers.createDefault(36f, "glitched");
             FontRenderers.monsterrat = FontRenderers.createDefault(18f, "monsterrat");
             FontRenderers.sf_bold = FontRenderers.createDefault(16f, "sf_bold");
             FontRenderers.sf_medium = FontRenderers.createDefault(16f, "sf_medium");

@@ -15,7 +15,7 @@ public class FontRenderers {
     public static FontAdapter icons;
     public static FontAdapter mid_icons;
     public static FontAdapter big_icons;
-    public static FontAdapter thGlitch;
+    public static FontAdapter thglitch;
     public static FontAdapter monsterrat;
     public static FontAdapter sf_bold;
     public static FontAdapter sf_bold_mini;
@@ -32,10 +32,10 @@ public class FontRenderers {
     }
     
     public static @NotNull RendererFontAdapter createDefault(float size, String name) throws IOException, FontFormatException {
-        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("/fonts/" + name + ".ttf"))).deriveFont(Font.PLAIN, size * 2), size * 2);
+        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("fonts/" + name + ".ttf"))).deriveFont(Font.PLAIN, size * 2), size * 2);
     }
     
     public static @NotNull RendererFontAdapter createIcons(float size) throws IOException, FontFormatException {
-        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("/fonts/icons.ttf"))).deriveFont(Font.PLAIN, size * 2), size * 2);
+        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("fonts/icons.ttf"))).deriveFont(Font.PLAIN, size * 2), size * 2);
     }
 }
