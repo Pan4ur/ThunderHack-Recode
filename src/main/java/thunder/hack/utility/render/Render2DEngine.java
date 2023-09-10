@@ -940,6 +940,29 @@ public class Render2DEngine {
         RenderSystem.setShaderColor(1f,1f,1f,1f);
     }
 
+
+    // http://www.java2s.com/example/java/2d-graphics/check-if-a-color-is-more-dark-than-light.html
+    public static boolean isDark(Color color) {
+        float r = color.getRed() / 255.0f;
+        float g = color.getGreen() / 255.0f;
+        float b = color.getBlue() / 255.0f;
+        return isDark(r, g, b);
+    }
+
+    public static boolean isDark(double r, double g, double b) {
+        double dWhite = colorDistance(r, g, b, 1.0, 1.0, 1.0);
+        double dBlack = colorDistance(r, g, b, 0.0, 0.0, 0.0);
+        return dBlack < dWhite;
+    }
+
+    public static double colorDistance(double r1, double g1, double b1, double r2, double g2, double b2) {
+        double a = r2 - r1;
+        double b = g2 - g1;
+        double c = b2 - b1;
+        return Math.sqrt(a * a + b * b + c * c);
+    }
+    //
+
     public static class BlurredShadow {
         Texture id;
 

@@ -19,12 +19,13 @@ public class LevitationControl extends Module {
         if (mc.player.hasStatusEffect(StatusEffects.LEVITATION)) {
             int amplifier = mc.player.getStatusEffect(StatusEffects.LEVITATION).getAmplifier();
             if (mc.options.jumpKey.isPressed()) {
-                e.set_y(((0.05D * (double) (amplifier + 1) - e.get_y()) * 0.2D) * upAmplifier.getValue());
+                e.set_y(((0.05D * (double) (amplifier + 1) - e.get_y()) * 0.2D) * upAmplifier.getValue() * 100);
             } else if (mc.options.sneakKey.isPressed()) {
-                e.set_y(-(((0.05D * (double) (amplifier + 1) - e.get_y()) * 0.2D) * downAmplifier.getValue()));
+                e.set_y(-(((0.05D * (double) (amplifier + 1) - e.get_y()) * 0.2D) * downAmplifier.getValue() * 100));
             } else {
                 e.set_y(0);
             }
+            e.cancel();
         }
     }
 }

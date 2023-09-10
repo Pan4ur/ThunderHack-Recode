@@ -113,7 +113,7 @@ public class JumpCircle extends Module {
                 stack.translate(-x, -y, -z);
                 stack.pop();
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         Collections.reverse(circles);
     }

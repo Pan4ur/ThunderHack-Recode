@@ -274,7 +274,7 @@ public class AutoAnchor extends Module {
                 BlockPos best1 = findAnchorBlocks().stream().filter(AutoAnchor.this::isFriendsSafe).max(Comparator.comparingDouble(bp -> ExplosionUtility.getAnchorExplosionDamage(bp, target))).orElse(null);
 
 
-                if (targetPos != null) {
+                if (targetPos != null && best1 != null) {
                     if ((ExplosionUtility.getAnchorExplosionDamage(targetPos, mc.player) >= ExplosionUtility.getAnchorExplosionDamage(best1, mc.player))) {
                         targetPos = best1;
                     }
@@ -433,8 +433,18 @@ public class AutoAnchor extends Module {
             Map<BlockPos, Integer> syncCharges
                     = Collections.synchronizedMap(charges);
 
-            if (mc.world.getBlockState(pos).getBlock() == Blocks.RESPAWN_ANCHOR
-                    && (mc.world.getBlockState(pos).get(RespawnAnchorBlock.CHARGES) < chargeCount.getValue() || (syncCharges.containsKey(pos) && syncCharges.get(pos) < chargeCount.getValue()))) {
+            int serverSideCharges = 0;
+
+            boolean isAnchor = mc.world.getBlockState(pos).getBlock() == Blocks.RESPAWN_ANCHOR;
+
+            try {
+                if(isAnchor) {
+                    serverSideCharges = mc.world.getBlockState(pos).get(RespawnAnchorBlock.CHARGES);
+                }
+            } catch (Exception ignored){
+            }
+
+            if (isAnchor && (serverSideCharges < chargeCount.getValue() || (syncCharges.containsKey(pos) && syncCharges.get(pos) < chargeCount.getValue()))) {
                 if (onlyOwn.getValue() && !ownAnchors.contains(pos)) return false;
                 return mc.player.squaredDistanceTo(pos.toCenterPos()) <= chargeRange.getPow2Value();
             }

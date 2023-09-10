@@ -3,6 +3,7 @@ package thunder.hack.modules.combat;
 import io.netty.buffer.Unpooled;
 import meteordevelopment.orbit.EventHandler;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -54,7 +55,6 @@ public class Criticals extends Module {
             }
         }
     }
-
 
     public static Entity getEntity(@NotNull PlayerInteractEntityC2SPacket packet) {
         PacketByteBuf packetBuf = new PacketByteBuf(Unpooled.buffer());

@@ -15,6 +15,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
 public class GuiMove extends Module {
 
+    public Setting<Boolean> rotateOnArrows = new Setting<>("RotateOnArrows", true);
     public Setting<Boolean> clickBypass = new Setting<>("strict", false);
     public Setting<Boolean> sneak = new Setting<>("sneak", false);
 
@@ -29,28 +30,30 @@ public class GuiMove extends Module {
         if (mc.currentScreen != null) {
             if (!(mc.currentScreen instanceof ChatScreen)) {
                 mc.player.setSprinting(true);
+
                 for (KeyBinding k : new KeyBinding[] { mc.options.forwardKey, mc.options.backKey, mc.options.leftKey, mc.options.rightKey, mc.options.jumpKey, mc.options.sprintKey }) {
                     k.setPressed(InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.fromTranslationKey(k.getBoundKeyTranslationKey()).getCode()));
                 }
-                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(),264)) {
-                    mc.player.setPitch(mc.player.getPitch() + 5);
+                if(rotateOnArrows.getValue()) {
+                    if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 264)) {
+                        mc.player.setPitch(mc.player.getPitch() + 5);
+                    }
+                    if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 265)) {
+                        mc.player.setPitch(mc.player.getPitch() - 5);
+                    }
+                    if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 262)) {
+                        mc.player.setYaw(mc.player.getYaw() + 5);
+                    }
+                    if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 263)) {
+                        mc.player.setYaw(mc.player.getYaw() - 5);
+                    }
+                    if (mc.player.getPitch() > 90) {
+                        mc.player.setYaw(90);
+                    }
+                    if (mc.player.getPitch() < -90) {
+                        mc.player.setYaw(-90);
+                    }
                 }
-                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(),265)) {
-                    mc.player.setPitch(mc.player.getPitch() - 5);
-                }
-                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(),262)) {
-                    mc.player.setYaw(mc.player.getYaw() + 5);
-                }
-                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(),263)) {
-                    mc.player.setYaw(mc.player.getYaw() - 5);
-                }
-                if (mc.player.getPitch() > 90) {
-                    mc.player.setYaw(90);
-                }
-                if (mc.player.getPitch() < -90) {
-                    mc.player.setYaw(-90);
-                }
-
                 if (sneak.getValue()) {
                     mc.options.sneakKey.setPressed(InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.fromTranslationKey(mc.options.sneakKey.getBoundKeyTranslationKey()).getCode()));
                 }

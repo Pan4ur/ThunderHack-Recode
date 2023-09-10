@@ -2,13 +2,17 @@ package thunder.hack.modules.render;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.ThSoundPack;
+import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
@@ -23,10 +27,12 @@ public class KillEffect extends Module {
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(new Color(255, 255, 0, 150)), value -> mode.getValue() == Mode.Orthodox);
 
     private final Map<Entity, Long> renderEntities = new ConcurrentHashMap<>();
+    private final Map<Entity, Long> lightingEntities = new ConcurrentHashMap<>();
 
     private enum Mode {
         Orthodox,
         FallingLava,
+        LightningBolt
     }
 
     public KillEffect() {
@@ -58,6 +64,14 @@ public class KillEffect extends Module {
 
                 renderEntities.remove(entity);
             });
+            case LightningBolt -> renderEntities.forEach((entity, time) -> {
+                LightningEntity lightningEntity = new LightningEntity(EntityType.LIGHTNING_BOLT, mc.world);
+                lightningEntity.refreshPositionAfterTeleport(entity.getX(), entity.getY(), entity.getZ());
+                EntitySpawnS2CPacket pac = new EntitySpawnS2CPacket(lightningEntity);
+                pac.apply(mc.getNetworkHandler());
+                renderEntities.remove(entity);
+                lightingEntities.put(entity, System.currentTimeMillis());
+            });
         }
     }
 
@@ -71,13 +85,21 @@ public class KillEffect extends Module {
     public void onUpdate() {
         mc.world.getEntities().forEach(entity -> {
             if (!(entity instanceof PlayerEntity)) return;
-            if (entity == mc.player || renderEntities.containsKey(entity)) return;
+            if (entity == mc.player || renderEntities.containsKey(entity) || lightingEntities.containsKey(entity)) return;
             if (entity.isAlive() || ((PlayerEntity) entity).getHealth() != 0) return;
 
             if (playSound.getValue() && mode.getValue() == Mode.Orthodox)
                 mc.world.playSound(mc.player, entity.getBlockPos(), ThSoundPack.ORTHODOX_SOUNDEVENT, SoundCategory.BLOCKS, 10f, 1f);
             renderEntities.put(entity, System.currentTimeMillis());
         });
+
+        if(!lightingEntities.isEmpty()){
+            lightingEntities.forEach((entity, time) ->{
+                if(System.currentTimeMillis() - time > 5000){
+                    lightingEntities.remove(entity);
+                }
+            });
+        }
     }
 
     private double calculateSpeed() {

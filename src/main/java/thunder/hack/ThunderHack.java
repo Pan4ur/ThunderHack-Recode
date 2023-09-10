@@ -30,8 +30,9 @@ public class ThunderHack implements ModInitializer {
     public static boolean oldVersion = false;
     public static float TICK_TIMER = 1f;
     public static BlockPos gps_position;
-    public static Color copy_color;
+    public static Color copy_color = new Color(-1);
     public static long initTime;
+    public static KeyListening currentKeyListener;
 
     /*-----------------    Managers  ---------------------*/
     public static NotificationManager notificationManager = new NotificationManager();
@@ -100,6 +101,10 @@ public class ThunderHack implements ModInitializer {
                 oldVersion = true;
         } catch (Exception ignored) {
         }
+    }
+
+    public enum KeyListening {
+        ThunderGui, ClickGui, Search, Sliders, Strings
     }
 
 }

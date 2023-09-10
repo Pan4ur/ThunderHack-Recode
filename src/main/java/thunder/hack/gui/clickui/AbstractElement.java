@@ -34,7 +34,6 @@ public abstract class AbstractElement {
 	}
 
 
-
 	public void mouseReleased(int mouseX, int mouseY, int button) {
 	}
 

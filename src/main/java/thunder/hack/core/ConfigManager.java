@@ -1,18 +1,19 @@
 package thunder.hack.core;
 
 import com.google.gson.*;
+import net.minecraft.block.Block;
 import org.apache.commons.io.IOUtils;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
-
+import thunder.hack.cmd.impl.SearchCommand;
+import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.render.Search;
-import thunder.hack.modules.Module;
-import net.minecraft.block.Block;
-import thunder.hack.cmd.impl.SearchCommand;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.*;
-
+import thunder.hack.setting.impl.Bind;
+import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.setting.impl.EnumConverter;
+import thunder.hack.setting.impl.PositionSetting;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -106,9 +107,9 @@ public class ConfigManager {
         try {
             new File("ThunderHackRecode").mkdirs();
             file.createNewFile();
-        } catch (Exception e) {
-
+        } catch (Exception ignored) {
         }
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (Block name : Search.defaultBlocks) {
                 writer.write(name.getTranslationKey() + "\n");
@@ -434,7 +435,7 @@ public class ConfigManager {
         return currentConfig;
     }
 
-    public void loadChestStealer(){
+    public void loadChestStealer() {
         try {
             File file = new File("ThunderHackRecode/misc/search.txt");
 
@@ -446,20 +447,22 @@ public class ConfigManager {
 
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     public void saveChestStealer() {
         File file = new File("ThunderHackRecode/misc/search.txt");
         try {
             file.createNewFile();
-        } catch (Exception ignored){
+        } catch (Exception ignored) {
 
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (String item : ModuleManager.chestStealer.items) {
                 writer.write(item + "\n");
             }
-        } catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 }

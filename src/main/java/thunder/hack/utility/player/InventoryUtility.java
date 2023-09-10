@@ -295,14 +295,10 @@ public final class InventoryUtility {
     }
 
     public static void switchTo(int slot) {
-        if(mc.player.getInventory().selectedSlot != slot)
-            switchTo(slot, SwitchMode.All);
+        switchTo(slot, SwitchMode.All);
     }
 
     public static void switchTo(int slot, InventoryUtility.SwitchMode switchMode) {
-        if(mc.player.getInventory().selectedSlot == slot)
-            return;
-
         if (switchMode == InventoryUtility.SwitchMode.Normal || switchMode == InventoryUtility.SwitchMode.All) {
             mc.player.getInventory().selectedSlot = slot;
         }

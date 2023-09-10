@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.Objects;
 
 import net.minecraft.client.gui.DrawContext;
+import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.gui.font.FontRenderers;
@@ -93,6 +94,8 @@ public class SliderElement extends AbstractElement {
 			Stringnumber = "";
 			this.listening = true;
 		}
+		if(listening)
+			ThunderHack.currentKeyListener = ThunderHack.KeyListening.Sliders;
 	}
 
 	@Override
@@ -108,24 +111,27 @@ public class SliderElement extends AbstractElement {
 
 	@Override
 	public void keyTyped(int keyCode) {
+		if(ThunderHack.currentKeyListener != ThunderHack.KeyListening.Sliders)
+			return;
+
 		if (this.listening) {
 			switch (keyCode) {
-				case GLFW.GLFW_KEY_ESCAPE: {
+				case GLFW.GLFW_KEY_ESCAPE -> {
 					listening = false;
 					Stringnumber = "";
 					return;
 				}
-				case GLFW.GLFW_KEY_ENTER: {
+				case GLFW.GLFW_KEY_ENTER -> {
 					try {
 						this.searchNumber();
 
-					}catch (Exception e){
+					} catch (Exception e) {
 						Stringnumber = "";
 						listening = false;
 					}
 					return;
 				}
-				case GLFW.GLFW_KEY_BACKSPACE: {
+				case GLFW.GLFW_KEY_BACKSPACE -> {
 					this.Stringnumber = removeLastChar(this.Stringnumber);
 					return;
 				}

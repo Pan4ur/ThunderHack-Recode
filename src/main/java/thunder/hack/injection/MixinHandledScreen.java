@@ -157,7 +157,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
                 }
             }
             draw(context, itemStacks, mouseX, mouseY, colors);
-        } catch (Exception e){
+        } catch (Exception ignored){
 
         }
     }

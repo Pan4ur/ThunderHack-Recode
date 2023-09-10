@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventCollision;
 
-@Mixin(BlockCollisionSpliterator.class)
+@Mixin(value = BlockCollisionSpliterator.class, priority = 1100)
 public class MixinBlockCollisionSpliterator {
     @Redirect(method = "computeNext", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;getCollisionShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;"))
     private VoxelShape computeNextHook(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
