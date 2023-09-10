@@ -3,7 +3,6 @@ package thunder.hack.gui.clickui.impl;
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.Animation;
@@ -51,7 +50,7 @@ public class ParentElement extends AbstractElement {
         
 
 
-        FontRenderers.getRenderer().drawString(matrixStack, setting.getName() ,(int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy() )), (int) (y + height / 2 - 2), new Color(-1).getRGB());
+        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName() ,(int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy() )), (int) (y + height / 2 - 2), new Color(-1).getRGB());
     }
 
 

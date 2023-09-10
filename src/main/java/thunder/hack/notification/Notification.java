@@ -33,7 +33,7 @@ public class Notification {
         this.type = type;
         timer = new Timer();
         timer.reset();
-        width = FontRenderers.getRenderer().getStringWidth(message) + 38;
+        width = FontRenderers.getSettingsRenderer().getStringWidth(message) + 38;
         animationX = width;
         posY = mc.getWindow().getScaledHeight() - height;
     }

@@ -168,7 +168,7 @@ public class ModuleButton extends AbstractButton {
         }
 
         if (this.binding) {
-            FontRenderers.getRenderer2().drawString(context.getMatrices(), "PressKey", (int) ix, (int) iy + 3 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "PressKey", (int) ix, (int) iy + 3 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
         } else {
             FontRenderers.sf_medium.drawString(context.getMatrices(), module.getName(), (int) ix + 2, (int) iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
         }

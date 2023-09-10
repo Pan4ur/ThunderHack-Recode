@@ -16,6 +16,6 @@ public class TPSCounter extends HudElement {
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
         String str = "TPS " + Formatting.WHITE + (ThunderHack.serverManager.getTPS());
-        FontRenderers.getRenderer2().drawString(context.getMatrices(), str, getPosX(), getPosY(), HudEditor.getColor(1).getRGB(), false);
+        FontRenderers.getModulesRenderer().drawString(context.getMatrices(), str, getPosX(), getPosY(), HudEditor.getColor(1).getRGB(), false);
     }
 }

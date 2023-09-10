@@ -1,10 +1,12 @@
 package thunder.hack.gui.font;
 
 
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.Objects;
 
 public class FontRenderers {
     public static FontAdapter settings;
@@ -21,19 +23,19 @@ public class FontRenderers {
     public static FontAdapter sf_medium_mini;
 
 
-    public static FontAdapter getRenderer() {
+    public static FontAdapter getSettingsRenderer() {
         return settings;
     }
 
-    public static FontAdapter getRenderer2() {
+    public static FontAdapter getModulesRenderer() {
         return modules;
     }
-
-    public static RendererFontAdapter createDefault(float size,String name) throws IOException, FontFormatException {
-        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, ThunderHack.class.getClassLoader().getResourceAsStream(name + ".ttf")).deriveFont(Font.PLAIN, size * 2), size * 2);
+    
+    public static @NotNull RendererFontAdapter createDefault(float size, String name) throws IOException, FontFormatException {
+        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("/fonts/" + name + ".ttf"))).deriveFont(Font.PLAIN, size * 2), size * 2);
     }
-
-    public static RendererFontAdapter createIcons(float size) throws IOException, FontFormatException {
-        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, ThunderHack.class.getClassLoader().getResourceAsStream("icons.ttf")).deriveFont(Font.PLAIN, size * 2), size * 2);
+    
+    public static @NotNull RendererFontAdapter createIcons(float size) throws IOException, FontFormatException {
+        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("/fonts/icons.ttf"))).deriveFont(Font.PLAIN, size * 2), size * 2);
     }
 }

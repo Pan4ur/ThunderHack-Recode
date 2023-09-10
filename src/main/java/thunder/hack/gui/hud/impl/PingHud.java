@@ -1,6 +1,5 @@
 package thunder.hack.gui.hud.impl;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.util.Formatting;
@@ -16,7 +15,7 @@ public class PingHud extends HudElement {
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        FontRenderers.getRenderer2().drawString(context.getMatrices(), "Ping " + Formatting.WHITE + getPing(), getPosX(), getPosY(), HudEditor.getColor(1).getRGB(), false);
+        FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "Ping " + Formatting.WHITE + getPing(), getPosX(), getPosY(), HudEditor.getColor(1).getRGB(), false);
     }
 
     public static int getPing() {

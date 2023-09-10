@@ -57,7 +57,7 @@ public class HoleFill extends Module {
     private final Setting<Float> rangeToTarget = new Setting<>("Range To Target", 2f, 1f, 5f, v -> mode.getValue() == Mode.Target);
     private final Setting<Boolean> autoDisable = new Setting<>("Auto Disable", false);
     private final Setting<InventoryUtility.SwitchMode> switchMode = new Setting<>("Switch Mode", InventoryUtility.SwitchMode.Packet);
-    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.All);
+    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Packet);
 
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
     private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Fade).withParent(renderCategory);

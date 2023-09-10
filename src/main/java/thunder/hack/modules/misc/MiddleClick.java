@@ -1,6 +1,7 @@
 package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.item.ItemStack;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
@@ -17,18 +18,21 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
+import thunder.hack.utility.player.PlayerUtility;
 
 public class MiddleClick extends Module {
-    public Setting<Boolean> friend = new Setting<>("Friend", true);
-    public Setting<Boolean> ep = new Setting<>("Pearl", true);
-    public Setting<Boolean> silentPearl = new Setting<>("SilentPearl", true, v -> ep.getValue());
-    public Setting<Boolean> inventoryPearl = new Setting<>("InventoryPearl", true, v -> ep.getValue());
-    public Setting<Integer> swapDelay = new Setting<>("SwapDelay", 100, 0, 1000, v -> !silentPearl.getValue());
-    public Setting<Boolean> xp = new Setting<>("XP", false);
-    public Setting<Boolean> feetExp = new Setting<>("FeetXP", false, v -> xp.getValue());
-    public Setting<Boolean> silent = new Setting<>("SilentXP", true, v -> xp.getValue());
+    private final Setting<Boolean> friend = new Setting<>("Friend", true);
+    private final Setting<Boolean> ep = new Setting<>("Pearl", true);
+    private final Setting<Boolean> silentPearl = new Setting<>("SilentPearl", true, v -> ep.getValue());
+    private final Setting<Boolean> inventoryPearl = new Setting<>("InventoryPearl", true, v -> ep.getValue());
+    private final Setting<Integer> swapDelay = new Setting<>("SwapDelay", 100, 0, 1000, v -> !silentPearl.getValue());
+    private final Setting<Boolean> xp = new Setting<>("XP", false);
+    private final Setting<Boolean> noWasteXp = new Setting<>("Anti Waste", true, v -> xp.getValue());
+    private final Setting<Integer> durability = new Setting<>("Stop On", 90, v -> xp.getValue());
+    private final Setting<Boolean> feetExp = new Setting<>("FeetXP", false, v -> xp.getValue());
+    private final Setting<Boolean> silent = new Setting<>("SilentXP", true, v -> xp.getValue());
 
-    public Timer timer = new Timer();
+    private final Timer timer = new Timer();
     private int lastSlot = -1;
 
 
@@ -49,6 +53,7 @@ public class MiddleClick extends Module {
         if (ep.getValue()) {
             sb.append(" EP ");
         }
+
         return sb.toString();
     }
 
@@ -91,7 +96,7 @@ public class MiddleClick extends Module {
                         sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
                     }
                 } else {
-                    int epSlot = InventoryUtility.getItemSlot(Items.ENDER_PEARL);
+                    int epSlot = InventoryUtility.findItemInHotBar(Items.ENDER_PEARL).slot();
                     if (epSlot != -1) {
                         sendPacket(new PickFromInventoryC2SPacket(epSlot));
                         mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
@@ -106,7 +111,7 @@ public class MiddleClick extends Module {
                         new PearlThread(mc.player, epSlot, originalSlot, swapDelay.getValue(), false).start();
                     }
                 } else {
-                    int epSlot = InventoryUtility.getItemSlot(Items.ENDER_PEARL);
+                    int epSlot = InventoryUtility.findItemInHotBar(Items.ENDER_PEARL).slot();
                     int currentItem = mc.player.getInventory().selectedSlot;
                     if (epSlot != -1) {
                         sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
@@ -118,28 +123,41 @@ public class MiddleClick extends Module {
         }
 
         if (xp.getValue()) {
+            if (noWasteXp.getValue() && !needXp()) return;
             if (mc.options.pickItemKey.isPressed()) {
                 int slot = findXPSlot();
                 if (slot != -1) {
                     int lastSlot = mc.player.getInventory().selectedSlot;
                     mc.player.getInventory().selectedSlot = slot;
-                    mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
+                    sendPacket(new UpdateSelectedSlotC2SPacket(slot));
                     mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
                     if (silent.getValue()) {
                         mc.player.getInventory().selectedSlot = lastSlot;
-                        mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(lastSlot));
+                        sendPacket(new UpdateSelectedSlotC2SPacket(lastSlot));
                     }
                 } else if (lastSlot != -1) {
                     mc.player.getInventory().selectedSlot = lastSlot;
-                    mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(lastSlot));
+                    sendPacket(new UpdateSelectedSlotC2SPacket(lastSlot));
                     lastSlot = -1;
                 }
             } else if (lastSlot != -1) {
                 mc.player.getInventory().selectedSlot = lastSlot;
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(lastSlot));
+                sendPacket(new UpdateSelectedSlotC2SPacket(lastSlot));
                 lastSlot = -1;
             }
         }
+    }
+
+    private boolean needXp() {
+        if (mc.player == null) return false;
+
+        for (ItemStack stack : mc.player.getArmorItems()) {
+            if (PlayerUtility.calculatePercentage(stack) < durability.getValue()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private int findEPSlot() {
@@ -179,8 +197,8 @@ public class MiddleClick extends Module {
         int epSlot, originalSlot, delay;
         boolean inv;
 
-        public PearlThread(ClientPlayerEntity entityPlayerSP, int epSlot, int originalSlot, int delay, boolean inventory) {
-            this.player = entityPlayerSP;
+        public PearlThread(ClientPlayerEntity entityPlayer, int epSlot, int originalSlot, int delay, boolean inventory) {
+            this.player = entityPlayer;
             this.epSlot = epSlot;
             this.originalSlot = originalSlot;
             this.delay = delay;
@@ -192,7 +210,7 @@ public class MiddleClick extends Module {
         public void run() {
             if (!inv) {
                 mc.player.getInventory().selectedSlot = epSlot;
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(epSlot));
+                sendPacket(new UpdateSelectedSlotC2SPacket(epSlot));
 
                 try {
                     sleep(delay);
@@ -203,8 +221,9 @@ public class MiddleClick extends Module {
                     sleep(delay);
                 } catch (Exception ignored) {
                 }
+
                 mc.player.getInventory().selectedSlot = originalSlot;
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
+                sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
                 super.run();
             } else {
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, epSlot, originalSlot, SlotActionType.SWAP, mc.player);
@@ -221,6 +240,7 @@ public class MiddleClick extends Module {
                 } catch (Exception ignored) {
                 }
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, epSlot, originalSlot, SlotActionType.SWAP, mc.player);
+
                 super.run();
             }
         }

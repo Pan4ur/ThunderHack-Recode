@@ -20,7 +20,7 @@ public class StringElement extends AbstractElement {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context,mouseX,mouseY,delta);
-        FontRenderers.getRenderer().drawString(context.getMatrices(),listening ? currentString + (mc.player.age % 5 == 0 ? "_" : "") : (String)setting.getValue(), x + 6,y + height / 2,-1);
+        FontRenderers.getSettingsRenderer().drawString(context.getMatrices(),listening ? currentString + (mc.player.age % 5 == 0 ? "_" : "") : (String)setting.getValue(), x + 6,y + height / 2,-1);
     }
 
     @Override

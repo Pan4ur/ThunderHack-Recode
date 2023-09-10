@@ -3,6 +3,7 @@ package thunder.hack.utility.player;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PendingUpdateManager;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
@@ -52,7 +53,12 @@ public final class PlayerUtility {
         return p;
     }
 
-    static PendingUpdateManager getUpdateManager(ClientWorld world) {
+    public static float calculatePercentage(@NotNull ItemStack stack) {
+        float durability = stack.getMaxDamage() - stack.getDamage();
+        return (durability / (float) stack.getMaxDamage()) * 100F;
+    }
+
+    private static PendingUpdateManager getUpdateManager(ClientWorld world) {
         return ((IClientWorldMixin) world).acquirePendingUpdateManager();
     }
 }

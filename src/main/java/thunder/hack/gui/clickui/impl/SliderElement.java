@@ -54,12 +54,12 @@ public class SliderElement extends AbstractElement {
 		FontRenderers.settings.drawString(matrixStack, setting.getName(), (int) (x + 6), (int) (y + 4), new Color(-1).getRGB());
 
 		if(!listening) {
-			FontRenderers.getRenderer().drawString(matrixStack,value, (int) (x + width - 6 - FontRenderers.getRenderer().getStringWidth(value)), (int) y + 5, new Color(-1).getRGB());
+			FontRenderers.getSettingsRenderer().drawString(matrixStack,value, (int) (x + width - 6 - FontRenderers.getSettingsRenderer().getStringWidth(value)), (int) y + 5, new Color(-1).getRGB());
 		} else {
 			if(Objects.equals(Stringnumber, "")) {
-				FontRenderers.getRenderer().drawString(matrixStack,"...", (int) (x + width - 6 - FontRenderers.getRenderer().getStringWidth(value)), (int) y + 5, new Color(-1).getRGB());
+				FontRenderers.getSettingsRenderer().drawString(matrixStack,"...", (int) (x + width - 6 - FontRenderers.getSettingsRenderer().getStringWidth(value)), (int) y + 5, new Color(-1).getRGB());
 			} else {
-				FontRenderers.getRenderer().drawString(matrixStack,Stringnumber, (int) (x + width - 6 - FontRenderers.getRenderer().getStringWidth(value)), (int) y + 5, new Color(-1).getRGB());
+				FontRenderers.getSettingsRenderer().drawString(matrixStack,Stringnumber, (int) (x + width - 6 - FontRenderers.getSettingsRenderer().getStringWidth(value)), (int) y + 5, new Color(-1).getRGB());
 			}
 		}
 

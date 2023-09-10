@@ -328,18 +328,18 @@ public class RadarRewrite extends HudElement {
             switch (stage1) {
                 case 0 -> {
                     // FontRender.drawCentString3("W", (x + cos), (y + sin), -1);
-                    FontRenderers.getRenderer2().drawString(matrices, "W", (x + cos), (y + sin), -1);
+                    FontRenderers.getModulesRenderer().drawString(matrices, "W", (x + cos), (y + sin), -1);
                 }
                 case 1 -> {
-                    FontRenderers.getRenderer2().drawString(matrices, "N", (x + cos), (y + sin), -1);
+                    FontRenderers.getModulesRenderer().drawString(matrices, "N", (x + cos), (y + sin), -1);
 
                 }
                 case 2 -> {
-                    FontRenderers.getRenderer2().drawString(matrices, "E", (x + cos), (y + sin), -1);
+                    FontRenderers.getModulesRenderer().drawString(matrices, "E", (x + cos), (y + sin), -1);
 
                 }
                 case 3 -> {
-                    FontRenderers.getRenderer2().drawString(matrices, "S", (x + cos), (y + sin), -1);
+                    FontRenderers.getModulesRenderer().drawString(matrices, "S", (x + cos), (y + sin), -1);
                 }
             }
         }

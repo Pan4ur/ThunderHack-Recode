@@ -290,7 +290,7 @@ public class ModuleManager {
     }
 
     public void sortModules() {
-        sortedModules = getEnabledModules().stream().filter(Module::isDrawn).sorted(Comparator.comparing(module -> FontRenderers.getRenderer().getStringWidth(module.getFullArrayString()) * -1)).collect(Collectors.toList());
+        sortedModules = getEnabledModules().stream().filter(Module::isDrawn).sorted(Comparator.comparing(module -> FontRenderers.getSettingsRenderer().getStringWidth(module.getFullArrayString()) * -1)).collect(Collectors.toList());
     }
 
     public void onLogout() {

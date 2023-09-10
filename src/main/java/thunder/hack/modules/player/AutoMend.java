@@ -9,6 +9,7 @@ import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.RotationAxis;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.EventKeyPress;
 import thunder.hack.events.impl.EventKeyRelease;
 import thunder.hack.events.impl.EventMouse;
@@ -22,6 +23,7 @@ import thunder.hack.utility.Timer;
 
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterDynamicAnimation;
@@ -32,13 +34,9 @@ import java.util.List;
 
 
 public class AutoMend extends Module {
-    public AutoMend() {
-        super("AutoMend", Category.PLAYER);
-    }
-
-    public Setting<Bind> key = new Setting<>("Key", new Bind(-1, false, false));
-    private final Setting<Integer> dlay = new Setting<>("ThrowDelay", 100, 0, 100);
-    private final Setting<Integer> armdlay = new Setting<>("ArmorDelay", 100, 0, 1000);
+    private final Setting<Bind> key = new Setting<>("Key", new Bind(-1, false, false));
+    private final Setting<Integer> delay = new Setting<>("Throw Delay", 100, 0, 100);
+    private final Setting<Integer> armorDelay = new Setting<>("Armor Delay", 100, 0, 1000);
 
     private final Timer timer = new Timer();
     private final Timer timer2 = new Timer();
@@ -46,28 +44,30 @@ public class AutoMend extends Module {
     public static BetterDynamicAnimation mendAnimation = new BetterDynamicAnimation();
     boolean need_repair = false;
 
+    public AutoMend() {
+        super("AutoMend", Category.PLAYER);
+    }
 
     @EventHandler
-    public void onKeyPress(EventKeyPress e) {
+    public void onKeyPress(@NotNull EventKeyPress e) {
         if (e.getKey() == key.getValue().getKey()) keyState = true;
     }
 
 
     @EventHandler
-    public void onKeyRelease(EventKeyRelease e) {
+    public void onKeyRelease(@NotNull EventKeyRelease e) {
         if (e.getKey() == key.getValue().getKey()) keyState = false;
     }
 
 
     @EventHandler
-    public void onMouse(EventMouse e) {
+    public void onMouse(@NotNull EventMouse e) {
         if (e.getButton() == key.getValue().getKey()) keyState = e.getAction() == 1;
     }
 
 
     @EventHandler
     public void onSync(EventSync e) {
-
         if (keyState && mc.currentScreen == null) {
             mc.player.setPitch(90);
             SearchInvResult xpResult = InventoryUtility.getXp();
@@ -80,7 +80,7 @@ public class AutoMend extends Module {
             need_repair = false;
 
             for (ItemStack stack : stacks)
-                if (calculatePercentage(stack) < 100) {
+                if (PlayerUtility.calculatePercentage(stack) < 100) {
                     need_repair = true;
                     break;
                 }
@@ -91,19 +91,19 @@ public class AutoMend extends Module {
                 xpResult.switchTo();
 
                 final ItemStack helm = mc.player.getInventory().getStack(36);
-                if (!helm.isEmpty() && calculatePercentage(helm) >= 100) takeOffSlot(8);
+                if (!helm.isEmpty() && PlayerUtility.calculatePercentage(helm) >= 100) takeOffSlot(8);
 
                 final ItemStack chest = mc.player.getInventory().getStack(37);
-                if (!chest.isEmpty() && calculatePercentage(chest) >= 100) takeOffSlot(7);
+                if (!chest.isEmpty() && PlayerUtility.calculatePercentage(chest) >= 100) takeOffSlot(7);
 
                 final ItemStack legging = mc.player.getInventory().getStack(38);
-                if (!legging.isEmpty() && calculatePercentage(legging) >= 100) takeOffSlot(6);
+                if (!legging.isEmpty() && PlayerUtility.calculatePercentage(legging) >= 100) takeOffSlot(6);
 
                 final ItemStack feet = mc.player.getInventory().getStack(39);
-                if (!feet.isEmpty() && calculatePercentage(feet) >= 100) takeOffSlot(5);
+                if (!feet.isEmpty() && PlayerUtility.calculatePercentage(feet) >= 100) takeOffSlot(5);
 
                 if (xpResult.found()) {
-                    if (timer.passedMs(dlay.getValue())) {
+                    if (timer.passedMs(delay.getValue())) {
                         mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
                         timer.reset();
                     }
@@ -126,7 +126,7 @@ public class AutoMend extends Module {
             int totalarmor = 0;
             for (ItemStack armor : stacks) {
                 if (armor.isEmpty()) continue;
-                totalarmor += (int) calculatePercentage(armor);
+                totalarmor += (int) PlayerUtility.calculatePercentage(armor);
                 multiplier++;
             }
             float progress = (float) totalarmor / (100f * multiplier);
@@ -190,7 +190,7 @@ public class AutoMend extends Module {
     }
 
     private void takeOffSlot(int slot) {
-        if (!timer2.passedMs(armdlay.getValue())) return;
+        if (!timer2.passedMs(armorDelay.getValue())) return;
 
         int target = -1;
         for (int i = 0; i < 36; i++) {
@@ -206,10 +206,4 @@ public class AutoMend extends Module {
             timer2.reset();
         }
     }
-
-    public static float calculatePercentage(ItemStack stack) {
-        float durability = stack.getMaxDamage() - stack.getDamage();
-        return (durability / (float) stack.getMaxDamage()) * 100F;
-    }
-
 }
