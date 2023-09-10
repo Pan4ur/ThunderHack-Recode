@@ -310,7 +310,7 @@ public class PistonAura extends Module {
             mc.player.setPitch(angle[1]);
         }
         postAction = () -> {
-            InteractionUtility.placeBlock(firePos, false, interact.getValue(), placeMode.getValue(), InventoryUtility.getItemSlotHotbar(Items.FLINT_AND_STEEL), false, false);
+            InteractionUtility.placeBlock(firePos, false, interact.getValue(), placeMode.getValue(), InventoryUtility.findItemInHotBar(Items.FLINT_AND_STEEL).slot(), false, false);
             stage = Stage.Crystal;
         };
     }

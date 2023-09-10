@@ -250,7 +250,7 @@ public class ThunderGui2 extends Screen {
         context.getMatrices().push();
         context.getMatrices().scale(0.85f,0.85f,1);
         context.getMatrices().translate((main_posX + 10) / 0.85, (main_posY + 15)/ 0.85,0);
-        FontRenderers.thglitch.drawString(context.getMatrices(),"THUNDERHACK", 0, 0, ThunderHackGui.getColorByTheme(2).getRGB());
+        FontRenderers.thGlitch.drawString(context.getMatrices(),"THUNDERHACK", 0, 0, ThunderHackGui.getColorByTheme(2).getRGB());
         context.getMatrices().translate(-(main_posX + 10)/ 0.85, -(main_posY + 15)/ 0.85,0);
         context.getMatrices().scale(1,1,1);
         context.getMatrices().pop();

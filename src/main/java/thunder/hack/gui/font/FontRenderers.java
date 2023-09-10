@@ -15,7 +15,7 @@ public class FontRenderers {
     public static FontAdapter icons;
     public static FontAdapter mid_icons;
     public static FontAdapter big_icons;
-    public static FontAdapter thglitch;
+    public static FontAdapter thGlitch;
     public static FontAdapter monsterrat;
     public static FontAdapter sf_bold;
     public static FontAdapter sf_bold_mini;

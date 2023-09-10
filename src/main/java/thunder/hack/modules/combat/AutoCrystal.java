@@ -235,7 +235,7 @@ public class AutoCrystal extends Module {
         if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL && autoGapple.getValue()
                 && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() == Items.END_CRYSTAL) {
             SearchInvResult result = InventoryUtility.findItemInHotBar(Items.ENCHANTED_GOLDEN_APPLE);
-            result.switchIfFound();
+            result.switchTo();
         }
 
         if (invTimer++ >= 20) {
@@ -407,7 +407,7 @@ public class AutoCrystal extends Module {
         if (checkAttackedBefore(crystal.getId())) return;
 
         int prevSlot = -1;
-        SearchInvResult swordResult = InventoryUtility.getSwordHotbar();
+        SearchInvResult swordResult = InventoryUtility.getSwordHotBar();
         SearchInvResult swordResultInv = InventoryUtility.getSword();
         if (antiWeakness.getValue() != Switch.NONE) {
             if (weaknessEffect != null && (strengthEffect == null || strengthEffect.getAmplifier() < weaknessEffect.getAmplifier())) {
@@ -465,7 +465,7 @@ public class AutoCrystal extends Module {
     private int doAntiWeakness(SearchInvResult swordResult, SearchInvResult swordResultInv, @NotNull Setting<Switch> antiWeakness) {
         int prevSlot = mc.player.getInventory().selectedSlot;
         if (antiWeakness.getValue() != Switch.INVENTORY) {
-            swordResult.switchIfFound();
+            swordResult.switchTo();
         } else if (swordResultInv.found()) {
             prevSlot = swordResultInv.slot();
             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);

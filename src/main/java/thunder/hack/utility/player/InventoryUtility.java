@@ -1,7 +1,6 @@
 package thunder.hack.utility.player;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.SkullBlock;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.*;
@@ -158,7 +157,7 @@ public final class InventoryUtility {
         return new SearchInvResult(slot, true, mc.player.getInventory().getStack(slot));
     }
 
-    public static SearchInvResult getSwordHotbar() {
+    public static SearchInvResult getSwordHotBar() {
         if (mc.player == null) return SearchInvResult.notFound();
 
         int slot = -1;
@@ -216,12 +215,6 @@ public final class InventoryUtility {
                 return i;
             }
         }
-        return -1;
-    }
-
-    @Deprecated
-    public static int getItemSlotHotbar(Item input) {
-        for (int i = 0; i < 9; i++) if (mc.player.getInventory().getStack(i).getItem() == input) return i;
         return -1;
     }
 
@@ -299,6 +292,7 @@ public final class InventoryUtility {
     }
 
     public static void switchTo(int slot, InventoryUtility.SwitchMode switchMode) {
+        if (mc.player == null || mc.getNetworkHandler() == null) return;
         if (switchMode == InventoryUtility.SwitchMode.Normal || switchMode == InventoryUtility.SwitchMode.All) {
             mc.player.getInventory().selectedSlot = slot;
         }

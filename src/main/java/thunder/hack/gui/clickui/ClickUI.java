@@ -100,8 +100,8 @@ public class ClickUI extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 
         if (ThunderHack.oldVersion && (mc.player.age % 20) > 10) {
-            FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f + 1, mc.getWindow().getScaledHeight() - 39 - FontRenderers.thglitch.getFontHeight("New version is available!"), Color.BLACK.getRGB());
-            FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() - 40 - FontRenderers.thglitch.getFontHeight("New version is available!"), -1);
+            FontRenderers.thGlitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f + 1, mc.getWindow().getScaledHeight() - 39 - FontRenderers.thGlitch.getFontHeight("New version is available!"), Color.BLACK.getRGB());
+            FontRenderers.thGlitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() - 40 - FontRenderers.thGlitch.getFontHeight("New version is available!"), -1);
         }
 
         if (Module.fullNullCheck()) renderBackground(context);
