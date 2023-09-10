@@ -67,7 +67,7 @@ public class HudEditorGui extends Screen {
             int i = 0;
             for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
                 if (!category.getName().contains("HUD")) continue;
-                ModuleWindow window = new ModuleWindow(category.getName(), ThunderHack.moduleManager.getModulesByCategory(category), i, x + offset, y, 108, windowHeight);
+                ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category), i, x + offset, y, 108, windowHeight);
                 window.setOpen(true);
                 windows.add(window);
                 offset += 110;

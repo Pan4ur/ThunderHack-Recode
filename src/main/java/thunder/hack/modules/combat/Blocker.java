@@ -90,7 +90,7 @@ public class Blocker extends Module {
             tickCounter = 0;
         }
 
-        SearchInvResult searchResult = InventoryUtility.findInInventory(stack -> {
+        SearchInvResult searchResult = InventoryUtility.findInHotBar(stack -> {
             Item item = stack.getItem();
             return item == Items.OBSIDIAN || item == Items.ENDER_CHEST
                     || (newBlocks.getValue() && (item == Items.CRYING_OBSIDIAN || item == Items.NETHERITE_BLOCK || (allowAnchors.getValue() && item == Items.RESPAWN_ANCHOR)));

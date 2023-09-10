@@ -41,7 +41,7 @@ public class MacroManager {
         try {
             new File("ThunderHackRecode").mkdirs();
             file.createNewFile();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {

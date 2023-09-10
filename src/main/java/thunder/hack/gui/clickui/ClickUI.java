@@ -27,7 +27,7 @@ import static thunder.hack.modules.Module.mc;
 
 public class ClickUI extends Screen {
 
-    private final List<AbstractWindow> windows;
+    public static List<AbstractWindow> windows;
 
     private Identifier pic1 = new Identifier("textures/pic1.png");
     private Identifier pic2 = new Identifier("textures/pic2.png");
@@ -75,7 +75,7 @@ public class ClickUI extends Screen {
             int i = 0;
             for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
                 if (category.getName().contains("HUD")) continue;
-                ModuleWindow window = new ModuleWindow(category.getName(), ThunderHack.moduleManager.getModulesByCategory(category), i, x + offset, y, 108, windowHeight);
+                ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category), i, x + offset, y, 108, windowHeight);
                 window.setOpen(true);
                 windows.add(window);
                 offset += 110;

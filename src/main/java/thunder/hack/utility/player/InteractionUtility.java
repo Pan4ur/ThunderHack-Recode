@@ -135,10 +135,12 @@ public final class InteractionUtility {
 
     @Nullable
     public static BlockHitResult getPlaceResult(BlockPos bp, Interact interact, boolean ignoreEntities) {
-        if (!ignoreEntities)
-            for (Entity entity : mc.world.getNonSpectatingEntities(Entity.class, new Box(bp)))
+        if (!ignoreEntities) {
+            ArrayList<Entity> cache = new ArrayList<>(mc.world.getNonSpectatingEntities(Entity.class, new Box(bp)));
+            for (Entity entity : cache)
                 if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity))
                     return null;
+        }
         if (!mc.world.getBlockState(bp).isReplaceable()) return null;
         ArrayList<BlockPosWithFacing> supports = getSupportBlocks(bp);
         for (BlockPosWithFacing support : supports) {
@@ -220,20 +222,20 @@ public final class InteractionUtility {
         double upDelta = getEyesPos(mc.player).y - (positionVector.add(0, 0.5, 0).y);
         double downDelta = getEyesPos(mc.player).y - (positionVector.add(0, -0.5, 0).y);
 
-        if (westDelta > 0 && !mc.world.isAir(bp.west())) visibleSides.add(Direction.EAST);
-        if (westDelta < 0 && !mc.world.isAir(bp.east())) visibleSides.add(Direction.WEST);
-        if (eastDelta < 0 && !mc.world.isAir(bp.east())) visibleSides.add(Direction.WEST);
-        if (eastDelta > 0 && !mc.world.isAir(bp.west())) visibleSides.add(Direction.EAST);
+        if (westDelta > 0 && !mc.world.getBlockState(bp.west()).isReplaceable()) visibleSides.add(Direction.EAST);
+        if (westDelta < 0 && !mc.world.getBlockState(bp.east()).isReplaceable()) visibleSides.add(Direction.WEST);
+        if (eastDelta < 0 && !mc.world.getBlockState(bp.east()).isReplaceable()) visibleSides.add(Direction.WEST);
+        if (eastDelta > 0 && !mc.world.getBlockState(bp.west()).isReplaceable()) visibleSides.add(Direction.EAST);
 
-        if (northDelta > 0 && !mc.world.isAir(bp.north())) visibleSides.add(Direction.SOUTH);
-        if (northDelta < 0 && !mc.world.isAir(bp.south())) visibleSides.add(Direction.NORTH);
-        if (southDelta < 0 && !mc.world.isAir(bp.south())) visibleSides.add(Direction.NORTH);
-        if (southDelta > 0 && !mc.world.isAir(bp.north())) visibleSides.add(Direction.SOUTH);
+        if (northDelta > 0 && !mc.world.getBlockState(bp.north()).isReplaceable()) visibleSides.add(Direction.SOUTH);
+        if (northDelta < 0 && !mc.world.getBlockState(bp.south()).isReplaceable()) visibleSides.add(Direction.NORTH);
+        if (southDelta < 0 && !mc.world.getBlockState(bp.south()).isReplaceable()) visibleSides.add(Direction.NORTH);
+        if (southDelta > 0 && !mc.world.getBlockState(bp.north()).isReplaceable()) visibleSides.add(Direction.SOUTH);
 
-        if (upDelta > 0 && !mc.world.isAir(bp.down())) visibleSides.add(Direction.UP);
-        if (upDelta < 0 && !mc.world.isAir(bp.up())) visibleSides.add(Direction.DOWN);
-        if (downDelta < 0 && !mc.world.isAir(bp.up())) visibleSides.add(Direction.DOWN);
-        if (downDelta > 0 && !mc.world.isAir(bp.down())) visibleSides.add(Direction.UP);
+        if (upDelta > 0 && !mc.world.getBlockState(bp.down()).isReplaceable()) visibleSides.add(Direction.UP);
+        if (upDelta < 0 && !mc.world.getBlockState(bp.up()).isReplaceable()) visibleSides.add(Direction.DOWN);
+        if (downDelta < 0 && !mc.world.getBlockState(bp.up()).isReplaceable()) visibleSides.add(Direction.DOWN);
+        if (downDelta > 0 && !mc.world.getBlockState(bp.down()).isReplaceable()) visibleSides.add(Direction.UP);
 
         return visibleSides;
     }

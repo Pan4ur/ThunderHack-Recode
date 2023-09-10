@@ -15,14 +15,15 @@ public class ClickGui extends Module {
 
     private static ClickGui INSTANCE = new ClickGui();
 
-    public Setting<scrollModeEn> scrollMode = new Setting<>("ScrollMode", scrollModeEn.New);
+    public Setting<scrollModeEn> scrollMode = new Setting<>("ScrollMode", scrollModeEn.Old);
     public Setting<Integer> catHeight = new Setting<Integer>("CategoryHeight", 300, 100, 720);
 
     private Setting<colorModeEn> colorMode = new Setting<>("ColorMode", colorModeEn.Static);
-    public final Setting<ColorSetting> hcolor1 = new Setting<>("MainColor", new ColorSetting(-6974059));
-    public final Setting<ColorSetting> acolor = new Setting<>("MainColor2", new ColorSetting(-8365735));
-    public final Setting<ColorSetting> plateColor = new Setting<>("PlateColor", new ColorSetting(-14474718));
-    public final Setting<ColorSetting> catColor = new Setting<>("CategoryColor", new ColorSetting(-15395563));
+    public final Setting<ColorSetting> hcolor1 = new Setting<>("Main", new ColorSetting(-6974059));
+    public final Setting<ColorSetting> acolor = new Setting<>("Main2", new ColorSetting(-8365735));
+    public final Setting<ColorSetting> plateColor = new Setting<>("Plate", new ColorSetting(-14474718));
+    public final Setting<ColorSetting> disabled = new Setting<>("Disabled", new ColorSetting(new Color(24, 24, 27)));
+    public final Setting<ColorSetting> catColor = new Setting<>("Category", new ColorSetting(-15395563));
     public Setting<Integer> colorSpeed = new Setting<Integer>("ColorSpeed", 18, 2, 54);
     public Setting<Boolean> showBinds = new Setting<>("ShowBinds", true);
     public Setting<Boolean> msaa = new Setting<>("MSAA", true);

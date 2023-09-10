@@ -26,13 +26,13 @@ public class WaterMark extends HudElement {
         super.onRender2D(context);
         if (mode.getValue() == Mode.Big) {
             FontRenderers.thglitch.drawString(context.getMatrices(), "THUNDERHACK", getPosX() + 5.5, getPosY() + 5, -1);
-            FontRenderers.monsterrat.drawGradientString(context.getMatrices(), "recode", getPosX() + 35.5f, getPosY() + 21f, 1);
+            FontRenderers.monsterrat.drawGradientString(context.getMatrices(), "recode", getPosX() + 35.5f, getPosY() + 21f, 1, true);
         } else if (mode.getValue() == Mode.Small) {
             String info = Formatting.GRAY + "| " + Formatting.RESET + mc.getSession().getUsername() + Formatting.GRAY + " | " + Formatting.RESET + PingHud.getPing() + " ms" + Formatting.GRAY + " | " + Formatting.RESET + (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address);
-            FontRenderers.sf_bold.drawGradientString(context.getMatrices(), "ThunderHack ", getPosX() + 2, getPosY() + 3, 10);
+            FontRenderers.sf_bold.drawGradientString(context.getMatrices(), "ThunderHack ", getPosX() + 2, getPosY() + 3, 10, true);
             FontRenderers.sf_bold.drawString(context.getMatrices(), info, getPosX() + 2 + FontRenderers.sf_bold.getStringWidth("ThunderHack "), getPosY() + 3, HudEditor.textColor.getValue().getColor());
         } else {
-            FontRenderers.monsterrat.drawGradientString(context.getMatrices(), "ThunderHack v" + ThunderHack.version, getPosX() + 5.5f, getPosY() + 5, 10);
+            FontRenderers.monsterrat.drawGradientString(context.getMatrices(), "ThunderHack v" + ThunderHack.version, getPosX() + 5.5f, getPosY() + 5, 10, true);
         }
     }
 

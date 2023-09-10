@@ -128,9 +128,9 @@ public class EbatteSratte extends Module {
                     }
 
                     words = spamList;
-                } catch (Exception e) {}
+                } catch (Exception ignored) {}
             }).start();
-        } catch (IOException e) {}
+        } catch (IOException ignored) {}
     }
 
     @Override

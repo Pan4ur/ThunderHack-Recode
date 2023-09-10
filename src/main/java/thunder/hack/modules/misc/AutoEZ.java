@@ -87,9 +87,9 @@ public class AutoEZ extends Module {
                     }
 
                     EZWORDS = spamList;
-                } catch (Exception e) {}
+                } catch (Exception ignored) {}
             }).start();
-        } catch (IOException e) {}
+        } catch (IOException ignored) {}
     }
 
     @Override

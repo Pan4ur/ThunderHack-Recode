@@ -1,6 +1,7 @@
 package thunder.hack.gui.thundergui.components;
 
 
+import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui2;
 import thunder.hack.setting.Setting;
@@ -107,6 +108,9 @@ public class SliderComponent extends SettingElement {
                 this.dragging = true;
             }
         }
+
+        if(listening)
+            ThunderHack.currentKeyListener = ThunderHack.KeyListening.Sliders;
     }
 
     @Override
@@ -123,6 +127,9 @@ public class SliderComponent extends SettingElement {
 
     @Override
     public void keyTyped(String typedChar, int keyCode) {
+        if(ThunderHack.currentKeyListener != ThunderHack.KeyListening.Sliders)
+            return;
+
         if (this.listening) {
             switch (keyCode) {
                 case 1: {

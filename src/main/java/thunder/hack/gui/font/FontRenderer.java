@@ -2,26 +2,22 @@ package thunder.hack.gui.font;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.DrawContext;
-import thunder.hack.modules.client.HudEditor;
-import thunder.hack.utility.math.MathUtility;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Util;
 import org.joml.Matrix4f;
+import thunder.hack.modules.client.ClickGui;
+import thunder.hack.modules.client.HudEditor;
+import thunder.hack.utility.math.MathUtility;
 
-import java.awt.Font;
+import java.awt.*;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.lwjgl.opengl.GL11.*;
+
 public class FontRenderer {
     static final Map<Character, Integer> colorMap = Util.make(() -> {
         Map<Character, Integer> ci = new HashMap<>();
@@ -82,7 +78,7 @@ public class FontRenderer {
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-       // RenderSystem.enableTexture();
+        // RenderSystem.enableTexture();
         RenderSystem.disableCull();
         GlStateManager._texParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -112,7 +108,7 @@ public class FontRenderer {
         matrices.pop();
     }
 
-    public void drawGradientString(MatrixStack matrices, String s, float x, float y, int offset) {
+    public void drawGradientString(MatrixStack matrices, String s, float x, float y, int offset, boolean hud) {
         float roundedX = (float) MathUtility.roundToDecimal(x, 1);
         float roundedY = (float) MathUtility.roundToDecimal(y, 1);
         float r1 = 0;
@@ -133,6 +129,8 @@ public class FontRenderer {
         int num = 0;
         for (char c : s.toCharArray()) {
             int color = HudEditor.getColor(num * offset).getRGB();
+            if (!hud) color = ClickGui.getInstance().getColor(num * offset).getRGB();
+
             r1 = (float) (color >> 16 & 255) / 255.0F;
             g1 = (float) (color >> 8 & 255) / 255.0F;
             b1 = (float) (color & 255) / 255.0F;

@@ -167,9 +167,9 @@ public final class ExplosionUtility {
                     }
                 }
             }
-        } catch (Exception e){
-
+        } catch (Exception ignored){
         }
+
         return 0f;
     }
 

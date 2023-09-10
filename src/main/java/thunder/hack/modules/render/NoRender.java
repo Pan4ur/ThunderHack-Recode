@@ -1,14 +1,6 @@
 package thunder.hack.modules.render;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
-import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.ParticleEvent;
-import thunder.hack.modules.Module;
-import thunder.hack.notification.Notification;
-import thunder.hack.setting.Setting;
 import net.minecraft.client.particle.CampfireSmokeParticle;
 import net.minecraft.client.particle.ElderGuardianAppearanceParticle;
 import net.minecraft.client.particle.ExplosionLargeParticle;
@@ -20,6 +12,17 @@ import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.thrown.EggEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
+import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
+import thunder.hack.ThunderHack;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.ParticleEvent;
+import thunder.hack.modules.Module;
+import thunder.hack.notification.Notification;
+import thunder.hack.setting.Setting;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NoRender extends Module {
     public NoRender() {
@@ -56,81 +59,86 @@ public class NoRender extends Module {
 
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.Receive e){
-        if(e.getPacket() instanceof TitleS2CPacket && antiTitle.getValue()){
+    public void onPacketReceive(PacketEvent.Receive e) {
+        if (e.getPacket() instanceof TitleS2CPacket && antiTitle.getValue()) {
             e.cancel();
         }
     }
 
     @EventHandler
-    public void onSync(EventSync e){
-        for(Entity ent : mc.world.getEntities()){
-            if(ent instanceof PotionEntity){
+    public void onSync(EventSync e) {
+        for (Entity ent : mc.world.getEntities()) {
+            if (ent instanceof PotionEntity) {
                 potionCouter++;
-                if(potions.getValue())
+                if (potions.getValue())
                     mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
             }
-            if(ent instanceof ExperienceBottleEntity){
+            if (ent instanceof ExperienceBottleEntity) {
                 xpCounter++;
-                if(xp.getValue())
+                if (xp.getValue())
                     mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
             }
-            if(ent instanceof EndCrystalEntity){
-                if(crystals.getValue())
+            if (ent instanceof EndCrystalEntity) {
+                if (crystals.getValue())
                     mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
             }
-            if(ent instanceof ArrowEntity){
+            if (ent instanceof ArrowEntity) {
                 arrowCounter++;
-                if(arrows.getValue())
+                if (arrows.getValue())
                     mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
             }
-            if(ent instanceof EggEntity){
-                if(eggs.getValue())
+            if (ent instanceof EggEntity) {
+                if (eggs.getValue())
                     mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
             }
-            if(ent instanceof ItemEntity){
+            if (ent instanceof ItemEntity) {
                 itemsCounter++;
-                if(items.getValue())
+                if (items.getValue())
                     mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
             }
         }
-        if(auto.getValue()){
+        if (auto.getValue()) {
+            if (arrowCounter > 64)
+                ThunderHack.notificationManager.publicity("NoRender", "Превышен лимит стрел! Удаляю...", 3, Notification.Type.SUCCESS);
+
+            if (itemsCounter > 16)
+                ThunderHack.notificationManager.publicity("NoRender", "Превышен лимит вещей! Удаляю...", 3, Notification.Type.SUCCESS);
+
+            if (xpCounter > 16)
+                ThunderHack.notificationManager.publicity("NoRender", "Превышен лимит пузырьков опыта! Удаляю...", 3, Notification.Type.SUCCESS);
+
+            if (potionCouter > 8)
+                ThunderHack.notificationManager.publicity("NoRender", "Превышен лимит зелий! Удаляю...", 3, Notification.Type.SUCCESS);
 
 
-            if(arrowCounter > 64){
-                ThunderHack.notificationManager.publicity("NoRender","Превышен лимит стрел! Удаляю...",3, Notification.Type.SUCCESS);
-            }
-            if(itemsCounter > 16){
-                ThunderHack.notificationManager.publicity("NoRender","Превышен лимит вещей! Удаляю...",3, Notification.Type.SUCCESS);
-            }
-            if(xpCounter > 16){
-                ThunderHack.notificationManager.publicity("NoRender","Превышен лимит пузырьков опыта! Удаляю...",3, Notification.Type.SUCCESS);
-            }
-            if(potionCouter > 8){
-                ThunderHack.notificationManager.publicity("NoRender","Превышен лимит зелий! Удаляю...",3, Notification.Type.SUCCESS);
+            List<Integer> toRemove = new ArrayList<>();
+
+            for (Entity ent : mc.world.getEntities()) {
+                if (ent instanceof ArrowEntity && arrowCounter > 64) {
+                    toRemove.add(ent.getId());
+                }
+                if (ent instanceof ItemEntity && itemsCounter > 16) {
+                    toRemove.add(ent.getId());
+                }
+                if (ent instanceof ExperienceBottleEntity && xpCounter > 16) {
+                    toRemove.add(ent.getId());
+                }
+                if (ent instanceof PotionEntity && potionCouter > 8) {
+                    toRemove.add(ent.getId());
+                }
             }
 
-            for(Entity ent : mc.world.getEntities()){
-                if(ent instanceof ArrowEntity && arrowCounter > 64){
-                    mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
-                }
-                if(ent instanceof ItemEntity && itemsCounter > 16){
-                    mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
-                }
-                if(ent instanceof ExperienceBottleEntity && xpCounter > 16){
-                    mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
-                }
-                if(ent instanceof PotionEntity && potionCouter > 8){
-                    mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
-                }
+            try {
+                toRemove.forEach(id -> mc.world.removeEntity(id, Entity.RemovalReason.KILLED));
+            } catch (Exception ignored) {
             }
         }
+
         arrowCounter = 0;
         itemsCounter = 0;
         potionCouter = 0;
         xpCounter = 0;
     }
-
 
 
     @EventHandler

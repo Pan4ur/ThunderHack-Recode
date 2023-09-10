@@ -2,10 +2,10 @@ package thunder.hack.gui.font;
 
 import net.minecraft.client.util.math.MatrixStack;
 
-import java.awt.Font;
+import java.awt.*;
 
 
-public class RendererFontAdapter implements FontAdapter{
+public class RendererFontAdapter implements FontAdapter {
 
     public FontRenderer getFontRenderer() {
         return fontRenderer;
@@ -16,7 +16,7 @@ public class RendererFontAdapter implements FontAdapter{
     final float si;
 
     public RendererFontAdapter(Font fnt, float si) {
-        this.fontRenderer = new FontRenderer(fnt , (int) si);
+        this.fontRenderer = new FontRenderer(fnt, (int) si);
         this.si = si;
     }
 
@@ -49,8 +49,8 @@ public class RendererFontAdapter implements FontAdapter{
     }
 
     @Override
-    public void drawGradientString(MatrixStack matrices, String s, float x, float y, int offset)  {
-        fontRenderer.drawGradientString(matrices, s, x, y - 3, offset);
+    public void drawGradientString(MatrixStack matrices, String s, float x, float y, int offset, boolean hud) {
+        fontRenderer.drawGradientString(matrices, s, x, y - 3, offset, hud);
     }
 
     @Override

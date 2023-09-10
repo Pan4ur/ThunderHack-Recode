@@ -20,16 +20,15 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModuleButton {
+public class ModuleButton extends AbstractButton {
     private final List<AbstractElement> elements;
-    private final Module module;
-    private double x, y, width, height;
-    private double offsetY, scrollAnimation, scrollPosY, prevY;
+    public final Module module;
     private boolean open;
     private boolean hovered;
 
     private boolean binding = false;
     private boolean holdbind = false;
+    private boolean isVisible = false;
 
     public ModuleButton(Module module) {
         this.module = module;
@@ -63,15 +62,17 @@ public class ModuleButton {
         double ix = x + 5;
         double iy = y + height / 2 - (6 / 2f);
 
+        if(isHiden()) return;
+
         offset_animation = CheckBoxElement.fast(1f, 0f, 15f);
         if (target_offset != offsetY) {
             offsetY = interp(offsetY, target_offset, offset_animation);
         } else offset_animation = 1f;
 
         if (isOpen()) {
-            int sbg = new Color(24, 24, 27).getRGB();
+            Color sbg = ClickGui.getInstance().disabled.getValue().getColorObject();
 
-            Render2DEngine.drawRoundDoubleColor(context.getMatrices(), x + 4, y + height - 16, (width - 8), (height) + getElementsHeight(), 3f, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(200), 0.8f) : new Color(sbg), module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(0), 0.8f) : new Color(sbg));
+            Render2DEngine.drawRoundDoubleColor(context.getMatrices(), x + 4, y + height - 16, (width - 8), (height) + getElementsHeight(), 3f, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(200), 0.8f) : sbg, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(0), 0.8f) : sbg);
 
             if (isOpen()) {
                 Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle(x, y + height - 15, (width) + x + 6, (height) + y + getElementsHeight()));
@@ -91,7 +92,7 @@ public class ModuleButton {
                 element.setHeight(15);
 
                 if (element instanceof ColorPickerElement)
-                    element.setHeight(56);
+                    element.setHeight(66);
 
                 else if (element instanceof SliderElement)
                     element.setHeight(18);
@@ -174,6 +175,8 @@ public class ModuleButton {
     }
 
     public void mouseClicked(int mouseX, int mouseY, int button) {
+        if(isHiden()) return;
+
         if (this.binding) {
             if (mouseX > x + 52 && mouseX < x + 80 && mouseY > y && mouseY < y + height) {
                 holdbind = false;
@@ -214,6 +217,8 @@ public class ModuleButton {
 
 
     public void keyTyped(int keyCode) {
+        if(isHiden()) return;
+
         if (isOpen()) {
             for (AbstractElement element : elements)
                 element.keyTyped(keyCode);
@@ -256,7 +261,6 @@ public class ModuleButton {
 
     float category_animation = 0f;
     float offset_animation = 0f;
-    float hover_animation = 0f;
 
     public double interp(double d, double d2, float d3) {
         return d2 + (d - d2) * d3;
@@ -269,43 +273,4 @@ public class ModuleButton {
     public void setOpen(boolean open) {
         this.open = open;
     }
-
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double y) {
-        this.y = y + offsetY;
-    }
-
-    public double getWidth() {
-        return width;
-    }
-
-    public void setWidth(double width) {
-        this.width = width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public void setHeight(double height) {
-        this.height = height;
-    }
-
-    private double target_offset;
-
-    public void setOffsetY(double offsetY) {
-        this.target_offset = offsetY;
-    }
-
 }

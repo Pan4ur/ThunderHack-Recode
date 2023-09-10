@@ -203,7 +203,7 @@ public class ElytraPlus extends Module {
     @EventHandler
     public void onPacketSend(PacketEvent.SendPost event) {
         if (fullNullCheck()) return;
-        if (event.getPacket() instanceof ClientCommandC2SPacket command)
+        if (event.getPacket() instanceof ClientCommandC2SPacket command && mode.getValue() == Mode.FireWork)
             if (command.getMode() == ClientCommandC2SPacket.Mode.START_FALL_FLYING)
                 doFireWork(false);
     }
@@ -238,7 +238,8 @@ public class ElytraPlus extends Module {
         if (strictTimer.passedMs(1500) && !strictTimer.passedMs(2000)) ThunderHack.TICK_TIMER = 1.0f;
 
         if (!mc.player.isFallFlying()) {
-            if (hasTouchedGround && BoostTimer.getValue() && !mc.player.isOnGround()) ThunderHack.TICK_TIMER = 0.3f;
+            if (hasTouchedGround && BoostTimer.getValue() && !mc.player.isOnGround() && mc.player.fallDistance > 0)
+                ThunderHack.TICK_TIMER = 0.3f;
 
             if (!mc.player.isOnGround() && instantFly.getValue() && mc.player.getVelocity().getY() < 0D) {
                 if (!instantFlyTimer.passedMs((long) (1000 * timeout.getValue()))) return;
@@ -406,73 +407,34 @@ public class ElytraPlus extends Module {
     private void doControl(EventMove e) {
         Vec3d lookVec = mc.player.getRotationVec(mc.getTickDelta());
 
-        float pitch = mc.player.getPitch() * 0.017453292F;
-
         double lookDist = Math.sqrt(lookVec.x * lookVec.x + lookVec.z * lookVec.z);
         double motionDist = Math.sqrt(e.get_x() * e.get_x() + e.get_z() * e.get_z());
-        double lookVecDist = lookVec.length();
 
-        float cosPitch = MathHelper.cos(pitch);
-        cosPitch = (float) ((double) cosPitch * (double) cosPitch * Math.min(1.0D, lookVecDist / 0.4D));
-
-        if (mode.getValue() != Mode.Control) {
-            e.set_y(e.get_y() + (-0.08D + (double) cosPitch * (0.06D / downFactor.getValue())));
+        if (mc.options.sneakKey.isPressed()) {
+            e.set_y(-sneakDownSpeed.getValue());
+        } else if (!mc.options.jumpKey.isPressed()) {
+            e.set_y(-0.00000000000003D * downFactor.getValue());
         }
 
-        if (mode.getValue() == Mode.Control) {
-            if (mc.options.sneakKey.isPressed()) {
-                e.set_y(-sneakDownSpeed.getValue());
-            } else if (!mc.options.jumpKey.isPressed()) {
-                e.set_y(-0.00000000000003D * downFactor.getValue());
-            }
-        } else if (mode.getValue() != Mode.Control && e.get_y() < 0.0D && lookDist > 0.0D) {
-            double downSpeed = e.get_y() * -0.1D * (double) cosPitch;
-            e.set_y(e.get_y() + downSpeed);
-            e.set_x(e.get_x() + (lookVec.x * downSpeed / lookDist) * factor.getValue());
-            e.set_z(e.get_z() + (lookVec.z * downSpeed / lookDist) * factor.getValue());
-            mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
-
-        }
-
-        if (pitch < 0.0F && mode.getValue() != Mode.Control) {
-            double rawUpSpeed = motionDist * (double) (-MathHelper.sin(pitch)) * 0.04D;
-            e.set_y(e.get_y() + rawUpSpeed * 3.2D * upFactor.getValue());
-            e.set_x(e.get_x() - lookVec.x * rawUpSpeed / lookDist);
-            e.set_z(e.get_z() - lookVec.z * rawUpSpeed / lookDist);
-            mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
-        } else if (mode.getValue() == Mode.Control && mc.options.jumpKey.isPressed()) {
-            if (motionDist > upFactor.getValue() / upFactor.getMax()) {
-                double rawUpSpeed = motionDist * 0.01325D;
-                e.set_y(e.get_y() + rawUpSpeed * 3.2D);
-                e.set_x(e.get_x() - lookVec.x * rawUpSpeed / lookDist);
-                e.set_z(e.get_z() - lookVec.z * rawUpSpeed / lookDist);
-                mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
-            } else {
-                double[] dir = MovementUtility.forward(speed.getValue());
-                e.set_x(dir[0]);
-                e.set_z(dir[1]);
-                mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
-            }
+        if (mc.options.jumpKey.isPressed()) {
+            e.set_y(upFactor.getValue());
         }
 
         if (lookDist > 0.0D) {
             e.set_x(e.get_x() + (lookVec.x / lookDist * motionDist - e.get_x()) * 0.1D);
             e.set_z(e.get_z() + (lookVec.z / lookDist * motionDist - e.get_z()) * 0.1D);
-            mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
         }
 
-        if (mode.getValue() == Mode.Control && !mc.options.jumpKey.isPressed()) {
+        if (!mc.options.jumpKey.isPressed()) {
             double[] dir = MovementUtility.forward(speed.getValue());
             e.set_x(dir[0]);
             e.set_z(dir[1]);
-            mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
         }
 
         if (!noDrag.getValue()) {
             e.set_y(e.get_y() * 0.9900000095367432D);
             e.set_x(e.get_x() * 0.9800000190734863D);
             e.set_z(e.get_z() * 0.9900000095367432D);
-            mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
         }
 
         double finalDist = Math.sqrt(e.get_x() * e.get_x() + e.get_z() * e.get_z());
@@ -480,7 +442,6 @@ public class ElytraPlus extends Module {
         if (speedLimit.getValue() && finalDist > maxSpeed.getValue()) {
             e.set_x(e.get_x() * maxSpeed.getValue() / finalDist);
             e.set_z(e.get_z() * maxSpeed.getValue() / finalDist);
-            mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
         }
     }
 
@@ -507,7 +468,7 @@ public class ElytraPlus extends Module {
     }
 
     private void noFireworks() {
-        disable("Нету феерверков в инвентаре!");
+        disable("Нету фейерверков в инвентаре!");
         flying = false;
         ticksInAir = 0;
     }

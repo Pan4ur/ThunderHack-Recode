@@ -544,14 +544,17 @@ public class ThunderGui2 extends Screen {
 
         if (isHoveringItem(main_posX + 250, main_posY + 15, 140, 10, (float)mouseX, (float)mouseY) && currentMode == CurrentMode.Modules) {
             searching = true;
+            ThunderHack.currentKeyListener = ThunderHack.KeyListening.ThunderGui;
         }
 
         if (isHoveringItem(main_posX + 250, main_posY + 15, 110, 10,(float) mouseX, (float)mouseY) && currentMode == CurrentMode.CfgManager) {
             listening_config = true;
+            ThunderHack.currentKeyListener = ThunderHack.KeyListening.ThunderGui;
         }
 
         if (isHoveringItem(main_posX + 250, main_posY + 15, 110, 10, (float)mouseX,(float) mouseY) && currentMode == CurrentMode.FriendManager) {
             listening_friend = true;
+            ThunderHack.currentKeyListener = ThunderHack.KeyListening.ThunderGui;
         }
 
         if (isHoveringItem(main_posX, main_posY + main_height - 6, main_width, 12,(float) mouseX,(float) mouseY)) {
@@ -582,9 +585,7 @@ public class ThunderGui2 extends Screen {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         try {
             keyTyped(GLFW.glfwGetKeyName(keyCode, scanCode), keyCode);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        } catch (IOException ignored) {}
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             super.keyPressed(keyCode, scanCode, modifiers);
             return true;
@@ -593,6 +594,10 @@ public class ThunderGui2 extends Screen {
     }
 
     public void keyTyped(String typedChar, int keyCode) throws IOException {
+
+        if(ThunderHack.currentKeyListener != ThunderHack.KeyListening.ThunderGui)
+            return;
+
         if (keyCode == 1) {
             open_direction = false;
             searching = false;
@@ -658,16 +663,16 @@ public class ThunderGui2 extends Screen {
                 friend_string = "";
             }
             switch (keyCode) {
-                case GLFW.GLFW_KEY_ESCAPE: {
+                case GLFW.GLFW_KEY_ESCAPE -> {
                     friend_string = "Add friend";
                     listening_friend = false;
                     return;
                 }
-                case GLFW.GLFW_KEY_BACKSPACE: {
+                case GLFW.GLFW_KEY_BACKSPACE -> {
                     friend_string = (removeLastChar(friend_string));
                     return;
                 }
-                case GLFW.GLFW_KEY_ENTER: {
+                case GLFW.GLFW_KEY_ENTER -> {
                     if (!friend_string.equals("Add friend") && !config_string.equals("")) {
                         ThunderHack.friendManager.addFriend(friend_string);
                         friend_string = "Add friend";

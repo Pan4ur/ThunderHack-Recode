@@ -1,6 +1,7 @@
 package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
+import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
@@ -24,11 +25,17 @@ public class StringElement extends AbstractElement {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (hovered && button == 0) listening = !listening;
+        if (hovered && button == 0)
+            listening = !listening;
+        if(listening)
+            ThunderHack.currentKeyListener = ThunderHack.KeyListening.Strings;
     }
 
     @Override
     public void keyTyped(int keyCode) {
+        if(ThunderHack.currentKeyListener != ThunderHack.KeyListening.Strings)
+            return;
+
         if (listening) {
             switch (keyCode) {
                 case GLFW.GLFW_KEY_ESCAPE -> {

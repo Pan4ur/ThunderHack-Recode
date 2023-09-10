@@ -185,7 +185,7 @@ public class Search extends Module {
                     } else {
                         Thread.yield();
                     }
-                } catch (Exception exception) {}
+                } catch (Exception ignored) {}
             }
         }
     }
