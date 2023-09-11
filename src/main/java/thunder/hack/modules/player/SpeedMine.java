@@ -56,6 +56,7 @@ public class SpeedMine extends Module {
     private Direction mineFacing;
     private int mineBreaks;
     public static float progress;
+    public boolean worth = false;
 
     public SpeedMine() {
         super("SpeedMine", "SpeedMine", Category.PLAYER);
@@ -117,7 +118,7 @@ public class SpeedMine extends Module {
         }
     }
 
-    public boolean isWorth() {
+    public boolean checkWorth() {
         if (isDisabled()
                 || mode.getValue() != Mode.Packet
                 || minePosition == null
@@ -137,6 +138,10 @@ public class SpeedMine extends Module {
         }
 
         return false;
+    }
+
+    public boolean isWorth() {
+        return worth;
     }
 
     public float getBlockStrength(BlockState state, BlockPos position) {
@@ -210,6 +215,8 @@ public class SpeedMine extends Module {
     }
 
     public void onRender3D(MatrixStack stack) {
+        worth = checkWorth();
+
         if (mode.getValue() == Mode.Packet) {
             if (minePosition != null && !mc.world.isAir(minePosition)) {
                 switch (renderMode.getValue()) {

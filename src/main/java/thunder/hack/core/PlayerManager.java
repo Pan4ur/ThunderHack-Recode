@@ -6,6 +6,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.math.Vec2f;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
@@ -33,6 +34,7 @@ public class PlayerManager {
     public float lastYaw, lastPitch;
     public double currentPlayerSpeed;
     public int ticksElytraFlying;
+    public int serverSideSlot = 0;
 
     // Мы можем зайти в инвентарь, и сервер этого не узнает, пока мы не начнем кликать
     // Юзать везде!
@@ -69,6 +71,9 @@ public class PlayerManager {
     public void onSyncWithServer(PacketEvent.Send event) {
         if(event.getPacket() instanceof ClickSlotC2SPacket){
             inInventory = true;
+        }
+        if(event.getPacket() instanceof UpdateSelectedSlotC2SPacket slot){
+            serverSideSlot = slot.getSelectedSlot();
         }
         if(event.getPacket() instanceof CloseHandledScreenC2SPacket){
             inInventory = false;

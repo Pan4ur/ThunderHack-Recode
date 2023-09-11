@@ -62,6 +62,7 @@ public class AutoSex extends Module {
         if (messageTimer.passedMs(msgDelay.getValue() * 1000)) {
             List<String> messages = Arrays.stream(mode.getValue() == SexMode.Active ? ACTIVE_MESSAGES : PASSIVE_MESSAGES).toList();
             mc.getNetworkHandler().sendChatCommand("msg " + target.getName().getString() + " " + messages.get((int) (Math.random() * messages.size())));
+            messageTimer.reset();
         }
 
         super.onUpdate();

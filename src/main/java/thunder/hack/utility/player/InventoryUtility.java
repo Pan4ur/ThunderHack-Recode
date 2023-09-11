@@ -6,6 +6,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
 
 import java.util.Arrays;
 import java.util.List;
@@ -293,6 +294,8 @@ public final class InventoryUtility {
 
     public static void switchTo(int slot, InventoryUtility.SwitchMode switchMode) {
         if (mc.player == null || mc.getNetworkHandler() == null) return;
+        if (mc.player.getInventory().selectedSlot == slot && ThunderHack.playerManager.serverSideSlot == slot) return;
+
         if (switchMode == InventoryUtility.SwitchMode.Normal || switchMode == InventoryUtility.SwitchMode.All) {
             mc.player.getInventory().selectedSlot = slot;
         }
