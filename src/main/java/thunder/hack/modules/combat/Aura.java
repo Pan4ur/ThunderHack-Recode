@@ -30,6 +30,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.core.ModuleManager;
@@ -37,8 +38,6 @@ import thunder.hack.core.PlayerManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.MainSettings;
-import thunder.hack.modules.movement.Speed;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
@@ -54,6 +53,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.minecraft.util.UseAction.BLOCK;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class Aura extends Module {
     public static final Setting<Float> attackRange = new Setting<>("Attack Range", 3.1f, 1f, 7.0f);
@@ -154,8 +154,8 @@ public class Aura extends Module {
     }
 
     public void auraLogic() {
-        if (target != null && target instanceof LivingEntity && (((LivingEntity) target).getHealth() <= 0 || ((LivingEntity) target).isDead())) {
-            if (MainSettings.language.getValue() == MainSettings.Language.RU) {
+        if (target instanceof LivingEntity && (((LivingEntity) target).getHealth() <= 0 || ((LivingEntity) target).isDead())) {
+            if (isRu()) {
                 ThunderHack.notificationManager.publicity("Aura", "Цель успешно нейтрализована!", 3, Notification.Type.SUCCESS);
             } else {
                 ThunderHack.notificationManager.publicity("Aura", "Target successfully neutralized!", 3, Notification.Type.SUCCESS);
@@ -195,8 +195,8 @@ public class Aura extends Module {
             if (!(target instanceof PlayerEntity) || !(((PlayerEntity) target).isUsingItem() && ((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD) || ignoreShield.getValue()) {
                 Criticals.cancelCrit = true;
 
-                if (ThunderHack.moduleManager.get(Criticals.class).isEnabled())
-                    ThunderHack.moduleManager.get(Criticals.class).doCrit();
+                if (ModuleManager.criticals.isEnabled())
+                    ModuleManager.criticals.doCrit();
 
                 mc.interactionManager.attackEntity(mc.player, target);
                 Criticals.cancelCrit = false;
@@ -232,10 +232,10 @@ public class Aura extends Module {
     }
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.Receive e) {
+    public void onPacketReceive(PacketEvent.@NotNull Receive e) {
         if (e.getPacket() instanceof EntityStatusS2CPacket status) {
             if (status.getStatus() == 30 && status.getEntity(mc.world) != null && target != null && status.getEntity(mc.world) == target)
-                ThunderHack.notificationManager.publicity("Aura", MainSettings.isRu() ? ("Успешно сломали щит игроку " + target.getName().getString()) : ("Succesfully destroyed " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("Aura", isRu() ? ("Успешно сломали щит игроку " + target.getName().getString()) : ("Succesfully destroyed " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
         }
         /*
         if(e.getPacket() instanceof EntityTrackerUpdateS2CPacket attrib){
@@ -282,7 +282,7 @@ public class Aura extends Module {
             if (minCPS.getValue() > maxCPS.getValue()) minCPS.setValue(maxCPS.getValue());
         }
 
-        if (!mc.options.jumpKey.isPressed() && (!ThunderHack.moduleManager.get(TargetStrafe.class).isEnabled() && !ThunderHack.moduleManager.get(Speed.class).isEnabled()))
+        if (!mc.options.jumpKey.isPressed() && (!ModuleManager.targetStrafe.isEnabled() && !ModuleManager.speed.isEnabled()))
             return true;
 
         if (mc.player.isInLava()) return true;
@@ -486,7 +486,7 @@ public class Aura extends Module {
                             // Скипаем, если вне досягаемости
                             if (distanceFromHead(v1) > attackRange.getPow2Value()) continue;
 
-                            float[] rotation = ThunderHack.playerManager.calcAngle(v1);
+                            float[] rotation = PlayerManager.calcAngle(v1);
                             if (ThunderHack.playerManager.checkRtx(rotation[0], rotation[1], attackRange.getValue(), false, rayTrace.getValue())) {
                                 // Наводимся, если видим эту точку
                                 rotationPoint = new Vec3d(x1, y1, z1);
@@ -510,7 +510,9 @@ public class Aura extends Module {
                 return ent;
             }
             if (skipEntity(ent)) continue;
-            first_stage.add((LivingEntity) ent);
+            if (ent instanceof LivingEntity) {
+                first_stage.add((LivingEntity) ent);
+            }
         }
 
         switch (sort.getValue()) {
@@ -551,7 +553,7 @@ public class Aura extends Module {
         return distanceFromHead(entity.getPos()) > getRotateDistance() * getRotateDistance();
     }
 
-    private float getFOVAngle(LivingEntity e) {
+    private float getFOVAngle(@NotNull LivingEntity e) {
         double difX = e.getX() - mc.player.getPos().x;
         double difZ = e.getZ() - mc.player.getPos().z;
         float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);
@@ -559,7 +561,7 @@ public class Aura extends Module {
         return (float) Math.abs(yaw - plYaw);
     }
 
-    private float distanceFromHead(Vec3d vec) {
+    private float distanceFromHead(@NotNull Vec3d vec) {
         double d0 = vec.x - mc.player.getX();
         double d1 = vec.z - mc.player.getZ();
         double d2 = vec.y - (mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose()));

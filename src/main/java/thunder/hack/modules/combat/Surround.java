@@ -6,8 +6,11 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.PickaxeItem;
+import net.minecraft.item.SwordItem;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
@@ -24,51 +27,54 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-
 public class Surround extends Module {
-
-    public Surround() {
-        super("Surround", "окружает тебя обсой", Category.COMBAT);
-    }
-
-    private final Setting<PlaceTiming> placeTiming = new Setting<>("PlaceTiming", PlaceTiming.Default);
-    private final Setting<Integer> blocksPerTick = new Setting<>("Block/Tick", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
+    private final Setting<PlaceTiming> placeTiming = new Setting<>("Place Timing", PlaceTiming.Default);
+    private final Setting<Integer> actionDelay = new Setting<>("Delay", 1, 25, 1000, v-> placeTiming.getValue() == PlaceTiming.Default);
+    private final Setting<Integer> blocksPerTick = new Setting<>("Block Per Action", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10, v -> placeTiming.getValue() != PlaceTiming.Sequential);
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
-    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("PlaceMode", InteractionUtility.PlaceMode.Normal);
+    private final Setting<InteractMode> placeMode = new Setting<>("Place Mode", InteractMode.Normal);
+    private final Setting<InventoryUtility.SwitchMode> switchMode = new Setting<>("Switch Mode", InventoryUtility.SwitchMode.All);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
-    private final Setting<Boolean> breakCrystal = new Setting<>("BreakCrystal", true);
-    private final Setting<Boolean> breakCrystalTick = new Setting<>("BreakCrystalTick", true);
-    private final Setting<Boolean> breakCrystalPacket = new Setting<>("BreakCrystalPacket", true);
     private final Setting<Boolean> center = new Setting<>("Center", true);
+
+    private final Setting<Parent> crystalBreaker = new Setting<>("Crystal Breaker", new Parent(false, 0));
+    private final Setting<Boolean> breakCrystal = new Setting<>("Break Crystal", true).withParent(crystalBreaker);
+    private final Setting<Boolean> alwaysBreak = new Setting<>("Always Break", true).withParent(crystalBreaker);
+    private final Setting<InteractMode> breakCrystalMode = new Setting<>("Break Crystal Mode", InteractMode.Normal).withParent(crystalBreaker);
+    private final Setting<Boolean> antiWeakness = new Setting<>("Anti Weakness", false).withParent(crystalBreaker);
+
     private final Setting<Parent> blocks = new Setting<>("Blocks", new Parent(false, 0));
     private final Setting<Boolean> obsidian = new Setting<>("Obsidian", true).withParent(blocks);
     private final Setting<Boolean> anchor = new Setting<>("Anchor", false).withParent(blocks);
-    private final Setting<Boolean> enderChest = new Setting<>("EnderChest", true).withParent(blocks);
+    private final Setting<Boolean> enderChest = new Setting<>("Ender Chest", true).withParent(blocks);
     private final Setting<Boolean> netherite = new Setting<>("Netherite", false).withParent(blocks);
-    private final Setting<Boolean> cryingObsidian = new Setting<>("CryingObsidian", true).withParent(blocks);
+    private final Setting<Boolean> cryingObsidian = new Setting<>("Crying Obsidian", true).withParent(blocks);
     private final Setting<Boolean> dirt = new Setting<>("Dirt", false).withParent(blocks);
-    private final Setting<Parent> autoDisable = new Setting<>("AutoDisable", new Parent(false, 0));
-    private final Setting<Boolean> onYChange = new Setting<>("onYChange", true).withParent(autoDisable);
-    private final Setting<Boolean> onTp = new Setting<>("onTp", true).withParent(autoDisable);
+
+    private final Setting<Parent> autoDisable = new Setting<>("Auto Disable", new Parent(false, 0));
+    private final Setting<Boolean> onYChange = new Setting<>("On Y Change", true).withParent(autoDisable);
+    private final Setting<Boolean> onTp = new Setting<>("On Tp", true).withParent(autoDisable);
+
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
     private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Fade).withParent(renderCategory);
     private final Setting<ColorSetting> renderFillColor = new Setting<>("Render Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
@@ -86,14 +92,25 @@ public class Surround extends Module {
         Decrease
     }
 
+    private enum InteractMode {
+        Packet,
+        Normal,
+        All
+    }
+
+    public static final Timer inactivityTimer = new Timer();
     private final List<BlockPos> sequentialBlocks = new ArrayList<>();
     private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
+
     private int delay;
     private BlockPos currentPlacePos = null;
     private double prevY;
 
-    public static final Timer inactivityTimer = new Timer();
+    public Surround() {
+        super("Surround", "Окружает тебя блоками", Category.COMBAT);
+    }
 
+    @Override
     public void onRender3D(MatrixStack stack) {
         renderPoses.forEach((pos, time) -> {
             if (System.currentTimeMillis() - time > 500) {
@@ -118,9 +135,46 @@ public class Surround extends Module {
 
     @Override
     public void onEnable() {
+        if (mc.player == null) return;
+
         currentPlacePos = null;
         delay = 0;
         prevY = mc.player.getY();
+
+        new Thread(() -> {
+            while (isEnabled()) {
+                try {
+                    Thread.sleep(actionDelay.getValue());
+                } catch (InterruptedException ignored) {
+                }
+
+                if (placeTiming.getValue() == PlaceTiming.Default) {
+                    InventoryUtility.saveSlot();
+                    int placed = 0;
+                    while (placed < blocksPerTick.getValue()) {
+                        BlockPos targetBlock = getSequentialPos();
+                        if (targetBlock == null)
+                            break;
+                        currentPlacePos = targetBlock;
+
+                        if (breakCrystal.getValue() && alwaysBreak.getValue()) {
+                            Entity entity = getEntity(targetBlock);
+                            if (entity != null)
+                                removeCrystal(entity);
+                        }
+
+                        if (placeBlock(targetBlock)) {
+                            placed++;
+                            delay = placeDelay.getValue();
+                            inactivityTimer.reset();
+                            renderPoses.put(targetBlock, System.currentTimeMillis());
+                        } else break;
+                    }
+                    InventoryUtility.returnSlot(switchMode.getValue());
+                }
+            }
+        }).start();
+
         if (center.getValue()) {
             mc.player.updatePosition(MathHelper.floor(mc.player.getX()) + 0.5, mc.player.getY(), MathHelper.floor(mc.player.getZ()) + 0.5);
             sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.isOnGround()));
@@ -129,34 +183,18 @@ public class Surround extends Module {
 
     @EventHandler
     public void onEntitySpawn(EventEntitySpawn e) {
-        if (breakCrystal.getValue() && !breakCrystalTick.getValue()) {
+        if (breakCrystal.getValue() && !alwaysBreak.getValue()) {
             Entity entity = getEntity(currentPlacePos);
-
-            if (entity != null) {
-                if (breakCrystalPacket.getValue()) sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
-                else mc.interactionManager.attackEntity(mc.player, entity);
-            }
+            if (entity != null)
+                removeCrystal(entity);
         }
-    }
-
-    public static EndCrystalEntity getEntity(BlockPos blockPos) {
-        if (blockPos == null) return null;
-        return hasEntity(new Box(blockPos), entity -> entity instanceof EndCrystalEntity) ?
-                (EndCrystalEntity) mc.world.getOtherEntities(null, new Box(blockPos), entity -> entity instanceof EndCrystalEntity).get(0) : null;
-    }
-
-    public static boolean hasEntity(Box box, Predicate<Entity> predicate) {
-        try {
-            return !mc.world.getOtherEntities(null, box, predicate).isEmpty();
-        } catch (java.util.ConcurrentModificationException ignored) {
-        }
-
-        return false;
     }
 
     @EventHandler
-    public void onStep(EventSync event) {
-        if(onYChange.getValue() && mc.player.getY() != prevY)
+    public void onSync(EventSync event) {
+        if (mc.player == null) return;
+
+        if (onYChange.getValue() && mc.player.getY() != prevY)
             disable(isRu() ? "Выключен из-за изменения Y!" : "Disabled due to Y change!");
     }
 
@@ -173,62 +211,34 @@ public class Surround extends Module {
         if (getSlot() == -1) disable(isRu() ? "Нет блоков!" : "No blocks!");
 
 
-
         InventoryUtility.saveSlot();
-        if (placeTiming.getValue() == PlaceTiming.Default) {
-            int placed = 0;
-            while (placed < blocksPerTick.getValue()) {
-                BlockPos targetBlock = getSequentialPos();
-                if (targetBlock == null)
-                    break;
-                currentPlacePos = targetBlock;
-
-                if (breakCrystal.getValue() && breakCrystalTick.getValue()) {
-                    Entity entity = getEntity(targetBlock);
-
-                    if (entity != null) {
-                        if (breakCrystalPacket.getValue()) sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
-                        else mc.interactionManager.attackEntity(mc.player, entity);
-                    }
-                }
-
-                if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
-                    placed++;
-                    delay = placeDelay.getValue();
-                    inactivityTimer.reset();
-                    renderPoses.put(targetBlock, System.currentTimeMillis());
-                } else break;
-            }
-        } else if (placeTiming.getValue() == PlaceTiming.Vanilla || placeTiming.getValue() == PlaceTiming.Sequential) {
+        if (placeTiming.getValue() == PlaceTiming.Vanilla || placeTiming.getValue() == PlaceTiming.Sequential) {
             BlockPos targetBlock = getSequentialPos();
             if (targetBlock == null)
                 return;
             currentPlacePos = targetBlock;
 
-            if (breakCrystal.getValue() && breakCrystalTick.getValue()) {
+            if (breakCrystal.getValue() && alwaysBreak.getValue()) {
                 Entity entity = getEntity(targetBlock);
-
-                if (entity != null) {
-                    if (breakCrystalPacket.getValue())
-                        sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
-                    else mc.interactionManager.attackEntity(mc.player, entity);
-                }
+                if (entity != null)
+                    removeCrystal(entity);
             }
 
-            if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
+            if (placeBlock(targetBlock)) {
                 sequentialBlocks.add(targetBlock);
                 delay = placeDelay.getValue();
                 inactivityTimer.reset();
                 renderPoses.put(targetBlock, System.currentTimeMillis());
             }
         }
-        InventoryUtility.returnSlot();
+        InventoryUtility.returnSlot(switchMode.getValue());
     }
 
     @EventHandler
     public void onPacketReceive(PacketEvent.@NotNull Receive e) {
         if (getSlot() == -1) disable(isRu() ? "Нет блоков!" : "No blocks!");
-        if (e.getPacket() instanceof BlockUpdateS2CPacket pac) {
+
+        if (e.getPacket() instanceof BlockUpdateS2CPacket pac && mc.player != null) {
             if (placeTiming.getValue() == PlaceTiming.Sequential && !sequentialBlocks.isEmpty()) {
                 handleSequential(pac.getPos());
             }
@@ -236,7 +246,8 @@ public class Surround extends Module {
                 handleSurroundBreak();
             }
         }
-        if(e.getPacket() instanceof PlayerPositionLookS2CPacket && onTp.getValue())
+
+        if (e.getPacket() instanceof PlayerPositionLookS2CPacket && onTp.getValue())
             disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to teleport!");
     }
 
@@ -244,23 +255,20 @@ public class Surround extends Module {
         BlockPos bp = getSequentialPos();
         if (bp != null) {
             currentPlacePos = bp;
-            if (breakCrystal.getValue() && breakCrystalTick.getValue()) {
+            if (breakCrystal.getValue() && alwaysBreak.getValue()) {
                 Entity entity = getEntity(bp);
-
-                if (entity != null) {
-                    if (breakCrystalPacket.getValue()) sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
-                    else mc.interactionManager.attackEntity(mc.player, entity);
-                }
+                if (entity != null)
+                    removeCrystal(entity);
             }
 
             InventoryUtility.saveSlot();
-            if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
+            if (placeBlock(bp)) {
                 InventoryUtility.returnSlot();
                 inactivityTimer.reset();
                 renderPoses.put(bp, System.currentTimeMillis());
                 return;
             }
-            InventoryUtility.returnSlot();
+            InventoryUtility.returnSlot(switchMode.getValue());
         }
     }
 
@@ -269,69 +277,126 @@ public class Surround extends Module {
             BlockPos bp = getSequentialPos();
             if (bp != null) {
                 currentPlacePos = bp;
-                if (breakCrystal.getValue() && breakCrystalTick.getValue()) {
+                if (breakCrystal.getValue() && alwaysBreak.getValue()) {
                     Entity entity = getEntity(bp);
-
-                    if (entity != null) {
-                        if (breakCrystalPacket.getValue()) sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
-                        else mc.interactionManager.attackEntity(mc.player, entity);
-                    }
+                    if (entity != null)
+                        removeCrystal(entity);
                 }
 
                 InventoryUtility.saveSlot();
-                if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
+                if (placeBlock(bp)) {
                     sequentialBlocks.add(bp);
                     sequentialBlocks.remove(pos);
-                    InventoryUtility.returnSlot();
                     inactivityTimer.reset();
                     renderPoses.put(bp, System.currentTimeMillis());
+                    InventoryUtility.returnSlot(switchMode.getValue());
                     return;
                 }
-                InventoryUtility.returnSlot();
+                InventoryUtility.returnSlot(switchMode.getValue());
             }
         }
     }
 
+    private boolean placeBlock(BlockPos pos) {
+        boolean validInteraction = false;
+
+        if (placeMode.getValue() == InteractMode.Packet || placeMode.getValue() == InteractMode.All) {
+            validInteraction = InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), InteractionUtility.PlaceMode.Packet, getSlot(), false, false);
+        }
+        if (placeMode.getValue() == InteractMode.Normal || placeMode.getValue() == InteractMode.All) {
+            validInteraction = InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), InteractionUtility.PlaceMode.Normal, getSlot(), false, false);
+        }
+
+        return validInteraction;
+    }
+
+    private @Nullable EndCrystalEntity getEntity(BlockPos blockPos) {
+        if (blockPos == null || mc.world == null) return null;
+
+        return hasEntity(new Box(blockPos), entity -> entity instanceof EndCrystalEntity) ?
+                (EndCrystalEntity) mc.world.getOtherEntities(null, new Box(blockPos), entity -> entity instanceof EndCrystalEntity).get(0) : null;
+    }
+
+    private boolean hasEntity(Box box, Predicate<Entity> predicate) {
+        if (mc.world == null) return false;
+
+        try {
+            return !mc.world.getOtherEntities(null, box, predicate).isEmpty();
+        } catch (java.util.ConcurrentModificationException ignored) {
+        }
+
+        return false;
+    }
+
+    private void removeCrystal(Entity entity) {
+        if (mc.player == null || mc.interactionManager == null) return;
+
+        int preSlot = mc.player.getInventory().selectedSlot;
+        if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
+            final SearchInvResult result = InventoryUtility.findInHotBar(stack -> stack.getItem() instanceof SwordItem || stack.getItem() instanceof PickaxeItem);
+            result.switchTo(switchMode.getValue());
+        }
+
+        if (breakCrystalMode.getValue() == InteractMode.Packet || breakCrystalMode.getValue() == InteractMode.All) {
+            sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
+        }
+        if (breakCrystalMode.getValue() == InteractMode.Normal || breakCrystalMode.getValue() == InteractMode.All) {
+            mc.interactionManager.attackEntity(mc.player, entity);
+        }
+
+        if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
+            InventoryUtility.switchTo(preSlot, switchMode.getValue());
+        }
+    }
+
     private @Nullable BlockPos getSequentialPos() {
+        if (mc.player == null || mc.world == null) return null;
+
         for (BlockPos bp : getBlocks()) {
             if (new Box(bp).intersects(mc.player.getBoundingBox())) continue;
             if (InteractionUtility.canPlaceBlock(bp, interact.getValue(), true) && mc.world.getBlockState(bp).isReplaceable()) {
                 return bp;
             }
         }
+
         return null;
     }
 
-    List<BlockPos> getBlocks() {
+    private @NotNull List<BlockPos> getBlocks() {
         BlockPos playerPos = this.getPlayerPos();
-        ArrayList<BlockPos> offsets = new ArrayList<BlockPos>();
-        if (!center.getValue()) {
+        ArrayList<BlockPos> offsets = new ArrayList<>();
+
+        if (!center.getValue() && mc.player != null) {
             int z;
             int x;
             double decimalX = Math.abs(mc.player.getX()) - Math.floor(Math.abs(mc.player.getX()));
             double decimalZ = Math.abs(mc.player.getZ()) - Math.floor(Math.abs(mc.player.getZ()));
-            int lengthXPos = this.calcLength(decimalX, false);
-            int lengthXNeg = this.calcLength(decimalX, true);
-            int lengthZPos = this.calcLength(decimalZ, false);
-            int lengthZNeg = this.calcLength(decimalZ, true);
+            int lengthXPos = calcLength(decimalX, false);
+            int lengthXNeg = calcLength(decimalX, true);
+            int lengthZPos = calcLength(decimalZ, false);
+            int lengthZNeg = calcLength(decimalZ, true);
             ArrayList<BlockPos> tempOffsets = new ArrayList<>();
-            offsets.addAll(this.getOverlapPos());
-            for (x = 1; x < lengthXPos + 1; ++x) {
-                tempOffsets.add(this.addToPlayer(playerPos, x, 0.0, 1 + lengthZPos));
-                tempOffsets.add(this.addToPlayer(playerPos, x, 0.0, -(1 + lengthZNeg)));
+            offsets.addAll(getOverlapPos());
+
+            if (playerPos != null) {
+                for (x = 1; x < lengthXPos + 1; ++x) {
+                    tempOffsets.add(addToPlayer(playerPos, x, 0.0, 1 + lengthZPos));
+                    tempOffsets.add(addToPlayer(playerPos, x, 0.0, -(1 + lengthZNeg)));
+                }
+                for (x = 0; x <= lengthXNeg; ++x) {
+                    tempOffsets.add(addToPlayer(playerPos, -x, 0.0, 1 + lengthZPos));
+                    tempOffsets.add(addToPlayer(playerPos, -x, 0.0, -(1 + lengthZNeg)));
+                }
+                for (z = 1; z < lengthZPos + 1; ++z) {
+                    tempOffsets.add(addToPlayer(playerPos, 1 + lengthXPos, 0.0, z));
+                    tempOffsets.add(addToPlayer(playerPos, -(1 + lengthXNeg), 0.0, z));
+                }
+                for (z = 0; z <= lengthZNeg; ++z) {
+                    tempOffsets.add(addToPlayer(playerPos, 1 + lengthXPos, 0.0, -z));
+                    tempOffsets.add(addToPlayer(playerPos, -(1 + lengthXNeg), 0.0, -z));
+                }
             }
-            for (x = 0; x <= lengthXNeg; ++x) {
-                tempOffsets.add(this.addToPlayer(playerPos, -x, 0.0, 1 + lengthZPos));
-                tempOffsets.add(this.addToPlayer(playerPos, -x, 0.0, -(1 + lengthZNeg)));
-            }
-            for (z = 1; z < lengthZPos + 1; ++z) {
-                tempOffsets.add(this.addToPlayer(playerPos, 1 + lengthXPos, 0.0, z));
-                tempOffsets.add(this.addToPlayer(playerPos, -(1 + lengthXNeg), 0.0, z));
-            }
-            for (z = 0; z <= lengthZNeg; ++z) {
-                tempOffsets.add(this.addToPlayer(playerPos, 1 + lengthXPos, 0.0, -z));
-                tempOffsets.add(this.addToPlayer(playerPos, -(1 + lengthXNeg), 0.0, -z));
-            }
+
             for (BlockPos pos : tempOffsets) {
                 if (getDown(pos)) {
                     offsets.add(pos.add(0, -1, 0));
@@ -352,24 +417,25 @@ public class Surround extends Module {
                 offsets.add(playerPos.add(surround[0], 0, surround[1]));
             }
         }
+
         return offsets;
     }
 
     public static boolean getDown(BlockPos pos) {
+        if (mc.world == null) return false;
 
         for (Direction e : Direction.values())
             if (!mc.world.getBlockState(pos.add(e.getVector())).isReplaceable())
                 return false;
 
         return true;
-
     }
 
-    int calcOffset(double dec) {
+    private int calcOffset(double dec) {
         return dec >= 0.7 ? 1 : (dec <= 0.3 ? -1 : 0);
     }
 
-    BlockPos addToPlayer(BlockPos playerPos, double x, double y, double z) {
+    private BlockPos addToPlayer(@NotNull BlockPos playerPos, double x, double y, double z) {
         if (playerPos.getX() < 0) {
             x = -x;
         }
@@ -382,25 +448,29 @@ public class Surround extends Module {
         return playerPos.add(BlockPos.ofFloored(x, y, z));
     }
 
-    List<BlockPos> getOverlapPos() {
+    private @NotNull List<BlockPos> getOverlapPos() {
         ArrayList<BlockPos> positions = new ArrayList<>();
-        double decimalX = mc.player.getX() - Math.floor(mc.player.getX());
-        double decimalZ = mc.player.getZ() - Math.floor(mc.player.getZ());
-        int offX = this.calcOffset(decimalX);
-        int offZ = this.calcOffset(decimalZ);
-        positions.add(this.getPlayerPos());
-        for (int x = 0; x <= Math.abs(offX); ++x) {
-            for (int z = 0; z <= Math.abs(offZ); ++z) {
-                int properX = x * offX;
-                int properZ = z * offZ;
-                positions.add(this.getPlayerPos().add(properX, -1, properZ));
+
+        if (mc.player != null) {
+            double decimalX = mc.player.getX() - Math.floor(mc.player.getX());
+            double decimalZ = mc.player.getZ() - Math.floor(mc.player.getZ());
+            int offX = calcOffset(decimalX);
+            int offZ = calcOffset(decimalZ);
+            positions.add(getPlayerPos());
+            for (int x = 0; x <= Math.abs(offX); ++x) {
+                for (int z = 0; z <= Math.abs(offZ); ++z) {
+                    int properX = x * offX;
+                    int properZ = z * offZ;
+                    positions.add(Objects.requireNonNull(getPlayerPos()).add(properX, -1, properZ));
+                }
             }
         }
+
         return positions;
     }
 
 
-    int calcLength(double decimal, boolean negative) {
+    private int calcLength(double decimal, boolean negative) {
         if (negative) {
             return decimal <= 0.3 ? 1 : 0;
         }
@@ -430,6 +500,7 @@ public class Surround extends Module {
         }
         int slot = -1;
 
+        if (mc.player == null) return slot;
         final ItemStack mainhandStack = mc.player.getMainHandStack();
         if (mainhandStack != ItemStack.EMPTY && mainhandStack.getItem() instanceof BlockItem) {
             final Block blockFromMainhandItem = ((BlockItem) mainhandStack.getItem()).getBlock();
@@ -450,10 +521,13 @@ public class Surround extends Module {
                 }
             }
         }
+
         return slot;
     }
 
-    private @NotNull BlockPos getPlayerPos() {
+    private @Nullable BlockPos getPlayerPos() {
+        if (mc.player == null) return null;
+
         return BlockPos.ofFloored(mc.player.getX(), mc.player.getY() - Math.floor(mc.player.getY()) > 0.8 ? Math.floor(mc.player.getY()) + 1.0 : Math.floor(mc.player.getY()), mc.player.getZ());
     }
 }

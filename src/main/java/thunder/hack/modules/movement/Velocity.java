@@ -2,6 +2,7 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.PushEvent;
@@ -97,7 +98,7 @@ public class Velocity extends Module {
             }
         }
 
-        if (onlyAura.getValue() && ThunderHack.moduleManager.get(Aura.class).isDisabled()) return;
+        if (onlyAura.getValue() && ModuleManager.aura.isDisabled()) return;
 
         if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket pac) {
             if (pac.getId() == mc.player.getId()) {

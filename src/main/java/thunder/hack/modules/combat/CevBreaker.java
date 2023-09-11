@@ -124,7 +124,7 @@ public class CevBreaker extends Module {
         targetSurroundBlockPos = null;
         canPlaceBlock = true;
 
-        if (breakMode.getValue() == BreakMode.Packet && ThunderHack.moduleManager.get(SpeedMine.class).isDisabled()) {
+        if (breakMode.getValue() == BreakMode.Packet && ModuleManager.speedMine.isDisabled()) {
             ThunderHack.notificationManager.publicity(getName(), MainSettings.isRu() ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine", 5, Notification.Type.ERROR);
             disable("MainSettings.isRu() ? \"Для использования пакетного копания необходимо включить и настроить модуль SpeedMine\" : \"For using packet mine is necessary to enable and config SpeedMine\"");
         }

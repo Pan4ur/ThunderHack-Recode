@@ -9,7 +9,7 @@ import net.minecraft.entity.Entity;
 import java.util.UUID;
 
 public class FakePlayer extends Module {
-    private final Setting<Boolean> copyInventory = new Setting<>("CopyInventory", false);
+    private final Setting<Boolean> copyInventory = new Setting<>("Copy Inventory", false);
 
     public static OtherClientPlayerEntity fakePlayer;
 

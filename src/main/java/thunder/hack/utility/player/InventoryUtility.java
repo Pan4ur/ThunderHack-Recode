@@ -91,7 +91,7 @@ public final class InventoryUtility {
             }
         }
 
-        if(slot >= 36) slot = slot - 36;
+        if (slot >= 36) slot = slot - 36;
 
         if (slot == -1) return SearchInvResult.notFound();
         return new SearchInvResult(slot, true, mc.player.getInventory().getStack(slot));
@@ -282,9 +282,15 @@ public final class InventoryUtility {
         cachedSlot = mc.player.getInventory().selectedSlot;
     }
 
-    public static void returnSlot(){
-        if(cachedSlot != -1)
+    public static void returnSlot() {
+        if (cachedSlot != -1)
             switchTo(cachedSlot);
+        cachedSlot = -1;
+    }
+
+    public static void returnSlot(SwitchMode switchMode) {
+        if (cachedSlot != -1)
+            switchTo(cachedSlot, switchMode);
         cachedSlot = -1;
     }
 

@@ -11,6 +11,7 @@ import net.minecraft.entity.passive.PigEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.render.FreeCam;
@@ -52,7 +53,7 @@ public class Step extends Module {
             return;
         }
 
-        if (mc.player.getAbilities().flying || ThunderHack.moduleManager.get(FreeCam.class).isOn()) {
+        if (mc.player.getAbilities().flying || ModuleManager.freeCam.isOn()) {
             mc.player.setStepHeight(0.6F);
             return;
         }

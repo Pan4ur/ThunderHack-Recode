@@ -216,15 +216,6 @@ public class ModuleManager {
         return null;
     }
 
-    @Deprecated
-    public <T extends Module> T get(Class<T> clazz) {
-        for (Module module : modules) {
-            if (!clazz.isInstance(module)) continue;
-            return (T) module;
-        }
-        return null;
-    }
-
     public ArrayList<Module> getEnabledModules() {
         ArrayList<Module> enabledModules = new ArrayList<Module>();
         for (Module module : modules) {
@@ -255,7 +246,7 @@ public class ModuleManager {
 
         if (ConfigManager.firstLaunch) {
             ModuleManager.notifications.enable();
-            ThunderHack.moduleManager.get(RPC.class).enable();
+            rpc.enable();
         }
     }
 

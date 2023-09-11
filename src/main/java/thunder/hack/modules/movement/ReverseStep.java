@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -24,7 +25,7 @@ public class ReverseStep extends Module {
 
     @EventHandler
     public void onEntitySync(EventSync eventPlayerUpdateWalking) {
-        if (ThunderHack.moduleManager.get(PacketFly.class).isEnabled()) return;
+        if (ModuleManager.packetFly.isEnabled()) return;
 
         if(pauseIfShift.getValue() && mc.options.sneakKey.isPressed()) return;
 
