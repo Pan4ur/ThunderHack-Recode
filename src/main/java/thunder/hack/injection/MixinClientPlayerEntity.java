@@ -17,6 +17,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.*;
+import thunder.hack.modules.movement.NoSlow;
 import thunder.hack.modules.movement.Velocity;
 
 import static thunder.hack.modules.Module.fullNullCheck;
@@ -41,7 +42,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Redirect(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"), require = 0)
     private boolean tickMovementHook(ClientPlayerEntity player) {
         if (ModuleManager.noSlow.isEnabled())
-            return false;
+             return false;
         return player.isUsingItem();
     }
 

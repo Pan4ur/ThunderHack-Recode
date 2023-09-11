@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AutoCrystal extends Module {
@@ -137,7 +138,7 @@ public class AutoCrystal extends Module {
 
     public enum Render {Fade, Slide}
 
-    public enum Remove{OFF, Fake, ON}
+    public enum Remove {OFF, Fake, ON}
 
     public static PlayerEntity target;
     private BlockHitResult bestPosition;
@@ -164,7 +165,7 @@ public class AutoCrystal extends Module {
 
     private BlockPos renderPos, prevRenderPos;
     private long renderMultiplier;
-    private final Map<BlockPos, Long> renderPositions = new HashMap<>();
+    private final Map<BlockPos, Long> renderPositions = new ConcurrentHashMap<>();
 
     // Threads
     private PlaceThread placeThread;
@@ -309,11 +310,13 @@ public class AutoCrystal extends Module {
 
     public void onRender3D(MatrixStack stack) {
         if (render.getValue()) {
-            Map<BlockPos, Long> cache = new HashMap<>(renderPositions);
+            Map<BlockPos, Long> cache = new ConcurrentHashMap<>(renderPositions);
+
             cache.forEach((pos, time) -> {
                 if (System.currentTimeMillis() - time > 500)
                     renderPositions.remove(pos);
             });
+
 
             String dmg = MathUtility.round2(renderDamage) + (rselfDamage.getValue() ? " / " + MathUtility.round2(renderSelfDamage) : "");
 
@@ -581,7 +584,7 @@ public class AutoCrystal extends Module {
             if (!(ent instanceof EndCrystalEntity))
                 continue;
 
-            if(deadCrystals.containsKey(ent))
+            if (deadCrystals.containsKey(ent))
                 continue;
 
             if (PlayerUtility.squaredDistanceFromEyes(ent.getPos()) > explodeRange.getPow2Value())

@@ -162,6 +162,7 @@ public class ModuleManager {
     public static AntiWeb antiWeb = new AntiWeb();
     public static AntiBot antiBot = new AntiBot();
     public static AntiAim antiAim = new AntiAim();
+    public static DropAll dropAll = new DropAll();
     public static XCarry xCarry = new XCarry();
     public static Trails trails = new Trails();
     public static Strafe strafe = new Strafe();
