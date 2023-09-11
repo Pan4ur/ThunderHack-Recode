@@ -96,7 +96,7 @@ public class MiddleClick extends Module {
                         sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
                     }
                 } else {
-                    int epSlot = InventoryUtility.findItemInHotBar(Items.ENDER_PEARL).slot();
+                    int epSlot = InventoryUtility.findItemInInventory(Items.ENDER_PEARL).slot();
                     if (epSlot != -1) {
                         sendPacket(new PickFromInventoryC2SPacket(epSlot));
                         mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
@@ -111,7 +111,7 @@ public class MiddleClick extends Module {
                         new PearlThread(mc.player, epSlot, originalSlot, swapDelay.getValue(), false).start();
                     }
                 } else {
-                    int epSlot = InventoryUtility.findItemInHotBar(Items.ENDER_PEARL).slot();
+                    int epSlot = InventoryUtility.findItemInInventory(Items.ENDER_PEARL).slot();
                     int currentItem = mc.player.getInventory().selectedSlot;
                     if (epSlot != -1) {
                         sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
