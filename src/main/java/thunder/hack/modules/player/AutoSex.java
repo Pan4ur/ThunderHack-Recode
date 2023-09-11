@@ -26,9 +26,9 @@ public class AutoSex extends Module {
     };
     private static final String[] ACTIVE_MESSAGES = {
             "Oh, I'm cumming!",
-            "Oh, ur pussy so nice!",
+            "Oh, ur pussy is so nice!",
             "Yeah, yeah",
-            "I fell u!",
+            "I feel u!",
             "Oh, im inside u"
     };
 
@@ -64,7 +64,5 @@ public class AutoSex extends Module {
             mc.getNetworkHandler().sendChatCommand("msg " + target.getName().getString() + " " + messages.get((int) (Math.random() * messages.size())));
             messageTimer.reset();
         }
-
-        super.onUpdate();
     }
 }
