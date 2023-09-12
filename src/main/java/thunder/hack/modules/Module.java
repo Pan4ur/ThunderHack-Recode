@@ -23,15 +23,14 @@ import java.util.Objects;
 
 
 public abstract class Module {
+    private final String description;
+    public static MinecraftClient mc = MinecraftClient.getInstance();
+    private final Category category;
     public Setting<Boolean> enabled = new Setting<>("Enabled", false);
+    public String displayName;
     public Setting<Bind> bind = new Setting<>("Keybind", new Bind(-1, false, false));
     public Setting<Boolean> drawn = new Setting<>("Drawn", true);
 
-    public static MinecraftClient mc = MinecraftClient.getInstance();
-
-    protected final String displayName;
-    protected final String description;
-    protected final Category category;
 
     public Module(String name, String description, Category category) {
         this.displayName = name;
@@ -55,6 +54,7 @@ public abstract class Module {
     public void onLoad() {
     }
 
+
     public void onTick() {
     }
 
@@ -73,19 +73,13 @@ public abstract class Module {
     public void onRender2D(DrawContext event) {
     }
 
-    public void onPreRender3D(MatrixStack stack) {
-    }
-
     public void onRender3D(MatrixStack event) {
     }
 
-    public void onPostRender3D(MatrixStack stack) {
+    public void onPreRender3D(MatrixStack stack) {
     }
 
     public void onUnload() {
-    }
-
-    public void onThread() {
     }
 
     protected void sendPacket(Packet<?> packet) {
@@ -107,18 +101,17 @@ public abstract class Module {
     }
 
     public void enable() {
-        enabled.setValue(true);
-        onEnable();
-        if (isOn()) {
+        this.enabled.setValue(true);
+        this.onEnable();
+        if (this.isOn()) {
             ThunderHack.EVENT_BUS.subscribe(this);
         }
-
         if (fullNullCheck()) return;
-        if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
+        if ((!Objects.equals(this.getDisplayName(), "ClickGui")) && (!Objects.equals(this.getDisplayName(), "ThunderGui"))) {
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                ThunderHack.notificationManager.publicity(getDisplayName(), "Модуль включен!", 2, Notification.Type.ENABLED);
+                ThunderHack.notificationManager.publicity(this.getDisplayName(), "Модуль включен!", 2, Notification.Type.ENABLED);
             } else {
-                ThunderHack.notificationManager.publicity(getDisplayName(), "Was Enabled!", 2, Notification.Type.ENABLED);
+                ThunderHack.notificationManager.publicity(this.getDisplayName(), "Was Enabled!", 2, Notification.Type.ENABLED);
             }
             mc.world.playSound(mc.player, mc.player.getBlockPos(), ThSoundPack.ENABLE_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
         }
@@ -228,7 +221,7 @@ public abstract class Module {
                 field.setAccessible(true);
 
                 try {
-                    settingList.add((Setting<?>) field.get(this));
+                    settingList.add((Setting) field.get(this));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -240,7 +233,7 @@ public abstract class Module {
                 field.setAccessible(true);
 
                 try {
-                    settingList.add((Setting<?>) field.get(this));
+                    settingList.add((Setting) field.get(this));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -276,6 +269,12 @@ public abstract class Module {
         }
 
         return null;
+    }
+
+    public void onThread() {
+    }
+
+    public void onPostRender3D(MatrixStack stack) {
     }
 
     public enum Category {

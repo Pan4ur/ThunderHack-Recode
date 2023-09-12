@@ -38,6 +38,7 @@ import thunder.hack.core.PlayerManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
@@ -53,7 +54,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.minecraft.util.UseAction.BLOCK;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
-import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class Aura extends Module {
     public static final Setting<Float> attackRange = new Setting<>("Attack Range", 3.1f, 1f, 7.0f);
@@ -154,23 +154,22 @@ public class Aura extends Module {
     }
 
     public void auraLogic() {
-        if (target instanceof LivingEntity && (((LivingEntity) target).getHealth() <= 0 || ((LivingEntity) target).isDead())) {
-            if (isRu()) {
+        if (target != null && target instanceof LivingEntity && (((LivingEntity) target).getHealth() <= 0 || ((LivingEntity) target).isDead())) {
+            if (MainSettings.language.getValue() == MainSettings.Language.RU) {
                 ThunderHack.notificationManager.publicity("Aura", "Цель успешно нейтрализована!", 3, Notification.Type.SUCCESS);
             } else {
                 ThunderHack.notificationManager.publicity("Aura", "Target successfully neutralized!", 3, Notification.Type.SUCCESS);
             }
         }
 
-        for (PlayerEntity player : mc.world.getPlayers()) {
+        for (PlayerEntity player : mc.world.getPlayers())
             if (player instanceof OtherClientPlayerEntity) ((IOtherClientPlayerEntity) player).resolve();
-        }
-
+        
         calcThread();
 
-        for (PlayerEntity player : mc.world.getPlayers()) {
+        for (PlayerEntity player : mc.world.getPlayers())
             if (player instanceof OtherClientPlayerEntity) ((IOtherClientPlayerEntity) player).releaseResolver();
-        }
+
 
         boolean readyForAttack = autoCrit() && (lookingAtHitbox || mode.getValue() != Mode.Universal || rayTrace.getValue() == RayTrace.OFF);
 
@@ -194,10 +193,7 @@ public class Aura extends Module {
 
             if (!(target instanceof PlayerEntity) || !(((PlayerEntity) target).isUsingItem() && ((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD) || ignoreShield.getValue()) {
                 Criticals.cancelCrit = true;
-
-                if (ModuleManager.criticals.isEnabled())
-                    ModuleManager.criticals.doCrit();
-
+                ModuleManager.criticals.doCrit();
                 mc.interactionManager.attackEntity(mc.player, target);
                 Criticals.cancelCrit = false;
                 mc.player.swingHand(Hand.MAIN_HAND);
@@ -235,7 +231,7 @@ public class Aura extends Module {
     public void onPacketReceive(PacketEvent.@NotNull Receive e) {
         if (e.getPacket() instanceof EntityStatusS2CPacket status) {
             if (status.getStatus() == 30 && status.getEntity(mc.world) != null && target != null && status.getEntity(mc.world) == target)
-                ThunderHack.notificationManager.publicity("Aura", isRu() ? ("Успешно сломали щит игроку " + target.getName().getString()) : ("Succesfully destroyed " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("Aura", MainSettings.isRu() ? ("Успешно сломали щит игроку " + target.getName().getString()) : ("Succesfully destroyed " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
         }
         /*
         if(e.getPacket() instanceof EntityTrackerUpdateS2CPacket attrib){
@@ -266,7 +262,13 @@ public class Aura extends Module {
     }
 
     private boolean autoCrit() {
-        boolean reasonForSkipCrit = !smartCrit.getValue() || mc.player.getAbilities().flying || mc.player.isFallFlying() || mc.player.hasStatusEffect(StatusEffects.SLOWNESS) || mc.player.isHoldingOntoLadder() || (mc.world.getBlockState(new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY())), (int) Math.floor(mc.player.getZ()))).getBlock() == Blocks.COBWEB);
+        boolean reasonForSkipCrit =
+                !smartCrit.getValue()
+                        || mc.player.getAbilities().flying
+                        || mc.player.isFallFlying()
+                        || mc.player.hasStatusEffect(StatusEffects.SLOWNESS)
+                        || mc.player.isHoldingOntoLadder()
+                        || (mc.world.getBlockState(new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY())), (int) Math.floor(mc.player.getZ()))).getBlock() == Blocks.COBWEB);
 
         if (hitTicks > 0) return false;
 
@@ -275,14 +277,16 @@ public class Aura extends Module {
 
         if (pauseInInventory.getValue() && ThunderHack.playerManager.inInventory) return false;
 
-        if (!oldDelay.getValue()) {
-            if (!(MathHelper.clamp(((float) ((ILivingEntity) mc.player).getLastAttackedTicks() + 0.5f) / getAttackCooldownProgressPerTick(), 0.0F, 1.0F) >= 0.93f))
-                return false;
-        } else {
+        if (oldDelay.getValue())
             if (minCPS.getValue() > maxCPS.getValue()) minCPS.setValue(maxCPS.getValue());
-        }
+            else if (!(MathHelper.clamp(((float) ((ILivingEntity) mc.player).getLastAttackedTicks() + 0.5f) / getAttackCooldownProgressPerTick(), 0.0F, 1.0F) >= 0.93f))
+                return false;
 
-        if (!mc.options.jumpKey.isPressed() && (!ModuleManager.targetStrafe.isEnabled() && !ModuleManager.speed.isEnabled()))
+
+        boolean mergeWithTargetStrafe = !ModuleManager.targetStrafe.isEnabled() || !ModuleManager.targetStrafe.jump.getValue();
+        boolean mergeWithSpeed = !ModuleManager.speed.isEnabled() || mc.player.isOnGround();
+
+        if (!mc.options.jumpKey.isPressed() && mergeWithTargetStrafe && mergeWithSpeed)
             return true;
 
         if (mc.player.isInLava()) return true;
@@ -330,6 +334,7 @@ public class Aura extends Module {
     }
 
     private void calcThread() {
+
         Entity candidat = findTarget();
 
         if (target == null) {
@@ -510,9 +515,8 @@ public class Aura extends Module {
                 return ent;
             }
             if (skipEntity(ent)) continue;
-            if (ent instanceof LivingEntity) {
-                first_stage.add((LivingEntity) ent);
-            }
+            if(!(ent instanceof LivingEntity)) continue;
+            first_stage.add((LivingEntity) ent);
         }
 
         switch (sort.getValue()) {

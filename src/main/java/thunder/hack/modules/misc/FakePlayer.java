@@ -1,6 +1,13 @@
 package thunder.hack.modules.misc;
 
 import com.mojang.authlib.GameProfile;
+import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageSources;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
+import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import net.minecraft.client.network.OtherClientPlayerEntity;
@@ -9,13 +16,16 @@ import net.minecraft.entity.Entity;
 import java.util.UUID;
 
 public class FakePlayer extends Module {
-    private final Setting<Boolean> copyInventory = new Setting<>("Copy Inventory", false);
+    private final Setting<Boolean> copyInventory = new Setting<>("CopyInventory", false);
 
     public static OtherClientPlayerEntity fakePlayer;
 
     public FakePlayer() {
         super("FakePlayer", "FakePlayer", Category.MISC);
     }
+
+    private Vec3d pos;
+    private Box box;
 
     @Override
     public void onEnable() {
@@ -25,7 +35,13 @@ public class FakePlayer extends Module {
         if (copyInventory.getValue()) {
             fakePlayer.getInventory().clone(mc.player.getInventory());
         }
-        mc.world.addPlayer(22822854, fakePlayer);
+        pos = new Vec3d(mc.player.getX(), mc.player.getY(), mc.player.getZ());
+        box = new Box(mc.player.getBoundingBox().minX, mc.player.getBoundingBox().minY, mc.player.getBoundingBox().minZ, mc.player.getBoundingBox().maxX, mc.player.getBoundingBox().maxY, mc.player.getBoundingBox().maxZ);
+        mc.world.addEntity(22822854, fakePlayer);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onUpdate(PlayerUpdateEvent e){
     }
 
 

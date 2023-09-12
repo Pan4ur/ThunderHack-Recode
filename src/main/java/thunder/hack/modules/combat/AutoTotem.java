@@ -11,7 +11,6 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.TntMinecartEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.SwordItem;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -20,11 +19,10 @@ import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -41,8 +39,11 @@ public class AutoTotem extends Module {
     public Setting<Float> healthS = new Setting<>("ShieldGappleHp", 16f, 0f, 20f, v -> offhand.getValue() == OffHand.Shield);
     public Setting<Boolean> matrix = new Setting<>("Matrix", true);
     public Setting<Boolean> stopMotion = new Setting<>("stopMotion", false);
+    public Setting<Boolean> resetAttackCooldown = new Setting<>("ResetAttackCooldown", false);
+
     public final Setting<Parent> safety = new Setting<>("Safety", new Parent(false, 0));
-    public Setting<Boolean> griefInstant = new Setting<>("GriefInstant", false).withParent(safety);
+    public Setting<Boolean> hotbarFallBack = new Setting<>("HotbarFallback", false).withParent(safety);
+    public Setting<Boolean> fallBackCalc = new Setting<>("FallBackCalc", true, v -> hotbarFallBack.getValue()).withParent(safety);
     public Setting<Boolean> onElytra = new Setting<>("OnElytra", true).withParent(safety);
     public Setting<Boolean> onFall = new Setting<>("OnFall", true).withParent(safety);
     public Setting<Boolean> onCrystal = new Setting<>("OnCrystal", true).withParent(safety);
@@ -67,22 +68,13 @@ public class AutoTotem extends Module {
         delay--;
     }
 
-    //TODO Вспомнить зачем это было нужно
-    /*
-    @EventHandler
-    public void onPacketSend(PacketEvent.Send e) {
-        if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket) {
-            if (mc.player.isUsingItem() && (mc.player.getMainHandStack().getItem() == Items.GOLDEN_APPLE || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE))
-                mc.player.stopUsingItem();
-        }
-    }
-     */
-
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
-        if (e.getPacket() instanceof EntitySpawnS2CPacket spawn && griefInstant.getValue()) {
+        if (e.getPacket() instanceof EntitySpawnS2CPacket spawn && hotbarFallBack.getValue()) {
             if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
                 if (mc.player.squaredDistanceTo(spawn.getX(), spawn.getY(), spawn.getZ()) < 36) {
+                    if(fallBackCalc.getValue() && ExplosionUtility.getSelfExplosionDamage(new Vec3d(spawn.getX(), spawn.getY(), spawn.getZ())) < mc.player.getHealth() + mc.player.getAbsorptionAmount() + 4f)
+                        return;
                     runInstant();
                 }
             }
@@ -94,9 +86,6 @@ public class AutoTotem extends Module {
                 }
             }
         }
-        if (e.getPacket() instanceof InventoryS2CPacket pac) {
-            //     sendMessage(pac.toString());
-        }
     }
 
     private void runInstant() {
@@ -107,7 +96,7 @@ public class AutoTotem extends Module {
             delay = 20;
         } else if (invResult.found()) {
             int slot = invResult.slot() >= 36 ? invResult.slot() - 36 : invResult.slot();
-            if (!griefInstant.getValue()) {
+            if (!hotbarFallBack.getValue()) {
                 swapTo(slot);
             } else {
                 mc.interactionManager.pickFromInventory(slot);
@@ -144,7 +133,9 @@ public class AutoTotem extends Module {
 
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
                     mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                    mc.player.resetLastAttackedTicks();
+
+                    if(resetAttackCooldown.getValue())
+                        mc.player.resetLastAttackedTicks();
                 } else {
                     sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
                     clickSlot(slot);
@@ -160,7 +151,8 @@ public class AutoTotem extends Module {
 
                 sendPacket(new UpdateSelectedSlotC2SPacket(prevCurrentItem));
                 mc.player.getInventory().selectedSlot = prevCurrentItem;
-                mc.player.resetLastAttackedTicks();
+                if(resetAttackCooldown.getValue())
+                    mc.player.resetLastAttackedTicks();
             }
             delay = 5;
         }
