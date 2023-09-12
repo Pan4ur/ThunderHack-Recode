@@ -12,6 +12,7 @@ import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.cmd.Command;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -102,7 +103,7 @@ public class Tracker extends Module {
     public void onUpdate() {
         boolean found = false;
         for (PlayerEntity player : mc.world.getPlayers()) {
-            if (player == null || player.equals(mc.player) || FreeCam.dummy == player) continue;
+            if (player == null || player.equals(mc.player) || ModuleManager.freeCam.dummy == player) continue;
 
             if (found && only1v1.getValue()) {
                 disable(MainSettings.isRu() ? "Ты не в дуели! Отключаю.." : "Disabled, you are not in a 1v1!");
@@ -110,9 +111,9 @@ public class Tracker extends Module {
             }
             if (trackedPlayer == null) {
                 if (MainSettings.isRu()) {
-                    sendMessage("[Tracker] " + Formatting.LIGHT_PURPLE + "Следим за " + Formatting.DARK_PURPLE + player.getName().getString() + Formatting.LIGHT_PURPLE + "!");
+                    sendMessage(Formatting.LIGHT_PURPLE + "Следим за " + Formatting.DARK_PURPLE + player.getName().getString() + Formatting.LIGHT_PURPLE + "!");
                 } else {
-                    sendMessage("[Tracker] " + Formatting.LIGHT_PURPLE + "Now tracking " + Formatting.DARK_PURPLE + player.getName().getString() + Formatting.LIGHT_PURPLE + "!");
+                    sendMessage(Formatting.LIGHT_PURPLE + "Now tracking " + Formatting.DARK_PURPLE + player.getName().getString() + Formatting.LIGHT_PURPLE + "!");
                 }
             }
             trackedPlayer = player;

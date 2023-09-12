@@ -28,4 +28,3 @@ accessible field net/minecraft/client/Mouse cursorDeltaX D
 accessible field net/minecraft/entity/Entity hasVisualFire Z
 accessible field net/minecraft/network/packet/s2c/play/GameMessageS2CPacket content Lnet/minecraft/text/Text;
 accessible method net/minecraft/client/render/GameRenderer renderHand (Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V
-accessible method net/minecraft/block/AbstractBlock$AbstractBlockState asBlockState ()Lnet/minecraft/block/BlockState;

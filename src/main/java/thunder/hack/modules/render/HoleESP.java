@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -29,6 +30,7 @@ public class HoleESP extends Module {
 
     private enum Mode {
         Fade,
+        Fade2,
         CubeOutline,
         CubeFill,
         CubeBoth
@@ -43,58 +45,109 @@ public class HoleESP extends Module {
     public void onRender3D(MatrixStack stack) {
         if (positions.isEmpty()) return;
 
-        for (PosWithColor posWithColor : positions) {
-            if (mode.getValue() == Mode.CubeOutline || mode.getValue() == Mode.CubeBoth) {
-                Render3DEngine.drawBoxOutline(
-                        new Box(
-                                posWithColor.getBp().getX(),
-                                posWithColor.getBp().getY(),
-                                posWithColor.getBp().getZ(),
-                                posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
-                                posWithColor.getBp().getY() + height.getValue(),
-                                posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
-                        ), posWithColor.getColor(), lineWith.getValue()
-                );
-            }
-            if (mode.getValue() == Mode.CubeFill || mode.getValue() == Mode.CubeBoth) {
-                Render3DEngine.drawFilledBox(stack,
-                        new Box(
-                                posWithColor.getBp().getX(),
-                                posWithColor.getBp().getY(),
-                                posWithColor.getBp().getZ(),
-                                posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
-                                posWithColor.getBp().getY() + height.getValue(),
-                                posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
-                        ), posWithColor.getColor()
-                );
-            }
-
-            if (mode.getValue() == Mode.Fade) {
-                RenderSystem.disableCull();
-                Render3DEngine.drawFilledFadeBox(stack,
-                        new Box(
-                                posWithColor.getBp().getX(),
-                                posWithColor.getBp().getY(),
-                                posWithColor.getBp().getZ(),
-                                posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
-                                posWithColor.getBp().getY() + height.getValue(),
-                                posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
-                        ), Render2DEngine.injectAlpha(posWithColor.getColor(), 60), Render2DEngine.injectAlpha(posWithColor.getColor(), 0)
-                );
-                Render3DEngine.drawBottomOutline(
-                        new Box(
-                                posWithColor.getBp().getX(),
-                                posWithColor.getBp().getY(),
-                                posWithColor.getBp().getZ(),
-                                posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
-                                posWithColor.getBp().getY() + height.getValue(),
-                                posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
-                        ), posWithColor.getColor(), lineWith.getValue()
-                );
-                RenderSystem.enableCull();
+        for (PosWithColor pwc : positions) {
+            switch (mode.getValue()){
+                case Fade -> renderFade(pwc, stack);
+                case Fade2 -> renderFade2(pwc, stack);
+                case CubeFill -> renderFill(pwc, stack);
+                case CubeOutline -> renderOutline(pwc, stack);
+                case CubeBoth -> {
+                    renderOutline(pwc, stack);
+                    renderFill(pwc, stack);
+                }
             }
         }
     }
+
+    public void renderFade(PosWithColor posWithColor, MatrixStack stack) {
+        RenderSystem.disableCull();
+        Render3DEngine.drawFilledFadeBox(stack,
+                new Box(
+                        posWithColor.getBp().getX(),
+                        posWithColor.getBp().getY(),
+                        posWithColor.getBp().getZ(),
+                        posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
+                        posWithColor.getBp().getY() + height.getValue(),
+                        posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
+                ), Render2DEngine.applyOpacity(posWithColor.getColor(), 60), Render2DEngine.applyOpacity(posWithColor.getColor(), 0)
+        );
+        Render3DEngine.drawBottomOutline(
+                new Box(
+                        posWithColor.getBp().getX(),
+                        posWithColor.getBp().getY(),
+                        posWithColor.getBp().getZ(),
+                        posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
+                        posWithColor.getBp().getY() + height.getValue(),
+                        posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
+                ), posWithColor.getColor(), lineWith.getValue()
+        );
+        RenderSystem.enableCull();
+    }
+
+
+    public void renderFade2(PosWithColor posWithColor, MatrixStack stack) {
+        RenderSystem.disableCull();
+        Render3DEngine.drawFilledFadeBox(stack,
+                new Box(
+                        posWithColor.getBp().getX(),
+                        posWithColor.getBp().getY(),
+                        posWithColor.getBp().getZ(),
+                        posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
+                        posWithColor.getBp().getY() + height.getValue(),
+                        posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
+                ), Render2DEngine.applyOpacity(posWithColor.getColor(), 60), Render2DEngine.applyOpacity(posWithColor.getColor(), 0)
+        );
+        Render3DEngine.drawHoleOutline(
+                new Box(
+                        posWithColor.getBp().getX(),
+                        posWithColor.getBp().getY(),
+                        posWithColor.getBp().getZ(),
+                        posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
+                        posWithColor.getBp().getY() + height.getValue(),
+                        posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
+                ), posWithColor.getColor(), lineWith.getValue()
+        );
+
+        Render3DEngine.drawFilledBox(stack,
+                new Box(
+                        posWithColor.getBp().getX(),
+                        posWithColor.getBp().getY(),
+                        posWithColor.getBp().getZ(),
+                        posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
+                        posWithColor.getBp().getY() + 0.01,
+                        posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
+                ), posWithColor.getColor()
+        );
+
+        RenderSystem.enableCull();
+    }
+
+    public void renderOutline(PosWithColor posWithColor, MatrixStack stack) {
+        Render3DEngine.drawBoxOutline(
+                new Box(
+                        posWithColor.getBp().getX(),
+                        posWithColor.getBp().getY(),
+                        posWithColor.getBp().getZ(),
+                        posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
+                        posWithColor.getBp().getY() + height.getValue(),
+                        posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
+                ), posWithColor.getColor(), lineWith.getValue()
+        );
+    }
+
+    public void renderFill(PosWithColor posWithColor, MatrixStack stack) {
+        Render3DEngine.drawFilledBox(stack,
+                new Box(
+                        posWithColor.getBp().getX(),
+                        posWithColor.getBp().getY(),
+                        posWithColor.getBp().getZ(),
+                        posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
+                        posWithColor.getBp().getY() + height.getValue(),
+                        posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
+                ), posWithColor.getColor()
+        );
+    }
+
 
     @Override
     public void onThread() {

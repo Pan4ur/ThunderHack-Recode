@@ -93,6 +93,7 @@ public class AutoCrystal extends Module {
     private final Setting<Integer> switchDelay = new Setting<>("SwitchDelay", 100, 0, 1000, v -> page.getValue() == Pages.Pause && switchPause.getValue());
 
     /*   DAMAGES   */
+    private final Setting<Sort> sort = new Setting<>("Sort", Sort.DAMAGE, v -> page.getValue() == Pages.Damages);
     private final Setting<Float> minDamage = new Setting<>("MinDamage", 6.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
     private final Setting<Float> maxSelfDamage = new Setting<>("MaxSelfDamage", 10.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
     private final Setting<Safety> safety = new Setting<>("Safety", Safety.NONE, v -> page.getValue() == Pages.Damages);
@@ -136,7 +137,9 @@ public class AutoCrystal extends Module {
 
     public enum Safety {BALANCE, STABLE, NONE}
 
-    public enum Render {Fade, Slide}
+    public enum Sort {SAFE, DAMAGE}
+
+    public enum Render {Fade, Slide, Default}
 
     public enum Remove {OFF, Fake, ON}
 
@@ -252,6 +255,42 @@ public class AutoCrystal extends Module {
         if (rotate.getValue()) rotateMethod();
     }
 
+    @Override
+    public String getDisplayInfo() {
+        String info = crystalSpeed + " c/s";
+        if (bestPosition != null)
+            info = crystalSpeed + " c/s | " + bestPosition.getSide().toString().toUpperCase();
+        return info;
+    }
+
+    @EventHandler
+    public void onPacketReceive(PacketEvent.Receive e) {
+        if (target == null) return;
+        if (e.getPacket() instanceof EntitySpawnS2CPacket spawn) {
+            onSpawnPacket(spawn);
+        }
+    }
+
+    @EventHandler
+    public void onPacketSend(PacketEvent.@NotNull Send e) {
+        if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket) switchTimer.reset();
+    }
+
+    @EventHandler
+    public void onPostSync(EventPostSync e) {
+        tickBusy = false;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onTick(EventTick e) {
+        ticking.set(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPostTick(EventPostTick e) {
+        ticking.set(false);
+    }
+
     public void rotateMethod() {
         if (bestPosition != null) {
             float[] angle = InteractionUtility.calculateAngle(bestPosition.getPos());
@@ -269,22 +308,6 @@ public class AutoCrystal extends Module {
         }
     }
 
-    @Override
-    public String getDisplayInfo() {
-        String info = crystalSpeed + " c/s";
-        if (bestPosition != null)
-            info = crystalSpeed + " c/s | " + bestPosition.getSide().toString().toUpperCase();
-        return info;
-    }
-
-    @EventHandler
-    public void onPacketReceive(PacketEvent.Receive e) {
-        if (target == null) return;
-        if (e.getPacket() instanceof EntitySpawnS2CPacket spawn) {
-            onSpawnPacket(spawn);
-        }
-    }
-
     private void onSpawnPacket(@NotNull EntitySpawnS2CPacket spawn) {
         if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
             if (!placedCrystals.isEmpty()) {
@@ -297,17 +320,6 @@ public class AutoCrystal extends Module {
         }
     }
 
-    @EventHandler
-    public void onPacketSend(PacketEvent.@NotNull Send e) {
-        if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket) switchTimer.reset();
-    }
-
-
-    @EventHandler
-    public void onPostSync(EventPostSync e) {
-        tickBusy = false;
-    }
-
     public void onRender3D(MatrixStack stack) {
         if (render.getValue()) {
             Map<BlockPos, Long> cache = new ConcurrentHashMap<>(renderPositions);
@@ -316,7 +328,6 @@ public class AutoCrystal extends Module {
                 if (System.currentTimeMillis() - time > 500)
                     renderPositions.remove(pos);
             });
-
 
             String dmg = MathUtility.round2(renderDamage) + (rselfDamage.getValue() ? " / " + MathUtility.round2(renderSelfDamage) : "");
 
@@ -329,7 +340,7 @@ public class AutoCrystal extends Module {
                         Render3DEngine.drawTextIn3D(dmg, pos.toCenterPos(), 0, 0.1, 0, Render2DEngine.injectAlpha(textColor.getValue().getColorObject(), alpha));
                     }
                 });
-            } else if (renderPos != null) {
+            } else if (renderMode.getValue() == Render.Slide && renderPos != null) {
                 if (prevRenderPos == null) prevRenderPos = renderPos;
                 if (renderPositions.isEmpty()) return;
                 float mult = MathUtility.clamp((System.currentTimeMillis() - renderMultiplier) / (float) slideDelay.getValue(), 0f, 1f);
@@ -337,6 +348,12 @@ public class AutoCrystal extends Module {
                 Render3DEngine.drawFilledBox(stack, interpolatedBox, fillColor.getValue().getColorObject());
                 Render3DEngine.drawBoxOutline(interpolatedBox, lineColor.getValue().getColorObject(), lineWidth.getValue());
                 Render3DEngine.drawTextIn3D(dmg, interpolatedBox.getCenter(), 0, 0.1, 0, textColor.getValue().getColorObject());
+            } else if (renderPos != null) {
+                Box box = new Box(renderPos);
+                if (renderPositions.isEmpty()) return;
+                Render3DEngine.drawFilledBox(stack, box, fillColor.getValue().getColorObject());
+                Render3DEngine.drawBoxOutline(box, lineColor.getValue().getColorObject(), lineWidth.getValue());
+                Render3DEngine.drawTextIn3D(dmg, box.getCenter(), 0, 0.1, 0, textColor.getValue().getColorObject());
             }
         }
     }
@@ -539,27 +556,9 @@ public class AutoCrystal extends Module {
             prevRenderPos = null;
             return null;
         }
-        List<PlaceData> rawList = getPossibleBlocks(target);
-        List<PlaceData> clearedList = new ArrayList<>();
 
-        for (PlaceData data : rawList) {
-            double safetyIndex = 1;
-            if (data.selfDamage + 0.5 > mc.player.getHealth() + mc.player.getAbsorptionAmount() && !data.overrideDamage) {
-                safetyIndex = -9999;
-            } else if (safety.getValue() == Safety.STABLE) {
-                double efficiency = data.damage - data.selfDamage;
-                if (efficiency < 0 && Math.abs(efficiency) < 0.25)
-                    efficiency = 0;
-                safetyIndex = efficiency;
-            } else if (safety.getValue() == Safety.BALANCE) {
-                double balance = data.damage * safetyBalance.getValue();
-                safetyIndex = balance - data.selfDamage;
-            }
-            if (safetyIndex < 0) continue;
-            clearedList.add(data);
-        }
-
-        return clearedList.isEmpty() ? null : filterPositions(clearedList);
+        List<PlaceData> list = getPossibleBlocks(target).stream().filter(data -> isSafe(data.damage, data.selfDamage, data.overrideDamage)).toList();
+        return list.isEmpty() ? null : filterPositions(list);
     }
 
     public List<PlaceData> getPossibleBlocks(PlayerEntity target) {
@@ -617,89 +616,94 @@ public class AutoCrystal extends Module {
     }
 
     public EndCrystalEntity getCrystalToExplode(PlayerEntity target) {
-        List<CrystalData> rawList = getPossibleCrystals(target);
-        List<CrystalData> clearedList = new ArrayList<>();
+        List<CrystalData> list = getPossibleCrystals(target).stream().filter(data -> isSafe(data.damage, data.selfDamage, data.overrideDamage)).toList();
+        return list.isEmpty() ? null : filterCrystals(list);
+    }
 
-        for (CrystalData data : rawList) {
-            double safetyIndex = 1;
-            if (data.selfDamage + 0.5 > mc.player.getHealth() + mc.player.getAbsorptionAmount() && !data.overrideDamage) {
-                safetyIndex = -9999;
-            } else if (safety.getValue() == Safety.STABLE) {
-                double efficiency = data.damage - data.selfDamage;
-                if (efficiency < 0 && Math.abs(efficiency) < 0.25)
-                    efficiency = 0;
-                safetyIndex = efficiency;
-            } else if (safety.getValue() == Safety.BALANCE) {
-                double balance = data.damage * safetyBalance.getValue();
-                safetyIndex = balance - data.selfDamage;
-            }
-            if (safetyIndex < 0) continue;
-            clearedList.add(data);
+    public boolean isSafe(float damage, float selfDamage, boolean overrideDamage) {
+        double safetyIndex = 1;
+        if (selfDamage + 0.5 > mc.player.getHealth() + mc.player.getAbsorptionAmount() && !overrideDamage) {
+            safetyIndex = -9999;
+        } else if (safety.getValue() == Safety.STABLE) {
+            double efficiency = damage - selfDamage;
+            if (efficiency < 0 && Math.abs(efficiency) < 0.25)
+                efficiency = 0;
+            safetyIndex = efficiency;
+        } else if (safety.getValue() == Safety.BALANCE) {
+            double balance = damage * safetyBalance.getValue();
+            safetyIndex = balance - selfDamage;
         }
-
-        return clearedList.isEmpty() ? null : filterCrystals(clearedList);
+        return safetyIndex >= 0;
     }
 
     public BlockHitResult filterPositions(@NotNull List<PlaceData> clearedList) {
         PlaceData bestData = null;
-        float bestDmg = 0f;
+        float bestVal = 0f;
         for (PlaceData data : clearedList) {
-            boolean override = target.getHealth() + target.getAbsorptionAmount() <= facePlaceHp.getValue();
-
-            if (armorBreaker.getValue())
-                for (ItemStack armor : target.getArmorItems())
-                    if (armor != null && !armor.getItem().equals(Items.AIR) && ((armor.getMaxDamage() - armor.getDamage()) / (float) armor.getMaxDamage()) * 100 < armorScale.getValue()) {
-                        override = true;
-                        break;
+            if ((shouldOverride(data.damage) || data.damage > minDamage.getValue())) {
+                if (sort.getValue() == Sort.DAMAGE) {
+                    if (bestVal < data.damage) {
+                        bestData = data;
+                        bestVal = data.damage;
                     }
-
-            if (facePlaceButton.getValue().getKey() != -1 && InputUtil.isKeyPressed(mc.getWindow().getHandle(), facePlaceButton.getValue().getKey()))
-                override = true;
-
-            if ((target.getHealth() + target.getAbsorptionAmount()) - (data.damage * lethalMultiplier.getValue()) < 0.5)
-                override = true;
-
-            if ((override || data.damage > minDamage.getValue()) && bestDmg < data.damage) {
-                renderDamage = data.damage;
-                renderSelfDamage = data.selfDamage;
-                bestData = data;
-                bestDmg = data.damage;
+                } else {
+                    if (bestVal < data.damage / data.selfDamage) {
+                        bestData = data;
+                        bestVal = data.damage / data.selfDamage;
+                    }
+                }
             }
         }
 
         if (bestData == null) return null;
-
+        renderDamage = bestData.damage;
+        renderSelfDamage = bestData.selfDamage;
         return bestData.bhr;
+    }
+
+    private boolean shouldOverride(float damage){
+        if(target == null) return false;
+
+        boolean override = target.getHealth() + target.getAbsorptionAmount() <= facePlaceHp.getValue();
+
+        if (armorBreaker.getValue())
+            for (ItemStack armor : target.getArmorItems())
+                if (armor != null && !armor.getItem().equals(Items.AIR) && ((armor.getMaxDamage() - armor.getDamage()) / (float) armor.getMaxDamage()) * 100 < armorScale.getValue()) {
+                    override = true;
+                    break;
+                }
+
+        if (facePlaceButton.getValue().getKey() != -1 && InputUtil.isKeyPressed(mc.getWindow().getHandle(), facePlaceButton.getValue().getKey()))
+            override = true;
+
+        if ((target.getHealth() + target.getAbsorptionAmount()) - (damage * lethalMultiplier.getValue()) < 0.5)
+            override = true;
+
+        return override;
     }
 
     public EndCrystalEntity filterCrystals(@NotNull List<CrystalData> clearedList) {
         CrystalData bestData = null;
-        float bestDmg = 0f;
+        float bestVal = 0f;
         for (CrystalData data : clearedList) {
-            boolean override = target.getHealth() + target.getAbsorptionAmount() <= facePlaceHp.getValue();
-
-            if (armorBreaker.getValue())
-                for (ItemStack armor : target.getArmorItems())
-                    if (armor != null && !armor.getItem().equals(Items.AIR) && ((armor.getMaxDamage() - armor.getDamage()) / (float) armor.getMaxDamage()) * 100 < armorScale.getValue()) {
-                        override = true;
-                        break;
+            if ((shouldOverride(data.damage) || data.damage > minDamage.getValue())) {
+                if (sort.getValue() == Sort.DAMAGE) {
+                    if (bestVal < data.damage) {
+                        bestData = data;
+                        bestVal = data.damage;
                     }
-
-            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), facePlaceButton.getValue().getKey()))
-                override = true;
-
-            if ((target.getHealth() + target.getAbsorptionAmount()) - (data.damage * lethalMultiplier.getValue()) < 0.5)
-                override = true;
-
-            if ((override || data.damage > minDamage.getValue()) && bestDmg < data.damage) {
-                renderDamage = data.damage;
-                renderSelfDamage = data.selfDamage;
-                bestData = data;
-                bestDmg = data.damage;
+                } else {
+                    if (bestVal < data.damage / data.selfDamage) {
+                        bestData = data;
+                        bestVal = data.damage / data.selfDamage;
+                    }
+                }
             }
         }
 
         if (bestData == null) return null;
+        renderDamage = bestData.damage;
+        renderSelfDamage = bestData.selfDamage;
         return bestData.crystal;
     }
 
@@ -876,16 +880,6 @@ public class AutoCrystal extends Module {
             }
         }
         return bestResult;
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onTick(EventTick e) {
-        ticking.set(true);
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPostTick(EventPostTick e) {
-        ticking.set(false);
     }
 
     private record PlaceData(BlockHitResult bhr, float damage, float selfDamage, boolean overrideDamage) {

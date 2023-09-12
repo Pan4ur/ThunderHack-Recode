@@ -3,10 +3,12 @@ package thunder.hack.utility.player;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PendingUpdateManager;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.injection.accesors.IClientWorldMixin;
 
 import static thunder.hack.modules.Module.mc;
@@ -42,7 +44,7 @@ public final class PlayerUtility {
         return (float) (d * d + f * f);
     }
 
-    public ClientPlayerEntity getPlayer() {
+    public static ClientPlayerEntity getPlayer() {
         return mc.player;
     }
 

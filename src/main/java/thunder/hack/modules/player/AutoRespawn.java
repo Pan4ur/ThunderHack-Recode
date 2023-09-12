@@ -36,10 +36,10 @@ public class AutoRespawn extends Module {
                 mc.setScreen(null);
 
                 ThunderHack.asyncManager.run(()-> {
-                    if (autokit.getValue()) {
+                    if (autokit.getValue() && mc.player != null) {
                         mc.player.networkHandler.sendChatCommand("kit " + kit.getValue());
                     }
-                    if (autohome.getValue()) {
+                    if (autohome.getValue() && mc.player != null) {
                         mc.player.networkHandler.sendChatCommand("home");
                     }
                 },1000);

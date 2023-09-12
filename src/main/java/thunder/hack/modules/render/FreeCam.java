@@ -19,7 +19,7 @@ import thunder.hack.utility.player.PlayerEntityCopy;
 public class FreeCam extends Module {
     private final Setting<Float> speed = new Setting<>("Speed", 1f, 0.0f, 5.0f);
 
-    public static PlayerEntityCopy dummy;
+    public PlayerEntityCopy dummy;
     private Vec3d playerPos;
     private Vec2f playerRot;
     private Entity riding;
@@ -81,7 +81,7 @@ public class FreeCam extends Module {
 
     }
 
-    public static PlayerEntityCopy getPlayer() {
+    public PlayerEntityCopy getPlayer() {
         return dummy;
     }
 

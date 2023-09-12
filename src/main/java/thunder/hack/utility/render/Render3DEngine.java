@@ -404,6 +404,8 @@ public class Render3DEngine {
         cleanup();
     }
 
+
+
     public static void drawBottomOutline(Box box, Color color, float lineWidth) {
         setup();
         MatrixStack matrices = matrixFrom(box.minX, box.minY, box.minZ);
@@ -426,6 +428,40 @@ public class Render3DEngine {
         vertexLine(matrices, buffer, x2, y1, z1, x2, y1, z2, color);
         vertexLine(matrices, buffer, x2, y1, z2, x1, y1, z2, color);
         vertexLine(matrices, buffer, x1, y1, z2, x1, y1, z1, color);
+
+        tessellator.draw();
+        RenderSystem.enableCull();
+        cleanup();
+    }
+
+    public static void drawHoleOutline(Box box, Color color, float lineWidth) {
+        setup();
+        MatrixStack matrices = matrixFrom(box.minX, box.minY, box.minZ);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        RenderSystem.disableCull();
+        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
+        RenderSystem.lineWidth(lineWidth);
+        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+
+        box = box.offset(new Vec3d(box.minX, box.minY, box.minZ).negate());
+
+        float x1 = (float) box.minX;
+        float y1 = (float) box.minY;
+        float y2 = (float) box.maxY;
+        float z1 = (float) box.minZ;
+        float x2 = (float) box.maxX;
+        float z2 = (float) box.maxZ;
+
+        vertexLine(matrices, buffer, x1, y1, z1, x2, y1, z1, color);
+        vertexLine(matrices, buffer, x2, y1, z1, x2, y1, z2, color);
+        vertexLine(matrices, buffer, x2, y1, z2, x1, y1, z2, color);
+        vertexLine(matrices, buffer, x1, y1, z2, x1, y1, z1, color);
+
+        vertexLine(matrices, buffer, x1, y1, z1, x1, y2, z1, color);
+        vertexLine(matrices, buffer, x2, y1, z2, x2, y2, z2, color);
+        vertexLine(matrices, buffer, x1, y1, z2, x1, y2, z2, color);
+        vertexLine(matrices, buffer, x2, y1, z1, x2, y2, z1, color);
 
         tessellator.draw();
         RenderSystem.enableCull();
