@@ -99,6 +99,7 @@ public class Surround extends Module {
     }
 
     public static final Timer inactivityTimer = new Timer();
+    public static final Timer attackTimer = new Timer();
     private final List<BlockPos> sequentialBlocks = new ArrayList<>();
     private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
 
@@ -157,10 +158,11 @@ public class Surround extends Module {
                             break;
                         currentPlacePos = targetBlock;
 
-                        if (breakCrystal.getValue() && alwaysBreak.getValue()) {
+                        if (breakCrystal.getValue() && alwaysBreak.getValue() && attackTimer.passedMs(100)) {
                             Entity entity = getEntity(targetBlock);
                             if (entity != null)
                                 removeCrystal(entity);
+                            attackTimer.reset();
                         }
 
                         if (placeBlock(targetBlock)) {
@@ -183,10 +185,11 @@ public class Surround extends Module {
 
     @EventHandler
     public void onEntitySpawn(EventEntitySpawn e) {
-        if (breakCrystal.getValue() && !alwaysBreak.getValue()) {
+        if (breakCrystal.getValue() && !alwaysBreak.getValue() && attackTimer.passedMs(100)) {
             Entity entity = getEntity(currentPlacePos);
             if (entity != null)
                 removeCrystal(entity);
+            attackTimer.reset();
         }
     }
 
@@ -218,10 +221,11 @@ public class Surround extends Module {
                 return;
             currentPlacePos = targetBlock;
 
-            if (breakCrystal.getValue() && alwaysBreak.getValue()) {
+            if (breakCrystal.getValue() && alwaysBreak.getValue() && attackTimer.passedMs(100)) {
                 Entity entity = getEntity(targetBlock);
                 if (entity != null)
                     removeCrystal(entity);
+                attackTimer.reset();
             }
 
             if (placeBlock(targetBlock)) {
@@ -255,10 +259,11 @@ public class Surround extends Module {
         BlockPos bp = getSequentialPos();
         if (bp != null) {
             currentPlacePos = bp;
-            if (breakCrystal.getValue() && alwaysBreak.getValue()) {
+            if (breakCrystal.getValue() && alwaysBreak.getValue() && attackTimer.passedMs(100)) {
                 Entity entity = getEntity(bp);
                 if (entity != null)
                     removeCrystal(entity);
+                attackTimer.reset();
             }
 
             InventoryUtility.saveSlot();
@@ -277,10 +282,11 @@ public class Surround extends Module {
             BlockPos bp = getSequentialPos();
             if (bp != null) {
                 currentPlacePos = bp;
-                if (breakCrystal.getValue() && alwaysBreak.getValue()) {
+                if (breakCrystal.getValue() && alwaysBreak.getValue() && attackTimer.passedMs(100)) {
                     Entity entity = getEntity(bp);
                     if (entity != null)
                         removeCrystal(entity);
+                    attackTimer.reset();
                 }
 
                 InventoryUtility.saveSlot();

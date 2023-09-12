@@ -50,6 +50,6 @@ public class AntiWeb extends Module {
     @EventHandler
     public void onCollide(EventCollision e) {
         if (e.getState().getBlock() instanceof CobwebBlock && mode.getValue() == Mode.Solid)
-            e.setShape(VoxelShapes.fullCube());
+            e.setState(Blocks.DIRT.getDefaultState());
     }
 }

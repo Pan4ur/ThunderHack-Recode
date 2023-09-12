@@ -16,7 +16,7 @@ import thunder.hack.modules.movement.AntiWeb;
 public class MixinCobwebBlock {
     @Inject(method = "onEntityCollision", at = @At("HEAD"), cancellable = true)
     public void onEntityCollisionHook(BlockState state, World world, BlockPos pos, Entity entity, CallbackInfo ci) {
-        if(ModuleManager.antiWeb.isEnabled() && ModuleManager.antiWeb.mode.getValue() == AntiWeb.Mode.Ignore){
+        if(ModuleManager.antiWeb.isEnabled() && AntiWeb.mode.getValue() == AntiWeb.Mode.Ignore){
             ci.cancel();
         }
     }
