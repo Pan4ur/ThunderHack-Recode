@@ -16,6 +16,7 @@
 - Default ClickGui keybind - **```P```**
 - Default prefix  - **```@```**
 - Middle click on module to bind
+- DoxWare 2.0 is a ratted TH Recode rename, be aware :)
 
 ## Requirements
 - [FabricApi 1.20.1](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files)
