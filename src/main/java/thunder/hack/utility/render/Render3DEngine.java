@@ -486,7 +486,6 @@ public class Render3DEngine {
 
         return new Vector3f(xNormal / normalSqrt, yNormal / normalSqrt, zNormal / normalSqrt);
     }
-    // -------------------- Utils --------------------
 
     public static MatrixStack matrixFrom(double x, double y, double z) {
         MatrixStack matrices = new MatrixStack();

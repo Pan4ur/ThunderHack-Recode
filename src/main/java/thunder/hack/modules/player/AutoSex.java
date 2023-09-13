@@ -5,6 +5,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.math.MathUtility;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +35,7 @@ public class AutoSex extends Module {
 
     private PlayerEntity target;
     private final Timer messageTimer = new Timer();
+    private final Timer sneakTimer = new Timer();
 
     public AutoSex() {
         super("AutoSex", Category.PLAYER);
@@ -46,16 +48,21 @@ public class AutoSex extends Module {
             target = ThunderHack.combatManager.getNearestTarget(targetRange.getValue());
             return;
         }
-        if (target.getPos().squaredDistanceTo(mc.player.getPos()) >= targetRange.getValue()) {
+        if (target.getPos().squaredDistanceTo(mc.player.getPos()) >= targetRange.getPow2Value()) {
             target = null;
             return;
         }
 
         switch (mode.getValue()) {
-            case Active -> mc.player.setSneaking(!mc.player.isSneaking());
+            case Active -> {
+                if (sneakTimer.passedMs((long) MathUtility.random(80, 120))) {
+                    mc.options.sneakKey.setPressed(!mc.options.sneakKey.isPressed());
+                    sneakTimer.reset();
+                }
+            }
             case Passive -> {
-                if (!mc.player.isSneaking())
-                    mc.player.setSneaking(true);
+                if (!mc.options.sneakKey.isPressed())
+                    mc.options.sneakKey.setPressed(true);
             }
         }
 

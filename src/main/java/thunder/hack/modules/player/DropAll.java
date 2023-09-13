@@ -29,7 +29,7 @@ public class DropAll extends Module {
             for (int i = 5; i <= 45; i++) {
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 1, SlotActionType.THROW, mc.player);
                 try {
-                    Thread.sleep(70);
+                    Thread.sleep(delay.getValue());
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }

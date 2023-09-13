@@ -36,17 +36,17 @@ public class ThunderHack implements ModInitializer {
 
     /*-----------------    Managers  ---------------------*/
     public static NotificationManager notificationManager = new NotificationManager();
-    public static FriendManager friendManager = new FriendManager();
+    public static WayPointManager wayPointManager = new WayPointManager();
     public static ModuleManager moduleManager = new ModuleManager();
+    public static FriendManager friendManager = new FriendManager();
     public static ServerManager serverManager = new ServerManager();
     public static PlayerManager playerManager = new PlayerManager();
     public static CombatManager combatManager = new CombatManager();
     public static ConfigManager configManager = new ConfigManager();
+    public static ShaderManager shaderManager = new ShaderManager();
     public static AsyncManager asyncManager = new AsyncManager();
     public static MacroManager macroManager = new MacroManager();
-    public static WayPointManager wayPointManager = new WayPointManager();
     public static CommandManager commandManager = new CommandManager();
-    public static ShaderManager shaderManager = new ShaderManager();
 
     public static Core core = new Core();
     /*--------------------------------------------------------*/
@@ -57,6 +57,7 @@ public class ThunderHack implements ModInitializer {
                 .orElseThrow()
                 .getMetadata();
     }
+
 
     @Override
     public void onInitialize() {

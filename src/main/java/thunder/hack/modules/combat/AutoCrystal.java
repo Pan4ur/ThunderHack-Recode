@@ -518,6 +518,7 @@ public class AutoCrystal extends Module {
 
         boolean offhand = mc.player.getOffHandStack().getItem() instanceof EndCrystalItem;
 
+
         sendPacket(new PlayerInteractBlockC2SPacket(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
         mc.player.swingHand(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND);
 
