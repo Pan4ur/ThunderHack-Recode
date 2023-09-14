@@ -10,10 +10,13 @@ import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
@@ -21,6 +24,8 @@ import java.util.ArrayList;
 
 public class XRay extends Module {
     private final Setting<Boolean> brutForce = new Setting<>("OreDeobf", false);
+    private final Setting<Boolean> rotate = new Setting<>("Rotate", false, v -> brutForce.getValue());
+    private final Setting<Boolean> fast = new Setting<>("Fast", false, v -> brutForce.getValue());
     private final Setting<Integer> checkSpeed = new Setting<>("CheckSpeed", 4, 1, 5, v -> brutForce.getValue());
     private final Setting<Integer> rxz = new Setting<>("RadiusXZ", 5, 5, 64, v -> brutForce.getValue());
     private final Setting<Integer> ry = new Setting<>("RadiusY", 5, 2, 50, v -> brutForce.getValue());
@@ -50,7 +55,13 @@ public class XRay extends Module {
         ores.clear();
         toCheck.clear();
         for (BlockPos pos : getBlocks()) {
-            if (mc.world.isAir(pos)) continue;
+            if (mc.world.isAir(pos))
+                continue;
+
+            if(fast.getValue())
+                if (pos.getX() % 2 == 0 || pos.getZ() % 2 == 0 || pos.getY() % 2 == 0)
+                    continue;
+
             toCheck.add(pos);
         }
         all = toCheck.size();
@@ -63,16 +74,33 @@ public class XRay extends Module {
         mc.worldRenderer.reload();
     }
 
-    @Override
-    public void onUpdate() {
-        if (!brutForce.getValue()) return;
+    @EventHandler
+    public void onSync(EventSync e) {
+        if (!brutForce.getValue())
+            return;
+        if (toCheck.size() < 1)
+            return;
+        if(!rotate.getValue())
+            return;
+
+        BlockPos pos = toCheck.get(0);
+        InteractionUtility.BreakData bdata = InteractionUtility.getBreakData(pos, InteractionUtility.Interact.Strict);
+        if (bdata != null) {
+            float[] angle = InteractionUtility.calculateAngle(bdata.vector());
+            mc.player.setYaw(angle[0]);
+            mc.player.setPitch(angle[1]);
+        }
+    }
+
+    @EventHandler
+    public void onPostSync(EventPostSync e) {
         for (int i = 0; i < checkSpeed.getValue(); ++i) {
             if (toCheck.size() < 1) {
                 return;
             }
             BlockPos pos = toCheck.remove(0);
             ++done;
-            mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos, Direction.UP));
+            sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos, Direction.UP));
             displayBlock = pos;
         }
     }
@@ -125,7 +153,7 @@ public class XRay extends Module {
                 }
             }
             if (displayBlock != null && (done != all)) {
-                Render3DEngine.drawFilledBox(stack, new Box(displayBlock), new Color(255, 0, 30));
+                Render3DEngine.drawFilledBox(stack, new Box(displayBlock), new Color(255, 0, 30, 100));
                 Render3DEngine.drawBoxOutline(new Box(displayBlock), new Color(255, 0, 60), 2);
             }
         } catch (Exception ignored) {

@@ -8,6 +8,7 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -34,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class Blocker extends Module {
     private final Setting<Integer> actionShift = new Setting<>("Place Per Tick", 1, 1, 5);
@@ -66,6 +69,17 @@ public class Blocker extends Module {
 
     public Blocker() {
         super("Blocker", Category.COMBAT);
+    }
+
+
+    @Override
+    public void onEnable(){
+        sendMessage(isRu() ?
+                        Formatting.RED + "ВНИМАНИЕ!!! "
+                        + Formatting.RESET + "Использование блокера на серверах осуждается игроками, а в некоторых странах карается набутыливанием!" :
+                        Formatting.RED +"WARNING!!! "
+                        + Formatting.RESET +  "The use of blocker on servers is condemned by players, and in some countries is punishable by jail!"
+                );
     }
 
     @Override
