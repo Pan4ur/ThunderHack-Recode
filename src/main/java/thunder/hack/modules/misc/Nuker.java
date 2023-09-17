@@ -70,7 +70,7 @@ public class Nuker extends Module {
         mc.player.setYaw(angle[0]);
         mc.player.setPitch(angle[1]);
 
-        if (ModuleManager.speedMine.isEnabled()) {
+        if (ModuleManager.speedMine.isEnabled() && ModuleManager.speedMine.mode.getValue() == SpeedMine.Mode.Packet) {
             if (SpeedMine.minePosition != nukerTargetBlockpos.bp) {
                 mc.interactionManager.attackBlock(nukerTargetBlockpos.bp, nukerTargetBlockpos.dir);
                 mc.player.swingHand(Hand.MAIN_HAND);

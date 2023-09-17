@@ -31,12 +31,13 @@ import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
 
 public class SpeedMine extends Module {
-    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
+    public final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
     private final Setting<Float> startDmg = new Setting<>("StartDmg", 0f, 0f, 1f);
     private final Setting<Float> finishDmg = new Setting<>("FinishDmg", 1f, 0f, 1f);
     private final Setting<Float> range = new Setting<>("Range", 4.2f, 3.0f, 10.0f);
@@ -55,7 +56,7 @@ public class SpeedMine extends Module {
     public static BlockPos minePosition;
     private Direction mineFacing;
     private int mineBreaks;
-    public static float progress;
+    public static float progress, prevProgress;
     public boolean worth = false;
 
     public SpeedMine() {
@@ -110,9 +111,11 @@ public class SpeedMine extends Module {
                         progress = 0;
                         mineBreaks++;
                     }
+                    prevProgress = progress;
                     progress += getBlockStrength(mc.world.getBlockState(minePosition), minePosition);
                 } else {
                     progress = 0;
+                    prevProgress = 0;
                 }
             }
         }
@@ -195,6 +198,7 @@ public class SpeedMine extends Module {
     public void onPacketSend(PacketEvent.SendPost e) {
         if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket && resetOnSwitch.getValue()) {
             progress = 0;
+            prevProgress = 0;
         }
     }
 
@@ -204,6 +208,7 @@ public class SpeedMine extends Module {
         mineFacing = null;
         progress = 0;
         mineBreaks = 0;
+        prevProgress = 0;
     }
 
     @Override
@@ -212,6 +217,7 @@ public class SpeedMine extends Module {
         mineFacing = null;
         progress = 0;
         mineBreaks = 0;
+        prevProgress = 0;
     }
 
     public void onRender3D(MatrixStack stack) {
@@ -222,7 +228,7 @@ public class SpeedMine extends Module {
                 switch (renderMode.getValue()) {
                     case Shrink -> {
                         Box shrunkMineBox = new Box(minePosition.getX(), minePosition.getY(), minePosition.getZ(), minePosition.getX(), minePosition.getY(), minePosition.getZ());
-                        float noom = MathUtility.clamp(progress, 0f, 1f);
+                        float noom = (float) MathUtility.clamp(Render2DEngine.interpolate(prevProgress, progress, mc.getTickDelta()), 0f, 1f);
 
                         Render3DEngine.drawFilledBox(
                                 stack,
