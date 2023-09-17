@@ -1,5 +1,6 @@
 package thunder.hack.core;
 
+import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -27,8 +28,8 @@ public class AsyncManager {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPostTick(EventPostTick e) {
         if (mc.world == null) return;
-        threadSafeEntityList = mc.world.getEntities();
-        threadSafePlayersList = mc.world.getPlayers();
+        threadSafeEntityList = Lists.newArrayList(mc.world.getEntities());
+        threadSafePlayersList = Lists.newArrayList(mc.world.getPlayers());
     }
 
     public Iterable<Entity> getAsyncEntities() {
