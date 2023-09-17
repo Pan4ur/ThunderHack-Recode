@@ -27,6 +27,8 @@ public class ModuleManager {
 
 
     public static LevitationControl levitationControl = new LevitationControl();
+    public static InventoryCleaner inventoryCleaner = new InventoryCleaner();
+
     public static NoCommentExploit noCommentExploit = new NoCommentExploit();
     public static AntiFriendAttack antiFriendAttack = new AntiFriendAttack();
     public static TotemPopCounter totemPopCounter = new TotemPopCounter();
@@ -62,6 +64,7 @@ public class ModuleManager {
     public static ChestStealer chestStealer = new ChestStealer();
     public static AutoTpAccept autoTpAccept = new AutoTpAccept();
     public static AntiSurround antiSurround = new AntiSurround();
+
     public static WorldTweaks worldTweaks = new WorldTweaks();
     public static VisualRange visualRange = new VisualRange();
     public static Speedometer speedometer = new Speedometer();
@@ -163,6 +166,8 @@ public class ModuleManager {
     public static AntiBot antiBot = new AntiBot();
     public static AntiAim antiAim = new AntiAim();
     public static DropAll dropAll = new DropAll();
+    public static AutoSex autoSex = new AutoSex();
+
     public static XCarry xCarry = new XCarry();
     public static Trails trails = new Trails();
     public static Strafe strafe = new Strafe();
@@ -177,6 +182,7 @@ public class ModuleManager {
     public static Burrow burrow = new Burrow();
     public static AutoEZ autoEZ = new AutoEZ();
     public static AimBot aimBot = new AimBot();
+
     public static Timer timer = new Timer();
     public static Speed speed = new Speed();
     public static Reach reach = new Reach();
@@ -192,7 +198,6 @@ public class ModuleManager {
     public static RPC rpc = new RPC();
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
-    public static AutoSex autoSex = new AutoSex();
 
 
     public ModuleManager() {

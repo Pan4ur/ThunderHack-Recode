@@ -18,7 +18,6 @@ public class NoPistonPush extends Module {
             wasSprinting = mc.player.isSprinting();
         }
 
-        super.onEnable();
     }
 
     @Override
@@ -33,8 +32,6 @@ public class NoPistonPush extends Module {
                 mc.player.setSprinting(wasSprinting);
             }
         }
-
-        super.onUpdate();
     }
 
     private boolean detectPistonPush() {

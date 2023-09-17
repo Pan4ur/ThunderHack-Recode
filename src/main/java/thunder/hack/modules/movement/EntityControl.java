@@ -1,9 +1,9 @@
-package thunder.hack.modules.player;
+package thunder.hack.modules.movement;
 
 import thunder.hack.modules.Module;
 
 public class EntityControl extends Module {
     public EntityControl() {
-        super("EntityControl", Category.PLAYER);
+        super("EntityControl", Category.MOVEMENT);
     }
 }

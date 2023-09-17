@@ -21,7 +21,11 @@ public class WaterSpeed extends Module {
     @Override
     public void onUpdate() {
         if(mode.getValue() == Mode.HollyWorld) {
-            mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, 2));
+            if(mc.player.isSwimming()){
+                mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, 2));
+            } else {
+                mc.player.removeStatusEffect(StatusEffects.DOLPHINS_GRACE);
+            }
         }
     }
 
