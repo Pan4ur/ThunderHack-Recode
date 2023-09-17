@@ -4,6 +4,8 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.effect.StatusEffects;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventMove;
+import thunder.hack.events.impl.EventSprint;
+import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
@@ -47,7 +49,7 @@ public class Speed extends Module {
     }
 
     @EventHandler
-    public void onPlayerUpdate(PlayerUpdateEvent e) {
+    public void onSync(EventSync e) {
         if (mode.getValue() == Mode.MatrixJB) {
             if (MovementUtility.isMoving() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(0.5, 0.0, 0.5).offset(0.0, -1.0, 0.0)).iterator().hasNext() && !flip) {
                 mc.player.setOnGround(true);
