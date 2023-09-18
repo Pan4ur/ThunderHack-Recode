@@ -572,7 +572,7 @@
           "Target Range": 5,
           "Sex Mode": "Active",
           "Message Delay": 50,
-          "Enabled": true,
+          "Enabled": false,
           "Keybind": [
             -1,
             false
