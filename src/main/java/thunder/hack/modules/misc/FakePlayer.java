@@ -24,8 +24,6 @@ public class FakePlayer extends Module {
         super("FakePlayer", "FakePlayer", Category.MISC);
     }
 
-    private Vec3d pos;
-    private Box box;
 
     @Override
     public void onEnable() {
@@ -35,8 +33,6 @@ public class FakePlayer extends Module {
         if (copyInventory.getValue()) {
             fakePlayer.getInventory().clone(mc.player.getInventory());
         }
-        pos = new Vec3d(mc.player.getX(), mc.player.getY(), mc.player.getZ());
-        box = new Box(mc.player.getBoundingBox().minX, mc.player.getBoundingBox().minY, mc.player.getBoundingBox().minZ, mc.player.getBoundingBox().maxX, mc.player.getBoundingBox().maxY, mc.player.getBoundingBox().maxZ);
         mc.world.addEntity(22822854, fakePlayer);
     }
 

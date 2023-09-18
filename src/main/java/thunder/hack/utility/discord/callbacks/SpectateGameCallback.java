@@ -1,7 +1,3 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
 package thunder.hack.utility.discord.callbacks;
 
 import com.sun.jna.Callback;

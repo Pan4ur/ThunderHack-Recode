@@ -13,14 +13,9 @@ import static thunder.hack.modules.Module.mc;
 public class PredictUtility {
     public static PlayerEntity predictPlayer(PlayerEntity entity, int ticks) {
         Vec3d posVec = new Vec3d(entity.getX(), entity.getY(), entity.getZ());
-        Vec3d newPosVec = clone(posVec);
-
         double motionX = entity.getX() - entity.prevX;
         double motionY = entity.getY() - entity.prevY;
         double motionZ = entity.getZ() - entity.prevZ;
-
-        int stairPredicted = 0;
-        boolean allowPredictStair = Math.abs(entity.getX() - entity.prevX) + Math.abs(entity.getZ() - entity.prevZ) > .3f;
 
         for (int i = 0; i < ticks; i++) {
             if (!mc.world.isAir(BlockPos.ofFloored(posVec.add(0, motionY, 0)))) {
