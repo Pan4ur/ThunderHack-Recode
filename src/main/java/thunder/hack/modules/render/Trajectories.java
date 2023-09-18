@@ -3,6 +3,8 @@ package thunder.hack.modules.render;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.*;
@@ -59,39 +61,49 @@ public class Trajectories extends Module {
         if (mc.player == null || mc.world == null || !mc.options.getPerspective().isFirstPerson())
             return;
         Hand hand;
-        if(mc.player.getMainHandStack().getItem() instanceof BowItem || mc.player.getMainHandStack().getItem() instanceof CrossbowItem || isThrowable(mc.player.getMainHandStack().getItem())) {
+
+        ItemStack mainHand = mc.player.getMainHandStack();
+        ItemStack offHand = mc.player.getOffHandStack();
+
+        if(mainHand.getItem() instanceof BowItem || mainHand.getItem() instanceof CrossbowItem || isThrowable(mainHand.getItem())) {
             hand = Hand.MAIN_HAND;
-        } else if(mc.player.getOffHandStack().getItem() instanceof BowItem || mc.player.getOffHandStack().getItem() instanceof CrossbowItem  || isThrowable(mc.player.getOffHandStack().getItem())){
+        } else if(offHand.getItem() instanceof BowItem || offHand.getItem() instanceof CrossbowItem  || isThrowable(offHand.getItem())){
             hand = Hand.OFF_HAND;
         } else return;
 
         boolean prev_bob = mc.options.getBobView().getValue();
         mc.options.getBobView().setValue(false);
-        calcTrajectory(hand == Hand.OFF_HAND ? mc.player.getOffHandStack().getItem() : mc.player.getMainHandStack().getItem(), stack);
+        if((mainHand.getItem() instanceof CrossbowItem && EnchantmentHelper.getLevel(Enchantments.MULTISHOT, mainHand) != 0) ||
+                (mainHand.getItem() instanceof CrossbowItem && EnchantmentHelper.getLevel(Enchantments.MULTISHOT, mainHand) != 0)){
+
+            calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw() - 10);
+            calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw());
+            calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw() + 10);
+
+        } else calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw());
         mc.options.getBobView().setValue(prev_bob);
     }
 
-    private void calcTrajectory(Item item, MatrixStack matrices) {
+    private void calcTrajectory(Item item, MatrixStack matrices, float yaw) {
         double x = Render2DEngine.interpolate(mc.player.prevX,mc.player.getX(),mc.getTickDelta());
         double y = Render2DEngine.interpolate(mc.player.prevY,mc.player.getY(),mc.getTickDelta());
         double z = Render2DEngine.interpolate(mc.player.prevZ,mc.player.getZ(),mc.getTickDelta());
 
+        y = y + mc.player.getEyeHeight(mc.player.getPose()) - 0.1000000014901161;
+
         if(item == mc.player.getMainHandStack().getItem()) {
-            x = x - MathHelper.cos(mc.player.getYaw() / 180.0f * 3.1415927f) * 0.16f;
-            y = y + mc.player.getEyeHeight(mc.player.getPose()) - 0.1000000014901161;
-            z = z - MathHelper.sin(mc.player.getYaw() / 180.0f * 3.1415927f) * 0.16f;
+            x = x - MathHelper.cos(yaw / 180.0f * 3.1415927f) * 0.16f;
+            z = z - MathHelper.sin(yaw / 180.0f * 3.1415927f) * 0.16f;
         } else {
-            x = x + MathHelper.cos(mc.player.getYaw() / 180.0f * 3.1415927f) * 0.16f;
-            y = y + mc.player.getEyeHeight(mc.player.getPose()) - 0.1000000014901161;
-            z = z + MathHelper.sin(mc.player.getYaw() / 180.0f * 3.1415927f) * 0.16f;
+            x = x + MathHelper.cos(yaw / 180.0f * 3.1415927f) * 0.16f;
+            z = z + MathHelper.sin(yaw / 180.0f * 3.1415927f) * 0.16f;
         }
 
         final float maxDist = getDistance(item);
-        double motionX = -MathHelper.sin(mc.player.getYaw() / 180.0f * 3.1415927f) * MathHelper.cos(mc.player.getPitch() / 180.0f * 3.1415927f) * maxDist;
+        double motionX = -MathHelper.sin(yaw / 180.0f * 3.1415927f) * MathHelper.cos(mc.player.getPitch() / 180.0f * 3.1415927f) * maxDist;
         double motionY = -MathHelper.sin((mc.player.getPitch() - getThrowPitch(item)) / 180.0f * 3.141593f) * maxDist;
-        double motionZ = MathHelper.cos(mc.player.getYaw() / 180.0f * 3.1415927f) * MathHelper.cos(mc.player.getPitch() / 180.0f * 3.1415927f) * maxDist;
-        int var6 = 72000 - mc.player.getItemUseTimeLeft(); //TODO LEFT
-        float power = var6 / 20.0f;
+        double motionZ = MathHelper.cos(yaw / 180.0f * 3.1415927f) * MathHelper.cos(mc.player.getPitch() / 180.0f * 3.1415927f) * maxDist;
+        float power = mc.player.getItemUseTime() / 20.0f;
         power = (power * power + power * 2.0f) / 3.0f;
         if (power > 1.0f) {
             power = 1.0f;
@@ -101,7 +113,7 @@ public class Trajectories extends Module {
         motionY /= distance;
         motionZ /= distance;
 
-        final float pow = (item instanceof BowItem ? (power * 2.0f) :  item instanceof CrossbowItem  ? (2.0f) : 1.0f) * getThrowVelocity(item);
+        final float pow = (item instanceof BowItem ? (power * 2.0f) :  item instanceof CrossbowItem  ? (2.2f) : 1.0f) * getThrowVelocity(item);
 
 
 
@@ -155,7 +167,7 @@ public class Trajectories extends Module {
                 break;
             }
 
-            if (y <= 0) break;
+            if (y <= -65) break;
             if (motionX == 0 && motionY == 0 && motionZ == 0) continue;
 
             Render3DEngine.drawLine((float) lastPos.x, (float) lastPos.y, (float) lastPos.z,(float) x, (float) y, (float) z, mode.getValue() == Mode.Sync ? HudEditor.getColor(i) : color.getValue().getColorObject(),2);
