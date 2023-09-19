@@ -73,13 +73,13 @@ public class Blocker extends Module {
 
 
     @Override
-    public void onEnable(){
+    public void onEnable() {
         sendMessage(isRu() ?
-                        Formatting.RED + "ВНИМАНИЕ!!! "
+                Formatting.RED + "ВНИМАНИЕ!!! "
                         + Formatting.RESET + "Использование блокера на серверах осуждается игроками, а в некоторых странах карается набутыливанием!" :
-                        Formatting.RED +"WARNING!!! "
-                        + Formatting.RESET +  "The use of blocker on servers is condemned by players, and in some countries is punishable by jail!"
-                );
+                Formatting.RED + "WARNING!!! "
+                        + Formatting.RESET + "The use of blocker on servers is condemned by players, and in some countries is punishable by jail!"
+        );
     }
 
     @Override

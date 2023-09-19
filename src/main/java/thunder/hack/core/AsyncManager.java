@@ -28,6 +28,7 @@ public class AsyncManager {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPostTick(EventPostTick e) {
         if (mc.world == null) return;
+
         threadSafeEntityList = Lists.newArrayList(mc.world.getEntities());
         threadSafePlayersList = Lists.newArrayList(mc.world.getPlayers());
     }

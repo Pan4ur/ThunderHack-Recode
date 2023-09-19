@@ -2,7 +2,6 @@ package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Direction;
@@ -20,19 +19,16 @@ import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InventoryUtility;
-import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import thunder.hack.utility.render.BlockAnimationUtility;
 import thunder.hack.utility.world.HoleUtility;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
@@ -60,7 +56,8 @@ public class HoleFill extends Module {
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Packet);
 
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
-    private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Fade).withParent(renderCategory);
+    private final Setting<BlockAnimationUtility.BlockRenderMode> renderMode = new Setting<>("Render Mode", BlockAnimationUtility.BlockRenderMode.All).withParent(renderCategory);
+    private final Setting<BlockAnimationUtility.BlockAnimationMode> animationMode = new Setting<>("Animation Mode", BlockAnimationUtility.BlockAnimationMode.Fade).withParent(renderCategory);
     private final Setting<ColorSetting> renderFillColor = new Setting<>("Render Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<ColorSetting> renderLineColor = new Setting<>("Render Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<Integer> renderLineWidth = new Setting<>("Render Line Width", 2, 1, 5).withParent(renderCategory);
@@ -77,18 +74,12 @@ public class HoleFill extends Module {
         Indestrictible
     }
 
-    private enum RenderMode {
-        Fade,
-        Decrease
-    }
-
     private enum SelfFillMode {
         Burrow,
         Trap
     }
 
     private boolean burrowWasEnabled = false;
-    private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
     public static final Timer inactivityTimer = new Timer();
     private int tickCounter = 0;
     private boolean selfFillNeed = false;
@@ -101,30 +92,6 @@ public class HoleFill extends Module {
     public void onEnable() {
         burrowWasEnabled = false;
         selfFillNeed = false;
-    }
-
-    @Override
-    public void onRender3D(MatrixStack stack) {
-        renderPoses.forEach((pos, time) -> {
-            if (System.currentTimeMillis() - time > 500) {
-                renderPoses.remove(pos);
-            } else {
-                switch (renderMode.getValue()) {
-                    case Fade -> {
-                        Box box = new Box(pos);
-                        Render3DEngine.drawFilledBox(stack, box, Render2DEngine.injectAlpha(renderFillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
-                        Render3DEngine.drawBoxOutline(box, Render2DEngine.injectAlpha(renderLineColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))), renderLineWidth.getValue());
-                    }
-                    case Decrease -> {
-                        float scale = 1 - (float) (System.currentTimeMillis() - time) / 500;
-                        Box box = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
-
-                        Render3DEngine.drawFilledBox(stack, box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), Render2DEngine.injectAlpha(renderFillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
-                        Render3DEngine.drawBoxOutline(box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), renderLineColor.getValue().getColorObject(), renderLineWidth.getValue());
-                    }
-                }
-            }
-        });
     }
 
     @EventHandler
@@ -206,7 +173,7 @@ public class HoleFill extends Module {
                             if (mc.world.getBlockState(headPos).isReplaceable() && InteractionUtility.canPlaceBlock(headPos, interactMode.getValue(), false)) {
                                 selfFillNeed = false;
                                 InteractionUtility.placeBlock(headPos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), slot, true, switchMode.getValue(), false);
-                                renderPoses.put(headPos, System.currentTimeMillis());
+                                BlockAnimationUtility.renderBlock(headPos, renderLineColor.getValue().getColorObject(), renderLineWidth.getValue(), renderFillColor.getValue().getColorObject(), animationMode.getValue(), renderMode.getValue());
 
                                 tickCounter = 0;
                                 inactivityTimer.reset();
@@ -240,7 +207,7 @@ public class HoleFill extends Module {
                     if (InteractionUtility.placeBlock(blockPos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), slot, true, switchMode.getValue(), false)) {
                         blocksPlaced++;
                         tickCounter = 0;
-                        renderPoses.put(blockPos, System.currentTimeMillis());
+                        BlockAnimationUtility.renderBlock(blockPos, renderLineColor.getValue().getColorObject(), renderLineWidth.getValue(), renderFillColor.getValue().getColorObject(), animationMode.getValue(), renderMode.getValue());
                         if (!mc.player.isOnGround()) return;
                         inactivityTimer.reset();
                     } else {
@@ -301,7 +268,7 @@ public class HoleFill extends Module {
     }
 
     private boolean isFillingNow(BlockPos pos) {
-        return renderPoses.containsKey(pos);
+        return BlockAnimationUtility.isRendering(pos);
     }
 
     private boolean isValidItem(Item item) {

@@ -35,8 +35,6 @@ public class PistonPush extends Module {
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
 
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
-    //  я тут сломал немного
-    //  private final Setting<LogicType> logicType = new Setting<>("Logic Type", LogicType.All);
     private final Setting<ChargeType> chargeType = new Setting<>("Charge Type", ChargeType.All);
     private final Setting<PistonType> pistonType = new Setting<>("Piston Type", PistonType.All);
     private final Setting<Boolean> autoSwap = new Setting<>("Auto Swap", true);
@@ -135,7 +133,7 @@ public class PistonPush extends Module {
                 return;
             }
             if (onSync) {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
+                sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
             } else {
                 mc.player.setYaw(angle[0]);
                 mc.player.setPitch(angle[1]);
@@ -145,7 +143,7 @@ public class PistonPush extends Module {
         placeRunnable = () -> {
             int prevSlot = mc.player.getInventory().selectedSlot;
             InteractionUtility.placeBlock(chargePos, false, interact.getValue(), placeMode.getValue(), getChargeSlot(), true, false);
-            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
+            sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
             mc.player.getInventory().selectedSlot = prevSlot;
             firstPlace = true;
             if (swing.getValue())
@@ -164,7 +162,7 @@ public class PistonPush extends Module {
                 return;
             }
             if (extra) {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
+                sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
             } else {
                 mc.player.setYaw(angle[0]);
                 mc.player.setPitch(angle[1]);
@@ -173,14 +171,14 @@ public class PistonPush extends Module {
         placeRunnable = () -> {
             // без комментариев
             final float angle = InteractionUtility.calculateAngle(target.getEyePos(), pistonPos.toCenterPos())[0];
-            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle, 0, mc.player.isOnGround()));
+            sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle, 0, mc.player.isOnGround()));
             float prevYaw = mc.player.getYaw();
             mc.player.setYaw(angle);
             mc.player.prevYaw = angle;
             ((IClientPlayerEntity) mc.player).setLastYaw(angle);
             int prevSlot = mc.player.getInventory().selectedSlot;
             InteractionUtility.placeBlock(pistonPos, false, interact.getValue(), placeMode.getValue(), getPistonSlot(), true, false);
-            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
+            sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
             mc.player.getInventory().selectedSlot = prevSlot;
             mc.player.setYaw(prevYaw);
             firstPlace = false;
@@ -281,12 +279,6 @@ public class PistonPush extends Module {
             target = player;
             break;
         }
-    }
-
-    private enum LogicType {
-        ChargePlace,
-        PlaceCharge,
-        All
     }
 
     private enum ChargeType {
