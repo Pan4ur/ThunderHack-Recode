@@ -71,10 +71,6 @@ class RPC extends Module {
         return String.join(", ", names);
     }
 
-    // - 126 131 / -210 -160 exit
-
-    // 42 -94 / -124 85 spawn
-
     @Override
     public void onDisable() {
         started = false;

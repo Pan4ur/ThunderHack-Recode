@@ -42,6 +42,7 @@ import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
@@ -56,10 +57,15 @@ import static net.minecraft.util.UseAction.BLOCK;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
 
 public class Aura extends Module {
+    public Aura() {
+        super("Aura", "Запомните блядь-киллка тх не мисает-а дает шанс убежать", Category.COMBAT);
+    }
+
+
     public static final Setting<Float> attackRange = new Setting<>("Attack Range", 3.1f, 1f, 7.0f);
     public static final Setting<Mode> mode = new Setting<>("Rotation", Mode.Universal);
     public static final Setting<RayTrace> rayTrace = new Setting<>("RayTrace", RayTrace.OnlyTarget);
-    private final Setting<Boolean> onlyWeapon = new Setting<>("OnlyWeapon", false);
+    public final Setting<Boolean> onlyWeapon = new Setting<>("OnlyWeapon", false);
     public final Setting<Boolean> smartCrit = new Setting<>("SmartCrit", true);
     public final Setting<Boolean> ignoreWalls = new Setting<>("IgnoreWalls", true);
     public final Setting<Boolean> wallsBypass = new Setting<>("WallsBypass", false, v -> ignoreWalls.getValue());
@@ -101,19 +107,14 @@ public class Aura extends Module {
     }
 
     public static Entity target;
-    private float rotationYaw, rotationPitch, prevClientYaw;
-    private float pitchAcceleration = 1f;
+
+    private float rotationYaw, rotationPitch, prevClientYaw, pitchAcceleration = 1f;
 
     private Vec3d rotationPoint = Vec3d.ZERO;
     private Vec3d rotationMotion = Vec3d.ZERO;
 
     private int hitTicks;
-    public static boolean lookingAtHitbox;
-    public static boolean attackAllowed;
-
-    public Aura() {
-        super("Aura", "Запомните блядь-киллка тх не мисает-а дает шанс убежать", Category.COMBAT);
-    }
+    public static boolean lookingAtHitbox, attackAllowed;
 
     @EventHandler
     public void modifyVelocity(EventPlayerTravel e) {
@@ -164,7 +165,7 @@ public class Aura extends Module {
 
         for (PlayerEntity player : mc.world.getPlayers())
             if (player instanceof OtherClientPlayerEntity) ((IOtherClientPlayerEntity) player).resolve();
-        
+
         calcThread();
 
         for (PlayerEntity player : mc.world.getPlayers())
@@ -197,7 +198,7 @@ public class Aura extends Module {
                 mc.interactionManager.attackEntity(mc.player, target);
                 Criticals.cancelCrit = false;
                 mc.player.swingHand(Hand.MAIN_HAND);
-                hitTicks = oldDelay.getValue() ? 1 + (int) (20f / MathUtility.random(minCPS.getValue(), maxCPS.getValue())) : 11;
+                hitTicks = getHitTicks();
             }
 
             if (sprint && dropSprint.getValue())
@@ -206,6 +207,14 @@ public class Aura extends Module {
                 sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
         }
         hitTicks--;
+    }
+
+    private int getHitTicks() {
+        // Обоссаный плагин поставили чтоб нубики с читами в крит не попадали
+        if(mc.getCurrentServerEntry() != null && mc.getCurrentServerEntry().address.equals("ngrief.me") && mc.player.getMainHandStack().getItem() instanceof AxeItem){
+            return 21;
+        }
+        return oldDelay.getValue() ? 1 + (int) (20f / MathUtility.random(minCPS.getValue(), maxCPS.getValue())) : 11;
     }
 
     @EventHandler
@@ -277,10 +286,10 @@ public class Aura extends Module {
 
         if (pauseInInventory.getValue() && ThunderHack.playerManager.inInventory) return false;
 
-        if (oldDelay.getValue())
-            if (minCPS.getValue() > maxCPS.getValue()) minCPS.setValue(maxCPS.getValue());
-            else if (!(MathHelper.clamp(((float) ((ILivingEntity) mc.player).getLastAttackedTicks() + 0.5f) / getAttackCooldownProgressPerTick(), 0.0F, 1.0F) >= 0.93f))
-                return false;
+        if (oldDelay.getValue()) {
+            if (minCPS.getValue() > maxCPS.getValue())
+                minCPS.setValue(maxCPS.getValue());
+        } else if (getAttackCooldown() < 0.93f) return false;
 
 
         boolean mergeWithTargetStrafe = !ModuleManager.targetStrafe.isEnabled() || !ModuleManager.targetStrafe.jump.getValue();
@@ -325,13 +334,18 @@ public class Aura extends Module {
         return true;
     }
 
-    static boolean isAboveWater() {
+    public static boolean isAboveWater() {
         return mc.player.isSubmergedInWater() || mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos().add(0, -0.4, 0))).getBlock() == Blocks.WATER;
     }
 
-    static float getAttackCooldownProgressPerTick() {
+    public static float getAttackCooldownProgressPerTick() {
         return (float) (1.0 / mc.player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_SPEED) * (20.0 * ThunderHack.TICK_TIMER));
     }
+
+    public static float getAttackCooldown() {
+        return MathHelper.clamp(((float) ((ILivingEntity) mc.player).getLastAttackedTicks() + 0.5f) / getAttackCooldownProgressPerTick(), 0.0F, 1.0F);
+    }
+
 
     private void calcThread() {
 
@@ -515,7 +529,7 @@ public class Aura extends Module {
                 return ent;
             }
             if (skipEntity(ent)) continue;
-            if(!(ent instanceof LivingEntity)) continue;
+            if (!(ent instanceof LivingEntity)) continue;
             first_stage.add((LivingEntity) ent);
         }
 

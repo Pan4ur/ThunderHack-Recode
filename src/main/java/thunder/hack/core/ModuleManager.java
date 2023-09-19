@@ -64,7 +64,6 @@ public class ModuleManager {
     public static ChestStealer chestStealer = new ChestStealer();
     public static AutoTpAccept autoTpAccept = new AutoTpAccept();
     public static AntiSurround antiSurround = new AntiSurround();
-
     public static WorldTweaks worldTweaks = new WorldTweaks();
     public static VisualRange visualRange = new VisualRange();
     public static Speedometer speedometer = new Speedometer();
@@ -100,6 +99,7 @@ public class ModuleManager {
     public static AutoAnchor autoAnchor = new AutoAnchor();
     public static AntiHunger antiHunger = new AntiHunger();
     public static Animations animations = new Animations();
+    public static DamageFly damageFly = new DamageFly();
     public static WayPoints wayPoints = new WayPoints();
     public static WaterMark waterMark = new WaterMark();
     public static ViewModel viewModel = new ViewModel();

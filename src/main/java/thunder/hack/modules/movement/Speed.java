@@ -26,8 +26,9 @@ public class Speed extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
     public Setting<Boolean> useTimer = new Setting<>("Use Timer", false);
     public final Setting<Integer> hurttime = new Setting<>("Hurttime", 0, 0, 10, v-> mode.getValue() == Mode.MatrixDamage);
+    public final Setting<Float> boostFactor = new Setting<>("BoostFactor", 2f, 0f, 10f, v-> mode.getValue() == Mode.MatrixDamage);
+    public final Setting<Boolean> allowOffGround = new Setting<>("AllowOffGround", true, v-> mode.getValue() == Mode.MatrixDamage);
 
-    public boolean flip;
     public double baseSpeed;
     private int stage, ticks;
     private thunder.hack.utility.Timer elytraDelay = new thunder.hack.utility.Timer();
@@ -97,11 +98,11 @@ public class Speed extends Module {
         if(mode.getValue() == Mode.MatrixDamage){
             if (MovementUtility.isMoving() && mc.player.hurtTime > hurttime.getValue()) {
                 if (mc.player.isOnGround()) {
-                    MovementUtility.setMotion(0.387f);
+                    MovementUtility.setMotion(0.387f * boostFactor.getValue());
                 } else if (mc.player.isTouchingWater()) {
-                    MovementUtility.setMotion(0.346f);
-                } else if (!mc.player.isOnGround()) {
-                    MovementUtility.setMotion(0.448f);
+                    MovementUtility.setMotion(0.346f * boostFactor.getValue());
+                } else if (!mc.player.isOnGround() && allowOffGround.getValue()) {
+                    MovementUtility.setMotion(0.448f * boostFactor.getValue());
                 }
             }
         }
