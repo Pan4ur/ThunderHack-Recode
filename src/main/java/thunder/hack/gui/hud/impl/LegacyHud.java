@@ -44,6 +44,8 @@ public class LegacyHud extends Module {
     private final Setting<Boolean> potions = new Setting<>("Potions", false);
     private final Setting<Boolean> ping = new Setting<>("Ping", false);
     private final Setting<Boolean> tps = new Setting<>("TPS", false);
+    private final Setting<Boolean> extraTps = new Setting<>("ExtraTPS", true, v-> tps.getValue());
+
     private final Setting<Boolean> fps = new Setting<>("FPS", false);
     public Setting<Integer> waterMarkY = new Setting<>("WatermarkPosY", 2, 0, 20, v -> waterMark.getValue());
     public Setting<Boolean> time = new Setting<>("Time", false);
@@ -116,7 +118,7 @@ public class LegacyHud extends Module {
                 context.drawText(mc.textRenderer, Text.of(str), (width - getStringWidth(str) - 2), (height - 2 - i), color, true);
             }
             if (tps.getValue()) {
-                String str = "TPS " + Formatting.WHITE + ThunderHack.serverManager.getTPS();
+                String str = "TPS " + Formatting.WHITE + ThunderHack.serverManager.getTPS() + (extraTps.getValue() ? " [" + ThunderHack.serverManager.getTPS2() + "]" : "");
                 i += 10;
                 context.drawText(mc.textRenderer, Text.of(str), (width - getStringWidth(str) - 2), (height - 2 - i), color, true);
             }
@@ -172,7 +174,7 @@ public class LegacyHud extends Module {
                 context.drawText(mc.textRenderer, Text.of(str), (width - getStringWidth(str) - 2), (2 + i++ * 10), color, true);
             }
             if (tps.getValue()) {
-                String str = "TPS " + Formatting.WHITE + ThunderHack.serverManager.getTPS();
+                String str = "TPS " + Formatting.WHITE + ThunderHack.serverManager.getTPS() + (extraTps.getValue() ? " [" + ThunderHack.serverManager.getTPS2() + "]" : "");
                 context.drawText(mc.textRenderer, Text.of(str), (width - getStringWidth(str) - 2), (2 + i++ * 10), color, true);
             }
             String fpsText = "FPS " + Formatting.WHITE + FrameRateCounter.INSTANCE.getFps();

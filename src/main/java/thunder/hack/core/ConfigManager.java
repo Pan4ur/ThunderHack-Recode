@@ -284,7 +284,7 @@ public class ConfigManager {
                         case "ColorSetting":
                             JsonArray array = mobject.getAsJsonArray(setting2.getName());
                             ((ColorSetting) setting2.getValue()).setColor(array.get(0).getAsInt());
-                            ((ColorSetting) setting2.getValue()).setCycle(array.get(1).getAsBoolean());
+                            ((ColorSetting) setting2.getValue()).setRainbow(array.get(1).getAsBoolean());
                             ((ColorSetting) setting2.getValue()).setGlobalOffset(array.get(2).getAsInt());
                             continue;
                         case "PositionSetting":
@@ -326,7 +326,7 @@ public class ConfigManager {
             if (setting.isColorSetting()) {
                 JsonArray array = new JsonArray();
                 array.add(new JsonPrimitive(((ColorSetting) setting.getValue()).getRawColor()));
-                array.add(new JsonPrimitive(((ColorSetting) setting.getValue()).isCycle()));
+                array.add(new JsonPrimitive(((ColorSetting) setting.getValue()).isRainbow()));
                 array.add(new JsonPrimitive(((ColorSetting) setting.getValue()).getGlobalOffset()));
                 attribs.add(setting.getName(), array);
                 continue;

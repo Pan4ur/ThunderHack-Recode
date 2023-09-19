@@ -32,10 +32,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import static thunder.hack.modules.Module.mc;
 
 public final class Core {
-    Timer lastPacket = new Timer();
 
-    public static boolean lock_sprint, serversprint;
+    public static boolean lock_sprint, serversprint, hold_mouse0, showSkull;
     public static Map<String, Identifier> heads = new ConcurrentHashMap<>();
+    private final Identifier SKULL = new Identifier("textures/skull.png");
+    private final Timer skullTimer = new Timer();
+    private final Timer lastPacket = new Timer();
+
 
     @EventHandler
     public void onTick(PlayerUpdateEvent event) {
@@ -74,17 +77,18 @@ public final class Core {
         }
 
         if (e.getPacket() instanceof ClientCommandC2SPacket command) {
+            if(command.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING ||command.getMode() == ClientCommandC2SPacket.Mode.STOP_SPRINTING ) {
+                if (lock_sprint) {
+                    e.setCancelled(true);
+                    return;
+                }
 
-            if (lock_sprint) {
-                e.setCancelled(true);
-                return;
+                if (command.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING)
+                    serversprint = true;
+
+                if (command.getMode() == ClientCommandC2SPacket.Mode.STOP_SPRINTING)
+                    serversprint = false;
             }
-
-            if (command.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING)
-                serversprint = true;
-
-            if (command.getMode() == ClientCommandC2SPacket.Mode.STOP_SPRINTING)
-                serversprint = false;
         }
     }
 
@@ -115,7 +119,7 @@ public final class Core {
     }
 
     public void drawSkull(DrawContext e) {
-        if (showSkull && !skullTimer.passedMs(3000)) {
+        if (showSkull && !skullTimer.passedMs(3000) && MainSettings.skullEmoji.getValue()) {
             int xPos = (int) (mc.getWindow().getScaledWidth() / 2f - 150);
             int yPos = (int) (mc.getWindow().getScaledHeight() / 2f - 150);
             float alpha = (1 - (skullTimer.getPassedTimeMs() / 3000f));
@@ -154,8 +158,6 @@ public final class Core {
         }
     }
 
-    public static boolean hold_mouse0;
-
     @EventHandler
     public void onMouse(EventMouse event) {
         if (event.getAction() == 0) {
@@ -182,9 +184,4 @@ public final class Core {
     public static boolean fullNullCheck() {
         return mc.player == null || mc.world == null;
     }
-
-    private final Identifier SKULL = new Identifier("textures/skull.png");
-
-    private final Timer skullTimer = new Timer();
-    private boolean showSkull = false;
 }

@@ -6,7 +6,7 @@ import java.awt.*;
 
 public final class ColorSetting {
     private int color;
-    private boolean cycle = false;
+    private boolean rainbow = false;
     private int globalOffset = 0;
 
     public ColorSetting(@NotNull Color color) {
@@ -19,12 +19,12 @@ public final class ColorSetting {
 
     public ColorSetting(int color, boolean cycle) {
         this.color = color;
-        this.cycle = cycle;
+        this.rainbow = cycle;
     }
 
     public ColorSetting(int color, boolean cycle, int globalOffset) {
         this.color = color;
-        this.cycle = cycle;
+        this.rainbow = cycle;
         this.globalOffset = globalOffset;
     }
 
@@ -38,12 +38,8 @@ public final class ColorSetting {
                 ((blue & 0xFF)));
     }
 
-    public static int parseColor(String nm) throws NumberFormatException {
-        return Integer.decode(nm);
-    }
-
     public int getColor() {
-        if (cycle) {
+        if (rainbow) {
             float[] hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
             double rainbowState = Math.ceil((System.currentTimeMillis() + 300 + globalOffset) / 20.0);
             rainbowState %= 360;
@@ -72,26 +68,8 @@ public final class ColorSetting {
         this.globalOffset = globalOffset;
     }
 
-    public int getOffsetColor(int offset) {
-        if (cycle) {
-            float[] hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
-            double rainbowState = Math.ceil((System.currentTimeMillis() + 300 + offset + globalOffset) / 20.0);
-            rainbowState %= 360;
-            int rgb = Color.getHSBColor((float) (rainbowState / 360.0f), hsb[1], hsb[2]).getRGB();
-            int alpha = (color >> 24) & 0xff;
-            int red = (rgb >> 16) & 0xFF;
-            int green = (rgb >> 8) & 0xFF;
-            int blue = (rgb) & 0xFF;
-            return ((alpha & 0xFF) << 24) |
-                    ((red & 0xFF) << 16) |
-                    ((green & 0xFF) << 8) |
-                    ((blue & 0xFF));
-        }
-        return color;
-    }
-
     public int getRed() {
-        if (cycle) {
+        if (rainbow) {
             float[] hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
             double rainbowState = Math.ceil((System.currentTimeMillis() + 300 + globalOffset) / 20.0);
             rainbowState %= 360;
@@ -102,7 +80,7 @@ public final class ColorSetting {
     }
 
     public int getGreen() {
-        if (cycle) {
+        if (rainbow) {
             float[] hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
             double rainbowState = Math.ceil((System.currentTimeMillis() + 300 + globalOffset) / 20.0);
             rainbowState %= 360;
@@ -113,7 +91,7 @@ public final class ColorSetting {
     }
 
     public int getBlue() {
-        if (cycle) {
+        if (rainbow) {
             float[] hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
             double rainbowState = Math.ceil((System.currentTimeMillis() + 300 + globalOffset) / 20.0);
             rainbowState %= 360;
@@ -142,15 +120,11 @@ public final class ColorSetting {
         return color;
     }
 
-    public boolean isCycle() {
-        return cycle;
+    public boolean isRainbow() {
+        return rainbow;
     }
 
-    public void setCycle(boolean cycle) {
-        this.cycle = cycle;
-    }
-
-    public void toggleCycle() {
-        this.cycle = !this.cycle;
+    public void setRainbow(boolean rainbow) {
+        this.rainbow = rainbow;
     }
 }

@@ -2,6 +2,8 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventSprint;
@@ -51,13 +53,22 @@ public class Speed extends Module {
     @EventHandler
     public void onSync(EventSync e) {
         if (mode.getValue() == Mode.MatrixJB) {
-            if (MovementUtility.isMoving() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(0.5, 0.0, 0.5).offset(0.0, -1.0, 0.0)).iterator().hasNext() && !flip) {
+            boolean closeToGround = false;
+
+            for(VoxelShape a : mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(0.5, 0.0, 0.5).offset(0.0, -1.0, 0.0)))
+                if(a != VoxelShapes.empty()){
+                    closeToGround = true;
+                    break;
+                }
+
+            if (MovementUtility.isMoving() && closeToGround && mc.player.fallDistance <= 0) {
+                ThunderHack.TICK_TIMER = 1f;
                 mc.player.setOnGround(true);
                 mc.player.jump();
+            } else if(mc.player.fallDistance > 0 && useTimer.getValue()) {
+                ThunderHack.TICK_TIMER = 1.088f;
+                mc.player.addVelocity(0f, -0.003f,0f);
             }
-            if (mc.player.fallDistance > 0) flip = true;
-            if (mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, -0.2, 0.0)).iterator().hasNext() && flip)
-                flip = false;
         }
     }
 

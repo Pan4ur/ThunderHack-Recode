@@ -662,8 +662,8 @@ public class AutoCrystal extends Module {
         return bestData.bhr;
     }
 
-    private boolean shouldOverride(float damage){
-        if(target == null) return false;
+    private boolean shouldOverride(float damage) {
+        if (target == null) return false;
 
         boolean override = target.getHealth() + target.getAbsorptionAmount() <= facePlaceHp.getValue();
 
@@ -710,13 +710,13 @@ public class AutoCrystal extends Module {
 
     public PlaceData getPlaceData(BlockPos bp, PlayerEntity target) {
         Block base = mc.world.getBlockState(bp).getBlock();
-        Block freeSpace = mc.world.getBlockState(bp.up()).getBlock();
-        Block legacyFreeSpace = mc.world.getBlockState(bp.up().up()).getBlock();
+        boolean freeSpace = mc.world.isAir(bp.up());
+        boolean legacyFreeSpace = mc.world.isAir(bp.up().up());
 
         if (base != Blocks.OBSIDIAN && base != Blocks.BEDROCK)
             return null;
 
-        if (!(freeSpace == Blocks.AIR && (!oldVer.getValue() || legacyFreeSpace == Blocks.AIR)))
+        if (!(freeSpace && (!oldVer.getValue() || legacyFreeSpace)))
             return null;
 
         if (checkEntities(bp)) return null;
@@ -893,13 +893,11 @@ public class AutoCrystal extends Module {
         @Override
         public void run() {
             while (ModuleManager.autoCrystal.isEnabled()) {
-                while (ticking.get() || !placeTimer.passedMs(placeDelay.getValue())) Thread.yield();
-                try {
-                    bestPosition = calcPosition();
-                    if (bestPosition != null && placeCrystal(bestPosition)) placeTimer.reset();
-                    if (stopThreads.get()) placeThread.interrupt();
-                } catch (Exception ignored) {
+                while (ticking.get() || !placeTimer.passedMs(placeDelay.getValue())) {
                 }
+                bestPosition = calcPosition();
+                if (bestPosition != null && placeCrystal(bestPosition)) placeTimer.reset();
+                if (stopThreads.get()) placeThread.interrupt();
             }
         }
     }
@@ -908,7 +906,8 @@ public class AutoCrystal extends Module {
         @Override
         public void run() {
             while (ModuleManager.autoCrystal.isEnabled()) {
-                while (ticking.get()) Thread.yield();
+                while (ticking.get()) {
+                }
 
                 if (remove.getValue() == Remove.ON && !deadCrystals.isEmpty()) {
                     Map<EndCrystalEntity, Long> cache = new HashMap<>(deadCrystals);
@@ -922,14 +921,12 @@ public class AutoCrystal extends Module {
                     });
                 }
 
-                while (!breakTimer.passedMs(breakDelay.getValue())) Thread.yield();
-
-                try {
-                    bestCrystal = getCrystalToExplode(target);
-                    if (bestCrystal != null) attackCrystal(bestCrystal);
-                    if (stopThreads.get()) breakThread.interrupt();
-                } catch (Exception ignored) {
+                while (!breakTimer.passedMs(breakDelay.getValue())) {
                 }
+
+                bestCrystal = getCrystalToExplode(target);
+                if (bestCrystal != null) attackCrystal(bestCrystal);
+                if (stopThreads.get()) breakThread.interrupt();
             }
         }
     }

@@ -7,7 +7,8 @@ import thunder.hack.setting.Setting;
 import java.util.Objects;
 
 public class MainSettings extends Module {
-    public static Setting<Boolean> renderRotations = new Setting<>("renderRotations", true);
+    public static Setting<Boolean> renderRotations = new Setting<>("RenderRotations", true);
+    public static Setting<Boolean> skullEmoji = new Setting<>("SkullEmoji", true);
     public static Setting<Language> language = new Setting<>("Language", Language.ENG);
     public static Setting<String> prefix = new Setting<>("Prefix", "@");
 

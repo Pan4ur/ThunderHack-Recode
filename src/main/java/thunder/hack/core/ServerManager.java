@@ -5,6 +5,7 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.utility.Timer;
 import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
+import thunder.hack.utility.math.MathUtility;
 
 
 import java.math.BigDecimal;
@@ -13,40 +14,21 @@ import java.util.ArrayDeque;
 
 public class ServerManager {
 
-    private final Timer timeDelay;
-    private final ArrayDeque<Float> tpsResult;
+    private final Timer timeDelay = new Timer();
+    private final ArrayDeque<Float> tpsResult = new ArrayDeque<>(20);
     private long time;
+    private long ticktime;
     private float tps;
 
-    public ServerManager() {
-        this.tpsResult = new ArrayDeque<>(20);
-        this.timeDelay = new Timer();
-    }
-
-
-    public Timer getDelayTimer() {
-        return timeDelay;
-    }
-
-    public long getTime() {
-        return time;
-    }
-
-    public void setTime(long time) {
-        this.time = time;
-    }
-
     public float getTPS() {
-        return round2(this.tps);
+        return round2(tps);
     }
 
-    public void setTPS(float tps) {
-        this.tps = tps;
+    public float getTPS2() {
+        return round2(20.0f * ((float) ticktime / 1000f));
     }
 
-    public ArrayDeque<Float> getTPSResults() {
-        return tpsResult;
-    }
+
 
     public static float round2(double value) {
         BigDecimal bd = new BigDecimal(value);
@@ -57,21 +39,26 @@ public class ServerManager {
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if (!(event.getPacket() instanceof ChatMessageS2CPacket)) {
-            getDelayTimer().reset();
+            timeDelay.reset();
         }
         if (event.getPacket() instanceof WorldTimeUpdateS2CPacket) {
-            if (getTime() != 0L) {
-                if (getTPSResults().size() > 20) {
-                    getTPSResults().poll();
-                }
-                getTPSResults().add(20.0f * (1000.0f / (float) (System.currentTimeMillis() - getTime())));
-                float f = 0.0f;
-                for (Float value : getTPSResults()) {
-                    f += Math.max(0.0f, Math.min(20.0f, value));
-                }
-                setTPS(f / (float) getTPSResults().size());
+            if (time != 0L) {
+                ticktime = System.currentTimeMillis() - time;
+
+                if (tpsResult.size() > 20)
+                    tpsResult.poll();
+
+                tpsResult.add(20.0f * (1000.0f / (float) (ticktime)));
+
+                float average = 0.0f;
+
+                for (Float value : tpsResult)
+                    average += MathUtility.clamp(value, 0f, 20f);
+
+
+                tps = average / (float) tpsResult.size();
             }
-            setTime(System.currentTimeMillis());
+            time = System.currentTimeMillis();
         }
     }
 }

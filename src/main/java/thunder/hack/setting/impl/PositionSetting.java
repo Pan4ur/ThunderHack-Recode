@@ -9,16 +9,16 @@ public class PositionSetting {
         this.y = y;
     }
 
-    public void setX(float posx) {
-        this.x = posx;
+    public void setX(float x) {
+        this.x = x;
     }
 
     public float getX() {
         return this.x;
     }
 
-    public void setY(float posy) {
-        this.y = posy;
+    public void setY(float y) {
+        this.y = y;
     }
 
     public float getY() {

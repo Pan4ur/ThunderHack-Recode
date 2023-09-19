@@ -60,7 +60,7 @@ public class ColorPickerElement extends AbstractElement {
         boolean dark = Render2DEngine.isDark(ThunderHack.copy_color);
         boolean dark2 = Render2DEngine.isDark(getColorSetting().getColorObject());
 
-        Render2DEngine.drawRound(matrixStack, (int) (x + width - 65), (int) (y + 5), 33, 7, 1,getColorSetting().isCycle() ? getColorSetting().getColorObject() : new Color(0x424242));
+        Render2DEngine.drawRound(matrixStack, (int) (x + width - 65), (int) (y + 5), 33, 7, 1,getColorSetting().isRainbow() ? getColorSetting().getColorObject() : new Color(0x424242));
         FontRenderers.getSettingsRenderer().drawString(matrixStack, "Rainbow", (int) (x + width - 62), (int) (y + 8), rainbowHovered ? new Color(0xA3FFFFFF, true).getRGB() : (dark2 ? Color.WHITE.getRGB() : Color.BLACK.getRGB()));
 
 
@@ -174,7 +174,7 @@ public class ColorPickerElement extends AbstractElement {
             sbfocused = true;
 
         else if (rainbowHovered && button == 0)
-            getColorSetting().setCycle(!getColorSetting().isCycle());
+            getColorSetting().setRainbow(!getColorSetting().isRainbow());
 
         else if(copyHovered)
             ThunderHack.copy_color = getColorSetting().getColorObject();

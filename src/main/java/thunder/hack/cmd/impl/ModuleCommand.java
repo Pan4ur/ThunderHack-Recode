@@ -126,7 +126,7 @@ public class ModuleCommand extends Command {
                     case "ColorSetting":
                         JsonArray array = element.getAsJsonArray();
                         ((ColorSetting) setting2.getValue()).setColor(array.get(0).getAsInt());
-                        ((ColorSetting) setting2.getValue()).setCycle(array.get(1).getAsBoolean());
+                        ((ColorSetting) setting2.getValue()).setRainbow(array.get(1).getAsBoolean());
                         ((ColorSetting) setting2.getValue()).setGlobalOffset(array.get(2).getAsInt());
                         return;
                     case "PositionSetting":

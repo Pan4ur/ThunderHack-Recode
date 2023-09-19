@@ -36,9 +36,13 @@ public class Step extends Module {
 
     @Override
     public void onDisable() {
+        ThunderHack.TICK_TIMER = 1f;
         mc.player.setStepHeight(0.6F);
         if (entityRiding != null) {
-            if (entityRiding instanceof HorseEntity || entityRiding instanceof LlamaEntity || entityRiding instanceof MuleEntity || entityRiding instanceof PigEntity && mc.player.getControllingVehicle() == entityRiding && ((PigEntity) entityRiding).canBeSaddled()) {
+            if (entityRiding instanceof HorseEntity
+                    || entityRiding instanceof LlamaEntity
+                    || entityRiding instanceof MuleEntity
+                    || entityRiding instanceof PigEntity && mc.player.getControllingVehicle() == entityRiding && ((PigEntity) entityRiding).canBeSaddled()) {
                 entityRiding.setStepHeight(1);
             } else {
                 entityRiding.setStepHeight(0.5F);
@@ -106,9 +110,9 @@ public class Step extends Module {
                     ThunderHack.TICK_TIMER = 1F / offsets.length;
                     timer = true;
                 }
-                for (double offset : offsets) {
+                for (double offset : offsets)
                     mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.prevX, mc.player.prevY + offset, mc.player.prevZ, false));
-                }
+
             }
             stepTimer.reset();
         }
