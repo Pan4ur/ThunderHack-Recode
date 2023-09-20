@@ -8,6 +8,7 @@ import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.math.Vec2f;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -53,8 +54,8 @@ public class PlayerManager {
         double d3 = mc.player.getZ() - mc.player.prevZ;
         double d4 = d2 * d2 + d3 * d3;
         currentPlayerSpeed = Math.sqrt(d4);
-        if(mc.currentScreen == null) inInventory = false;
-        if(mc.player.isFallFlying() && mc.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA){
+        if (mc.currentScreen == null) inInventory = false;
+        if (mc.player.isFallFlying() && mc.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
             ticksElytraFlying++;
         } else ticksElytraFlying = 0;
     }
@@ -68,14 +69,14 @@ public class PlayerManager {
     }
 
     @EventHandler
-    public void onSyncWithServer(PacketEvent.Send event) {
-        if(event.getPacket() instanceof ClickSlotC2SPacket){
+    public void onSyncWithServer(PacketEvent.@NotNull Send event) {
+        if (event.getPacket() instanceof ClickSlotC2SPacket) {
             inInventory = true;
         }
-        if(event.getPacket() instanceof UpdateSelectedSlotC2SPacket slot){
+        if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket slot) {
             serverSideSlot = slot.getSelectedSlot();
         }
-        if(event.getPacket() instanceof CloseHandledScreenC2SPacket){
+        if (event.getPacket() instanceof CloseHandledScreenC2SPacket) {
             inInventory = false;
         }
         if (event.getPacket() instanceof PlayerMoveC2SPacket) {
@@ -119,8 +120,8 @@ public class PlayerManager {
             Vec3d vec3d4 = entityHitResult.getPos();
             double g = vec3d.squaredDistanceTo(vec3d4);
             if (g < distancePow2 || result == null) {
-                    targetedEntity = entity2;
-                    if (targetedEntity == Aura.target || rt == Aura.RayTrace.OnlyTarget) return true;
+                targetedEntity = entity2;
+                if (targetedEntity == Aura.target || rt == Aura.RayTrace.OnlyTarget) return true;
 
             }
         }
