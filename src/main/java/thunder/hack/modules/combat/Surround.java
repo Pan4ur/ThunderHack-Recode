@@ -153,6 +153,8 @@ public class Surround extends Module {
                     InventoryUtility.saveSlot();
                     int placed = 0;
                     while (placed < blocksPerTick.getValue()) {
+                        if (getSlot() == -1) disable(isRu() ? "Нет блоков!" : "No blocks!");
+
                         BlockPos targetBlock = getSequentialPos();
                         if (targetBlock == null)
                             break;

@@ -1,7 +1,6 @@
 package thunder.hack.modules.movement;
 
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
@@ -12,14 +11,16 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
 
 public class Flight extends Module {
-    public boolean pendingFlagApplyPacket = false;
+
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Vanilla);
     public Setting<Float> hSpeed = new Setting<>("Horizontal", 1f, 0.0f, 10.0f, v -> mode.getValue() != Mode.MatrixJump);
     public Setting<Float> vSpeed = new Setting<>("Vertical", 0.78F, 0.0F, 5F, v -> mode.getValue() != Mode.MatrixJump);
     public Setting<Boolean> autoToggle = new Setting<>("AutoToggle", false, v -> mode.getValue() == Mode.MatrixJump);
-    private double lastMotionX = 0.0;
-    private double lastMotionY = 0.0;
-    private double lastMotionZ = 0.0;
+
+    private double prevX, prevY, prevZ;
+    public boolean onPosLook = false;
+    private int flyTicks = 0;
+
 
 
     public Flight() {
@@ -45,6 +46,19 @@ public class Flight extends Module {
                 mc.player.setOnGround(true);
                 mc.player.jump();
             }
+        } else if (mode.getValue() == Mode.MatrixGlide){
+            if (mc.player.isOnGround()) {
+                mc.player.jump();
+                flyTicks = 5;
+            } else if (flyTicks > 0) {
+                if (MovementUtility.isMoving()) {
+                    final double[] dir = MovementUtility.forward(hSpeed.getValue());
+                    mc.player.setVelocity(dir[0], -0.04, dir[1]);
+                } else {
+                    mc.player.setVelocity(0, -0.04, 0);
+                }
+                flyTicks--;
+            }
         }
     }
 
@@ -68,28 +82,26 @@ public class Flight extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
-        if (mode.getValue() != Mode.MatrixJump) {
-            return;
-        }
-        if (fullNullCheck()) {
-            return;
-        }
-        if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
-            pendingFlagApplyPacket = true;
-            lastMotionX = mc.player.getVelocity().getX();
-            lastMotionY = mc.player.getVelocity().getY();
-            lastMotionZ = mc.player.getVelocity().getZ();
+        if (mode.getValue() == Mode.MatrixJump) {
+            if (fullNullCheck()) {
+                return;
+            }
+            if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
+                onPosLook = true;
+                prevX = mc.player.getVelocity().getX();
+                prevY = mc.player.getVelocity().getY();
+                prevZ = mc.player.getVelocity().getZ();
+            }
         }
     }
 
     @EventHandler
     public void onPacketSend(PacketEvent.Send e) {
         if (mode.getValue() == Mode.MatrixJump) {
-
             if (e.getPacket() instanceof PlayerMoveC2SPacket.Full) {
-                if (pendingFlagApplyPacket) {
-                    mc.player.setVelocity(lastMotionX, lastMotionY, lastMotionZ);
-                    pendingFlagApplyPacket = false;
+                if (onPosLook) {
+                    mc.player.setVelocity(prevX, prevY, prevZ);
+                    onPosLook = false;
                     if (autoToggle.getValue())
                         disable();
                 }
@@ -98,6 +110,6 @@ public class Flight extends Module {
     }
 
     private enum Mode {
-        Vanilla, MatrixJump, AirJump
+        Vanilla, MatrixJump, AirJump, MatrixGlide
     }
 }

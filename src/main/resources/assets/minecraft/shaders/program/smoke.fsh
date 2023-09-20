@@ -1,9 +1,5 @@
 
-#version 330
-
-#ifdef GL_ES
-precision mediump float;
-#endif
+#version 150
 
 uniform sampler2D DiffuseSampler;
 in vec2 texCoord;

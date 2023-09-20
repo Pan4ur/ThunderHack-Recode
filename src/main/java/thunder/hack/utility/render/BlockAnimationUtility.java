@@ -70,6 +70,34 @@ public final class BlockAnimationUtility {
                         Render3DEngine.drawFilledBox(stack, box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() * (time / 500f))));
                     }
                 }
+                case Flash -> {
+                    float scale;
+                    if(time > 100) {
+                        scale = 1 - (float) (time - 100) / 400;
+                    } else {
+                        scale = (float) time / 100;
+                    }
+
+                    Box box = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
+
+                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Line) {
+                        Render3DEngine.drawBoxOutline(box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), lineColor, lineWidth);
+                    }
+                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Fill) {
+                        Render3DEngine.drawFilledBox(stack, box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() * scale)));
+                    }
+                }
+                case Grow -> {
+                    float scale = (float) time / 500;
+                    Box box = new Box(pos.getX(), pos.getY() + scale, pos.getZ(), pos.getX() + 1, pos.getY(), pos.getZ() + 1);
+
+                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Line) {
+                        Render3DEngine.drawBoxOutline(box, lineColor, lineWidth);
+                    }
+                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Fill) {
+                        Render3DEngine.drawFilledBox(stack, box, Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() *  (time / 500f))));
+                    }
+                }
             }
         }
 
@@ -94,6 +122,8 @@ public final class BlockAnimationUtility {
         Fade,
         Hover,
         Decrease,
-        Static
+        Static,
+        Flash,
+        Grow
     }
 }

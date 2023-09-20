@@ -19,9 +19,7 @@ public class HitSound extends Module {
     public Setting<Float> volume = new Setting<>("Volume", 1f, 0.1f, 10f);
     public Setting<Float> pitch = new Setting<>("Pitch", 1f, 0.1f, 10f);
 
-    public enum Mode {
-        UWU, MOAN, SKEET, KEYBOARD
-    }
+    public enum Mode {UWU, MOAN, SKEET, KEYBOARD}
 
     @EventHandler
     public void onAttack(EventAttack event) {
@@ -31,11 +29,11 @@ public class HitSound extends Module {
                 case SKEET -> playSound(ThSoundPack.SKEET_SOUNDEVENT);
                 case KEYBOARD ->  playSound(ThSoundPack.KEYPRESS_SOUNDEVENT);
                 case MOAN -> {
-                    SoundEvent sound = switch ((int) (MathUtility.random(0,5))) {
-                        case 1 -> ThSoundPack.MOAN1_SOUNDEVENT;
-                        case 2 -> ThSoundPack.MOAN2_SOUNDEVENT;
-                        case 3 -> ThSoundPack.MOAN3_SOUNDEVENT;
-                        case 4 -> ThSoundPack.MOAN4_SOUNDEVENT;
+                    SoundEvent sound = switch ((int) (MathUtility.random(0,4))) {
+                        case 0 -> ThSoundPack.MOAN1_SOUNDEVENT;
+                        case 1 -> ThSoundPack.MOAN2_SOUNDEVENT;
+                        case 2 -> ThSoundPack.MOAN3_SOUNDEVENT;
+                        case 3 -> ThSoundPack.MOAN4_SOUNDEVENT;
                         default -> ThSoundPack.MOAN5_SOUNDEVENT;
                     };
                     playSound(sound);
@@ -47,5 +45,4 @@ public class HitSound extends Module {
     private void playSound(SoundEvent sound){
         mc.world.playSound(mc.player, mc.player.getBlockPos(), sound, SoundCategory.BLOCKS, volume.getValue(), pitch.getValue());
     }
-
 }

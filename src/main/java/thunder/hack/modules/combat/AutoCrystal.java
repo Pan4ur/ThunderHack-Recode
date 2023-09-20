@@ -125,6 +125,7 @@ public class AutoCrystal extends Module {
     private final Setting<Integer> slideDelay = new Setting<>("Slide Delay", 200, 1, 1000, v -> page.getValue() == Pages.Render);
     private final Setting<ColorSetting> textColor = new Setting<>("Text Color", new ColorSetting(Color.WHITE), v -> page.getValue() == Pages.Render);
 
+
     private enum Pages {Place, Break, Pause, Render, Damages, Main, Switch, Remove}
 
     private enum Switch {NONE, NORMAL, SILENT, INVENTORY}
@@ -321,6 +322,7 @@ public class AutoCrystal extends Module {
     }
 
     public void onRender3D(MatrixStack stack) {
+        removeAttackedCrystals();
         if (render.getValue()) {
             Map<BlockPos, Long> cache = new ConcurrentHashMap<>(renderPositions);
 
@@ -544,25 +546,26 @@ public class AutoCrystal extends Module {
         return true;
     }
 
-    public BlockHitResult calcPosition() {
+    public void calcPosition() {
         if (ModuleManager.speedMine.isWorth()) {
             PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
             if (autoMineData != null) {
-                return autoMineData.bhr;
+                bestPosition = autoMineData.bhr;
             }
         }
 
         if (target == null) {
             renderPos = null;
             prevRenderPos = null;
-            return null;
+            bestPosition = null;
+            return;
         }
 
         List<PlaceData> list = getPossibleBlocks(target).stream().filter(data -> isSafe(data.damage, data.selfDamage, data.overrideDamage)).toList();
-        return list.isEmpty() ? null : filterPositions(list);
+        bestPosition = list.isEmpty() ? null : filterPositions(list);
     }
 
-    public List<PlaceData> getPossibleBlocks(PlayerEntity target) {
+    private List<PlaceData> getPossibleBlocks(PlayerEntity target) {
         List<PlaceData> blocks = new ArrayList<>();
         BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
         for (int x = (int) Math.floor(playerPos.getX() - placeRange.getValue()); x <= Math.ceil(playerPos.getX() + placeRange.getValue()); x++) {
@@ -577,7 +580,7 @@ public class AutoCrystal extends Module {
         return blocks;
     }
 
-    public List<CrystalData> getPossibleCrystals(PlayerEntity target) {
+    private List<CrystalData> getPossibleCrystals(PlayerEntity target) {
         List<CrystalData> crystals = new ArrayList<>();
 
         for (Entity ent : mc.world.getEntities()) {
@@ -616,9 +619,9 @@ public class AutoCrystal extends Module {
         return crystals;
     }
 
-    public EndCrystalEntity getCrystalToExplode(PlayerEntity target) {
+    public void getCrystalToExplode(PlayerEntity target) {
         List<CrystalData> list = getPossibleCrystals(target).stream().filter(data -> isSafe(data.damage, data.selfDamage, data.overrideDamage)).toList();
-        return list.isEmpty() ? null : filterCrystals(list);
+        bestCrystal = list.isEmpty() ? null : filterCrystals(list);
     }
 
     public boolean isSafe(float damage, float selfDamage, boolean overrideDamage) {
@@ -637,7 +640,7 @@ public class AutoCrystal extends Module {
         return safetyIndex >= 0;
     }
 
-    public BlockHitResult filterPositions(@NotNull List<PlaceData> clearedList) {
+    private BlockHitResult filterPositions(@NotNull List<PlaceData> clearedList) {
         PlaceData bestData = null;
         float bestVal = 0f;
         for (PlaceData data : clearedList) {
@@ -683,7 +686,7 @@ public class AutoCrystal extends Module {
         return override;
     }
 
-    public EndCrystalEntity filterCrystals(@NotNull List<CrystalData> clearedList) {
+    private EndCrystalEntity filterCrystals(@NotNull List<CrystalData> clearedList) {
         CrystalData bestData = null;
         float bestVal = 0f;
         for (CrystalData data : clearedList) {
@@ -708,7 +711,7 @@ public class AutoCrystal extends Module {
         return bestData.crystal;
     }
 
-    public PlaceData getPlaceData(BlockPos bp, PlayerEntity target) {
+    private PlaceData getPlaceData(BlockPos bp, PlayerEntity target) {
         Block base = mc.world.getBlockState(bp).getBlock();
         boolean freeSpace = mc.world.isAir(bp.up());
         boolean legacyFreeSpace = mc.world.isAir(bp.up().up());
@@ -883,6 +886,20 @@ public class AutoCrystal extends Module {
         return bestResult;
     }
 
+    public void removeAttackedCrystals() {
+        if (remove.getValue() == Remove.ON && !deadCrystals.isEmpty()) {
+            Map<EndCrystalEntity, Long> cache = new HashMap<>(deadCrystals);
+            cache.forEach((crystal, time) -> {
+                if (System.currentTimeMillis() - time > removeDelay.getValue()) {
+                    crystal.kill();
+                    crystal.setRemoved(Entity.RemovalReason.KILLED);
+                    crystal.onRemoved();
+                    deadCrystals.remove(crystal);
+                }
+            });
+        }
+    }
+
     private record PlaceData(BlockHitResult bhr, float damage, float selfDamage, boolean overrideDamage) {
     }
 
@@ -895,7 +912,7 @@ public class AutoCrystal extends Module {
             while (ModuleManager.autoCrystal.isEnabled()) {
                 while (ticking.get() || !placeTimer.passedMs(placeDelay.getValue())) {
                 }
-                bestPosition = calcPosition();
+                calcPosition();
                 if (bestPosition != null && placeCrystal(bestPosition)) placeTimer.reset();
                 if (stopThreads.get()) placeThread.interrupt();
             }
@@ -908,23 +925,11 @@ public class AutoCrystal extends Module {
             while (ModuleManager.autoCrystal.isEnabled()) {
                 while (ticking.get()) {
                 }
-
-                if (remove.getValue() == Remove.ON && !deadCrystals.isEmpty()) {
-                    Map<EndCrystalEntity, Long> cache = new HashMap<>(deadCrystals);
-                    cache.forEach((crystal, time) -> {
-                        if (System.currentTimeMillis() - time > removeDelay.getValue()) {
-                            crystal.kill();
-                            crystal.setRemoved(Entity.RemovalReason.KILLED);
-                            crystal.onRemoved();
-                            deadCrystals.remove(crystal);
-                        }
-                    });
-                }
-
                 while (!breakTimer.passedMs(breakDelay.getValue())) {
                 }
 
-                bestCrystal = getCrystalToExplode(target);
+                if(target != null)
+                    getCrystalToExplode(target);
                 if (bestCrystal != null) attackCrystal(bestCrystal);
                 if (stopThreads.get()) breakThread.interrupt();
             }

@@ -15,8 +15,8 @@ public class AutoSprint extends Module {
     public static final Setting<Boolean> sprint = new Setting<>("KeepSprint", true);
     public static final Setting<Float> motion = new Setting("motion", 1f, 0f, 1f, v-> sprint.getValue());
 
-    @EventHandler
-    public void onTick(PlayerUpdateEvent event) {
+    @Override
+    public void onUpdate() {
         if (mc.player.getHungerManager().getFoodLevel() <= 6) return;
         if(mc.player.horizontalCollision) return;
         if(mc.player.input.movementForward < 0) return;

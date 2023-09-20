@@ -99,7 +99,7 @@ public class ClickUI extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 
-        if (ThunderHack.oldVersion && (mc.player.age % 20) > 10) {
+        if (ThunderHack.isOutdated && (mc.player.age % 20) > 10) {
             FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f + 1, mc.getWindow().getScaledHeight() - 39 - FontRenderers.thglitch.getFontHeight("New version is available!"), Color.BLACK.getRGB());
             FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() - 40 - FontRenderers.thglitch.getFontHeight("New version is available!"), -1);
         }

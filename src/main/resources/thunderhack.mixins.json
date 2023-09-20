@@ -6,6 +6,7 @@
   "client": [
     "MixinArmorFeatureRenderer",
     "MixinBackgroundRenderer",
+    "MixinBlockCollisionSpliterator",
     "MixinBossBarHud",
     "MixinCamera",
     "MixinCapeFeatureRenderer",
@@ -36,8 +37,8 @@
     "MixinShaderEffect",
     "MixinShaderProgram",
     "MixinTextVisitFactory",
+    "MixinTitleScreen",
     "MixinWorldRenderer",
-    "MixinBlockCollisionSpliterator",
     "accesors.IClientPlayerEntity",
     "accesors.IClientWorldMixin",
     "accesors.IFrustum",

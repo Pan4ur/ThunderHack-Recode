@@ -5,16 +5,15 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.EventMove;
-import thunder.hack.events.impl.EventSprint;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PlayerUpdateEvent;
+import thunder.hack.events.impl.*;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
 
+import static thunder.hack.modules.movement.Timer.violation;
 import static thunder.hack.utility.player.MovementUtility.isMoving;
 
 public class Speed extends Module {
@@ -28,6 +27,7 @@ public class Speed extends Module {
     public final Setting<Integer> hurttime = new Setting<>("Hurttime", 0, 0, 10, v-> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Float> boostFactor = new Setting<>("BoostFactor", 2f, 0f, 10f, v-> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Boolean> allowOffGround = new Setting<>("AllowOffGround", true, v-> mode.getValue() == Mode.MatrixDamage);
+    public final Setting<Integer> shiftTicks = new Setting<>("ShiftTicks", 0, 0, 10, v-> mode.getValue() == Mode.MatrixDamage);
 
     public double baseSpeed;
     private int stage, ticks;
@@ -95,6 +95,11 @@ public class Speed extends Module {
                 elytraDelay.reset();
             }
         }
+
+    }
+
+    @EventHandler
+    public void onPostPlayerUpdate(PostPlayerUpdateEvent event) {
         if(mode.getValue() == Mode.MatrixDamage){
             if (MovementUtility.isMoving() && mc.player.hurtTime > hurttime.getValue()) {
                 if (mc.player.isOnGround()) {
@@ -104,13 +109,18 @@ public class Speed extends Module {
                 } else if (!mc.player.isOnGround() && allowOffGround.getValue()) {
                     MovementUtility.setMotion(0.448f * boostFactor.getValue());
                 }
+
+                if(shiftTicks.getValue() > 0 && (MathUtility.clamp((int) (100 - Math.min(violation, 100)), 0, 100) > 90)) {
+                    event.setCancelled(true);
+                    event.setIterations(shiftTicks.getValue());
+                }
             }
         }
     }
 
     @EventHandler
     public void onMove(EventMove event) {
-        if (mode.getValue() == Mode.MatrixJB || mode.getValue() == Mode.FGLowRider || mode.getValue() == Mode.MatrixDamage) return;
+        if (mode.getValue() != Mode.NCP && mode.getValue() != Mode.StrictStrafe ) return;
         if (mc.player.getAbilities().flying) return;
         if (mc.player.isFallFlying()) return;
         if (mc.player.getHungerManager().getFoodLevel() <= 6) return;
@@ -135,24 +145,25 @@ public class Speed extends Module {
 
             baseSpeed = Math.max(baseSpeed, MovementUtility.getBaseMoveSpeed());
 
-            double baseStrictSpeed = mode.getValue() == Mode.StrictStrafe || mc.player.input.movementForward < 1 ? 0.465 : 0.576;
-            double baseRestrictedSpeed = mode.getValue() == Mode.StrictStrafe || mc.player.input.movementForward < 1 ? 0.44 : 0.57;
+            double ncpSpeed = mode.getValue() == Mode.StrictStrafe || mc.player.input.movementForward < 1 ? 0.465 : 0.576;
+            double ncpBypassSpeed = mode.getValue() == Mode.StrictStrafe || mc.player.input.movementForward < 1 ? 0.44 : 0.57;
 
             if (mc.player.hasStatusEffect(StatusEffects.SPEED)) {
                 double amplifier = mc.player.getStatusEffect(StatusEffects.SPEED).getAmplifier();
-                baseStrictSpeed *= 1 + (0.2 * (amplifier + 1));
-                baseRestrictedSpeed *= 1 + (0.2 * (amplifier + 1));
+                ncpSpeed *= 1 + (0.2 * (amplifier + 1));
+                ncpBypassSpeed *= 1 + (0.2 * (amplifier + 1));
             }
 
             if (mc.player.hasStatusEffect(StatusEffects.SLOWNESS)) {
                 double amplifier = mc.player.getStatusEffect(StatusEffects.SLOWNESS).getAmplifier();
-                baseStrictSpeed /= 1 + (0.2 * (amplifier + 1));
-                baseRestrictedSpeed /= 1 + (0.2 * (amplifier + 1));
+                ncpSpeed /= 1 + (0.2 * (amplifier + 1));
+                ncpBypassSpeed /= 1 + (0.2 * (amplifier + 1));
             }
 
-            baseSpeed = Math.min(baseSpeed, ticks > 25 ? baseStrictSpeed : baseRestrictedSpeed);
+            baseSpeed = Math.min(baseSpeed, ticks > 25 ? ncpSpeed : ncpBypassSpeed);
 
-            if (ticks++ > 50) ticks = 0;
+            if (ticks++ > 50)
+                ticks = 0;
 
             MovementUtility.modifyEventSpeed(event, baseSpeed);
         } else {

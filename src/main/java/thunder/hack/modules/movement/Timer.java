@@ -19,7 +19,7 @@ import thunder.hack.utility.player.MovementUtility;
 public class Timer extends Module {
     private static final Setting<Mode> mode = new Setting<>("Mode", Mode.NORMAL);
     public static final Setting<Float> speed = new Setting<>("Speed", 2.0f, 0.1f, 10.0f, v -> mode.getValue() != Mode.TICKSHIFT);
-    private final Setting<Float> shiftTicks = new Setting<>("ShiftTicks", 10.0F, 1F, 40f, v -> mode.getValue() == Mode.TICKSHIFT);
+    private final Setting<Integer> shiftTicks = new Setting<>("ShiftTicks", 10, 1, 40, v -> mode.getValue() == Mode.TICKSHIFT);
     private static final Setting<Float> addOnTheMove = new Setting<>("addOnTheMove", 0.0f, 0.0f, 1.0f, v -> mode.getValue() == Mode.SMART);
     private static final Setting<Float> decreaseRate = new Setting<>("decreaseRate", 1.0f, 0.5f, 3.0f, v -> mode.getValue() == Mode.SMART);
     private final Setting<Bind> boostKey = new Setting<>("BoostKey", new Bind(-1, false, false), v -> mode.getValue() == Mode.GrimFunnyGame);
@@ -120,7 +120,7 @@ public class Timer extends Module {
                 return;
             }
             event.setCancelled(true);
-            event.setIterations(shiftTicks.getValue().intValue());
+            event.setIterations(shiftTicks.getValue());
             violation = 40f;
             disable(MainSettings.isRu() ? "Тики пропущены! Отключаю.." : "Ticks shifted! Disabling..");
         }

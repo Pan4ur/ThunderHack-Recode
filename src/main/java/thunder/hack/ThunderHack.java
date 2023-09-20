@@ -26,8 +26,8 @@ public class ThunderHack implements ModInitializer {
     public static final String MOD_ID = "thunderhack";
     public static final IEventBus EVENT_BUS = new EventBus();
 
-    public static String version = "1.2b1309";
-    public static boolean oldVersion = false;
+    public static String version = "1.2b1010+";
+    public static boolean isOutdated = false;
     public static float TICK_TIMER = 1f;
     public static BlockPos gps_position;
     public static Color copy_color = new Color(-1);
@@ -99,7 +99,7 @@ public class ThunderHack implements ModInitializer {
     public static void syncVersion() {
         try {
             if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersion.txt").openStream())).readLine().equals(version)) {
-                oldVersion = true;
+                isOutdated = true;
             }
         } catch (Exception ignored) {
         }
