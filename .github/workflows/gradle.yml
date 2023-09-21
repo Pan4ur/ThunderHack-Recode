@@ -5,9 +5,14 @@ name: Java CI with Gradle
 
 on: [ push,pull_request ]
 
+concurrency:
+  group: "latest"
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - uses: actions/checkout@v2
 
