@@ -22,7 +22,7 @@ jobs:
     - name: Build
       run: ./gradlew build
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: ThunderHackRecode
         path: build/libs/*-1.2.jar 
