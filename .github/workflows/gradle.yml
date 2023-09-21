@@ -24,9 +24,8 @@ jobs:
 
     - name: Remove *-sources.jar
       run: rm ./build/libs/*-sources.jar || true
-
     - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
+      with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: false
