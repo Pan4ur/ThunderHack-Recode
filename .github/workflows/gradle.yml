@@ -27,9 +27,9 @@ jobs:
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          repo_token: "${{ secrets.THUNDERHACK_ABOBA_KEY }}"
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
-          prerelease: false
+          prerelease: true
           title: "Latest Build"
           files: |
             ./build/libs/*.jar
