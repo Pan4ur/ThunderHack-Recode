@@ -22,7 +22,14 @@ jobs:
     - name: Build
       run: ./gradlew build
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: ThunderHackRecode
-        path: build/libs/*-1.2.jar 
+    - name: Remove *-sources.jar
+      run: rm ./build/libs/*-sources.jar || true
+
+    - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: "Latest Build"
+          files: |
+            ./build/libs/*.jar

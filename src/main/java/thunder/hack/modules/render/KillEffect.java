@@ -12,7 +12,6 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.ThSoundPack;
-import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
@@ -74,12 +73,6 @@ public class KillEffect extends Module {
             });
         }
     }
-
-    @Override
-    public void onEnable(){
-        mc.world.playSound(mc.player, mc.player.getBlockPos(), ThSoundPack.ORTHODOX_SOUNDEVENT, SoundCategory.BLOCKS, 10f, 1f);
-    }
-
 
     @Override
     public void onUpdate() {

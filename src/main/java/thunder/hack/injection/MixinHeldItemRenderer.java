@@ -15,6 +15,7 @@ import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -108,18 +109,12 @@ public abstract class MixinHeldItemRenderer {
                 if (player.isUsingItem() && player.getItemUseTimeLeft() > 0 && player.getActiveHand() == hand) {
                     l = bl2 ? 1 : -1;
                     switch (item.getUseAction()) {
-                        case NONE:
-                            this.applyEquipOffset(matrices, arm, equipProgress);
-                            break;
-                        case EAT:
-                        case DRINK:
+                        case NONE, BLOCK -> this.applyEquipOffset(matrices, arm, equipProgress);
+                        case EAT, DRINK -> {
                             applyEatOrDrinkTransformationCustom(matrices, tickDelta, arm, item);
                             this.applyEquipOffset(matrices, arm, equipProgress);
-                            break;
-                        case BLOCK:
-                            this.applyEquipOffset(matrices, arm, equipProgress);
-                            break;
-                        case BOW:
+                        }
+                        case BOW -> {
                             this.applyEquipOffset(matrices, arm, equipProgress);
                             matrices.translate((float) l * -0.2785682F, 0.18344387F, 0.15731531F);
                             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-13.935F));
@@ -131,19 +126,17 @@ public abstract class MixinHeldItemRenderer {
                             if (f > 1.0F) {
                                 f = 1.0F;
                             }
-
                             if (f > 0.1F) {
                                 g = MathHelper.sin((m - 0.1F) * 1.3F);
                                 h = f - 0.1F;
                                 j = g * h;
                                 matrices.translate(j * 0.0F, j * 0.004F, j * 0.0F);
                             }
-
                             matrices.translate(f * 0.0F, f * 0.0F, f * 0.04F);
                             matrices.scale(1.0F, 1.0F, 1.0F + f * 0.2F);
                             matrices.multiply(RotationAxis.NEGATIVE_Y.rotationDegrees((float) l * 45.0F));
-                            break;
-                        case SPEAR:
+                        }
+                        case SPEAR -> {
                             this.applyEquipOffset(matrices, arm, equipProgress);
                             matrices.translate((float) l * -0.5F, 0.7F, 0.1F);
                             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-55.0F));
@@ -154,20 +147,17 @@ public abstract class MixinHeldItemRenderer {
                             if (f > 1.0F) {
                                 f = 1.0F;
                             }
-
                             if (f > 0.1F) {
                                 g = MathHelper.sin((m - 0.1F) * 1.3F);
                                 h = f - 0.1F;
                                 j = g * h;
                                 matrices.translate(j * 0.0F, j * 0.004F, j * 0.0F);
                             }
-
                             matrices.translate(0.0F, 0.0F, f * 0.2F);
                             matrices.scale(1.0F, 1.0F, 1.0F + f * 0.2F);
                             matrices.multiply(RotationAxis.NEGATIVE_Y.rotationDegrees((float) l * 45.0F));
-                            break;
-                        case BRUSH:
-                            this.applyBrushTransformation(matrices, tickDelta, arm, item, equipProgress);
+                        }
+                        case BRUSH -> this.applyBrushTransformation(matrices, tickDelta, arm, item, equipProgress);
                     }
                 } else if (player.isUsingRiptide()) {
                     this.applyEquipOffset(matrices, arm, equipProgress);
@@ -176,8 +166,6 @@ public abstract class MixinHeldItemRenderer {
                     matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) l * 65.0F));
                     matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) l * -85.0F));
                 } else {
-                    //     Animations.Mode mode = Animations.mode.getValue();
-                    // if (mode == Animations.Mode.IDK) {
                     float n = -0.4F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
                     m = 0.2F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 6.2831855F);
                     f = -0.2F * MathHelper.sin(swingProgress * 3.1415927F);
@@ -185,79 +173,6 @@ public abstract class MixinHeldItemRenderer {
                     matrices.translate(0, 0, 0);
                     this.applyEquipOffset(matrices, arm, equipProgress);
                     this.applySwingOffset(matrices, arm, swingProgress);
-                       /* } else if (mode == Animations.Mode.Default) {
-                            float var4 = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927f);
-                            matrices.translate(0, 0, 0);
-                            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(var4 * -20.0f));
-                            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(var4 * -75.0f));
-
-                            this.applyEquipOffset(matrices, arm, equipProgress);
-                            this.applySwingOffset(matrices, arm, swingProgress);
-                        }
-
-                        */
-                        /*
-                        else if (mode == Animations.Mode.Swipe) {
-                            transformFirstPersonItem(equipProgress / 3.0f, swingprogress);
-                            translate();
-                            float var3 = MathHelper.sin(swingprogress * swingprogress * 3.1415927f);
-                            float var4 = MathHelper.sin(MathHelper.sqrt(swingprogress) * 3.1415927f);
-                            GlStateManager.rotate(var3 * -20.0f, 0.0f, 1.0f, 0.0f);
-                            GlStateManager.rotate(var4 * -20.0f, 0.0f, 0.0f, 2.0f);
-                            GlStateManager.rotate(var4 * -75.0f, 1.0f, 0.0f, 0.0f);
-                        } else if (mode == Animations.Mode.Rich) {
-                            transformSideFirstPerson2(enumhandside, p_187457_7_);
-                            translate4();
-                            float var3 = MathHelper.sin(swingprogress * swingprogress * (float) Math.PI);
-                            float var4 = MathHelper.sin(MathHelper.sqrt(swingprogress) * (float) Math.PI);
-                            GlStateManager.rotate(var4 * -20.0f, 0.0f, 0.0f, 2.0f);
-                            GlStateManager.rotate(var4 * -75.0f, 1.0f, 0.0f, 0.0f);
-                        } else if (mode == Animations.Mode.New) {
-                            transformSideFirstPerson2(enumhandside, p_187457_7_);
-                            translate3();
-                            float var3 = MathHelper.sin(swingprogress * swingprogress * 3.1415927f);
-                            float var4 = MathHelper.sin(MathHelper.sqrt(swingprogress) * 3.1415927f);
-                            GlStateManager.rotate(var4 * -70, var4 * 40, 0.0f, 0);
-                            GlStateManager.rotate(40, -30, 0.0f, 0);
-                        } else if (mode == Animations.Mode.Oblique) {
-                            transformSideFirstPerson2(enumhandside, p_187457_7_);
-                            float var4 = MathHelper.sin(MathHelper.sqrt(swingprogress) * 3.1415927f);
-                            GlStateManager.rotate(var4 * -70, var4 * 70, 0.0f, var4 * -90);
-                        } else if (mode == Animations.Mode.Glide) {
-                            transformFirstPersonItem(equipProgress / 2, 0);
-                            translate();
-                        } else if (mode == Animations.Mode.Fap) {
-                            transformSideFirstPerson2(enumhandside, p_187457_7_);
-                            GlStateManager.translate(0.96f, -0.02f, -0.71999997f);
-                            GlStateManager.rotate(45.0f, 0.0f, 1.0f, 0.0f);
-                            float var3 = MathHelper.sin(0.0f);
-                            float var4 = MathHelper.sin(MathHelper.sqrt(0.0f) * 3.1415927f);
-                            GlStateManager.rotate(var3 * -20.0f, 0.0f, 1.0f, 0.0f);
-                            GlStateManager.rotate(var4 * -20.0f, 0.0f, 0.0f, 1.0f);
-                            GlStateManager.rotate(var4 * -80.0f, 1.0f, 0.0f, 0.0f);
-                            GlStateManager.translate(-0.5f, 0.2f, 0.0f);
-                            GlStateManager.rotate(30.0f, 0.0f, 1.0f, 0.0f);
-                            GlStateManager.rotate(-80.0f, 1.0f, 0.0f, 0.0f);
-                            GlStateManager.rotate(60.0f, 0.0f, 1.0f, 0.0f);
-                            int alpha = (int) Math.min(255L, (System.currentTimeMillis() % 255L > 127L ? Math.abs(Math.abs(System.currentTimeMillis()) % 255L - 255L) : System.currentTimeMillis() % 255L) * 2L);
-                            float f5 = (double) f1 > 0.5 ? 1.0f - f1 : f1;
-                            GlStateManager.translate(0.3f, -0.0f, 0.4f);
-                            GlStateManager.rotate(0.0f, 0.0f, 0.0f, 1.0f);
-                            GlStateManager.translate(0.0f, 0.5f, 0.0f);
-                            GlStateManager.rotate(90.0f, 1.0f, 0.0f, -1.0f);
-                            GlStateManager.translate(0.6f, 0.5f, 0.0f);
-                            GlStateManager.rotate(-90.0f, 1.0f, 0.0f, -1.0f);
-                            GlStateManager.rotate(-10.0f, 1.0f, 0.0f, -1.0f);
-                            GlStateManager.rotate((-f5) * 10.0f, 10.0f, 10.0f, -9.0f);
-                            GlStateManager.rotate(10.0f, -1.0f, 0.0f, 0.0f);
-
-
-                            GlStateManager.translate(0.0, 0.0, -0.5);
-                            GlStateManager.rotate(Thunderhack.moduleManager.getModuleByClass(Animations.class).abobka228 ? (float) (-alpha) / Thunderhack.moduleManager.getModuleByClass(Animations.class).fapSmooth.getValue() : 1.0f, 1.0f, -0.0f, 1.0f);
-                            GlStateManager.translate(0.0, 0.0, 0.5);
-                        }
-
-                         */
                 }
 
 
@@ -269,12 +184,12 @@ public abstract class MixinHeldItemRenderer {
         }
     }
 
-    private void applyEquipOffset(MatrixStack matrices, Arm arm, float equipProgress) {
+    private void applyEquipOffset(@NotNull MatrixStack matrices, Arm arm, float equipProgress) {
         int i = arm == Arm.RIGHT ? 1 : -1;
         matrices.translate((float) i * 0.56F, -0.52F + equipProgress * -0.6F, -0.72F);
     }
 
-    private void applySwingOffset(MatrixStack matrices, Arm arm, float swingProgress) {
+    private void applySwingOffset(@NotNull MatrixStack matrices, Arm arm, float swingProgress) {
         int i = arm == Arm.RIGHT ? 1 : -1;
         float f = MathHelper.sin(swingProgress * swingProgress * 3.1415927F);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) i * (45.0F + f * -20.0F)));
@@ -284,7 +199,7 @@ public abstract class MixinHeldItemRenderer {
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) i * -45.0F));
     }
 
-    private void applyEatOrDrinkTransformationCustom(MatrixStack matrices, float tickDelta, Arm arm, ItemStack stack) {
+    private void applyEatOrDrinkTransformationCustom(MatrixStack matrices, float tickDelta, Arm arm, @NotNull ItemStack stack) {
         float f = (float) mc.player.getItemUseTimeLeft() - tickDelta + 1.0F;
         float g = f / (float) stack.getMaxUseTime();
         float h;
@@ -292,29 +207,30 @@ public abstract class MixinHeldItemRenderer {
             h = MathHelper.abs(MathHelper.cos(f / 4.0F * 3.1415927F) * 0.005F);
             matrices.translate(0.0F, h, 0.0F);
         }
-
         h = 1.0F - (float) Math.pow(g, 27.0);
         int i = arm == Arm.RIGHT ? 1 : -1;
+
         matrices.translate(h * 0.6F * (float) i * ModuleManager.viewModel.eatX.getValue(), h * -0.5F * ModuleManager.viewModel.eatY.getValue(), h * 0.0F);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) i * h * 90.0F));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(h * 10.0F));
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) i * h * 30.0F));
     }
 
-    @Inject(method = {"applyEatOrDrinkTransformation"}, at = {@At(value = "HEAD")}, cancellable = true)
+    @Inject(method = "applyEatOrDrinkTransformation", at = @At(value = "HEAD"), cancellable = true)
     private void applyEatOrDrinkTransformationHook(MatrixStack matrices, float tickDelta, Arm arm, ItemStack stack, CallbackInfo ci) {
         if (ModuleManager.animations.isEnabled()) {
-            applyEatOrDrinkTransformationCustom(matrices,tickDelta,arm,stack);
+            applyEatOrDrinkTransformationCustom(matrices, tickDelta, arm, stack);
             ci.cancel();
         }
     }
 
 
-    private void applyBrushTransformation(MatrixStack matrices, float tickDelta, Arm arm, ItemStack stack, float equipProgress) {
-        this.applyEquipOffset(matrices, arm, equipProgress);
+    private void applyBrushTransformation(MatrixStack matrices, float tickDelta, Arm arm, @NotNull ItemStack stack, float equipProgress) {
+        applyEquipOffset(matrices, arm, equipProgress);
         float f = (float) mc.player.getItemUseTimeLeft() - tickDelta + 1.0F;
         float g = 1.0F - f / (float) stack.getMaxUseTime();
         float m = -15.0F + 75.0F * MathHelper.cos(g * 45.0F * 3.1415927F);
+
         if (arm != Arm.RIGHT) {
             matrices.translate(0.1, 0.83, 0.35);
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-80.0F));
