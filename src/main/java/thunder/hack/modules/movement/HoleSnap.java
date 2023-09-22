@@ -28,7 +28,7 @@ public class HoleSnap extends Module {
     private float prevClientYaw;
 
     public HoleSnap() {
-        super("HoleSnap", Category.MOVEMENT);
+        super("HoleSnap", "Прыгает сам в холку.", Module.Category.MOVEMENT);
     }
 
     @Override
