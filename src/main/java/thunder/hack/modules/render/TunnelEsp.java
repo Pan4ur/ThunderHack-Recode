@@ -19,7 +19,7 @@ import java.util.List;
 public class TunnelEsp extends Module {
 
     public TunnelEsp() {
-        super("TunnelEsp", Category.RENDER);
+        super("TunnelEsp", "Показывает где тунелль.", Module.Category.RENDER);
     }
 
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(new Color(0xAE8A8AF6, true)));
