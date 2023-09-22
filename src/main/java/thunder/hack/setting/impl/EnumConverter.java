@@ -3,6 +3,7 @@ package thunder.hack.setting.impl;
 import com.google.common.base.Converter;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -32,9 +33,9 @@ public class EnumConverter extends Converter<Enum, JsonElement> {
         return clazz.getClass().getEnumConstants()[0];
     }
 
-    public static Enum setEnumInt(Enum clazz, int id) {
+    public static Enum<?> setEnumInt(@NotNull Enum<?> clazz, int id) {
         for (int i = 0; i < clazz.getClass().getEnumConstants().length; ++i) {
-            Enum e = clazz.getClass().getEnumConstants()[i];
+            Enum<?> e = clazz.getClass().getEnumConstants()[i];
             if (i != id) continue;
             return e;
         }

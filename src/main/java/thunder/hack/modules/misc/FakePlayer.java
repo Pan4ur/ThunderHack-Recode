@@ -33,7 +33,7 @@ public class FakePlayer extends Module {
         if (copyInventory.getValue()) {
             fakePlayer.getInventory().clone(mc.player.getInventory());
         }
-        mc.world.addEntity(22822854, fakePlayer);
+        mc.world.addEntity(fakePlayer);
     }
 
     @EventHandler(priority = EventPriority.HIGH)

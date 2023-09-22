@@ -37,7 +37,7 @@ public class MixinEntityLiving implements IEntityLiving {
     double prevServerX,prevServerY,prevServerZ;
 
     @Inject(method = {"updateTrackedPositionAndAngles"}, at = {@At("HEAD")})
-    private void updateTrackedPositionAndAnglesHook(double x, double y, double z, float yaw, float pitch, int interpolationSteps, boolean interpolate, CallbackInfo ci) {
+    private void updateTrackedPositionAndAnglesHook(double x, double y, double z, float yaw, float pitch, int interpolationSteps, CallbackInfo ci) {
         prevServerX = serverX;
         prevServerY = serverY;
         prevServerZ = serverZ;

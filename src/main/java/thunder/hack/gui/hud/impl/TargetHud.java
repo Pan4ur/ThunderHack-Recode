@@ -113,7 +113,7 @@ public class TargetHud extends HudElement {
         if (AutoCrystal.target != null) {
             target = AutoCrystal.target;
             direction = true;
-            if(AutoCrystal.target.isDead()){
+            if (AutoCrystal.target.isDead()) {
                 AutoCrystal.target = null;
                 return;
             }
@@ -214,7 +214,7 @@ public class TargetHud extends HudElement {
                 }
 
                 if (target instanceof PlayerEntity) {
-                    RenderSystem.setShaderTexture(0, ((AbstractClientPlayerEntity) target).getSkinTexture());
+                    RenderSystem.setShaderTexture(0, ((AbstractClientPlayerEntity) target).getSkinTextures().texture());
                 } else {
                     RenderSystem.setShaderTexture(0, mc.getEntityRenderDispatcher().getRenderer(target).getTexture(target));
                 }
@@ -291,7 +291,7 @@ public class TargetHud extends HudElement {
 
                 // Бошка
                 if (target instanceof PlayerEntity) {
-                    RenderSystem.setShaderTexture(0, ((AbstractClientPlayerEntity) target).getSkinTexture());
+                    RenderSystem.setShaderTexture(0, ((AbstractClientPlayerEntity) target).getSkinTextures().texture());
                 } else {
                     RenderSystem.setShaderTexture(0, mc.getEntityRenderDispatcher().getRenderer(target).getTexture(target));
                 }
@@ -363,7 +363,7 @@ public class TargetHud extends HudElement {
                 Render2DEngine.drawRect(context.getMatrices(), getPosX() + 50, getPosY() + 30, (int) (60 * (health / 20)), 10, color.getValue().getColorObject().brighter().brighter().brighter());
 
                 if (target instanceof PlayerEntity) {
-                    RenderSystem.setShaderTexture(0, ((AbstractClientPlayerEntity) target).getSkinTexture());
+                    RenderSystem.setShaderTexture(0, ((AbstractClientPlayerEntity) target).getSkinTextures().texture());
                 } else {
                     RenderSystem.setShaderTexture(0, mc.getEntityRenderDispatcher().getRenderer(target).getTexture(target));
                 }

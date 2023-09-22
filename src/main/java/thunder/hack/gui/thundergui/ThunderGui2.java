@@ -176,7 +176,7 @@ public class ThunderGui2 extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        if(Module.fullNullCheck()) renderBackground(context);
+        if(Module.fullNullCheck()) renderBackground(context, mouseX, mouseY, delta);
 
         context.getMatrices().push();
         mouse_x = mouseX;
@@ -636,16 +636,16 @@ public class ThunderGui2 extends Screen {
                 config_string = "";
             }
             switch (keyCode) {
-                case GLFW.GLFW_KEY_ESCAPE: {
+                case GLFW.GLFW_KEY_ESCAPE -> {
                     config_string = "Save config";
                     listening_config = false;
                     return;
                 }
-                case GLFW.GLFW_KEY_BACKSPACE: {
+                case GLFW.GLFW_KEY_BACKSPACE -> {
                     config_string = (removeLastChar(config_string));
                     return;
                 }
-                case GLFW.GLFW_KEY_ENTER: {
+                case GLFW.GLFW_KEY_ENTER -> {
                     if (!config_string.equals("Save config") && !config_string.equals("")) {
                         ThunderHack.configManager.save(config_string);
                         config_string = "Save config";
@@ -692,11 +692,9 @@ public class ThunderGui2 extends Screen {
         return (mouseX >= x && mouseY >= y && mouseX <= x1 + x && mouseY <= y1 + y);
     }
 
-
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-
-        final float dWheel = (int) (amount * 10D);
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        final float dWheel = (int) (verticalAmount * 10D);
         settings.forEach(component -> component.checkMouseWheel(dWheel));
         if (scroll_lock) {
             scroll_lock = false;
@@ -709,12 +707,15 @@ public class ThunderGui2 extends Screen {
             configs.forEach(component -> component.scrollElement(dWheel * ThunderHackGui.scrollSpeed.getValue()));
             friends.forEach(component -> component.scrollElement(dWheel * ThunderHackGui.scrollSpeed.getValue()));
         }
-        return super.mouseScrolled(mouseX, mouseY, amount);
+
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
-
-
     public enum CurrentMode {
-        Modules, CfgManager, FriendManager, WayPointManager, MacroManager
+        Modules,
+        CfgManager,
+        FriendManager,
+        WayPointManager,
+        MacroManager
     }
 }

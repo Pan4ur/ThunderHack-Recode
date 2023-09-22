@@ -14,8 +14,8 @@ import static thunder.hack.modules.Module.mc;
 
 @Mixin(ClientWorld.class)
 public class MixinClientWorld {
-    @Inject(method = "addEntityPrivate", at = @At("HEAD"), cancellable = true)
-    public void onAddEntity(int id, Entity entity, CallbackInfo ci) {
+    @Inject(method = "addEntity", at = @At("HEAD"), cancellable = true)
+    public void onAddEntity(Entity entity, CallbackInfo ci) {
         EventEntitySpawn ees = new EventEntitySpawn(entity);
         ThunderHack.EVENT_BUS.post(ees);
         if (ees.isCancelled()) {

@@ -3,6 +3,7 @@ package thunder.hack.modules.movement;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.network.packet.c2s.common.KeepAliveC2SPacket;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;

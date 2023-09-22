@@ -53,11 +53,8 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	
-	// satin
-	modImplementation "org.ladysnake:satin:1.14.0"
-	include "org.ladysnake:satin:1.14.0"
-
-	libImpl("meteordevelopment:orbit:0.2.3")
+	modImpl("org.ladysnake:satin:${project.satin_version}")
+	libImpl("meteordevelopment:orbit:${project.orbit_version}")
 
 	configurations.libImpl.dependencies.each {
 		implementation(it)

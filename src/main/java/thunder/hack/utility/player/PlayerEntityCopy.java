@@ -21,7 +21,7 @@ public class PlayerEntityCopy extends OtherClientPlayerEntity {
         if (mc.world == null) return;
 
         unsetRemoved();
-        mc.world.addEntity(this.getId(), this);
+        mc.world.addEntity(this);
     }
 
     public void deSpawn() {

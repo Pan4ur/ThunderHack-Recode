@@ -2,12 +2,11 @@ package thunder.hack.injection;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
-import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.util.SkinTextures;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,34 +21,32 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Objects;
 
-@Mixin(PlayerListEntry.class)
-public class MixinPlayerListEntry {
-    @Shadow
+@Mixin(SkinTextures.class)
+public class MixinSkinTextures {
+    private static final Identifier SUN_SKIN = new Identifier("textures/sunskin.png");
+
     @Final
     private GameProfile profile;
-    @Shadow
     @Final
     private Map<MinecraftProfileTexture.Type, Identifier> textures;
+
     private boolean loadedCapeTexture = false;
 
-
-    private Identifier sunSkin = new Identifier("textures/sunskin.png");
-
-    @Inject(method = "getCapeTexture", at = @At("HEAD"))
+    @Inject(method = "capeTexture", at = @At("HEAD"))
     private void getCapeTextureHook(CallbackInfoReturnable<Identifier> cir) {
         if(ModuleManager.optifineCapes.isEnabled())
             getTexture();
     }
 
-    @Inject(method = "getElytraTexture", at = @At("HEAD"))
+    @Inject(method = "elytraTexture", at = @At("HEAD"))
     private void getElytraTextureHook(CallbackInfoReturnable<Identifier> cir) {
         if(ModuleManager.optifineCapes.isEnabled())
             getTexture();
     }
-    @Inject(method = "getSkinTexture", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "texture", at = @At("HEAD"), cancellable = true)
     public void getSkinTextureHook(CallbackInfoReturnable<Identifier> cir) {
         if(ModuleManager.media.isEnabled() && Media.skinProtect.getValue()){
-            cir.setReturnValue(sunSkin);
+            cir.setReturnValue(SUN_SKIN);
         }
     }
 

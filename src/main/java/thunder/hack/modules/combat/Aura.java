@@ -211,7 +211,7 @@ public class Aura extends Module {
 
     private int getHitTicks() {
         // Обоссаный плагин поставили чтоб нубики с читами в крит не попадали
-        if(mc.getCurrentServerEntry() != null && mc.getCurrentServerEntry().address.equals("ngrief.me") && mc.player.getMainHandStack().getItem() instanceof AxeItem){
+        if (mc.getCurrentServerEntry() != null && mc.getCurrentServerEntry().address.equals("ngrief.me") && mc.player.getMainHandStack().getItem() instanceof AxeItem) {
             return 21;
         }
         return oldDelay.getValue() ? 1 + (int) (20f / MathUtility.random(minCPS.getValue(), maxCPS.getValue())) : 11;
@@ -242,21 +242,6 @@ public class Aura extends Module {
             if (status.getStatus() == 30 && status.getEntity(mc.world) != null && target != null && status.getEntity(mc.world) == target)
                 ThunderHack.notificationManager.publicity("Aura", MainSettings.isRu() ? ("Успешно сломали щит игроку " + target.getName().getString()) : ("Succesfully destroyed " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
         }
-        /*
-        if(e.getPacket() instanceof EntityTrackerUpdateS2CPacket attrib){
-            for(DataTracker.SerializedEntry<?> a : attrib.trackedValues()){
-                if(a.id() == 8 && a.value().equals((byte) 3)){
-                    PacketByteBuf packetBuf = new PacketByteBuf(Unpooled.buffer());
-                    attrib.write(packetBuf);
-                    Entity ent = mc.world.getEntityById(packetBuf.readVarInt());
-                    if(target != null && ent != null && ent.getId() == target.getId()) {
-                        shieldBreaker(true);
-                        hitTicks = 10;
-                    }
-                }
-            }
-        }
-         */
     }
 
     @Override
@@ -446,22 +431,22 @@ public class Aura extends Module {
         rotationPoint = rotationPoint.add(rotationMotion);
 
         // Сталкиваемся с хитбоксом по X
-        if (rotationPoint.x >= (target.getBoundingBox().getXLength() - 0.05) / 2f)
+        if (rotationPoint.x >= (target.getBoundingBox().getLengthX() - 0.05) / 2f)
             rotationMotion = new Vec3d(-MathUtility.random(minMotionXZ, maxMotionXZ), rotationMotion.getY(), rotationMotion.getZ());
 
 
         // Сталкиваемся с хитбоксом по Y
-        if (rotationPoint.y >= target.getBoundingBox().getYLength())
+        if (rotationPoint.y >= target.getBoundingBox().getLengthY())
             rotationMotion = new Vec3d(rotationMotion.getX(), -MathUtility.random(minMotionY, maxMotionY), rotationMotion.getZ());
 
 
         // Сталкиваемся с хитбоксом по Z
-        if (rotationPoint.z >= (target.getBoundingBox().getZLength() - 0.05) / 2f)
+        if (rotationPoint.z >= (target.getBoundingBox().getLengthZ() - 0.05) / 2f)
             rotationMotion = new Vec3d(rotationMotion.getX(), rotationMotion.getY(), -MathUtility.random(minMotionXZ, maxMotionXZ));
 
 
         // Сталкиваемся с хитбоксом по -X
-        if (rotationPoint.x <= -(target.getBoundingBox().getXLength() - 0.05) / 2f)
+        if (rotationPoint.x <= -(target.getBoundingBox().getLengthX() - 0.05) / 2f)
             rotationMotion = new Vec3d(MathUtility.random(minMotionXZ, 0.03f), rotationMotion.getY(), rotationMotion.getZ());
 
 
@@ -471,7 +456,7 @@ public class Aura extends Module {
 
 
         // Сталкиваемся с хитбоксом по -Z
-        if (rotationPoint.z <= -(target.getBoundingBox().getZLength() - 0.05) / 2f)
+        if (rotationPoint.z <= -(target.getBoundingBox().getLengthZ() - 0.05) / 2f)
             rotationMotion = new Vec3d(rotationMotion.getX(), rotationMotion.getY(), MathUtility.random(minMotionXZ, maxMotionXZ));
 
 
@@ -480,7 +465,7 @@ public class Aura extends Module {
 
         // Если мы используем обход ударов через стену и наша цель за стеной, то целимся в верхушку хитбокса т.к. матриксу поебать
         if (!mc.player.canSee(target) && wallsBypass.getValue())
-            return target.getPos().add(MathUtility.random(-0.15, 0.15), target.getBoundingBox().getYLength(), MathUtility.random(-0.15, 0.15));
+            return target.getPos().add(MathUtility.random(-0.15, 0.15), target.getBoundingBox().getLengthY(), MathUtility.random(-0.15, 0.15));
 
         // Если мы перестали смотреть на цель
         if (!lookingAtHitbox) {
@@ -494,7 +479,7 @@ public class Aura extends Module {
                 rotationPoint = new Vec3d(MathUtility.random(-0.1f, 0.1f), target.getEyeHeight(target.getPose()) / (MathUtility.random(1.8f, 2.5f)), MathUtility.random(-0.1f, 0.1f));
             } else {
                 // Сканим хитбокс на видимую точку
-                float halfBox = (float) (target.getBoundingBox().getXLength() / 2.3f);
+                float halfBox = (float) (target.getBoundingBox().getLengthX() / 2.3f);
 
                 for (float x1 = -halfBox; x1 < halfBox; x1 += 0.05f) {
                     for (float z1 = -halfBox; z1 < halfBox; z1 += 0.05f) {

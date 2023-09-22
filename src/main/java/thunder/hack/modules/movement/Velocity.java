@@ -1,6 +1,7 @@
 package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
@@ -44,14 +45,6 @@ public class Velocity extends Module {
     }
 
 
-    @Override
-    public void onDisable() {
-        // Blocks.ICE.slipperiness = 0.98f;
-        // Blocks.PACKED_ICE.slipperiness = 0.98f;
-        //Blocks.FROSTED_ICE.slipperiness = 0.98f;
-    }
-
-
     @EventHandler
     public void onPacketReceived(PacketEvent.Receive event) {
 
@@ -92,7 +85,7 @@ public class Velocity extends Module {
                     grimTicks = 6;
                 }
             }
-            if (event.getPacket() instanceof PlayPingS2CPacket && grimTicks > 0) {
+            if (event.getPacket() instanceof PingResultS2CPacket && grimTicks > 0) {
                 event.cancel();
                 grimTicks--;
             }

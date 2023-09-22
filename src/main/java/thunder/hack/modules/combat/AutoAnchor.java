@@ -54,8 +54,8 @@ public class AutoAnchor extends Module {
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
     private final Setting<Integer> logicTimeout = new Setting<>("Logic Timeout", 30, 1, 2000);
-    public Setting<YawStepMode> yawStep = new Setting<>("YawStep", YawStepMode.Off);
-    public Setting<Integer> yawAngle = new Setting<>("YawAngle", 54, 5, 180, v -> yawStep.getValue() != YawStepMode.Off);
+    private final Setting<YawStepMode> yawStep = new Setting<>("YawStep", YawStepMode.Off);
+    private final Setting<Integer> yawAngle = new Setting<>("YawAngle", 54, 5, 180, v -> yawStep.getValue() != YawStepMode.Off);
     public static Setting<Integer> predictTicks = new Setting<>("PredictTicks", 5, 0, 40);
 
     // Place
@@ -112,12 +112,16 @@ public class AutoAnchor extends Module {
         On
     }
 
-
     private final List<BlockPos> ownAnchors = new ArrayList<>();
     private final Map<BlockPos, Integer> charges = new HashMap<>();
     private PlayerEntity target;
     private BlockPos targetPos;
     private Vec3d rotations;
+
+    private Thread logicThread;
+    private Thread placeThread;
+    private Thread chargeThread;
+    private Thread explodeThread;
 
     public AutoAnchor() {
         super("AutoAnchor", "Ебашит якоря как-героин", Category.COMBAT);
@@ -135,12 +139,37 @@ public class AutoAnchor extends Module {
         charges.clear();
 
         // Threads
-        new LogicThread().start();
-        new PlaceThread().start();
-        new ChargeThread().start();
-        new ExplodeThread().start();
+        logicThread = new LogicThread();
+        placeThread = new PlaceThread();
+        chargeThread = new ChargeThread();
+        explodeThread = new ExplodeThread();
+
+        logicThread.start();
+        placeThread.start();
+        chargeThread.start();
+        explodeThread.start();
 
         super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        if (logicThread != null && !logicThread.isInterrupted()) {
+            logicThread.interrupt();
+            logicThread = null;
+        }
+        if (placeThread != null && !placeThread.isInterrupted()) {
+            placeThread.interrupt();
+            placeThread = null;
+        }
+        if (chargeThread != null && !chargeThread.isInterrupted()) {
+            chargeThread.interrupt();
+            chargeThread = null;
+        }
+        if (explodeThread != null && !explodeThread.isInterrupted()) {
+            explodeThread.interrupt();
+            explodeThread = null;
+        }
     }
 
     @Override
@@ -174,7 +203,7 @@ public class AutoAnchor extends Module {
         return positions;
     }
 
-    private List<BlockPos> findAnchors() {
+    private @NotNull List<BlockPos> findAnchors() {
         List<BlockPos> positions = new ArrayList<>();
         BlockPos centerPos = mc.player.getBlockPos();
 
@@ -232,8 +261,6 @@ public class AutoAnchor extends Module {
             yp[1] = (float) (yp[1] - (yp[1] - ((IClientPlayerEntity) ((mc.player))).getLastYaw()) % gcdFix);
             mc.player.setYaw(yp[0]);
             mc.player.setPitch(yp[1]);
-            // if (placeTimer.passedMs(2000))
-            //     rotations = null;
         }
     }
 
@@ -251,13 +278,12 @@ public class AutoAnchor extends Module {
         @Override
         public synchronized void run() {
             while (isEnabled()) {
-                try {
-                    sleep(logicTimeout.getValue());
-                } catch (InterruptedException ignored) {
-                }
-
-                while (ticking.get()) {
-                }
+                if (!ticking.get()) {
+                    try {
+                        sleep(logicTimeout.getValue());
+                    } catch (InterruptedException ignored) {
+                    }
+                } else continue;
 
                 if (fullNullCheck()) continue;
 
@@ -271,8 +297,10 @@ public class AutoAnchor extends Module {
                 }
 
                 // Finding new best target pos
-                BlockPos best1 = findAnchorBlocks().stream().filter(AutoAnchor.this::isFriendsSafe).max(Comparator.comparingDouble(bp -> ExplosionUtility.getAnchorExplosionDamage(bp, target))).orElse(null);
-
+                BlockPos best1 = findAnchorBlocks().stream()
+                        .filter(AutoAnchor.this::isFriendsSafe)
+                        .max(Comparator.comparingDouble(bp -> ExplosionUtility.getAnchorExplosionDamage(bp, target)))
+                        .orElse(null);
 
                 if (targetPos != null && best1 != null) {
                     if ((ExplosionUtility.getAnchorExplosionDamage(targetPos, mc.player) >= ExplosionUtility.getAnchorExplosionDamage(best1, mc.player))) {
@@ -291,17 +319,6 @@ public class AutoAnchor extends Module {
                 if (targetPos == null) {
                     targetPos = best1;
                 }
-/*
-                if (targetPos == null) {
-                    targetPos = best1;
-                } else if (mc.player.squaredDistanceTo(targetPos.toCenterPos()) <= placeRange.getPow2Value() || !InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false) && !mc.world.getBlockState(targetPos).getBlock().equals(Blocks.RESPAWN_ANCHOR)) {
-                    if ((ExplosionUtility.getAnchorExplosionDamage(targetPos, mc.player) >= ExplosionUtility.getAnchorExplosionDamage(best1, mc.player)
-                            && ExplosionUtility.getAnchorExplosionDamage(targetPos, target) <= ExplosionUtility.getAnchorExplosionDamage(best1, target))) {
-                        targetPos = best1;
-                    }
-                }
-
- */
             }
         }
     }
@@ -313,13 +330,10 @@ public class AutoAnchor extends Module {
             }
         }
 
-        if(ExplosionUtility.getAnchorExplosionDamage(blockPos,mc.player) >= maxDamage.getValue())
+        if (ExplosionUtility.getAnchorExplosionDamage(blockPos, mc.player) >= maxDamage.getValue())
             return false;
 
-        if(target != null && ExplosionUtility.getAnchorExplosionDamage(blockPos,target) < minDamage.getValue())
-            return false;
-
-        return true;
+        return target == null || !(ExplosionUtility.getAnchorExplosionDamage(blockPos, target) < minDamage.getValue());
     }
 
     private final class PlaceThread extends Thread {
@@ -349,9 +363,9 @@ public class AutoAnchor extends Module {
                     return;
                 }
 
-                if (placeRotate.getValue() == RotateMode.Normal && targetPosCopy != null) {
+                if (placeRotate.getValue() == RotateMode.Normal) {
                     BlockHitResult bhr = InteractionUtility.getPlaceResult(targetPosCopy, interactMode.getValue(), false);
-                    if(bhr != null) {
+                    if (bhr != null) {
                         rotations = bhr.getPos();
                     }
                 }
@@ -381,14 +395,13 @@ public class AutoAnchor extends Module {
                 }
 
                 BlockPos targetPosCopy = null;
-                if(targetPos != null) {
+                if (targetPos != null) {
                     targetPosCopy = new BlockPos(targetPos);
-                } else if(target != null){
+                } else if (target != null) {
                     targetPosCopy = findAnchors().stream().filter(AutoAnchor.this::isFriendsSafe).max(Comparator.comparingDouble(bp -> ExplosionUtility.getAnchorExplosionDamage(bp, target))).orElse(null);
                 }
 
                 if (target == null || targetPosCopy == null || fullNullCheck()) continue;
-
                 if (!isCorrectPos(targetPosCopy) || shouldPause()) continue;
 
                 SearchInvResult glowResult = InventoryUtility.getGlowStone();
@@ -438,10 +451,10 @@ public class AutoAnchor extends Module {
             boolean isAnchor = mc.world.getBlockState(pos).getBlock() == Blocks.RESPAWN_ANCHOR;
 
             try {
-                if(isAnchor) {
+                if (isAnchor) {
                     serverSideCharges = mc.world.getBlockState(pos).get(RespawnAnchorBlock.CHARGES);
                 }
-            } catch (Exception ignored){
+            } catch (Exception ignored) {
             }
 
             if (isAnchor && (serverSideCharges < chargeCount.getValue() || (syncCharges.containsKey(pos) && syncCharges.get(pos) < chargeCount.getValue()))) {
@@ -509,7 +522,6 @@ public class AutoAnchor extends Module {
 
                     sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                     interact(result, explodeMode, Hand.OFF_HAND);
-                    //               sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                 }
 
                 if (switchBack.getValue())

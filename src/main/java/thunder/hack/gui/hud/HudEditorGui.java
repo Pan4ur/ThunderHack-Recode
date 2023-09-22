@@ -147,13 +147,11 @@ public class HudEditorGui extends Screen {
         super.render(context, mouseX, mouseY, delta);
     }
 
-
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        dWheel = (int) (amount * 5D);
-        return super.mouseScrolled(mouseX, mouseY, amount);
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        dWheel = (int) (verticalAmount * 5D);
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
-
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {

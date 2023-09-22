@@ -104,9 +104,9 @@ public class ClickUI extends Screen {
             FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() - 40 - FontRenderers.thglitch.getFontHeight("New version is available!"), -1);
         }
 
-        if (Module.fullNullCheck()) renderBackground(context);
+        if (Module.fullNullCheck()) renderBackground(context, mouseX, mouseY, delta);
 
-        if(ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old) {
+        if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old) {
             for (AbstractWindow window : windows) {
                 if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 264)) {
                     window.setY(window.getY() + 2);
@@ -207,14 +207,12 @@ public class ClickUI extends Screen {
 
             } else if (hstep == 2) {
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !MainSettings.isRu() ?
-                                "Choose your server" : "На какой сервер?"
-                        , hx, hy - 80, -1);
+                                "Choose your server" : "На какой сервер?", hx, hy - 80, -1);
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 20, 180, 20)) {
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 20, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 100));
                 } else {
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 20, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70));
-
                 }
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 50, 180, 20)) {
@@ -265,9 +263,9 @@ public class ClickUI extends Screen {
 
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        scrollY += (int) (amount * 5D);
-        return super.mouseScrolled(mouseX, mouseY, amount);
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        scrollY += (int) (verticalAmount * 5D);
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override
