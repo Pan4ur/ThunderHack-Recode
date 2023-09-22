@@ -5,9 +5,14 @@ name: Java CI with Gradle
 
 on: [ push,pull_request ]
 
+concurrency:
+  group: "latest"
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - uses: actions/checkout@v2
 
@@ -27,9 +32,9 @@ jobs:
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          repo_token: "${{ secrets.THUNDERHACK_ABOBA_KEY }}"
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
-          prerelease: false
+          prerelease: true
           title: "Latest Build"
           files: |
             ./build/libs/*.jar
