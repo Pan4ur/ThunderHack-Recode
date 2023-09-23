@@ -102,7 +102,11 @@ public abstract class Module {
 
     public void enable() {
         this.enabled.setValue(true);
-        this.onEnable();
+
+        if(!fullNullCheck()) {
+            this.onEnable();
+        }
+
         if (this.isOn()) {
             ThunderHack.EVENT_BUS.subscribe(this);
         }

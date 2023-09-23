@@ -42,8 +42,6 @@ public class MainMenuButton {
 
         Render2DEngine.drawGradientRoundShader(context.getMatrices(), c1, c2, c3, c4, halfOfWidth + posX, halfOfHeight + posY, width, height, 10);
         Render2DEngine.drawRoundShader(context.getMatrices(), halfOfWidth + posX + 1, halfOfHeight + posY + 1, width - 2, height - 2, 10, HudEditor.plateColor.getValue().getColorObject());
-
-
     }
 
     public void onRenderText(DrawContext context, float mouseX, float mouseY) {

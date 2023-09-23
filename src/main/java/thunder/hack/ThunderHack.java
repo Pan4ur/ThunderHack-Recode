@@ -9,8 +9,10 @@ import thunder.hack.notification.NotificationManager;
 import thunder.hack.utility.ThSoundPack;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.math.BlockPos;
+import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.shaders.GradientGlowProgram;
+import thunder.hack.utility.render.shaders.MainMenuProgram;
 import thunder.hack.utility.render.shaders.RoundedGradientProgram;
 import thunder.hack.utility.render.shaders.RoundedProgram;
 
@@ -89,9 +91,12 @@ public class ThunderHack implements ModInitializer {
         Render2DEngine.ROUNDED_GRADIENT_PROGRAM = new RoundedGradientProgram();
         Render2DEngine.ROUNDED_PROGRAM = new RoundedProgram();
         Render2DEngine.GRADIENT_GLOW_PROGRAM = new GradientGlowProgram();
+        Render2DEngine.MAIN_MENU_PROGRAM = new MainMenuProgram();
+
 
         ThSoundPack.registerSounds();
         syncVersion();
+        ThunderUtility.parseChangeLog();
         ModuleManager.rpc.startRpc();
         initTime = System.currentTimeMillis();
     }

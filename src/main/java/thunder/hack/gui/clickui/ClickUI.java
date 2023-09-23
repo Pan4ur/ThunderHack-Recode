@@ -96,6 +96,9 @@ public class ClickUI extends Screen {
         return false;
     }
 
+
+
+
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 
@@ -104,7 +107,9 @@ public class ClickUI extends Screen {
             FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() - 40 - FontRenderers.thglitch.getFontHeight("New version is available!"), -1);
         }
 
-        if (Module.fullNullCheck()) renderBackground(context, mouseX, mouseY, delta);
+        if (Module.fullNullCheck())
+            Render2DEngine.drawMainMenuShader(context.getMatrices(), 0, 0, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
+
 
         if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old) {
             for (AbstractWindow window : windows) {
@@ -140,19 +145,16 @@ public class ClickUI extends Screen {
                     for (AbstractWindow window : windows) {
                         window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().hcolor1.getValue().getColorObject());
                     }
-                    super.render(context, mouseX, mouseY, delta);
                 });
             } else {
                 for (AbstractWindow window : windows) {
                     window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().hcolor1.getValue().getColorObject());
                 }
-                super.render(context, mouseX, mouseY, delta);
             }
         } else {
             for (AbstractWindow window : windows) {
                 window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().hcolor1.getValue().getColorObject());
             }
-            super.render(context, mouseX, mouseY, delta);
         }
         if (!setup && ConfigManager.firstLaunch) {
             float hx = mc.getWindow().getScaledWidth() / 2f;
@@ -207,7 +209,7 @@ public class ClickUI extends Screen {
 
             } else if (hstep == 2) {
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !MainSettings.isRu() ?
-                                "Choose your server" : "На какой сервер?", hx, hy - 80, -1);
+                        "Choose your server" : "На какой сервер?", hx, hy - 80, -1);
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 20, 180, 20)) {
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 20, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 100));
@@ -241,15 +243,11 @@ public class ClickUI extends Screen {
 
                 FontRenderers.modules.drawCenteredString(context.getMatrices(), "ThunderHack v" + ThunderHack.version, hx, hy + 90, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70).getRGB());
             } else if (hstep == 3) {
-                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !MainSettings.isRu() ?
-                                "ThunderHack is set up" : "Вперед, сносить кабины))0)"
-                        , hx, hy - 80, -1);
+                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !MainSettings.isRu() ? "ThunderHack is set up" : "Вперед, сносить кабины))0)", hx, hy - 80, -1);
                 FontRenderers.modules.drawCenteredString(context.getMatrices(), "ThunderHack v" + ThunderHack.version, hx, hy + 90, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70).getRGB());
                 context.drawTexture(pic2, (int) hx - 45, (int) hy + 10, 0, 0, 80, 75, 80, 75);
             } else if (hstep == 5) {
-                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(),
-                        "((("
-                        , hx, hy - 80, -1);
+                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "(((", hx, hy - 80, -1);
 
                 context.drawTexture(pic3, (int) hx - 45, (int) hy + 10, 0, 0, 80, 75, 80, 75);
             }

@@ -3,21 +3,23 @@ package thunder.hack.gui.mainmenu;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.option.OptionsScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.ClickUI;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.render.MSAAFramebuffer;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,7 @@ import static thunder.hack.modules.Module.mc;
 public class MainMenuScreen extends Screen {
 
     private List<MainMenuButton> buttons = new ArrayList<>();
+    public boolean confirm = false;
 
     private final Identifier TH_LOGO = new Identifier("textures/th.png");
 
@@ -52,7 +55,6 @@ public class MainMenuScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
 
         float halfOfWidth = mc.getWindow().getScaledWidth() / 2f;
         float halfOfHeight = mc.getWindow().getScaledHeight() / 2f;
@@ -81,22 +83,68 @@ public class MainMenuScreen extends Screen {
 
             // Smooth zone
 
+            boolean hoveredLogo = Render2DEngine.isHovered(mouseX, mouseY, (int) (halfOfWidth - 157), (int) (halfOfHeight - 140), 300, 70);
+
+
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(770, 1);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.3f);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, hoveredLogo ? 0.4f : 0.3f);
             Render2DEngine.drawTexture(context, TH_LOGO, (int) (halfOfWidth - 157), (int) (halfOfHeight - 140), 300, 70);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableBlend();
+
             buttons.forEach(b -> b.onRenderText(context, mouseX, mouseY));
 
+            boolean hovered = Render2DEngine.isHovered(mouseX, mouseY, halfOfWidth - 50, halfOfHeight + 70, 100, 10);
+            FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "<-- Back to default menu", halfOfWidth, halfOfHeight + 70, hovered ? -1 : Render2DEngine.applyOpacity(-1, 0.4f));
+
+            FontRenderers.sf_medium.drawString(context.getMatrices(), "By Pan4ur & 06ED", halfOfWidth * 2 - FontRenderers.sf_medium.getStringWidth("By Pan4ur & 06ED") - 5f, halfOfHeight * 2 - 10, Render2DEngine.applyOpacity(-1, 0.4f));
+
+
+            int offsetY = 10;
+            for (String change : ThunderUtility.changeLog) {
+                String prefix = getPrefix(change);
+                FontRenderers.sf_medium.drawString(context.getMatrices(), prefix, 10, offsetY, Render2DEngine.applyOpacity(-1, 0.4f));
+                offsetY += 10;
+            }
         });
+    }
+
+    private static String getPrefix(String change) {
+        String prefix = "";
+        if (change.contains("[+]")) {
+            change = change.replace("[+] ", "");
+            prefix = Formatting.GREEN + "[+] " + Formatting.RESET;
+        } else if (change.contains("[-]")) {
+            change = change.replace("[-] ", "");
+            prefix = Formatting.RED + "[-] " + Formatting.RESET;
+        } else if (change.contains("[/]")) {
+            change = change.replace("[/] ", "");
+            prefix = Formatting.LIGHT_PURPLE + "[/] " + Formatting.RESET;
+        } else if (change.contains("[*]")) {
+            change = change.replace("[*] ", "");
+            prefix = Formatting.GOLD + "[*] " + Formatting.RESET;
+        }
+        return prefix + change;
     }
 
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        float halfOfWidth = mc.getWindow().getScaledWidth() / 2f;
+        float halfOfHeight = mc.getWindow().getScaledHeight() / 2f;
         buttons.forEach(b -> b.onClick((int) mouseX, (int) mouseY));
+
+        if (Render2DEngine.isHovered(mouseX, mouseY, halfOfWidth - 50, halfOfHeight + 70, 100, 10)) {
+            confirm = true;
+            mc.setScreen(new TitleScreen());
+            confirm = false;
+        }
+
+        if (Render2DEngine.isHovered(mouseX, mouseY, (int) (halfOfWidth - 157), (int) (halfOfHeight - 140), 300, 70))
+            Util.getOperatingSystem().open(URI.create("http://thunderhack.xyz"));
+
         return super.mouseClicked(mouseX, mouseY, button);
     }
 }
