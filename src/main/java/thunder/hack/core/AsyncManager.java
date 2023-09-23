@@ -9,7 +9,11 @@ import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventPostTick;
 import thunder.hack.events.impl.EventSync;
+import thunder.hack.gui.clickui.ClickUI;
+import thunder.hack.gui.mainmenu.MainMenuScreen;
 import thunder.hack.modules.Module;
+import thunder.hack.utility.Timer;
+import thunder.hack.utility.render.shaders.MainMenuProgram;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +25,8 @@ import static thunder.hack.modules.Module.mc;
 public class AsyncManager {
     private ClientService clientService = new ClientService();
     public static ExecutorService executor = Executors.newCachedThreadPool();
+
+    private static final Timer updateTimer = new Timer();
 
     private volatile Iterable<Entity> threadSafeEntityList = Collections.emptyList();
     private volatile List<AbstractClientPlayerEntity> threadSafePlayersList = Collections.emptyList();
@@ -61,6 +67,11 @@ public class AsyncManager {
         @Override
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
+                if(mc != null && (mc.currentScreen instanceof MainMenuScreen || mc.currentScreen instanceof ClickUI) && updateTimer.passedMs(16)){
+                    MainMenuProgram.increaseTime();
+                    updateTimer.reset();
+                }
+
                 try {
                     if (!Module.fullNullCheck()) {
                         for (Module module : ThunderHack.moduleManager.modules) {

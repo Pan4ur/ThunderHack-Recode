@@ -19,6 +19,7 @@ import thunder.hack.gui.font.Texture;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.shaders.GradientGlowProgram;
+import thunder.hack.utility.render.shaders.MainMenuProgram;
 import thunder.hack.utility.render.shaders.RoundedGradientProgram;
 import thunder.hack.utility.render.shaders.RoundedProgram;
 
@@ -36,6 +37,7 @@ public class Render2DEngine {
     public static RoundedGradientProgram ROUNDED_GRADIENT_PROGRAM;
     public static RoundedProgram ROUNDED_PROGRAM;
     public static GradientGlowProgram GRADIENT_GLOW_PROGRAM;
+    public static MainMenuProgram MAIN_MENU_PROGRAM;
 
     private static final Identifier star = new Identifier("textures/star.png");
     private static final Identifier heart = new Identifier("textures/heart.png");
@@ -435,15 +437,15 @@ public class Render2DEngine {
     }
 
     public static void drawRound(MatrixStack matrices, float x, float y, float width, float height, float radius, Color color) {
-        renderRoundedQuad(matrices, color, x, y, width + x, height + y, radius, 9);
+        renderRoundedQuad(matrices, color, x, y, width + x, height + y, radius, 4);
     }
 
     public static void drawRoundD(MatrixStack matrices, double x, double y, double width, double height, float radius, Color color) {
-        renderRoundedQuad(matrices, color, x, y, width + x, height + y, radius, 9);
+        renderRoundedQuad(matrices, color, x, y, width + x, height + y, radius, 4);
     }
 
     public static void drawRoundDoubleColor(MatrixStack matrices, double x, double y, double width, double height, float radius, Color color, Color color2) {
-        renderRoundedQuad(matrices, color, color2, x, y, width + x, height + y, radius, 9);
+        renderRoundedQuad(matrices, color, color2, x, y, width + x, height + y, radius, 4);
     }
 
     public static void renderRoundedQuad(MatrixStack matrices, Color c, double fromX, double fromY, double toX, double toY, double radius, double samples) {
@@ -872,6 +874,22 @@ public class Render2DEngine {
         RenderSystem.disableBlend();
     }
 
+    public static void drawMainMenuShader(MatrixStack matrices, float x, float y, float width, float height) {
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+        buffer.vertex(matrix, x, y, 0).next();
+        buffer.vertex(matrix, x, y + height, 0).next();
+        buffer.vertex(matrix, x + width, y + height, 0).next();
+        buffer.vertex(matrix, x + width, y, 0).next();
+        MAIN_MENU_PROGRAM.setParameters(x, y, width, height);
+        MAIN_MENU_PROGRAM.use();
+        Tessellator.getInstance().draw();
+        RenderSystem.disableBlend();
+    }
+
     public static void drawGradientRoundShader(MatrixStack matrices, Color color1, Color color2, Color color3, Color color4, float x, float y, float width, float height, float radius) {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
@@ -883,7 +901,6 @@ public class Render2DEngine {
         buffer.vertex(matrix, x + width, y + height, 0).next();
         buffer.vertex(matrix, x + width, y, 0).next();
         ROUNDED_GRADIENT_PROGRAM.setParameters(x, y, width, height, radius, color1, color2, color3, color4);
-
         ROUNDED_GRADIENT_PROGRAM.use();
         Tessellator.getInstance().draw();
         RenderSystem.disableBlend();

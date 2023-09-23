@@ -30,7 +30,7 @@ public class SearchBar extends AbstractButton {
         if (!listening) {
             FontRenderers.sf_medium.drawGradientString(context.getMatrices(), "Search...", (float) (x + 7f), (float) (y + 7f), 2, false);
         } else {
-            FontRenderers.sf_medium.drawGradientString(context.getMatrices(), moduleName + ((mc.player.age / 10) % 2 == 0 ? " " : "_"), (float) (x + 7f), (float) (y + 7f), 2, false);
+            FontRenderers.sf_medium.drawGradientString(context.getMatrices(), moduleName + (mc.player == null || ((mc.player.age / 10) % 2 == 0) ? " " : "_"), (float) (x + 7f), (float) (y + 7f), 2, false);
         }
 
     }

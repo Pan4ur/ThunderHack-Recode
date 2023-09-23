@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.ThunderHack;
+import thunder.hack.gui.mainmenu.MainMenuScreen;
 
 import java.net.URI;
 
@@ -35,6 +36,10 @@ public class MixinTitleScreen extends Screen {
                         else mc.stop();
                     },
                     Text.of(Formatting.RED + "You are using an outdated version of ThunderHack Recode"), Text.of("Please update to the latest release"), Text.of("Download"), Text.of("Quit Game")));
+        }
+
+        if(true){
+            mc.setScreen(MainMenuScreen.getInstance());
         }
     }
 }

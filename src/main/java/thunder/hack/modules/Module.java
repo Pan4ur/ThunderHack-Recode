@@ -130,9 +130,10 @@ public abstract class Module {
         } catch (Exception ignored) {
         }
 
-        if (fullNullCheck()) return;
 
         enabled.setValue(false);
+
+        if (fullNullCheck()) return;
         onDisable();
 
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
