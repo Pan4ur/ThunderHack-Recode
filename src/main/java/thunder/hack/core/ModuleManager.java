@@ -25,10 +25,8 @@ public class ModuleManager {
     public ArrayList<Module> modules = new ArrayList<>();
     public List<Module> sortedModules = new ArrayList<>();
 
-
     public static LevitationControl levitationControl = new LevitationControl();
     public static InventoryCleaner inventoryCleaner = new InventoryCleaner();
-
     public static NoCommentExploit noCommentExploit = new NoCommentExploit();
     public static AntiFriendAttack antiFriendAttack = new AntiFriendAttack();
     public static TotemPopCounter totemPopCounter = new TotemPopCounter();
@@ -201,7 +199,7 @@ public class ModuleManager {
 
 
     public ModuleManager() {
-        for (Field field : this.getClass().getDeclaredFields()) {
+        for (Field field : getClass().getDeclaredFields()) {
             if (Module.class.isAssignableFrom(field.getType())) {
                 field.setAccessible(true);
                 try {

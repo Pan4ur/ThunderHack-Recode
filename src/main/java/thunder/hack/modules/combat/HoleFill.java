@@ -293,8 +293,7 @@ public class HoleFill extends Module {
     }
 
     private boolean isHole(BlockPos pos) {
-        return ((HoleUtility.validTwoBlockIndestructibleXZ(pos) || HoleUtility.validTwoBlockIndestructibleXZ(pos)
-                || HoleUtility.validTwoBlockBedrockXZ1(pos) || HoleUtility.validTwoBlockBedrockXZ(pos)) && fillDouble.getValue())
+        return ((HoleUtility.validTwoBlockIndestructibleXZ(pos) || HoleUtility.validTwoBlockBedrockXZ(pos)) && fillDouble.getValue())
                 || ((HoleUtility.validQuadBedrock(pos) || HoleUtility.validQuadIndestructible(pos)) && fillQuad.getValue())
                 || ((HoleUtility.validBedrock(pos) || HoleUtility.validIndestructible(pos)) && fillSingle.getValue());
     }

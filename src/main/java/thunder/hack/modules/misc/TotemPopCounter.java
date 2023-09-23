@@ -3,6 +3,7 @@ package thunder.hack.modules.misc;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.modules.Module;
@@ -21,7 +22,7 @@ public class TotemPopCounter extends Module {
 
 
     @EventHandler
-    public void onTotemPop(TotemPopEvent event) {
+    public void onTotemPop(@NotNull TotemPopEvent event) {
         if (event.getEntity() == mc.player) return;
         String s;
         if (MainSettings.language.getValue() == MainSettings.Language.RU) {
