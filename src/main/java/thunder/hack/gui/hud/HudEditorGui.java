@@ -129,22 +129,17 @@ public class HudEditorGui extends Screen {
                     for (AbstractWindow window : windows) {
                         window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().hcolor1.getValue().getColorObject());
                     }
-                    super.render(context, mouseX, mouseY, delta);
                 });
             } else {
                 for (AbstractWindow window : windows) {
                     window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().hcolor1.getValue().getColorObject());
                 }
-                super.render(context, mouseX, mouseY, delta);
             }
         } else {
             for (AbstractWindow window : windows) {
                 window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().hcolor1.getValue().getColorObject());
             }
-            super.render(context, mouseX, mouseY, delta);
         }
-
-        super.render(context, mouseX, mouseY, delta);
     }
 
     @Override

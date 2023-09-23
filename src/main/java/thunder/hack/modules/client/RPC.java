@@ -154,7 +154,7 @@ class RPC extends Module {
             if (mc.getCurrentServerEntry().address.equals("ngrief.me"))
                 result = mc.getCurrentServerEntry().address + " " + getNexusDetails();
         } else if (mc.isInSingleplayer()) {
-            result = "Читерит в одиночке";
+            result = isRu() ? "Читерит в одиночке" : "SinglePlayer hacker";
         }
         return result;
     }
