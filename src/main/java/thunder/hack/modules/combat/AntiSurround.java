@@ -32,9 +32,9 @@ public class AntiSurround extends Module {
 
     private final Setting<Parent> logic = new Setting<>("Logic", new Parent(false, 0));
     private final Setting<TargetLogic> targetLogic = new Setting<>("TargetLogic", TargetLogic.Distance).withParent(logic);
-    private final Setting<Boolean> antiSurround = new Setting<>("Anti Surround", true).withParent(logic);
-    private final Setting<Boolean> antiCev = new Setting<>("Anti Cev", true).withParent(logic);
-    private final Setting<Boolean> antiCiv = new Setting<>("Anti Civ", true).withParent(logic);
+    private final Setting<Boolean> antiSurround = new Setting<>("Surround", true).withParent(logic);
+    private final Setting<Boolean> antiCev = new Setting<>("Cev", true).withParent(logic);
+    private final Setting<Boolean> antiCiv = new Setting<>("Civ", true).withParent(logic);
 
     private BlockPos blockPos;
 

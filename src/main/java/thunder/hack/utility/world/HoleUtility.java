@@ -93,8 +93,7 @@ public final class HoleUtility {
 
     public static boolean isHole(BlockPos pos) {
         return validIndestructible(pos) || validBedrock(pos)
-                || validTwoBlockIndestructibleXZ(pos) || validTwoBlockIndestructibleXZ1(pos)
-                || validTwoBlockBedrockXZ(pos) || validTwoBlockBedrockXZ1(pos)
+                || validTwoBlockIndestructibleXZ(pos) || validTwoBlockBedrockXZ(pos)
                 || validQuadIndestructible(pos) || validQuadBedrock(pos);
     }
 
@@ -121,94 +120,167 @@ public final class HoleUtility {
                 && isAir(pos.add(0, 2, 0));
     }
 
-    public static boolean validTwoBlockIndestructibleXZ(@NotNull BlockPos pos) {
-        return (isIndestructible(pos.down()) || isBedrock(pos.down()))
-                && (isIndestructible(pos.west()) || isBedrock(pos.west()))
-                && (isIndestructible(pos.south()) || isBedrock(pos.south()))
-                && (isIndestructible(pos.north()) || isBedrock(pos.north()))
-                && isAir(pos)
-                && isAir(pos.up())
-                && isAir(pos.up(2))
-                && (isIndestructible(pos.east().down()) || isBedrock(pos.east().down()))
-                && (isIndestructible(pos.east(2)) || isBedrock(pos.east(2)))
-                && (isIndestructible(pos.east().south()) || isBedrock(pos.east().south()))
-                && (isIndestructible(pos.east().north()) || isBedrock(pos.east().north()))
-                && isAir(pos.east())
-                && isAir(pos.east().up())
-                && isAir(pos.east().up(2));
+    public static boolean validTwoBlockBedrockXZ(@NotNull BlockPos pos) {
+        if (!isAir(pos)) return false;
+        Vec3i addVec = getTwoBlocksDirection(pos);
+
+        // If addVec not found -> hole incorrect
+        if (addVec == null)
+            return false;
+
+        BlockPos[] checkPoses = new BlockPos[]{pos, pos.add(addVec)};
+        // Check surround poses of checkPoses
+        for (BlockPos checkPos : checkPoses) {
+            BlockPos downPos = checkPos.down();
+            if (!isBedrock(downPos))
+                return false;
+
+            for (Vec3i vec : VECTOR_PATTERN) {
+                BlockPos reducedPos = checkPos.add(vec);
+                if (!isBedrock(reducedPos) && !reducedPos.equals(pos) && !reducedPos.equals(pos.add(addVec)))
+                    return false;
+            }
+        }
+
+        return true;
     }
 
-    public static boolean validTwoBlockIndestructibleXZ1(@NotNull BlockPos pos) {
-        return (isIndestructible(pos.down()) || isBedrock(pos.down()))
-                && (isIndestructible(pos.west()) || isBedrock(pos.west()))
-                && (isIndestructible(pos.east()) || isBedrock(pos.east()))
-                && (isIndestructible(pos.north()) || isBedrock(pos.north()))
-                && isAir(pos)
-                && isAir(pos.up())
-                && isAir(pos.up(2))
-                && (isIndestructible(pos.south().down()) || isBedrock(pos.south().down()))
-                && (isIndestructible(pos.south(2)) || isBedrock(pos.south(2)))
-                && (isIndestructible(pos.south().east()) || isBedrock(pos.south().east()))
-                && (isIndestructible(pos.south().west()) || isBedrock(pos.south().west()))
-                && isAir(pos.south())
-                && isAir(pos.south().up())
-                && isAir(pos.south().up(2));
+    public static boolean validTwoBlockIndestructibleXZ(@NotNull BlockPos pos) {
+        if (!isAir(pos)) return false;
+        Vec3i addVec = getTwoBlocksDirection(pos);
+
+        // If addVec not found -> hole incorrect
+        if (addVec == null)
+            return false;
+
+        BlockPos[] checkPoses = new BlockPos[]{pos, pos.add(addVec)};
+        // Check surround poses of checkPoses
+        boolean wasIndestrictible = false;
+        for (BlockPos checkPos : checkPoses) {
+            BlockPos downPos = checkPos.down();
+            if (isIndestructible(downPos))
+                wasIndestrictible = true;
+            else if (!isBedrock(downPos))
+                return false;
+
+            for (Vec3i vec : VECTOR_PATTERN) {
+                BlockPos reducedPos = checkPos.add(vec);
+
+                if (isIndestructible(reducedPos)) {
+                    wasIndestrictible = true;
+                    continue;
+                }
+                if (!isBedrock(reducedPos) && !reducedPos.equals(pos) && !reducedPos.equals(pos.add(addVec)))
+                    return false;
+            }
+        }
+
+        return wasIndestrictible;
+    }
+
+    private static @Nullable Vec3i getTwoBlocksDirection(BlockPos pos) {
+        // Try to get direction
+        for (Vec3i vec : VECTOR_PATTERN) {
+            if (isAir(pos.add(vec)))
+                return vec;
+        }
+
+        return null;
     }
 
     public static boolean validQuadIndestructible(@NotNull BlockPos pos) {
-        return ((isIndestructible(pos.down()) || isBedrock(pos.down())) && (isAir(pos)) && isAir(pos.up()) && isAir(pos.up(2)))
-                && ((isIndestructible(pos.south().down()) || isBedrock(pos.south().down())) && (isAir(pos.south())) && isAir(pos.south().up()) && isAir(pos.south().up(2)))
-                && ((isIndestructible(pos.east().down()) || isBedrock(pos.east().down())) && (isAir(pos.east())) && isAir(pos.east().up()) && isAir(pos.east().up(2)))
-                && ((isIndestructible(pos.south().east().down()) || isBedrock(pos.south().east().down())) && (isAir(pos.south().east())) && isAir(pos.south().east().up()) && isAir(pos.south().east().up(2)))
-                && ((isIndestructible(pos.north()) || isBedrock(pos.north())) && (isIndestructible(pos.west()) || isBedrock(pos.west())))
-                && ((isIndestructible(pos.east().north()) || isBedrock(pos.east().north())) && (isIndestructible(pos.east().east()) || isBedrock(pos.east().east())))
-                && ((isIndestructible(pos.south().west()) || isBedrock(pos.south().west())) && (isIndestructible(pos.south().south()) || isBedrock(pos.south().south())))
-                && ((isIndestructible(pos.east().south().south()) || isBedrock(pos.east().south().south())) && (isIndestructible(pos.east().south().east()) || isBedrock(pos.east().south().east())));
+        List<BlockPos> checkPoses = getQuadDirection(pos);
+        // If checkPoses not found -> hole incorrect
+        if (checkPoses == null)
+            return false;
+
+        boolean wasIndestrictible = false;
+        for (BlockPos checkPos : checkPoses) {
+            BlockPos downPos = checkPos.down();
+            if (isIndestructible(downPos)) {
+                wasIndestrictible = true;
+            } else if (!isBedrock(downPos)) {
+                return false;
+            }
+
+            for (Vec3i vec : VECTOR_PATTERN) {
+                BlockPos reducedPos = checkPos.add(vec);
+
+                if (isIndestructible(reducedPos)) {
+                    wasIndestrictible = true;
+                    continue;
+                }
+                if (!isBedrock(reducedPos) && !checkPoses.contains(reducedPos)) {
+                    return false;
+                }
+            }
+        }
+
+        return wasIndestrictible;
     }
 
     public static boolean validQuadBedrock(@NotNull BlockPos pos) {
-        return ((isBedrock(pos.down())) && (isAir(pos)) && isAir(pos.up()) && isAir(pos.up(2)))
-                && ((isBedrock(pos.south().down())) && (isAir(pos.south())) && isAir(pos.south().up()) && isAir(pos.south().up(2)))
-                && ((isBedrock(pos.east().down())) && (isAir(pos.east())) && isAir(pos.east().up()) && isAir(pos.east().up(2)))
-                && ((isBedrock(pos.south().east().down())) && (isAir(pos.south().east())) && isAir(pos.south().east().up()) && isAir(pos.south().east().up(2)))
-                && (isBedrock(pos.north()) && isBedrock(pos.west()))
-                && (isBedrock(pos.east().north()) && isBedrock(pos.east().east()))
-                && (isBedrock(pos.south().west()) && isBedrock(pos.south().south()))
-                && (isBedrock(pos.east().south().south()) && isBedrock(pos.east().south().east()));
+        List<BlockPos> checkPoses = getQuadDirection(pos);
+        // If checkPoses not found -> hole incorrect
+        if (checkPoses == null)
+            return false;
+
+        for (BlockPos checkPos : checkPoses) {
+            BlockPos downPos = checkPos.down();
+            if (!isBedrock(downPos)) {
+                return false;
+            }
+
+            for (Vec3i vec : VECTOR_PATTERN) {
+                BlockPos reducedPos = checkPos.add(vec);
+                if (!isBedrock(reducedPos) && !checkPoses.contains(reducedPos)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
-    public static boolean validTwoBlockBedrockXZ(@NotNull BlockPos pos) {
-        return isBedrock(pos.down())
-                && isBedrock(pos.west())
-                && isBedrock(pos.south())
-                && isBedrock(pos.north())
-                && isAir(pos)
-                && isAir(pos.up())
-                && isAir(pos.up(2))
-                && isBedrock(pos.east().down())
-                && isBedrock(pos.east(2))
-                && isBedrock(pos.east().south())
-                && isBedrock(pos.east().north())
-                && isAir(pos.east())
-                && isAir(pos.east().up())
-                && isAir(pos.east().up(2));
-    }
+    private static @Nullable List<BlockPos> getQuadDirection(@NotNull BlockPos pos) {
+        // Try to get direction
+        List<BlockPos> dirList = new ArrayList<>();
+        dirList.add(pos);
 
-    public static boolean validTwoBlockBedrockXZ1(@NotNull BlockPos pos) {
-        return isBedrock(pos.down())
-                && isBedrock(pos.west())
-                && isBedrock(pos.east())
-                && isBedrock(pos.north())
-                && isAir(pos)
-                && isAir(pos.up())
-                && isAir(pos.up(2))
-                && isBedrock(pos.south().down())
-                && isBedrock(pos.south(2))
-                && isBedrock(pos.south().east())
-                && isBedrock(pos.south().west())
-                && isAir(pos.south())
-                && isAir(pos.south().up())
-                && isAir(pos.south().up(2));
+        if (isAir(pos.add(1, 0, 0))
+                && isAir(pos.add(0, 0, 1))
+                && isAir(pos.add(1, 0, 1))) {
+            dirList.add(pos.add(1, 0, 0));
+            dirList.add(pos.add(0, 0, 1));
+            dirList.add(pos.add(1, 0, 1));
+        }
+        if (isAir(pos.add(-1, 0, 0))
+                && isAir(pos.add(0, 0, -1))
+                && isAir(pos.add(-1, 0, -1))) {
+            dirList.add(pos.add(-1, 0, 0));
+            dirList.add(pos.add(0, 0, -1));
+            dirList.add(pos.add(-1, 0, -1));
+        }
+        if (isAir(pos.add(1, 0, 0))
+                && isAir(pos.add(0, 0, -1))
+                && isAir(pos.add(1, 0, -1))) {
+            dirList.add(pos.add(1, 0, 0));
+            dirList.add(pos.add(0, 0, -1));
+            dirList.add(pos.add(1, 0, -1));
+        }
+        if (isAir(pos.add(-1, 0, 0))
+                && isAir(pos.add(0, 0, 1))
+                && isAir(pos.add(-1, 0, 1))) {
+
+            dirList.add(pos.add(-1, 0, 0));
+            dirList.add(pos.add(0, 0, 1));
+            dirList.add(pos.add(-1, 0, 1));
+        }
+
+        if (dirList.size() != 4)
+            return null;
+
+        return dirList;
     }
 
     private static boolean isIndestructible(BlockPos bp) {

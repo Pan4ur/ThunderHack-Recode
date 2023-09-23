@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -59,7 +59,7 @@ public class HoleESP extends Module {
         }
     }
 
-    public void renderFade(PosWithColor posWithColor, MatrixStack stack) {
+    public void renderFade(@NotNull PosWithColor posWithColor, MatrixStack stack) {
         RenderSystem.disableCull();
         Render3DEngine.drawFilledFadeBox(stack,
                 new Box(
@@ -85,7 +85,7 @@ public class HoleESP extends Module {
     }
 
 
-    public void renderFade2(PosWithColor posWithColor, MatrixStack stack) {
+    public void renderFade2(@NotNull PosWithColor posWithColor, MatrixStack stack) {
         RenderSystem.disableCull();
         Render3DEngine.drawFilledFadeBox(stack,
                 new Box(
@@ -122,7 +122,7 @@ public class HoleESP extends Module {
         RenderSystem.enableCull();
     }
 
-    public void renderOutline(PosWithColor posWithColor, MatrixStack stack) {
+    public void renderOutline(@NotNull PosWithColor posWithColor, MatrixStack stack) {
         Render3DEngine.drawBoxOutline(
                 new Box(
                         posWithColor.getBp().getX(),
@@ -135,7 +135,7 @@ public class HoleESP extends Module {
         );
     }
 
-    public void renderFill(PosWithColor posWithColor, MatrixStack stack) {
+    public void renderFill(@NotNull PosWithColor posWithColor, MatrixStack stack) {
         Render3DEngine.drawFilledBox(stack,
                 new Box(
                         posWithColor.getBp().getX(),
@@ -171,10 +171,6 @@ public class HoleESP extends Module {
                         blocks.add(new PosWithColor(pos, true, false, bedrockColor.getValue().getColorObject()));
                     } else if (HoleUtility.validTwoBlockIndestructibleXZ(pos)) {
                         blocks.add(new PosWithColor(pos, true, false, indestrictibleColor.getValue().getColorObject()));
-                    } else if (HoleUtility.validTwoBlockBedrockXZ1(pos)) {
-                        blocks.add(new PosWithColor(pos, false, true, bedrockColor.getValue().getColorObject()));
-                    } else if (HoleUtility.validTwoBlockIndestructibleXZ1(pos)) {
-                        blocks.add(new PosWithColor(pos, false, true, indestrictibleColor.getValue().getColorObject()));
                     } else if (HoleUtility.validQuadBedrock(pos)) {
                         blocks.add(new PosWithColor(pos, true, true, bedrockColor.getValue().getColorObject()));
                     } else if (HoleUtility.validQuadIndestructible(pos)) {

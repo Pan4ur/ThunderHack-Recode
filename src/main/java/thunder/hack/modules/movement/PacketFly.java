@@ -3,6 +3,7 @@ package thunder.hack.modules.movement;
 
 
 import meteordevelopment.orbit.EventHandler;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventSync;
@@ -84,7 +85,7 @@ public class PacketFly extends Module {
         return -n;
     }
 
-    public Vec3d getVectorByMode(Vec3d vec3d, Vec3d vec3d2) {
+    public Vec3d getVectorByMode(@NotNull Vec3d vec3d, Vec3d vec3d2) {
         Vec3d vec3d3 = vec3d.add(vec3d2);
         switch ((type.getValue())) {
             case Preserve -> {
@@ -145,7 +146,7 @@ public class PacketFly extends Module {
 
 
     @EventHandler
-    public void onPacketSend(PacketEvent.Send event) {
+    public void onPacketSend(PacketEvent.@NotNull Send event) {
         if (event.getPacket() instanceof PlayerMoveC2SPacket) {
             if (movePackets.contains((PlayerMoveC2SPacket) event.getPacket())) {
                 movePackets.remove((PlayerMoveC2SPacket) event.getPacket());
@@ -165,7 +166,7 @@ public class PacketFly extends Module {
     }
 
     @EventHandler
-    public void onMove(EventMove event) {
+    public void onMove(@NotNull EventMove event) {
         if (!event.isCancelled()) {
             if (mode.getValue() != Mode.Rubber && teleportId == 0) {
                 return;

@@ -26,9 +26,6 @@ public class HoleAnchor extends Module {
                             || HoleUtility.validTwoBlockIndestructibleXZ(BlockPos.ofFloored(mc.player.getPos()).down(1))
                             || HoleUtility.validTwoBlockIndestructibleXZ(BlockPos.ofFloored(mc.player.getPos()).down(2))
                             || HoleUtility.validTwoBlockIndestructibleXZ(BlockPos.ofFloored(mc.player.getPos()).down(3))
-                            || HoleUtility.validTwoBlockIndestructibleXZ1(BlockPos.ofFloored(mc.player.getPos()).down(1))
-                            || HoleUtility.validTwoBlockIndestructibleXZ1(BlockPos.ofFloored(mc.player.getPos()).down(2))
-                            || HoleUtility.validTwoBlockIndestructibleXZ1(BlockPos.ofFloored(mc.player.getPos()).down(3))
             ) {
                 if (!pull.getValue()) {
                     mc.player.setVelocity(0, mc.player.getVelocity().getY(), 0);
