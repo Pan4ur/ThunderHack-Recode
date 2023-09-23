@@ -20,6 +20,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
+
 public class ModuleButton extends AbstractButton {
     private final List<AbstractElement> elements;
     public final Module module;
@@ -227,10 +229,10 @@ public class ModuleButton extends AbstractButton {
         if (this.binding) {
             if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_DELETE) {
                 module.setBind(-1, false, holdbind);
-                Command.sendMessage("Удален бинд с модуля " + module.getName());
+                Command.sendMessage((isRu() ? "Удален бинд с модуля " : "Removed bind from ") + module.getName());
             } else {
                 module.setBind(keyCode, false, holdbind);
-                Command.sendMessage(module.getName() + " бинд изменен на " + module.getBind().getBind());
+                Command.sendMessage(module.getName() + (isRu() ? " бинд изменен на " : " bind changed to ") + module.getBind().getBind());
             }
             binding = false;
         }

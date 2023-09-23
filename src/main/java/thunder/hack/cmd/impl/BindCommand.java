@@ -12,6 +12,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.Bind;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class BindCommand extends Command {
     public BindCommand() {
@@ -37,7 +38,7 @@ public class BindCommand extends Command {
                         try {
                             key = InputUtil.fromTranslationKey("key.keyboard." + stringKey.toLowerCase()).getCode();
                         } catch (NumberFormatException e) {
-                            sendMessage("Такой кнопки не существует!");
+                            sendMessage(isRu() ? "Такой кнопки не существует!" : "There is no such button");
                             return SINGLE_SUCCESS;
                         }
                     }

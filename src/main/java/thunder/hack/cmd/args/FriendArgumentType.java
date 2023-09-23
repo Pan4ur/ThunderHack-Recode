@@ -25,10 +25,10 @@ public class FriendArgumentType implements ArgumentType<String> {
 
     @Override
     public String parse(StringReader reader) throws CommandSyntaxException {
-        String friend = reader.getString();
+        String friend = reader.readString();
         if (!ThunderHack.friendManager.isFriend(friend)) throw new DynamicCommandExceptionType(
                 name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Друга с именем " + name.toString() + " не существует(" : "Friend with name " + name.toString() + " does not exists(")
-        ).create(reader.readString());
+        ).create(friend);
 
         return friend;
     }

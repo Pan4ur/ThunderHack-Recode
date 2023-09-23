@@ -247,31 +247,25 @@ public final class HoleUtility {
         List<BlockPos> dirList = new ArrayList<>();
         dirList.add(pos);
 
-        if (isAir(pos.add(1, 0, 0))
-                && isAir(pos.add(0, 0, 1))
-                && isAir(pos.add(1, 0, 1))) {
+        if(!isAir(pos))
+            return null;
+
+        if (isAir(pos.add(1, 0, 0)) && isAir(pos.add(0, 0, 1)) && isAir(pos.add(1, 0, 1))) {
             dirList.add(pos.add(1, 0, 0));
             dirList.add(pos.add(0, 0, 1));
             dirList.add(pos.add(1, 0, 1));
         }
-        if (isAir(pos.add(-1, 0, 0))
-                && isAir(pos.add(0, 0, -1))
-                && isAir(pos.add(-1, 0, -1))) {
+        if (isAir(pos.add(-1, 0, 0)) && isAir(pos.add(0, 0, -1)) && isAir(pos.add(-1, 0, -1))) {
             dirList.add(pos.add(-1, 0, 0));
             dirList.add(pos.add(0, 0, -1));
             dirList.add(pos.add(-1, 0, -1));
         }
-        if (isAir(pos.add(1, 0, 0))
-                && isAir(pos.add(0, 0, -1))
-                && isAir(pos.add(1, 0, -1))) {
+        if (isAir(pos.add(1, 0, 0)) && isAir(pos.add(0, 0, -1)) && isAir(pos.add(1, 0, -1))) {
             dirList.add(pos.add(1, 0, 0));
             dirList.add(pos.add(0, 0, -1));
             dirList.add(pos.add(1, 0, -1));
         }
-        if (isAir(pos.add(-1, 0, 0))
-                && isAir(pos.add(0, 0, 1))
-                && isAir(pos.add(-1, 0, 1))) {
-
+        if (isAir(pos.add(-1, 0, 0)) && isAir(pos.add(0, 0, 1)) && isAir(pos.add(-1, 0, 1))) {
             dirList.add(pos.add(-1, 0, 0));
             dirList.add(pos.add(0, 0, 1));
             dirList.add(pos.add(-1, 0, 1));

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -36,7 +37,7 @@ public class HoleESP extends Module {
         CubeBoth
     }
 
-    private final List<PosWithColor> positions = new CopyOnWriteArrayList<>();
+    private final List<BoxWithColor> positions = new CopyOnWriteArrayList<>();
 
     public HoleESP() {
         super("HoleESP", Category.RENDER);
@@ -45,8 +46,8 @@ public class HoleESP extends Module {
     public void onRender3D(MatrixStack stack) {
         if (positions.isEmpty()) return;
 
-        for (PosWithColor pwc : positions) {
-            switch (mode.getValue()){
+        for (BoxWithColor pwc : positions) {
+            switch (mode.getValue()) {
                 case Fade -> renderFade(pwc, stack);
                 case Fade2 -> renderFade2(pwc, stack);
                 case CubeFill -> renderFill(pwc, stack);
@@ -59,92 +60,44 @@ public class HoleESP extends Module {
         }
     }
 
-    public void renderFade(@NotNull PosWithColor posWithColor, MatrixStack stack) {
+    public void renderFade(@NotNull HoleESP.BoxWithColor posWithColor, MatrixStack stack) {
         RenderSystem.disableCull();
         Render3DEngine.drawFilledFadeBox(stack,
-                new Box(
-                        posWithColor.getBp().getX(),
-                        posWithColor.getBp().getY(),
-                        posWithColor.getBp().getZ(),
-                        posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
-                        posWithColor.getBp().getY() + height.getValue(),
-                        posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
-                ), Render2DEngine.applyOpacity(posWithColor.getColor(), 60), Render2DEngine.applyOpacity(posWithColor.getColor(), 0)
+                posWithColor.box, Render2DEngine.applyOpacity(posWithColor.color(), 60), Render2DEngine.applyOpacity(posWithColor.color(), 0)
         );
         Render3DEngine.drawBottomOutline(
-                new Box(
-                        posWithColor.getBp().getX(),
-                        posWithColor.getBp().getY(),
-                        posWithColor.getBp().getZ(),
-                        posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
-                        posWithColor.getBp().getY() + height.getValue(),
-                        posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
-                ), posWithColor.getColor(), lineWith.getValue()
+                posWithColor.box, posWithColor.color(), lineWith.getValue()
         );
         RenderSystem.enableCull();
     }
 
 
-    public void renderFade2(@NotNull PosWithColor posWithColor, MatrixStack stack) {
+    public void renderFade2(@NotNull HoleESP.BoxWithColor boxWithColor, MatrixStack stack) {
         RenderSystem.disableCull();
         Render3DEngine.drawFilledFadeBox(stack,
-                new Box(
-                        posWithColor.getBp().getX(),
-                        posWithColor.getBp().getY(),
-                        posWithColor.getBp().getZ(),
-                        posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
-                        posWithColor.getBp().getY() + height.getValue(),
-                        posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
-                ), Render2DEngine.applyOpacity(posWithColor.getColor(), 60), Render2DEngine.applyOpacity(posWithColor.getColor(), 0)
+                boxWithColor.box, Render2DEngine.applyOpacity(boxWithColor.color(), 60), Render2DEngine.applyOpacity(boxWithColor.color(), 0)
         );
         Render3DEngine.drawHoleOutline(
-                new Box(
-                        posWithColor.getBp().getX(),
-                        posWithColor.getBp().getY(),
-                        posWithColor.getBp().getZ(),
-                        posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
-                        posWithColor.getBp().getY() + height.getValue(),
-                        posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
-                ), posWithColor.getColor(), lineWith.getValue()
+                boxWithColor.box, boxWithColor.color(), lineWith.getValue()
         );
 
         Render3DEngine.drawFilledBox(stack,
-                new Box(
-                        posWithColor.getBp().getX(),
-                        posWithColor.getBp().getY(),
-                        posWithColor.getBp().getZ(),
-                        posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
-                        posWithColor.getBp().getY() + 0.01,
-                        posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
-                ), posWithColor.getColor()
+                new Box(boxWithColor.box.minX, boxWithColor.box.minY, boxWithColor.box.minZ,
+                        boxWithColor.box.maxX, boxWithColor.box.minY + 0.01f, boxWithColor.box.maxZ), boxWithColor.color()
         );
 
         RenderSystem.enableCull();
     }
 
-    public void renderOutline(@NotNull PosWithColor posWithColor, MatrixStack stack) {
+    public void renderOutline(@NotNull HoleESP.BoxWithColor boxWithColor, MatrixStack stack) {
         Render3DEngine.drawBoxOutline(
-                new Box(
-                        posWithColor.getBp().getX(),
-                        posWithColor.getBp().getY(),
-                        posWithColor.getBp().getZ(),
-                        posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
-                        posWithColor.getBp().getY() + height.getValue(),
-                        posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
-                ), posWithColor.getColor(), lineWith.getValue()
+                boxWithColor.box, boxWithColor.color(), lineWith.getValue()
         );
     }
 
-    public void renderFill(@NotNull PosWithColor posWithColor, MatrixStack stack) {
+    public void renderFill(@NotNull HoleESP.BoxWithColor boxWithColor, MatrixStack stack) {
         Render3DEngine.drawFilledBox(stack,
-                new Box(
-                        posWithColor.getBp().getX(),
-                        posWithColor.getBp().getY(),
-                        posWithColor.getBp().getZ(),
-                        posWithColor.getBp().getX() + (posWithColor.checkDirX() ? 2f : 1f),
-                        posWithColor.getBp().getY() + height.getValue(),
-                        posWithColor.getBp().getZ() + (posWithColor.checkDirZ() ? 2f : 1f)
-                ), posWithColor.getColor()
+                boxWithColor.box, boxWithColor.color()
         );
     }
 
@@ -156,26 +109,48 @@ public class HoleESP extends Module {
     }
 
     private void findHoles() {
-        ArrayList<PosWithColor> blocks = new ArrayList<>();
+        ArrayList<BoxWithColor> blocks = new ArrayList<>();
         BlockPos centerPos = mc.player.getBlockPos();
+        List<Box> boxes = new ArrayList<>();
 
         for (int i = centerPos.getX() - rangeXZ.getValue(); i < centerPos.getX() + rangeXZ.getValue(); i++) {
             for (int j = centerPos.getY() - rangeY.getValue(); j < centerPos.getY() + rangeY.getValue(); j++) {
                 for (int k = centerPos.getZ() - rangeXZ.getValue(); k < centerPos.getZ() + rangeXZ.getValue(); k++) {
                     BlockPos pos = new BlockPos(i, j, k);
+                    Box box = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + height.getValue(), pos.getZ() + 1);
+                    Color color = indestrictibleColor.getValue().getColorObject();
                     if (HoleUtility.validIndestructible(pos)) {
-                        blocks.add(new PosWithColor(pos, false, false, indestrictibleColor.getValue().getColorObject()));
                     } else if (HoleUtility.validBedrock(pos)) {
-                        blocks.add(new PosWithColor(pos, false, false, bedrockColor.getValue().getColorObject()));
+                        color = bedrockColor.getValue().getColorObject();
                     } else if (HoleUtility.validTwoBlockBedrockXZ(pos)) {
-                        blocks.add(new PosWithColor(pos, true, false, bedrockColor.getValue().getColorObject()));
+                        boolean east = mc.world.isAir(pos.offset(Direction.EAST));
+                        boolean south = mc.world.isAir(pos.offset(Direction.SOUTH));
+                        box = new Box(box.minX, box.minY, box.minZ, box.maxX + (east ? 1 : 0), box.maxY, box.maxZ + (south ? 1 : 0));
+                        color = bedrockColor.getValue().getColorObject();
                     } else if (HoleUtility.validTwoBlockIndestructibleXZ(pos)) {
-                        blocks.add(new PosWithColor(pos, true, false, indestrictibleColor.getValue().getColorObject()));
+                        boolean east = mc.world.isAir(pos.offset(Direction.EAST));
+                        boolean south = mc.world.isAir(pos.offset(Direction.SOUTH));
+                        box = new Box(box.minX, box.minY, box.minZ, box.maxX + (east ? 1 : 0), box.maxY, box.maxZ + (south ? 1 : 0));
                     } else if (HoleUtility.validQuadBedrock(pos)) {
-                        blocks.add(new PosWithColor(pos, true, true, bedrockColor.getValue().getColorObject()));
+                        box = new Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY, box.maxZ + 1);
+                        color = bedrockColor.getValue().getColorObject();
                     } else if (HoleUtility.validQuadIndestructible(pos)) {
-                        blocks.add(new PosWithColor(pos, true, true, indestrictibleColor.getValue().getColorObject()));
+                        box = new Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY, box.maxZ + 1);
+                    } else {
+                        continue;
                     }
+
+                    boolean skip = false;
+                    for (Box boxOffset : boxes) {
+                        if (boxOffset.intersects(box))
+                            skip = true;
+                    }
+
+                    if (skip)
+                        continue;
+
+                    blocks.add(new BoxWithColor(box, color));
+                    boxes.add(box);
                 }
             }
         }
@@ -183,33 +158,6 @@ public class HoleESP extends Module {
         positions.addAll(blocks);
     }
 
-    public static class PosWithColor {
-        private final BlockPos bp;
-        private final boolean dirX;
-        private final boolean dirZ;
-        private final Color color;
-
-        public PosWithColor(BlockPos pos, boolean dirX, boolean dirZ, Color color) {
-            this.bp = pos;
-            this.dirX = dirX;
-            this.dirZ = dirZ;
-            this.color = color;
-        }
-
-        public BlockPos getBp() {
-            return bp;
-        }
-
-        public boolean checkDirX() {
-            return dirX;
-        }
-
-        public boolean checkDirZ() {
-            return dirZ;
-        }
-
-        public Color getColor() {
-            return color;
-        }
+    public record BoxWithColor(Box box, Color color) {
     }
 }

@@ -45,8 +45,12 @@ public class CfgCommand extends Command {
             return SINGLE_SUCCESS;
         })));
 
-        // я заменил CfgArgumentType.create() на StringArgumentType.word()
         builder.then(literal("load").then(arg("name", CfgArgumentType.create()).executes(context -> {
+            ThunderHack.configManager.load(context.getArgument("name", String.class));
+            return SINGLE_SUCCESS;
+        })));
+
+        builder.then(literal("set").then(arg("name", CfgArgumentType.create()).executes(context -> {
             ThunderHack.configManager.load(context.getArgument("name", String.class));
             return SINGLE_SUCCESS;
         })));

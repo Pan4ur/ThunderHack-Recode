@@ -51,4 +51,5 @@ public class SearchArgumentType implements ArgumentType<String> {
         }
         return result;
     }
+
 }
