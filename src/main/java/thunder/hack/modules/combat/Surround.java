@@ -136,10 +136,10 @@ public class Surround extends Module {
                         currentPlacePos = targetBlock;
 
                         if (placeBlock(targetBlock)) {
-                            placed++;
                             delay = placeDelay.getValue();
                             inactivityTimer.reset();
                         } else break;
+                        placed++;
                     }
                 }
             }
