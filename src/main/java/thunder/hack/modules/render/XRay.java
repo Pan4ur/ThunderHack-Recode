@@ -58,7 +58,7 @@ public class XRay extends Module {
             if (mc.world.isAir(pos))
                 continue;
 
-            if(fast.getValue())
+            if (fast.getValue())
                 if (pos.getX() % 2 == 0 || pos.getZ() % 2 == 0 || pos.getY() % 2 == 0)
                     continue;
 
@@ -80,7 +80,7 @@ public class XRay extends Module {
             return;
         if (toCheck.size() < 1)
             return;
-        if(!rotate.getValue())
+        if (!rotate.getValue())
             return;
 
         BlockPos pos = toCheck.get(0);
@@ -94,10 +94,11 @@ public class XRay extends Module {
 
     @EventHandler
     public void onPostSync(EventPostSync e) {
+        if (!brutForce.getValue())
+            return;
         for (int i = 0; i < checkSpeed.getValue(); ++i) {
-            if (toCheck.size() < 1) {
+            if (toCheck.isEmpty())
                 return;
-            }
             BlockPos pos = toCheck.remove(0);
             ++done;
             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos, Direction.UP));
@@ -162,7 +163,8 @@ public class XRay extends Module {
 
 
     public void onRender2D(DrawContext context) {
-        FontRenderers.modules.drawCenteredString(context.getMatrices(), "Done: " + done + " / " + "All: " + all, mc.getWindow().getScaledWidth() / 2f, 50, -1);
+        if (brutForce.getValue())
+            FontRenderers.modules.drawCenteredString(context.getMatrices(), "Done: " + done + " / " + "All: " + all, mc.getWindow().getScaledWidth() / 2f, 50, -1);
     }
 
     public static boolean isCheckableOre(Block block) {
@@ -184,7 +186,7 @@ public class XRay extends Module {
         if (coal.getValue() && (block == Blocks.COAL_ORE || block == Blocks.DEEPSLATE_COAL_ORE))
             return true;
 
-        if (netherite.getValue() && (block == Blocks.ANCIENT_DEBRIS))
+        if (netherite.getValue() && block == Blocks.ANCIENT_DEBRIS)
             return true;
 
         if (water.getValue() && block == Blocks.WATER)
