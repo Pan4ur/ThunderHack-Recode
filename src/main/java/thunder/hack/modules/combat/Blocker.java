@@ -26,7 +26,6 @@ import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.SearchInvResult;
-import thunder.hack.utility.render.BlockAnimationUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.world.HoleUtility;
@@ -58,14 +57,13 @@ public class Blocker extends Module {
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Normal);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
 
-    private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
-    private final Setting<BlockAnimationUtility.BlockRenderMode> renderMode = new Setting<>("Render Mode", BlockAnimationUtility.BlockRenderMode.All).withParent(renderCategory);
-    private final Setting<BlockAnimationUtility.BlockAnimationMode> animationMode = new Setting<>("Animation Mode", BlockAnimationUtility.BlockAnimationMode.Fade).withParent(renderCategory);
-    private final Setting<ColorSetting> renderFillColor = new Setting<>("Render Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
-    private final Setting<ColorSetting> renderLineColor = new Setting<>("Render Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
-    private final Setting<Integer> renderLineWidth = new Setting<>("Render Line Width", 2, 1, 5).withParent(renderCategory);
+    private final Setting<Parent> render = new Setting<>("Render", new Parent(false, 0));
+    private final Setting<ColorSetting> fillColor = new Setting<>("Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(render);
+    private final Setting<ColorSetting> lineColor = new Setting<>("Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(render);
+    private final Setting<Integer> lineWidth = new Setting<>("Line Width", 2, 1, 5).withParent(render);
 
     private final List<BlockPos> placePositions = new CopyOnWriteArrayList<>();
+    private final Map<BlockPos, Long> renderBlocks = new ConcurrentHashMap<>();
     public static final Timer inactivityTimer = new Timer();
     private int tickCounter = 0;
 
@@ -82,6 +80,18 @@ public class Blocker extends Module {
                 Formatting.RED + "WARNING!!! "
                         + Formatting.RESET + "The use of blocker on servers is condemned by players, and in some countries is punishable by jail!"
         );
+    }
+
+    @Override
+    public void onRender3D(MatrixStack stack) {
+        renderBlocks.forEach((pos, time) -> {
+            if (System.currentTimeMillis() - time > 500) {
+                renderBlocks.remove(pos);
+            } else {
+                Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(fillColor.getValue().getColorObject(), 100));
+                Render3DEngine.drawBoxOutline(new Box(pos), lineColor.getValue().getColorObject(), lineWidth.getValue());
+            }
+        });
     }
 
     @EventHandler
@@ -127,9 +137,7 @@ public class Blocker extends Module {
                         mc.player.swingHand(Hand.MAIN_HAND);
 
                     blocksPlaced++;
-                    BlockAnimationUtility.renderBlock(pos, renderLineColor.getValue().getColorObject(),
-                            renderLineWidth.getValue(), renderFillColor.getValue().getColorObject(),
-                            animationMode.getValue(), renderMode.getValue());
+                    renderBlocks.put(pos, System.currentTimeMillis());
                     tickCounter = 0;
                     placePositions.remove(pos);
                     inactivityTimer.reset();

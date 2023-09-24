@@ -31,7 +31,7 @@ void main() {
                         if (colorFinal[0] == -1) {
                             colorFinal = outlinecolor.rgb;
                         }
-                        alphaOutline += outlinecolor.a * 255f > 0 ? max(0, (lineWidth - distance(vec2(x, y), vec2(0))) / (outlinecolor.a * 255f)) : 1;
+                        alphaOutline += outlinecolor.a * 255.0 > 0 ? max(0, (lineWidth - distance(vec2(x, y), vec2(0))) / (outlinecolor.a * 255.0)) : 1;
                     }
                     else {
                         fragColor = vec4(outlinecolor.rgb, alpha0);

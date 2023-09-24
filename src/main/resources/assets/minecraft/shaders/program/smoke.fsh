@@ -107,7 +107,7 @@ void main() {
                 vec4 t = texture(DiffuseSampler, coord);
                 if (t.a != 0){
                     if (alpha0 == -1.0) {
-                        alphaOutline += first.a * 255f > 0 ? max(0, (lineWidth - distance(vec2(x, y), vec2(0))) / (first.a * 255f)) : 1;
+                        alphaOutline += first.a * 255.0 > 0 ? max(0, (lineWidth - distance(vec2(x, y), vec2(0))) / (first.a * 255.0)) : 1;
                     }
                     else {
                         fragColor = vec4(getColor(centerCol), alpha0);

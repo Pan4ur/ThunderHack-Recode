@@ -81,7 +81,7 @@ void main() {
 
                 if (t.a != 0)
                 if (alpha0 == -1.0) {
-                    alphaOutline += alpha1 * 255f > 0 ? max(0, (lineWidth - distance(vec2(x, y), vec2(0))) / (alpha1 * 255f)) : 1;
+                    alphaOutline += alpha1 * 255.0 > 0 ? max(0, (lineWidth - distance(vec2(x, y), vec2(0))) / (alpha1 * 255.0)) : 1;
                 }
                 else {
                     fragColor = vec4(getColor(centerCol), alpha0);

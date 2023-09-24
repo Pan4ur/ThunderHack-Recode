@@ -23,7 +23,6 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -70,7 +69,7 @@ public class AutoTotem extends Module {
     }
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.@NotNull Receive e) {
+    public void onPacketReceive(PacketEvent.Receive e) {
         if (e.getPacket() instanceof EntitySpawnS2CPacket spawn && hotbarFallBack.getValue()) {
             if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
                 if (mc.player.squaredDistanceTo(spawn.getX(), spawn.getY(), spawn.getZ()) < 36) {
@@ -133,7 +132,7 @@ public class AutoTotem extends Module {
                     mc.player.getInventory().selectedSlot = prevCurrentItem;
 
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
-                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                    mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
 
                     if(resetAttackCooldown.getValue())
                         mc.player.resetLastAttackedTicks();

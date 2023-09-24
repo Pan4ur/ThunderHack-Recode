@@ -44,17 +44,17 @@ public class AirPlace extends Module {
         if (mc.options.useKey.isPressed()
                 && mc.player.getMainHandStack().getItem() instanceof BlockItem) {
             if (mc.player.isSprinting()) {
-                sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
             }
 
             if (!mc.player.isSneaking()) {
-                sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
+                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
             }
 
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hit);
 
             if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
-            else sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+            else mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         }
 
         ((IMinecraftClient)mc).setUseCooldown(4);
