@@ -63,7 +63,7 @@ public final class Core {
         HashMap<BlockPos, Long> cache = new HashMap<>(InteractionUtility.awaiting);
         if(!cache.isEmpty()){
             cache.forEach((bp, time) -> {
-                if(System.currentTimeMillis() - time > 1000){
+                if(System.currentTimeMillis() - time > 300){
                     InteractionUtility.awaiting.remove(bp);
                 }
             });

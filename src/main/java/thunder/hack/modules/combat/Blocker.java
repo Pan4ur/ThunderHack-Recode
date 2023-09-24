@@ -52,7 +52,6 @@ public class Blocker extends Module {
     private final Setting<Boolean> expand = new Setting<>("Expand", true).withParent(logic);
 
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
-    private final Setting<InventoryUtility.SwitchMode> switchMode = new Setting<>("Switch Mode", InventoryUtility.SwitchMode.All);
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Normal);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
@@ -132,7 +131,7 @@ public class Blocker extends Module {
                         }
                     }
 
-                if (InteractionUtility.placeBlock(pos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), searchResult, true, switchMode.getValue(), false)) {
+                if (InteractionUtility.placeBlock(pos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), searchResult, true, false)) {
                     if (swing.getValue())
                         mc.player.swingHand(Hand.MAIN_HAND);
 

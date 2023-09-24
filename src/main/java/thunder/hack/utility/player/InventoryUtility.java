@@ -288,35 +288,14 @@ public final class InventoryUtility {
         cachedSlot = -1;
     }
 
-    public static void returnSlot(SwitchMode switchMode) {
-        if (cachedSlot != -1)
-            switchTo(cachedSlot, switchMode);
-        cachedSlot = -1;
-    }
-
     public static void switchTo(int slot) {
-        switchTo(slot, SwitchMode.All);
-    }
-
-    public static void switchTo(int slot, InventoryUtility.SwitchMode switchMode) {
         if (mc.player == null || mc.getNetworkHandler() == null) return;
         if (mc.player.getInventory().selectedSlot == slot && ThunderHack.playerManager.serverSideSlot == slot) return;
-
-        if (switchMode == InventoryUtility.SwitchMode.Normal || switchMode == InventoryUtility.SwitchMode.All) {
-            mc.player.getInventory().selectedSlot = slot;
-        }
-        if (switchMode == InventoryUtility.SwitchMode.Packet || switchMode == InventoryUtility.SwitchMode.All) {
-            mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
-        }
+        mc.player.getInventory().selectedSlot = slot;
+        mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
     }
 
     public interface Searcher {
         boolean isValid(ItemStack stack);
-    }
-
-    public enum SwitchMode {
-        Packet,
-        Normal,
-        All
     }
 }

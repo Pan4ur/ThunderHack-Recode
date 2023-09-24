@@ -24,11 +24,6 @@ public record SearchInvResult(int slot, boolean found, ItemStack stack) {
 
     public void switchTo() {
         if (found)
-            switchTo(InventoryUtility.SwitchMode.All);
-    }
-
-    public void switchTo(InventoryUtility.SwitchMode switchMode) {
-        if (found)
-            InventoryUtility.switchTo(slot, switchMode);
+            InventoryUtility.switchTo(slot);
     }
 }

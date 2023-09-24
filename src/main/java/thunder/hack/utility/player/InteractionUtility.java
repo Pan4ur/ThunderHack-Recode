@@ -72,26 +72,11 @@ public final class InteractionUtility {
         return result;
     }
 
-    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, SearchInvResult invResult, boolean returnSlot, boolean ignoreEntities) {
-        return placeBlock(bp, rotate, interact, mode, invResult, returnSlot, InventoryUtility.SwitchMode.All, ignoreEntities);
-    }
-
-    public synchronized static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, @NotNull SearchInvResult invResult, boolean returnSlot, InventoryUtility.SwitchMode switchMode, boolean ignoreEntities) {
+    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, @NotNull SearchInvResult invResult, boolean returnSlot, boolean ignoreEntities) {
         int prevItem = mc.player.getInventory().selectedSlot;
-        invResult.switchTo(switchMode);
+        invResult.switchTo();
         boolean result = placeBlock(bp, rotate, interact, mode, ignoreEntities);
-        if (returnSlot) InventoryUtility.switchTo(prevItem, switchMode);
-
-        return result;
-    }
-
-    public synchronized static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, int slot, boolean returnSlot, InventoryUtility.SwitchMode switchMode, boolean ignoreEntities) {
-        int prevItem = mc.player.getInventory().selectedSlot;
-        InventoryUtility.switchTo(slot, switchMode);
-
-        boolean result = placeBlock(bp, rotate, interact, mode, ignoreEntities);
-
-        if (returnSlot) InventoryUtility.switchTo(prevItem, switchMode);
+        if (returnSlot) InventoryUtility.switchTo(prevItem);
 
         return result;
     }
@@ -126,6 +111,7 @@ public final class InteractionUtility {
     }
 
     public static boolean canPlaceBlock(BlockPos bp, Interact interact, boolean ignoreEntities) {
+        if(awaiting.containsKey(bp)) return false;
         return getPlaceResult(bp, interact, ignoreEntities) != null;
     }
 

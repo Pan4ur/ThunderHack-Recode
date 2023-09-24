@@ -52,7 +52,6 @@ public class HoleFill extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Always);
     private final Setting<Float> rangeToTarget = new Setting<>("Range To Target", 2f, 1f, 5f, v -> mode.getValue() == Mode.Target);
     private final Setting<Boolean> autoDisable = new Setting<>("Auto Disable", false);
-    private final Setting<InventoryUtility.SwitchMode> switchMode = new Setting<>("Switch Mode", InventoryUtility.SwitchMode.Packet);
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Packet);
 
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
@@ -172,7 +171,7 @@ public class HoleFill extends Module {
                             BlockPos headPos = BlockPos.ofFloored(mc.player.getPos()).up(2);
                             if (mc.world.getBlockState(headPos).isReplaceable() && InteractionUtility.canPlaceBlock(headPos, interactMode.getValue(), false)) {
                                 selfFillNeed = false;
-                                InteractionUtility.placeBlock(headPos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), slot, true, switchMode.getValue(), false);
+                                InteractionUtility.placeBlock(headPos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), slot, true, false);
                                 BlockAnimationUtility.renderBlock(headPos, renderLineColor.getValue().getColorObject(), renderLineWidth.getValue(), renderFillColor.getValue().getColorObject(), animationMode.getValue(), renderMode.getValue());
 
                                 tickCounter = 0;
@@ -187,7 +186,7 @@ public class HoleFill extends Module {
                                             continue;
                                         }
                                         if (InteractionUtility.canPlaceBlock(checkPos, interactMode.getValue(), false)) {
-                                            InteractionUtility.placeBlock(checkPos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), slot, true, switchMode.getValue(), false);
+                                            InteractionUtility.placeBlock(checkPos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), slot, true, false);
                                             blocksPlaced++;
                                             tickCounter = 0;
                                             inactivityTimer.reset();
@@ -204,7 +203,7 @@ public class HoleFill extends Module {
                 }
 
                 for (BlockPos blockPos : poses) {
-                    if (InteractionUtility.placeBlock(blockPos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), slot, true, switchMode.getValue(), false)) {
+                    if (InteractionUtility.placeBlock(blockPos, rotate.getValue(), interactMode.getValue(), placeMode.getValue(), slot, true, false)) {
                         blocksPlaced++;
                         tickCounter = 0;
                         BlockAnimationUtility.renderBlock(blockPos, renderLineColor.getValue().getColorObject(), renderLineWidth.getValue(), renderFillColor.getValue().getColorObject(), animationMode.getValue(), renderMode.getValue());

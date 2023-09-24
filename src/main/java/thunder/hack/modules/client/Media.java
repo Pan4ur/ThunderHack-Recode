@@ -22,9 +22,9 @@ public class Media extends Module {
     public void onPacketReceive(PacketEvent.@NotNull Receive e) {
         if (e.getPacket() instanceof GameMessageS2CPacket pac && nickProtect.getValue()) {
             for (PlayerListEntry ple : mc.player.networkHandler.getPlayerList()) {
-                if (pac.content().getString().contains(ple.getDisplayName().getString())) {
+                if (pac.content().getString().contains(ple.getProfile().getName())) {
                     IGameMessageS2CPacket packet = e.getPacket();
-                    packet.setContent(Text.of(pac.content().getString().replace(ple.getDisplayName().getString(), "Protected")));
+                    packet.setContent(Text.of(pac.content().getString().replace(ple.getProfile().getName(), "Protected")));
                 }
             }
         }

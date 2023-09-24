@@ -49,7 +49,6 @@ public class AutoAnchor extends Module {
     private final Setting<Integer> maxFDamage = new Setting<>("Max Friend Damage", 12, 0, 36);
     private final Setting<Boolean> antiSelfPop = new Setting<>("Anti Self Pop", true);
     private final Setting<Boolean> antiFriendPop = new Setting<>("Anti Friend Pop", false);
-    private final Setting<InventoryUtility.SwitchMode> switchMode = new Setting<>("Switch Mode", InventoryUtility.SwitchMode.All);
     private final Setting<Boolean> switchBack = new Setting<>("Switch Back", true);
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
@@ -370,7 +369,7 @@ public class AutoAnchor extends Module {
                     }
                 }
 
-                boolean result = InteractionUtility.placeBlock(targetPosCopy, placeRotate.getValue() == RotateMode.Packet, interactMode.getValue(), placeMode.getValue(), anchor, switchBack.getValue(), switchMode.getValue(), false);
+                boolean result = InteractionUtility.placeBlock(targetPosCopy, placeRotate.getValue() == RotateMode.Packet, interactMode.getValue(), placeMode.getValue(), anchor, switchBack.getValue(), false);
                 if (result)
                     ownAnchors.add(targetPosCopy);
             }
@@ -412,7 +411,7 @@ public class AutoAnchor extends Module {
 
                 // Charging
                 int preSlot = mc.player.getInventory().selectedSlot;
-                glowResult.switchTo(switchMode.getValue());
+                glowResult.switchTo();
                 InteractionUtility.BreakData data = InteractionUtility.getBreakData(targetPosCopy, interactMode.getValue());
 
                 if (data != null && data.vector() != null) {
@@ -436,7 +435,7 @@ public class AutoAnchor extends Module {
                 }
 
                 if (switchBack.getValue())
-                    InventoryUtility.switchTo(preSlot, switchMode.getValue());
+                    InventoryUtility.switchTo(preSlot);
             }
         }
 
@@ -500,7 +499,7 @@ public class AutoAnchor extends Module {
                 int preSlot = mc.player.getInventory().selectedSlot;
                 if (mc.player.getMainHandStack().getItem().equals(Items.GLOWSTONE)) {
                     SearchInvResult result = InventoryUtility.findInHotBar(stack -> !stack.getItem().equals(Items.GLOWSTONE));
-                    result.switchTo(switchMode.getValue());
+                    result.switchTo();
                 }
 
                 InteractionUtility.BreakData data = InteractionUtility.getBreakData(targetPosCopy, interactMode.getValue());
@@ -525,7 +524,7 @@ public class AutoAnchor extends Module {
                 }
 
                 if (switchBack.getValue())
-                    InventoryUtility.switchTo(preSlot, switchMode.getValue());
+                    InventoryUtility.switchTo(preSlot);
             }
         }
 

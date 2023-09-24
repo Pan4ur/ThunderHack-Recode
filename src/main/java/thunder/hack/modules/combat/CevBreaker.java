@@ -71,7 +71,6 @@ public class CevBreaker extends Module {
     private final Setting<BreakMode> breakMode = new Setting<>("Break Mode", BreakMode.Packet);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
 
-    private final Setting<InventoryUtility.SwitchMode> switchMode = new Setting<>("Switch Mode", InventoryUtility.SwitchMode.All);
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Normal);
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
 
@@ -469,7 +468,7 @@ public class CevBreaker extends Module {
         SearchInvResult result = getObsidian();
         if (result == null) return false;
         if (!result.found()) return false;
-        return InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), placeMode.getValue(), result, false, switchMode.getValue(), false);
+        return InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), placeMode.getValue(), result, false, false);
     }
 
     public BlockHitResult getPlaceData(BlockPos bp) {
