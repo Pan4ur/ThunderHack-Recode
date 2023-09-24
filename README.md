@@ -5,21 +5,20 @@
 <div align="center">
     
 [![Discord Mine](https://img.shields.io/discord/1140266441082404924?label=discord&logo=discord&logoColor=white)](https://discord.gg/bJajFP3kCX)
-![Downloads](https://img.shields.io/github/downloads/Pan4ur/ThunderHack-Recode/total.svg)
 
 </div>
 
 
 ## Info
-- Minecraft version: ```fabric``` 1.20.1
-- Client version: v 1.2
+- Minecraft version: ```fabric``` 1.20.2
+- Client version: v 1.3
 - Default ClickGui keybind - **```P```**
 - Default prefix  - **```@```**
 - Middle click on module to bind
 - DoxWare 2.0 is a ratted TH Recode rename, be aware :)
 
 ## Requirements
-- [FabricApi 1.20.1](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files)
+- [FabricApi 1.20.2](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files)
 - [Java 17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 
 ## Recommended to use
