@@ -980,7 +980,6 @@ public class AutoCrystal extends Module {
                 if (!multiThread.getValue() && timing.getValue() == Timing.NORMAL && (placeDelay.getValue() == 0 || placeTimer.passedMs(placeDelay.getValue())))
                     if (bestPosition != null) {
                         placeCrystal(bestPosition);
-                        sendMessage("aboba");
                     }
             }
         }

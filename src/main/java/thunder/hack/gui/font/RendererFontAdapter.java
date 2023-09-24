@@ -16,7 +16,7 @@ public class RendererFontAdapter implements FontAdapter {
     final float si;
 
     public RendererFontAdapter(Font fnt, float si) {
-        this.fontRenderer = new FontRenderer(fnt, (int) si);
+        this.fontRenderer = new FontRenderer(new Font[]{fnt}, si);
         this.si = si;
     }
 
@@ -78,7 +78,7 @@ public class RendererFontAdapter implements FontAdapter {
 
     @Override
     public float getFontHeight() {
-        return fontRenderer.getFontHeight();
+        return fontRenderer.getStringHeight("abcdefg123");
     }
 
     @Override

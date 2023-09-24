@@ -39,8 +39,8 @@ public class Render2DEngine {
     public static GradientGlowProgram GRADIENT_GLOW_PROGRAM;
     public static MainMenuProgram MAIN_MENU_PROGRAM;
 
-    private static final Identifier star = new Identifier("textures/star.png");
-    private static final Identifier heart = new Identifier("textures/heart.png");
+    public static final Identifier star = new Identifier("textures/star.png");
+    public static final Identifier heart = new Identifier("textures/heart.png");
 
     public static void addWindow(MatrixStack stack, Rectangle r1) {
         Matrix4f matrix = stack.peek().getPositionMatrix();
