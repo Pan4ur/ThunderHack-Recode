@@ -1,11 +1,18 @@
 package thunder.hack.injection;
 
-import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.*;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.core.ModuleManager;
+
+import static thunder.hack.modules.Module.mc;
 
 @Mixin(AbstractBlock.AbstractBlockState.class)
 public class MixinAbstractBlockState {
@@ -16,4 +23,5 @@ public class MixinAbstractBlockState {
             cir.setReturnValue(15);
         }
     }
+
 }

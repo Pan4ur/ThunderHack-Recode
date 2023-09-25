@@ -3,6 +3,8 @@ package thunder.hack.core;
 import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import org.apache.commons.compress.utils.Lists;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.RadarRewrite;
@@ -24,9 +26,7 @@ import net.minecraft.util.math.*;
 import thunder.hack.events.impl.*;
 import thunder.hack.utility.player.InteractionUtility;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.modules.Module.mc;
@@ -114,6 +114,18 @@ public final class Core {
                 showSkull = true;
                 skullTimer.reset();
                 mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_SKELETON_DEATH, SoundCategory.BLOCKS, 1f, 1f);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntitySpawn(EventEntitySpawn e){
+        List<BlockPos> cache = new ArrayList<>(InteractionUtility.awaiting.keySet());
+        for(BlockPos bp : cache){
+            if(e.getEntity() == null) return;
+            if(bp.getSquaredDistance(e.getEntity().getPos()) < 4.){
+                InteractionUtility.awaiting.remove(bp);
+                Command.sendMessage("r");
             }
         }
     }

@@ -68,6 +68,7 @@
     "MixinSodiumBlockOcclusionCache",
     "MixinSplashOverlay",
     "MixinWorld",
+    "MixinWorldChunk",
     "accesors.IBeaconBlockEntity",
     "accesors.IEntity",
     "accesors.IExplosionS2CPacket",

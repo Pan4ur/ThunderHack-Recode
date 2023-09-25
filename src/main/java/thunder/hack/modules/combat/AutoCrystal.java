@@ -1,5 +1,6 @@
 package thunder.hack.modules.combat;
 
+import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.Block;
@@ -18,7 +19,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.SwordItem;
 import net.minecraft.network.packet.c2s.play.*;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
@@ -149,6 +149,7 @@ public class AutoCrystal extends Module {
     public enum Render {Fade, Slide, Default}
 
     public enum Remove {OFF, Fake, ON}
+
 
     public static PlayerEntity target;
     private BlockHitResult bestPosition;
@@ -287,19 +288,8 @@ public class AutoCrystal extends Module {
         if (e.getPacket() instanceof EntitySpawnS2CPacket spawn) {
             onSpawnPacket(spawn);
         }
-        /*
-        if (e.getPacket() instanceof BlockUpdateS2CPacket bUpdate) {
-            if (!multiThread.getValue() && !mc.world.isAir(bUpdate.getPos()) && bUpdate.getState().isAir() && target.squaredDistanceTo(bUpdate.getPos().toCenterPos()) < 1.5f) {
-                PlaceData pData = getPlaceData(bUpdate.getPos().down(), target);
-                if (pData != null) {
-                    placeCrystal(pData.bhr());
-                    sendMessage("es");
-                }
-            }
-        }
-
-         */
     }
+
 
     @EventHandler
     public void onPacketSend(PacketEvent.@NotNull Send e) {
@@ -333,23 +323,6 @@ public class AutoCrystal extends Module {
             double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
             mc.player.setYaw((float) (angle[0] - (angle[0] - ((IClientPlayerEntity) ((mc.player))).getLastYaw()) % gcdFix));
             mc.player.setPitch((float) (angle[1] - (angle[1] - ((IClientPlayerEntity) ((mc.player))).getLastPitch()) % gcdFix));
-        }
-    }
-
-    private void onSpawnPacket(@NotNull EntitySpawnS2CPacket spawn) {
-        if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
-            if (!placedCrystals.isEmpty()) {
-                Map<BlockPos, Long> cachedList = new HashMap<>(placedCrystals);
-                for (BlockPos bp : cachedList.keySet())
-                    if (spawn.getX() == bp.getX() + 0.5 && spawn.getZ() == bp.getZ() + 0.5 && spawn.getY() == bp.getY() + 1f) {
-                        placedCrystals.remove(bp);
-                        if (!multiThread.getValue()) {
-                            EndCrystalEntity fakeCrystal = new EndCrystalEntity(mc.world, spawn.getX(), spawn.getY(), spawn.getZ());
-                            fakeCrystal.setId(spawn.getId());
-                            attackCrystal(fakeCrystal);
-                        }
-                    }
-            }
         }
     }
 
@@ -529,7 +502,8 @@ public class AutoCrystal extends Module {
         if (!ccPlace.getValue())
             posBoundingBox = posBoundingBox.expand(0, 1f, 0);
 
-        for (Entity ent : mc.world.getEntities()) {
+        Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
+        for (Entity ent : entities) {
             if (ent == null) continue;
             if (ent.getBoundingBox().intersects(posBoundingBox)) {
                 if (ent instanceof ExperienceOrbEntity)
@@ -580,9 +554,21 @@ public class AutoCrystal extends Module {
 
     public void calcPosition() {
         if (ModuleManager.speedMine.isWorth()) {
-            PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
-            if (autoMineData != null) {
-                bestPosition = autoMineData.bhr;
+            boolean found = false;
+            for (Direction dir : Direction.values()) {
+                if (dir == Direction.UP || dir == Direction.DOWN) continue;
+                PlaceData autoMineData = getPlaceData(SpeedMine.minePosition.down().offset(dir), null);
+                if (autoMineData != null) {
+                    bestPosition = autoMineData.bhr;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
+                if (autoMineData != null) {
+                    bestPosition = autoMineData.bhr;
+                }
             }
         }
 
@@ -614,8 +600,8 @@ public class AutoCrystal extends Module {
 
     private List<CrystalData> getPossibleCrystals(PlayerEntity target) {
         List<CrystalData> crystals = new ArrayList<>();
-
-        for (Entity ent : mc.world.getEntities()) {
+        Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
+        for (Entity ent : entities) {
             if (!(ent instanceof EndCrystalEntity))
                 continue;
 
@@ -635,7 +621,8 @@ public class AutoCrystal extends Module {
             boolean overrideDamage = shouldOverrideDamage(damage, selfDamage);
 
             if (protectFriends.getValue()) {
-                for (PlayerEntity pl : mc.world.getPlayers()) {
+                List<PlayerEntity> players = Lists.newArrayList(mc.world.getPlayers());
+                for (PlayerEntity pl : players) {
                     if (!ThunderHack.friendManager.isFriend(pl)) continue;
                     float fdamage = ExplosionUtility.getExplosionDamage2(ent.getPos(), pl);
                     if (fdamage > selfDamage) {
@@ -764,7 +751,8 @@ public class AutoCrystal extends Module {
         boolean overrideDamage = shouldOverrideDamage(damage, selfDamage);
 
         if (protectFriends.getValue()) {
-            for (PlayerEntity pl : mc.world.getPlayers()) {
+            List<PlayerEntity> players = Lists.newArrayList(mc.world.getPlayers());
+            for (PlayerEntity pl : players) {
                 if (!ThunderHack.friendManager.isFriend(pl)) continue;
                 float fdamage = ExplosionUtility.getExplosionDamage2(crystalVec, pl);
                 if (fdamage > selfDamage) {
@@ -795,7 +783,8 @@ public class AutoCrystal extends Module {
         if (!ccPlace.getValue())
             posBoundingBox = posBoundingBox.expand(0, 1f, 0);
 
-        for (Entity ent : mc.world.getEntities()) {
+        Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
+        for (Entity ent : entities) {
             if (ent == null) continue;
             if (ent.getBoundingBox().intersects(posBoundingBox)) {
                 if (ent instanceof ExperienceOrbEntity)
@@ -963,12 +952,43 @@ public class AutoCrystal extends Module {
             Map<BlockPos, Long> cachedList = new HashMap<>(placedCrystals);
             for (BlockPos bp : cachedList.keySet())
                 if (e.getEntity().squaredDistanceTo(bp.toCenterPos().add(0, 0.5f, 0)) < 1) {
-                    if (!multiThread.getValue() && timing.getValue() == Timing.NORMAL && (breakDelay.getValue() == 0 || breakTimer.passedMs(breakDelay.getValue())))
-                        attackCrystal((EndCrystalEntity) e.getEntity());
+                    if (!multiThread.getValue() && timing.getValue() == Timing.NORMAL && (breakDelay.getValue() == 0 || breakTimer.passedMs(breakDelay.getValue()))) {
+                        new Thread(() -> {
+                            getCrystalToExplode();
+                            if (bestCrystal == e.getEntity()) {
+                                attackCrystal((EndCrystalEntity) e.getEntity());
+                                sendMessage("1");
+                            }
+                        }).start();
+                    }
                     placedCrystals.remove(bp);
                 }
         }
     }
+
+    private void onSpawnPacket(@NotNull EntitySpawnS2CPacket spawn) {
+        if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
+            if (!placedCrystals.isEmpty()) {
+                Map<BlockPos, Long> cachedList = new HashMap<>(placedCrystals);
+                for (BlockPos bp : cachedList.keySet())
+                    if (spawn.getX() == bp.getX() + 0.5 && spawn.getZ() == bp.getZ() + 0.5 && spawn.getY() == bp.getY() + 1f) {
+                        placedCrystals.remove(bp);
+                        if (!multiThread.getValue()) {
+                            new Thread(() -> {
+                                EndCrystalEntity fakeCrystal = new EndCrystalEntity(mc.world, spawn.getX(), spawn.getY(), spawn.getZ());
+                                fakeCrystal.setId(spawn.getId());
+                                getCrystalToExplode();
+                                if (bestCrystal == fakeCrystal) {
+                                    attackCrystal(fakeCrystal);
+                                    sendMessage("2");
+                                }
+                            }).start();
+                        }
+                    }
+            }
+        }
+    }
+
 
     @EventHandler
     public void onCrystalRemove(EventEntityRemoved e) {

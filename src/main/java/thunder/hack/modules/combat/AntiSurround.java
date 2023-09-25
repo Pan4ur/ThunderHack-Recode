@@ -145,12 +145,15 @@ public class AntiSurround extends Module {
             }
 
             if (!requirePickaxe.getValue() || mc.player.getMainHandStack().getItem() instanceof PickaxeItem) {
-                if (ModuleManager.speedMine.isEnabled() && SpeedMine.progress != 0)
+                if (ModuleManager.speedMine.isEnabled() && SpeedMine.minePosition != null && SpeedMine.minePosition.equals(minePos))
                     return;
                 InteractionUtility.BreakData data = InteractionUtility.getBreakData(minePos, InteractionUtility.Interact.Strict);
                 if (data == null)
                     return;
-                mc.interactionManager.attackBlock(minePos, data.dir());
+
+                if (ModuleManager.speedMine.isEnabled()) mc.interactionManager.attackBlock(minePos, data.dir());
+                else mc.interactionManager.updateBlockBreakingProgress(minePos, data.dir());
+
                 if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
                 blockPos = minePos;
             }

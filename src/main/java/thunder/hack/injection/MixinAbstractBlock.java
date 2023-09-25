@@ -39,6 +39,8 @@ public abstract class MixinAbstractBlock {
         int effect = EnchantmentHelper.getLevel(EFFICIENCY, stack);
         return (float) Math.max(str + (str > 1.0 ? (effect * effect + 1.0) : 0.0), 0.0);
     }
+
+
 /*
     private boolean canHarvestBlock(BlockState state, ItemStack stack) {
         if (state.isToolRequired()) {
