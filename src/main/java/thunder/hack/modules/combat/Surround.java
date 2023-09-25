@@ -47,7 +47,7 @@ import java.util.function.Predicate;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class Surround extends Module {
-    private final Setting<Sequential> useSequential = new Setting<>("UseSequence", Sequential.PlaceEat);
+    private final Setting<Sequential> useSequential = new Setting<>("UseSequence", Sequential.None);
     private final Setting<PlaceTiming> placeTiming = new Setting<>("Place Timing", PlaceTiming.Default);
     private final Setting<Integer> blocksPerTick = new Setting<>("Blocks/Place", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10, v -> placeTiming.getValue() != PlaceTiming.Sequential);

@@ -1,10 +1,13 @@
 package thunder.hack.modules.movement;
 
-import net.minecraft.block.FluidBlock;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import thunder.hack.events.impl.EventMove;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.MovementUtility;
 
 public class WaterSpeed extends Module {
     public WaterSpeed() {
@@ -13,26 +16,46 @@ public class WaterSpeed extends Module {
 
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.HollyWorld);
 
-    public enum Mode{
-        HollyWorld/*, Ignore*/
+    private float acceleration = 0f;
+
+
+    public enum Mode {
+        HollyWorld, HollyWorld2
     }
 
 
     @Override
     public void onUpdate() {
-        if(mode.getValue() == Mode.HollyWorld) {
-            if(mc.player.isSwimming()){
-                mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, 2));
+        if (mode.getValue() == Mode.HollyWorld) {
+            if (mc.player.isSwimming()) {
+                mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, 2, 2));
             } else {
                 mc.player.removeStatusEffect(StatusEffects.DOLPHINS_GRACE);
             }
         }
     }
 
+    @EventHandler
+    public void onMove(EventMove e) {
+        if (mode.getValue() == Mode.HollyWorld2) {
+            if (mc.player.isSwimming()) {
+                double[] dirSpeed = MovementUtility.forward(acceleration / (mc.player.input.movementSideways != 0 ? 2.2f : 2f));
+                e.set_x(e.get_x() + dirSpeed[0]);
+                e.set_z(e.get_z() + dirSpeed[1]);
+                e.cancel();
+                acceleration += 0.05f;
+                acceleration = MathUtility.clamp(acceleration, 0f, 1f);
+            } else acceleration = 0f;
+            if (!MovementUtility.isMoving())
+                acceleration = 0f;
+        }
+    }
+
     @Override
     public void onDisable() {
-        if(mode.getValue() == Mode.HollyWorld) {
+        if (mode.getValue() == Mode.HollyWorld) {
             mc.player.removeStatusEffect(StatusEffects.DOLPHINS_GRACE);
         }
     }
+
 }

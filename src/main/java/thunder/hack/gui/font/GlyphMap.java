@@ -72,7 +72,7 @@ class GlyphMap {
             return;
         }
         int range = toExcl - fromIncl - 1;
-        int charsVert = (int) (Math.ceil(Math.sqrt(range)) * 1.5);  // double as many chars wide as high
+        int charsVert = (int) (Math.ceil(Math.sqrt(range)) * 1.5);
         glyphs.clear();
         int generatedChars = 0;
         int charNX = 0;
@@ -81,7 +81,7 @@ class GlyphMap {
         int currentRowMaxY = 0;
         List<Glyph> glyphs1 = new ArrayList<>();
         AffineTransform af = new AffineTransform();
-        FontRenderContext frc = new FontRenderContext(af, true, false);
+        FontRenderContext frc = new FontRenderContext(af, true, true);
         while (generatedChars <= range) {
             char currentChar = (char) (fromIncl + generatedChars);
             Font font = getFontForGlyph(currentChar);
@@ -94,11 +94,11 @@ class GlyphMap {
             maxY = Math.max(maxY, currentY + height);
             if (charNX >= charsVert) {
                 currentX = 0;
-                currentY += currentRowMaxY + PADDING; // add height of highest glyph, and reset
+                currentY += currentRowMaxY + PADDING;
                 charNX = 0;
                 currentRowMaxY = 0;
             }
-            currentRowMaxY = Math.max(currentRowMaxY, height); // calculate the highest glyph in this row
+            currentRowMaxY = Math.max(currentRowMaxY, height);
             glyphs1.add(new Glyph(currentX, currentY, width, height, currentChar, this));
             currentX += width + PADDING;
             charNX++;
@@ -112,7 +112,7 @@ class GlyphMap {
         g2d.fillRect(0, 0, width, height);
         g2d.setColor(Color.WHITE);
 
-        g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
+        g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 

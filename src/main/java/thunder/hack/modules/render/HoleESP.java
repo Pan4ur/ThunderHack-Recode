@@ -96,9 +96,7 @@ public class HoleESP extends Module {
     }
 
     public void renderFill(@NotNull HoleESP.BoxWithColor boxWithColor, MatrixStack stack) {
-        Render3DEngine.drawFilledBox(stack,
-                boxWithColor.box, boxWithColor.color()
-        );
+        Render3DEngine.drawFilledBox(stack, boxWithColor.box, boxWithColor.color());
     }
 
 

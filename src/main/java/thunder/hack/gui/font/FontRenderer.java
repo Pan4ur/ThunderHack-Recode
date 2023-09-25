@@ -248,7 +248,7 @@ public class FontRenderer implements Closeable {
             Glyph glyph = locateGlyph1(c);
             if (glyph.value() != ' ') {
                 Identifier i1 = glyph.owner().bindToTexture;
-                DrawEntry entry = new DrawEntry(xOffset, yOffset, color.getRed(), color.getGreen(), color.getBlue(), glyph);
+                DrawEntry entry = new DrawEntry(xOffset, yOffset, color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, glyph);
                 GLYPH_PAGE_CACHE.computeIfAbsent(i1, integer -> new ObjectArrayList<>()).add(entry);
             }
             xOffset += glyph.width();

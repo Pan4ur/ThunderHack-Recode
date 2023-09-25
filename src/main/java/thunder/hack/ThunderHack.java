@@ -28,7 +28,7 @@ public class ThunderHack implements ModInitializer {
     public static final String MOD_ID = "thunderhack";
     public static final IEventBus EVENT_BUS = new EventBus();
 
-    public static String version = "1.2b1010+";
+    public static String version = "1.3b2409";
     public static boolean isOutdated = false;
     public static float TICK_TIMER = 1f;
     public static BlockPos gps_position;

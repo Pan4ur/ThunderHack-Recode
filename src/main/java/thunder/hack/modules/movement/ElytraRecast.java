@@ -8,11 +8,13 @@ import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.EventTravel;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.math.MathUtility;
 
 public class ElytraRecast extends Module {
     public ElytraRecast() {
@@ -24,47 +26,62 @@ public class ElytraRecast extends Module {
                         ^ Author of this exploit
      */
 
+
+    public Setting<Exploit> exploit = new Setting<>("Exploit", Exploit.None);
     public Setting<Boolean> changePitch = new Setting<>("ChangePitch", true);
     public Setting<Float> pitchValue = new Setting<>("PitchValue", 55f, -90f, 90f, v -> changePitch.getValue());
     public Setting<Boolean> autoWalk = new Setting<>("AutoWalk", true);
     public Setting<Boolean> autoJump = new Setting<>("AutoJump", true);
     public Setting<Boolean> allowBroken = new Setting<>("AllowBroken", true);
 
-    private float prevClientPitch;
+    private float prevClientPitch, prevClientYaw;
+
+
+    private enum Exploit {
+        None, Strict
+    }
 
     @EventHandler
     public void onSync(EventSync e) {
-        if (changePitch.getValue()) mc.player.setPitch(pitchValue.getValue());
+        if (changePitch.getValue())
+            mc.player.setPitch(pitchValue.getValue());
+        if (exploit.getValue() == Exploit.Strict)
+            mc.player.setYaw(mc.player.getYaw() + (20 * MathUtility.sin((System.currentTimeMillis() - ThunderHack.initTime) / 50f)));
     }
 
     @EventHandler
     public void modifyVelocity(EventTravel e) {
         if (e.isPre()) {
             prevClientPitch = mc.player.getPitch();
+            prevClientYaw = mc.player.getYaw();
             mc.player.setPitch(pitchValue.getValue());
+            if (exploit.getValue() == Exploit.Strict)
+                mc.player.setYaw(mc.player.getYaw() + (20 * MathUtility.sin((System.currentTimeMillis() - ThunderHack.initTime) / 50f)));
         } else {
             mc.player.setPitch(prevClientPitch);
+            if (exploit.getValue() == Exploit.Strict)
+                mc.player.setYaw(prevClientYaw);
         }
     }
 
     @Override
-    public void onDisable(){
-        if(!InputUtil.isKeyPressed(mc.getWindow().getHandle(), mc.options.forwardKey.getDefaultKey().getCode())){
+    public void onDisable() {
+        if (!InputUtil.isKeyPressed(mc.getWindow().getHandle(), mc.options.forwardKey.getDefaultKey().getCode())) {
             mc.options.forwardKey.setPressed(false);
         }
-        if(!InputUtil.isKeyPressed(mc.getWindow().getHandle(), mc.options.jumpKey.getDefaultKey().getCode())){
+        if (!InputUtil.isKeyPressed(mc.getWindow().getHandle(), mc.options.jumpKey.getDefaultKey().getCode())) {
             mc.options.jumpKey.setPressed(false);
         }
     }
 
     @Override
     public void onUpdate() {
-        if(autoJump.getValue())
+        if (autoJump.getValue())
             mc.options.jumpKey.setPressed(true);
-        if(autoWalk.getValue())
+        if (autoWalk.getValue())
             mc.options.forwardKey.setPressed(true);
 
-        if(!mc.player.isFallFlying() && mc.player.fallDistance > 0 && checkElytra() && !mc.player.isFallFlying()) {
+        if (!mc.player.isFallFlying() && mc.player.fallDistance > 0 && checkElytra() && !mc.player.isFallFlying()) {
             castElytra();
         }
 
@@ -90,7 +107,7 @@ public class ElytraRecast extends Module {
     private boolean check() {
         if (!mc.player.isTouchingWater() && !mc.player.hasStatusEffect(StatusEffects.LEVITATION)) {
             ItemStack is = mc.player.getEquippedStack(EquipmentSlot.CHEST);
-            if (is.isOf(Items.ELYTRA) && (ElytraItem.isUsable(is) || allowBroken.getValue()) ) {
+            if (is.isOf(Items.ELYTRA) && (ElytraItem.isUsable(is) || allowBroken.getValue())) {
                 mc.player.startFallFlying();
                 return true;
             }

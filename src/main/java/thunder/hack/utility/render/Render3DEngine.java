@@ -27,6 +27,23 @@ import static thunder.hack.modules.Module.mc;
 public class Render3DEngine {
 
     public static void drawFilledBox(MatrixStack stack, Box box, Color c) {
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.enableDepthTest();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        setFilledBoxVertexes(bufferBuilder, stack.peek().getPositionMatrix(), box, c);
+
+        tessellator.draw();
+        RenderSystem.disableDepthTest();
+        RenderSystem.disableBlend();
+    }
+
+    public static void setFilledBoxVertexes(BufferBuilder bufferBuilder, Matrix4f m, Box box, Color c) {
         float minX = (float) (box.minX - mc.getEntityRenderDispatcher().camera.getPos().getX());
         float minY = (float) (box.minY - mc.getEntityRenderDispatcher().camera.getPos().getY());
         float minZ = (float) (box.minZ - mc.getEntityRenderDispatcher().camera.getPos().getZ());
@@ -34,51 +51,37 @@ public class Render3DEngine {
         float maxY = (float) (box.maxY - mc.getEntityRenderDispatcher().camera.getPos().getY());
         float maxZ = (float) (box.maxZ - mc.getEntityRenderDispatcher().camera.getPos().getZ());
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        bufferBuilder.vertex(m, minX, minY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, minY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, minY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, minY, maxZ).color(c.getRGB()).next();
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.enableDepthTest();
+        bufferBuilder.vertex(m, minX, minY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, maxY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, maxY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, minY, minZ).color(c.getRGB()).next();
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        bufferBuilder.vertex(m, maxX, minY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, maxY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, maxY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, minY, maxZ).color(c.getRGB()).next();
 
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, minZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, minZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, maxZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, minY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, minY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, maxY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, maxY, maxZ).color(c.getRGB()).next();
 
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, minZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, minZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, minZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, minY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, minY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, maxY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, maxY, minZ).color(c.getRGB()).next();
 
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, minZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, minZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, maxZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, maxZ).color(c.getRGB()).next();
-
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, maxZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, minY, maxZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, maxZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, maxZ).color(c.getRGB()).next();
-
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, minZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, minY, maxZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, maxZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, minZ).color(c.getRGB()).next();
-
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, minZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), minX, maxY, maxZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, maxZ).color(c.getRGB()).next();
-        bufferBuilder.vertex(stack.peek().getPositionMatrix(), maxX, maxY, minZ).color(c.getRGB()).next();
-        RenderSystem.disableDepthTest();
-
-        tessellator.draw();
-        RenderSystem.disableBlend();
-        //   cleanup();
+        bufferBuilder.vertex(m, minX, maxY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, maxY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, maxY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, maxY, minZ).color(c.getRGB()).next();
     }
+
 
     public static Box interpolateBox(Box from, Box to, float delta) {
         double interpX = Render2DEngine.interpolate(from.maxX, to.maxX, delta);

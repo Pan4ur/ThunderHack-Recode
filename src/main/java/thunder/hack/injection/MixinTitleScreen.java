@@ -4,7 +4,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
-
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
@@ -29,18 +28,17 @@ public class MixinTitleScreen extends Screen {
 
     @Inject(method = "init", at = @At("RETURN"))
     public void postInitHook(CallbackInfo ci) {
+        if (MainSettings.customMainMenu.getValue() && !MainMenuScreen.getInstance().confirm) {
+            mc.setScreen(MainMenuScreen.getInstance());
+        }
+
         if (ThunderHack.isOutdated && !FabricLoader.getInstance().isDevelopmentEnvironment()) {
             mc.setScreen(new ConfirmScreen(
                     confirm -> {
-                        if (confirm)
-                            Util.getOperatingSystem().open(URI.create("http://thunderhack.xyz"));
+                        if (confirm) Util.getOperatingSystem().open(URI.create("http://thunderhack.xyz"));
                         else mc.stop();
                     },
                     Text.of(Formatting.RED + "You are using an outdated version of ThunderHack Recode"), Text.of("Please update to the latest release"), Text.of("Download"), Text.of("Quit Game")));
-        }
-
-        if(MainSettings.customMainMenu.getValue() && !MainMenuScreen.getInstance().confirm) {
-            mc.setScreen(MainMenuScreen.getInstance());
         }
     }
 }

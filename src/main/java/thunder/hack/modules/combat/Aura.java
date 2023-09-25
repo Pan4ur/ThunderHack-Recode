@@ -42,11 +42,11 @@ import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.Timer;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
+import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.Comparator;
@@ -65,7 +65,8 @@ public class Aura extends Module {
     public static final Setting<Float> attackRange = new Setting<>("Attack Range", 3.1f, 1f, 7.0f);
     public static final Setting<Mode> mode = new Setting<>("Rotation", Mode.Universal);
     public static final Setting<RayTrace> rayTrace = new Setting<>("RayTrace", RayTrace.OnlyTarget);
-    public final Setting<Boolean> onlyWeapon = new Setting<>("OnlyWeapon", false);
+    public static final Setting<Switch> switchMode = new Setting<>("Switch", Switch.None);
+    public final Setting<Boolean> onlyWeapon = new Setting<>("OnlyWeapon", false, v -> switchMode.getValue() != Switch.Silent);
     public final Setting<Boolean> smartCrit = new Setting<>("SmartCrit", true);
     public final Setting<Boolean> ignoreWalls = new Setting<>("IgnoreWalls", true);
     public final Setting<Boolean> wallsBypass = new Setting<>("WallsBypass", false, v -> ignoreWalls.getValue());
@@ -105,6 +106,11 @@ public class Aura extends Module {
     public enum Grim {
         None, MoveFix, SilentTest
     }
+
+    public enum Switch {
+        Normal, None, Silent
+    }
+
 
     public static Entity target;
 
@@ -181,7 +187,7 @@ public class Aura extends Module {
             }
             attackAllowed = false;
             final Item selectedItem = mc.player.getInventory().getStack(mc.player.getInventory().selectedSlot).getItem();
-            if (onlyWeapon.getValue() && !(selectedItem instanceof SwordItem || selectedItem instanceof AxeItem))
+            if (switchMode.getValue() != Switch.Silent && onlyWeapon.getValue() && !(selectedItem instanceof SwordItem || selectedItem instanceof AxeItem))
                 return;
 
             boolean blocking = mc.player.isUsingItem() && mc.player.getActiveItem().getItem().getUseAction(mc.player.getActiveItem()) == BLOCK;
@@ -195,10 +201,12 @@ public class Aura extends Module {
             if (!(target instanceof PlayerEntity) || !(((PlayerEntity) target).isUsingItem() && ((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD) || ignoreShield.getValue()) {
                 Criticals.cancelCrit = true;
                 ModuleManager.criticals.doCrit();
+                int prevSlot = switchMethod();
                 mc.interactionManager.attackEntity(mc.player, target);
                 Criticals.cancelCrit = false;
                 mc.player.swingHand(Hand.MAIN_HAND);
                 hitTicks = getHitTicks();
+                if(prevSlot != -1) InventoryUtility.switchTo(prevSlot);
             }
 
             if (sprint && dropSprint.getValue())
@@ -207,6 +215,17 @@ public class Aura extends Module {
                 sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
         }
         hitTicks--;
+    }
+
+    private int switchMethod() {
+        int prevSlot = -1;
+        SearchInvResult swordResult = InventoryUtility.getSwordHotBar();
+        if(swordResult.found() && switchMode.getValue() != Switch.None) {
+            if (switchMode.getValue() == Switch.Silent)
+                prevSlot = mc.player.getInventory().selectedSlot;
+            swordResult.switchTo();
+        }
+        return prevSlot;
     }
 
     private int getHitTicks() {
@@ -387,9 +406,8 @@ public class Aura extends Module {
 
 
     public void onRender3D(MatrixStack stack) {
-        if (target != null && esp.getValue()) {
+        if (target != null && esp.getValue())
             Render3DEngine.drawTargetEsp(stack, target);
-        }
     }
 
     @Override
