@@ -2,8 +2,9 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
+import net.minecraft.network.packet.s2c.common.KeepAliveS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.util.math.MathHelper;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
@@ -34,7 +35,7 @@ public class Timer extends Module {
 
     private long cancelTime;
     public static double value;
-    private PingResultS2CPacket pingPacket;
+    private CommonPingS2CPacket pingPacket;
 
     public Timer() {
         super("Timer", "Timer", Category.MOVEMENT);
@@ -97,7 +98,7 @@ public class Timer extends Module {
                 if (pingPacket != null)
                     pingPacket.apply(mc.player.networkHandler);
             }
-            if (e.getPacket() instanceof PingResultS2CPacket) {
+            if (e.getPacket() instanceof CommonPingS2CPacket) {
                 pingPacket = e.getPacket();
                 violation -= 0.8f;
                 violation = MathHelper.clamp(violation, 0.0f, 100f / speed.getValue());
