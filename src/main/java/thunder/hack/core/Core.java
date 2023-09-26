@@ -121,13 +121,10 @@ public final class Core {
     @EventHandler
     public void onEntitySpawn(EventEntitySpawn e){
         List<BlockPos> cache = new ArrayList<>(InteractionUtility.awaiting.keySet());
-        for(BlockPos bp : cache){
-            if(e.getEntity() == null) return;
-            if(bp.getSquaredDistance(e.getEntity().getPos()) < 4.){
+        cache.forEach(bp -> {
+            if(e.getEntity() != null && bp.getSquaredDistance(e.getEntity().getPos()) < 4.)
                 InteractionUtility.awaiting.remove(bp);
-                Command.sendMessage("r");
-            }
-        }
+        });
     }
 
     public void drawSkull(DrawContext e) {

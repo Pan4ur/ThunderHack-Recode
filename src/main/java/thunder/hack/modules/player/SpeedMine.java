@@ -29,6 +29,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -59,6 +60,8 @@ public class SpeedMine extends Module {
     public static float progress, prevProgress;
     public boolean worth = false;
 
+    private Timer attackTimer = new Timer();
+
     public SpeedMine() {
         super("SpeedMine", "SpeedMine", Category.PLAYER);
     }
@@ -71,8 +74,8 @@ public class SpeedMine extends Module {
                     ((IInteractionManager) mc.interactionManager).setCurBlockDamageMP(startDmg.getValue());
                 if (((IInteractionManager) mc.interactionManager).getCurBlockDamageMP() >= finishDmg.getValue())
                     ((IInteractionManager) mc.interactionManager).setCurBlockDamageMP(1f);
-            } else if (mode.getValue() == Mode.Packet) {
 
+            } else if (mode.getValue() == Mode.Packet) {
                 if (minePosition != null) {
                     if (mineBreaks >= breakAttempts.getValue() || mc.player.squaredDistanceTo(minePosition.toCenterPos()) > range.getPow2Value()) {
                         minePosition = null;
@@ -81,33 +84,35 @@ public class SpeedMine extends Module {
                         mineBreaks = 0;
                         return;
                     }
-                    if (progress == 0 && !mc.world.isAir(minePosition)) {
+                    if (progress == 0 && !mc.world.isAir(minePosition) && attackTimer.passedMs(800)) {
                         mc.interactionManager.attackBlock(minePosition, mineFacing);
                         mc.player.swingHand(Hand.MAIN_HAND);
+                        attackTimer.reset();
                     }
                 }
 
                 if (minePosition != null && !mc.world.isAir(minePosition)) {
                     int swapSlot = getTool(minePosition);
                     if (swapSlot == -1) return;
+
                     if (progress >= 1) {
                         if (swapSlot < 9) {
                             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 30, swapSlot, SlotActionType.SWAP, mc.player);
-                            mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                            closeScreen();
                         }
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 30, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                        mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                        closeScreen();
 
-                        mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, minePosition, mineFacing));
-                        mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, minePosition, mineFacing));
-                        mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, minePosition, mineFacing));
-                        mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, minePosition, mineFacing));
+                        sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, minePosition, mineFacing));
+                        sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, minePosition, mineFacing));
+                        sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, minePosition, mineFacing));
+                        sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, minePosition, mineFacing));
 
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 30, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                        mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-
+                        closeScreen();
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 30, swapSlot, SlotActionType.SWAP, mc.player);
-                        mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                        closeScreen();
+
                         progress = 0;
                         mineBreaks++;
                     }
@@ -119,6 +124,10 @@ public class SpeedMine extends Module {
                 }
             }
         }
+    }
+
+    public void closeScreen(){
+        sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
     }
 
     public boolean checkWorth() {
@@ -168,7 +177,7 @@ public class SpeedMine extends Module {
             ItemStack itemstack = mc.player.getInventory().getStack(getTool(position));
             int efficiencyModifier = EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, itemstack);
             if (efficiencyModifier > 0 && !itemstack.isEmpty()) {
-                digSpeed += StrictMath.pow(efficiencyModifier, 2) + 1;
+                digSpeed += (float) (StrictMath.pow(efficiencyModifier, 2) + 1);
             }
         }
         if (mc.player.hasStatusEffect(StatusEffects.HASTE)) {
@@ -272,8 +281,8 @@ public class SpeedMine extends Module {
                     progress = 0;
                     mineBreaks = 0;
                     if (minePosition != null && mineFacing != null) {
-                        mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, minePosition, mineFacing));
-                        mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, minePosition, mineFacing));
+                        sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, minePosition, mineFacing));
+                        sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, minePosition, mineFacing));
                     }
                 }
             }

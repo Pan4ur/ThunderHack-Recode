@@ -957,7 +957,6 @@ public class AutoCrystal extends Module {
                             getCrystalToExplode();
                             if (bestCrystal == e.getEntity()) {
                                 attackCrystal((EndCrystalEntity) e.getEntity());
-                                sendMessage("1");
                             }
                         }).start();
                     }
@@ -980,7 +979,6 @@ public class AutoCrystal extends Module {
                                 getCrystalToExplode();
                                 if (bestCrystal == fakeCrystal) {
                                     attackCrystal(fakeCrystal);
-                                    sendMessage("2");
                                 }
                             }).start();
                         }

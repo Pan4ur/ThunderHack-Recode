@@ -1,8 +1,13 @@
 package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
-import thunder.hack.ThunderHack;
+import net.minecraft.entity.projectile.FishingBobberEntity;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
+import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -10,12 +15,8 @@ import thunder.hack.events.impl.PushEvent;
 import thunder.hack.injection.accesors.IExplosionS2CPacket;
 import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
-import net.minecraft.entity.projectile.FishingBobberEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.s2c.play.*;
 
 public class Velocity extends Module {
 
@@ -39,11 +40,9 @@ public class Velocity extends Module {
     private boolean doJump, failJump, skip, flag;
     private int grimTicks = 0;
 
-
     public Velocity() {
         super("Velocity", "акэбэшка", Module.Category.MOVEMENT);
     }
-
 
     @EventHandler
     public void onPacketReceived(PacketEvent.Receive event) {
@@ -57,35 +56,34 @@ public class Velocity extends Module {
             }
         }
 
-        if (event.getPacket() instanceof EntityStatusS2CPacket pac  && (pac = event.getPacket()).getStatus() == 31 && pac.getEntity(Velocity.mc.world) instanceof FishingBobberEntity) {
-            FishingBobberEntity fishHook = (FishingBobberEntity) pac.getEntity(Velocity.mc.world) ;
+        if (event.getPacket() instanceof EntityStatusS2CPacket pac && (pac = event.getPacket()).getStatus() == 31 && pac.getEntity(Velocity.mc.world) instanceof FishingBobberEntity) {
+            FishingBobberEntity fishHook = (FishingBobberEntity) pac.getEntity(Velocity.mc.world);
             if (fishHook.getHookedEntity() == Velocity.mc.player) {
                 event.setCancelled(true);
             }
         }
 
-        if (event.getPacket() instanceof ExplosionS2CPacket) {
-            ExplosionS2CPacket velocity_ = event.getPacket();
+        if (event.getPacket() instanceof ExplosionS2CPacket explosion) {
             if (mode.getValue() == modeEn.Custom) {
-                ((IExplosionS2CPacket)velocity_).setMotionX(((IExplosionS2CPacket)velocity_).getMotionX() * horizontal.getValue() / 100f);
-                ((IExplosionS2CPacket)velocity_).setMotionZ(((IExplosionS2CPacket)velocity_).getMotionZ() * horizontal.getValue() / 100f);
-                ((IExplosionS2CPacket)velocity_).setMotionY(((IExplosionS2CPacket)velocity_).getMotionY() * vertical.getValue() / 100f);
+                ((IExplosionS2CPacket) explosion).setMotionX(((IExplosionS2CPacket) explosion).getMotionX() * horizontal.getValue() / 100f);
+                ((IExplosionS2CPacket) explosion).setMotionZ(((IExplosionS2CPacket) explosion).getMotionZ() * horizontal.getValue() / 100f);
+                ((IExplosionS2CPacket) explosion).setMotionY(((IExplosionS2CPacket) explosion).getMotionY() * vertical.getValue() / 100f);
             } else if (mode.getValue() == modeEn.Cancel) {
-                ((IExplosionS2CPacket)velocity_).setMotionX(0);
-                ((IExplosionS2CPacket)velocity_).setMotionY(0);
-                ((IExplosionS2CPacket)velocity_).setMotionZ(0);
+                ((IExplosionS2CPacket) explosion).setMotionX(0);
+                ((IExplosionS2CPacket) explosion).setMotionY(0);
+                ((IExplosionS2CPacket) explosion).setMotionZ(0);
             }
         }
 
-        if(mode.getValue() == modeEn.OldGrim){
-            if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket ) {
-                EntityVelocityUpdateS2CPacket  var4 = event.getPacket();
+        if (mode.getValue() == modeEn.OldGrim) {
+            if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket) {
+                EntityVelocityUpdateS2CPacket var4 = event.getPacket();
                 if (var4.getId() == mc.player.getId()) {
                     event.cancel();
                     grimTicks = 6;
                 }
             }
-            if (event.getPacket() instanceof PingResultS2CPacket && grimTicks > 0) {
+            if (event.getPacket() instanceof CommonPingS2CPacket && grimTicks > 0) {
                 event.cancel();
                 grimTicks--;
             }
@@ -95,7 +93,7 @@ public class Velocity extends Module {
 
         if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket pac) {
             if (pac.getId() == mc.player.getId()) {
-                if(mode.getValue() == modeEn.Matrix) {
+                if (mode.getValue() == modeEn.Matrix) {
                     if (!flag) {
                         event.setCancelled(true);
                         flag = true;
@@ -104,9 +102,9 @@ public class Velocity extends Module {
                         ((ISPacketEntityVelocity) pac).setMotionX(((int) ((double) pac.getVelocityX() * -0.1)));
                         ((ISPacketEntityVelocity) pac).setMotionZ(((int) ((double) pac.getVelocityZ() * -0.1)));
                     }
-                } else if(mode.getValue() == modeEn.Redirect){
-                    int vX =  pac.getVelocityX();
-                    int vZ =  pac.getVelocityZ();
+                } else if (mode.getValue() == modeEn.Redirect) {
+                    int vX = pac.getVelocityX();
+                    int vZ = pac.getVelocityZ();
                     if (vX < 0) vX *= -1;
                     if (vZ < 0) vZ *= -1;
 
@@ -116,21 +114,22 @@ public class Velocity extends Module {
                     ((ISPacketEntityVelocity) pac).setMotionY(0);
                     ((ISPacketEntityVelocity) pac).setMotionZ((int) (motion[1]));
                 } else if (mode.getValue() == modeEn.Custom) {
-                    ((ISPacketEntityVelocity)pac).setMotionX((int) ((float) pac.getVelocityX() * horizontal.getValue() / 100f));
-                    ((ISPacketEntityVelocity)pac).setMotionY((int) ((float) pac.getVelocityY() * vertical.getValue() / 100f));
-                    ((ISPacketEntityVelocity)pac).setMotionZ((int) ((float) pac.getVelocityZ() * horizontal.getValue() / 100f));
+                    ((ISPacketEntityVelocity) pac).setMotionX((int) ((float) pac.getVelocityX() * horizontal.getValue() / 100f));
+                    ((ISPacketEntityVelocity) pac).setMotionY((int) ((float) pac.getVelocityY() * vertical.getValue() / 100f));
+                    ((ISPacketEntityVelocity) pac).setMotionZ((int) ((float) pac.getVelocityZ() * horizontal.getValue() / 100f));
                 } else if (mode.getValue() == modeEn.Sunrise) {
                     event.setCancelled(true);
                     mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), -999.0, mc.player.getZ(), true));
                 } else if (mode.getValue() == modeEn.Cancel) {
                     event.setCancelled(true);
-                } else if(mode.getValue() == modeEn.Jump && mc.player.isOnGround()){
-                    ((ISPacketEntityVelocity)pac).setMotionX((int) ((float) pac.getVelocityX() * horizontal.getValue() / 100f));
-                    ((ISPacketEntityVelocity)pac).setMotionZ((int) ((float) pac.getVelocityZ() * horizontal.getValue() / 100f));
+                } else if (mode.getValue() == modeEn.Jump && mc.player.isOnGround()) {
+                    ((ISPacketEntityVelocity) pac).setMotionX((int) ((float) pac.getVelocityX() * horizontal.getValue() / 100f));
+                    ((ISPacketEntityVelocity) pac).setMotionZ((int) ((float) pac.getVelocityZ() * horizontal.getValue() / 100f));
                 }
             }
         }
     }
+
 
     @EventHandler
     public void onSync(EventSync e) {
@@ -138,11 +137,11 @@ public class Velocity extends Module {
             if (mc.player.hurtTime > 0 && !mc.player.isOnGround()) {
                 double var3 = mc.player.getYaw() * 0.017453292F;
                 double var5 = Math.sqrt(mc.player.getVelocity().x * mc.player.getVelocity().x + mc.player.getVelocity().z * mc.player.getVelocity().z);
-                mc.player.setVelocity(-Math.sin(var3) * var5,mc.player.getVelocity().y,Math.cos(var3) * var5);
+                mc.player.setVelocity(-Math.sin(var3) * var5, mc.player.getVelocity().y, Math.cos(var3) * var5);
                 mc.player.setSprinting(mc.player.age % 2 != 0);
             }
         }
-        if(mode.getValue() == modeEn.Jump){
+        if (mode.getValue() == modeEn.Jump) {
             if ((failJump || mc.player.hurtTime > 6) && mc.player.isOnGround()) {
                 if (failJump) failJump = false;
                 if (!doJump) skip = true;
@@ -162,12 +161,13 @@ public class Velocity extends Module {
                     skip = false;
                     return;
                 }
-                switch (jumpMode.getValue()){
+                switch (jumpMode.getValue()) {
                     case Jump -> mc.player.jump();
-                    case Motion -> mc.player.setVelocity(mc.player.getVelocity().getX(), motion.getValue(),mc.player.getVelocity().getZ());
+                    case Motion ->
+                            mc.player.setVelocity(mc.player.getVelocity().getX(), motion.getValue(), mc.player.getVelocity().getZ());
                     case Both -> {
                         mc.player.jump();
-                        mc.player.setVelocity(mc.player.getVelocity().getX(), motion.getValue(),mc.player.getVelocity().getZ());
+                        mc.player.setVelocity(mc.player.getVelocity().getX(), motion.getValue(), mc.player.getVelocity().getZ());
                     }
                 }
             }
@@ -183,7 +183,7 @@ public class Velocity extends Module {
 
     @EventHandler
     public void onPush(PushEvent event) {
-        if(noPush.getValue()) {
+        if (noPush.getValue()) {
             event.setPushX(event.getPushX() * 0);
             event.setPushY(event.getPushY() * 0);
             event.setPushZ(event.getPushZ() * 0);
