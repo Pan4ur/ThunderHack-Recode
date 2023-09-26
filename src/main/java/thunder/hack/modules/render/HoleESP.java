@@ -1,6 +1,7 @@
 package thunder.hack.modules.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -50,11 +51,11 @@ public class HoleESP extends Module {
             switch (mode.getValue()) {
                 case Fade -> renderFade(pwc, stack);
                 case Fade2 -> renderFade2(pwc, stack);
-                case CubeFill -> renderFill(pwc, stack);
-                case CubeOutline -> renderOutline(pwc, stack);
+                case CubeFill -> renderFill(pwc);
+                case CubeOutline -> renderOutline(pwc);
                 case CubeBoth -> {
-                    renderOutline(pwc, stack);
-                    renderFill(pwc, stack);
+                    renderOutline(pwc);
+                    renderFill(pwc);
                 }
             }
         }
@@ -65,8 +66,8 @@ public class HoleESP extends Module {
         Render3DEngine.drawFilledFadeBox(stack,
                 posWithColor.box, Render2DEngine.applyOpacity(posWithColor.color(), 60), Render2DEngine.applyOpacity(posWithColor.color(), 0)
         );
-        Render3DEngine.drawBottomOutline(
-                posWithColor.box, posWithColor.color(), lineWith.getValue()
+        Render3DEngine.drawSideOutline(
+                posWithColor.box, posWithColor.color(), lineWith.getValue(), Direction.DOWN
         );
         RenderSystem.enableCull();
     }
@@ -89,14 +90,14 @@ public class HoleESP extends Module {
         RenderSystem.enableCull();
     }
 
-    public void renderOutline(@NotNull HoleESP.BoxWithColor boxWithColor, MatrixStack stack) {
+    public void renderOutline(@NotNull HoleESP.BoxWithColor boxWithColor) {
         Render3DEngine.drawBoxOutline(
                 boxWithColor.box, boxWithColor.color(), lineWith.getValue()
         );
     }
 
-    public void renderFill(@NotNull HoleESP.BoxWithColor boxWithColor, MatrixStack stack) {
-        Render3DEngine.drawFilledBox(stack, boxWithColor.box, boxWithColor.color());
+    public void renderFill(@NotNull HoleESP.BoxWithColor boxWithColor) {
+        Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(boxWithColor.box(), boxWithColor.color()));
     }
 
 

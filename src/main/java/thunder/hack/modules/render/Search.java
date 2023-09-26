@@ -74,12 +74,12 @@ public class Search extends Module {
 
                 BlockPos pos = new BlockPos((int) vec.x, (int) vec.y, (int) vec.z);
 
-                if (fill.getValue()) {
-                    Render3DEngine.drawFilledBox(stack, new Box(pos), color.getValue().getColorObject());
-                }
-                if(outline.getValue()){
-                    Render3DEngine.drawBoxOutline(new Box(pos), color.getValue().getColorObject(),1f);
-                }
+                if (fill.getValue())
+                    Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(new Box(pos), color.getValue().getColorObject()));
+
+
+                if(outline.getValue())
+                    Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(new Box(pos), color.getValue().getColorObject(), 2f));
             }
         }
 

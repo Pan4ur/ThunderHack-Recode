@@ -13,6 +13,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FireballEntity;
@@ -561,6 +562,7 @@ public class Aura extends Module {
         if (!entity.isAlive()) return true;
         if (entity instanceof ArmorStandEntity) return true;
         if (ModuleManager.antiBot.isEnabled() && AntiBot.bots.contains(entity)) return true;
+        if (entity instanceof CatEntity) return true;
         if ((entity instanceof SlimeEntity) && !Slimes.getValue()) return true;
         if ((entity instanceof PlayerEntity) && !Players.getValue()) return true;
         if ((entity instanceof VillagerEntity) && !Villagers.getValue()) return true;

@@ -59,6 +59,7 @@ public abstract class MixinGameRenderer {
         MSAAFramebuffer.use(() -> {
             ThunderHack.moduleManager.onRender3D(matrix);
             BlockAnimationUtility.onRender(matrix);
+            Render3DEngine.onRender3D(matrix); // <- не двигать
         });
     }
 
