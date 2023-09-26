@@ -2,6 +2,8 @@ package thunder.hack.injection;
 
 import com.mojang.authlib.GameProfile;
 import org.spongepowered.asm.mixin.Unique;
+import thunder.hack.core.ModuleManager;
+import thunder.hack.modules.misc.FakePlayer;
 import thunder.hack.utility.interfaces.IEntityLiving;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -24,6 +26,10 @@ public class MixinOtherClientPlayerEntity extends AbstractClientPlayerEntity imp
     }
 
     public void resolve() {
+        if((Object) this == FakePlayer.fakePlayer){
+            backUpY = -999;
+            return;
+        }
         backUpX = getX();
         backUpY = getY();
         backUpZ = getZ();
