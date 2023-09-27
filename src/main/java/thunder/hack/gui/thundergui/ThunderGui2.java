@@ -359,8 +359,8 @@ public class ThunderGui2 extends Screen {
             Render2DEngine.drawRound(context.getMatrices(),main_posX + 100, (float) main_posY + 40, (float) 295, (float) main_height - 44, 4f, ThunderHackGui.getColorByTheme(7));
             this.configs.forEach(components -> components.render(context,mouseX, mouseY));
             this.friends.forEach(components -> components.render(context,mouseX, mouseY));
-            Render2DEngine.draw2DGradientRect(context.getMatrices(),main_posX + 102, main_posY + 34, main_posX + 393, main_posY + 60, new Color(25, 20, 30, 0).getRGB(), ThunderHackGui.getColorByTheme(7).getRGB(), new Color(25, 20, 30, 0).getRGB(), new Color(37, 27, 41, 245).getRGB());
-            Render2DEngine.draw2DGradientRect(context.getMatrices(),main_posX + 102, main_posY + main_height - 35, main_posX + 393, main_posY + main_height, ThunderHackGui.getColorByTheme(7).getRGB(), new Color(25, 20, 30, 0).getRGB(), ThunderHackGui.getColorByTheme(7).getRGB(), new Color(37, 27, 41, 0).getRGB());
+            Render2DEngine.draw2DGradientRect(context.getMatrices(),main_posX + 102, main_posY + 34, main_posX + 393, main_posY + 60, new Color(25, 20, 30, 0), ThunderHackGui.getColorByTheme(7), new Color(25, 20, 30, 0), new Color(37, 27, 41, 245));
+            Render2DEngine.draw2DGradientRect(context.getMatrices(),main_posX + 102, main_posY + main_height - 35, main_posX + 393, main_posY + main_height, ThunderHackGui.getColorByTheme(7), new Color(25, 20, 30, 0), ThunderHackGui.getColorByTheme(7), new Color(37, 27, 41, 0));
             Render2DEngine.popWindow();
         }
 
@@ -373,8 +373,8 @@ public class ThunderGui2 extends Screen {
         this.categories.forEach(category -> category.render(context.getMatrices(),mouseX, mouseY));
 
         if (currentMode == CurrentMode.Modules) {
-            Render2DEngine.draw2DGradientRect(context.getMatrices(),main_posX + 98, main_posY + 34, main_posX + 191, main_posY + 50, new Color(37, 27, 41, 0).getRGB(), new Color(37, 27, 41, 245).getRGB(), new Color(37, 27, 41, 0).getRGB(), new Color(37, 27, 41, 245).getRGB());
-            Render2DEngine.draw2DGradientRect(context.getMatrices(),main_posX + 98, main_posY + main_height - 15, main_posX + 191, main_posY + main_height, new Color(37, 27, 41, 245).getRGB(), new Color(37, 27, 41, 0).getRGB(), new Color(37, 27, 41, 245).getRGB(), new Color(37, 27, 41, 0).getRGB());
+            Render2DEngine.draw2DGradientRect(context.getMatrices(),main_posX + 98, main_posY + 34, main_posX + 191, main_posY + 50, new Color(37, 27, 41, 0), new Color(37, 27, 41, 245), new Color(37, 27, 41, 0), new Color(37, 27, 41, 245));
+            Render2DEngine.draw2DGradientRect(context.getMatrices(),main_posX + 98, main_posY + main_height - 15, main_posX + 191, main_posY + main_height, new Color(37, 27, 41, 245), new Color(37, 27, 41, 0), new Color(37, 27, 41, 245), new Color(37, 27, 41, 0));
         }
 
         Render2DEngine.drawRound(context.getMatrices(),main_posX + 100, main_posY + 5, 295, 30, 7f, new Color(25, 20, 30, 250));

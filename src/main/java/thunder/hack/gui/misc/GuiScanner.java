@@ -74,7 +74,7 @@ public class GuiScanner extends Screen {
         }
 
         Render2DEngine.drawRectDumbWay(context.getMatrices(), centerx - 1f, centery - 1f, centerx + 1f, centery + 1f, new Color(0xFF0303));
-        Render2DEngine.drawRectDumbWay(context.getMatrices(), (mc.player.getX() / 16 / 4f) + centerx, (mc.player.getZ() / 16 / 4f) + centery, ((mc.player.getX() / 16 / 4f) + (radarx1 - radarx) / 300f) + centerx, ((mc.player.getZ() / 16 / 4f) + (radary1 - radary) / 300f) + centery, new Color(0x0012FF));
+        Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) ((mc.player.getX() / 16 / 4f) + centerx), (float) ((mc.player.getZ() / 16 / 4f) + centery), (float) (((mc.player.getX() / 16 / 4f) + (radarx1 - radarx) / 300f) + centerx), (float) (((mc.player.getZ() / 16 / 4f) + (radary1 - radary) / 300f) + centery), new Color(0x0012FF));
 
         if (mouseX > radarx && mouseX < radarx1 && mouseY > radary && mouseY < radary1) {
             hoverx = mouseX - centerx;

@@ -62,6 +62,7 @@ public class ModuleManager {
     public static ChestStealer chestStealer = new ChestStealer();
     public static AutoTpAccept autoTpAccept = new AutoTpAccept();
     public static AntiSurround antiSurround = new AntiSurround();
+    public static AntiServerRP antiServerRP = new AntiServerRP();
     public static WorldTweaks worldTweaks = new WorldTweaks();
     public static VisualRange visualRange = new VisualRange();
     public static Speedometer speedometer = new Speedometer();
@@ -165,7 +166,6 @@ public class ModuleManager {
     public static AntiAim antiAim = new AntiAim();
     public static DropAll dropAll = new DropAll();
     public static AutoSex autoSex = new AutoSex();
-
     public static XCarry xCarry = new XCarry();
     public static Trails trails = new Trails();
     public static Strafe strafe = new Strafe();
@@ -180,7 +180,6 @@ public class ModuleManager {
     public static Burrow burrow = new Burrow();
     public static AutoEZ autoEZ = new AutoEZ();
     public static AimBot aimBot = new AimBot();
-
     public static Timer timer = new Timer();
     public static Speed speed = new Speed();
     public static Reach reach = new Reach();
@@ -220,7 +219,7 @@ public class ModuleManager {
     }
 
     public ArrayList<Module> getEnabledModules() {
-        ArrayList<Module> enabledModules = new ArrayList<Module>();
+        ArrayList<Module> enabledModules = new ArrayList<>();
         for (Module module : modules) {
             if (!module.isEnabled()) continue;
             enabledModules.add(module);
@@ -229,7 +228,7 @@ public class ModuleManager {
     }
 
     public ArrayList<Module> getModulesByCategory(Module.Category category) {
-        ArrayList<Module> modulesCategory = new ArrayList<Module>();
+        ArrayList<Module> modulesCategory = new ArrayList<>();
         modules.forEach(module -> {
             if (module.getCategory() == category) {
                 modulesCategory.add(module);
@@ -358,15 +357,13 @@ public class ModuleManager {
     public ArrayList<Module> getModulesSearch(String string) {
         ArrayList<Module> modulesCategory = new ArrayList<>();
         modules.forEach(module -> {
-            if (module.getName().toLowerCase().contains(string.toLowerCase())) {
+            if (module.getName().toLowerCase().contains(string.toLowerCase()))
                 modulesCategory.add(module);
-            }
         });
 
         modules.forEach(module -> {
-            if (module.getDescription().toLowerCase().contains(string.toLowerCase())) {
+            if (module.getDescription().toLowerCase().contains(string.toLowerCase()))
                 modulesCategory.add(module);
-            }
         });
 
         return modulesCategory;

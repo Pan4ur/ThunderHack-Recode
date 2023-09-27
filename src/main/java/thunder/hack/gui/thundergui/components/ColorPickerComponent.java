@@ -65,7 +65,7 @@ public class ColorPickerComponent extends SettingElement {
 
     private void renderPicker(MatrixStack stack,int mouseX, int mouseY, Color color) {
         double cx = x + 6;
-        double cy = y + 20;
+        float cy = (float) (y + 20);
         double cw = width - 38;
         double ch = height - 20;
 
@@ -90,8 +90,8 @@ public class ColorPickerComponent extends SettingElement {
         Color colorA = Color.getHSBColor(hue, 0.0F, 1.0F), colorB = Color.getHSBColor(hue, 1.0F, 1.0F);
         Color colorC = new Color(0, 0, 0, 0), colorD = new Color(0, 0, 0);
 
-        Render2DEngine.horizontalGradient(stack,(float)(cx + 40), cy, cx + cw, cy + ch, colorA.getRGB(), colorB.getRGB());
-        Render2DEngine.verticalGradient(stack,cx + 40, cy, cx + cw, cy + ch, colorC.getRGB(), colorD.getRGB());
+        Render2DEngine.horizontalGradient(stack,(float)(cx + 40), cy, (float) (cx + cw), (float) (cy + ch), colorA, colorB);
+        Render2DEngine.verticalGradient(stack, (float) (cx + 40), cy, (float) (cx + cw), (float) (cy + ch), colorC, colorD);
 
         for (float i = 1f; i < ch - 2f; i += 1f) {
             float curHue = (float) (1f / (ch / i));
@@ -100,7 +100,7 @@ public class ColorPickerComponent extends SettingElement {
 
         Render2DEngine.drawRect(stack,(float) (cx + cw + 17), (float) (cy + 1), 8, (float) (ch - 3), new Color(-1));
 
-        Render2DEngine.verticalGradient(stack,cx + cw + 17, cy + 0.8, cx + cw + 25, cy + ch - 2, new Color(color.getRed(), color.getGreen(), color.getBlue(), 255).getRGB(), new Color(0, 0, 0, 0).getRGB());
+        Render2DEngine.verticalGradient(stack, (float) (cx + cw + 17), (float) (cy + 0.8), (float) (cx + cw + 25), (float) (cy + ch - 2), new Color(color.getRed(), color.getGreen(), color.getBlue(), 255), new Color(0, 0, 0, 0));
 
         Render2DEngine.drawRect(stack,(float) (cx + cw + 3), hpos + 0.5f, 10, 1, Color.WHITE);
         Render2DEngine.drawRect(stack,(float) (cx + cw + 16), apos + 0.5f, 10, 1, Color.WHITE);

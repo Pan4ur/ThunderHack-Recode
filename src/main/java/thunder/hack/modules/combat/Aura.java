@@ -63,7 +63,7 @@ public class Aura extends Module {
     }
 
 
-    public static final Setting<Float> attackRange = new Setting<>("Attack Range", 3.1f, 1f, 7.0f);
+    public static final Setting<Float> attackRange = new Setting<>("Attack Range", 3.1f, 2f, 6.0f);
     public static final Setting<Mode> mode = new Setting<>("Rotation", Mode.Universal);
     public static final Setting<RayTrace> rayTrace = new Setting<>("RayTrace", RayTrace.OnlyTarget);
     public static final Setting<Switch> switchMode = new Setting<>("Switch", Switch.None);
@@ -149,16 +149,14 @@ public class Aura extends Module {
 
     @EventHandler
     public void onPlayerUpdate(PlayerUpdateEvent e) {
-        if (grimAC.getValue() != Grim.SilentTest) {
+        if (grimAC.getValue() != Grim.SilentTest)
             auraLogic();
-        }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPostSync(EventPostSync e) {
-        if (grimAC.getValue() == Grim.SilentTest) {
+        if (grimAC.getValue() == Grim.SilentTest)
             auraLogic();
-        }
     }
 
     public void auraLogic() {
@@ -170,13 +168,11 @@ public class Aura extends Module {
             }
         }
 
-        for (PlayerEntity player : mc.world.getPlayers())
-            if (player instanceof OtherClientPlayerEntity) ((IOtherClientPlayerEntity) player).resolve();
+        for (PlayerEntity player : mc.world.getPlayers()) if (player instanceof OtherClientPlayerEntity) ((IOtherClientPlayerEntity) player).resolve();
 
         calcThread();
 
-        for (PlayerEntity player : mc.world.getPlayers())
-            if (player instanceof OtherClientPlayerEntity) ((IOtherClientPlayerEntity) player).releaseResolver();
+        for (PlayerEntity player : mc.world.getPlayers()) if (player instanceof OtherClientPlayerEntity) ((IOtherClientPlayerEntity) player).releaseResolver();
 
 
         boolean readyForAttack = autoCrit() && (lookingAtHitbox || mode.getValue() != Mode.Universal || rayTrace.getValue() == RayTrace.OFF);
@@ -203,11 +199,12 @@ public class Aura extends Module {
                 Criticals.cancelCrit = true;
                 ModuleManager.criticals.doCrit();
                 int prevSlot = switchMethod();
+                mc.player.resetLastAttackedTicks();
                 mc.interactionManager.attackEntity(mc.player, target);
                 Criticals.cancelCrit = false;
                 mc.player.swingHand(Hand.MAIN_HAND);
                 hitTicks = getHitTicks();
-                if(prevSlot != -1) InventoryUtility.switchTo(prevSlot);
+                if (prevSlot != -1) InventoryUtility.switchTo(prevSlot);
             }
 
             if (sprint && dropSprint.getValue())
@@ -221,11 +218,12 @@ public class Aura extends Module {
     private int switchMethod() {
         int prevSlot = -1;
         SearchInvResult swordResult = InventoryUtility.getSwordHotBar();
-        if(swordResult.found() && switchMode.getValue() != Switch.None) {
+        if (swordResult.found() && switchMode.getValue() != Switch.None) {
             if (switchMode.getValue() == Switch.Silent)
                 prevSlot = mc.player.getInventory().selectedSlot;
             swordResult.switchTo();
         }
+
         return prevSlot;
     }
 
@@ -234,7 +232,7 @@ public class Aura extends Module {
         if (mc.getCurrentServerEntry() != null && mc.getCurrentServerEntry().address.equals("ngrief.me") && mc.player.getMainHandStack().getItem() instanceof AxeItem) {
             return 21;
         }
-        return oldDelay.getValue() ? 1 + (int) (20f / MathUtility.random(minCPS.getValue(), maxCPS.getValue())) : 11;
+        return oldDelay.getValue() ? 1 + (int) (20f / MathUtility.random(minCPS.getValue(), maxCPS.getValue())) : 12;
     }
 
     @EventHandler
@@ -351,9 +349,7 @@ public class Aura extends Module {
         return MathHelper.clamp(((float) ((ILivingEntity) mc.player).getLastAttackedTicks() + 0.5f) / getAttackCooldownProgressPerTick(), 0.0F, 1.0F);
     }
 
-
     private void calcThread() {
-
         Entity candidat = findTarget();
 
         if (target == null) {

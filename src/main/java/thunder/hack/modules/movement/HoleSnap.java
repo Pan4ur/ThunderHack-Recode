@@ -1,11 +1,12 @@
 package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.MovementType;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.events.impl.EventKeyboardInput;
+import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.modules.Module;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 
 public class HoleSnap extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Normal);
+    private final Setting<Boolean> stopOverHole = new Setting<>("StopOverHole", true);
 
     private enum Mode {
         Normal,
@@ -38,8 +40,20 @@ public class HoleSnap extends Module {
 
     @Override
     public void onUpdate() {
-        if (mc.player != null && mc.player.horizontalCollision) {
+        if (mc.player != null && mc.player.horizontalCollision && mc.player.isOnGround()) 
             mc.player.jump();
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onMove(EventMove e) {
+        BlockPos bp = BlockPos.ofFloored(mc.player.getPos());
+        if (HoleUtility.isHole(bp.down()) || HoleUtility.isHole(bp.down(2)) || HoleUtility.isHole(bp.down(3))) {
+            Vec3d center = new Vec3d(Math.floor(mc.player.getX()) + 0.5, mc.player.getY(), Math.floor(mc.player.getZ()) + 0.5);
+            if (center.distanceTo(mc.player.getPos()) < 0.15f) {
+                e.set_x(0);
+                e.set_z(0);
+                e.cancel();
+            }
         }
     }
 

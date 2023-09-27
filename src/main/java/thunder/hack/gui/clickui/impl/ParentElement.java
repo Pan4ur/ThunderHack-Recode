@@ -43,7 +43,7 @@ public class ParentElement extends AbstractElement {
         matrixStack.translate(tx, ty, 0);
         matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) (-180f * rotation.getOutput())));
         matrixStack.translate(-tx, -ty, 0);
-        Render2DEngine.drawTexture(context,arrow, (int) (x + width - 14), (int) (y + (17 - 6) / 2), 6, 6);
+        context.drawTexture(arrow, (int) (x + width - 14), (int) (y + (17 - 6) / 2), 0, 0, 6, 6, 6, 6);
         matrixStack.pop();
 
 

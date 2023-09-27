@@ -44,7 +44,6 @@ public abstract class Module {
         this.category = category;
     }
 
-
     public void onEnable() {
     }
 
@@ -53,7 +52,6 @@ public abstract class Module {
 
     public void onLoad() {
     }
-
 
     public void onTick() {
     }
@@ -103,19 +101,19 @@ public abstract class Module {
     public void enable() {
         this.enabled.setValue(true);
 
-        if(!fullNullCheck()) {
-            this.onEnable();
+        if (!fullNullCheck()) {
+            onEnable();
         }
 
-        if (this.isOn()) {
+        if (isOn()) {
             ThunderHack.EVENT_BUS.subscribe(this);
         }
         if (fullNullCheck()) return;
-        if ((!Objects.equals(this.getDisplayName(), "ClickGui")) && (!Objects.equals(this.getDisplayName(), "ThunderGui"))) {
+        if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                ThunderHack.notificationManager.publicity(this.getDisplayName(), "Модуль включен!", 2, Notification.Type.ENABLED);
+                ThunderHack.notificationManager.publicity(getDisplayName(), "Модуль включен!", 2, Notification.Type.ENABLED);
             } else {
-                ThunderHack.notificationManager.publicity(this.getDisplayName(), "Was Enabled!", 2, Notification.Type.ENABLED);
+                ThunderHack.notificationManager.publicity(getDisplayName(), "Was Enabled!", 2, Notification.Type.ENABLED);
             }
             mc.world.playSound(mc.player, mc.player.getBlockPos(), ThSoundPack.ENABLE_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
         }
@@ -159,43 +157,43 @@ public abstract class Module {
     }
 
     public String getDisplayName() {
-        return this.displayName;
+        return displayName;
     }
 
     public String getDescription() {
-        return this.description;
+        return description;
     }
 
     public boolean isDrawn() {
-        return this.drawn.getValue();
+        return drawn.getValue();
     }
 
-    public void setDrawn(boolean drawn) {
-        this.drawn.setValue(drawn);
+    public void setDrawn(boolean d) {
+        drawn.setValue(d);
     }
 
     public Category getCategory() {
-        return this.category;
+        return category;
     }
 
     public Bind getBind() {
-        return this.bind.getValue();
+        return bind.getValue();
     }
 
     public void setBind(int key, boolean mouse, boolean hold) {
         setBind(new Bind(key, mouse, hold));
     }
 
-    public void setBind(Bind bind) {
-        this.bind.setValue(bind);
+    public void setBind(Bind b) {
+        bind.setValue(b);
     }
 
     public boolean listening() {
-        return this.isOn();
+        return isOn();
     }
 
     public String getFullArrayString() {
-        return this.getDisplayName() + Formatting.GRAY + (this.getDisplayInfo() != null ? " [" + Formatting.WHITE + this.getDisplayInfo() + Formatting.GRAY + "]" : "");
+        return getDisplayName() + Formatting.GRAY + (getDisplayInfo() != null ? " [" + Formatting.WHITE + getDisplayInfo() + Formatting.GRAY + "]" : "");
     }
 
     public static boolean fullNullCheck() {
@@ -203,14 +201,14 @@ public abstract class Module {
     }
 
     public String getName() {
-        return this.getDisplayName();
+        return getDisplayName();
     }
 
 
     public List<Setting<?>> getSettings() {
         ArrayList<Setting<?>> settingList = new ArrayList<>();
 
-        for (Field field : this.getClass().getDeclaredFields()) {
+        for (Field field : getClass().getDeclaredFields()) {
             if (Setting.class.isAssignableFrom(field.getType())) {
                 field.setAccessible(true);
                 try {
@@ -221,7 +219,7 @@ public abstract class Module {
             }
         }
 
-        for (Field field : this.getClass().getSuperclass().getDeclaredFields()) {
+        for (Field field : getClass().getSuperclass().getDeclaredFields()) {
             if (Setting.class.isAssignableFrom(field.getType())) {
                 field.setAccessible(true);
 
@@ -233,7 +231,7 @@ public abstract class Module {
             }
         }
 
-        for (Field field : this.getClass().getSuperclass().getSuperclass().getDeclaredFields()) {
+        for (Field field : getClass().getSuperclass().getSuperclass().getDeclaredFields()) {
             if (Setting.class.isAssignableFrom(field.getType())) {
                 field.setAccessible(true);
 
@@ -249,11 +247,11 @@ public abstract class Module {
     }
 
     public boolean isEnabled() {
-        return this.isOn();
+        return isOn();
     }
 
     public boolean isDisabled() {
-        return !this.isEnabled();
+        return !isEnabled();
     }
 
     public static void clickSlot(int id) {
@@ -293,12 +291,12 @@ public abstract class Module {
 
         private final String name;
 
-        Category(String name) {
-            this.name = name;
+        Category(String n) {
+            name = n;
         }
 
         public String getName() {
-            return this.name;
+            return name;
         }
     }
 }

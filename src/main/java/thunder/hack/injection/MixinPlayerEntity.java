@@ -1,5 +1,6 @@
 package thunder.hack.injection;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
@@ -8,6 +9,7 @@ import thunder.hack.events.impl.EventAttack;
 import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.modules.client.Media;
+import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.movement.AutoSprint;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -33,6 +35,12 @@ public class MixinPlayerEntity{
         }
     }
 
+    @Inject(method = "getAttackCooldownProgressPerTick", at = @At("HEAD"), cancellable = true)
+    public void getAttackCooldownProgressPerTickHook(CallbackInfoReturnable<Float> cir) {
+        if(ModuleManager.aura.isEnabled() && Aura.switchMode.getValue() == Aura.Switch.Silent){
+            cir.setReturnValue(12.5f);
+        }
+    }
 
     @Inject(method = "getDisplayName", at = @At("HEAD"), cancellable = true)
     public void getDisplayNameHook(CallbackInfoReturnable<Text> cir) {

@@ -107,7 +107,8 @@ public abstract class MixinSplashOverlay {
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(770, 1);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, h);
-        Render2DEngine.drawTexture(context, TH_LOGO, k - 150, p - 35, 300, 70);
+
+        context.drawTexture(TH_LOGO, k - 150, p - 35, 0, 0, 300, 70, 300, 70);
 
         int s = (int) ((double) context.getScaledWindowHeight() * 0.8325);
         float t = this.reload.getProgress();

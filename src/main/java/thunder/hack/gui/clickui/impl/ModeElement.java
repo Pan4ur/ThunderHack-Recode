@@ -46,8 +46,7 @@ public class ModeElement extends AbstractElement {
 		matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(thetaRotation));
 		matrixStack.translate(-tx, -ty, 0);
 
-		Render2DEngine.drawTexture(context,arrow, (int) (x + width - 14), (int) (y + (wheight - 6) / 2), 6, 6);
-
+		context.drawTexture(arrow, (int) (x + width - 14), (int) (y + (wheight - 6) / 2), 0, 0, 6, 6, 6, 6);
 
 		matrixStack.pop();
 

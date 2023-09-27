@@ -13,12 +13,14 @@ import org.lwjgl.opengl.GL30C;
 import thunder.hack.modules.render.Shaders;
 import thunder.hack.utility.interfaces.IShaderEffect;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import static thunder.hack.modules.Module.mc;
 
 public class ShaderManager {
-    private final static LinkedList<RenderTask> tasks = new LinkedList<>();
+    private final static List<RenderTask> tasks = new ArrayList<>();
     private ThunderHackFramebuffer shaderBuffer;
 
     public float time = 0;
@@ -40,11 +42,9 @@ public class ShaderManager {
             shaderBuffer = new ThunderHackFramebuffer(mc.getFramebuffer().textureWidth, mc.getFramebuffer().textureHeight);
             reloadShaders();
         }
-
-        while (!tasks.isEmpty()) {
-            RenderTask task = tasks.pop();
-            applyShader(task.task(), task.shader);
-        }
+        
+        tasks.forEach( t -> applyShader(t.task(), t.shader()));
+        tasks.clear();
     }
 
     public void applyShader(Runnable runnable, Shader mode) {
@@ -61,9 +61,9 @@ public class ShaderManager {
         ManagedShaderEffect shader = getShader(mode);
         Framebuffer mainBuffer = MinecraftClient.getInstance().getFramebuffer();
         PostEffectProcessor effect = shader.getShaderEffect();
-        if (effect != null) {
+        
+        if (effect != null) 
             ((IShaderEffect) effect).addFakeTargetHook("bufIn", shaderBuffer);
-        }
 
         Framebuffer outBuffer = shader.getShaderEffect().getSecondaryTarget("bufOut");
         setupShader(mode, shader);
@@ -128,12 +128,12 @@ public class ShaderManager {
             effect.setUniformValue("alpha1", shaders.fillAlpha.getValue() / 255f);
             effect.setUniformValue("lineWidth", shaders.lineWidth.getValue());
             effect.setUniformValue("quality", shaders.quality.getValue());
-            effect.setUniformValue("first", shaders.outlineColor.getValue().getRed() / 255f, shaders.outlineColor.getValue().getGreen() / 255f, shaders.outlineColor.getValue().getBlue() / 255f, shaders.outlineColor.getValue().getAlpha() / 255f);
-            effect.setUniformValue("second", shaders.outlineColor1.getValue().getRed() / 255f, shaders.outlineColor1.getValue().getGreen() / 255f, shaders.outlineColor1.getValue().getBlue() / 255f);
-            effect.setUniformValue("third", shaders.outlineColor2.getValue().getRed() / 255f, shaders.outlineColor2.getValue().getGreen() / 255f, shaders.outlineColor2.getValue().getBlue() / 255f);
-            effect.setUniformValue("ffirst", shaders.fillColor1.getValue().getRed() / 255f, shaders.fillColor1.getValue().getGreen() / 255f, shaders.fillColor1.getValue().getBlue() / 255f, shaders.fillColor1.getValue().getAlpha() / 255f);
-            effect.setUniformValue("fsecond", shaders.fillColor2.getValue().getRed() / 255f, shaders.fillColor2.getValue().getGreen() / 255f, shaders.fillColor2.getValue().getBlue() / 255f);
-            effect.setUniformValue("fthird", shaders.fillColor3.getValue().getRed() / 255f, shaders.fillColor3.getValue().getGreen() / 255f, shaders.fillColor3.getValue().getBlue() / 255f);
+            effect.setUniformValue("first", shaders.outlineColor.getValue().getGlRed(), shaders.outlineColor.getValue().getGlGreen(), shaders.outlineColor.getValue().getGlBlue(), shaders.outlineColor.getValue().getGlAlpha());
+            effect.setUniformValue("second", shaders.outlineColor1.getValue().getGlRed(), shaders.outlineColor1.getValue().getGlGreen(), shaders.outlineColor1.getValue().getGlBlue());
+            effect.setUniformValue("third", shaders.outlineColor2.getValue().getGlRed(), shaders.outlineColor2.getValue().getGlGreen(), shaders.outlineColor2.getValue().getGlBlue());
+            effect.setUniformValue("ffirst", shaders.fillColor1.getValue().getGlRed(), shaders.fillColor1.getValue().getGlGreen(), shaders.fillColor1.getValue().getGlBlue(), shaders.fillColor1.getValue().getGlAlpha());
+            effect.setUniformValue("fsecond", shaders.fillColor2.getValue().getGlRed(), shaders.fillColor2.getValue().getGlGreen(), shaders.fillColor2.getValue().getGlBlue());
+            effect.setUniformValue("fthird", shaders.fillColor3.getValue().getGlRed(), shaders.fillColor3.getValue().getGlGreen(), shaders.fillColor3.getValue().getGlBlue());
             effect.setUniformValue("oct", shaders.octaves.getValue());
             effect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
             effect.setUniformValue("time", time);
@@ -143,8 +143,8 @@ public class ShaderManager {
             effect.setUniformValue("alpha0", shaders.glow.getValue() ? -1.0f : shaders.outlineColor.getValue().getAlpha() / 255.0f);
             effect.setUniformValue("lineWidth", shaders.lineWidth.getValue());
             effect.setUniformValue("quality", shaders.quality.getValue());
-            effect.setUniformValue("color", shaders.fillColor1.getValue().getRed() / 255f, shaders.fillColor1.getValue().getGreen() / 255f, shaders.fillColor1.getValue().getBlue() / 255f, shaders.fillColor1.getValue().getAlpha() / 255f);
-            effect.setUniformValue("outlinecolor", shaders.outlineColor.getValue().getRed() / 255f, shaders.outlineColor.getValue().getGreen() / 255f, shaders.outlineColor.getValue().getBlue() / 255f, shaders.outlineColor.getValue().getAlpha() / 255f);
+            effect.setUniformValue("color", shaders.fillColor1.getValue().getGlRed(), shaders.fillColor1.getValue().getGlGreen(), shaders.fillColor1.getValue().getGlBlue(), shaders.fillColor1.getValue().getGlAlpha());
+            effect.setUniformValue("outlinecolor", shaders.outlineColor.getValue().getGlRed(), shaders.outlineColor.getValue().getGlGreen(), shaders.outlineColor.getValue().getGlBlue(), shaders.outlineColor.getValue().getGlAlpha());
             effect.render(mc.getTickDelta());
         }
     }

@@ -27,8 +27,8 @@ public class ParentComponent extends SettingElement {
             return;
         }
         FontRenderers.modules.drawCenteredString(stack,getSetting().getName(), (float) (getX() + width / 2f), (float) getY() + 2, new Color(0xB0FFFFFF, true).getRGB());
-        Render2DEngine.draw2DGradientRect(stack,(float) (getX() + 10), (float) (getY() + 6), (float) ((getX() + width / 2f) - 20), (float) (getY() + 7), new Color(0x0FFFFFF, true).getRGB(), new Color(0x0FFFFFF, true).getRGB(), new Color(0xB0FFFFFF, true).getRGB(), new Color(0xB0FFFFFF, true).getRGB());
-        Render2DEngine.draw2DGradientRect(stack,(float) (getX() + width / 2f + 20f), (float) (getY() + 6), (float) (getX() + width - 10), (float) (getY() + 7), new Color(0xB0FFFFFF, true).getRGB(), new Color(0xB0FFFFFF, true).getRGB(), new Color(0x0FFFFFF, true).getRGB(), new Color(0x0FFFFFF, true).getRGB());
+        Render2DEngine.draw2DGradientRect(stack,(float) (getX() + 10), (float) (getY() + 6), (float) ((getX() + width / 2f) - 20), (float) (getY() + 7), new Color(0x0FFFFFF, true), new Color(0x0FFFFFF, true), new Color(0xB0FFFFFF, true), new Color(0xB0FFFFFF, true));
+        Render2DEngine.draw2DGradientRect(stack,(float) (getX() + width / 2f + 20f), (float) (getY() + 6), (float) (getX() + width - 10), (float) (getY() + 7), new Color(0xB0FFFFFF, true), new Color(0xB0FFFFFF, true), new Color(0x0FFFFFF, true), new Color(0x0FFFFFF, true));
     }
 
     @Override

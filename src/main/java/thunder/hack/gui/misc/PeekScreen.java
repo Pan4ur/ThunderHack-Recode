@@ -79,10 +79,11 @@ public class PeekScreen extends ShulkerBoxScreen {
         } else {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         }
-      //  this.client.getTextureManager().bindTexture(TEXTURE);
         int i = (this.width - this.backgroundWidth) / 2;
         int j = (this.height - this.backgroundHeight) / 2;
-        Render2DEngine.drawTexture(context,TEXTURE,i + 2,j + 12,176,67);
+
+        context.drawTexture(TEXTURE, i + 2,j + 12, 0, 0, 176, 67, 176, 67);
+
         RenderSystem.setShaderColor(1f,1f,1f,1f);
     }
 }

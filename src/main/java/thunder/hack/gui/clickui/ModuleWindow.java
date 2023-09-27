@@ -115,7 +115,7 @@ public class ModuleWindow extends AbstractWindow {
 
         Render2DEngine.drawRoundD(context.getMatrices(), x + 2, y - 3, width - 4, height, 4, ClickGui.getInstance().catColor.getValue().getColorObject());
 
-        Render2DEngine.drawTexture(context, ICON, (int) (x + 7), (int) (y + (height - 18) / 2), 12, 12);
+        context.drawTexture(ICON, (int) (x + 7), (int) (y + (height - 18) / 2), 0, 0, 12, 12, 12, 12);
 
         FontRenderers.categories.drawCenteredString(context.getMatrices(), getName(), ((int) x + 2 + (width - 4) / 2), (int) y + (int) height / 2f - 7, new Color(-1).getRGB());
         context.getMatrices().pop();

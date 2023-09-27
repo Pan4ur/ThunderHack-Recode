@@ -87,11 +87,10 @@ public class MainMenuScreen extends Screen {
 
 
             RenderSystem.enableBlend();
-            RenderSystem.blendFunc(770, 1);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, hoveredLogo ? 0.4f : 0.3f);
-            Render2DEngine.drawTexture(context, TH_LOGO, (int) (halfOfWidth - 157), (int) (halfOfHeight - 140), 300, 70);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.defaultBlendFunc();
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, hoveredLogo ? 0.4f : 0.3f);
+            context.drawTexture(TH_LOGO,(int) (halfOfWidth - 157), (int) (halfOfHeight - 140), 0, 0, 300, 70, 300, 70);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.disableBlend();
 
             buttons.forEach(b -> b.onRenderText(context, mouseX, mouseY));

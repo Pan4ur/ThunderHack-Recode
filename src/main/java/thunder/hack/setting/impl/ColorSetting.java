@@ -5,8 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 
 public final class ColorSetting {
+
     private int color;
-    private boolean rainbow = false;
+    private boolean rainbow;
     private int globalOffset = 0;
 
     public ColorSetting(@NotNull Color color) {
@@ -101,6 +102,22 @@ public final class ColorSetting {
         return (color) & 0xFF;
     }
 
+    public float getGlRed() {
+        return getRed() / 255f;
+    }
+
+    public float getGlBlue() {
+        return getBlue() / 255f;
+    }
+
+    public float getGlGreen() {
+        return getGreen() / 255f;
+    }
+
+    public float getGlAlpha() {
+        return getAlpha() / 255f;
+    }
+
     public int getAlpha() {
         return (color >> 24) & 0xff;
     }
@@ -111,9 +128,7 @@ public final class ColorSetting {
         int red = (color >> 16) & 0xFF;
         int green = (color >> 8) & 0xFF;
         int blue = (color) & 0xFF;
-
         return new Color(red, green, blue, alpha);
-
     }
 
     public int getRawColor() {

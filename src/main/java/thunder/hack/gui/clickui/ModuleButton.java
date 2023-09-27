@@ -77,7 +77,7 @@ public class ModuleButton extends AbstractButton {
             Render2DEngine.drawRoundDoubleColor(context.getMatrices(), x + 4, y + height - 16, (width - 8), (height) + getElementsHeight(), 3f, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(200), 0.8f) : sbg, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(0), 0.8f) : sbg);
 
             if (isOpen()) {
-                Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle(x, y + height - 15, (width) + x + 6, (height) + y + getElementsHeight()));
+                Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle((float) x, (float) (y + height - 15), (float) ((width) + x + 6), (float) ((height) + y + getElementsHeight())));
             }
 
             context.getMatrices().push();
