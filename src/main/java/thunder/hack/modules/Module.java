@@ -124,14 +124,12 @@ public abstract class Module {
         disable();
     }
 
-
     @Deprecated
     public void disable() {
         try {
             ThunderHack.EVENT_BUS.unsubscribe(this);
         } catch (Exception ignored) {
         }
-
 
         enabled.setValue(false);
 
@@ -149,11 +147,8 @@ public abstract class Module {
     }
 
     public void toggle() {
-        if (enabled.getValue()) {
-            disable();
-        } else {
-            enable();
-        }
+        if (enabled.getValue()) disable();
+        else enable();
     }
 
     public String getDisplayName() {

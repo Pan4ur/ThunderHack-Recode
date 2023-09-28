@@ -181,7 +181,6 @@ public class AutoCrystal extends Module {
     // Threads
     private PlaceThread placeThread;
     private BreakThread breakThread;
-    private final AtomicBoolean ticking = new AtomicBoolean(false);
     private final AtomicBoolean stopThreads = new AtomicBoolean(false);
 
     public AutoCrystal() {
@@ -933,8 +932,6 @@ public class AutoCrystal extends Module {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTick(EventTick e) {
-        ticking.set(true);
-
         if (multiThread.getValue())
             return;
 
@@ -942,11 +939,6 @@ public class AutoCrystal extends Module {
             calcPosition();
             getCrystalToExplode();
         }).start();
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPostTick(EventPostTick e) {
-        ticking.set(false);
     }
 
     @EventHandler
@@ -1024,7 +1016,7 @@ public class AutoCrystal extends Module {
         @Override
         public void run() {
             while (ModuleManager.autoCrystal.isEnabled()) {
-                while (ticking.get() || !placeTimer.passedMs(placeDelay.getValue())) {
+                while (ThunderHack.asyncManager.ticking.get() || !placeTimer.passedMs(placeDelay.getValue())) {
                 }
 
                 calcPosition();
@@ -1042,7 +1034,7 @@ public class AutoCrystal extends Module {
         @Override
         public void run() {
             while (ModuleManager.autoCrystal.isEnabled()) {
-                while (ticking.get()) {
+                while (ThunderHack.asyncManager.ticking.get()) {
                 }
                 while (!breakTimer.passedMs(breakDelay.getValue())) {
                 }

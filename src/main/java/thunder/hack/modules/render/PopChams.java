@@ -25,6 +25,9 @@ import thunder.hack.utility.math.MathUtility;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static thunder.hack.utility.render.Render3DEngine.cleanup;
+import static thunder.hack.utility.render.Render3DEngine.setup;
+
 public class PopChams extends Module {
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
     private final Setting<Integer> ySpeed = new Setting<>("Y Speed", 0, -10, 10);

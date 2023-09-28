@@ -88,11 +88,7 @@ public class ThunderHack implements ModInitializer {
         macroManager.onLoad();
         wayPointManager.onLoad();
 
-        Render2DEngine.ROUNDED_GRADIENT_PROGRAM = new RoundedGradientProgram();
-        Render2DEngine.ROUNDED_PROGRAM = new RoundedProgram();
-        Render2DEngine.GRADIENT_GLOW_PROGRAM = new GradientGlowProgram();
-        Render2DEngine.MAIN_MENU_PROGRAM = new MainMenuProgram();
-
+        Render2DEngine.initShaders();
 
         ThSoundPack.registerSounds();
         syncVersion();

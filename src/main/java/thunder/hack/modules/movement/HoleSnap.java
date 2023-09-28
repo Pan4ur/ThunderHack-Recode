@@ -40,7 +40,7 @@ public class HoleSnap extends Module {
 
     @Override
     public void onUpdate() {
-        if (mc.player != null && mc.player.horizontalCollision && mc.player.isOnGround()) 
+        if (mc.player != null && mc.player.horizontalCollision && mc.player.isOnGround())
             mc.player.jump();
     }
 

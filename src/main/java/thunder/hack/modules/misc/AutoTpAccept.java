@@ -23,7 +23,7 @@ public class AutoTpAccept extends Module {
 
     public Setting<Boolean> grief = new Setting<>("Grief", false);
     public Setting<Boolean> onlyFriends = new Setting<>("onlyFriends", true);
-    public Setting<Boolean> duo = new Setting<>("Duo", true);
+    public Setting<Boolean> duo = new Setting<>("Duo", false);
     private final Setting<Integer> timeOut = new Setting<>("TimeOut", 60, 1, 180, v -> duo.getValue());
 
     private TpTask tpTask;

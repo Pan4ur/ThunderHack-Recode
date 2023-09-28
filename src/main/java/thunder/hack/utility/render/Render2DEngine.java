@@ -13,13 +13,11 @@ import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL40C;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.font.Texture;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.math.MathUtility;
-import thunder.hack.utility.render.shaders.GradientGlowProgram;
-import thunder.hack.utility.render.shaders.MainMenuProgram;
-import thunder.hack.utility.render.shaders.RoundedGradientProgram;
-import thunder.hack.utility.render.shaders.RoundedProgram;
+import thunder.hack.utility.render.shaders.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -708,6 +706,13 @@ public class Render2DEngine {
         float b = g2 - g1;
         float c = b2 - b1;
         return (float) Math.sqrt(a * a + b * b + c * c);
+    }
+
+    public static void initShaders() {
+        ROUNDED_GRADIENT_PROGRAM = new RoundedGradientProgram();
+        ROUNDED_PROGRAM = new RoundedProgram();
+        GRADIENT_GLOW_PROGRAM = new GradientGlowProgram();
+        MAIN_MENU_PROGRAM = new MainMenuProgram();
     }
 
     public static class BlurredShadow {

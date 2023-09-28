@@ -9,6 +9,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventPostTick;
 import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.EventTick;
 import thunder.hack.gui.clickui.ClickUI;
 import thunder.hack.gui.mainmenu.MainMenuScreen;
 import thunder.hack.modules.Module;
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -30,6 +32,8 @@ public class AsyncManager {
 
     private volatile Iterable<Entity> threadSafeEntityList = Collections.emptyList();
     private volatile List<AbstractClientPlayerEntity> threadSafePlayersList = Collections.emptyList();
+    public final AtomicBoolean ticking = new AtomicBoolean(false);
+
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPostTick(EventPostTick e) {
@@ -37,6 +41,7 @@ public class AsyncManager {
 
         threadSafeEntityList = Lists.newArrayList(mc.world.getEntities());
         threadSafePlayersList = Lists.newArrayList(mc.world.getPlayers());
+        ticking.set(false);
     }
 
     public Iterable<Entity> getAsyncEntities() {
@@ -90,6 +95,12 @@ public class AsyncManager {
             }
         }
     }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onTick(EventTick e) {
+        ticking.set(true);
+    }
+
 
     public void run(Runnable runnable, long delay) {
         executor.execute(() -> {
