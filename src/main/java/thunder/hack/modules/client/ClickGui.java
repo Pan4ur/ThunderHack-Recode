@@ -26,6 +26,7 @@ public class ClickGui extends Module {
     public final Setting<ColorSetting> catColor = new Setting<>("Category", new ColorSetting(-15395563));
     public Setting<Integer> colorSpeed = new Setting<Integer>("ColorSpeed", 18, 2, 54);
     public Setting<Boolean> showBinds = new Setting<>("ShowBinds", true);
+    public Setting<Boolean> outline = new Setting<>("Outline", false);
     public Setting<Boolean> msaa = new Setting<>("MSAA", true);
 
 /*

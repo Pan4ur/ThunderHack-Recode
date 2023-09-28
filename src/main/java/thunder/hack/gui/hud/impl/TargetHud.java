@@ -246,14 +246,11 @@ public class TargetHud extends HudElement {
                 Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 55, getPosY() + 35 - 14, (int) MathUtility.clamp((90 * (health / 20)), 3, 90), 10, 2f);
 
 
-                if (hpMode.getValue() == HPmodeEn.HP) {
-                    FontRenderers.modules.drawString(context.getMatrices(), String.valueOf(Math.round(10.0 * target.getHealth()) / 10.0), getPosX() + 95, getPosY() + 25.5f, -1);
-                } else {
-                    FontRenderers.modules.drawString(context.getMatrices(), ((Math.round(10.0 * health) / 10.0) / 20f) * 100 + "%", getPosX() + 95, getPosY() + 25.5f, -1);
-                }
+                FontRenderers.modules.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * target.getHealth()) / 10.0) : ((Math.round(10.0 * health) / 10.0) / 20f) * 100 + "%", getPosX() + 102, getPosY() + 22.5f, -1);
+
                 //
 
-                //Имя
+                //Имя ебыря
 
                 FontRenderers.modules.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : target.getName().getString(), getPosX() + 55, getPosY() + 7, -1, false);
 
@@ -322,7 +319,7 @@ public class TargetHud extends HudElement {
                 Render2DEngine.drawGradientRound(context.getMatrices(), getPosX() + 48, getPosY() + 32, 85, 11, 4f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
                 Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 48, getPosY() + 32, (int) MathUtility.clamp((85 * (health / 20)), 8, 85), 11, 4f);
 
-                FontRenderers.modules.drawString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * target.getHealth()) / 10.0) : (((Math.round(10.0 * target.getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 85f, getPosY() + 37f, -1);
+                FontRenderers.modules.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * target.getHealth()) / 10.0) : (((Math.round(10.0 * target.getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 92f, getPosY() + 34f, -1);
                 //
 
                 //Имя
@@ -374,7 +371,7 @@ public class TargetHud extends HudElement {
                 RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
                 FontRenderers.modules.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : target.getName().getString(), getPosX() + 50, getPosY() + 7, -1, false);
-                FontRenderers.modules.drawString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * target.getHealth()) / 10.0) : (((Math.round(10.0 * target.getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 74f, getPosY() + 34f, -1);
+                FontRenderers.modules.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * target.getHealth()) / 10.0) : (((Math.round(10.0 * target.getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 81f, getPosY() + 31f, -1);
 
 
                 if (target instanceof PlayerEntity) {

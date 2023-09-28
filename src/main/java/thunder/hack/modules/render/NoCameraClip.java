@@ -12,7 +12,7 @@ public class NoCameraClip extends Module {
     }
 
     public Setting<Boolean> antiFront = new Setting<>("AntiFront", false);
-    public Setting<Float> distance = new Setting<>("Distance", 3f, 0f, 20f);
+    public Setting<Float> distance = new Setting<>("Distance", 3f, 1f, 20f);
     private final BetterDynamicAnimation animation = new BetterDynamicAnimation();
 
     @Override

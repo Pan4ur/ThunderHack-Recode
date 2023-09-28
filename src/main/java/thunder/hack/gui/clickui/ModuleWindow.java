@@ -68,8 +68,12 @@ public class ModuleWindow extends AbstractWindow {
         }
 
         if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old || (getButtonsHeight() + 8) < ModuleManager.clickGui.catHeight.getValue()) {
+            if(ModuleManager.clickGui.outline.getValue())
+                Render2DEngine.drawRound(context.getMatrices(), (float) x + 2, (float) (y + height - 7), (float) width - 4, height1 + 2, 3, ClickGui.getInstance().getColor(1));
             Render2DEngine.drawRound(context.getMatrices(), (float) x + 3, (float) (y + height - 6), (float) width - 6, height1, 3, ClickGui.getInstance().plateColor.getValue().getColorObject());
         } else {
+            if(ModuleManager.clickGui.outline.getValue())
+                Render2DEngine.drawRound(context.getMatrices(), (float) x + 2, (float) (y + height - 7), (float) width - 4, height1 + 2, 3, ClickGui.getInstance().getColor(1));
             Render2DEngine.drawRound(context.getMatrices(), (float) x + 3, (float) (y + height - 6), (float) width - 6, height1, 3, ClickGui.getInstance().plateColor.getValue().getColorObject());
             Render2DEngine.addWindow(context.getMatrices(), (float) x + 3, (float) (y + height - 6), (float) (x + 3 + (float) width - 6), (float) ((y + height - 6) + (float) ((ModuleManager.clickGui.catHeight.getValue()) * animation.getOutput())), 1f);
             popStack = true;

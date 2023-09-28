@@ -1,6 +1,7 @@
 package thunder.hack.gui.clickui;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.cmd.Command;
@@ -9,6 +10,7 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.TargetHud;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.ColorSetting;
@@ -20,6 +22,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class ModuleButton extends AbstractButton {
@@ -30,7 +33,6 @@ public class ModuleButton extends AbstractButton {
 
     private boolean binding = false;
     private boolean holdbind = false;
-    private boolean isVisible = false;
 
     public ModuleButton(Module module) {
         this.module = module;
@@ -169,10 +171,14 @@ public class ModuleButton extends AbstractButton {
             }
         }
 
-        if (this.binding) {
-            FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "PressKey", (int) ix, (int) iy + 3 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+        if(hovered && InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT)){
+            FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"), (int) ix + 1f, (int) iy + 3 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
         } else {
-            FontRenderers.sf_medium.drawString(context.getMatrices(), module.getName(), (int) ix + 2, (int) iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            if (this.binding) {
+                FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "PressKey", (int) ix, (int) iy + 3 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            } else {
+                FontRenderers.sf_medium.drawString(context.getMatrices(), module.getName(), (int) ix + 2, (int) iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            }
         }
     }
 
@@ -196,6 +202,16 @@ public class ModuleButton extends AbstractButton {
             binding = false;
         }
         if (hovered) {
+            if(InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT) && button == 0){
+                module.setDrawn(!module.isDrawn());
+                if(MainSettings.isRu()){
+                    Command.sendMessage("Модуль " + Formatting.GREEN + module.getName() + Formatting.WHITE + " теперь " + (module.isDrawn() ? "виден в ArrayList" : "не виден в ArrayList"));
+                } else {
+                    Command.sendMessage(Formatting.GREEN + module.getName() + Formatting.WHITE + " is now " + (module.isDrawn() ? "visible in ArrayList" : "invisible in ArrayList"));
+                }
+                return;
+            }
+
             if (button == 0) {
                 module.toggle();
             } else if (button == 1 && (module.getSettings().size() > 3)) {
