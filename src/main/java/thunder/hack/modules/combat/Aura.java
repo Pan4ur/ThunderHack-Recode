@@ -39,7 +39,6 @@ import thunder.hack.core.PlayerManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
@@ -56,6 +55,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.minecraft.util.UseAction.BLOCK;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class Aura extends Module {
     public Aura() {
@@ -160,20 +160,16 @@ public class Aura extends Module {
     }
 
     public void auraLogic() {
-        if (target != null && target instanceof LivingEntity && (((LivingEntity) target).getHealth() <= 0 || ((LivingEntity) target).isDead())) {
-            if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                ThunderHack.notificationManager.publicity("Aura", "Цель успешно нейтрализована!", 3, Notification.Type.SUCCESS);
-            } else {
-                ThunderHack.notificationManager.publicity("Aura", "Target successfully neutralized!", 3, Notification.Type.SUCCESS);
-            }
-        }
+        if (target != null && target instanceof LivingEntity && (((LivingEntity) target).getHealth() <= 0 || ((LivingEntity) target).isDead()))
+            ThunderHack.notificationManager.publicity("Aura", isRu() ? "Цель успешно нейтрализована!" : "Target successfully neutralized!", 3, Notification.Type.SUCCESS);
 
-        for (PlayerEntity player : mc.world.getPlayers()) if (player instanceof OtherClientPlayerEntity) ((IOtherClientPlayerEntity) player).resolve();
+        for (PlayerEntity player : mc.world.getPlayers())
+            if (player instanceof OtherClientPlayerEntity) ((IOtherClientPlayerEntity) player).resolve();
 
         calcThread();
 
-        for (PlayerEntity player : mc.world.getPlayers()) if (player instanceof OtherClientPlayerEntity) ((IOtherClientPlayerEntity) player).releaseResolver();
-
+        for (PlayerEntity player : mc.world.getPlayers())
+            if (player instanceof OtherClientPlayerEntity) ((IOtherClientPlayerEntity) player).releaseResolver();
 
         boolean readyForAttack = autoCrit() && (lookingAtHitbox || mode.getValue() != Mode.Universal || rayTrace.getValue() == RayTrace.OFF);
 
@@ -182,37 +178,49 @@ public class Aura extends Module {
                 hitTicks = 10;
                 return;
             }
-            attackAllowed = false;
             final Item selectedItem = mc.player.getInventory().getStack(mc.player.getInventory().selectedSlot).getItem();
             if (switchMode.getValue() != Switch.Silent && onlyWeapon.getValue() && !(selectedItem instanceof SwordItem || selectedItem instanceof AxeItem))
                 return;
 
-            boolean blocking = mc.player.isUsingItem() && mc.player.getActiveItem().getItem().getUseAction(mc.player.getActiveItem()) == BLOCK;
-            if (blocking && unpressShield.getValue())
-                sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
-
-            boolean sprint = Core.serversprint;
-            if (sprint && dropSprint.getValue())
-                sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
-
-            if (!(target instanceof PlayerEntity) || !(((PlayerEntity) target).isUsingItem() && ((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD) || ignoreShield.getValue()) {
-                Criticals.cancelCrit = true;
-                ModuleManager.criticals.doCrit();
-                int prevSlot = switchMethod();
-                mc.player.resetLastAttackedTicks();
-                mc.interactionManager.attackEntity(mc.player, target);
-                Criticals.cancelCrit = false;
-                mc.player.swingHand(Hand.MAIN_HAND);
-                hitTicks = getHitTicks();
-                if (prevSlot != -1) InventoryUtility.switchTo(prevSlot);
-            }
-
-            if (sprint && dropSprint.getValue())
-                sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
-            if (blocking && unpressShield.getValue())
-                sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
+            boolean[] playerState = preAttack();
+            if (!(target instanceof PlayerEntity) || !(((PlayerEntity) target).isUsingItem() && ((PlayerEntity) target).getOffHandStack().getItem() == Items.SHIELD) || ignoreShield.getValue())
+                attack();
+            postAttack(playerState[0], playerState[1]);
         }
         hitTicks--;
+    }
+
+    public void attack() {
+        Criticals.cancelCrit = true;
+        ModuleManager.criticals.doCrit();
+        int prevSlot = switchMethod();
+        mc.player.resetLastAttackedTicks();
+        mc.interactionManager.attackEntity(mc.player, target);
+        Criticals.cancelCrit = false;
+        mc.player.swingHand(Hand.MAIN_HAND);
+        hitTicks = getHitTicks();
+        if (prevSlot != -1) InventoryUtility.switchTo(prevSlot);
+    }
+
+    private boolean @NotNull [] preAttack() {
+        attackAllowed = false;
+
+        boolean blocking = mc.player.isUsingItem() && mc.player.getActiveItem().getItem().getUseAction(mc.player.getActiveItem()) == BLOCK;
+        if (blocking && unpressShield.getValue())
+            sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
+
+        boolean sprint = Core.serversprint;
+        if (sprint && dropSprint.getValue())
+            sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+
+        return new boolean[]{blocking, sprint};
+    }
+
+    public void postAttack(boolean sprint, boolean block) {
+        if (sprint && dropSprint.getValue())
+            sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+        if (block && unpressShield.getValue())
+            sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
     }
 
     private int switchMethod() {
@@ -258,7 +266,7 @@ public class Aura extends Module {
     public void onPacketReceive(PacketEvent.@NotNull Receive e) {
         if (e.getPacket() instanceof EntityStatusS2CPacket status) {
             if (status.getStatus() == 30 && status.getEntity(mc.world) != null && target != null && status.getEntity(mc.world) == target)
-                ThunderHack.notificationManager.publicity("Aura", MainSettings.isRu() ? ("Успешно сломали щит игроку " + target.getName().getString()) : ("Succesfully destroyed " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("Aura", isRu() ? ("Успешно сломали щит игроку " + target.getName().getString()) : ("Succesfully destroyed " + target.getName().getString() + "'s shield"), 2, Notification.Type.SUCCESS);
         }
     }
 
@@ -538,7 +546,7 @@ public class Aura extends Module {
                 return first_stage.stream().min(Comparator.comparing(e -> (mc.player.squaredDistanceTo(e.getPos())))).orElse(null);
             }
             case FOV -> {
-                return first_stage.stream().min(Comparator.comparing(e -> (getFOVAngle(e)))).orElse(null);
+                return first_stage.stream().min(Comparator.comparing(this::getFOVAngle)).orElse(null);
             }
             case Health -> {
                 return first_stage.stream().min(Comparator.comparing(e -> (e.getHealth() + e.getAbsorptionAmount()))).orElse(null);
@@ -548,28 +556,41 @@ public class Aura extends Module {
     }
 
     private boolean skipEntity(Entity entity) {
-        if ((entity instanceof ShulkerBulletEntity || entity instanceof FireballEntity)
+        if (isBullet(entity)) return false;
+        if (!(entity instanceof LivingEntity ent)) return true;
+        if (ent.isDead() || !entity.isAlive()) return true;
+        if (entity instanceof ArmorStandEntity) return true;
+        if (entity instanceof CatEntity) return true;
+        if (skipNotSelected(entity)) return true;
+
+        if (entity instanceof PlayerEntity player) {
+            if(ModuleManager.antiBot.isEnabled() && AntiBot.bots.contains(entity))
+                return true;
+            if (player == mc.player || ThunderHack.friendManager.isFriend(player))
+                return true;
+            if (player.isCreative() && ignoreCreativ.getValue())
+                return true;
+            if (player.isInvisible() && ignoreInvisible.getValue())
+                return true;
+        }
+
+        return distanceFromHead(entity.getPos()) > getRotateDistance() * getRotateDistance();
+    }
+
+    private boolean isBullet(Entity entity){
+        return (entity instanceof ShulkerBulletEntity || entity instanceof FireballEntity)
                 && entity.isAlive()
                 && distanceFromHead(entity.getPos()) < getRotateDistance() * getRotateDistance()
-                && Projectiles.getValue())
-            return false;
-        if (!(entity instanceof LivingEntity ent)) return true;
-        if (ent.isDead()) return true;
-        if (!entity.isAlive()) return true;
-        if (entity instanceof ArmorStandEntity) return true;
-        if (ModuleManager.antiBot.isEnabled() && AntiBot.bots.contains(entity)) return true;
-        if (entity instanceof CatEntity) return true;
+                && Projectiles.getValue();
+    }
+
+    private boolean skipNotSelected(Entity entity) {
         if ((entity instanceof SlimeEntity) && !Slimes.getValue()) return true;
         if ((entity instanceof PlayerEntity) && !Players.getValue()) return true;
         if ((entity instanceof VillagerEntity) && !Villagers.getValue()) return true;
         if ((entity instanceof MobEntity) && !Mobs.getValue()) return true;
         if ((entity instanceof AnimalEntity) && !Animals.getValue()) return true;
-        if ((entity instanceof PlayerEntity) && entity == mc.player) return true;
-        if ((entity instanceof PlayerEntity) && ((PlayerEntity) entity).isCreative() && ignoreCreativ.getValue())
-            return true;
-        if ((entity instanceof PlayerEntity) && entity.isInvisible() && ignoreInvisible.getValue()) return true;
-        if ((entity instanceof PlayerEntity) && ThunderHack.friendManager.isFriend((PlayerEntity) entity)) return true;
-        return distanceFromHead(entity.getPos()) > getRotateDistance() * getRotateDistance();
+        return false;
     }
 
     private float getFOVAngle(@NotNull LivingEntity e) {

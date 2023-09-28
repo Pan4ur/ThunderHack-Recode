@@ -384,13 +384,14 @@ public class AutoCrystal extends Module {
         if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < pauseHP.getValue())
             return false;
 
-        if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL && autoGapple.getValue() && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE) {
+        if (!offhand && autoGapple.getValue() && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
             return false;
-        }
 
-        boolean silent = autoSwitch.getValue() == Switch.SILENT || antiWeakness.getValue() == Switch.SILENT || autoSwitch.getValue() == Switch.INVENTORY || antiWeakness.getValue() == Switch.INVENTORY;
+        boolean silentWeakness = antiWeakness.getValue() == Switch.SILENT || antiWeakness.getValue() == Switch.INVENTORY;
 
-        return !switchPause.getValue() || switchTimer.passedMs(switchDelay.getValue()) || silent;
+        boolean silent = autoSwitch.getValue() == Switch.SILENT || autoSwitch.getValue() == Switch.INVENTORY;
+
+        return !switchPause.getValue() || switchTimer.passedMs(switchDelay.getValue()) || silent || silentWeakness;
     }
 
     public boolean rotationMarkedDirty() {
@@ -433,7 +434,7 @@ public class AutoCrystal extends Module {
         if (antiWeakness.getValue() != Switch.NONE) {
             if (weaknessEffect != null && (strengthEffect == null || strengthEffect.getAmplifier() < weaknessEffect.getAmplifier())) {
                 if (!(mc.player.getMainHandStack().getItem() instanceof SwordItem)) {
-                    prevSlot = doAntiWeakness(swordResult, swordResultInv, antiWeakness);
+                    prevSlot = switchTo(swordResult, swordResultInv, antiWeakness);
                 }
             }
         }
@@ -478,12 +479,12 @@ public class AutoCrystal extends Module {
         return false;
     }
 
-    private int doAntiWeakness(SearchInvResult swordResult, SearchInvResult swordResultInv, @NotNull Setting<Switch> antiWeakness) {
+    private int switchTo(SearchInvResult result, SearchInvResult resultInv, @NotNull Setting<Switch> antiWeakness) {
         int prevSlot = mc.player.getInventory().selectedSlot;
         if (antiWeakness.getValue() != Switch.INVENTORY) {
-            swordResult.switchTo();
-        } else if (swordResultInv.found()) {
-            prevSlot = swordResultInv.slot();
+            result.switchTo();
+        } else if (resultInv.found()) {
+            prevSlot = resultInv.slot();
             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
             sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
         }
@@ -496,38 +497,26 @@ public class AutoCrystal extends Module {
         SearchInvResult crystalResult = InventoryUtility.findItemInHotBar(Items.END_CRYSTAL);
         SearchInvResult crystalResultInv = InventoryUtility.findItemInInventory(Items.END_CRYSTAL);
 
+        boolean offhand = mc.player.getOffHandStack().getItem() instanceof EndCrystalItem;
+
+        boolean holdingCrystal = mc.player.getMainHandStack().getItem() instanceof EndCrystalItem || offhand;
+
         if (rotate.getValue() && !rotated)
             return;
 
-        Box posBoundingBox = new Box(bhr.getBlockPos().up());
+        Box posBB = new Box(bhr.getBlockPos().up());
 
         if (!ccPlace.getValue())
-            posBoundingBox = posBoundingBox.expand(0, 1f, 0);
+            posBB = posBB.expand(0, 1f, 0);
 
-        Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
-        for (Entity ent : entities) {
-            if (ent == null) continue;
-            if (ent.getBoundingBox().intersects(posBoundingBox)) {
-                if (ent instanceof ExperienceOrbEntity)
-                    continue;
-                if (ent instanceof EndCrystalEntity && deadCrystals.containsKey(ent))
-                    continue;
-
-                return;
-            }
-        }
-
-        if (autoSwitch.getValue() != Switch.NONE) {
-            if (mc.player.getMainHandStack().getItem() != Items.END_CRYSTAL && mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL) {
-                prevSlot = doAntiWeakness(crystalResult, crystalResultInv, autoSwitch);
-            }
-        }
-
-        if (mc.player.getMainHandStack().getItem() != Items.END_CRYSTAL && mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL)
+        if(checkOtherEntities(posBB))
             return;
 
-        boolean offhand = mc.player.getOffHandStack().getItem() instanceof EndCrystalItem;
+        if (autoSwitch.getValue() != Switch.NONE && !holdingCrystal)
+            prevSlot = switchTo(crystalResult, crystalResultInv, autoSwitch);
 
+        if (!holdingCrystal)
+            return;
 
         sendPacket(new PlayerInteractBlockC2SPacket(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
         mc.player.swingHand(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND);
@@ -543,13 +532,33 @@ public class AutoCrystal extends Module {
         renderPositions.put(bhr.getBlockPos(), System.currentTimeMillis());
         tickBusy = true;
 
-        if (autoSwitch.getValue() == Switch.SILENT && prevSlot != -1) {
-            mc.player.getInventory().selectedSlot = prevSlot;
-            sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
+        postPlaceSwitch(prevSlot);
+    }
+
+    private boolean checkOtherEntities(Box posBoundingBox){
+        Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
+        for (Entity ent : entities) {
+            if (ent == null) continue;
+            if (ent.getBoundingBox().intersects(posBoundingBox)) {
+                if (ent instanceof ExperienceOrbEntity)
+                    continue;
+                if (ent instanceof EndCrystalEntity && deadCrystals.containsKey(ent))
+                    continue;
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void postPlaceSwitch(int slot){
+        if (autoSwitch.getValue() == Switch.SILENT && slot != -1) {
+            mc.player.getInventory().selectedSlot = slot;
+            sendPacket(new UpdateSelectedSlotC2SPacket(slot));
         }
 
-        if (autoSwitch.getValue() == Switch.INVENTORY && prevSlot != -1) {
-            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+        if (autoSwitch.getValue() == Switch.INVENTORY && slot != -1) {
+            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
             sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
         }
     }
@@ -995,7 +1004,6 @@ public class AutoCrystal extends Module {
         }
     }
 
-
     @EventHandler
     public void onCrystalRemove(EventEntityRemoved e) {
         if (e.entity != null && e.entity instanceof EndCrystalEntity) {
@@ -1010,7 +1018,6 @@ public class AutoCrystal extends Module {
             }
         }
     }
-
 
     private class PlaceThread extends Thread {
         @Override

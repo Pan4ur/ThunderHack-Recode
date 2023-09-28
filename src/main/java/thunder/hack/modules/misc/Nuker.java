@@ -148,8 +148,7 @@ public class Nuker extends Module {
                             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, b, Direction.UP, PlayerUtility.getWorldActionId(mc.world)));
                             mc.interactionManager.breakBlock(b);
                             mc.player.swingHand(Hand.MAIN_HAND);
-                        } catch (Exception ignored) {
-                        }
+                        } catch (Exception ignored) {}
                     }
                 }
             }
@@ -175,9 +174,8 @@ public class Nuker extends Module {
     public void onRender3D(MatrixStack stack) {
         BlockPos renderBp = null;
 
-        if (blockData != null && blockData.bp != null) {
+        if (blockData != null && blockData.bp != null)
             renderBp = blockData.bp;
-        }
 
         if (renderBp != null) {
             Color color1 = colorMode.getValue() == ColorMode.Sync ? HudEditor.getColor(1) : color.getValue().getColorObject();
