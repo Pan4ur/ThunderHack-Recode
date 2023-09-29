@@ -12,7 +12,7 @@ import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
 public class OpenFolderCommand extends Command {
     public OpenFolderCommand() {
-        super("openfolder");
+        super("openfolder", "folder");
     }
 
     @Override

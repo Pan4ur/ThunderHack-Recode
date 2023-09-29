@@ -14,10 +14,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
@@ -35,6 +32,7 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.world.HoleUtility;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -341,38 +339,57 @@ public class AutoAnchor extends Module {
             while (isEnabled()) {
                 try {
                     sleep(placeTimeout.getValue());
+
                 } catch (InterruptedException ignored) {
                 }
 
                 while (ticking.get()) {
                 }
 
-                if (target == null || targetPos == null)
+                if (target == null || targetPos == null || shouldPause())
                     continue;
 
                 BlockPos targetPosCopy = new BlockPos(targetPos);
 
-
-                if (!isCorrectPos(targetPosCopy) || shouldPause())
-                    continue;
-
-                SearchInvResult anchor = InventoryUtility.getAnchor();
-                if (!anchor.found() && anchorDisable.getValue()) {
-                    disable(isRu() ? "В хотбаре не найдены якоря возрождения! Выключение..." : "No respawn anchors in hotbar! Disabling...");
-                    return;
-                }
-
-                if (placeRotate.getValue() == RotateMode.Normal) {
-                    BlockHitResult bhr = InteractionUtility.getPlaceResult(targetPosCopy, interactMode.getValue(), false);
-                    if (bhr != null) {
-                        rotations = bhr.getPos();
+                if (!isCorrectPos(targetPosCopy)) {
+                    if (mc.world.getBlockState(targetPosCopy.up(2)).isReplaceable() && HoleUtility.isHole(mc.player.getBlockPos())) {
+                        BlockPos placePos = null;
+                        for (int i = 2; i > 0; i--) {
+                            for (Vec3i vec : HoleUtility.VECTOR_PATTERN) {
+                                BlockPos checkPos = targetPosCopy.up(i).add(vec);
+                                if (InteractionUtility.canPlaceBlock(checkPos, interactMode.getValue(), false)) {
+                                    placePos = checkPos;
+                                    break;
+                                }
+                            }
+                            if (placePos != null) break;
+                        }
+                        if (placePos != null) doPlace(placePos);
                     }
+                    continue;
                 }
 
-                boolean result = InteractionUtility.placeBlock(targetPosCopy, placeRotate.getValue() == RotateMode.Packet, interactMode.getValue(), placeMode.getValue(), anchor, switchBack.getValue(), false);
-                if (result)
-                    ownAnchors.add(targetPosCopy);
+                doPlace(targetPosCopy);
             }
+        }
+
+        private void doPlace(BlockPos pos) {
+            SearchInvResult anchor = InventoryUtility.getAnchor();
+            if (!anchor.found() && anchorDisable.getValue()) {
+                disable(isRu() ? "В хотбаре не найдены якоря возрождения! Выключение..." : "No respawn anchors in hotbar! Disabling...");
+                return;
+            }
+
+            if (placeRotate.getValue() == RotateMode.Normal) {
+                BlockHitResult bhr = InteractionUtility.getPlaceResult(pos, interactMode.getValue(), false);
+                if (bhr != null) {
+                    rotations = bhr.getPos();
+                }
+            }
+
+            boolean result = InteractionUtility.placeBlock(pos, placeRotate.getValue() == RotateMode.Packet, interactMode.getValue(), placeMode.getValue(), anchor, switchBack.getValue(), false);
+            if (result)
+                ownAnchors.add(pos);
         }
 
         private synchronized boolean isCorrectPos(@NotNull BlockPos pos) {

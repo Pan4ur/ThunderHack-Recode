@@ -6,10 +6,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.PickaxeItem;
-import net.minecraft.item.SwordItem;
+import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
@@ -23,7 +20,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -36,13 +32,13 @@ import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.BlockAnimationUtility;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
@@ -95,7 +91,7 @@ public class Surround extends Module {
         All
     }
 
-    private enum  Sequential{
+    private enum Sequential {
         PlaceEat,
         EatPlace,
         None
@@ -107,7 +103,6 @@ public class Surround extends Module {
 
     private int delay;
     private double prevY;
-    private BlockPos currentPlacePos = null;
 
     public Surround() {
         super("Surround", "Окружает тебя блоками", Category.COMBAT);
@@ -117,7 +112,6 @@ public class Surround extends Module {
     public void onEnable() {
         if (mc.player == null) return;
 
-        currentPlacePos = null;
         delay = 0;
         prevY = mc.player.getY();
 
@@ -153,7 +147,6 @@ public class Surround extends Module {
             BlockPos targetBlock = getSequentialPos();
             if (targetBlock == null)
                 return;
-            currentPlacePos = targetBlock;
             if (placeBlock(targetBlock)) {
                 sequentialBlocks.add(targetBlock);
                 delay = placeDelay.getValue();
@@ -161,14 +154,13 @@ public class Surround extends Module {
             }
         } else {
             int placed = 0;
-            if(delay > 0) return;
+            if (delay > 0) return;
             while (placed < blocksPerTick.getValue()) {
                 if (getSlot() == -1) disable(isRu() ? "Нет блоков!" : "No blocks!");
 
                 BlockPos targetBlock = getSequentialPos();
                 if (targetBlock == null)
                     break;
-                currentPlacePos = targetBlock;
 
                 if (placeBlock(targetBlock)) {
                     placed++;
@@ -207,7 +199,6 @@ public class Surround extends Module {
     private void handleSurroundBreak() {
         BlockPos bp = getSequentialPos();
         if (bp != null) {
-            currentPlacePos = bp;
             if (placeBlock(bp))
                 inactivityTimer.reset();
         }
@@ -217,7 +208,6 @@ public class Surround extends Module {
         if (sequentialBlocks.contains(pos)) {
             BlockPos bp = getSequentialPos();
             if (bp != null) {
-                currentPlacePos = bp;
                 if (placeBlock(bp)) {
                     sequentialBlocks.add(bp);
                     sequentialBlocks.remove(pos);
@@ -234,10 +224,10 @@ public class Surround extends Module {
         if (slot == -1)
             return false;
 
-        if(useSequential.getValue() != Sequential.None) {
-            if (useSequential.getValue() == Sequential.PlaceEat && mc.player.isUsingItem())
+        if (useSequential.getValue() != Sequential.None) {
+            if (useSequential.getValue() == Sequential.PlaceEat && PlayerUtility.isEating())
                 mc.options.useKey.setPressed(false);
-            else if (useSequential.getValue() == Sequential.EatPlace && mc.player.isUsingItem())
+            else if (useSequential.getValue() == Sequential.EatPlace && PlayerUtility.isEating())
                 return false;
         }
 
@@ -262,16 +252,20 @@ public class Surround extends Module {
         return validInteraction;
     }
 
-    private boolean removeCrystal(Entity entity) {
-        if (fullNullCheck() || !(entity instanceof EndCrystalEntity) || !attackTimer.passedMs(breakDelay.getValue()) || mc.player.squaredDistanceTo(entity) > 25 || !breakCrystal.getValue()) return false;
+    private void removeCrystal(Entity entity) {
+        if (fullNullCheck() || !(entity instanceof EndCrystalEntity) || !attackTimer.passedMs(breakDelay.getValue()) || mc.player.squaredDistanceTo(entity) > 25 || !breakCrystal.getValue())
+            return;
         if (antiSelfPop.getValue() && mc.player.getHealth() + mc.player.getAbsorptionAmount() - ExplosionUtility.getSelfExplosionDamage(entity.getPos()) <= 2)
-            return false;
+            return;
 
         int preSlot = mc.player.getInventory().selectedSlot;
         if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
-            final SearchInvResult result = InventoryUtility.findInHotBar(stack -> stack.getItem() instanceof SwordItem || stack.getItem() instanceof PickaxeItem);
+            final SearchInvResult result = InventoryUtility.findInHotBar(stack -> stack.getItem() instanceof SwordItem
+                    || stack.getItem() instanceof PickaxeItem
+                    || stack.getItem() instanceof ShovelItem
+                    || stack.getItem() instanceof AxeItem);
             if (!result.found())
-                return false;
+                return;
 
             result.switchTo();
         }
@@ -292,17 +286,16 @@ public class Surround extends Module {
         if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
             InventoryUtility.switchTo(preSlot);
         }
-        return true;
     }
 
     private @Nullable BlockPos getSequentialPos() {
         if (mc.player == null || mc.world == null) return null;
 
         for (BlockPos bp : getBlocks()) {
-            for(Entity ent : mc.world.getEntities()){
-                if(!(ent instanceof EndCrystalEntity) || mc.player.squaredDistanceTo(ent.getPos()) > 25) continue;
+            for (Entity ent : mc.world.getEntities()) {
+                if (!(ent instanceof EndCrystalEntity) || mc.player.squaredDistanceTo(ent.getPos()) > 25) continue;
 
-                if(ent.getBoundingBox().intersects(new Box(bp))){
+                if (ent.getBoundingBox().intersects(new Box(bp))) {
                     removeCrystal(ent);
                 }
             }
@@ -455,20 +448,15 @@ public class Surround extends Module {
         int slot = -1;
 
         if (mc.player == null) return slot;
-        final ItemStack mainhandStack = mc.player.getMainHandStack();
-        if (mainhandStack != ItemStack.EMPTY && mainhandStack.getItem() instanceof BlockItem) {
-            final Block blockFromMainhandItem = ((BlockItem) mainhandStack.getItem()).getBlock();
-            if (canUseBlocks.contains(blockFromMainhandItem)) {
+        final ItemStack mainHandStack = mc.player.getMainHandStack();
+        if (mainHandStack != ItemStack.EMPTY && mainHandStack.getItem() instanceof BlockItem) {
+            final Block blockFromMainHandItem = ((BlockItem) mainHandStack.getItem()).getBlock();
+            if (canUseBlocks.contains(blockFromMainHandItem)) {
                 slot = mc.player.getInventory().selectedSlot;
             }
         }
 
-
-        if (slot == -1) {
-            return InventoryUtility.findBlockInHotBar(canUseBlocks).slot();
-        }
-
-        return slot;
+        return slot == -1 ? InventoryUtility.findBlockInHotBar(canUseBlocks).slot() : slot;
     }
 
     private @Nullable BlockPos getPlayerPos() {

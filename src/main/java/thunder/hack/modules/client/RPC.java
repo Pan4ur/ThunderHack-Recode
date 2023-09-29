@@ -20,7 +20,6 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 
 public
 class RPC extends Module {
-
     private static final DiscordRPC rpc = DiscordRPC.INSTANCE;
     public static Setting<mode> Mode = new Setting<>("Picture", mode.Recode);
     public static Setting<Boolean> showIP = new Setting<>("ShowIP", true);
@@ -159,7 +158,7 @@ class RPC extends Module {
         return result;
     }
 
-    private String getNexusDetails() {
+    private @NotNull String getNexusDetails() {
         if (isOn(-150, -3, -146, 1))
             return "(фармит на плите)";
         else if (isOn(-120, 10, -82, 46))

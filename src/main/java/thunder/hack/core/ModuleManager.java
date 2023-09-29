@@ -306,7 +306,7 @@ public class ModuleManager {
 
     public void onUnloadPost() {
         for (Module module : modules) {
-            module.enabled.setValue(false);
+            module.setEnabled(false);
         }
     }
 
