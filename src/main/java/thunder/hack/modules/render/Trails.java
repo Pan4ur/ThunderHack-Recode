@@ -60,7 +60,7 @@ public class Trails extends Module {
     }
 
     private enum Players {
-        Trail, Particles, None
+        Trail, Particles, Cute, None
     }
 
 
@@ -91,7 +91,7 @@ public class Trails extends Module {
                 float alpha = color.getValue().getAlpha() / 255f;
 
 
-                if (((IEntity) entity).getTrails().size() > 0) {
+                if (!((IEntity) entity).getTrails().isEmpty()) {
                     stack.push();
                     RenderSystem.disableCull();
                     Tessellator tessellator = Tessellator.getInstance();
@@ -126,6 +126,83 @@ public class Trails extends Module {
                 }
             }
             RenderSystem.disableDepthTest();
+        } else if(players.getValue() == Players.Cute){
+            for (PlayerEntity entity : mc.world.getPlayers()) {
+                // if (entity == mc.player && mc.options.getPerspective().isFirstPerson())
+                //     continue;
+
+                float alpha = color.getValue().getAlpha() / 255f;
+
+
+                if (!((IEntity) entity).getTrails().isEmpty()) {
+                    stack.push();
+                    RenderSystem.disableCull();
+                    Tessellator tessellator = Tessellator.getInstance();
+                    BufferBuilder bufferBuilder = tessellator.getBuffer();
+
+                    RenderSystem.enableBlend();
+                    RenderSystem.defaultBlendFunc();
+                    RenderSystem.enableDepthTest();
+                    RenderSystem.depthFunc(GL11.GL_LEQUAL);
+
+                    float step = (float) (mc.player.getBoundingBox().getLengthY() / 5f);
+
+                    RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+                    bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+                    for (int i = 0; i < ((IEntity) entity).getTrails().size(); i++) {
+                        Trail ctx = ((IEntity) entity).getTrails().get(i);
+                        Vec3d pos = ctx.interpolate(mc.getTickDelta());
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(69, 221, 255), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(69, 221, 255), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
+                    }
+                    tessellator.draw();
+
+                    RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+                    bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+                    for (int i = 0; i < ((IEntity) entity).getTrails().size(); i++) {
+                        Trail ctx = ((IEntity) entity).getTrails().get(i);
+                        Vec3d pos = ctx.interpolate(mc.getTickDelta());
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(248, 139, 160), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step * 2, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(248, 139, 160), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
+                    }
+                    tessellator.draw();
+
+                    RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+                    bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+                    for (int i = 0; i < ((IEntity) entity).getTrails().size(); i++) {
+                        Trail ctx = ((IEntity) entity).getTrails().get(i);
+                        Vec3d pos = ctx.interpolate(mc.getTickDelta());
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step * 2, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(255, 255, 255), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step * 3, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(255, 255, 255), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
+                    }
+                    tessellator.draw();
+
+                    RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+                    bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+                    for (int i = 0; i < ((IEntity) entity).getTrails().size(); i++) {
+                        Trail ctx = ((IEntity) entity).getTrails().get(i);
+                        Vec3d pos = ctx.interpolate(mc.getTickDelta());
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step * 3, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(248, 139, 160), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step * 4, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(248, 139, 160), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
+                    }
+                    tessellator.draw();
+
+                    RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+                    bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+                    for (int i = 0; i < ((IEntity) entity).getTrails().size(); i++) {
+                        Trail ctx = ((IEntity) entity).getTrails().get(i);
+                        Vec3d pos = ctx.interpolate(mc.getTickDelta());
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step * 4, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(69, 221, 255), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step * 5, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(69, 221, 255), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
+                    }
+                    tessellator.draw();
+
+                    Render3DEngine.cleanup();
+                    RenderSystem.enableCull();
+                    RenderSystem.disableDepthTest();
+                    stack.pop();
+                }
+            }
         }
     }
 
@@ -150,8 +227,6 @@ public class Trails extends Module {
                 particles.add(new Particle(mc.player.getX(), MathUtility.random((float) (mc.player.getY() + mc.player.getHeight()), (float) mc.player.getY()), mc.player.getZ(), c));
             }
         }
-        ((IEntity) mc.player).getTrails().removeIf(Trail::update);
-
         particles.removeIf(particle -> System.currentTimeMillis() - particle.time > 1000f * lifeTime.getValue());
     }
 
