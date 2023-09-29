@@ -73,6 +73,7 @@ public class AutoCrystal extends Module {
     private final Setting<Interact> interact = new Setting<>("Interact", Interact.Default, v -> page.getValue() == Pages.Place);
     private final Setting<Boolean> oldVer = new Setting<>("1.12", false, v -> page.getValue() == Pages.Place);
     private final Setting<Boolean> ccPlace = new Setting<>("CC", true, v -> page.getValue() == Pages.Place);
+    private final Setting<Boolean> instantPlace = new Setting<>("InstantPlace", true, v -> page.getValue() == Pages.Place);
     private final Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 0, 0, 1000, v -> page.getValue() == Pages.Place);
     private final Setting<Float> placeRange = new Setting<>("PlaceRange", 5f, 1.0f, 6f, v -> page.getValue() == Pages.Place);
     private final Setting<Float> placeWallRange = new Setting<>("PlaceWallRange", 3.5f, 1.0f, 6f, v -> page.getValue() == Pages.Place);
@@ -132,7 +133,6 @@ public class AutoCrystal extends Module {
     /* MULTITHREADING */
     private final Setting<Boolean> multiThread = new Setting<>("MultiThread", false, v -> page.getValue() == Pages.MultiThread);
 
-
     private enum Pages {Place, Break, Pause, Render, Damages, Main, Switch, Remove, MultiThread}
 
     private enum Switch {NONE, NORMAL, SILENT, INVENTORY}
@@ -150,7 +150,6 @@ public class AutoCrystal extends Module {
     public enum Render {Fade, Slide, Default}
 
     public enum Remove {OFF, Fake, ON}
-
 
     public static PlayerEntity target;
     private BlockHitResult bestPosition;
@@ -182,7 +181,6 @@ public class AutoCrystal extends Module {
     // Threads
     private PlaceThread placeThread;
     private BreakThread breakThread;
-    private final AtomicBoolean ticking = new AtomicBoolean(false);
     private final AtomicBoolean stopThreads = new AtomicBoolean(false);
 
     public AutoCrystal() {
@@ -345,8 +343,8 @@ public class AutoCrystal extends Module {
                         int alpha = (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)));
                         Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(fillColor.getValue().getColorObject(), alpha));
                         Render3DEngine.drawBoxOutline(new Box(pos), Render2DEngine.injectAlpha(lineColor.getValue().getColorObject(), alpha), lineWidth.getValue());
-                        if(drawDamage.getValue())
-                            Render3DEngine.drawTextIn3D(dmg, pos.toCenterPos(), 0, 0.1, 0, Render2DEngine.injectAlpha(textColor.getValue().getColorObject(), alpha));
+                        if (drawDamage.getValue())
+                            Render3DEngine.drawTextIn3D(dmg, pos.toCenterPos(), 0, 0.1, 0, Render2DEngine.applyOpacity(textColor.getValue().getColorObject(), alpha / 100f));
                     }
                 });
             } else if (renderMode.getValue() == Render.Slide && renderPos != null) {
@@ -356,14 +354,14 @@ public class AutoCrystal extends Module {
                 Box interpolatedBox = Render3DEngine.interpolateBox(new Box(prevRenderPos), new Box(renderPos), mult);
                 Render3DEngine.drawFilledBox(stack, interpolatedBox, fillColor.getValue().getColorObject());
                 Render3DEngine.drawBoxOutline(interpolatedBox, lineColor.getValue().getColorObject(), lineWidth.getValue());
-                if(drawDamage.getValue())
+                if (drawDamage.getValue())
                     Render3DEngine.drawTextIn3D(dmg, interpolatedBox.getCenter(), 0, 0.1, 0, textColor.getValue().getColorObject());
             } else if (renderPos != null) {
                 Box box = new Box(renderPos);
                 if (renderPositions.isEmpty()) return;
                 Render3DEngine.drawFilledBox(stack, box, fillColor.getValue().getColorObject());
                 Render3DEngine.drawBoxOutline(box, lineColor.getValue().getColorObject(), lineWidth.getValue());
-                if(drawDamage.getValue())
+                if (drawDamage.getValue())
                     Render3DEngine.drawTextIn3D(dmg, box.getCenter(), 0, 0.1, 0, textColor.getValue().getColorObject());
             }
         }
@@ -386,13 +384,14 @@ public class AutoCrystal extends Module {
         if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < pauseHP.getValue())
             return false;
 
-        if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL && autoGapple.getValue() && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE) {
+        if (!offhand && autoGapple.getValue() && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
             return false;
-        }
 
-        boolean silent = autoSwitch.getValue() == Switch.SILENT || antiWeakness.getValue() == Switch.SILENT || autoSwitch.getValue() == Switch.INVENTORY || antiWeakness.getValue() == Switch.INVENTORY;
+        boolean silentWeakness = antiWeakness.getValue() == Switch.SILENT || antiWeakness.getValue() == Switch.INVENTORY;
 
-        return !switchPause.getValue() || switchTimer.passedMs(switchDelay.getValue()) || silent;
+        boolean silent = autoSwitch.getValue() == Switch.SILENT || autoSwitch.getValue() == Switch.INVENTORY;
+
+        return !switchPause.getValue() || switchTimer.passedMs(switchDelay.getValue()) || silent || silentWeakness;
     }
 
     public boolean rotationMarkedDirty() {
@@ -435,7 +434,7 @@ public class AutoCrystal extends Module {
         if (antiWeakness.getValue() != Switch.NONE) {
             if (weaknessEffect != null && (strengthEffect == null || strengthEffect.getAmplifier() < weaknessEffect.getAmplifier())) {
                 if (!(mc.player.getMainHandStack().getItem() instanceof SwordItem)) {
-                    prevSlot = doAntiWeakness(swordResult, swordResultInv, antiWeakness);
+                    prevSlot = switchTo(swordResult, swordResultInv, antiWeakness);
                 }
             }
         }
@@ -480,12 +479,12 @@ public class AutoCrystal extends Module {
         return false;
     }
 
-    private int doAntiWeakness(SearchInvResult swordResult, SearchInvResult swordResultInv, @NotNull Setting<Switch> antiWeakness) {
+    private int switchTo(SearchInvResult result, SearchInvResult resultInv, @NotNull Setting<Switch> antiWeakness) {
         int prevSlot = mc.player.getInventory().selectedSlot;
         if (antiWeakness.getValue() != Switch.INVENTORY) {
-            swordResult.switchTo();
-        } else if (swordResultInv.found()) {
-            prevSlot = swordResultInv.slot();
+            result.switchTo();
+        } else if (resultInv.found()) {
+            prevSlot = resultInv.slot();
             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
             sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
         }
@@ -498,38 +497,26 @@ public class AutoCrystal extends Module {
         SearchInvResult crystalResult = InventoryUtility.findItemInHotBar(Items.END_CRYSTAL);
         SearchInvResult crystalResultInv = InventoryUtility.findItemInInventory(Items.END_CRYSTAL);
 
+        boolean offhand = mc.player.getOffHandStack().getItem() instanceof EndCrystalItem;
+
+        boolean holdingCrystal = mc.player.getMainHandStack().getItem() instanceof EndCrystalItem || offhand;
+
         if (rotate.getValue() && !rotated)
             return;
 
-        Box posBoundingBox = new Box(bhr.getBlockPos().up());
+        Box posBB = new Box(bhr.getBlockPos().up());
 
         if (!ccPlace.getValue())
-            posBoundingBox = posBoundingBox.expand(0, 1f, 0);
+            posBB = posBB.expand(0, 1f, 0);
 
-        Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
-        for (Entity ent : entities) {
-            if (ent == null) continue;
-            if (ent.getBoundingBox().intersects(posBoundingBox)) {
-                if (ent instanceof ExperienceOrbEntity)
-                    continue;
-                if (ent instanceof EndCrystalEntity && deadCrystals.containsKey(ent))
-                    continue;
-
-                return;
-            }
-        }
-
-        if (autoSwitch.getValue() != Switch.NONE) {
-            if (mc.player.getMainHandStack().getItem() != Items.END_CRYSTAL && mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL) {
-                prevSlot = doAntiWeakness(crystalResult, crystalResultInv, autoSwitch);
-            }
-        }
-
-        if (mc.player.getMainHandStack().getItem() != Items.END_CRYSTAL && mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL)
+        if(checkOtherEntities(posBB))
             return;
 
-        boolean offhand = mc.player.getOffHandStack().getItem() instanceof EndCrystalItem;
+        if (autoSwitch.getValue() != Switch.NONE && !holdingCrystal)
+            prevSlot = switchTo(crystalResult, crystalResultInv, autoSwitch);
 
+        if (!holdingCrystal)
+            return;
 
         sendPacket(new PlayerInteractBlockC2SPacket(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
         mc.player.swingHand(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND);
@@ -545,13 +532,33 @@ public class AutoCrystal extends Module {
         renderPositions.put(bhr.getBlockPos(), System.currentTimeMillis());
         tickBusy = true;
 
-        if (autoSwitch.getValue() == Switch.SILENT && prevSlot != -1) {
-            mc.player.getInventory().selectedSlot = prevSlot;
-            sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
+        postPlaceSwitch(prevSlot);
+    }
+
+    private boolean checkOtherEntities(Box posBoundingBox){
+        Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
+        for (Entity ent : entities) {
+            if (ent == null) continue;
+            if (ent.getBoundingBox().intersects(posBoundingBox)) {
+                if (ent instanceof ExperienceOrbEntity)
+                    continue;
+                if (ent instanceof EndCrystalEntity && deadCrystals.containsKey(ent))
+                    continue;
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void postPlaceSwitch(int slot){
+        if (autoSwitch.getValue() == Switch.SILENT && slot != -1) {
+            mc.player.getInventory().selectedSlot = slot;
+            sendPacket(new UpdateSelectedSlotC2SPacket(slot));
         }
 
-        if (autoSwitch.getValue() == Switch.INVENTORY && prevSlot != -1) {
-            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+        if (autoSwitch.getValue() == Switch.INVENTORY && slot != -1) {
+            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
             sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
         }
     }
@@ -841,7 +848,7 @@ public class AutoCrystal extends Module {
             if (PlayerUtility.squaredDistanceFromEyes(crystalVector) > placeWallRange.getPow2Value())
                 return null;
 
-        return new BlockHitResult(crystalVector, Direction.DOWN, bp, false);
+        return new BlockHitResult(crystalVector, mc.world.isInBuildLimit(bp.up()) ? Direction.UP : Direction.DOWN, bp, false);
     }
 
     public BlockHitResult getStrictInteract(BlockPos bp) {
@@ -916,7 +923,7 @@ public class AutoCrystal extends Module {
         if (remove.getValue() == Remove.ON && !deadCrystals.isEmpty()) {
             Map<EndCrystalEntity, Long> cache = new HashMap<>(deadCrystals);
             cache.forEach((crystal, time) -> {
-                if (System.currentTimeMillis() - time > removeDelay.getValue()) {
+                if (System.currentTimeMillis() - time >= removeDelay.getValue()) {
                     crystal.kill();
                     crystal.setRemoved(Entity.RemovalReason.KILLED);
                     crystal.onRemoved();
@@ -934,8 +941,6 @@ public class AutoCrystal extends Module {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTick(EventTick e) {
-        ticking.set(true);
-
         if (multiThread.getValue())
             return;
 
@@ -943,11 +948,6 @@ public class AutoCrystal extends Module {
             calcPosition();
             getCrystalToExplode();
         }).start();
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPostTick(EventPostTick e) {
-        ticking.set(false);
     }
 
     @EventHandler
@@ -959,8 +959,14 @@ public class AutoCrystal extends Module {
                     if (!multiThread.getValue() && timing.getValue() == Timing.NORMAL && (breakDelay.getValue() == 0 || breakTimer.passedMs(breakDelay.getValue()))) {
                         new Thread(() -> {
                             getCrystalToExplode();
-                            if (bestCrystal == e.getEntity()) {
+                            if (bestCrystal == e.getEntity())
                                 attackCrystal((EndCrystalEntity) e.getEntity());
+
+                            if (target != null && instantPlace.getValue()) {
+                                getPossibleCrystals(target);
+                                if (bestPosition != null) {
+                                    placeCrystal(bestPosition);
+                                }
                             }
                         }).start();
                     }
@@ -981,8 +987,15 @@ public class AutoCrystal extends Module {
                                 EndCrystalEntity fakeCrystal = new EndCrystalEntity(mc.world, spawn.getX(), spawn.getY(), spawn.getZ());
                                 fakeCrystal.setId(spawn.getId());
                                 getCrystalToExplode();
-                                if (bestCrystal == fakeCrystal) {
+
+                                if (bestCrystal == fakeCrystal)
                                     attackCrystal(fakeCrystal);
+
+                                if (target != null && instantPlace.getValue()) {
+                                    getPossibleCrystals(target);
+                                    if (bestPosition != null) {
+                                        placeCrystal(bestPosition);
+                                    }
                                 }
                             }).start();
                         }
@@ -990,7 +1003,6 @@ public class AutoCrystal extends Module {
             }
         }
     }
-
 
     @EventHandler
     public void onCrystalRemove(EventEntityRemoved e) {
@@ -1007,12 +1019,11 @@ public class AutoCrystal extends Module {
         }
     }
 
-
     private class PlaceThread extends Thread {
         @Override
         public void run() {
             while (ModuleManager.autoCrystal.isEnabled()) {
-                while (ticking.get() || !placeTimer.passedMs(placeDelay.getValue())) {
+                while (ThunderHack.asyncManager.ticking.get() || !placeTimer.passedMs(placeDelay.getValue())) {
                 }
 
                 calcPosition();
@@ -1030,7 +1041,7 @@ public class AutoCrystal extends Module {
         @Override
         public void run() {
             while (ModuleManager.autoCrystal.isEnabled()) {
-                while (ticking.get()) {
+                while (ThunderHack.asyncManager.ticking.get()) {
                 }
                 while (!breakTimer.passedMs(breakDelay.getValue())) {
                 }
