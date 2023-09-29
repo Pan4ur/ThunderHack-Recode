@@ -61,8 +61,7 @@ public class Notification {
             case SUCCESS -> icon = "H";
             case INFO -> icon = "J";
             case ENABLED -> icon = "K";
-            case DISABLED -> icon = "I";
-            case ERROR -> icon = "I";
+            case DISABLED, ERROR -> icon = "I";
             case WARNING -> icon = "L";
         }
 
@@ -84,7 +83,7 @@ public class Notification {
         int y1 = (int) posY;
 
 
-        Render2DEngine.drawGradientGlow(matrix, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90),x1, y1, width, height, 5f,10);
+        Render2DEngine.drawGradientGlow(matrix, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), x1, y1, width, height, 5f, 10);
         Render2DEngine.drawGradientRoundShader(matrix, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), x1 - 0.5f, y1 - 0.5f, width + 1, height + 1, 5f);
         Render2DEngine.drawRoundShader(matrix, x1, y1, width, height, 5f, HudEditor.plateColor.getValue().getColorObject());
 

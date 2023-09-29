@@ -11,6 +11,7 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import thunder.hack.modules.client.ClickGui;
@@ -58,7 +59,7 @@ public class FontRenderer implements Closeable {
     private static final Random RND = new Random();
 
 
-    public FontRenderer(Font[] fonts, float sizePx) {
+    public FontRenderer(Font @NotNull [] fonts, float sizePx) {
         Preconditions.checkArgument(fonts.length > 0, "fonts.length == 0");
         this.originalSize = sizePx;
         init(fonts, sizePx);
@@ -69,7 +70,7 @@ public class FontRenderer implements Closeable {
     }
 
 
-    public static String stripControlCodes(String text) {
+    public static @NotNull String stripControlCodes(@NotNull String text) {
         char[] chars = text.toCharArray();
         StringBuilder f = new StringBuilder();
         for (int i = 0; i < chars.length; i++) {
@@ -91,7 +92,7 @@ public class FontRenderer implements Closeable {
         }
     }
 
-    private void init(Font[] fonts, float sizePx) {
+    private void init(Font @NotNull [] fonts, float sizePx) {
         this.previousGameScale = getGuiScale();
         this.scaleMul = this.previousGameScale;
         this.fonts = new Font[fonts.length];
@@ -100,7 +101,7 @@ public class FontRenderer implements Closeable {
         }
     }
 
-    private GlyphMap generateMap(char from, char to) {
+    private @NotNull GlyphMap generateMap(char from, char to) {
         GlyphMap gm = new GlyphMap(from, to, this.fonts, randomIdentifier());
         maps.add(gm);
         return gm;
@@ -121,7 +122,7 @@ public class FontRenderer implements Closeable {
         return allGlyphs.computeIfAbsent(glyph, this::locateGlyph0);
     }
 
-    public void drawString(MatrixStack stack, String s, float x, float y, float r, float g, float b, float a) {
+    public void drawString(@NotNull MatrixStack stack, @NotNull String s, float x, float y, float r, float g, float b, float a) {
         sizeCheck();
         float r2 = r, g2 = g, b2 = b;
         stack.push();
@@ -210,7 +211,7 @@ public class FontRenderer implements Closeable {
         GLYPH_PAGE_CACHE.clear();
     }
 
-    public void drawGradientString(MatrixStack stack, String s, float x, float y, int offset, boolean hud) {
+    public void drawGradientString(@NotNull MatrixStack stack, @NotNull String s, float x, float y, int offset, boolean hud) {
         sizeCheck();
         stack.push();
         stack.translate(x, y, 0);
@@ -343,7 +344,8 @@ public class FontRenderer implements Closeable {
         return (int) mc.getWindow().getScaleFactor();
     }
 
-    public static int[] RGBIntToRGB(int in) {
+    @Contract(value = "_ -> new", pure = true)
+    public static int @NotNull [] RGBIntToRGB(int in) {
         int red = in >> 8 * 2 & 0xFF;
         int green = in >> 8 & 0xFF;
         int blue = in & 0xFF;
@@ -351,7 +353,7 @@ public class FontRenderer implements Closeable {
     }
 
     @Contract(value = "-> new", pure = true)
-    public static Identifier randomIdentifier() {
+    public static @NotNull Identifier randomIdentifier() {
         return new Identifier("thunderhack", "temp/" + randomString(32));
     }
 

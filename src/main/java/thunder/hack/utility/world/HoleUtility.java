@@ -5,6 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +40,8 @@ public final class HoleUtility {
         final List<BlockPos> checkQuad = findQuadPoses(from);
         final List<BlockPos> checkDouble = findDoublePoses(from);
 
-        if (checkQuad != null && checkQuad.size() == 4) return checkQuad;
         if (checkDouble != null && checkDouble.size() == 2) return checkDouble;
+        if (checkQuad != null && checkQuad.size() == 4) return checkQuad;
 
         return List.of(from);
     }
@@ -72,23 +73,15 @@ public final class HoleUtility {
         return quadPoses;
     }
 
-    public static @Nullable List<BlockPos> findDoublePoses(BlockPos checkFrom) {
+    public static @Nullable @Unmodifiable List<BlockPos> findDoublePoses(BlockPos checkFrom) {
         if (mc.world == null) return null;
-        final List<BlockPos> doublePoses = new ArrayList<>();
 
-        doublePoses.add(checkFrom);
+        for (Vec3i vec : VECTOR_PATTERN) {
+            if (mc.world.getBlockState(checkFrom.add(vec)).isReplaceable())
+                return List.of(checkFrom, checkFrom.add(vec));
+        }
 
-        if (mc.world.getBlockState(checkFrom.add(1, 0, 0)).isReplaceable())
-            doublePoses.add(checkFrom.add(1, 0, 0));
-        else if (mc.world.getBlockState(checkFrom.add(-1, 0, 0)).isReplaceable())
-            doublePoses.add(checkFrom.add(-1, 0, 0));
-        else if (mc.world.getBlockState(checkFrom.add(0, 0, 1)).isReplaceable())
-            doublePoses.add(checkFrom.add(0, 0, 1));
-        else if (mc.world.getBlockState(checkFrom.add(0, 0, -1)).isReplaceable())
-            doublePoses.add(checkFrom.add(0, 0, -1));
-
-
-        return doublePoses;
+        return null;
     }
 
     public static boolean isHole(BlockPos pos) {

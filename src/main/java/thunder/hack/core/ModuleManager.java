@@ -61,7 +61,7 @@ public class ModuleManager {
     public static EbatteSratte ebatteSratte = new EbatteSratte();
     public static ChestStealer chestStealer = new ChestStealer();
     public static AutoTpAccept autoTpAccept = new AutoTpAccept();
-    public static AntiSurround antiSurround = new AntiSurround();
+    public static AutoMine autoMine = new AutoMine();
     public static AntiServerRP antiServerRP = new AntiServerRP();
     public static WorldTweaks worldTweaks = new WorldTweaks();
     public static VisualRange visualRange = new VisualRange();

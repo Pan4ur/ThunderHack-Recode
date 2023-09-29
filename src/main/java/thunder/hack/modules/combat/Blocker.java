@@ -2,7 +2,6 @@ package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.item.Item;
@@ -26,14 +25,11 @@ import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.SearchInvResult;
-import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.render.BlockAnimationUtility;
 import thunder.hack.utility.world.HoleUtility;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
@@ -56,13 +52,14 @@ public class Blocker extends Module {
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Normal);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
 
-    private final Setting<Parent> render = new Setting<>("Render", new Parent(false, 0));
-    private final Setting<ColorSetting> fillColor = new Setting<>("Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(render);
-    private final Setting<ColorSetting> lineColor = new Setting<>("Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(render);
-    private final Setting<Integer> lineWidth = new Setting<>("Line Width", 2, 1, 5).withParent(render);
+    private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
+    private final Setting<BlockAnimationUtility.BlockRenderMode> renderMode = new Setting<>("RenderMode", BlockAnimationUtility.BlockRenderMode.All).withParent(renderCategory);
+    private final Setting<BlockAnimationUtility.BlockAnimationMode> animationMode = new Setting<>("AnimationMode", BlockAnimationUtility.BlockAnimationMode.Fade).withParent(renderCategory);
+    private final Setting<ColorSetting> renderFillColor = new Setting<>("RenderFillColor", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
+    private final Setting<ColorSetting> renderLineColor = new Setting<>("RenderLineColor", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
+    private final Setting<Integer> renderLineWidth = new Setting<>("RenderLineWidth", 2, 1, 5).withParent(renderCategory);
 
     private final List<BlockPos> placePositions = new CopyOnWriteArrayList<>();
-    private final Map<BlockPos, Long> renderBlocks = new ConcurrentHashMap<>();
     public static final Timer inactivityTimer = new Timer();
     private int tickCounter = 0;
 
@@ -79,18 +76,6 @@ public class Blocker extends Module {
                 Formatting.RED + "WARNING!!! "
                         + Formatting.RESET + "The use of blocker on servers is condemned by players, and in some countries is punishable by jail!"
         );
-    }
-
-    @Override
-    public void onRender3D(MatrixStack stack) {
-        renderBlocks.forEach((pos, time) -> {
-            if (System.currentTimeMillis() - time > 500) {
-                renderBlocks.remove(pos);
-            } else {
-                Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(fillColor.getValue().getColorObject(), 100));
-                Render3DEngine.drawBoxOutline(new Box(pos), lineColor.getValue().getColorObject(), lineWidth.getValue());
-            }
-        });
     }
 
     @EventHandler
@@ -136,7 +121,7 @@ public class Blocker extends Module {
                         mc.player.swingHand(Hand.MAIN_HAND);
 
                     blocksPlaced++;
-                    renderBlocks.put(pos, System.currentTimeMillis());
+                    BlockAnimationUtility.renderBlock(pos, renderLineColor.getValue().getColorObject(), renderLineWidth.getValue(), renderFillColor.getValue().getColorObject(), animationMode.getValue(), renderMode.getValue());
                     tickCounter = 0;
                     placePositions.remove(pos);
                     inactivityTimer.reset();

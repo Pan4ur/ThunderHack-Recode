@@ -13,7 +13,7 @@ public final class BlockAnimationUtility {
 
     public static void onRender(MatrixStack matrixStack) {
         blocks.forEach((animation, time) -> {
-            if (System.currentTimeMillis() - time > 300f) {
+            if (System.currentTimeMillis() - time > 500) {
                 blocks.remove(animation);
             } else {
                 animation.renderWithTime(System.currentTimeMillis() - time, matrixStack);
@@ -45,28 +45,30 @@ public final class BlockAnimationUtility {
                     }
                 }
                 case Decrease -> {
-                    float scale = 1 - (float) time / 300f;
-                    Box box = new Box(pos);
+                    float scale = 1 - (float) time / 500;
+                    Box box = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
 
-                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Line)
+                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Line) {
                         Render3DEngine.drawBoxOutline(box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), lineColor, lineWidth);
-
-                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Fill)
-                        Render3DEngine.drawFilledBox(stack, box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() * (1f - (time / 300f)))));
+                    }
+                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Fill) {
+                        Render3DEngine.drawFilledBox(stack, box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() * (1f - (time / 500f)))));
+                    }
                 }
                 case Fade -> {
                     Box box = new Box(pos);
                     renderBox(time, stack, box, renderMode, lineColor, lineWidth, fillColor);
                 }
                 case Hover -> {
-                    float scale =  (float) time / 300f;
-                    Box box = new Box(pos);
+                    float scale =  (float) time / 500;
+                    Box box = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
 
-                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Line)
+                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Line) {
                         Render3DEngine.drawBoxOutline(box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), lineColor, lineWidth);
-
-                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Fill)
-                        Render3DEngine.drawFilledBox(stack, box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() * (time / 300f))));
+                    }
+                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Fill) {
+                        Render3DEngine.drawFilledBox(stack, box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() * (time / 500f))));
+                    }
                 }
                 case Flash -> {
                     float scale;
@@ -76,33 +78,36 @@ public final class BlockAnimationUtility {
                         scale = (float) time / 100;
                     }
 
-                    Box box = new Box(pos);
+                    Box box = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
 
-                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Line)
+                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Line) {
                         Render3DEngine.drawBoxOutline(box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), lineColor, lineWidth);
-
-                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Fill)
+                    }
+                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Fill) {
                         Render3DEngine.drawFilledBox(stack, box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() * scale)));
+                    }
                 }
                 case Grow -> {
-                    float scale = (float) time / 300f;
+                    float scale = (float) time / 500;
                     Box box = new Box(pos.getX(), pos.getY() + scale, pos.getZ(), pos.getX() + 1, pos.getY(), pos.getZ() + 1);
 
-                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Line)
+                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Line) {
                         Render3DEngine.drawBoxOutline(box, lineColor, lineWidth);
-
-                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Fill)
-                        Render3DEngine.drawFilledBox(stack, box, Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() *  (time / 300f))));
+                    }
+                    if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Fill) {
+                        Render3DEngine.drawFilledBox(stack, box, Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() *  (time / 500f))));
+                    }
                 }
             }
         }
 
         private static void renderBox(Long time, MatrixStack stack, Box box, BlockRenderMode renderMode, Color lineColor, int lineWidth, Color fillColor) {
-            if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Line)
-                Render3DEngine.drawBoxOutline(box, Render2DEngine.injectAlpha(lineColor, (int) (fillColor.getAlpha() * (1f - (time / 300f)))), lineWidth);
-
-            if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Fill)
-                Render3DEngine.drawFilledBox(stack, box, Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() * (1f - (time / 300f)))));
+            if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Line) {
+                Render3DEngine.drawBoxOutline(box, Render2DEngine.injectAlpha(lineColor, (int) (fillColor.getAlpha() * (1f - (time / 500f)))), lineWidth);
+            }
+            if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Fill) {
+                Render3DEngine.drawFilledBox(stack, box, Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() * (1f - (time / 500f)))));
+            }
         }
     }
 

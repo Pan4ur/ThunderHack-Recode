@@ -21,7 +21,7 @@ import thunder.hack.utility.world.HoleUtility;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class AntiSurround extends Module {
+public class AutoMine extends Module {
     private final Setting<Float> range = new Setting<>("Range", 5f, 1f, 7f);
     private final Setting<Boolean> autoDisable = new Setting<>("Auto Disable", true);
     private final Setting<Boolean> autoSwitch = new Setting<>("Switch", true);
@@ -44,8 +44,8 @@ public class AntiSurround extends Module {
         FOV
     }
 
-    public AntiSurround() {
-        super("AntiSurround", Category.COMBAT);
+    public AutoMine() {
+        super("AutoMine", Category.COMBAT);
     }
 
     @Override

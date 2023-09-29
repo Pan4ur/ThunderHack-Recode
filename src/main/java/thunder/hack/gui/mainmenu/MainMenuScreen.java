@@ -11,6 +11,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.gui.clickui.ClickUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
@@ -26,12 +27,9 @@ import java.util.List;
 import static thunder.hack.modules.Module.mc;
 
 public class MainMenuScreen extends Screen {
-
-    private List<MainMenuButton> buttons = new ArrayList<>();
+    private static final Identifier TH_LOGO = new Identifier("textures/th.png");
+    private final List<MainMenuButton> buttons = new ArrayList<>();
     public boolean confirm = false;
-
-    private final Identifier TH_LOGO = new Identifier("textures/th.png");
-
 
     protected MainMenuScreen() {
         super(Text.of("THMainMenuScreen"));
@@ -54,7 +52,7 @@ public class MainMenuScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull DrawContext context, int mouseX, int mouseY, float delta) {
 
         float halfOfWidth = mc.getWindow().getScaledWidth() / 2f;
         float halfOfHeight = mc.getWindow().getScaledHeight() / 2f;
@@ -110,7 +108,7 @@ public class MainMenuScreen extends Screen {
         });
     }
 
-    private static String getPrefix(String change) {
+    private static @NotNull String getPrefix(@NotNull String change) {
         String prefix = "";
         if (change.contains("[+]")) {
             change = change.replace("[+] ", "");
@@ -142,7 +140,7 @@ public class MainMenuScreen extends Screen {
         }
 
         if (Render2DEngine.isHovered(mouseX, mouseY, (int) (halfOfWidth - 157), (int) (halfOfHeight - 140), 300, 70))
-            Util.getOperatingSystem().open(URI.create("http://thunderhack.xyz"));
+            Util.getOperatingSystem().open(URI.create("https://thunderhack.xyz"));
 
         return super.mouseClicked(mouseX, mouseY, button);
     }

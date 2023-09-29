@@ -12,10 +12,9 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.item.PickaxeItem;
-import net.minecraft.item.SwordItem;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -70,6 +69,7 @@ public class CevBreaker extends Module {
 
     private final Setting<BreakMode> breakMode = new Setting<>("Break Mode", BreakMode.Packet);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
+    private final Setting<Boolean> autoDisable = new Setting<>("Auto Disable", true);
 
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Normal);
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
@@ -79,8 +79,7 @@ public class CevBreaker extends Module {
     private final Setting<Boolean> onMine = new Setting<>("Pause On Mine", false).withParent(pause);
     private final Setting<Boolean> onAura = new Setting<>("Pause On Aura", false).withParent(pause);
 
-    private final Setting<Parent> render = new Setting<>("Render", new Parent(false, 1));
-
+    private final Setting<Parent> render = new Setting<>("Render", new Parent(false, 0));
     private final Setting<Boolean> renderTrap = new Setting<>("Render Trap", false).withParent(render);
     private final Setting<ColorSetting> trapFillColor = new Setting<>("Trap Fill Color", new ColorSetting(new Color(255, 0, 0, 50)), value -> renderTrap.getValue()).withParent(render);
     private final Setting<ColorSetting> trapLineColor = new Setting<>("Trap Line Color", new ColorSetting(new Color(255, 0, 0, 200)), value -> renderTrap.getValue()).withParent(render);
@@ -123,20 +122,21 @@ public class CevBreaker extends Module {
         targetSurroundBlockPos = null;
         canPlaceBlock = true;
 
-        if (breakMode.getValue() == BreakMode.Packet && ModuleManager.speedMine.isDisabled()) {
+        if (breakMode.getValue() == BreakMode.Packet && ModuleManager.speedMine.isDisabled() && autoDisable.getValue()) {
             ThunderHack.notificationManager.publicity(getName(), MainSettings.isRu() ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine", 5, Notification.Type.ERROR);
-            disable("MainSettings.isRu() ? \"Для использования пакетного копания необходимо включить и настроить модуль SpeedMine\" : \"For using packet mine is necessary to enable and config SpeedMine\"");
+            disable(MainSettings.isRu() ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine");
         }
     }
 
     @EventHandler
-    public void onSync(EventSync e) {
+    public void onSync(@SuppressWarnings("unused") EventSync e) {
         if (fullNullCheck() || shouldPause()) return;
 
         // Find target
         if (target == null || target.isDead()
                 || target.getHealth() + target.getAbsorptionAmount() <= 0
                 || target.distanceTo(((mc.player))) > range.getValue()) {
+            target = null;
             findTarget();
             return;
         }
@@ -146,34 +146,34 @@ public class CevBreaker extends Module {
         }
 
         // To prevent stuck we will mine necessary blocks
-        if (!mc.world.getBlockState(target.getBlockPos().add(0, 4, 0)).getBlock().equals(Blocks.AIR) && oldMode.getValue()) {
-            startMine(target.getBlockPos().add(0, 4, 0));
+        if (!mc.world.getBlockState(target.getBlockPos().up(4)).isAir() && oldMode.getValue()) {
+            startMine(target.getBlockPos().up(4));
             return;
         }
-        if (!mc.world.getBlockState(target.getBlockPos().add(0, 3, 0)).getBlock().equals(Blocks.AIR)) {
-            startMine(target.getBlockPos().add(0, 3, 0));
+        if (!mc.world.getBlockState(target.getBlockPos().up(3)).isAir()) {
+            startMine(target.getBlockPos().up(3));
             placeCrystalProgress = .1;
             return;
         }
 
         // Prevent SpeedMine stuck
         if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL
-                && mc.world.getBlockState(target.getBlockPos().add(0, 2, 0)).getBlock().equals(Blocks.OBSIDIAN)) {
+                && mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.OBSIDIAN)) {
             placeCrystal();
         }
 
         delay = 0;
         int blocksPlaced = 0;
 
-        // Checking if structure placed, start breaking, place crystal, if it is necessary
-        if (mc.world.getBlockState(target.getBlockPos().add(0, 2, 0)).getBlock().equals(Blocks.OBSIDIAN)) {
-            if (SpeedMine.progress >= placeCrystalProgress && SpeedMine.minePosition.equals(target.getBlockPos().add(0, 2, 0))) {
+        // Checking if structure placed, start breaking. (Place crystal, if it is necessary)
+        if (mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.OBSIDIAN)) {
+            if (SpeedMine.progress >= placeCrystalProgress && SpeedMine.minePosition.equals(target.getBlockPos().up(2))) {
                 placeCrystal();
                 return;
             } else {
-                for (Map.Entry<Integer, BlockBreakingInfo> entry : ((IWorldRenderer) mc.worldRenderer).getBlockBreakingInfos().entrySet()) {
+                for (Map.Entry<Integer, BlockBreakingInfo> entry : ((IWorldRenderer) mc.worldRenderer).getBlockBreakingInfos().int2ObjectEntrySet()) {
                     BlockBreakingInfo destroyBlockProgress = entry.getValue();
-                    if (target.getBlockPos().add(0, 2, 0).equals(destroyBlockProgress.getPos())) {
+                    if (target.getBlockPos().up(2).equals(destroyBlockProgress.getPos())) {
 
                         if (destroyBlockProgress.getStage() >= placeCrystalProgress * 10) {
                             placeCrystal();
@@ -183,14 +183,14 @@ public class CevBreaker extends Module {
                 }
             }
 
-            startMine(target.getBlockPos().add(0, 2, 0));
+            startMine(target.getBlockPos().up(2));
         }
 
         BlockPos[] surroundBlocks = new BlockPos[]{
-                target.getBlockPos().add(0, 1, 0).west(),
-                target.getBlockPos().add(0, 1, 0).south(),
-                target.getBlockPos().add(0, 1, 0).north(),
-                target.getBlockPos().add(0, 1, 0).east()
+                target.getBlockPos().up().west(),
+                target.getBlockPos().up().south(),
+                target.getBlockPos().up().north(),
+                target.getBlockPos().up().east()
         };
 
         // Generate structure
@@ -198,11 +198,11 @@ public class CevBreaker extends Module {
             targetSurroundBlockPos = surroundBlocks[0];
 
             for (BlockPos pos : surroundBlocks) {
-                if (!mc.world.getBlockState(pos.add(0, 2, 0)).getBlock().equals(Blocks.AIR)) {
+                if (!mc.world.getBlockState(pos.add(0, 2, 0)).isAir()) {
                     targetSurroundBlockPos = pos;
                     break;
                 }
-                if (!mc.world.getBlockState(pos.add(0, 1, 0)).getBlock().equals(Blocks.AIR))
+                if (!mc.world.getBlockState(pos.add(0, 1, 0)).isAir())
                     targetSurroundBlockPos = pos;
             }
         }
@@ -210,24 +210,33 @@ public class CevBreaker extends Module {
         // Trap
         if (trap.getValue()) {
             List<BlockPos> trapBlocks = new ArrayList<>();
-            for (BlockPos surroundBlock : surroundBlocks) {
-                if (mc.world.getBlockState(surroundBlock).getBlock().equals(Blocks.AIR)) {
+            for (BlockPos surroundBlock : HoleUtility.getSurroundPoses(target.getBlockPos()).stream()
+                    .map(BlockPos::up)
+                    .toList()) {
+                if (InteractionUtility.canPlaceBlock(surroundBlock, interact.getValue(), false)) {
                     trapBlocks.add(surroundBlock);
                 }
             }
-            InventoryUtility.saveSlot();
+            for (BlockPos headPos : HoleUtility.getHolePoses(target.getBlockPos()).stream()
+                    .map(pos -> pos.up(2))
+                    .filter(pos -> !pos.equals(currentMineBlockPos))
+                    .toList()) {
+                if (InteractionUtility.canPlaceBlock(headPos, interact.getValue(), false)) {
+                    trapBlocks.add(headPos);
+                }
+            }
+
             for (BlockPos trapBlock : trapBlocks) {
                 if (blocksPlaced >= blocksPerTick.getValue()) return;
+                if (!InteractionUtility.canPlaceBlock(trapBlock, interact.getValue(), false)) continue;
                 if (placeObsidian(trapBlock)) renderTrapPoses.put(trapBlock, System.currentTimeMillis());
                 blocksPlaced++;
             }
-            InventoryUtility.returnSlot();
         }
 
         // Build structure
-        InventoryUtility.saveSlot();
         while (blocksPlaced < blocksPerTick.getValue()) {
-            if (!mc.world.getBlockState(targetSurroundBlockPos.add(0, 1, 0)).getBlock().equals(Blocks.AIR)) {
+            if (InteractionUtility.canPlaceBlock(targetSurroundBlockPos.add(0, 2, 0), interact.getValue(), false)) {
                 BlockPos targetedPos = target.getBlockPos().add(0, 2, 0);
                 if (newCycle) {
                     // Place obsidian under target's head
@@ -242,7 +251,7 @@ public class CevBreaker extends Module {
 
                 blocksPlaced++;
                 continue;
-            } else if (!mc.world.getBlockState(targetSurroundBlockPos.add(0, 0, 0)).getBlock().equals(Blocks.AIR)) {
+            } else if (InteractionUtility.canPlaceBlock(targetSurroundBlockPos.add(0, 1, 0), interact.getValue(), false)) {
                 // Second step place obsidian
                 if (placeObsidian(targetSurroundBlockPos.add(0, 1, 0)))
                     renderStructurePoses.put(targetSurroundBlockPos.add(0, 1, 0), System.currentTimeMillis());
@@ -251,20 +260,19 @@ public class CevBreaker extends Module {
             }
 
             // First step place obsidian
-            if (placeObsidian(targetSurroundBlockPos))
+            if (InteractionUtility.canPlaceBlock(targetSurroundBlockPos, interact.getValue(), false)
+                    && placeObsidian(targetSurroundBlockPos))
                 renderStructurePoses.put(targetSurroundBlockPos, System.currentTimeMillis());
 
             blocksPlaced++;
         }
-        InventoryUtility.returnSlot();
-
 
         // Rotations
         if (rotate.getValue()) {
             float[] yp = InteractionUtility.calculateAngle(rotations);
             final double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
-            yp[0] = (float) (yp[0] - (yp[0] - ((IClientPlayerEntity) ((mc.player))).getLastYaw()) % gcdFix);
-            yp[1] = (float) (yp[1] - (yp[1] - ((IClientPlayerEntity) ((mc.player))).getLastYaw()) % gcdFix);
+            yp[0] = (float) (yp[0] - (yp[0] - ((IClientPlayerEntity) mc.player).getLastYaw()) % gcdFix);
+            yp[1] = (float) (yp[1] - (yp[1] - ((IClientPlayerEntity) mc.player).getLastYaw()) % gcdFix);
             mc.player.setYaw(yp[0]);
             mc.player.setPitch(yp[1]);
             rotations = null;
@@ -277,14 +285,15 @@ public class CevBreaker extends Module {
                 || (onEat.getValue() && PlayerUtility.isEating());
     }
 
+    @Override
     public void onRender3D(MatrixStack stack) {
         if (renderTrap.getValue()) {
             renderTrapPoses.forEach((pos, time) -> {
                 if (System.currentTimeMillis() - time > 500) {
                     renderTrapPoses.remove(pos);
                 } else {
-                    Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(trapFillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
-                    Render3DEngine.drawBoxOutline(new Box(pos), trapLineColor.getValue().getColorObject(), trapLineWidth.getValue());
+                    Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(new Box(pos), Render2DEngine.injectAlpha(trapFillColor.getValue().getColorObject(), (int) (100f * (trapFillColor.getValue().getColorObject().getAlpha() - ((System.currentTimeMillis() - time) / 500f))))));
+                    Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(new Box(pos), trapLineColor.getValue().getColorObject(), trapLineWidth.getValue()));
                 }
             });
         }
@@ -293,54 +302,62 @@ public class CevBreaker extends Module {
                 if (System.currentTimeMillis() - time > 500) {
                     renderTrapPoses.remove(pos);
                 } else {
-                    Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(structureFillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
-                    Render3DEngine.drawBoxOutline(new Box(pos), structureLineColor.getValue().getColorObject(), structureLineWidth.getValue());
+                    Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(new Box(pos), Render2DEngine.injectAlpha(structureFillColor.getValue().getColorObject(), (int) (structureFillColor.getValue().getColorObject().getAlpha() * (1f - ((System.currentTimeMillis() - time) / 500f))))));
+                    Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(new Box(pos), structureLineColor.getValue().getColorObject(), structureLineWidth.getValue()));
                 }
             });
         }
         if (renderTarget.getValue()) {
-            Render3DEngine.drawFilledBox(stack, new Box(target.getBlockPos().add(0, 3, 0)), targetFillColor.getValue().getColorObject());
-            Render3DEngine.drawBoxOutline(new Box(target.getBlockPos().add(0, 3, 0)), targetLineColor.getValue().getColorObject(), targetLineWidth.getValue());
+            Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(new Box(target.getBlockPos().up(3)), targetFillColor.getValue().getColorObject()));
+            Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(new Box(target.getBlockPos().up(3)), targetLineColor.getValue().getColorObject(), targetLineWidth.getValue()));
         }
     }
 
     @EventHandler
+    @SuppressWarnings("unused")
     private void onEntityRemove(@NotNull EventEntityRemoved e) {
-        if (e.entity == null) return;
-        if (target == null) return;
-        if (e.entity.getBlockPos().equals(target.getBlockPos().add(0, 3, 0))
+        if (e.entity == null || target == null) return;
+        if (e.entity.getBlockPos().equals(target.getBlockPos().up(3))
                 && e.entity instanceof EndCrystalEntity) {
             newCycle = true;
         }
     }
 
     @EventHandler
+    @SuppressWarnings("unused")
     private void onPacket(PacketEvent.Receive e) {
         if (target == null) return;
         if (e.getPacket() instanceof BlockUpdateS2CPacket pac) {
-            if (pac.getPos().equals(target.getBlockPos().add(0, 2, 0)) && pac.getState().getBlock().equals(Blocks.AIR)) {
+            if (pac.getPos().equals(target.getBlockPos().up(2)) && pac.getState().isAir()) {
                 for (Entity entity : ThunderHack.asyncManager.getAsyncEntities()) {
                     if (entity instanceof EndCrystalEntity endCrystal && entity.getBlockPos().equals(target.getBlockPos().add(0, 3, 0))) {
                         canPlaceBlock = false;
-                        breakCrystalThread(endCrystal);
+                        startBreakCrystalThread(endCrystal);
                     }
                 }
             }
         }
     }
 
-    public void breakCrystalThread(EndCrystalEntity endCrystal) {
-        ThunderHack.asyncManager.run(() -> {
-                    if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS) && !(mc.player.getMainHandStack().getItem() instanceof SwordItem)) {
+    private void startBreakCrystalThread(EndCrystalEntity endCrystal) {
+        if (mc.player == null || mc.interactionManager == null)
+            return;
 
+        ThunderHack.asyncManager.run(() -> {
+                    final int preSlot = mc.player.getInventory().selectedSlot;
+                    if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
                         SearchInvResult swordResult = InventoryUtility.getSword();
                         if (autoSwap.getValue()) swordResult.switchTo();
                     }
 
-                    Criticals.cancelCrit = true;
                     mc.interactionManager.attackEntity(mc.player, endCrystal);
-                    mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-                    Criticals.cancelCrit = false;
+                    sendPacket(PlayerInteractEntityC2SPacket.attack(endCrystal, mc.player.isSneaking()));
+                    sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+
+                    if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
+                        if (autoSwap.getValue()) InventoryUtility.switchTo(preSlot);
+                    }
+
                     try {
                         Thread.sleep(breakCrystalDelay.getValue() / 2);
                     } catch (InterruptedException e) {
@@ -348,19 +365,24 @@ public class CevBreaker extends Module {
                     }
                     canPlaceBlock = true;
                 },
-                breakCrystalDelay.getValue() / 2);
+                breakCrystalDelay.getValue() / 2
+        );
     }
 
     @EventHandler
+    @SuppressWarnings("unused")
     private void onPostSync(EventPostSync e) {
-        if (shouldPause()) return;
+        if (shouldPause()
+                || mc.world == null
+                || mc.player == null
+                || mc.interactionManager == null) return;
 
         // Normal breaking block
-        if (mine && !mc.world.getBlockState(currentMineBlockPos).getBlock().equals(Blocks.AIR)) {
+        if (mine && !mc.world.getBlockState(currentMineBlockPos).isReplaceable()) {
             if (breakMode.getValue() == BreakMode.Normal) {
                 if (autoSwap.getValue()) {
                     SearchInvResult pickResult = InventoryUtility.findInInventory(stack -> stack.getItem() instanceof PickaxeItem);
-                    mc.player.getInventory().selectedSlot = pickResult.found() ? pickResult.slot() : mc.player.getInventory().selectedSlot;
+                    InventoryUtility.switchTo(pickResult.slot());
                 }
 
                 InteractionUtility.BreakData bData = InteractionUtility.getBreakData(currentMineBlockPos, InteractionUtility.Interact.Strict);
@@ -374,6 +396,10 @@ public class CevBreaker extends Module {
     }
 
     private void startMine(BlockPos pos) {
+        if (mc.world == null
+                || mc.player == null
+                || mc.interactionManager == null) return;
+
         switch (breakMode.getValue()) {
             case Normal -> {
                 mine = true;
@@ -382,13 +408,14 @@ public class CevBreaker extends Module {
             case Packet -> {
                 if (ModuleManager.speedMine.isEnabled()
                         && SpeedMine.progress != 0
-                        && !mc.world.getBlockState(SpeedMine.minePosition).getBlock().equals(Blocks.AIR)) {
+                        && !mc.world.getBlockState(SpeedMine.minePosition).isAir()) {
                     return;
                 }
 
                 InteractionUtility.BreakData bData = InteractionUtility.getBreakData(pos, interact.getValue());
                 if (bData == null) return;
 
+                SpeedMine.minePosition = pos;
                 mc.interactionManager.attackBlock(pos, bData.dir());
                 if (swing.getValue())
                     mc.player.swingHand(Hand.MAIN_HAND);
@@ -403,50 +430,52 @@ public class CevBreaker extends Module {
             if (player.distanceTo(((mc.player))) > range.getValue()) continue;
             if (player.isDead()) continue;
             if (player.getHealth() + player.getAbsorptionAmount() <= 0) continue;
-            if (!HoleUtility.validBedrock(player.getBlockPos()) && !HoleUtility.validIndestructible(player.getBlockPos()))
+            if (!HoleUtility.isHole(player.getBlockPos()))
                 continue;
 
             target = player;
             break;
         }
 
-        if (target == null) {
-            ThunderHack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.", 5, Notification.Type.ERROR);
+        if (target == null && autoDisable.getValue()) {
+            ThunderHack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.", 3, Notification.Type.ERROR);
             disable(MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.");
         }
     }
 
     private void placeCrystal() {
-        BlockPos pos = target.getBlockPos().add(0, 2, 0);
-        for (Entity entity : mc.world.getEntities()) {
-            if (entity instanceof EndCrystalEntity && entity.getBlockPos().equals(pos.add(0, 1, 0))) {
+        if (mc.world == null || mc.player == null || mc.interactionManager == null)
+            return;
+
+        BlockPos pos = target.getBlockPos().up(2);
+        for (Entity entity : ThunderHack.asyncManager.getAsyncEntities()) {
+            if (entity instanceof EndCrystalEntity && entity.getBlockPos().equals(pos.up())) {
                 return;
             }
         }
 
         BlockHitResult pData = getPlaceData(pos);
 
-        if (mc.player.getOffHandStack().getItem().equals(Items.END_CRYSTAL)) {
-            sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, pData, PlayerUtility.getWorldActionId(mc.world)));
-
-            if (swing.getValue()) mc.player.swingHand(Hand.OFF_HAND);
-            return;
-        }
-
-        int preSlot = mc.player.getInventory().selectedSlot;
-
-        if (mc.player.getMainHandStack().getItem() != Items.END_CRYSTAL) {
-            SearchInvResult crystalResult = InventoryUtility.getCrystal();
-            crystalResult.switchTo();
-        }
-
         // Place crystal
-        sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, pData, PlayerUtility.getWorldActionId(mc.world)));
+        if (pData != null) {
+            if (mc.player.getOffHandStack().getItem().equals(Items.END_CRYSTAL)) {
+                mc.interactionManager.interactBlock(mc.player, Hand.OFF_HAND, pData);
+                sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, pData, PlayerUtility.getWorldActionId(mc.world)));
 
-        if (preSlot != mc.player.getInventory().selectedSlot) {
-            sendPacket(new UpdateSelectedSlotC2SPacket(preSlot));
+                if (swing.getValue()) mc.player.swingHand(Hand.OFF_HAND);
+                return;
+            }
+
+            final int preSlot = mc.player.getInventory().selectedSlot;
+            if (mc.player.getMainHandStack().getItem() != Items.END_CRYSTAL) {
+                SearchInvResult crystalResult = InventoryUtility.getCrystal();
+                crystalResult.switchTo();
+            }
+            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, pData);
+            sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, pData, PlayerUtility.getWorldActionId(mc.world)));
+            InventoryUtility.switchTo(preSlot);
+            if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
         }
-
     }
 
     private @Nullable SearchInvResult getObsidian() {
@@ -454,7 +483,7 @@ public class CevBreaker extends Module {
 
         if (!result.isHolding() && !autoSwap.getValue())
             return null;
-        if (!result.found()) {
+        if (!result.found() && autoDisable.getValue()) {
             ThunderHack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!", 5, Notification.Type.ERROR);
             disable(MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!");
             return null;
@@ -466,19 +495,20 @@ public class CevBreaker extends Module {
     private boolean placeObsidian(BlockPos pos) {
         if (!canPlaceBlock) return false;
         SearchInvResult result = getObsidian();
-        if (result == null) return false;
-        if (!result.found()) return false;
-        return InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), placeMode.getValue(), result, false, false);
+        if (result == null || !result.found()) return false;
+
+        return InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), placeMode.getValue(), result, autoSwap.getValue(), false);
     }
 
-    public BlockHitResult getPlaceData(BlockPos bp) {
+    public @Nullable BlockHitResult getPlaceData(BlockPos bp) {
+        if (mc.world == null)
+            return null;
         Block block = mc.world.getBlockState(bp).getBlock();
         Block freeSpace = mc.world.getBlockState(bp.up()).getBlock();
-        Block legacyFreeSpace = mc.world.getBlockState(bp.up().up()).getBlock();
+        Block legacyFreeSpace = mc.world.getBlockState(bp.up(2)).getBlock();
 
         if (block != Blocks.OBSIDIAN && block != Blocks.BEDROCK)
             return null;
-
         if (!(freeSpace == Blocks.AIR && (!oldMode.getValue() || legacyFreeSpace == Blocks.AIR)))
             return null;
 
@@ -490,18 +520,16 @@ public class CevBreaker extends Module {
         for (Entity ent : ThunderHack.asyncManager.getAsyncEntities()) {
             if (ent == null) continue;
             if (ent.getBoundingBox().intersects(posBoundingBox)) {
-                if (ent instanceof ExperienceOrbEntity)
-                    continue;
-                if (ent instanceof EndCrystalEntity)
+                if (ent instanceof ExperienceOrbEntity || ent instanceof EndCrystalEntity)
                     continue;
                 return null;
             }
         }
 
-        Vec3d crystalvector = new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ());
+        Vec3d crystalVector = new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ());
         if (interact.getValue() == InteractionUtility.Interact.Vanilla) {
-            return new BlockHitResult(crystalvector, Direction.DOWN, bp, false);
-        } else if (interact.getValue() == InteractionUtility.Interact.Strict) {
+            return new BlockHitResult(crystalVector, Direction.DOWN, bp, false);
+        } else if (interact.getValue() == InteractionUtility.Interact.Strict && mc.player != null) {
             float bestDistance = 999f;
             Direction bestDirection = null;
             Vec3d bestVector = null;

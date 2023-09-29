@@ -20,6 +20,7 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 
 public
 class RPC extends Module {
+
     private static final DiscordRPC rpc = DiscordRPC.INSTANCE;
     public static Setting<mode> Mode = new Setting<>("Picture", mode.Recode);
     public static Setting<Boolean> showIP = new Setting<>("ShowIP", true);
@@ -104,7 +105,7 @@ class RPC extends Module {
                         case Stats ->
                                 presence.state = "Hacks: " + ThunderHack.moduleManager.getEnabledModules().size() + " / " + ThunderHack.moduleManager.modules.size();
                         case Custom -> presence.state = state.getValue();
-                        case Version -> presence.state = "v" + ThunderHack.version + " for mc 1.20.2";
+                        case Version -> presence.state = "v1.2 for mc 1.20.1";
                     }
 
                     if (nickname.getValue()) {
@@ -158,7 +159,7 @@ class RPC extends Module {
         return result;
     }
 
-    private @NotNull String getNexusDetails() {
+    private String getNexusDetails() {
         if (isOn(-150, -3, -146, 1))
             return "(фармит на плите)";
         else if (isOn(-120, 10, -82, 46))
