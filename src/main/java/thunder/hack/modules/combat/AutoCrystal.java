@@ -515,7 +515,7 @@ public class AutoCrystal extends Module {
         if (autoSwitch.getValue() != Switch.NONE && !holdingCrystal)
             prevSlot = switchTo(crystalResult, crystalResultInv, autoSwitch);
 
-        if (!holdingCrystal)
+        if (!(mc.player.getMainHandStack().getItem() instanceof EndCrystalItem || offhand))
             return;
 
         sendPacket(new PlayerInteractBlockC2SPacket(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));

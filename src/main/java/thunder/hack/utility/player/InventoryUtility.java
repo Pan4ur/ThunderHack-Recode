@@ -3,10 +3,15 @@ package thunder.hack.utility.player;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.DamageUtil;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.ModuleManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +20,7 @@ import static thunder.hack.modules.Module.mc;
 
 public final class InventoryUtility {
     private static int cachedSlot = -1;
+
 
     public static int getItemCount(Item item) {
         if (mc.player == null) return 0;
@@ -288,14 +294,44 @@ public final class InventoryUtility {
     }
 
     public static void switchTo(int slot) {
-        if (mc.player == null || mc.getNetworkHandler() == null || slot == -1) return;
+        if (mc.player == null || mc.getNetworkHandler() == null) return;
         if (mc.player.getInventory().selectedSlot == slot && ThunderHack.playerManager.serverSideSlot == slot) return;
-
         mc.player.getInventory().selectedSlot = slot;
         mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
     }
 
     public interface Searcher {
         boolean isValid(ItemStack stack);
+    }
+
+    public static float getHitDamage(ItemStack weapon, PlayerEntity ent) {
+        float baseDamage = 1f;
+
+        if(weapon.getItem() instanceof SwordItem swordItem)
+             baseDamage = swordItem.getAttackDamage();
+
+        if(weapon.getItem() instanceof AxeItem axeItem)
+            baseDamage = axeItem.getAttackDamage();
+
+        if (mc.player.fallDistance > 0 || ModuleManager.criticals.isEnabled())
+            baseDamage += baseDamage / 2f;
+
+        baseDamage += EnchantmentHelper.getLevel(Enchantments.SHARPNESS, weapon);
+
+        if (mc.player.hasStatusEffect(StatusEffects.STRENGTH)) {
+            int strength = mc.player.getStatusEffect(StatusEffects.STRENGTH).getAmplifier() + 1;
+            baseDamage += 3 * strength;
+        }
+
+        // Reduce by resistance
+       // baseDamage = resistanceReduction(target, damage);
+
+        // Reduce by armour
+        baseDamage = DamageUtil.getDamageLeft(baseDamage, ent.getArmor(), (float) ent.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
+
+        // Reduce by enchants
+       // damage = normalProtReduction(target, damage);
+
+        return baseDamage;
     }
 }
