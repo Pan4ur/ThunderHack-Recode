@@ -4,6 +4,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
 public class MainSettings extends Module {
+    public static Setting<Boolean> futureCompatibility = new Setting<>("FutureCompatibility", false);
     public static Setting<Boolean> customMainMenu = new Setting<>("CustomMainMenu", true);
     public static Setting<Boolean> renderRotations = new Setting<>("RenderRotations", true);
     public static Setting<Boolean> skullEmoji = new Setting<>("SkullEmoji", true);

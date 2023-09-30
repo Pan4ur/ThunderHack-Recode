@@ -1,31 +1,31 @@
 package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import thunder.hack.events.impl.EventMove;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.client.HudEditor;
-import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.setting.Setting;
-import thunder.hack.utility.Timer;
-import thunder.hack.utility.player.InteractionUtility;
-import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import thunder.hack.events.impl.EventMove;
+import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.modules.Module;
+import thunder.hack.modules.client.HudEditor;
+import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.setting.impl.Parent;
+import thunder.hack.utility.Timer;
+import thunder.hack.utility.player.InteractionUtility;
+import thunder.hack.utility.render.BlockAnimationUtility;
 
-import static thunder.hack.utility.player.InteractionUtility.checkNearBlocks;
 import static thunder.hack.utility.player.InteractionUtility.BlockPosWithFacing;
+import static thunder.hack.utility.player.InteractionUtility.checkNearBlocks;
 
 
 public class Scaffold extends Module {
@@ -36,7 +36,14 @@ public class Scaffold extends Module {
     public Setting<Boolean> tower = new Setting<>("Tower", true);
     public Setting<Boolean> safewalk = new Setting<>("SafeWalk", true);
     public Setting<Boolean> echestholding = new Setting<>("EchestHolding", false);
-    public Setting<Boolean> render = new Setting<>("Render", true);
+    private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
+    public Setting<Boolean> render = new Setting<>("Render", true).withParent(renderCategory);
+    private final Setting<BlockAnimationUtility.BlockRenderMode> renderMode = new Setting<>("RenderMode", BlockAnimationUtility.BlockRenderMode.All).withParent(renderCategory);
+    private final Setting<BlockAnimationUtility.BlockAnimationMode> animationMode = new Setting<>("AnimationMode", BlockAnimationUtility.BlockAnimationMode.Fade).withParent(renderCategory);
+    private final Setting<ColorSetting> renderFillColor = new Setting<>("RenderFillColor", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
+    private final Setting<ColorSetting> renderLineColor = new Setting<>("RenderLineColor", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
+    private final Setting<Integer> renderLineWidth = new Setting<>("RenderLineWidth", 2, 1, 5).withParent(renderCategory);
+
     public Setting<Boolean> strictRotate = new Setting<>("StrictRotate", false);
 
     private final Timer timer = new Timer();
@@ -66,7 +73,7 @@ public class Scaffold extends Module {
     }
 
     @Override
-    public void onEnable(){
+    public void onEnable() {
         rotation = new float[]{mc.player.getYaw(), mc.player.getPitch()};
     }
 
@@ -191,21 +198,14 @@ public class Scaffold extends Module {
             doSafeWalk(event);
     }
 
-    public void onRender3D(MatrixStack stack) {
-        if (render.getValue() && currentblock != null) {
-            Render3DEngine.drawFilledBox(stack,new Box(currentblock.position()), Render2DEngine.injectAlpha(HudEditor.getColor(0), 150));
-            Render3DEngine.drawBoxOutline(new Box(currentblock.position()), Render2DEngine.injectAlpha(HudEditor.getColor(0), 230), 2);
-        }
-    }
-
     private boolean isOffsetBBEmpty(double x, double z) {
-        return !mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.1,0,-0.1).offset(x,  -2, z)).iterator().hasNext();
+        return !mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.1, 0, -0.1).offset(x, -2, z)).iterator().hasNext();
     }
 
     @EventHandler
     public void onPre(EventSync event) {
-        if(strictRotate.getValue()) mc.player.setSprinting(false);
-        if(strictRotate.getValue()){
+        if (strictRotate.getValue()) mc.player.setSprinting(false);
+        if (strictRotate.getValue()) {
             mc.player.setYaw(rotation[0]);
             mc.player.setPitch(rotation[1]);
         }
@@ -238,7 +238,7 @@ public class Scaffold extends Module {
                 Vec3d hitVec = new Vec3d(currentblock.position().getX() + 0.5, currentblock.position().getY() + 0.90, currentblock.position().getZ() + 0.5).add(new Vec3d(currentblock.facing().getUnitVector()).multiply(0.5));
                 float[] rotations = InteractionUtility.calculateAngle(hitVec);
 
-                if(strictRotate.getValue()){
+                if (strictRotate.getValue()) {
                     rotation = rotations;
                 } else {
                     mc.player.setYaw(rotations[0]);
@@ -250,7 +250,8 @@ public class Scaffold extends Module {
 
     @EventHandler
     public void onPost(EventPostSync e) {
-        if(mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.2,0,-0.2).offset(0,  -0.5, 0)).iterator().hasNext()) return;
+        if (mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.2, 0, -0.2).offset(0, -0.5, 0)).iterator().hasNext())
+            return;
         if (currentblock == null) return;
         int prev_item = mc.player.getInventory().selectedSlot;
         if (!(mc.player.getMainHandStack().getItem() instanceof BlockItem)) {
@@ -268,17 +269,19 @@ public class Scaffold extends Module {
             } else {
                 mc.player.setVelocity(0.0, 0.42, 0.0);
                 if (timer.passedMs(1500)) {
-                    mc.player.setVelocity(mc.player.getVelocity().x,-0.28,mc.player.getVelocity().z);
+                    mc.player.setVelocity(mc.player.getVelocity().x, -0.28, mc.player.getVelocity().z);
                     timer.reset();
                 }
             }
             Vec3d hitVec = new Vec3d(currentblock.position().getX() + 0.5, currentblock.position().getY() + 0.90, currentblock.position().getZ() + 0.5).add(new Vec3d(currentblock.facing().getUnitVector()).multiply(0.5));
 
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(hitVec, currentblock.facing(), currentblock.position(), false));
-
             mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
-            if(!strictRotate.getValue()) {
+            if (render.getValue())
+                BlockAnimationUtility.renderBlock(currentblock.position(), renderLineColor.getValue().getColorObject(), renderLineWidth.getValue(), renderFillColor.getValue().getColorObject(), animationMode.getValue(), renderMode.getValue());
+
+            if (!strictRotate.getValue()) {
                 mc.player.getInventory().selectedSlot = prev_item;
                 mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
             }
