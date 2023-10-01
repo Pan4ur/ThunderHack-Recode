@@ -133,7 +133,7 @@ public class ModulePlate {
             FontRenderers.modules.drawString(stack, sbind, posX + 86 - FontRenderers.modules.getStringWidth(sbind), posY + 6, Render2DEngine.applyOpacity(new Color(0xB0B0B0), getFadeFactor()).getRGB(), false);
         }
 
-        if (!listening_bind) {
+        if (!listening_bind && module.getDescription() != null) {
             String[] splitString = module.getDescription().split("-");
             if (splitString[0] != null && !splitString[0].equals("")) {
                 FontRenderers.settings.drawString(stack, splitString[0], posX + 5, posY + 14, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
