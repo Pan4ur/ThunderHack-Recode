@@ -11,9 +11,18 @@ public interface IHeldItemRenderer {
     @Accessor(value="equipProgressMainHand")
     void setEquippedProgressMainHand(float var1);
 
+    @Accessor(value="equipProgressOffHand")
+    void setEquippedProgressOffHand(float var1);
+
     @Accessor(value="equipProgressMainHand")
     float getEquippedProgressMainHand();
 
+    @Accessor(value="equipProgressOffHand")
+    float getEquippedProgressOffHand();
+
     @Accessor(value="mainHand")
     void setItemStackMainHand(ItemStack var1);
+
+    @Accessor(value="offHand")
+    void setItemStackOffHand(ItemStack var1);
 }

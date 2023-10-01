@@ -15,7 +15,8 @@ public class ViewModel extends Module {
     }
 
 
-    public Setting<Boolean> oldAnimations = new Setting<>("DisableSwap", false);
+    public Setting<Boolean> oldAnimationsM = new Setting<>("DisableSwapMain", false);
+    public Setting<Boolean> oldAnimationsOff = new Setting<>("DisableSwapOff", false);
 
     public final Setting<Parent> mainHand = new Setting<>("MainHand", new Parent(false, 0));
     public final Setting<Parent> scaleMain = new Setting<>("Scale", new Parent(false, 1)).withParent(mainHand);
@@ -97,9 +98,14 @@ public class ViewModel extends Module {
     @Override
     public void onUpdate() {
         if (fullNullCheck()) return;
-        if (oldAnimations.getValue() && ((IHeldItemRenderer) mc.getEntityRenderDispatcher().getHeldItemRenderer()).getEquippedProgressMainHand() <= 1f) {
+        if (oldAnimationsM.getValue() && ((IHeldItemRenderer) mc.getEntityRenderDispatcher().getHeldItemRenderer()).getEquippedProgressMainHand() <= 1f) {
             ((IHeldItemRenderer) mc.getEntityRenderDispatcher().getHeldItemRenderer()).setEquippedProgressMainHand(1f);
             ((IHeldItemRenderer) mc.getEntityRenderDispatcher().getHeldItemRenderer()).setItemStackMainHand(mc.player.getMainHandStack());
+        }
+
+        if (oldAnimationsOff.getValue() && ((IHeldItemRenderer) mc.getEntityRenderDispatcher().getHeldItemRenderer()).getEquippedProgressOffHand() <= 1f) {
+            ((IHeldItemRenderer) mc.getEntityRenderDispatcher().getHeldItemRenderer()).setEquippedProgressOffHand(1f);
+            ((IHeldItemRenderer) mc.getEntityRenderDispatcher().getHeldItemRenderer()).setItemStackOffHand(mc.player.getOffHandStack());
         }
     }
 }

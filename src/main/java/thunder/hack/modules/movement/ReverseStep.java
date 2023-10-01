@@ -11,62 +11,67 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
 public class ReverseStep extends Module {
-    public Setting<Float> timer = new Setting("Timer", 3.0F, 1F, 10.0F);
+    public ReverseStep() {
+        super("ReverseStep", Category.MOVEMENT);
+    }
+
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Motion);
+    public Setting<Float> timer = new Setting<>("Timer", 3.0F, 1F, 10.0F, v -> mode.getValue() == Mode.Timer);
+    public Setting<Float> motion = new Setting<>("Motion", 1.0F, 0.1F, 10.0F, v -> mode.getValue() == Mode.Motion);
     public Setting<Boolean> anyblock = new Setting<>("AnyBlock", false);
     public Setting<Boolean> pauseIfShift = new Setting<>("PauseIfShift", false);
 
-    private boolean flag = true;
+    private boolean disableTimer = true;
     private boolean prevGround = false;
-    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Motion);
-
-    public ReverseStep() {
-        super("ReverseStep", "быстро падать", Category.MOVEMENT);
-    }
 
     @EventHandler
     public void onEntitySync(EventSync eventPlayerUpdateWalking) {
         if (ModuleManager.packetFly.isEnabled()) return;
 
-        if(pauseIfShift.getValue() && mc.options.sneakKey.isPressed()) return;
+        BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
 
-        BlockState iBlockState = mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos()).down(2));
-        BlockState iBlockState2 = mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos()).down(3));
-        BlockState iBlockState3 = mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos()).down(4));
-        if (!(iBlockState.getBlock() != Blocks.BEDROCK && iBlockState.getBlock() != Blocks.OBSIDIAN && !(anyblock.getValue()) || mc.player.isInLava() || mc.player.isSubmergedInWater() || (mc.world.getBlockState(new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY())), (int) Math.floor(mc.player.getZ()))).getBlock() == Blocks.COBWEB) || mc.player.isFallFlying() || mc.player.getAbilities().flying)) {
-            if (mc.player.isOnGround() && mode.getValue() == Mode.Motion) {
-                mc.player.setVelocity(mc.player.getVelocity().add(0,-1,0));
-            }
-            if (!(mode.getValue() != Mode.Timer || !prevGround || mc.player.isOnGround() || !(mc.player.getVelocity().getY() < -0.1) || flag || mc.player.isInLava() || mc.player.isSubmergedInWater() || (mc.world.getBlockState(new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY())), (int) Math.floor(mc.player.getZ()))).getBlock() == Blocks.COBWEB) || mc.player.isFallFlying() || mc.player.getAbilities().flying)) {
-                ThunderHack.TICK_TIMER = timer.getValue();
-                flag = true;
-            }
-        } else if (!(iBlockState2.getBlock() != Blocks.BEDROCK && iBlockState2.getBlock() != Blocks.OBSIDIAN && !anyblock.getValue() || mc.player.isInLava() || mc.player.isSubmergedInWater() || (mc.world.getBlockState(new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY())), (int) Math.floor(mc.player.getZ()))).getBlock() == Blocks.COBWEB) || mc.player.isFallFlying() || mc.player.getAbilities().flying)) {
-            if (mc.player.isOnGround() && mode.getValue() == Mode.Motion) {
-                mc.player.setVelocity(mc.player.getVelocity().add(0,-1,0));
-            }
-            if (!(mode.getValue() != Mode.Timer || !prevGround ||  mc.player.isOnGround() || !(mc.player.getVelocity().getY() < -0.1) || flag || mc.player.isInLava() || mc.player.isSubmergedInWater() || (mc.world.getBlockState(new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY())), (int) Math.floor(mc.player.getZ()))).getBlock() == Blocks.COBWEB) || mc.player.isFallFlying() || mc.player.getAbilities().flying)) {
-                ThunderHack.TICK_TIMER = timer.getValue();
-                flag = true;
-            }
-        } else if (!(iBlockState3.getBlock() != Blocks.BEDROCK && iBlockState3.getBlock() != Blocks.OBSIDIAN && !anyblock.getValue() || mc.player.isInLava() || mc.player.isSubmergedInWater() || (mc.world.getBlockState(new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY())), (int) Math.floor(mc.player.getZ()))).getBlock() == Blocks.COBWEB) || mc.player.isFallFlying() || mc.player.getAbilities().flying)) {
-            if (mc.player.isOnGround() && mode.getValue() == Mode.Motion) {
-                mc.player.setVelocity(mc.player.getVelocity().add(0,-1,0));
-            }
-            if (!(mode.getValue() != Mode.Timer || !prevGround || mc.player.isOnGround() || !(mc.player.getVelocity().getY() < -0.1) || flag || mc.player.isInLava() || mc.player.isSubmergedInWater() || (mc.world.getBlockState(new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY())), (int) Math.floor(mc.player.getZ()))).getBlock() == Blocks.COBWEB) || mc.player.isFallFlying() || mc.player.getAbilities().flying)) {
-                ThunderHack.TICK_TIMER = timer.getValue();
-                flag = true;
-            }
+        if (pauseIfShift.getValue() && mc.options.sneakKey.isPressed()) {
+            disableTimer();
+            return;
         }
-        if (flag && (mc.player.isOnGround() || mc.player.isInLava() || mc.player.isSubmergedInWater() || (mc.world.getBlockState(new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY())), (int) Math.floor(mc.player.getZ()))).getBlock() == Blocks.COBWEB) || mc.player.isFallFlying() || mc.player.getAbilities().flying)) {
-            flag = false;
-            ThunderHack.TICK_TIMER = (1.0f);
+
+        if (mc.player.isTouchingWater() || mc.player.isSubmergedInWater() || mc.player.isInLava() || mc.player.isFallFlying() || mc.player.getAbilities().flying || mc.world.getBlockState(playerPos).getBlock() == Blocks.COBWEB) {
+            disableTimer();
+            return;
         }
+
+        if (checkBlock(mc.world.getBlockState(playerPos.down(2))) || checkBlock(mc.world.getBlockState(playerPos.down(3))) || checkBlock(mc.world.getBlockState(playerPos.down(4))))
+            doStep();
+
+        if (disableTimer && (mc.player.isOnGround())) {
+            disableTimer = false;
+            ThunderHack.TICK_TIMER = 1.0f;
+        }
+
         prevGround = mc.player.isOnGround();
     }
 
+    private void disableTimer() {
+        if (disableTimer)
+            ThunderHack.TICK_TIMER = 1f;
+    }
+
+    private boolean checkBlock(BlockState bs) {
+        return bs.getBlock() == Blocks.BEDROCK || bs.getBlock() != Blocks.OBSIDIAN || anyblock.getValue();
+    }
+
+    private void doStep() {
+        if (!(mode.getValue() != Mode.Timer || !prevGround || mc.player.isOnGround() || !(mc.player.getVelocity().getY() < -0.1) || disableTimer)) {
+            ThunderHack.TICK_TIMER = timer.getValue();
+            disableTimer = true;
+        }
+
+        if (mc.player.isOnGround() && mode.getValue() == Mode.Motion) {
+            mc.player.setVelocity(mc.player.getVelocity().add(0, -motion.getValue(), 0));
+        }
+    }
 
     public enum Mode {
         Timer, Motion
     }
-
 }
