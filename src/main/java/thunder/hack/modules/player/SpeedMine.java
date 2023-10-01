@@ -19,6 +19,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.PlayerManager;
 import thunder.hack.events.impl.EventAttackBlock;
@@ -54,13 +55,23 @@ public class SpeedMine extends Module {
     private final Setting<ColorSetting> startFillColor = new Setting<>("Start Fill Color", new ColorSetting(new Color(255, 0, 0, 120))).withParent(render);
     private final Setting<ColorSetting> endFillColor = new Setting<>("End Fill Color", new ColorSetting(new Color(47, 255, 0, 120))).withParent(render);
 
+    public enum Mode {
+        Packet,
+        Damage
+    }
+
+    private enum RenderMode {
+        Block,
+        Shrink
+    }
+
     public static BlockPos minePosition;
     private Direction mineFacing;
     private int mineBreaks;
     public static float progress, prevProgress;
     public boolean worth = false;
 
-    private Timer attackTimer = new Timer();
+    private final Timer attackTimer = new Timer();
 
     public SpeedMine() {
         super("SpeedMine", "SpeedMine", Category.PLAYER);
@@ -68,6 +79,9 @@ public class SpeedMine extends Module {
 
     @Override
     public void onUpdate() {
+        if (mc.player == null || mc.interactionManager == null || mc.world == null)
+            return;
+
         if (!mc.player.getAbilities().creativeMode) {
             if (mode.getValue() == Mode.Damage) {
                 if (((IInteractionManager) mc.interactionManager).getCurBlockDamageMP() < startDmg.getValue())
@@ -126,7 +140,105 @@ public class SpeedMine extends Module {
         }
     }
 
-    public void closeScreen(){
+    @Override
+    public void onDisable() {
+        minePosition = null;
+        mineFacing = null;
+        progress = 0;
+        mineBreaks = 0;
+        prevProgress = 0;
+    }
+
+    @Override
+    public void onEnable() {
+        minePosition = null;
+        mineFacing = null;
+        progress = 0;
+        mineBreaks = 0;
+        prevProgress = 0;
+    }
+
+    @Override
+    public void onRender3D(MatrixStack stack) {
+        worth = checkWorth();
+
+        if (mode.getValue() == Mode.Packet) {
+            if (minePosition != null && !mc.world.isAir(minePosition)) {
+                switch (renderMode.getValue()) {
+                    case Shrink -> {
+                        Box shrunkMineBox = new Box(minePosition.getX(), minePosition.getY(), minePosition.getZ(), minePosition.getX(), minePosition.getY(), minePosition.getZ());
+                        float noom = (float) MathUtility.clamp(Render2DEngine.interpolate(prevProgress, progress, mc.getTickDelta()), 0f, 1f);
+
+                        Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(
+                                shrunkMineBox.shrink(noom, noom, noom).offset(0.5 + noom * 0.5, 0.5 + noom * 0.5, 0.5 + noom * 0.5),
+                                progress >= 0.95 ? endFillColor.getValue().getColorObject() : startFillColor.getValue().getColorObject()
+                        ));
+
+                        Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(
+                                shrunkMineBox.shrink(noom, noom, noom).offset(0.5 + noom * 0.5, 0.5 + noom * 0.5, 0.5 + noom * 0.5),
+                                progress >= 0.95 ? endLineColor.getValue().getColorObject() : startLineColor.getValue().getColorObject(),
+                                lineWidth.getValue()
+                        ));
+                    }
+                    case Block -> {
+                        Box renderBox = new Box(minePosition);
+
+                        Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(
+                                renderBox,
+                                progress >= 0.95 ? endFillColor.getValue().getColorObject() : startFillColor.getValue().getColorObject()
+                        ));
+
+                        Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(
+                                renderBox,
+                                progress >= 0.95 ? endLineColor.getValue().getColorObject() : startLineColor.getValue().getColorObject(),
+                                lineWidth.getValue()
+                        ));
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPacketSend(PacketEvent.@NotNull SendPost e) {
+        if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket && resetOnSwitch.getValue()) {
+            progress = 0;
+            prevProgress = 0;
+        }
+    }
+
+    @EventHandler
+    public void onAttackBlock(@NotNull EventAttackBlock event) {
+        if (canBreak(event.getBlockPos()) && !mc.player.getAbilities().creativeMode) {
+            if (mode.getValue() == Mode.Packet) {
+                if (!event.getBlockPos().equals(minePosition)) {
+                    minePosition = event.getBlockPos();
+                    mineFacing = event.getEnumFacing();
+                    progress = 0;
+                    mineBreaks = 0;
+                    if (minePosition != null && mineFacing != null) {
+                        sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, minePosition, mineFacing));
+                        sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, minePosition, mineFacing));
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntitySync(EventSync event) {
+        if (rotate.getValue()) {
+            if (progress > 0.95) {
+                if (minePosition != null) {
+                    float[] angle = PlayerManager.calcAngle(mc.player.getEyePos(), minePosition.toCenterPos());
+                    mc.player.setYaw(angle[0]);
+                    mc.player.setPitch(angle[1]);
+                }
+            }
+        }
+    }
+
+    private void closeScreen() {
         sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
     }
 
@@ -156,13 +268,13 @@ public class SpeedMine extends Module {
         return worth;
     }
 
-    public float getBlockStrength(BlockState state, BlockPos position) {
+    private float getBlockStrength(@NotNull BlockState state, BlockPos position) {
         float hardness = state.getHardness(mc.world, position);
         if (hardness < 0) return 0;
         return getDigSpeed(state, position) / hardness / (canBreak(position) ? 30f : 100f);
     }
 
-    public float getDestroySpeed(BlockPos position, BlockState state) {
+    private float getDestroySpeed(BlockPos position, BlockState state) {
         float destroySpeed = 1;
         int slot = getTool(position);
         if (slot != -1 && mc.player.getInventory().getStack(slot) != null && !mc.player.getInventory().getStack(slot).isEmpty()) {
@@ -171,7 +283,7 @@ public class SpeedMine extends Module {
         return destroySpeed;
     }
 
-    public float getDigSpeed(BlockState state, BlockPos position) {
+    private float getDigSpeed(BlockState state, BlockPos position) {
         float digSpeed = getDestroySpeed(position, state);
         if (digSpeed > 1) {
             ItemStack itemstack = mc.player.getInventory().getStack(getTool(position));
@@ -203,105 +315,6 @@ public class SpeedMine extends Module {
         return (digSpeed < 0 ? 0 : digSpeed);
     }
 
-    @EventHandler
-    public void onPacketSend(PacketEvent.SendPost e) {
-        if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket && resetOnSwitch.getValue()) {
-            progress = 0;
-            prevProgress = 0;
-        }
-    }
-
-    @Override
-    public void onDisable() {
-        minePosition = null;
-        mineFacing = null;
-        progress = 0;
-        mineBreaks = 0;
-        prevProgress = 0;
-    }
-
-    @Override
-    public void onEnable() {
-        minePosition = null;
-        mineFacing = null;
-        progress = 0;
-        mineBreaks = 0;
-        prevProgress = 0;
-    }
-
-    public void onRender3D(MatrixStack stack) {
-        worth = checkWorth();
-
-        if (mode.getValue() == Mode.Packet) {
-            if (minePosition != null && !mc.world.isAir(minePosition)) {
-                switch (renderMode.getValue()) {
-                    case Shrink -> {
-                        Box shrunkMineBox = new Box(minePosition.getX(), minePosition.getY(), minePosition.getZ(), minePosition.getX(), minePosition.getY(), minePosition.getZ());
-                        float noom = (float) MathUtility.clamp(Render2DEngine.interpolate(prevProgress, progress, mc.getTickDelta()), 0f, 1f);
-
-                        Render3DEngine.drawFilledBox(
-                                stack,
-                                shrunkMineBox.shrink(noom, noom, noom).offset(0.5 + noom * 0.5, 0.5 + noom * 0.5, 0.5 + noom * 0.5),
-                                progress >= 0.95 ? endFillColor.getValue().getColorObject() : startFillColor.getValue().getColorObject()
-                        );
-
-                        Render3DEngine.drawBoxOutline(
-                                shrunkMineBox.shrink(noom, noom, noom).offset(0.5 + noom * 0.5, 0.5 + noom * 0.5, 0.5 + noom * 0.5),
-                                progress >= 0.95 ? endLineColor.getValue().getColorObject() : startLineColor.getValue().getColorObject(),
-                                lineWidth.getValue()
-                        );
-                    }
-                    case Block -> {
-                        Box renderBox = new Box(minePosition);
-
-                        Render3DEngine.drawFilledBox(
-                                stack,
-                                renderBox,
-                                progress >= 0.95 ? endFillColor.getValue().getColorObject() : startFillColor.getValue().getColorObject()
-                        );
-
-                        Render3DEngine.drawBoxOutline(
-                                renderBox,
-                                progress >= 0.95 ? endLineColor.getValue().getColorObject() : startLineColor.getValue().getColorObject(),
-                                lineWidth.getValue()
-                        );
-                    }
-                }
-            }
-        }
-    }
-
-    @EventHandler
-    public void onAttackBlock(EventAttackBlock event) {
-        if (canBreak(event.getBlockPos()) && !mc.player.getAbilities().creativeMode) {
-            if (mode.getValue() == Mode.Packet) {
-                if (!event.getBlockPos().equals(minePosition)) {
-                    minePosition = event.getBlockPos();
-                    mineFacing = event.getEnumFacing();
-                    progress = 0;
-                    mineBreaks = 0;
-                    if (minePosition != null && mineFacing != null) {
-                        sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, minePosition, mineFacing));
-                        sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, minePosition, mineFacing));
-                    }
-                }
-            }
-        }
-    }
-
-    @EventHandler
-    public void onEntitySync(EventSync event) {
-        if (rotate.getValue()) {
-            if (progress > 0.95) {
-                if (minePosition != null) {
-                    float[] angle = PlayerManager.calcAngle(mc.player.getEyePos(), minePosition.toCenterPos());
-                    mc.player.setYaw(angle[0]);
-                    mc.player.setPitch(angle[1]);
-                }
-            }
-        }
-    }
-
     private int getTool(final BlockPos pos) {
         int index = -1;
         float CurrentFastest = 1.0f;
@@ -327,15 +340,5 @@ public class SpeedMine extends Module {
         final BlockState blockState = mc.world.getBlockState(pos);
         final Block block = blockState.getBlock();
         return block.getHardness() != -1;
-    }
-
-    public enum Mode {
-        Packet,
-        Damage
-    }
-
-    public enum RenderMode {
-        Block,
-        Shrink
     }
 }

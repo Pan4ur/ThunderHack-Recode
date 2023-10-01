@@ -20,6 +20,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -43,7 +44,7 @@ import java.util.Objects;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class Surround extends Module {
-    private final Setting<Sequential> useSequential = new Setting<>("UseSequence", Sequential.None);
+    private final Setting<Sequential> useSequential = new Setting<>("Use Sequence", Sequential.None);
     private final Setting<PlaceTiming> placeTiming = new Setting<>("Place Timing", PlaceTiming.Default);
     private final Setting<Integer> blocksPerTick = new Setting<>("Blocks/Place", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10, v -> placeTiming.getValue() != PlaceTiming.Sequential);
@@ -65,12 +66,12 @@ public class Surround extends Module {
     private final Setting<Boolean> anchor = new Setting<>("Anchor", false).withParent(blocks);
     private final Setting<Boolean> enderChest = new Setting<>("EnderChest", true).withParent(blocks);
     private final Setting<Boolean> netherite = new Setting<>("Netherite", false).withParent(blocks);
-    private final Setting<Boolean> cryingObsidian = new Setting<>("CryingObsidian", true).withParent(blocks);
+    private final Setting<Boolean> cryingObsidian = new Setting<>("Crying Obsidian", true).withParent(blocks);
     private final Setting<Boolean> dirt = new Setting<>("Dirt", false).withParent(blocks);
 
-    private final Setting<Parent> autoDisable = new Setting<>("AutoDisable", new Parent(false, 0));
-    private final Setting<Boolean> onYChange = new Setting<>("OnYChange", true).withParent(autoDisable);
-    private final Setting<Boolean> onTp = new Setting<>("OnTp", true).withParent(autoDisable);
+    private final Setting<Parent> autoDisable = new Setting<>("Auto Disable", new Parent(false, 0));
+    private final Setting<Boolean> onYChange = new Setting<>("On Y Change", true).withParent(autoDisable);
+    private final Setting<Boolean> onTp = new Setting<>("On Tp", true).withParent(autoDisable);
 
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
     private final Setting<BlockAnimationUtility.BlockRenderMode> renderMode = new Setting<>("RenderMode", BlockAnimationUtility.BlockRenderMode.All).withParent(renderCategory);
@@ -140,8 +141,16 @@ public class Surround extends Module {
             return;
         }
 
-        if (getSlot() == -1) disable(isRu() ? "Нет блоков!" : "No blocks!");
+        if (getSlot() == -1)
+            disable(isRu() ? "Нет блоков!" : "No blocks!");
 
+        if (breakCrystal.getValue()) {
+            for (Entity entity : mc.world.getEntities()) {
+                if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(mc.player) <= 25) {
+                    removeCrystal(entity);
+                }
+            }
+        }
 
         if (placeTiming.getValue() == PlaceTiming.Vanilla || placeTiming.getValue() == PlaceTiming.Sequential) {
             BlockPos targetBlock = getSequentialPos();
@@ -172,7 +181,16 @@ public class Surround extends Module {
     }
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.@NotNull Receive e) {
+    private void onEntitySpawn(@NotNull EventEntitySpawn event) {
+        if (event.getEntity() instanceof EndCrystalEntity && breakCrystal.getValue()) {
+            if (event.getEntity().squaredDistanceTo(mc.player) <= 25) {
+                removeCrystal(event.getEntity());
+            }
+        }
+    }
+
+    @EventHandler
+    private void onPacketReceive(PacketEvent.@NotNull Receive e) {
         if (getSlot() == -1) disable(isRu() ? "Нет блоков!" : "No blocks!");
 
         if (e.getPacket() instanceof BlockUpdateS2CPacket pac && mc.player != null) {

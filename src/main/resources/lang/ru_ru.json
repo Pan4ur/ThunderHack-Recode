@@ -1,0 +1,10 @@
+{
+  "descriptions": {
+    "combat": {
+      "auto-crystal": "Сама ставит и ломает кристалы.",
+      "aura": "Бьет врагов по жопе.",
+      "auto-anchor": "Automatically places and explodes respawn anchors.",
+      "auto-mine": "Автоматом копает блоки с помощью SpeedMine."
+    }
+  }
+}

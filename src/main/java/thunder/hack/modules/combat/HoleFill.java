@@ -82,6 +82,7 @@ public class HoleFill extends Module {
     public static final Timer inactivityTimer = new Timer();
     private int tickCounter = 0;
     private boolean selfFillNeed = false;
+    private List<BlockPos> holes;
 
     public HoleFill() {
         super("HoleFill", Category.COMBAT);
@@ -93,12 +94,21 @@ public class HoleFill extends Module {
         selfFillNeed = false;
     }
 
+    @Override
+    public void onThread() {
+        if (tickCounter < actionInterval.getValue()) {
+            return;
+        }
+        holes = findHoles();
+    }
+
     @EventHandler
     public void onSync(EventSync event) {
         if (fullNullCheck()) return;
         if (jumpDisable.getValue() && mc.player.prevY < mc.player.getY())
             disable(isRu() ? "Вы прыгнули! Выключаю..." : "You jumped! Disabling...");
-
+        if (holes == null)
+            return;
         if (tickCounter < actionInterval.getValue()) {
             tickCounter++;
             return;
@@ -108,8 +118,6 @@ public class HoleFill extends Module {
         }
         int slot = getBlockSlot();
         if (slot == -1) return;
-
-        List<BlockPos> holes = findHoles();
 
         PlayerEntity target = ThunderHack.combatManager.getTargets(placeRange.getValue()).stream()
                 .min(Comparator.comparing(e -> mc.player.squaredDistanceTo(e)))

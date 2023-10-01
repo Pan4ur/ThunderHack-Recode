@@ -8,6 +8,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.CommandManager;
 import thunder.hack.modules.client.MainSettings;
@@ -23,17 +24,15 @@ import java.util.Objects;
 
 
 public abstract class Module {
-
     private final Setting<Bind> bind = new Setting<>("Keybind", new Bind(-1, false, false));
     private final Setting<Boolean> drawn = new Setting<>("Drawn", true);
     private final Setting<Boolean> enabled = new Setting<>("Enabled", false);
 
-    private final String description;
+    private String description;
     private final Category category;
     private final String displayName;
 
     public static MinecraftClient mc = MinecraftClient.getInstance();
-
 
     public Module(String name, String description, Category category) {
         this.displayName = name;
@@ -41,9 +40,11 @@ public abstract class Module {
         this.category = category;
     }
 
-    public Module(String name, Category category) {
+    public Module(String name, @NotNull Category category) {
+        Text description = Text.translatable("descriptions." + category.getName().toLowerCase() + "." + generateKey(name));
         this.displayName = name;
-        this.description = name;
+        // TODO fix descriptions
+        // this.description = description.asOrderedText() == null ? "" : description.getString();
         this.category = category;
     }
 
@@ -280,6 +281,26 @@ public abstract class Module {
         }
 
         return null;
+    }
+
+    private static @NotNull String generateKey(@NotNull String name) {
+        StringBuilder formatted = new StringBuilder();
+
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            if (i > 0) {
+                if (Character.isUpperCase(c) && !Character.isUpperCase(name.charAt(i) - 1)) {
+                    formatted.append('-');
+                    formatted.append(Character.toLowerCase(c));
+                } else {
+                    formatted.append(Character.toLowerCase(c));
+                }
+            } else {
+                formatted.append(Character.toLowerCase(c));
+            }
+        }
+
+        return formatted.toString();
     }
 
     public enum Category {
