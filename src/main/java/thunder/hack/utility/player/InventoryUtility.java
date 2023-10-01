@@ -15,12 +15,12 @@ import thunder.hack.core.ModuleManager;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
 
 public final class InventoryUtility {
     private static int cachedSlot = -1;
-
 
     public static int getItemCount(Item item) {
         if (mc.player == null) return 0;
@@ -123,7 +123,7 @@ public final class InventoryUtility {
         return new SearchInvResult(slot, true, mc.player.getInventory().getStack(slot));
     }
 
-    public static SearchInvResult getPickAxeHotbar() {
+    public static SearchInvResult getPickAxeHotBar() {
         if (mc.player == null) return SearchInvResult.notFound();
 
         int slot = -1;
@@ -321,17 +321,33 @@ public final class InventoryUtility {
         mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
     }
 
-    public interface Searcher {
-        boolean isValid(ItemStack stack);
+    public static SearchInvResult getAntiWeaknessItem() {
+        if (mc.player == null) return SearchInvResult.notFound();
+
+        Item mainHand = mc.player.getMainHandStack().getItem();
+        if (mainHand instanceof SwordItem
+                || mainHand instanceof PickaxeItem
+                || mainHand instanceof AxeItem
+                || mainHand instanceof ShovelItem) {
+            return new SearchInvResult(mc.player.getInventory().selectedSlot, true, mc.player.getMainHandStack());
+        }
+
+        return findInHotBar(
+                itemStack -> itemStack.getItem() instanceof SwordItem
+                        || itemStack.getItem() instanceof PickaxeItem
+                        || itemStack.getItem() instanceof AxeItem
+                        || itemStack.getItem() instanceof ShovelItem
+        );
     }
 
-    public static float getHitDamage(ItemStack weapon, PlayerEntity ent) {
+    public static float getHitDamage(@NotNull ItemStack weapon, PlayerEntity ent) {
+        if (mc.player == null) return 0;
         float baseDamage = 1f;
 
-        if(weapon.getItem() instanceof SwordItem swordItem)
-             baseDamage = swordItem.getAttackDamage();
+        if (weapon.getItem() instanceof SwordItem swordItem)
+            baseDamage = swordItem.getAttackDamage();
 
-        if(weapon.getItem() instanceof AxeItem axeItem)
+        if (weapon.getItem() instanceof AxeItem axeItem)
             baseDamage = axeItem.getAttackDamage();
 
         if (mc.player.fallDistance > 0 || ModuleManager.criticals.isEnabled())
@@ -340,19 +356,23 @@ public final class InventoryUtility {
         baseDamage += EnchantmentHelper.getLevel(Enchantments.SHARPNESS, weapon);
 
         if (mc.player.hasStatusEffect(StatusEffects.STRENGTH)) {
-            int strength = mc.player.getStatusEffect(StatusEffects.STRENGTH).getAmplifier() + 1;
+            int strength = Objects.requireNonNull(mc.player.getStatusEffect(StatusEffects.STRENGTH)).getAmplifier() + 1;
             baseDamage += 3 * strength;
         }
 
         // Reduce by resistance
-       // baseDamage = resistanceReduction(target, damage);
+        // baseDamage = resistanceReduction(target, damage);
 
         // Reduce by armour
         baseDamage = DamageUtil.getDamageLeft(baseDamage, ent.getArmor(), (float) ent.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
 
         // Reduce by enchants
-       // damage = normalProtReduction(target, damage);
+        // damage = normalProtReduction(target, damage);
 
         return baseDamage;
+    }
+
+    public interface Searcher {
+        boolean isValid(ItemStack stack);
     }
 }

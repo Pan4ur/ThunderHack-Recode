@@ -28,7 +28,7 @@ public final class HoleUtility {
             for (Vec3i pattern : VECTOR_PATTERN) {
                 BlockPos newPos = checkPos.add(pattern);
 
-                if (!mc.world.getBlockState(newPos).isReplaceable())
+                if (!mc.world.getBlockState(newPos).isAir())
                     surroundPoses.add(newPos);
             }
         });

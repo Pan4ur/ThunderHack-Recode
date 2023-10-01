@@ -1,5 +1,6 @@
 package thunder.hack.modules.combat;
 
+import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -124,7 +125,7 @@ public class Surround extends Module {
 
     @EventHandler
     @SuppressWarnings("unused")
-    public void onSync(EventSync event) {
+    private void onSync(EventSync event) {
         if (mc.player == null) return;
 
         if (onYChange.getValue() && mc.player.getY() != prevY)
@@ -132,7 +133,7 @@ public class Surround extends Module {
     }
 
     @EventHandler
-    public void onPostSync(@SuppressWarnings("unused") EventPostSync e) {
+    private void onPostSync(@SuppressWarnings("unused") EventPostSync e) {
         List<BlockPos> blocks = getBlocks();
         if (blocks.isEmpty()) return;
 
@@ -145,7 +146,8 @@ public class Surround extends Module {
             disable(isRu() ? "Нет блоков!" : "No blocks!");
 
         if (breakCrystal.getValue()) {
-            for (Entity entity : mc.world.getEntities()) {
+            List<Entity> crystals = Lists.newArrayList(mc.world.getEntities());
+            for (Entity entity : crystals) {
                 if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(mc.player) <= 25) {
                     removeCrystal(entity);
                 }
@@ -278,10 +280,7 @@ public class Surround extends Module {
 
         int preSlot = mc.player.getInventory().selectedSlot;
         if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
-            final SearchInvResult result = InventoryUtility.findInHotBar(stack -> stack.getItem() instanceof SwordItem
-                    || stack.getItem() instanceof PickaxeItem
-                    || stack.getItem() instanceof ShovelItem
-                    || stack.getItem() instanceof AxeItem);
+            final SearchInvResult result = InventoryUtility.getAntiWeaknessItem();
             if (!result.found())
                 return;
 

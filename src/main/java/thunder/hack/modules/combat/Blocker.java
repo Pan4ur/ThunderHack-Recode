@@ -6,6 +6,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.network.listener.PacketListener;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -110,9 +114,15 @@ public class Blocker extends Module {
                 if (crystalBreaker.getValue())
                     for (Entity entity : mc.world.getOtherEntities(null, new Box(pos))) {
                         if (entity instanceof EndCrystalEntity) {
-                            mc.interactionManager.attackEntity(mc.player, entity);
+                            if (placeMode.getValue() == InteractionUtility.PlaceMode.Packet)
+                                sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
+                            else
+                                mc.interactionManager.attackEntity(mc.player, entity);
+
                             if (swing.getValue())
                                 mc.player.swingHand(Hand.MAIN_HAND);
+                            else
+                                sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                         }
                     }
 
@@ -164,7 +174,7 @@ public class Blocker extends Module {
             if (antiCiv.getValue()) {
                 for (BlockPos checkPos : HoleUtility.getSurroundPoses(playerPos)) {
                     if (checkPos.up().equals(pos))
-                        placePositions.add(playerPos.add(checkPos.add(0, 2, 0)));
+                        placePositions.add(playerPos.add(checkPos.up(2)));
                 }
             }
         }

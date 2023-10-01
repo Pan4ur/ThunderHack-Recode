@@ -167,7 +167,7 @@ public class CevBreaker extends Module {
 
         // Checking if structure placed, start breaking. (Place crystal, if it is necessary)
         if (mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.OBSIDIAN)) {
-            if (SpeedMine.progress >= placeCrystalProgress && SpeedMine.minePosition.equals(target.getBlockPos().up(2))) {
+            if (SpeedMine.progress >= placeCrystalProgress && target.getBlockPos().up(2).equals(SpeedMine.minePosition)) {
                 placeCrystal();
                 return;
             } else {
@@ -346,7 +346,7 @@ public class CevBreaker extends Module {
         ThunderHack.asyncManager.run(() -> {
                     final int preSlot = mc.player.getInventory().selectedSlot;
                     if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
-                        SearchInvResult swordResult = InventoryUtility.getSword();
+                        SearchInvResult swordResult = InventoryUtility.getAntiWeaknessItem();
                         if (autoSwap.getValue()) swordResult.switchTo();
                     }
 
@@ -407,10 +407,11 @@ public class CevBreaker extends Module {
             }
             case Packet -> {
                 if (ModuleManager.speedMine.isEnabled()
-                        && SpeedMine.progress != 0
-                        && !mc.world.getBlockState(SpeedMine.minePosition).isAir()) {
+                        && SpeedMine.progress != 0)
                     return;
-                }
+                if (SpeedMine.minePosition != null
+                        && !mc.world.getBlockState(SpeedMine.minePosition).isAir())
+                    return;
 
                 InteractionUtility.BreakData bData = InteractionUtility.getBreakData(pos, interact.getValue());
                 if (bData == null) return;
