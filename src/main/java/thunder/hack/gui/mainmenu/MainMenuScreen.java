@@ -140,7 +140,7 @@ public class MainMenuScreen extends Screen {
         }
 
         if (Render2DEngine.isHovered(mouseX, mouseY, (int) (halfOfWidth - 157), (int) (halfOfHeight - 140), 300, 70))
-            Util.getOperatingSystem().open(URI.create("https://thunderhack.xyz"));
+            Util.getOperatingSystem().open(URI.create("https://thunderhack.onrender.com/"));
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
