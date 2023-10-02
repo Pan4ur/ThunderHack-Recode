@@ -2,6 +2,7 @@ package thunder.hack.gui.clickui;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.cmd.Command;
@@ -63,6 +64,10 @@ public class ModuleButton extends AbstractButton {
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta, Color color) {
         hovered = Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height);
+
+        if(hovered)
+            ClickUI.currentDescription = Text.translatable(module.getDescription()).getString();
+
         double ix = x + 5;
         double iy = y + height / 2 - (6 / 2f);
 

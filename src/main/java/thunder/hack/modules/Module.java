@@ -36,15 +36,13 @@ public abstract class Module {
 
     public Module(String name, String description, Category category) {
         this.displayName = name;
-        this.description = description;
+        this.description = "descriptions." + category.getName().toLowerCase() + "." + name.toLowerCase();
         this.category = category;
     }
 
     public Module(String name, @NotNull Category category) {
-        Text description = Text.translatable("descriptions." + category.getName().toLowerCase() + "." + generateKey(name));
         this.displayName = name;
-        // TODO fix descriptions
-        // this.description = description.asOrderedText() == null ? "" : description.getString();
+        this.description = "descriptions." + category.getName().toLowerCase() + "." + name.toLowerCase();
         this.category = category;
     }
 
@@ -283,25 +281,6 @@ public abstract class Module {
         return null;
     }
 
-    private static @NotNull String generateKey(@NotNull String name) {
-        StringBuilder formatted = new StringBuilder();
-
-        for (int i = 0; i < name.length(); i++) {
-            char c = name.charAt(i);
-            if (i > 0) {
-                if (Character.isUpperCase(c) && !Character.isUpperCase(name.charAt(i) - 1)) {
-                    formatted.append('-');
-                    formatted.append(Character.toLowerCase(c));
-                } else {
-                    formatted.append(Character.toLowerCase(c));
-                }
-            } else {
-                formatted.append(Character.toLowerCase(c));
-            }
-        }
-
-        return formatted.toString();
-    }
 
     public enum Category {
         COMBAT("Combat"),

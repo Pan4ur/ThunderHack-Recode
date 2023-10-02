@@ -2,6 +2,7 @@ package thunder.hack.gui.thundergui.components;
 
 
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 import thunder.hack.cmd.Command;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui2;
@@ -39,14 +40,11 @@ public class ModulePlate {
         scroll_animation = 0;
     }
 
-
     public void render(MatrixStack stack, int MouseX, int MouseY) {
-
         if (scrollPosY != posY) {
             scroll_animation = ThunderGui2.fast(scroll_animation, 1, 15f);
             posY = (int) Render2DEngine.interpolate(prevPosY, scrollPosY, scroll_animation);
         }
-
 
         if ((posY > ThunderGui2.getInstance().main_posY + ThunderGui2.getInstance().height) || posY < ThunderGui2.getInstance().main_posY) {
             return;
@@ -134,20 +132,17 @@ public class ModulePlate {
         }
 
         if (!listening_bind && module.getDescription() != null) {
-            String[] splitString = module.getDescription().split("-");
-            if (splitString[0] != null && !splitString[0].equals("")) {
-                FontRenderers.settings.drawString(stack, splitString[0], posX + 5, posY + 14, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
-            }
-            if (splitString.length > 1) {
-                if (splitString[1] != null && !splitString[1].equals("")) {
-                    FontRenderers.settings.drawString(stack, splitString[1], posX + 5, posY + 19, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
+            int step = 0;
+            StringBuilder firstString = new StringBuilder();
+            for(String word : Text.translatable(module.getDescription()).getString().split(" ")){
+                firstString.append(word + " ");
+                String[] splitString2 = firstString.toString().split("\n");
+                if(FontRenderers.settings.getStringWidth(splitString2[step]) > 70){
+                    firstString.append("\n");
+                    step++;
                 }
             }
-            if (splitString.length == 3) {
-                if (splitString[2] != null && !splitString[2].equals("")) {
-                    FontRenderers.settings.drawString(stack, splitString[2], posX + 5, posY + 24, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
-                }
-            }
+            FontRenderers.settings.drawString(stack, firstString.toString(), posX + 5, posY + 14, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
         }
 
         if(listening_bind){

@@ -21,6 +21,7 @@ import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -38,6 +39,8 @@ public class ClickUI extends Screen {
     private float scrollY;
     private boolean setup = false;
     private int hstep = 0;
+
+    public static String currentDescription = "";
 
     public ClickUI() {
         super(Text.of("ClickGUI"));
@@ -95,8 +98,6 @@ public class ClickUI extends Screen {
     public boolean shouldPause() {
         return false;
     }
-
-
 
 
     @Override
@@ -250,6 +251,13 @@ public class ClickUI extends Screen {
 
                 context.drawTexture(pic3, (int) hx - 45, (int) hy + 10, 0, 0, 80, 75, 80, 75);
             }
+        }
+
+        if (!Objects.equals(currentDescription, "") && ModuleManager.clickGui.descriptions.getValue()) {
+            Render2DEngine.drawRoundDoubleColor(context.getMatrices(), mouseX + 7, mouseY + 7, FontRenderers.sf_medium.getStringWidth(currentDescription) + 6, 11, 3f, ClickGui.getInstance().getColor(200), ClickGui.getInstance().getColor(0));
+            Render2DEngine.drawRound(context.getMatrices(), mouseX + 7.5f, mouseY + 7.5f, FontRenderers.sf_medium.getStringWidth(currentDescription) + 5, 10, 3f, ClickGui.getInstance().plateColor.getValue().getColorObject());
+            FontRenderers.sf_medium.drawString(context.getMatrices(), currentDescription, mouseX + 10, mouseY + 10, -1);
+            currentDescription = "";
         }
     }
 
