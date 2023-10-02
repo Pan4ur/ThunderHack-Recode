@@ -36,7 +36,6 @@ public class CfgCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
             return SINGLE_SUCCESS;
         }));
 

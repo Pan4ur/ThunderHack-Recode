@@ -152,6 +152,34 @@ public class ConfigManager {
         ThunderHack.moduleManager.onUnloadPost();
         load(file);
         ThunderHack.moduleManager.onLoad();
+    }
+
+    public void loadModuleOnly(String name, String module) {
+        File file = new File(ConfigsFolder, name + ".th");
+        if (!file.exists()) {
+            if (MainSettings.isRu()) {
+                Command.sendMessage("Конфига " + name + " не существует!");
+            } else {
+                Command.sendMessage("Config " + name + " does not exist!");
+            }
+            return;
+        }
+
+        ThunderHack.moduleManager.onUnload();
+        ThunderHack.moduleManager.onUnloadPost();
+
+
+        Module module1 = ThunderHack.moduleManager.modules.stream()
+                .filter(m1 -> Objects.equals(m1.getName(), module))
+                .findFirst().orElse(null);
+
+        if(module1 == null){
+            Command.sendMessage("error 228");
+            return;
+        }
+
+        loadModuleOnly(file, module1);
+        ThunderHack.moduleManager.onLoad();
 
     }
 
@@ -197,6 +225,51 @@ public class ConfigManager {
         saveCurrentConfig();
     }
 
+    public void loadModuleOnly(File config, Module module) {
+        try {
+            FileReader reader = new FileReader(config);
+            JsonParser parser = new JsonParser();
+
+            JsonArray array = null;
+            try {
+                array = (JsonArray) parser.parse(reader);
+            } catch (ClassCastException e) {
+            }
+
+            JsonArray modules = null;
+            try {
+                JsonObject modulesObject = (JsonObject) array.get(0);
+                modules = modulesObject.getAsJsonArray("Modules");
+            } catch (Exception ignored) {
+            }
+
+            if (modules != null) {
+                modules.forEach(m -> {
+                    Module module1 = ThunderHack.moduleManager.modules.stream()
+                            .filter(m1 -> m.getAsJsonObject().getAsJsonObject(m1.getName()) != null)
+                            .findFirst().orElse(null);
+
+                    if (module1 == null)
+                        return;
+
+                    if (Objects.equals(module.getName(), module1.getName())) {
+                        try {
+                            parseModule(m.getAsJsonObject());
+                        } catch (NullPointerException e) {
+                            System.err.println(e.getMessage());
+                        }
+                    }
+                });
+            }
+            if (MainSettings.isRu()) {
+                Command.sendMessage("Загружен модуль " + module.getName() + " с конфига " + config.getName());
+            } else {
+                Command.sendMessage("Loaded " + module.getName() + " from " + config.getName());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void save(String name) {
         File file = new File(ConfigsFolder, name + ".th");

@@ -127,7 +127,7 @@ public class PacketFly extends Module {
             Teleport teleport = (Teleport) teleports.remove(pac.getTeleportId());
             if (
                     mc.player.isAlive()
-                    && mc.world.isChunkLoaded((int) mc.player.getX(), (int) mc.player.getZ())
+                    && mc.world.isChunkLoaded((int) mc.player.getX() >> 4, (int) mc.player.getZ() >> 4)
                     && !(mc.currentScreen instanceof DownloadingTerrainScreen)
                     && mode.getValue() != Mode.Rubber
                     && teleport != null

@@ -10,12 +10,13 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static thunder.hack.modules.Module.mc;
 
 public final class MathUtility {
     public static double random(double min, double max) {
-        return Math.random() * (max - min) + min;
+        return ThreadLocalRandom.current().nextDouble() * (max - min) + min;
     }
 
     public static float random(float min, float max) {

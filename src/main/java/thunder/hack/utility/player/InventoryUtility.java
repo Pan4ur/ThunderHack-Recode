@@ -102,6 +102,27 @@ public final class InventoryUtility {
         return new SearchInvResult(slot, true, mc.player.getInventory().getStack(slot));
     }
 
+    public static SearchInvResult getPickAxeHotbar() {
+        if (mc.player == null) return SearchInvResult.notFound();
+
+        int slot = -1;
+        float f = 1.0F;
+        for (int b1 = 0; b1 < 9; b1++) {
+            ItemStack itemStack = mc.player.getInventory().getStack(b1);
+            if (itemStack != null && itemStack.getItem() instanceof PickaxeItem) {
+                float f1 = 0;
+                f1 += EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, itemStack);
+                if (f1 > f) {
+                    f = f1;
+                    slot = b1;
+                }
+            }
+        }
+
+        if (slot == -1) return SearchInvResult.notFound();
+        return new SearchInvResult(slot, true, mc.player.getInventory().getStack(slot));
+    }
+
     public static SearchInvResult getPickAxe() {
         if (mc.player == null) return SearchInvResult.notFound();
 
