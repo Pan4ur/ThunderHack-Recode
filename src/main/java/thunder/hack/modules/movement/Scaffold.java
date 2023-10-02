@@ -6,6 +6,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -37,24 +38,41 @@ public class Scaffold extends Module {
     public Setting<Boolean> autoswap = new Setting<>("AutoSwap", true);
     public Setting<Boolean> tower = new Setting<>("Tower", true);
     public Setting<Boolean> safewalk = new Setting<>("SafeWalk", true);
-    public Setting<Boolean> autoSneak = new Setting<>("AutoSneak", false);
     public Setting<Boolean> echestholding = new Setting<>("EchestHolding", false);
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
     public Setting<Boolean> render = new Setting<>("Render", true).withParent(renderCategory);
     private final Setting<BlockAnimationUtility.BlockRenderMode> renderMode = new Setting<>("RenderMode", BlockAnimationUtility.BlockRenderMode.All).withParent(renderCategory);
     private final Setting<BlockAnimationUtility.BlockAnimationMode> animationMode = new Setting<>("AnimationMode", BlockAnimationUtility.BlockAnimationMode.Fade).withParent(renderCategory);
-    private final Setting<ColorSetting> renderFillColor = new Setting<>("RenderFill", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
-    private final Setting<ColorSetting> renderLineColor = new Setting<>("RenderLine", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
+    private final Setting<ColorSetting> renderFillColor = new Setting<>("RenderFillColor", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
+    private final Setting<ColorSetting> renderLineColor = new Setting<>("RenderLineColor", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<Integer> renderLineWidth = new Setting<>("RenderLineWidth", 2, 1, 5).withParent(renderCategory);
 
     public Setting<Boolean> strictRotate = new Setting<>("StrictRotate", false);
 
     private final Timer timer = new Timer();
     private BlockPosWithFacing currentblock;
-    private float[] rotation = new float[2];
+    float[] rotation = new float[2];
 
     public Scaffold() {
         super("Scaffold", "лучший скафф", Category.MOVEMENT);
+    }
+
+    private int findBlockToPlace() {
+        if (mc.player.getMainHandStack().getItem() instanceof BlockItem) {
+            if (((BlockItem) mc.player.getMainHandStack().getItem()).getBlock().getDefaultState().isSolid())
+                return mc.player.getInventory().selectedSlot;
+        }
+        for (int i = 0; i < 9; i++) {
+            if (mc.player.getInventory().getStack(i).getCount() != 0) {
+                if (mc.player.getInventory().getStack(i).getItem() instanceof BlockItem) {
+                    if (!echestholding.getValue() || (echestholding.getValue() && !mc.player.getInventory().getStack(i).getItem().equals(Item.fromBlock(Blocks.ENDER_CHEST)))) {
+                        if (((BlockItem) mc.player.getInventory().getStack(i).getItem()).getBlock().getDefaultState().isSolid())
+                            return i;
+                    }
+                }
+            }
+        }
+        return -1;
     }
 
     @Override
@@ -63,8 +81,9 @@ public class Scaffold extends Module {
     }
 
     private BlockPosWithFacing checkNearBlocksExtended(BlockPos blockPos) {
-        BlockPosWithFacing ret = checkNearBlocks(blockPos);
+        BlockPosWithFacing ret = null;
 
+        ret = checkNearBlocks(blockPos);
         if (ret != null) return ret;
 
         ret = checkNearBlocks(blockPos.add(-1, 0, 0));
@@ -176,7 +195,9 @@ public class Scaffold extends Module {
 
     @EventHandler
     public void onMove(EventMove event) {
-        if (safewalk.getValue() && !autoSneak.getValue())
+        if (fullNullCheck()) return;
+
+        if (safewalk.getValue())
             doSafeWalk(event);
     }
 
@@ -205,16 +226,18 @@ public class Scaffold extends Module {
 
         Item item = mc.player.getInventory().getStack(n2).getItem();
         if (!(item instanceof BlockItem)) return;
+        boolean fullBlock = false;
+        BlockPos blockPos2 = new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY()) - (fullBlock ? 1.0 : 0.01)), (int) Math.floor(mc.player.getZ()));
 
-        BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos()).down();
+        if (!mc.world.getBlockState(blockPos2).isReplaceable()) return;
 
-        if (!mc.world.getBlockState(playerPos).isReplaceable()) return;
-
-        currentblock = checkNearBlocksExtended(playerPos);
+        currentblock = checkNearBlocksExtended(blockPos2);
         if (currentblock != null) {
             if (rotate.getValue()) {
+
                 Vec3d hitVec = new Vec3d(currentblock.position().getX() + 0.5, currentblock.position().getY() + 0.90, currentblock.position().getZ() + 0.5).add(new Vec3d(currentblock.facing().getUnitVector()).multiply(0.5));
                 float[] rotations = InteractionUtility.calculateAngle(hitVec);
+
                 if (strictRotate.getValue()) {
                     rotation = rotations;
                 } else {
@@ -227,23 +250,21 @@ public class Scaffold extends Module {
 
     @EventHandler
     public void onPost(EventPostSync e) {
-        if (mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.1, 0, -0.1).offset(0, -0.5, 0)).iterator().hasNext()) {
-            if(autoSneak.getValue())
-                mc.options.sneakKey.setPressed(false);
+        if (mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.2, 0, -0.2).offset(0, -0.5, 0)).iterator().hasNext())
             return;
-        } else {
-            if(autoSneak.getValue())
-                mc.options.sneakKey.setPressed(true);
-        }
-
         if (currentblock == null) return;
         int prev_item = mc.player.getInventory().selectedSlot;
         if (!(mc.player.getMainHandStack().getItem() instanceof BlockItem)) {
-            if (autoswap.getValue())
-                InventoryUtility.switchTo(findBlockToPlace());
+            if (autoswap.getValue()) {
+                int blockSlot = findBlockToPlace();
+                if (blockSlot != -1) {
+                    mc.player.getInventory().selectedSlot = blockSlot;
+                    mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(blockSlot));
+                }
+            }
         }
         if ((mc.player.getMainHandStack().getItem() instanceof BlockItem) && ((BlockItem) mc.player.getMainHandStack().getItem()).getBlock().getDefaultState().isSolid()) {
-            if (!mc.player.input.jumping || MovementUtility.isMoving() || !tower.getValue()) {
+            if (!mc.player.input.jumping || mc.player.input.movementForward != 0.0f || mc.player.input.movementSideways != 0.0f || !tower.getValue()) {
                 timer.reset();
             } else {
                 mc.player.setVelocity(0.0, 0.42, 0.0);
@@ -252,24 +273,7 @@ public class Scaffold extends Module {
                     timer.reset();
                 }
             }
-
-            boolean upPlace = currentblock.facing() == Direction.UP;
-
-            Vec3d hitVec;
-
-            if(upPlace){
-                hitVec = new Vec3d(
-                        currentblock.position().getX() + Math.abs(random(0.35, 0.49) + currentblock.facing().getVector().getX() * random(0.35, 0.49)),
-                        currentblock.position().getY() + 1f,
-                        currentblock.position().getZ() + Math.abs(random(0.35, 0.49) + currentblock.facing().getVector().getZ() * random(0.35, 0.49))
-                );
-            } else {
-                hitVec = new Vec3d(
-                        currentblock.position().getX() + Math.abs(random(0.35, 0.49) + currentblock.facing().getVector().getX() * random(0.35, 0.49)),
-                        currentblock.position().getY() + random(0.6, 0.92),
-                        currentblock.position().getZ() + Math.abs(random(0.35, 0.49) + currentblock.facing().getVector().getZ() * random(0.35, 0.49))
-                );
-            }
+            Vec3d hitVec = new Vec3d(currentblock.position().getX() + 0.5, currentblock.position().getY() + 0.90, currentblock.position().getZ() + 0.5).add(new Vec3d(currentblock.facing().getUnitVector()).multiply(0.5));
 
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(hitVec, currentblock.facing(), currentblock.position(), false));
             mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -277,26 +281,10 @@ public class Scaffold extends Module {
             if (render.getValue())
                 BlockAnimationUtility.renderBlock(currentblock.position(), renderLineColor.getValue().getColorObject(), renderLineWidth.getValue(), renderFillColor.getValue().getColorObject(), animationMode.getValue(), renderMode.getValue());
 
-            if (!strictRotate.getValue())
-                InventoryUtility.switchTo(prev_item);
-        }
-    }
-
-    private int findBlockToPlace() {
-        if (mc.player.getMainHandStack().getItem() instanceof BlockItem) {
-            if (((BlockItem) mc.player.getMainHandStack().getItem()).getBlock().getDefaultState().isSolid())
-                return mc.player.getInventory().selectedSlot;
-        }
-        for (int i = 0; i < 9; i++) {
-            if (mc.player.getInventory().getStack(i).getCount() != 0) {
-                if (mc.player.getInventory().getStack(i).getItem() instanceof BlockItem) {
-                    if (!echestholding.getValue() || (echestholding.getValue() && !mc.player.getInventory().getStack(i).getItem().equals(Item.fromBlock(Blocks.ENDER_CHEST)))) {
-                        if (((BlockItem) mc.player.getInventory().getStack(i).getItem()).getBlock().getDefaultState().isSolid())
-                            return i;
-                    }
-                }
+            if (!strictRotate.getValue()) {
+                mc.player.getInventory().selectedSlot = prev_item;
+                mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
             }
         }
-        return -1;
     }
 }
