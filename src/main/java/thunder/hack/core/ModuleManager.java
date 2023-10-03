@@ -120,6 +120,7 @@ public class ModuleManager {
     public static AutoLeave autoLeave = new AutoLeave();
     public static AutoFlyme autoFlyme = new AutoFlyme();
     public static AutoArmor autoArmor = new AutoArmor();
+    public static AutoBed autoBed = new AutoBed();
     public static ViewLock viewLock = new ViewLock();
     public static Velocity velocity = new Velocity();
     public static Tooltips tooltips = new Tooltips();

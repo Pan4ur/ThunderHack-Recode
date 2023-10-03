@@ -168,7 +168,6 @@ public class SpeedMine extends Module {
             mc.world.removeBlock(minePosition, false);
             float dmg = ExplosionUtility.getExplosionDamage1(minePosition.toCenterPos(), pl);
             mc.world.setBlockState(minePosition, Blocks.OBSIDIAN.getDefaultState());
-            ExplosionUtility.anchorIgnore = null;
             if (ThunderHack.friendManager.isFriend(pl.getEntityName())) continue;
             if (dmg > 7.5f) return true;
         }
