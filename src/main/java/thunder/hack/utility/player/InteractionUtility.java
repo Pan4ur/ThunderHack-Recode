@@ -1,7 +1,9 @@
 package thunder.hack.utility.player;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.FluidBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
@@ -111,7 +113,7 @@ public final class InteractionUtility {
     }
 
     public static boolean canPlaceBlock(BlockPos bp, Interact interact, boolean ignoreEntities) {
-        if(awaiting.containsKey(bp)) return false;
+        if (awaiting.containsKey(bp)) return false;
         return getPlaceResult(bp, interact, ignoreEntities) != null;
     }
 
@@ -123,13 +125,23 @@ public final class InteractionUtility {
 
     @Nullable
     public static BlockHitResult getPlaceResult(BlockPos bp, Interact interact, boolean ignoreEntities) {
-        if (!ignoreEntities) {
-            ArrayList<Entity> cache = new ArrayList<>(mc.world.getNonSpectatingEntities(Entity.class, new Box(bp)));
-            for (Entity entity : cache)
+        if (!ignoreEntities)
+            for (Entity entity : new ArrayList<>(mc.world.getNonSpectatingEntities(Entity.class, new Box(bp))))
                 if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity))
                     return null;
+
+        BlockState bs = mc.world.getBlockState(bp);
+
+        /*
+        if (!mc.world.getBlockState(bp).isReplaceable()) {
+            return null;
+        } else if (!(bs.getBlock() instanceof FluidBlock) && !bs.isAir()) {
+            BreakData bData = getBreakData(bp, interact);
+            return new BlockHitResult(bData.vector, bData.dir, bp, false);
         }
-        if (!mc.world.getBlockState(bp).isReplaceable()) return null;
+
+         */
+
         ArrayList<BlockPosWithFacing> supports = getSupportBlocks(bp);
         for (BlockPosWithFacing support : supports) {
             if (interact != Interact.Vanilla) {

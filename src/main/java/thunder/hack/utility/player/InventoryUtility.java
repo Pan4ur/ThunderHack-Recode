@@ -413,6 +413,20 @@ public final class InventoryUtility {
         return SearchInvResult.notFound();
     }
 
+    public static int getBedsCount() {
+        if (mc.player == null) return 0;
+
+        int counter = 0;
+
+        for (int i = 0; i <= 44; ++i) {
+            ItemStack itemStack = mc.player.getInventory().getStack(i);
+            if (!(itemStack.getItem() instanceof BedItem)) continue;
+            counter += itemStack.getCount();
+        }
+
+        return counter;
+    }
+
 
     public interface Searcher {
         boolean isValid(ItemStack stack);
