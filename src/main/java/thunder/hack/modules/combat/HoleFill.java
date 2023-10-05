@@ -236,23 +236,20 @@ public class HoleFill extends Module {
     private @NotNull List<BlockPos> findHoles() {
         List<BlockPos> positions = new ArrayList<>();
         BlockPos centerPos = mc.player.getBlockPos();
-        int r = (int) Math.ceil(placeRange.getValue()) + 1;
-        int h = placeRange.getValue().intValue();
 
-        for (int i = centerPos.getX() - r; i < centerPos.getX() + r; i++) {
-            for (int j = centerPos.getY() - h; j < centerPos.getY() + h; j++) {
-                for (int k = centerPos.getZ() - r; k < centerPos.getZ() + r; k++) {
-                    BlockPos pos = new BlockPos(i, j, k);
-                    if (isHole(pos) && !isFillingNow(pos)) {
-                        BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), pos.toCenterPos().offset(Direction.UP, 0.5f), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
-                        if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != pos)
-                            if (InteractionUtility.squaredDistanceFromEyes(pos.toCenterPos()) > placeWallRange.getPow2Value())
-                                continue;
-                        positions.add(pos);
-                    }
-                }
+        BlockPos.iterateOutwards(centerPos,
+                placeRange.getValue().intValue() + 1,
+                placeRange.getValue().intValue() + 1,
+                placeRange.getValue().intValue() + 1
+        ).forEach(pos -> {
+            if (isHole(pos) && !isFillingNow(pos)) {
+                BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), pos.toCenterPos().offset(Direction.UP, 0.5f), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
+                if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != pos)
+                    if (InteractionUtility.squaredDistanceFromEyes(pos.toCenterPos()) > placeWallRange.getPow2Value())
+                        return;
+                positions.add(pos);
             }
-        }
+        });
 
         return positions;
     }

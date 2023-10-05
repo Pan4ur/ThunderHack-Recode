@@ -1,6 +1,7 @@
 package thunder.hack.modules.render;
 
 import net.minecraft.client.util.math.MatrixStack;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
@@ -29,13 +30,11 @@ public class Search extends Module {
     private final Setting<Boolean> fill = new Setting<>("Fill", true);
     private final Setting<Boolean> outline = new Setting<>("Outline", true);
 
+    private SearchThread searchThread = new SearchThread();
 
     public Search() {
         super("Search", "подсветка блоков", Category.RENDER);
     }
-
-    private SearchThread searchThread = new SearchThread();
-
 
     @Override
     public void onEnable() {
@@ -63,7 +62,7 @@ public class Search extends Module {
 
     public void onRender3D(MatrixStack stack) {
         if (fullNullCheck() || blocks.isEmpty()) return;
-        if(FrameRateCounter.INSTANCE.getFps() < 10 && mc.player.age > 100) disable("Saving ur pc :)");
+        if (FrameRateCounter.INSTANCE.getFps() < 10 && mc.player.age > 100) disable("Saving ur pc :)");
 
         if (fill.getValue() || outline.getValue()) {
             for (BlockVec vec : blocks) {
@@ -78,7 +77,7 @@ public class Search extends Module {
                     Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(new Box(pos), color.getValue().getColorObject()));
 
 
-                if(outline.getValue())
+                if (outline.getValue())
                     Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(new Box(pos), color.getValue().getColorObject(), 2f));
             }
         }
@@ -110,7 +109,7 @@ public class Search extends Module {
         return false;
     }
 
-    private boolean shouldRender(BlockVec vec) {
+    private boolean shouldRender(@NotNull BlockVec vec) {
         if (defaultBlocks.contains(mc.world.getBlockState(new BlockPos((int) vec.x, (int) vec.y, (int) vec.z)).getBlock())) {
             return true;
         }
@@ -141,18 +140,9 @@ public class Search extends Module {
         return Objects.equals(mc.world.getRegistryKey().getValue().getPath(), "the_nether");
     }
 
-    private static class BlockVec {
-        public final double x;
-        public final double y;
-        public final double z;
+    private record BlockVec(double x, double y, double z) {
 
-        public BlockVec(double x, double y, double z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        public double getDistance(BlockVec v) {
+        public double getDistance(@NotNull BlockVec v) {
             double dx = x - v.x;
             double dy = y - v.y;
             double dz = z - v.z;
@@ -171,8 +161,8 @@ public class Search extends Module {
                         for (int x = (int) Math.floor(mc.player.getX() - range.getValue()); x <= Math.ceil(mc.player.getX() + range.getValue()); x++) {
                             for (int y = mc.world.getBottomY() + 1; y <= mc.world.getTopY(); y++) {
                                 for (int z = (int) Math.floor(mc.player.getZ() - range.getValue()); z <= Math.ceil(mc.player.getZ() + range.getValue()); z++) {
-                                    BlockPos pos = new BlockPos(x,y,z);
-                                    if(mc.world.isAir(pos)) continue;
+                                    BlockPos pos = new BlockPos(x, y, z);
+                                    if (mc.world.isAir(pos)) continue;
                                     if (shouldAdd(mc.world.getBlockState(pos).getBlock(), pos)) {
                                         bloks.add(new BlockVec(pos.getX(), pos.getY(), pos.getZ()));
                                     }
@@ -185,7 +175,8 @@ public class Search extends Module {
                     } else {
                         Thread.yield();
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
     }

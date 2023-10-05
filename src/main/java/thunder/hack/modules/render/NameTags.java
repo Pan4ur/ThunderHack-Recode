@@ -19,6 +19,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector4d;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
@@ -36,27 +37,23 @@ import java.util.ArrayList;
 
 
 public class NameTags extends Module {
-    public NameTags() {
-        super("NameTags", "NameTags", Category.RENDER);
-    }
-
-    private Setting<Float> scale = new Setting<>("Scale", 1f, 0.1f, 10f);
-    private Setting<Float> height = new Setting<>("Height", 2f, 0.1f, 10f);
+    private final Setting<Float> scale = new Setting<>("Scale", 1f, 0.1f, 10f);
+    private final Setting<Float> height = new Setting<>("Height", 2f, 0.1f, 10f);
 
 
-    private Setting<Boolean> gamemode = new Setting<>("Gamemode", false);
-    private Setting<Boolean> spawners = new Setting<>("SpawnerNameTag", false);
-    private Setting<Boolean> entityOwner = new Setting<>("EntityOwner", false);
+    private final Setting<Boolean> gamemode = new Setting<>("Gamemode", false);
+    private final Setting<Boolean> spawners = new Setting<>("SpawnerNameTag", false);
+    private final Setting<Boolean> entityOwner = new Setting<>("EntityOwner", false);
 
-    private Setting<Boolean> ping = new Setting<>("Ping", false);
-    private Setting<Boolean> health = new Setting<>("Health", true);
-    private Setting<Boolean> distance = new Setting<>("Distance", true);
-    private Setting<Boolean> pops = new Setting<>("TotemPops", true);
-    private Setting<Boolean> outline = new Setting<>("Outline", true);
-    private Setting<Boolean> enchantss = new Setting<>("Enchants", true);
-    private Setting<Boolean> potions = new Setting<>("Potions", true);
-    private Setting<Boolean> box = new Setting<>("Box", true);
-    private Setting<ColorSetting> fillColorA = new Setting<>("Color", new ColorSetting(0x80000000));
+    private final Setting<Boolean> ping = new Setting<>("Ping", false);
+    private final Setting<Boolean> health = new Setting<>("Health", true);
+    private final Setting<Boolean> distance = new Setting<>("Distance", true);
+    private final Setting<Boolean> pops = new Setting<>("TotemPops", true);
+    private final Setting<Boolean> outline = new Setting<>("Outline", true);
+    private final Setting<Boolean> enchantss = new Setting<>("Enchants", true);
+    private final Setting<Boolean> potions = new Setting<>("Potions", true);
+    private final Setting<Boolean> box = new Setting<>("Box", true);
+    private final Setting<ColorSetting> fillColorA = new Setting<>("Color", new ColorSetting(0x80000000));
 
     public static final Setting<Font> font = new Setting<>("FontMode", Font.Fancy);
 
@@ -64,10 +61,14 @@ public class NameTags extends Module {
         Fancy, Fast
     }
 
-    public static final Setting<Armor> armorMode = new Setting<>("ArmorMode", Armor.Full);
-
     public enum Armor {
         None, Full, Durability
+    }
+
+    private final Setting<Armor> armorMode = new Setting<>("ArmorMode", Armor.Full);
+
+    public NameTags() {
+        super("NameTags", "NameTags", Category.RENDER);
     }
 
     public void onRender2D(DrawContext context) {
@@ -83,9 +84,8 @@ public class NameTags extends Module {
 
 
             vector = Render3DEngine.worldSpaceToScreenSpace(new Vec3d(vector.x, vector.y, vector.z));
-            if (vector != null && vector.z > 0 && vector.z < 1) {
-                if (position == null)
-                    position = new Vector4d(vector.x, vector.y, vector.z, 0);
+            if (vector.z > 0 && vector.z < 1) {
+                position = new Vector4d(vector.x, vector.y, vector.z, 0);
                 position.x = Math.min(vector.x, position.x);
                 position.y = Math.min(vector.y, position.y);
                 position.z = Math.max(vector.x, position.z);
@@ -252,7 +252,7 @@ public class NameTags extends Module {
                 Vec3d vector = new Vec3d(spawner.getPos().getX() + 0.5, spawner.getPos().getY() + 1.5, spawner.getPos().getZ() + 0.5);
                 Vector4d position = null;
                 vector = Render3DEngine.worldSpaceToScreenSpace(new Vec3d(vector.x, vector.y, vector.z));
-                if (vector != null && vector.z > 0 && vector.z < 1) {
+                if (vector.z > 0 && vector.z < 1) {
                     position = new Vector4d(vector.x, vector.y, vector.z, 0);
                     position.x = Math.min(vector.x, position.x);
                     position.y = Math.min(vector.y, position.y);
@@ -304,7 +304,7 @@ public class NameTags extends Module {
             Vec3d vector = new Vec3d(x, y + 2, z);
             Vector4d position = null;
             vector = Render3DEngine.worldSpaceToScreenSpace(new Vec3d(vector.x, vector.y, vector.z));
-            if (vector != null && vector.z > 0 && vector.z < 1) {
+            if (vector.z > 0 && vector.z < 1) {
                 position = new Vector4d(vector.x, vector.y, vector.z, 0);
                 position.x = Math.min(vector.x, position.x);
                 position.y = Math.min(vector.y, position.y);
@@ -334,7 +334,7 @@ public class NameTags extends Module {
         }
     }
 
-    public void drawBox(PlayerEntity ent, DrawContext context) {
+    public void drawBox(@NotNull PlayerEntity ent, DrawContext context) {
         double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
         double y = ent.prevY + (ent.getY() - ent.prevY) * mc.getTickDelta();
         double z = ent.prevZ + (ent.getZ() - ent.prevZ) * mc.getTickDelta();
@@ -345,7 +345,7 @@ public class NameTags extends Module {
         Vector4d position = null;
         for (Vec3d vector : vectors) {
             vector = Render3DEngine.worldSpaceToScreenSpace(new Vec3d(vector.x, vector.y, vector.z));
-            if (vector != null && vector.z > 0 && vector.z < 1) {
+            if (vector.z > 0 && vector.z < 1) {
                 if (position == null)
                     position = new Vector4d(vector.x, vector.y, vector.z, 0);
                 position.x = Math.min(vector.x, position.x);
@@ -379,8 +379,7 @@ public class NameTags extends Module {
         }
     }
 
-
-    public void drawPotions(MatrixStack matrices, PlayerEntity entity, float posX, float posY) {
+    public void drawPotions(MatrixStack matrices, @NotNull PlayerEntity entity, float posX, float posY) {
         ArrayList<StatusEffectInstance> effects = new ArrayList<>();
 
         int y_offset1 = 0;
@@ -411,7 +410,7 @@ public class NameTags extends Module {
     }
 
 
-    public static String getDuration(StatusEffectInstance pe) {
+    public static @NotNull String getDuration(@NotNull StatusEffectInstance pe) {
         if (pe.isInfinite()) {
             return "*:*";
         } else {
@@ -446,13 +445,12 @@ public class NameTags extends Module {
         };
     }
 
-    private String getHealthColor(PlayerEntity entity) {
+    private @NotNull String getHealthColor(@NotNull PlayerEntity entity) {
         int health = (int) ((int) entity.getHealth() + entity.getAbsorptionAmount());
         if (health <= 15 && health > 7) return Formatting.YELLOW + "";
         if (health > 15) return Formatting.GREEN + "";
         return Formatting.RED + "";
     }
-
 
     public static float round2(double value) {
         BigDecimal bd = new BigDecimal(value);
