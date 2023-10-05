@@ -58,7 +58,7 @@ public class LegacyHud extends Module {
         int height = mc.getWindow().getScaledHeight();
         color = colorSetting.getValue().getColor();
         if (waterMark.getValue()) {
-            String string = "thunderhack v" + ThunderHack.version;
+            String string = "thunderhack v" + ThunderHack.VERSION;
             context.drawText(mc.textRenderer, Text.of(string), 2, waterMarkY.getValue(), color, true);
         }
         int j = (mc.currentScreen instanceof ChatScreen && !renderingUp.getValue()) ? 14 : 0;

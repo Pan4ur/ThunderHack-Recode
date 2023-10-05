@@ -11,7 +11,6 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.render.Render2DEngine;
-
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -23,8 +22,8 @@ public class ThunderHack implements ModInitializer {
     public static final ModMetadata MOD_META;
     public static final String MOD_ID = "thunderhack";
     public static final IEventBus EVENT_BUS = new EventBus();
+    public static final String VERSION = "1.3b2409";
 
-    public static String version = "1.3b2409";
     public static boolean isOutdated = false;
     public static float TICK_TIMER = 1f;
     public static BlockPos gps_position;
@@ -95,7 +94,7 @@ public class ThunderHack implements ModInitializer {
 
     public static void syncVersion() {
         try {
-            if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersion.txt").openStream())).readLine().equals(version)) {
+            if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersion.txt").openStream())).readLine().equals(VERSION)) {
                 isOutdated = true;
             }
         } catch (Exception ignored) {

@@ -1,6 +1,7 @@
 package thunder.hack.notification;
 
 import net.minecraft.client.gui.DrawContext;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.setting.Setting;
 
@@ -13,6 +14,10 @@ public class NotificationManager {
     private final Setting<Float> position = new Setting<>("Position", 1f, 0f, 1f);
 
     private final List<Notification> notifications = new CopyOnWriteArrayList<>();
+
+    {
+        ThunderHack.EVENT_BUS.subscribe(this);
+    }
 
     public void publicity(String title, String content, int second, Notification.Type type) {
         notifications.add(new Notification(title, content, type, second * 1000));
@@ -27,7 +32,7 @@ public class NotificationManager {
             Notification notification = notifications.get(i);
             notifications.removeIf(Notification::shouldDelete);
             notification.render(event.getMatrices(), startY);
-            startY -= notification.getHeight() + 3;
+            startY -= (float) (notification.getHeight() + 3);
         }
     }
 
@@ -37,7 +42,7 @@ public class NotificationManager {
 
         for (Notification notification : notifications) {
             notification.renderShaders(context.getMatrices(), startY);
-            startY -= notification.getHeight() + 3;
+            startY -= (float) (notification.getHeight() + 3);
         }
     }
 

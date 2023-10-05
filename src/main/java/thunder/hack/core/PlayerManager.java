@@ -9,6 +9,7 @@ import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.math.Vec2f;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.combat.Aura;

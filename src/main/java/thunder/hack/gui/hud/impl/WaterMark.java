@@ -6,7 +6,6 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.client.Media;
 import thunder.hack.setting.Setting;
@@ -35,7 +34,7 @@ public class WaterMark extends HudElement {
             FontRenderers.sf_bold.drawGradientString(context.getMatrices(), "ThunderHack ", getPosX() + 2, getPosY() + 3, 10, true);
             FontRenderers.sf_bold.drawString(context.getMatrices(), info, getPosX() + 2 + FontRenderers.sf_bold.getStringWidth("ThunderHack "), getPosY() + 3, HudEditor.textColor.getValue().getColor());
         } else {
-            FontRenderers.monsterrat.drawGradientString(context.getMatrices(), "ThunderHack v" + ThunderHack.version, getPosX() + 5.5f, getPosY() + 5, 10, true);
+            FontRenderers.monsterrat.drawGradientString(context.getMatrices(), "ThunderHack v" + ThunderHack.VERSION, getPosX() + 5.5f, getPosY() + 5, 10, true);
         }
     }
 

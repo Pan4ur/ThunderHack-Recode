@@ -43,6 +43,7 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 public class Surround extends Module {
     private final Setting<Sequential> useSequential = new Setting<>("Use Sequence", Sequential.None);
     private final Setting<PlaceTiming> placeTiming = new Setting<>("Place Timing", PlaceTiming.Default);
+    private final Setting<Float> range = new Setting<>("Range", 5f, 0f, 7f);
     private final Setting<Integer> blocksPerTick = new Setting<>("Blocks/Place", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10, v -> placeTiming.getValue() != PlaceTiming.Sequential);
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
@@ -126,22 +127,34 @@ public class Surround extends Module {
         prevY = mc.player.getY();
 
         // Centering
-        Vec3d centerVec = new Vec3d(MathHelper.floor(mc.player.getX()) + 0.5,
-                mc.player.getY(),
-                MathHelper.floor(mc.player.getZ()) + 0.5
-        );
-        switch (center.getValue()) {
-            case Motion ->
-                    mc.player.move(MovementType.SELF, new Vec3d((centerVec.getX() - mc.player.getX()) / 2, 0, (centerVec.getZ() - mc.player.getZ()) / 2));
-            case Teleport -> {
-                mc.player.updatePosition(centerVec.getX(), centerVec.getY(), centerVec.getZ());
-                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.isOnGround()));
-            }
+        if (center.getValue() == CenterMode.Teleport) {
+            mc.player.updatePosition(MathHelper.floor(mc.player.getX()) + 0.5, mc.player.getY(), MathHelper.floor(mc.player.getZ()) + 0.5);
+            sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.isOnGround()));
         }
     }
 
     @EventHandler
     private void onPostSync(@SuppressWarnings("unused") EventPostSync e) {
+        if (prevY != mc.player.getY() && onYChange.getValue()) {
+            disable(isRu() ? "Выключен из-за изменения Y!" : "Disabled due to Y change!");
+            return;
+        }
+        prevY = mc.player.getY();
+
+        Vec3d centerVec = new Vec3d(
+                MathHelper.floor(mc.player.getX()) + 0.5,
+                mc.player.getY(),
+                MathHelper.floor(mc.player.getZ()) + 0.5
+        );
+        Box centerBox = new Box(
+                centerVec.getX() - 0.2, centerVec.getY() - 0.1, centerVec.getZ() - 0.2,
+                centerVec.getX() + 0.2, centerVec.getY() + 0.1, centerVec.getZ() + 0.2
+        );
+        if (center.getValue() == CenterMode.Motion && !centerBox.contains(mc.player.getPos())) {
+            mc.player.move(MovementType.SELF, new Vec3d((centerVec.getX() - mc.player.getX()) / 2, 0, (centerVec.getZ() - mc.player.getZ()) / 2));
+            return;
+        }
+
         List<BlockPos> blocks = getBlocks();
         if (blocks.isEmpty()) return;
 
@@ -152,15 +165,6 @@ public class Surround extends Module {
 
         if (getSlot() == -1)
             disable(isRu() ? "Нет блоков!" : "No blocks!");
-
-//        if (breakCrystal.getValue()) {
-//            List<Entity> crystals = Lists.newArrayList(mc.world.getEntities());
-//            crystals.forEach(entity -> {
-//                if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(mc.player) <= 25) {
-//                    removeCrystal(entity);
-//                }
-//            });
-//        }
 
         if (placeTiming.getValue() == PlaceTiming.Vanilla || placeTiming.getValue() == PlaceTiming.Sequential) {
             BlockPos targetBlock = getSequentialPos();
@@ -191,18 +195,9 @@ public class Surround extends Module {
     }
 
     @EventHandler
-    private void onMove(@NotNull EventEntityMoving event) {
-        if (event.getEntity().equals(mc.player)
-                && event.getMovement().getY() != 0
-                && onYChange.getValue()) {
-            disable(isRu() ? "Выключен из-за изменения Y!" : "Disabled due to Y change!");
-        }
-    }
-
-    @EventHandler
     private void onEntitySpawn(@NotNull EventEntitySpawn event) {
         if (event.getEntity() instanceof EndCrystalEntity && breakCrystal.getValue()) {
-            if (event.getEntity().squaredDistanceTo(mc.player) <= 25) {
+            if (event.getEntity().squaredDistanceTo(mc.player) <= remove.getPow2Value()) {
                 removeCrystal(event.getEntity());
             }
         }
@@ -224,15 +219,21 @@ public class Surround extends Module {
             if (placeTiming.getValue() == PlaceTiming.Sequential && !sequentialBlocks.isEmpty()) {
                 handleSequential(pac.getPos());
             }
-            if (mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < 9) {
+            if (mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value()) {
                 handleSurroundBreak();
             }
         }
 
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket)
             switch (onTp.getValue()) {
-                case Enable -> enable();
                 case Disable -> disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to teleport!");
+                case Enable -> new Thread(() -> {
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException ignored) {
+                    }
+                    enable();
+                });
             }
     }
 
@@ -293,7 +294,11 @@ public class Surround extends Module {
     }
 
     private void removeCrystal(Entity entity) {
-        if (fullNullCheck() || !(entity instanceof EndCrystalEntity) || !attackTimer.passedMs(breakDelay.getValue()) || mc.player.squaredDistanceTo(entity) > 25 || !breakCrystal.getValue())
+        if (fullNullCheck()
+                || !(entity instanceof EndCrystalEntity)
+                || !attackTimer.passedMs(breakDelay.getValue())
+                || mc.player.squaredDistanceTo(entity) > range.getPow2Value()
+                || !breakCrystal.getValue())
             return;
         if (antiSelfPop.getValue() && mc.player.getHealth() + mc.player.getAbsorptionAmount() - ExplosionUtility.getSelfExplosionDamage(entity.getPos()) <= 2)
             return;
@@ -331,7 +336,7 @@ public class Surround extends Module {
         for (BlockPos bp : getBlocks()) {
             if (breakCrystal.getValue()) {
                 List<EndCrystalEntity> entities = Lists.newArrayList(mc.world.getNonSpectatingEntities(EndCrystalEntity.class, new Box(bp))).stream()
-                        .filter(entity -> mc.player.squaredDistanceTo(entity) <= 25)
+                        .filter(entity -> mc.player.squaredDistanceTo(entity) <= range.getPow2Value())
                         .toList();
                 entities.forEach(this::removeCrystal);
             }
