@@ -31,18 +31,11 @@ public class Speedometer extends HudElement {
         FontRenderers.getModulesRenderer().drawString(context.getMatrices(), str, getPosX(), getPosY(), HudEditor.getColor(1).getRGB(), true);
     }
 
-    @EventHandler
-    public void updateValues(EventSync e) {
-        float deltaX = (float) (mc.player.getX() - mc.player.prevX);
-        float deltaZ = (float) (mc.player.getZ() - mc.player.prevZ);
-        speed = (float) Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
-    }
-
     public float getSpeedKpH() {
-        return speed * 72f;
+        return (float) (ThunderHack.playerManager.currentPlayerSpeed * 72f);
     }
 
     public float getSpeedMpS() {
-        return speed * 20f;
+        return (float) (ThunderHack.playerManager.currentPlayerSpeed * 20f);
     }
 }
