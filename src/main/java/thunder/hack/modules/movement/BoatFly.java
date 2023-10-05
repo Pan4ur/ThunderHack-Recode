@@ -41,7 +41,7 @@ public class BoatFly extends Module {
     private final Setting<Integer> waitTicks = new Setting<>("WaitTicks", 10, 1, 100, v-> pause.getValue());
     private final Setting<Boolean> automount = new Setting<>("AutoMount", true);
     private final Setting<Boolean> stopunloaded = new Setting<>("StopUnloaded", true);
-    private final Setting<Float> speed = new Setting<>("Speed", 2f, 0.0f, 50f);
+    private final Setting<Float> speed = new Setting<>("Speed", 2f, 0.0f, 25f);
     private final Setting<Float> yspeed = new Setting<>("YSpeed", 1f, 0.0f, 10f);
     private final Setting<Float> glidespeed = new Setting<>("GlideSpeed", 1f, 0.0f, 10f);
     private final Setting<Float> timer = new Setting<>("Timer", 1f, 0.1f, 5f);

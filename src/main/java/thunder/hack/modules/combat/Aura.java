@@ -10,11 +10,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.SlimeEntity;
+import net.minecraft.entity.mob.*;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -93,6 +93,7 @@ public class Aura extends Module {
     public final Setting<Boolean> ignoreInvisible = new Setting<>("IgnoreInvis", false).withParent(targets);
     public final Setting<Boolean> ignoreCreativ = new Setting<>("IgnoreCreative", true).withParent(targets);
     public final Setting<Boolean> ignoreShield = new Setting<>("IgnoreShield", true).withParent(targets);
+    public final Setting<Boolean> onlyAngry = new Setting<>("OnlyAngryEntities", true).withParent(targets);
 
     public enum Mode {
         Universal, None
@@ -610,11 +611,12 @@ public class Aura extends Module {
     }
 
     private boolean skipNotSelected(Entity entity) {
-        if ((entity instanceof SlimeEntity) && !Slimes.getValue()) return true;
-        if ((entity instanceof PlayerEntity) && !Players.getValue()) return true;
-        if ((entity instanceof VillagerEntity) && !Villagers.getValue()) return true;
-        if ((entity instanceof MobEntity) && !Mobs.getValue()) return true;
-        if ((entity instanceof AnimalEntity) && !Animals.getValue()) return true;
+        if (entity instanceof SlimeEntity && !Slimes.getValue()) return true;
+        if (entity instanceof HostileEntity he && !he.isAngryAt(mc.player) && onlyAngry.getValue()) return true;
+        if (entity instanceof PlayerEntity && !Players.getValue()) return true;
+        if (entity instanceof VillagerEntity && !Villagers.getValue()) return true;
+        if (entity instanceof MobEntity && !Mobs.getValue()) return true;
+        if (entity instanceof AnimalEntity && !Animals.getValue()) return true;
         return false;
     }
 

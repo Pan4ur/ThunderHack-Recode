@@ -9,9 +9,7 @@ import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.math.Vec2f;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.combat.Aura;
 import net.minecraft.entity.Entity;
@@ -50,14 +48,16 @@ public class PlayerManager {
         lastYaw = ((IClientPlayerEntity) mc.player).getLastYaw();
         lastPitch = ((IClientPlayerEntity) mc.player).getLastPitch();
 
-        double d2 = mc.player.getX() - mc.player.prevX;
-        double d3 = mc.player.getZ() - mc.player.prevZ;
-        double d4 = d2 * d2 + d3 * d3;
-        currentPlayerSpeed = Math.sqrt(d4);
+
         if (mc.currentScreen == null) inInventory = false;
         if (mc.player.isFallFlying() && mc.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
             ticksElytraFlying++;
         } else ticksElytraFlying = 0;
+    }
+
+    @EventHandler
+    public void onTick(EventTick e){
+        currentPlayerSpeed = Math.hypot(mc.player.getX() - mc.player.prevX, mc.player.getZ() - mc.player.prevZ);
     }
 
 

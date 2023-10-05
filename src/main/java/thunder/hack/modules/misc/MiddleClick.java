@@ -20,6 +20,8 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import thunder.hack.utility.player.PlayerUtility;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
+
 public class MiddleClick extends Module {
     private final Setting<Boolean> friend = new Setting<>("Friend", true);
     private final Setting<Boolean> ep = new Setting<>("Pearl", true);
@@ -69,10 +71,10 @@ public class MiddleClick extends Module {
         if (friend.getValue() && mc.currentScreen == null && mc.options.pickItemKey.isPressed() && mc.targetedEntity != null && mc.targetedEntity instanceof PlayerEntity entity && timer.passedMs(800)) {
             if (ThunderHack.friendManager.isFriend(entity.getName().getString())) {
                 ThunderHack.friendManager.removeFriend(entity.getName().getString());
-                sendMessage("§b" + entity.getName().getString() + "§r удален из друзей!");
+                sendMessage(isRu() ? "§b" + entity.getName().getString() + "§r удален из друзей!" : "§b" + entity.getName().getString() + "§r removed from friends!");
             } else {
                 ThunderHack.friendManager.addFriend(entity.getName().getString());
-                sendMessage("Добавлен друг §b" + entity.getName().getString());
+                sendMessage(isRu() ? "Добавлен друг §b" + entity.getName().getString() : "Added friend §b" + entity.getName().getString());
             }
             timer.reset();
             return;
@@ -232,7 +234,7 @@ public class MiddleClick extends Module {
                 } catch (Exception ignored) {
                 }
                 if (ModuleManager.aura.isEnabled() && Aura.target != null) {
-                    mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
+                    sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
                 }
                 mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
                 try {

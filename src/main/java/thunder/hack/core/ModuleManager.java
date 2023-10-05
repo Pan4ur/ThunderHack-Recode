@@ -61,7 +61,6 @@ public class ModuleManager {
     public static EbatteSratte ebatteSratte = new EbatteSratte();
     public static ChestStealer chestStealer = new ChestStealer();
     public static AutoTpAccept autoTpAccept = new AutoTpAccept();
-    public static AutoMine autoMine = new AutoMine();
     public static AntiServerRP antiServerRP = new AntiServerRP();
     public static WorldTweaks worldTweaks = new WorldTweaks();
     public static VisualRange visualRange = new VisualRange();
@@ -75,6 +74,7 @@ public class ModuleManager {
     public static BreadCrumbs breadCrumbs = new BreadCrumbs();
     public static AutoRespawn autoRespawn = new AutoRespawn();
     public static AutoCrystal autoCrystal = new AutoCrystal();
+    public static EntitySpeed entitySpeed = new EntitySpeed();
     public static WaterSpeed waterSpeed = new WaterSpeed();
     public static TriggerBot triggerBot = new TriggerBot();
     public static TPSCounter tpsCounter = new TPSCounter();
@@ -120,6 +120,7 @@ public class ModuleManager {
     public static AutoLeave autoLeave = new AutoLeave();
     public static AutoFlyme autoFlyme = new AutoFlyme();
     public static AutoArmor autoArmor = new AutoArmor();
+    public static AutoMine autoMine = new AutoMine();
     public static ViewLock viewLock = new ViewLock();
     public static Velocity velocity = new Velocity();
     public static Tooltips tooltips = new Tooltips();
@@ -146,6 +147,7 @@ public class ModuleManager {
     public static AutoAuth autoAuth = new AutoAuth();
     public static ArmorHud armorHud = new ArmorHud();
     public static AirPlace airPlace = new AirPlace();
+    public static AutoBed autoBed = new AutoBed();
     public static VoidESP voidESP = new VoidESP();
     public static Tracker tracker = new Tracker();
     public static TpsSync tpsSync = new TpsSync();

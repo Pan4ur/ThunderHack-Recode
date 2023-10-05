@@ -393,6 +393,41 @@ public final class InventoryUtility {
         return baseDamage;
     }
 
+    public static SearchInvResult findBedInHotbar() {
+        if (mc.player == null) return SearchInvResult.notFound();
+        for (int b1 = 0; b1 < 9; b1++) {
+            ItemStack itemStack = mc.player.getInventory().getStack(b1);
+            if (itemStack != null && itemStack.getItem() instanceof BedItem)
+                return new SearchInvResult(b1, true, mc.player.getInventory().getStack(b1));
+        }
+        return SearchInvResult.notFound();
+    }
+
+    public static SearchInvResult findBed() {
+        if (mc.player == null) return SearchInvResult.notFound();
+        for (int b1 = 9; b1 < 45; b1++) {
+            ItemStack itemStack = mc.player.getInventory().getStack(b1 >= 36 ? b1 - 36 : b1);
+            if (itemStack != null && itemStack.getItem() instanceof BedItem)
+                return new SearchInvResult(b1, true, mc.player.getInventory().getStack(b1));
+        }
+        return SearchInvResult.notFound();
+    }
+
+    public static int getBedsCount() {
+        if (mc.player == null) return 0;
+
+        int counter = 0;
+
+        for (int i = 0; i <= 44; ++i) {
+            ItemStack itemStack = mc.player.getInventory().getStack(i);
+            if (!(itemStack.getItem() instanceof BedItem)) continue;
+            counter += itemStack.getCount();
+        }
+
+        return counter;
+    }
+
+
     public interface Searcher {
         boolean isValid(ItemStack stack);
     }

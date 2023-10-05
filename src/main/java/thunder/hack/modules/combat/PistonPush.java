@@ -118,8 +118,12 @@ public class PistonPush extends Module {
             if (System.currentTimeMillis() - time > 500) {
                 renderPoses.remove(pos);
             } else {
-                Render3DEngine.drawFilledBox(stack, new Box(pos), Render2DEngine.injectAlpha(fillColor.getValue().getColorObject(), (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)))));
-                Render3DEngine.drawBoxOutline(new Box(pos), lineColor.getValue().getColorObject(), lineWidth.getValue());
+                Render3DEngine.FILLED_QUEUE.add(
+                        new Render3DEngine.FillAction(new Box(pos), Render2DEngine.injectAlpha(fillColor.getValue().getColorObject(), (int) (fillColor.getValue().getAlpha() * (1f - ((System.currentTimeMillis() - time) / 500f)))))
+                );
+                Render3DEngine.OUTLINE_QUEUE.add(
+                        new Render3DEngine.OutlineAction(new Box(pos), lineColor.getValue().getColorObject(), lineWidth.getValue())
+                );
             }
         });
     }

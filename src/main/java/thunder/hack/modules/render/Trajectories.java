@@ -1,6 +1,5 @@
 package thunder.hack.modules.render;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -22,41 +21,42 @@ import thunder.hack.utility.render.Render3DEngine;
 
 
 public class Trajectories extends Module {
+    private final Setting<Mode> mode = new Setting<>("ColorMode", Mode.Sync);
+    private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x2250b4b4), v -> mode.getValue() == Mode.Custom);
+    private final Setting<Mode> lmode = new Setting<>("LandedColorMode", Mode.Sync);
+    private final Setting<ColorSetting> lcolor = new Setting<>("LandedColor", new ColorSetting(0x2250b4b4), v -> lmode.getValue() == Mode.Custom);
+
+    private enum Mode {
+        Custom,
+        Sync
+    }
+
     public Trajectories() {
         super("Trajectories", Category.RENDER);
     }
 
-
-    private final Setting<Mode> mode = new Setting<>("ColorMode", Mode.Sync);
-    public final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x2250b4b4), v -> mode.getValue() == Mode.Custom);
-    private final Setting<Mode> lmode = new Setting<>("LandedColorMode", Mode.Sync);
-    public final Setting<ColorSetting> lcolor = new Setting<>("LandedColor", new ColorSetting(0x2250b4b4), v -> lmode.getValue() == Mode.Custom);
-
-    private enum Mode {
-        Custom,Sync
+    private boolean isThrowable(Item item) {
+        return item instanceof EnderPearlItem || item instanceof TridentItem || item instanceof ExperienceBottleItem || item instanceof SnowballItem || item instanceof EggItem || item instanceof SplashPotionItem || item instanceof LingeringPotionItem;
     }
 
-    protected boolean isThrowable(Item item) {
-        return item instanceof EnderPearlItem || item instanceof TridentItem  || item instanceof ExperienceBottleItem || item instanceof SnowballItem || item instanceof EggItem || item instanceof SplashPotionItem || item instanceof LingeringPotionItem;
-    }
-
-    protected float getDistance(Item item) {
+    private float getDistance(Item item) {
         return item instanceof BowItem ? 1.0f : 0.4f;
     }
 
-    protected float getThrowVelocity(Item item) {
+    private float getThrowVelocity(Item item) {
         if (item instanceof SplashPotionItem || item instanceof LingeringPotionItem) return 0.5f;
         if (item instanceof ExperienceBottleItem) return 0.59f;
         if (item instanceof TridentItem) return 2f;
         return 1.5f;
     }
 
-    protected int getThrowPitch(Item item) {
-        if (item instanceof SplashPotionItem || item instanceof LingeringPotionItem || item instanceof ExperienceBottleItem) return 20;
+    private int getThrowPitch(Item item) {
+        if (item instanceof SplashPotionItem || item instanceof LingeringPotionItem || item instanceof ExperienceBottleItem)
+            return 20;
         return 0;
     }
 
-
+    @Override
     public void onRender3D(MatrixStack stack) {
         if (mc.player == null || mc.world == null || !mc.options.getPerspective().isFirstPerson())
             return;
@@ -65,33 +65,34 @@ public class Trajectories extends Module {
         ItemStack mainHand = mc.player.getMainHandStack();
         ItemStack offHand = mc.player.getOffHandStack();
 
-        if(mainHand.getItem() instanceof BowItem || mainHand.getItem() instanceof CrossbowItem || isThrowable(mainHand.getItem())) {
+        if (mainHand.getItem() instanceof BowItem || mainHand.getItem() instanceof CrossbowItem || isThrowable(mainHand.getItem())) {
             hand = Hand.MAIN_HAND;
-        } else if(offHand.getItem() instanceof BowItem || offHand.getItem() instanceof CrossbowItem  || isThrowable(offHand.getItem())){
+        } else if (offHand.getItem() instanceof BowItem || offHand.getItem() instanceof CrossbowItem || isThrowable(offHand.getItem())) {
             hand = Hand.OFF_HAND;
         } else return;
 
         boolean prev_bob = mc.options.getBobView().getValue();
         mc.options.getBobView().setValue(false);
-        if((mainHand.getItem() instanceof CrossbowItem && EnchantmentHelper.getLevel(Enchantments.MULTISHOT, mainHand) != 0) ||
-                (mainHand.getItem() instanceof CrossbowItem && EnchantmentHelper.getLevel(Enchantments.MULTISHOT, mainHand) != 0)){
+        if ((mainHand.getItem() instanceof CrossbowItem && EnchantmentHelper.getLevel(Enchantments.MULTISHOT, mainHand) != 0) ||
+                (mainHand.getItem() instanceof CrossbowItem && EnchantmentHelper.getLevel(Enchantments.MULTISHOT, mainHand) != 0)) {
 
             calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw() - 10);
             calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw());
             calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw() + 10);
 
-        } else calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw());
+        } else
+            calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw());
         mc.options.getBobView().setValue(prev_bob);
     }
 
     private void calcTrajectory(Item item, MatrixStack matrices, float yaw) {
-        double x = Render2DEngine.interpolate(mc.player.prevX,mc.player.getX(),mc.getTickDelta());
-        double y = Render2DEngine.interpolate(mc.player.prevY,mc.player.getY(),mc.getTickDelta());
-        double z = Render2DEngine.interpolate(mc.player.prevZ,mc.player.getZ(),mc.getTickDelta());
+        double x = Render2DEngine.interpolate(mc.player.prevX, mc.player.getX(), mc.getTickDelta());
+        double y = Render2DEngine.interpolate(mc.player.prevY, mc.player.getY(), mc.getTickDelta());
+        double z = Render2DEngine.interpolate(mc.player.prevZ, mc.player.getZ(), mc.getTickDelta());
 
         y = y + mc.player.getEyeHeight(mc.player.getPose()) - 0.1000000014901161;
 
-        if(item == mc.player.getMainHandStack().getItem()) {
+        if (item == mc.player.getMainHandStack().getItem()) {
             x = x - MathHelper.cos(yaw / 180.0f * 3.1415927f) * 0.16f;
             z = z - MathHelper.sin(yaw / 180.0f * 3.1415927f) * 0.16f;
         } else {
@@ -113,8 +114,7 @@ public class Trajectories extends Module {
         motionY /= distance;
         motionZ /= distance;
 
-        final float pow = (item instanceof BowItem ? (power * 2.0f) :  item instanceof CrossbowItem  ? (2.2f) : 1.0f) * getThrowVelocity(item);
-
+        final float pow = (item instanceof BowItem ? (power * 2.0f) : item instanceof CrossbowItem ? (2.2f) : 1.0f) * getThrowVelocity(item);
 
 
         motionX *= pow;
@@ -140,7 +140,7 @@ public class Trajectories extends Module {
                 motionZ *= 0.99;
             }
 
-            if(item instanceof BowItem){
+            if (item instanceof BowItem) {
                 motionY -= 0.05000000074505806;
             } else if (mc.player.getMainHandStack().getItem() instanceof CrossbowItem) {
                 motionY -= 0.05000000074505806;
@@ -151,26 +151,35 @@ public class Trajectories extends Module {
             Vec3d pos = new Vec3d(x, y, z);
 
 
-            for(Entity ent : mc.world.getEntities()){
-                if(ent instanceof ArrowEntity || ent.equals(mc.player)) continue;
-                if(ent.getBoundingBox().intersects(new Box(x - 0.3, y - 0.3, z - 0.3, x + 0.3, y + 0.3, z + 0.2))){
-                    Render3DEngine.drawBoxOutline(ent.getBoundingBox(),lmode.getValue() == Mode.Sync ? HudEditor.getColor(i) : lcolor.getValue().getColorObject(),2f);
-                    Render3DEngine.drawFilledBox(matrices,ent.getBoundingBox(),lmode.getValue() == Mode.Sync ? Render2DEngine.injectAlpha(HudEditor.getColor(i),100) : lcolor.getValue().getColorObject());
+            for (Entity ent : mc.world.getEntities()) {
+                if (ent instanceof ArrowEntity || ent.equals(mc.player)) continue;
+                if (ent.getBoundingBox().intersects(new Box(x - 0.3, y - 0.3, z - 0.3, x + 0.3, y + 0.3, z + 0.2))) {
+                    Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(
+                            ent.getBoundingBox(),
+                            lmode.getValue() == Mode.Sync ? HudEditor.getColor(i) : lcolor.getValue().getColorObject(),
+                            2f));
+                    Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(
+                            ent.getBoundingBox(), lmode.getValue() == Mode.Sync ? Render2DEngine.injectAlpha(HudEditor.getColor(i), 100) : lcolor.getValue().getColorObject()
+                    ));
                     break;
                 }
             }
 
             BlockHitResult bhr = mc.world.raycast(new RaycastContext(lastPos, pos, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
             if (bhr != null && bhr.getType() == HitResult.Type.BLOCK) {
-                Render3DEngine.drawSideOutline(new Box(bhr.getBlockPos()),lmode.getValue() == Mode.Sync ? HudEditor.getColor(i) : lcolor.getValue().getColorObject(),2f,bhr.getSide());
-                Render3DEngine.drawFilledSide(matrices,new Box(bhr.getBlockPos()),lmode.getValue() == Mode.Sync ? Render2DEngine.injectAlpha(HudEditor.getColor(i),100) : lcolor.getValue().getColorObject(),bhr.getSide());
+                Render3DEngine.OUTLINE_SIDE_QUEUE.add(new Render3DEngine.OutlineSideAction(
+                        new Box(bhr.getBlockPos()), lmode.getValue() == Mode.Sync ? HudEditor.getColor(i) : lcolor.getValue().getColorObject(), 2f, bhr.getSide()
+                ));
+                Render3DEngine.FILLED_SIDE_QUEUE.add(new Render3DEngine.FillSideAction(
+                        new Box(bhr.getBlockPos()), lmode.getValue() == Mode.Sync ? Render2DEngine.injectAlpha(HudEditor.getColor(i), 100) : lcolor.getValue().getColorObject(), bhr.getSide()
+                ));
                 break;
             }
 
             if (y <= -65) break;
             if (motionX == 0 && motionY == 0 && motionZ == 0) continue;
 
-            Render3DEngine.drawLine((float) lastPos.x, (float) lastPos.y, (float) lastPos.z,(float) x, (float) y, (float) z, mode.getValue() == Mode.Sync ? HudEditor.getColor(i) : color.getValue().getColorObject(),2);
+            Render3DEngine.drawLine((float) lastPos.x, (float) lastPos.y, (float) lastPos.z, (float) x, (float) y, (float) z, mode.getValue() == Mode.Sync ? HudEditor.getColor(i) : color.getValue().getColorObject(), 2);
         }
     }
 }
