@@ -5,6 +5,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.MovementType;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.*;
@@ -15,16 +16,10 @@ import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import thunder.hack.events.impl.EventEntitySpawn;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.*;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -37,6 +32,7 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.BlockAnimationUtility;
+import thunder.hack.utility.world.HoleUtility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +48,7 @@ public class Surround extends Module {
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
     private final Setting<InteractMode> placeMode = new Setting<>("Place Mode", InteractMode.Normal);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
-    private final Setting<Boolean> center = new Setting<>("Center", true);
+    private final Setting<CenterMode> center = new Setting<>("Center", CenterMode.Disabled);
 
     private final Setting<Parent> crystalBreaker = new Setting<>("CrystalBreaker", new Parent(false, 0));
     private final Setting<Boolean> breakCrystal = new Setting<>("BreakCrystal", true).withParent(crystalBreaker);
@@ -72,7 +68,7 @@ public class Surround extends Module {
 
     private final Setting<Parent> autoDisable = new Setting<>("Auto Disable", new Parent(false, 0));
     private final Setting<Boolean> onYChange = new Setting<>("On Y Change", true).withParent(autoDisable);
-    private final Setting<Boolean> onTp = new Setting<>("On Tp", true).withParent(autoDisable);
+    private final Setting<OnTpAction> onTp = new Setting<>("On Tp", OnTpAction.None).withParent(autoDisable);
 
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
     private final Setting<BlockAnimationUtility.BlockRenderMode> renderMode = new Setting<>("RenderMode", BlockAnimationUtility.BlockRenderMode.All).withParent(renderCategory);
@@ -85,6 +81,18 @@ public class Surround extends Module {
         Default,
         Vanilla,
         Sequential
+    }
+
+    private enum CenterMode {
+        Teleport,
+        Motion,
+        Disabled
+    }
+
+    private enum OnTpAction {
+        Disable,
+        Enable,
+        None
     }
 
     private enum InteractMode {
@@ -117,19 +125,19 @@ public class Surround extends Module {
         delay = 0;
         prevY = mc.player.getY();
 
-        if (center.getValue()) {
-            mc.player.updatePosition(MathHelper.floor(mc.player.getX()) + 0.5, mc.player.getY(), MathHelper.floor(mc.player.getZ()) + 0.5);
-            sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.isOnGround()));
+        // Centering
+        Vec3d centerVec = new Vec3d(MathHelper.floor(mc.player.getX()) + 0.5,
+                mc.player.getY(),
+                MathHelper.floor(mc.player.getZ()) + 0.5
+        );
+        switch (center.getValue()) {
+            case Motion ->
+                    mc.player.move(MovementType.SELF, new Vec3d((centerVec.getX() - mc.player.getX()) / 2, 0, (centerVec.getZ() - mc.player.getZ()) / 2));
+            case Teleport -> {
+                mc.player.updatePosition(centerVec.getX(), centerVec.getY(), centerVec.getZ());
+                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.isOnGround()));
+            }
         }
-    }
-
-    @EventHandler
-    @SuppressWarnings("unused")
-    private void onSync(EventSync event) {
-        if (mc.player == null) return;
-
-        if (onYChange.getValue() && mc.player.getY() != prevY)
-            disable(isRu() ? "Выключен из-за изменения Y!" : "Disabled due to Y change!");
     }
 
     @EventHandler
@@ -145,14 +153,14 @@ public class Surround extends Module {
         if (getSlot() == -1)
             disable(isRu() ? "Нет блоков!" : "No blocks!");
 
-        if (breakCrystal.getValue()) {
-            List<Entity> crystals = Lists.newArrayList(mc.world.getEntities());
-            for (Entity entity : crystals) {
-                if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(mc.player) <= 25) {
-                    removeCrystal(entity);
-                }
-            }
-        }
+//        if (breakCrystal.getValue()) {
+//            List<Entity> crystals = Lists.newArrayList(mc.world.getEntities());
+//            crystals.forEach(entity -> {
+//                if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(mc.player) <= 25) {
+//                    removeCrystal(entity);
+//                }
+//            });
+//        }
 
         if (placeTiming.getValue() == PlaceTiming.Vanilla || placeTiming.getValue() == PlaceTiming.Sequential) {
             BlockPos targetBlock = getSequentialPos();
@@ -179,6 +187,15 @@ public class Surround extends Module {
                     inactivityTimer.reset();
                 } else break;
             }
+        }
+    }
+
+    @EventHandler
+    private void onMove(@NotNull EventEntityMoving event) {
+        if (event.getEntity().equals(mc.player)
+                && event.getMovement().getY() != 0
+                && onYChange.getValue()) {
+            disable(isRu() ? "Выключен из-за изменения Y!" : "Disabled due to Y change!");
         }
     }
 
@@ -212,8 +229,11 @@ public class Surround extends Module {
             }
         }
 
-        if (e.getPacket() instanceof PlayerPositionLookS2CPacket && onTp.getValue())
-            disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to teleport!");
+        if (e.getPacket() instanceof PlayerPositionLookS2CPacket)
+            switch (onTp.getValue()) {
+                case Enable -> enable();
+                case Disable -> disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to teleport!");
+            }
     }
 
     private void handleSurroundBreak() {
@@ -309,12 +329,11 @@ public class Surround extends Module {
         if (mc.player == null || mc.world == null) return null;
 
         for (BlockPos bp : getBlocks()) {
-            for (Entity ent : mc.world.getEntities()) {
-                if (!(ent instanceof EndCrystalEntity) || mc.player.squaredDistanceTo(ent.getPos()) > 25) continue;
-
-                if (ent.getBoundingBox().intersects(new Box(bp))) {
-                    removeCrystal(ent);
-                }
+            if (breakCrystal.getValue()) {
+                List<EndCrystalEntity> entities = Lists.newArrayList(mc.world.getNonSpectatingEntities(EndCrystalEntity.class, new Box(bp))).stream()
+                        .filter(entity -> mc.player.squaredDistanceTo(entity) <= 25)
+                        .toList();
+                entities.forEach(this::removeCrystal);
             }
 
             if (new Box(bp).intersects(mc.player.getBoundingBox()))
@@ -332,7 +351,7 @@ public class Surround extends Module {
         ArrayList<BlockPos> offsets = new ArrayList<>();
         if (playerPos == null) return offsets;
 
-        if (!center.getValue() && mc.player != null) {
+        if (center.getValue() == CenterMode.Disabled && mc.player != null) {
             int z;
             int x;
             double decimalX = Math.abs(mc.player.getX()) - Math.floor(Math.abs(mc.player.getX()));
@@ -369,16 +388,12 @@ public class Surround extends Module {
             }
         } else {
             offsets.add(playerPos.add(0, -1, 0));
-            for (int[] surround : new int[][]{
-                    {1, 0},
-                    {0, 1},
-                    {-1, 0},
-                    {0, -1}
-            }) {
-                if (getDown(playerPos.add(surround[0], 0, surround[1])))
-                    offsets.add(playerPos.add(surround[0], -1, surround[1]));
 
-                offsets.add(playerPos.add(surround[0], 0, surround[1]));
+            for (Vec3i surround : HoleUtility.VECTOR_PATTERN) {
+                if (getDown(playerPos.add(surround)))
+                    offsets.add(playerPos.add(surround.getX(), -1, surround.getZ()));
+
+                offsets.add(playerPos.add(surround));
             }
         }
 

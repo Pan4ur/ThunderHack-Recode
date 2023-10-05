@@ -1,7 +1,5 @@
 package thunder.hack.modules.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -10,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.world.HoleUtility;
@@ -38,12 +37,19 @@ public class HoleESP extends Module {
         CubeBoth
     }
 
+    private final Timer logicTimer = new Timer();
     private final List<BoxWithColor> positions = new CopyOnWriteArrayList<>();
 
     public HoleESP() {
         super("HoleESP", Category.RENDER);
     }
 
+    @Override
+    public void onDisable() {
+        positions.clear();
+    }
+
+    @Override
     public void onRender3D(MatrixStack stack) {
         if (positions.isEmpty()) return;
 
@@ -62,37 +68,33 @@ public class HoleESP extends Module {
     }
 
     public void renderFade(@NotNull HoleESP.BoxWithColor posWithColor, MatrixStack stack) {
-        RenderSystem.disableCull();
-        Render3DEngine.drawFilledFadeBox(stack,
-                posWithColor.box, Render2DEngine.applyOpacity(posWithColor.color(), 60), Render2DEngine.applyOpacity(posWithColor.color(), 0)
+        Render3DEngine.FADE_QUEUE.add(
+                new Render3DEngine.FadeAction(posWithColor.box, Render2DEngine.applyOpacity(posWithColor.color(), 60), Render2DEngine.applyOpacity(posWithColor.color(), 0))
         );
-        Render3DEngine.drawSideOutline(
-                posWithColor.box, posWithColor.color(), lineWith.getValue(), Direction.DOWN
+        Render3DEngine.OUTLINE_SIDE_QUEUE.add(
+                new Render3DEngine.OutlineSideAction(posWithColor.box, posWithColor.color(), lineWith.getValue(), Direction.DOWN)
         );
-        RenderSystem.enableCull();
     }
 
 
     public void renderFade2(@NotNull HoleESP.BoxWithColor boxWithColor, MatrixStack stack) {
-        RenderSystem.disableCull();
-        Render3DEngine.drawFilledFadeBox(stack,
-                boxWithColor.box, Render2DEngine.applyOpacity(boxWithColor.color(), 60), Render2DEngine.applyOpacity(boxWithColor.color(), 0)
-        );
+        Render3DEngine.FADE_QUEUE.add(
+                new Render3DEngine.FadeAction(boxWithColor.box, Render2DEngine.applyOpacity(boxWithColor.color(), 60), Render2DEngine.applyOpacity(boxWithColor.color(), 0)
+                ));
         Render3DEngine.drawHoleOutline(
                 boxWithColor.box, boxWithColor.color(), lineWith.getValue()
         );
 
-        Render3DEngine.drawFilledBox(stack,
-                new Box(boxWithColor.box.minX, boxWithColor.box.minY, boxWithColor.box.minZ,
+        Render3DEngine.FILLED_QUEUE.add(
+                new Render3DEngine.FillAction(new Box(boxWithColor.box.minX, boxWithColor.box.minY, boxWithColor.box.minZ,
                         boxWithColor.box.maxX, boxWithColor.box.minY + 0.01f, boxWithColor.box.maxZ), boxWithColor.color()
+                )
         );
-
-        RenderSystem.enableCull();
     }
 
     public void renderOutline(@NotNull HoleESP.BoxWithColor boxWithColor) {
-        Render3DEngine.drawBoxOutline(
-                boxWithColor.box, boxWithColor.color(), lineWith.getValue()
+        Render3DEngine.OUTLINE_QUEUE.add(
+                new Render3DEngine.OutlineAction(boxWithColor.box, boxWithColor.color(), lineWith.getValue())
         );
     }
 
@@ -100,59 +102,62 @@ public class HoleESP extends Module {
         Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(boxWithColor.box(), boxWithColor.color()));
     }
 
-
     @Override
     public void onThread() {
-        if (fullNullCheck()) return;
+        if (fullNullCheck() || !logicTimer.passedMs(500))
+            return;
+
         findHoles();
+        logicTimer.reset();
     }
 
     private void findHoles() {
         ArrayList<BoxWithColor> blocks = new ArrayList<>();
-        BlockPos centerPos = mc.player.getBlockPos();
+        if (mc.world == null || mc.player == null) {
+            positions.clear();
+            return;
+        }
+        BlockPos centerPos = BlockPos.ofFloored(mc.player.getPos());
         List<Box> boxes = new ArrayList<>();
 
-        for (int i = centerPos.getX() - rangeXZ.getValue(); i < centerPos.getX() + rangeXZ.getValue(); i++) {
-            for (int j = centerPos.getY() - rangeY.getValue(); j < centerPos.getY() + rangeY.getValue(); j++) {
-                for (int k = centerPos.getZ() - rangeXZ.getValue(); k < centerPos.getZ() + rangeXZ.getValue(); k++) {
-                    BlockPos pos = new BlockPos(i, j, k);
-                    Box box = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + height.getValue(), pos.getZ() + 1);
-                    Color color = indestrictibleColor.getValue().getColorObject();
-                    if (HoleUtility.validIndestructible(pos)) {
-                    } else if (HoleUtility.validBedrock(pos)) {
-                        color = bedrockColor.getValue().getColorObject();
-                    } else if (HoleUtility.validTwoBlockBedrockXZ(pos)) {
-                        boolean east = mc.world.isAir(pos.offset(Direction.EAST));
-                        boolean south = mc.world.isAir(pos.offset(Direction.SOUTH));
-                        box = new Box(box.minX, box.minY, box.minZ, box.maxX + (east ? 1 : 0), box.maxY, box.maxZ + (south ? 1 : 0));
-                        color = bedrockColor.getValue().getColorObject();
-                    } else if (HoleUtility.validTwoBlockIndestructibleXZ(pos)) {
-                        boolean east = mc.world.isAir(pos.offset(Direction.EAST));
-                        boolean south = mc.world.isAir(pos.offset(Direction.SOUTH));
-                        box = new Box(box.minX, box.minY, box.minZ, box.maxX + (east ? 1 : 0), box.maxY, box.maxZ + (south ? 1 : 0));
-                    } else if (HoleUtility.validQuadBedrock(pos)) {
-                        box = new Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY, box.maxZ + 1);
-                        color = bedrockColor.getValue().getColorObject();
-                    } else if (HoleUtility.validQuadIndestructible(pos)) {
-                        box = new Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY, box.maxZ + 1);
-                    } else {
-                        continue;
-                    }
+        BlockPos.iterateOutwards(centerPos,
+                rangeXZ.getValue(),
+                rangeY.getValue(),
+                rangeXZ.getValue()
+        ).forEach(pos -> {
+            Box box = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + height.getValue(), pos.getZ() + 1);
+            Color color = indestrictibleColor.getValue().getColorObject();
 
-                    boolean skip = false;
-                    for (Box boxOffset : boxes) {
-                        if (boxOffset.intersects(box))
-                            skip = true;
-                    }
+            if (HoleUtility.validBedrock(pos)) {
+                color = bedrockColor.getValue().getColorObject();
+            } else if (HoleUtility.validTwoBlockBedrockXZ(pos)) {
+                boolean east = mc.world.getBlockState(pos.east()).isReplaceable();
+                boolean south = mc.world.getBlockState(pos.south()).isReplaceable();
+                box = new Box(box.minX, box.minY, box.minZ, box.maxX + (east ? 1 : 0), box.maxY, box.maxZ + (south ? 1 : 0));
+                color = bedrockColor.getValue().getColorObject();
+            } else if (HoleUtility.validTwoBlockIndestructibleXZ(pos)) {
+                boolean east = mc.world.getBlockState(pos.east()).isReplaceable();
+                boolean south = mc.world.getBlockState(pos.south()).isReplaceable();
+                box = new Box(box.minX, box.minY, box.minZ, box.maxX + (east ? 1 : 0), box.maxY, box.maxZ + (south ? 1 : 0));
+            } else if (HoleUtility.validQuadBedrock(pos)) {
+                box = new Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY, box.maxZ + 1);
+                color = bedrockColor.getValue().getColorObject();
+            } else if (HoleUtility.validQuadIndestructible(pos)) {
+                box = new Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY, box.maxZ + 1);
+            } else if (!HoleUtility.validIndestructible(pos)) return;
 
-                    if (skip)
-                        continue;
-
-                    blocks.add(new BoxWithColor(box, color));
-                    boxes.add(box);
-                }
+            boolean skip = false;
+            for (Box boxOffset : boxes) {
+                if (boxOffset.intersects(box))
+                    skip = true;
             }
-        }
+
+            if (skip) return;
+
+            blocks.add(new BoxWithColor(box, color));
+            boxes.add(box);
+        });
+
         positions.clear();
         positions.addAll(blocks);
     }

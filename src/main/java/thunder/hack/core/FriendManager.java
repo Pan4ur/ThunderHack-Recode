@@ -36,7 +36,7 @@ public class FriendManager {
         friends.clear();
     }
 
-    public List<AbstractClientPlayerEntity> getOnlineFriends() {
+    public List<AbstractClientPlayerEntity> getNearFriends() {
         if (mc.world == null) return new ArrayList<>();
 
         return mc.world.getPlayers().stream()

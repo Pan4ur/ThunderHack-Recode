@@ -28,7 +28,7 @@ public final class HoleUtility {
             for (Vec3i pattern : VECTOR_PATTERN) {
                 BlockPos newPos = checkPos.add(pattern);
 
-                if (!mc.world.getBlockState(newPos).isAir())
+                if (!isReplaceable(newPos))
                     surroundPoses.add(newPos);
             }
         });
@@ -77,7 +77,7 @@ public final class HoleUtility {
         if (mc.world == null) return null;
 
         for (Vec3i vec : VECTOR_PATTERN) {
-            if (mc.world.getBlockState(checkFrom.add(vec)).isReplaceable())
+            if (isReplaceable(checkFrom.add(vec)))
                 return List.of(checkFrom, checkFrom.add(vec));
         }
 
@@ -97,9 +97,9 @@ public final class HoleUtility {
                 && (isIndestructible(pos.add(-1, 0, 0)) || isBedrock(pos.add(-1, 0, 0)))
                 && (isIndestructible(pos.add(0, 0, 1)) || isBedrock(pos.add(0, 0, 1)))
                 && (isIndestructible(pos.add(0, 0, -1)) || isBedrock(pos.add(0, 0, -1)))
-                && isAir(pos)
-                && isAir(pos.add(0, 1, 0))
-                && isAir(pos.add(0, 2, 0));
+                && isReplaceable(pos)
+                && isReplaceable(pos.add(0, 1, 0))
+                && isReplaceable(pos.add(0, 2, 0));
     }
 
     public static boolean validBedrock(@NotNull BlockPos pos) {
@@ -108,13 +108,13 @@ public final class HoleUtility {
                 && isBedrock(pos.add(-1, 0, 0))
                 && isBedrock(pos.add(0, 0, 1))
                 && isBedrock(pos.add(0, 0, -1))
-                && isAir(pos)
-                && isAir(pos.add(0, 1, 0))
-                && isAir(pos.add(0, 2, 0));
+                && isReplaceable(pos)
+                && isReplaceable(pos.add(0, 1, 0))
+                && isReplaceable(pos.add(0, 2, 0));
     }
 
     public static boolean validTwoBlockBedrockXZ(@NotNull BlockPos pos) {
-        if (!isAir(pos)) return false;
+        if (!isReplaceable(pos)) return false;
         Vec3i addVec = getTwoBlocksDirection(pos);
 
         // If addVec not found -> hole incorrect
@@ -139,7 +139,7 @@ public final class HoleUtility {
     }
 
     public static boolean validTwoBlockIndestructibleXZ(@NotNull BlockPos pos) {
-        if (!isAir(pos)) return false;
+        if (!isReplaceable(pos)) return false;
         Vec3i addVec = getTwoBlocksDirection(pos);
 
         // If addVec not found -> hole incorrect
@@ -174,7 +174,7 @@ public final class HoleUtility {
     private static @Nullable Vec3i getTwoBlocksDirection(BlockPos pos) {
         // Try to get direction
         for (Vec3i vec : VECTOR_PATTERN) {
-            if (isAir(pos.add(vec)))
+            if (isReplaceable(pos.add(vec)))
                 return vec;
         }
 
@@ -240,25 +240,25 @@ public final class HoleUtility {
         List<BlockPos> dirList = new ArrayList<>();
         dirList.add(pos);
 
-        if(!isAir(pos))
+        if (!isReplaceable(pos))
             return null;
 
-        if (isAir(pos.add(1, 0, 0)) && isAir(pos.add(0, 0, 1)) && isAir(pos.add(1, 0, 1))) {
+        if (isReplaceable(pos.add(1, 0, 0)) && isReplaceable(pos.add(0, 0, 1)) && isReplaceable(pos.add(1, 0, 1))) {
             dirList.add(pos.add(1, 0, 0));
             dirList.add(pos.add(0, 0, 1));
             dirList.add(pos.add(1, 0, 1));
         }
-        if (isAir(pos.add(-1, 0, 0)) && isAir(pos.add(0, 0, -1)) && isAir(pos.add(-1, 0, -1))) {
+        if (isReplaceable(pos.add(-1, 0, 0)) && isReplaceable(pos.add(0, 0, -1)) && isReplaceable(pos.add(-1, 0, -1))) {
             dirList.add(pos.add(-1, 0, 0));
             dirList.add(pos.add(0, 0, -1));
             dirList.add(pos.add(-1, 0, -1));
         }
-        if (isAir(pos.add(1, 0, 0)) && isAir(pos.add(0, 0, -1)) && isAir(pos.add(1, 0, -1))) {
+        if (isReplaceable(pos.add(1, 0, 0)) && isReplaceable(pos.add(0, 0, -1)) && isReplaceable(pos.add(1, 0, -1))) {
             dirList.add(pos.add(1, 0, 0));
             dirList.add(pos.add(0, 0, -1));
             dirList.add(pos.add(1, 0, -1));
         }
-        if (isAir(pos.add(-1, 0, 0)) && isAir(pos.add(0, 0, 1)) && isAir(pos.add(-1, 0, 1))) {
+        if (isReplaceable(pos.add(-1, 0, 0)) && isReplaceable(pos.add(0, 0, 1)) && isReplaceable(pos.add(-1, 0, 1))) {
             dirList.add(pos.add(-1, 0, 0));
             dirList.add(pos.add(0, 0, 1));
             dirList.add(pos.add(-1, 0, 1));
@@ -285,9 +285,9 @@ public final class HoleUtility {
         return mc.world.getBlockState(bp).getBlock() == Blocks.BEDROCK;
     }
 
-    private static boolean isAir(BlockPos bp) {
+    private static boolean isReplaceable(BlockPos bp) {
         if (mc.world == null) return false;
 
-        return mc.world.isAir(bp);
+        return mc.world.getBlockState(bp).isReplaceable();
     }
 }

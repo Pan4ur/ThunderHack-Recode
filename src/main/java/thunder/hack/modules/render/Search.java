@@ -19,7 +19,6 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Search extends Module {
-
     public static CopyOnWriteArrayList<BlockVec> blocks = new CopyOnWriteArrayList<>();
     public static ArrayList<Block> defaultBlocks = new ArrayList<>();
     private final Setting<Integer> range = new Setting<>("Range", 100, 1, 128);

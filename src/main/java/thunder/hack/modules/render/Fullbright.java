@@ -9,5 +9,4 @@ public class Fullbright extends Module {
     }
 
     public static Setting<Integer> brightness = new Setting<>("Brightness", 15, 0, 15);
-
 }

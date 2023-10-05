@@ -1,5 +1,6 @@
 package thunder.hack.injection;
 
+import net.minecraft.entity.MovementType;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Shadow;
@@ -10,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
+import thunder.hack.events.impl.EventEntityMoving;
 import thunder.hack.events.impl.PushEvent;
 import thunder.hack.modules.combat.HitBox;
 import thunder.hack.modules.render.NoRender;
@@ -73,6 +75,11 @@ public abstract class MixinEntity implements IEntity {
         if (ModuleManager.hitBox.isEnabled() && (Object) this != mc.player) {
             cir.setReturnValue(new Box(this.boundingBox.minX - HitBox.XZExpand.getValue() / 2f, this.boundingBox.minY - HitBox.YExpand.getValue() / 2f, this.boundingBox.minZ - HitBox.XZExpand.getValue() / 2f, this.boundingBox.maxX + HitBox.XZExpand.getValue() / 2f, this.boundingBox.maxY + HitBox.YExpand.getValue() / 2f, this.boundingBox.maxZ + HitBox.XZExpand.getValue() / 2f));
         }
+    }
+
+    @Inject(method = "move", at = @At("HEAD"))
+    private void onMove(MovementType movementType, Vec3d movement, CallbackInfo ci) {
+        ThunderHack.EVENT_BUS.post(new EventEntityMoving((Entity) (Object) this, movementType, movement));
     }
 
     @Unique

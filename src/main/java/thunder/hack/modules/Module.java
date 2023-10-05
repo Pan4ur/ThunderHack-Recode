@@ -28,19 +28,19 @@ public abstract class Module {
     private final Setting<Boolean> drawn = new Setting<>("Drawn", true);
     private final Setting<Boolean> enabled = new Setting<>("Enabled", false);
 
-    private String description;
+    private final String description;
     private final Category category;
     private final String displayName;
 
     public static MinecraftClient mc = MinecraftClient.getInstance();
 
-    public Module(String name, String description, Category category) {
+    public Module(@NotNull String name, String description, @NotNull Category category) {
         this.displayName = name;
         this.description = "descriptions." + category.getName().toLowerCase() + "." + name.toLowerCase();
         this.category = category;
     }
 
-    public Module(String name, @NotNull Category category) {
+    public Module(@NotNull String name, @NotNull Category category) {
         this.displayName = name;
         this.description = "descriptions." + category.getName().toLowerCase() + "." + name.toLowerCase();
         this.category = category;

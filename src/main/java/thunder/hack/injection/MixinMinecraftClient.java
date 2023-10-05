@@ -3,6 +3,7 @@ package thunder.hack.injection;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.Icons;
+import net.minecraft.client.util.MacWindowUtil;
 import net.minecraft.resource.ResourcePack;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
@@ -77,13 +78,17 @@ public class MixinMinecraftClient {
     }
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/Window;setIcon(Lnet/minecraft/resource/ResourcePack;Lnet/minecraft/client/util/Icons;)V"))
-    private void onChangeIcon(Window instance, ResourcePack resourcePack, Icons icons) {
+    private void onChangeIcon(Window instance, ResourcePack resourcePack, Icons icons) throws IOException {
+        RenderSystem.assertInInitPhase();
+
+        if (GLFW.glfwGetPlatform() == 393218) {
+            MacWindowUtil.setApplicationIconImage(icons.getMacIcon(resourcePack));
+            return;
+        }
         setWindowIcon(ThunderHack.class.getResourceAsStream("/icon.png"), ThunderHack.class.getResourceAsStream("/icon.png"));
     }
 
     public void setWindowIcon(InputStream img16x16, InputStream img32x32) {
-        RenderSystem.assertInInitPhase();
-
         try (MemoryStack memorystack = MemoryStack.stackPush()) {
             GLFWImage.Buffer buffer = GLFWImage.malloc(2, memorystack);
             List<InputStream> imgList = List.of(img16x16, img32x32);

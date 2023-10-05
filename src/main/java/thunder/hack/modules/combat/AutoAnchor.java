@@ -321,7 +321,7 @@ public class AutoAnchor extends Module {
     }
 
     public synchronized boolean isFriendsSafe(BlockPos blockPos) {
-        for (AbstractClientPlayerEntity player : ThunderHack.friendManager.getOnlineFriends()) {
+        for (AbstractClientPlayerEntity player : ThunderHack.friendManager.getNearFriends()) {
             if (ExplosionUtility.getAnchorExplosionDamage(blockPos, player) > maxFDamage.getValue()) {
                 return false;
             }
@@ -502,7 +502,7 @@ public class AutoAnchor extends Module {
                 if (antiFriendPop.getValue()) {
                     boolean shouldContinue = false;
 
-                    for (AbstractClientPlayerEntity entity : ThunderHack.friendManager.getOnlineFriends()) {
+                    for (AbstractClientPlayerEntity entity : ThunderHack.friendManager.getNearFriends()) {
                         if (entity.getHealth() - ExplosionUtility.getAnchorExplosionDamage(targetPosCopy, entity) <= 0) {
                             shouldContinue = true;
                             break;

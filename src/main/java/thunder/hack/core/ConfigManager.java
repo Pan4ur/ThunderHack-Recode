@@ -154,7 +154,7 @@ public class ConfigManager {
         ThunderHack.moduleManager.onLoad();
     }
 
-    public void loadModuleOnly(String name, String module) {
+    public void loadModuleOnly(String name, Module module) {
         File file = new File(ConfigsFolder, name + ".th");
         if (!file.exists()) {
             if (MainSettings.isRu()) {
@@ -168,17 +168,7 @@ public class ConfigManager {
         ThunderHack.moduleManager.onUnload();
         ThunderHack.moduleManager.onUnloadPost();
 
-
-        Module module1 = ThunderHack.moduleManager.modules.stream()
-                .filter(m1 -> Objects.equals(m1.getName(), module))
-                .findFirst().orElse(null);
-
-        if(module1 == null){
-            Command.sendMessage("error 228");
-            return;
-        }
-
-        loadModuleOnly(file, module1);
+        loadModuleOnly(file, module);
         ThunderHack.moduleManager.onLoad();
 
     }
