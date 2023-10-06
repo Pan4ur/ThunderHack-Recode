@@ -6,7 +6,6 @@ import java.io.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MacroManager {
-
     private static CopyOnWriteArrayList<Macro> macros = new CopyOnWriteArrayList<>();
 
     public static void addMacro(Macro macro) {

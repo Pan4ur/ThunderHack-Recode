@@ -1,6 +1,5 @@
 package thunder.hack.gui.font;
 
-
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 
@@ -21,7 +20,6 @@ public class FontRenderers {
     public static FontAdapter sf_bold_mini;
     public static FontAdapter sf_medium;
     public static FontAdapter sf_medium_mini;
-
 
     public static FontAdapter getSettingsRenderer() {
         return settings;

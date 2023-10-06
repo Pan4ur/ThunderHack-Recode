@@ -4,10 +4,13 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
-
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -17,12 +20,10 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.*;
-import thunder.hack.utility.player.InteractionUtility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,14 +59,6 @@ public class AutoTrap extends Module {
     public static Timer inactivityTimer = new Timer();
 
     private int delay;
-
-    private enum PlaceTiming {
-        Default, Vanilla, Sequential
-    }
-
-    private enum RenderMode {
-        Fade, Decrease
-    }
 
     private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
 
@@ -109,7 +102,7 @@ public class AutoTrap extends Module {
                 BlockPos targetBlock = getSequentialPos();
                 if (targetBlock == null)
                     break;
-                if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false,false)) {
+                if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
                     placed++;
                     delay = placeDelay.getValue();
                     inactivityTimer.reset();
@@ -121,7 +114,7 @@ public class AutoTrap extends Module {
             if (targetBlock == null)
                 return;
 
-            if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false,false)) {
+            if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
                 sequentialBlocks.add(targetBlock);
                 delay = placeDelay.getValue();
                 inactivityTimer.reset();
@@ -139,7 +132,7 @@ public class AutoTrap extends Module {
                     BlockPos bp = getSequentialPos();
                     if (bp != null) {
                         InventoryUtility.saveSlot();
-                        if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false,false)) {
+                        if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
                             sequentialBlocks.add(bp);
                             sequentialBlocks.remove(pac.getPos());
                             InventoryUtility.returnSlot();
@@ -156,9 +149,9 @@ public class AutoTrap extends Module {
 
     private BlockPos getSequentialPos() {
         List<BlockPos> list = getBlocks();
-        if(list.isEmpty()) return null;
+        if (list.isEmpty()) return null;
         for (BlockPos bp : getBlocks()) {
-            if (InteractionUtility.canPlaceBlock(bp, interact.getValue(),false) && mc.world.isAir(bp)) {
+            if (InteractionUtility.canPlaceBlock(bp, interact.getValue(), false) && mc.world.isAir(bp)) {
                 return bp;
             }
         }
@@ -167,7 +160,7 @@ public class AutoTrap extends Module {
 
     private List<BlockPos> getBlocks() {
         PlayerEntity pl = ThunderHack.combatManager.getNearestTarget(range.getValue());
-        if(pl == null) return new ArrayList<>();
+        if (pl == null) return new ArrayList<>();
         List<BlockPos> blocks = new ArrayList<>();
         for (BlockPos bp : getPlayerBlocks(pl)) {
             blocks.add(bp.east().up());
@@ -186,14 +179,13 @@ public class AutoTrap extends Module {
             blocks.add(bp.north().down());
             blocks.add(bp.up().up());
 
-            if(!InteractionUtility.canPlaceBlock(bp.up().up(), interact.getValue(),false)){
+            if (!InteractionUtility.canPlaceBlock(bp.up().up(), interact.getValue(), false)) {
                 Direction dir = mc.player.getHorizontalFacing();
-                if(dir != null){
-                    blocks.add(bp.up().up().offset(dir,1));
+                if (dir != null) {
+                    blocks.add(bp.up().up().offset(dir, 1));
                 }
             }
         }
-
 
         return blocks;
     }
@@ -224,24 +216,13 @@ public class AutoTrap extends Module {
     private int getSlot() {
         List<Block> canUseBlocks = new ArrayList<>();
 
-        if (obsidian.getValue()) {
-            canUseBlocks.add(Blocks.OBSIDIAN);
-        }
-        if (enderChest.getValue()) {
-            canUseBlocks.add(Blocks.ENDER_CHEST);
-        }
-        if (cryingObsidian.getValue()) {
-            canUseBlocks.add(Blocks.CRYING_OBSIDIAN);
-        }
-        if (netherite.getValue()) {
-            canUseBlocks.add(Blocks.NETHERITE_BLOCK);
-        }
-        if (anchor.getValue()) {
-            canUseBlocks.add(Blocks.RESPAWN_ANCHOR);
-        }
-        if (dirt.getValue()) {
-            canUseBlocks.add(Blocks.DIRT);
-        }
+        if (obsidian.getValue()) canUseBlocks.add(Blocks.OBSIDIAN);
+        if (enderChest.getValue()) canUseBlocks.add(Blocks.ENDER_CHEST);
+        if (cryingObsidian.getValue()) canUseBlocks.add(Blocks.CRYING_OBSIDIAN);
+        if (netherite.getValue()) canUseBlocks.add(Blocks.NETHERITE_BLOCK);
+        if (anchor.getValue()) canUseBlocks.add(Blocks.RESPAWN_ANCHOR);
+        if (dirt.getValue()) canUseBlocks.add(Blocks.DIRT);
+
         int slot = -1;
 
         final ItemStack mainhandStack = mc.player.getMainHandStack();
@@ -269,5 +250,13 @@ public class AutoTrap extends Module {
 
     private BlockPos getPlayerPos(PlayerEntity pl) {
         return BlockPos.ofFloored(pl.getX(), pl.getY() - Math.floor(pl.getY()) > 0.8 ? Math.floor(pl.getY()) + 1.0 : Math.floor(pl.getY()), pl.getZ());
+    }
+
+    private enum PlaceTiming {
+        Default, Vanilla, Sequential
+    }
+
+    private enum RenderMode {
+        Fade, Decrease
     }
 }

@@ -56,7 +56,6 @@ public class FGHelper extends Module {
     private final Timer pvpTimer = new Timer();
     private final Timer inviteTimer = new Timer();
 
-
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof GameMessageS2CPacket && photomath.getValue()) {
@@ -92,30 +91,29 @@ public class FGHelper extends Module {
         }
     }
 
-
     @Override
     public void onUpdate() {
         if (mode.getValue() == Mode.Survival) {
             if (mc.player.getHealth() < triggerhealth.getValue() && timer.passedMs(200) && getCappuchinoAtHotbar() != -1 && cappuccino.getValue()) {
                 int hotbarslot = mc.player.getInventory().selectedSlot;
                 mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.AMBIENT, 150.0f, 1.0F);
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(getCappuchinoAtHotbar()));
-                mc.getNetworkHandler().sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(hotbarslot));
+                sendPacket(new UpdateSelectedSlotC2SPacket(getCappuchinoAtHotbar()));
+                sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                sendPacket(new UpdateSelectedSlotC2SPacket(hotbarslot));
                 timer.reset();
             }
             if (timer.passedMs(200) && getAmericanoAtHotbar() != -1 && !mc.player.hasStatusEffect(StatusEffects.HASTE) && americano.getValue()) {
                 int hotbarslot = mc.player.getInventory().selectedSlot;
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(getAmericanoAtHotbar()));
-                mc.getNetworkHandler().sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(hotbarslot));
+                sendPacket(new UpdateSelectedSlotC2SPacket(getAmericanoAtHotbar()));
+                sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                sendPacket(new UpdateSelectedSlotC2SPacket(hotbarslot));
                 timer.reset();
             }
             if (timer.passedMs(500) && getPowderAtHotbar() != -1 && !(mc.player.hasStatusEffect(StatusEffects.STRENGTH)) && mc.crosshairTarget != null && mc.crosshairTarget.getType() != HitResult.Type.BLOCK && powder.getValue()) {
                 int hotbarslot = mc.player.getInventory().selectedSlot;
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(getPowderAtHotbar()));
-                mc.getNetworkHandler().sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(hotbarslot));
+                sendPacket(new UpdateSelectedSlotC2SPacket(getPowderAtHotbar()));
+                sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                sendPacket(new UpdateSelectedSlotC2SPacket(hotbarslot));
                 timer.reset();
             }
             if (jboost.getValue() && powder.getValue()) {
@@ -151,21 +149,15 @@ public class FGHelper extends Module {
 
         } else {
             if (feed.getValue() && mc.player.getHungerManager().getFoodLevel() < 8) {
-                if (canSendCommand()) {
+                if (canSendCommand())
                     mc.player.networkHandler.sendChatCommand("feed");
-                }
             }
             if (fixAll.getValue()) {
-                if (canSendCommand()) {
+                if (canSendCommand())
                     mc.player.networkHandler.sendChatCommand("fix all");
-                }
             }
-            if (mc.player.hurtTime > 0) {
-                pvpTimer.reset();
-            }
-            if (near.getValue()) {
-                if (mc.player.age % 30 == 0) mc.player.networkHandler.sendChatCommand("near");
-            }
+            if (mc.player.hurtTime > 0) pvpTimer.reset();
+            if (near.getValue()) if (mc.player.age % 30 == 0) mc.player.networkHandler.sendChatCommand("near");
             if (farmilka.getValue()) {
                 for (Entity ent : mc.world.getEntities()) {
                     if (ent instanceof PlayerEntity) continue;
@@ -193,7 +185,6 @@ public class FGHelper extends Module {
         return -1;
     }
 
-
     private int getCappuchinoAtHotbar() {
         for (int i = 0; i < 9; ++i) {
             ItemStack itemStack = mc.player.getInventory().getStack(i);
@@ -215,7 +206,6 @@ public class FGHelper extends Module {
     public enum Mode {
         Survival, Grief
     }
-
 
     Timer atphtimer = new Timer();
     Timer checktimer = new Timer();

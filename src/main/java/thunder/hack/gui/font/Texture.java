@@ -23,5 +23,4 @@ public class Texture extends Identifier {
         }
         return ret.toString();
     }
-
 }

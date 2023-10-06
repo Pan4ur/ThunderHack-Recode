@@ -41,7 +41,6 @@ public class WaterMark extends HudElement {
     public void onRenderShaders(DrawContext context) {
         String username = ((ModuleManager.media.isEnabled() && Media.nickProtect.getValue()) || ModuleManager.nameProtect.isEnabled()) ? (ModuleManager.nameProtect.isEnabled() ? ModuleManager.nameProtect.getName() : "Protected") : mc.getSession().getUsername();
 
-
         if (mode.getValue() == Mode.Big) {
             //  Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX(), getPosY(), 103, 30, 8, HudEditor.getColor(270));
             Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 103, 30, HudEditor.hudRound.getValue(), 10);

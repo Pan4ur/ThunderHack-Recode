@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import static thunder.hack.modules.Module.mc;
 
+@SuppressWarnings("unused")
 public class ModuleManager {
     public ArrayList<Module> modules = new ArrayList<>();
     public List<Module> sortedModules = new ArrayList<>();

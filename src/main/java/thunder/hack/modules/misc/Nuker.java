@@ -21,7 +21,6 @@ import thunder.hack.events.impl.EventSetBlockState;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -34,6 +33,7 @@ import thunder.hack.utility.render.Render3DEngine;
 import java.awt.*;
 
 import static net.minecraft.block.Blocks.BEDROCK;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class Nuker extends Module {
     public Nuker() {
@@ -41,11 +41,11 @@ public class Nuker extends Module {
     }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
-    private Setting<Integer> delay = new Setting<>("Delay", 25, 0, 1000);
+    private final Setting<Integer> delay = new Setting<>("Delay", 25, 0, 1000);
     private final Setting<BlockSelection> blocks = new Setting<>("Blocks", BlockSelection.Select);
-    private Setting<Boolean> flatten = new Setting<>("Flatten", false);
-    private Setting<Boolean> creative = new Setting<>("Creative", false);
-    private Setting<Float> range = new Setting<>("Range", 4.2f, 1.5f, 5f);
+    private final Setting<Boolean> flatten = new Setting<>("Flatten", false);
+    private final Setting<Boolean> creative = new Setting<>("Creative", false);
+    private final Setting<Float> range = new Setting<>("Range", 4.2f, 1.5f, 5f);
     private final Setting<ColorMode> colorMode = new Setting<>("ColorMode", ColorMode.Sync);
     public final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x2250b4b4), v -> colorMode.getValue() == ColorMode.Custom);
 
@@ -54,20 +54,6 @@ public class Nuker extends Module {
     private Timer breakTimer = new Timer();
 
     private NukerThread nukerThread = new NukerThread();
-
-
-    private enum Mode {
-        Default, Fast, FastAF
-    }
-
-    private enum ColorMode {
-        Custom, Sync
-    }
-
-    private enum BlockSelection {
-        Select, All
-    }
-
 
     @Override
     public void onEnable() {
@@ -97,7 +83,7 @@ public class Nuker extends Module {
         if (mc.world.isAir(e.getBlockPos())) return;
         if (blocks.getValue().equals(BlockSelection.Select) && targetBlockType != mc.world.getBlockState(e.getBlockPos()).getBlock()) {
             targetBlockType = mc.world.getBlockState(e.getBlockPos()).getBlock();
-            sendMessage(MainSettings.isRu() ? "Выбран блок: " + Formatting.AQUA + targetBlockType.getName().getString() : "Selected block: " + Formatting.AQUA + targetBlockType.getName().getString());
+            sendMessage(isRu() ? "Выбран блок: " + Formatting.AQUA + targetBlockType.getName().getString() : "Selected block: " + Formatting.AQUA + targetBlockType.getName().getString());
         }
     }
 
@@ -236,6 +222,18 @@ public class Nuker extends Module {
         }
     }
 
-    public record BlockData(BlockPos bp, Vec3d vec3d, Direction dir) {
+
+    private enum Mode {
+        Default, Fast, FastAF
     }
+
+    private enum ColorMode {
+        Custom, Sync
+    }
+
+    private enum BlockSelection {
+        Select, All
+    }
+
+    public record BlockData(BlockPos bp, Vec3d vec3d, Direction dir) {}
 }

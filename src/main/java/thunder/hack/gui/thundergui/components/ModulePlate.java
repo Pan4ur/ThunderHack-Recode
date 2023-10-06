@@ -1,6 +1,5 @@
 package thunder.hack.gui.thundergui.components;
 
-
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import thunder.hack.cmd.Command;

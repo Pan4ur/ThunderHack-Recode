@@ -11,27 +11,23 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
-import thunder.hack.cmd.Command;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.MainSettings;
-import thunder.hack.modules.render.FreeCam;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
+
+//~pasted~ Ported from 3arthh4ack
 public class Tracker extends Module {
     public Tracker() {
         super("Tracker", Category.MISC);
     }
-
-    /*
-    ~pasted~ Ported from 3arthh4ack
-     */
 
     protected final Setting<Boolean> only1v1 = new Setting<>("1v1-Only", true);
 
@@ -43,7 +39,6 @@ public class Tracker extends Module {
     protected boolean awaiting;
     protected int crystalStacks;
     protected int expStacks;
-
 
     @Override
     public void onEnable() {
@@ -67,7 +62,7 @@ public class Tracker extends Module {
 
             String s = pac.content().getString();
             if (!s.contains("<") && (s.contains("has accepted your duel request") || s.contains("Accepted the duel request from"))) {
-                sendMessage(MainSettings.isRu() ? "Дуель принята! Обновляю цель..." : "Duel accepted! Resetting target...");
+                sendMessage(isRu() ? "Дуель принята! Обновляю цель..." : "Duel accepted! Resetting target...");
                 trackedPlayer = null;
                 awaitingExp.set(0);
                 crystals.set(0);
@@ -75,7 +70,6 @@ public class Tracker extends Module {
                 crystalStacks = 0;
                 expStacks = 0;
             }
-
         }
     }
 
@@ -88,14 +82,9 @@ public class Tracker extends Module {
         }
         if (e.getEntity() instanceof ExperienceBottleEntity) {
             if (awaitingExp.get() > 0) {
-                if (mc.player.squaredDistanceTo(e.getEntity()) < 16) {
-                    awaitingExp.decrementAndGet();
-                } else {
-                    exp.incrementAndGet();
-                }
-            } else {
-                exp.incrementAndGet();
-            }
+                if (mc.player.squaredDistanceTo(e.getEntity()) < 16) awaitingExp.decrementAndGet();
+                else exp.incrementAndGet();
+            } else exp.incrementAndGet();
         }
     }
 
@@ -106,16 +95,11 @@ public class Tracker extends Module {
             if (player == null || player.equals(mc.player) || ModuleManager.freeCam.dummy == player) continue;
 
             if (found && only1v1.getValue()) {
-                disable(MainSettings.isRu() ? "Ты не в дуели! Отключаю.." : "Disabled, you are not in a 1v1!");
+                disable(isRu() ? "Ты не в дуели! Отключаю.." : "Disabled, you are not in a 1v1! Disabling...");
                 return;
             }
-            if (trackedPlayer == null) {
-                if (MainSettings.isRu()) {
-                    sendMessage(Formatting.LIGHT_PURPLE + "Следим за " + Formatting.DARK_PURPLE + player.getName().getString() + Formatting.LIGHT_PURPLE + "!");
-                } else {
-                    sendMessage(Formatting.LIGHT_PURPLE + "Now tracking " + Formatting.DARK_PURPLE + player.getName().getString() + Formatting.LIGHT_PURPLE + "!");
-                }
-            }
+            if (trackedPlayer == null)
+                sendMessage(Formatting.LIGHT_PURPLE + (isRu() ? "Следим за " : "Now tracking ") + Formatting.DARK_PURPLE + player.getName().getString() + Formatting.LIGHT_PURPLE + "!");
             trackedPlayer = player;
             found = true;
         }
@@ -125,21 +109,15 @@ public class Tracker extends Module {
         int exp = this.exp.get() / 64;
         if (expStacks != exp) {
             expStacks = exp;
-            if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                sendMessage(Formatting.DARK_PURPLE + trackedPlayer.getName().getString() + Formatting.LIGHT_PURPLE + " использовал " + Formatting.WHITE + exp + Formatting.LIGHT_PURPLE + (exp == 1 ? " стак" : " стаков") + " Пузырьков опыта!");
-            } else {
-                sendMessage(Formatting.DARK_PURPLE + trackedPlayer.getName().getString() + Formatting.LIGHT_PURPLE + " used " + Formatting.WHITE + exp + Formatting.LIGHT_PURPLE + (exp == 1 ? " stack" : " stacks") + " of Exp!");
-            }
+            if (isRu()) sendMessage(Formatting.DARK_PURPLE + trackedPlayer.getName().getString() + Formatting.LIGHT_PURPLE + " использовал " + Formatting.WHITE + exp + Formatting.LIGHT_PURPLE + (exp == 1 ? " стак" : " стаков") + " Пузырьков опыта!");
+            else sendMessage(Formatting.DARK_PURPLE + trackedPlayer.getName().getString() + Formatting.LIGHT_PURPLE + " used " + Formatting.WHITE + exp + Formatting.LIGHT_PURPLE + (exp == 1 ? " stack" : " stacks") + " of XP Bottles!");
         }
 
         int crystals = this.crystals.get() / 64;
         if (crystalStacks != crystals) {
             crystalStacks = crystals;
-            if (MainSettings.language.getValue() == MainSettings.Language.ENG) {
-                sendMessage(Formatting.DARK_PURPLE + trackedPlayer.getName().getString() + Formatting.LIGHT_PURPLE + " used " + Formatting.WHITE + crystals + Formatting.LIGHT_PURPLE + (crystals == 1 ? " stack" : " stacks") + " of Crystals!");
-            } else {
-                sendMessage(Formatting.DARK_PURPLE + trackedPlayer.getName().getString() + Formatting.LIGHT_PURPLE + " использовал " + Formatting.WHITE + crystals + Formatting.LIGHT_PURPLE + (crystals == 1 ? " стак" : " стаков") + " Кристаллов!");
-            }
+            if (isRu()) sendMessage(Formatting.DARK_PURPLE + trackedPlayer.getName().getString() + Formatting.LIGHT_PURPLE + " used " + Formatting.WHITE + crystals + Formatting.LIGHT_PURPLE + (crystals == 1 ? " stack" : " stacks") + " of Crystals!");
+            else sendMessage(Formatting.DARK_PURPLE + trackedPlayer.getName().getString() + Formatting.LIGHT_PURPLE + " использовал " + Formatting.WHITE + crystals + Formatting.LIGHT_PURPLE + (crystals == 1 ? " стак" : " стаков") + " Кристаллов!");
         }
     }
 
@@ -148,32 +126,22 @@ public class Tracker extends Module {
             int c = crystals.get();
             int e = exp.get();
             StringBuilder builder;
-            if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                builder = new StringBuilder().append(trackedPlayer.getName().getString()).append(Formatting.LIGHT_PURPLE).append(" использовал ").append(Formatting.WHITE).append(c).append(Formatting.LIGHT_PURPLE).append(" (").append(Formatting.WHITE);
-            } else {
-                builder = new StringBuilder().append(trackedPlayer.getName().getString()).append(Formatting.LIGHT_PURPLE).append(" has used ").append(Formatting.WHITE).append(c).append(Formatting.LIGHT_PURPLE).append(" (").append(Formatting.WHITE);
-            }
-            if (c % 64 == 0) {
-                builder.append(c / 64);
-            } else {
-                builder.append(MathUtility.round(c / 64.0, 1));
-            }
-            if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                builder.append(Formatting.LIGHT_PURPLE).append(") кристаллов и ").append(Formatting.WHITE).append(e).append(Formatting.LIGHT_PURPLE).append(" (").append(Formatting.WHITE);
-            } else {
-                builder.append(Formatting.LIGHT_PURPLE).append(") crystals and ").append(Formatting.WHITE).append(e).append(Formatting.LIGHT_PURPLE).append(" (").append(Formatting.WHITE);
-            }
 
-            if (e % 64 == 0) {
-                builder.append(e / 64);
-            } else {
-                builder.append(MathUtility.round(e / 64.0, 1));
-            }
-            if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                builder.append(Formatting.LIGHT_PURPLE).append(") пузырьков опыта.");
-            } else {
-                builder.append(Formatting.LIGHT_PURPLE).append(") bottles of experience.");
-            }
+            if (isRu()) builder = new StringBuilder().append(trackedPlayer.getName().getString()).append(Formatting.LIGHT_PURPLE).append(" использовал ").append(Formatting.WHITE).append(c).append(Formatting.LIGHT_PURPLE).append(" (").append(Formatting.WHITE);
+            else builder = new StringBuilder().append(trackedPlayer.getName().getString()).append(Formatting.LIGHT_PURPLE).append(" has used ").append(Formatting.WHITE).append(c).append(Formatting.LIGHT_PURPLE).append(" (").append(Formatting.WHITE);
+
+            if (c % 64 == 0) builder.append(c / 64);
+            else builder.append(MathUtility.round(c / 64.0, 1));
+
+            if (isRu()) builder.append(Formatting.LIGHT_PURPLE).append(") кристаллов и ").append(Formatting.WHITE).append(e).append(Formatting.LIGHT_PURPLE).append(" (").append(Formatting.WHITE);
+            else builder.append(Formatting.LIGHT_PURPLE).append(") crystals and ").append(Formatting.WHITE).append(e).append(Formatting.LIGHT_PURPLE).append(" (").append(Formatting.WHITE);
+
+            if (e % 64 == 0) builder.append(e / 64);
+            else builder.append(MathUtility.round(e / 64.0, 1));
+
+            if (isRu()) builder.append(Formatting.LIGHT_PURPLE).append(") пузырьков опыта.");
+            else builder.append(Formatting.LIGHT_PURPLE).append(") bottles of experience.");
+
             sendMessage(builder.toString());
         }
     }

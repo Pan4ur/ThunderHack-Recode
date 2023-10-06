@@ -13,6 +13,8 @@ import net.minecraft.item.FishingRodItem;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
+
 public class AutoFish extends Module {
     public AutoFish() {
         super("AutoFish", "AutoFish", Category.MISC);
@@ -45,13 +47,11 @@ public class AutoFish extends Module {
         if (mc.player.getMainHandStack().getItem() instanceof FishingRodItem) {
             if (mc.player.getMainHandStack().getDamage() > 52) {
                 if (rodSave.getValue() && !changeRod.getValue()) {
-                    disable(MainSettings.isRu() ? "Удочка почти сломалась!" : "Saving rod...");
+                    disable(isRu() ? "Удочка почти сломалась!" : "Saving the rod...");
                 } else if (changeRod.getValue() && getRodSlot() != -1) {
-                    sendMessage("Swapped to a new rod");
+                    sendMessage(isRu() ? "Свапнулся на новую удочку" : "Swapped to a new rod");
                     mc.player.getInventory().selectedSlot = getRodSlot();
-                } else {
-                    disable(MainSettings.isRu() ? "Удочка почти сломалась!" : "Saving rod...");
-                }
+                } else disable(isRu() ? "Удочка почти сломалась!" : "Saving the rod...");
             }
         }
         if (timeout.passedMs(60000)) {
@@ -70,20 +70,14 @@ public class AutoFish extends Module {
             if (!flag && caughtFish) {
                 mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
                 if (autoSell.getValue()) {
-                    if (timeout.passedMs(1000)) {
-                        mc.player.networkHandler.sendChatCommand("sellfish");
-                    }
+                    if (timeout.passedMs(1000)) mc.player.networkHandler.sendChatCommand("sellfish");
                 }
 
-                ThunderHack.asyncManager.run(() -> {
-                    mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
-                }, 250);
+                ThunderHack.asyncManager.run(() -> mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND), 250);
 
                 timeout.reset();
                 flag = true;
-            } else if (!caughtFish) {
-                flag = false;
-            }
+            } else if (!caughtFish) flag = false;
         }
     }
 

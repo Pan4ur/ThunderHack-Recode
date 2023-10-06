@@ -35,7 +35,6 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.injection.accesors.IWorldRenderer;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
@@ -55,6 +54,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class CevBreaker extends Module {
     private final Setting<Float> range = new Setting<>("Target Range", 5.f, 0.f, 7.f);
@@ -123,8 +124,8 @@ public class CevBreaker extends Module {
         canPlaceBlock = true;
 
         if (breakMode.getValue() == BreakMode.Packet && ModuleManager.speedMine.isDisabled() && autoDisable.getValue()) {
-            ThunderHack.notificationManager.publicity(getName(), MainSettings.isRu() ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine", 5, Notification.Type.ERROR);
-            disable(MainSettings.isRu() ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine");
+            ThunderHack.notificationManager.publicity(getName(), isRu() ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine", 5, Notification.Type.ERROR);
+            disable(isRu() ? "Для использования пакетного копания необходимо включить и настроить модуль SpeedMine" : "For using packet mine is necessary to enable and config SpeedMine");
         }
     }
 
@@ -133,9 +134,7 @@ public class CevBreaker extends Module {
         if (fullNullCheck() || shouldPause()) return;
 
         // Find target
-        if (target == null || target.isDead()
-                || target.getHealth() + target.getAbsorptionAmount() <= 0
-                || target.distanceTo(((mc.player))) > range.getValue()) {
+        if (target == null || target.isDead() || target.getHealth() + target.getAbsorptionAmount() <= 0 || target.distanceTo(((mc.player))) > range.getValue()) {
             target = null;
             findTarget();
             return;
@@ -145,7 +144,7 @@ public class CevBreaker extends Module {
             return;
         }
 
-        // To prevent stuck we will mine necessary blocks
+        // To prevent getting stuck we will mine necessary blocks
         if (!mc.world.getBlockState(target.getBlockPos().up(4)).isAir() && oldMode.getValue()) {
             startMine(target.getBlockPos().up(4));
             return;
@@ -157,8 +156,7 @@ public class CevBreaker extends Module {
         }
 
         // Prevent SpeedMine stuck
-        if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL
-                && mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.OBSIDIAN)) {
+        if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL && mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.OBSIDIAN)) {
             placeCrystal();
         }
 
@@ -186,12 +184,7 @@ public class CevBreaker extends Module {
             startMine(target.getBlockPos().up(2));
         }
 
-        BlockPos[] surroundBlocks = new BlockPos[]{
-                target.getBlockPos().up().west(),
-                target.getBlockPos().up().south(),
-                target.getBlockPos().up().north(),
-                target.getBlockPos().up().east()
-        };
+        BlockPos[] surroundBlocks = new BlockPos[]{target.getBlockPos().up().west(), target.getBlockPos().up().south(), target.getBlockPos().up().north(), target.getBlockPos().up().east()};
 
         // Generate structure
         if (targetSurroundBlockPos == null) {
@@ -202,25 +195,19 @@ public class CevBreaker extends Module {
                     targetSurroundBlockPos = pos;
                     break;
                 }
-                if (!mc.world.getBlockState(pos.add(0, 1, 0)).isAir())
-                    targetSurroundBlockPos = pos;
+                if (!mc.world.getBlockState(pos.add(0, 1, 0)).isAir()) targetSurroundBlockPos = pos;
             }
         }
 
         // Trap
         if (trap.getValue()) {
             List<BlockPos> trapBlocks = new ArrayList<>();
-            for (BlockPos surroundBlock : HoleUtility.getSurroundPoses(target.getBlockPos()).stream()
-                    .map(BlockPos::up)
-                    .toList()) {
+            for (BlockPos surroundBlock : HoleUtility.getSurroundPoses(target.getBlockPos()).stream().map(BlockPos::up).toList()) {
                 if (InteractionUtility.canPlaceBlock(surroundBlock, interact.getValue(), false)) {
                     trapBlocks.add(surroundBlock);
                 }
             }
-            for (BlockPos headPos : HoleUtility.getHolePoses(target.getBlockPos()).stream()
-                    .map(pos -> pos.up(2))
-                    .filter(pos -> !pos.equals(currentMineBlockPos))
-                    .toList()) {
+            for (BlockPos headPos : HoleUtility.getHolePoses(target.getBlockPos()).stream().map(pos -> pos.up(2)).filter(pos -> !pos.equals(currentMineBlockPos)).toList()) {
                 if (InteractionUtility.canPlaceBlock(headPos, interact.getValue(), false)) {
                     trapBlocks.add(headPos);
                 }
@@ -260,8 +247,7 @@ public class CevBreaker extends Module {
             }
 
             // First step place obsidian
-            if (InteractionUtility.canPlaceBlock(targetSurroundBlockPos, interact.getValue(), false)
-                    && placeObsidian(targetSurroundBlockPos))
+            if (InteractionUtility.canPlaceBlock(targetSurroundBlockPos, interact.getValue(), false) && placeObsidian(targetSurroundBlockPos))
                 renderStructurePoses.put(targetSurroundBlockPos, System.currentTimeMillis());
 
             blocksPlaced++;
@@ -280,9 +266,7 @@ public class CevBreaker extends Module {
     }
 
     private boolean shouldPause() {
-        return (onAura.getValue() && ModuleManager.aura.isEnabled())
-                || (onMine.getValue() && PlayerUtility.isMining())
-                || (onEat.getValue() && PlayerUtility.isEating());
+        return (onAura.getValue() && ModuleManager.aura.isEnabled()) || (onMine.getValue() && PlayerUtility.isMining()) || (onEat.getValue() && PlayerUtility.isEating());
     }
 
     @Override
@@ -317,8 +301,7 @@ public class CevBreaker extends Module {
     @SuppressWarnings("unused")
     private void onEntityRemove(@NotNull EventEntityRemoved e) {
         if (e.entity == null || target == null) return;
-        if (e.entity.getBlockPos().equals(target.getBlockPos().up(3))
-                && e.entity instanceof EndCrystalEntity) {
+        if (e.entity.getBlockPos().equals(target.getBlockPos().up(3)) && e.entity instanceof EndCrystalEntity) {
             newCycle = true;
         }
     }
@@ -340,42 +323,36 @@ public class CevBreaker extends Module {
     }
 
     private void startBreakCrystalThread(EndCrystalEntity endCrystal) {
-        if (mc.player == null || mc.interactionManager == null)
-            return;
+        if (mc.player == null || mc.interactionManager == null) return;
 
         ThunderHack.asyncManager.run(() -> {
-                    final int preSlot = mc.player.getInventory().selectedSlot;
-                    if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
-                        SearchInvResult swordResult = InventoryUtility.getAntiWeaknessItem();
-                        if (autoSwap.getValue()) swordResult.switchTo();
-                    }
+            final int preSlot = mc.player.getInventory().selectedSlot;
+            if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
+                SearchInvResult swordResult = InventoryUtility.getAntiWeaknessItem();
+                if (autoSwap.getValue()) swordResult.switchTo();
+            }
 
-                    mc.interactionManager.attackEntity(mc.player, endCrystal);
-                    sendPacket(PlayerInteractEntityC2SPacket.attack(endCrystal, mc.player.isSneaking()));
-                    sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+            mc.interactionManager.attackEntity(mc.player, endCrystal);
+            sendPacket(PlayerInteractEntityC2SPacket.attack(endCrystal, mc.player.isSneaking()));
+            sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
-                    if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
-                        if (autoSwap.getValue()) InventoryUtility.switchTo(preSlot);
-                    }
+            if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
+                if (autoSwap.getValue()) InventoryUtility.switchTo(preSlot);
+            }
 
-                    try {
-                        Thread.sleep(breakCrystalDelay.getValue() / 2);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    canPlaceBlock = true;
-                },
-                breakCrystalDelay.getValue() / 2
-        );
+            try {
+                Thread.sleep(breakCrystalDelay.getValue() / 2);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            canPlaceBlock = true;
+        }, breakCrystalDelay.getValue() / 2);
     }
 
     @EventHandler
     @SuppressWarnings("unused")
     private void onPostSync(EventPostSync e) {
-        if (shouldPause()
-                || mc.world == null
-                || mc.player == null
-                || mc.interactionManager == null) return;
+        if (shouldPause() || mc.world == null || mc.player == null || mc.interactionManager == null) return;
 
         // Normal breaking block
         if (mine && !mc.world.getBlockState(currentMineBlockPos).isReplaceable()) {
@@ -396,9 +373,7 @@ public class CevBreaker extends Module {
     }
 
     private void startMine(BlockPos pos) {
-        if (mc.world == null
-                || mc.player == null
-                || mc.interactionManager == null) return;
+        if (mc.world == null || mc.player == null || mc.interactionManager == null) return;
 
         switch (breakMode.getValue()) {
             case Normal -> {
@@ -406,20 +381,15 @@ public class CevBreaker extends Module {
                 currentMineBlockPos = pos;
             }
             case Packet -> {
-                if (ModuleManager.speedMine.isEnabled()
-                        && SpeedMine.progress != 0)
-                    return;
-                if (SpeedMine.minePosition != null
-                        && !mc.world.getBlockState(SpeedMine.minePosition).isAir())
-                    return;
+                if (ModuleManager.speedMine.isEnabled() && SpeedMine.progress != 0) return;
+                if (SpeedMine.minePosition != null && !mc.world.getBlockState(SpeedMine.minePosition).isAir()) return;
 
                 InteractionUtility.BreakData bData = InteractionUtility.getBreakData(pos, interact.getValue());
                 if (bData == null) return;
 
                 SpeedMine.minePosition = pos;
                 mc.interactionManager.attackBlock(pos, bData.dir());
-                if (swing.getValue())
-                    mc.player.swingHand(Hand.MAIN_HAND);
+                if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
             }
         }
     }
@@ -431,22 +401,20 @@ public class CevBreaker extends Module {
             if (player.distanceTo(((mc.player))) > range.getValue()) continue;
             if (player.isDead()) continue;
             if (player.getHealth() + player.getAbsorptionAmount() <= 0) continue;
-            if (!HoleUtility.isHole(player.getBlockPos()))
-                continue;
+            if (!HoleUtility.isHole(player.getBlockPos())) continue;
 
             target = player;
             break;
         }
 
         if (target == null && autoDisable.getValue()) {
-            ThunderHack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.", 3, Notification.Type.ERROR);
-            disable(MainSettings.isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.");
+            ThunderHack.notificationManager.publicity("CevBreaker", isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.", 3, Notification.Type.ERROR);
+            disable(isRu() ? "Не удалось найти подходящую цель. Если игрок есть, он не в холке." : "There are no valid target. If player exists, maybe he not in hole.");
         }
     }
 
     private void placeCrystal() {
-        if (mc.world == null || mc.player == null || mc.interactionManager == null)
-            return;
+        if (mc.world == null || mc.player == null || mc.interactionManager == null) return;
 
         BlockPos pos = target.getBlockPos().up(2);
         for (Entity entity : ThunderHack.asyncManager.getAsyncEntities()) {
@@ -482,11 +450,10 @@ public class CevBreaker extends Module {
     private @Nullable SearchInvResult getObsidian() {
         SearchInvResult result = InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN);
 
-        if (!result.isHolding() && !autoSwap.getValue())
-            return null;
+        if (!result.isHolding() && !autoSwap.getValue()) return null;
         if (!result.found() && autoDisable.getValue()) {
-            ThunderHack.notificationManager.publicity("CevBreaker", MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!", 5, Notification.Type.ERROR);
-            disable(MainSettings.isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!");
+            ThunderHack.notificationManager.publicity("CevBreaker", isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!", 5, Notification.Type.ERROR);
+            disable(isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!");
             return null;
         }
 
@@ -502,27 +469,22 @@ public class CevBreaker extends Module {
     }
 
     public @Nullable BlockHitResult getPlaceData(BlockPos bp) {
-        if (mc.world == null)
-            return null;
+        if (mc.world == null) return null;
         Block block = mc.world.getBlockState(bp).getBlock();
         Block freeSpace = mc.world.getBlockState(bp.up()).getBlock();
         Block legacyFreeSpace = mc.world.getBlockState(bp.up(2)).getBlock();
 
-        if (block != Blocks.OBSIDIAN && block != Blocks.BEDROCK)
-            return null;
-        if (!(freeSpace == Blocks.AIR && (!oldMode.getValue() || legacyFreeSpace == Blocks.AIR)))
-            return null;
+        if (block != Blocks.OBSIDIAN && block != Blocks.BEDROCK) return null;
+        if (!(freeSpace == Blocks.AIR && (!oldMode.getValue() || legacyFreeSpace == Blocks.AIR))) return null;
 
         Box posBoundingBox = new Box(bp.up());
 
-        if (oldMode.getValue())
-            posBoundingBox.expand(0, 1f, 0);
+        if (oldMode.getValue()) posBoundingBox.expand(0, 1f, 0);
 
         for (Entity ent : ThunderHack.asyncManager.getAsyncEntities()) {
             if (ent == null) continue;
             if (ent.getBoundingBox().intersects(posBoundingBox)) {
-                if (ent instanceof ExperienceOrbEntity || ent instanceof EndCrystalEntity)
-                    continue;
+                if (ent instanceof ExperienceOrbEntity || ent instanceof EndCrystalEntity) continue;
                 return null;
             }
         }
@@ -568,8 +530,7 @@ public class CevBreaker extends Module {
                         BlockHitResult result = ExplosionUtility.rayCastBlock(new RaycastContext(InteractionUtility.getEyesPos(mc.player), point, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player), bp);
 
                         if (InteractionUtility.squaredDistanceFromEyes(point) < bestDistance)
-                            if (result != null && result.getType() == HitResult.Type.BLOCK)
-                                bestData = result;
+                            if (result != null && result.getType() == HitResult.Type.BLOCK) bestData = result;
                     }
                 }
             }
@@ -578,7 +539,6 @@ public class CevBreaker extends Module {
     }
 
     public enum BreakMode {
-        Packet,
-        Normal
+        Packet, Normal
     }
 }

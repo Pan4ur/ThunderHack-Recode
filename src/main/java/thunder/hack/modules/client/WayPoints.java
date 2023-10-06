@@ -24,7 +24,6 @@ public class WayPoints extends Module {
         sendMessage(ThunderHack.commandManager.getPrefix() + "waypoint add x y z name");
     }
 
-
     public void onRender2D(DrawContext context) {
         if (!ThunderHack.wayPointManager.getWayPoints().isEmpty()) {
             for (WayPointManager.WayPoint wp : ThunderHack.wayPointManager.getWayPoints()) {

@@ -31,15 +31,8 @@ public class ChatUtils extends Module {
         super("ChatUtils", Category.MISC);
     }
 
-
     private final Setting<Welcomer> welcomer = new Setting("Welcomer", Welcomer.Off);
-
-    private enum Welcomer {Off, Server, Client}
-
     private final Setting<Prefix> prefix = new Setting("Prefix", Prefix.None);
-
-    private enum Prefix {Green, Global, None}
-
     public final Setting<Boolean> totems = new Setting<>("Totems", false);
     public final Setting<Boolean> time = new Setting<>("Time", false);
     public final Setting<Boolean> mention = new Setting<>("Mention", false);
@@ -49,7 +42,6 @@ public class ChatUtils extends Module {
     private final Timer antiSpam = new Timer();
 
     private final LinkedHashMap<UUID, String> nameMap = new LinkedHashMap<>();
-
 
     @Override
     public void onDisable() {
@@ -76,9 +68,7 @@ public class ChatUtils extends Module {
                 String string1 = "server";
                 if (mc.player.networkHandler.getServerInfo() != null) {
                     string1 = qq[n2].replace("SERVERIP1D5A9E", mc.player.networkHandler.getServerInfo().address);
-                } else {
-                    string1 = "server";
-                }
+                } else string1 = "server";
                 if (pck.getActions().contains(PlayerListS2CPacket.Action.ADD_PLAYER)) {
                     for (PlayerListS2CPacket.Entry ple : pck.getPlayerAdditionEntries()) {
                         if (antiBot(ple.profile().getName())) return;
@@ -86,9 +76,7 @@ public class ChatUtils extends Module {
                         if (welcomer.getValue() == Welcomer.Server) {
                             mc.player.networkHandler.sendChatMessage(getPrefix() + string1 + ple.profile().getName());
                             antiSpam.reset();
-                        } else {
-                            sendMessage(string1 + ple.profile().getName());
-                        }
+                        } else sendMessage(string1 + ple.profile().getName());
                         nameMap.put(ple.profile().getId(), ple.profile().getName());
                     }
                 }
@@ -102,9 +90,7 @@ public class ChatUtils extends Module {
                     if (welcomer.getValue() == Welcomer.Server) {
                         mc.player.networkHandler.sendChatMessage(getPrefix() + bb[n] + nameMap.get(uuid2));
                         antiSpam.reset();
-                    } else {
-                        sendMessage(bb[n] + nameMap.get(uuid2));
-                    }
+                    } else sendMessage(bb[n] + nameMap.get(uuid2));
                     nameMap.remove(uuid2);
                 }
             }
@@ -197,4 +183,12 @@ public class ChatUtils extends Module {
             " pop <pop> times ur eyes don't work right? ",
             " cringelord popped <pop> times so ez "
     };
+
+    private enum Welcomer {
+        Off, Server, Client
+    }
+
+    private enum Prefix {
+        Green, Global, None
+    }
 }

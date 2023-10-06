@@ -1,11 +1,11 @@
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.item.Items;
 import thunder.hack.events.impl.PostPlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
-import net.minecraft.item.Items;
 
 public class AutoGApple extends Module {
     public AutoGApple() {
@@ -30,7 +30,7 @@ public class AutoGApple extends Module {
                 isActive = false;
                 mc.options.useKey.setPressed(false);
             }
-        } else if(isActive){
+        } else if (isActive) {
             isActive = false;
             mc.options.useKey.setPressed(false);
         }

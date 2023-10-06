@@ -9,7 +9,6 @@ import thunder.hack.setting.impl.Bind;
 
 import java.awt.*;
 
-
 public class BindElement extends AbstractElement {
     public BindElement(Setting setting) {
         super(setting);
@@ -34,9 +33,7 @@ public class BindElement extends AbstractElement {
             setting.setValue(b);
             isListening = false;
         }
-        if (hovered && button == 0) {
-            isListening = !isListening;
-        }
+        if (hovered && button == 0) isListening = !isListening;
     }
 
     @Override

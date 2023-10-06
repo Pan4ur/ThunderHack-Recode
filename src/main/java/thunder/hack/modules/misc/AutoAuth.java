@@ -11,11 +11,12 @@ import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.util.Formatting;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
+
 public class AutoAuth extends Module {
     public AutoAuth() {
         super("AutoAuth", "Автоматически-логинится на -серверах", Category.MISC);
     }
-
 
     private String password;
     private final Setting<Mode> passwordMode = new Setting<>("Password Mode", Mode.Custom);
@@ -28,9 +29,10 @@ public class AutoAuth extends Module {
 
     @Override
     public void onEnable() {
-        sendMessage(Formatting.RED + "Внимание!!! " + Formatting.RESET + "Пароль сохраняется в конфиге, перед передачей конфига " + Formatting.RED + " ВЫКЛЮЧИ МОДУЛЬ!");
-        sendMessage(Formatting.RED + "Внимание!!! " + Formatting.RESET + "Пароль сохраняется в конфиге, перед передачей конфига " + Formatting.RED + " ВЫКЛЮЧИ МОДУЛЬ!");
-        sendMessage(Formatting.RED + "Внимание!!! " + Formatting.RESET + "Пароль сохраняется в конфиге, перед передачей конфига " + Formatting.RED + " ВЫКЛЮЧИ МОДУЛЬ!");
+        String warningMsg = isRu() ?
+                Formatting.RED + "Внимание!!! " + Formatting.RESET + "Пароль сохраняется в конфиге, перед передачей конфига " + Formatting.RED + " ВЫКЛЮЧИ МОДУЛЬ!" :
+                Formatting.RED + "Attention!!! " + Formatting.RESET + "The passwords are stored in the config, so before sharing your configs " + Formatting.RED + " TOGGLE OFF THE MODULE!";
+        sendMessage(warningMsg);
     }
 
     @Override

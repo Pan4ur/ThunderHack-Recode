@@ -38,9 +38,7 @@ public class SettingElement {
     public void init() {
     }
 
-
     public void onTick() {
-
     }
 
     public void mouseClicked(int mouseX, int mouseY, int button) {

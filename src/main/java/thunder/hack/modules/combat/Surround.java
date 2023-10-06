@@ -78,36 +78,6 @@ public class Surround extends Module {
     private final Setting<ColorSetting> renderLineColor = new Setting<>("RenderLineColor", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<Integer> renderLineWidth = new Setting<>("RenderLineWidth", 2, 1, 5).withParent(renderCategory);
 
-    private enum PlaceTiming {
-        Default,
-        Vanilla,
-        Sequential
-    }
-
-    private enum CenterMode {
-        Teleport,
-        Motion,
-        Disabled
-    }
-
-    private enum OnTpAction {
-        Disable,
-        Enable,
-        None
-    }
-
-    private enum InteractMode {
-        Packet,
-        Normal,
-        All
-    }
-
-    private enum Sequential {
-        PlaceEat,
-        EatPlace,
-        None
-    }
-
     public static final Timer inactivityTimer = new Timer();
     public static final Timer attackTimer = new Timer();
     private final List<BlockPos> sequentialBlocks = new ArrayList<>();
@@ -136,7 +106,7 @@ public class Surround extends Module {
     @EventHandler
     private void onPostSync(@SuppressWarnings("unused") EventPostSync e) {
         if (prevY != mc.player.getY() && onYChange.getValue()) {
-            disable(isRu() ? "Выключен из-за изменения Y!" : "Disabled due to Y change!");
+            disable(isRu() ? "Отключён из-за изменения Y!" : "Disabled due to Y change!");
             return;
         }
         prevY = mc.player.getY();
@@ -216,17 +186,15 @@ public class Surround extends Module {
             }
         }
         if (e.getPacket() instanceof BlockBreakingProgressS2CPacket pac && mc.player != null) {
-            if (placeTiming.getValue() == PlaceTiming.Sequential && !sequentialBlocks.isEmpty()) {
+            if (placeTiming.getValue() == PlaceTiming.Sequential && !sequentialBlocks.isEmpty())
                 handleSequential(pac.getPos());
-            }
-            if (mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value()) {
+            if (mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value())
                 handleSurroundBreak();
-            }
         }
 
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket)
             switch (onTp.getValue()) {
-                case Disable -> disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to teleport!");
+                case Disable -> disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to a rubberband!");
                 case Enable -> new Thread(() -> {
                     try {
                         Thread.sleep(250);
@@ -322,13 +290,10 @@ public class Surround extends Module {
         sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         attackTimer.reset();
 
-        if (remove.getValue()) {
-            mc.world.removeEntity(entity.getId(), Entity.RemovalReason.KILLED);
-        }
+        if (remove.getValue()) mc.world.removeEntity(entity.getId(), Entity.RemovalReason.KILLED);
 
-        if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
+        if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS))
             InventoryUtility.switchTo(preSlot);
-        }
     }
 
     private @Nullable BlockPos getSequentialPos() {
@@ -387,9 +352,8 @@ public class Surround extends Module {
             }
 
             for (BlockPos pos : tempOffsets) {
-                if (getDown(pos)) {
+                if (getDown(pos))
                     offsets.add(pos.add(0, -1, 0));
-                }
                 offsets.add(pos);
             }
         } else {
@@ -421,15 +385,9 @@ public class Surround extends Module {
     }
 
     private BlockPos addToPlayer(@NotNull BlockPos playerPos, double x, double y, double z) {
-        if (playerPos.getX() < 0) {
-            x = -x;
-        }
-        if (playerPos.getY() < 0) {
-            y = -y;
-        }
-        if (playerPos.getZ() < 0) {
-            z = -z;
-        }
+        if (playerPos.getX() < 0) x = -x;
+        if (playerPos.getY() < 0) y = -y;
+        if (playerPos.getZ() < 0) z = -z;
         return playerPos.add(BlockPos.ofFloored(x, y, z));
     }
 
@@ -454,35 +412,21 @@ public class Surround extends Module {
         return positions;
     }
 
-
     private int calcLength(double decimal, boolean negative) {
-        if (negative) {
-            return decimal <= 0.3 ? 1 : 0;
-        }
+        if (negative) return decimal <= 0.3 ? 1 : 0;
         return decimal >= 0.7 ? 1 : 0;
     }
 
     private int getSlot() {
         List<Block> canUseBlocks = new ArrayList<>();
 
-        if (obsidian.getValue()) {
-            canUseBlocks.add(Blocks.OBSIDIAN);
-        }
-        if (enderChest.getValue()) {
-            canUseBlocks.add(Blocks.ENDER_CHEST);
-        }
-        if (cryingObsidian.getValue()) {
-            canUseBlocks.add(Blocks.CRYING_OBSIDIAN);
-        }
-        if (netherite.getValue()) {
-            canUseBlocks.add(Blocks.NETHERITE_BLOCK);
-        }
-        if (anchor.getValue()) {
-            canUseBlocks.add(Blocks.RESPAWN_ANCHOR);
-        }
-        if (dirt.getValue()) {
-            canUseBlocks.add(Blocks.DIRT);
-        }
+        if (obsidian.getValue()) canUseBlocks.add(Blocks.OBSIDIAN);
+        if (enderChest.getValue()) canUseBlocks.add(Blocks.ENDER_CHEST);
+        if (cryingObsidian.getValue()) canUseBlocks.add(Blocks.CRYING_OBSIDIAN);
+        if (netherite.getValue()) canUseBlocks.add(Blocks.NETHERITE_BLOCK);
+        if (anchor.getValue()) canUseBlocks.add(Blocks.RESPAWN_ANCHOR);
+        if (dirt.getValue()) canUseBlocks.add(Blocks.DIRT);
+
         int slot = -1;
 
         if (mc.player == null) return slot;
@@ -501,5 +445,35 @@ public class Surround extends Module {
         if (mc.player == null) return null;
 
         return BlockPos.ofFloored(mc.player.getX(), mc.player.getY() - Math.floor(mc.player.getY()) > 0.8 ? Math.floor(mc.player.getY()) + 1.0 : Math.floor(mc.player.getY()), mc.player.getZ());
+    }
+
+    private enum PlaceTiming {
+        Default,
+        Vanilla,
+        Sequential
+    }
+
+    private enum CenterMode {
+        Teleport,
+        Motion,
+        Disabled
+    }
+
+    private enum OnTpAction {
+        Disable,
+        Enable,
+        None
+    }
+
+    private enum InteractMode {
+        Packet,
+        Normal,
+        All
+    }
+
+    private enum Sequential {
+        PlaceEat,
+        EatPlace,
+        None
     }
 }

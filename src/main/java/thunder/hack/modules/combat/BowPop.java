@@ -16,9 +16,6 @@ import net.minecraft.util.Hand;
 import java.util.Random;
 
 public class BowPop extends Module {
-
-    public static Timer delayTimer = new Timer();
-
     public Setting<Boolean> rotation =new Setting<>("Rotation", false);
     public Setting<ModeEn> Mode =new Setting<>("Mode", ModeEn.Maximum);
     public Setting<Float> factor =new Setting<>("Factor", 1f, 1f, 20f);
@@ -34,6 +31,7 @@ public class BowPop extends Module {
     public final Setting<Boolean> potions = new Setting<>("SplashPotions", true).withParent(selection);
     public final Setting<Boolean> snowballs = new Setting<>("Snowballs", true).withParent(selection);
 
+    public static Timer delayTimer = new Timer();
     private final Random rnd = new Random();
 
     public BowPop() {
@@ -87,34 +85,24 @@ public class BowPop extends Module {
     }
 
     private void spoof(double x, double y, double z, boolean ground) {
-        if (rotation.getValue()) {
-            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(x, y, z, mc.player.getYaw(), mc.player.getPitch(), ground));
-        } else {
-            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, ground));
-        }
+        if (rotation.getValue())
+            sendPacket(new PlayerMoveC2SPacket.Full(x, y, z, mc.player.getYaw(), mc.player.getPitch(), ground));
+        else sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, ground));
     }
 
     private int getRuns() {
-        if (Mode.getValue() == ModeEn.Factorised) {
-            return 10 + (int) ((factor.getValue() - 1));
-        }
-        if (Mode.getValue() == ModeEn.Normal) {
-            return (int) Math.floor(factor.getValue());
-        }
-        if (Mode.getValue() == ModeEn.Maximum) {
-            return (int) (30f * factor.getValue());
-        }
-        return 1;
+        return switch (Mode.getValue()) {
+            case Normal -> (int) Math.floor(factor.getValue());
+            case Maximum -> (int) (30f * factor.getValue());
+            case Factorised -> 10 + (int) ((factor.getValue() - 1));
+        };
     }
 
     private int getWorldBorderRnd() {
-        if (mc.isInSingleplayer()) {
-            return 1;
-        }
+        if (mc.isInSingleplayer()) return 1;
+
         int n = rnd.nextInt(29000000);
-        if (rnd.nextBoolean()) {
-            return n;
-        }
+        if (rnd.nextBoolean()) return n;
         return -n;
     }
 

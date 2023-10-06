@@ -1,6 +1,5 @@
 package thunder.hack.gui.thundergui.components;
 
-
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui2;
 import thunder.hack.modules.Module;
@@ -16,7 +15,6 @@ public class CategoryPlate {
     private final Module.Category cat;
     private int posX;
     private int posY;
-
 
     public CategoryPlate(Module.Category cat, int posX, int posY) {
         this.cat = cat;

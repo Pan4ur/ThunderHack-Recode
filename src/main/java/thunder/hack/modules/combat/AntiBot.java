@@ -1,6 +1,5 @@
 package thunder.hack.modules.combat;
 
-
 import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
@@ -24,10 +23,10 @@ public class AntiBot extends Module {
     private final Timer timer = new Timer();
     private int botsNumber = 0;
     private int ticks = 0;
+
     public AntiBot() {
         super("AntiBot", "Убирает ботов", Category.COMBAT);
     }
-
 
     @EventHandler
     public void onSync(EventSync e) {
@@ -86,21 +85,18 @@ public class AntiBot extends Module {
                             bots.add((PlayerEntity) Aura.target);
                         }
                     }
-
                 }
             }
         }
-
 
         for (PlayerEntity bot : bots) {
             if (remove.getValue()) {
                 try {
                     mc.world.removeEntity(bot.getId(), Entity.RemovalReason.KILLED);
-                } catch (Exception ignored) {
-
-                }
+                } catch (Exception ignored) {}
             }
         }
+
         if (timer.passedMs(10000)) {
             bots.clear();
             botsNumber = 0;
@@ -114,10 +110,7 @@ public class AntiBot extends Module {
         return String.valueOf(botsNumber);
     }
 
-
     public enum Mode {
         UUIDCheck, MotionCheck
     }
-
-
 }

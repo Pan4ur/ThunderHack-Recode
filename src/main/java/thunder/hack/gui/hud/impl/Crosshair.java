@@ -1,6 +1,5 @@
 package thunder.hack.gui.hud.impl;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -23,14 +22,12 @@ public class Crosshair extends Module {
         Custom, Sync
     }
 
-
     public void onRender2D(DrawContext context) {
         if (!mc.options.getPerspective().isFirstPerson()) return;
 
 
         int progress = (int) (360 * (mc.player.handSwingProgress));
         progress = progress == 0 ? 360 : progress;
-
 
         Render2DEngine.drawElipse(mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() / 2f, 1f, 1f, 0, 360, 4f, Color.BLACK);
         Render2DEngine.drawElipse(mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() / 2f, 1f, 1f, 0, 360, 3.5f, Color.BLACK);

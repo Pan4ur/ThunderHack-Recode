@@ -15,7 +15,6 @@ import java.awt.*;
 import static thunder.hack.utility.math.MathUtility.clamp;
 
 public class BooleanComponent extends SettingElement {
-
     float animation = 0f;
 
     public BooleanComponent(Setting setting) {
@@ -49,8 +48,6 @@ public class BooleanComponent extends SettingElement {
         if ((getY() > ThunderGui2.getInstance().main_posY + ThunderGui2.getInstance().height) || getY() < ThunderGui2.getInstance().main_posY) {
             return;
         }
-        if (isHovered()) {
-            setting.setValue(!((Boolean) setting.getValue()));
-        }
+        if (isHovered()) setting.setValue(!((Boolean) setting.getValue()));
     }
 }

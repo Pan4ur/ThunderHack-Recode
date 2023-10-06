@@ -18,13 +18,11 @@ import java.util.Objects;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public
-class RPC extends Module {
-
+public class RPC extends Module {
     private static final DiscordRPC rpc = DiscordRPC.INSTANCE;
-    public static Setting<mode> Mode = new Setting<>("Picture", mode.Recode);
+    public static Setting<Mode> mode = new Setting<>("Picture", Mode.Recode);
     public static Setting<Boolean> showIP = new Setting<>("ShowIP", true);
-    public static Setting<smode> sMode = new Setting<>("StateMode", smode.Stats);
+    public static Setting<sMode> smode = new Setting<>("StateMode", sMode.Stats);
     public static Setting<String> state = new Setting<>("State", "Beta? Recode? NextGen?");
     public static Setting<Boolean> nickname = new Setting<>("Nickname", true);
     public static DiscordRichPresence presence = new DiscordRichPresence();
@@ -101,7 +99,7 @@ class RPC extends Module {
 
                     presence.details = getDetails();
 
-                    switch (sMode.getValue()) {
+                    switch (smode.getValue()) {
                         case Stats ->
                                 presence.state = "Hacks: " + ThunderHack.moduleManager.getEnabledModules().size() + " / " + ThunderHack.moduleManager.modules.size();
                         case Custom -> presence.state = state.getValue();
@@ -119,7 +117,7 @@ class RPC extends Module {
                     presence.button_label_1 = "Download";
                     presence.button_url_1 = "https://thunderhack.onrender.com/";
 
-                    switch (Mode.getValue()) {
+                    switch (mode.getValue()) {
                         case Recode -> presence.largeImageKey = "https://i.imgur.com/yY0z2Uq.gif";
                         case MegaCute ->
                                 presence.largeImageKey = "https://media1.tenor.com/images/6bcbfcc0be97d029613b54f97845bc59/tenor.gif?itemid=26823781";
@@ -179,7 +177,7 @@ class RPC extends Module {
         return mc.player.getX() > x && mc.player.getX() < x1 && mc.player.getZ() > z && mc.player.getZ() < z1;
     }
 
-    public enum mode {Custom, MegaCute, Recode}
+    public enum Mode {Custom, MegaCute, Recode}
 
-    public enum smode {Custom, Stats, Version}
+    public enum sMode {Custom, Stats, Version}
 }

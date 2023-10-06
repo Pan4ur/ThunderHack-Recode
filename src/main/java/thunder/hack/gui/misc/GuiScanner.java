@@ -3,7 +3,6 @@ package thunder.hack.gui.misc;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
-import thunder.hack.cmd.Command;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.misc.NoCommentExploit;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import static thunder.hack.modules.Module.mc;
 
 public class GuiScanner extends Screen {
-
     public static boolean neartrack = false;
     public static boolean track = false;
     public static boolean busy = false;
@@ -50,7 +48,6 @@ public class GuiScanner extends Screen {
 
         Render2DEngine.drawRectDumbWay(context.getMatrices(), consolex, consoley1 + 3, consolex1, consoley1 + 17, new Color(0xF70C0C0C, true));
         FontRenderers.monsterrat.drawString(context.getMatrices(), "cursor pos: " + hoverx * 64 + "x" + "  " + hovery * 64 + "z", consolex + 4, consoley1 + 6, -1);
-
 
         if (!track) {
             Render2DEngine.drawRectDumbWay(context.getMatrices(), consolex, consoley1 + 20, consolex1, consoley1 + 35, new Color(0xF70C0C0C, true));

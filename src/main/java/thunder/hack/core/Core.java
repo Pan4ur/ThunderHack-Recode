@@ -3,17 +3,6 @@ package thunder.hack.core;
 import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import org.apache.commons.compress.utils.Lists;
-import thunder.hack.ThunderHack;
-import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.gui.hud.impl.RadarRewrite;
-import thunder.hack.gui.thundergui.ThunderGui2;
-import thunder.hack.modules.client.ClickGui;
-import thunder.hack.modules.client.MainSettings;
-import thunder.hack.utility.Macro;
-import thunder.hack.utility.Timer;
-import thunder.hack.cmd.Command;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
@@ -22,8 +11,20 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec2f;
+import thunder.hack.ThunderHack;
+import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.*;
+import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.gui.hud.impl.RadarRewrite;
+import thunder.hack.gui.thundergui.ThunderGui2;
+import thunder.hack.modules.client.ClickGui;
+import thunder.hack.modules.client.MainSettings;
+import thunder.hack.utility.Macro;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InteractionUtility;
 
 import java.util.*;
@@ -32,13 +33,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import static thunder.hack.modules.Module.mc;
 
 public final class Core {
-
     public static boolean lock_sprint, serversprint, hold_mouse0, showSkull;
     public static Map<String, Identifier> heads = new ConcurrentHashMap<>();
     private final Identifier SKULL = new Identifier("textures/skull.png");
     private final Timer skullTimer = new Timer();
     private final Timer lastPacket = new Timer();
-
 
     @EventHandler
     public void onTick(PlayerUpdateEvent event) {
@@ -61,9 +60,9 @@ public final class Core {
         ThunderHack.moduleManager.onTick();
 
         HashMap<BlockPos, Long> cache = new HashMap<>(InteractionUtility.awaiting);
-        if(!cache.isEmpty()){
+        if (!cache.isEmpty()) {
             cache.forEach((bp, time) -> {
-                if(System.currentTimeMillis() - time > 300){
+                if (System.currentTimeMillis() - time > 300) {
                     InteractionUtility.awaiting.remove(bp);
                 }
             });
@@ -77,17 +76,14 @@ public final class Core {
         }
 
         if (e.getPacket() instanceof ClientCommandC2SPacket command) {
-            if(command.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING ||command.getMode() == ClientCommandC2SPacket.Mode.STOP_SPRINTING ) {
+            if (command.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING || command.getMode() == ClientCommandC2SPacket.Mode.STOP_SPRINTING) {
                 if (lock_sprint) {
                     e.setCancelled(true);
                     return;
                 }
 
-                if (command.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING)
-                    serversprint = true;
-
-                if (command.getMode() == ClientCommandC2SPacket.Mode.STOP_SPRINTING)
-                    serversprint = false;
+                if (command.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING) serversprint = true;
+                if (command.getMode() == ClientCommandC2SPacket.Mode.STOP_SPRINTING) serversprint = false;
             }
         }
     }
@@ -119,10 +115,10 @@ public final class Core {
     }
 
     @EventHandler
-    public void onEntitySpawn(EventEntitySpawn e){
+    public void onEntitySpawn(EventEntitySpawn e) {
         List<BlockPos> cache = new ArrayList<>(InteractionUtility.awaiting.keySet());
         cache.forEach(bp -> {
-            if(e.getEntity() != null && bp.getSquaredDistance(e.getEntity().getPos()) < 4.)
+            if (e.getEntity() != null && bp.getSquaredDistance(e.getEntity().getPos()) < 4.)
                 InteractionUtility.awaiting.remove(bp);
         });
     }
@@ -169,12 +165,8 @@ public final class Core {
 
     @EventHandler
     public void onMouse(EventMouse event) {
-        if (event.getAction() == 0) {
-            hold_mouse0 = false;
-        }
-        if (event.getAction() == 1) {
-            hold_mouse0 = true;
-        }
+        if (event.getAction() == 0) hold_mouse0 = false;
+        if (event.getAction() == 1) hold_mouse0 = true;
     }
 
     public int getDistance(BlockPos bp) {

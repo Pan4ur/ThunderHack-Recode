@@ -5,7 +5,6 @@ import net.minecraft.util.math.BlockPos;
 import thunder.hack.events.Event;
 
 public class EventSetBlockState extends Event {
-
     private final BlockPos pos;
     private final BlockState state;
 

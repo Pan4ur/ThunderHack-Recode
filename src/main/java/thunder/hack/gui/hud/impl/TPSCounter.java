@@ -1,6 +1,5 @@
 package thunder.hack.gui.hud.impl;
 
-
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
 import thunder.hack.ThunderHack;
@@ -15,7 +14,6 @@ public class TPSCounter extends HudElement {
     }
 
     private final Setting<Boolean> extraTps = new Setting<>("ExtraTPS", true);
-
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);

@@ -8,8 +8,6 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.math.FrameRateCounter;
 
 public class FpsCounter extends HudElement {
-
-
     public FpsCounter() {
         super("Fps", "fps", 50, 10);
     }

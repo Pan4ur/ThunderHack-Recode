@@ -31,14 +31,14 @@ public class CombatManager {
         if (event.getPacket() instanceof EntityStatusS2CPacket pac) {
             if (pac.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING) {
                 Entity ent = pac.getEntity(mc.world);
-                if(!(ent instanceof PlayerEntity)) return;
+                if (!(ent instanceof PlayerEntity)) return;
                 if (popList == null) {
                     popList = new HashMap<>();
                 }
                 if (popList.get(ent.getName().getString()) == null) {
                     popList.put(ent.getName().getString(), 1);
                 } else if (popList.get(ent.getName().getString()) != null) {
-                    popList.put(ent.getName().getString(),  popList.get(ent.getName().getString()) + 1);
+                    popList.put(ent.getName().getString(), popList.get(ent.getName().getString()) + 1);
                 }
                 ThunderHack.EVENT_BUS.post(new TotemPopEvent((PlayerEntity) ent, popList.get(ent.getName().getString())));
             }
@@ -51,15 +51,15 @@ public class CombatManager {
             return;
         }
         for (PlayerEntity player : mc.world.getPlayers()) {
-            if(AntiBot.bots.contains(player)) return;
+            if (AntiBot.bots.contains(player)) return;
             if (player.getHealth() <= 0 && popList.containsKey(player.getName().getString())) {
                 popList.remove(player.getName().getString(), popList.get(player.getName().getString()));
             }
         }
     }
 
-    public int getPops(PlayerEntity entity){
-        if(popList.get(entity.getName().getString()) == null) return 0;
+    public int getPops(PlayerEntity entity) {
+        if (popList.get(entity.getName().getString()) == null) return 0;
         return popList.get(entity.getName().getString());
     }
 
@@ -73,7 +73,7 @@ public class CombatManager {
                 .collect(Collectors.toList());
     }
 
-    public PlayerEntity getNearestTarget(float range){
+    public PlayerEntity getNearestTarget(float range) {
         return mc.world.getPlayers()
                 .stream()
                 .filter(e -> e != mc.player)
@@ -84,7 +84,7 @@ public class CombatManager {
                 .min(Comparator.comparing(t -> mc.player.distanceTo(t))).orElse(null);
     }
 
-    public PlayerEntity getTargetByHP(float range){
+    public PlayerEntity getTargetByHP(float range) {
         return mc.world.getPlayers()
                 .stream()
                 .filter(e -> e != mc.player)
@@ -95,7 +95,7 @@ public class CombatManager {
                 .min(Comparator.comparing(t -> (t.getHealth() + t.getAbsorptionAmount()))).orElse(null);
     }
 
-    public PlayerEntity getTargetByFOV(float range){
+    public PlayerEntity getTargetByFOV(float range) {
         return mc.world.getPlayers()
                 .stream()
                 .filter(e -> e != mc.player)
@@ -106,7 +106,7 @@ public class CombatManager {
                 .min(Comparator.comparing(this::getFOVAngle)).orElse(null);
     }
 
-    private float getFOVAngle(LivingEntity e) {;
+    private float getFOVAngle(LivingEntity e) {
         double difX = e.getX() - mc.player.getPos().x;
         double difZ = e.getZ() - mc.player.getPos().z;
         float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);

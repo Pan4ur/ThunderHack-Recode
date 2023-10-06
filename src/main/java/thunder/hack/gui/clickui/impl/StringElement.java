@@ -1,11 +1,11 @@
 package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
-import org.lwjgl.glfw.GLFW;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -19,21 +19,21 @@ public class StringElement extends AbstractElement {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context,mouseX,mouseY,delta);
-        FontRenderers.getSettingsRenderer().drawString(context.getMatrices(),listening ? currentString + (mc.player == null || mc.player.age % 5 == 0 ? "_" : "") : (String)setting.getValue(), x + 6,y + height / 2,-1);
+        super.render(context, mouseX, mouseY, delta);
+        FontRenderers.getSettingsRenderer().drawString(context.getMatrices(), listening ? currentString + (mc.player == null || mc.player.age % 5 == 0 ? "_" : "") : (String) setting.getValue(), x + 6, y + height / 2, -1);
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (hovered && button == 0)
             listening = !listening;
-        if(listening)
+        if (listening)
             ThunderHack.currentKeyListener = ThunderHack.KeyListening.Strings;
     }
 
     @Override
     public void keyTyped(int keyCode) {
-        if(ThunderHack.currentKeyListener != ThunderHack.KeyListening.Strings)
+        if (ThunderHack.currentKeyListener != ThunderHack.KeyListening.Strings)
             return;
 
         if (listening) {
@@ -56,7 +56,7 @@ public class StringElement extends AbstractElement {
                     return;
                 }
             }
-            if(GLFW.glfwGetKeyName(keyCode, 0) == null) return;
+            if (GLFW.glfwGetKeyName(keyCode, 0) == null) return;
             currentString = currentString + GLFW.glfwGetKeyName(keyCode, 0);
         }
     }

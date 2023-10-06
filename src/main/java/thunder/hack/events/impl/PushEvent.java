@@ -3,7 +3,6 @@ package thunder.hack.events.impl;
 import thunder.hack.events.Event;
 
 public class PushEvent extends Event {
-
     private double pushX;
     private double pushY;
     private double pushZ;

@@ -1,11 +1,7 @@
 package thunder.hack.modules.misc;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.combat.AutoTotem;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 import net.minecraft.screen.GenericContainerScreenHandler;
@@ -17,7 +13,6 @@ import java.util.List;
 import java.util.Random;
 
 public class ChestStealer extends Module {
-
     public ChestStealer() {
         super("ChestStealer", "ChestStealer", Category.MISC);
     }
@@ -30,10 +25,6 @@ public class ChestStealer extends Module {
 
     private final Timer timer = new Timer();
     private final Random rnd = new Random();
-
-    private enum Sort{
-        None, WhiteList, BlackList
-    }
 
     @Override
     public void onUpdate() {
@@ -56,15 +47,12 @@ public class ChestStealer extends Module {
     }
 
     private boolean isAllowed(ItemStack stack) {
-        if(sort.getValue() == Sort.None){
-            return true;
-        } else if(sort.getValue() == Sort.WhiteList){
-            return items.contains(stack.getItem().getTranslationKey().replace("block.minecraft.","").replace("item.minecraft.",""));
-        } else {
-            return !items.contains(stack.getItem().getTranslationKey().replace("block.minecraft.","").replace("item.minecraft.",""));
-        }
+        return switch (sort.getValue()) {
+            case None -> true;
+            case WhiteList -> items.contains(stack.getItem().getTranslationKey().replace("block.minecraft.","").replace("item.minecraft.",""));
+            default -> !items.contains(stack.getItem().getTranslationKey().replace("block.minecraft.","").replace("item.minecraft.",""));
+        };
     }
-
 
     private boolean isContainerEmpty(GenericContainerScreenHandler container) {
         boolean empty = true;
@@ -77,5 +65,9 @@ public class ChestStealer extends Module {
             ++i;
         }
         return empty;
+    }
+
+    private enum Sort {
+        None, WhiteList, BlackList
     }
 }

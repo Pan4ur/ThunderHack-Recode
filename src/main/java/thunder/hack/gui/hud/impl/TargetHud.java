@@ -33,11 +33,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class TargetHud extends HudElement {
-
     private static final Identifier thudPic = new Identifier("textures/thud.png");
-
 
     public static BetterDynamicAnimation healthanimation = new BetterDynamicAnimation();
     public static BetterDynamicAnimation ebaloAnimation = new BetterDynamicAnimation();
@@ -61,7 +58,6 @@ public class TargetHud extends HudElement {
     public TargetHud() {
         super("TargetHud", "ПИЗДАТЕЙШИЙ", 150, 50);
     }
-
 
     public static void sizeAnimation(MatrixStack matrixStack, double width, double height, double animation) {
         matrixStack.translate(width, height, 0);
@@ -102,9 +98,8 @@ public class TargetHud extends HudElement {
         ebaloAnimation.update();
     }
 
-    //  сила скорка спешка викнес регенерация сопротивление
+    //  сила скорка спешка слабость реген сопротивление
     //  Str 1:23 Spd2 1:23 H3 1:23 Reg4 1:23 Res5 1:23
-
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
@@ -133,11 +128,8 @@ public class TargetHud extends HudElement {
             if (animation.getAnimationd() < 0.02)
                 target = null;
         }
-        if (target == null) {
-            return;
-        }
+        if (target == null) return;
 
-        //
         context.getMatrices().push();
         sizeAnimation(context.getMatrices(), getPosX() + 75 + animX.getValue(), getPosY() + 25 + animY.getValue(), animation.getAnimationd());
 
@@ -149,7 +141,6 @@ public class TargetHud extends HudElement {
                 // Основа
                 Render2DEngine.drawRound(context.getMatrices(), getPosX(), getPosY(), 70, 50, 6, new Color(0, 0, 0, 139));
                 Render2DEngine.drawRound(context.getMatrices(), getPosX() + 50, getPosY(), 100, 50, 6, new Color(0, 0, 0, 255));
-                //
 
                 // Картинка
                 if (imageMode.getValue() == ImageModeEn.Anime) {
@@ -202,8 +193,6 @@ public class TargetHud extends HudElement {
                 }
 
                 if (target.hurtTime == 8) sentParticles = false;
-                //
-
 
                 // Бошка
                 float hurtPercent2 = hurtPercent;
@@ -234,7 +223,6 @@ public class TargetHud extends HudElement {
                 RenderSystem.defaultBlendFunc();
                 RenderSystem.disableBlend();
 
-
                 // Баллон
                 float health = Math.min(20, target.getHealth());
                 healthanimation.setValue(health);
@@ -248,12 +236,8 @@ public class TargetHud extends HudElement {
 
                 FontRenderers.modules.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * target.getHealth()) / 10.0) : ((Math.round(10.0 * health) / 10.0) / 20f) * 100 + "%", getPosX() + 102, getPosY() + 22.5f, -1);
 
-                //
-
                 //Имя ебыря
-
                 FontRenderers.modules.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : target.getName().getString(), getPosX() + 55, getPosY() + 7, -1, false);
-
 
                 if (target instanceof PlayerEntity) {
                     //Броня
@@ -283,9 +267,6 @@ public class TargetHud extends HudElement {
                 Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 137, 47.5f, 9);
                 Render2DEngine.drawRound(context.getMatrices(), getPosX() + 0.5f, getPosY() + 0.5f, 136f, 46, 9, Render2DEngine.injectAlpha(Color.BLACK, 220));
 
-                //
-
-
                 // Бошка
                 if (target instanceof PlayerEntity) {
                     RenderSystem.setShaderTexture(0, ((AbstractClientPlayerEntity) target).getSkinTextures().texture());
@@ -301,15 +282,13 @@ public class TargetHud extends HudElement {
                 RenderSystem.setShader(GameRenderer::getPositionColorProgram);
                 Render2DEngine.renderRoundedQuadInternal(context.getMatrices().peek().getPositionMatrix(), 1f, 1f - hurtPercent, 1f - hurtPercent, 1f, getPosX() + 3.5f + hurtPercent, getPosY() + 3.5f + hurtPercent, getPosX() + 3.5f - hurtPercent + 40, getPosY() + 3.5f - hurtPercent + 40, 7, 10);
 
-                ///   Render2DEngine.drawRound(context.getMatrices(),getPosX() + 3.5f + hurtPercent, getPosY() + 3.5f + hurtPercent, getPosX() + 3.5f - hurtPercent + 40, getPosY() + 3.5f - hurtPercent + 40,7,new Color(-1));
+                //Render2DEngine.drawRound(context.getMatrices(),getPosX() + 3.5f + hurtPercent, getPosY() + 3.5f + hurtPercent, getPosX() + 3.5f - hurtPercent + 40, getPosY() + 3.5f - hurtPercent + 40,7,new Color(-1));
 
                 RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
                 RenderSystem.setShaderColor(1f, 1f - hurtPercent, 1f - hurtPercent, 1f);
                 Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 3.5f + hurtPercent, getPosY() + 3.5f + hurtPercent, 40 - hurtPercent * 2, 40, 8, 8, 8, 8, 64, 64);
                 Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 3.5f + hurtPercent, getPosY() + 3.5f + hurtPercent, 40, 40, 40, 8, 8, 8, 64, 64);
                 RenderSystem.defaultBlendFunc();
-
-                //
 
                 // Баллон
                 float health = Math.min(20, target.getHealth());
@@ -326,8 +305,6 @@ public class TargetHud extends HudElement {
                 FontRenderers.modules.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : target.getName().getString(), getPosX() + 48, getPosY() + 7, -1, false);
 
                 if (target instanceof PlayerEntity) {
-
-
                     //Броня
                     List<ItemStack> armor = ((PlayerEntity) target).getInventory().armor;
                     ItemStack[] items = new ItemStack[]{target.getMainHandStack(), armor.get(3), armor.get(2), armor.get(1), armor.get(0), target.getOffHandStack()};
@@ -375,7 +352,6 @@ public class TargetHud extends HudElement {
 
 
                 if (target instanceof PlayerEntity) {
-
                     if (!((PlayerEntity) target).getInventory().armor.get(3).isEmpty()) {
                         context.getMatrices().push();
                         context.getMatrices().translate(getPosX() + 118, getPosY() + 5, 0);
@@ -446,12 +422,10 @@ public class TargetHud extends HudElement {
         FontRenderers.settings.drawString(ms, finalString.toString(), getPosX() + 55, getPosY() + 14, new Color(0x8D8D8D).getRGB(), false);
     }
 
-
     public enum HPmodeEn {
         HP,
         Percentage
     }
-
 
     public enum ImageModeEn {
         None,
@@ -464,5 +438,4 @@ public class TargetHud extends HudElement {
         NurikZapen,
         CelkaPasta
     }
-
 }

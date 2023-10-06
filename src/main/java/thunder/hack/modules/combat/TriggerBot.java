@@ -12,7 +12,6 @@ import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.movement.Speed;
 import thunder.hack.setting.Setting;
 
 public class TriggerBot extends Module {
@@ -20,7 +19,7 @@ public class TriggerBot extends Module {
         super("TriggerBot", Category.COMBAT);
     }
 
-    public final Setting<Float> attackRange = new Setting("Range", 3f, 1f, 7.0f);
+    public final Setting<Float> attackRange = new Setting<>("Range", 3f, 1f, 7.0f);
     public final Setting<Boolean> smartCrit = new Setting<>("SmartCrit", true);
     public final Setting<Boolean> ignoreWalls = new Setting<>("IgnoreWals", false);
 

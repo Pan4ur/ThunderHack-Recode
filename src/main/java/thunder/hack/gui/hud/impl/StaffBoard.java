@@ -1,7 +1,6 @@
 package thunder.hack.gui.hud.impl;
 
 import com.mojang.authlib.GameProfile;
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.scoreboard.Team;
@@ -28,11 +27,9 @@ public class StaffBoard extends HudElement {
     List<String> notSpec = new ArrayList<>();
     private final LinkedHashMap<UUID, String> nameMap = new LinkedHashMap<>();
 
-
     public StaffBoard() {
         super("StaffBoard", "StaffBoard", 50, 50);
     }
-
 
     public static List<String> getOnlinePlayer() {
         return mc.player.networkHandler.getPlayerList().stream()
@@ -99,7 +96,6 @@ public class StaffBoard extends HudElement {
         return name.contains("helper") || name.contains("moder") || name.contains("admin") || name.contains("owner") || name.contains("curator") || name.contains("куратор") || name.contains("модер") || name.contains("админ") || name.contains("хелпер");
     }
 
-
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
         int y_offset1 = 11;
@@ -117,13 +113,11 @@ public class StaffBoard extends HudElement {
             y_offset1 += 13;
         }
 
-
         Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX(), getPosY(), scale_x + 20, 20 + y_offset1, 20, shadowColor.getValue().getColorObject());
 
         Render2DEngine.drawRound(context.getMatrices(), getPosX(), getPosY(), scale_x + 20, 20 + y_offset1, 7f, color2.getValue().getColorObject());
         FontRenderers.modules.drawCenteredString(context.getMatrices(), "StaffBoard", getPosX() + (scale_x + 20) / 2, getPosY() + 5, textColor.getValue().getColor());
         Render2DEngine.drawRound(context.getMatrices(), getPosX() + 2, getPosY() + 13, scale_x + 16, 1, 0.5f, color3.getValue().getColorObject());
-
 
         int y_offset = 11;
         for (String player : all) {
@@ -132,7 +126,6 @@ public class StaffBoard extends HudElement {
             y_offset += 13;
         }
     }
-
 
     @Override
     public void onDisable() {

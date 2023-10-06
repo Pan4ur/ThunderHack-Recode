@@ -58,7 +58,6 @@ public class FontRenderer implements Closeable {
     private static final char RND_END = 'z';
     private static final Random RND = new Random();
 
-
     public FontRenderer(Font @NotNull [] fonts, float sizePx) {
         Preconditions.checkArgument(fonts.length > 0, "fonts.length == 0");
         this.originalSize = sizePx;

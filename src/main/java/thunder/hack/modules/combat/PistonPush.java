@@ -106,11 +106,8 @@ public class PistonPush extends Module {
     }
 
     public void handlePistonPush(boolean onSync) {
-        if (firstPlace) {
-            placePiston(onSync);
-        } else {
-            placeCharge(onSync);
-        }
+        if (firstPlace) placePiston(onSync);
+        else placeCharge(onSync);
     }
 
     public void onRender3D(MatrixStack stack) {

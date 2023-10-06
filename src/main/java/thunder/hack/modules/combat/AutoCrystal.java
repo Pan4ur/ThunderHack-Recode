@@ -131,24 +131,6 @@ public class AutoCrystal extends Module {
     private final Setting<Integer> slideDelay = new Setting<>("Slide Delay", 200, 1, 1000, v -> page.getValue() == Pages.Render);
     private final Setting<ColorSetting> textColor = new Setting<>("Text Color", new ColorSetting(Color.WHITE), v -> page.getValue() == Pages.Render);
 
-    private enum Pages {Place, Break, Pause, Render, Damages, Main, Switch, Remove, MultiThread}
-
-    private enum Switch {NONE, NORMAL, SILENT, INVENTORY}
-
-    private enum Timing {NORMAL, SEQUENTIAL}
-
-    private enum Interact {Default, Strict, Legit}
-
-    private enum TargetLogic {Distance, HP, FOV}
-
-    public enum Safety {BALANCE, STABLE, NONE}
-
-    public enum Sort {SAFE, DAMAGE}
-
-    public enum Render {Fade, Slide, Default}
-
-    public enum Remove {OFF, Fake, ON}
-
     public static PlayerEntity target;
     private BlockHitResult bestPosition;
     private EndCrystalEntity bestCrystal;
@@ -240,7 +222,7 @@ public class AutoCrystal extends Module {
         }
 
         if (prevMthread != multiThread.getValue()) {
-            disable(isRu() ? "Перевключи модуль!" : "Re-Enable me!");
+            disable(isRu() ? "Включи модуль заново!" : "Re-enable me!");
             return;
         }
 
@@ -1065,5 +1047,42 @@ public class AutoCrystal extends Module {
                     breakThread.interrupt();
             }
         }
+    }
+
+
+    private enum Pages {
+        Place, Break, Pause, Render, Damages, Main, Switch, Remove, MultiThread
+    }
+
+    private enum Switch {
+        NONE, NORMAL, SILENT, INVENTORY
+    }
+
+    private enum Timing {
+        NORMAL, SEQUENTIAL
+    }
+
+    private enum Interact {
+        Default, Strict, Legit
+    }
+
+    private enum TargetLogic {
+        Distance, HP, FOV
+    }
+
+    public enum Safety {
+        BALANCE, STABLE, NONE
+    }
+
+    public enum Sort {
+        SAFE, DAMAGE
+    }
+
+    public enum Render {
+        Fade, Slide, Default
+    }
+
+    public enum Remove {
+        OFF, Fake, ON
     }
 }

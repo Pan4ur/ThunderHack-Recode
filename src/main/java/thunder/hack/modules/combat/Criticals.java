@@ -2,16 +2,16 @@ package thunder.hack.modules.combat;
 
 import io.netty.buffer.Unpooled;
 import meteordevelopment.orbit.EventHandler;
-import org.jetbrains.annotations.NotNull;
-import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.modules.Module;
-import thunder.hack.setting.Setting;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import org.jetbrains.annotations.NotNull;
+import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.modules.Module;
+import thunder.hack.setting.Setting;
 
 public class Criticals extends Module {
     public Criticals() {
@@ -19,10 +19,6 @@ public class Criticals extends Module {
     }
 
     public Setting<Mode> mode = new Setting<>("Mode", Mode.FunnyGame);
-
-    private enum Mode {
-        Ncp, Strict, FunnyGame, New2b2t
-    }
 
     public static boolean cancelCrit;
 
@@ -74,8 +70,10 @@ public class Criticals extends Module {
     }
 
     public enum InteractType {
-        INTERACT,
-        ATTACK,
-        INTERACT_AT
+        INTERACT, ATTACK, INTERACT_AT
+    }
+
+    public enum Mode {
+        Ncp, Strict, FunnyGame, New2b2t
     }
 }
