@@ -8,7 +8,6 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
 public class DamageFly extends Module {
-
     public DamageFly() {
         super("DamageFly", Category.MOVEMENT);
     }
@@ -16,19 +15,18 @@ public class DamageFly extends Module {
     public Setting<Integer> boostTicks = new Setting<>("Ticks", 8, 0, 40);
     public Setting<Integer> hurtTime = new Setting<>("HurtTime", 9, 1, 10);
 
-
     private boolean canBoost, damage, isVelocity;
     private int ticks;
     private double motion;
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onPacketReceive(PacketEvent.Receive event) {
-        if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket velocity) {
-            if (velocity.getVelocityY() > 0)
+    public void onPacketReceive(PacketEvent.Receive e) {
+        if (e.getPacket() instanceof EntityVelocityUpdateS2CPacket velPacket) {
+            if (velPacket.getVelocityY() > 0)
                 isVelocity = true;
 
-            if (velocity.getVelocityY() / 8000.0 > 0.2) {
-                motion = velocity.getVelocityY() / 8000.0;
+            if (velPacket.getVelocityY() / 8000.0 > 0.2) {
+                motion = velPacket.getVelocityY() / 8000.0;
                 canBoost = true;
             }
         }

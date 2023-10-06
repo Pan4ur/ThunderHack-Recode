@@ -7,7 +7,6 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
 public class WorldTweaks extends Module {
-
     public WorldTweaks() {
         super("WorldTweaks", "WorldTweaks", Category.MISC);
     }

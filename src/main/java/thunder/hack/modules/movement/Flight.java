@@ -1,6 +1,5 @@
 package thunder.hack.modules.movement;
 
-
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
@@ -21,8 +20,6 @@ public class Flight extends Module {
     public boolean onPosLook = false;
     private int flyTicks = 0;
 
-
-
     public Flight() {
         super("Flight", "Makes you fly.", Module.Category.MOVEMENT);
     }
@@ -33,20 +30,17 @@ public class Flight extends Module {
             if (MovementUtility.isMoving()) {
                 final double[] dir = MovementUtility.forward(hSpeed.getValue());
                 mc.player.setVelocity(dir[0], 0, dir[1]);
-            } else {
-                mc.player.setVelocity(0, 0, 0);
-            }
-            if (mc.options.jumpKey.isPressed())
-                mc.player.setVelocity(mc.player.getVelocity().add(0, vSpeed.getValue(), 0));
-            if (mc.options.sneakKey.isPressed())
-                mc.player.setVelocity(mc.player.getVelocity().add(0, -vSpeed.getValue(), 0));
+            } else mc.player.setVelocity(0, 0, 0);
+
+            if (mc.options.jumpKey.isPressed()) mc.player.setVelocity(mc.player.getVelocity().add(0, vSpeed.getValue(), 0));
+            if (mc.options.sneakKey.isPressed()) mc.player.setVelocity(mc.player.getVelocity().add(0, -vSpeed.getValue(), 0));
 
         } else if (mode.getValue() == Mode.AirJump) {
             if (MovementUtility.isMoving() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(0.5, 0.0, 0.5).offset(0.0, -1.0, 0.0)).iterator().hasNext()) {
                 mc.player.setOnGround(true);
                 mc.player.jump();
             }
-        } else if (mode.getValue() == Mode.MatrixGlide){
+        } else if (mode.getValue() == Mode.MatrixGlide) {
             if (mc.player.isOnGround()) {
                 mc.player.jump();
                 flyTicks = 5;
@@ -54,9 +48,7 @@ public class Flight extends Module {
                 if (MovementUtility.isMoving()) {
                     final double[] dir = MovementUtility.forward(hSpeed.getValue());
                     mc.player.setVelocity(dir[0], -0.04, dir[1]);
-                } else {
-                    mc.player.setVelocity(0, -0.04, 0);
-                }
+                } else mc.player.setVelocity(0, -0.04, 0);
                 flyTicks--;
             }
         }
@@ -64,17 +56,12 @@ public class Flight extends Module {
 
     @Override
     public void onUpdate() {
-        if (mode.getValue() != Mode.MatrixJump) {
-            return;
-        }
+        if (mode.getValue() != Mode.MatrixJump) return;
         mc.player.getAbilities().flying = false;
         mc.player.setVelocity(0.0, 0.0, 0.0);
 
-        if (mc.options.jumpKey.isPressed())
-            mc.player.setVelocity(mc.player.getVelocity().add(0, vSpeed.getValue(), 0));
-
-        if (mc.options.sneakKey.isPressed())
-            mc.player.setVelocity(mc.player.getVelocity().add(0, -vSpeed.getValue(), 0));
+        if (mc.options.jumpKey.isPressed()) mc.player.setVelocity(mc.player.getVelocity().add(0, vSpeed.getValue(), 0));
+        if (mc.options.sneakKey.isPressed()) mc.player.setVelocity(mc.player.getVelocity().add(0, -vSpeed.getValue(), 0));
 
         final double[] dir = MovementUtility.forward(hSpeed.getValue());
         mc.player.setVelocity(dir[0], mc.player.getVelocity().getY(), dir[1]);
@@ -83,9 +70,7 @@ public class Flight extends Module {
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (mode.getValue() == Mode.MatrixJump) {
-            if (fullNullCheck()) {
-                return;
-            }
+            if (fullNullCheck()) return;
             if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
                 onPosLook = true;
                 prevX = mc.player.getVelocity().getX();
@@ -102,8 +87,7 @@ public class Flight extends Module {
                 if (onPosLook) {
                     mc.player.setVelocity(prevX, prevY, prevZ);
                     onPosLook = false;
-                    if (autoToggle.getValue())
-                        disable();
+                    if (autoToggle.getValue()) disable();
                 }
             }
         }

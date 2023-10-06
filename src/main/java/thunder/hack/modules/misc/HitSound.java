@@ -6,7 +6,7 @@ import net.minecraft.sound.SoundEvent;
 import thunder.hack.events.impl.EventAttack;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.ThSoundPack;
+import thunder.hack.utility.SoundUtil;
 import thunder.hack.utility.math.MathUtility;
 import net.minecraft.sound.SoundCategory;
 
@@ -25,16 +25,16 @@ public class HitSound extends Module {
     public void onAttack(EventAttack event) {
         if (!(event.getEntity() instanceof EndCrystalEntity)) {
             switch (mode.getValue()){
-                case UWU -> playSound(ThSoundPack.UWU_SOUNDEVENT);
-                case SKEET -> playSound(ThSoundPack.SKEET_SOUNDEVENT);
-                case KEYBOARD ->  playSound(ThSoundPack.KEYPRESS_SOUNDEVENT);
+                case UWU -> playSound(SoundUtil.UWU_SOUNDEVENT);
+                case SKEET -> playSound(SoundUtil.SKEET_SOUNDEVENT);
+                case KEYBOARD ->  playSound(SoundUtil.KEYPRESS_SOUNDEVENT);
                 case MOAN -> {
                     SoundEvent sound = switch ((int) (MathUtility.random(0,4))) {
-                        case 0 -> ThSoundPack.MOAN1_SOUNDEVENT;
-                        case 1 -> ThSoundPack.MOAN2_SOUNDEVENT;
-                        case 2 -> ThSoundPack.MOAN3_SOUNDEVENT;
-                        case 3 -> ThSoundPack.MOAN4_SOUNDEVENT;
-                        default -> ThSoundPack.MOAN5_SOUNDEVENT;
+                        case 0 -> SoundUtil.MOAN1_SOUNDEVENT;
+                        case 1 -> SoundUtil.MOAN2_SOUNDEVENT;
+                        case 2 -> SoundUtil.MOAN3_SOUNDEVENT;
+                        case 3 -> SoundUtil.MOAN4_SOUNDEVENT;
+                        default -> SoundUtil.MOAN5_SOUNDEVENT;
                     };
                     playSound(sound);
                 }

@@ -18,30 +18,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static thunder.hack.utility.render.Render2DEngine.*;
 
 public class HitParticles extends Module {
-    private final Setting<Mode> mode = new Setting("Mode", Mode.Stars);
-    private final Setting<Physics> physics = new Setting("Physics", Physics.Fall);
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Stars);
+    private final Setting<Physics> physics = new Setting<>("Physics", Physics.Fall);
     public final Setting<ColorSetting> colorrr = new Setting<>("Color", new ColorSetting(0x8800FF00));
-    public Setting<Boolean> selfp = new Setting("Self", false);
+    public Setting<Boolean> selfp = new Setting<>("Self", false);
     public Setting<Integer> amount = new Setting<>("Amount", 2, 1, 5);
     public Setting<Integer> lifeTime = new Setting<>("LifeTime", 2, 1, 10);
     public Setting<Integer> speed = new Setting<>("Speed", 2, 1, 20);
     CopyOnWriteArrayList<Particle> particles = new CopyOnWriteArrayList<>();
     public Setting<Integer> starsScale = new Setting<>("Scale", 3, 1, 10, v -> mode.getValue() != Mode.Orbiz);
-
-    public enum Physics {
-        Fall, Fly
-    }
-
-    public enum Mode {
-        Orbiz, Stars, Hearts
-    }
-
     private final Setting<ColorMode> colorMode = new Setting("ColorMode", ColorMode.Sync);
-
-    public enum ColorMode {
-        Custom, Sync
-    }
-
 
     public HitParticles() {
         super("HitParticles", "HitParticles", Category.RENDER);
@@ -60,7 +46,6 @@ public class HitParticles extends Module {
         }
         particles.removeIf(particle -> System.currentTimeMillis() - particle.getTime() > lifeTime.getValue() * 1000);
     }
-
 
     public void onPreRender3D(MatrixStack stack) {
         RenderSystem.enableDepthTest();
@@ -93,7 +78,6 @@ public class HitParticles extends Module {
             this.color = color;
         }
 
-
         public long getTime() {
             return time;
         }
@@ -104,18 +88,10 @@ public class HitParticles extends Module {
             y += motionY;
             z += motionZ;
 
-
             if (posBlock(x, y - starsScale.getValue() / 10f, z)) {
                 motionY = -motionY / 1.1;
             } else {
-                if (posBlock(x, y, z) || posBlock(x, y, z) || posBlock(x, y, z) || posBlock(x - sp, y, z - sp)
-                        || posBlock(x + sp, y, z + sp) || posBlock(x + sp, y, z - sp) || posBlock(x - sp, y, z + sp)
-                        || posBlock(x + sp, y, z) || posBlock(x - sp, y, z) || posBlock(x, y, z + sp) || posBlock(x, y, z - sp)
-                        || posBlock(x - sp, y, z - sp) || posBlock(x + sp, y, z + sp) || posBlock(x + sp, y, z - sp)
-                        || posBlock(x - sp, y, z + sp) || posBlock(x + sp, y, z) || posBlock(x - sp, y, z) || posBlock(x, y, z + sp)
-                        || posBlock(x, y, z - sp) || posBlock(x - sp, y, z - sp) || posBlock(x + sp, y, z + sp) || posBlock(x + sp, y, z - sp)
-                        || posBlock(x - sp, y, z + sp) || posBlock(x + sp, y, z) || posBlock(x - sp, y, z) || posBlock(x, y, z + sp)
-                        || posBlock(x, y, z - sp)) {
+                if (posBlock(x, y, z) || posBlock(x, y, z) || posBlock(x, y, z) || posBlock(x - sp, y, z - sp) || posBlock(x + sp, y, z + sp) || posBlock(x + sp, y, z - sp) || posBlock(x - sp, y, z + sp) || posBlock(x + sp, y, z) || posBlock(x - sp, y, z) || posBlock(x, y, z + sp) || posBlock(x, y, z - sp) || posBlock(x - sp, y, z - sp) || posBlock(x + sp, y, z + sp) || posBlock(x + sp, y, z - sp) || posBlock(x - sp, y, z + sp) || posBlock(x + sp, y, z) || posBlock(x - sp, y, z) || posBlock(x, y, z + sp) || posBlock(x, y, z - sp) || posBlock(x - sp, y, z - sp) || posBlock(x + sp, y, z + sp) || posBlock(x + sp, y, z - sp) || posBlock(x - sp, y, z + sp) || posBlock(x + sp, y, z) || posBlock(x - sp, y, z) || posBlock(x, y, z + sp) || posBlock(x, y, z - sp)) {
                     motionX = -motionX;
                     motionZ = -motionZ;
                 }
@@ -141,14 +117,14 @@ public class HitParticles extends Module {
             matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-mc.gameRenderer.getCamera().getYaw()));
             matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(mc.gameRenderer.getCamera().getPitch()));
 
-            if (mode.getValue() == Mode.Orbiz) {
-                drawOrbiz(matrixStack, 0.0f, 0.7, color);
-                drawOrbiz(matrixStack, 0.1f, 1.4, color);
-                drawOrbiz(matrixStack, 0.2f, 2.3, color);
-            } else if (mode.getValue() == Mode.Stars) {
-                drawStar(matrixStack, color, starsScale.getValue());
-            } else {
-                drawHeart(matrixStack, color, starsScale.getValue());
+            switch (mode.getValue()) {
+                case Orbiz -> {
+                    drawOrbiz(matrixStack, 0.0f, 0.7, color);
+                    drawOrbiz(matrixStack, 0.1f, 1.4, color);
+                    drawOrbiz(matrixStack, 0.2f, 2.3, color);
+                }
+                case Stars -> drawStar(matrixStack, color, starsScale.getValue());
+                case Hearts -> drawHeart(matrixStack, color, starsScale.getValue());
             }
 
             matrixStack.scale(0.8f, 0.8f, 0.8f);
@@ -158,5 +134,17 @@ public class HitParticles extends Module {
         private boolean posBlock(double x, double y, double z) {
             return (mc.world.getBlockState(new BlockPos((int) x, (int) y, (int) z)).getBlock() != Blocks.AIR && mc.world.getBlockState(new BlockPos((int) x, (int) y, (int) z)).getBlock() != Blocks.WATER && mc.world.getBlockState(new BlockPos((int) x, (int) y, (int) z)).getBlock() != Blocks.LAVA);
         }
+    }
+
+    public enum Physics {
+        Fall, Fly
+    }
+
+    public enum Mode {
+        Orbiz, Stars, Hearts
+    }
+
+    public enum ColorMode {
+        Custom, Sync
     }
 }

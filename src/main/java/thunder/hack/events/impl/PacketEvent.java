@@ -3,7 +3,6 @@ package thunder.hack.events.impl;
 import thunder.hack.events.Event;
 import net.minecraft.network.packet.Packet;
 
-
 public class PacketEvent extends Event {
     private final Packet<?> packet;
 

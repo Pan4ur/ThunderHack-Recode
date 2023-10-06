@@ -11,7 +11,7 @@ import net.minecraft.sound.SoundCategory;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.utility.ThSoundPack;
+import thunder.hack.utility.SoundUtil;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
@@ -82,13 +82,13 @@ public class KillEffect extends Module {
             if (entity.isAlive() || ((PlayerEntity) entity).getHealth() != 0) return;
 
             if (playSound.getValue() && mode.getValue() == Mode.Orthodox)
-                mc.world.playSound(mc.player, entity.getBlockPos(), ThSoundPack.ORTHODOX_SOUNDEVENT, SoundCategory.BLOCKS, 10f, 1f);
+                mc.world.playSound(mc.player, entity.getBlockPos(), SoundUtil.ORTHODOX_SOUNDEVENT, SoundCategory.BLOCKS, 10f, 1f);
             renderEntities.put(entity, System.currentTimeMillis());
         });
 
-        if(!lightingEntities.isEmpty()){
-            lightingEntities.forEach((entity, time) ->{
-                if(System.currentTimeMillis() - time > 5000){
+        if (!lightingEntities.isEmpty()) {
+            lightingEntities.forEach((entity, time) -> {
+                if (System.currentTimeMillis() - time > 5000) {
                     lightingEntities.remove(entity);
                 }
             });

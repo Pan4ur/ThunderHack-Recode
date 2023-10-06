@@ -9,6 +9,6 @@ public class FOV extends Module {
     public final Setting<Integer> itemFovModifier = new Setting<>("Item FOV modifier", 120, 0, 358);
 
     public FOV() {
-        super("FOV","FOV как у про", Category.RENDER);
+        super("FOV", "FOV как у про", Category.RENDER);
     }
 }

@@ -5,12 +5,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.MovementUtility;
 
 import static java.lang.Math.abs;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class HitBoxTricks extends Module {
     public HitBoxTricks() {
@@ -33,7 +33,7 @@ public class HitBoxTricks extends Module {
             Vec3d offset = new Vec3d(mc.player.getHorizontalFacing().getUnitVector());
             Vec3d fin = merge(Vec3d.of(BlockPos.ofFloored(mc.player.getBoundingBox().getCenter())).add(.5, 0, .5).add(offset.multiply(MAGIC_OFFSET)), mc.player.getHorizontalFacing());
             mc.player.setPosition(fin.x == 0 ? mc.player.getX() : fin.x, mc.player.getY(), fin.z == 0 ? mc.player.getZ() : fin.z);
-            disable(MainSettings.isRu() ? "Хитбокс сдвинут! Отключаю.." : "Hitbox desynced! Disabling..");
+            disable(isRu() ? "Хитбокс сдвинут! Отключаю.." : "Hitbox desynced! Disabling..");
         } else {
             if (MovementUtility.isMoving()) {
                 mc.player.input.movementForward = 0F;
@@ -46,8 +46,8 @@ public class HitBoxTricks extends Module {
                 mc.player.setPosition(roundToClosest(mc.player.getX(), Math.floor(mc.player.getX()) + 0.301, Math.floor(mc.player.getX()) + 0.699), mc.player.getY(), roundToClosest(mc.player.getZ(), Math.floor(mc.player.getZ()) + 0.301, Math.floor(mc.player.getZ()) + 0.699));
             } else if (mc.player.age % interval.getValue() == 0) {
                 mc.player.setPosition(mc.player.getX() + MathUtility.clamp(roundToClosest(mc.player.getX(), Math.floor(mc.player.getX()) + 0.241, Math.floor(mc.player.getX()) + 0.759) - mc.player.getX(), -0.03, 0.03), mc.player.getY(), mc.player.getZ() + MathUtility.clamp(roundToClosest(mc.player.getZ(), Math.floor(mc.player.getZ()) + 0.241, Math.floor(mc.player.getZ()) + 0.759) - mc.player.getZ(), -0.03, 0.03));
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), true));
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(roundToClosest(mc.player.getX(), Math.floor(mc.player.getX()) + 0.23, Math.floor(mc.player.getX()) + 0.77), mc.player.getY(), roundToClosest(mc.player.getZ(), Math.floor(mc.player.getZ()) + 0.23, Math.floor(mc.player.getZ()) + 0.77), true));
+                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), true));
+                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(roundToClosest(mc.player.getX(), Math.floor(mc.player.getX()) + 0.23, Math.floor(mc.player.getX()) + 0.77), mc.player.getY(), roundToClosest(mc.player.getZ(), Math.floor(mc.player.getZ()) + 0.23, Math.floor(mc.player.getZ()) + 0.77), true));
             }
         }
     }
@@ -55,11 +55,8 @@ public class HitBoxTricks extends Module {
     private double roundToClosest(double num, double low, double high) {
         double d1 = num - low;
         double d2 = high - num;
-        if (d2 > d1) {
-            return low;
-        } else {
-            return high;
-        }
+        if (d2 > d1) return low;
+        else return high;
     }
 
     private Vec3d merge(Vec3d a, Direction facing) {

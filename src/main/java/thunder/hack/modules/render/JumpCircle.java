@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class JumpCircle extends Module {
-
     public Setting<cmode> CMode = new Setting<>("ColorMode", cmode.Astolfo);
     public Setting<Integer> lifetime = new Setting<>("live", 3, 1, 10);
     public final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(3649978));
@@ -53,9 +52,8 @@ public class JumpCircle extends Module {
             circle.update();
         }
         circles.removeIf(Circle::update);
-        // mc.player.distanceTraveled = 4f;
+        //mc.player.distanceTraveled = 4f;
     }
-
 
     public void onPreRender3D(MatrixStack stack) {
         Collections.reverse(circles);
@@ -118,19 +116,22 @@ public class JumpCircle extends Module {
         Collections.reverse(circles);
     }
 
-
     public int getColor(int stage) {
-        if (CMode.getValue() == cmode.Astolfo) {
-            return astolfo.getColor(((stage + 90) / 360.));
-        } else if (CMode.getValue() == cmode.Rainbow) {
-            return Render2DEngine.rainbow(stage, 1f, 1f).getRGB();
-        } else if (CMode.getValue() == cmode.Custom) {
-            return color.getValue().getColorObject().getRGB();
-        } else {
-            return getColor2(color.getValue().getColorObject(), color2.getValue().getColorObject(), stage).getRGB();
+        switch (CMode.getValue()) {
+            case Rainbow -> {
+                return Render2DEngine.rainbow(stage, 1f, 1f).getRGB();
+            }
+            case Astolfo -> {
+                return astolfo.getColor(((stage + 90) / 360.));
+            }
+            case Custom -> {
+                return color.getValue().getColorObject().getRGB();
+            }
+            default -> {
+                return getColor2(color.getValue().getColorObject(), color2.getValue().getColorObject(), stage).getRGB();
+            }
         }
     }
-
 
     private Color getColor2(Color color1, Color color2, int offset) {
         return TwoColoreffect(color1, color2, Math.abs(System.currentTimeMillis() / 10) / 100.0 + offset * ((20f - colorOffset1.getValue()) / 200));

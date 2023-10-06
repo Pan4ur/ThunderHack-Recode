@@ -1,6 +1,5 @@
 package thunder.hack.modules.render;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.BlockHitResult;
@@ -31,20 +30,19 @@ public class BreakHighLight extends Module {
 
     private final Setting<Float> lineWidth = new Setting<>("LineWidth", 2F, 0f, 5F);
     private final Setting<Boolean> otherPlayer = new Setting<>("OtherPlayer", true);
-    private enum Mode{Grow, Shrink, Static}
+
     private float prevProgress;
 
-    public void onRender3D(MatrixStack stack){
-        if(mc.interactionManager.isBreakingBlock() && mc.crosshairTarget != null && mc.crosshairTarget instanceof BlockHitResult bhr && !mc.world.isAir(bhr.getBlockPos())){
+    public void onRender3D(MatrixStack stack) {
+        if (mc.interactionManager.isBreakingBlock() && mc.crosshairTarget != null && mc.crosshairTarget instanceof BlockHitResult bhr && !mc.world.isAir(bhr.getBlockPos())) {
             Box shrunkMineBox = new Box(bhr.getBlockPos().getX(), bhr.getBlockPos().getY(), bhr.getBlockPos().getZ(), bhr.getBlockPos().getX(), bhr.getBlockPos().getY(), bhr.getBlockPos().getZ());
 
-            float noom;
-            if(mode.getValue() == Mode.Grow) {
-                noom = Render2DEngine.interpolateFloat(prevProgress, MathUtility.clamp(mc.interactionManager.currentBreakingProgress, 0f, 1f), mc.getTickDelta());
-            } else if(mode.getValue() == Mode.Shrink){
-                noom = 1f - Render2DEngine.interpolateFloat(prevProgress,mc.interactionManager.currentBreakingProgress, mc.getTickDelta());
-            } else {
-                noom = 1;
+            float noom; //ам ням не ебался
+
+            switch (mode.getValue()) {
+                case Grow -> noom = Render2DEngine.interpolateFloat(prevProgress, MathUtility.clamp(mc.interactionManager.currentBreakingProgress, 0f, 1f), mc.getTickDelta());
+                case Shrink -> noom = 1f - Render2DEngine.interpolateFloat(prevProgress, mc.interactionManager.currentBreakingProgress, mc.getTickDelta());
+                default -> noom = 1;
             }
 
             Render3DEngine.drawFilledBox(
@@ -58,12 +56,10 @@ public class BreakHighLight extends Module {
                     lineWidth.getValue()
             );
 
-            if(mode.getValue() == Mode.Grow) {
-                prevProgress = noom;
-            } else if(mode.getValue() == Mode.Shrink){
-                prevProgress = 1 - noom;
-            } else {
-                prevProgress = 1f;
+            switch (mode.getValue()) {
+                case Grow -> prevProgress = noom;
+                case Shrink -> prevProgress = 1 - noom;
+                default -> prevProgress = 1f;
             }
         }
         ((IWorldRenderer) mc.worldRenderer).getBlockBreakingInfos().forEach(((integer, destroyBlockProgress) -> {
@@ -74,12 +70,10 @@ public class BreakHighLight extends Module {
                 Box shrunkMineBox = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
 
                 float noom;
-                if(mode.getValue() == Mode.Grow) {
-                    noom = MathUtility.clamp((destroyBlockProgress.getStage() / 10f), 0f, 1f);
-                } else if(mode.getValue() == Mode.Shrink){
-                    noom = 1f - (destroyBlockProgress.getStage() / 10f);
-                } else {
-                    noom = 1;
+                switch (mode.getValue()) {
+                    case Grow -> noom = MathUtility.clamp((destroyBlockProgress.getStage() / 10f), 0f, 1f);
+                    case Shrink -> noom = 1f - (destroyBlockProgress.getStage() / 10f);
+                    default -> noom = 1;
                 }
 
                 Render3DEngine.drawFilledBox(
@@ -95,5 +89,9 @@ public class BreakHighLight extends Module {
                 );
             }
         }));
+    }
+
+    private enum Mode {
+        Grow, Shrink, Static
     }
 }

@@ -45,25 +45,22 @@ public class Velocity extends Module {
     }
 
     @EventHandler
-    public void onPacketReceived(PacketEvent.Receive event) {
-
+    public void onPacketReceived(PacketEvent.Receive e) {
         if (fullNullCheck()) return;
 
-        if (event.getPacket() instanceof GameMessageS2CPacket && autoDisable.getValue()) {
-            String text = ((GameMessageS2CPacket) event.getPacket()).content().getString();
-            if (text.contains("Тебя проверяют на чит АКБ, ник хелпера - ")) {
-                disable();
-            }
+        if (e.getPacket() instanceof GameMessageS2CPacket && autoDisable.getValue()) {
+            String text = ((GameMessageS2CPacket) e.getPacket()).content().getString();
+            if (text.contains("Тебя проверяют на чит АКБ, ник хелпера - ")) disable(":^)");
         }
 
-        if (event.getPacket() instanceof EntityStatusS2CPacket pac && (pac = event.getPacket()).getStatus() == 31 && pac.getEntity(Velocity.mc.world) instanceof FishingBobberEntity) {
+        if (e.getPacket() instanceof EntityStatusS2CPacket pac && (pac = e.getPacket()).getStatus() == 31 && pac.getEntity(Velocity.mc.world) instanceof FishingBobberEntity) {
             FishingBobberEntity fishHook = (FishingBobberEntity) pac.getEntity(Velocity.mc.world);
             if (fishHook.getHookedEntity() == Velocity.mc.player) {
-                event.setCancelled(true);
+                e.setCancelled(true);
             }
         }
 
-        if (event.getPacket() instanceof ExplosionS2CPacket explosion) {
+        if (e.getPacket() instanceof ExplosionS2CPacket explosion) {
             if (mode.getValue() == modeEn.Custom) {
                 ((IExplosionS2CPacket) explosion).setMotionX(((IExplosionS2CPacket) explosion).getMotionX() * horizontal.getValue() / 100f);
                 ((IExplosionS2CPacket) explosion).setMotionZ(((IExplosionS2CPacket) explosion).getMotionZ() * horizontal.getValue() / 100f);
@@ -76,26 +73,26 @@ public class Velocity extends Module {
         }
 
         if (mode.getValue() == modeEn.OldGrim) {
-            if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket) {
-                EntityVelocityUpdateS2CPacket var4 = event.getPacket();
+            if (e.getPacket() instanceof EntityVelocityUpdateS2CPacket) {
+                EntityVelocityUpdateS2CPacket var4 = e.getPacket();
                 if (var4.getId() == mc.player.getId()) {
-                    event.cancel();
+                    e.cancel();
                     grimTicks = 6;
                 }
             }
-            if (event.getPacket() instanceof CommonPingS2CPacket && grimTicks > 0) {
-                event.cancel();
+            if (e.getPacket() instanceof CommonPingS2CPacket && grimTicks > 0) {
+                e.cancel();
                 grimTicks--;
             }
         }
 
         if (onlyAura.getValue() && ModuleManager.aura.isDisabled()) return;
 
-        if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket pac) {
+        if (e.getPacket() instanceof EntityVelocityUpdateS2CPacket pac) {
             if (pac.getId() == mc.player.getId()) {
                 if (mode.getValue() == modeEn.Matrix) {
                     if (!flag) {
-                        event.setCancelled(true);
+                        e.setCancelled(true);
                         flag = true;
                     } else {
                         flag = false;
@@ -118,10 +115,10 @@ public class Velocity extends Module {
                     ((ISPacketEntityVelocity) pac).setMotionY((int) ((float) pac.getVelocityY() * vertical.getValue() / 100f));
                     ((ISPacketEntityVelocity) pac).setMotionZ((int) ((float) pac.getVelocityZ() * horizontal.getValue() / 100f));
                 } else if (mode.getValue() == modeEn.Sunrise) {
-                    event.setCancelled(true);
+                    e.setCancelled(true);
                     mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), -999.0, mc.player.getZ(), true));
                 } else if (mode.getValue() == modeEn.Cancel) {
-                    event.setCancelled(true);
+                    e.setCancelled(true);
                 } else if (mode.getValue() == modeEn.Jump && mc.player.isOnGround()) {
                     ((ISPacketEntityVelocity) pac).setMotionX((int) ((float) pac.getVelocityX() * horizontal.getValue() / 100f));
                     ((ISPacketEntityVelocity) pac).setMotionZ((int) ((float) pac.getVelocityZ() * horizontal.getValue() / 100f));

@@ -14,10 +14,7 @@ public class NoPistonPush extends Module {
 
     @Override
     public void onEnable() {
-        if (mc.player != null) {
-            wasSprinting = mc.player.isSprinting();
-        }
-
+        if (mc.player != null) wasSprinting = mc.player.isSprinting();
     }
 
     @Override
@@ -28,9 +25,7 @@ public class NoPistonPush extends Module {
             if (detectPistonPush()) {
                 wasSprinting = mc.player.isSprinting();
                 mc.player.setSprinting(true);
-            } else {
-                mc.player.setSprinting(wasSprinting);
-            }
+            } else mc.player.setSprinting(wasSprinting);
         }
     }
 

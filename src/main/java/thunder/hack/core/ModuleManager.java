@@ -109,7 +109,7 @@ public class ModuleManager {
     public static PotionHud potionHud = new PotionHud();
     public static PearlBait pearlBait = new PearlBait();
     public static PacketFly packetFly = new PacketFly();
-    public static Multitask multitask = new Multitask();
+    public static MultiTask multitask = new MultiTask();
     public static LegacyHud legacyHud = new LegacyHud();
     public static HudEditor hudEditor = new HudEditor();
     public static ElytraFix elytraFix = new ElytraFix();
@@ -136,7 +136,7 @@ public class ModuleManager {
     public static HitSound hitSound = new HitSound();
     public static FGHelper fgHelper = new FGHelper();
     public static ExtraTab extraTab = new ExtraTab();
-    public static EZbowPOP eZbowPOP = new EZbowPOP();
+    public static BowPop bowPop = new BowPop();
     public static ClickGui clickGui = new ClickGui();
     public static AutoTrap autoTrap = new AutoTrap();
     public static AutoTool autoTool = new AutoTool();

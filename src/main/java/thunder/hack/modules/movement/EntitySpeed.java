@@ -12,7 +12,6 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
 
 public class EntitySpeed extends Module {
-
     public EntitySpeed() {
         super("EntitySpeed", Category.MOVEMENT);
     }
@@ -35,17 +34,12 @@ public class EntitySpeed extends Module {
 
     @EventHandler
     public void onPlayerTravel(@NotNull EventPlayerTravel ev) {
-        if (!ev.isPre())
-            return;
-
-        if (fullNullCheck())
-            return;
+        if (!ev.isPre()) return;
+        if (fullNullCheck()) return;
 
         Entity entity = mc.player.getControllingVehicle();
 
-        if (entity == null)
-            return;
-
+        if (entity == null) return;
         if ((!mc.world.isChunkLoaded((int) entity.getPos().getX() >> 4, (int) entity.getPos().getZ() >> 4) || entity.getPos().getY() < -60) && stopunloaded.getValue())
             return;
 

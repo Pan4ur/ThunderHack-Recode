@@ -1,6 +1,5 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -16,7 +15,7 @@ import net.minecraft.util.Hand;
 
 import java.util.Random;
 
-public class EZbowPOP extends Module {
+public class BowPop extends Module {
 
     public static Timer delayTimer = new Timer();
 
@@ -37,8 +36,8 @@ public class EZbowPOP extends Module {
 
     private final Random rnd = new Random();
 
-    public EZbowPOP() {
-        super("EZbowPOP", "Шотает с лука", Category.COMBAT);
+    public BowPop() {
+        super("BowPop", "Шотает с лука", Category.COMBAT);
     }
 
     @EventHandler

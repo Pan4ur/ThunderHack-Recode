@@ -89,9 +89,7 @@ public class Step extends Module {
                         entityRiding.setStepHeight(0.5F);
                     }
                 }
-            } else {
-                mc.player.setStepHeight(0.6F);
-            }
+            } else mc.player.setStepHeight(0.6F);
         }
     }
 

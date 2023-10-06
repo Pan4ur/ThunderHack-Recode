@@ -17,7 +17,6 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.*;
-import thunder.hack.modules.movement.NoSlow;
 import thunder.hack.modules.movement.Velocity;
 
 import static thunder.hack.modules.Module.fullNullCheck;
@@ -51,7 +50,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         EventMove event = new EventMove(movement.x, movement.y, movement.z);
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
-            super.move(movementType, new Vec3d(event.get_x(), event.get_y(), event.get_z()));
+            super.move(movementType, new Vec3d(event.getX(), event.getY(), event.getZ()));
             ci.cancel();
         }
     }

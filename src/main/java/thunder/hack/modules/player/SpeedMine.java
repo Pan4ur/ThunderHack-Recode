@@ -39,6 +39,8 @@ import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
 
+import static net.minecraft.enchantment.EnchantmentHelper.hasAquaAffinity;
+
 public class SpeedMine extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
     public final Setting<SwitchMode> switchMode = new Setting<>("SwitchMode", SwitchMode.Alternative, v -> mode.getValue() == Mode.Packet);
@@ -119,13 +121,13 @@ public class SpeedMine extends Module {
                             InventoryUtility.getPickAxeHotbar().switchTo();
                         }
 
-                        if(stop.getValue())
+                        if (stop.getValue())
                             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, minePosition, mineFacing));
-                        if(abort.getValue())
+                        if (abort.getValue())
                             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, minePosition, mineFacing));
-                        if(start.getValue())
+                        if (start.getValue())
                             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, minePosition, mineFacing));
-                        if(stop2.getValue())
+                        if (stop2.getValue())
                             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, minePosition, mineFacing));
 
                         if (switchMode.getValue() == SwitchMode.Alternative) {
@@ -217,12 +219,8 @@ public class SpeedMine extends Module {
 
             digSpeed *= fatigueScale;
         }
-        if (mc.player.isSubmergedInWater() && !EnchantmentHelper.hasAquaAffinity(mc.player)) {
-            digSpeed /= 5;
-        }
-        if (!mc.player.isOnGround()) {
-            digSpeed /= 5;
-        }
+        if (mc.player.isSubmergedInWater() && !hasAquaAffinity(mc.player)) digSpeed /= 5;
+        if (!mc.player.isOnGround()) digSpeed /= 5;
         return (digSpeed < 0 ? 0 : digSpeed);
     }
 

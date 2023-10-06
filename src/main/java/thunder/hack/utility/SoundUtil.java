@@ -5,7 +5,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 
-public final class ThSoundPack {
+public final class SoundUtil {
     public static final Identifier KEYPRESS_SOUND = new Identifier("thunderhack:keypress");
     public static SoundEvent KEYPRESS_SOUNDEVENT = SoundEvent.of(KEYPRESS_SOUND);
     public static final Identifier KEYRELEASE_SOUND = new Identifier("thunderhack:keyrelease");
@@ -32,17 +32,17 @@ public final class ThSoundPack {
     public static SoundEvent ORTHODOX_SOUNDEVENT = SoundEvent.of(ORTHODOX_SOUND);
 
     public static void registerSounds() {
-        Registry.register(Registries.SOUND_EVENT, ThSoundPack.KEYPRESS_SOUND, ThSoundPack.KEYPRESS_SOUNDEVENT);
-        Registry.register(Registries.SOUND_EVENT, ThSoundPack.KEYRELEASE_SOUND, ThSoundPack.KEYRELEASE_SOUNDEVENT);
-        Registry.register(Registries.SOUND_EVENT, ThSoundPack.ENABLE_SOUND, ThSoundPack.ENABLE_SOUNDEVENT);
-        Registry.register(Registries.SOUND_EVENT, ThSoundPack.DISABLE_SOUND, ThSoundPack.DISABLE_SOUNDEVENT);
-        Registry.register(Registries.SOUND_EVENT, ThSoundPack.MOAN1_SOUND, ThSoundPack.MOAN1_SOUNDEVENT);
-        Registry.register(Registries.SOUND_EVENT, ThSoundPack.MOAN2_SOUND, ThSoundPack.MOAN2_SOUNDEVENT);
-        Registry.register(Registries.SOUND_EVENT, ThSoundPack.MOAN3_SOUND, ThSoundPack.MOAN3_SOUNDEVENT);
-        Registry.register(Registries.SOUND_EVENT, ThSoundPack.MOAN4_SOUND, ThSoundPack.MOAN4_SOUNDEVENT);
-        Registry.register(Registries.SOUND_EVENT, ThSoundPack.MOAN5_SOUND, ThSoundPack.MOAN5_SOUNDEVENT);
-        Registry.register(Registries.SOUND_EVENT, ThSoundPack.UWU_SOUND, ThSoundPack.UWU_SOUNDEVENT);
-        Registry.register(Registries.SOUND_EVENT, ThSoundPack.SKEET_SOUND, ThSoundPack.SKEET_SOUNDEVENT);
-        Registry.register(Registries.SOUND_EVENT, ThSoundPack.ORTHODOX_SOUND, ThSoundPack.ORTHODOX_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtil.KEYPRESS_SOUND, SoundUtil.KEYPRESS_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtil.KEYRELEASE_SOUND, SoundUtil.KEYRELEASE_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtil.ENABLE_SOUND, SoundUtil.ENABLE_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtil.DISABLE_SOUND, SoundUtil.DISABLE_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtil.MOAN1_SOUND, SoundUtil.MOAN1_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtil.MOAN2_SOUND, SoundUtil.MOAN2_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtil.MOAN3_SOUND, SoundUtil.MOAN3_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtil.MOAN4_SOUND, SoundUtil.MOAN4_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtil.MOAN5_SOUND, SoundUtil.MOAN5_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtil.UWU_SOUND, SoundUtil.UWU_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtil.SKEET_SOUND, SoundUtil.SKEET_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtil.ORTHODOX_SOUND, SoundUtil.ORTHODOX_SOUNDEVENT);
     }
 }

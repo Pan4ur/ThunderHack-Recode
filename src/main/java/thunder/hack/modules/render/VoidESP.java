@@ -1,6 +1,5 @@
 package thunder.hack.modules.render;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;

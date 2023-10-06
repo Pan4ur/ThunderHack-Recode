@@ -29,11 +29,8 @@ public class AntiWeb extends Module {
     public void onPlayerUpdate(PlayerUpdateEvent e) {
         if (mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos())).getBlock() == Blocks.COBWEB) {
             if (mode.getValue() == Mode.Timer) {
-                if (mc.player.isOnGround()) {
-                    ThunderHack.TICK_TIMER = 1f;
-                } else {
-                    ThunderHack.TICK_TIMER = timer.getValue();
-                }
+                if (mc.player.isOnGround()) ThunderHack.TICK_TIMER = 1f;
+                else ThunderHack.TICK_TIMER = timer.getValue();
             }
             if (mode.getValue() == Mode.Fly) {
                 final double[] dir = MovementUtility.forward(speed.getValue());
@@ -42,7 +39,6 @@ public class AntiWeb extends Module {
                     mc.player.setVelocity(mc.player.getVelocity().add(0, speed.getValue(), 0));
                 if (mc.options.sneakKey.isPressed())
                     mc.player.setVelocity(mc.player.getVelocity().add(0, -speed.getValue(), 0));
-
             }
         }
     }

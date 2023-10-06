@@ -15,10 +15,8 @@ public class ViewLock extends Module {
     public Setting<Boolean> yaw = new Setting<>("Yaw", true);
     public Setting<Float> yawValue = new Setting<>("YawValue", 0f, -180f, 180f, v -> pitch.getValue());
 
-    public void onRender3D(MatrixStack m){
-        if(pitch.getValue())
-            mc.player.setPitch(pitchValue.getValue());
-        if(yaw.getValue())
-            mc.player.setYaw(yawValue.getValue());
+    public void onRender3D(MatrixStack m) {
+        if (pitch.getValue()) mc.player.setPitch(pitchValue.getValue());
+        if (yaw.getValue()) mc.player.setYaw(yawValue.getValue());
     }
 }

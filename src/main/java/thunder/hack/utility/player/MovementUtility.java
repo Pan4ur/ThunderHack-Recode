@@ -81,8 +81,8 @@ public final class MovementUtility {
         double d3 = mc.player.input.movementSideways;
         float f = mc.player.getYaw();
         if (d2 == 0.0 && d3 == 0.0) {
-            event.set_x(0.0);
-            event.set_z(0.0);
+            event.setX(0.0);
+            event.setZ(0.0);
         } else {
             if (d2 != 0.0) {
                 if (d3 > 0.0) {
@@ -101,8 +101,8 @@ public final class MovementUtility {
             double sin = Math.sin(Math.toRadians(f + 90.0F));
             double cos = Math.cos(Math.toRadians(f + 90.0F));
 
-            event.set_x(d2 * d * cos + d3 * d * sin);
-            event.set_z(d2 * d * sin - d3 * d * cos);
+            event.setX(d2 * d * cos + d3 * d * sin);
+            event.setZ(d2 * d * sin - d3 * d * cos);
         }
     }
 
@@ -111,8 +111,8 @@ public final class MovementUtility {
         double d3 = mc.player.input.movementSideways;
         float f = mc.player.getYaw();
         if (d2 == 0.0 && d3 == 0.0) {
-            event.set_x(0.0);
-            event.set_z(0.0);
+            event.setX(0.0);
+            event.setZ(0.0);
         } else {
             if (d2 != 0.0) {
                 if (d3 > 0.0) {
@@ -131,8 +131,8 @@ public final class MovementUtility {
             double sin = Math.sin(Math.toRadians(f + 90.0F));
             double cos = Math.cos(Math.toRadians(f + 90.0F));
 
-            event.set_x(d2 * d * cos + d3 * d * sin);
-            event.set_z(d2 * d * sin - d3 * d * cos);
+            event.setX(d2 * d * cos + d3 * d * sin);
+            event.setZ(d2 * d * sin - d3 * d * cos);
         }
     }
 

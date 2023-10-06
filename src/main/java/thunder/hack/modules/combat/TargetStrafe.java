@@ -10,14 +10,11 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.movement.Speed;
-import thunder.hack.modules.movement.Scaffold;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InventoryUtility;
 
@@ -105,7 +102,7 @@ public class TargetStrafe extends Module {
     public double calculateSpeed(EventMove move) {
         jumpTicks--;
         float speedAttributes = getAIMoveSpeed();
-        final float frictionFactor = mc.world.getBlockState(new BlockPos.Mutable().set(mc.player.getX(), getBoundingBox().getMin(Direction.Axis.Y) - move.get_y(), mc.player.getZ())).getBlock().getSlipperiness() * 0.91F;
+        final float frictionFactor = mc.world.getBlockState(new BlockPos.Mutable().set(mc.player.getX(), getBoundingBox().getMin(Direction.Axis.Y) - move.getY(), mc.player.getZ())).getBlock().getSlipperiness() * 0.91F;
         float n6 = mc.player.hasStatusEffect(StatusEffects.JUMP_BOOST) && mc.player.isUsingItem() ? 0.88f : (float) (oldSpeed > 0.32 && mc.player.isUsingItem() ? 0.88 : 0.91F);
         if (mc.player.isOnGround()) {
             n6 = frictionFactor;
@@ -114,7 +111,7 @@ public class TargetStrafe extends Module {
         float n8;
         if (mc.player.isOnGround()) {
             n8 = speedAttributes * n7;
-            if (move.get_y() > 0) {
+            if (move.getY() > 0) {
                 n8 += boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && disabled ? 0.65 : 0.2f;
             }
             disabled = false;
@@ -124,9 +121,9 @@ public class TargetStrafe extends Module {
         boolean noslow = false;
         double max2 = oldSpeed + n8;
         double max = 0.0;
-        if (mc.player.isUsingItem() && move.get_y() <= 0) {
+        if (mc.player.isUsingItem() && move.getY() <= 0) {
             double n10 = oldSpeed + n8 * 0.25;
-            double motionY2 = move.get_y();
+            double motionY2 = move.getY();
             if (motionY2 != 0.0 && Math.abs(motionY2) < 0.08) {
                 n10 += 0.055;
             }
@@ -197,7 +194,7 @@ public class TargetStrafe extends Module {
         int elytraSlot = InventoryUtility.getElytra();
 
         if (boost.getValue() == Boost.Elytra && elytraSlot != -1) {
-            if (isMoving() && !mc.player.isOnGround() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, event.get_y(), 0.0f)).iterator().hasNext() && disabled) {
+            if (isMoving() && !mc.player.isOnGround() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, event.getY(), 0.0f)).iterator().hasNext() && disabled) {
                 oldSpeed = setSpeed.getValue();
             }
         }
@@ -219,8 +216,8 @@ public class TargetStrafe extends Module {
                     z = Aura.target.getZ() + distance.getValue() * Math.sin(wrap);
                 }
 
-                event.set_x(speed * -Math.sin(Math.toRadians(wrapDS(x, z))));
-                event.set_z(speed * Math.cos(Math.toRadians(wrapDS(x, z))));
+                event.setX(speed * -Math.sin(Math.toRadians(wrapDS(x, z))));
+                event.setZ(speed * Math.cos(Math.toRadians(wrapDS(x, z))));
                 event.setCancelled(true);
 
             }

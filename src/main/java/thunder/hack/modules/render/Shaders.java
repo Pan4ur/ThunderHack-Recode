@@ -12,15 +12,11 @@ import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 
 public class Shaders extends Module {
-
     public Shaders() {
         super("Shaders", Category.RENDER);
     }
 
-
-/*
-        Thanks to @0x3C50 for Shader rendering example
- */
+    //Thanks to @0x3C50 for Shader rendering example
 
     public Setting<ShaderManager.Shader> mode = new Setting<>("Mode", ShaderManager.Shader.Default);
     public Setting<ShaderManager.Shader> handsMode = new Setting<>("HandsMode", ShaderManager.Shader.Default);
@@ -54,13 +50,10 @@ public class Shaders extends Module {
     public final Setting<ColorSetting> fillColor2 = new Setting<>("SmokeFill", new ColorSetting(0x8800FF00)).withParent(colors);
     public final Setting<ColorSetting> fillColor3 = new Setting<>("SmokeFil2", new ColorSetting(0x8800FF00)).withParent(colors);
 
-
-
-
     public boolean shouldRender(Entity entity) {
         if (entity == null) return false;
-        if(mc.player == null) return false;
-        if(mc.player.squaredDistanceTo(entity.getPos()) > maxRange.getPow2Value()) return false;
+        if (mc.player == null) return false;
+        if (mc.player.squaredDistanceTo(entity.getPos()) > maxRange.getPow2Value()) return false;
         if (entity instanceof PlayerEntity) {
             if (entity == mc.player) return false;
             if (ThunderHack.friendManager.isFriend((PlayerEntity) entity)) {
@@ -79,14 +72,14 @@ public class Shaders extends Module {
         };
     }
 
-    public void onRender3D(MatrixStack matrices){
-        if(hands.getValue())
+    public void onRender3D(MatrixStack matrices) {
+        if (hands.getValue())
             ThunderHack.shaderManager.renderShader(()-> mc.gameRenderer.renderHand(matrices, mc.gameRenderer.getCamera(), mc.getTickDelta()), handsMode.getValue());
     }
 
 
     @Override
-    public void onDisable(){
+    public void onDisable() {
         ThunderHack.shaderManager.reloadShaders();
     }
 }

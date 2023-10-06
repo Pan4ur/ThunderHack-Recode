@@ -66,24 +66,19 @@ public class ElytraRecast extends Module {
 
     @Override
     public void onDisable() {
-        if (!InputUtil.isKeyPressed(mc.getWindow().getHandle(), mc.options.forwardKey.getDefaultKey().getCode())) {
+        if (!InputUtil.isKeyPressed(mc.getWindow().getHandle(), mc.options.forwardKey.getDefaultKey().getCode()))
             mc.options.forwardKey.setPressed(false);
-        }
-        if (!InputUtil.isKeyPressed(mc.getWindow().getHandle(), mc.options.jumpKey.getDefaultKey().getCode())) {
+        if (!InputUtil.isKeyPressed(mc.getWindow().getHandle(), mc.options.jumpKey.getDefaultKey().getCode()))
             mc.options.jumpKey.setPressed(false);
-        }
     }
 
     @Override
     public void onUpdate() {
-        if (autoJump.getValue())
-            mc.options.jumpKey.setPressed(true);
-        if (autoWalk.getValue())
-            mc.options.forwardKey.setPressed(true);
+        if (autoJump.getValue()) mc.options.jumpKey.setPressed(true);
+        if (autoWalk.getValue()) mc.options.forwardKey.setPressed(true);
 
-        if (!mc.player.isFallFlying() && mc.player.fallDistance > 0 && checkElytra() && !mc.player.isFallFlying()) {
+        if (!mc.player.isFallFlying() && mc.player.fallDistance > 0 && checkElytra() && !mc.player.isFallFlying())
             castElytra();
-        }
 
         ((ILivingEntity) mc.player).setLastJumpCooldown(0);
     }

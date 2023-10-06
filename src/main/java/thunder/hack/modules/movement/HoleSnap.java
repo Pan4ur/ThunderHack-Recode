@@ -17,6 +17,8 @@ import thunder.hack.utility.world.HoleUtility;
 
 import java.util.ArrayList;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
+
 public class HoleSnap extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Normal);
     private final Setting<Boolean> stopOverHole = new Setting<>("StopOverHole", true);
@@ -50,8 +52,8 @@ public class HoleSnap extends Module {
         if (HoleUtility.isHole(bp.down()) || HoleUtility.isHole(bp.down(2)) || HoleUtility.isHole(bp.down(3))) {
             Vec3d center = new Vec3d(Math.floor(mc.player.getX()) + 0.5, mc.player.getY(), Math.floor(mc.player.getZ()) + 0.5);
             if (center.distanceTo(mc.player.getPos()) < 0.15f) {
-                e.set_x(0);
-                e.set_z(0);
+                e.setX(0);
+                e.setZ(0);
                 e.cancel();
             }
         }
@@ -66,9 +68,7 @@ public class HoleSnap extends Module {
             if (e.isPre()) {
                 prevClientYaw = mc.player.getYaw();
                 mc.player.setYaw(InteractionUtility.calculateAngle(hole.toCenterPos())[0]);
-            } else {
-                mc.player.setYaw(prevClientYaw);
-            }
+            } else mc.player.setYaw(prevClientYaw);
         }
     }
 
@@ -79,9 +79,7 @@ public class HoleSnap extends Module {
             if (e.isPre()) {
                 prevClientYaw = mc.player.getYaw();
                 mc.player.setYaw(InteractionUtility.calculateAngle(hole.toCenterPos())[0]);
-            } else {
-                mc.player.setYaw(prevClientYaw);
-            }
+            } else mc.player.setYaw(prevClientYaw);
         }
     }
 
@@ -109,7 +107,7 @@ public class HoleSnap extends Module {
         BlockPos fbp = null;
         for (BlockPos bp : blocks) {
             if (BlockPos.ofFloored(mc.player.getPos()).equals(bp)) {
-                disable(MainSettings.isRu() ? "Ты в холке! Отключаю.." : "You're in the hole! Disabling..");
+                disable(isRu() ? "Ты в холке! Отключаю.." : "You're in a hole already! Disabling..");
                 return null;
             }
             if (mc.player.squaredDistanceTo(bp.toCenterPos()) < nearestDistance) {

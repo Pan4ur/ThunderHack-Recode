@@ -6,7 +6,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import thunder.hack.core.*;
 import thunder.hack.notification.NotificationManager;
-import thunder.hack.utility.ThSoundPack;
+import thunder.hack.utility.SoundUtil;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.utility.ThunderUtility;
@@ -85,7 +85,7 @@ public class ThunderHack implements ModInitializer {
 
         Render2DEngine.initShaders();
 
-        ThSoundPack.registerSounds();
+        SoundUtil.registerSounds();
         syncVersion();
         ThunderUtility.parseChangeLog();
         ModuleManager.rpc.startRpc();

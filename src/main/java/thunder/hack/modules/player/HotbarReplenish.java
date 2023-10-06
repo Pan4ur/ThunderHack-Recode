@@ -6,17 +6,14 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 
-
 public class HotbarReplenish extends Module {
     public HotbarReplenish() {
         super("HotbarReplenish", Category.PLAYER);
     }
 
-
     private final Setting<Integer> delay = new Setting<>("Delay", 2, 0, 10);
-    private final Setting<Integer> minRefil = new Setting<>("MinRefil", 16, 5, 32);
+    private final Setting<Integer> refillThr = new Setting<>("Threshold", 16, 5, 32);
     private final Timer timer = new Timer();
-
 
     @Override
     public void onUpdate() {
@@ -34,7 +31,7 @@ public class HotbarReplenish extends Module {
 
         if (stack.isEmpty()) return false;
         if (!stack.isStackable()) return false;
-        if (stack.getCount() >= minRefil.getValue()) return false;
+        if (stack.getCount() >= refillThr.getValue()) return false;
 
         for (int i = 9; i < 36; ++i) {
             ItemStack item = mc.player.getInventory().getStack(i);

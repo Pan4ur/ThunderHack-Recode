@@ -1,7 +1,6 @@
 package thunder.hack.modules.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BeaconBlockEntity;
@@ -14,12 +13,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.TntEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec2f;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.RadarRewrite;
 import thunder.hack.injection.accesors.IBeaconBlockEntity;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -29,29 +30,28 @@ import thunder.hack.utility.render.Render3DEngine;
 import java.awt.*;
 
 public class ESP extends Module {
-
     public ESP() {
         super("ESP", Category.RENDER);
     }
 
     private final Setting<Boolean> lingeringPotions = new Setting<>("LingeringPotions", false);
     private final Setting<Boolean> tntFuse = new Setting<>("TNTFuse", false);
-    private Setting<Float> tntrange = new Setting<>("TNTRange",8.0f,0f,8f);
-    private final Setting<ColorSetting> tntFuseText = new Setting<>("TNTFuseText", new ColorSetting(new Color(-1)),v-> tntFuse.getValue());
+    private Setting<Float> tntrange = new Setting<>("TNTRange", 8.0f, 0f, 8f);
+    private final Setting<ColorSetting> tntFuseText = new Setting<>("TNTFuseText", new ColorSetting(new Color(-1)), v -> tntFuse.getValue());
     private final Setting<Boolean> tntRadius = new Setting<>("TNTRadius", false);
-    private final Setting<ColorSetting> tntRadiusColor = new Setting<>("TNTSphereColor", new ColorSetting(new Color(-1)),v-> tntRadius.getValue());
+    private final Setting<ColorSetting> tntRadiusColor = new Setting<>("TNTSphereColor", new ColorSetting(new Color(-1)), v -> tntRadius.getValue());
     private final Setting<Boolean> beaconRadius = new Setting<>("BeaconRadius", false);
-    private final Setting<ColorSetting> sphereColor = new Setting<>("SphereColor", new ColorSetting(new Color(-1)),v-> beaconRadius.getValue());
-    private final Setting<ColorSetting> beakonColor = new Setting<>("BeakonColor", new ColorSetting(new Color(-1)),v-> beaconRadius.getValue());
+    private final Setting<ColorSetting> sphereColor = new Setting<>("SphereColor", new ColorSetting(new Color(-1)), v -> beaconRadius.getValue());
+    private final Setting<ColorSetting> beakonColor = new Setting<>("BeakonColor", new ColorSetting(new Color(-1)), v -> beaconRadius.getValue());
     private final Setting<Boolean> burrow = new Setting<>("Burrow", false);
-    private final Setting<ColorSetting> burrowTextColor = new Setting<>("BurrowTextColor", new ColorSetting(new Color(-1)),v-> burrow.getValue());
-    private final Setting<ColorSetting> burrowColor = new Setting<>("BurrowColor", new ColorSetting(new Color(-1)),v-> burrow.getValue());
+    private final Setting<ColorSetting> burrowTextColor = new Setting<>("BurrowTextColor", new ColorSetting(new Color(-1)), v -> burrow.getValue());
+    private final Setting<ColorSetting> burrowColor = new Setting<>("BurrowColor", new ColorSetting(new Color(-1)), v -> burrow.getValue());
     private final Setting<Boolean> pearls = new Setting<>("Pearls", false);
 
-    public void onRender3D(MatrixStack stack){
-        if(lingeringPotions.getValue()){
-            for(Entity ent : mc.world.getEntities()){
-                if(ent instanceof AreaEffectCloudEntity aece){
+    public void onRender3D(MatrixStack stack) {
+        if (lingeringPotions.getValue()) {
+            for (Entity ent : mc.world.getEntities()) {
+                if (ent instanceof AreaEffectCloudEntity aece) {
                     double x = aece.getX() - mc.getEntityRenderDispatcher().camera.getPos().getX();
                     double y = aece.getY() - mc.getEntityRenderDispatcher().camera.getPos().getY();
                     double z = aece.getZ() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
@@ -59,8 +59,7 @@ public class ESP extends Module {
                     float middle = aece.getRadius();
 
                     stack.push();
-                    stack.translate(x,y,z);
-
+                    stack.translate(x, y, z);
 
                     Tessellator tessellator = Tessellator.getInstance();
                     BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -71,25 +70,24 @@ public class ESP extends Module {
                     for (int i = 0; i <= 360; i += 6) {
                         double v = Math.sin(Math.toRadians(i));
                         double u = Math.cos(Math.toRadians(i));
-                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(aece.getColor()),100).getRGB()).next();
-                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), 0, 0, 0).color(Render2DEngine.injectAlpha(new Color(aece.getColor()),0).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(aece.getColor()), 100).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), 0, 0, 0).color(Render2DEngine.injectAlpha(new Color(aece.getColor()), 0).getRGB()).next();
                     }
                     tessellator.draw();
-
 
                     RenderSystem.setShader(GameRenderer::getPositionColorProgram);
                     bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
                     for (int i = 0; i <= 360; i += 6) {
                         double v = Math.sin(Math.toRadians(i));
                         double u = Math.cos(Math.toRadians(i));
-                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(aece.getColor()),255).getRGB()).next();
-                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * (middle - 0.04f), (float) 0, (float) v * (middle - 0.04f)).color(Render2DEngine.injectAlpha(new Color(aece.getColor()),255).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(aece.getColor()), 255).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * (middle - 0.04f), (float) 0, (float) v * (middle - 0.04f)).color(Render2DEngine.injectAlpha(new Color(aece.getColor()), 255).getRGB()).next();
                     }
                     tessellator.draw();
 
                     Render3DEngine.cleanup();
                     RenderSystem.enableDepthTest();
-                    stack.translate(-x,-y,-z);
+                    stack.translate(-x, -y, -z);
                     stack.pop();
 
                     RenderSystem.disableDepthTest();
@@ -105,7 +103,7 @@ public class ESP extends Module {
                     matrices.translate(0, 0, 0);
                     matrices.scale(-0.05f, -0.05f, 0);
                     VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-                    FontRenderers.modules.drawCenteredString(matrices, String.format("%.1f",((aece.getRadius() * 10) - 5f)), 0, -10f, -1);
+                    FontRenderers.modules.drawCenteredString(matrices, String.format("%.1f", ((aece.getRadius() * 10) - 5f)), 0, -10f, -1);
                     immediate.draw();
                     RenderSystem.disableBlend();
                     RenderSystem.enableDepthTest();
@@ -113,28 +111,28 @@ public class ESP extends Module {
             }
         }
 
-        if(beaconRadius.getValue()){
-            for(BlockEntity be : StorageEsp.getBlockEntities()) {
-                if(be instanceof BeaconBlockEntity bbe) {
+        if (beaconRadius.getValue()) {
+            for (BlockEntity be : StorageEsp.getBlockEntities()) {
+                if (be instanceof BeaconBlockEntity bbe) {
                     double x = be.getPos().getX() - mc.getEntityRenderDispatcher().camera.getPos().getX();
                     double y = be.getPos().getY() - mc.getEntityRenderDispatcher().camera.getPos().getY();
                     double z = be.getPos().getZ() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
 
-                    Render3DEngine.drawBoxOutline(new Box(be.getPos()),beakonColor.getValue().getColorObject(),2);
-                    int level = ((IBeaconBlockEntity)bbe).getLevel();
+                    Render3DEngine.drawBoxOutline(new Box(be.getPos()), beakonColor.getValue().getColorObject(), 2);
+                    int level = ((IBeaconBlockEntity) bbe).getLevel();
                     float range = level == 1.0F ? 19.0F : (level == 2.0F ? 29.0F : (level == 3.0F ? 40.0F : (level == 4.0F ? 51.f : 0.0F)));
 
                     stack.push();
                     stack.translate(x, y, z);
-                    Render3DEngine.drawSphere(stack, range, 20, 20,sphereColor.getValue().getColor());
+                    Render3DEngine.drawSphere(stack, range, 20, 20, sphereColor.getValue().getColor());
                     stack.translate(-x, -y, -z);
                     stack.pop();
                 }
             }
         }
 
-        if(burrow.getValue()){
-            for (PlayerEntity pl : mc.world.getPlayers()){
+        if (burrow.getValue()) {
+            for (PlayerEntity pl : mc.world.getPlayers()) {
                 BlockPos blockPos = BlockPos.ofFloored(pl.getPos());
                 Block block = mc.world.getBlockState(blockPos).getBlock();
 
@@ -142,13 +140,13 @@ public class ESP extends Module {
                 double y = blockPos.getY() - mc.getEntityRenderDispatcher().camera.getPos().getY();
                 double z = blockPos.getZ() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
 
-                if(block == Blocks.OBSIDIAN
+                if (block == Blocks.OBSIDIAN
                         || block == Blocks.CRYING_OBSIDIAN
                         || block == Blocks.ANVIL
                         || block == Blocks.PLAYER_HEAD
                         || block == Blocks.SKELETON_SKULL
-                        || block == Blocks.WITHER_SKELETON_SKULL){
-                    Render3DEngine.drawBoxOutline(new Box(blockPos),burrowColor.getValue().getColorObject(),2);
+                        || block == Blocks.WITHER_SKELETON_SKULL) {
+                    Render3DEngine.drawBoxOutline(new Box(blockPos), burrowColor.getValue().getColorObject(), 2);
                     RenderSystem.disableDepthTest();
                     MatrixStack matrices = new MatrixStack();
                     Camera camera = mc.gameRenderer.getCamera();
@@ -170,14 +168,14 @@ public class ESP extends Module {
             }
         }
 
-        if(tntFuse.getValue() || tntRadius.getValue()){
-            for(Entity ent : mc.world.getEntities()) {
+        if (tntFuse.getValue() || tntRadius.getValue()) {
+            for (Entity ent : mc.world.getEntities()) {
                 if (ent instanceof TntEntity tnt) {
                     double x = tnt.prevX + (tnt.getPos().getX() - tnt.prevX) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getX();
                     double y = tnt.prevY + (tnt.getPos().getY() - tnt.prevY) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getY();
                     double z = tnt.prevZ + (tnt.getPos().getZ() - tnt.prevZ) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
 
-                    if(tntFuse.getValue()) {
+                    if (tntFuse.getValue()) {
                         RenderSystem.disableDepthTest();
                         MatrixStack matrices = new MatrixStack();
                         Camera camera = mc.gameRenderer.getCamera();
@@ -197,10 +195,10 @@ public class ESP extends Module {
                         RenderSystem.enableDepthTest();
                     }
 
-                    if(tntRadius.getValue()) {
+                    if (tntRadius.getValue()) {
                         stack.push();
                         stack.translate(x, y, z);
-                        Render3DEngine.drawSphere(stack, tntrange.getValue(), 20, 20,tntRadiusColor.getValue().getColor());
+                        Render3DEngine.drawSphere(stack, tntrange.getValue(), 20, 20, tntRadiusColor.getValue().getColor());
                         stack.translate(-x, -y, -z);
                         stack.pop();
                     }
@@ -209,8 +207,8 @@ public class ESP extends Module {
         }
     }
 
-    public void onRender2D(DrawContext context){
-        if(pearls.getValue()) {
+    public void onRender2D(DrawContext context) {
+        if (pearls.getValue()) {
             for (Entity ent : mc.world.getEntities()) {
                 if (ent instanceof EnderPearlEntity pearl) {
                     float xOffset = mc.getWindow().getScaledWidth() / 2f;
@@ -228,7 +226,7 @@ public class ESP extends Module {
                     context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-yaw));
                     context.getMatrices().translate(-xOffset, -yOffset, 0.0F);
                     RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-                    FontRenderers.modules.drawCenteredString(context.getMatrices(), String.format("%.1f",mc.player.distanceTo(pearl)) + "m", (float) (Math.sin(Math.toRadians(yaw)) * 50f) + xOffset, (float) (yOffset - (Math.cos(Math.toRadians(yaw)) * 50f)) - 20, -1);
+                    FontRenderers.modules.drawCenteredString(context.getMatrices(), String.format("%.1f", mc.player.distanceTo(pearl)) + "m", (float) (Math.sin(Math.toRadians(yaw)) * 50f) + xOffset, (float) (yOffset - (Math.cos(Math.toRadians(yaw)) * 50f)) - 20, -1);
                 }
             }
         }

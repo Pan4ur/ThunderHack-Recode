@@ -18,20 +18,15 @@ public class WaterSpeed extends Module {
 
     private float acceleration = 0f;
 
-
     public enum Mode {
         HollyWorld, HollyWorld2
     }
 
-
     @Override
     public void onUpdate() {
         if (mode.getValue() == Mode.HollyWorld) {
-            if (mc.player.isSwimming()) {
-                mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, 2, 2));
-            } else {
-                mc.player.removeStatusEffect(StatusEffects.DOLPHINS_GRACE);
-            }
+            if (mc.player.isSwimming()) mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, 2, 2));
+            else mc.player.removeStatusEffect(StatusEffects.DOLPHINS_GRACE);
         }
     }
 
@@ -40,14 +35,13 @@ public class WaterSpeed extends Module {
         if (mode.getValue() == Mode.HollyWorld2) {
             if (mc.player.isSwimming()) {
                 double[] dirSpeed = MovementUtility.forward(acceleration / (mc.player.input.movementSideways != 0 ? 2.2f : 2f));
-                e.set_x(e.get_x() + dirSpeed[0]);
-                e.set_z(e.get_z() + dirSpeed[1]);
+                e.setX(e.getX() + dirSpeed[0]);
+                e.setZ(e.getZ() + dirSpeed[1]);
                 e.cancel();
                 acceleration += 0.05f;
                 acceleration = MathUtility.clamp(acceleration, 0f, 1f);
             } else acceleration = 0f;
-            if (!MovementUtility.isMoving())
-                acceleration = 0f;
+            if (!MovementUtility.isMoving()) acceleration = 0f;
         }
     }
 
@@ -57,5 +51,4 @@ public class WaterSpeed extends Module {
             mc.player.removeStatusEffect(StatusEffects.DOLPHINS_GRACE);
         }
     }
-
 }

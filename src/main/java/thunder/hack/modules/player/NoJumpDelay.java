@@ -12,8 +12,8 @@ public class NoJumpDelay extends Module {
     private final Setting<Integer> delay = new Setting<>("Delay", 1, 0, 4);
 
     @Override
-    public void onUpdate(){
-        if(((ILivingEntity)mc.player).getLastJumpCooldown() > delay.getValue()){
+    public void onUpdate() {
+        if (((ILivingEntity)mc.player).getLastJumpCooldown() > delay.getValue()) {
             ((ILivingEntity)mc.player).setLastJumpCooldown(delay.getValue());
         }
     }

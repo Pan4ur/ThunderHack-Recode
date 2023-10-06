@@ -7,18 +7,18 @@ import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.SearchInvResult;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
+
 public class ElytraSwap extends Module {
     public ElytraSwap() {
         super("ElytraSwap", Category.PLAYER);
     }
-
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Enable);
     private final Setting<Bind> switchButton = new Setting<>("SwitchButton", new Bind(-1, false, false), v -> mode.getValue() == Mode.Bind);
@@ -65,19 +65,19 @@ public class ElytraSwap extends Module {
             hotbarFireWorkResult.switchTo();
         } else if (fireWorkResult.found()) {
             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, fireWorkResult.slot(), mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-            mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+            sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
         } else {
-            sendMessage(MainSettings.isRu() ? "У тебя нет фейерверков!" : "You don't have rockets!");
+            sendMessage(isRu() ? "У тебя нет фейерверков!" : "You've got no fireworks!");
             return;
         }
 
         mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
 
-        if(fireWorkMode.getValue() == FireWorkMode.Silent){
+        if (fireWorkMode.getValue() == FireWorkMode.Silent) {
             InventoryUtility.returnSlot();
-            if(!hotbarFireWorkResult.found()){
+            if (!hotbarFireWorkResult.found()) {
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, fireWorkResult.slot(), mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
             }
         }
     }
@@ -100,9 +100,9 @@ public class ElytraSwap extends Module {
                 clickSlot(slot);
                 clickSlot(6);
                 clickSlot(slot);
-                mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
             } else {
-                disable(MainSettings.isRu() ? "У тебя нет нагрудника!" : "You don't have chestplate!");
+                disable(isRu() ? "У тебя нет нагрудника!" : "You don't have a chestplate!");
                 return;
             }
         } else if (InventoryUtility.getItemSlot(Items.ELYTRA) != -1) {
@@ -110,13 +110,12 @@ public class ElytraSwap extends Module {
             clickSlot(slot);
             clickSlot(6);
             clickSlot(slot);
-            mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+            sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
         } else {
-            disable(MainSettings.isRu() ? "У тебя нет элитры!" : "You don't have elytra!");
+            disable(isRu() ? "У тебя нет элитры!" : "You don't have an elytra!");
             return;
         }
 
-        if (disable)
-            disable(MainSettings.isRu() ? "Свапнул! Отключаю.." : "Swapped! Disabling..");
+        if (disable) disable(isRu() ? "Свапнул! Отключаю.." : "Swapped! Disabling..");
     }
 }

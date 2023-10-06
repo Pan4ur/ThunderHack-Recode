@@ -1,6 +1,5 @@
 package thunder.hack.modules.movement;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
@@ -20,9 +19,8 @@ import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.PlayerUtility;
 
 public class Spider extends Module {
-
     public final Setting<Integer> delay = new Setting("delay", 2, 1, 15);
-    private final Setting<mode> a = new Setting("Mode", mode.Matrix);
+    private final Setting<Mode> mode = new Setting("Mode", Mode.Matrix);
 
     public Spider() {
         super("Spider", "можно по стенам хуярить-как черт", Category.MOVEMENT);
@@ -45,27 +43,23 @@ public class Spider extends Module {
     public void onUpdate() {
         if (!mc.player.horizontalCollision) return;
 
-        if (a.getValue() == mode.Default) {
+        if (mode.getValue() == Mode.Default) {
             mc.player.setVelocity(mc.player.getVelocity().offset(Direction.UP,0.2));
-        } else if (a.getValue() == mode.Matrix) {
-            if (mc.player.age % delay.getValue() == 0) {
-                mc.player.setOnGround(true);
-            } else {
-                mc.player.setOnGround(false);
-            }
+        } else if (mode.getValue() == Mode.Matrix) {
+            if (mc.player.age % delay.getValue() == 0) mc.player.setOnGround(true);
+            else mc.player.setOnGround(false);
             mc.player.prevY -= 2.0E-232;
             if (mc.player.isOnGround()) mc.player.setVelocity(mc.player.getVelocity().offset(Direction.UP,0.42));
         }
     }
 
-
     @EventHandler
     public void onSync(EventSync event) {
-        if (mc.options.jumpKey.isPressed() && mc.player.getVelocity().getY() <= -0.3739040364667221 && a.getValue() == mode.MatrixNew) {
+        if (mc.options.jumpKey.isPressed() && mc.player.getVelocity().getY() <= -0.3739040364667221 && mode.getValue() == Mode.MatrixNew) {
             mc.player.setOnGround(true);
             mc.player.setVelocity(mc.player.getVelocity().offset(Direction.UP,0.481145141919180));
         }
-        if (mc.player.age % delay.getValue() == 0 && mc.player.horizontalCollision && MovementUtility.isMoving() && a.getValue() == mode.Blocks) {
+        if (mc.player.age % delay.getValue() == 0 && mc.player.horizontalCollision && MovementUtility.isMoving() && mode.getValue() == Mode.Blocks) {
             int find = -2;
             for (int i = 0; i <= 8; i++)
                 if (mc.player.getInventory().getStack(i).getItem() instanceof BlockItem) find = i;
@@ -73,25 +67,25 @@ public class Spider extends Module {
             BlockPos pos = BlockPos.ofFloored(mc.player.getX(), mc.player.getY() + 2, mc.player.getZ());
             Direction side = getPlaceableSide(pos);
             if (side != null) {
-                mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(find));
+                sendPacket(new UpdateSelectedSlotC2SPacket(find));
                 BlockPos neighbour = BlockPos.ofFloored(mc.player.getX(), mc.player.getY() + 2, mc.player.getZ()).offset(side);
                 Direction opposite = side.getOpposite();
                 Vec3d hitVec = new Vec3d(neighbour.getX() + 0.5, neighbour.getY() + 0.5, neighbour.getZ() + 0.5).add(new Vec3d(opposite.getUnitVector()).multiply(0.5));
-                mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket( Hand.MAIN_HAND, new BlockHitResult(hitVec, opposite, neighbour, false), PlayerUtility.getWorldActionId(mc.world)));
-                mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
+                sendPacket(new PlayerInteractBlockC2SPacket( Hand.MAIN_HAND, new BlockHitResult(hitVec, opposite, neighbour, false), PlayerUtility.getWorldActionId(mc.world)));
+                sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
                 if (mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos()).add(0, 2, 0)).getBlock() != Blocks.AIR) {
-                    mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, neighbour, opposite));
-                    mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, neighbour, opposite));
+                    sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, neighbour, opposite));
+                    sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, neighbour, opposite));
                 }
-                mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
+                sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
             }
             mc.player.setOnGround(true);
             mc.player.jump();
-            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+            sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
         }
     }
 
-    public enum mode {
+    public enum Mode {
         Default, Matrix, MatrixNew, Blocks
     }
 }

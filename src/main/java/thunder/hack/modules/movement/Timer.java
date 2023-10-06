@@ -3,7 +3,6 @@ package thunder.hack.modules.movement;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
-import net.minecraft.network.packet.s2c.common.KeepAliveS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.MathHelper;
 import thunder.hack.ThunderHack;
@@ -11,11 +10,12 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.PostPlayerUpdateEvent;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.MovementUtility;
+
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class Timer extends Module {
     private static final Setting<Mode> mode = new Setting<>("Mode", Mode.NORMAL);
@@ -71,9 +71,8 @@ public class Timer extends Module {
             if (violation < 90f / speed.getValue()) {
                 violation += decreaseRate.getValue();
                 violation = MathHelper.clamp(violation, 0.0f, 100f / speed.getValue());
-            } else {
-                disable(MainSettings.isRu() ? "Заряд таймера кончился! Отключаю.." : "Timer's out of charge! Disabling..");
-            }
+            } else
+                disable(isRu() ? "Заряд таймера кончился! Отключаю.." : "Timer's out of charge! Disabling..");
         } else if (mode.getValue() == Mode.NORMAL) {
             ThunderHack.TICK_TIMER = speed.getValue();
         } else {
@@ -106,7 +105,7 @@ public class Timer extends Module {
             }
             if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
                 violation = 40f;
-                disable(MainSettings.isRu() ? "выключен т.к. ты получил велосити!" : "disabled because you got velocity packet!");
+                disable(isRu() ? "Отключён т.к. ты получил велосити!" : "Disabled because you got velocity packet!");
             }
         }
     }
@@ -117,20 +116,18 @@ public class Timer extends Module {
             int status = MathUtility.clamp((int) (100 - Math.min(violation, 100)), 0, 100);
 
             if (status < 90f) {
-                disable(MainSettings.isRu() ? "Перед повторным использованием необходимо постоять на месте!" : "Standing still is required before reuse!");
+                disable(isRu() ? "Перед повторным использованием необходимо постоять на месте!" : "Standing still is required before reuse!");
                 return;
             }
             event.setCancelled(true);
             event.setIterations(shiftTicks.getValue());
             violation = 40f;
-            disable(MainSettings.isRu() ? "Тики пропущены! Отключаю.." : "Ticks shifted! Disabling..");
+            disable(isRu() ? "Тики пропущены! Отключаю.." : "Ticks shifted! Disabling..");
         }
     }
 
     public static void onEntitySync(EventSync e) {
-        if (mode.getValue() == Mode.GrimFunnyGame) {
-            return;
-        }
+        if (mode.getValue() == Mode.GrimFunnyGame) return;
         violation = notMoving() ? (float) (violation - (decreaseRate.getValue() + 0.4)) : violation - (addOnTheMove.getValue() / 10.0f);
         violation = (float) MathHelper.clamp(violation, 0.0, Math.floor(100f / ThunderHack.TICK_TIMER));
         prevPosX = mc.player.getX();
@@ -143,7 +140,6 @@ public class Timer extends Module {
     private static boolean notMoving() {
         return prevPosX == mc.player.getX() && prevPosY == mc.player.getY() && prevPosZ == mc.player.getZ() && yaw == mc.player.getYaw() && pitch == mc.player.getPitch();
     }
-
 
     public enum Mode {
         NORMAL,

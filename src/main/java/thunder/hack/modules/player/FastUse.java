@@ -9,7 +9,7 @@ import net.minecraft.item.Items;
 
 public class FastUse extends Module {
     public FastUse() {
-        super("FastUse", "убирает задержку-испольования пкм", Category.PLAYER);
+        super("FastUse", "Убирает задержку испольования айтемов", Category.PLAYER);
     }
 
     private final Setting<Integer> delay = new Setting<>("Delay", 0, 0, 20);
@@ -20,13 +20,12 @@ public class FastUse extends Module {
 
     @Override
     public void onUpdate() {
-        if(check(mc.player.getMainHandStack().getItem())){
-            if (((IMinecraftClient)mc).getUseCooldown() > delay.getValue())
-                ((IMinecraftClient)mc).setUseCooldown(delay.getValue());
-        }
+        if (check(mc.player.getMainHandStack().getItem()))
+            ((IMinecraftClient) mc).setUseCooldown(delay.getValue());
+
     }
 
-    public boolean check(Item item){
+    public boolean check(Item item) {
         return (item instanceof BlockItem && blocks.getValue())
                 || (item == Items.END_CRYSTAL && crystals.getValue())
                 || (item == Items.EXPERIENCE_BOTTLE && xp.getValue())

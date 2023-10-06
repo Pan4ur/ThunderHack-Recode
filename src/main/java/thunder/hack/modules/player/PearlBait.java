@@ -14,7 +14,7 @@ public class PearlBait extends Module {
     }
 
     @EventHandler
-    public void OnEntitySpawn(EventEntitySpawn e) {
+    public void onEntitySpawn(EventEntitySpawn e) {
         if (e.getEntity() instanceof EnderPearlEntity)
             mc.world.getPlayers().stream()
                     .min(Comparator.comparingDouble((p) -> p.squaredDistanceTo(e.getEntity().getPos())))
