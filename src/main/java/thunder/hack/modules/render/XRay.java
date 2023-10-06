@@ -125,7 +125,7 @@ public class XRay extends Module {
         }
     }
 
-    void draw(MatrixStack stack, BlockPos pos, int r, int g, int b) {
+    private void draw(MatrixStack stack, BlockPos pos, int r, int g, int b) {
         Render3DEngine.drawFilledBox(stack, new Box(pos), new Color(r, g, b, 100));
         Render3DEngine.drawBoxOutline(new Box(pos), new Color(r, g, b, 200), 2);
     }
