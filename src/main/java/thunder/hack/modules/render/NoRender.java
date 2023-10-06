@@ -24,6 +24,8 @@ import thunder.hack.setting.Setting;
 import java.util.ArrayList;
 import java.util.List;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
+
 public class NoRender extends Module {
     public NoRender() {
         super("NoRender", "NoRender", Category.RENDER);
@@ -54,9 +56,7 @@ public class NoRender extends Module {
     public Setting<Boolean> antiTitle = new Setting<>("AntiTitle", false);
     public Setting<Boolean> antiPlayerCollision = new Setting<>("AntiPlayerCollision", true);
 
-
     int potionCouter, xpCounter, arrowCounter, itemsCounter;
-
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
@@ -70,62 +70,48 @@ public class NoRender extends Module {
         for (Entity ent : mc.world.getEntities()) {
             if (ent instanceof PotionEntity) {
                 potionCouter++;
-                if (potions.getValue())
-                    mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
+                if (potions.getValue()) mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
             }
             if (ent instanceof ExperienceBottleEntity) {
                 xpCounter++;
-                if (xp.getValue())
-                    mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
+                if (xp.getValue()) mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
             }
             if (ent instanceof EndCrystalEntity) {
-                if (crystals.getValue())
-                    mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
+                if (crystals.getValue()) mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
             }
             if (ent instanceof ArrowEntity) {
                 arrowCounter++;
-                if (arrows.getValue())
-                    mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
+                if (arrows.getValue()) mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
             }
             if (ent instanceof EggEntity) {
-                if (eggs.getValue())
-                    mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
+                if (eggs.getValue()) mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
             }
             if (ent instanceof ItemEntity) {
                 itemsCounter++;
-                if (items.getValue())
-                    mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
+                if (items.getValue()) mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
             }
         }
         if (auto.getValue()) {
             if (arrowCounter > 64)
-                ThunderHack.notificationManager.publicity("NoRender", "Превышен лимит стрел! Удаляю...", 3, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("NoRender", isRu() ? "Превышен лимит стрел! Удаляю..." : "Arrows limit reached! Removing...", 3, Notification.Type.SUCCESS);
 
             if (itemsCounter > 16)
-                ThunderHack.notificationManager.publicity("NoRender", "Превышен лимит вещей! Удаляю...", 3, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("NoRender", isRu() ? "Превышен лимит вещей! Удаляю..." : "Item limit reached! Removing...", 3, Notification.Type.SUCCESS);
 
             if (xpCounter > 16)
-                ThunderHack.notificationManager.publicity("NoRender", "Превышен лимит пузырьков опыта! Удаляю...", 3, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("NoRender", isRu() ? "Превышен лимит пузырьков опыта! Удаляю..." : "XP orbs limit reached! Removing...", 3, Notification.Type.SUCCESS);
 
             if (potionCouter > 8)
-                ThunderHack.notificationManager.publicity("NoRender", "Превышен лимит зелий! Удаляю...", 3, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("NoRender", isRu() ? "Превышен лимит зелий! Удаляю..." : "Potions limit reached! Removing...", 3, Notification.Type.SUCCESS);
 
 
             List<Integer> toRemove = new ArrayList<>();
 
             for (Entity ent : mc.world.getEntities()) {
-                if (ent instanceof ArrowEntity && arrowCounter > 64) {
-                    toRemove.add(ent.getId());
-                }
-                if (ent instanceof ItemEntity && itemsCounter > 16) {
-                    toRemove.add(ent.getId());
-                }
-                if (ent instanceof ExperienceBottleEntity && xpCounter > 16) {
-                    toRemove.add(ent.getId());
-                }
-                if (ent instanceof PotionEntity && potionCouter > 8) {
-                    toRemove.add(ent.getId());
-                }
+                if (ent instanceof ArrowEntity && arrowCounter > 64) toRemove.add(ent.getId());
+                if (ent instanceof ItemEntity && itemsCounter > 16) toRemove.add(ent.getId());
+                if (ent instanceof ExperienceBottleEntity && xpCounter > 16) toRemove.add(ent.getId());
+                if (ent instanceof PotionEntity && potionCouter > 8) toRemove.add(ent.getId());
             }
 
             try {
@@ -142,15 +128,10 @@ public class NoRender extends Module {
 
 
     @EventHandler
-    public void onParticle(ParticleEvent.AddParticle event) {
-        if (elderGuardian.getValue() && event.particle instanceof ElderGuardianAppearanceParticle) {
-            event.setCancelled(true);
-        } else if (explosions.getValue() && event.particle instanceof ExplosionLargeParticle) {
-            event.setCancelled(true);
-        } else if (campFire.getValue() && event.particle instanceof CampfireSmokeParticle) {
-            event.setCancelled(true);
-        } else if (fireworks.getValue() && (event.particle instanceof FireworksSparkParticle.FireworkParticle || event.particle instanceof FireworksSparkParticle.Flash)) {
-            event.setCancelled(true);
-        }
+    public void onParticle(ParticleEvent.AddParticle e) {
+        if (elderGuardian.getValue() && e.particle instanceof ElderGuardianAppearanceParticle) e.setCancelled(true);
+        else if (explosions.getValue() && e.particle instanceof ExplosionLargeParticle) e.setCancelled(true);
+        else if (campFire.getValue() && e.particle instanceof CampfireSmokeParticle) e.setCancelled(true);
+        else if (fireworks.getValue() && (e.particle instanceof FireworksSparkParticle.FireworkParticle || e.particle instanceof FireworksSparkParticle.Flash)) e.setCancelled(true);
     }
 }

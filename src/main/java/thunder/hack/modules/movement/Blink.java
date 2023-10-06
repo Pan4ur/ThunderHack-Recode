@@ -64,13 +64,9 @@ public class Blink extends Module {
     @Override
     public void onDisable() {
         if (mc.world == null || mc.player == null) return;
-        while (!storedPackets.isEmpty()) {
-            mc.player.networkHandler.sendPacket(storedPackets.poll());
-        }
+        while (!storedPackets.isEmpty()) sendPacket(storedPackets.poll());
 
-        if (blinkPlayer != null) {
-            blinkPlayer.deSpawn();
-        }
+        if (blinkPlayer != null) blinkPlayer.deSpawn();
         blinkPlayer = null;
     }
 

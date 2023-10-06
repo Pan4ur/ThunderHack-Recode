@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
+
 public class Search extends Module {
     public static CopyOnWriteArrayList<BlockVec> blocks = new CopyOnWriteArrayList<>();
     public static ArrayList<Block> defaultBlocks = new ArrayList<>();
@@ -61,7 +63,8 @@ public class Search extends Module {
 
     public void onRender3D(MatrixStack stack) {
         if (fullNullCheck() || blocks.isEmpty()) return;
-        if (FrameRateCounter.INSTANCE.getFps() < 10 && mc.player.age > 100) disable("Saving ur pc :)");
+        if (FrameRateCounter.INSTANCE.getFps() < 10 && mc.player.age > 100)
+            disable(isRu() ? "Спасаем твой ПК :)" : "Saving ur pc :)");
 
         if (fill.getValue() || outline.getValue()) {
             for (BlockVec vec : blocks) {
@@ -74,7 +77,6 @@ public class Search extends Module {
 
                 if (fill.getValue())
                     Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(new Box(pos), color.getValue().getColorObject()));
-
 
                 if (outline.getValue())
                     Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(new Box(pos), color.getValue().getColorObject(), 2f));
@@ -99,12 +101,8 @@ public class Search extends Module {
     }
 
     private boolean shouldAdd(Block block, BlockPos pos) {
-        if (defaultBlocks.contains(block)) {
-            return true;
-        }
-        if (illegals.getValue()) {
-            return isIllegal(block, pos);
-        }
+        if (defaultBlocks.contains(block)) return true;
+        if (illegals.getValue()) return isIllegal(block, pos);
         return false;
     }
 
@@ -113,9 +111,7 @@ public class Search extends Module {
             return true;
         }
 
-        if (illegals.getValue()) {
-            return isIllegal(mc.world.getBlockState(new BlockPos((int) vec.x, (int) vec.y, (int) vec.z)).getBlock(), new BlockPos((int) vec.x, (int) vec.y, (int) vec.z));
-        }
+        if (illegals.getValue()) return isIllegal(mc.world.getBlockState(new BlockPos((int) vec.x, (int) vec.y, (int) vec.z)).getBlock(), new BlockPos((int) vec.x, (int) vec.y, (int) vec.z));
 
         return false;
     }
@@ -133,14 +129,12 @@ public class Search extends Module {
         return false;
     }
 
-
     public boolean isHell() {
         if (mc.world == null) return false;
         return Objects.equals(mc.world.getRegistryKey().getValue().getPath(), "the_nether");
     }
 
     private record BlockVec(double x, double y, double z) {
-
         public double getDistance(@NotNull BlockVec v) {
             double dx = x - v.x;
             double dy = y - v.y;
@@ -171,9 +165,7 @@ public class Search extends Module {
 
                         blocks.clear();
                         blocks.addAll(bloks);
-                    } else {
-                        Thread.yield();
-                    }
+                    } else Thread.yield();
                 } catch (Exception ignored) {
                 }
             }

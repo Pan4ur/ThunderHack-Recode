@@ -1,6 +1,5 @@
 package thunder.hack.modules.movement;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.effect.StatusEffects;
 import thunder.hack.events.impl.EventMove;
@@ -18,13 +17,9 @@ public class LevitationControl extends Module {
     public void onMove(EventMove e) {
         if (mc.player.hasStatusEffect(StatusEffects.LEVITATION)) {
             int amplifier = mc.player.getStatusEffect(StatusEffects.LEVITATION).getAmplifier();
-            if (mc.options.jumpKey.isPressed()) {
-                e.set_y(((0.05D * (double) (amplifier + 1) - e.get_y()) * 0.2D) * upAmplifier.getValue() * 100);
-            } else if (mc.options.sneakKey.isPressed()) {
-                e.set_y(-(((0.05D * (double) (amplifier + 1) - e.get_y()) * 0.2D) * downAmplifier.getValue() * 100));
-            } else {
-                e.set_y(0);
-            }
+            if (mc.options.jumpKey.isPressed()) e.setY(((0.05D * (double) (amplifier + 1) - e.getY()) * 0.2D) * upAmplifier.getValue() * 100);
+            else if (mc.options.sneakKey.isPressed()) e.setY(-(((0.05D * (double) (amplifier + 1) - e.getY()) * 0.2D) * downAmplifier.getValue() * 100));
+            else e.setY(0);
             e.cancel();
         }
     }

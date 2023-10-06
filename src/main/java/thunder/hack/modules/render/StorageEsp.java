@@ -1,29 +1,26 @@
 package thunder.hack.modules.render;
 
-import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.util.math.MatrixStack;
-import thunder.hack.modules.Module;
-import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.setting.Setting;
-import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.entity.*;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.chunk.WorldChunk;
+import org.jetbrains.annotations.Nullable;
+import thunder.hack.modules.Module;
+import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class StorageEsp extends Module {
     public StorageEsp() {
         super("StorageEsp", "StorageEsp", Category.RENDER);
     }
 
-
     public final Setting<Boolean> outline = new Setting<>("Outline", true);
     public final Setting<Boolean> fill = new Setting<>("Fill", true);
-
 
     public final Setting<Boolean> chest = new Setting<>("Chest", true);
     public final Setting<Boolean> dispenser = new Setting<>("Dispenser", false);
@@ -33,12 +30,12 @@ public class StorageEsp extends Module {
     public final Setting<Boolean> hopper = new Setting<>("Hopper", false);
     public final Setting<Boolean> barrels = new Setting<>("Barrel", false);
 
-    // public final Setting<Boolean> cart = new Setting<>("Minecart", false);
-   // public final Setting<Boolean> frame = new Setting<>("ItemFrame", false);
+    //public final Setting<Boolean> cart = new Setting<>("Minecart", false);
+    //public final Setting<Boolean> frame = new Setting<>("ItemFrame", false);
     private final Setting<ColorSetting> chestColor = new Setting<>("ChestColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> shulkColor = new Setting<>("ShulkerColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> echestColor = new Setting<>("EChestColor", new ColorSetting(0x8800FF00));
-   // private final Setting<ColorSetting> frameColor = new Setting<>("FrameColor", new ColorSetting(0x8800FF00));
+    //private final Setting<ColorSetting> frameColor = new Setting<>("FrameColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> shulkerframeColor = new Setting<>("ShulkFrameColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> furnaceColor = new Setting<>("FurnaceColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> hopperColor = new Setting<>("HopperColor", new ColorSetting(0x8800FF00));
@@ -49,29 +46,11 @@ public class StorageEsp extends Module {
 
     public void onRender3D(MatrixStack stack) {
         for (BlockEntity blockEntity : getBlockEntities()) {
-            Color color = null;
-
-            if (blockEntity instanceof TrappedChestBlockEntity && chest.getValue()) {
-                color = chestColor.getValue().getColorObject();
-            } else if (blockEntity instanceof ChestBlockEntity && chest.getValue()) {
-                color = chestColor.getValue().getColorObject();
-            } else if (blockEntity instanceof EnderChestBlockEntity && echest.getValue()) {
-                color = echestColor.getValue().getColorObject();
-            } else if (blockEntity instanceof BarrelBlockEntity && barrels.getValue()) {
-                color = barrelColor.getValue().getColorObject();
-            } else if (blockEntity instanceof ShulkerBoxBlockEntity && shulker.getValue()) {
-                color = shulkColor.getValue().getColorObject();
-            } else if (blockEntity instanceof AbstractFurnaceBlockEntity && furnace.getValue()) {
-                color = furnaceColor.getValue().getColorObject();
-            } else if (blockEntity instanceof DispenserBlockEntity && dispenser.getValue()) {
-                color = dispenserColor.getValue().getColorObject();
-            }else if (blockEntity instanceof HopperBlockEntity && hopper.getValue()) {
-                color = hopperColor.getValue().getColorObject();
-            }
+            Color color = getColor(blockEntity);
 
             if (color == null) continue;
 
-            Box chestbox =  new Box(
+            Box chestbox = new Box(
                     blockEntity.getPos().getX() + 0.06,
                     blockEntity.getPos().getY(),
                     blockEntity.getPos().getZ() + 0.06,
@@ -80,15 +59,14 @@ public class StorageEsp extends Module {
                     (blockEntity.getPos().getZ() + 0.94)
             );
 
-            if(fill.getValue()) {
-                if(blockEntity instanceof ChestBlockEntity){
-
+            if (fill.getValue()) {
+                if (blockEntity instanceof ChestBlockEntity) {
                     Render3DEngine.drawFilledBox(stack, chestbox, color);
-                } else if(blockEntity instanceof EnderChestBlockEntity){
+                } else if (blockEntity instanceof EnderChestBlockEntity) {
                     Render3DEngine.drawFilledBox(stack, chestbox, color);
                 } else Render3DEngine.drawFilledBox(stack, new Box(blockEntity.getPos()), color);
             }
-            if(outline.getValue()) {
+            if (outline.getValue()) {
                 if (blockEntity instanceof ChestBlockEntity) {
                     Render3DEngine.drawBoxOutline(chestbox, color, 1f);
                 } else if (blockEntity instanceof EnderChestBlockEntity) {
@@ -98,9 +76,32 @@ public class StorageEsp extends Module {
         }
     }
 
+    @Nullable
+    private Color getColor(BlockEntity bEnt) {
+        Color color = null;
+
+        if (bEnt instanceof TrappedChestBlockEntity && chest.getValue()) color = chestColor.getValue().getColorObject();
+        else if (bEnt instanceof ChestBlockEntity && chest.getValue())
+            color = chestColor.getValue().getColorObject();
+        else if (bEnt instanceof EnderChestBlockEntity && echest.getValue())
+            color = echestColor.getValue().getColorObject();
+        else if (bEnt instanceof BarrelBlockEntity && barrels.getValue())
+            color = barrelColor.getValue().getColorObject();
+        else if (bEnt instanceof ShulkerBoxBlockEntity && shulker.getValue())
+            color = shulkColor.getValue().getColorObject();
+        else if (bEnt instanceof AbstractFurnaceBlockEntity && furnace.getValue())
+            color = furnaceColor.getValue().getColorObject();
+        else if (bEnt instanceof DispenserBlockEntity && dispenser.getValue())
+            color = dispenserColor.getValue().getColorObject();
+        else if (bEnt instanceof HopperBlockEntity && hopper.getValue())
+            color = hopperColor.getValue().getColorObject();
+
+        return color;
+    }
+
     public static List<BlockEntity> getBlockEntities() {
         List<BlockEntity> list = new ArrayList<>();
-        for (WorldChunk chunk: getLoadedChunks())
+        for (WorldChunk chunk : getLoadedChunks())
             list.addAll(chunk.getBlockEntities().values());
 
         return list;
@@ -113,12 +114,9 @@ public class StorageEsp extends Module {
             for (int z = -viewDist; z <= viewDist; z++) {
                 WorldChunk chunk = mc.world.getChunkManager().getWorldChunk((int) mc.player.getX() / 16 + x, (int) mc.player.getZ() / 16 + z);
 
-                if (chunk != null) {
-                    chunks.add(chunk);
-                }
+                if (chunk != null) chunks.add(chunk);
             }
         }
-
         return chunks;
     }
 }

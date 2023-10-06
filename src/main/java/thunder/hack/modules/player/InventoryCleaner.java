@@ -1,6 +1,5 @@
 package thunder.hack.modules.player;
 
-
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -17,21 +16,17 @@ public class InventoryCleaner extends Module {
         super("InventoryCleaner", Category.PLAYER);
     }
 
-
     private static final List<Item> nexusShit = Arrays.asList(
             Items.PAPER, Items.OAK_SAPLING, Items.PLAYER_HEAD, Items.WOODEN_AXE,
             Items.KNOWLEDGE_BOOK, Items.BIRCH_SAPLING, Items.STONE_SHOVEL, Items.SPRUCE_SAPLING,
             Items.WHEAT_SEEDS, Items.TORCH, Items.BUCKET, Items.FLINT_AND_STEEL, Items.STICK
     );
 
-
-
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.NexusGrief);
 
     public enum Mode {
         NexusGrief
     }
-
 
     public final Setting<DropWhen> dropWhen = new Setting<>("DropWhen", DropWhen.NotInInventory);
 
@@ -43,11 +38,8 @@ public class InventoryCleaner extends Module {
     public void onUpdate() {
         boolean inInv = mc.currentScreen instanceof GenericContainerScreen;
 
-        if(dropWhen.getValue() == DropWhen.Inventory && !inInv)
-            return;
-
-        if(dropWhen.getValue() == DropWhen.NotInInventory && inInv)
-            return;
+        if (dropWhen.getValue() == DropWhen.Inventory && !inInv) return;
+        if (dropWhen.getValue() == DropWhen.NotInInventory && inInv) return;
 
         for (int slot = 0; slot < 36; slot++) {
             Item itemFromslot = mc.player.getInventory().getStack(slot).getItem();

@@ -20,15 +20,15 @@ public class NoCameraClip extends Module {
         animation.update();
     }
 
-    public void onRender3D(MatrixStack matrix){
+    public void onRender3D(MatrixStack matrix) {
         if (mc.options.getPerspective() == Perspective.FIRST_PERSON) animation.setValue(0f);
         else animation.setValue(1f);
 
-        if(mc.options.getPerspective() == Perspective.THIRD_PERSON_FRONT && antiFront.getValue())
+        if (mc.options.getPerspective() == Perspective.THIRD_PERSON_FRONT && antiFront.getValue())
             mc.options.setPerspective(Perspective.FIRST_PERSON);
     }
 
     public double getDistance() {
-        return 1d + ( (distance.getValue() - 1d) * (float) animation.getAnimationD());
+        return 1d + ((distance.getValue() - 1d) * (float) animation.getAnimationD());
     }
 }

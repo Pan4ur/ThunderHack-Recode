@@ -10,7 +10,6 @@ import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventPostSync;
@@ -21,16 +20,12 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InteractionUtility;
-import thunder.hack.utility.player.InventoryUtility;
-import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.render.BlockAnimationUtility;
 
 import static thunder.hack.utility.math.MathUtility.random;
 import static thunder.hack.utility.player.InteractionUtility.BlockPosWithFacing;
 import static thunder.hack.utility.player.InteractionUtility.checkNearBlocks;
-
 
 public class Scaffold extends Module {
     public Setting<Boolean> rotate = new Setting<>("Rotate", true);
@@ -82,7 +77,7 @@ public class Scaffold extends Module {
 
     private BlockPosWithFacing checkNearBlocksExtended(BlockPos blockPos) {
         BlockPosWithFacing ret = null;
-
+        //:skull:
         ret = checkNearBlocks(blockPos);
         if (ret != null) return ret;
 
@@ -146,9 +141,9 @@ public class Scaffold extends Module {
     }
 
     private void doSafeWalk(EventMove event) {
-        double x = event.get_x();
-        double y = event.get_y();
-        double z = event.get_z();
+        double x = event.getX();
+        double y = event.getY();
+        double z = event.getZ();
 
         if (mc.player.isOnGround() && !mc.player.noClip) {
             double increment;
@@ -187,9 +182,9 @@ public class Scaffold extends Module {
                 }
             }
         }
-        event.set_x(x);
-        event.set_y(y);
-        event.set_z(z);
+        event.setX(x);
+        event.setY(y);
+        event.setZ(z);
         event.setCancelled(true);
     }
 

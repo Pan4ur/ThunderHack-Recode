@@ -8,10 +8,10 @@ public class Reach extends Module {
         super("Reach", Category.COMBAT);
     }
 
-    public static final Setting<Float> range = new Setting("Range", 3f, 0.1f, 10.0f);
+    public static final Setting<Float> range = new Setting<>("Range", 3f, 0.1f, 10.0f);
 
     @Override
-    public String getDisplayInfo(){
+    public String getDisplayInfo() {
         return String.valueOf(range.getValue());
     }
 }

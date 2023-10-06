@@ -14,7 +14,6 @@ public class ViewModel extends Module {
         super("ViewModel", "ViewModel", Category.RENDER);
     }
 
-
     public Setting<Boolean> oldAnimationsM = new Setting<>("DisableSwapMain", false);
     public Setting<Boolean> oldAnimationsOff = new Setting<>("DisableSwapOff", false);
 
@@ -61,7 +60,6 @@ public class ViewModel extends Module {
     public final Setting<Float> eatX = new Setting<>("EatX", 1f, -1f, 2f).withParent(eatMod);
     public final Setting<Float> eatY = new Setting<>("EatY", 1f, -1f, 2f).withParent(eatMod);
 
-
     private double changeRotate(double value, double speed) {
         return value - speed <= 180 && value - speed > -180 ? value - speed : 180;
     }
@@ -76,10 +74,10 @@ public class ViewModel extends Module {
             if (animateMainZ.getValue())
                 rotationMainZ.setValue((float) changeRotate(rotationMainZ.getValue(), speedAnimateMain.getValue()));
             event.getStack().translate(positionMainX.getValue(), positionMainY.getValue(), positionMainZ.getValue());
-            event.getStack().scale((float) scaleMainX.getValue(), (float) scaleMainY.getValue(), (float) scaleMainZ.getValue());
-            event.getStack().multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) rotationMainX.getValue()));
-            event.getStack().multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) rotationMainY.getValue()));
-            event.getStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) rotationMainZ.getValue()));
+            event.getStack().scale(scaleMainX.getValue(), scaleMainY.getValue(), scaleMainZ.getValue());
+            event.getStack().multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotationMainX.getValue()));
+            event.getStack().multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotationMainY.getValue()));
+            event.getStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotationMainZ.getValue()));
         } else {
             if (animateOffX.getValue())
                 rotationOffX.setValue((float) changeRotate(rotationOffX.getValue(), speedAnimateOff.getValue()));
@@ -88,10 +86,10 @@ public class ViewModel extends Module {
             if (animateOffZ.getValue())
                 rotationOffZ.setValue((float) changeRotate(rotationOffZ.getValue(), speedAnimateOff.getValue()));
             event.getStack().translate(positionOffX.getValue(), positionOffY.getValue(), positionOffZ.getValue());
-            event.getStack().scale((float) scaleOffX.getValue(), (float) scaleOffY.getValue(), (float) scaleOffZ.getValue());
-            event.getStack().multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) rotationOffX.getValue()));
-            event.getStack().multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) rotationOffY.getValue()));
-            event.getStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) rotationOffZ.getValue()));
+            event.getStack().scale(scaleOffX.getValue(), scaleOffY.getValue(), scaleOffZ.getValue());
+            event.getStack().multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotationOffX.getValue()));
+            event.getStack().multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotationOffY.getValue()));
+            event.getStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotationOffZ.getValue()));
         }
     }
 

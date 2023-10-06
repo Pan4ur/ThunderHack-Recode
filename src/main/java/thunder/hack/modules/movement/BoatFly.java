@@ -9,7 +9,10 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
 import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket;
-import net.minecraft.network.packet.s2c.play.*;
+import net.minecraft.network.packet.s2c.play.EntityAttachS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntityS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.network.packet.s2c.play.VehicleMoveS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -25,7 +28,6 @@ import thunder.hack.utility.player.MovementUtility;
 import java.util.ArrayList;
 
 public class BoatFly extends Module {
-
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
     private final Setting<Boolean> slotClick = new Setting<>("ClickSlot", false);
     private final Setting<Boolean> limit = new Setting<>("Limit", true);
@@ -37,8 +39,8 @@ public class BoatFly extends Module {
     private final Setting<Boolean> cancel = new Setting<>("Cancel", true);
     private final Setting<Boolean> remount = new Setting<>("Remount", true);
     private final Setting<Boolean> pause = new Setting<>("Pause", false);
-    private final Setting<Integer> enableticks = new Setting<>("EnableTicks", 10, 1, 100, v-> pause.getValue());
-    private final Setting<Integer> waitTicks = new Setting<>("WaitTicks", 10, 1, 100, v-> pause.getValue());
+    private final Setting<Integer> enableticks = new Setting<>("EnableTicks", 10, 1, 100, v -> pause.getValue());
+    private final Setting<Integer> waitTicks = new Setting<>("WaitTicks", 10, 1, 100, v -> pause.getValue());
     private final Setting<Boolean> automount = new Setting<>("AutoMount", true);
     private final Setting<Boolean> stopunloaded = new Setting<>("StopUnloaded", true);
     private final Setting<Float> speed = new Setting<>("Speed", 2f, 0.0f, 25f);
@@ -46,8 +48,6 @@ public class BoatFly extends Module {
     private final Setting<Float> glidespeed = new Setting<>("GlideSpeed", 1f, 0.0f, 10f);
     private final Setting<Float> timer = new Setting<>("Timer", 1f, 0.1f, 5f);
     private final Setting<Float> jitter = new Setting<>("Jitter", 0.1f, 0.0f, 10f);
-
-
 
     private final ArrayList<VehicleMoveC2SPacket> vehiclePackets = new ArrayList<>();
     private int ticksEnabled = 0;
@@ -67,8 +67,7 @@ public class BoatFly extends Module {
             return;
         }
 
-        if (automount.getValue())
-            mountToBoat();
+        if (automount.getValue()) mountToBoat();
     }
 
     @Override
@@ -77,17 +76,13 @@ public class BoatFly extends Module {
         vehiclePackets.clear();
         waitedCooldown = false;
 
-        if (mc.player == null)
-            return;
+        if (mc.player == null) return;
 
         if ((phase.getValue()) && mode.getValue() == Mode.Motion) {
-            if (mc.player.getControllingVehicle() != null)
-                mc.player.getControllingVehicle().noClip = false;
+            if (mc.player.getControllingVehicle() != null) mc.player.getControllingVehicle().noClip = false;
             mc.player.noClip = false;
         }
-        if (mc.player.getControllingVehicle() != null) {
-            mc.player.getControllingVehicle().setNoGravity(false);
-        }
+        if (mc.player.getControllingVehicle() != null) mc.player.getControllingVehicle().setNoGravity(false);
         mc.player.setNoGravity(false);
     }
 
@@ -125,15 +120,11 @@ public class BoatFly extends Module {
 
     @EventHandler
     public void onPlayerTravel(@NotNull EventPlayerTravel ev) {
-        if (!ev.isPre())
-            return;
-
-        if (fullNullCheck())
-            return;
+        if (!ev.isPre()) return;
+        if (fullNullCheck()) return;
 
         if (mc.player.getControllingVehicle() == null) {
-            if (automount.getValue())
-                mountToBoat();
+            if (automount.getValue()) mountToBoat();
             return;
         }
 
@@ -160,8 +151,7 @@ public class BoatFly extends Module {
                 return;
             }
 
-            if (enableDelay <= 0)
-                waitedCooldown = false;
+            if (enableDelay <= 0) waitedCooldown = false;
         }
 
         Entity entity = mc.player.getControllingVehicle();
@@ -172,8 +162,7 @@ public class BoatFly extends Module {
             return;
         }
 
-        if (timer.getValue() != 1.0f)
-            ThunderHack.TICK_TIMER = (timer.getValue());
+        if (timer.getValue() != 1.0f) ThunderHack.TICK_TIMER = (timer.getValue());
 
         entity.setYaw(mc.player.getYaw());
 
@@ -195,18 +184,18 @@ public class BoatFly extends Module {
             entity.setVelocity(boatMotion[0], entity.getVelocity().getY(), boatMotion[1]);
 
         if (mc.options.jumpKey.isPressed()) {
-            if (mode.getValue() == Mode.Motion) entity.setVelocity(entity.getVelocity().getX(), entity.getVelocity().getY() + yspeed.getValue(), entity.getVelocity().getZ());
+            if (mode.getValue() == Mode.Motion)
+                entity.setVelocity(entity.getVelocity().getX(), entity.getVelocity().getY() + yspeed.getValue(), entity.getVelocity().getZ());
             else predictedY += yspeed.getValue();
         } else if (mc.options.sneakKey.isPressed()) {
-            if (mode.getValue() == Mode.Motion) entity.setVelocity(entity.getVelocity().getX(), entity.getVelocity().getY() - yspeed.getValue(), entity.getVelocity().getZ());
+            if (mode.getValue() == Mode.Motion)
+                entity.setVelocity(entity.getVelocity().getX(), entity.getVelocity().getY() - yspeed.getValue(), entity.getVelocity().getZ());
             else predictedY -= yspeed.getValue();
         }
 
-        if (!MovementUtility.isMoving())
-            entity.setVelocity(0, entity.getVelocity().getY(), 0);
+        if (!MovementUtility.isMoving()) entity.setVelocity(0, entity.getVelocity().getY(), 0);
 
-        if (ongroundpacket.getValue())
-            teleportToGround(entity);
+        if (ongroundpacket.getValue()) teleportToGround(entity);
 
         if (mode.getValue() == Mode.Packet) {
             entity.setPosition(predictedX, predictedY, predictedZ);
@@ -233,43 +222,30 @@ public class BoatFly extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
-        if (fullNullCheck())
-            return;
+        if (fullNullCheck()) return;
 
-        if (event.getPacket() instanceof DisconnectS2CPacket)
-            disable();
+        if (event.getPacket() instanceof DisconnectS2CPacket) disable();
 
-        if (!mc.player.isRiding() || returnGravity || waitedCooldown)
-            return;
+        if (!mc.player.isRiding() || returnGravity || waitedCooldown) return;
 
-        if(cancel.getValue()){
-            if (event.getPacket() instanceof VehicleMoveS2CPacket)
-                event.cancel();
-
-            if (event.getPacket() instanceof PlayerPositionLookS2CPacket)
-                event.cancel();
-
-            if (event.getPacket() instanceof EntityS2CPacket)
-                event.cancel();
-
-            if (event.getPacket() instanceof EntityAttachS2CPacket)
-                event.cancel();
+        if (cancel.getValue()) {
+            if (event.getPacket() instanceof VehicleMoveS2CPacket) event.cancel();
+            if (event.getPacket() instanceof PlayerPositionLookS2CPacket) event.cancel();
+            if (event.getPacket() instanceof EntityS2CPacket) event.cancel();
+            if (event.getPacket() instanceof EntityAttachS2CPacket) event.cancel();
         }
     }
 
     @EventHandler
     public void onPacketSend(PacketEvent.Send event) {
-        if (fullNullCheck())
-            return;
+        if (fullNullCheck()) return;
 
         if ((event.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround && (cancelrotations.getValue()) || event.getPacket() instanceof PlayerInputC2SPacket) && mc.player.isRiding())
             event.cancel();
 
-        if (returnGravity && event.getPacket() instanceof VehicleMoveC2SPacket)
-            event.cancel();
+        if (returnGravity && event.getPacket() instanceof VehicleMoveC2SPacket) event.cancel();
 
-        if (!mc.player.isRiding() || returnGravity || waitedCooldown)
-            return;
+        if (!mc.player.isRiding() || returnGravity || waitedCooldown) return;
 
         Vec3d boatPos = mc.player.getControllingVehicle().getPos();
         if ((!mc.world.isChunkLoaded((int) boatPos.getX() >> 4, (int) boatPos.getZ() >> 4) || boatPos.getY() < -60) && stopunloaded.getValue())

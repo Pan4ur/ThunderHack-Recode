@@ -93,7 +93,11 @@ public class ElytraPlus extends Module {
     @Override
     public void onEnable() {
         if (mc.player.getY() < infiniteMaxHeight.getValue() && mode.getValue() == Mode.Pitch40Infinite) {
-            disable(isRu() ? "Поднимись выше " + Formatting.AQUA + infiniteMaxHeight.getValue() + Formatting.GRAY + " высоты!" : "Rise above " + Formatting.AQUA + infiniteMaxHeight.getValue() + Formatting.GRAY + " high!");
+            disable(
+                    isRu() ?
+                            "Поднимись выше " + Formatting.AQUA + infiniteMaxHeight.getValue() + Formatting.GRAY + " высоты!" :
+                            "Go above " + Formatting.AQUA + infiniteMaxHeight.getValue() + Formatting.GRAY + " height!"
+            );
         }
 
         infiniteFlag = false;
@@ -106,9 +110,7 @@ public class ElytraPlus extends Module {
         }
         hasElytra = false;
 
-        if (mode.getValue() == Mode.FireWork) {
-            fireworkOnEnable();
-        }
+        if (mode.getValue() == Mode.FireWork) fireworkOnEnable();
     }
 
     @EventHandler
@@ -117,46 +119,33 @@ public class ElytraPlus extends Module {
             if (e.isPre()) {
                 prevClientPitch = mc.player.getPitch();
                 mc.player.setPitch(getInfinitePitch());
-            } else {
-                mc.player.setPitch(prevClientPitch);
-            }
+            } else mc.player.setPitch(prevClientPitch);
         }
         if (mode.getValue() == Mode.FireWork) {
             if (ThunderHack.playerManager.ticksElytraFlying < 4) {
                 if (e.isPre()) {
                     prevClientPitch = mc.player.getPitch();
                     mc.player.setPitch(-45f);
-                } else {
-                    mc.player.setPitch(prevClientPitch);
-                }
+                } else mc.player.setPitch(prevClientPitch);
             }
         }
     }
 
     @EventHandler
     public void onSync(EventSync e) {
-        if (mode.getValue() == Mode.Sunrise) {
-            doSunrise();
-        }
-
-        if (mode.getValue() == Mode.Control || mode.getValue() == Mode.Boost) {
-            doPreLegacy();
-        }
+        if (mode.getValue() == Mode.Sunrise) doSunrise();
+        if (mode.getValue() == Mode.Control || mode.getValue() == Mode.Boost) doPreLegacy();
 
         if (mode.getValue() == Mode.Pitch40Infinite) {
             ItemStack is = mc.player.getEquippedStack(EquipmentSlot.CHEST);
-            if (is.isOf(Items.ELYTRA)) {
-                mc.player.setPitch(getInfinitePitch());
-            }
+            if (is.isOf(Items.ELYTRA)) mc.player.setPitch(getInfinitePitch());
             if (is.isOf(Items.ELYTRA) && is.getDamage() > 380 && mc.player.age % 100 == 0) {
-                ThunderHack.notificationManager.publicity("Elytra+", isRu() ? "Элитра скоро сломается!" : "Elytra is about to break down!", 2, Notification.Type.WARNING);
+                ThunderHack.notificationManager.publicity("Elytra+", isRu() ? "Элитра скоро сломается!" : "Elytra's about to break!", 2, Notification.Type.WARNING);
                 mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.AMBIENT, 10.0f, 1.0F);
             }
         }
 
-        if (mode.getValue() == Mode.FireWork) {
-            fireworkOnSync();
-        }
+        if (mode.getValue() == Mode.FireWork) fireworkOnSync();
     }
 
     private float getInfinitePitch() {
@@ -165,14 +154,11 @@ public class ElytraPlus extends Module {
                 infiniteFlag = true;
             if (ThunderHack.playerManager.currentPlayerSpeed * 72f > infiniteMaxSpeed.getValue() && infiniteFlag)
                 infiniteFlag = false;
-        } else {
-            infiniteFlag = true;
-        }
-        if (infiniteFlag) {
-            infinitePitch++;
-        } else {
-            infinitePitch--;
-        }
+        } else infiniteFlag = true;
+
+        if (infiniteFlag) infinitePitch++;
+        else infinitePitch--;
+
         infinitePitch = MathUtility.clamp(infinitePitch, -40, 40);
         return infinitePitch;
     }
@@ -185,19 +171,13 @@ public class ElytraPlus extends Module {
             if (!mc.player.isCreative()) mc.player.getAbilities().allowFlying = false;
             mc.player.getAbilities().flying = false;
         }
-        if (mode.getValue() == Mode.FireWork) {
-            fireworkOnDisable();
-        }
+        if (mode.getValue() == Mode.FireWork) fireworkOnDisable();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onMove(EventMove e) {
-        if (mode.getValue() == Mode.Control || mode.getValue() == Mode.Boost) {
-            doLegacy(e);
-        }
-        if (mode.getValue() == Mode.FireWork) {
-            fireworkOnMove(e);
-        }
+        if (mode.getValue() == Mode.Control || mode.getValue() == Mode.Boost) doLegacy(e);
+        if (mode.getValue() == Mode.FireWork) fireworkOnMove(e);
     }
 
     @EventHandler
@@ -219,7 +199,7 @@ public class ElytraPlus extends Module {
     public void onPacketReceive(PacketEvent.Receive e) {
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             acceleration = 0;
-            if(disableOnFlag.getValue() && mode.getValue() == Mode.FireWork) disable(isRu() ? "Выключен из-за флага!" : "Disabled due to flag!");
+            if (disableOnFlag.getValue() && mode.getValue() == Mode.FireWork) disable(isRu() ? "Выключен из-за флага!" : "Disabled due to flag!");
         }
     }
 
@@ -290,11 +270,8 @@ public class ElytraPlus extends Module {
         if (fullNullCheck() || !hasElytra || !mc.player.isFallFlying()) return;
         if (!mc.player.isTouchingWater() || mc.player != null && mc.player.getAbilities().flying && !mc.player.isInLava() || mc.player.getAbilities().flying && mc.player.isFallFlying()) {
             e.cancel();
-            if (mode.getValue() == Mode.Control) {
-                doControl(e);
-            } else {
-                doBoost(e);
-            }
+            if (mode.getValue() == Mode.Control) doControl(e);
+            else doBoost(e);
         }
     }
 
@@ -302,15 +279,10 @@ public class ElytraPlus extends Module {
         float moveForward = mc.player.input.movementForward;
 
         if (cruiseControl.getValue()) {
-            if (mc.options.jumpKey.isPressed()) {
-                height += upFactor.getValue() * 0.5;
-            } else if (mc.player.input.sneaking) {
-                height -= downFactor.getValue() * 0.5;
-            }
+            if (mc.options.jumpKey.isPressed()) height += upFactor.getValue() * 0.5;
+            else if (mc.player.input.sneaking) height -= downFactor.getValue() * 0.5;
 
-            if (forceHeight.getValue()) {
-                height = manualHeight.getValue();
-            }
+            if (forceHeight.getValue()) height = manualHeight.getValue();
 
             double horizSpeed = ThunderHack.playerManager.currentPlayerSpeed;
             double horizPct = MathHelper.clamp(horizSpeed / 1.7, 0.0, 1.0);
@@ -341,66 +313,66 @@ public class ElytraPlus extends Module {
         float f = mc.player.getPitch() * 0.017453292F;
 
         double d6 = Math.sqrt(vec3d.x * vec3d.x + vec3d.z * vec3d.z);
-        double d8 = Math.sqrt(e.get_x() * e.get_x() + e.get_z() * e.get_z());
+        double d8 = Math.sqrt(e.getX() * e.getX() + e.getZ() * e.getZ());
         double d1 = vec3d.length();
         float f4 = MathHelper.cos(f);
         f4 = (float) ((double) f4 * (double) f4 * Math.min(1.0D, d1 / 0.4D));
 
-        e.set_y(e.get_y() + (-0.08D + (double) f4 * 0.06D));
+        e.setY(e.getY() + (-0.08D + (double) f4 * 0.06D));
 
-        if (e.get_y() < 0.0D && d6 > 0.0D) {
-            double d2 = e.get_y() * -0.1D * (double) f4;
-            e.set_y(e.get_y() + d2);
-            e.set_x(e.get_x() + vec3d.x * d2 / d6);
-            e.set_z(e.get_z() + vec3d.z * d2 / d6);
-            mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
+        if (e.getY() < 0.0D && d6 > 0.0D) {
+            double d2 = e.getY() * -0.1D * (double) f4;
+            e.setY(e.getY() + d2);
+            e.setX(e.getX() + vec3d.x * d2 / d6);
+            e.setZ(e.getZ() + vec3d.z * d2 / d6);
+            mc.player.setVelocity(e.getX(), e.getY(), e.getZ());
         }
 
         if (f < 0.0F) {
             double d10 = d8 * (double) (-MathHelper.sin(f)) * 0.04D;
-            e.set_y(e.get_y() + d10 * 3.2D);
-            e.set_x(e.get_x() - vec3d.x * d10 / d6);
-            e.set_z(e.get_z() - vec3d.z * d10 / d6);
-            mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
+            e.setY(e.getY() + d10 * 3.2D);
+            e.setX(e.getX() - vec3d.x * d10 / d6);
+            e.setZ(e.getZ() - vec3d.z * d10 / d6);
+            mc.player.setVelocity(e.getX(), e.getY(), e.getZ());
         }
 
         if (d6 > 0.0D) {
-            e.set_x(e.get_x() + (vec3d.x / d6 * d8 - e.get_x()) * 0.1D);
-            e.set_z(e.get_z() + (vec3d.z / d6 * d8 - e.get_z()) * 0.1D);
-            mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
+            e.setX(e.getX() + (vec3d.x / d6 * d8 - e.getX()) * 0.1D);
+            e.setZ(e.getZ() + (vec3d.z / d6 * d8 - e.getZ()) * 0.1D);
+            mc.player.setVelocity(e.getX(), e.getY(), e.getZ());
         }
 
         if (!noDrag.getValue()) {
-            e.set_y(e.get_y() * 0.9900000095367432D);
-            e.set_x(e.get_x() * 0.9800000190734863D);
-            e.set_z(e.get_z() * 0.9900000095367432D);
-            mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
+            e.setY(e.getY() * 0.9900000095367432D);
+            e.setX(e.getX() * 0.9800000190734863D);
+            e.setZ(e.getZ() * 0.9900000095367432D);
+            mc.player.setVelocity(e.getX(), e.getY(), e.getZ());
         }
 
         float yaw = mc.player.getYaw() * 0.017453292F;
 
-        if (f > 0F && e.get_y() < 0D) {
+        if (f > 0F && e.getY() < 0D) {
             if (moveForward != 0F && instantFlyTimer.passedMs((long) (2000 * packetDelay.getValue())) && staticTimer.passedMs((long) (1000 * staticDelay.getValue()))) {
                 if (stopMotion.getValue()) {
-                    e.set_x(0);
-                    e.set_z(0);
+                    e.setX(0);
+                    e.setZ(0);
                 }
                 instantFlyTimer.reset();
                 mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
             } else if (!instantFlyTimer.passedMs((long) (2000 * packetDelay.getValue()))) {
-                e.set_x(e.get_x() - moveForward * Math.sin(yaw) * factor.getValue() / 20F);
-                e.set_z(e.get_z() + moveForward * Math.cos(yaw) * factor.getValue() / 20F);
-                mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
+                e.setX(e.getX() - moveForward * Math.sin(yaw) * factor.getValue() / 20F);
+                e.setZ(e.getZ() + moveForward * Math.cos(yaw) * factor.getValue() / 20F);
+                mc.player.setVelocity(e.getX(), e.getY(), e.getZ());
                 staticTimer.reset();
             }
         }
 
-        double finalDist = Math.sqrt(e.get_x() * e.get_x() + e.get_z() * e.get_z());
+        double finalDist = Math.sqrt(e.getX() * e.getX() + e.getZ() * e.getZ());
 
         if (speedLimit.getValue() && finalDist > maxSpeed.getValue()) {
-            e.set_x(e.get_x() * maxSpeed.getValue() / finalDist);
-            e.set_z(e.get_z() * maxSpeed.getValue() / finalDist);
-            mc.player.setVelocity(e.get_x(), e.get_y(), e.get_z());
+            e.setX(e.getX() * maxSpeed.getValue() / finalDist);
+            e.setZ(e.getZ() * maxSpeed.getValue() / finalDist);
+            mc.player.setVelocity(e.getX(), e.getY(), e.getZ());
         }
     }
 
@@ -408,40 +380,40 @@ public class ElytraPlus extends Module {
         Vec3d lookVec = mc.player.getRotationVec(mc.getTickDelta());
 
         double lookDist = Math.sqrt(lookVec.x * lookVec.x + lookVec.z * lookVec.z);
-        double motionDist = Math.sqrt(e.get_x() * e.get_x() + e.get_z() * e.get_z());
+        double motionDist = Math.sqrt(e.getX() * e.getX() + e.getZ() * e.getZ());
 
         if (mc.options.sneakKey.isPressed()) {
-            e.set_y(-sneakDownSpeed.getValue());
+            e.setY(-sneakDownSpeed.getValue());
         } else if (!mc.options.jumpKey.isPressed()) {
-            e.set_y(-0.00000000000003D * downFactor.getValue());
+            e.setY(-0.00000000000003D * downFactor.getValue());
         }
 
         if (mc.options.jumpKey.isPressed()) {
-            e.set_y(upFactor.getValue());
+            e.setY(upFactor.getValue());
         }
 
         if (lookDist > 0.0D) {
-            e.set_x(e.get_x() + (lookVec.x / lookDist * motionDist - e.get_x()) * 0.1D);
-            e.set_z(e.get_z() + (lookVec.z / lookDist * motionDist - e.get_z()) * 0.1D);
+            e.setX(e.getX() + (lookVec.x / lookDist * motionDist - e.getX()) * 0.1D);
+            e.setZ(e.getZ() + (lookVec.z / lookDist * motionDist - e.getZ()) * 0.1D);
         }
 
         if (!mc.options.jumpKey.isPressed()) {
             double[] dir = MovementUtility.forward(speed.getValue());
-            e.set_x(dir[0]);
-            e.set_z(dir[1]);
+            e.setX(dir[0]);
+            e.setZ(dir[1]);
         }
 
         if (!noDrag.getValue()) {
-            e.set_y(e.get_y() * 0.9900000095367432D);
-            e.set_x(e.get_x() * 0.9800000190734863D);
-            e.set_z(e.get_z() * 0.9900000095367432D);
+            e.setY(e.getY() * 0.9900000095367432D);
+            e.setX(e.getX() * 0.9800000190734863D);
+            e.setZ(e.getZ() * 0.9900000095367432D);
         }
 
-        double finalDist = Math.sqrt(e.get_x() * e.get_x() + e.get_z() * e.get_z());
+        double finalDist = Math.sqrt(e.getX() * e.getX() + e.getZ() * e.getZ());
 
         if (speedLimit.getValue() && finalDist > maxSpeed.getValue()) {
-            e.set_x(e.get_x() * maxSpeed.getValue() / finalDist);
-            e.set_z(e.get_z() * maxSpeed.getValue() / finalDist);
+            e.setX(e.getX() * maxSpeed.getValue() / finalDist);
+            e.setZ(e.getZ() * maxSpeed.getValue() / finalDist);
         }
     }
 
@@ -462,19 +434,17 @@ public class ElytraPlus extends Module {
     private int getFireWorks(boolean hotbar) {
         if (hotbar) {
             return InventoryUtility.findItemInHotBar(Items.FIREWORK_ROCKET).slot();
-        } else {
-            return InventoryUtility.findItemInInventory(Items.FIREWORK_ROCKET).slot();
-        }
+        } else return InventoryUtility.findItemInInventory(Items.FIREWORK_ROCKET).slot();
     }
 
     private void noFireworks() {
-        disable("Нету фейерверков в инвентаре!");
+        disable(isRu() ? "Нету фейерверков в инвентаре!" : "No fireworks in the hotbar!");
         flying = false;
         ticksInAir = 0;
     }
 
     private void noElytra() {
-        disable("Нету элитр в инвентаре!");
+        disable(isRu() ? "Нету элитр в инвентаре!" : "No elytras found in the inventory!");
         flying = false;
         ticksInAir = 0;
     }
@@ -532,8 +502,8 @@ public class ElytraPlus extends Module {
             return -1;
         }
         if (firesInHotbar == -1) {
-            if(!allowFireSwap.getValue()){
-                   disable("Нет фейерверков!");
+            if (!allowFireSwap.getValue()) {
+                disable(isRu() ? "Нет фейерверков!" : "No fireworks!");
                 return fireSlot.getValue() - 1;
             }
             moveFireworksToHotbar(firesInInventory);
@@ -543,9 +513,7 @@ public class ElytraPlus extends Module {
     }
 
     private boolean canFly() {
-        if (shouldSwapToElytra()) {
-            return false;
-        }
+        if (shouldSwapToElytra()) return false;
         return getFireworks() != -1;
     }
 
@@ -561,12 +529,9 @@ public class ElytraPlus extends Module {
         if (started && (float) (System.currentTimeMillis() - lastFireworkTime) < fireDelay.getValue() * 1000.0f) {
             return;
         }
-        if (started && !mc.player.isFallFlying()) {
-            return;
-        }
-        if (!started && ticksInAir > 1) {
-            return;
-        }
+        if (started && !mc.player.isFallFlying()) return;
+        if (!started && ticksInAir > 1) return;
+
         int n2 = getFireworks();
         if (n2 == -1) {
             slotWithFireWorks = -1;
@@ -574,13 +539,9 @@ public class ElytraPlus extends Module {
         }
         slotWithFireWorks = n2;
         boolean bl3 = mc.player.getOffHandStack().getItem() == Items.FIREWORK_ROCKET;
-        if (!bl3) {
-            sendPacket(new UpdateSelectedSlotC2SPacket(n2));
-        }
+        if (!bl3) sendPacket(new UpdateSelectedSlotC2SPacket(n2));
         sendPacket(new PlayerInteractItemC2SPacket(bl3 ? Hand.OFF_HAND : Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
-        if (!bl3) {
-            sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
-        }
+        if (!bl3) sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
         ++ticksInAir;
         flying = true;
         lastFireworkTime = System.currentTimeMillis();
@@ -596,9 +557,7 @@ public class ElytraPlus extends Module {
             noElytra();
             return;
         }
-        if (!shouldSwapToElytra()) {
-            return;
-        }
+        if (!shouldSwapToElytra()) return;
         if (prevElytraSlot == -1) {
             ItemStack is = mc.player.getEquippedStack(EquipmentSlot.CHEST);
             prevElytraSlot = elytraSlot;
@@ -627,9 +586,8 @@ public class ElytraPlus extends Module {
                 pickPrevElytraSlot();
                 return;
             }
-            if (n2 == -1) {
-                return;
-            }
+            if (n2 == -1) return;
+
             clickSlot(n2);
             clickSlot(6);
             if (!bl2) {
@@ -652,7 +610,6 @@ public class ElytraPlus extends Module {
         return -1;
     }
 
-
     public void fireWorkOnPlayerUpdate() {
         boolean inAir = mc.world.isAir(BlockPos.ofFloored(mc.player.getPos()));
         boolean aboveLiquid = isAboveLiquid(0.1f) && inAir && mc.player.getVelocity().getY() < 0.0;
@@ -665,7 +622,6 @@ public class ElytraPlus extends Module {
         }
 
         if (!MovementUtility.isMoving()) currentSpeed = 0;
-
         if (!canFly()) return;
 
         if (!mc.player.isFallFlying() && !startFallFlying && mc.player.getVelocity().getY() < 0.0) {
@@ -682,31 +638,28 @@ public class ElytraPlus extends Module {
         if (!MovementUtility.isMoving() && mc.options.jumpKey.isPressed() && mc.player.isFallFlying() && flying)
             mc.player.setPitch(-90f);
 
-        if (ThunderHack.playerManager.ticksElytraFlying < 5) {
-            mc.player.setPitch(-45f);
-        }
+        if (ThunderHack.playerManager.ticksElytraFlying < 5) mc.player.setPitch(-45f);
     }
-
 
     public void fireworkOnMove(EventMove e) {
         if (mc.player.isFallFlying() && flying) {
             if (ThunderHack.playerManager.ticksElytraFlying < 4) {
-                e.set_y(0.2f);
+                e.setY(0.2f);
                 e.cancel();
                 return;
             }
             if (mc.options.jumpKey.isPressed()) {
-                e.set_y(ySpeed.getValue());
+                e.setY(ySpeed.getValue());
             } else if (mc.options.sneakKey.isPressed()) {
-                e.set_y(-ySpeed.getValue());
+                e.setY(-ySpeed.getValue());
             } else if (bowBomb.getValue() && checkGround(2.0f)) {
-                e.set_y((float) (mc.player.age % 2 == 0 ? (double) 0.42f : (double) -0.42f));
+                e.setY((float) (mc.player.age % 2 == 0 ? (double) 0.42f : (double) -0.42f));
             } else {
-                e.set_y((float) (mc.player.age % 2 == 0 ? (double) 0.08f : (double) -0.08f));
+                e.setY((float) (mc.player.age % 2 == 0 ? (double) 0.08f : (double) -0.08f));
             }
             MovementUtility.modifyEventSpeed(e, xzSpeed.getValue() * Math.min((float) (currentSpeed += 9) / 100.0f, 1.0f));
             if (stayMad.getValue() && !checkGround(3.0f) && ThunderHack.playerManager.ticksElytraFlying > 10) {
-                e.set_y(0.42f);
+                e.setY(0.42f);
             }
             e.cancel();
         }
@@ -735,7 +688,6 @@ public class ElytraPlus extends Module {
         getStackInSlotCopy = mc.player.getInventory().getStack(fireSlot.getValue() - 1).copy();
         prevItemInHand = mc.player.getInventory().getStack(fireSlot.getValue() - 1).getItem();
     }
-
 
     public void fireworkOnDisable() {
         currentSpeed = 0;

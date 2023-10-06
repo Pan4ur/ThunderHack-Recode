@@ -36,14 +36,13 @@ public class Trails extends Module {
         super("Trails", "Trails", Category.RENDER);
     }
 
-
     public final Setting<Boolean> pearls = new Setting("Pearls", false);
     public final Setting<Boolean> xp = new Setting("Xp", false);
     public final Setting<Boolean> arrows = new Setting("Arrows", false);
     private final Setting<Players> players = new Setting<>("Players", Players.Particles);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
-    public Setting<Float> down = new Setting("Down", 0.5F, 0.0F, 2.0F);
-    public Setting<Float> width = new Setting("Height", 1.3F, 0.1F, 2.0F);
+    public Setting<Float> down = new Setting<>("Down", 0.5F, 0.0F, 2.0F);
+    public Setting<Float> width = new Setting<>("Height", 1.3F, 0.1F, 2.0F);
     public Setting<Integer> speed = new Setting<>("Speed", 2, 1, 20, v-> players.getValue() == Players.Particles);
     private final Setting<HitParticles.Mode> mode = new Setting<>("Mode", HitParticles.Mode.Stars, v-> players.getValue() == Players.Particles);
     private final Setting<HitParticles.Physics> physics = new Setting<>("Physics", HitParticles.Physics.Fall, v-> players.getValue() == Players.Particles);
@@ -54,15 +53,6 @@ public class Trails extends Module {
     public final Setting<ColorSetting> lcolor = new Setting<>("Color2", new ColorSetting(0x2250b4b4), v -> lmode.getValue() == Mode.Custom);
 
     private List<Particle> particles = new ArrayList<>();
-
-    private enum Mode {
-        Custom, Sync
-    }
-
-    private enum Players {
-        Trail, Particles, Cute, None
-    }
-
 
     public void onPreRender3D(MatrixStack stack) {
         for (Entity en : ThunderHack.asyncManager.getAsyncEntities()) {
@@ -89,7 +79,6 @@ public class Trails extends Module {
                 //     continue;
 
                 float alpha = color.getValue().getAlpha() / 255f;
-
 
                 if (!((IEntity) entity).getTrails().isEmpty()) {
                     stack.push();
@@ -132,7 +121,6 @@ public class Trails extends Module {
                 //     continue;
 
                 float alpha = color.getValue().getAlpha() / 255f;
-
 
                 if (!((IEntity) entity).getTrails().isEmpty()) {
                     stack.push();
@@ -205,7 +193,6 @@ public class Trails extends Module {
             }
         }
     }
-
 
     @Override
     public void onUpdate() {
@@ -329,7 +316,6 @@ public class Trails extends Module {
             this.color = color;
         }
 
-
         public long getTime() {
             return time;
         }
@@ -339,7 +325,6 @@ public class Trails extends Module {
             x += motionX;
             y += motionY;
             z += motionZ;
-
 
             if (posBlock(x, y - starsScale.getValue() / 10f, z)) {
                 motionY = -motionY / 1.1;
@@ -377,14 +362,14 @@ public class Trails extends Module {
             matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-mc.gameRenderer.getCamera().getYaw()));
             matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(mc.gameRenderer.getCamera().getPitch()));
 
-            if (mode.getValue() == HitParticles.Mode.Orbiz) {
-                drawOrbiz(matrixStack, 0.0f, 0.7, color);
-                drawOrbiz(matrixStack, 0.1f, 1.4, color);
-                drawOrbiz(matrixStack, 0.2f, 2.3, color);
-            } else if (mode.getValue() == HitParticles.Mode.Stars) {
-                drawStar(matrixStack, color, starsScale.getValue());
-            } else {
-                drawHeart(matrixStack, color, starsScale.getValue());
+            switch (mode.getValue()) {
+                case Stars -> drawStar(matrixStack, color, starsScale.getValue());
+                case Orbiz ->  {
+                    drawOrbiz(matrixStack, 0.0f, 0.7, color);
+                    drawOrbiz(matrixStack, 0.1f, 1.4, color);
+                    drawOrbiz(matrixStack, 0.2f, 2.3, color);
+                }
+                default -> drawHeart(matrixStack, color, starsScale.getValue());
             }
 
             matrixStack.scale(0.8f, 0.8f, 0.8f);
@@ -394,5 +379,13 @@ public class Trails extends Module {
         private boolean posBlock(double x, double y, double z) {
             return (mc.world.getBlockState(new BlockPos((int) x, (int) y, (int) z)).getBlock() != Blocks.AIR && mc.world.getBlockState(new BlockPos((int) x, (int) y, (int) z)).getBlock() != Blocks.WATER && mc.world.getBlockState(new BlockPos((int) x, (int) y, (int) z)).getBlock() != Blocks.LAVA);
         }
+    }
+
+    private enum Mode {
+        Custom, Sync
+    }
+
+    private enum Players {
+        Trail, Particles, Cute, None
     }
 }

@@ -1,7 +1,5 @@
 package thunder.hack.modules.movement;
 
-
-
 import meteordevelopment.orbit.EventHandler;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
@@ -87,19 +85,11 @@ public class PacketFly extends Module {
 
     public Vec3d getVectorByMode(@NotNull Vec3d vec3d, Vec3d vec3d2) {
         Vec3d vec3d3 = vec3d.add(vec3d2);
-        switch ((type.getValue())) {
-            case Preserve -> {
-                vec3d3 = vec3d3.add(getWorldBorder(), 0.0, getWorldBorder());
-            }
-            case Up -> {
-                vec3d3 = vec3d3.add(0.0, 1337.0, 0.0);
-            }
-            case Down -> {
-                vec3d3 = vec3d3.add(0.0, -1337.0, 0.0);
-            }
-            case Bounds -> {
-                vec3d3 = new Vec3d(vec3d3.x, mc.player.getY() <= 10.0 ? 255.0 : 1.0, vec3d3.z);
-            }
+        switch (type.getValue()) {
+            case Preserve -> vec3d3 = vec3d3.add(getWorldBorder(), 0.0, getWorldBorder());
+            case Up -> vec3d3 = vec3d3.add(0.0, 1337.0, 0.0);
+            case Down -> vec3d3 = vec3d3.add(0.0, -1337.0, 0.0);
+            case Bounds -> vec3d3 = new Vec3d(vec3d3.x, mc.player.getY() <= 10.0 ? 255.0 : 1.0, vec3d3.z);
         }
         return vec3d3;
     }
@@ -108,14 +98,16 @@ public class PacketFly extends Module {
         Vec3d vec3d = new Vec3d(x, y, z);
         Vec3d vec3d2 = mc.player.getPos().add(vec3d);
         Vec3d vec3d3 = getVectorByMode(vec3d, vec3d2);
+
         PlayerMoveC2SPacket packet1 =  new PlayerMoveC2SPacket.PositionAndOnGround(vec3d2.x, vec3d2.y, vec3d2.z, mc.player.isOnGround());
         movePackets.add(packet1);
-        mc.player.networkHandler.sendPacket(packet1);
+        sendPacket(packet1);
+
         PlayerMoveC2SPacket packet2 = new PlayerMoveC2SPacket.PositionAndOnGround(vec3d3.x, vec3d3.y, vec3d3.z, mc.player.isOnGround());
         movePackets.add(packet2);
-        mc.player.networkHandler.sendPacket(packet2);
+        sendPacket(packet2);
         if (confirm) {
-            mc.player.networkHandler.sendPacket(new TeleportConfirmC2SPacket(++teleportId));
+            sendPacket(new TeleportConfirmC2SPacket(++teleportId));
             teleports.put(teleportId, new Teleport(vec3d2.x, vec3d2.y, vec3d2.z, System.currentTimeMillis()));
         }
     }
@@ -124,7 +116,7 @@ public class PacketFly extends Module {
     public void onPacketReceive(PacketEvent.Receive event) {
         if (fullNullCheck()) return;
         if (mc.player != null && event.getPacket() instanceof PlayerPositionLookS2CPacket pac) {
-            Teleport teleport = (Teleport) teleports.remove(pac.getTeleportId());
+            Teleport teleport = teleports.remove(pac.getTeleportId());
             if (
                     mc.player.isAlive()
                     && mc.world.isChunkLoaded((int) mc.player.getX() >> 4, (int) mc.player.getZ() >> 4)
@@ -143,7 +135,6 @@ public class PacketFly extends Module {
             teleportId = pac.getTeleportId();
         }
     }
-
 
     @EventHandler
     public void onPacketSend(PacketEvent.@NotNull Send event) {
@@ -172,9 +163,9 @@ public class PacketFly extends Module {
                 return;
             }
             event.setCancelled(true);
-            event.set_x(mc.player.getVelocity().x);
-            event.set_y(mc.player.getVelocity().y);
-            event.set_z(mc.player.getVelocity().z);
+            event.setX(mc.player.getVelocity().x);
+            event.setY(mc.player.getVelocity().y);
+            event.setZ(mc.player.getVelocity().z);
             if (phase.getValue() != Phase.Off && (phase.getValue() == Phase.Semi || mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.0625, -0.0625, -0.0625)).iterator().hasNext())) {
                 mc.player.noClip = true;
             }

@@ -15,16 +15,16 @@ public class ElytraFix extends Module {
         super("ElytraFix", Category.PLAYER);
     }
 
-    private Timer delay = new Timer();
+    private final Timer delay = new Timer();
 
     @EventHandler
-    public void onPlayerEvent(PlayerUpdateEvent event){
+    public void onPlayerEvent(PlayerUpdateEvent event) {
         ItemStack stack = mc.player.currentScreenHandler.getCursorStack();
         if(ModuleManager.elytraFix.isEnabled()) return;
         if (stack.getItem() instanceof ArmorItem && delay.passedMs(300)) {
             if (((ArmorItem) stack.getItem()).getType() == ArmorItem.Type.CHESTPLATE && mc.player.getInventory().getArmorStack(2).getItem() == Items.ELYTRA) {
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 6, 0, SlotActionType.PICKUP, mc.player);
-                int nullSlot = findNullSlot();
+                int nullSlot = findEmptySlot();
                 boolean needDrop = nullSlot == 999;
                 if (needDrop) nullSlot = 9;
                 sendMessage("fixed!");
@@ -35,7 +35,7 @@ public class ElytraFix extends Module {
         }
     }
 
-    public static int findNullSlot() {
+    public static int findEmptySlot() {
         for (int i = 0; i < 36; i++) {
             ItemStack stack = mc.player.getInventory().getStack(i);
             if (stack.isEmpty()) {

@@ -17,7 +17,6 @@ import java.awt.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-
 public class BreadCrumbs extends Module {
     public BreadCrumbs() {
         super("BreadCrumbs", Category.RENDER);
@@ -29,18 +28,17 @@ public class BreadCrumbs extends Module {
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(3649978), v -> lmode.getValue() == Mode.Custom);
 
     private enum Mode {
-        Custom,Sync
+        Custom, Sync
     }
 
     public void onRender3D(MatrixStack stack) {
-        drawLine(2f,false);
-        drawLine(5,false);
-        drawLine(10,false);
-        drawLine(1,true);
+        drawLine(2f, false);
+        drawLine(5, false);
+        drawLine(10, false);
+        drawLine(1, true);
     }
 
-
-    public void drawLine(float width, boolean white){
+    public void drawLine(float width, boolean white) {
         Render3DEngine.setup();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -50,20 +48,18 @@ public class BreadCrumbs extends Module {
         RenderSystem.lineWidth(width);
         buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
 
-
         for (int i = 0; i < positions.size(); i++) {
             Vec3d vec1 = null;
             try {
                 vec1 = positions.get(i - 1);
-            } catch (Exception ignored){}
+            } catch (Exception ignored) {
+            }
             Vec3d vec2 = positions.get(i);
             if (vec1 != null && vec2 != null) {
                 Color c = lmode.getValue() == Mode.Sync ? HudEditor.getColor(i) : color.getValue().getColorObject();
-                if(white) c = Color.WHITE;
+                if (white) c = Color.WHITE;
 
-                if(i < 10){
-                    c = Render2DEngine.injectAlpha(c, (int) (c.getAlpha() * (i / 10f)));
-                }
+                if (i < 10) c = Render2DEngine.injectAlpha(c, (int) (c.getAlpha() * (i / 10f)));
                 MatrixStack matrices = Render3DEngine.matrixFrom(vec1.getX(), vec1.getY(), vec1.getZ());
                 Render3DEngine.vertexLine(matrices, buffer, 0f, 0f, 0f, (float) (vec2.getX() - vec1.getX()), (float) (vec2.getY() - vec1.getY()), (float) (vec2.getZ() - vec1.getZ()), c);
             }
@@ -76,10 +72,8 @@ public class BreadCrumbs extends Module {
     }
 
     @EventHandler
-    public void postSync(EventPostSync event) {
-        if(positions.size() > limit.getValue()){
-            positions.remove(0);
-        }
+    public void postSync(EventPostSync e) {
+        if (positions.size() > limit.getValue()) positions.remove(0);
         positions.add(new Vec3d(mc.player.getX(), mc.player.getBoundingBox().minY, mc.player.getZ()));
     }
 

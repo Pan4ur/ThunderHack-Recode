@@ -10,10 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-public final class OFCapesUtility {
-    /* author:
-        @dragonostic
-        of-capes
+public final class OptifineCapes {
+    /**
+     * author: @dragonostic
+     * of-capes
      */
 
     public interface ReturnCapeTexture {
@@ -28,9 +28,7 @@ public final class OFCapesUtility {
             response.response(capeTexture);
         } catch (Exception ignored) {
         }
-
     }
-
 
     public static NativeImageBackedTexture getCapeFromURL(String capeStringURL) {
         try {

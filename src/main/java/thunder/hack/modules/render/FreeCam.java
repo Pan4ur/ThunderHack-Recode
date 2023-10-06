@@ -50,9 +50,7 @@ public class FreeCam extends Module {
             mc.player.getVehicle().removeAllPassengers();
         }
 
-        if (mc.player.isSprinting()) {
-            mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
-        }
+        if (mc.player.isSprinting()) sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
 
         prevFlying = mc.player.getAbilities().flying;
         prevFlySpeed = mc.player.getAbilities().getFlySpeed();
@@ -61,9 +59,7 @@ public class FreeCam extends Module {
 
     @Override
     public void onDisable() {
-        if (fullNullCheck() || dummy == null) {
-            return;
-        }
+        if (fullNullCheck() || dummy == null) return;
 
         mc.chunkCullingEnabled = true;
 
@@ -75,10 +71,7 @@ public class FreeCam extends Module {
         mc.player.refreshPositionAndAngles(playerPos.getX(), playerPos.getY(), playerPos.getZ(), playerRot.x, playerRot.y);
         mc.player.setVelocity(Vec3d.ZERO);
 
-        if (riding != null && mc.world.getEntityById(riding.getId()) != null) {
-            mc.player.startRiding(riding);
-        }
-
+        if (riding != null && mc.world.getEntityById(riding.getId()) != null) mc.player.startRiding(riding);
     }
 
     public PlayerEntityCopy getPlayer() {
@@ -119,7 +112,6 @@ public class FreeCam extends Module {
         mc.player.setOnGround(getPlayer().isOnGround());
     }
 
-
     @EventHandler
     public void onPostSync(EventPostSync event) {
         if (fullNullCheck()) {
@@ -151,10 +143,8 @@ public class FreeCam extends Module {
         }
 
         mc.player.setOnGround(false);
-        if (!MovementUtility.isMoving()) {
-            mc.player.setVelocity(Vec3d.ZERO);
-        }
-        mc.player.getAbilities().setFlySpeed((float) (speed.getValue() / 5));
+        if (!MovementUtility.isMoving()) mc.player.setVelocity(Vec3d.ZERO);
+        mc.player.getAbilities().setFlySpeed(speed.getValue() / 5);
         mc.player.getAbilities().flying = true;
         mc.player.setPose(EntityPose.STANDING);
     }

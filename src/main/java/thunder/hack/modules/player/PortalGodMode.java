@@ -1,6 +1,5 @@
 package thunder.hack.modules.player;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
@@ -10,7 +9,6 @@ import thunder.hack.modules.Module;
 import thunder.hack.utility.Timer;
 
 public class PortalGodMode extends Module {
-
     private Timer confirmTimer = new Timer();
     private boolean teleported;
 
@@ -33,7 +31,7 @@ public class PortalGodMode extends Module {
     }
 
     @Override
-    public void onUpdate(){
+    public void onUpdate() {
         for(int x = (int) (mc.player.getX() - 2); x < mc.player.getX() + 2; x++)
             for(int z = (int) (mc.player.getZ() - 2); z < mc.player.getZ() + 2; z++)
                 for(int y = (int) (mc.player.getY() - 2); y < mc.player.getY() + 2; y++)
@@ -42,8 +40,7 @@ public class PortalGodMode extends Module {
     }
 
     @Override
-    public String getDisplayInfo(){
+    public String getDisplayInfo() {
         return teleported ? "God" : confirmTimer.getPassedTimeMs() < 5000 ? "Ready" : "Waiting";
     }
-
 }

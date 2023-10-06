@@ -3,8 +3,6 @@ package thunder.hack.events.impl;
 import thunder.hack.events.Event;
 
 public class EventMove extends Event {
-
-
     public double x, y, z;
 
     public EventMove( double x, double y, double z) {
@@ -25,28 +23,15 @@ public class EventMove extends Event {
         this.x = x;
     }
 
-
-    public double get_x() {
+    public double getX() {
         return this.x;
     }
 
-    public void set_x(double x) {
-        this.x = x;
-    }
-
-    public double get_y() {
+    public double getY() {
         return this.y;
     }
 
-    public void set_y(double y) {
-        this.y = y;
-    }
-
-    public double get_z() {
+    public double getZ() {
         return this.z;
-    }
-
-    public void set_z(double z) {
-        this.z = z;
     }
 }

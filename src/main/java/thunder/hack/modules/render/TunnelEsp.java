@@ -1,6 +1,5 @@
 package thunder.hack.modules.render;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -16,8 +15,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TunnelEsp extends Module {
+import static thunder.hack.modules.client.MainSettings.isRu;
 
+public class TunnelEsp extends Module {
     public TunnelEsp() {
         super("TunnelEsp", Category.RENDER);
     }
@@ -28,27 +28,23 @@ public class TunnelEsp extends Module {
     List<BlockPos> tunnelbp = new ArrayList<>();
     private Timer delayTimer = new Timer();
 
-
     public void onRender3D(MatrixStack stack) {
         try {
             for (BlockPos bp : tunnelbp) {
-                if (box.getValue()) {
-                    Render3DEngine.drawFilledBox(stack, new Box(bp), color.getValue().getColorObject());
-                }
-                if (outline.getValue()) {
-                    Render3DEngine.drawBoxOutline(new Box(bp), Render2DEngine.injectAlpha(color.getValue().getColorObject(), 255), 2);
-                }
+                if (box.getValue()) Render3DEngine.drawFilledBox(stack, new Box(bp), color.getValue().getColorObject());
+                if (outline.getValue()) Render3DEngine.drawBoxOutline(new Box(bp), Render2DEngine.injectAlpha(color.getValue().getColorObject(), 255), 2);
             }
-        } catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
     public void onThread() {
-        if(delayTimer.passedMs(2000)){
+        if (delayTimer.passedMs(2000)) {
             for (int x = (int) (mc.player.getX() - 128); x < mc.player.getX() + 128; ++x) {
                 for (int z = (int) (mc.player.getZ() - 128); z < mc.player.getZ() + 128; ++z) {
                     for (int y = 0; y < 121; ++y) {
-                        if ((one_two(new BlockPos(x, y, z)) && one_two(new BlockPos(x + 1, y, z)) && one_two(new BlockPos(x - 1, y, z)) && one_two(new BlockPos(x + 2, y, z)) && one_two(new BlockPos(x - 2, y, z)))){
+                        if ((one_two(new BlockPos(x, y, z)) && one_two(new BlockPos(x + 1, y, z)) && one_two(new BlockPos(x - 1, y, z)) && one_two(new BlockPos(x + 2, y, z)) && one_two(new BlockPos(x - 2, y, z)))) {
                             tunnelbp.add(new BlockPos(x, y, z));
                             tunnelbp.add(new BlockPos(x, y + 1, z));
 
@@ -63,9 +59,9 @@ public class TunnelEsp extends Module {
 
                             tunnelbp.add(new BlockPos(x - 2, y, z));
                             tunnelbp.add(new BlockPos(x - 2, y + 1, z));
-                            Command.sendMessage("I found tunnel!");
+                            Command.sendMessage(isRu() ? "Нашёл тоннель!" : "Tunnel found!");
                         }
-                        if((one_two(new BlockPos(x, y, z)) && one_two(new BlockPos(x, y, z + 1)) && one_two(new BlockPos(x, y, z - 1)) && one_two(new BlockPos(x, y, z + 2)) && one_two(new BlockPos(x, y, z - 2)))) {
+                        if ((one_two(new BlockPos(x, y, z)) && one_two(new BlockPos(x, y, z + 1)) && one_two(new BlockPos(x, y, z - 1)) && one_two(new BlockPos(x, y, z + 2)) && one_two(new BlockPos(x, y, z - 2)))) {
                             tunnelbp.add(new BlockPos(x, y, z));
                             tunnelbp.add(new BlockPos(x, y + 1, z));
 
@@ -80,7 +76,7 @@ public class TunnelEsp extends Module {
 
                             tunnelbp.add(new BlockPos(x, y, z - 2));
                             tunnelbp.add(new BlockPos(x, y + 1, z - 2));
-                            Command.sendMessage("I found tunnel!");
+                            Command.sendMessage(isRu() ? "Нашёл тоннель!" : "Tunnel found!");
                         }
                     }
                 }
@@ -89,7 +85,7 @@ public class TunnelEsp extends Module {
         }
     }
 
-    /*---------------------- 1 x 2 check -----------------------*/
+    //1 x 2 check
     private boolean one_two(BlockPos pos) {
         if (tunnelbp.contains(pos)) return false;
         if (!mc.world.isAir(pos) || !mc.world.isAir(pos.up())) return false;
@@ -103,7 +99,7 @@ public class TunnelEsp extends Module {
         return false;
     }
 
-    /*---------------------- 1 x 1 check -----------------------*/
+    /*1 x 1 check
     private boolean one_one(BlockPos pos) {
         if (tunnelbp.contains(pos)) return false;
         if (!mc.world.isAir(pos)) return false;
@@ -115,5 +111,5 @@ public class TunnelEsp extends Module {
             return !mc.world.isAir(pos.north()) && !mc.world.isAir(pos.south()) && !mc.world.isAir(pos.up().north()) && !mc.world.isAir(pos.up().south());
         }
         return false;
-    }
+    }*/
 }

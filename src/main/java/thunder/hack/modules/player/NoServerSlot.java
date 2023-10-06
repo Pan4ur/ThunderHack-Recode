@@ -1,6 +1,5 @@
 package thunder.hack.modules.player;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -12,12 +11,11 @@ public class NoServerSlot extends Module {
         super("NoServerSlot", "не дает серверу свапать слоты", Category.PLAYER);
     }
 
-
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof UpdateSelectedSlotS2CPacket) {
             event.setCancelled(true);
-            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+            sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
         }
     }
 }

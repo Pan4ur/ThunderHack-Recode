@@ -5,8 +5,9 @@ import net.minecraft.screen.slot.SlotActionType;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
-public class DropAll extends Module {
+import static thunder.hack.modules.client.MainSettings.isRu;
 
+public class DropAll extends Module {
     public DropAll() {
         super("DropAll", Category.PLAYER);
     }
@@ -34,7 +35,6 @@ public class DropAll extends Module {
             sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
         });
         dropThread.start();
-        disable();
+        disable(isRu() ? "Выбросил" : "Done");
     }
-
 }

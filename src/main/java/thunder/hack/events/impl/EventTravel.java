@@ -5,7 +5,6 @@ import thunder.hack.events.Event;
 
 public class EventTravel extends Event {
     private Vec3d mVec;
-
     private boolean pre;
 
     public EventTravel(Vec3d mVec, boolean pre) {
@@ -13,35 +12,15 @@ public class EventTravel extends Event {
         this.pre = pre;
     }
 
-    public Vec3d getmVec() {
-        return mVec;
-    }
+    public Vec3d getmVec() {return mVec;}
+    public boolean isPre() {return pre;}
 
-    public boolean isPre() {
-        return pre;
-    }
+    public void setX(double x) {mVec = new Vec3d(x, mVec.getY(), mVec.getZ());}
+    public double getX() {return mVec.getX();}
 
-    public void set_y(double v) {
-        mVec = new Vec3d(mVec.getX(), v, mVec.getZ());
-    }
+    public void setY(double v) {mVec = new Vec3d(mVec.getX(), v, mVec.getZ());}
+    public double getY() {return mVec.getY();}
 
-    public double get_y() {
-        return mVec.getY();
-    }
-
-    public void set_x(double x) {
-        mVec = new Vec3d(x, mVec.getY(), mVec.getZ());
-    }
-
-    public double get_x() {
-        return mVec.getX();
-    }
-
-    public void set_z(double z) {
-        mVec = new Vec3d(mVec.getX(), mVec.getY(), z);
-    }
-
-    public double get_z() {
-        return mVec.getZ();
-    }
+    public void setZ(double z) {mVec = new Vec3d(mVec.getX(), mVec.getY(), z);}
+    public double getZ() {return mVec.getZ();}
 }

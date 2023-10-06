@@ -45,6 +45,4 @@ public class NotificationManager {
             startY -= (float) (notification.getHeight() + 3);
         }
     }
-
-
 }

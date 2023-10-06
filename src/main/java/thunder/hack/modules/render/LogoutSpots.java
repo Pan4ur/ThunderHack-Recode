@@ -98,7 +98,6 @@ public class LogoutSpots extends Module {
             String string = data.getName().getString() + " " + String.format("%.1f", (data.getHealth() + data.getAbsorptionAmount())) + " X: " + (int) data.getX() + " " + " Z: " + (int) data.getZ();
 
             if (position != null) {
-
                 float diff = (float) (position.z - position.x) / 2;
                 float textWidth = (FontRenderers.sf_bold.getStringWidth(string) * 1);
                 float tagX = (float) ((position.x + diff - textWidth / 2) * 1);

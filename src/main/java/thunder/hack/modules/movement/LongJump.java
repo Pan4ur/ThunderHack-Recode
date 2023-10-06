@@ -12,6 +12,7 @@ import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class LongJump extends Module {
     public LongJump() {
@@ -27,14 +28,10 @@ public class LongJump extends Module {
     private final Setting<Float> timr = new Setting("TimerSpeed", 1.0F, 0.5F, 3.0F);
     private final Setting<Float> speed = new Setting("Speed", 4.48F, 0.0F, 10.0F);
 
-    
     @EventHandler
     public void onMove(EventMove e) {
-        if (Mode.getValue() == ModeEn.Normal) {
-            doNormal(e);
-        } else if (Mode.getValue() == ModeEn.Pause) {
-            doPause(e);
-        }
+        if (Mode.getValue() == ModeEn.Normal) doNormal(e);
+        else doPause(e);
     }
 
     @EventHandler
@@ -42,7 +39,7 @@ public class LongJump extends Module {
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             stage = 0;
             distance = 0.0;
-            disable(MainSettings.isRu() ? "Тебя флагнуло! Отключаю.." : "You've been flagged! Disabling..");
+            disable(isRu() ? "Тебя флагнуло! Отключаю.." : "You've been flagged! Disabling..");
         }
     }
 
@@ -63,11 +60,8 @@ public class LongJump extends Module {
     }
 
     public double isJumpBoost() {
-        if (mc.player.hasStatusEffect(StatusEffects.JUMP_BOOST)) {
-            return 0.2;
-        } else {
-            return 0;
-        }
+        if (mc.player.hasStatusEffect(StatusEffects.JUMP_BOOST)) return 0.2;
+        else return 0;
     }
     
     public enum ModeEn {
@@ -79,9 +73,8 @@ public class LongJump extends Module {
 
     private void doPause(EventMove eventPlayerMove) {
         if (MovementUtility.isMoving()) {
-            if (usetimer.getValue()) {
+            if (usetimer.getValue())
                 ThunderHack.TICK_TIMER = timr.getValue();
-            }
             switch (stage) {
                 case 0 -> {
                     speedXZ = speed.getValue() * MovementUtility.getBaseMoveSpeed();
@@ -91,7 +84,7 @@ public class LongJump extends Module {
                 case 1 -> {
                     eventPlayerMove.cancel();
                     mc.player.setVelocity(mc.player.getVelocity().getX(),0.42 + isJumpBoost(),mc.player.getVelocity().getZ());
-                    eventPlayerMove.set_y(0.42 + isJumpBoost());
+                    eventPlayerMove.setY(0.42 + isJumpBoost());
                     speedXZ *= 2.149;
                     ++stage;
                 }
@@ -102,9 +95,8 @@ public class LongJump extends Module {
                 }
                 case 3 -> {
                     if (mc.player.verticalCollision || mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.2, 0.0, -0.2).offset(0.0, mc.player.getVelocity().getY(), 0.0)).iterator().hasNext()) {
-                        if(jumpDisable.getValue()){
-                            disable(MainSettings.isRu() ? "Прыжок выполнен! Отключаю.." : "Jump complete! Disabling..");
-                        }
+                        if (jumpDisable.getValue())
+                            disable(isRu() ? "Прыжок выполнен! Отключаю.." : "Jump complete! Disabling..");
                         stage = 0;
                         distance = 0.0;
                     }
@@ -119,29 +111,23 @@ public class LongJump extends Module {
 
     private void doNormal(EventMove eventPlayerMove) {
         if (MovementUtility.isMoving()) {
-            if (usetimer.getValue()) {
-                ThunderHack.TICK_TIMER = timr.getValue();
-            }
+            if (usetimer.getValue()) ThunderHack.TICK_TIMER = timr.getValue();
             if (stage == 0) {
                 speedXZ = speed.getValue() * MovementUtility.getBaseMoveSpeed();
             } else if (stage == 1) {
                 eventPlayerMove.cancel();
                 mc.player.setVelocity(mc.player.getVelocity().getX(),0.42 + isJumpBoost(),mc.player.getVelocity().getZ());
-                eventPlayerMove.set_y(0.42 + isJumpBoost());
+                eventPlayerMove.setY(0.42 + isJumpBoost());
                 speedXZ *= 2.149;
             } else if (stage == 2) {
                 double d = 0.66 * (distance - MovementUtility.getBaseMoveSpeed());
                 speedXZ = distance - d;
             } else {
                 if (mc.player.verticalCollision || mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.2, 0.0, -0.2).offset(0.0, mc.player.getVelocity().getY(), 0.0)).iterator().hasNext()) {
-                    if (!reduction.getValue()) {
-                        dropSync = true;
-                    } else {
-                        stage = 0;
-                    }
-                    if(jumpDisable.getValue()){
-                        disable(MainSettings.isRu() ? "Прыжок выполнен! Отключаю.." : "Jump complete! Disabling..");
-                    }
+                    if (!reduction.getValue()) dropSync = true;
+                    else stage = 0;
+                    if(jumpDisable.getValue())
+                        disable(isRu() ? "Прыжок выполнен! Отключаю.." : "Jump complete! Disabling..");
                 }
                 speedXZ = distance - distance / 159.0;
             }

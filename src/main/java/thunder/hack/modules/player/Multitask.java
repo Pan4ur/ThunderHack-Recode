@@ -3,8 +3,8 @@ package thunder.hack.modules.player;
 import net.minecraft.util.hit.BlockHitResult;
 import thunder.hack.modules.Module;
 
-public class Multitask extends Module {
-    public Multitask() {
+public class MultiTask extends Module {
+    public MultiTask() {
         super("MultiTask", Category.PLAYER);
     }
 

@@ -38,7 +38,7 @@ public class Strafe extends Module {
 
     public double calculateSpeed(EventMove move) {
         float speedAttributes = getAIMoveSpeed();
-        final float frictionFactor = mc.world.getBlockState(new BlockPos.Mutable().set(mc.player.getX(), getBoundingBox().getMin(Direction.Axis.Y) - move.get_y(), mc.player.getZ())).getBlock().getSlipperiness() * 0.91F;
+        final float frictionFactor = mc.world.getBlockState(new BlockPos.Mutable().set(mc.player.getX(), getBoundingBox().getMin(Direction.Axis.Y) - move.getY(), mc.player.getZ())).getBlock().getSlipperiness() * 0.91F;
         float n6 = mc.player.hasStatusEffect(StatusEffects.JUMP_BOOST) && mc.player.isUsingItem() ? 0.88f : (float) (oldSpeed > 0.32 && mc.player.isUsingItem() ? 0.88 : 0.91F);
         if (mc.player.isOnGround()) {
             n6 = frictionFactor;
@@ -47,7 +47,7 @@ public class Strafe extends Module {
         float n8;
         if (mc.player.isOnGround()) {
             n8 = speedAttributes * n7;
-            if (move.get_y() > 0) {
+            if (move.getY() > 0) {
                 n8 += boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && disabled ? 0.65 : 0.2f;
             }
             disabled = false;
@@ -57,9 +57,9 @@ public class Strafe extends Module {
         boolean noslow = false;
         double max2 = oldSpeed + n8;
         double max = 0.0;
-        if (mc.player.isUsingItem() && move.get_y() <= 0) {
+        if (mc.player.isUsingItem() && move.getY() <= 0) {
             double n10 = oldSpeed + n8 * 0.25;
-            double motionY2 = move.get_y();
+            double motionY2 = move.getY();
             if (motionY2 != 0.0 && Math.abs(motionY2) < 0.08) {
                 n10 += 0.055;
             }
@@ -157,7 +157,7 @@ public class Strafe extends Module {
         int elytraSlot = InventoryUtility.getElytra();
 
         if (boost.getValue() == Boost.Elytra && elytraSlot != -1) {
-            if (isMoving() && !mc.player.isOnGround() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, event.get_y(), 0.0f)).iterator().hasNext() && disabled) {
+            if (isMoving() && !mc.player.isOnGround() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, event.getY(), 0.0f)).iterator().hasNext() && disabled) {
                 oldSpeed = setSpeed.getValue();
             }
         }
@@ -165,12 +165,12 @@ public class Strafe extends Module {
             if (isMoving()) {
                 double[] motions = MovementUtility.forward(calculateSpeed(event));
 
-                event.set_x(motions[0]);
-                event.set_z(motions[1]);
+                event.setX(motions[0]);
+                event.setZ(motions[1]);
             } else {
                 oldSpeed = 0;
-                event.set_x(0);
-                event.set_z(0);
+                event.setX(0);
+                event.setZ(0);
             }
             event.cancel();
         } else {

@@ -19,7 +19,6 @@ import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
-
 public class Trajectories extends Module {
     private final Setting<Mode> mode = new Setting<>("ColorMode", Mode.Sync);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x2250b4b4), v -> mode.getValue() == Mode.Custom);
@@ -80,8 +79,7 @@ public class Trajectories extends Module {
             calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw());
             calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw() + 10);
 
-        } else
-            calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw());
+        } else calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw());
         mc.options.getBobView().setValue(prev_bob);
     }
 
@@ -115,7 +113,6 @@ public class Trajectories extends Module {
         motionZ /= distance;
 
         final float pow = (item instanceof BowItem ? (power * 2.0f) : item instanceof CrossbowItem ? (2.2f) : 1.0f) * getThrowVelocity(item);
-
 
         motionX *= pow;
         motionY *= pow;

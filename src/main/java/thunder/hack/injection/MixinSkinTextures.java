@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.client.Media;
-import thunder.hack.utility.OFCapesUtility;
+import thunder.hack.utility.OptifineCapes;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -72,7 +72,7 @@ public class MixinSkinTextures {
             } catch (Exception ignored) {
             }
             Map<MinecraftProfileTexture.Type, Identifier> textures = this.textures;
-            OFCapesUtility.loadPlayerCape(this.profile, id -> {
+            OptifineCapes.loadPlayerCape(this.profile, id -> {
                 textures.put(MinecraftProfileTexture.Type.CAPE, id);
             });
         });

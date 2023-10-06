@@ -41,7 +41,6 @@ public class Notification {
     public void render(MatrixStack matrix, float getY) {
         Color icolor2 = new Color(170, 170, 170, (int) MathUtility.clamp((1 - animation.getAnimationd()), 0, 255));
 
-
         direction = isFinished();
         animationX = (float) (width * animation.getAnimationd());
 
@@ -82,13 +81,10 @@ public class Notification {
         int x1 = (int) ((mc.getWindow().getScaledWidth() - 6) - width + animationX);
         int y1 = (int) posY;
 
-
         Render2DEngine.drawGradientGlow(matrix, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), x1, y1, width, height, 5f, 10);
         Render2DEngine.drawGradientRoundShader(matrix, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), x1 - 0.5f, y1 - 0.5f, width + 1, height + 1, 5f);
         Render2DEngine.drawRoundShader(matrix, x1, y1, width, height, 5f, HudEditor.plateColor.getValue().getColorObject());
-
     }
-
 
     private boolean isFinished() {
         return timer.passedMs(stayTime);
@@ -105,7 +101,6 @@ public class Notification {
     public float animate(float value, float target) {
         return value + (target - value) / 8f;
     }
-
 
     public enum Type {
         SUCCESS("Success"),

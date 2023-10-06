@@ -19,7 +19,6 @@ import java.net.URI;
 
 import static thunder.hack.modules.Module.mc;
 
-
 @Mixin(TitleScreen.class)
 public class MixinTitleScreen extends Screen {
     protected MixinTitleScreen(Text title) {

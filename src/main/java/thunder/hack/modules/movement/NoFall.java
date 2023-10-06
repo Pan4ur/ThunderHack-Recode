@@ -2,8 +2,6 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -40,9 +38,7 @@ public class NoFall extends Module {
     @EventHandler
     public void onSync(EventSync e) {
         if (isFalling()) {
-            if (mode.getValue() == Mode.Rubberband) {
-                sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
-            }
+            if (mode.getValue() == Mode.Rubberband) sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
             if (mode.getValue() == Mode.Items) {
                 mc.player.setPitch(90);
                 BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
@@ -65,9 +61,7 @@ public class NoFall extends Module {
                     doSnowDrop(snowResult, playerPos);
                 }
             }
-            if (mode.getValue() == Mode.MatrixOffGround) {
-                cancelGround = true;
-            }
+            if (mode.getValue() == Mode.MatrixOffGround) cancelGround = true;
         }
     }
 
@@ -128,8 +122,8 @@ public class NoFall extends Module {
         }
     }
 
-    public boolean isFalling(){
-        switch (fallDistance.getValue()){
+    public boolean isFalling() {
+        switch (fallDistance.getValue()) {
             case Custom -> {
                 return mc.player.fallDistance > fallDistanceValue.getValue();
             }
@@ -141,7 +135,7 @@ public class NoFall extends Module {
     }
 
     @Override
-    public String getDisplayInfo(){
+    public String getDisplayInfo() {
         return mode.getValueAsString() + " " + (isFalling() ? "Ready" : "");
     }
 
