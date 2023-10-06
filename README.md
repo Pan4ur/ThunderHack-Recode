@@ -16,6 +16,10 @@
 - Default prefix  - **```@```**
 - Middle click on module to bind
 - DoxWare 2.0 is a ratted TH Recode rename, be aware :)
+- selfdox попросил меня написать тут что у него самое большое колво ело на сс
+- А у 06ED'a самая красивая попа
+- А кен просто крутой
+- А я тоже крутой
 
 ## Requirements
 - [FabricApi 1.20.2](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files)
