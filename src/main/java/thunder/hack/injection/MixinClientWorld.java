@@ -23,7 +23,6 @@ public class MixinClientWorld {
         }
     }
 
-
     @Inject(method = "removeEntity", at = @At("HEAD"))
     public void onRemoveEntity(int entityId, Entity.RemovalReason removalReason, CallbackInfo ci) {
         if(mc.world == null) return;

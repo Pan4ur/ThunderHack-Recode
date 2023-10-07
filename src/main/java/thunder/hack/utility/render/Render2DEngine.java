@@ -13,11 +13,13 @@ import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL40C;
-import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.font.Texture;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.math.MathUtility;
-import thunder.hack.utility.render.shaders.*;
+import thunder.hack.utility.render.shaders.GradientGlowProgram;
+import thunder.hack.utility.render.shaders.MainMenuProgram;
+import thunder.hack.utility.render.shaders.RoundedGradientProgram;
+import thunder.hack.utility.render.shaders.RoundedProgram;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -40,7 +42,6 @@ public class Render2DEngine {
 
     public static HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
     final static Stack<Rectangle> clipStack = new Stack<>();
-
 
     public static void addWindow(MatrixStack stack, Rectangle r1) {
         Matrix4f matrix = stack.peek().getPositionMatrix();
@@ -104,12 +105,8 @@ public class Render2DEngine {
         float x4 = x1;
         float y4 = y1 - h2;
 
-        if (x4 < x3) {
-            x4 = x3;
-        }
-        if (y4 < y3) {
-            y4 = y3;
-        }
+        if (x4 < x3) x4 = x3;
+        if (y4 < y3) y4 = y3;
         addWindow(stack, new Rectangle(x3, y3, x4, y4));
     }
 
@@ -279,7 +276,6 @@ public class Render2DEngine {
     }
 
     public static void drawElipseSync(float x, float y, float rx, float ry, float start, float end, float radius, Color color) {
-
         if (start > end) {
             float endOffset = end;
             end = start;
@@ -345,8 +341,7 @@ public class Render2DEngine {
     public static void renderRoundedQuad(MatrixStack matrices, Color c, Color c1, double fromX, double fromY, double toX, double toY, double radius, double samples) {
         setupRender();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        renderRoundedQuadInternal(matrices.peek().getPositionMatrix(), c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f,
-                c1.getRed() / 255f, c1.getGreen() / 255f, c1.getBlue() / 255f, c1.getAlpha() / 255f, fromX, fromY, toX, toY, radius, samples);
+        renderRoundedQuadInternal(matrices.peek().getPositionMatrix(), c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f, c1.getRed() / 255f, c1.getGreen() / 255f, c1.getBlue() / 255f, c1.getAlpha() / 255f, fromX, fromY, toX, toY, radius, samples);
         endRender();
     }
 
@@ -407,12 +402,7 @@ public class Render2DEngine {
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
-        double[][] map = new double[][]{
-                new double[]{toX - radC1, toY - radC1, radC1},
-                new double[]{toX - radC1, fromY + radC1, radC1},
-                new double[]{fromX + radC1, fromY + radC1, radC1},
-                new double[]{fromX + radC1, toY - radC1, radC1}
-        };
+        double[][] map = new double[][]{new double[]{toX - radC1, toY - radC1, radC1}, new double[]{toX - radC1, fromY + radC1, radC1}, new double[]{fromX + radC1, fromY + radC1, radC1}, new double[]{fromX + radC1, toY - radC1, radC1}};
 
         for (int i = 0; i < 4; i++) {
             double[] current = map[i];
@@ -421,6 +411,12 @@ public class Render2DEngine {
                 float rad1 = (float) Math.toRadians(r);
                 float sin = (float) (Math.sin(rad1) * rad);
                 float cos = (float) (Math.cos(rad1) * rad);
+                switch (i) {
+                    case 0 -> bufferBuilder.vertex(matrix, (float) current[0] + sin, (float) current[1] + cos, 0.0F).color(cr1, cg1, cb1, ca1).next();
+                    case 1 -> bufferBuilder.vertex(matrix, (float) current[0] + sin, (float) current[1] + cos, 0.0F).color(cr, cg, cb, ca).next();
+                    case 2 -> bufferBuilder.vertex(matrix, (float) current[0] + sin, (float) current[1] + cos, 0.0F).color(cr2, cg2, cb2, ca2).next();
+                    default ->bufferBuilder.vertex(matrix, (float) current[0] + sin, (float) current[1] + cos, 0.0F).color(cr3, cg3, cb3, ca3).next();
+                }/*
                 if (i == 1) {
                     bufferBuilder.vertex(matrix, (float) current[0] + sin, (float) current[1] + cos, 0.0F).color(cr, cg, cb, ca).next();
                 } else if (i == 0) {
@@ -429,7 +425,7 @@ public class Render2DEngine {
                     bufferBuilder.vertex(matrix, (float) current[0] + sin, (float) current[1] + cos, 0.0F).color(cr2, cg2, cb2, ca2).next();
                 } else {
                     bufferBuilder.vertex(matrix, (float) current[0] + sin, (float) current[1] + cos, 0.0F).color(cr3, cg3, cb3, ca3).next();
-                }
+                }*/
             }
         }
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
@@ -458,7 +454,6 @@ public class Render2DEngine {
     public static void endRender() {
         RenderSystem.disableBlend();
     }
-
 
     public static void drawGradientRound(MatrixStack ms, float v, float v1, int i, int i1, float v2, Color darker, Color darker1, Color darker2, Color darker3) {
         renderRoundedQuad2(ms, darker, darker1, darker2, darker3, v, v1, v + i, v1 + i1, v2);
@@ -524,8 +519,7 @@ public class Render2DEngine {
 
     public static Color skyRainbow(int speed, int index) {
         int angle = (int) ((System.currentTimeMillis() / speed + index) % 360);
-        return Color.getHSBColor((double) ((float) ((angle %= 360) / 360.0)) < 0.5 ? -((float) (angle / 360.0))
-                : (float) (angle / 360.0), 0.5F, 1.0F);
+        return Color.getHSBColor((double) ((float) ((angle %= 360) / 360.0)) < 0.5 ? -((float) (angle / 360.0)) : (float) (angle / 360.0), 0.5F, 1.0F);
     }
 
     public static Color fade(int speed, int index, Color color, float alpha) {
@@ -564,23 +558,18 @@ public class Render2DEngine {
         int angle = (int) ((System.currentTimeMillis() / speed + index) % 360);
         float hue = angle / 360f;
         Color color = new Color(Color.HSBtoRGB(hue, saturation, brightness));
-        return new Color(color.getRed(), color.getGreen(), color.getBlue(),
-                Math.max(0, Math.min(255, (int) (opacity * 255))));
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(), Math.max(0, Math.min(255, (int) (opacity * 255))));
     }
 
     public static Color interpolateColorsBackAndForth(int speed, int index, Color start, Color end, boolean trueColor) {
         int angle = (int) (((System.currentTimeMillis()) / speed + index) % 360);
         angle = (angle >= 180 ? 360 - angle : angle) * 2;
-        return trueColor ? interpolateColorHue(start, end, angle / 360f)
-                : interpolateColorC(start, end, angle / 360f);
+        return trueColor ? interpolateColorHue(start, end, angle / 360f) : interpolateColorC(start, end, angle / 360f);
     }
 
     public static Color interpolateColorC(Color color1, Color color2, float amount) {
         amount = Math.min(1, Math.max(0, amount));
-        return new Color(interpolateInt(color1.getRed(), color2.getRed(), amount),
-                interpolateInt(color1.getGreen(), color2.getGreen(), amount),
-                interpolateInt(color1.getBlue(), color2.getBlue(), amount),
-                interpolateInt(color1.getAlpha(), color2.getAlpha(), amount));
+        return new Color(interpolateInt(color1.getRed(), color2.getRed(), amount), interpolateInt(color1.getGreen(), color2.getGreen(), amount), interpolateInt(color1.getBlue(), color2.getBlue(), amount), interpolateInt(color1.getAlpha(), color2.getAlpha(), amount));
     }
 
     public static Color interpolateColorHue(Color color1, Color color2, float amount) {
@@ -589,12 +578,9 @@ public class Render2DEngine {
         float[] color1HSB = Color.RGBtoHSB(color1.getRed(), color1.getGreen(), color1.getBlue(), null);
         float[] color2HSB = Color.RGBtoHSB(color2.getRed(), color2.getGreen(), color2.getBlue(), null);
 
-        Color resultColor = Color.getHSBColor(interpolateFloat(color1HSB[0], color2HSB[0], amount),
-                interpolateFloat(color1HSB[1], color2HSB[1], amount),
-                interpolateFloat(color1HSB[2], color2HSB[2], amount));
+        Color resultColor = Color.getHSBColor(interpolateFloat(color1HSB[0], color2HSB[0], amount), interpolateFloat(color1HSB[1], color2HSB[1], amount), interpolateFloat(color1HSB[2], color2HSB[2], amount));
 
-        return new Color(resultColor.getRed(), resultColor.getGreen(), resultColor.getBlue(),
-                interpolateInt(color1.getAlpha(), color2.getAlpha(), amount));
+        return new Color(resultColor.getRed(), resultColor.getGreen(), resultColor.getBlue(), interpolateInt(color1.getAlpha(), color2.getAlpha(), amount));
     }
 
     public static double interpolate(double oldValue, double newValue, double interpolationValue) {
@@ -692,7 +678,7 @@ public class Render2DEngine {
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 
-    // http://www.java2s.com/example/java/2d-graphics/check-if-a-color-is-more-dark-than-light.html
+    //http://www.java2s.com/example/java/2d-graphics/check-if-a-color-is-more-dark-than-light.html
     public static boolean isDark(Color color) {
         return isDark(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f);
     }

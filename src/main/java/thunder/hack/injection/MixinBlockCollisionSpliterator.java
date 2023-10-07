@@ -13,7 +13,6 @@ import thunder.hack.events.impl.EventCollision;
 
 @Mixin(value = BlockCollisionSpliterator.class, priority = 800)
 public abstract class MixinBlockCollisionSpliterator {
-
     // я надеюсь это никто не будет редиректить
     @Redirect(method = "computeNext", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/BlockView;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;"))
     private BlockState computeNextHook(BlockView instance, BlockPos blockPos) {

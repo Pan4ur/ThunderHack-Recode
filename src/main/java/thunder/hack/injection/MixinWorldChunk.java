@@ -15,12 +15,9 @@ import thunder.hack.events.impl.EventSetBlockState;
 
 @Mixin({WorldChunk.class})
 public class MixinWorldChunk {
-    @Shadow
-    @Final
-    World world;
+    @Shadow @Final World world;
 
-
-    @Inject(method = {"setBlockState"}, at = {@At("RETURN")})
+    @Inject(method = "setBlockState", at = @At("RETURN"))
     private void setBlockStateHook(BlockPos pos, BlockState state, boolean moved, CallbackInfoReturnable<BlockState> cir) {
         if (this.world.isClient) {
             ThunderHack.EVENT_BUS.post(new EventSetBlockState(pos, state));

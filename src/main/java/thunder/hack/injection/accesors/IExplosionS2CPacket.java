@@ -19,8 +19,6 @@ public interface IExplosionS2CPacket {
     @Accessor("playerVelocityZ")
     void setMotionZ(float velocityZ);
 
-
-
     @Accessor("playerVelocityX")
     float getMotionX();
 

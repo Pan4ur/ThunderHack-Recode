@@ -24,8 +24,7 @@ import static thunder.hack.modules.Module.mc;
 
 @Mixin(value = ClientPlayerEntity.class, priority = 800)
 public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity {
-    @Shadow
-    public abstract float getPitch(float tickDelta);
+    @Shadow public abstract float getPitch(float tickDelta);
 
     public MixinClientPlayerEntity(ClientWorld world, GameProfile profile) {
         super(world, profile);
@@ -67,19 +66,17 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         EventAfterRotate ear = new EventAfterRotate();
         ThunderHack.EVENT_BUS.post(ear);
         if (e.getSprintState() != mc.player.lastSprinting) {
-            if (e.getSprintState()) {
+            if (e.getSprintState())
                 mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(this, ClientCommandC2SPacket.Mode.START_SPRINTING));
-            } else {
+            else
                 mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(this, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
-            }
+
             mc.player.lastSprinting = e.getSprintState();
         }
         pre_sprint_state = mc.player.lastSprinting;
         Core.lock_sprint = true;
 
-        if (event.isCancelled()) {
-            info.cancel();
-        }
+        if (event.isCancelled()) info.cancel();
     }
 
     @Inject(method = "sendMovementPackets", at = @At("RETURN"), cancellable = true)
@@ -89,15 +86,12 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         Core.lock_sprint = false;
         EventPostSync event = new EventPostSync();
         ThunderHack.EVENT_BUS.post(event);
-        if (event.isCancelled()) {
-            info.cancel();
-        }
+        if (event.isCancelled()) info.cancel();
     }
 
     private boolean updateLock = false;
 
-    @Shadow
-    protected abstract void sendMovementPackets();
+    @Shadow protected abstract void sendMovementPackets();
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendMovementPackets()V", ordinal = 0, shift = At.Shift.AFTER), cancellable = true)
     private void PostUpdateHook(CallbackInfo info) {

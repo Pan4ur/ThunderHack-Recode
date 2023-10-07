@@ -2,12 +2,9 @@ package thunder.hack.injection;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.DrawContext;
-import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Overlay;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.SplashOverlay;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.ResourceReload;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -25,29 +22,14 @@ import java.util.function.Consumer;
 
 import static thunder.hack.modules.Module.mc;
 
-
 @Mixin(SplashOverlay.class)
 public abstract class MixinSplashOverlay {
-    @Final
-    @Shadow
-    private boolean reloading;
-
-    @Shadow
-    private float progress;
-
-    @Shadow
-    private long reloadCompleteTime = -1L;
-
-    @Shadow
-    private long reloadStartTime = -1L;
-
-    @Final
-    @Shadow
-    private ResourceReload reload;
-
-    @Final
-    @Shadow
-    private Consumer<Optional<Throwable>> exceptionHandler;
+    @Final @Shadow private boolean reloading;
+    @Shadow private float progress;
+    @Shadow private long reloadCompleteTime = -1L;
+    @Shadow private long reloadStartTime = -1L;
+    @Final @Shadow private ResourceReload reload;
+    @Final @Shadow private Consumer<Optional<Throwable>> exceptionHandler;
 
     @Shadow
     protected abstract void renderProgressBar(DrawContext drawContext, int minX, int minY, int maxX, int maxY, float opacity);
@@ -73,17 +55,15 @@ public abstract class MixinSplashOverlay {
         float h;
         int k;
         if (f >= 1.0F) {
-            if (mc.currentScreen != null) {
+            if (mc.currentScreen != null)
                 mc.currentScreen.render(context, 0, 0, delta);
-            }
 
             k = MathHelper.ceil((1.0F - MathHelper.clamp(f - 1.0F, 0.0F, 1.0F)) * 255.0F);
             context.fill(0, 0, i, j, withAlpha(new Color(0x070015).getRGB(), k));
             h = 1.0F - MathHelper.clamp(f - 1.0F, 0.0F, 1.0F);
         } else if (reloading) {
-            if (mc.currentScreen != null && g < 1.0F) {
+            if (mc.currentScreen != null && g < 1.0F)
                 mc.currentScreen.render(context, mouseX, mouseY, delta);
-            }
 
             k = MathHelper.ceil(MathHelper.clamp((double) g, 0.15, 1.0) * 255.0);
             context.fill(0, 0, i, j, withAlpha(new Color(0x070015).getRGB(), k));
@@ -138,7 +118,6 @@ public abstract class MixinSplashOverlay {
                 mc.currentScreen.init(mc, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
             }
         }
-
     }
 
     private static int withAlpha(int color, int alpha) {

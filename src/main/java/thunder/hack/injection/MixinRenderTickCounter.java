@@ -1,6 +1,6 @@
 package thunder.hack.injection;
 
-
+import org.spongepowered.asm.mixin.Final;
 import thunder.hack.ThunderHack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,20 +12,18 @@ import net.minecraft.client.render.RenderTickCounter;
 
 @Mixin(RenderTickCounter.class)
 public class MixinRenderTickCounter {
-
-    @Shadow private float lastFrameDuration;
-    @Shadow private float tickDelta;
+    @Shadow public float lastFrameDuration;
+    @Shadow public float tickDelta;
     @Shadow private long prevTimeMillis;
-    @Shadow private float tickTime;
+    @Final @Shadow private float tickTime;
 
     @Inject(method = "beginRenderTick", at = @At("HEAD"), cancellable = true)
-    private void beginRenderTick(long timeMillis, CallbackInfoReturnable<Integer> ci) {
+    private void beginRenderTick(long timeMillis, CallbackInfoReturnable<Integer> cir) {
         this.lastFrameDuration = ((timeMillis - this.prevTimeMillis) / this.tickTime) * ThunderHack.TICK_TIMER;
         this.prevTimeMillis = timeMillis;
         this.tickDelta += this.lastFrameDuration;
         int i = (int) this.tickDelta;
         this.tickDelta -= i;
-        ci.setReturnValue(i);
+        cir.setReturnValue(i);
     }
-
 }

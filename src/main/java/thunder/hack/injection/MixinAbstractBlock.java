@@ -1,6 +1,5 @@
 package thunder.hack.injection;
 
-
 import thunder.hack.core.ModuleManager;
 import thunder.hack.modules.player.AutoTool;
 import net.minecraft.block.AbstractBlock;
@@ -19,7 +18,6 @@ import static net.minecraft.enchantment.Enchantments.EFFICIENCY;
 
 @Mixin({AbstractBlock.class})
 public abstract class MixinAbstractBlock {
-
     @Inject(method = "calcBlockBreakingDelta", at = @At("HEAD"), cancellable = true)
     public void calcBlockBreakingDeltaHook(BlockState state, PlayerEntity player, BlockView world, BlockPos pos, CallbackInfoReturnable<Float> ci)  {
         if(ModuleManager.autoTool.isEnabled() && AutoTool.silent.getValue()) {
@@ -40,9 +38,7 @@ public abstract class MixinAbstractBlock {
         return (float) Math.max(str + (str > 1.0 ? (effect * effect + 1.0) : 0.0), 0.0);
     }
 
-
-/*
-    private boolean canHarvestBlock(BlockState state, ItemStack stack) {
+    /*private boolean canHarvestBlock(BlockState state, ItemStack stack) {
         if (state.isToolRequired()) {
             return true;
         }
@@ -55,9 +51,5 @@ public abstract class MixinAbstractBlock {
             return mc.player.canHarvest(state);
         }
         return toolLevel >= state.getBlock().getHarvestLevel(state);
-    }
-
-
- */
-
+    }*/
 }

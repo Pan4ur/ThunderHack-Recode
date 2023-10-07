@@ -1,6 +1,5 @@
 package thunder.hack.injection;
 
-
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.HeldItemRenderer;
@@ -39,7 +38,6 @@ public abstract class MixinHeldItemRenderer {
     @Shadow
     public abstract void renderItem(LivingEntity entity, ItemStack stack, ModelTransformationMode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light);
 
-
     @Inject(method = "renderFirstPersonItem", at = @At(value = "HEAD"), cancellable = true)
     private void onRenderItemHook(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         if (ThunderHack.moduleManager != null && ModuleManager.animations.isEnabled() && !(item.isEmpty()) && !(item.getItem() instanceof FilledMapItem)) {
@@ -47,7 +45,6 @@ public abstract class MixinHeldItemRenderer {
             renderFirstPersonItemCustom(player, tickDelta, pitch, hand, swingProgress, item, equipProgress, matrices, vertexConsumers, light);
         }
     }
-
 
     private void renderFirstPersonItemCustom(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         if (!player.isUsingSpyglass()) {
@@ -175,7 +172,6 @@ public abstract class MixinHeldItemRenderer {
                     this.applySwingOffset(matrices, arm, swingProgress);
                 }
 
-
                 EventHeldItemRenderer event = new EventHeldItemRenderer(hand, item, equipProgress, matrices);
                 ThunderHack.EVENT_BUS.post(event);
                 this.renderItem(player, item, bl2 ? ModelTransformationMode.FIRST_PERSON_RIGHT_HAND : ModelTransformationMode.FIRST_PERSON_LEFT_HAND, !bl2, matrices, vertexConsumers, light);
@@ -224,7 +220,6 @@ public abstract class MixinHeldItemRenderer {
         }
     }
 
-
     private void applyBrushTransformation(MatrixStack matrices, float tickDelta, Arm arm, @NotNull ItemStack stack, float equipProgress) {
         applyEquipOffset(matrices, arm, equipProgress);
         float f = (float) mc.player.getItemUseTimeLeft() - tickDelta + 1.0F;
@@ -244,6 +239,5 @@ public abstract class MixinHeldItemRenderer {
             matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(0.0F));
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(m));
         }
-
     }
 }

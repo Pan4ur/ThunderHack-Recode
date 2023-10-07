@@ -1,31 +1,27 @@
 package thunder.hack.injection;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.util.math.Vec3d;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventTravel;
 import thunder.hack.modules.render.ViewModel;
 import thunder.hack.utility.interfaces.IEntityLiving;
-import net.minecraft.entity.LivingEntity;
-
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static thunder.hack.modules.Module.mc;
 
 @Mixin(LivingEntity.class)
 public class MixinEntityLiving implements IEntityLiving {
-
     @Shadow protected double serverX;
-
     @Shadow protected double serverY;
-
     @Shadow protected double serverZ;
 
     @Inject(method = {"getHandSwingDuration"}, at = {@At("HEAD")}, cancellable = true)
@@ -34,7 +30,7 @@ public class MixinEntityLiving implements IEntityLiving {
             info.setReturnValue(ViewModel.slowAnimationVal.getValue());
     }
 
-    double prevServerX,prevServerY,prevServerZ;
+    double prevServerX, prevServerY, prevServerZ;
 
     @Inject(method = {"updateTrackedPositionAndAngles"}, at = {@At("HEAD")})
     private void updateTrackedPositionAndAnglesHook(double x, double y, double z, float yaw, float pitch, int interpolationSteps, CallbackInfo ci) {
@@ -61,7 +57,6 @@ public class MixinEntityLiving implements IEntityLiving {
     @Unique
     private boolean prevFlying = false;
 
-
     @Inject(method = "isFallFlying", at = @At("TAIL"), cancellable = true)
     public void isFallFlyingHook(CallbackInfoReturnable<Boolean> cir) {
         if (ModuleManager.elytraRecast.isEnabled()) {
@@ -75,8 +70,8 @@ public class MixinEntityLiving implements IEntityLiving {
 
     @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
     public void travelHook(Vec3d movementInput, CallbackInfo ci) {
-        if((LivingEntity)(Object)this != mc.player) return;
-        final EventTravel event = new EventTravel(mc.player.getVelocity(),true);
+        if ((LivingEntity) (Object) this != mc.player) return;
+        final EventTravel event = new EventTravel(mc.player.getVelocity(), true);
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
             mc.player.move(MovementType.SELF, event.getmVec());
@@ -86,8 +81,8 @@ public class MixinEntityLiving implements IEntityLiving {
 
     @Inject(method = "travel", at = @At("RETURN"), cancellable = true)
     public void travelPostHook(Vec3d movementInput, CallbackInfo ci) {
-        if((LivingEntity)(Object)this != mc.player) return;
-        final EventTravel event = new EventTravel(movementInput,false);
+        if ((LivingEntity) (Object) this != mc.player) return;
+        final EventTravel event = new EventTravel(movementInput, false);
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
             mc.player.move(MovementType.SELF, mc.player.getVelocity());

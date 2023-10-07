@@ -39,7 +39,6 @@ import java.util.function.Consumer;
 
 import static thunder.hack.modules.Module.mc;
 
-
 @Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer {
     @Shadow

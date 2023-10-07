@@ -17,29 +17,19 @@ import java.util.List;
 
 import static thunder.hack.modules.Module.mc;
 
-
 @Mixin(PlayerListHud.class)
 public class MixinPlayerListHud {
-
-    private static final Comparator<Object> ENTRY_ORDERING = Comparator.comparingInt((entry) -> {
-        return ((PlayerListEntry)entry).getGameMode() == GameMode.SPECTATOR ? 1 : 0;
-    }).thenComparing((entry) -> {
-        return (String) Nullables.mapOrElse(((PlayerListEntry)entry).getScoreboardTeam(), Team::getName, "");
-    }).thenComparing((entry) -> {
-        return ((PlayerListEntry)entry).getProfile().getName();
-    }, String::compareToIgnoreCase);
+    private static final Comparator<Object> ENTRY_ORDERING = Comparator.comparingInt((entry) -> ((PlayerListEntry) entry).getGameMode() == GameMode.SPECTATOR ? 1 : 0)
+            .thenComparing((entry) -> (String) Nullables.mapOrElse(((PlayerListEntry) entry).getScoreboardTeam(), Team::getName, ""))
+            .thenComparing((entry) -> ((PlayerListEntry) entry).getProfile().getName(), String::compareToIgnoreCase);
 
     @Inject(method = "collectPlayerEntries", at = @At("HEAD"), cancellable = true)
     private void collectPlayerEntriesHook(CallbackInfoReturnable<List<PlayerListEntry>> cir) {
-        if(MainSettings.futureCompatibility.getValue())
-            return;
+        if (MainSettings.futureCompatibility.getValue()) return;
 
-        if(ModuleManager.extraTab.isEnabled()){
+        if (ModuleManager.extraTab.isEnabled())
             cir.setReturnValue(mc.player.networkHandler.getListedPlayerListEntries().stream().sorted(ENTRY_ORDERING).limit(1000).toList());
-        } else {
+        else
             cir.setReturnValue(mc.player.networkHandler.getListedPlayerListEntries().stream().sorted(ENTRY_ORDERING).limit(80).toList());
-        }
     }
-
-
 }

@@ -13,7 +13,7 @@ import java.awt.*;
 
 import static thunder.hack.modules.Module.mc;
 
-public class GradientGlowProgram extends GlProgram{
+public class GradientGlowProgram extends GlProgram {
 
     private GlUniform uSize;
     private GlUniform uLocation;

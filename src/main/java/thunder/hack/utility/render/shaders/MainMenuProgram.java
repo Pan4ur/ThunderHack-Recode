@@ -7,10 +7,7 @@ import net.minecraft.client.gl.SimpleFramebuffer;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL30;
-import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.WindowResizeCallback;
-
-
 
 public class MainMenuProgram extends GlProgram {
 
@@ -18,7 +15,6 @@ public class MainMenuProgram extends GlProgram {
     private GlUniform uSize;
     private Framebuffer input;
     public static float time_ = 0f;
-
 
     public MainMenuProgram() {
         super(new Identifier("thunderhack", "mainmenu"), VertexFormats.POSITION);
@@ -33,10 +29,9 @@ public class MainMenuProgram extends GlProgram {
         this.Time.set((float) time_);
     }
 
-    public static void increaseTime(){
+    public static void increaseTime() {
         time_ += 0.001f;
     }
-
 
     @Override
     public void use() {

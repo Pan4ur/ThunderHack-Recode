@@ -14,7 +14,6 @@ import java.awt.*;
 import static thunder.hack.modules.Module.mc;
 
 public class RoundedProgram extends GlProgram {
-
     private GlUniform uSize;
     private GlUniform uLocation;
     private GlUniform size;
@@ -32,9 +31,9 @@ public class RoundedProgram extends GlProgram {
 
     public void setParameters(float x, float y, float width, float height, float radius, Color color) {
         this.size.set(radius * 2);
-        this.uSize.set(width * 2,height * 2);
-        this.uLocation.set(x * 2,-y * 2 + mc.getWindow().getScaledHeight() * 2 - height * 2);
-        this.color.set(color.getRed() / 255f,color.getGreen() / 255f,color.getBlue() / 255f,color.getAlpha() / 255f);
+        this.uSize.set(width * 2, height * 2);
+        this.uLocation.set(x * 2, -y * 2 + mc.getWindow().getScaledHeight() * 2 - height * 2);
+        this.color.set(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
     }
 
     @Override

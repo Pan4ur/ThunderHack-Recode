@@ -1,4 +1,5 @@
 package thunder.hack.injection;
+
 import net.minecraft.client.gl.ShaderProgram;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

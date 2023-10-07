@@ -1,22 +1,15 @@
 package thunder.hack.utility;
 
-import com.mojang.authlib.minecraft.MinecraftProfileTexture;
-import net.minecraft.util.Identifier;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static thunder.hack.modules.Module.mc;
 
-
 public final class ThunderUtility {
-
     public static List<String> changeLog = new ArrayList<>();
 
     public static String solveName(String notSolved) {
@@ -38,7 +31,7 @@ public final class ThunderUtility {
             while ((inputLine = in.readLine()) != null)
                 changeLog.add(inputLine.trim());
         } catch (Exception ignored) {
-            changeLog.add("ChangeLog parsing  error :(");
+            changeLog.add("ChangeLog parsing error :(");
         }
     }
 }

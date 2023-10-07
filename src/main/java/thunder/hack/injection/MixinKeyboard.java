@@ -1,6 +1,5 @@
 package thunder.hack.injection;
 
-
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventKeyPress;
 import thunder.hack.events.impl.EventKeyRelease;
@@ -14,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static thunder.hack.modules.Module.mc;
 
-
 @Mixin(Keyboard.class)
 public class MixinKeyboard {
 
@@ -22,14 +20,11 @@ public class MixinKeyboard {
     private void onKey(long windowPointer, int key, int scanCode, int action, int modifiers, CallbackInfo ci) {
         boolean whitelist = mc.currentScreen == null || mc.currentScreen instanceof ClickUI || mc.currentScreen instanceof HudEditorGui;
         if (!whitelist) return;
-        if (action == 1) {
-            ThunderHack.moduleManager.onKeyPressed(key);
-        }
-        if (action == 0) {
-            ThunderHack.moduleManager.onKeyReleased(key);
-        }
 
+        if (action == 0) ThunderHack.moduleManager.onKeyReleased(key);
+        if (action == 1) ThunderHack.moduleManager.onKeyPressed(key);
         if (action == 2) action = 1;
+
         switch (action) {
             case 0 -> {
                 EventKeyRelease event = new EventKeyRelease(key, scanCode);

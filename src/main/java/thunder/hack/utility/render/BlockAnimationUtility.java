@@ -28,8 +28,7 @@ public final class BlockAnimationUtility {
     }
 
     public static boolean isRendering(BlockPos pos) {
-        return blocks.keySet().stream()
-                .anyMatch(blockRenderData -> blockRenderData.pos().equals(pos));
+        return blocks.keySet().stream().anyMatch(blockRenderData -> blockRenderData.pos().equals(pos));
     }
 
     private record BlockRenderData(BlockPos pos, Color lineColor, int lineWidth, Color fillColor,
@@ -58,7 +57,7 @@ public final class BlockAnimationUtility {
                     renderBox(time, stack, box, renderMode, lineColor, lineWidth, fillColor);
                 }
                 case Fill -> {
-                    float scale =  (float) time / 300f;
+                    float scale = (float) time / 300f;
                     Box box = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
                     if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Line)
                         Render3DEngine.drawBoxOutline(box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), lineColor, lineWidth);
@@ -68,7 +67,7 @@ public final class BlockAnimationUtility {
                 }
                 case Flash -> {
                     float scale;
-                    if(time > 100) {
+                    if (time > 100) {
                         scale = 1 - (float) (time - 100) / 400;
                     } else {
                         scale = (float) time / 100;
@@ -91,12 +90,12 @@ public final class BlockAnimationUtility {
                         Render3DEngine.drawBoxOutline(box, lineColor, lineWidth);
 
                     if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Fill)
-                        Render3DEngine.drawFilledBox(stack, box, Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() *  (time / 300f))));
+                        Render3DEngine.drawFilledBox(stack, box, Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() * (time / 300f))));
                 }
                 case TNT -> {
                     float scale;
 
-                    if(time < 200){
+                    if (time < 200) {
                         scale = 1f;
                     } else {
                         scale = 1 + (time - 200f) / 400f;
@@ -114,7 +113,7 @@ public final class BlockAnimationUtility {
                 case Pull -> {
                     float scale;
 
-                    if(time < 200){
+                    if (time < 200) {
                         scale = 1.5f - (time / 200f) * 0.5f;
                     } else {
                         scale = 1f;
@@ -136,7 +135,7 @@ public final class BlockAnimationUtility {
                     Box box = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
 
                     if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Line)
-                        Render3DEngine.drawBoxOutline(box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5f, 0.5f + scale * 0.5, 0.5 + scale * 0.5),  Render2DEngine.injectAlpha(lineColor, (int) (lineColor.getAlpha() * (1f - (time / 300f)))), lineWidth);
+                        Render3DEngine.drawBoxOutline(box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5f, 0.5f + scale * 0.5, 0.5 + scale * 0.5), Render2DEngine.injectAlpha(lineColor, (int) (lineColor.getAlpha() * (1f - (time / 300f)))), lineWidth);
 
                     if (renderMode == BlockRenderMode.All || renderMode == BlockRenderMode.Fill)
                         Render3DEngine.drawFilledBox(stack, box.shrink(scale, scale, scale).offset(0.5 + scale * 0.5, 0.5 + scale * 0.5, 0.5 + scale * 0.5), Render2DEngine.injectAlpha(fillColor, (int) (fillColor.getAlpha() * (1f - (time / 300f)))));
@@ -154,21 +153,10 @@ public final class BlockAnimationUtility {
     }
 
     public enum BlockRenderMode {
-        Fill,
-        Line,
-        All,
-        None
+        Fill, Line, All, None
     }
 
     public enum BlockAnimationMode {
-        Fade,
-        Hover,
-        Decrease,
-        Static,
-        Flash,
-        Grow,
-        Fill,
-        TNT,
-        Pull
+        Fade, Hover, Decrease, Static, Flash, Grow, Fill, TNT, Pull
     }
 }
