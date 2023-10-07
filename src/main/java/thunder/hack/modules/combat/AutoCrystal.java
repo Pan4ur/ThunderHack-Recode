@@ -107,7 +107,7 @@ public class AutoCrystal extends Module {
     private final Setting<Boolean> overrideSelfDamage = new Setting<>("OverrideSelfDamage", true, v -> page.getValue() == Pages.Damages);
     private final Setting<Float> lethalMultiplier = new Setting<>("LethalMultiplier", 1.0f, 0.0f, 5f, v -> page.getValue() == Pages.Damages);
     private final Setting<Boolean> armorBreaker = new Setting<>("ArmorBreaker", true, v -> page.getValue() == Pages.Damages);
-    private final Setting<Float> armorScale = new Setting<>("ArmorScale", 5.0f, 0.0f, 40f, v -> armorBreaker.getValue() && page.getValue() == Pages.Damages);
+    private final Setting<Float> armorScale = new Setting<>("Armor %", 5.0f, 0.0f, 40f, v -> armorBreaker.getValue() && page.getValue() == Pages.Damages);
     private final Setting<Float> facePlaceHp = new Setting<>("FacePlaceHp", 5.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
     private final Setting<Bind> facePlaceButton = new Setting<>("FacePlaceButton", new Bind(GLFW.GLFW_KEY_LEFT_SHIFT, false, false), v -> page.getValue() == Pages.Damages);
 
