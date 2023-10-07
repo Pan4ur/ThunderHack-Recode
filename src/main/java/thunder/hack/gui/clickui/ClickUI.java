@@ -1,6 +1,5 @@
 package thunder.hack.gui.clickui;
 
-
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -24,20 +23,25 @@ import java.util.List;
 import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
-
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class ClickUI extends Screen {
-
     public static List<AbstractWindow> windows;
 
     private Identifier pic1 = new Identifier("textures/pic1.png");
     private Identifier pic2 = new Identifier("textures/pic2.png");
     private Identifier pic3 = new Identifier("textures/pic3.png");
 
-
     private boolean firstOpen;
     private float scrollY;
     private boolean setup = false;
+
+    /*
+      0 - lang
+      1 - help
+      2 - cfg
+      3 - final
+     */
     private int hstep = 0;
 
     public static String currentDescription = "";
@@ -67,7 +71,6 @@ public class ClickUI extends Screen {
         INSTANCE = this;
     }
 
-
     @Override
     protected void init() {
         if (firstOpen) {
@@ -93,12 +96,10 @@ public class ClickUI extends Screen {
         windows.forEach(AbstractWindow::init);
     }
 
-
     @Override
     public boolean shouldPause() {
         return false;
     }
-
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
@@ -113,21 +114,16 @@ public class ClickUI extends Screen {
 
         if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old) {
             for (AbstractWindow window : windows) {
-                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 264)) {
+                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 264))
                     window.setY(window.getY() + 2);
-                }
-                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 265)) {
+                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 265))
                     window.setY(window.getY() - 2);
-                }
-                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 262)) {
+                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 262))
                     window.setX(window.getX() + 2);
-                }
-                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 263)) {
+                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 263))
                     window.setX(window.getX() - 2);
-                }
-                if (scrollY != 0) {
+                if (scrollY != 0)
                     window.setY(window.getY() + scrollY);
-                }
             }
         } else {
             for (AbstractWindow window : windows) {
@@ -184,16 +180,13 @@ public class ClickUI extends Screen {
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "English", hx, hy - 45, -1);
                 FontRenderers.modules.drawCenteredString(context.getMatrices(), "ThunderHack v" + ThunderHack.VERSION, hx, hy + 90, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70).getRGB());
             } else if (hstep == 1) {
-                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !MainSettings.isRu() ? "Hi! Thanks for using ThunderHack 1.20.1" : "Привет! Спс что скачал ThunderHack 1.20.1"
-                        , hx, hy - 80, -1);
-                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !MainSettings.isRu() ? "Do you need help with the config?" : "Те помочь с кфг?"
-                        , hx, hy - 70, -1);
+                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !isRu() ? "Hi! Thanks for using ThunderHack 1.20.1" : "Привет! Спс что скачал ThunderHack 1.20.1", hx, hy - 80, -1);
+                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !isRu() ? "Do you need help with the config?" : "Те помочь с кфг?", hx, hy - 70, -1);
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 20, 180, 20)) {
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 20, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 100));
                 } else {
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 20, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70));
-
                 }
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 50, 180, 20)) {
@@ -208,8 +201,7 @@ public class ClickUI extends Screen {
                 context.drawTexture(pic1, (int) hx - 45, (int) hy + 10, 0, 0, 80, 75, 80, 75);
 
             } else if (hstep == 2) {
-                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !MainSettings.isRu() ?
-                        "Choose your server" : "На какой сервер?", hx, hy - 80, -1);
+                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !isRu() ? "Choose your server" : "На какой сервер?", hx, hy - 80, -1);
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 20, 180, 20)) {
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 20, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 100));
@@ -217,33 +209,32 @@ public class ClickUI extends Screen {
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 20, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70));
                 }
 
-                if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 50, 180, 20)) {
+                if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 50, 180, 20))
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 50, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 100));
-                } else {
+                else
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 50, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70));
-                }
 
-                if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy + 10, 180, 20)) {
+
+                if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy + 10, 180, 20))
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy + 10, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 100));
-                } else {
+                else
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy + 10, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70));
-                }
 
-                if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy + 40, 180, 20)) {
+
+                if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy + 40, 180, 20))
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy + 40, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 100));
-                } else {
+                else
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy + 40, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70));
-                }
+
 
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "crystalpvp.cc", hx, hy - 45, -1);
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "strict.2b2tpvp.org", hx, hy - 15, -1);
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "mcfunny.su (aka shit)", hx, hy + 15, -1);
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "rw, hw, ares, ft (GrimAc)", hx, hy + 45, -1);
 
-
                 FontRenderers.modules.drawCenteredString(context.getMatrices(), "ThunderHack v" + ThunderHack.VERSION, hx, hy + 90, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70).getRGB());
             } else if (hstep == 3) {
-                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !MainSettings.isRu() ? "ThunderHack is set up" : "Вперед, сносить кабины))0)", hx, hy - 80, -1);
+                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), !isRu() ? "ThunderHack is set up" : "Вперед, сносить кабины))0)", hx, hy - 80, -1);
                 FontRenderers.modules.drawCenteredString(context.getMatrices(), "ThunderHack v" + ThunderHack.VERSION, hx, hy + 90, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70).getRGB());
                 context.drawTexture(pic2, (int) hx - 45, (int) hy + 10, 0, 0, 80, 75, 80, 75);
             } else if (hstep == 5) {
@@ -260,12 +251,6 @@ public class ClickUI extends Screen {
             currentDescription = "";
         }
     }
-
-    // 0 lang
-    // 1 help
-    // 2 cfg
-    // 3 final
-
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
@@ -330,8 +315,7 @@ public class ClickUI extends Screen {
             w.mouseClicked((int) mouseX, (int) mouseY, button);
 
             windows.forEach(w1 -> {
-                if (w.dragging && w != w1)
-                    w1.dragging = false;
+                if (w.dragging && w != w1) w1.dragging = false;
             });
         });
         return super.mouseClicked(mouseX, mouseY, button);
@@ -362,5 +346,4 @@ public class ClickUI extends Screen {
     public void removed() {
         ThunderHack.EVENT_BUS.unsubscribe(this);
     }
-
 }

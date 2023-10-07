@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityRenderer.class)
 public abstract class MixinEntityRenderer<T extends Entity> {
-
     @Inject(method = "renderLabelIfPresent", at = @At("HEAD"), cancellable = true)
     private void renderLabelIfPresent(T entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo info) {
         if (entity instanceof PlayerEntity && ModuleManager.nameTags.isEnabled()) {
@@ -26,8 +25,8 @@ public abstract class MixinEntityRenderer<T extends Entity> {
     }
 
     @Inject(method = "getSkyLight", at = @At("RETURN"), cancellable = true)
-    private void onGetSkyLight(CallbackInfoReturnable<Integer> info) {
+    private void onGetSkyLight(CallbackInfoReturnable<Integer> cir) {
         if(ModuleManager.fullbright.isEnabled())
-            info.setReturnValue(Fullbright.brightness.getValue());
+            cir.setReturnValue(Fullbright.brightness.getValue());
     }
 }

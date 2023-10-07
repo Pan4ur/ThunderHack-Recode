@@ -1,20 +1,17 @@
 package thunder.hack.core;
 
 import meteordevelopment.orbit.EventHandler;
-import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.utility.Timer;
 import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import thunder.hack.utility.math.MathUtility;
 
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayDeque;
 
 public class ServerManager {
-
     private final Timer timeDelay = new Timer();
     private final ArrayDeque<Float> tpsResult = new ArrayDeque<>(20);
     private long time;
@@ -28,8 +25,6 @@ public class ServerManager {
     public float getTPS2() {
         return round2(20.0f * ((float) ticktime / 1000f));
     }
-
-
 
     public static float round2(double value) {
         BigDecimal bd = new BigDecimal(value);
@@ -53,9 +48,7 @@ public class ServerManager {
 
                 float average = 0.0f;
 
-                for (Float value : tpsResult)
-                    average += MathUtility.clamp(value, 0f, 20f);
-
+                for (Float value : tpsResult) average += MathUtility.clamp(value, 0f, 20f);
 
                 tps = average / (float) tpsResult.size();
             }

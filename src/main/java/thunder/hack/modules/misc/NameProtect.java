@@ -9,5 +9,4 @@ public class NameProtect extends Module {
     }
 
     public static Setting<String> newName = new Setting<>("name", "Hell_Raider");
-
 }

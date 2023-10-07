@@ -12,7 +12,6 @@ import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 
-
 public class ModuleList extends HudElement {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.ColorText);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
@@ -26,7 +25,6 @@ public class ModuleList extends HudElement {
     private final Setting<ColorSetting> color2 = new Setting<>("Color2", new ColorSetting(237176633));
     private final Setting<ColorSetting> color3 = new Setting<>("RectColor", new ColorSetting(-16777216));
     private final Setting<ColorSetting> color4 = new Setting<>("SideRectColor", new ColorSetting(-16777216));
-
 
     public ModuleList() {
         super("ArrayList", "arraylist", 50, 30);
@@ -48,7 +46,7 @@ public class ModuleList extends HudElement {
         }
         setHeight(yTotal);
 
-        // Если режим - ЦветнойТекст, то мы рендерим сначала эффект свечения, а затем плитки
+        //Если режим - ЦветнойТекст, то мы рендерим сначала эффект свечения, а затем плитки
         if (mode.getValue() == Mode.ColorText) {
             for (int k = 0; k < ThunderHack.moduleManager.sortedModules.size(); k++) {
                 Module module = ThunderHack.moduleManager.sortedModules.get(k);

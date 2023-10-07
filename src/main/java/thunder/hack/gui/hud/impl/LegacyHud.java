@@ -90,16 +90,12 @@ public class LegacyHud extends Module {
                 for (StatusEffectInstance potionEffect : effects) {
                     StatusEffect potion = potionEffect.getEffectType();
                     String power = "";
-                    if (potionEffect.getAmplifier() == 0) {
-                        power = "I";
-                    } else if (potionEffect.getAmplifier() == 1) {
-                        power = "II";
-                    } else if (potionEffect.getAmplifier() == 2) {
-                        power = "III";
-                    } else if (potionEffect.getAmplifier() == 3) {
-                        power = "IV";
-                    } else if (potionEffect.getAmplifier() == 4) {
-                        power = "V";
+                    switch (potionEffect.getAmplifier()) {
+                        case 0 -> power = "I";
+                        case 1 -> power = "II";
+                        case 2 -> power = "III";
+                        case 3 -> power = "IV";
+                        case 4 -> power = "V";
                     }
                     String s = potion.getName().getString() + " " + power;
                     String s2 = getDuration(potionEffect) + "";
@@ -149,16 +145,12 @@ public class LegacyHud extends Module {
                 for (StatusEffectInstance potionEffect : effects) {
                     StatusEffect potion = potionEffect.getEffectType();
                     String power = "";
-                    if (potionEffect.getAmplifier() == 0) {
-                        power = "I";
-                    } else if (potionEffect.getAmplifier() == 1) {
-                        power = "II";
-                    } else if (potionEffect.getAmplifier() == 2) {
-                        power = "III";
-                    } else if (potionEffect.getAmplifier() == 3) {
-                        power = "IV";
-                    } else if (potionEffect.getAmplifier() == 4) {
-                        power = "V";
+                    switch (potionEffect.getAmplifier()) {
+                        case 0 -> power = "I";
+                        case 1 -> power = "II";
+                        case 2 -> power = "III";
+                        case 3 -> power = "IV";
+                        case 4 -> power = "V";
                     }
                     String s = potion.getName().getString() + " " + power;
                     String s2 = getDuration(potionEffect) + "";

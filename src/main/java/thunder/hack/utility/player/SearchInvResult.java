@@ -16,6 +16,7 @@ public record SearchInvResult(int slot, boolean found, ItemStack stack) {
         return new SearchInvResult(999, true, stack);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isHolding() {
         if (mc.player == null) return false;
 
@@ -23,7 +24,6 @@ public record SearchInvResult(int slot, boolean found, ItemStack stack) {
     }
 
     public void switchTo() {
-        if (found)
-            InventoryUtility.switchTo(slot);
+        if (found) InventoryUtility.switchTo(slot);
     }
 }

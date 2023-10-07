@@ -2,29 +2,31 @@ package thunder.hack.core;
 
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
-import net.minecraft.util.math.Vec2f;
-import org.jetbrains.annotations.NotNull;
-import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.*;
-import thunder.hack.injection.accesors.IClientPlayerEntity;
-import thunder.hack.modules.combat.Aura;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
+import org.jetbrains.annotations.NotNull;
+import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.EventTick;
+import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.combat.Aura;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -36,8 +38,8 @@ public class PlayerManager {
     public int ticksElytraFlying;
     public int serverSideSlot = 0;
 
-    // Мы можем зайти в инвентарь, и сервер этого не узнает, пока мы не начнем кликать
-    // Юзать везде!
+    //Мы можем зайти в инвентарь, и сервер этого не узнает, пока мы не начнем кликать
+    //Юзать везде!
     public boolean inInventory;
 
     @EventHandler
@@ -49,7 +51,6 @@ public class PlayerManager {
         lastYaw = ((IClientPlayerEntity) mc.player).getLastYaw();
         lastPitch = ((IClientPlayerEntity) mc.player).getLastPitch();
 
-
         if (mc.currentScreen == null) inInventory = false;
         if (mc.player.isFallFlying() && mc.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
             ticksElytraFlying++;
@@ -57,10 +58,9 @@ public class PlayerManager {
     }
 
     @EventHandler
-    public void onTick(EventTick e){
+    public void onTick(EventTick e) {
         currentPlayerSpeed = Math.hypot(mc.player.getX() - mc.player.prevX, mc.player.getZ() - mc.player.prevZ);
     }
-
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void postSync(EventPostSync event) {
@@ -190,5 +190,4 @@ public class PlayerManager {
         double dist = MathHelper.sqrt((float) (difX * difX + difZ * difZ));
         return new float[]{(float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0), (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difY, dist)))};
     }
-
 }

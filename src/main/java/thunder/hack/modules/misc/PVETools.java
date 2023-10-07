@@ -1,10 +1,9 @@
-package thunder.hack.modules.misc;
+/*package thunder.hack.modules.misc;
 
 import com.google.common.eventbus.Subscribe;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
 
 public class PVETools extends Module {
@@ -12,9 +11,8 @@ public class PVETools extends Module {
         super("PVETools", Category.MISC);
     }
 
-
     // Crops
-    private final Setting<Boolean> AutoHoe = new Setting<>("AutoHoe", false);
+    private final Setting<Boolean> autoHoe = new Setting<>("AutoHoe", false);
     private final Setting<Boolean> autoLand = new Setting<>("AutoLand", false);
     private final Setting<Boolean> autoBoneMeal = new Setting<>("AutoBoneMeal", false);
     private final Setting<Boolean> Harvester = new Setting<>("Harvester", false);
@@ -25,13 +23,10 @@ public class PVETools extends Module {
 
 
     @Subscribe
-    public void rotateAction(EventSync e){
-
+    public void rotateAction(EventSync e) {
     }
 
     @Subscribe
-    public void postRotateAction(EventPostSync e){
-
+    public void postRotateAction(EventPostSync e) {
     }
-
-}
+}*/

@@ -53,10 +53,8 @@ public class MainMenuScreen extends Screen {
 
     @Override
     public void render(@NotNull DrawContext context, int mouseX, int mouseY, float delta) {
-
         float halfOfWidth = mc.getWindow().getScaledWidth() / 2f;
         float halfOfHeight = mc.getWindow().getScaledHeight() / 2f;
-
 
         float mainX = halfOfWidth - 120f;
         float mainY = halfOfHeight - 80f;
@@ -78,9 +76,7 @@ public class MainMenuScreen extends Screen {
         buttons.forEach(b -> b.onRender(context, mouseX, mouseY));
 
         MSAAFramebuffer.use(() -> {
-
             // Smooth zone
-
             boolean hoveredLogo = Render2DEngine.isHovered(mouseX, mouseY, (int) (halfOfWidth - 157), (int) (halfOfHeight - 140), 300, 70);
 
 
@@ -97,7 +93,6 @@ public class MainMenuScreen extends Screen {
             FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "<-- Back to default menu", halfOfWidth, halfOfHeight + 70, hovered ? -1 : Render2DEngine.applyOpacity(-1, 0.4f));
 
             FontRenderers.sf_medium.drawString(context.getMatrices(), "By Pan4ur & 06ED", halfOfWidth * 2 - FontRenderers.sf_medium.getStringWidth("By Pan4ur & 06ED") - 5f, halfOfHeight * 2 - 10, Render2DEngine.applyOpacity(-1, 0.4f));
-
 
             int offsetY = 10;
             for (String change : ThunderUtility.changeLog) {
@@ -125,7 +120,6 @@ public class MainMenuScreen extends Screen {
         }
         return prefix + change;
     }
-
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {

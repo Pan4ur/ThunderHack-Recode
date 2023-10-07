@@ -1,6 +1,5 @@
 package thunder.hack.gui.hud;
 
-
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -8,7 +7,6 @@ import thunder.hack.events.impl.EventMouse;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
-
 
 public class HudElement extends Module {
     int height;

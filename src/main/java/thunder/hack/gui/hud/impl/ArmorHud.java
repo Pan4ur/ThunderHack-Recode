@@ -1,6 +1,5 @@
 package thunder.hack.gui.hud.impl;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
 import thunder.hack.gui.hud.HudElement;

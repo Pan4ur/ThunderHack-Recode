@@ -60,9 +60,8 @@ import static thunder.hack.utility.math.MathUtility.random;
 
 public class Aura extends Module {
     public Aura() {
-        super("Aura", "Запомните блядь-киллка тх не мисает-а дает шанс убежать", Category.COMBAT);
+        super("Aura", "Запомните блять: киллка тх не мисает, а даёт шанс убежать", Category.COMBAT);
     }
-
 
     public static final Setting<Float> attackRange = new Setting<>("Attack Range", 3.1f, 2f, 6.0f);
     public static final Setting<Mode> mode = new Setting<>("Rotation", Mode.Universal);
@@ -94,26 +93,6 @@ public class Aura extends Module {
     public final Setting<Boolean> ignoreCreativ = new Setting<>("IgnoreCreative", true).withParent(targets);
     public final Setting<Boolean> ignoreShield = new Setting<>("IgnoreShield", true).withParent(targets);
     public final Setting<Boolean> onlyAngry = new Setting<>("OnlyAngryEntities", true).withParent(targets);
-
-    public enum Mode {
-        Universal, None
-    }
-
-    public enum RayTrace {
-        OFF, OnlyTarget, AllEntities
-    }
-
-    public enum Sort {
-        Distance, Health, FOV
-    }
-
-    public enum Grim {
-        None, MoveFix, SilentTest
-    }
-
-    public enum Switch {
-        Normal, None, Silent
-    }
 
     public static Entity target;
 
@@ -567,18 +546,12 @@ public class Aura extends Module {
             first_stage.add((LivingEntity) ent);
         }
 
-        switch (sort.getValue()) {
-            case Distance -> {
-                return first_stage.stream().min(Comparator.comparing(e -> (mc.player.squaredDistanceTo(e.getPos())))).orElse(null);
-            }
-            case FOV -> {
-                return first_stage.stream().min(Comparator.comparing(this::getFOVAngle)).orElse(null);
-            }
-            case Health -> {
-                return first_stage.stream().min(Comparator.comparing(e -> (e.getHealth() + e.getAbsorptionAmount()))).orElse(null);
-            }
-        }
-        return null;
+        return switch (sort.getValue()) {
+            case Distance -> first_stage.stream().min(Comparator.comparing(e -> (mc.player.squaredDistanceTo(e.getPos())))).orElse(null);
+            case FOV -> first_stage.stream().min(Comparator.comparing(this::getFOVAngle)).orElse(null);
+            case Health -> first_stage.stream().min(Comparator.comparing(e -> (e.getHealth() + e.getAbsorptionAmount()))).orElse(null);
+        };
+        //return null; todo помолиться что всё будет работать
     }
 
     private boolean skipEntity(Entity entity) {
@@ -625,5 +598,25 @@ public class Aura extends Module {
         double difZ = e.getZ() - mc.player.getY();
         float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);
         return Math.abs(yaw - MathHelper.wrapDegrees(mc.player.getYaw()));
+    }
+
+    public enum Mode {
+        Universal, None
+    }
+
+    public enum RayTrace {
+        OFF, OnlyTarget, AllEntities
+    }
+
+    public enum Sort {
+        Distance, Health, FOV
+    }
+
+    public enum Grim {
+        None, MoveFix, SilentTest
+    }
+
+    public enum Switch {
+        Normal, None, Silent
     }
 }

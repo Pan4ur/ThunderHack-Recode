@@ -1,6 +1,5 @@
 package thunder.hack.gui.hud.impl;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
 import thunder.hack.gui.font.FontRenderers;
@@ -18,21 +17,10 @@ public class Radar extends HudElement {
     }
 
     public Setting<Mode> mode = new Setting<>("Mode", Mode.Rect);
-
-    private enum Mode {
-        Rect, Text
-    }
-
     public Setting<ColorMode> colorMode = new Setting<>("ColorMode", ColorMode.Sync);
-
-    private enum ColorMode {
-        Sync, Custom
-    }
-
     private final Setting<Integer> size = new Setting<>("Size", 80, 20, 300);
     public final Setting<ColorSetting> color2 = new Setting<>("Color", new ColorSetting(0xFF101010));
     public final Setting<ColorSetting> color3 = new Setting<>("PlayerColor", new ColorSetting(0xC59B9B9B));
-
 
     private CopyOnWriteArrayList<PlayerEntity> players = new CopyOnWriteArrayList<>();
 
@@ -110,5 +98,14 @@ public class Radar extends HudElement {
                 Render2DEngine.drawRound(context.getMatrices(), (getPosX() + size.getValue() / 2F + rotX) - 2, (getPosY() + size.getValue() / 2F + rotY) - 2, 4, 4, 2f, color3.getValue().getColorObject());
             }
         }
+    }
+
+
+    private enum Mode {
+        Rect, Text
+    }
+
+    public enum ColorMode {
+        Sync, Custom
     }
 }

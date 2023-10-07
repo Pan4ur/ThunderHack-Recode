@@ -1,6 +1,5 @@
 package thunder.hack.setting.impl;
 
-
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Field;
@@ -35,14 +34,13 @@ public class Bind {
                         }
                     }
                 }
-            } catch (Exception ignored) {
+            } catch (Exception ignore) {
                 kn = "unknown." + this.key;
             }
         }
 
         return this.key == -1 ? "None" : (kn + "").toUpperCase();
     }
-
 
     public boolean isHold() {
         return hold;
@@ -56,4 +54,3 @@ public class Bind {
         this.hold = hold;
     }
 }
-

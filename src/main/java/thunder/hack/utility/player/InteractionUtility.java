@@ -138,9 +138,7 @@ public final class InteractionUtility {
         } else if (!(bs.getBlock() instanceof FluidBlock) && !bs.isAir()) {
             BreakData bData = getBreakData(bp, interact);
             return new BlockHitResult(bData.vector, bData.dir, bp, false);
-        }
-
-         */
+        }*/
 
         ArrayList<BlockPosWithFacing> supports = getSupportBlocks(bp);
         for (BlockPosWithFacing support : supports) {

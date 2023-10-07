@@ -13,7 +13,6 @@ public class Coords extends HudElement {
         super("Coords", "coords", 100, 10);
     }
 
-
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
         int posX = (int) mc.player.getX();
@@ -30,5 +29,4 @@ public class Coords extends HudElement {
         if (mc.world == null) return false;
         return Objects.equals(mc.world.getRegistryKey().getValue().getPath(), "the_nether");
     }
-
 }

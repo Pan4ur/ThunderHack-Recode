@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(PostEffectPass.class)
-public interface  IPostProcessShader {
+public interface IPostProcessShader {
     @Mutable
     @Accessor("input")
     void setInput(Framebuffer framebuffer);

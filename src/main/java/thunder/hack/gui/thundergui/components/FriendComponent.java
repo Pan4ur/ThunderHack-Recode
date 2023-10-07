@@ -1,6 +1,5 @@
 package thunder.hack.gui.thundergui.components;
 
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.texture.NativeImage;
@@ -18,7 +17,6 @@ import java.io.InputStream;
 import java.net.URL;
 
 import static thunder.hack.modules.Module.mc;
-
 
 public class FriendComponent {
     float scroll_animation = 0f;
@@ -140,7 +138,6 @@ public class FriendComponent {
         } else {
             context.drawTexture(crackedSkin,posX + 10,posY + 3,0,0,22,22,22,22);
         }
-
 
         FontRenderers.modules.drawString(context.getMatrices(),name, posX + 37, posY + 6, Render2DEngine.applyOpacity(-1, getFadeFactor()), false);
 

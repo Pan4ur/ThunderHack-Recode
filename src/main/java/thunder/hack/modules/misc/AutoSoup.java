@@ -1,6 +1,5 @@
 package thunder.hack.modules.misc;
 
-import com.google.common.eventbus.Subscribe;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
@@ -15,17 +14,17 @@ public class AutoSoup extends Module {
         super("AutoSoup", Category.MISC);
     }
 
-    public Setting<Float> thealth = new Setting<>("TriggerHealth", 7f, 1f, 20f);
+    public Setting<Float> health = new Setting<>("TriggerHealth", 7f, 1f, 20f);
 
     @Override
     public void onUpdate() {
-        if (mc.player.getHealth() <= thealth.getValue()) {
+        if (mc.player.getHealth() <= health.getValue()) {
             int soupslot = InventoryUtility.findItemInHotBar(Items.MUSHROOM_STEW).slot();
             int currentslot = mc.player.getInventory().selectedSlot;
             if (soupslot != -1) {
-                mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(soupslot));
-                mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
-                mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(currentslot));
+                sendPacket(new UpdateSelectedSlotC2SPacket(soupslot));
+                sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                sendPacket(new UpdateSelectedSlotC2SPacket(currentslot));
             }
         }
     }

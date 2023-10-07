@@ -1,6 +1,5 @@
 package thunder.hack.gui.hud.impl;
 
-
 import net.minecraft.client.gui.DrawContext;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;

@@ -1,6 +1,5 @@
 package thunder.hack.modules.misc;
 
-import thunder.hack.cmd.Command;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Spammer extends Module {
-
     public static ArrayList<String> SpamList = new ArrayList<>();
     public Setting<Boolean> global = new Setting<>("global", true);
     public Setting<Integer> delay = new Setting<>("delay", 5, 1, 30);
@@ -29,7 +27,6 @@ public class Spammer extends Module {
             if (!file.exists()) file.createNewFile();
             new Thread(() -> {
                 try {
-
                     FileInputStream fis = new FileInputStream(file);
                     InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
                     BufferedReader reader = new BufferedReader(isr);
@@ -56,7 +53,7 @@ public class Spammer extends Module {
 
                         for (String l : lines) {
                             if (l.equals("")) {
-                                if (spamChunk.length() > 0) {
+                                if (!spamChunk.isEmpty()) {
                                     spamList.add(spamChunk.toString());
                                     spamChunk = new StringBuilder();
                                 }
@@ -65,9 +62,7 @@ public class Spammer extends Module {
                             }
                         }
                         spamList.add(spamChunk.toString());
-                    } else {
-                        spamList.addAll(lines);
-                    }
+                    } else spamList.addAll(lines);
                     SpamList = spamList;
                 } catch (Exception e) {
                     System.err.println("Could not load file ");
@@ -76,7 +71,6 @@ public class Spammer extends Module {
         } catch (IOException e) {
             System.err.println("Could not load file ");
         }
-
     }
 
     @Override
@@ -92,12 +86,10 @@ public class Spammer extends Module {
                 return;
             }
             String c = SpamList.get(new Random().nextInt(SpamList.size()));
-            if(c.charAt(0) == '/'){
-                c = c.replace("/","");
+            if (c.charAt(0) == '/') {
+                c = c.replace("/", "");
                 mc.player.networkHandler.sendCommand(global.getValue() ? "!" + c : c);
-            } else {
-                mc.player.networkHandler.sendChatMessage(global.getValue() ? "!" + c : c);
-            }
+            } else mc.player.networkHandler.sendChatMessage(global.getValue() ? "!" + c : c);
 
             timer_delay.reset();
         }

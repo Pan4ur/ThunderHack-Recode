@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 
 public final class ColorSetting {
-
     private int color;
     private boolean rainbow;
     private int globalOffset = 0;

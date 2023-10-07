@@ -1,7 +1,5 @@
 package thunder.hack.gui.thundergui.components;
 
-
-
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui2;
 import thunder.hack.setting.Setting;
@@ -12,7 +10,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import java.awt.*;
 
 public class ParentComponent extends SettingElement {
-
 
     public ParentComponent(Setting setting) {
         super(setting);
@@ -41,5 +38,4 @@ public class ParentComponent extends SettingElement {
             parent.setExtended(!parent.isExtended());
         }
     }
-
 }

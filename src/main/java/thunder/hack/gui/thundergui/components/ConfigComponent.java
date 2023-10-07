@@ -10,7 +10,6 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 
 public class ConfigComponent {
-
     float scroll_animation = 0f;
     private final String name;
     private final String date;
@@ -51,10 +50,7 @@ public class ConfigComponent {
                     Render2DEngine.applyOpacity(new Color(25, 20, 30, 255), getFadeFactor()),
                     Render2DEngine.applyOpacity(ThunderHackGui.onColor1.getValue().getColorObject(), getFadeFactor()),
                     Render2DEngine.applyOpacity(ThunderHackGui.onColor2.getValue().getColorObject(), getFadeFactor()));
-        } else {
-            Render2DEngine.drawRound(context.getMatrices(),posX + 5, posY, 285, 30, 4f, Render2DEngine.applyOpacity(new Color(44, 35, 52, 255), getFadeFactor()));
-        }
-
+        } else Render2DEngine.drawRound(context.getMatrices(),posX + 5, posY, 285, 30, 4f, Render2DEngine.applyOpacity(new Color(44, 35, 52, 255), getFadeFactor()));
 
         if (first_open) {
             Render2DEngine.addWindow(context.getMatrices(),posX + 5, posY, posX + 5 + 285, posY + 30,1f);
@@ -73,15 +69,12 @@ public class ConfigComponent {
 
         if (Render2DEngine.isHovered(MouseX, MouseY, posX + 252, posY + 10, 10, 10)) {
             Render2DEngine.drawRound(context.getMatrices(),posX + 252, posY + 10, 10, 10, 2f, Render2DEngine.applyOpacity(new Color(21, 58, 0, 255), getFadeFactor()));
-        } else {
-            Render2DEngine.drawRound(context.getMatrices(),posX + 252, posY + 10, 10, 10, 2f, Render2DEngine.applyOpacity(new Color(32, 89, 0, 255), getFadeFactor()));
+        } else Render2DEngine.drawRound(context.getMatrices(),posX + 252, posY + 10, 10, 10, 2f, Render2DEngine.applyOpacity(new Color(32, 89, 0, 255), getFadeFactor()));
 
-        }
         if (Render2DEngine.isHovered(MouseX, MouseY, posX + 268, posY + 10, 10, 10)) {
             Render2DEngine.drawRound(context.getMatrices(),posX + 268, posY + 10, 10, 10, 2f, Render2DEngine.applyOpacity(new Color(65, 1, 13, 255), getFadeFactor()));
-        } else {
-            Render2DEngine.drawRound(context.getMatrices(),posX + 268, posY + 10, 10, 10, 2f, Render2DEngine.applyOpacity(new Color(94, 1, 18, 255), getFadeFactor()));
-        }
+        } else Render2DEngine.drawRound(context.getMatrices(),posX + 268, posY + 10, 10, 10, 2f, Render2DEngine.applyOpacity(new Color(94, 1, 18, 255), getFadeFactor()));
+
         FontRenderers.icons.drawString(context.getMatrices(),"x", posX + 252, posY + 13, Render2DEngine.applyOpacity(-1, getFadeFactor()));
         FontRenderers.icons.drawString(context.getMatrices(),"w", posX + 268, posY + 13, Render2DEngine.applyOpacity(-1, getFadeFactor()));
 
@@ -95,18 +88,12 @@ public class ConfigComponent {
         return fade / (5f + index);
     }
 
-
     public void onTick() {
-        if (progress > 4) {
-            progress = 0;
-        }
+        if (progress > 4) progress = 0;
         progress++;
 
-        if (fade < 10 + index) {
-            fade++;
-        }
+        if (fade < 10 + index) fade++;
     }
-
 
     private boolean isHovered(int mouseX, int mouseY) {
         return mouseX > posX && mouseX < posX + 295 && mouseY > posY && mouseY < posY + 30;
@@ -122,14 +109,13 @@ public class ConfigComponent {
         if ((posY > ThunderGui2.getInstance().main_posY + ThunderGui2.getInstance().height) || posY < ThunderGui2.getInstance().main_posY) {
             return;
         }
-        if (Render2DEngine.isHovered(MouseX, MouseY, posX + 252, posY + 10, 10, 10)) {
+        if (Render2DEngine.isHovered(MouseX, MouseY, posX + 252, posY + 10, 10, 10))
             ThunderHack.configManager.load(name);
-        }
+
         if (Render2DEngine.isHovered(MouseX, MouseY, posX + 268, posY + 10, 10, 10)) {
             ThunderHack.configManager.delete(name);
             ThunderGui2.getInstance().loadConfigs();
         }
-
     }
 
     public double getPosX() {

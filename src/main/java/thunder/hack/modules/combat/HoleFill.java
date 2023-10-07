@@ -61,23 +61,6 @@ public class HoleFill extends Module {
     private final Setting<ColorSetting> renderLineColor = new Setting<>("Render Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<Integer> renderLineWidth = new Setting<>("Render Line Width", 2, 1, 5).withParent(renderCategory);
 
-    private enum Mode {
-        Always,
-        Target
-    }
-
-    private enum FillBlocks {
-        All,
-        Webs,
-        Obsidian,
-        Indestrictible
-    }
-
-    private enum SelfFillMode {
-        Burrow,
-        Trap
-    }
-
     private boolean burrowWasEnabled = false;
     public static final Timer inactivityTimer = new Timer();
     private int tickCounter = 0;
@@ -96,9 +79,7 @@ public class HoleFill extends Module {
 
     @Override
     public void onThread() {
-        if (tickCounter < actionInterval.getValue()) {
-            return;
-        }
+        if (tickCounter < actionInterval.getValue()) return;
         holes = findHoles();
     }
 
@@ -106,7 +87,7 @@ public class HoleFill extends Module {
     public void onSync(EventSync event) {
         if (fullNullCheck()) return;
         if (jumpDisable.getValue() && mc.player.prevY < mc.player.getY())
-            disable(isRu() ? "Вы прыгнули! Выключаю..." : "You jumped! Disabling...");
+            disable(isRu() ? "Вы прыгнули! Отключаю..." : "You've jumped! Disabling...");
         if (holes == null)
             return;
         if (tickCounter < actionInterval.getValue()) {
@@ -167,9 +148,7 @@ public class HoleFill extends Module {
                 if (selfFillNeed && HoleUtility.isHole(mc.player.getBlockPos())) {
                     switch (selfFillMode.getValue()) {
                         case Burrow -> {
-                            if (ModuleManager.burrow.isEnabled() || burrowWasEnabled) {
-                                return;
-                            }
+                            if (ModuleManager.burrow.isEnabled() || burrowWasEnabled) return;
 
                             ModuleManager.burrow.enable();
                             selfFillNeed = false;
@@ -225,9 +204,7 @@ public class HoleFill extends Module {
                 if (broke)
                     break;
             } else {
-                if (autoDisable.getValue()) {
-                    disable(isRu() ? "Все холки заполнены!" : "All holes are filled!");
-                }
+                if (autoDisable.getValue()) disable(isRu() ? "Все холки заполнены!" : "All the holes are been filled!");
                 break;
             }
         }
@@ -300,5 +277,22 @@ public class HoleFill extends Module {
         return ((HoleUtility.validTwoBlockIndestructibleXZ(pos) || HoleUtility.validTwoBlockBedrockXZ(pos)) && fillDouble.getValue())
                 || ((HoleUtility.validQuadBedrock(pos) || HoleUtility.validQuadIndestructible(pos)) && fillQuad.getValue())
                 || ((HoleUtility.validBedrock(pos) || HoleUtility.validIndestructible(pos)) && fillSingle.getValue());
+    }
+
+    private enum Mode {
+        Always,
+        Target
+    }
+
+    private enum FillBlocks {
+        All,
+        Webs,
+        Obsidian,
+        Indestrictible
+    }
+
+    private enum SelfFillMode {
+        Burrow,
+        Trap
     }
 }

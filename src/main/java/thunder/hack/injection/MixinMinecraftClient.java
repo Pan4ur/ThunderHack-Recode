@@ -67,10 +67,7 @@ public class MixinMinecraftClient {
         if (!Module.fullNullCheck()) ThunderHack.EVENT_BUS.post(new EventPostTick());
     }
 
-
-    @Shadow
-    @Final
-    private Window window;
+    @Shadow @Final private Window window;
 
     @Inject(method = "onResolutionChanged", at = @At("TAIL"))
     private void captureResize(CallbackInfo ci) {

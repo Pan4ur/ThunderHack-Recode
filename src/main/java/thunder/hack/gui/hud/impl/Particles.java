@@ -3,19 +3,15 @@ package thunder.hack.gui.hud.impl;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.RotationAxis;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
-
-import static thunder.hack.modules.Module.mc;
 
 public class Particles {
     public double x, y, deltaX, deltaY, size, opacity;
     public Color color;
 
     private final Identifier star = new Identifier("textures/star.png");
-
 
     public static Color mixColors(final Color color1, final Color color2, final double percent) {
         final double inverse_percent = 1.0 - percent;
@@ -24,7 +20,6 @@ public class Particles {
         final int bluePart = (int) (color1.getBlue() * percent + color2.getBlue() * inverse_percent);
         return new Color(redPart, greenPart, bluePart);
     }
-
 
     public void render2D(MatrixStack matrixStack) {
         drawStar(matrixStack, (float) x, (float) y, color);

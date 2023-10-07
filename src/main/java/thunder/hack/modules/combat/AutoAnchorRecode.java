@@ -67,11 +67,6 @@ public class AutoAnchorRecode extends Module {
     private final Setting<Boolean> glowStoneDisable = new Setting<>("Disable No GlowStone", true).withParent(disable);
     private final Setting<Boolean> dimensionDisable = new Setting<>("Disable Nether", true).withParent(disable);
 
-    private enum YawStepMode {
-        Off,
-        On
-    }
-
     private int prevAnchorAmount, anchorSpeed, invTimer;
     private final Map<BlockPos, Integer> charges = new HashMap<>();
     private final Timer logicTimer = new Timer();
@@ -86,7 +81,7 @@ public class AutoAnchorRecode extends Module {
     public void onEnable() {
         if (mc.world == null) return;
         if (dimensionDisable.getValue() && mc.world.getDimension().respawnAnchorWorks()) {
-            disable(isRu() ? "В данном измерении не работают якоря возрождения! Выключение..." : "There are respawn anchors don't work! Disabling...");
+            disable(isRu() ? "Ты в незере! Отключаем..." : "You are in the nether! Disabling...");
         }
     }
 
@@ -99,9 +94,8 @@ public class AutoAnchorRecode extends Module {
 
     @Override
     public void onRender3D(MatrixStack event) {
-        if (targetPos != null) {
+        if (targetPos != null)
             Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(new Box(targetPos), HudEditor.getColor(0), 2));
-        }
 
         super.onRender3D(event);
     }
@@ -245,7 +239,7 @@ public class AutoAnchorRecode extends Module {
     private void doCharge() {
         SearchInvResult glowResult = InventoryUtility.getGlowStone();
         if (glowStoneDisable.getValue() && !glowResult.found()) {
-            disable(isRu() ? "В хотбаре не найден светящийся камень! Выключение..." : "No glowstone in hotbar! Disabling...");
+            disable(isRu() ? "В хотбаре не найден светящийся камень! Отключаем..." : "No glowstone found in hotbar! Disabling...");
             return;
         }
 
@@ -261,11 +255,8 @@ public class AutoAnchorRecode extends Module {
             sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
             interact(result, Hand.MAIN_HAND);
 
-            if (charges.containsKey(targetPosCopy)) {
-                charges.put(targetPosCopy, charges.get(targetPosCopy) + 1);
-            } else {
-                charges.put(targetPosCopy, 1);
-            }
+            if (charges.containsKey(targetPosCopy)) charges.put(targetPosCopy, charges.get(targetPosCopy) + 1);
+            else charges.put(targetPosCopy, 1);
         }
 
         InventoryUtility.switchTo(preSlot);
@@ -280,8 +271,11 @@ public class AutoAnchorRecode extends Module {
         }
         InteractionUtility.BreakData data = InteractionUtility.getBreakData(targetPosCopy, InteractionUtility.Interact.Vanilla);
         if (data != null && data.vector() != null) {
-
             SearchInvResult anchorResult = InventoryUtility.getAnchor();
+            if (anchorDisable.getValue() && !anchorResult.found()) {
+                disable(isRu() ? "В хотбаре не найдены якоря возрождения! Отключаем..." : "No respawn anchors found in hotbar! Disabling...");
+                return;
+            }
 
             if (anchorResult.found()) anchorResult.switchTo();
 
@@ -298,5 +292,10 @@ public class AutoAnchorRecode extends Module {
     private void interact(BlockHitResult result, Hand hand) {
         sendPacket(new PlayerInteractBlockC2SPacket(hand, result, PlayerUtility.getWorldActionId(mc.world)));
         sendPacket(new HandSwingC2SPacket(hand));
+    }
+
+    private enum YawStepMode {
+        Off,
+        On
     }
 }

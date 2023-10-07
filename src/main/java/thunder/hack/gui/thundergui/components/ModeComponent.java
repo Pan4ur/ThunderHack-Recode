@@ -1,7 +1,5 @@
 package thunder.hack.gui.thundergui.components;
 
-
-
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui2;
 import thunder.hack.modules.client.ClickGui;
@@ -44,9 +42,7 @@ public class ModeComponent extends SettingElement {
             Render2DEngine.drawRound(stack,(float) (x + 114), (float) (y + 2), 62, 11, 0.5f, new Color(50, 35, 60, 178));
         }
 
-
         FontRenderers.modules.drawString(stack,setting.currentEnumName(), (float) (x + 116), (float) (y + 6), new Color(0xB0FFFFFF, true).getRGB(), false);
-
 
         String arrow = "n";
         switch (progress) {
@@ -76,8 +72,6 @@ public class ModeComponent extends SettingElement {
                 offsetY += 12;
             }
         }
-
-
     }
 
     @Override

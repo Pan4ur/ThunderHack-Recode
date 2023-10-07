@@ -6,7 +6,6 @@ import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.ThunderUtility;
@@ -17,10 +16,11 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
+
 public class AutoEZ extends Module {
     public static ArrayList<String> EZWORDS = new ArrayList<>();
     public Setting<Boolean> global = new Setting<>("global", true);
-
 
     String[] EZ = new String[]{
             "%player% ПОЗОРИЩЕЕЕЕЕ ДАЖЕ БОТИХА НА ХЕЛЛРАЙДЕРЕ ВГЕТАЛА БАФЫ",
@@ -30,15 +30,15 @@ public class AutoEZ extends Module {
             "%player% ЧЕ ТАК БЫСТРО СЛИЛСЯ ТО А?",
             "%player% ПЛАЧЬ",
             "%player% УПССС ЗАБЫЛ КИЛЛКУ ВЫРУБИТЬ",
-            "ОДНОКЛЕТОЧНЫЙ  %player% БЫЛ ВПЕНЕН",
+            "ОДНОКЛЕТОЧНЫЙ %player% БЫЛ ВПЕНЕН",
             "%player% ИЗИ БЛЯТЬ АХААХАХАХАХААХ",
             "%player% БОЖЕ МНЕ ТЕБЯ ЖАЛКО ВГЕТАЙ ТХ",
             "%player% ОПРАВДЫВАЙСЯ В ХУЙ ЧЕ СДОХ ТО)))",
             "%player% СПС ЗА ОТСОС)))"
     };
 
-    private final Setting<ModeEn> Mode = new Setting<>("Mode", ModeEn.Basic);
-    private final Setting<ServerMode> server = new Setting<>("Sever", ServerMode.Universal);
+    private final Setting<ModeEn> mode = new Setting<>("Mode", ModeEn.Basic);
+    private final Setting<ServerMode> server = new Setting<>("Server", ServerMode.Universal);
 
 
     public AutoEZ() {
@@ -77,19 +77,17 @@ public class AutoEZ extends Module {
                                     spamList.add(spamChunk.toString());
                                     spamChunk = new StringBuilder();
                                 }
-                            } else {
-                                spamChunk.append(l).append(" ");
-                            }
+                            } else spamChunk.append(l).append(" ");
                         }
                         spamList.add(spamChunk.toString());
-                    } else {
-                        spamList.addAll(lines);
-                    }
+                    } else spamList.addAll(lines);
 
                     EZWORDS = spamList;
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }).start();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 
     @Override
@@ -97,29 +95,24 @@ public class AutoEZ extends Module {
         loadEZ();
     }
 
-
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (fullNullCheck()) return;
-        if(server.getValue() == ServerMode.Universal) return;
+        if (server.getValue() == ServerMode.Universal) return;
         if (e.getPacket() instanceof GameMessageS2CPacket) {
             final GameMessageS2CPacket packet = e.getPacket();
             if (packet.content().getString().contains("Вы убили игрока")) {
                 String name = ThunderUtility.solveName(packet.content().getString());
-                if(Objects.equals(name, "FATAL ERROR")) return;
+                if (Objects.equals(name, "FATAL ERROR")) return;
 
                 String finalword;
-                if (Mode.getValue() == ModeEn.Basic) {
+                if (mode.getValue() == ModeEn.Basic) {
                     int n;
                     n = (int) Math.floor(Math.random() * EZ.length);
                     finalword = EZ[n].replace("%player%", name);
                 } else {
                     if (EZWORDS.isEmpty()) {
-                        if(MainSettings.language.getValue() == MainSettings.Language.RU){
-                            sendMessage("Файл с AutoEZ пустой!");
-                        } else {
-                            sendMessage("AutoEZ.txt is empty!");
-                        }
+                        sendMessage(isRu() ? "Файл с AutoEZ пустой!" : "AutoEZ.txt is empty!");
                         return;
                     }
                     finalword = EZWORDS.get(new Random().nextInt(EZWORDS.size()));
@@ -130,39 +123,31 @@ public class AutoEZ extends Module {
         }
     }
 
-
     @EventHandler
-    public void onPacket(PacketEvent.Receive e){
-        if(!(e.getPacket() instanceof EntityStatusS2CPacket pac)) return;
-        if(pac.getStatus() == EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES) {
+    public void onPacket(PacketEvent.Receive e) {
+        if (!(e.getPacket() instanceof EntityStatusS2CPacket pac)) return;
+        if (pac.getStatus() == EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES) {
             if (server.getValue() != ServerMode.Universal) return;
             if (Aura.target != null && Aura.target == pac.getEntity(mc.world)) {
                 sayEZ(pac.getEntity(mc.world).getName().getString());
                 return;
             }
-          //  if (AutoCrystal.CAtarget != null && AutoCrystal.CAtarget == pac.getEntity(mc.world)) {
+            //  if (AutoCrystal.CAtarget != null && AutoCrystal.CAtarget == pac.getEntity(mc.world)) {
             //    sayEZ(pac.getEntity(mc.world).getName().getString());
             //}
         }
-        if(pac.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING) {
-
-        }
+        //if (pac.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING) {}
     }
 
-
-    public void sayEZ(String pn){
+    public void sayEZ(String pn) {
         String finalword;
-        if (Mode.getValue() == ModeEn.Basic) {
+        if (mode.getValue() == ModeEn.Basic) {
             int n;
             n = (int) Math.floor(Math.random() * EZ.length);
             finalword = EZ[n].replace("%player%", pn);
         } else {
             if (EZWORDS.isEmpty()) {
-                if(MainSettings.language.getValue() == MainSettings.Language.RU){
-                    sendMessage("Файл с AutoEZ пустой!");
-                } else {
-                    sendMessage("AutoEZ.txt is empty!");
-                }
+                sendMessage(isRu() ? "Файл с AutoEZ пустой!" : "AutoEZ.txt is empty!");
                 return;
             }
             finalword = EZWORDS.get(new Random().nextInt(EZWORDS.size()));

@@ -12,7 +12,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import java.awt.*;
 
 public class ColorPickerComponent extends SettingElement {
-
     private final Setting colorSetting;
     private boolean open;
     private float hue;
@@ -20,11 +19,9 @@ public class ColorPickerComponent extends SettingElement {
     private float brightness;
     private int alpha;
 
-
     private boolean afocused;
     private boolean hfocused;
     private boolean sbfocused;
-
 
     private boolean copy_focused;
     private boolean paste_focused;
@@ -60,7 +57,6 @@ public class ColorPickerComponent extends SettingElement {
     @Override
     public void onTick() {
         super.onTick();
-
     }
 
     private void renderPicker(MatrixStack stack,int mouseX, int mouseY, Color color) {

@@ -60,7 +60,7 @@ public class AutoMine extends Module {
 
         if (blockPos != null && mc.world.isAir(blockPos)) {
             if (autoDisable.getValue()) {
-                disable(isRu() ? "Сарраунд сломан! Выключаю..." : "Surround has been broken! Turning off...");
+                disable(isRu() ? "Сарраунд пробит! Отключаю..." : "Surround has been broken! Turning off...");
                 return;
             }
             blockPos = null;

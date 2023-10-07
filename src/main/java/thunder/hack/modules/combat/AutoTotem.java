@@ -73,7 +73,7 @@ public class AutoTotem extends Module {
         if (e.getPacket() instanceof EntitySpawnS2CPacket spawn && hotbarFallBack.getValue()) {
             if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
                 if (mc.player.squaredDistanceTo(spawn.getX(), spawn.getY(), spawn.getZ()) < 36) {
-                    if(fallBackCalc.getValue() && ExplosionUtility.getSelfExplosionDamage(new Vec3d(spawn.getX(), spawn.getY(), spawn.getZ())) < mc.player.getHealth() + mc.player.getAbsorptionAmount() + 4f)
+                    if (fallBackCalc.getValue() && ExplosionUtility.getSelfExplosionDamage(new Vec3d(spawn.getX(), spawn.getY(), spawn.getZ())) < mc.player.getHealth() + mc.player.getAbsorptionAmount() + 4f)
                         return;
                     runInstant();
                 }
@@ -96,23 +96,17 @@ public class AutoTotem extends Module {
             delay = 20;
         } else if (invResult.found()) {
             int slot = invResult.slot() >= 36 ? invResult.slot() - 36 : invResult.slot();
-            if (!hotbarFallBack.getValue()) {
-                swapTo(slot);
-            } else {
-                mc.interactionManager.pickFromInventory(slot);
-            }
+            if (!hotbarFallBack.getValue()) swapTo(slot);
+            else mc.interactionManager.pickFromInventory(slot);
             delay = 20;
         }
     }
 
     public void swapTo(int slot) {
         if (slot != -1 && delay <= 0) {
-            if (mc.currentScreen instanceof GenericContainerScreen) {
-                return;
-            }
+            if (mc.currentScreen instanceof GenericContainerScreen) return;
 
-            if (stopMotion.getValue())
-                mc.player.setVelocity(0, mc.player.getVelocity().getY(), 0);
+            if (stopMotion.getValue()) mc.player.setVelocity(0, mc.player.getVelocity().getY(), 0);
 
             int nearest_slot = findNearestCurrentItem();
             int prevCurrentItem = mc.player.getInventory().selectedSlot;
@@ -121,7 +115,7 @@ public class AutoTotem extends Module {
                     sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
 
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
-                    mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
 
                     sendPacket(new UpdateSelectedSlotC2SPacket(nearest_slot));
                     mc.player.getInventory().selectedSlot = nearest_slot;
@@ -132,10 +126,9 @@ public class AutoTotem extends Module {
                     mc.player.getInventory().selectedSlot = prevCurrentItem;
 
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
-                    mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
 
-                    if(resetAttackCooldown.getValue())
-                        mc.player.resetLastAttackedTicks();
+                    if (resetAttackCooldown.getValue()) mc.player.resetLastAttackedTicks();
                 } else {
                     sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
                     clickSlot(slot);
@@ -151,7 +144,7 @@ public class AutoTotem extends Module {
 
                 sendPacket(new UpdateSelectedSlotC2SPacket(prevCurrentItem));
                 mc.player.getInventory().selectedSlot = prevCurrentItem;
-                if(resetAttackCooldown.getValue())
+                if (resetAttackCooldown.getValue())
                     mc.player.resetLastAttackedTicks();
             }
             delay = 5;
@@ -180,50 +173,33 @@ public class AutoTotem extends Module {
         } else if (offhand.getValue() == OffHand.GApple) {
             if (crapple.getValue()) {
                 if (mc.player.hasStatusEffect(StatusEffects.ABSORPTION)) {
-                    if (crappleSlot != -1) {
-                        item = Items.GOLDEN_APPLE;
-                    } else if (gappleSlot != -1) {
-                        item = Items.ENCHANTED_GOLDEN_APPLE;
-                    }
-                } else if (gappleSlot != -1) {
-                    item = Items.ENCHANTED_GOLDEN_APPLE;
-                }
+                    if (crappleSlot != -1) item = Items.GOLDEN_APPLE;
+                    else if (gappleSlot != -1) item = Items.ENCHANTED_GOLDEN_APPLE;
+                } else if (gappleSlot != -1) item = Items.ENCHANTED_GOLDEN_APPLE;
             } else {
-                if (gappleSlot != -1) {
-                    item = Items.ENCHANTED_GOLDEN_APPLE;
-                } else if (crappleSlot != -1) {
-                    item = Items.GOLDEN_APPLE;
-                }
+                if (gappleSlot != -1) item = Items.ENCHANTED_GOLDEN_APPLE;
+                else if (crappleSlot != -1) item = Items.GOLDEN_APPLE;
             }
-        } else {
+        } else { //if else if else
             if (shieldSlot != -1) {
                 if (mc.player.getHealth() + mc.player.getAbsorptionAmount() <= healthS.getValue()) {
-                    if (gappleSlot != -1) {
-                        item = Items.ENCHANTED_GOLDEN_APPLE;
-                    } else if (crappleSlot != -1) {
-                        item = Items.GOLDEN_APPLE;
-                    }
+                    if (gappleSlot != -1) item = Items.ENCHANTED_GOLDEN_APPLE;
+                    else if (crappleSlot != -1) item = Items.GOLDEN_APPLE;
                 } else {
-                    if (!mc.player.getItemCooldownManager().isCoolingDown(Items.SHIELD)) {
+                    if (!mc.player.getItemCooldownManager().isCoolingDown(Items.SHIELD))
                         item = Items.SHIELD;
-                    } else {
-                        if (gappleSlot != -1) {
-                            item = Items.ENCHANTED_GOLDEN_APPLE;
-                        } else if (crappleSlot != -1) {
-                            item = Items.GOLDEN_APPLE;
-                        }
+                    else {
+                        if (gappleSlot != -1) item = Items.ENCHANTED_GOLDEN_APPLE;
+                        else if (crappleSlot != -1) item = Items.GOLDEN_APPLE;
                     }
                 }
-            } else if (crappleSlot != -1) {
-                item = Items.GOLDEN_APPLE;
-            }
+            } else if (crappleSlot != -1) item = Items.GOLDEN_APPLE;
         }
 
         if (rcGap.getValue() && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed()) {
             if (crappleSlot != -1) item = Items.GOLDEN_APPLE;
             if (gappleSlot != -1) item = Items.ENCHANTED_GOLDEN_APPLE;
         }
-
 
         if (onFall.getValue() && (mc.player.getHealth() + mc.player.getAbsorptionAmount()) - (((mc.player.fallDistance - 3) / 2F) + 3.5F) < 0.5)
             item = Items.TOTEM_OF_UNDYING;

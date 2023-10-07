@@ -13,7 +13,6 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 
 public class ColorPickerElement extends AbstractElement {
-
     private float hue;
     private float saturation;
     private float brightness;
@@ -60,16 +59,14 @@ public class ColorPickerElement extends AbstractElement {
         boolean dark = Render2DEngine.isDark(ThunderHack.copy_color);
         boolean dark2 = Render2DEngine.isDark(getColorSetting().getColorObject());
 
-        Render2DEngine.drawRound(matrixStack, (int) (x + width - 65), (int) (y + 5), 33, 7, 1,getColorSetting().isRainbow() ? getColorSetting().getColorObject() : new Color(0x424242));
+        Render2DEngine.drawRound(matrixStack, (int) (x + width - 65), (int) (y + 5), 33, 7, 1, getColorSetting().isRainbow() ? getColorSetting().getColorObject() : new Color(0x424242));
         FontRenderers.getSettingsRenderer().drawString(matrixStack, "Rainbow", (int) (x + width - 62), (int) (y + 8), rainbowHovered ? new Color(0xA3FFFFFF, true).getRGB() : (dark2 ? Color.WHITE.getRGB() : Color.BLACK.getRGB()));
-
 
         Render2DEngine.drawRound(matrixStack, (int) (x + width - 95), (int) (y + 54), 40, 7, 1, new Color(0x424242));
         FontRenderers.getSettingsRenderer().drawString(matrixStack, "Сopy", (int) (x + width - 83), (int) (y + 57), copyHovered ? new Color(0xA3FFFFFF, true).getRGB() : Color.WHITE.getRGB());
 
         Render2DEngine.drawRound(matrixStack, (int) (x + width - 49), (int) (y + 54), 40, 7, 1, ThunderHack.copy_color);
         FontRenderers.getSettingsRenderer().drawString(matrixStack, "Paste", (int) (x + width - 37), (int) (y + 57), pasteHovered ? new Color(0xA3FFFFFF, true).getRGB() : dark ? Color.WHITE.getRGB() : Color.BLACK.getRGB());
-
 
         renderPicker(matrixStack, mouseX, mouseY, getColorSetting().getColorObject());
     }
@@ -111,9 +108,7 @@ public class ColorPickerElement extends AbstractElement {
 
         Render2DEngine.drawRect(matrixStack, (float) (cx + cw + 17), (float) (cy + 1f), 8f, (float) (ch - 3), new Color(0xFFFFFFFF));
 
-        Render2DEngine.verticalGradient(matrixStack, (float) (cx + cw + 17), (float) (cy + 0.8f), (float) (cx + cw + 25), (float) (cy + ch - 2),
-                new Color(color.getRed(), color.getGreen(), color.getBlue(), 255),
-                new Color(0, 0, 0, 0));
+        Render2DEngine.verticalGradient(matrixStack, (float) (cx + cw + 17), (float) (cy + 0.8f), (float) (cx + cw + 25), (float) (cy + ch - 2), new Color(color.getRed(), color.getGreen(), color.getBlue(), 255), new Color(0, 0, 0, 0));
 
         Render2DEngine.drawRect(matrixStack, (float) (cx + cw + 3), hpos + 0.5f, 10, 1, Color.WHITE);
         Render2DEngine.drawRect(matrixStack, (float) (cx + cw + 16), apos + 0.5f, 10, 1, Color.WHITE);
@@ -164,24 +159,17 @@ public class ColorPickerElement extends AbstractElement {
         boolean pasteHovered = Render2DEngine.isHovered(mouseX, mouseY, (float) (x + width - 49), (float) (y + 54), 40, 7);
         boolean rainbowHovered = Render2DEngine.isHovered(mouseX, mouseY, (float) (x + width - 65), (float) (y + 5), 33, 7);
 
-        if (Render2DEngine.isHovered(mouseX, mouseY, cx + cw + 17, cy, 8, ch) && button == 0)
-            afocused = true;
+        if (Render2DEngine.isHovered(mouseX, mouseY, cx + cw + 17, cy, 8, ch) && button == 0) afocused = true;
 
-        else if (Render2DEngine.isHovered(mouseX, mouseY, cx + cw + 4, cy, 8, ch) && button == 0)
-            hfocused = true;
+        else if (Render2DEngine.isHovered(mouseX, mouseY, cx + cw + 4, cy, 8, ch) && button == 0) hfocused = true;
 
-        else if (Render2DEngine.isHovered(mouseX, mouseY, cx, cy, cw, ch) && button == 0)
-            sbfocused = true;
+        else if (Render2DEngine.isHovered(mouseX, mouseY, cx, cy, cw, ch) && button == 0) sbfocused = true;
 
-        else if (rainbowHovered && button == 0)
-            getColorSetting().setRainbow(!getColorSetting().isRainbow());
+        else if (rainbowHovered && button == 0) getColorSetting().setRainbow(!getColorSetting().isRainbow());
 
-        else if(copyHovered)
-            ThunderHack.copy_color = getColorSetting().getColorObject();
+        else if (copyHovered) ThunderHack.copy_color = getColorSetting().getColorObject();
 
-        else if(pasteHovered)
-            getColorSetting().setColor(ThunderHack.copy_color.getRGB());
-
+        else if (pasteHovered) getColorSetting().setColor(ThunderHack.copy_color.getRGB());
     }
 
     @Override

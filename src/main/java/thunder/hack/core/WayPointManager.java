@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class WayPointManager {
-
     private static CopyOnWriteArrayList<WayPoint> wayPoints = new CopyOnWriteArrayList<>();
 
     public void addWayPoint(WayPoint macro) {
@@ -30,7 +29,6 @@ public class WayPointManager {
 
                         addWayPoint(new WayPoint(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z), name, server));
                     }
-
                 }
             }
         } catch (Exception ignored) {
@@ -43,7 +41,6 @@ public class WayPointManager {
             new File("ThunderHackRecode").mkdirs();
             file.createNewFile();
         } catch (Exception ignored) {
-
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (WayPoint wayPoint : wayPoints) {

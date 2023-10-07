@@ -34,7 +34,6 @@ public class AsyncManager {
     private volatile List<AbstractClientPlayerEntity> threadSafePlayersList = Collections.emptyList();
     public final AtomicBoolean ticking = new AtomicBoolean(false);
 
-
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPostTick(EventPostTick e) {
         if (mc.world == null) return;
@@ -72,7 +71,7 @@ public class AsyncManager {
         @Override
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
-                if(mc != null && (mc.currentScreen instanceof MainMenuScreen || mc.currentScreen instanceof ClickUI) && updateTimer.passedMs(16)){
+                if (mc != null && (mc.currentScreen instanceof MainMenuScreen || mc.currentScreen instanceof ClickUI) && updateTimer.passedMs(16)) {
                     MainMenuProgram.increaseTime();
                     updateTimer.reset();
                 }
@@ -85,9 +84,7 @@ public class AsyncManager {
                             }
                         }
                         Thread.sleep(20);
-                    } else {
-                        Thread.yield();
-                    }
+                    } else Thread.yield();
                 } catch (Exception exception) {
                     exception.printStackTrace();
                     Command.sendMessage(exception.getMessage());
@@ -100,7 +97,6 @@ public class AsyncManager {
     public void onTick(EventTick e) {
         ticking.set(true);
     }
-
 
     public void run(Runnable runnable, long delay) {
         executor.execute(() -> {

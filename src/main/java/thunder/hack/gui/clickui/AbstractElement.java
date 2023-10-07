@@ -7,9 +7,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.client.util.math.MatrixStack;
 
-
 public abstract class AbstractElement {
-
 	protected Setting setting;
 
 	protected double x, y, width, height;
@@ -33,10 +31,8 @@ public abstract class AbstractElement {
 	public void mouseClicked(int mouseX, int mouseY, int button) {
 	}
 
-
 	public void mouseReleased(int mouseX, int mouseY, int button) {
 	}
-
 
 	public void keyTyped(int keyCode) {
 	}
@@ -87,5 +83,4 @@ public abstract class AbstractElement {
 	public boolean isVisible() {
 		return setting.isVisible();
 	}
-
 }

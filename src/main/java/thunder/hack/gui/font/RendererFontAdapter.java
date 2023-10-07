@@ -4,7 +4,6 @@ import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;
 
-
 public class RendererFontAdapter implements FontAdapter {
 
     public FontRenderer getFontRenderer() {

@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModuleWindow extends AbstractWindow {
-
     private final Identifier ICON;
 
     private final Animation animation = new EaseBackIn(270, 1f, 1.03f, Direction.BACKWARDS);
@@ -114,8 +113,7 @@ public class ModuleWindow extends AbstractWindow {
             }
         }
 
-        if (popStack)
-            Render2DEngine.popWindow();
+        if (popStack) Render2DEngine.popWindow();
 
         Render2DEngine.drawRoundD(context.getMatrices(), x + 2, y - 3, width - 4, height, 4, ClickGui.getInstance().catColor.getValue().getColorObject());
 
@@ -155,7 +153,6 @@ public class ModuleWindow extends AbstractWindow {
         return false;
     }
 
-
     @Override
     public void onClose() {
         super.onClose();
@@ -182,7 +179,6 @@ public class ModuleWindow extends AbstractWindow {
             offsetY += button.getHeight() + openY;
         }
     }
-
 
     public double getButtonsHeight() {
         double height = 0;

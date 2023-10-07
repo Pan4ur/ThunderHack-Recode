@@ -19,20 +19,13 @@ import java.util.concurrent.CompletableFuture;
 
 @Mixin(ChatInputSuggestor.class)
 public abstract class MixinChatInputSuggestor {
-    @Final
-    @Shadow
-    TextFieldWidget textField;
-    @Shadow
-    boolean completingSuggestions;
-    @Shadow
-    private ParseResults<CommandSource> parse;
-    @Shadow
-    private CompletableFuture<Suggestions> pendingSuggestions;
-    @Shadow
-    private ChatInputSuggestor.SuggestionWindow window;
+    @Final @Shadow TextFieldWidget textField;
+    @Shadow boolean completingSuggestions;
+    @Shadow private ParseResults<CommandSource> parse;
+    @Shadow private CompletableFuture<Suggestions> pendingSuggestions;
+    @Shadow private ChatInputSuggestor.SuggestionWindow window;
 
-    @Shadow
-    protected abstract void showCommandSuggestions();
+    @Shadow protected abstract void showCommandSuggestions();
 
     @Inject(method = "refresh", at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/StringReader;canRead()Z", remap = false), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
     public void onRefresh(CallbackInfo ci, String string, StringReader reader) {

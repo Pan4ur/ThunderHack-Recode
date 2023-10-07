@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(MinecraftClient.class)
 public interface IMinecraftClient {
-
     @Accessor("itemUseCooldown")
     int getUseCooldown();
 
@@ -26,7 +25,6 @@ public interface IMinecraftClient {
     @Mutable
     @Accessor("profileKeys")
     void setProfileKeys(ProfileKeys keys);
-
 
     @Mutable
     @Accessor("session")

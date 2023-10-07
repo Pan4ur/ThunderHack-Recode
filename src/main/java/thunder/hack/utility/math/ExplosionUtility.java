@@ -22,7 +22,6 @@ import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
 
-
 public final class ExplosionUtility {
     public static boolean terrainIgnore = false;
     public static BlockPos anchorIgnore = null;
@@ -95,9 +94,8 @@ public final class ExplosionUtility {
                             toDamage = Math.max(resistance_1 / 25f, 0f);
                         }
 
-                        if (toDamage <= 0f) {
-                            toDamage = 0f;
-                        } else {
+                        if (toDamage <= 0f) toDamage = 0f;
+                        else {
                             int protAmount = EnchantmentHelper.getProtectionAmount(target.getArmorItems(), explosion.getDamageSource());
                             if (protAmount > 0) {
                                 toDamage = DamageUtil.getInflictedDamage(toDamage, protAmount);
@@ -196,5 +194,4 @@ public final class ExplosionUtility {
             return BlockHitResult.createMissed(raycastContext.getEnd(), Direction.getFacing(vec3d.x, vec3d.y, vec3d.z), BlockPos.ofFloored(raycastContext.getEnd()));
         });
     }
-
 }

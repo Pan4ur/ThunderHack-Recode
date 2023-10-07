@@ -26,6 +26,5 @@ public class MainSettings extends Module {
 
     @Override
     public void onUpdate() {
-
     }
 }

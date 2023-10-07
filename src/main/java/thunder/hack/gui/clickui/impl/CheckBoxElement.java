@@ -12,8 +12,6 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 
 public class CheckBoxElement extends AbstractElement {
-
-
     public CheckBoxElement(Setting setting) {super(setting);}
 
     float animation = 0f;
@@ -43,5 +41,4 @@ public class CheckBoxElement extends AbstractElement {
     public static float fast(float end, float start, float multiple) {
         return (1 - MathUtility.clamp((float) (deltaTime() * multiple), 0, 1)) * end + MathUtility.clamp((float) (deltaTime() * multiple), 0, 1) * start;
     }
-
 }

@@ -60,6 +60,7 @@ public class AutoBed extends Module {
     public static final Setting<Integer> explodeDelay = new Setting<>("ExplodeDelay", 100, 0, 1000);
     public static final Setting<Float> minDamage = new Setting<>("MinDamage", 8f, 0f, 25.0f);
     public static final Setting<Float> maxSelfDamage = new Setting<>("MaxSelfDamage", 4f, 0f, 25.0f);
+    private final Setting<Boolean> dimCheck = new Setting<>("DimensionCheck", false);
     public final Setting<Boolean> switchToHotbar = new Setting<>("SwitchToHotbar", true);
     public final Setting<Boolean> autoSwap = new Setting<>("AutoSwap", true);
     public final Setting<Boolean> autoCraft = new Setting<>("AutoCraft", true);
@@ -83,8 +84,9 @@ public class AutoBed extends Module {
     public void onSync(EventSync e) {
         target = findTarget();
 
-        if (!(Objects.equals(mc.world.getRegistryKey().getValue().getPath(), "the_nether"))) {
-            disable(isRu() ? "Кровати не взрываются в этом мире!" : "Beds don't explode in this world!");
+        if (mc.world.getDimension().bedWorks() && dimCheck.getValue()) {
+        //if (!(Objects.equals(mc.world.getRegistryKey().getValue().getPath(), "the_nether"))) { зачем?
+            disable(isRu() ? "Кровати не взрываются в этом измерении!" : "Beds don't explode in this dimension!");
             return;
         }
 
@@ -109,7 +111,7 @@ public class AutoBed extends Module {
                 return;
             }
             if (mc.player.currentScreenHandler instanceof CraftingScreenHandler) {
-                mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                 mc.player.closeScreen();
             }
         }
@@ -125,7 +127,7 @@ public class AutoBed extends Module {
                 SearchInvResult invResult = InventoryUtility.findBed();
                 if (invResult.found() && !(mc.currentScreen instanceof CraftingScreen)) {
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, invResult.slot(), mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                    mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                 }
             }
         }
@@ -141,7 +143,7 @@ public class AutoBed extends Module {
 
         if (bestPos != null && placeTimer.passedMs(placeDelay.getValue()) && !(mc.world.getBlockState(bestPos.hitResult().getBlockPos().up()).getBlock() instanceof BedBlock)) {
             final float angle2 = InteractionUtility.calculateAngle(bestPos.hitResult.getBlockPos().toCenterPos(), bestPos.hitResult.getBlockPos().offset(bestPos.dir).toCenterPos())[0];
-            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle2, 0, mc.player.isOnGround()));
+            sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle2, 0, mc.player.isOnGround()));
             float prevYaw = mc.player.getYaw();
             mc.player.setYaw(angle2);
             mc.player.prevYaw = angle2;

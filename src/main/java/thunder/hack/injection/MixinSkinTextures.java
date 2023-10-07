@@ -25,27 +25,24 @@ import java.util.Objects;
 public class MixinSkinTextures {
     private static final Identifier SUN_SKIN = new Identifier("textures/sunskin.png");
 
-    @Final
-    private GameProfile profile;
-    @Final
-    private Map<MinecraftProfileTexture.Type, Identifier> textures;
+    @Final private GameProfile profile;
+    @Final private Map<MinecraftProfileTexture.Type, Identifier> textures;
 
     private boolean loadedCapeTexture = false;
 
     @Inject(method = "capeTexture", at = @At("HEAD"))
     private void getCapeTextureHook(CallbackInfoReturnable<Identifier> cir) {
-        if(ModuleManager.optifineCapes.isEnabled())
-            getTexture();
+        if (ModuleManager.optifineCapes.isEnabled()) getTexture();
     }
 
     @Inject(method = "elytraTexture", at = @At("HEAD"))
     private void getElytraTextureHook(CallbackInfoReturnable<Identifier> cir) {
-        if(ModuleManager.optifineCapes.isEnabled())
-            getTexture();
+        if (ModuleManager.optifineCapes.isEnabled()) getTexture();
     }
+
     @Inject(method = "texture", at = @At("HEAD"), cancellable = true)
     public void getSkinTextureHook(CallbackInfoReturnable<Identifier> cir) {
-        if(ModuleManager.media.isEnabled() && Media.skinProtect.getValue()){
+        if (ModuleManager.media.isEnabled() && Media.skinProtect.getValue()) {
             cir.setReturnValue(SUN_SKIN);
         }
     }
@@ -64,7 +61,7 @@ public class MixinSkinTextures {
                     String colune = inputLine.trim();
                     String name = colune.split(":")[0];
                     String cape = colune.split(":")[1];
-                    if(Objects.equals(this.profile.getName(), name)) {
+                    if (Objects.equals(this.profile.getName(), name)) {
                         textures.put(MinecraftProfileTexture.Type.CAPE, new Identifier("textures/" + cape + ".png"));
                         return;
                     }

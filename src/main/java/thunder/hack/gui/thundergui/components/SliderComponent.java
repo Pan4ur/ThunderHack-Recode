@@ -1,6 +1,5 @@
 package thunder.hack.gui.thundergui.components;
 
-
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
@@ -87,7 +86,6 @@ public class SliderComponent extends SettingElement {
         double diff = ((Number) setting.getMax()).floatValue() - ((Number) setting.getMin()).floatValue();
         double percentBar = MathHelper.clamp((mouseX - x) / width, 0.0, 1.0);
         double value = ((Number) setting.getMin()).floatValue() + percentBar * diff;
-
 
         if (this.setting.getValue() instanceof Float) {
             this.setting.setValue((float) value);
@@ -190,6 +188,4 @@ public class SliderComponent extends SettingElement {
             }
         }
     }
-
-
 }

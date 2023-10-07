@@ -3,7 +3,6 @@ package thunder.hack.gui.misc;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.modules.render.Tooltips;
-import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.block.Block;
 import net.minecraft.block.EnderChestBlock;
 import net.minecraft.block.ShulkerBoxBlock;
@@ -21,7 +20,6 @@ import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Arrays;
-
 
 public class PeekScreen extends ShulkerBoxScreen {
     private static final Identifier TEXTURE = new Identifier("textures/container.png");

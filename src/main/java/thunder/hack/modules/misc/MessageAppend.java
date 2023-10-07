@@ -15,18 +15,16 @@ public class MessageAppend extends Module {
     public Setting<String> word = new Setting<>("word", " TH RECODE");
 
     public MessageAppend() {
-        super("MessageAppend", "добавляет фразу-в конце сообщения", Category.MISC);
+        super("MessageAppend", "добавляет фразу в конце сообщения", Category.MISC);
     }
 
     String skip;
 
     @EventHandler
     public void onPacketSend(PacketEvent.Send e) {
-        if (fullNullCheck()) {
-            return;
-        }
+        if (fullNullCheck()) return;
         if (e.getPacket() instanceof ChatMessageC2SPacket pac) {
-            if(Objects.equals(pac.chatMessage(), skip)){
+            if (Objects.equals(pac.chatMessage(), skip)) {
                 return;
             }
 

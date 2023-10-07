@@ -21,7 +21,7 @@ public class VisualRange extends Module {
     private final Setting<Boolean> enter = new Setting<>("Enter", true);
     private final Setting<Boolean> friends = new Setting<>("Friends", true);
     private final Setting<Boolean> soundpl = new Setting<>("Sound", true);
-    private final Setting<mode> Mode = new Setting<>("Mode", mode.Notification);
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Notification);
 
     public VisualRange() {
         super("VisualRange", Category.MISC);
@@ -51,41 +51,34 @@ public class VisualRange extends Module {
 
     public void notify(Entity entity, boolean enter) {
         String message = "";
-        if (ThunderHack.friendManager.isFriend(entity.getName().getString())) {
+        if (ThunderHack.friendManager.isFriend(entity.getName().getString()))
             message = Formatting.AQUA + entity.getName().getString();
-        } else {
-            message = Formatting.GRAY + entity.getName().getString();
-        }
+        else message = Formatting.GRAY + entity.getName().getString();
 
-        if (enter) {
-            message += Formatting.GREEN + " was found!";
-        } else {
-            message += Formatting.RED + " left!";
-        }
+        if (enter) message += Formatting.GREEN + " was found!";
+        else message += Formatting.RED + " left!";
 
-        if (Mode.getValue() == mode.Chat) {
-            sendMessage(message);
-        }
-        if (Mode.getValue() == mode.Notification) {
-            ThunderHack.notificationManager.publicity("VisualRange",message, 2, Notification.Type.WARNING);
-        }
+        if (mode.getValue() == Mode.Chat) sendMessage(message);
+        if (mode.getValue() == Mode.Notification)
+            ThunderHack.notificationManager.publicity("VisualRange", message, 2, Notification.Type.WARNING);
 
         if (soundpl.getValue()) {
             try {
-                if (enter) {
+                if (enter)
                     mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 1f, 1f);
-                } else {
+                else
                     mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 1f, 1f);
-                }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
     public boolean isValid(Entity entity) {
         if (!(entity instanceof PlayerEntity)) return false;
-        if (entity == mc.player || (ThunderHack.friendManager.isFriend(entity.getName().getString()) && !friends.getValue())) return false;
-        return true;
+        return entity != mc.player && (!ThunderHack.friendManager.isFriend(entity.getName().getString()) || friends.getValue());
     }
 
-    public enum mode {Chat, Notification}
+    public enum Mode {
+        Chat, Notification
+    }
 }

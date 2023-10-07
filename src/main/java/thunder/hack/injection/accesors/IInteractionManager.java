@@ -11,5 +11,4 @@ public interface IInteractionManager {
 
     @Accessor(value = "currentBreakingProgress")
     void setCurBlockDamageMP(float a);
-
 }

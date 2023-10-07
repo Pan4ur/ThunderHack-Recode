@@ -21,11 +21,9 @@ import thunder.hack.utility.player.InventoryUtility;
 import static thunder.hack.utility.player.MovementUtility.isMoving;
 
 public class TargetStrafe extends Module {
-
     public TargetStrafe() {
         super("TargetStrafe", "TargetStrafe", Category.COMBAT);
     }
-
 
     public Setting<Boolean> jump = new Setting<>("Jump", true);
     public Setting<Float> distance = new Setting<>("Distance", 1.3F, 0.2F, 7f);
@@ -34,7 +32,6 @@ public class TargetStrafe extends Module {
     public Setting<Float> setSpeed = new Setting<>("speed", 1.3F, 0.0F, 2f, v -> boost.getValue() == Boost.Elytra);
     private final Setting<Float> velReduction = new Setting<>("Reduction", 6.0f, 0.1f, 10f, v -> boost.getValue() == Boost.Damage);
     private final Setting<Float> maxVelocitySpeed = new Setting<>("MaxVelocity", 0.8f, 0.1f, 2f, v -> boost.getValue() == Boost.Damage);
-
 
     public static double oldSpeed, contextFriction, fovval;
     public static boolean needSwap, needSprintState, skip, switchDir, disabled;
@@ -50,26 +47,15 @@ public class TargetStrafe extends Module {
     }
 
     public boolean canStrafe() {
-        if (mc.player.isSneaking()) {
-            return false;
-        }
-        if (mc.player.isInLava()) {
-            return false;
-        }
-        if (ModuleManager.scaffold.isEnabled()) {
-            return false;
-        }
-        if (ModuleManager.speed.isEnabled()) {
-            return false;
-        }
-        if (mc.player.isSubmergedInWater() || waterTicks > 0) {
-            return false;
-        }
+        if (mc.player.isSneaking()) return false;
+        if (mc.player.isInLava()) return false;
+        if (ModuleManager.scaffold.isEnabled()) return false;
+        if (ModuleManager.speed.isEnabled()) return false;
+        if (mc.player.isSubmergedInWater() || waterTicks > 0) return false;
         return !mc.player.getAbilities().flying;
     }
 
     public boolean needToSwitch(double x, double z) {
-
         if (mc.player.horizontalCollision || ((mc.options.leftKey.isPressed() || mc.options.rightKey.isPressed()) && jumpTicks <= 0)) {
             jumpTicks = 10;
             return true;
@@ -87,8 +73,7 @@ public class TargetStrafe extends Module {
                 }
                 return true;
             }
-            if (mc.world.isAir(playerPos))
-                continue;
+            if (mc.world.isAir(playerPos)) continue;
             return false;
         }
         return false;
@@ -130,24 +115,16 @@ public class TargetStrafe extends Module {
             if (max2 > (max = Math.max(0.043, n10))) {
                 noslow = true;
                 ++noSlowTicks;
-            } else {
-                noSlowTicks = Math.max(noSlowTicks - 1, 0);
-            }
-        } else {
-            noSlowTicks = 0;
-        }
-        if (noSlowTicks > 3) {
-            max2 = max - 0.019;
-        } else {
-            max2 = Math.max(noslow ? 0 : 0.25, max2) - (mc.player.age % 2 == 0 ? 0.001 : 0.002);
-        }
+            } else noSlowTicks = Math.max(noSlowTicks - 1, 0);
+        } else noSlowTicks = 0;
+        if (noSlowTicks > 3) max2 = max - 0.019;
+        else max2 = Math.max(noslow ? 0 : 0.25, max2) - (mc.player.age % 2 == 0 ? 0.001 : 0.002);
+
         contextFriction = n6;
         if (!mc.player.isOnGround()) {
             needSprintState = !mc.player.lastSprinting;
             needSwap = true;
-        } else {
-            needSprintState = false;
-        }
+        } else needSprintState = false;
         return max2;
     }
 

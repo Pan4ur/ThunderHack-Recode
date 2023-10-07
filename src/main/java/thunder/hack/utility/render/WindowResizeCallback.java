@@ -6,7 +6,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.Window;
 
 public interface WindowResizeCallback {
-
     Event<WindowResizeCallback> EVENT = EventFactory.createArrayBacked(WindowResizeCallback.class, callbacks -> (client, window) -> {
         for (var callback : callbacks) {
             callback.onResized(client, window);
@@ -14,5 +13,4 @@ public interface WindowResizeCallback {
     });
 
     void onResized(MinecraftClient client, Window window);
-
 }

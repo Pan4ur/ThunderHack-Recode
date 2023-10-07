@@ -6,8 +6,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.Kernel;
 
-
-public class GaussianFilter  {
+public class GaussianFilter {
     protected float radius;
     protected Kernel kernel;
 
@@ -32,16 +31,14 @@ public class GaussianFilter  {
                         if (ix < 0) {
                             if (edgeAction == 1) {
                                 ix = 0;
-                            }
-                            else if (edgeAction == 2) {
+                            } else if (edgeAction == 2) {
                                 ix = (x + width) % width;
                             }
 
                         } else if (ix >= width) {
                             if (edgeAction == 1) {
                                 ix = width - 1;
-                            }
-                            else if (edgeAction == 2) {
+                            } else if (edgeAction == 2) {
                                 ix = (x + width) % width;
                             }
                         }
@@ -84,10 +81,7 @@ public class GaussianFilter  {
     }
 
     public static int clamp(int c) {
-        if (c < 0) {
-            return 0;
-        }
-
+        if (c < 0) return 0;
         return Math.min(c, 255);
     }
 
@@ -147,7 +141,7 @@ public class GaussianFilter  {
         }
         return new BufferedImage(dstCM, dstCM.createCompatibleWritableRaster(src.getWidth(), src.getHeight()), dstCM.isAlphaPremultiplied(), null);
     }
-    
+
     public String toString() {
         return "Blur/Gaussian Blur...";
     }

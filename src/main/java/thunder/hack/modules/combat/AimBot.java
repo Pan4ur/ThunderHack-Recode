@@ -33,7 +33,6 @@ import static net.minecraft.util.math.MathHelper.wrapDegrees;
 import static thunder.hack.core.PlayerManager.calcAngleVec;
 
 public class AimBot extends Module {
-
     public AimBot() {
         super("AimBot", "RustMeAim", Category.COMBAT);
     }
@@ -52,20 +51,12 @@ public class AimBot extends Module {
     public Setting<Integer> predictTicks = new Setting<>("PredictTicks", 2, 0, 20, v -> mode.getValue() == Mode.BowAim);
     private final Setting<Part> part = new Setting<>("Part Mode", Part.Chest, v -> mode.getValue() == Mode.CSAim);
 
-    private enum Part {Chest, Head, Neck, Leggings, Boots}
-
-    private enum Rotation {Client, Silent}
-
-    private enum Mode {CSAim, AimAssist, BowAim}
-
     public static Entity target;
-    private float rotationYaw, rotationPitch;
     public static float ppx, ppy, ppz, pmx, pmy, pmz;
 
+    private float rotationYaw, rotationPitch;
     private Box debug_box;
-
     private float assistAcceleration;
-
 
     @EventHandler
     public void onSync(EventSync event) {
@@ -102,7 +93,7 @@ public class AimBot extends Module {
             calcThread();
             if (target != null && (mc.player.canSee(target) || ignoreWalls.getValue()))
                 if (mc.player.age % delay.getValue() == 0)
-                    mc.player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                    sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
         } else {
             if (mc.crosshairTarget.getType() == ENTITY) {
                 assistAcceleration = 0;
@@ -293,5 +284,18 @@ public class AimBot extends Module {
 
     private Vec3d getResolvedPos(Entity pl) {
         return new Vec3d(pl.getX() + pl.getVelocity().x * predict.getValue(), pl.getY(), pl.getZ() + pl.getVelocity().z * predict.getValue());
+    }
+
+
+    private enum Part {
+        Chest, Head, Neck, Leggings, Boots
+    }
+
+    private enum Rotation {
+        Client, Silent
+    }
+
+    private enum Mode {
+        CSAim, AimAssist, BowAim
     }
 }

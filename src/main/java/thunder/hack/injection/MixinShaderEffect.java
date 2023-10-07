@@ -1,6 +1,5 @@
 package thunder.hack.injection;
 
-
 import org.spongepowered.asm.mixin.Unique;
 import thunder.hack.injection.accesors.IPostProcessShader;
 import thunder.hack.utility.interfaces.IShaderEffect;
@@ -20,15 +19,9 @@ import java.util.Map;
 
 @Mixin(PostEffectProcessor.class)
 public class MixinShaderEffect implements IShaderEffect {
-
-    @Unique
-    private final List<String> fakedBufferNames = new ArrayList<>();
-    @Shadow
-    @Final
-    private Map<String, Framebuffer> targetsByName;
-    @Shadow
-    @Final
-    private List<PostEffectPass> passes;
+    @Unique private final List<String> fakedBufferNames = new ArrayList<>();
+    @Shadow @Final private Map<String, Framebuffer> targetsByName;
+    @Shadow @Final private List<PostEffectPass> passes;
 
     @Override
     public List<PostEffectPass> getPassesHook() {

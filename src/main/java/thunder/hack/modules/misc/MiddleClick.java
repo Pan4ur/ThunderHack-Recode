@@ -1,23 +1,23 @@
 package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.ItemStack;
-import thunder.hack.ThunderHack;
-import thunder.hack.core.ModuleManager;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.combat.Aura;
-import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.InventoryUtility;
-import thunder.hack.utility.Timer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PickFromInventoryC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
+import thunder.hack.ThunderHack;
+import thunder.hack.core.ModuleManager;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.modules.Module;
+import thunder.hack.modules.combat.Aura;
+import thunder.hack.setting.Setting;
+import thunder.hack.utility.Timer;
+import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
@@ -37,36 +37,27 @@ public class MiddleClick extends Module {
     private final Timer timer = new Timer();
     private int lastSlot = -1;
 
-
     public MiddleClick() {
-        super("MiddleClick", "действия на колесико-мыши", Category.MISC);
+        super("MiddleClick", "действия на колёсико мыши", Category.MISC);
     }
 
     @Override
     public String getDisplayInfo() {
-        StringBuilder sb = new StringBuilder();
+        String sb = "";
 
-        if (friend.getValue()) {
-            sb.append("FR");
-        }
-        if (xp.getValue()) {
-            sb.append(" XP ");
-        }
-        if (ep.getValue()) {
-            sb.append(" EP ");
-        }
+        if (friend.getValue()) sb += ("FR");
+        if (xp.getValue()) sb += (" XP ");
+        if (ep.getValue()) sb += (" EP ");
 
-        return sb.toString();
+        return sb;
     }
-
 
     @EventHandler
     public void onPreMotion(EventSync event) {
         if (fullNullCheck()) return;
 
-        if (xp.getValue() && feetExp.getValue() && mc.options.pickItemKey.isPressed()) {
+        if (xp.getValue() && feetExp.getValue() && mc.options.pickItemKey.isPressed())
             mc.player.setPitch(90);
-        }
 
         if (friend.getValue() && mc.currentScreen == null && mc.options.pickItemKey.isPressed() && mc.targetedEntity != null && mc.targetedEntity instanceof PlayerEntity entity && timer.passedMs(800)) {
             if (ThunderHack.friendManager.isFriend(entity.getName().getString())) {
@@ -81,10 +72,8 @@ public class MiddleClick extends Module {
         }
 
         if (ep.getValue() && timer.passedMs(500) && mc.currentScreen == null && mc.options.pickItemKey.isPressed()) {
-
-            if (ModuleManager.aura.isEnabled() && Aura.target != null) {
+            if (ModuleManager.aura.isEnabled() && Aura.target != null)
                 sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
-            }
 
             if (silentPearl.getValue()) {
                 if (!inventoryPearl.getValue() || (inventoryPearl.getValue() && findEPSlot() != -1)) {
@@ -207,40 +196,28 @@ public class MiddleClick extends Module {
             inv = inventory;
         }
 
-
         @Override
         public void run() {
             if (!inv) {
                 mc.player.getInventory().selectedSlot = epSlot;
                 sendPacket(new UpdateSelectedSlotC2SPacket(epSlot));
 
-                try {
-                    sleep(delay);
-                } catch (Exception ignored) {
-                }
+                try {sleep(delay);} catch (Exception ignore) {}
                 mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
-                try {
-                    sleep(delay);
-                } catch (Exception ignored) {
-                }
 
+                try {sleep(delay);} catch (Exception ignore) {}
                 mc.player.getInventory().selectedSlot = originalSlot;
                 sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
                 super.run();
             } else {
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, epSlot, originalSlot, SlotActionType.SWAP, mc.player);
-                try {
-                    sleep(delay);
-                } catch (Exception ignored) {
-                }
-                if (ModuleManager.aura.isEnabled() && Aura.target != null) {
+
+                try {sleep(delay);} catch (Exception ignore) {}
+                if (ModuleManager.aura.isEnabled() && Aura.target != null)
                     sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
-                }
                 mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
-                try {
-                    sleep(delay);
-                } catch (Exception ignored) {
-                }
+
+                try {sleep(delay);} catch (Exception ignore) {}
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, epSlot, originalSlot, SlotActionType.SWAP, mc.player);
 
                 super.run();

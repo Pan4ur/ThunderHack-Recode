@@ -5,7 +5,6 @@ import net.minecraft.util.math.BlockPos;
 import thunder.hack.events.Event;
 
 public class EventCollision extends Event {
-
     private BlockState bs;
     private BlockPos bp;
 

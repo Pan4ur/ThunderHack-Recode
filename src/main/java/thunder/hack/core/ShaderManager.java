@@ -14,7 +14,6 @@ import thunder.hack.modules.render.Shaders;
 import thunder.hack.utility.interfaces.IShaderEffect;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import static thunder.hack.modules.Module.mc;
@@ -79,33 +78,19 @@ public class ShaderManager {
     }
 
     public ManagedShaderEffect getShader(@NotNull Shader mode) {
-        switch (mode) {
-            case Smoke -> {
-                return SMOKE;
-            }
-            case Default -> {
-                return DEFAULT;
-            }
-            case Gradient -> {
-                return GRADIENT;
-            }
-        }
-        return DEFAULT;
+        return switch (mode) {
+            case Gradient -> GRADIENT;
+            case Smoke -> SMOKE;
+            default -> DEFAULT;
+        };
     }
 
     public ManagedShaderEffect getShaderOutline(@NotNull Shader mode) {
-        switch (mode) {
-            case Smoke -> {
-                return SMOKE_OUTLINE;
-            }
-            case Default -> {
-                return DEFAULT_OUTLINE;
-            }
-            case Gradient -> {
-                return GRADIENT_OUTLINE;
-            }
-        }
-        return DEFAULT_OUTLINE;
+        return switch (mode) {
+            case Gradient -> GRADIENT_OUTLINE;
+            case Smoke -> SMOKE_OUTLINE;
+            default -> DEFAULT_OUTLINE;
+        };
     }
 
     public void setupShader(Shader shader, ManagedShaderEffect effect) {

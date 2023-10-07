@@ -83,9 +83,7 @@ public class ModuleButton extends AbstractButton {
 
             Render2DEngine.drawRoundDoubleColor(context.getMatrices(), x + 4, y + height - 16, (width - 8), (height) + getElementsHeight(), 3f, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(200), 0.8f) : sbg, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(0), 0.8f) : sbg);
 
-            if (isOpen()) {
-                Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle((float) x, (float) (y + height - 15), (float) ((width) + x + 6), (float) ((height) + y + getElementsHeight())));
-            }
+            if (isOpen()) Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle((float) x, (float) (y + height - 15), (float) ((width) + x + 6), (float) ((height) + y + getElementsHeight())));
 
             context.getMatrices().push();
             TargetHud.sizeAnimation(context.getMatrices(), x + width / 2 + 6, y + height / 2 - 15, 1f - category_animation);
@@ -125,9 +123,7 @@ public class ModuleButton extends AbstractButton {
             if (isOpen()) {
                 Render2DEngine.popWindow();
             }
-        } else {
-            category_animation = CheckBoxElement.fast(1, 0, 1f);
-        }
+        } else category_animation = CheckBoxElement.fast(1, 0, 1f);
 
 
         if (module.isEnabled()) {
@@ -238,7 +234,6 @@ public class ModuleButton extends AbstractButton {
             elements.forEach(element -> element.mouseReleased(mouseX, mouseY, button));
     }
 
-
     public void keyTyped(int keyCode) {
         if(isHiden()) return;
 
@@ -266,7 +261,6 @@ public class ModuleButton extends AbstractButton {
     public List<AbstractElement> getElements() {
         return elements;
     }
-
 
     public double getElementsHeight() {
         float offsetY = 0;

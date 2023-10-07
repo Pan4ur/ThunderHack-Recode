@@ -9,7 +9,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
@@ -18,10 +17,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
@@ -33,29 +30,27 @@ import thunder.hack.utility.player.SearchInvResult;
 
 import java.lang.reflect.Field;
 
-
 public class Burrow extends Module {
-
     public Burrow() {
         super("Burrow", "Ставит в тебя блок", Category.COMBAT);
     }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
-    private final Setting<OffsetMode> offsetMode = new Setting<>("Mode", OffsetMode.Smart, v-> mode.getValue() == Mode.Default);
+    private final Setting<OffsetMode> offsetMode = new Setting<>("Mode", OffsetMode.Smart, v -> mode.getValue() == Mode.Default);
     public Setting<Float> vClip = new Setting("V-Clip", -9.0F, -256.0F, 256.0F, v -> offsetMode.getValue() == OffsetMode.Constant && mode.getValue() == Mode.Default);
-    public Setting<Integer> delay = new Setting<>("Delay", 100, 0, 1000, v-> mode.getValue() == Mode.Default);
-    public Setting<Boolean> scaleDown = new Setting<>("Scale-Down", false, v-> mode.getValue() == Mode.Default);
-    public Setting<Boolean> scaleVelocity = new Setting<>("Scale-Velocity", false, v-> mode.getValue() == Mode.Default);
-    public Setting<Boolean> scaleExplosion = new Setting<>("Scale-Explosion", false, v-> mode.getValue() == Mode.Default);
-    public Setting<Float> scaleFactor = new Setting("Scale-Factor", 1.0F, 0.1F, 10.0F, v-> mode.getValue() == Mode.Default);
-    public Setting<Integer> scaleDelay = new Setting<>("Scale-Delay", 250, 0, 1000, v-> mode.getValue() == Mode.Default);
-    public Setting<Boolean> attack = new Setting<>("Attack", true, v-> mode.getValue() == Mode.Default);
-    public Setting<Boolean> placeDisable = new Setting<>("PlaceDisable", false, v-> mode.getValue() == Mode.Default);
+    public Setting<Integer> delay = new Setting<>("Delay", 100, 0, 1000, v -> mode.getValue() == Mode.Default);
+    public Setting<Boolean> scaleDown = new Setting<>("Scale-Down", false, v -> mode.getValue() == Mode.Default);
+    public Setting<Boolean> scaleVelocity = new Setting<>("Scale-Velocity", false, v -> mode.getValue() == Mode.Default);
+    public Setting<Boolean> scaleExplosion = new Setting<>("Scale-Explosion", false, v -> mode.getValue() == Mode.Default);
+    public Setting<Float> scaleFactor = new Setting("Scale-Factor", 1.0F, 0.1F, 10.0F, v -> mode.getValue() == Mode.Default);
+    public Setting<Integer> scaleDelay = new Setting<>("Scale-Delay", 250, 0, 1000, v -> mode.getValue() == Mode.Default);
+    public Setting<Boolean> attack = new Setting<>("Attack", true, v -> mode.getValue() == Mode.Default);
+    public Setting<Boolean> placeDisable = new Setting<>("PlaceDisable", false, v -> mode.getValue() == Mode.Default);
     public Setting<Boolean> wait = new Setting<>("Wait", true);
     public Setting<Boolean> evade = new Setting<>("Evade", false, v -> offsetMode.getValue() == OffsetMode.Constant && mode.getValue() == Mode.Default);
     public Setting<Boolean> noVoid = new Setting<>("NoVoid", false, v -> offsetMode.getValue() == OffsetMode.Smart && mode.getValue() == Mode.Default);
-    public Setting<Boolean> onGround = new Setting<>("OnGround", true, v-> mode.getValue() == Mode.Default);
-    public Setting<Boolean> allowUp = new Setting<>("IgnoreHeadBlock", false, v-> mode.getValue() == Mode.Default);
+    public Setting<Boolean> onGround = new Setting<>("OnGround", true, v -> mode.getValue() == Mode.Default);
+    public Setting<Boolean> allowUp = new Setting<>("IgnoreHeadBlock", false, v -> mode.getValue() == Mode.Default);
     public Setting<Boolean> rotate = new Setting<>("Rotate", true);
     public Setting<Boolean> discrete = new Setting<>("Discrete", true, v -> offsetMode.getValue() == OffsetMode.Smart && mode.getValue() == Mode.Default);
     public Setting<Boolean> air = new Setting<>("Air", false, v -> offsetMode.getValue() == OffsetMode.Smart && mode.getValue() == Mode.Default);
@@ -77,15 +72,13 @@ public class Burrow extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
-        if(mode.getValue() != Mode.Default) return;
+        if (mode.getValue() != Mode.Default) return;
         if (event.getPacket() instanceof ExplosionS2CPacket) {
             if (scaleExplosion.getValue()) {
                 motionY = ((ExplosionS2CPacket) event.getPacket()).getPlayerVelocityY();
                 scaleTimer.reset();
             }
-            if (scaleVelocity.getValue()) {
-                return;
-            }
+            if (scaleVelocity.getValue()) return;
             if (mc.player != null) {
                 motionY = ((ExplosionS2CPacket) event.getPacket()).getPlayerVelocityY() / 8000.0;
                 scaleTimer.reset();
@@ -98,16 +91,9 @@ public class Burrow extends Module {
             double y = packet.getY();
             double z = packet.getZ();
 
-            if (packet.getFlags().contains(PositionFlag.X)) {
-                x += mc.player.getX();
-            }
-            if (packet.getFlags().contains(PositionFlag.Y)) {
-                y += mc.player.getY();
-            }
-
-            if (packet.getFlags().contains(PositionFlag.Z)) {
-                z += mc.player.getZ();
-            }
+            if (packet.getFlags().contains(PositionFlag.X)) x += mc.player.getX();
+            if (packet.getFlags().contains(PositionFlag.Y)) y += mc.player.getY();
+            if (packet.getFlags().contains(PositionFlag.Z)) z += mc.player.getZ();
 
             last_x = MathUtility.clamp(x, -3.0E7, 3.0E7);
             last_y = y;
@@ -120,7 +106,7 @@ public class Burrow extends Module {
         if (wait.getValue()) {
             BlockPos currentPos = getPlayerPos();
             if (!currentPos.equals(startPos)) {
-                disable(MainSettings.isRu() ? "Отключен из-за движения!" : "Disabled due to move!");
+                disable(MainSettings.isRu() ? "Отключен из-за движения!" : "Disabled due to movement!");
                 return;
             }
         }
@@ -128,7 +114,7 @@ public class Burrow extends Module {
         BlockPos pos = getPosition(mc.player);
         if (!mc.world.getBlockState(pos).isReplaceable()) {
             if (!wait.getValue())
-                disable(MainSettings.isRu() ? "Невозможно поставить блок! Отключаю.." : "Can't place the block on! Disabling..");
+                disable(MainSettings.isRu() ? "Невозможно поставить блок! Отключаю.." : "Can't place the block! Disabling..");
             return;
         }
 
@@ -137,8 +123,8 @@ public class Burrow extends Module {
                 if (entity instanceof EndCrystalEntity && attack.getValue()) {
                     PlayerInteractEntityC2SPacket attackPacket = PlayerInteractEntityC2SPacket.attack(mc.player, ((mc.player)).isSneaking());
                     changeId(attackPacket, entity.getId());
-                    mc.player.networkHandler.sendPacket(attackPacket);
-                    mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                    sendPacket(attackPacket);
+                    sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                     continue;
                 }
                 if (!wait.getValue())
@@ -147,7 +133,7 @@ public class Burrow extends Module {
             }
         }
 
-        switch (mode.getValue()){
+        switch (mode.getValue()) {
             case Default -> handleDefault(pos);
             case Web -> handleWeb(pos);
             case Skull -> handleSkull(pos);
@@ -157,17 +143,16 @@ public class Burrow extends Module {
     private void handleWeb(BlockPos pos) {
         SearchInvResult webResult = InventoryUtility.findBlockInHotBar(Blocks.COBWEB);
 
-        if(!webResult.found()){
+        if (!webResult.found()) {
             disable(MainSettings.isRu() ? "Нет паутины!" : "No webs found!");
             return;
         }
 
         if (timer.passedMs(1000)) {
-            if (rotate.getValue()) {
-                sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), 90, onGround.getValue()));
-            }
+            if (rotate.getValue()) sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), 90, onGround.getValue()));
+
             InventoryUtility.saveSlot();
-            InteractionUtility.placeBlock(pos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Packet, webResult.slot(),false, true);
+            InteractionUtility.placeBlock(pos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Packet, webResult.slot(), false, true);
             mc.player.swingHand(Hand.MAIN_HAND);
             timer.reset();
             InventoryUtility.returnSlot();
@@ -179,17 +164,15 @@ public class Burrow extends Module {
     private void handleSkull(BlockPos pos) {
         SearchInvResult skullResult = InventoryUtility.getSkull();
 
-        if(!skullResult.found()){
+        if (!skullResult.found()) {
             disable(MainSettings.isRu() ? "Нет голов!" : "No heads found!");
             return;
         }
 
         if (timer.passedMs(1000)) {
-            if (rotate.getValue()) {
-                sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), 90, onGround.getValue()));
-            }
+            if (rotate.getValue()) sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), 90, onGround.getValue()));
             InventoryUtility.saveSlot();
-            InteractionUtility.placeBlock(pos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, skullResult.slot(),false, true);
+            InteractionUtility.placeBlock(pos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, skullResult.slot(), false, true);
             mc.player.swingHand(Hand.MAIN_HAND);
             timer.reset();
             InventoryUtility.returnSlot();
@@ -198,7 +181,7 @@ public class Burrow extends Module {
         }
     }
 
-    public void handleDefault(BlockPos pos){
+    public void handleDefault(BlockPos pos) {
         if ((mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos().offset(Direction.UP, 0.2))).blocksMovement() || !mc.player.verticalCollision)) {
             return;
         }
@@ -247,11 +230,8 @@ public class Burrow extends Module {
         if (timer.passedMs(1000)) {
             if (rotate.getValue()) {
                 if (r != null) {
-                    if (finalREntity.getPos().equals(new Vec3d(last_x, last_y, last_z))) {
-                        sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(r[0], r[1], onGround.getValue()));
-                    } else {
-                        sendPacket(new PlayerMoveC2SPacket.Full(finalREntity.getX(), finalREntity.getY(), finalREntity.getZ(), r[0], r[1], onGround.getValue()));
-                    }
+                    if (finalREntity.getPos().equals(new Vec3d(last_x, last_y, last_z))) sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(r[0], r[1], onGround.getValue()));
+                    else sendPacket(new PlayerMoveC2SPacket.Full(finalREntity.getX(), finalREntity.getY(), finalREntity.getZ(), r[0], r[1], onGround.getValue()));
                 }
             }
 
@@ -261,7 +241,7 @@ public class Burrow extends Module {
             sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(finalREntity.getX(), finalREntity.getY() + 1.16, finalREntity.getZ(), onGround.getValue()));
 
             InventoryUtility.saveSlot();
-            InteractionUtility.placeBlock(pos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Packet, slot,false, true);
+            InteractionUtility.placeBlock(pos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Packet, slot, false, true);
             mc.player.swingHand(Hand.MAIN_HAND);
             sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(rEntity.getX(), y, rEntity.getZ(), false));
             timer.reset();
@@ -341,16 +321,11 @@ public class Burrow extends Module {
             BlockState state = mc.world.getBlockState(pos);
             if (!this.air.getValue() && !state.blocksMovement() || state.getBlock() == Blocks.AIR) {
                 if (air) {
-                    if (add) {
-                        return discrete.getValue() ? pos.getY() : y - off;
-                    } else {
-                        return discrete.getValue() ? last.getY() : lastOff;
-                    }
+                    if (add) return discrete.getValue() ? pos.getY() : y - off;
+                    else return discrete.getValue() ? last.getY() : lastOff;
                 }
                 air = true;
-            } else {
-                air = false;
-            }
+            } else air = false;
             last = pos;
             lastOff = y - off;
         }
@@ -366,12 +341,8 @@ public class Burrow extends Module {
             return value;
         }
 
-        if (value < mc.player.getY()) {
-            value -= (motionY * scaleFactor.getValue());
-        } else {
-            value += (motionY * scaleFactor.getValue());
-        }
-
+        if (value < mc.player.getY()) value -= (motionY * scaleFactor.getValue());
+        else value += (motionY * scaleFactor.getValue());
 
         return discrete.getValue() ? Math.floor(value) : value;
     }
@@ -385,7 +356,7 @@ public class Burrow extends Module {
         Smart
     }
 
-    private enum Mode{
+    private enum Mode {
         Default, Skull, Web
     }
 }

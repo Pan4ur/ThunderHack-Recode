@@ -16,7 +16,6 @@ import net.minecraft.util.math.RotationAxis;
 import java.awt.*;
 
 public class ParentElement extends AbstractElement {
-
     private final Setting<Parent> parentSetting;
 
     final Identifier arrow = new Identifier("textures/arrow.png");
@@ -46,13 +45,8 @@ public class ParentElement extends AbstractElement {
         context.drawTexture(arrow, (int) (x + width - 14), (int) (y + (17 - 6) / 2), 0, 0, 6, 6, 6, 6);
         matrixStack.pop();
 
-
-        
-
-
         FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName() ,(int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy() )), (int) (y + height / 2 - 2), new Color(-1).getRGB());
     }
-
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
@@ -61,11 +55,7 @@ public class ParentElement extends AbstractElement {
         }
     }
 
-
-
-
     public Setting<Parent> getParentSetting() {
         return parentSetting;
     }
-
 }

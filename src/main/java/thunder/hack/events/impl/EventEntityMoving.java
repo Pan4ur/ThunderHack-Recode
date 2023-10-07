@@ -10,7 +10,6 @@ public class EventEntityMoving extends Event {
     private final MovementType movementType;
     private final Vec3d movement;
 
-
     public EventEntityMoving(Entity entity, MovementType movementType, Vec3d movement) {
         this.entity = entity;
         this.movementType = movementType;

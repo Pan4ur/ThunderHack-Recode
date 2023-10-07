@@ -22,7 +22,6 @@ import java.util.List;
 import static thunder.hack.modules.Module.mc;
 
 public class HudEditorGui extends Screen {
-
     private Animation openAnimation, bgAnimation, rAnimation;
     private final List<AbstractWindow> windows;
 
@@ -53,7 +52,6 @@ public class HudEditorGui extends Screen {
         INSTANCE = this;
     }
 
-
     @Override
     protected void init() {
         openAnimation = new EaseBackIn(270, .4f, 1.13f);
@@ -82,7 +80,6 @@ public class HudEditorGui extends Screen {
         windows.forEach(AbstractWindow::init);
     }
 
-
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 
@@ -91,9 +88,7 @@ public class HudEditorGui extends Screen {
             mc.currentScreen = null;
         }
 
-
         double anim = (openAnimation.getOutput() + .6f);
-
 
         double centerX = width >> 1;
         double centerY = height >> 1;
@@ -116,9 +111,7 @@ public class HudEditorGui extends Screen {
                 window.setX(window.getX() - 2);
             }
 
-            if (dWheel != 0) {
-                window.setY(window.getY() + dWheel);
-            }
+            if (dWheel != 0) window.setY(window.getY() + dWheel);
         }
 
         dWheel = 0;

@@ -1,6 +1,5 @@
 package thunder.hack.utility.render;
 
-
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
@@ -23,7 +22,6 @@ import java.util.List;
 
 import static com.mojang.blaze3d.systems.RenderSystem.disableBlend;
 import static thunder.hack.modules.Module.mc;
-
 
 public class Render3DEngine {
 
@@ -305,7 +303,6 @@ public class Render3DEngine {
     public static void setOutlinePoints(Box box, MatrixStack matrices, BufferBuilder buffer, Color color) {
         box = box.offset(new Vec3d(box.minX, box.minY, box.minZ).negate());
 
-
         float x1 = (float) box.minX;
         float y1 = (float) box.minY;
         float z1 = (float) box.minZ;
@@ -335,7 +332,6 @@ public class Render3DEngine {
     public static void setSideOutlinePoints(Box box, MatrixStack matrices, BufferBuilder buffer, Color color, Direction dir) {
         box = box.offset(new Vec3d(box.minX, box.minY, box.minZ).negate());
 
-
         float x1 = (float) box.minX;
         float y1 = (float) box.minY;
         float z1 = (float) box.minZ;
@@ -343,46 +339,43 @@ public class Render3DEngine {
         float y2 = (float) box.maxY;
         float z2 = (float) box.maxZ;
 
-        if (dir == Direction.DOWN) {
-            vertexLine(matrices, buffer, x1, y1, z1, x2, y1, z1, color);
-            vertexLine(matrices, buffer, x2, y1, z1, x2, y1, z2, color);
-            vertexLine(matrices, buffer, x2, y1, z2, x1, y1, z2, color);
-            vertexLine(matrices, buffer, x1, y1, z2, x1, y1, z1, color);
-        }
-
-        if (dir == Direction.NORTH) {
-            vertexLine(matrices, buffer, x2, y1, z1, x2, y2, z1, color);
-            vertexLine(matrices, buffer, x1, y1, z1, x1, y2, z1, color);
-            vertexLine(matrices, buffer, x2, y1, z1, x1, y1, z1, color);
-            vertexLine(matrices, buffer, x2, y2, z1, x1, y2, z1, color);
-        }
-
-        if (dir == Direction.EAST) {
-            vertexLine(matrices, buffer, x2, y1, z1, x2, y2, z1, color);
-            vertexLine(matrices, buffer, x2, y1, z2, x2, y2, z2, color);
-            vertexLine(matrices, buffer, x2, y2, z2, x2, y2, z1, color);
-            vertexLine(matrices, buffer, x2, y1, z2, x2, y1, z1, color);
-        }
-
-        if (dir == Direction.SOUTH) {
-            vertexLine(matrices, buffer, x1, y1, z2, x1, y2, z2, color);
-            vertexLine(matrices, buffer, x2, y1, z2, x2, y2, z2, color);
-            vertexLine(matrices, buffer, x1, y1, z2, x2, y1, z2, color);
-            vertexLine(matrices, buffer, x1, y2, z2, x2, y2, z2, color);
-        }
-
-        if (dir == Direction.WEST) {
-            vertexLine(matrices, buffer, x1, y1, z1, x1, y2, z1, color);
-            vertexLine(matrices, buffer, x1, y1, z2, x1, y2, z2, color);
-            vertexLine(matrices, buffer, x1, y2, z2, x1, y2, z1, color);
-            vertexLine(matrices, buffer, x1, y1, z2, x1, y1, z1, color);
-        }
-
-        if (dir == Direction.UP) {
-            vertexLine(matrices, buffer, x1, y2, z1, x2, y2, z1, color);
-            vertexLine(matrices, buffer, x2, y2, z1, x2, y2, z2, color);
-            vertexLine(matrices, buffer, x2, y2, z2, x1, y2, z2, color);
-            vertexLine(matrices, buffer, x1, y2, z2, x1, y2, z1, color);
+        switch (dir) {
+            case UP -> {
+                vertexLine(matrices, buffer, x1, y2, z1, x2, y2, z1, color);
+                vertexLine(matrices, buffer, x2, y2, z1, x2, y2, z2, color);
+                vertexLine(matrices, buffer, x2, y2, z2, x1, y2, z2, color);
+                vertexLine(matrices, buffer, x1, y2, z2, x1, y2, z1, color);
+            }
+            case DOWN -> {
+                vertexLine(matrices, buffer, x1, y1, z1, x2, y1, z1, color);
+                vertexLine(matrices, buffer, x2, y1, z1, x2, y1, z2, color);
+                vertexLine(matrices, buffer, x2, y1, z2, x1, y1, z2, color);
+                vertexLine(matrices, buffer, x1, y1, z2, x1, y1, z1, color);
+            }
+            case EAST -> {
+                vertexLine(matrices, buffer, x2, y1, z1, x2, y2, z1, color);
+                vertexLine(matrices, buffer, x2, y1, z2, x2, y2, z2, color);
+                vertexLine(matrices, buffer, x2, y2, z2, x2, y2, z1, color);
+                vertexLine(matrices, buffer, x2, y1, z2, x2, y1, z1, color);
+            }
+            case WEST -> {
+                vertexLine(matrices, buffer, x1, y1, z1, x1, y2, z1, color);
+                vertexLine(matrices, buffer, x1, y1, z2, x1, y2, z2, color);
+                vertexLine(matrices, buffer, x1, y2, z2, x1, y2, z1, color);
+                vertexLine(matrices, buffer, x1, y1, z2, x1, y1, z1, color);
+            }
+            case NORTH -> {
+                vertexLine(matrices, buffer, x2, y1, z1, x2, y2, z1, color);
+                vertexLine(matrices, buffer, x1, y1, z1, x1, y2, z1, color);
+                vertexLine(matrices, buffer, x2, y1, z1, x1, y1, z1, color);
+                vertexLine(matrices, buffer, x2, y2, z1, x1, y2, z1, color);
+            }
+            case SOUTH -> {
+                vertexLine(matrices, buffer, x1, y1, z2, x1, y2, z2, color);
+                vertexLine(matrices, buffer, x2, y1, z2, x2, y2, z2, color);
+                vertexLine(matrices, buffer, x1, y1, z2, x2, y1, z2, color);
+                vertexLine(matrices, buffer, x1, y2, z2, x2, y2, z2, color);
+            }
         }
     }
 

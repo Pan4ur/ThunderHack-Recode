@@ -57,20 +57,9 @@ public class AutoWeb extends Module {
     private final ArrayList<BlockPos> sequentialBlocks = new ArrayList<>();
     public static Timer inactivityTimer = new Timer();
 
-    private enum PlaceTiming {
-        Default, Vanilla, Sequential
-    }
-
-
-    private enum RenderMode {
-        Fade,
-        Decrease
-    }
-
     private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
 
     private int delay = 0;
-
 
     public void onRender3D(MatrixStack stack) {
         renderPoses.forEach((pos, time) -> {
@@ -116,8 +105,7 @@ public class AutoWeb extends Module {
             int placed = 0;
             while (placed < blocksPerTick.getValue()) {
                 BlockPos targetBlock = getSequentialPos();
-                if (targetBlock == null)
-                    break;
+                if (targetBlock == null) break;
                 if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
                     placed++;
                     renderPoses.put(targetBlock, System.currentTimeMillis());
@@ -127,8 +115,7 @@ public class AutoWeb extends Module {
             }
         } else if (placeTiming.getValue() == PlaceTiming.Vanilla || placeTiming.getValue() == PlaceTiming.Sequential) {
             BlockPos targetBlock = getSequentialPos();
-            if (targetBlock == null)
-                return;
+            if (targetBlock == null) return;
 
             if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
                 sequentialBlocks.add(targetBlock);
@@ -177,10 +164,9 @@ public class AutoWeb extends Module {
             positions.add(targetBp.north());
 
             for (BlockPos bp : positions) {
-                BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), bp.toCenterPos().offset(Direction.UP,0.5f), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
+                BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), bp.toCenterPos().offset(Direction.UP, 0.5f), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
                 if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != bp)
-                    if (squaredDistanceFromEyes(bp.toCenterPos()) > placeWallRange.getPow2Value())
-                        continue;
+                    if (squaredDistanceFromEyes(bp.toCenterPos()) > placeWallRange.getPow2Value()) continue;
                 if (InteractionUtility.canPlaceBlock(bp, interact.getValue(), false) && mc.world.isAir(bp)) {
                     return bp;
                 }
@@ -217,4 +203,11 @@ public class AutoWeb extends Module {
         return slot;
     }
 
+    private enum PlaceTiming {
+        Default, Vanilla, Sequential
+    }
+
+    private enum RenderMode {
+        Fade, Decrease
+    }
 }

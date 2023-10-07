@@ -71,15 +71,12 @@ public class Blocker extends Module {
         super("Blocker", Category.COMBAT);
     }
 
-
     @Override
     public void onEnable() {
-        sendMessage(isRu() ?
-                Formatting.RED + "ВНИМАНИЕ!!! "
-                        + Formatting.RESET + "Использование блокера на серверах осуждается игроками, а в некоторых странах карается набутыливанием!" :
-                Formatting.RED + "WARNING!!! "
-                        + Formatting.RESET + "The use of blocker on servers is condemned by players, and in some countries is punishable by jail!"
-        );
+        sendMessage(Formatting.RED + (isRu() ?
+                "ВНИМАНИЕ!!! " + Formatting.RESET + "Использование блокера на серверах осуждается игроками, а в некоторых странах карается набутыливанием!" :
+                "WARNING!!! " + Formatting.RESET + "The use of blocker on servers is condemned by players, and in some countries is punishable by jail!"
+        ));
     }
 
     @EventHandler
@@ -136,12 +133,8 @@ public class Blocker extends Module {
                     placePositions.remove(pos);
                     inactivityTimer.reset();
                     if (!mc.player.isOnGround()) return;
-                } else {
-                    break;
-                }
-            } else {
-                break;
-            }
+                } else break;
+            } else break;
         }
     }
 
@@ -155,9 +148,8 @@ public class Blocker extends Module {
             if (mc.world.getBlockState(pos).getBlock() == Blocks.BEDROCK || mc.world.getBlockState(pos).getBlock() == Blocks.AIR)
                 return;
 
-            if (antiCev.getValue() && pos.equals(playerPos.up().up())) {
+            if (antiCev.getValue() && pos.equals(playerPos.up().up()))
                 placePositions.add(playerPos.up().up().up());
-            }
 
             if (HoleUtility.getSurroundPoses(playerPos).contains(pos)) {
                 placePositions.add(pos.up());

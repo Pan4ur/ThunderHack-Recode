@@ -2,8 +2,6 @@ package thunder.hack.gui.hud.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.ThunderHack;
-import thunder.hack.core.ShaderManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
@@ -39,7 +37,6 @@ public class TimerIndicator extends HudElement {
         int status;
         float timerStatus;
 
-
         float f4 = 100 / Timer.speed.getValue();
         float f5 = Math.min(Timer.violation, f4);
         timerAnimation.setValue(((f4 - f5) / f4) * 61);
@@ -47,7 +44,6 @@ public class TimerIndicator extends HudElement {
         status = (int) (((f4 - f5) / f4) * 100);
         status = MathUtility.clamp(status, 0, 100);
         timerStatus = MathUtility.clamp(timerStatus, 5, 61);
-
 
         Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), 62, 12, HudEditor.hudRound.getValue() - 3f, new Color(1));
         Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() + 0.5f, getPosY() + 0.5f, (int) timerStatus, 11, HudEditor.hudRound.getValue() - 3f);

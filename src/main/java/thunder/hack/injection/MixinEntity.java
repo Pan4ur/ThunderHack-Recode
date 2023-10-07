@@ -31,17 +31,11 @@ import static thunder.hack.modules.Module.mc;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity implements IEntity {
-
-    @Shadow
-    private Box boundingBox;
-
-    @Override
-    public List<Trails.Trail> getTrails() {
+    @Shadow private Box boundingBox;
+    @Override public List<Trails.Trail> getTrails() {
         return trails;
     }
-
-    @Override
-    public List<Vec3d> getPrevPositions() {
+    @Override public List<Vec3d> getPrevPositions() {
         return backPositions;
     }
 
@@ -56,13 +50,10 @@ public abstract class MixinEntity implements IEntity {
         }
     }
 
-    @Unique
-    public List<Trails.Trail> trails = new ArrayList<>();
+    @Unique public List<Trails.Trail> trails = new ArrayList<>();
+    @Unique public List<Vec3d> backPositions = new ArrayList<>();
 
-    @Unique
-    public List<Vec3d> backPositions = new ArrayList<>();
-
-    @Inject(method = {"changeLookDirection"}, at = {@At("HEAD")}, cancellable = true)
+    @Inject(method = "changeLookDirection", at = {@At("HEAD")}, cancellable = true)
     public void changeLookDirectionHook(double cursorDeltaX, double cursorDeltaY, CallbackInfo ci) {
         if (ModuleManager.noPitchLimit.isEnabled()) {
             ci.cancel();
@@ -70,7 +61,7 @@ public abstract class MixinEntity implements IEntity {
         }
     }
 
-    @Inject(method = {"getBoundingBox"}, at = {@At("HEAD")}, cancellable = true)
+    @Inject(method = "getBoundingBox", at = {@At("HEAD")}, cancellable = true)
     public final void getBoundingBox(CallbackInfoReturnable<Box> cir) {
         if (ModuleManager.hitBox.isEnabled() && (Object) this != mc.player) {
             cir.setReturnValue(new Box(this.boundingBox.minX - HitBox.XZExpand.getValue() / 2f, this.boundingBox.minY - HitBox.YExpand.getValue() / 2f, this.boundingBox.minZ - HitBox.XZExpand.getValue() / 2f, this.boundingBox.maxX + HitBox.XZExpand.getValue() / 2f, this.boundingBox.maxY + HitBox.YExpand.getValue() / 2f, this.boundingBox.maxZ + HitBox.XZExpand.getValue() / 2f));

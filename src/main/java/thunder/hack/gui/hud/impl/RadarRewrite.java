@@ -22,7 +22,6 @@ import java.awt.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RadarRewrite extends HudElement {
-
     public static AstolfoAnimation astolfo = new AstolfoAnimation();
     public static Setting<Boolean> glow = new Setting("TracerGlow", false);
 
@@ -74,7 +73,6 @@ public class RadarRewrite extends HudElement {
     public static double interp(double d, double d2) {
         return d2 + (d - d2) * (double) mc.getTickDelta();
     }
-
 
     public boolean isHovering() {
         return normaliseX() > xOffset2 - 50 && normaliseX() < xOffset2 + 50 && normaliseY() > yOffset2 - 50 && normaliseY() < yOffset2 + 50;
@@ -326,21 +324,11 @@ public class RadarRewrite extends HudElement {
             y = y - 1;
 
             switch (stage1) {
-                case 0 -> {
-                    // FontRender.drawCentString3("W", (x + cos), (y + sin), -1);
-                    FontRenderers.getModulesRenderer().drawString(matrices, "W", (x + cos), (y + sin), -1);
-                }
-                case 1 -> {
-                    FontRenderers.getModulesRenderer().drawString(matrices, "N", (x + cos), (y + sin), -1);
-
-                }
-                case 2 -> {
-                    FontRenderers.getModulesRenderer().drawString(matrices, "E", (x + cos), (y + sin), -1);
-
-                }
-                case 3 -> {
-                    FontRenderers.getModulesRenderer().drawString(matrices, "S", (x + cos), (y + sin), -1);
-                }
+                // FontRender.drawCentString3("W", (x + cos), (y + sin), -1);
+                case 0 -> FontRenderers.getModulesRenderer().drawString(matrices, "W", (x + cos), (y + sin), -1);
+                case 1 -> FontRenderers.getModulesRenderer().drawString(matrices, "N", (x + cos), (y + sin), -1);
+                case 2 -> FontRenderers.getModulesRenderer().drawString(matrices, "E", (x + cos), (y + sin), -1);
+                case 3 -> FontRenderers.getModulesRenderer().drawString(matrices, "S", (x + cos), (y + sin), -1);
             }
         }
     }

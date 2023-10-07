@@ -92,23 +92,6 @@ public class AutoAnchor extends Module {
 
     private final AtomicBoolean ticking = new AtomicBoolean(false);
 
-
-    private enum InteractMode {
-        Packet,
-        Normal
-    }
-
-    private enum RotateMode {
-        Packet,
-        Normal,
-        None
-    }
-
-    private enum YawStepMode {
-        Off,
-        On
-    }
-
     private final List<BlockPos> ownAnchors = new ArrayList<>();
     private final Map<BlockPos, Integer> charges = new HashMap<>();
     private PlayerEntity target;
@@ -121,15 +104,14 @@ public class AutoAnchor extends Module {
     private Thread explodeThread;
 
     public AutoAnchor() {
-        super("AutoAnchor", "Ебашит якоря как-героин", Category.COMBAT);
+        super("AutoAnchor", "Ебашит якоря как героин", Category.COMBAT);
     }
 
     @Override
     public void onEnable() {
         if (mc.world == null) return;
-        if (dimensionDisable.getValue() && mc.world.getDimension().respawnAnchorWorks()) {
-            disable(isRu() ? "В данном измерении не работают якоря возрождения! Выключение..." : "There are respawn anchors don't work! Disabling...");
-        }
+        if (dimensionDisable.getValue() && mc.world.getDimension().respawnAnchorWorks())
+            disable(isRu() ? "Ты в незере! Отключаем..." : "You are in the nether! Disabling...");
 
         target = null;
         targetPos = null;
@@ -171,9 +153,7 @@ public class AutoAnchor extends Module {
 
     @Override
     public void onRender3D(MatrixStack event) {
-        if (targetPos != null) {
-            Render3DEngine.drawBoxOutline(new Box(targetPos), HudEditor.getColor(0), 2);
-        }
+        if (targetPos != null) Render3DEngine.drawBoxOutline(new Box(targetPos), HudEditor.getColor(0), 2);
 
         super.onRender3D(event);
     }
@@ -230,12 +210,9 @@ public class AutoAnchor extends Module {
     }
 
     private void interact(BlockHitResult result, @NotNull Setting<InteractMode> explodeMode, Hand hand) {
-        if (explodeMode.getValue() == InteractMode.Packet) {
+        if (explodeMode.getValue() == InteractMode.Packet)
             sendPacket(new PlayerInteractBlockC2SPacket(hand, result, PlayerUtility.getWorldActionId(mc.world)));
-        }
-        if (explodeMode.getValue() == InteractMode.Normal) {
-            mc.interactionManager.interactBlock(mc.player, hand, result);
-        }
+        else mc.interactionManager.interactBlock(mc.player, hand, result);
 
         if (swing.getValue()) mc.player.swingHand(hand);
         else sendPacket(new HandSwingC2SPacket(hand));
@@ -339,7 +316,6 @@ public class AutoAnchor extends Module {
             while (isEnabled()) {
                 try {
                     sleep(placeTimeout.getValue());
-
                 } catch (InterruptedException ignored) {
                 }
 
@@ -559,5 +535,21 @@ public class AutoAnchor extends Module {
 
             return false;
         }
+    }
+
+    private enum InteractMode {
+        Packet,
+        Normal
+    }
+
+    private enum RotateMode {
+        Packet,
+        Normal,
+        None
+    }
+
+    private enum YawStepMode {
+        Off,
+        On
     }
 }

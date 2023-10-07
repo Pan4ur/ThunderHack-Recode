@@ -1,6 +1,5 @@
 package thunder.hack.setting.impl;
 
-
 public class Parent {
     private boolean extended;
     private final int hierarchy;

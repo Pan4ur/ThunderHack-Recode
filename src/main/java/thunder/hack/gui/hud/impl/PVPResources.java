@@ -1,6 +1,5 @@
 package thunder.hack.gui.hud.impl;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -24,19 +23,15 @@ public class PVPResources extends HudElement {
     }
 
     public void onRenderShaders(DrawContext context) {
-
-
         Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 50, 50, HudEditor.hudRound.getValue(), 10);
         Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, 51, 51, HudEditor.hudRound.getValue());
         Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), 50, 50, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
-
 
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 24.5f, getPosX() + 26, getPosY() + 25, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 26, getPosY() + 24.5f, getPosX() + 48, getPosY() + 25, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
 
         Render2DEngine.verticalGradient(context.getMatrices(), getPosX() + 25.5f, getPosY() + 2, getPosX() + 26, getPosY() + 23, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
         Render2DEngine.verticalGradient(context.getMatrices(), getPosX() + 25.5f, getPosY() + 23, getPosX() + 26, getPosY() + 48, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
-
 
         int totemCount = getItemCount(Items.TOTEM_OF_UNDYING);
         int xpCount = getItemCount(Items.EXPERIENCE_BOTTLE);
@@ -50,7 +45,6 @@ public class PVPResources extends HudElement {
         if (crystalCount > 0) list.add(new ItemStack(Items.END_CRYSTAL, crystalCount));
         if (gappleCount > 0) list.add(new ItemStack(Items.ENCHANTED_GOLDEN_APPLE, gappleCount));
 
-
         for (int i = 0; i < list.size(); ++i) {
             int offsetX = i % 2 * 25;
             int offsetY = i / 2 * 25;
@@ -59,11 +53,8 @@ public class PVPResources extends HudElement {
         }
     }
 
-
     public int getItemCount(Item item) {
-        if (mc.player == null) {
-            return 0;
-        }
+        if (mc.player == null) return 0;
         int n = 0;
         int n2 = 44;
         for (int i = 0; i <= n2; ++i) {

@@ -20,7 +20,6 @@ import java.util.List;
 
 import static thunder.hack.modules.Module.mc;
 
-
 class GlyphMap {
     private static final int PADDING = 5;
     char fromIncl, toExcl;
@@ -30,7 +29,6 @@ class GlyphMap {
     int width, height;
 
     boolean generated = false;
-
 
     public GlyphMap(char from, char to, Font[] fonts, Identifier identifier) {
         fromIncl = from;

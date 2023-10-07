@@ -1,6 +1,5 @@
 package thunder.hack.gui.hud.impl;
 
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -16,7 +15,6 @@ public class PotionHud extends HudElement {
         super("Potions", "Potions", 100, 100);
     }
 
-
     public static String getDuration(StatusEffectInstance pe) {
         if (pe.isInfinite()) {
             return "*:*";
@@ -28,7 +26,6 @@ public class PotionHud extends HudElement {
             return mins + ":" + sec;
         }
     }
-
 
     public void onRenderShaders(DrawContext context) {
         int y_offset1 = 0;
@@ -43,17 +40,14 @@ public class PotionHud extends HudElement {
                 y_offset1 += 10;
                 StatusEffect potion = potionEffect.getEffectType();
                 String power = "";
-                if (potionEffect.getAmplifier() == 0) {
-                    power = "I";
-                } else if (potionEffect.getAmplifier() == 1) {
-                    power = "II";
-                } else if (potionEffect.getAmplifier() == 2) {
-                    power = "III";
-                } else if (potionEffect.getAmplifier() == 3) {
-                    power = "IV";
-                } else if (potionEffect.getAmplifier() == 4) {
-                    power = "V";
+                switch (potionEffect.getAmplifier()) {
+                    case 0 -> power = "I";
+                    case 1 -> power = "II";
+                    case 2 -> power = "III";
+                    case 3 -> power = "IV";
+                    case 4 -> power = "V";
                 }
+
                 String s = potion.getName().getString() + " " + power;
                 String s2 = getDuration(potionEffect) + "";
 
@@ -64,18 +58,15 @@ public class PotionHud extends HudElement {
             }
         }
 
-        //  Render2DEngine.drawGradientBlurredShadow(e.getMatrixStack(), getPosX() + 1, getPosY() + 1, max_width - 2, 18 + y_offset1, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+        //Render2DEngine.drawGradientBlurredShadow(e.getMatrixStack(), getPosX() + 1, getPosY() + 1, max_width - 2, 18 + y_offset1, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
 
         Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), max_width, 20 + y_offset1, HudEditor.hudRound.getValue(), 10);
         Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, max_width + 1, 21 + y_offset1, HudEditor.hudRound.getValue());
         Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), max_width, 20 + y_offset1, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
 
-
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + max_width / 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + max_width / 2, getPosY() + 13.7f, getPosX() + max_width - 2, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
     }
-
-
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
@@ -84,22 +75,17 @@ public class PotionHud extends HudElement {
 
         ArrayList<StatusEffectInstance> effects = new ArrayList<>();
 
-
         for (StatusEffectInstance potionEffect : mc.player.getStatusEffects()) {
             if (potionEffect.getDuration() != 0) {
                 effects.add(potionEffect);
                 StatusEffect potion = potionEffect.getEffectType();
                 String power = "";
-                if (potionEffect.getAmplifier() == 0) {
-                    power = "I";
-                } else if (potionEffect.getAmplifier() == 1) {
-                    power = "II";
-                } else if (potionEffect.getAmplifier() == 2) {
-                    power = "III";
-                } else if (potionEffect.getAmplifier() == 3) {
-                    power = "IV";
-                } else if (potionEffect.getAmplifier() == 4) {
-                    power = "V";
+                switch (potionEffect.getAmplifier()) {
+                    case 0 -> power = "I";
+                    case 1 -> power = "II";
+                    case 2 -> power = "III";
+                    case 3 -> power = "IV";
+                    case 4 -> power = "V";
                 }
                 String s = potion.getName().getString() + " " + power;
                 String s2 = getDuration(potionEffect) + "";
@@ -116,17 +102,14 @@ public class PotionHud extends HudElement {
         for (StatusEffectInstance potionEffect : effects) {
             StatusEffect potion = potionEffect.getEffectType();
             String power = "";
-            if (potionEffect.getAmplifier() == 0) {
-                power = "I";
-            } else if (potionEffect.getAmplifier() == 1) {
-                power = "II";
-            } else if (potionEffect.getAmplifier() == 2) {
-                power = "III";
-            } else if (potionEffect.getAmplifier() == 3) {
-                power = "IV";
-            } else if (potionEffect.getAmplifier() == 4) {
-                power = "V";
+            switch (potionEffect.getAmplifier()) {
+                case 0 -> power = "I";
+                case 1 -> power = "II";
+                case 2 -> power = "III";
+                case 3 -> power = "IV";
+                case 4 -> power = "V";
             }
+
             String s = potion.getName().getString() + " " + power;
             String s2 = getDuration(potionEffect) + "";
 
@@ -134,6 +117,4 @@ public class PotionHud extends HudElement {
             y_offset += 10;
         }
     }
-
-
 }

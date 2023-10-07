@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static thunder.hack.modules.Module.mc;
-
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class ConfigManager {
     public static File MainFolder = new File(mc.runDirectory, "ThunderHackRecode");
@@ -50,7 +50,6 @@ public class ConfigManager {
 
     public static boolean firstLaunch = false;
 
-
     public ConfigManager() {
         if (!MainFolder.exists()) {
             MainFolder.mkdirs();
@@ -67,7 +66,6 @@ public class ConfigManager {
         if (!DiscordEmbeds.exists()) DiscordEmbeds.mkdirs();
         loadSearch();
     }
-
 
     public void loadSearch() {
         try {
@@ -101,7 +99,6 @@ public class ConfigManager {
         }
     }
 
-
     public void saveSearch() {
         File file = new File("ThunderHackRecode/misc/search.txt");
         try {
@@ -118,7 +115,6 @@ public class ConfigManager {
         }
     }
 
-
     public static String getConfigDate(String name) {
         File file = new File(ConfigsFolder, name + ".th");
         if (!file.exists()) {
@@ -132,21 +128,16 @@ public class ConfigManager {
 
     public File currentConfig = null;
 
-
     public void load(String name) {
         File file = new File(ConfigsFolder, name + ".th");
         if (!file.exists()) {
-            if (MainSettings.isRu()) {
-                Command.sendMessage("Конфига " + name + " не существует!");
-            } else {
-                Command.sendMessage("Config " + name + " does not exist!");
-            }
+            if (isRu()) Command.sendMessage("Конфига " + name + " не существует!");
+            else Command.sendMessage("Config " + name + " does not exist!");
+
             return;
         }
 
-        if (currentConfig != null) {
-            save(currentConfig);
-        }
+        if (currentConfig != null) save(currentConfig);
 
         ThunderHack.moduleManager.onUnload();
         ThunderHack.moduleManager.onUnloadPost();
@@ -157,11 +148,9 @@ public class ConfigManager {
     public void loadModuleOnly(String name, Module module) {
         File file = new File(ConfigsFolder, name + ".th");
         if (!file.exists()) {
-            if (MainSettings.isRu()) {
-                Command.sendMessage("Конфига " + name + " не существует!");
-            } else {
-                Command.sendMessage("Config " + name + " does not exist!");
-            }
+            if (isRu()) Command.sendMessage("Конфига " + name + " не существует!");
+            else Command.sendMessage("Config " + name + " does not exist!");
+
             return;
         }
 
@@ -170,7 +159,6 @@ public class ConfigManager {
 
         loadModuleOnly(file, module);
         ThunderHack.moduleManager.onLoad();
-
     }
 
     public void load(File config) {
@@ -202,12 +190,8 @@ public class ConfigManager {
                 });
             }
 
-            if (MainSettings.isRu()) {
-                Command.sendMessage("Загружен конфиг " + config.getName());
-            } else {
-                Command.sendMessage("Loaded " + config.getName());
-            }
-
+            if (isRu()) Command.sendMessage("Загружен конфиг " + config.getName());
+            else Command.sendMessage("Loaded " + config.getName());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -251,11 +235,8 @@ public class ConfigManager {
                     }
                 });
             }
-            if (MainSettings.isRu()) {
-                Command.sendMessage("Загружен модуль " + module.getName() + " с конфига " + config.getName());
-            } else {
-                Command.sendMessage("Loaded " + module.getName() + " from " + config.getName());
-            }
+            if (isRu()) Command.sendMessage("Загружен модуль " + module.getName() + " с конфига " + config.getName());
+            else Command.sendMessage("Loaded " + module.getName() + " from " + config.getName());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -264,14 +245,13 @@ public class ConfigManager {
     public void save(String name) {
         File file = new File(ConfigsFolder, name + ".th");
         if (file.exists()) {
-            Command.sendMessage(MainSettings.isRu() ? "Перезаписываем " + name + "..." : "Overwriting " + name + "...");
+            Command.sendMessage(isRu() ? "Перезаписываем " + name + "..." : "Overwriting " + name + "...");
             file.delete();
         } else {
-            Command.sendMessage(MainSettings.isRu() ? "Конфиг " + name + " успешно сохранен!" : "Config " + name + " successfully saved!");
+            Command.sendMessage(isRu() ? "Конфиг " + name + " успешно сохранен!" : "Config " + name + " successfully saved!");
         }
         save(file);
     }
-
 
     public void save(File config) {
         saveSearch();
@@ -285,7 +265,6 @@ public class ConfigManager {
             modulesObj.add("Modules", getModuleArray());
             array.add(modulesObj);
 
-
             FileWriter writer = new FileWriter(config);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -294,12 +273,9 @@ public class ConfigManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
-
     private void parseModule(JsonObject object) throws NullPointerException {
-
         Module module = ThunderHack.moduleManager.modules.stream()
                 .filter(m -> object.getAsJsonObject(m.getName()) != null)
                 .findFirst().orElse(null);
@@ -440,7 +416,6 @@ public class ConfigManager {
         return file.delete();
     }
 
-
     public boolean delete(String name) {
         File file = new File(ConfigsFolder, name + ".th");
         if (!file.exists()) {
@@ -461,7 +436,6 @@ public class ConfigManager {
         }
         return list;
     }
-
 
     public void saveCurrentConfig() {
         File file = new File("ThunderHackRecode/misc/currentcfg.txt");

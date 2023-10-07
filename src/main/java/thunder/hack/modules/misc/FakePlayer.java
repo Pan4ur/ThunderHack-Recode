@@ -38,7 +38,6 @@ public class FakePlayer extends Module {
         super("FakePlayer", "FakePlayer", Category.MISC);
     }
 
-
     private Setting<Boolean> record = new Setting<>("Record", false);
     private Setting<Boolean> play = new Setting<>("Play", false);
     private Setting<Boolean> autoTotem = new Setting<>("AutoTotem", false);
@@ -53,7 +52,7 @@ public class FakePlayer extends Module {
         fakePlayer = new OtherClientPlayerEntity(mc.world, new GameProfile(UUID.fromString("66123666-6666-6666-6666-666666666600"), "Hell_Raider"));
         fakePlayer.copyPositionAndRotation(mc.player);
 
-        if(copyInventory.getValue()) {
+        if (copyInventory.getValue()) {
             fakePlayer.setStackInHand(Hand.MAIN_HAND, mc.player.getMainHandStack().copy());
             fakePlayer.setStackInHand(Hand.OFF_HAND, mc.player.getOffHandStack().copy());
 
@@ -90,7 +89,6 @@ public class FakePlayer extends Module {
             return;
         }
         if (fakePlayer != null) {
-
             if (play.getValue() && !positions.isEmpty()) {
                 movementTick++;
 
@@ -107,15 +105,12 @@ public class FakePlayer extends Module {
                 fakePlayer.updateTrackedPositionAndAngles(p.x, p.y, p.z, p.yaw, p.pitch, 3);
             } else movementTick = 0;
 
-            if (autoTotem.getValue() && fakePlayer.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING) {
+            if (autoTotem.getValue() && fakePlayer.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING)
                 fakePlayer.setStackInHand(Hand.OFF_HAND, new ItemStack(Items.TOTEM_OF_UNDYING));
-            }
 
             if (fakePlayer.isDead()) {
                 deathTime++;
-                if (deathTime > 10) {
-                    disable();
-                }
+                if (deathTime > 10) disable();
             }
         }
     }
@@ -123,16 +118,14 @@ public class FakePlayer extends Module {
     @EventHandler
     public void onAttack(EventAttack e) {
         if (fakePlayer != null && e.getEntity() == fakePlayer && fakePlayer.hurtTime == 0) {
-            mc.world.playSound(mc.player, fakePlayer.getX(), fakePlayer.getY(), fakePlayer.getZ(), SoundEvents.ENTITY_PLAYER_HURT,  SoundCategory.PLAYERS,1f, 1f);
+            mc.world.playSound(mc.player, fakePlayer.getX(), fakePlayer.getY(), fakePlayer.getZ(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1f, 1f);
 
-            if(mc.player.fallDistance > 0 || ModuleManager.criticals.isEnabled())
-                mc.world.playSound(mc.player, fakePlayer.getX(), fakePlayer.getY(), fakePlayer.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT,  SoundCategory.PLAYERS,1f, 1f);
+            if (mc.player.fallDistance > 0 || ModuleManager.criticals.isEnabled())
+                mc.world.playSound(mc.player, fakePlayer.getX(), fakePlayer.getY(), fakePlayer.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1f, 1f);
             fakePlayer.onDamaged(mc.world.getDamageSources().generic());
-            if(Aura.getAttackCooldown() >= 0.85){
+            if (Aura.getAttackCooldown() >= 0.85)
                 fakePlayer.setHealth(fakePlayer.getHealth() + fakePlayer.getAbsorptionAmount() - InventoryUtility.getHitDamage(mc.player.getMainHandStack(), fakePlayer));
-            } else {
-                fakePlayer.setHealth(fakePlayer.getHealth() + fakePlayer.getAbsorptionAmount() - 1f);
-            }
+            else fakePlayer.setHealth(fakePlayer.getHealth() + fakePlayer.getAbsorptionAmount() - 1f);
             if (fakePlayer.isDead()) {
                 if (fakePlayer.tryUseTotem(mc.world.getDamageSources().generic())) {
                     fakePlayer.setHealth(10f);
@@ -141,7 +134,6 @@ public class FakePlayer extends Module {
             }
         }
     }
-
 
     @Override
     public void onDisable() {
@@ -154,8 +146,5 @@ public class FakePlayer extends Module {
         deathTime = 0;
     }
 
-
-    private record PlayerState(double x, double y, double z, float yaw, float pitch) {
-    }
-
+    private record PlayerState(double x, double y, double z, float yaw, float pitch) {}
 }

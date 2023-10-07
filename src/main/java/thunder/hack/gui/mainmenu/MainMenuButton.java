@@ -10,7 +10,6 @@ import java.awt.*;
 import static thunder.hack.modules.Module.mc;
 
 public class MainMenuButton {
-
     private float posX, posY, width, height;
     private final String name;
     private final Runnable action;
@@ -39,7 +38,6 @@ public class MainMenuButton {
             Render2DEngine.drawGradientGlow(context.getMatrices(), c1, c2, c3, c4, halfOfWidth + posX, halfOfHeight + posY, width, height, 10, 10);
         }
 
-
         Render2DEngine.drawGradientRoundShader(context.getMatrices(), c1, c2, c3, c4, halfOfWidth + posX, halfOfHeight + posY, width, height, 10);
         Render2DEngine.drawRoundShader(context.getMatrices(), halfOfWidth + posX + 1, halfOfHeight + posY + 1, width - 2, height - 2, 10, HudEditor.plateColor.getValue().getColorObject());
     }
@@ -51,14 +49,12 @@ public class MainMenuButton {
         FontRenderers.monsterrat.drawCenteredString(context.getMatrices(), name,halfOfWidth +  posX + width / 2f, halfOfHeight + posY + height / 2f - 5f, hovered ? -1 : Render2DEngine.applyOpacity(-1, 0.7f));
     }
 
-
     public void onClick(int mouseX, int mouseY) {
 
         float halfOfWidth = mc.getWindow().getScaledWidth() / 2f;
         float halfOfHeight = mc.getWindow().getScaledHeight() / 2f;
         boolean hovered = Render2DEngine.isHovered(mouseX, mouseY,halfOfWidth +  posX, halfOfHeight +  posY, width, height);
 
-        if (hovered)
-            action.run();
+        if (hovered) action.run();
     }
 }
