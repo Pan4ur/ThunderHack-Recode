@@ -603,6 +603,7 @@ public class AutoCrystal extends Module {
 
     private @NotNull List<CrystalData> getPossibleCrystals(PlayerEntity target) {
         List<CrystalData> crystals = new ArrayList<>();
+        assert mc.world != null;
         Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
         for (Entity ent : entities) {
             if (!(ent instanceof EndCrystalEntity))

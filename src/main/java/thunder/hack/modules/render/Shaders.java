@@ -77,7 +77,6 @@ public class Shaders extends Module {
             ThunderHack.shaderManager.renderShader(()-> mc.gameRenderer.renderHand(matrices, mc.gameRenderer.getCamera(), mc.getTickDelta()), handsMode.getValue());
     }
 
-
     @Override
     public void onDisable() {
         ThunderHack.shaderManager.reloadShaders();
