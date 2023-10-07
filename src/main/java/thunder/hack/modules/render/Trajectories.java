@@ -75,15 +75,15 @@ public class Trajectories extends Module {
         if ((mainHand.getItem() instanceof CrossbowItem && EnchantmentHelper.getLevel(Enchantments.MULTISHOT, mainHand) != 0) ||
                 (mainHand.getItem() instanceof CrossbowItem && EnchantmentHelper.getLevel(Enchantments.MULTISHOT, mainHand) != 0)) {
 
-            calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw() - 10);
-            calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw());
-            calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw() + 10);
+            calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), mc.player.getYaw() - 10);
+            calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), mc.player.getYaw());
+            calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), mc.player.getYaw() + 10);
 
-        } else calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), stack, mc.player.getYaw());
+        } else calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), mc.player.getYaw());
         mc.options.getBobView().setValue(prev_bob);
     }
 
-    private void calcTrajectory(Item item, MatrixStack matrices, float yaw) {
+    private void calcTrajectory(Item item, float yaw) {
         double x = Render2DEngine.interpolate(mc.player.prevX, mc.player.getX(), mc.getTickDelta());
         double y = Render2DEngine.interpolate(mc.player.prevY, mc.player.getY(), mc.getTickDelta());
         double z = Render2DEngine.interpolate(mc.player.prevZ, mc.player.getZ(), mc.getTickDelta());
@@ -121,7 +121,7 @@ public class Trajectories extends Module {
             motionY += mc.player.getVelocity().getY();
 
 
-        Vec3d lastPos = new Vec3d(x, y, z);
+        Vec3d lastPos;
         for (int i = 0; i < 300; i++) {
             lastPos = new Vec3d(x, y, z);
             x += motionX;

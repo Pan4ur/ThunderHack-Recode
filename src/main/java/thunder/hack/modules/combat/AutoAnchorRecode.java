@@ -93,11 +93,11 @@ public class AutoAnchorRecode extends Module {
     }
 
     @Override
-    public void onRender3D(MatrixStack event) {
+    public void onRender3D(MatrixStack stack) {
         if (targetPos != null)
             Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(new Box(targetPos), HudEditor.getColor(0), 2));
 
-        super.onRender3D(event);
+        super.onRender3D(stack);
     }
 
     @Override

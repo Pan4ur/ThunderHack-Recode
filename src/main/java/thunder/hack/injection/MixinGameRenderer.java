@@ -2,6 +2,7 @@ package thunder.hack.injection;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.Camera;
 import net.minecraft.item.SwordItem;
 import net.minecraft.resource.ResourceFactory;
@@ -103,11 +104,15 @@ public abstract class MixinGameRenderer {
     @Inject(at = @At("TAIL"), method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D", cancellable = true)
     public void getFov(Camera camera, float tickDelta, boolean changingFov, CallbackInfoReturnable<Double> cb) {
         if (ModuleManager.fov.isEnabled()) {
-            if (cb.getReturnValue() == 70 && !ModuleManager.fov.itemFov.getValue()) return;
+            if (cb.getReturnValue() == 70
+                    && !ModuleManager.fov.itemFov.getValue()
+                    && mc.options.getPerspective() != Perspective.FIRST_PERSON) return;
             else if (ModuleManager.fov.itemFov.getValue() && cb.getReturnValue() == 70) {
                 cb.setReturnValue(ModuleManager.fov.itemFovModifier.getValue().doubleValue());
                 return;
             }
+
+            if (mc.player.isSubmergedInWater()) return;
             cb.setReturnValue(ModuleManager.fov.fovModifier.getValue().doubleValue());
         }
     }

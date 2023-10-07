@@ -18,7 +18,6 @@ import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.player.InventoryUtility;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
@@ -70,7 +69,7 @@ public class HoleFill extends Module {
         All,
         Webs,
         Obsidian,
-        Indestrictible
+        Indestructible
     }
 
     private enum SelfFillMode {
@@ -275,7 +274,7 @@ public class HoleFill extends Module {
             switch (blocks.getValue()) {
                 case Webs -> isCorrectBlock = block == Blocks.COBWEB;
                 case Obsidian -> isCorrectBlock = block == Blocks.OBSIDIAN;
-                case Indestrictible -> isCorrectBlock = block == Blocks.OBSIDIAN
+                case Indestructible -> isCorrectBlock = block == Blocks.OBSIDIAN
                         || block == Blocks.CRYING_OBSIDIAN
                         || block == Blocks.NETHERITE_BLOCK
                         || block == Blocks.RESPAWN_ANCHOR;
