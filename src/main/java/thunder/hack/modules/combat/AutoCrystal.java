@@ -853,11 +853,17 @@ public class AutoCrystal extends Module {
         if (mc.player.getEyePos().getY() > bp.up().getY()) {
             bestDirection = Direction.UP;
             bestVector = new Vec3d(bp.getX() + 0.5, bp.getY() + 1, bp.getZ() + 0.5);
-        } else if (mc.player.getEyePos().getY() < bp.getY()) {
+        } else if (mc.player.getEyePos().getY() < bp.getY() && mc.world.isAir(bp.down())) {
             bestDirection = Direction.DOWN;
             bestVector = new Vec3d(bp.getX() + 0.5, bp.getY(), bp.getZ() + 0.5);
         } else {
             for (Direction dir : Direction.values()) {
+                if(dir == Direction.UP || dir == Direction.DOWN)
+                    continue;
+
+                if(!mc.world.isAir(bp.offset(dir)))
+                    continue;
+
                 Vec3d directionVec = new Vec3d(bp.getX() + 0.5 + dir.getVector().getX() * 0.5, bp.getY() + 0.5 + dir.getVector().getY() * 0.5, bp.getZ() + 0.5 + dir.getVector().getZ() * 0.5);
                 float distance = PlayerUtility.squaredDistanceFromEyes(directionVec);
                 if (bestDistance > distance) {
