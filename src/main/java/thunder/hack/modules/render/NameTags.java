@@ -348,13 +348,12 @@ public class NameTags extends Module {
     }
 
     public void drawPotions(MatrixStack matrices, @NotNull PlayerEntity entity, float posX, float posY) {
-        ArrayList<StatusEffectInstance> effects = new ArrayList<>();
+        ArrayList<StatusEffectInstance> effects = new ArrayList<>(entity.getStatusEffects());
 
         int y_offset1 = 0;
 
-        for (StatusEffectInstance potionEffect : entity.getStatusEffects()) {
+        for (StatusEffectInstance potionEffect : effects) {
             if (potionEffect.getDuration() != 0) {
-                effects.add(potionEffect);
                 StatusEffect potion = potionEffect.getEffectType();
                 String power = "";
                 switch (potionEffect.getAmplifier()) {
@@ -365,7 +364,7 @@ public class NameTags extends Module {
                     case 4 -> power = "V";
                 }
                 String s = potion.getName().getString() + " " + power;
-                String s2 = getDuration(potionEffect) + "";
+                String s2 = getDuration(potionEffect);
 
                 FontRenderers.sf_bold_mini.drawString(matrices, s + " " + s2, posX, posY + y_offset1, -1);
                 y_offset1 += 8;
