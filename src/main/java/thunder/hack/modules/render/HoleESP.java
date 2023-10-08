@@ -120,43 +120,47 @@ public class HoleESP extends Module {
         BlockPos centerPos = BlockPos.ofFloored(mc.player.getPos());
         List<Box> boxes = new ArrayList<>();
 
-        BlockPos.iterateOutwards(centerPos,
-                rangeXZ.getValue(),
-                rangeY.getValue(),
-                rangeXZ.getValue()
-        ).forEach(pos -> {
-            Box box = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + height.getValue(), pos.getZ() + 1);
-            Color color = indestrictibleColor.getValue().getColorObject();
+        for (int i = centerPos.getX() - rangeXZ.getValue(); i < centerPos.getX() + rangeXZ.getValue(); i++) {
+            for (int j = centerPos.getY() - rangeY.getValue(); j < centerPos.getY() + rangeY.getValue(); j++) {
+                for (int k = centerPos.getZ() - rangeXZ.getValue(); k < centerPos.getZ() + rangeXZ.getValue(); k++) {
+                    BlockPos pos = new BlockPos(i, j, k);
+                    Box box = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + height.getValue(), pos.getZ() + 1);
+                    Color color = indestrictibleColor.getValue().getColorObject();
+                    if (HoleUtility.validIndestructible(pos)) {
+                    } else if (HoleUtility.validBedrock(pos)) {
+                        color = bedrockColor.getValue().getColorObject();
+                    } else if (HoleUtility.validTwoBlockBedrockXZ(pos)) {
+                        boolean east = mc.world.isAir(pos.offset(Direction.EAST));
+                        boolean south = mc.world.isAir(pos.offset(Direction.SOUTH));
+                        box = new Box(box.minX, box.minY, box.minZ, box.maxX + (east ? 1 : 0), box.maxY, box.maxZ + (south ? 1 : 0));
+                        color = bedrockColor.getValue().getColorObject();
+                    } else if (HoleUtility.validTwoBlockIndestructibleXZ(pos)) {
+                        boolean east = mc.world.isAir(pos.offset(Direction.EAST));
+                        boolean south = mc.world.isAir(pos.offset(Direction.SOUTH));
+                        box = new Box(box.minX, box.minY, box.minZ, box.maxX + (east ? 1 : 0), box.maxY, box.maxZ + (south ? 1 : 0));
+                    } else if (HoleUtility.validQuadBedrock(pos)) {
+                        box = new Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY, box.maxZ + 1);
+                        color = bedrockColor.getValue().getColorObject();
+                    } else if (HoleUtility.validQuadIndestructible(pos)) {
+                        box = new Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY, box.maxZ + 1);
+                    } else {
+                        continue;
+                    }
 
-            if (HoleUtility.validBedrock(pos)) {
-                color = bedrockColor.getValue().getColorObject();
-            } else if (HoleUtility.validTwoBlockBedrockXZ(pos)) {
-                boolean east = mc.world.getBlockState(pos.east()).isReplaceable();
-                boolean south = mc.world.getBlockState(pos.south()).isReplaceable();
-                box = new Box(box.minX, box.minY, box.minZ, box.maxX + (east ? 1 : 0), box.maxY, box.maxZ + (south ? 1 : 0));
-                color = bedrockColor.getValue().getColorObject();
-            } else if (HoleUtility.validTwoBlockIndestructibleXZ(pos)) {
-                boolean east = mc.world.getBlockState(pos.east()).isReplaceable();
-                boolean south = mc.world.getBlockState(pos.south()).isReplaceable();
-                box = new Box(box.minX, box.minY, box.minZ, box.maxX + (east ? 1 : 0), box.maxY, box.maxZ + (south ? 1 : 0));
-            } else if (HoleUtility.validQuadBedrock(pos)) {
-                box = new Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY, box.maxZ + 1);
-                color = bedrockColor.getValue().getColorObject();
-            } else if (HoleUtility.validQuadIndestructible(pos)) {
-                box = new Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY, box.maxZ + 1);
-            } else if (!HoleUtility.validIndestructible(pos)) return;
+                    boolean skip = false;
+                    for (Box boxOffset : boxes) {
+                        if (boxOffset.intersects(box))
+                            skip = true;
+                    }
 
-            boolean skip = false;
-            for (Box boxOffset : boxes) {
-                if (boxOffset.intersects(box))
-                    skip = true;
+                    if (skip)
+                        continue;
+
+                    blocks.add(new BoxWithColor(box, color));
+                    boxes.add(box);
+                }
             }
-
-            if (skip) return;
-
-            blocks.add(new BoxWithColor(box, color));
-            boxes.add(box);
-        });
+        }
 
         positions.clear();
         positions.addAll(blocks);
