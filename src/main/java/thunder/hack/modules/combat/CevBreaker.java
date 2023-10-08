@@ -336,9 +336,8 @@ public class CevBreaker extends Module {
             sendPacket(PlayerInteractEntityC2SPacket.attack(endCrystal, mc.player.isSneaking()));
             sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
-            if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
+            if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS))
                 if (autoSwap.getValue()) InventoryUtility.switchTo(preSlot);
-            }
 
             try {
                 Thread.sleep(breakCrystalDelay.getValue() / 2);
@@ -452,8 +451,8 @@ public class CevBreaker extends Module {
 
         if (!result.isHolding() && !autoSwap.getValue()) return null;
         if (!result.found() && autoDisable.getValue()) {
-            ThunderHack.notificationManager.publicity("CevBreaker", isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!", 5, Notification.Type.ERROR);
-            disable(isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian in hotbar!");
+            ThunderHack.notificationManager.publicity("CevBreaker", isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian found in hotbar!", 5, Notification.Type.ERROR);
+            disable(isRu() ? "В хотбаре не найден обсидиан!" : "No obsidian found in hotbar!");
             return null;
         }
 

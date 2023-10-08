@@ -51,6 +51,7 @@ public final class InteractionUtility {
     }
 
     public static float[] calculateAngle(Vec3d to) {
+        assert mc.player != null;
         return calculateAngle(getEyesPos(mc.player), to);
     }
 
