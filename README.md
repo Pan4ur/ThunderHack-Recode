@@ -26,10 +26,10 @@
 - [Java 17+](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 
 ## Recommended to use
-- [Sodium](https://modrinth.com/mod/sodium/version/mc1.20.1-0.5.0) & [Lithium](https://modrinth.com/mod/lithium/version/mc1.20.1-0.11.2) - For optimisation
+- [Sodium](https://modrinth.com/mod/sodium/version/mc1.20.2-0.5.3) & [Lithium](https://modrinth.com/mod/lithium/version/mc1.20.2-0.12.0) - For optimisation
 - [ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus) - To play on 1.12.2 servers (!!!will fuck up the silent switch in SpeedMine and ShieldBreaker in Aura!!!)
 - [InGameAccountSwitcher](https://www.curseforge.com/minecraft/mc-mods/in-game-account-switcher) - To switch accounts in game
-- [NotEnoughCrashes](https://github.com/natanfudge/not-enough-crashes) - :^)
+- [NotEnoughCrashes](https://www.curseforge.com/minecraft/mc-mods/not-enough-crashes/files) - :^)
 
 ## ScreenShots
 ![image](https://cdn.discordapp.com/attachments/934396624111824900/1149001329675604048/2023-09-06_18.06.52.png)
