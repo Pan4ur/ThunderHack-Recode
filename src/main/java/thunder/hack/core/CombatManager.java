@@ -7,6 +7,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventPostTick;
 import thunder.hack.events.impl.PacketEvent;
@@ -58,7 +59,7 @@ public class CombatManager {
         }
     }
 
-    public int getPops(PlayerEntity entity) {
+    public int getPops(@NotNull PlayerEntity entity) {
         if (popList.get(entity.getName().getString()) == null) return 0;
         return popList.get(entity.getName().getString());
     }
@@ -106,7 +107,7 @@ public class CombatManager {
                 .min(Comparator.comparing(this::getFOVAngle)).orElse(null);
     }
 
-    private float getFOVAngle(LivingEntity e) {
+    private float getFOVAngle(@NotNull LivingEntity e) {
         double difX = e.getX() - mc.player.getPos().x;
         double difZ = e.getZ() - mc.player.getPos().z;
         float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);

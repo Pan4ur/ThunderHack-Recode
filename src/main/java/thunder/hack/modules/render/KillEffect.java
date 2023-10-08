@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
+import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -20,7 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class KillEffect extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Orthodox);
-
     private final Setting<Integer> speed = new Setting<>("Y Speed", 0, -10, 10, value -> mode.getValue() == Mode.Orthodox);
     private final Setting<Boolean> playSound = new Setting<>("Play Sound", true, value -> mode.getValue() == Mode.Orthodox);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(new Color(255, 255, 0, 150)), value -> mode.getValue() == Mode.Orthodox);
@@ -76,7 +76,7 @@ public class KillEffect extends Module {
 
     @Override
     public void onUpdate() {
-        mc.world.getEntities().forEach(entity -> {
+        ThunderHack.asyncManager.getAsyncEntities().forEach(entity -> {
             if (!(entity instanceof PlayerEntity)) return;
             if (entity == mc.player || renderEntities.containsKey(entity) || lightingEntities.containsKey(entity)) return;
             if (entity.isAlive() || ((PlayerEntity) entity).getHealth() != 0) return;

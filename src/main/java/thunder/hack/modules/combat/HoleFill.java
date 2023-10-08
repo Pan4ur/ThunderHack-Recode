@@ -18,7 +18,6 @@ import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.player.InventoryUtility;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
@@ -61,11 +60,27 @@ public class HoleFill extends Module {
     private final Setting<ColorSetting> renderLineColor = new Setting<>("Render Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<Integer> renderLineWidth = new Setting<>("Render Line Width", 2, 1, 5).withParent(renderCategory);
 
+    private enum Mode {
+        Always,
+        Target
+    }
+
+    private enum FillBlocks {
+        All,
+        Webs,
+        Obsidian,
+        Indestrictible
+    }
+
+    private enum SelfFillMode {
+        Burrow,
+        Trap
+    }
+
     private boolean burrowWasEnabled = false;
     public static final Timer inactivityTimer = new Timer();
     private int tickCounter = 0;
     private boolean selfFillNeed = false;
-    private List<BlockPos> holes;
 
     public HoleFill() {
         super("HoleFill", Category.COMBAT);
@@ -77,19 +92,12 @@ public class HoleFill extends Module {
         selfFillNeed = false;
     }
 
-    @Override
-    public void onThread() {
-        if (tickCounter < actionInterval.getValue()) return;
-        holes = findHoles();
-    }
-
     @EventHandler
     public void onSync(EventSync event) {
         if (fullNullCheck()) return;
         if (jumpDisable.getValue() && mc.player.prevY < mc.player.getY())
-            disable(isRu() ? "Вы прыгнули! Отключаю..." : "You've jumped! Disabling...");
-        if (holes == null)
-            return;
+            disable(isRu() ? "Вы прыгнули! Выключаю..." : "You jumped! Disabling...");
+
         if (tickCounter < actionInterval.getValue()) {
             tickCounter++;
             return;
@@ -99,6 +107,8 @@ public class HoleFill extends Module {
         }
         int slot = getBlockSlot();
         if (slot == -1) return;
+
+        List<BlockPos> holes = findHoles();
 
         PlayerEntity target = ThunderHack.combatManager.getTargets(placeRange.getValue()).stream()
                 .min(Comparator.comparing(e -> mc.player.squaredDistanceTo(e)))
@@ -148,7 +158,9 @@ public class HoleFill extends Module {
                 if (selfFillNeed && HoleUtility.isHole(mc.player.getBlockPos())) {
                     switch (selfFillMode.getValue()) {
                         case Burrow -> {
-                            if (ModuleManager.burrow.isEnabled() || burrowWasEnabled) return;
+                            if (ModuleManager.burrow.isEnabled() || burrowWasEnabled) {
+                                return;
+                            }
 
                             ModuleManager.burrow.enable();
                             selfFillNeed = false;
@@ -204,7 +216,9 @@ public class HoleFill extends Module {
                 if (broke)
                     break;
             } else {
-                if (autoDisable.getValue()) disable(isRu() ? "Все холки заполнены!" : "All the holes are been filled!");
+                if (autoDisable.getValue()) {
+                    disable(isRu() ? "Все холки заполнены!" : "All holes are filled!");
+                }
                 break;
             }
         }
@@ -213,20 +227,23 @@ public class HoleFill extends Module {
     private @NotNull List<BlockPos> findHoles() {
         List<BlockPos> positions = new ArrayList<>();
         BlockPos centerPos = mc.player.getBlockPos();
+        int r = (int) Math.ceil(placeRange.getValue()) + 1;
+        int h = placeRange.getValue().intValue();
 
-        BlockPos.iterateOutwards(centerPos,
-                placeRange.getValue().intValue() + 1,
-                placeRange.getValue().intValue() + 1,
-                placeRange.getValue().intValue() + 1
-        ).forEach(pos -> {
-            if (isHole(pos) && !isFillingNow(pos)) {
-                BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), pos.toCenterPos().offset(Direction.UP, 0.5f), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
-                if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != pos)
-                    if (InteractionUtility.squaredDistanceFromEyes(pos.toCenterPos()) > placeWallRange.getPow2Value())
-                        return;
-                positions.add(pos);
+        for (int i = centerPos.getX() - r; i < centerPos.getX() + r; i++) {
+            for (int j = centerPos.getY() - h; j < centerPos.getY() + h; j++) {
+                for (int k = centerPos.getZ() - r; k < centerPos.getZ() + r; k++) {
+                    BlockPos pos = new BlockPos(i, j, k);
+                    if (isHole(pos) && !isFillingNow(pos)) {
+                        BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), pos.toCenterPos().offset(Direction.UP, 0.5f), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
+                        if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != pos)
+                            if (InteractionUtility.squaredDistanceFromEyes(pos.toCenterPos()) > placeWallRange.getPow2Value())
+                                continue;
+                        positions.add(pos);
+                    }
+                }
             }
-        });
+        }
 
         return positions;
     }
@@ -277,22 +294,5 @@ public class HoleFill extends Module {
         return ((HoleUtility.validTwoBlockIndestructibleXZ(pos) || HoleUtility.validTwoBlockBedrockXZ(pos)) && fillDouble.getValue())
                 || ((HoleUtility.validQuadBedrock(pos) || HoleUtility.validQuadIndestructible(pos)) && fillQuad.getValue())
                 || ((HoleUtility.validBedrock(pos) || HoleUtility.validIndestructible(pos)) && fillSingle.getValue());
-    }
-
-    private enum Mode {
-        Always,
-        Target
-    }
-
-    private enum FillBlocks {
-        All,
-        Webs,
-        Obsidian,
-        Indestrictible
-    }
-
-    private enum SelfFillMode {
-        Burrow,
-        Trap
     }
 }

@@ -16,7 +16,9 @@ public abstract class MixinCamera {
 
     @ModifyArgs(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;moveBy(DDD)V", ordinal = 0))
     private void modifyCameraDistance(Args args) {
-        args.set(0, -clipToSpace(ModuleManager.noCameraClip.getDistance()));
+        if (ModuleManager.noCameraClip.isEnabled()) {
+            args.set(0, -clipToSpace(ModuleManager.noCameraClip.getDistance()));
+        }
     }
 
     @Inject(method = "clipToSpace", at = @At("HEAD"), cancellable = true)

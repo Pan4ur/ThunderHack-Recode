@@ -14,7 +14,6 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
@@ -54,10 +53,18 @@ public class AirPlace extends Module {
         ((IMinecraftClient)mc).setUseCooldown(4);
     }
 
+    @Override
     public void onRender3D(MatrixStack stack) {
         if (hit == null || !mc.world.getBlockState(hit.getBlockPos()).getBlock().equals(Blocks.AIR)) return;
 
-        Render3DEngine.drawFilledBox(stack, new Box(hit.getBlockPos()), fillColor.getValue().getColorObject());
-        Render3DEngine.drawBoxOutline(new Box(hit.getBlockPos()), lineColor.getValue().getColorObject(), lineWidth.getValue());
+        Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(
+                new Box(hit.getBlockPos()),
+                fillColor.getValue().getColorObject()
+        ));
+        Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(
+                new Box(hit.getBlockPos()),
+                lineColor.getValue().getColorObject(),
+                lineWidth.getValue()
+        ));
     }
 }

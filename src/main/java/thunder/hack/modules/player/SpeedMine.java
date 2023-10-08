@@ -44,6 +44,7 @@ import static net.minecraft.enchantment.EnchantmentHelper.hasAquaAffinity;
 public class SpeedMine extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
     public final Setting<SwitchMode> switchMode = new Setting<>("SwitchMode", SwitchMode.Alternative, v -> mode.getValue() == Mode.Packet);
+    private final Setting<Float> factor = new Setting<>("Factor", 1f, 0.5f, 2f, v -> mode.getValue() == Mode.Packet);
     private final Setting<Float> startDmg = new Setting<>("StartDmg", 0f, 0f, 1f, v -> mode.getValue() == Mode.Damage);
     private final Setting<Float> finishDmg = new Setting<>("FinishDmg", 1f, 0f, 1f, v -> mode.getValue() == Mode.Damage);
     private final Setting<Float> range = new Setting<>("Range", 4.2f, 3.0f, 10.0f, v -> mode.getValue() == Mode.Packet);
@@ -69,7 +70,7 @@ public class SpeedMine extends Module {
     public static float progress, prevProgress;
     public boolean worth = false;
 
-    private Timer attackTimer = new Timer();
+    private final Timer attackTimer = new Timer();
 
     public SpeedMine() {
         super("SpeedMine", "SpeedMine", Category.PLAYER);
@@ -205,27 +206,22 @@ public class SpeedMine extends Module {
                 digSpeed += (float) (StrictMath.pow(efficiencyModifier, 2) + 1);
             }
         }
-        if (mc.player.hasStatusEffect(StatusEffects.HASTE)) {
-            digSpeed *= 1 + (mc.player.getStatusEffect(StatusEffects.HASTE).getAmplifier() + 1) * 0.2F;
-        }
-        if (mc.player.hasStatusEffect(StatusEffects.MINING_FATIGUE)) {
-            float fatigueScale;
-            switch (mc.player.getStatusEffect(StatusEffects.MINING_FATIGUE).getAmplifier()) {
-                case 0 -> fatigueScale = 0.3F;
-                case 1 -> fatigueScale = 0.09F;
-                case 2 -> fatigueScale = 0.0027F;
-                default -> fatigueScale = 8.1E-4F;
-            }
 
-            digSpeed *= fatigueScale;
-        }
+        if (mc.player.hasStatusEffect(StatusEffects.HASTE))
+            digSpeed *= 1 + (mc.player.getStatusEffect(StatusEffects.HASTE).getAmplifier() + 1) * 0.2F;
+
+
+        if (mc.player.hasStatusEffect(StatusEffects.MINING_FATIGUE))
+            digSpeed *= (float) Math.pow(0.3f, mc.player.getStatusEffect(StatusEffects.MINING_FATIGUE).getAmplifier() + 1);
+
+
         if (mc.player.isSubmergedInWater() && !hasAquaAffinity(mc.player)) digSpeed /= 5;
         if (!mc.player.isOnGround()) digSpeed /= 5;
-        return (digSpeed < 0 ? 0 : digSpeed);
+        return (digSpeed < 0 ? 0 : digSpeed * factor.getValue());
     }
 
     @EventHandler
-    public void onPacketSend(PacketEvent.SendPost e) {
+    public void onPacketSend(PacketEvent.@NotNull SendPost e) {
         if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket && resetOnSwitch.getValue()) {
             progress = 0;
             prevProgress = 0;
@@ -293,7 +289,7 @@ public class SpeedMine extends Module {
     }
 
     @EventHandler
-    public void onAttackBlock(EventAttackBlock event) {
+    public void onAttackBlock(@NotNull EventAttackBlock event) {
         if (canBreak(event.getBlockPos()) && !mc.player.getAbilities().creativeMode) {
             if (mode.getValue() == Mode.Packet) {
                 if (!event.getBlockPos().equals(minePosition)) {

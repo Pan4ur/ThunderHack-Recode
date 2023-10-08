@@ -56,6 +56,11 @@
   "descriptions.misc.worldtweaks": "Tweaks for world.",
   "descriptions.misc.xray": "Diamonds? No problem.",
 
+  "descriptions.render.animations": "Nice hand animations.",
+  "descriptions.render.blockhighlight": "Highlights selected block.",
+  "descriptions.render.breadcrumbs": "Line on your movements.",
+  "descriptions.render.breakhighlight": "Hightlights breaking blocks.",
+  "descriptions.render.chams": "Nice hand renders.",
 
   "descriptions.thunderhack.antiserverrp": "Disables server's resourcepack.",
   "descriptions.thunderhack.clickgui": "ThunderHack gui.",

@@ -24,6 +24,7 @@ public record SearchInvResult(int slot, boolean found, ItemStack stack) {
     }
 
     public void switchTo() {
-        if (found) InventoryUtility.switchTo(slot);
+        if (found && slot < 9)
+            InventoryUtility.switchTo(slot);
     }
 }

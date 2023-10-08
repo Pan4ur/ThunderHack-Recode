@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 import java.util.Optional;
@@ -30,9 +31,6 @@ public abstract class MixinSplashOverlay {
     @Shadow private long reloadStartTime = -1L;
     @Final @Shadow private ResourceReload reload;
     @Final @Shadow private Consumer<Optional<Throwable>> exceptionHandler;
-
-    @Shadow
-    protected abstract void renderProgressBar(DrawContext drawContext, int minX, int minY, int maxX, int maxY, float opacity);
 
     private static final Identifier TH_LOGO = new Identifier("textures/th.png");
 
@@ -80,22 +78,19 @@ public abstract class MixinSplashOverlay {
 
         k = (int) ((double) context.getScaledWindowWidth() * 0.5);
         int p = (int) ((double) context.getScaledWindowHeight() * 0.5);
-        double d = Math.min((double) context.getScaledWindowWidth() * 0.75, context.getScaledWindowHeight()) * 0.25;
-        double e = d * 4.0;
-        int r = (int) (e * 0.5);
 
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(770, 1);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, h);
 
+        RenderSystem.setShaderColor(0.1F, 0.1F, 0.1F, h);
         context.drawTexture(TH_LOGO, k - 150, p - 35, 0, 0, 300, 70, 300, 70);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, h);
+        Render2DEngine.addWindow(context.getMatrices(),k - 150, p - 35, k - 150 + (300 * progress), p + 35, 1f);
+        context.drawTexture(TH_LOGO, k - 150, p - 35, 0, 0, 300, 70, 300, 70);
+        Render2DEngine.popWindow();
 
-        int s = (int) ((double) context.getScaledWindowHeight() * 0.8325);
         float t = this.reload.getProgress();
         this.progress = MathHelper.clamp(this.progress * 0.95F + t * 0.050000012F, 0.0F, 1.0F);
-        if (f < 1.0F) {
-            renderProgressBar(context, i / 2 - r, s - 5, i / 2 + r, s + 5, 1.0F - MathHelper.clamp(f, 0.0F, 1.0F));
-        }
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.defaultBlendFunc();

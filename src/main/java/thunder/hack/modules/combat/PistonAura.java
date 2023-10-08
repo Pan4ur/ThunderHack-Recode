@@ -758,7 +758,7 @@ public class PistonAura extends Module {
 
         if (bypass.getValue() && InventoryUtility.findItemInHotBar(Items.FLINT_AND_STEEL).found()) {
             List<Structure> bestStructure = list.stream().filter(Structure::isFirePa).sorted(Comparator.comparingDouble(Structure::getMaxRange)).collect(Collectors.toList());
-            if (bestStructure.size() == 0) {
+            if (bestStructure.isEmpty()) {
                 isFire = false;
                 bestStructure = list.stream().filter(Structure::isNormalPa).sorted(Comparator.comparingDouble(Structure::getMaxRange)).collect(Collectors.toList());
                 if (!bestStructure.isEmpty()) {

@@ -113,33 +113,27 @@ public final class InteractionUtility {
         return true;
     }
 
-    public static boolean canPlaceBlock(BlockPos bp, Interact interact, boolean ignoreEntities) {
+    public static boolean canPlaceBlock(@NotNull BlockPos bp, Interact interact, boolean ignoreEntities) {
         if (awaiting.containsKey(bp)) return false;
         return getPlaceResult(bp, interact, ignoreEntities) != null;
     }
 
-    public static float @Nullable [] getPlaceAngle(BlockPos bp, Interact interact, boolean ignoreEntities) {
+    public static float @Nullable [] getPlaceAngle(@NotNull BlockPos bp, Interact interact, boolean ignoreEntities) {
         BlockHitResult result = getPlaceResult(bp, interact, ignoreEntities);
         if (result != null) return calculateAngle(result.getPos());
         return null;
     }
 
     @Nullable
-    public static BlockHitResult getPlaceResult(BlockPos bp, Interact interact, boolean ignoreEntities) {
+    public static BlockHitResult getPlaceResult(@NotNull BlockPos bp, Interact interact, boolean ignoreEntities) {
         if (!ignoreEntities)
             for (Entity entity : new ArrayList<>(mc.world.getNonSpectatingEntities(Entity.class, new Box(bp))))
                 if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity))
                     return null;
 
-        BlockState bs = mc.world.getBlockState(bp);
-
-        /*
         if (!mc.world.getBlockState(bp).isReplaceable()) {
             return null;
-        } else if (!(bs.getBlock() instanceof FluidBlock) && !bs.isAir()) {
-            BreakData bData = getBreakData(bp, interact);
-            return new BlockHitResult(bData.vector, bData.dir, bp, false);
-        }*/
+        }
 
         ArrayList<BlockPosWithFacing> supports = getSupportBlocks(bp);
         for (BlockPosWithFacing support : supports) {

@@ -126,7 +126,12 @@ public class PistonPush extends Module {
     }
 
     private void placeCharge(boolean onSync) {
-        if (!getChargeSlot().found() || (!autoSwap.getValue() && !getChargeSlot().isHolding())) return;
+        if (!getChargeSlot().found() || (!autoSwap.getValue() && !getChargeSlot().isHolding()))
+            return;
+        
+        if(chargePos == null)
+            return;
+
 
         if (rotate.getValue()) {
             final float[] angle = InteractionUtility.getPlaceAngle(chargePos, interact.getValue(), false);
@@ -154,21 +159,24 @@ public class PistonPush extends Module {
     }
 
     private void placePiston(boolean extra) {
+        if(pistonPos == null)
+            return;
+
         if (!getPistonSlot().found() || (!autoSwap.getValue() && !getPistonSlot().isHolding()))
             return;
 
         if (rotate.getValue()) {
             final float[] angle = InteractionUtility.getPlaceAngle(pistonPos, interact.getValue(), false);
-            if (angle == null) {
+            if (angle == null)
                 return;
-            }
-            if (extra) {
-                sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
-            } else {
+
+            if (extra) sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
+            else {
                 mc.player.setYaw(angle[0]);
                 mc.player.setPitch(angle[1]);
             }
         }
+
         placeRunnable = () -> {
             // без комментариев
             final float angle = InteractionUtility.calculateAngle(target.getEyePos(), pistonPos.toCenterPos())[0];
@@ -243,21 +251,21 @@ public class PistonPush extends Module {
                 if (chPos == targetBP) continue;
                 if (mc.world.getBlockState(chPos).isReplaceable()) {
                     if (chargeType.getValue() == ChargeType.Torch) {
-
                         if (chPos == pos.up()) continue;
-
-                        if (InteractionUtility.canPlaceBlock(pos, interact.getValue(), false)) {
+                        if (InteractionUtility.canPlaceBlock(chPos, interact.getValue(), false)) {
                             chargePos = chPos;
-                            pistonPos = pos;
-                            return;
+                            break;
                         }
                     } else {
-                        chargePos = chPos;
-                        pistonPos = pos;
-                        return;
+                        if (InteractionUtility.canPlaceBlock(chPos, interact.getValue(), false)) {
+                            chargePos = chPos;
+                            break;
+                        }
                     }
                 }
             }
+
+            pistonPos = pos;
         }
     }
 
