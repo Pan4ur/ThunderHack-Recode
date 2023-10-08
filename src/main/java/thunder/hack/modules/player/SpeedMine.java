@@ -69,7 +69,7 @@ public class SpeedMine extends Module {
     public static float progress, prevProgress;
     public boolean worth = false;
 
-    private Timer attackTimer = new Timer();
+    private final Timer attackTimer = new Timer();
 
     public SpeedMine() {
         super("SpeedMine", "SpeedMine", Category.PLAYER);
@@ -204,6 +204,9 @@ public class SpeedMine extends Module {
             if (efficiencyModifier > 0 && !itemstack.isEmpty()) {
                 digSpeed += (float) (StrictMath.pow(efficiencyModifier, 2) + 1);
             }
+            if (itemstack.isEmpty()) {
+                digSpeed += mc.player.getMainHandStack().getMiningSpeedMultiplier(mc.world.getBlockState(position));
+            }
         }
         if (mc.player.hasStatusEffect(StatusEffects.HASTE)) {
             digSpeed *= 1 + (mc.player.getStatusEffect(StatusEffects.HASTE).getAmplifier() + 1) * 0.2F;
@@ -225,7 +228,7 @@ public class SpeedMine extends Module {
     }
 
     @EventHandler
-    public void onPacketSend(PacketEvent.SendPost e) {
+    public void onPacketSend(PacketEvent.@NotNull SendPost e) {
         if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket && resetOnSwitch.getValue()) {
             progress = 0;
             prevProgress = 0;
@@ -293,7 +296,7 @@ public class SpeedMine extends Module {
     }
 
     @EventHandler
-    public void onAttackBlock(EventAttackBlock event) {
+    public void onAttackBlock(@NotNull EventAttackBlock event) {
         if (canBreak(event.getBlockPos()) && !mc.player.getAbilities().creativeMode) {
             if (mode.getValue() == Mode.Packet) {
                 if (!event.getBlockPos().equals(minePosition)) {

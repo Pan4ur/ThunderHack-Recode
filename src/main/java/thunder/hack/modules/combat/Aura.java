@@ -59,10 +59,6 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 import static thunder.hack.utility.math.MathUtility.random;
 
 public class Aura extends Module {
-    public Aura() {
-        super("Aura", "Запомните блять: киллка тх не мисает, а даёт шанс убежать", Category.COMBAT);
-    }
-
     public static final Setting<Float> attackRange = new Setting<>("Attack Range", 3.1f, 2f, 6.0f);
     public static final Setting<Mode> mode = new Setting<>("Rotation", Mode.Universal);
     public static final Setting<RayTrace> rayTrace = new Setting<>("RayTrace", RayTrace.OnlyTarget);
@@ -103,6 +99,10 @@ public class Aura extends Module {
 
     private int hitTicks;
     public static boolean lookingAtHitbox, attackAllowed;
+
+    public Aura() {
+        super("Aura", "Запомните блять: киллка тх не мисает, а даёт шанс убежать", Category.COMBAT);
+    }
 
     @EventHandler
     public void modifyVelocity(EventPlayerTravel e) {
@@ -405,14 +405,18 @@ public class Aura extends Module {
 
 
     public void onRender3D(MatrixStack stack) {
-        if (target != null) {
-            if (esp.getValue()) {
-                Render3DEngine.drawTargetEsp(stack, target);
-            }
-            if (clientLook.getValue() && mode.getValue() == Mode.Universal) {
-                mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.prevYaw, rotationYaw, mc.getTickDelta()));
-                mc.player.setPitch((float) Render2DEngine.interpolate(mc.player.prevPitch, rotationPitch, mc.getTickDelta()));
-            }
+        Item handItem = mc.player.getMainHandStack().getItem();
+        if (target == null
+                || (switchMode.getValue() != Switch.Silent
+                && onlyWeapon.getValue()
+                && !(handItem instanceof SwordItem || handItem instanceof AxeItem)))
+            return;
+        if (esp.getValue()) {
+            Render3DEngine.drawTargetEsp(stack, target);
+        }
+        if (clientLook.getValue() && mode.getValue() == Mode.Universal) {
+            mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.prevYaw, rotationYaw, mc.getTickDelta()));
+            mc.player.setPitch((float) Render2DEngine.interpolate(mc.player.prevPitch, rotationPitch, mc.getTickDelta()));
         }
     }
 
@@ -547,9 +551,11 @@ public class Aura extends Module {
         }
 
         return switch (sort.getValue()) {
-            case Distance -> first_stage.stream().min(Comparator.comparing(e -> (mc.player.squaredDistanceTo(e.getPos())))).orElse(null);
+            case Distance ->
+                    first_stage.stream().min(Comparator.comparing(e -> (mc.player.squaredDistanceTo(e.getPos())))).orElse(null);
             case FOV -> first_stage.stream().min(Comparator.comparing(this::getFOVAngle)).orElse(null);
-            case Health -> first_stage.stream().min(Comparator.comparing(e -> (e.getHealth() + e.getAbsorptionAmount()))).orElse(null);
+            case Health ->
+                    first_stage.stream().min(Comparator.comparing(e -> (e.getHealth() + e.getAbsorptionAmount()))).orElse(null);
         };
         //return null; todo помолиться что всё будет работать
     }

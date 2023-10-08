@@ -2,6 +2,7 @@ package thunder.hack.modules.combat;
 
 import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -70,6 +71,7 @@ public class Surround extends Module {
     private final Setting<Parent> autoDisable = new Setting<>("Auto Disable", new Parent(false, 0));
     private final Setting<Boolean> onYChange = new Setting<>("On Y Change", true).withParent(autoDisable);
     private final Setting<OnTpAction> onTp = new Setting<>("On Tp", OnTpAction.None).withParent(autoDisable);
+    private final Setting<Boolean> onDeath = new Setting<>("On Death", false).withParent(autoDisable);
 
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
     private final Setting<BlockAnimationUtility.BlockRenderMode> renderMode = new Setting<>("RenderMode", BlockAnimationUtility.BlockRenderMode.All).withParent(renderCategory);
@@ -82,11 +84,12 @@ public class Surround extends Module {
     public static final Timer attackTimer = new Timer();
     private final List<BlockPos> sequentialBlocks = new ArrayList<>();
 
+    private boolean wasTp = false;
     private int delay;
     private double prevY;
 
     public Surround() {
-        super("Surround", "Окружает тебя блоками", Category.COMBAT);
+        super("Surround", Category.COMBAT);
     }
 
     @Override
@@ -94,6 +97,7 @@ public class Surround extends Module {
         if (mc.player == null) return;
 
         delay = 0;
+        wasTp = false;
         prevY = mc.player.getY();
 
         // Centering
@@ -103,12 +107,14 @@ public class Surround extends Module {
         }
     }
 
-    @EventHandler
-    private void onPostSync(@SuppressWarnings("unused") EventPostSync e) {
-        if (prevY != mc.player.getY() && onYChange.getValue()) {
+    @SuppressWarnings("unused")
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onPostSync(EventPostSync event) {
+        if (prevY != mc.player.getY() && onYChange.getValue() && !wasTp) {
             disable(isRu() ? "Отключён из-за изменения Y!" : "Disabled due to Y change!");
             return;
         }
+        if (wasTp) wasTp = false;
         prevY = mc.player.getY();
 
         Vec3d centerVec = new Vec3d(
@@ -162,9 +168,13 @@ public class Surround extends Module {
                 } else break;
             }
         }
+
+        if (mc.player.isDead() && onDeath.getValue())
+            disable(isRu() ? "Выключен из-за смерти." : "Disable because you died.");
     }
 
-    @EventHandler
+    @SuppressWarnings("unused")
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onEntitySpawn(@NotNull EventEntitySpawn event) {
         if (event.getEntity() instanceof EndCrystalEntity && breakCrystal.getValue()) {
             if (event.getEntity().squaredDistanceTo(mc.player) <= remove.getPow2Value()) {
@@ -173,36 +183,30 @@ public class Surround extends Module {
         }
     }
 
-    @EventHandler
-    private void onPacketReceive(PacketEvent.@NotNull Receive e) {
+    @SuppressWarnings("unused")
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onPacketReceive(PacketEvent.@NotNull Receive event) {
         if (getSlot() == -1) disable(isRu() ? "Нет блоков!" : "No blocks!");
 
-        if (e.getPacket() instanceof BlockUpdateS2CPacket pac && mc.player != null) {
+        if (event.getPacket() instanceof BlockUpdateS2CPacket pac && mc.player != null) {
             if (placeTiming.getValue() == PlaceTiming.Sequential && !sequentialBlocks.isEmpty()) {
                 handleSequential(pac.getPos());
             }
-            if (mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < 9 && pac.getState() == Blocks.AIR.getDefaultState()) {
+            if (mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value() && pac.getState() == Blocks.AIR.getDefaultState()) {
                 handleSurroundBreak();
             }
         }
-        if (e.getPacket() instanceof BlockBreakingProgressS2CPacket pac && mc.player != null) {
+        if (event.getPacket() instanceof BlockBreakingProgressS2CPacket pac && mc.player != null) {
             if (placeTiming.getValue() == PlaceTiming.Sequential && !sequentialBlocks.isEmpty())
                 handleSequential(pac.getPos());
             if (mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value())
                 handleSurroundBreak();
         }
 
-        if (e.getPacket() instanceof PlayerPositionLookS2CPacket)
+        if (event.getPacket() instanceof PlayerPositionLookS2CPacket)
             switch (onTp.getValue()) {
                 case Disable -> disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to a rubberband!");
-                case Enable -> new Thread(() -> {
-                    try {
-                        Thread.sleep(250);
-                    } catch (InterruptedException ignored) {
-                    }
-                    // skull rip 
-                    enable();
-                });
+                case Stay -> wasTp = true;
             }
     }
 
@@ -301,10 +305,9 @@ public class Surround extends Module {
 
         for (BlockPos bp : getBlocks()) {
             if (breakCrystal.getValue()) {
-                List<EndCrystalEntity> entities = Lists.newArrayList(mc.world.getNonSpectatingEntities(EndCrystalEntity.class, new Box(bp))).stream()
+                Lists.newArrayList(mc.world.getNonSpectatingEntities(EndCrystalEntity.class, new Box(bp))).stream()
                         .filter(entity -> mc.player.squaredDistanceTo(entity) <= range.getPow2Value())
-                        .toList();
-                entities.forEach(this::removeCrystal);
+                        .forEach(this::removeCrystal);
             }
 
             if (new Box(bp).intersects(mc.player.getBoundingBox()))
@@ -461,7 +464,7 @@ public class Surround extends Module {
 
     private enum OnTpAction {
         Disable,
-        Enable,
+        Stay,
         None
     }
 
