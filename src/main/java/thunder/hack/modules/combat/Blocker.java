@@ -4,10 +4,9 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.network.listener.PacketListener;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
@@ -15,11 +14,10 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -42,6 +40,7 @@ public class Blocker extends Module {
     private final Setting<Integer> actionShift = new Setting<>("Place Per Tick", 1, 1, 5);
     private final Setting<Integer> actionInterval = new Setting<>("Delay", 0, 0, 5);
     private final Setting<Boolean> crystalBreaker = new Setting<>("Destroy Crystal", false);
+    private final Setting<Boolean> antiWeakness = new Setting<>("Anti Weakness", false, v -> crystalBreaker.getValue());
 
     private final Setting<Boolean> newBlocks = new Setting<>("1.16 Blocks", true);
     private final Setting<Boolean> allowAnchors = new Setting<>("Allow Anchors", false, (value) -> newBlocks.getValue());
@@ -73,6 +72,7 @@ public class Blocker extends Module {
 
     @Override
     public void onEnable() {
+        tickCounter = 0;
         sendMessage(Formatting.RED + (isRu() ?
                 "ВНИМАНИЕ!!! " + Formatting.RESET + "Использование блокера на серверах осуждается игроками, а в некоторых странах карается набутыливанием!" :
                 "WARNING!!! " + Formatting.RESET + "The use of blocker on servers is condemned by players, and in some countries is punishable by jail!"
@@ -80,7 +80,7 @@ public class Blocker extends Module {
     }
 
     @EventHandler
-    public void onUpdate(PlayerUpdateEvent event) {
+    public void onPostSync(EventPostSync event) {
         if (tickCounter < actionInterval.getValue()) {
             tickCounter++;
             return;
@@ -104,22 +104,30 @@ public class Blocker extends Module {
         while (blocksPlaced < actionShift.getValue()) {
             BlockPos pos = placePositions.stream()
                     .filter(p -> InteractionUtility.canPlaceBlock(p, interactMode.getValue(), false))
-                    .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(new Vec3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5))))
+                    .min(Comparator.comparing(p -> mc.player.getPos().distanceTo(p.toCenterPos())))
                     .orElse(null);
 
             if (pos != null) {
                 if (crystalBreaker.getValue())
-                    for (Entity entity : mc.world.getOtherEntities(null, new Box(pos))) {
-                        if (entity instanceof EndCrystalEntity) {
-                            if (placeMode.getValue() == InteractionUtility.PlaceMode.Packet)
-                                sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
-                            else
-                                mc.interactionManager.attackEntity(mc.player, entity);
+                    for (Entity entity : mc.world.getNonSpectatingEntities(EndCrystalEntity.class, new Box(pos))) {
+                        int preSlot = mc.player.getInventory().selectedSlot;
+                        boolean wasEffect = false;
+                        if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS)) {
+                            SearchInvResult result = InventoryUtility.getAntiWeaknessItem();
+                            result.switchTo();
+                            wasEffect = true;
+                        }
 
-                            if (swing.getValue())
-                                mc.player.swingHand(Hand.MAIN_HAND);
-                            else
-                                sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                        if (placeMode.getValue() == InteractionUtility.PlaceMode.Packet)
+                            sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
+                        else
+                            mc.interactionManager.attackEntity(mc.player, entity);
+
+                        if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
+                        else sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+
+                        if (antiWeakness.getValue() && wasEffect) {
+                            InventoryUtility.switchTo(preSlot);
                         }
                     }
 
@@ -140,16 +148,16 @@ public class Blocker extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.@NotNull Receive e) {
-        BlockPos playerPos = mc.player.getBlockPos();
+        final BlockPos playerPos = mc.player.getBlockPos();
         if (e.getPacket() instanceof BlockBreakingProgressS2CPacket) {
             BlockBreakingProgressS2CPacket packet = e.getPacket();
             BlockPos pos = packet.getPos();
 
-            if (mc.world.getBlockState(pos).getBlock() == Blocks.BEDROCK || mc.world.getBlockState(pos).getBlock() == Blocks.AIR)
+            if (mc.world.getBlockState(pos).getBlock() == Blocks.BEDROCK || mc.world.getBlockState(pos).isReplaceable())
                 return;
 
-            if (antiCev.getValue() && pos.equals(playerPos.up().up()))
-                placePositions.add(playerPos.up().up().up());
+            if (antiCev.getValue() && pos.equals(playerPos.up(2)))
+                placePositions.add(playerPos.up(3));
 
             if (HoleUtility.getSurroundPoses(playerPos).contains(pos)) {
                 placePositions.add(pos.up());
@@ -165,7 +173,7 @@ public class Blocker extends Module {
 
             if (antiCiv.getValue()) {
                 for (BlockPos checkPos : HoleUtility.getSurroundPoses(playerPos)) {
-                    if (checkPos.up().equals(pos))
+                    if (pos.equals(checkPos.up()))
                         placePositions.add(playerPos.add(checkPos.up(2)));
                 }
             }

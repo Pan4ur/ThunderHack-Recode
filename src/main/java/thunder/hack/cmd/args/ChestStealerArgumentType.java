@@ -12,6 +12,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.modules.client.MainSettings;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class ChestStealerArgumentType implements ArgumentType<String> {
     }
 
 
-    public static List<String> getRegistered() {
+    private static @NotNull List<String> getRegistered() {
         List<String> result = new ArrayList<>();
 
         for (Block block : Registries.BLOCK) {

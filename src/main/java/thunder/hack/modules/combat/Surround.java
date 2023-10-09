@@ -107,6 +107,12 @@ public class Surround extends Module {
         }
     }
 
+    @Override
+    public void onUpdate() {
+        if ((mc.player.isDead() || mc.player.getHealth() + mc.player.getAbsorptionAmount() <= 0) && onDeath.getValue())
+            disable(isRu() ? "Выключен из-за смерти." : "Disable because you died.");
+    }
+
     @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPostSync(EventPostSync event) {
@@ -114,7 +120,7 @@ public class Surround extends Module {
             disable(isRu() ? "Отключён из-за изменения Y!" : "Disabled due to Y change!");
             return;
         }
-        if (wasTp) wasTp = false;
+        if (wasTp && mc.player.isOnGround()) wasTp = false;
         prevY = mc.player.getY();
 
         Vec3d centerVec = new Vec3d(
@@ -168,9 +174,6 @@ public class Surround extends Module {
                 } else break;
             }
         }
-
-        if (mc.player.isDead() && onDeath.getValue())
-            disable(isRu() ? "Выключен из-за смерти." : "Disable because you died.");
     }
 
     @SuppressWarnings("unused")
@@ -192,7 +195,7 @@ public class Surround extends Module {
             if (placeTiming.getValue() == PlaceTiming.Sequential && !sequentialBlocks.isEmpty()) {
                 handleSequential(pac.getPos());
             }
-            if (mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value() && pac.getState() == Blocks.AIR.getDefaultState()) {
+            if (mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value() && pac.getState().isReplaceable()) {
                 handleSurroundBreak();
             }
         }
