@@ -80,29 +80,29 @@ public class PlayerManager {
         if (event.getPacket() instanceof CloseHandledScreenC2SPacket) {
             inInventory = false;
         }
-        if (event.getPacket() instanceof PlayerMoveC2SPacket) {
-            serverYaw = ((PlayerMoveC2SPacket) event.getPacket()).getYaw(serverYaw);
-            serverPitch = ((PlayerMoveC2SPacket) event.getPacket()).getPitch(serverPitch);
+        if (event.getPacket() instanceof PlayerMoveC2SPacket move) {
+            serverYaw = move.getYaw(serverYaw);
+            serverPitch = move.getPitch(serverPitch);
         }
-        if (event.getPacket() instanceof PlayerMoveC2SPacket.PositionAndOnGround) {
-            serverYaw = ((PlayerMoveC2SPacket) event.getPacket()).getYaw(serverYaw);
-            serverPitch = ((PlayerMoveC2SPacket) event.getPacket()).getPitch(serverPitch);
+        if (event.getPacket() instanceof PlayerMoveC2SPacket.PositionAndOnGround move) {
+            serverYaw = move.getYaw(serverYaw);
+            serverPitch = move.getPitch(serverPitch);
         }
-        if (event.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround) {
-            serverYaw = ((PlayerMoveC2SPacket) event.getPacket()).getYaw(serverYaw);
-            serverPitch = ((PlayerMoveC2SPacket) event.getPacket()).getPitch(serverPitch);
+        if (event.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround move) {
+            serverYaw = move.getYaw(serverYaw);
+            serverPitch = move.getPitch(serverPitch);
         }
-        if (event.getPacket() instanceof PlayerMoveC2SPacket.Full) {
-            serverYaw = ((PlayerMoveC2SPacket) event.getPacket()).getYaw(serverYaw);
-            serverPitch = ((PlayerMoveC2SPacket) event.getPacket()).getPitch(serverPitch);
+        if (event.getPacket() instanceof PlayerMoveC2SPacket.Full move) {
+            serverYaw = move.getYaw(serverYaw);
+            serverPitch = move.getPitch(serverPitch);
         }
     }
 
     @EventHandler
     public void getServerPosLook(PacketEvent.Receive event) {
-        if (event.getPacket() instanceof PlayerPositionLookS2CPacket) {
-            serverYaw = ((PlayerPositionLookS2CPacket) event.getPacket()).getYaw();
-            serverPitch = ((PlayerPositionLookS2CPacket) event.getPacket()).getPitch();
+        if (event.getPacket() instanceof PlayerPositionLookS2CPacket posLook) {
+            serverYaw = posLook.getYaw();
+            serverPitch = posLook.getPitch();
         }
     }
 

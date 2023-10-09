@@ -113,7 +113,6 @@ public class ModuleManager {
     public static MultiTask multitask = new MultiTask();
     public static LegacyHud legacyHud = new LegacyHud();
     public static HudEditor hudEditor = new HudEditor();
-    public static ElytraFix elytraFix = new ElytraFix();
     public static Crosshair crosshair = new Crosshair();
     public static Criticals criticals = new Criticals();
     public static ChatUtils chatUtils = new ChatUtils();
@@ -167,7 +166,6 @@ public class ModuleManager {
     public static AntiWeb antiWeb = new AntiWeb();
     public static AntiBot antiBot = new AntiBot();
     public static AntiAim antiAim = new AntiAim();
-    public static DropAll dropAll = new DropAll();
     public static AutoSex autoSex = new AutoSex();
     public static XCarry xCarry = new XCarry();
     public static Trails trails = new Trails();

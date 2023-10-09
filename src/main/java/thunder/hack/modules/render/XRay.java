@@ -10,6 +10,7 @@ import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -63,12 +64,16 @@ public class XRay extends Module {
         }
         all = toCheck.size();
         done = 0;
+        mc.chunkCullingEnabled = false;
         mc.worldRenderer.reload();
     }
+
 
     @Override
     public void onDisable() {
         mc.worldRenderer.reload();
+        mc.chunkCullingEnabled = true;
+
     }
 
     @EventHandler

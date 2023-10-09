@@ -1,6 +1,6 @@
-/*package thunder.hack.modules.misc;
+package thunder.hack.modules.misc;
 
-import com.google.common.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
@@ -22,11 +22,11 @@ public class PVETools extends Module {
     private final Setting<Boolean> SheepShear = new Setting<>("SheepShear", false);
 
 
-    @Subscribe
+    @EventHandler
     public void rotateAction(EventSync e) {
     }
 
-    @Subscribe
+    @EventHandler
     public void postRotateAction(EventPostSync e) {
     }
-}*/
+}

@@ -12,41 +12,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandManager {
-    private String prefix;
+    private String prefix = "@";
 
-    private final CommandDispatcher<CommandSource> dispatcher;
-    private final CommandSource source;
-    private final List<Command> commands;
+    private final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
+    private final CommandSource source = new ClientCommandSource(null, MinecraftClient.getInstance());
+    private final List<Command> commands = new ArrayList<>();
 
     public CommandManager() {
-        prefix = "@";
-        commands = new ArrayList<>();
-        dispatcher = new CommandDispatcher<>();
-        source = new ClientCommandSource(null, MinecraftClient.getInstance());
-
-        add(new BindCommand());
-        add(new CfgCommand());
-        add(new DrawCommand());
-        add(new EClipCommand());
-        add(new FriendCommand());
-        add(new GpsCommand());
-        add(new HClipCommand());
-        add(new HelpCommand());
+        add(new RpcCommand());
         add(new KitCommand());
+        add(new GpsCommand());
+        add(new CfgCommand());
+        add(new BindCommand());
+        add(new DrawCommand());
+        add(new HelpCommand());
+        add(new EClipCommand());
+        add(new HClipCommand());
         add(new LoginCommand());
         add(new MacroCommand());
+        add(new StaffCommand());
+        add(new VClipCommand());
+        add(new FriendCommand());
         add(new ModuleCommand());
         add(new PrefixCommand());
-        add(new RpcCommand());
         add(new SearchCommand());
-        add(new StaffCommand());
         add(new TrackerCommand());
-        add(new VClipCommand());
+        add(new DropAllCommand());
         add(new WayPointCommand());
         add(new OpenFolderCommand());
         add(new ResetBindsCommand());
         add(new ChestStealerCommand());
-
     }
 
     private void add(Command command) {

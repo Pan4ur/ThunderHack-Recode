@@ -2,6 +2,9 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
@@ -16,6 +19,7 @@ import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
 
@@ -48,7 +52,7 @@ public class Strafe extends Module {
         if (mc.player.isOnGround()) {
             n8 = speedAttributes * n7;
             if (move.getY() > 0) {
-                n8 += boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && disabled ? 0.65 : 0.2f;
+                n8 += boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && disabled ? 0.65f : 0.2f;
             }
             disabled = false;
         } else {
@@ -234,6 +238,38 @@ public class Strafe extends Module {
         if ((boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && !mc.player.isOnGround() && mc.player.fallDistance > 0 && !disabled)) {
             disabler(InventoryUtility.getElytra());
         }
+        elytraFix();
+    }
+
+    private final thunder.hack.utility.Timer delay = new Timer();
+
+
+    public void elytraFix() {
+        ItemStack stack = mc.player.currentScreenHandler.getCursorStack();
+        if (stack.getItem() instanceof ArmorItem && delay.passedMs(300)) {
+            if (((ArmorItem) stack.getItem()).getType() == ArmorItem.Type.CHESTPLATE && mc.player.getInventory().getArmorStack(2).getItem() == Items.ELYTRA) {
+                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 6, 0, SlotActionType.PICKUP, mc.player);
+                int nullSlot = findEmptySlot();
+                boolean needDrop = nullSlot == 999;
+                if (needDrop) nullSlot = 9;
+                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, nullSlot, 1, SlotActionType.PICKUP, mc.player);
+                if (needDrop) mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, -999, 0, SlotActionType.PICKUP, mc.player);
+                delay.reset();
+            }
+        }
+    }
+
+    public static int findEmptySlot() {
+        for (int i = 0; i < 36; i++) {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            if (stack.isEmpty()) {
+                if (i < 9) {
+                    i += 36;
+                }
+                return i;
+            }
+        }
+        return 999;
     }
 
     private enum Boost {

@@ -311,13 +311,7 @@ public class ConfigManager {
                                 } else {
                                     setting2.setValue(new Bind(Integer.parseInt(bindArray.get(0).getAsString()), false, bindArray.get(1).getAsBoolean()));
                                 }
-                            } catch (Exception e) {
-                                // чтоб не проебать бинды если до этого был конфиг
-                                // можно будет убрать спустя ~5 обнов
-                                if (mobject.getAsJsonPrimitive(setting2.getName()).getAsString().contains("M"))
-                                    setting2.setValue(new Bind(Integer.parseInt(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().replace("M", "")), true, false));
-                                else
-                                    setting2.setValue(new Bind(mobject.getAsJsonPrimitive(setting2.getName()).getAsInt(), false, false));
+                            } catch (Exception ignored) {
                             }
                             continue;
                         case "ColorSetting":

@@ -14,12 +14,11 @@ import thunder.hack.modules.render.XRay;
 
 @SuppressWarnings("UnresolvedMixinReference")
 @Pseudo
-@Mixin(targets = "me.jellysquid.mods.sodium.client.render.occlusion.BlockOcclusionCache", remap = false)
+@Mixin(targets = "me.jellysquid.mods.sodium.client.render.chunk.compile.pipeline.BlockOcclusionCache", remap = false)
 public class MixinSodiumBlockOcclusionCache {
     @Inject(method = "shouldDrawSide", at = @At("RETURN"), cancellable = true)
     void shouldDrawSideHook(BlockState state, BlockView view, BlockPos pos, Direction facing, CallbackInfoReturnable<Boolean> cir) {
-        if (ModuleManager.xray.isEnabled()) {
+        if (ModuleManager.xray.isEnabled())
             cir.setReturnValue(XRay.isCheckableOre(state.getBlock()));
-        }
     }
 }

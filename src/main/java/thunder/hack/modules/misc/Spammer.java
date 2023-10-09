@@ -64,12 +64,10 @@ public class Spammer extends Module {
                         spamList.add(spamChunk.toString());
                     } else spamList.addAll(lines);
                     SpamList = spamList;
-                } catch (Exception e) {
-                    System.err.println("Could not load file ");
+                } catch (Exception ignored) {
                 }
             }).start();
-        } catch (IOException e) {
-            System.err.println("Could not load file ");
+        } catch (IOException ignored) {
         }
     }
 

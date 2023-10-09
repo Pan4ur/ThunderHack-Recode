@@ -3,94 +3,57 @@ package thunder.hack.modules.movement;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.util.math.Vec3d;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class LongJump extends Module {
+
     public LongJump() {
         super("LongJump", Category.MOVEMENT);
     }
-    public double speedXZ;
-    public double distance;
-    public int stage = 0;
-    private final Setting<ModeEn> Mode = new Setting("Mode", ModeEn.Normal);
-    public Setting<Boolean> usetimer = new Setting("Timer", true);
-    public Setting<Boolean> reduction = new Setting<>("Reduction", true);
-    public Setting<Boolean> jumpDisable = new Setting<>("JumpDisable", true);
-    private final Setting<Float> timr = new Setting("TimerSpeed", 1.0F, 0.5F, 3.0F);
-    private final Setting<Float> speed = new Setting("Speed", 4.48F, 0.0F, 10.0F);
+
+    private final Setting<Boolean> useTimer = new Setting<>("Timer", false);
+    private final Setting<Boolean> jumpDisable = new Setting<>("JumpDisable", true);
+    private final Setting<Float> timerValue = new Setting<>("TimerSpeed", 1.0F, 0.5F, 3.0F, v -> useTimer.getValue());
+    private final Setting<Float> speed = new Setting<>("Speed", 1.35F, 0.1F, 10.0F);
+    private final Setting<Float> maxDistance = new Setting<>("MaxDistance", 10f, 5f, 40f);
+
+    private float plannedSpeed, realSpeed;
+    private int stage = 0;
+    private Vec3d prevPosition;
 
     @EventHandler
     public void onMove(EventMove e) {
-        if (Mode.getValue() == ModeEn.Normal) doNormal(e);
-        else doPause(e);
-    }
+        if(mc.player.getPos().squaredDistanceTo(prevPosition) > maxDistance.getPow2Value())
+            disable(isRu() ? "Прыжок выполнен! Отключаю.." : "Jump complete! Disabling..");
 
-    @EventHandler
-    public void onPacketReceive(PacketEvent.Receive e) {
-        if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
-            stage = 0;
-            distance = 0.0;
-            disable(isRu() ? "Тебя флагнуло! Отключаю.." : "You've been flagged! Disabling..");
-        }
-    }
-
-    @Override
-    public void onDisable() {
-        ThunderHack.TICK_TIMER = 1f;
-        speedXZ = 0;
-        distance = 0;
-        stage = 0;
-    }
-
-    @Override
-    public void onEnable() {
-        ThunderHack.TICK_TIMER = 1f;
-        speedXZ = 0;
-        distance = 0;
-        stage = 0;
-    }
-
-    public double isJumpBoost() {
-        if (mc.player.hasStatusEffect(StatusEffects.JUMP_BOOST)) return 0.2;
-        else return 0;
-    }
-    
-    public enum ModeEn {
-        Normal,
-        Pause
-    }
-
-    private boolean dropSync = false;
-
-    private void doPause(EventMove eventPlayerMove) {
         if (MovementUtility.isMoving()) {
-            if (usetimer.getValue())
-                ThunderHack.TICK_TIMER = timr.getValue();
+            if (useTimer.getValue())
+                ThunderHack.TICK_TIMER = timerValue.getValue();
+
             switch (stage) {
                 case 0 -> {
-                    speedXZ = speed.getValue() * MovementUtility.getBaseMoveSpeed();
-                    distance = 0.0;
+                    plannedSpeed = (float) (speed.getValue() * MovementUtility.getBaseMoveSpeed());
+                    realSpeed = 0f;
                     ++stage;
                 }
                 case 1 -> {
-                    eventPlayerMove.cancel();
                     mc.player.setVelocity(mc.player.getVelocity().getX(),0.42 + isJumpBoost(),mc.player.getVelocity().getZ());
-                    eventPlayerMove.setY(0.42 + isJumpBoost());
-                    speedXZ *= 2.149;
+                    e.setY(0.42 + isJumpBoost());
+                    plannedSpeed *= 2.149f;
                     ++stage;
                 }
                 case 2 -> {
-                    double d = 0.66 * (distance - MovementUtility.getBaseMoveSpeed());
-                    speedXZ = distance - d;
+                    double d = 0.66f * (realSpeed - MovementUtility.getBaseMoveSpeed());
+                    plannedSpeed = (float) (realSpeed - d);
                     ++stage;
                 }
                 case 3 -> {
@@ -98,63 +61,51 @@ public class LongJump extends Module {
                         if (jumpDisable.getValue())
                             disable(isRu() ? "Прыжок выполнен! Отключаю.." : "Jump complete! Disabling..");
                         stage = 0;
-                        distance = 0.0;
+                        realSpeed = 0f;
                     }
-                    speedXZ = distance - distance / 159.0;
+                    plannedSpeed = realSpeed - realSpeed / 159f;
                 }
             }
         }
-        speedXZ = Math.max(MovementUtility.getBaseMoveSpeed(), speedXZ);
-        eventPlayerMove.cancel();
-        MovementUtility.modifyEventSpeed(eventPlayerMove, speedXZ);
+        plannedSpeed = (float) Math.max(MovementUtility.getBaseMoveSpeed(), plannedSpeed);
+
+        MovementUtility.modifyEventSpeed(e, plannedSpeed);
+        e.cancel();
     }
 
-    private void doNormal(EventMove eventPlayerMove) {
-        if (MovementUtility.isMoving()) {
-            if (usetimer.getValue()) ThunderHack.TICK_TIMER = timr.getValue();
-            if (stage == 0) {
-                speedXZ = speed.getValue() * MovementUtility.getBaseMoveSpeed();
-            } else if (stage == 1) {
-                eventPlayerMove.cancel();
-                mc.player.setVelocity(mc.player.getVelocity().getX(),0.42 + isJumpBoost(),mc.player.getVelocity().getZ());
-                eventPlayerMove.setY(0.42 + isJumpBoost());
-                speedXZ *= 2.149;
-            } else if (stage == 2) {
-                double d = 0.66 * (distance - MovementUtility.getBaseMoveSpeed());
-                speedXZ = distance - d;
-            } else {
-                if (mc.player.verticalCollision || mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.2, 0.0, -0.2).offset(0.0, mc.player.getVelocity().getY(), 0.0)).iterator().hasNext()) {
-                    if (!reduction.getValue()) dropSync = true;
-                    else stage = 0;
-                    if(jumpDisable.getValue())
-                        disable(isRu() ? "Прыжок выполнен! Отключаю.." : "Jump complete! Disabling..");
-                }
-                speedXZ = distance - distance / 159.0;
-            }
-            speedXZ = Math.max(MovementUtility.getBaseMoveSpeed(), speedXZ);
-            eventPlayerMove.cancel();
-            MovementUtility.modifyEventSpeed(eventPlayerMove, speedXZ);
-            ++stage;
-        }
+    @EventHandler
+    public void onPacketReceive(PacketEvent.Receive e) {
+        if (e.getPacket() instanceof PlayerPositionLookS2CPacket)
+            disable(isRu() ? "Тебя флагнуло! Отключаю.." : "You've been flagged! Disabling..");
+    }
+
+    @Override
+    public void onDisable() {
+        resetValues();
+    }
+
+    @Override
+    public void onEnable() {
+        resetValues();
+    }
+
+    public void resetValues() {
+        prevPosition = mc.player.getPos();
+        ThunderHack.TICK_TIMER = 1f;
+        plannedSpeed = 0;
+        realSpeed = 0;
+        stage = 0;
+    }
+
+    public float isJumpBoost() {
+        if (mc.player.hasStatusEffect(StatusEffects.JUMP_BOOST)) return 0.2f;
+        else return 0f;
     }
 
     @EventHandler
     public void onEntitySync(EventSync eventSync) {
-        if(Mode.getValue() == ModeEn.Normal || Mode.getValue() == ModeEn.Pause) {
-            if (MovementUtility.isMoving()) {
-                double d = mc.player.getX() - mc.player.prevX;
-                double d2 = mc.player.getZ() - mc.player.prevZ;
-                distance = Math.sqrt(d * d + d2 * d2);
-            } else {
-                eventSync.cancel();
-                stage = 0;
-                distance = 0.0;
-            }
-            if (dropSync) {
-                dropSync = false;
-                eventSync.cancel();
-                stage = 0;
-            }
-        }
+        if (MovementUtility.isMoving())
+            realSpeed = (float) Math.hypot(mc.player.getX() - mc.player.prevX, mc.player.getZ() - mc.player.prevZ);
+        else resetValues();
     }
 }

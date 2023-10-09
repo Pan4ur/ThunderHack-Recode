@@ -144,7 +144,7 @@ public class FreeCam extends Module {
 
         mc.player.setOnGround(false);
         if (!MovementUtility.isMoving()) mc.player.setVelocity(Vec3d.ZERO);
-        mc.player.getAbilities().setFlySpeed(speed.getValue() / 5);
+        mc.player.getAbilities().setFlySpeed(speed.getValue() / 5f);
         mc.player.getAbilities().flying = true;
         mc.player.setPose(EntityPose.STANDING);
     }

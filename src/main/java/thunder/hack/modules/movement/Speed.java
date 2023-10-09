@@ -126,7 +126,7 @@ public class Speed extends Module {
         if (mc.player.isFallFlying()) return;
         if (mc.player.getHungerManager().getFoodLevel() <= 6) return;
         if (event.isCancelled()) return;
-        event.setCancelled(true);
+        event.cancel();
 
         if (MovementUtility.isMoving()) {
             ThunderHack.TICK_TIMER = useTimer.getValue() ? 1.088f : 1f;
