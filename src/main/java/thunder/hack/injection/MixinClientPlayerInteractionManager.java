@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.ModuleManager;
 import thunder.hack.events.impl.EventAttackBlock;
+import thunder.hack.events.impl.EventBreakBlock;
 import thunder.hack.events.impl.EventStopUsingItem;
 import thunder.hack.modules.player.Reach;
 
@@ -76,5 +77,13 @@ public class MixinClientPlayerInteractionManager {
         if (ModuleManager.reach.isEnabled()) {
             cir.setReturnValue(true);
         }
+    }
+
+    @Inject(method = "breakBlock", at = @At("HEAD"), cancellable = true)
+    public void breakBlockHook(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        EventBreakBlock event = new EventBreakBlock(pos);
+        ThunderHack.EVENT_BUS.post(event);
+        if (event.isCancelled())
+            cir.setReturnValue(false);
     }
 }

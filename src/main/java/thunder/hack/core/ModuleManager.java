@@ -190,6 +190,7 @@ public class ModuleManager {
     public static Ghost ghost = new Ghost();
     public static Chams chams = new Chams();
     public static Blink blink = new Blink();
+    public static Phase phase = new Phase();
     public static XRay xray = new XRay();
     public static Step step = new Step();
     public static Aura aura = new Aura();
