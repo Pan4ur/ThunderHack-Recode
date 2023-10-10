@@ -29,8 +29,10 @@ public class Phase extends Module {
     private final Setting<Boolean> silent = new Setting<>("Silent", false, v -> mode.getValue() == Mode.Sunrise);
     private final Setting<Boolean> waitBreak = new Setting<>("WaitBreak", true, v -> mode.getValue() == Mode.Sunrise);
     private final Setting<Integer> afterBreak = new Setting<>("BreakTimeout", 4, 1, 20, v -> mode.getValue() == Mode.Sunrise && waitBreak.getValue());
+    private final Setting<Integer> afterPearl = new Setting<>("PearlTimeout", 0, 0, 60, v -> mode.getValue() == Mode.Pearl);
 
     public int clipTimer;
+    public int afterPearlTime;
 
 
     private enum Mode {
@@ -43,7 +45,7 @@ public class Phase extends Module {
             return;
         BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
 
-        if (mode.getValue() != Mode.Pearl && canNoClip()) {
+        if (mode.getValue() != Mode.Pearl && canNoClip() || afterPearlTime > 0) {
             if (!e.getPos().equals(playerPos.down()) || mc.options.sneakKey.isPressed())
                 e.setState(Blocks.AIR.getDefaultState());
         }
@@ -52,6 +54,7 @@ public class Phase extends Module {
     @EventHandler
     public void onSync(EventSync e) {
         if (clipTimer > 0) clipTimer--;
+        if (afterPearlTime > 0) afterPearlTime--;
 
         if (mode.getValue() == Mode.Sunrise && (mc.player.horizontalCollision || playerInsideBlock()) && !mc.player.isSubmergedInWater() && !mc.player.isInLava()) {
             double[] dir = MovementUtility.forward(0.5);
@@ -101,6 +104,7 @@ public class Phase extends Module {
                     InventoryUtility.switchTo(prevItem);
                 }
                 clipTimer = 20;
+                afterPearlTime = afterPearl.getValue();
             }
         }
     }
