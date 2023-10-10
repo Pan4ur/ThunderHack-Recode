@@ -593,6 +593,33 @@ public class Render3DEngine {
         Render3DEngine.cleanup();
     }
 
+    public static void drawCircle3D(MatrixStack stack,Entity ent, float radius, int color, int points, boolean hudColor, int colorOffset) {
+        Render3DEngine.setup();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
+
+        double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getX();
+        double y = ent.prevY + (ent.getY() - ent.prevY) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getY();
+        double z = ent.prevZ + (ent.getZ() - ent.prevZ) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
+        stack.push();
+        stack.translate(x, y, z);
+
+        Matrix4f matrix = stack.peek().getPositionMatrix();
+        for (int i = 0; i <= points; i++) {
+            if(hudColor)
+                color = HudEditor.getColor(i * colorOffset).getRGB();
+
+            bufferBuilder.vertex(matrix, (float) (radius * Math.cos(i * 6.28 / points)), 0f, (float) (radius * Math.sin(i * 6.28 / points))).color(color).next();
+        }
+
+        tessellator.draw();
+        Render3DEngine.cleanup();
+        stack.translate(-x, -y, -z);
+        stack.pop();
+    }
+
     public record FillAction(Box box, Color color) {
     }
 
