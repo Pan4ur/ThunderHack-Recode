@@ -23,10 +23,6 @@ public class MixinShaderEffect implements IShaderEffect {
     @Shadow @Final private Map<String, Framebuffer> targetsByName;
     @Shadow @Final private List<PostEffectPass> passes;
 
-    @Override
-    public List<PostEffectPass> getPassesHook() {
-        return passes;
-    }
 
     @Override
     public void addFakeTargetHook(String name, Framebuffer buffer) {
@@ -49,8 +45,7 @@ public class MixinShaderEffect implements IShaderEffect {
 
     @Inject(method = "close", at = @At("HEAD"))
     void deleteFakeBuffersHook(CallbackInfo ci) {
-        for (String fakedBufferName : fakedBufferNames) {
+        for (String fakedBufferName : fakedBufferNames)
             targetsByName.remove(fakedBufferName);
-        }
     }
 }

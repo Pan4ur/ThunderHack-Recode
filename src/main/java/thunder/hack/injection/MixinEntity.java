@@ -32,12 +32,13 @@ import static thunder.hack.modules.Module.mc;
 @Mixin(Entity.class)
 public abstract class MixinEntity implements IEntity {
     @Shadow private Box boundingBox;
+
     @Override public List<Trails.Trail> getTrails() {
         return trails;
     }
-    @Override public List<Vec3d> getPrevPositions() {
-        return backPositions;
-    }
+
+    @Unique public List<Trails.Trail> trails = new ArrayList<>();
+
 
     @ModifyArgs(method = "pushAwayFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;addVelocity(DDD)V"))
     private void pushAwayFromHook(Args args) {
@@ -49,9 +50,6 @@ public abstract class MixinEntity implements IEntity {
             args.set(2, event.getPushZ());
         }
     }
-
-    @Unique public List<Trails.Trail> trails = new ArrayList<>();
-    @Unique public List<Vec3d> backPositions = new ArrayList<>();
 
     @Inject(method = "changeLookDirection", at = {@At("HEAD")}, cancellable = true)
     public void changeLookDirectionHook(double cursorDeltaX, double cursorDeltaY, CallbackInfo ci) {

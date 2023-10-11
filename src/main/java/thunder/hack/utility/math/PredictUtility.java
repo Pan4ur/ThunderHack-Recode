@@ -59,8 +59,4 @@ public class PredictUtility {
 
         return copyEntity;
     }
-
-    public static Vec3d clone(Vec3d v) {
-        return new Vec3d(v.getX(), v.getY(), v.getZ());
-    }
 }

@@ -136,7 +136,6 @@ public class ModuleManager {
     public static HitSound hitSound = new HitSound();
     public static FGHelper fgHelper = new FGHelper();
     public static ExtraTab extraTab = new ExtraTab();
-    public static BowPop bowPop = new BowPop();
     public static ClickGui clickGui = new ClickGui();
     public static AutoTrap autoTrap = new AutoTrap();
     public static AutoTool autoTool = new AutoTool();
@@ -147,6 +146,7 @@ public class ModuleManager {
     public static AutoAuth autoAuth = new AutoAuth();
     public static ArmorHud armorHud = new ArmorHud();
     public static AirPlace airPlace = new AirPlace();
+    public static SelfTrap selfTrap = new SelfTrap();
     public static AutoBed autoBed = new AutoBed();
     public static VoidESP voidESP = new VoidESP();
     public static Tracker tracker = new Tracker();
@@ -167,6 +167,7 @@ public class ModuleManager {
     public static AntiBot antiBot = new AntiBot();
     public static AntiAim antiAim = new AntiAim();
     public static AutoSex autoSex = new AutoSex();
+    public static BowPop bowPop = new BowPop();
     public static XCarry xCarry = new XCarry();
     public static Trails trails = new Trails();
     public static Strafe strafe = new Strafe();

@@ -12,7 +12,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
@@ -33,12 +33,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AutoTrap extends Module {
-    public AutoTrap() {
-        super("AutoTrap", Category.COMBAT);
+public class SelfTrap extends Module {
+
+    public SelfTrap() {
+        super("SelfTrap", Category.COMBAT);
     }
 
-    private final Setting<Float> range = new Setting<>("Range", 5f, 2f, 7f);
     private final Setting<PlaceTiming> placeTiming = new Setting<>("PlaceTiming", PlaceTiming.Default);
     private final Setting<Integer> blocksPerTick = new Setting<>("Block/Tick", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10, v -> placeTiming.getValue() != PlaceTiming.Sequential);
@@ -175,10 +175,8 @@ public class AutoTrap extends Module {
     }
 
     private List<BlockPos> getBlocks() {
-        PlayerEntity pl = ThunderHack.combatManager.getNearestTarget(range.getValue());
-        if (pl == null) return new ArrayList<>();
         List<BlockPos> blocks = new ArrayList<>();
-        for (BlockPos bp : getPlayerBlocks(pl)) {
+        for (BlockPos bp : getPlayerBlocks(mc.player)) {
             blocks.add(bp.east().up());
             blocks.add(bp.west().up());
             blocks.add(bp.south().up());
