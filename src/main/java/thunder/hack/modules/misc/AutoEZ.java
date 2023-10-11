@@ -7,6 +7,7 @@ import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
+import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.ThunderUtility;
 
@@ -42,7 +43,7 @@ public class AutoEZ extends Module {
 
 
     public AutoEZ() {
-        super("AutoEZ", "Пишет изи убил убил - после килла", Category.MISC);
+        super("AutoEZ", Category.MISC);
         loadEZ();
     }
 
@@ -132,11 +133,10 @@ public class AutoEZ extends Module {
                 sayEZ(pac.getEntity(mc.world).getName().getString());
                 return;
             }
-            //  if (AutoCrystal.CAtarget != null && AutoCrystal.CAtarget == pac.getEntity(mc.world)) {
-            //    sayEZ(pac.getEntity(mc.world).getName().getString());
-            //}
+            if (AutoCrystal.target != null && AutoCrystal.target == pac.getEntity(mc.world)) {
+                sayEZ(pac.getEntity(mc.world).getName().getString());
+            }
         }
-        //if (pac.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING) {}
     }
 
     public void sayEZ(String pn) {

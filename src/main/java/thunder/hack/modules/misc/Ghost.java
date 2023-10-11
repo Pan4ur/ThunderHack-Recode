@@ -9,7 +9,7 @@ public class Ghost extends Module {
     private boolean bypass = false;
 
     public Ghost() {
-        super("Ghost", "Жить после смерти", Category.MISC);
+        super("Ghost", Category.MISC);
     }
 
     @Override

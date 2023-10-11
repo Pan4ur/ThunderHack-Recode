@@ -23,7 +23,7 @@ public class AutoFlyme extends Module {
     private final Timer timer = new Timer();
 
     public AutoFlyme() {
-        super("AutoFlyme", "Автоматически пишет /flyme", Category.MISC);
+        super("AutoFlyme", Category.MISC);
     }
 
     @Override

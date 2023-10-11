@@ -13,10 +13,10 @@ import thunder.hack.utility.render.Render2DEngine;
 
 public class WaterMark extends HudElement {
     public WaterMark() {
-        super("WaterMark", "WaterMark", 100, 35);
+        super("WaterMark", 100, 35);
     }
 
-    public static final Setting<Mode> mode = new Setting("Mode", Mode.Big);
+    public static final Setting<Mode> mode = new Setting<>("Mode", Mode.Big);
 
     private enum Mode {
         Big, Small, Classic

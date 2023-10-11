@@ -8,7 +8,7 @@ import thunder.hack.setting.Setting;
 
 public class WorldTweaks extends Module {
     public WorldTweaks() {
-        super("WorldTweaks", "WorldTweaks", Category.MISC);
+        super("WorldTweaks", Category.MISC);
     }
 
     public final Setting<Boolean> ctime = new Setting<>("ChangeTime", false);

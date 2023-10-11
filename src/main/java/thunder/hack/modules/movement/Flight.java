@@ -21,7 +21,7 @@ public class Flight extends Module {
     private int flyTicks = 0;
 
     public Flight() {
-        super("Flight", "Makes you fly.", Module.Category.MOVEMENT);
+        super("Flight", Module.Category.MOVEMENT);
     }
 
     @EventHandler

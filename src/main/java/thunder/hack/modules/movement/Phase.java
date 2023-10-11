@@ -53,6 +53,7 @@ public class Phase extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
+        if(fullNullCheck()) return;
         if (clipTimer > 0) clipTimer--;
         if (afterPearlTime > 0) afterPearlTime--;
 
@@ -90,12 +91,13 @@ public class Phase extends Module {
                 double[] dir = MovementUtility.forward(0.5);
                 BlockPos block = BlockPos.ofFloored(mc.player.getX() + dir[0], mc.player.getY(), mc.player.getZ() + dir[1]);
 
-                if(block == null)
+                if(mc.options.sneakKey.isPressed())
                     return;
 
                 float[] angle = InteractionUtility.calculateAngle(block.toCenterPos());
                 int epSlot = findEPSlot();
                 int prevItem = mc.player.getInventory().selectedSlot;
+
                 if (epSlot != -1) {
                     mc.player.setYaw(angle[0]);
                     mc.player.setPitch(80f);
@@ -132,7 +134,7 @@ public class Phase extends Module {
     }
 
     public boolean playerInsideBlock() {
-        return mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos())).getBlock() != Blocks.AIR;
+        return !mc.world.isAir(BlockPos.ofFloored(mc.player.getPos()));
     }
 
     @EventHandler

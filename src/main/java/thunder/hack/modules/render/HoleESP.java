@@ -23,8 +23,8 @@ public class HoleESP extends Module {
     private final Setting<Integer> rangeXZ = new Setting<>("Range XY", 10, 1, 128);
     private final Setting<Integer> rangeY = new Setting<>("Range Y", 5, 1, 128);
 
-    private final Setting<ColorSetting> indestrictibleColor = new Setting<>("Indestrictible Color", new ColorSetting(new Color(0x7A00FF).getRGB()));
-    private final Setting<ColorSetting> bedrockColor = new Setting<>("Bedrock Color", new ColorSetting(new Color(0x00FF51).getRGB()));
+    private final Setting<ColorSetting> indestrictibleColor = new Setting<>("Indestructible", new ColorSetting(new Color(0x7A00FF).getRGB()));
+    private final Setting<ColorSetting> bedrockColor = new Setting<>("Bedrock", new ColorSetting(new Color(0x00FF51).getRGB()));
 
     private final Setting<Float> height = new Setting<>("Height", 1f, 0.01f, 5f);
     private final Setting<Float> lineWith = new Setting<>("Line Width", 0.5f, 0.01f, 5f);
@@ -55,7 +55,7 @@ public class HoleESP extends Module {
 
         for (BoxWithColor pwc : positions) {
             switch (mode.getValue()) {
-                case Fade -> renderFade(pwc, stack);
+                case Fade -> renderFade(pwc);
                 case Fade2 -> renderFade2(pwc, stack);
                 case CubeFill -> renderFill(pwc);
                 case CubeOutline -> renderOutline(pwc);
@@ -67,7 +67,7 @@ public class HoleESP extends Module {
         }
     }
 
-    public void renderFade(@NotNull HoleESP.BoxWithColor posWithColor, MatrixStack stack) {
+    public void renderFade(@NotNull HoleESP.BoxWithColor posWithColor) {
         Render3DEngine.FADE_QUEUE.add(
                 new Render3DEngine.FadeAction(posWithColor.box, Render2DEngine.applyOpacity(posWithColor.color(), 60), Render2DEngine.applyOpacity(posWithColor.color(), 0))
         );
@@ -99,7 +99,9 @@ public class HoleESP extends Module {
     }
 
     public void renderFill(@NotNull HoleESP.BoxWithColor boxWithColor) {
-        Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(boxWithColor.box(), boxWithColor.color()));
+        Render3DEngine.FILLED_QUEUE.add(
+                new Render3DEngine.FillAction(boxWithColor.box(), boxWithColor.color())
+        );
     }
 
     @Override
@@ -161,7 +163,6 @@ public class HoleESP extends Module {
                 }
             }
         }
-
         positions.clear();
         positions.addAll(blocks);
     }

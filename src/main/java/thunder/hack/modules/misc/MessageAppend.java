@@ -15,7 +15,7 @@ public class MessageAppend extends Module {
     public Setting<String> word = new Setting<>("word", " TH RECODE");
 
     public MessageAppend() {
-        super("MessageAppend", "добавляет фразу в конце сообщения", Category.MISC);
+        super("MessageAppend", Category.MISC);
     }
 
     String skip;

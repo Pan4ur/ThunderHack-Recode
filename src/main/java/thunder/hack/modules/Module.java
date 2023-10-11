@@ -35,12 +35,6 @@ public abstract class Module {
 
     public static MinecraftClient mc = MinecraftClient.getInstance();
 
-    public Module(@NotNull String name, String description, @NotNull Category category) {
-        this.displayName = name;
-        this.description = "descriptions." + category.getName().toLowerCase() + "." + name.toLowerCase();
-        this.category = category;
-    }
-
     public Module(@NotNull String name, @NotNull Category category) {
         this.displayName = name;
         this.description = "descriptions." + category.getName().toLowerCase() + "." + name.toLowerCase();

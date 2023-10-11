@@ -35,7 +35,7 @@ public class LagNotifier extends Module {
     private boolean isLagging = false;
 
     public LagNotifier() {
-        super("LagNotifier", "Предупреждает о лагах на сервере", Category.MISC);
+        super("LagNotifier", Category.MISC);
     }
 
     @Override

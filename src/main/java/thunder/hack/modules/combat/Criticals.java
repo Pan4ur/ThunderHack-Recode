@@ -15,7 +15,7 @@ import thunder.hack.setting.Setting;
 
 public class Criticals extends Module {
     public Criticals() {
-        super("Criticals", "Criticals", Category.COMBAT);
+        super("Criticals", Category.COMBAT);
     }
 
     public Setting<Mode> mode = new Setting<>("Mode", Mode.FunnyGame);

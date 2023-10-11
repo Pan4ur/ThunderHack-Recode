@@ -41,7 +41,7 @@ public class Velocity extends Module {
     private int grimTicks = 0;
 
     public Velocity() {
-        super("Velocity", "акэбэшка", Module.Category.MOVEMENT);
+        super("Velocity", Module.Category.MOVEMENT);
     }
 
     @EventHandler

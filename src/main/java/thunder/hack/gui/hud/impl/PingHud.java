@@ -10,7 +10,7 @@ import thunder.hack.modules.client.HudEditor;
 public class PingHud extends HudElement {
 
     public PingHud() {
-        super("Ping", "PingHud", 50, 10);
+        super("Ping", 50, 10);
     }
 
     public void onRender2D(DrawContext context) {

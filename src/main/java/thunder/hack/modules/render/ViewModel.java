@@ -11,7 +11,7 @@ import thunder.hack.setting.impl.Parent;
 
 public class ViewModel extends Module {
     public ViewModel() {
-        super("ViewModel", "ViewModel", Category.RENDER);
+        super("ViewModel", Category.RENDER);
     }
 
     public Setting<Boolean> oldAnimationsM = new Setting<>("DisableSwapMain", false);

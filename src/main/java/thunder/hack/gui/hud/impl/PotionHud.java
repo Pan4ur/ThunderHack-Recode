@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class PotionHud extends HudElement {
     public PotionHud() {
-        super("Potions", "Potions", 100, 100);
+        super("Potions", 100, 100);
     }
 
     public static String getDuration(StatusEffectInstance pe) {

@@ -14,6 +14,7 @@ import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.AsyncManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.ParticleEvent;
@@ -28,7 +29,7 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class NoRender extends Module {
     public NoRender() {
-        super("NoRender", "NoRender", Category.RENDER);
+        super("NoRender", Category.RENDER);
     }
 
     public Setting<Boolean> auto = new Setting<>("Auto", false);
@@ -67,7 +68,7 @@ public class NoRender extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        for (Entity ent : mc.world.getEntities()) {
+        for (Entity ent : ThunderHack.asyncManager.getAsyncEntities()) {
             if (ent instanceof PotionEntity) {
                 potionCouter++;
                 if (potions.getValue()) mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
@@ -91,6 +92,7 @@ public class NoRender extends Module {
                 if (items.getValue()) mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
             }
         }
+
         if (auto.getValue()) {
             if (arrowCounter > 64)
                 ThunderHack.notificationManager.publicity("NoRender", isRu() ? "Превышен лимит стрел! Удаляю..." : "Arrows limit reached! Removing...", 3, Notification.Type.SUCCESS);
@@ -107,7 +109,7 @@ public class NoRender extends Module {
 
             List<Integer> toRemove = new ArrayList<>();
 
-            for (Entity ent : mc.world.getEntities()) {
+            for (Entity ent  : ThunderHack.asyncManager.getAsyncEntities()) {
                 if (ent instanceof ArrowEntity && arrowCounter > 64) toRemove.add(ent.getId());
                 if (ent instanceof ItemEntity && itemsCounter > 16) toRemove.add(ent.getId());
                 if (ent instanceof ExperienceBottleEntity && xpCounter > 16) toRemove.add(ent.getId());

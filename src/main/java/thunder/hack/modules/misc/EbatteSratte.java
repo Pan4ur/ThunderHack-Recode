@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public class EbatteSratte extends Module {
     public EbatteSratte() {
-        super("EbatteSratte", "авто токсик и не только xD", Module.Category.MISC);
+        super("EbatteSratte", Module.Category.MISC);
         loadEZ();
     }
 

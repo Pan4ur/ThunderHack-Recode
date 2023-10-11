@@ -30,7 +30,7 @@ public class HitParticles extends Module {
     private final Setting<ColorMode> colorMode = new Setting("ColorMode", ColorMode.Sync);
 
     public HitParticles() {
-        super("HitParticles", "HitParticles", Category.RENDER);
+        super("HitParticles", Category.RENDER);
     }
 
     @Override

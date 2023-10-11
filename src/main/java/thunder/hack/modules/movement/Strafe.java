@@ -37,7 +37,7 @@ public class Strafe extends Module {
     static long disableTime;
 
     public Strafe() {
-        super("Strafe", "testMove", Category.MOVEMENT);
+        super("Strafe", Category.MOVEMENT);
     }
 
     public double calculateSpeed(EventMove move) {

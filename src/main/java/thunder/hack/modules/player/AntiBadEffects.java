@@ -5,7 +5,7 @@ import thunder.hack.modules.Module;
 
 public class AntiBadEffects extends Module {
     public AntiBadEffects() {
-        super("AntiBadEffects", "убирает плохие эффекты", Category.PLAYER);
+        super("AntiBadEffects", Category.PLAYER);
     }
 
     @Override

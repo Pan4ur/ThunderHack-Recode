@@ -17,7 +17,7 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class AutoFish extends Module {
     public AutoFish() {
-        super("AutoFish", "AutoFish", Category.MISC);
+        super("AutoFish", Category.MISC);
     }
 
     private final Setting<Boolean> rodSave = new Setting<>("RodSave", true);

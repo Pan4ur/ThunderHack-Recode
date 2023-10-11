@@ -35,7 +35,7 @@ public class FakePlayer extends Module {
     public static OtherClientPlayerEntity fakePlayer;
 
     public FakePlayer() {
-        super("FakePlayer", "FakePlayer", Category.MISC);
+        super("FakePlayer", Category.MISC);
     }
 
     private Setting<Boolean> record = new Setting<>("Record", false);

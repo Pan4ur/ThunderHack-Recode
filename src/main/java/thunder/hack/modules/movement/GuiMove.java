@@ -19,7 +19,7 @@ public class GuiMove extends Module {
     public Setting<Boolean> sneak = new Setting<>("sneak", false);
 
     public GuiMove() {
-        super("GuiMove", "GuiMove", Category.MOVEMENT);
+        super("GuiMove", Category.MOVEMENT);
     }
 
     public static boolean pause = false;

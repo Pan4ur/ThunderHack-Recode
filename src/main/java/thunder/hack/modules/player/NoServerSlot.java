@@ -8,7 +8,7 @@ import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
 
 public class NoServerSlot extends Module {
     public NoServerSlot() {
-        super("NoServerSlot", "не дает серверу свапать слоты", Category.PLAYER);
+        super("NoServerSlot", Category.PLAYER);
     }
 
     @EventHandler

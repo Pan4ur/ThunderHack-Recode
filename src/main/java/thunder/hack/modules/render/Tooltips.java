@@ -7,7 +7,7 @@ import net.minecraft.nbt.NbtCompound;
 
 public class Tooltips extends Module {
     public Tooltips() {
-        super("Tooltips", "Tooltips", Category.MISC);
+        super("Tooltips", Category.MISC);
     }
 
     public static final Setting<Boolean> middleClickOpen = new Setting<>("MiddleClickOpen", true);

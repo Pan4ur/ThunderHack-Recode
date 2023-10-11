@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public class Coords extends HudElement {
     public Coords() {
-        super("Coords", "coords", 100, 10);
+        super("Coords", 100, 10);
     }
 
     public void onRender2D(DrawContext context) {

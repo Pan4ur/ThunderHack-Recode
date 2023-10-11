@@ -22,7 +22,7 @@ import static thunder.hack.utility.player.MovementUtility.isMoving;
 
 public class TargetStrafe extends Module {
     public TargetStrafe() {
-        super("TargetStrafe", "TargetStrafe", Category.COMBAT);
+        super("TargetStrafe", Category.COMBAT);
     }
 
     public Setting<Boolean> jump = new Setting<>("Jump", true);

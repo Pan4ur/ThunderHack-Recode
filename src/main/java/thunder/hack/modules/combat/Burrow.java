@@ -32,7 +32,7 @@ import java.lang.reflect.Field;
 
 public class Burrow extends Module {
     public Burrow() {
-        super("Burrow", "Ставит в тебя блок", Category.COMBAT);
+        super("Burrow", Category.COMBAT);
     }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Default);

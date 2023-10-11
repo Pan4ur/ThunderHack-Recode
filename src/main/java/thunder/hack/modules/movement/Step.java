@@ -31,7 +31,7 @@ public class Step extends Module {
     private Entity entityRiding;
 
     public Step() {
-        super("Step", "ходить по блокам 1 или 2 блока", Category.MOVEMENT);
+        super("Step", Category.MOVEMENT);
     }
 
     @Override

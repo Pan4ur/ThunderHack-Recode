@@ -9,7 +9,7 @@ import thunder.hack.utility.Timer;
 
 public class AutoGApple extends Module {
     public AutoGApple() {
-        super("AutoGApple", "AutoGApple", Category.COMBAT);
+        super("AutoGApple", Category.COMBAT);
     }
 
     public final Setting<Integer> Delay = new Setting("UseDelay", 0, 0, 2000);

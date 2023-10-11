@@ -5,7 +5,7 @@ import thunder.hack.setting.Setting;
 
 public class Fullbright extends Module {
     public Fullbright() {
-        super("Fullbright", "Fullbright", Category.RENDER);
+        super("Fullbright", Category.RENDER);
     }
 
     public static Setting<Integer> brightness = new Setting<>("Brightness", 15, 0, 15);

@@ -7,7 +7,7 @@ import thunder.hack.modules.movement.Timer;
 
 public class TpsSync extends Module {
     public TpsSync() {
-        super("TpsSync", "синхронизирует игру-с тпс", Module.Category.PLAYER);
+        super("TpsSync", Module.Category.PLAYER);
     }
 
     @Override

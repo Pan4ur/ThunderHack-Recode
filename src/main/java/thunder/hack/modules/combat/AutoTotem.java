@@ -59,7 +59,7 @@ public class AutoTotem extends Module {
     private int delay;
 
     public AutoTotem() {
-        super("AutoTotem", "AutoTotem", Category.COMBAT);
+        super("AutoTotem", Category.COMBAT);
     }
 
     @EventHandler

@@ -35,7 +35,7 @@ public class BowPop extends Module {
     private final Random rnd = new Random();
 
     public BowPop() {
-        super("BowPop", "Шотает с лука", Category.COMBAT);
+        super("BowPop", Category.COMBAT);
     }
 
     @EventHandler

@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 public class PacketFly extends Module {
     public PacketFly() {
-        super("PacketFly", "PacketFly", Category.MOVEMENT);
+        super("PacketFly", Category.MOVEMENT);
     }
 
     public Setting<Boolean> limit = new Setting<>("Limit", true);

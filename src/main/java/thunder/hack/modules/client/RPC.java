@@ -31,7 +31,7 @@ public class RPC extends Module {
     private static Thread thread;
 
     public RPC() {
-        super("DiscordRPC", "крутая рпс", Category.CLIENT);
+        super("DiscordRPC", Category.CLIENT);
     }
 
     public static void readFile() {

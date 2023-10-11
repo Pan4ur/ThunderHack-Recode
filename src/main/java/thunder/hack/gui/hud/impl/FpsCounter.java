@@ -9,7 +9,7 @@ import thunder.hack.utility.math.FrameRateCounter;
 
 public class FpsCounter extends HudElement {
     public FpsCounter() {
-        super("Fps", "fps", 50, 10);
+        super("Fps", 50, 10);
     }
 
     public void onRender2D(DrawContext context) {

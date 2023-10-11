@@ -111,7 +111,7 @@ public class CevBreaker extends Module {
     private final ConcurrentHashMap<BlockPos, Long> renderStructurePoses = new ConcurrentHashMap<>();
 
     public CevBreaker() {
-        super("CevBreaker", "Банит гринхолфагов", Category.COMBAT);
+        super("CevBreaker", Category.COMBAT);
     }
 
     @Override

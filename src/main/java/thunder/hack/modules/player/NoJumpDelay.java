@@ -6,7 +6,7 @@ import thunder.hack.setting.Setting;
 
 public class NoJumpDelay extends Module {
     public NoJumpDelay() {
-        super("NoJumpDelay", "NoJumpDelay", Category.PLAYER);
+        super("NoJumpDelay", Category.PLAYER);
     }
 
     private final Setting<Integer> delay = new Setting<>("Delay", 1, 0, 4);

@@ -13,8 +13,9 @@ import java.util.List;
 import java.util.Random;
 
 public class ChestStealer extends Module {
+
     public ChestStealer() {
-        super("ChestStealer", "ChestStealer", Category.MISC);
+        super("ChestStealer", Category.MISC);
     }
 
     private final Setting<Integer> delay = new Setting<>("Delay", 100, 0, 1000);

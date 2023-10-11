@@ -10,7 +10,7 @@ import thunder.hack.utility.math.MathUtility;
 
 public class AntiAim extends Module {
     public AntiAim() {
-        super("AntiAim", "утро 1 января", Category.PLAYER);
+        super("AntiAim", Category.PLAYER);
     }
 
     private final Setting<Mode> pitchMode = new Setting<>("PitchMode", Mode.None);

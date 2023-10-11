@@ -56,7 +56,7 @@ public class TargetHud extends HudElement {
     private LivingEntity target;
 
     public TargetHud() {
-        super("TargetHud", "ПИЗДАТЕЙШИЙ", 150, 50);
+        super("TargetHud", 150, 50);
     }
 
     public static void sizeAnimation(MatrixStack matrixStack, double width, double height, double animation) {

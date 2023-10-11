@@ -16,7 +16,7 @@ public class TimerIndicator extends HudElement {
     private final BetterDynamicAnimation timerAnimation = new BetterDynamicAnimation();
 
     public TimerIndicator() {
-        super("TimerIndicator", "TimerIndicator", 65, 15);
+        super("TimerIndicator", 65, 15);
     }
 
     @Override

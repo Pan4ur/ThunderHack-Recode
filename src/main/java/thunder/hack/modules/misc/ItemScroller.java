@@ -7,6 +7,6 @@ public class ItemScroller extends Module {
     public Setting<Integer> delay = new Setting<>("Delay",80,0,500);
 
     public ItemScroller() {
-        super("ItemScroller", "ItemScroller", Category.MISC);
+        super("ItemScroller", Category.MISC);
     }
 }

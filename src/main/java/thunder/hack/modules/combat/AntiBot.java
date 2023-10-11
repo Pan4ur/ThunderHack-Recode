@@ -25,69 +25,16 @@ public class AntiBot extends Module {
     private int ticks = 0;
 
     public AntiBot() {
-        super("AntiBot", "Убирает ботов", Category.COMBAT);
+        super("AntiBot", Category.COMBAT);
     }
 
     @EventHandler
     public void onSync(EventSync e) {
-        if (!onlyAura.getValue()) {
-            for (PlayerEntity player : AntiBot.mc.world.getPlayers()) {
-                if (mode.getValue() == Mode.MotionCheck) {
-                    if (player != null) {
-                        double speed = (player.getX() - player.prevX) * (player.getX() - player.prevX) + (player.getZ() - player.prevZ) * (player.getZ() - player.prevZ);
-                        if (player != mc.player && speed > 0.5 && MathUtility.getDistanceSq(player) <= Aura.attackRange.getPow2Value() && !bots.contains(player)) {
-                            if (!bots.contains(player)) {
-                                sendMessage(player.getName().getString() + " is a bot!");
-                                ++botsNumber;
-                                bots.add(player);
-                            }
-                        }
-                    }
-                } else {
-                    if (!player.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + player.getName().getString()).getBytes(StandardCharsets.UTF_8))) && player instanceof OtherClientPlayerEntity) {
-                        if (!bots.contains(player)) {
-                            sendMessage(player.getName().getString() + " is a bot!");
-                            ++botsNumber;
-                            bots.add(player);
-                        }
-                    }
-                    if (!player.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + player.getName().getString()).getBytes(StandardCharsets.UTF_8))) && player.isInvisible() && player instanceof OtherClientPlayerEntity) {
-                        if (!bots.contains(player)) {
-                            sendMessage(player.getName().getString() + " is a bot!");
-                            ++botsNumber;
-                            bots.add(player);
-                        }
-                    }
-                }
-            }
-        } else {
-            if (Aura.target != null) {
-                if (Aura.target instanceof PlayerEntity) {
-                    if (mode.getValue() == Mode.MotionCheck) {
-                        double speed = (Aura.target.getX() - Aura.target.prevX) * (Aura.target.getX() - Aura.target.prevX) + (Aura.target.getZ() - Aura.target.prevZ) * (Aura.target.getZ() - Aura.target.prevZ);
-                        if (speed > 0.5 && !bots.contains(Aura.target)) {
-                            if (ticks >= checkticks.getValue()) {
-                                sendMessage(Aura.target.getName().getString() + " is a bot!");
-                                ++botsNumber;
-                                bots.add((PlayerEntity) Aura.target);
-                            }
-                            ticks++;
-                        }
-                    } else {
-                        if (!Aura.target.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + Aura.target.getName().getString()).getBytes(StandardCharsets.UTF_8))) && Aura.target instanceof OtherClientPlayerEntity) {
-                            sendMessage(Aura.target.getName().getString() + " is a bot!");
-                            ++botsNumber;
-                            bots.add((PlayerEntity) Aura.target);
-                        }
-                        if (!Aura.target.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + Aura.target.getName().getString()).getBytes(StandardCharsets.UTF_8))) && Aura.target.isInvisible() && Aura.target instanceof OtherClientPlayerEntity) {
-                            sendMessage(Aura.target.getName().getString() + " is a bot!");
-                            ++botsNumber;
-                            bots.add((PlayerEntity) Aura.target);
-                        }
-                    }
-                }
-            }
-        }
+        if (!onlyAura.getValue())
+            for (PlayerEntity player : AntiBot.mc.world.getPlayers())
+                isABot(player);
+        else if (Aura.target instanceof PlayerEntity ent)
+            isABot(ent);
 
         for (PlayerEntity bot : bots) {
             if (remove.getValue()) {
@@ -100,8 +47,33 @@ public class AntiBot extends Module {
         if (timer.passedMs(10000)) {
             bots.clear();
             botsNumber = 0;
-            timer.reset();
             ticks = 0;
+            timer.reset();
+        }
+    }
+
+    private void isABot(PlayerEntity ent){
+        if (mode.getValue() == Mode.MotionCheck) {
+            double speed = (ent.getX() - ent.prevX) * (ent.getX() - ent.prevX) + (ent.getZ() - ent.prevZ) * (ent.getZ() - ent.prevZ);
+            if (speed > 0.5 && !bots.contains(ent)) {
+                if (ticks >= checkticks.getValue()) {
+                    sendMessage(ent.getName().getString() + " is a bot!");
+                    ++botsNumber;
+                    bots.add(ent);
+                }
+                ticks++;
+            }
+        } else {
+            if (!ent.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + ent.getName().getString()).getBytes(StandardCharsets.UTF_8))) && ent instanceof OtherClientPlayerEntity) {
+                sendMessage(ent.getName().getString() + " is a bot!");
+                ++botsNumber;
+                bots.add(ent);
+            }
+            if (!ent.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + ent.getName().getString()).getBytes(StandardCharsets.UTF_8))) && ent.isInvisible() && ent instanceof OtherClientPlayerEntity) {
+                sendMessage(ent.getName().getString() + " is a bot!");
+                ++botsNumber;
+                bots.add(ent);
+            }
         }
     }
 

@@ -15,9 +15,9 @@ import java.awt.*;
 public class ModuleList extends HudElement {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.ColorText);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
-    private final Setting<Float> rainbowSpeed = new Setting("Speed", 10.0f, 1.0f, 20.0f);
-    private final Setting<Float> saturation = new Setting("Saturation", 0.5f, 0.1f, 1.0f);
-    private final Setting<Integer> gste = new Setting("GS", 30, 1, 50);
+    private final Setting<Float> rainbowSpeed = new Setting<>("Speed", 10.0f, 1.0f, 20.0f);
+    private final Setting<Float> saturation = new Setting<>("Saturation", 0.5f, 0.1f, 1.0f);
+    private final Setting<Integer> gste = new Setting<>("GS", 30, 1, 50);
     private final Setting<Boolean> glow = new Setting<>("glow", false);
     private final Setting<cMode> cmode = new Setting<>("ColorMode", cMode.Rainbow);
     private final Setting<Boolean> hrender = new Setting<>("HideHud", true);
@@ -27,7 +27,7 @@ public class ModuleList extends HudElement {
     private final Setting<ColorSetting> color4 = new Setting<>("SideRectColor", new ColorSetting(-16777216));
 
     public ModuleList() {
-        super("ArrayList", "arraylist", 50, 30);
+        super("ArrayList", 50, 30);
     }
 
     boolean reverse;

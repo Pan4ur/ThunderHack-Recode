@@ -23,7 +23,7 @@ public class Spider extends Module {
     private final Setting<Mode> mode = new Setting("Mode", Mode.Matrix);
 
     public Spider() {
-        super("Spider", "можно по стенам хуярить-как черт", Category.MOVEMENT);
+        super("Spider", Category.MOVEMENT);
     }
 
     public static Direction getPlaceableSide(BlockPos pos) {

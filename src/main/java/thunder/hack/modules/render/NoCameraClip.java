@@ -8,7 +8,7 @@ import thunder.hack.utility.render.animation.BetterDynamicAnimation;
 
 public class NoCameraClip extends Module {
     public NoCameraClip() {
-        super("NoCameraClip", "NoCameraClip", Category.RENDER);
+        super("NoCameraClip", Category.RENDER);
     }
 
     public Setting<Boolean> antiFront = new Setting<>("AntiFront", false);

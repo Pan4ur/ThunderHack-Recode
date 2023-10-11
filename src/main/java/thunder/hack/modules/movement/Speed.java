@@ -21,12 +21,12 @@ import static thunder.hack.utility.player.MovementUtility.isMoving;
 public class Speed extends Module {
 
     public Speed() {
-        super("Speed", "спиды", Category.MOVEMENT);
+        super("Speed", Category.MOVEMENT);
     }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
     public Setting<Boolean> useTimer = new Setting<>("Use Timer", false);
-    public final Setting<Integer> hurttime = new Setting<>("Hurttime", 0, 0, 10, v -> mode.getValue() == Mode.MatrixDamage);
+    public final Setting<Integer> hurttime = new Setting<>("HurtTime", 0, 0, 10, v -> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Float> boostFactor = new Setting<>("BoostFactor", 2f, 0f, 10f, v -> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Boolean> allowOffGround = new Setting<>("AllowOffGround", true, v -> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Integer> shiftTicks = new Setting<>("ShiftTicks", 0, 0, 10, v -> mode.getValue() == Mode.MatrixDamage);

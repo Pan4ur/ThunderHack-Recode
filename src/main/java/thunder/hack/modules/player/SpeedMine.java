@@ -73,7 +73,7 @@ public class SpeedMine extends Module {
     private final Timer attackTimer = new Timer();
 
     public SpeedMine() {
-        super("SpeedMine", "SpeedMine", Category.PLAYER);
+        super("SpeedMine", Category.PLAYER);
     }
 
     @Override

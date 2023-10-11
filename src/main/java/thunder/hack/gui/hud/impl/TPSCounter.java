@@ -10,7 +10,7 @@ import thunder.hack.setting.Setting;
 
 public class TPSCounter extends HudElement {
     public TPSCounter() {
-        super("TPS", "trps", 50, 10);
+        super("TPS", 50, 10);
     }
 
     private final Setting<Boolean> extraTps = new Setting<>("ExtraTPS", true);

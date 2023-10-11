@@ -104,7 +104,7 @@ public class AutoAnchor extends Module {
     private Thread explodeThread;
 
     public AutoAnchor() {
-        super("AutoAnchor", "Ебашит якоря как героин", Category.COMBAT);
+        super("AutoAnchor", Category.COMBAT);
     }
 
     @Override

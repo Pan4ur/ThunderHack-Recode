@@ -38,7 +38,7 @@ public class MiddleClick extends Module {
     private int lastSlot = -1;
 
     public MiddleClick() {
-        super("MiddleClick", "действия на колёсико мыши", Category.MISC);
+        super("MiddleClick", Category.MISC);
     }
 
     @Override

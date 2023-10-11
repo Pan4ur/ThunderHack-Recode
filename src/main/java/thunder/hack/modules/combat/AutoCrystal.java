@@ -57,6 +57,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class AutoCrystal extends Module {
+
     /*   MAIN   */
     private static final Setting<Pages> page = new Setting<>("Page", Pages.Main);
     private final Setting<Timing> timing = new Setting<>("Timing", Timing.NORMAL, v -> page.getValue() == Pages.Main);
@@ -147,8 +148,7 @@ public class AutoCrystal extends Module {
 
     private final Map<EndCrystalEntity, Long> deadCrystals = new HashMap<>();
 
-    private float renderDamage = 0;
-    private float renderSelfDamage = 0;
+    private float renderDamage, renderSelfDamage;
 
     private int prevCrystalsAmount, crystalSpeed, invTimer;
 
@@ -409,11 +409,11 @@ public class AutoCrystal extends Module {
         if (crystalAge.getValue() != 0 && crystal.age < crystalAge.getValue())
             return;
 
-        if (target == null) {
+        if (target == null)
             return;
-        }
 
-        if (checkAttackedBefore(crystal.getId())) return;
+        if (checkAttackedBefore(crystal.getId()))
+            return;
 
         int prevSlot = -1;
         SearchInvResult antiWeaknessResult = InventoryUtility.getAntiWeaknessItem();
@@ -422,11 +422,8 @@ public class AutoCrystal extends Module {
                 || itemStack.getItem() instanceof AxeItem
                 || itemStack.getItem() instanceof ShovelItem);
         if (antiWeakness.getValue() != Switch.NONE) {
-            if (weaknessEffect != null && (strengthEffect == null || strengthEffect.getAmplifier() < weaknessEffect.getAmplifier())) {
-                if (!(mc.player.getMainHandStack().getItem() instanceof SwordItem)) {
-                    prevSlot = switchTo(antiWeaknessResult, antiWeaknessResultInv, antiWeakness);
-                }
-            }
+            if (weaknessEffect != null && (strengthEffect == null || strengthEffect.getAmplifier() < weaknessEffect.getAmplifier()))
+                prevSlot = switchTo(antiWeaknessResult, antiWeaknessResultInv, antiWeakness);
         }
 
         sendPacket(PlayerInteractEntityC2SPacket.attack(crystal, mc.player.isSneaking()));
@@ -557,6 +554,17 @@ public class AutoCrystal extends Module {
 
     public void calcPosition() {
         if (ModuleManager.speedMine.isWorth()) {
+
+            // если цивбрикаем - то ставим над
+            if(mc.world.isAir(SpeedMine.minePosition.down())){
+                PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
+                if (autoMineData != null) {
+                    bestPosition = autoMineData.bhr;
+                    return;
+                }
+            }
+
+            // иначе ставим рядом, чтоб трахнуть сурраунд
             boolean found = false;
             for (Direction dir : Direction.values()) {
                 if (dir == Direction.UP || dir == Direction.DOWN) continue;
@@ -567,11 +575,12 @@ public class AutoCrystal extends Module {
                     break;
                 }
             }
+
+            // если ставить некуда, то ставим все-таки над
             if (!found) {
                 PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
-                if (autoMineData != null) {
+                if (autoMineData != null)
                     bestPosition = autoMineData.bhr;
-                }
             }
         }
 
@@ -614,8 +623,10 @@ public class AutoCrystal extends Module {
 
             if (PlayerUtility.squaredDistanceFromEyes(ent.getPos()) > explodeRange.getPow2Value())
                 continue;
+
             if (!InteractionUtility.canSee(ent) && PlayerUtility.squaredDistanceFromEyes(ent.getPos()) > explodeWallRange.getPow2Value())
                 continue;
+
             if (!ent.isAlive())
                 continue;
 
@@ -827,7 +838,7 @@ public class AutoCrystal extends Module {
             if (canPopSelf && canKill)
                 return true;
 
-            return selfDamage > maxSelfDamage.getValue() && canPop && !canKillSelf && !canPopSelf;
+            return selfDamage > maxSelfDamage.getValue() && (canPop || canKill) && !canKillSelf && !canPopSelf;
         }
         return false;
     }

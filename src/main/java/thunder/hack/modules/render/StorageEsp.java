@@ -16,7 +16,7 @@ import java.util.List;
 
 public class StorageEsp extends Module {
     public StorageEsp() {
-        super("StorageEsp", "StorageEsp", Category.RENDER);
+        super("StorageEsp", Category.RENDER);
     }
 
     public final Setting<Boolean> outline = new Setting<>("Outline", true);

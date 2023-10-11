@@ -101,7 +101,7 @@ public class Aura extends Module {
     public static boolean lookingAtHitbox, attackAllowed;
 
     public Aura() {
-        super("Aura", "Запомните блять: киллка тх не мисает, а даёт шанс убежать", Category.COMBAT);
+        super("Aura", Category.COMBAT);
     }
 
     @EventHandler

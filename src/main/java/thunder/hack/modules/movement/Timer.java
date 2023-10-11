@@ -38,7 +38,7 @@ public class Timer extends Module {
     private CommonPingS2CPacket pingPacket;
 
     public Timer() {
-        super("Timer", "Timer", Category.MOVEMENT);
+        super("Timer", Category.MOVEMENT);
     }
 
     @Override

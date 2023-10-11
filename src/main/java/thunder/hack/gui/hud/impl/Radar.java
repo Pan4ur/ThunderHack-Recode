@@ -13,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Radar extends HudElement {
     public Radar() {
-        super("Radar", "Radar idk lol", 100, 100);
+        super("Radar", 100, 100);
     }
 
     public Setting<Mode> mode = new Setting<>("Mode", Mode.Rect);

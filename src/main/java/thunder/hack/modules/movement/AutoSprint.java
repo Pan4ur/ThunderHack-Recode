@@ -11,7 +11,7 @@ public class AutoSprint extends Module {
     private final Setting<Boolean> omni = new Setting<>("Omni", false);
 
     public AutoSprint() {
-        super("AutoSprint", "AutoSprint", Category.MOVEMENT);
+        super("AutoSprint", Category.MOVEMENT);
     }
 
     @Override

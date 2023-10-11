@@ -17,7 +17,7 @@ public class MainSettings extends Module {
     }
 
     public MainSettings() {
-        super("ClientSettings", "Настройки клиента", Category.CLIENT);
+        super("ClientSettings", Category.CLIENT);
     }
 
     public static boolean isRu() {

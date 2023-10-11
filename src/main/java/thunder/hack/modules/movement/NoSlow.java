@@ -12,7 +12,7 @@ public class NoSlow extends Module {
     public static Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
 
     public NoSlow() {
-        super("NoSlow", "NoSlow", Category.MOVEMENT);
+        super("NoSlow", Category.MOVEMENT);
     }
 
     @EventHandler

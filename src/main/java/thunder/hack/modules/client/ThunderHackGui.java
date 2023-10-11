@@ -13,7 +13,7 @@ public class ThunderHackGui extends Module {
     public static final Setting<Float> scrollSpeed = new Setting<>("ScrollSpeed", 1f, 0.1F, 2.0F);
 
     public ThunderHackGui() {
-        super("ThunderGui", "новый клик гуи", Category.CLIENT);
+        super("ThunderGui", Category.CLIENT);
     }
 
     @Override

@@ -50,7 +50,7 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class PistonAura extends Module {
     public PistonAura() {
-        super("PistonAura", "Поршни вталкивают кристал в чела (охуенная хуйня)", Category.COMBAT);
+        super("PistonAura", Category.COMBAT);
     }
 
     public Setting<Integer> placeDelay = new Setting<>("Delay/Place", 1, 0, 25);

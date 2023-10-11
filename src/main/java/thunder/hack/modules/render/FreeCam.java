@@ -31,7 +31,7 @@ public class FreeCam extends Module {
     public Vec2f prevRotate;
 
     public FreeCam() {
-        super("Freecam", "Freecam", Category.RENDER);
+        super("Freecam", Category.RENDER);
     }
 
     @Override

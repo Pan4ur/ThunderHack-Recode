@@ -18,7 +18,7 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 public class AutoTpAccept extends Module {
 
     public AutoTpAccept() {
-        super("AutoTPaccept", "Принимает тп автоматом", Category.MISC);
+        super("AutoTPaccept", Category.MISC);
     }
 
     public Setting<Boolean> grief = new Setting<>("Grief", false);

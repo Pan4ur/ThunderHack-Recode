@@ -34,13 +34,13 @@ import static thunder.hack.core.PlayerManager.calcAngleVec;
 
 public class AimBot extends Module {
     public AimBot() {
-        super("AimBot", "RustMeAim", Category.COMBAT);
+        super("AimBot", Category.COMBAT);
     }
 
-    private final Setting<Mode> mode = new Setting("Mode", Mode.BowAim);
-    private final Setting<Rotation> rotation = new Setting("Rotation", Rotation.Silent, v -> mode.getValue() != Mode.AimAssist);
-    public final Setting<Float> aimRange = new Setting("Range", 20f, 1f, 30f, v -> mode.getValue() != Mode.AimAssist);
-    public final Setting<Integer> aimStrength = new Setting("AimStrength", 30, 1, 100, v -> mode.getValue() == Mode.AimAssist);
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.BowAim);
+    private final Setting<Rotation> rotation = new Setting<>("Rotation", Rotation.Silent, v -> mode.getValue() != Mode.AimAssist);
+    public final Setting<Float> aimRange = new Setting<>("Range", 20f, 1f, 30f, v -> mode.getValue() != Mode.AimAssist);
+    public final Setting<Integer> aimStrength = new Setting<>("AimStrength", 30, 1, 100, v -> mode.getValue() == Mode.AimAssist);
     public final Setting<Boolean> ignoreWalls = new Setting<>("Ignore Walls", true, v -> mode.getValue() == Mode.CSAim);
     public final Setting<Boolean> ignoreInvisible = new Setting<>("IgnoreInvis", false);
     public Setting<Float> rotYawRandom = new Setting<>("Yaw Random", 0f, 0f, 3f, v -> mode.getValue() == Mode.CSAim);
@@ -73,10 +73,7 @@ public class AimBot extends Module {
 
             if (currentDuration >= 1.0f) currentDuration = 1.0f;
 
-            double duration = currentDuration * 3.0f;
-            double coeff = 0.05000000074505806;
-
-            float pitch = (float) (-Math.toDegrees(calculateArc(nearestTarget, duration, coeff)));
+            float pitch = (float) (-Math.toDegrees(calculateArc(nearestTarget, currentDuration * 3.0f)));
 
             if (Float.isNaN(pitch)) return;
 
@@ -167,21 +164,21 @@ public class AimBot extends Module {
     }
 
 
-    private float calculateArc(PlayerEntity target, double duration, double coeff) {
+    private float calculateArc(PlayerEntity target, double duration) {
         double yArc = target.getY() + (double) (target.getEyeHeight(target.getPose())) - (mc.player.getY() + (double) mc.player.getEyeHeight(mc.player.getPose()));
         double dX = target.getX() - mc.player.getX();
         double dZ = target.getZ() - mc.player.getZ();
         double dirRoot = Math.sqrt(dX * dX + dZ * dZ);
-        return calculateArc(duration, coeff, dirRoot, yArc);
+        return calculateArc(duration, dirRoot, yArc);
     }
 
-    private float calculateArc(double d, double c, double dr, double y) {
+    private float calculateArc(double d, double dr, double y) {
         y = 2.0 * y * (d * d);
-        y = c * ((c * (dr * dr)) + y);
+        y = 0.05000000074505806 * ((0.05000000074505806 * (dr * dr)) + y);
         y = Math.sqrt(d * d * d * d - y);
         d = d * d - y;
-        y = Math.atan2(d * d + y, c * dr);
-        d = Math.atan2(d, c * dr);
+        y = Math.atan2(d * d + y, 0.05000000074505806 * dr);
+        d = Math.atan2(d, 0.05000000074505806 * dr);
         return (float) Math.min(y, d);
     }
 
@@ -195,7 +192,7 @@ public class AimBot extends Module {
             return;
         }
 
-        Vec3d targetVec = getMatrix4Vec(target, aimRange.getValue());
+        Vec3d targetVec = getMatrix4Vec(target);
         if (targetVec == null) return;
 
         float delta_yaw = wrapDegrees((float) wrapDegrees(Math.toDegrees(Math.atan2(targetVec.z - mc.player.getZ(), (targetVec.x - mc.player.getX()))) - 90) - rotationYaw);
@@ -218,7 +215,7 @@ public class AimBot extends Module {
         rotationPitch = (float) (newPitch - (newPitch - rotationPitch) % gcdFix);
     }
 
-    public Vec3d getMatrix4Vec(Entity target, double distance) {
+    public Vec3d getMatrix4Vec(Entity target) {
         Vec3d cuteTargetPos = getResolvedPos(target);
         float aimPoint = switch (part.getValue()) {
             case Head -> 0.05f;

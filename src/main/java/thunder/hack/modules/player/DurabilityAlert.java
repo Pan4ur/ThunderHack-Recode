@@ -19,7 +19,7 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class DurabilityAlert extends Module {
     public DurabilityAlert() {
-        super("DurabilityAlert", "durability alert", Category.PLAYER);
+        super("DurabilityAlert", Category.PLAYER);
     }
 
     private final Setting<Boolean> friends = new Setting<>("Friend message", true);

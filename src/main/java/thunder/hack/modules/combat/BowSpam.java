@@ -15,7 +15,7 @@ public class BowSpam extends Module {
     private final Setting<Integer> ticks = new Setting<>("Delay", 3, 0, 20);
 
     public BowSpam() {
-        super("BowSpam", "Спамит стрелами", Category.COMBAT);
+        super("BowSpam", Category.COMBAT);
     }
 
     @EventHandler

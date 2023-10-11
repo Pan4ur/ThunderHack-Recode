@@ -17,7 +17,7 @@ public class Spammer extends Module {
     private final Timer timer_delay = new Timer();
 
     public Spammer() {
-        super("Spammer", "спаммер", Category.MISC);
+        super("Spammer", Category.MISC);
     }
 
     public static void loadSpammer() {

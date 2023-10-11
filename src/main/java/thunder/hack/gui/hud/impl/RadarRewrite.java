@@ -51,7 +51,7 @@ public class RadarRewrite extends HudElement {
     private final Setting<ColorSetting> colors = new Setting<>("TracerColor", new ColorSetting(0x2250b4b4));
 
     public RadarRewrite() {
-        super("AkrienRadar", "стрелочки", 50, 50);
+        super("AkrienRadar", 50, 50);
     }
 
     public static float clamp2(float num, float min, float max) {

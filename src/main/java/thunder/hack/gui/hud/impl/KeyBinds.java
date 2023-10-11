@@ -20,7 +20,7 @@ public class KeyBinds extends HudElement {
     public final Setting<Boolean> onlyEnabled = new Setting<>("OnlyEnabled", false);
 
     public KeyBinds() {
-        super("KeyBinds", "KeyBinds", 100, 100);
+        super("KeyBinds", 100, 100);
     }
 
     public void onRender2D(DrawContext context) {

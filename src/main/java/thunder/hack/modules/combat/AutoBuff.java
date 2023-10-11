@@ -28,7 +28,7 @@ public class AutoBuff extends Module {
     public Timer timer = new Timer();
 
     public AutoBuff() {
-        super("AutoBuff", "Кидает бафы", Category.COMBAT);
+        super("AutoBuff", Category.COMBAT);
     }
 
     public static int getPotionSlot(Potions potion) {

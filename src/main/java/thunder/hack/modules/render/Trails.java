@@ -33,7 +33,7 @@ import static thunder.hack.utility.render.Render2DEngine.*;
 
 public class Trails extends Module {
     public Trails() {
-        super("Trails", "Trails", Category.RENDER);
+        super("Trails", Category.RENDER);
     }
 
     public final Setting<Boolean> pearls = new Setting("Pearls", false);
@@ -56,27 +56,19 @@ public class Trails extends Module {
 
     public void onPreRender3D(MatrixStack stack) {
         for (Entity en : ThunderHack.asyncManager.getAsyncEntities()) {
-            if (en instanceof EnderPearlEntity && pearls.getValue()) {
+            if (en instanceof EnderPearlEntity && pearls.getValue())
                 calcTrajectory(en);
-            }
+
+            if (en instanceof ArrowEntity && arrows.getValue())
+                calcTrajectory(en);
+
+            if (en instanceof ExperienceBottleEntity && xp.getValue())
+                calcTrajectory(en);
         }
 
-        for (Entity en : ThunderHack.asyncManager.getAsyncEntities()) {
-            if (en instanceof ArrowEntity && arrows.getValue()) {
-                calcTrajectory(en);
-            }
-        }
-
-        for (Entity en : ThunderHack.asyncManager.getAsyncEntities()) {
-            if (en instanceof ExperienceBottleEntity && xp.getValue()) {
-                calcTrajectory(en);
-            }
-        }
 
         if (players.getValue() == Players.Trail) {
             for (PlayerEntity entity : mc.world.getPlayers()) {
-                // if (entity == mc.player && mc.options.getPerspective().isFirstPerson())
-                //     continue;
 
                 float alpha = color.getValue().getAlpha() / 255f;
 
@@ -281,12 +273,10 @@ public class Trails extends Module {
             Vec3d pos = new Vec3d(x, y, z);
 
             if (mc.world.raycast(new RaycastContext(lastPos, pos, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)) != null) {
-                if (mc.world.raycast(new RaycastContext(lastPos, pos, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.ENTITY) {
+                if (mc.world.raycast(new RaycastContext(lastPos, pos, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.ENTITY)
                     break;
-                }
-                if (mc.world.raycast(new RaycastContext(lastPos, pos, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.BLOCK) {
+                if (mc.world.raycast(new RaycastContext(lastPos, pos, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.BLOCK)
                     break;
-                }
             }
 
             if (y <= -65) break;

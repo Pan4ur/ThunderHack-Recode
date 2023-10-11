@@ -49,7 +49,7 @@ public class Scaffold extends Module {
     float[] rotation = new float[2];
 
     public Scaffold() {
-        super("Scaffold", "лучший скафф", Category.MOVEMENT);
+        super("Scaffold", Category.MOVEMENT);
     }
 
     private int findBlockToPlace() {

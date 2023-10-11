@@ -6,7 +6,7 @@ import thunder.hack.gui.hud.HudElement;
 
 public class ArmorHud extends HudElement {
     public ArmorHud() {
-        super("ArmorHud", "ArmorHud", 60, 25);
+        super("ArmorHud", 60, 25);
     }
 
     public void onRender2D(DrawContext context) {

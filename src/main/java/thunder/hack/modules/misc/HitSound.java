@@ -12,7 +12,7 @@ import thunder.hack.utility.math.MathUtility;
 
 public class HitSound extends Module {
     public HitSound() {
-        super("HitSound", "HitSound", Category.MISC);
+        super("HitSound", Category.MISC);
     }
 
     private final Setting<Mode> mode = new Setting<>("Sound", Mode.MOAN);

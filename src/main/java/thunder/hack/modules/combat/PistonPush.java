@@ -54,7 +54,7 @@ public class PistonPush extends Module {
     private final ConcurrentHashMap<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
 
     public PistonPush() {
-        super("PistonPush", "Выталкивает чела-из холки помощью-поршней", Category.COMBAT);
+        super("PistonPush", Category.COMBAT);
     }
 
     @Override

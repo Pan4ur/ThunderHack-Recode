@@ -34,7 +34,7 @@ public class Search extends Module {
     private SearchThread searchThread = new SearchThread();
 
     public Search() {
-        super("Search", "подсветка блоков", Category.RENDER);
+        super("Search", Category.RENDER);
     }
 
     @Override

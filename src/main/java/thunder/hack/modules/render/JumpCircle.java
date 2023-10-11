@@ -27,7 +27,7 @@ public class JumpCircle extends Module {
     public final Setting<Integer> colorOffset1 = new Setting<>("ColorOffset", 10, 1, 20);
 
     public JumpCircle() {
-        super("JumpCircle", "JumpCircle", Category.RENDER);
+        super("JumpCircle", Category.RENDER);
     }
 
     public static AstolfoAnimation astolfo = new AstolfoAnimation();

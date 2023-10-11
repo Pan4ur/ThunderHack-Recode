@@ -35,7 +35,7 @@ public class KillEffect extends Module {
     }
 
     public KillEffect() {
-        super("KillEffect", "Молния при убийстве", Category.RENDER);
+        super("KillEffect", Category.RENDER);
     }
 
     @Override

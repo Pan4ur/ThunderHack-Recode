@@ -38,7 +38,7 @@ public class ClickGui extends Module {
  */
 
     public ClickGui() {
-        super("ClickGui", "кликгуи", Module.Category.CLIENT);
+        super("ClickGui", Module.Category.CLIENT);
         this.setInstance();
     }
 

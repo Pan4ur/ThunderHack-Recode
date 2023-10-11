@@ -15,7 +15,7 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class AutoAuth extends Module {
     public AutoAuth() {
-        super("AutoAuth", "Автоматически-логинится на -серверах", Category.MISC);
+        super("AutoAuth", Category.MISC);
     }
 
     private String password;

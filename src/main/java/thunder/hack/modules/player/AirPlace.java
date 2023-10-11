@@ -30,7 +30,7 @@ public class AirPlace extends Module {
     private BlockHitResult hit;
 
     public AirPlace() {
-        super("AirPlace", "Ставишь блоки в воздухе", Category.PLAYER);
+        super("AirPlace", Category.PLAYER);
     }
 
     @Override

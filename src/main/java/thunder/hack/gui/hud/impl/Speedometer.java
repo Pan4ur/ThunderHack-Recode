@@ -14,7 +14,7 @@ public class Speedometer extends HudElement {
     private final Setting<Boolean> bps = new Setting<>("BPS", false);
 
     public Speedometer() {
-        super("Speedometer", "Speedometer", 50, 10);
+        super("Speedometer", 50, 10);
     }
 
     public void onRender2D(DrawContext context) {

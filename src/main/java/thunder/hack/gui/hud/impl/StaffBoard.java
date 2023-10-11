@@ -28,7 +28,7 @@ public class StaffBoard extends HudElement {
     private final LinkedHashMap<UUID, String> nameMap = new LinkedHashMap<>();
 
     public StaffBoard() {
-        super("StaffBoard", "StaffBoard", 50, 50);
+        super("StaffBoard", 50, 50);
     }
 
     public static List<String> getOnlinePlayer() {

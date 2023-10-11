@@ -15,7 +15,7 @@ import java.util.List;
 public class PVPResources extends HudElement {
 
     public PVPResources() {
-        super("PVPResources", "PAwdwad", 60, 60);
+        super("PVPResources", 60, 60);
     }
 
     public void onRender2D(DrawContext context) {

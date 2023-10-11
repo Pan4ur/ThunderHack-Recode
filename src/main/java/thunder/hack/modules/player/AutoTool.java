@@ -26,7 +26,7 @@ public class AutoTool extends Module {
     private final List<Integer> lastItem = new ArrayList<>();
 
     public AutoTool() {
-        super("AutoTool", "Автоматом свапается на-лучший инструмент", Category.PLAYER);
+        super("AutoTool", Category.PLAYER);
     }
 
     @Override

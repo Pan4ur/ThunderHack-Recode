@@ -66,7 +66,7 @@ public class NameTags extends Module {
     private final Setting<Armor> armorMode = new Setting<>("ArmorMode", Armor.Full);
 
     public NameTags() {
-        super("NameTags", "NameTags", Category.RENDER);
+        super("NameTags", Category.RENDER);
     }
 
     public void onRender2D(DrawContext context) {

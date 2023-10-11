@@ -10,7 +10,7 @@ import java.awt.*;
 
 public class HudEditor extends Module {
     public HudEditor() {
-        super("HudEditor", "худ изменять да", Module.Category.CLIENT);
+        super("HudEditor", Module.Category.CLIENT);
     }
 
     public static final Setting<ClickGui.colorModeEn> colorMode = new Setting<>("ColorMode", ClickGui.colorModeEn.Static);
@@ -21,7 +21,6 @@ public class HudEditor extends Module {
     public static final Setting<ColorSetting> plateColor = new Setting<>("PlateColor", new ColorSetting(new Color(0xE7000000, true).getRGB()));
     public static final Setting<ColorSetting> textColor = new Setting<>("TextColorColor", new ColorSetting(new Color(0xFFFFFFFF, true).getRGB()));
     public static final Setting<Float> hudRound = new Setting<>("HudRound", 6f, 1f, 10f);
-    //public static final Setting<Boolean> fpsEater = new Setting<>("fpsEater3000", true);
 
     public static Color getColor(int count) {
         int index = count;

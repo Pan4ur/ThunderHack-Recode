@@ -48,7 +48,7 @@ public class XRay extends Module {
     private int all;
 
     public XRay() {
-        super("XRay", "Искать алмазы на ezzzzz", Category.MISC);
+        super("XRay", Category.MISC);
     }
 
     @Override

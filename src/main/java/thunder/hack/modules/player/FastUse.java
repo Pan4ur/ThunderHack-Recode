@@ -9,7 +9,7 @@ import net.minecraft.item.Items;
 
 public class FastUse extends Module {
     public FastUse() {
-        super("FastUse", "Убирает задержку испольования айтемов", Category.PLAYER);
+        super("FastUse", Category.PLAYER);
     }
 
     private final Setting<Integer> delay = new Setting<>("Delay", 0, 0, 20);

@@ -16,8 +16,8 @@ public class HudElement extends Module {
     float x1 = 0;
     float y1 = 0;
 
-    public HudElement(String name, String description, int width, int height) {
-        super(name, description, Category.HUD);
+    public HudElement(String name, int width, int height) {
+        super(name, Category.HUD);
         this.height = height;
         this.width = width;
     }
