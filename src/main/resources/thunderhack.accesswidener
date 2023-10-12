@@ -1,16 +1,15 @@
 accessWidener	v1	named
 
-accessible   class   net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler
-accessible   class   net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType
 accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket
+accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType
+accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler
+accessible class net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask
+accessible class net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask$RenderData
 accessible field net/minecraft/client/network/ClientPlayerEntity lastSprinting Z
 accessible field net/minecraft/network/packet/s2c/play/PlayerPositionLookS2CPacket pitch F
 accessible field net/minecraft/network/packet/s2c/play/PlayerPositionLookS2CPacket yaw F
-accessible    class    net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask
-accessible    class    net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask$RenderData
-accessible    field    net/minecraft/client/render/chunk/ChunkBuilder$ChunkData    nonEmptyLayers    Ljava/util/Set;
-accessible    field    net/minecraft/client/render/chunk/ChunkBuilder$ChunkData    occlusionGraph    Lnet/minecraft/client/render/chunk/ChunkOcclusionData;
-accessible    method    net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask$RenderData    <init>    ()V
+accessible field net/minecraft/client/render/chunk/ChunkBuilder$ChunkData nonEmptyLayers Ljava/util/Set;
+accessible field net/minecraft/client/render/chunk/ChunkBuilder$ChunkData occlusionGraph Lnet/minecraft/client/render/chunk/ChunkOcclusionData;
 accessible field net/minecraft/entity/projectile/FishingBobberEntity CAUGHT_FISH Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/network/packet/c2s/play/PlayerMoveC2SPacket onGround Z
 accessible field net/minecraft/network/packet/c2s/play/PlayerMoveC2SPacket pitch F
@@ -28,3 +27,4 @@ accessible field net/minecraft/entity/Entity hasVisualFire Z
 accessible field net/minecraft/network/packet/s2c/play/GameMessageS2CPacket content Lnet/minecraft/text/Text;
 accessible method net/minecraft/client/render/GameRenderer renderHand (Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V
 accessible method net/minecraft/entity/LivingEntity tryUseTotem (Lnet/minecraft/entity/damage/DamageSource;)Z
+accessible method net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask$RenderData <init> ()V

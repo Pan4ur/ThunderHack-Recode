@@ -19,12 +19,12 @@
       }
     }
   ],
-  "license": "CC0-1.0",
+  "license": "GPL-3.0",
   "accessWidener": "thunderhack.accesswidener",
   "environment": "client",
   "entrypoints": {
     "main": [
-      "thunder.hack.ThunderHack"
+      "dev.thunderhack.ThunderHack"
     ]
   },
   "contact": {
