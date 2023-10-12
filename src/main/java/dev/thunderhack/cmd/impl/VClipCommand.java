@@ -24,14 +24,14 @@ public class VClipCommand extends Command {
                 sendMessage(Formatting.GREEN + "Клипаемся на " + count + " блоков");
 
                 for (int i = 0; i < 10; ++i) {
-                    MC.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(MC.player.getX(), MC.player.getY(), MC.player.getZ(), false));
+                    mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), false));
                 }
 
                 for (int i = 0; i < 10; ++i) {
-                    MC.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(MC.player.getX(), MC.player.getY() + count, MC.player.getZ(), false));
+                    mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + count, mc.player.getZ(), false));
                 }
 
-                MC.player.setPosition(MC.player.getX(), MC.player.getY() + count, MC.player.getZ());
+                mc.player.setPosition(mc.player.getX(), mc.player.getY() + count, mc.player.getZ());
             } catch (Exception ignored) {
             }
 

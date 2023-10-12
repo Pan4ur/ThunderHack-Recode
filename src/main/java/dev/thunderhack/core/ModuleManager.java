@@ -19,6 +19,8 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static dev.thunderhack.modules.Module.mc;
+
 @SuppressWarnings("unused")
 public class ModuleManager {
     public ArrayList<Module> modules = new ArrayList<>();
@@ -180,7 +182,7 @@ public class ModuleManager {
     public static Burrow burrow = new Burrow();
     public static AutoEZ autoEZ = new AutoEZ();
     public static AimBot aimBot = new AimBot();
-    public static dev.thunderhack.modules.movement.Timer timer = new Timer();
+    public static Timer timer = new Timer();
     public static Speed speed = new Speed();
     public static Reach reach = new Reach();
     public static Radar radar = new Radar();
@@ -312,7 +314,7 @@ public class ModuleManager {
     }
 
     public void onKeyPressed(int eventKey) {
-        if (eventKey == -1 || eventKey == 0 || Module.mc.currentScreen instanceof ClickUI) {
+        if (eventKey == -1 || eventKey == 0 || mc.currentScreen instanceof ClickUI) {
             return;
         }
         modules.forEach(module -> {
@@ -323,7 +325,7 @@ public class ModuleManager {
     }
 
     public void onKeyReleased(int eventKey) {
-        if (eventKey == -1 || eventKey == 0 || Module.mc.currentScreen instanceof ClickUI) {
+        if (eventKey == -1 || eventKey == 0 || mc.currentScreen instanceof ClickUI) {
             return;
         }
         modules.forEach(module -> {
@@ -334,7 +336,7 @@ public class ModuleManager {
     }
 
     public void onMoseKeyPressed(int eventKey) {
-        if (eventKey == -1 || Module.mc.currentScreen instanceof ClickUI) {
+        if (eventKey == -1 || mc.currentScreen instanceof ClickUI) {
             return;
         }
         modules.forEach(module -> {
@@ -345,7 +347,7 @@ public class ModuleManager {
     }
 
     public void onMoseKeyReleased(int eventKey) {
-        if (eventKey == -1 || Module.mc.currentScreen instanceof ClickUI) {
+        if (eventKey == -1 || mc.currentScreen instanceof ClickUI) {
             return;
         }
         modules.forEach(module -> {

@@ -22,6 +22,9 @@ import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 
+import static dev.thunderhack.modules.Module.fullNullCheck;
+import static dev.thunderhack.modules.Module.mc;
+
 public class ClickUI extends Screen {
     public static List<AbstractWindow> windows;
 
@@ -83,7 +86,7 @@ public class ClickUI extends Screen {
                 windows.add(window);
                 offset += 110;
 
-                if (offset > Module.mc.getWindow().getScaledWidth()) {
+                if (offset > mc.getWindow().getScaledWidth()) {
                     offset = 0;
                 }
                 i++;
@@ -100,33 +103,30 @@ public class ClickUI extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        if (ThunderHack.isOutdated && (Module.mc.player == null || (Module.mc.player.age % 20) > 10)) {
-            FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", Module.mc.getWindow().getScaledWidth() / 2f + 1, Module.mc.getWindow().getScaledHeight() - 39 - FontRenderers.thglitch.getFontHeight("New version is available!"), Color.BLACK.getRGB());
-            FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", Module.mc.getWindow().getScaledWidth() / 2f, Module.mc.getWindow().getScaledHeight() - 40 - FontRenderers.thglitch.getFontHeight("New version is available!"), -1);
+        if (ThunderHack.isOutdated && (mc.player == null || (mc.player.age % 20) > 10)) {
+            FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f + 1, mc.getWindow().getScaledHeight() - 39 - FontRenderers.thglitch.getFontHeight("New version is available!"), Color.BLACK.getRGB());
+            FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() - 40 - FontRenderers.thglitch.getFontHeight("New version is available!"), -1);
         }
 
-        if (Module.fullNullCheck())
-            Render2DEngine.drawMainMenuShader(context.getMatrices(), 0, 0, Module.mc.getWindow().getScaledWidth(), Module.mc.getWindow().getScaledHeight());
-
+        if (fullNullCheck())
+            Render2DEngine.drawMainMenuShader(context.getMatrices(), 0, 0, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
 
         if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old) {
             for (AbstractWindow window : windows) {
-                if (InputUtil.isKeyPressed(Module.mc.getWindow().getHandle(), 264))
+                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 264))
                     window.setY(window.getY() + 2);
-                if (InputUtil.isKeyPressed(Module.mc.getWindow().getHandle(), 265))
+                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 265))
                     window.setY(window.getY() - 2);
-                if (InputUtil.isKeyPressed(Module.mc.getWindow().getHandle(), 262))
+                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 262))
                     window.setX(window.getX() + 2);
-                if (InputUtil.isKeyPressed(Module.mc.getWindow().getHandle(), 263))
+                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 263))
                     window.setX(window.getX() - 2);
                 if (scrollY != 0)
                     window.setY(window.getY() + scrollY);
             }
         } else {
             for (AbstractWindow window : windows) {
-                if (scrollY != 0) {
-                    window.setModuleOffset(scrollY, mouseX, mouseY);
-                }
+                if (scrollY != 0) window.setModuleOffset(scrollY, mouseX, mouseY);
             }
         }
 
@@ -150,8 +150,8 @@ public class ClickUI extends Screen {
             }
         }
         if (!setup && ConfigManager.firstLaunch) {
-            float hx = Module.mc.getWindow().getScaledWidth() / 2f;
-            float hy = Module.mc.getWindow().getScaledHeight() / 2f;
+            float hx = mc.getWindow().getScaledWidth() / 2f;
+            float hy = mc.getWindow().getScaledHeight() / 2f;
 
             Render2DEngine.drawGradientBlurredShadow(context.getMatrices(), hx + 1 - 100, hy - 100 + 1, 199, 199, 10, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
             Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), hx - 100 - 0.5f, hy - 100 - 0.5f, 200 + 1, 200 + 1, HudEditor.hudRound.getValue());
@@ -162,16 +162,11 @@ public class ClickUI extends Screen {
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "Choose your language", hx, hy - 80, -1);
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 20, 180, 20)) {
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 20, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 100));
-                } else {
-                    Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 20, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70));
-
-                }
+                } else Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 20, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70));
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 50, 180, 20)) {
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 50, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 100));
-                } else {
-                    Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 50, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70));
-                }
+                } else Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 50, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70));
 
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "Russian", hx, hy - 15, -1);
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "English", hx, hy - 45, -1);
@@ -182,15 +177,13 @@ public class ClickUI extends Screen {
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 20, 180, 20)) {
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 20, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 100));
-                } else {
+                } else
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 20, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70));
-                }
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 50, 180, 20)) {
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 50, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 100));
-                } else {
+                } else
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 50, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70));
-                }
 
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), MainSettings.language.getValue() == MainSettings.Language.RU ? "Да" : "Yes", hx, hy - 45, -1);
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), MainSettings.language.getValue() == MainSettings.Language.RU ? "Нет, я про" : "Go fuck urself", hx, hy - 15, -1);
@@ -258,8 +251,8 @@ public class ClickUI extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (!setup && ConfigManager.firstLaunch) {
-            float hx = Module.mc.getWindow().getScaledWidth() / 2f;
-            float hy = Module.mc.getWindow().getScaledHeight() / 2f;
+            float hx = mc.getWindow().getScaledWidth() / 2f;
+            float hy = mc.getWindow().getScaledHeight() / 2f;
             if (hstep == 0) {
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 50, 180, 20)) {
                     MainSettings.language.setValue(MainSettings.Language.ENG);

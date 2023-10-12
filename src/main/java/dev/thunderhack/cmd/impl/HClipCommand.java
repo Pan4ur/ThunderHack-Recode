@@ -19,14 +19,14 @@ public class HClipCommand extends Command {
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("s").executes(context -> {
-            final double x = -(MathHelper.sin(MC.player.getYaw() * MathHelper.RADIANS_PER_DEGREE) * 0.8);
-            final double z = MathHelper.cos(MC.player.getYaw() * MathHelper.RADIANS_PER_DEGREE) * 0.8;
+            final double x = -(MathHelper.sin(mc.player.getYaw() * MathHelper.RADIANS_PER_DEGREE) * 0.8);
+            final double z = MathHelper.cos(mc.player.getYaw() * MathHelper.RADIANS_PER_DEGREE) * 0.8;
 
             for (int i = 0; i < 10; i++) {
-                MC.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(MC.player.getX() + x, MC.player.getY(), MC.player.getZ() + z, false));
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX() + x, mc.player.getY(), mc.player.getZ() + z, false));
             }
 
-            MC.player.setPosition(MC.player.getX() + x, MC.player.getY(), MC.player.getZ() + z);
+            mc.player.setPosition(mc.player.getX() + x, mc.player.getY(), mc.player.getZ() + z);
 
             return SINGLE_SUCCESS;
         }));
@@ -36,7 +36,7 @@ public class HClipCommand extends Command {
 
             try {
                 sendMessage(Formatting.GREEN + "клипаемся на  " + speed + " блоков.");
-                MC.player.setPosition(MC.player.getX() - ((double) MathHelper.sin(MC.player.getYaw() * MathHelper.RADIANS_PER_DEGREE) * speed), MC.player.getY(), MC.player.getZ() + (double) MathHelper.cos(MC.player.getYaw() * MathHelper.RADIANS_PER_DEGREE) * speed);
+                mc.player.setPosition(mc.player.getX() - ((double) MathHelper.sin(mc.player.getYaw() * MathHelper.RADIANS_PER_DEGREE) * speed), mc.player.getY(), mc.player.getZ() + (double) MathHelper.cos(mc.player.getYaw() * MathHelper.RADIANS_PER_DEGREE) * speed);
             } catch (Exception ignored) {
             }
 

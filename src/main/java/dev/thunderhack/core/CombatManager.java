@@ -20,16 +20,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static dev.thunderhack.modules.Module.fullNullCheck;
+import static dev.thunderhack.modules.Module.mc;
+
 public class CombatManager {
     public HashMap<String, Integer> popList = new HashMap<>();
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
-        if (Module.fullNullCheck()) return;
+        if (fullNullCheck()) return;
 
         if (event.getPacket() instanceof EntityStatusS2CPacket pac) {
             if (pac.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING) {
-                Entity ent = pac.getEntity(Module.mc.world);
+                Entity ent = pac.getEntity(mc.world);
                 if (!(ent instanceof PlayerEntity)) return;
                 if (popList == null) {
                     popList = new HashMap<>();
@@ -46,10 +49,8 @@ public class CombatManager {
 
     @EventHandler
     public void onPostTick(EventPostTick event) {
-        if (Module.fullNullCheck()) {
-            return;
-        }
-        for (PlayerEntity player : Module.mc.world.getPlayers()) {
+        if (fullNullCheck()) return;
+        for (PlayerEntity player : mc.world.getPlayers()) {
             if (AntiBot.bots.contains(player)) return;
             if (player.getHealth() <= 0 && popList.containsKey(player.getName().getString())) {
                 popList.remove(player.getName().getString(), popList.get(player.getName().getString()));
@@ -63,53 +64,53 @@ public class CombatManager {
     }
 
     public List<PlayerEntity> getTargets(float range) {
-        return Module.mc.world.getPlayers().stream()
+        return mc.world.getPlayers().stream()
                 .filter(e -> !e.isDead())
                 .filter(entityPlayer -> !ThunderHack.friendManager.isFriend(entityPlayer.getName().getString()))
-                .filter(entityPlayer -> entityPlayer != Module.mc.player)
-                .filter(entityPlayer -> Module.mc.player.distanceTo(entityPlayer) < range)
-                .sorted(Comparator.comparing(e -> Module.mc.player.distanceTo(e)))
+                .filter(entityPlayer -> entityPlayer != mc.player)
+                .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
+                .sorted(Comparator.comparing(e -> mc.player.distanceTo(e)))
                 .collect(Collectors.toList());
     }
 
     public PlayerEntity getNearestTarget(float range) {
-        return Module.mc.world.getPlayers()
+        return mc.world.getPlayers()
                 .stream()
-                .filter(e -> e != Module.mc.player)
+                .filter(e -> e != mc.player)
                 .filter(e -> !e.isDead())
                 .filter(e -> !ThunderHack.friendManager.isFriend(e.getName().getString()))
                 .filter(e -> e.getHealth() > 0)
-                .filter(entityPlayer -> Module.mc.player.distanceTo(entityPlayer) < range)
-                .min(Comparator.comparing(t -> Module.mc.player.distanceTo(t))).orElse(null);
+                .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
+                .min(Comparator.comparing(t -> mc.player.distanceTo(t))).orElse(null);
     }
 
     public PlayerEntity getTargetByHP(float range) {
-        return Module.mc.world.getPlayers()
+        return mc.world.getPlayers()
                 .stream()
-                .filter(e -> e != Module.mc.player)
+                .filter(e -> e != mc.player)
                 .filter(e -> !e.isDead())
                 .filter(e -> !ThunderHack.friendManager.isFriend(e.getName().getString()))
                 .filter(e -> e.getHealth() > 0)
-                .filter(entityPlayer -> Module.mc.player.distanceTo(entityPlayer) < range)
+                .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
                 .min(Comparator.comparing(t -> (t.getHealth() + t.getAbsorptionAmount()))).orElse(null);
     }
 
     public PlayerEntity getTargetByFOV(float range) {
-        return Module.mc.world.getPlayers()
+        return mc.world.getPlayers()
                 .stream()
-                .filter(e -> e != Module.mc.player)
+                .filter(e -> e != mc.player)
                 .filter(e -> !e.isDead())
                 .filter(e -> !ThunderHack.friendManager.isFriend(e.getName().getString()))
                 .filter(e -> e.getHealth() > 0)
-                .filter(entityPlayer -> Module.mc.player.distanceTo(entityPlayer) < range)
+                .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
                 .min(Comparator.comparing(this::getFOVAngle)).orElse(null);
     }
 
     private float getFOVAngle(@NotNull LivingEntity e) {
-        double difX = e.getX() - Module.mc.player.getPos().x;
-        double difZ = e.getZ() - Module.mc.player.getPos().z;
+        double difX = e.getX() - mc.player.getPos().x;
+        double difZ = e.getZ() - mc.player.getPos().z;
         float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);
-        double plYaw = MathHelper.wrapDegrees(Module.mc.player.getYaw());
+        double plYaw = MathHelper.wrapDegrees(mc.player.getYaw());
         return (float) Math.abs(yaw - plYaw);
     }
 }

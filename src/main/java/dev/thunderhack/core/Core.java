@@ -31,12 +31,14 @@ import net.minecraft.util.math.Vec2f;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static dev.thunderhack.modules.Module.mc;
+
 public final class Core {
     public static boolean lock_sprint, serversprint, hold_mouse0, showSkull;
     public static Map<String, Identifier> heads = new ConcurrentHashMap<>();
     private final Identifier SKULL = new Identifier("textures/skull.png");
-    private final dev.thunderhack.utils.Timer skullTimer = new dev.thunderhack.utils.Timer();
-    private final dev.thunderhack.utils.Timer lastPacket = new Timer();
+    private final Timer skullTimer = new Timer();
+    private final Timer lastPacket = new Timer();
 
     @EventHandler
     public void onTick(PlayerUpdateEvent event) {
@@ -108,7 +110,7 @@ public final class Core {
             if (packet.content().getString().contains("skull")) {
                 showSkull = true;
                 skullTimer.reset();
-                Module.mc.world.playSound(Module.mc.player, Module.mc.player.getBlockPos(), SoundEvents.ENTITY_SKELETON_DEATH, SoundCategory.BLOCKS, 1f, 1f);
+                mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_SKELETON_DEATH, SoundCategory.BLOCKS, 1f, 1f);
             }
         }
     }
@@ -124,8 +126,8 @@ public final class Core {
 
     public void drawSkull(DrawContext e) {
         if (showSkull && !skullTimer.passedMs(3000) && MainSettings.skullEmoji.getValue()) {
-            int xPos = (int) (Module.mc.getWindow().getScaledWidth() / 2f - 150);
-            int yPos = (int) (Module.mc.getWindow().getScaledHeight() / 2f - 150);
+            int xPos = (int) (mc.getWindow().getScaledWidth() / 2f - 150);
+            int yPos = (int) (mc.getWindow().getScaledHeight() / 2f - 150);
             float alpha = (1 - (skullTimer.getPassedTimeMs() / 3000f));
             RenderSystem.setShaderColor(1f, 1f, 1f, alpha);
             e.drawTexture(SKULL, xPos, yPos, 0, 0, 300, 300, 300, 300);
@@ -137,9 +139,9 @@ public final class Core {
 
     public void drawGps(DrawContext e) {
         if (ThunderHack.gps_position != null) {
-            float xOffset = Module.mc.getWindow().getScaledWidth() / 2f;
-            float yOffset = Module.mc.getWindow().getScaledHeight() / 2f;
-            float yaw = getRotations(new Vec2f(ThunderHack.gps_position.getX(), ThunderHack.gps_position.getZ())) - Module.mc.player.getYaw();
+            float xOffset = mc.getWindow().getScaledWidth() / 2f;
+            float yOffset = mc.getWindow().getScaledHeight() / 2f;
+            float yaw = getRotations(new Vec2f(ThunderHack.gps_position.getX(), ThunderHack.gps_position.getZ())) - mc.player.getYaw();
             e.getMatrices().translate(xOffset, yOffset, 0.0F);
             e.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
             e.getMatrices().translate(-xOffset, -yOffset, 0.0F);
@@ -169,19 +171,19 @@ public final class Core {
     }
 
     public int getDistance(BlockPos bp) {
-        double d0 = Module.mc.player.getX() - bp.getX();
-        double d2 = Module.mc.player.getZ() - bp.getZ();
+        double d0 = mc.player.getX() - bp.getX();
+        double d2 = mc.player.getZ() - bp.getZ();
         return (int) (MathHelper.sqrt((float) (d0 * d0 + d2 * d2)));
     }
 
     public static float getRotations(Vec2f vec) {
-        if (Module.mc.player == null) return 0;
-        double x = vec.x - Module.mc.player.getPos().x;
-        double z = vec.y - Module.mc.player.getPos().z;
+        if (mc.player == null) return 0;
+        double x = vec.x - mc.player.getPos().x;
+        double z = vec.y - mc.player.getPos().z;
         return (float) -(Math.atan2(x, z) * (180 / Math.PI));
     }
 
     public static boolean fullNullCheck() {
-        return Module.mc.player == null || Module.mc.world == null;
+        return mc.player == null || mc.world == null;
     }
 }

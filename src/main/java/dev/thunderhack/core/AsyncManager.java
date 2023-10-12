@@ -22,6 +22,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static dev.thunderhack.modules.Module.mc;
+
 public class AsyncManager {
     private ClientService clientService = new ClientService();
     public static ExecutorService executor = Executors.newCachedThreadPool();
@@ -34,10 +36,10 @@ public class AsyncManager {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPostTick(EventPostTick e) {
-        if (Module.mc.world == null) return;
+        if (mc.world == null) return;
 
-        threadSafeEntityList = Lists.newArrayList(Module.mc.world.getEntities());
-        threadSafePlayersList = Lists.newArrayList(Module.mc.world.getPlayers());
+        threadSafeEntityList = Lists.newArrayList(mc.world.getEntities());
+        threadSafePlayersList = Lists.newArrayList(mc.world.getPlayers());
         ticking.set(false);
     }
 
@@ -69,7 +71,7 @@ public class AsyncManager {
         @Override
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
-                if (Module.mc != null && (Module.mc.currentScreen instanceof MainMenuScreen || Module.mc.currentScreen instanceof ClickUI) && updateTimer.passedMs(16)) {
+                if (mc != null && (mc.currentScreen instanceof MainMenuScreen || mc.currentScreen instanceof ClickUI) && updateTimer.passedMs(16)) {
                     MainMenuProgram.increaseTime();
                     updateTimer.reset();
                 }

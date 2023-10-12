@@ -3,16 +3,16 @@ package dev.thunderhack.cmd.impl;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.thunderhack.cmd.Command;
 import dev.thunderhack.cmd.args.ChestStealerArgumentType;
-import dev.thunderhack.modules.client.MainSettings;
+import dev.thunderhack.core.ModuleManager;
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandSource;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
-import dev.thunderhack.core.ModuleManager;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static dev.thunderhack.modules.client.MainSettings.isRu;
 
 public class ChestStealerCommand extends Command {
     public ChestStealerCommand() {
@@ -31,12 +31,11 @@ public class ChestStealerCommand extends Command {
             String blockName = context.getArgument("item", String.class);
 
             String result = getRegistered(blockName);
-            if(result != null){
+            if (result != null) {
                 ModuleManager.chestStealer.items.add(result);
-                sendMessage(Formatting.GREEN + blockName + (MainSettings.isRu() ? " добавлен в ChestStealer" : " added to ChestStealer"));
-            } else {
-                sendMessage(Formatting.RED + (MainSettings.isRu() ? "Такого предмета нет!" : "There is no such item!"));
-            }
+                sendMessage(Formatting.GREEN + blockName + (isRu() ? " добавлен в ChestStealer" : " added to ChestStealer"));
+            } else
+                sendMessage(Formatting.RED + (isRu() ? "Такого предмета нет!" : "There is no such item!"));
             return SINGLE_SUCCESS;
         })));
 
@@ -44,12 +43,11 @@ public class ChestStealerCommand extends Command {
             String blockName = context.getArgument("item", String.class);
 
             String result = getRegistered(blockName);
-            if(result != null){
+            if (result != null) {
                 ModuleManager.chestStealer.items.remove(result);
-                sendMessage(Formatting.GREEN + blockName + (MainSettings.isRu() ? " удален из ChestStealer" : " removed from ChestStealer"));
-            } else {
-                sendMessage(Formatting.RED + (MainSettings.isRu() ? "Такого предмета нет!" : "There is no such item!"));
-            }
+                sendMessage(Formatting.GREEN + blockName + (isRu() ? " удален из ChestStealer" : " removed from ChestStealer"));
+            } else
+                sendMessage(Formatting.RED + (isRu() ? "Такого предмета нет!" : "There is no such item!"));
             return SINGLE_SUCCESS;
         })));
 
@@ -59,7 +57,7 @@ public class ChestStealerCommand extends Command {
             } else {
                 StringBuilder f = new StringBuilder("ChestStealer list: ");
 
-                for (String name :  ModuleManager.chestStealer.items)
+                for (String name : ModuleManager.chestStealer.items)
                     try {
                         f.append(name).append(", ");
                     } catch (Exception ignored) {
@@ -74,13 +72,13 @@ public class ChestStealerCommand extends Command {
 
     public static String getRegistered(String Name) {
         for (Block block : Registries.BLOCK) {
-            if (block.getTranslationKey().replace("block.minecraft.","").equalsIgnoreCase(Name)) {
-                return block.getTranslationKey().replace("block.minecraft.","");
+            if (block.getTranslationKey().replace("block.minecraft.", "").equalsIgnoreCase(Name)) {
+                return block.getTranslationKey().replace("block.minecraft.", "");
             }
         }
         for (Item item : Registries.ITEM) {
-            if (item.getTranslationKey().replace("item.minecraft.","").equalsIgnoreCase(Name)) {
-                return item.getTranslationKey().replace("item.minecraft.","");
+            if (item.getTranslationKey().replace("item.minecraft.", "").equalsIgnoreCase(Name)) {
+                return item.getTranslationKey().replace("item.minecraft.", "");
             }
         }
         return null;

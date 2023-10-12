@@ -2,7 +2,6 @@ package dev.thunderhack.core;
 
 import com.google.gson.*;
 import dev.thunderhack.ThunderHack;
-import dev.thunderhack.cmd.Command;
 import dev.thunderhack.cmd.impl.SearchCommand;
 import dev.thunderhack.modules.Module;
 import dev.thunderhack.modules.client.MainSettings;
@@ -24,8 +23,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static dev.thunderhack.cmd.Command.sendMessage;
+import static dev.thunderhack.modules.Module.mc;
+import static dev.thunderhack.modules.client.MainSettings.isRu;
+
 public class ConfigManager {
-    public static File MainFolder = new File(Module.mc.runDirectory, "ThunderHackRecode");
+    public static File MainFolder = new File(mc.runDirectory, "ThunderHackRecode");
     public static File ConfigsFolder = new File(MainFolder, "configs");
     public static File CustomImages = new File(MainFolder, "images");
     public static File TempFolder = new File(MainFolder, "temp");
@@ -74,7 +77,6 @@ public class ConfigManager {
                         String name = reader.readLine();
                         Search.defaultBlocks.add(SearchCommand.getRegisteredBlock(name));
                     }
-
                 }
             }
         } catch (Exception ignored) {
@@ -128,8 +130,8 @@ public class ConfigManager {
     public void load(String name) {
         File file = new File(ConfigsFolder, name + ".th");
         if (!file.exists()) {
-            if (MainSettings.isRu()) Command.sendMessage("Конфига " + name + " не существует!");
-            else Command.sendMessage("Config " + name + " does not exist!");
+            if (isRu()) sendMessage("Конфига " + name + " не существует!");
+            else sendMessage("Config " + name + " does not exist!");
 
             return;
         }
@@ -145,8 +147,8 @@ public class ConfigManager {
     public void loadModuleOnly(String name, Module module) {
         File file = new File(ConfigsFolder, name + ".th");
         if (!file.exists()) {
-            if (MainSettings.isRu()) Command.sendMessage("Конфига " + name + " не существует!");
-            else Command.sendMessage("Config " + name + " does not exist!");
+            if (isRu()) sendMessage("Конфига " + name + " не существует!");
+            else sendMessage("Config " + name + " does not exist!");
 
             return;
         }
@@ -187,8 +189,8 @@ public class ConfigManager {
                 });
             }
 
-            if (MainSettings.isRu()) Command.sendMessage("Загружен конфиг " + config.getName());
-            else Command.sendMessage("Loaded " + config.getName());
+            if (isRu()) sendMessage("Загружен конфиг " + config.getName());
+            else sendMessage("Loaded " + config.getName());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -232,8 +234,8 @@ public class ConfigManager {
                     }
                 });
             }
-            if (MainSettings.isRu()) Command.sendMessage("Загружен модуль " + module.getName() + " с конфига " + config.getName());
-            else Command.sendMessage("Loaded " + module.getName() + " from " + config.getName());
+            if (isRu()) sendMessage("Загружен модуль " + module.getName() + " с конфига " + config.getName());
+            else sendMessage("Loaded " + module.getName() + " from " + config.getName());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -242,10 +244,10 @@ public class ConfigManager {
     public void save(String name) {
         File file = new File(ConfigsFolder, name + ".th");
         if (file.exists()) {
-            Command.sendMessage(MainSettings.isRu() ? "Перезаписываем " + name + "..." : "Overwriting " + name + "...");
+            sendMessage(isRu() ? "Перезаписываем " + name + "..." : "Overwriting " + name + "...");
             file.delete();
         } else {
-            Command.sendMessage(MainSettings.isRu() ? "Конфиг " + name + " успешно сохранен!" : "Config " + name + " successfully saved!");
+            sendMessage(isRu() ? "Конфиг " + name + " успешно сохранен!" : "Config " + name + " successfully saved!");
         }
         save(file);
     }

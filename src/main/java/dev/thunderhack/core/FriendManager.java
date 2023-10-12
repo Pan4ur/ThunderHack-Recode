@@ -8,6 +8,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import java.io.*;
 import java.util.*;
 
+import static dev.thunderhack.modules.Module.mc;
+
 public class FriendManager {
     public static List<String> friends = new ArrayList<>();
 
@@ -36,9 +38,9 @@ public class FriendManager {
     }
 
     public List<AbstractClientPlayerEntity> getNearFriends() {
-        if (Module.mc.world == null) return new ArrayList<>();
+        if (mc.world == null) return new ArrayList<>();
 
-        return Module.mc.world.getPlayers().stream()
+        return mc.world.getPlayers().stream()
                 .filter(player -> friends.contains(player.getName().getString()))
                 .toList();
     }

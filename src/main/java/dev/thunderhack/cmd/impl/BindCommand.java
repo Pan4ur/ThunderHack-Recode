@@ -3,7 +3,6 @@ package dev.thunderhack.cmd.impl;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.thunderhack.modules.Module;
-import dev.thunderhack.modules.client.MainSettings;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
@@ -12,6 +11,7 @@ import dev.thunderhack.cmd.Command;
 import dev.thunderhack.cmd.args.ModuleArgumentType;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static dev.thunderhack.modules.client.MainSettings.isRu;
 
 public class BindCommand extends Command {
     public BindCommand() {
@@ -37,11 +37,10 @@ public class BindCommand extends Command {
                         try {
                             key = InputUtil.fromTranslationKey("key.keyboard." + stringKey.toLowerCase()).getCode();
                         } catch (NumberFormatException e) {
-                            sendMessage(MainSettings.isRu() ? "Такой кнопки не существует!" : "There is no such button");
+                            sendMessage(isRu() ? "Такой кнопки не существует!" : "There is no such button");
                             return SINGLE_SUCCESS;
                         }
                     }
-
 
                     if (key == 0) {
                         sendMessage("Unknown key '" + stringKey + "'!");
