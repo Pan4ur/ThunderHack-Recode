@@ -27,10 +27,12 @@ public class ShaderManager {
     public static ManagedShaderEffect DEFAULT_OUTLINE;
     public static ManagedShaderEffect SMOKE_OUTLINE;
     public static ManagedShaderEffect GRADIENT_OUTLINE;
+    public static ManagedShaderEffect SNOW_OUTLINE;
 
     public static ManagedShaderEffect DEFAULT;
     public static ManagedShaderEffect SMOKE;
     public static ManagedShaderEffect GRADIENT;
+    public static ManagedShaderEffect SNOW;
 
     public void renderShader(Runnable runnable, Shader mode) {
         tasks.add(new RenderTask(runnable, mode));
@@ -41,8 +43,8 @@ public class ShaderManager {
             shaderBuffer = new ThunderHackFramebuffer(mc.getFramebuffer().textureWidth, mc.getFramebuffer().textureHeight);
             reloadShaders();
         }
-        
-        tasks.forEach( t -> applyShader(t.task(), t.shader()));
+
+        tasks.forEach(t -> applyShader(t.task(), t.shader()));
         tasks.clear();
     }
 
@@ -60,8 +62,8 @@ public class ShaderManager {
         ManagedShaderEffect shader = getShader(mode);
         Framebuffer mainBuffer = MinecraftClient.getInstance().getFramebuffer();
         PostEffectProcessor effect = shader.getShaderEffect();
-        
-        if (effect != null) 
+
+        if (effect != null)
             ((IShaderEffect) effect).addFakeTargetHook("bufIn", shaderBuffer);
 
         Framebuffer outBuffer = shader.getShaderEffect().getSecondaryTarget("bufOut");
@@ -81,6 +83,7 @@ public class ShaderManager {
         return switch (mode) {
             case Gradient -> GRADIENT;
             case Smoke -> SMOKE;
+            case Snow -> SNOW;
             default -> DEFAULT;
         };
     }
@@ -89,6 +92,7 @@ public class ShaderManager {
         return switch (mode) {
             case Gradient -> GRADIENT_OUTLINE;
             case Smoke -> SMOKE_OUTLINE;
+            case Snow -> SNOW_OUTLINE;
             default -> DEFAULT_OUTLINE;
         };
     }
@@ -131,6 +135,13 @@ public class ShaderManager {
             effect.setUniformValue("color", shaders.fillColor1.getValue().getGlRed(), shaders.fillColor1.getValue().getGlGreen(), shaders.fillColor1.getValue().getGlBlue(), shaders.fillColor1.getValue().getGlAlpha());
             effect.setUniformValue("outlinecolor", shaders.outlineColor.getValue().getGlRed(), shaders.outlineColor.getValue().getGlGreen(), shaders.outlineColor.getValue().getGlBlue(), shaders.outlineColor.getValue().getGlAlpha());
             effect.render(mc.getTickDelta());
+        } else if (shader == Shader.Snow) {
+            effect.setUniformValue("color", shaders.fillColor1.getValue().getGlRed(), shaders.fillColor1.getValue().getGlGreen(), shaders.fillColor1.getValue().getGlBlue(), shaders.fillColor1.getValue().getGlAlpha());
+            effect.setUniformValue("quality", shaders.quality.getValue());
+            effect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
+            effect.setUniformValue("time", time);
+            effect.render(mc.getTickDelta());
+            time += 0.008f;
         }
     }
 
@@ -138,6 +149,7 @@ public class ShaderManager {
         DEFAULT = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/outline.json"));
         SMOKE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/smoke.json"));
         GRADIENT = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/gradient.json"));
+        SNOW = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/snow.json"));
 
         DEFAULT_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/outline.json"), managedShaderEffect -> {
             PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
@@ -156,6 +168,14 @@ public class ShaderManager {
         });
 
         GRADIENT_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/gradient.json"), managedShaderEffect -> {
+            PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
+            if (effect == null) return;
+
+            ((IShaderEffect) effect).addFakeTargetHook("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
+            ((IShaderEffect) effect).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
+        });
+
+        SNOW_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/snow.json"), managedShaderEffect -> {
             PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
             if (effect == null) return;
 
@@ -189,6 +209,7 @@ public class ShaderManager {
     public enum Shader {
         Default,
         Smoke,
-        Gradient
+        Gradient,
+        Snow
     }
 }

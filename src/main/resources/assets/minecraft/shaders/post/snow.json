@@ -1,0 +1,21 @@
+{
+  "targets": [
+    "bufIn",
+    "swap",
+    "bufOut"
+  ],
+  "passes": [
+    {
+      "name": "snow",
+      "intarget": "bufIn",
+      "outtarget": "swap",
+      "uniforms": []
+    },
+    {
+      "name": "blit",
+      "intarget": "swap",
+      "outtarget": "bufOut",
+      "uniforms": []
+    }
+  ]
+}

@@ -30,6 +30,7 @@
     "MixinMouse",
     "MixinOtherClientPlayerEntity",
     "MixinParticleManager",
+    "MixinPlayerListEntry",
     "MixinPlayerListHud",
     "MixinRenderTickCounter",
     "MixinScreen",

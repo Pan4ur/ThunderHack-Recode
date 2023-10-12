@@ -37,7 +37,7 @@ public class Shaders extends Module {
     public final Setting<Float> gradient = new Setting<>("Gradient", 2f, 0f, 20f);
     public final Setting<Integer> alpha2 = new Setting<>("GradientAlpha", 170, 0, 255);
     public final Setting<Integer> lineWidth = new Setting<>("LineWidth", 2, 0, 20);
-    public final Setting<Integer> quality = new Setting<>("Quality", 10, 5, 30);
+    public final Setting<Integer> quality = new Setting<>("Quality", 10, 1, 30);
     public final Setting<Integer> octaves = new Setting<>("SmokeOctaves", 10, 5, 30);
     public final Setting<Integer> fillAlpha = new Setting<>("FillAlpha", 170, 0, 255);
     public final Setting<Boolean> glow = new Setting<>("SmokeGlow", true);
