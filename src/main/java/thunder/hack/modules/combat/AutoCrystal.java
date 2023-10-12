@@ -612,6 +612,7 @@ public class AutoCrystal extends Module {
 
     private @NotNull List<CrystalData> getPossibleCrystals(PlayerEntity target) {
         List<CrystalData> crystals = new ArrayList<>();
+        assert mc.world != null;
         Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
         for (Entity ent : entities) {
             if (!(ent instanceof EndCrystalEntity))
@@ -1033,16 +1034,13 @@ public class AutoCrystal extends Module {
         @Override
         public void run() {
             while (ModuleManager.autoCrystal.isEnabled()) {
-                while (ThunderHack.asyncManager.ticking.get() || !placeTimer.passedMs(placeDelay.getValue())) {
-                }
+                //while (ThunderHack.asyncManager.ticking.get() || !placeTimer.passedMs(placeDelay.getValue())) {
+                //} todo
 
                 calcPosition();
 
-                if (bestPosition != null)
-                    placeCrystal(bestPosition);
-
-                if (stopThreads.get())
-                    placeThread.interrupt();
+                if (bestPosition != null) placeCrystal(bestPosition);
+                if (stopThreads.get()) placeThread.interrupt();
             }
         }
     }
@@ -1051,10 +1049,10 @@ public class AutoCrystal extends Module {
         @Override
         public void run() {
             while (ModuleManager.autoCrystal.isEnabled()) {
-                while (ThunderHack.asyncManager.ticking.get()) {
-                }
+                /*while (ThunderHack.asyncManager.ticking.get()) {
+                } todo
                 while (!breakTimer.passedMs(breakDelay.getValue())) {
-                }
+                }*/
 
                 getCrystalToExplode();
                 if (bestCrystal != null)
