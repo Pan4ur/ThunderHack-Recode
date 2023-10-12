@@ -10,14 +10,13 @@ import dev.thunderhack.utils.player.InteractionUtility;
 import dev.thunderhack.utils.player.MovementUtility;
 import dev.thunderhack.utils.player.PlayerEntityCopy;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec2f;
-import thunder.hack.event.events.*;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.Vec3d;
 
 public class FreeCam extends Module {
@@ -54,7 +53,8 @@ public class FreeCam extends Module {
             mc.player.getVehicle().removeAllPassengers();
         }
 
-        if (mc.player.isSprinting()) sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+        if (mc.player.isSprinting())
+            sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
 
         prevFlying = mc.player.getAbilities().flying;
         prevFlySpeed = mc.player.getAbilities().getFlySpeed();

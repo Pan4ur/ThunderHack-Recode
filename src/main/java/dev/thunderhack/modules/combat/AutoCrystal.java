@@ -1,9 +1,12 @@
 package dev.thunderhack.modules.combat;
 
 import com.google.common.collect.Lists;
+import dev.thunderhack.ThunderHack;
+import dev.thunderhack.core.ModuleManager;
 import dev.thunderhack.event.events.*;
 import dev.thunderhack.mixins.accesors.IClientPlayerEntity;
 import dev.thunderhack.modules.Module;
+import dev.thunderhack.modules.client.HudEditor;
 import dev.thunderhack.modules.player.SpeedMine;
 import dev.thunderhack.setting.Setting;
 import dev.thunderhack.setting.settings.Bind;
@@ -42,10 +45,6 @@ import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-import dev.thunderhack.ThunderHack;
-import dev.thunderhack.core.ModuleManager;
-import thunder.hack.event.events.*;
-import dev.thunderhack.modules.client.HudEditor;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -557,7 +556,7 @@ public class AutoCrystal extends Module {
         if (ModuleManager.speedMine.isWorth()) {
 
             // если цивбрикаем - то ставим над
-            if(mc.world.isAir(SpeedMine.minePosition.down())){
+            if (mc.world.isAir(SpeedMine.minePosition.down())) {
                 PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
                 if (autoMineData != null) {
                     bestPosition = autoMineData.bhr;
@@ -869,10 +868,10 @@ public class AutoCrystal extends Module {
             bestVector = new Vec3d(bp.getX() + 0.5, bp.getY(), bp.getZ() + 0.5);
         } else {
             for (Direction dir : Direction.values()) {
-                if(dir == Direction.UP || dir == Direction.DOWN)
+                if (dir == Direction.UP || dir == Direction.DOWN)
                     continue;
 
-                if(!mc.world.isAir(bp.offset(dir)))
+                if (!mc.world.isAir(bp.offset(dir)))
                     continue;
 
                 Vec3d directionVec = new Vec3d(bp.getX() + 0.5 + dir.getVector().getX() * 0.5, bp.getY() + 0.5 + dir.getVector().getY() * 0.5, bp.getZ() + 0.5 + dir.getVector().getZ() * 0.5);

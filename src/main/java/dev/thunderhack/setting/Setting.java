@@ -3,7 +3,6 @@ package dev.thunderhack.setting;
 import com.google.gson.JsonPrimitive;
 import dev.thunderhack.modules.Module;
 import dev.thunderhack.setting.settings.*;
-import thunder.hack.setting.settings.*;
 
 import java.util.function.Predicate;
 

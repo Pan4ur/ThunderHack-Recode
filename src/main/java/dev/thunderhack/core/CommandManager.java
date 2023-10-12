@@ -7,7 +7,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
-import thunder.hack.cmd.impl.*;
 
 import java.util.ArrayList;
 import java.util.List;

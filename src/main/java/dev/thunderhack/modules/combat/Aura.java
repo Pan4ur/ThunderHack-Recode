@@ -1,5 +1,9 @@
 package dev.thunderhack.modules.combat;
 
+import dev.thunderhack.ThunderHack;
+import dev.thunderhack.core.Core;
+import dev.thunderhack.core.ModuleManager;
+import dev.thunderhack.core.PlayerManager;
 import dev.thunderhack.event.events.*;
 import dev.thunderhack.mixins.accesors.ILivingEntity;
 import dev.thunderhack.modules.Module;
@@ -24,7 +28,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.*;
+import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.VillagerEntity;
@@ -45,11 +51,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
-import dev.thunderhack.ThunderHack;
-import dev.thunderhack.core.Core;
-import dev.thunderhack.core.ModuleManager;
-import dev.thunderhack.core.PlayerManager;
-import thunder.hack.event.events.*;
 
 import java.util.Comparator;
 import java.util.List;
@@ -57,7 +58,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.minecraft.util.UseAction.BLOCK;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
-import static dev.thunderhack.utils.math.MathUtility.random;
 
 public class Aura extends Module {
     public static final Setting<Float> attackRange = new Setting<>("Attack Range", 3.1f, 2f, 6.0f);

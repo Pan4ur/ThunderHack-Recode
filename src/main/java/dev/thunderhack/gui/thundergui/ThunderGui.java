@@ -2,6 +2,7 @@ package dev.thunderhack.gui.thundergui;
 
 import dev.thunderhack.ThunderHack;
 import dev.thunderhack.cmd.Command;
+import dev.thunderhack.core.ConfigManager;
 import dev.thunderhack.gui.font.FontRenderers;
 import dev.thunderhack.gui.thundergui.components.*;
 import dev.thunderhack.modules.Module;
@@ -16,8 +17,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
-import dev.thunderhack.core.ConfigManager;
-import thunder.hack.gui.thundergui.components.*;
 
 import java.awt.*;
 import java.io.File;

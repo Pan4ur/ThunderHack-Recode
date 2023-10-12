@@ -6,6 +6,7 @@ import dev.thunderhack.cmd.Command;
 import dev.thunderhack.event.events.*;
 import dev.thunderhack.gui.font.FontRenderers;
 import dev.thunderhack.gui.hud.impl.RadarRewrite;
+import dev.thunderhack.gui.thundergui.ThunderGui;
 import dev.thunderhack.modules.Module;
 import dev.thunderhack.modules.client.ClickGui;
 import dev.thunderhack.modules.client.MainSettings;
@@ -26,8 +27,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec2f;
-import thunder.hack.event.events.*;
-import dev.thunderhack.gui.thundergui.ThunderGui;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

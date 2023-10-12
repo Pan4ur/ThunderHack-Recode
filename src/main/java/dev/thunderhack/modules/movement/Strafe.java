@@ -1,5 +1,8 @@
 package dev.thunderhack.modules.movement;
 
+import dev.thunderhack.ThunderHack;
+import dev.thunderhack.core.Core;
+import dev.thunderhack.core.ModuleManager;
 import dev.thunderhack.event.events.*;
 import dev.thunderhack.mixins.accesors.ISPacketEntityVelocity;
 import dev.thunderhack.modules.Module;
@@ -19,10 +22,6 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import dev.thunderhack.ThunderHack;
-import dev.thunderhack.core.Core;
-import dev.thunderhack.core.ModuleManager;
-import thunder.hack.event.events.*;
 
 public class Strafe extends Module {
     private final Setting<Boost> boost = new Setting<>("Boost", Boost.None);
@@ -31,8 +30,8 @@ public class Strafe extends Module {
     private final Setting<Float> maxVelocitySpeed = new Setting<>("MaxVelocity", 0.8f, 0.1f, 2f, v -> boost.getValue() == Boost.Damage);
 
     public static double oldSpeed, contextFriction, fovval;
-    public static boolean needSwap, needSprintState,disabled;
-    public static int noSlowTicks,waterTicks,jumpTicks;
+    public static boolean needSwap, needSprintState, disabled;
+    public static int noSlowTicks, waterTicks, jumpTicks;
     static long disableTime;
 
     public Strafe() {
@@ -119,7 +118,6 @@ public class Strafe extends Module {
     }
 
 
-
     @Override
     public void onEnable() {
         oldSpeed = 0.0;
@@ -128,7 +126,7 @@ public class Strafe extends Module {
     }
 
     @Override
-    public void onDisable(){
+    public void onDisable() {
         mc.options.getFovEffectScale().setValue(fovval);
     }
 
@@ -252,7 +250,8 @@ public class Strafe extends Module {
                 boolean needDrop = nullSlot == 999;
                 if (needDrop) nullSlot = 9;
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, nullSlot, 1, SlotActionType.PICKUP, mc.player);
-                if (needDrop) mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, -999, 0, SlotActionType.PICKUP, mc.player);
+                if (needDrop)
+                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, -999, 0, SlotActionType.PICKUP, mc.player);
                 delay.reset();
             }
         }

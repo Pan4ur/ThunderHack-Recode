@@ -1,5 +1,6 @@
 package dev.thunderhack.modules.movement;
 
+import dev.thunderhack.ThunderHack;
 import dev.thunderhack.event.events.*;
 import dev.thunderhack.modules.Module;
 import dev.thunderhack.notification.Notification;
@@ -31,8 +32,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import dev.thunderhack.ThunderHack;
-import thunder.hack.event.events.*;
 
 import static dev.thunderhack.modules.client.MainSettings.isRu;
 
@@ -65,7 +64,7 @@ public class ElytraPlus extends Module {
     private final Setting<Float> sneakDownSpeed = new Setting<>("DownSpeed", 1.0F, 0.1F, 10.0F, v -> mode.getValue() == Mode.Control);
     private final Setting<Boolean> BoostTimer = new Setting<>("Timer", true, v -> mode.getValue() == Mode.Boost);
     public Setting<Boolean> speedLimit = new Setting<>("SpeedLimit", true, v -> (mode.getValue() != Mode.FireWork && mode.getValue() != Mode.Sunrise && mode.getValue() != Mode.Pitch40Infinite));
-    public Setting<Float> maxSpeed = new Setting<>("MaxSpeed", 2.5f, 0.1f, 10.0f, v -> speedLimit.getValue() && mode.getValue() != Mode.Pitch40Infinite && mode.getValue() != Mode.FireWork );
+    public Setting<Float> maxSpeed = new Setting<>("MaxSpeed", 2.5f, 0.1f, 10.0f, v -> speedLimit.getValue() && mode.getValue() != Mode.Pitch40Infinite && mode.getValue() != Mode.FireWork);
     public Setting<Boolean> noDrag = new Setting<>("NoDrag", false, v -> (mode.getValue() != Mode.FireWork && mode.getValue() != Mode.Sunrise && mode.getValue() != Mode.Pitch40Infinite));
     private final Setting<Float> packetDelay = new Setting<>("Limit", 1F, 0.1F, 5F, v -> mode.getValue() == Mode.Boost);
     private final Setting<Float> staticDelay = new Setting<>("Delay", 5F, 0.1F, 20F, v -> mode.getValue() == Mode.Boost);
@@ -201,7 +200,8 @@ public class ElytraPlus extends Module {
     public void onPacketReceive(PacketEvent.Receive e) {
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             acceleration = 0;
-            if (disableOnFlag.getValue() && mode.getValue() == Mode.FireWork) disable(isRu() ? "Выключен из-за флага!" : "Disabled due to flag!");
+            if (disableOnFlag.getValue() && mode.getValue() == Mode.FireWork)
+                disable(isRu() ? "Выключен из-за флага!" : "Disabled due to flag!");
         }
     }
 

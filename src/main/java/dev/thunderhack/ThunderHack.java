@@ -7,10 +7,9 @@ import dev.thunderhack.utils.ThunderUtility;
 import dev.thunderhack.utils.render.Render2DEngine;
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.IEventBus;
+import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import thunder.hack.core.*;
-import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.math.BlockPos;
 
 import java.awt.*;
@@ -18,7 +17,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
-
 
 public class ThunderHack implements ModInitializer {
     public static final ModMetadata MOD_META;
@@ -111,4 +109,3 @@ public class ThunderHack implements ModInitializer {
         Strings
     }
 }
-

@@ -18,7 +18,6 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.gui.clickui.impl.*;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -63,13 +62,13 @@ public class ModuleButton extends AbstractButton {
     public void render(DrawContext context, int mouseX, int mouseY, float delta, Color color) {
         hovered = Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height);
 
-        if(hovered)
+        if (hovered)
             ClickUI.currentDescription = Text.translatable(module.getDescription()).getString();
 
         double ix = x + 5;
         double iy = y + height / 2 - (6 / 2f);
 
-        if(isHiden()) return;
+        if (isHiden()) return;
 
         offset_animation = CheckBoxElement.fast(1f, 0f, 15f);
         if (target_offset != offsetY) {
@@ -81,7 +80,8 @@ public class ModuleButton extends AbstractButton {
 
             Render2DEngine.drawRoundDoubleColor(context.getMatrices(), x + 4, y + height - 16, (width - 8), (height) + getElementsHeight(), 3f, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(200), 0.8f) : sbg, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(0), 0.8f) : sbg);
 
-            if (isOpen()) Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle((float) x, (float) (y + height - 15), (float) ((width) + x + 6), (float) ((height) + y + getElementsHeight())));
+            if (isOpen())
+                Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle((float) x, (float) (y + height - 15), (float) ((width) + x + 6), (float) ((height) + y + getElementsHeight())));
 
             context.getMatrices().push();
             TargetHud.sizeAnimation(context.getMatrices(), x + width / 2 + 6, y + height / 2 - 15, 1f - category_animation);
@@ -170,7 +170,7 @@ public class ModuleButton extends AbstractButton {
             }
         }
 
-        if(hovered && InputUtil.isKeyPressed(Module.mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT)){
+        if (hovered && InputUtil.isKeyPressed(Module.mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT)) {
             FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"), (int) ix + 1f, (int) iy + 3 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
         } else {
             if (this.binding) {
@@ -182,7 +182,7 @@ public class ModuleButton extends AbstractButton {
     }
 
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if(isHiden()) return;
+        if (isHiden()) return;
 
         if (this.binding) {
             if (mouseX > x + 52 && mouseX < x + 80 && mouseY > y && mouseY < y + height) {
@@ -201,9 +201,9 @@ public class ModuleButton extends AbstractButton {
             binding = false;
         }
         if (hovered) {
-            if(InputUtil.isKeyPressed(Module.mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT) && button == 0){
+            if (InputUtil.isKeyPressed(Module.mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT) && button == 0) {
                 module.setDrawn(!module.isDrawn());
-                if(MainSettings.isRu()){
+                if (MainSettings.isRu()) {
                     Command.sendMessage("Модуль " + Formatting.GREEN + module.getName() + Formatting.WHITE + " теперь " + (module.isDrawn() ? "виден в ArrayList" : "не виден в ArrayList"));
                 } else {
                     Command.sendMessage(Formatting.GREEN + module.getName() + Formatting.WHITE + " is now " + (module.isDrawn() ? "visible in ArrayList" : "invisible in ArrayList"));
@@ -233,7 +233,7 @@ public class ModuleButton extends AbstractButton {
     }
 
     public void keyTyped(int keyCode) {
-        if(isHiden()) return;
+        if (isHiden()) return;
 
         if (isOpen()) {
             for (AbstractElement element : elements)

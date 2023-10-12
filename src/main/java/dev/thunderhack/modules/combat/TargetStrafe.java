@@ -1,5 +1,7 @@
 package dev.thunderhack.modules.combat;
 
+import dev.thunderhack.core.Core;
+import dev.thunderhack.core.ModuleManager;
 import dev.thunderhack.event.events.*;
 import dev.thunderhack.mixins.accesors.ISPacketEntityVelocity;
 import dev.thunderhack.modules.Module;
@@ -16,9 +18,6 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import dev.thunderhack.core.Core;
-import dev.thunderhack.core.ModuleManager;
-import thunder.hack.event.events.*;
 
 public class TargetStrafe extends Module {
     public TargetStrafe() {
