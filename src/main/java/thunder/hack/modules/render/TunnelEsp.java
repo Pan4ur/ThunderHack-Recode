@@ -118,7 +118,7 @@ public class TunnelEsp extends Module {
 
     private boolean alreadyIn(Box box) {
         for (Box box2 : renderBoxes) {
-            if (box.intersects(box2)) 
+            if (box.intersects(box2))
                 return true;
         }
         return false;

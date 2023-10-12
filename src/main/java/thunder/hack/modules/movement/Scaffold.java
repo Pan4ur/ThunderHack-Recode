@@ -6,6 +6,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -21,13 +22,14 @@ import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InteractionUtility;
+import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.BlockAnimationUtility;
 
-import static thunder.hack.utility.math.MathUtility.random;
 import static thunder.hack.utility.player.InteractionUtility.BlockPosWithFacing;
 import static thunder.hack.utility.player.InteractionUtility.checkNearBlocks;
 
 public class Scaffold extends Module {
+    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("PlaceMode", InteractionUtility.PlaceMode.Normal);
     public Setting<Boolean> rotate = new Setting<>("Rotate", true);
     public Setting<Boolean> allowShift = new Setting<>("AllowShift", false);
     public Setting<Boolean> autoswap = new Setting<>("AutoSwap", true);
@@ -42,7 +44,7 @@ public class Scaffold extends Module {
     private final Setting<ColorSetting> renderLineColor = new Setting<>("RenderLineColor", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<Integer> renderLineWidth = new Setting<>("RenderLineWidth", 2, 1, 5).withParent(renderCategory);
 
-    public Setting<Boolean> strictRotate = new Setting<>("StrictRotate", false);
+    public Setting<Boolean> strict = new Setting<>("Strict", false);
 
     private final Timer timer = new Timer();
     private BlockPosWithFacing currentblock;
@@ -202,8 +204,8 @@ public class Scaffold extends Module {
 
     @EventHandler
     public void onPre(EventSync event) {
-        if (strictRotate.getValue()) mc.player.setSprinting(false);
-        if (strictRotate.getValue()) {
+        if (strict.getValue()) {
+            mc.player.setSprinting(false);
             mc.player.setYaw(rotation[0]);
             mc.player.setPitch(rotation[1]);
         }
@@ -230,10 +232,10 @@ public class Scaffold extends Module {
         if (currentblock != null) {
             if (rotate.getValue()) {
 
-                Vec3d hitVec = new Vec3d(currentblock.position().getX() + 0.5, currentblock.position().getY() + 0.90, currentblock.position().getZ() + 0.5).add(new Vec3d(currentblock.facing().getUnitVector()).multiply(0.5));
+                Vec3d hitVec = new Vec3d(currentblock.position().getX() + 0.5, currentblock.position().getY() + 0.5, currentblock.position().getZ() + 0.5).add(new Vec3d(currentblock.facing().getUnitVector()).multiply(0.5));
                 float[] rotations = InteractionUtility.calculateAngle(hitVec);
 
-                if (strictRotate.getValue()) {
+                if (strict.getValue()) {
                     rotation = rotations;
                 } else {
                     mc.player.setYaw(rotations[0]);
@@ -268,15 +270,26 @@ public class Scaffold extends Module {
                     timer.reset();
                 }
             }
-            Vec3d hitVec = new Vec3d(currentblock.position().getX() + 0.5, currentblock.position().getY() + 0.90, currentblock.position().getZ() + 0.5).add(new Vec3d(currentblock.facing().getUnitVector()).multiply(0.5));
 
-            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(hitVec, currentblock.facing(), currentblock.position(), false));
+            BlockHitResult bhr;
+
+            if (strict.getValue()) {
+                bhr = new BlockHitResult(new Vec3d(currentblock.position().getX() + 0.5, currentblock.position().getY() + 0.5, currentblock.position().getZ() + 0.5).add(new Vec3d(currentblock.facing().getUnitVector()).multiply(0.5)), currentblock.facing(), currentblock.position(), false);
+            } else {
+                bhr = new BlockHitResult(new Vec3d((double) currentblock.position().getX() + Math.random(), currentblock.position().getY() + 0.99f, (double) currentblock.position().getZ() + Math.random()), currentblock.facing(), currentblock.position(), false);
+            }
+
+            if(placeMode.getValue() == InteractionUtility.PlaceMode.Packet)
+                sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
+            else
+                mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, bhr);
+
             mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
             if (render.getValue())
                 BlockAnimationUtility.renderBlock(currentblock.position(), renderLineColor.getValue().getColorObject(), renderLineWidth.getValue(), renderFillColor.getValue().getColorObject(), animationMode.getValue(), renderMode.getValue());
 
-            if (!strictRotate.getValue()) {
+            if (!strict.getValue()) {
                 mc.player.getInventory().selectedSlot = prev_item;
                 mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
             }
