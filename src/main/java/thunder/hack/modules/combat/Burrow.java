@@ -37,12 +37,12 @@ public class Burrow extends Module {
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
     private final Setting<OffsetMode> offsetMode = new Setting<>("Mode", OffsetMode.Smart, v -> mode.getValue() == Mode.Default);
-    public Setting<Float> vClip = new Setting("V-Clip", -9.0F, -256.0F, 256.0F, v -> offsetMode.getValue() == OffsetMode.Constant && mode.getValue() == Mode.Default);
+    public Setting<Float> vClip = new Setting<>("V-Clip", -9.0F, -256.0F, 256.0F, v -> offsetMode.getValue() == OffsetMode.Constant && mode.getValue() == Mode.Default);
     public Setting<Integer> delay = new Setting<>("Delay", 100, 0, 1000, v -> mode.getValue() == Mode.Default);
     public Setting<Boolean> scaleDown = new Setting<>("Scale-Down", false, v -> mode.getValue() == Mode.Default);
     public Setting<Boolean> scaleVelocity = new Setting<>("Scale-Velocity", false, v -> mode.getValue() == Mode.Default);
     public Setting<Boolean> scaleExplosion = new Setting<>("Scale-Explosion", false, v -> mode.getValue() == Mode.Default);
-    public Setting<Float> scaleFactor = new Setting("Scale-Factor", 1.0F, 0.1F, 10.0F, v -> mode.getValue() == Mode.Default);
+    public Setting<Float> scaleFactor = new Setting<>("Scale-Factor", 1.0F, 0.1F, 10.0F, v -> mode.getValue() == Mode.Default);
     public Setting<Integer> scaleDelay = new Setting<>("Scale-Delay", 250, 0, 1000, v -> mode.getValue() == Mode.Default);
     public Setting<Boolean> attack = new Setting<>("Attack", true, v -> mode.getValue() == Mode.Default);
     public Setting<Boolean> placeDisable = new Setting<>("PlaceDisable", false, v -> mode.getValue() == Mode.Default);
@@ -219,9 +219,6 @@ public class Burrow extends Module {
 
         float[] r = InteractionUtility.getPlaceAngle(pos, InteractionUtility.Interact.Strict, true);
 
-
-        PlayerEntity finalREntity = rEntity;
-
         if (mc.isInSingleplayer()) {
             disable(MainSettings.isRu() ? "Дебил! Ты в одиночке.." : "Retard! You're in singleplayer..");
             return;
@@ -230,15 +227,15 @@ public class Burrow extends Module {
         if (timer.passedMs(1000)) {
             if (rotate.getValue()) {
                 if (r != null) {
-                    if (finalREntity.getPos().equals(new Vec3d(last_x, last_y, last_z))) sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(r[0], r[1], onGround.getValue()));
-                    else sendPacket(new PlayerMoveC2SPacket.Full(finalREntity.getX(), finalREntity.getY(), finalREntity.getZ(), r[0], r[1], onGround.getValue()));
+                    if (rEntity.getPos().equals(new Vec3d(last_x, last_y, last_z))) sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(r[0], r[1], onGround.getValue()));
+                    else sendPacket(new PlayerMoveC2SPacket.Full(rEntity.getX(), rEntity.getY(), rEntity.getZ(), r[0], r[1], onGround.getValue()));
                 }
             }
 
-            sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(finalREntity.getX(), finalREntity.getY() + 0.42, finalREntity.getZ(), onGround.getValue()));
-            sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(finalREntity.getX(), finalREntity.getY() + 0.75, finalREntity.getZ(), onGround.getValue()));
-            sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(finalREntity.getX(), finalREntity.getY() + 1.01, finalREntity.getZ(), onGround.getValue()));
-            sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(finalREntity.getX(), finalREntity.getY() + 1.16, finalREntity.getZ(), onGround.getValue()));
+            sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(rEntity.getX(), rEntity.getY() + 0.42, rEntity.getZ(), onGround.getValue()));
+            sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(rEntity.getX(), rEntity.getY() + 0.75, rEntity.getZ(), onGround.getValue()));
+            sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(rEntity.getX(), rEntity.getY() + 1.01, rEntity.getZ(), onGround.getValue()));
+            sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(rEntity.getX(), rEntity.getY() + 1.16, rEntity.getZ(), onGround.getValue()));
 
             InventoryUtility.saveSlot();
             InteractionUtility.placeBlock(pos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Packet, slot, false, true);

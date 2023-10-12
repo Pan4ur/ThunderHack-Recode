@@ -69,7 +69,7 @@ public class HoleFill extends Module {
         All,
         Webs,
         Obsidian,
-        Indestrictible
+        Indestructible
     }
 
     private enum SelfFillMode {
@@ -277,7 +277,7 @@ public class HoleFill extends Module {
             switch (blocks.getValue()) {
                 case Webs -> isCorrectBlock = block == Blocks.COBWEB;
                 case Obsidian -> isCorrectBlock = block == Blocks.OBSIDIAN;
-                case Indestrictible -> isCorrectBlock = block == Blocks.OBSIDIAN
+                case Indestructible -> isCorrectBlock = block == Blocks.OBSIDIAN
                         || block == Blocks.CRYING_OBSIDIAN
                         || block == Blocks.NETHERITE_BLOCK
                         || block == Blocks.RESPAWN_ANCHOR;

@@ -26,10 +26,10 @@ public final class ExplosionUtility {
     public static boolean terrainIgnore = false;
     public static BlockPos anchorIgnore = null;
 
-    public static float getExplosionDamage2(Vec3d crysPos, PlayerEntity target) {
+    public static float getExplosionDamage2(Vec3d crystalPos, PlayerEntity target) {
         try {
-            if (AutoCrystal.predictTicks.getValue() == 0) return getExplosionDamage1(crysPos, target);
-            return getExplosionDamageWPredict(crysPos, target, PredictUtility.predictPlayer(target, AutoCrystal.predictTicks.getValue()));
+            if (AutoCrystal.predictTicks.getValue() == 0) return getExplosionDamage1(crystalPos, target);
+            return getExplosionDamageWPredict(crystalPos, target, PredictUtility.predictPlayer(target, AutoCrystal.predictTicks.getValue()));
         } catch (Exception ignored) {
         }
         return 0f;

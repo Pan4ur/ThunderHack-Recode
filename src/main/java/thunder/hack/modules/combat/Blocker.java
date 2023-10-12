@@ -153,13 +153,13 @@ public class Blocker extends Module {
             BlockBreakingProgressS2CPacket packet = e.getPacket();
             BlockPos pos = packet.getPos();
 
-            if (mc.world.getBlockState(pos).getBlock() == Blocks.BEDROCK || mc.world.getBlockState(pos).isReplaceable())
-                return;
-
             if (antiCev.getValue() && pos.equals(playerPos.up(2)))
                 placePositions.add(playerPos.up(3));
 
             if (HoleUtility.getSurroundPoses(playerPos).contains(pos)) {
+                if (mc.world.getBlockState(pos).getBlock() == Blocks.BEDROCK || mc.world.getBlockState(pos).isReplaceable())
+                    return;
+                
                 placePositions.add(pos.up());
 
                 if (expand.getValue()) {

@@ -15,8 +15,8 @@ public class AutoFlyme extends Module {
     public final Setting<Boolean> hover = new Setting<>("hover", false);
     public final Setting<Boolean> useTimer = new Setting<>("UseTimer", false);
 
-    public Setting<Float> hoverY = new Setting("hoverY", 0.228f, 0.0f, 1.0f, v -> hover.getValue());
-    public Setting<Float> speed = new Setting("speed", 1.05f, 0.0f, 8f, v -> hover.getValue());
+    public Setting<Float> hoverY = new Setting<>("hoverY", 0.228f, 0.0f, 1.0f, v -> hover.getValue());
+    public Setting<Float> speed = new Setting<>("speed", 1.05f, 0.0f, 8f, v -> hover.getValue());
 
     //фаннигейм перешел на матрикс, и теперь можно летать со скоростью 582 км/ч :skull:
 

@@ -23,8 +23,4 @@ public class MainSettings extends Module {
     public static boolean isRu() {
         return language.getValue() == Language.RU;
     }
-
-    @Override
-    public void onUpdate() {
-    }
 }
