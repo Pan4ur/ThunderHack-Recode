@@ -1,11 +1,13 @@
-package thunder.hack.core;
+package thunder.hack.core.impl;
 
 import com.google.gson.*;
 import net.minecraft.block.Block;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.impl.SearchCommand;
+import thunder.hack.core.IManager;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.render.Search;
@@ -27,7 +29,7 @@ import java.util.stream.Collectors;
 import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class ConfigManager {
+public class ConfigManager implements IManager {
     public static File MainFolder = new File(mc.runDirectory, "ThunderHackRecode");
     public static File ConfigsFolder = new File(MainFolder, "configs");
     public static File CustomImages = new File(MainFolder, "images");
@@ -115,7 +117,7 @@ public class ConfigManager {
         }
     }
 
-    public static String getConfigDate(String name) {
+    public static @NotNull String getConfigDate(String name) {
         File file = new File(ConfigsFolder, name + ".th");
         if (!file.exists()) {
             return "none";
@@ -161,7 +163,7 @@ public class ConfigManager {
         ThunderHack.moduleManager.onLoad();
     }
 
-    public void load(File config) {
+    public void load(@NotNull File config) {
         if (!config.exists()) save(config);
         try {
             FileReader reader = new FileReader(config);
@@ -253,7 +255,7 @@ public class ConfigManager {
         save(file);
     }
 
-    public void save(File config) {
+    public void save(@NotNull File config) {
         saveSearch();
         try {
             if (!config.exists()) {

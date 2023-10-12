@@ -7,7 +7,7 @@ import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.util.Identifier;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;

@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.ModuleManager;
-import thunder.hack.core.ShaderManager;
+import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.impl.ShaderManager;
 import thunder.hack.modules.render.Fullbright;
 
 import static thunder.hack.modules.Module.mc;

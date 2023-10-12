@@ -1,11 +1,12 @@
-package thunder.hack.core;
+package thunder.hack.core.impl;
 
+import thunder.hack.core.IManager;
 import thunder.hack.utility.Macro;
 
 import java.io.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class MacroManager {
+public class MacroManager implements IManager {
     private static CopyOnWriteArrayList<Macro> macros = new CopyOnWriteArrayList<>();
 
     public static void addMacro(Macro macro) {

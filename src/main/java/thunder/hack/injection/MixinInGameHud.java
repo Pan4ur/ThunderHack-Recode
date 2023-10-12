@@ -2,7 +2,7 @@ package thunder.hack.injection;
 
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.hud.impl.Hotbar;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.render.MSAAFramebuffer;

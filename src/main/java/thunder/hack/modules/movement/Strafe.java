@@ -14,7 +14,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;

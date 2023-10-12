@@ -15,7 +15,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventSetBlockState;
 import thunder.hack.events.impl.EventSync;

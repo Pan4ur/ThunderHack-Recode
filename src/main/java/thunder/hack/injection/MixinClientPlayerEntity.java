@@ -9,13 +9,14 @@ import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.modules.movement.Velocity;
 
@@ -24,7 +25,15 @@ import static thunder.hack.modules.Module.mc;
 
 @Mixin(value = ClientPlayerEntity.class, priority = 800)
 public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity {
-    @Shadow public abstract float getPitch(float tickDelta);
+    @Unique
+    boolean pre_sprint_state = false;
+    @Unique
+    private boolean updateLock = false;
+
+    @Shadow
+    public abstract float getPitch(float tickDelta);
+    @Shadow
+    protected abstract void sendMovementPackets();
 
     public MixinClientPlayerEntity(ClientWorld world, GameProfile profile) {
         super(world, profile);
@@ -40,7 +49,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Redirect(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"), require = 0)
     private boolean tickMovementHook(ClientPlayerEntity player) {
         if (ModuleManager.noSlow.isEnabled())
-             return false;
+            return false;
         return player.isUsingItem();
     }
 
@@ -54,11 +63,9 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         }
     }
 
-    boolean pre_sprint_state = false;
-
     @Inject(method = "sendMovementPackets", at = @At("HEAD"), cancellable = true)
     private void sendMovementPacketsHook(CallbackInfo info) {
-        if(fullNullCheck()) return;
+        if (fullNullCheck()) return;
         EventSync event = new EventSync(getYaw(), getPitch());
         ThunderHack.EVENT_BUS.post(event);
         EventSprint e = new EventSprint(isSprinting());
@@ -81,17 +88,13 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "sendMovementPackets", at = @At("RETURN"), cancellable = true)
     private void sendMovementPacketsPostHook(CallbackInfo info) {
-        if(fullNullCheck()) return;
+        if (fullNullCheck()) return;
         mc.player.lastSprinting = pre_sprint_state;
         Core.lock_sprint = false;
         EventPostSync event = new EventPostSync();
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) info.cancel();
     }
-
-    private boolean updateLock = false;
-
-    @Shadow protected abstract void sendMovementPackets();
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendMovementPackets()V", ordinal = 0, shift = At.Shift.AFTER), cancellable = true)
     private void PostUpdateHook(CallbackInfo info) {

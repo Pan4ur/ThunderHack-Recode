@@ -1,6 +1,8 @@
-package thunder.hack.core;
+package thunder.hack.core.impl;
 
 import meteordevelopment.orbit.EventHandler;
+import org.jetbrains.annotations.NotNull;
+import thunder.hack.core.IManager;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.utility.Timer;
 import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
@@ -11,7 +13,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayDeque;
 
-public class ServerManager {
+public class ServerManager implements IManager {
     private final Timer timeDelay = new Timer();
     private final ArrayDeque<Float> tpsResult = new ArrayDeque<>(20);
     private long time;
@@ -33,7 +35,7 @@ public class ServerManager {
     }
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.Receive event) {
+    public void onPacketReceive(PacketEvent.@NotNull Receive event) {
         if (!(event.getPacket() instanceof ChatMessageS2CPacket)) {
             timeDelay.reset();
         }

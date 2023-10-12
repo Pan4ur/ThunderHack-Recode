@@ -2,8 +2,7 @@ package thunder.hack.gui.clickui;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
-import thunder.hack.cmd.Command;
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;

@@ -6,7 +6,7 @@ import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
-import thunder.hack.core.ConfigManager;
+import thunder.hack.core.impl.ConfigManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.components.*;
 import thunder.hack.modules.Module;

@@ -1,6 +1,6 @@
 package thunder.hack.injection;
 
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.modules.player.AutoTool;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;

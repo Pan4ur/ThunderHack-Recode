@@ -1,4 +1,4 @@
-package thunder.hack.core;
+package thunder.hack.core.impl;
 
 import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
@@ -7,6 +7,7 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
+import thunder.hack.core.IManager;
 import thunder.hack.events.impl.EventPostTick;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.EventTick;
@@ -22,9 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static thunder.hack.modules.Module.mc;
-
-public class AsyncManager {
+public class AsyncManager implements IManager {
     private ClientService clientService = new ClientService();
     public static ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -36,10 +35,10 @@ public class AsyncManager {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPostTick(EventPostTick e) {
-        if (mc.world == null) return;
+        if (MC.world == null) return;
 
-        threadSafeEntityList = Lists.newArrayList(mc.world.getEntities());
-        threadSafePlayersList = Lists.newArrayList(mc.world.getPlayers());
+        threadSafeEntityList = Lists.newArrayList(MC.world.getEntities());
+        threadSafePlayersList = Lists.newArrayList(MC.world.getPlayers());
         ticking.set(false);
     }
 
@@ -71,7 +70,7 @@ public class AsyncManager {
         @Override
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
-                if (mc != null && (mc.currentScreen instanceof MainMenuScreen || mc.currentScreen instanceof ClickUI) && updateTimer.passedMs(16)) {
+                if (MC != null && (MC.currentScreen instanceof MainMenuScreen || MC.currentScreen instanceof ClickUI) && updateTimer.passedMs(16)) {
                     MainMenuProgram.increaseTime();
                     updateTimer.reset();
                 }

@@ -1,4 +1,4 @@
-package thunder.hack.core;
+package thunder.hack.core.impl;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
@@ -9,6 +9,7 @@ import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.IManager;
 import thunder.hack.events.impl.EventPostTick;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.TotemPopEvent;
@@ -20,9 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static thunder.hack.modules.Module.mc;
-
-public class CombatManager {
+public class CombatManager implements IManager {
     public HashMap<String, Integer> popList = new HashMap<>();
 
     @EventHandler
@@ -31,7 +30,7 @@ public class CombatManager {
 
         if (event.getPacket() instanceof EntityStatusS2CPacket pac) {
             if (pac.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING) {
-                Entity ent = pac.getEntity(mc.world);
+                Entity ent = pac.getEntity(MC.world);
                 if (!(ent instanceof PlayerEntity)) return;
                 if (popList == null) {
                     popList = new HashMap<>();
@@ -51,7 +50,7 @@ public class CombatManager {
         if (Module.fullNullCheck()) {
             return;
         }
-        for (PlayerEntity player : mc.world.getPlayers()) {
+        for (PlayerEntity player : MC.world.getPlayers()) {
             if (AntiBot.bots.contains(player)) return;
             if (player.getHealth() <= 0 && popList.containsKey(player.getName().getString())) {
                 popList.remove(player.getName().getString(), popList.get(player.getName().getString()));
@@ -65,53 +64,53 @@ public class CombatManager {
     }
 
     public List<PlayerEntity> getTargets(float range) {
-        return mc.world.getPlayers().stream()
+        return MC.world.getPlayers().stream()
                 .filter(e -> !e.isDead())
                 .filter(entityPlayer -> !ThunderHack.friendManager.isFriend(entityPlayer.getName().getString()))
-                .filter(entityPlayer -> entityPlayer != mc.player)
-                .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
-                .sorted(Comparator.comparing(e -> mc.player.distanceTo(e)))
+                .filter(entityPlayer -> entityPlayer != MC.player)
+                .filter(entityPlayer -> MC.player.distanceTo(entityPlayer) < range)
+                .sorted(Comparator.comparing(e -> MC.player.distanceTo(e)))
                 .collect(Collectors.toList());
     }
 
     public PlayerEntity getNearestTarget(float range) {
-        return mc.world.getPlayers()
+        return MC.world.getPlayers()
                 .stream()
-                .filter(e -> e != mc.player)
+                .filter(e -> e != MC.player)
                 .filter(e -> !e.isDead())
                 .filter(e -> !ThunderHack.friendManager.isFriend(e.getName().getString()))
                 .filter(e -> e.getHealth() > 0)
-                .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
-                .min(Comparator.comparing(t -> mc.player.distanceTo(t))).orElse(null);
+                .filter(entityPlayer -> MC.player.distanceTo(entityPlayer) < range)
+                .min(Comparator.comparing(t -> MC.player.distanceTo(t))).orElse(null);
     }
 
     public PlayerEntity getTargetByHP(float range) {
-        return mc.world.getPlayers()
+        return MC.world.getPlayers()
                 .stream()
-                .filter(e -> e != mc.player)
+                .filter(e -> e != MC.player)
                 .filter(e -> !e.isDead())
                 .filter(e -> !ThunderHack.friendManager.isFriend(e.getName().getString()))
                 .filter(e -> e.getHealth() > 0)
-                .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
+                .filter(entityPlayer -> MC.player.distanceTo(entityPlayer) < range)
                 .min(Comparator.comparing(t -> (t.getHealth() + t.getAbsorptionAmount()))).orElse(null);
     }
 
     public PlayerEntity getTargetByFOV(float range) {
-        return mc.world.getPlayers()
+        return MC.world.getPlayers()
                 .stream()
-                .filter(e -> e != mc.player)
+                .filter(e -> e != MC.player)
                 .filter(e -> !e.isDead())
                 .filter(e -> !ThunderHack.friendManager.isFriend(e.getName().getString()))
                 .filter(e -> e.getHealth() > 0)
-                .filter(entityPlayer -> mc.player.distanceTo(entityPlayer) < range)
+                .filter(entityPlayer -> MC.player.distanceTo(entityPlayer) < range)
                 .min(Comparator.comparing(this::getFOVAngle)).orElse(null);
     }
 
     private float getFOVAngle(@NotNull LivingEntity e) {
-        double difX = e.getX() - mc.player.getPos().x;
-        double difZ = e.getZ() - mc.player.getPos().z;
+        double difX = e.getX() - MC.player.getPos().x;
+        double difZ = e.getZ() - MC.player.getPos().z;
         float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);
-        double plYaw = MathHelper.wrapDegrees(mc.player.getYaw());
+        double plYaw = MathHelper.wrapDegrees(MC.player.getYaw());
         return (float) Math.abs(yaw - plYaw);
     }
 }

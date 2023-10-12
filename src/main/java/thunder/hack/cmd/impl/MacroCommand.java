@@ -9,7 +9,7 @@ import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.MacroArgumentType;
-import thunder.hack.core.MacroManager;
+import thunder.hack.core.impl.MacroManager;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.utility.Macro;
 

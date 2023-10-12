@@ -1,8 +1,9 @@
-package thunder.hack.core;
+package thunder.hack.core.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.IManager;
 import thunder.hack.gui.clickui.ClickUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.*;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 import static thunder.hack.modules.Module.mc;
 
 @SuppressWarnings("unused")
-public class ModuleManager {
+public class ModuleManager implements IManager {
     public ArrayList<Module> modules = new ArrayList<>();
     public List<Module> sortedModules = new ArrayList<>();
 

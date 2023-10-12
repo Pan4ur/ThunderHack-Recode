@@ -9,7 +9,7 @@ import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.ChestStealerArgumentType;
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static thunder.hack.modules.client.MainSettings.isRu;

@@ -4,39 +4,43 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.EventAttack;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.SoundUtil;
+import thunder.hack.utility.SoundUtility;
 import thunder.hack.utility.math.MathUtility;
 
 public class HitSound extends Module {
+    private final Setting<Mode> mode = new Setting<>("Sound", Mode.MOAN);
+    private final Setting<Float> volume = new Setting<>("Volume", 1f, 0.1f, 10f);
+    private final Setting<Float> pitch = new Setting<>("Pitch", 1f, 0.1f, 10f);
+
     public HitSound() {
         super("HitSound", Category.MISC);
     }
 
-    private final Setting<Mode> mode = new Setting<>("Sound", Mode.MOAN);
-    public Setting<Float> volume = new Setting<>("Volume", 1f, 0.1f, 10f);
-    public Setting<Float> pitch = new Setting<>("Pitch", 1f, 0.1f, 10f);
-
     public enum Mode {
-        UWU, MOAN, SKEET, KEYBOARD
+        UWU,
+        MOAN,
+        SKEET,
+        KEYBOARD
     }
 
     @EventHandler
-    public void onAttack(EventAttack event) {
+    @SuppressWarnings("unused")
+    public void onAttack(@NotNull EventAttack event) {
         if (!(event.getEntity() instanceof EndCrystalEntity)) {
             switch (mode.getValue()) {
-                case UWU -> playSound(SoundUtil.UWU_SOUNDEVENT);
-                case SKEET -> playSound(SoundUtil.SKEET_SOUNDEVENT);
-                case KEYBOARD -> playSound(SoundUtil.KEYPRESS_SOUNDEVENT);
+                case UWU -> playSound(SoundUtility.UWU_SOUNDEVENT);
+                case SKEET -> playSound(SoundUtility.SKEET_SOUNDEVENT);
+                case KEYBOARD -> playSound(SoundUtility.KEYPRESS_SOUNDEVENT);
                 case MOAN -> {
-                    SoundEvent sound = switch ((int) (MathUtility.random(0, 4))) {
-                        case 0 -> SoundUtil.MOAN1_SOUNDEVENT;
-                        case 1 -> SoundUtil.MOAN2_SOUNDEVENT;
-                        case 2 -> SoundUtil.MOAN3_SOUNDEVENT;
-                        case 3 -> SoundUtil.MOAN4_SOUNDEVENT;
-                        default -> SoundUtil.MOAN5_SOUNDEVENT;
+                    SoundEvent sound = switch ((int) (MathUtility.random(0, 3))) {
+                        case 0 -> SoundUtility.MOAN1_SOUNDEVENT;
+                        case 1 -> SoundUtility.MOAN2_SOUNDEVENT;
+                        case 2 -> SoundUtility.MOAN3_SOUNDEVENT;
+                        default -> SoundUtility.MOAN4_SOUNDEVENT;
                     };
                     playSound(sound);
                 }

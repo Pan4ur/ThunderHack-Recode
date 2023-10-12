@@ -1,4 +1,4 @@
-package thunder.hack.core;
+package thunder.hack.core.impl;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.client.MinecraftClient;
@@ -7,11 +7,12 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.impl.*;
+import thunder.hack.core.IManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommandManager {
+public class CommandManager implements IManager {
     private String prefix = "@";
 
     private final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();

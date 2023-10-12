@@ -1,4 +1,4 @@
-package thunder.hack.core;
+package thunder.hack.core.impl;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -10,15 +10,14 @@ import net.minecraft.client.gl.PostEffectProcessor;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL30C;
+import thunder.hack.core.IManager;
 import thunder.hack.modules.render.Shaders;
 import thunder.hack.utility.interfaces.IShaderEffect;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.modules.Module.mc;
-
-public class ShaderManager {
+public class ShaderManager implements IManager {
     private final static List<RenderTask> tasks = new ArrayList<>();
     private ThunderHackFramebuffer shaderBuffer;
 
@@ -40,7 +39,7 @@ public class ShaderManager {
 
     public void renderShaders() {
         if (DEFAULT == null) {
-            shaderBuffer = new ThunderHackFramebuffer(mc.getFramebuffer().textureWidth, mc.getFramebuffer().textureHeight);
+            shaderBuffer = new ThunderHackFramebuffer(MC.getFramebuffer().textureWidth, MC.getFramebuffer().textureHeight);
             reloadShaders();
         }
 
@@ -49,16 +48,16 @@ public class ShaderManager {
     }
 
     public void applyShader(Runnable runnable, Shader mode) {
-        Framebuffer mcBuffer = MinecraftClient.getInstance().getFramebuffer();
+        Framebuffer MCBuffer = MinecraftClient.getInstance().getFramebuffer();
         RenderSystem.assertOnRenderThreadOrInit();
-        if (shaderBuffer.textureWidth != mcBuffer.textureWidth || shaderBuffer.textureHeight != mcBuffer.textureHeight)
-            shaderBuffer.resize(mcBuffer.textureWidth, mcBuffer.textureHeight, false);
+        if (shaderBuffer.textureWidth != MCBuffer.textureWidth || shaderBuffer.textureHeight != MCBuffer.textureHeight)
+            shaderBuffer.resize(MCBuffer.textureWidth, MCBuffer.textureHeight, false);
         GlStateManager._glBindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, shaderBuffer.fbo);
         shaderBuffer.beginWrite(true);
         runnable.run();
         shaderBuffer.endWrite();
-        GlStateManager._glBindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, mcBuffer.fbo);
-        mcBuffer.beginWrite(false);
+        GlStateManager._glBindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, MCBuffer.fbo);
+        MCBuffer.beginWrite(false);
         ManagedShaderEffect shader = getShader(mode);
         Framebuffer mainBuffer = MinecraftClient.getInstance().getFramebuffer();
         PostEffectProcessor effect = shader.getShaderEffect();
@@ -108,9 +107,9 @@ public class ShaderManager {
             effect.setUniformValue("quality", shaders.quality.getValue());
             effect.setUniformValue("factor", shaders.factor.getValue());
             effect.setUniformValue("moreGradient", shaders.gradient.getValue());
-            effect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
+            effect.setUniformValue("resolution", (float) MC.getWindow().getScaledWidth(), (float) MC.getWindow().getScaledHeight());
             effect.setUniformValue("time", time);
-            effect.render(mc.getTickDelta());
+            effect.render(MC.getTickDelta());
             time += 0.008f;
         } else if (shader == Shader.Smoke) {
             effect.setUniformValue("alpha0", shaders.glow.getValue() ? -1.0f : shaders.outlineColor.getValue().getAlpha() / 255.0f);
@@ -124,9 +123,9 @@ public class ShaderManager {
             effect.setUniformValue("fsecond", shaders.fillColor2.getValue().getGlRed(), shaders.fillColor2.getValue().getGlGreen(), shaders.fillColor2.getValue().getGlBlue());
             effect.setUniformValue("fthird", shaders.fillColor3.getValue().getGlRed(), shaders.fillColor3.getValue().getGlGreen(), shaders.fillColor3.getValue().getGlBlue());
             effect.setUniformValue("oct", shaders.octaves.getValue());
-            effect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
+            effect.setUniformValue("resolution", (float) MC.getWindow().getScaledWidth(), (float) MC.getWindow().getScaledHeight());
             effect.setUniformValue("time", time);
-            effect.render(mc.getTickDelta());
+            effect.render(MC.getTickDelta());
             time += 0.008f;
         } else if (shader == Shader.Default) {
             effect.setUniformValue("alpha0", shaders.glow.getValue() ? -1.0f : shaders.outlineColor.getValue().getAlpha() / 255.0f);
@@ -134,13 +133,13 @@ public class ShaderManager {
             effect.setUniformValue("quality", shaders.quality.getValue());
             effect.setUniformValue("color", shaders.fillColor1.getValue().getGlRed(), shaders.fillColor1.getValue().getGlGreen(), shaders.fillColor1.getValue().getGlBlue(), shaders.fillColor1.getValue().getGlAlpha());
             effect.setUniformValue("outlinecolor", shaders.outlineColor.getValue().getGlRed(), shaders.outlineColor.getValue().getGlGreen(), shaders.outlineColor.getValue().getGlBlue(), shaders.outlineColor.getValue().getGlAlpha());
-            effect.render(mc.getTickDelta());
+            effect.render(MC.getTickDelta());
         } else if (shader == Shader.Snow) {
             effect.setUniformValue("color", shaders.fillColor1.getValue().getGlRed(), shaders.fillColor1.getValue().getGlGreen(), shaders.fillColor1.getValue().getGlBlue(), shaders.fillColor1.getValue().getGlAlpha());
             effect.setUniformValue("quality", shaders.quality.getValue());
-            effect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
+            effect.setUniformValue("resolution", (float) MC.getWindow().getScaledWidth(), (float) MC.getWindow().getScaledHeight());
             effect.setUniformValue("time", time);
-            effect.render(mc.getTickDelta());
+            effect.render(MC.getTickDelta());
             time += 0.008f;
         }
     }
@@ -155,32 +154,32 @@ public class ShaderManager {
             PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
             if (effect == null) return;
 
-            ((IShaderEffect) effect).addFakeTargetHook("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
-            ((IShaderEffect) effect).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
+            ((IShaderEffect) effect).addFakeTargetHook("bufIn", MC.worldRenderer.getEntityOutlinesFramebuffer());
+            ((IShaderEffect) effect).addFakeTargetHook("bufOut", MC.worldRenderer.getEntityOutlinesFramebuffer());
         });
 
         SMOKE_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/smoke.json"), managedShaderEffect -> {
             PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
             if (effect == null) return;
 
-            ((IShaderEffect) effect).addFakeTargetHook("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
-            ((IShaderEffect) effect).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
+            ((IShaderEffect) effect).addFakeTargetHook("bufIn", MC.worldRenderer.getEntityOutlinesFramebuffer());
+            ((IShaderEffect) effect).addFakeTargetHook("bufOut", MC.worldRenderer.getEntityOutlinesFramebuffer());
         });
 
         GRADIENT_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/gradient.json"), managedShaderEffect -> {
             PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
             if (effect == null) return;
 
-            ((IShaderEffect) effect).addFakeTargetHook("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
-            ((IShaderEffect) effect).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
+            ((IShaderEffect) effect).addFakeTargetHook("bufIn", MC.worldRenderer.getEntityOutlinesFramebuffer());
+            ((IShaderEffect) effect).addFakeTargetHook("bufOut", MC.worldRenderer.getEntityOutlinesFramebuffer());
         });
 
         SNOW_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/snow.json"), managedShaderEffect -> {
             PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
             if (effect == null) return;
 
-            ((IShaderEffect) effect).addFakeTargetHook("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
-            ((IShaderEffect) effect).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
+            ((IShaderEffect) effect).addFakeTargetHook("bufIn", MC.worldRenderer.getEntityOutlinesFramebuffer());
+            ((IShaderEffect) effect).addFakeTargetHook("bufOut", MC.worldRenderer.getEntityOutlinesFramebuffer());
         });
     }
 
@@ -195,7 +194,7 @@ public class ShaderManager {
 
     public boolean fullNullCheck() {
         if (GRADIENT == null || SMOKE == null || DEFAULT == null) {
-            shaderBuffer = new ThunderHackFramebuffer(mc.getFramebuffer().textureWidth, mc.getFramebuffer().textureHeight);
+            shaderBuffer = new ThunderHackFramebuffer(MC.getFramebuffer().textureWidth, MC.getFramebuffer().textureHeight);
             reloadShaders();
             return true;
         }

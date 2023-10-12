@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.WayPointArgumentType;
-import thunder.hack.core.WayPointManager;
+import thunder.hack.core.impl.WayPointManager;
 import thunder.hack.modules.client.MainSettings;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;

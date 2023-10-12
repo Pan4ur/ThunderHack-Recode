@@ -3,7 +3,7 @@ package thunder.hack.gui.misc;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.misc.NoCommentExploit;
 import thunder.hack.utility.render.Render2DEngine;

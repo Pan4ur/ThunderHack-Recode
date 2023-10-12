@@ -10,7 +10,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.WayPointManager;
+import thunder.hack.core.impl.WayPointManager;
 import thunder.hack.modules.client.MainSettings;
 
 import java.util.Collection;

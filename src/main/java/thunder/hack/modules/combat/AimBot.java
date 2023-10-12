@@ -13,7 +13,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -30,7 +30,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static java.lang.Math.abs;
 import static net.minecraft.util.hit.HitResult.Type.ENTITY;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
-import static thunder.hack.core.PlayerManager.calcAngleVec;
+import static thunder.hack.core.impl.PlayerManager.calcAngleVec;
 
 public class AimBot extends Module {
     public AimBot() {

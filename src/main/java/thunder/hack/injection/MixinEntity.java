@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventEntityMoving;
 import thunder.hack.events.impl.PushEvent;
 import thunder.hack.modules.combat.HitBox;
@@ -31,14 +31,16 @@ import static thunder.hack.modules.Module.mc;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity implements IEntity {
-    @Shadow private Box boundingBox;
+    @Shadow
+    private Box boundingBox;
 
-    @Override public List<Trails.Trail> getTrails() {
+    @Override
+    public List<Trails.Trail> thunderHack_Recode$getTrails() {
         return trails;
     }
 
-    @Unique public List<Trails.Trail> trails = new ArrayList<>();
-
+    @Unique
+    public List<Trails.Trail> trails = new ArrayList<>();
 
     @ModifyArgs(method = "pushAwayFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;addVelocity(DDD)V"))
     private void pushAwayFromHook(Args args) {

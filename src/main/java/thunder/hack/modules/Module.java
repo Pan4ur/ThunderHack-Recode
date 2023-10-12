@@ -10,12 +10,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.CommandManager;
-import thunder.hack.modules.client.MainSettings;
+import thunder.hack.core.impl.CommandManager;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
-import thunder.hack.utility.SoundUtil;
+import thunder.hack.utility.SoundUtility;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -115,7 +114,7 @@ public abstract class Module {
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
             ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль включен!" : "Was Enabled!", 2, Notification.Type.ENABLED);
 
-            mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundUtil.ENABLE_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
+            mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundUtility.ENABLE_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
         }
     }
 
@@ -139,7 +138,7 @@ public abstract class Module {
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
             ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль выключен!" : "Was Disabled!", 2, Notification.Type.DISABLED);
 
-            mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundUtil.DISABLE_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
+            mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundUtility.DISABLE_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
         }
     }
 

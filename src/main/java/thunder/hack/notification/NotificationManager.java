@@ -2,7 +2,7 @@ package thunder.hack.notification;
 
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.setting.Setting;
 
 import java.util.List;

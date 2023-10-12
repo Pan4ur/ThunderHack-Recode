@@ -4,8 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
-import thunder.hack.core.ModuleManager;
-import thunder.hack.modules.misc.Tracker;
+import thunder.hack.core.impl.ModuleManager;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 

@@ -29,7 +29,7 @@ public abstract class Command {
 
     public static void sendMessage(String message) {
         if (MC.player == null) return;
-        MC.player.sendMessage(Text.of(thunder.hack.core.CommandManager.getClientMessage() + " "  + message));
+        MC.player.sendMessage(Text.of(thunder.hack.core.impl.CommandManager.getClientMessage() + " "  + message));
     }
 
     public static void sendMessageWithoutTH(String message) {

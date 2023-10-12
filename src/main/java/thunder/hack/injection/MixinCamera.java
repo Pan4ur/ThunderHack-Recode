@@ -1,6 +1,6 @@
 package thunder.hack.injection;
 
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 import net.minecraft.client.render.Camera;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,7 +12,8 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(Camera.class)
 public abstract class MixinCamera {
-    @Shadow protected abstract double clipToSpace(double desiredCameraDistance);
+    @Shadow
+    protected abstract double clipToSpace(double desiredCameraDistance);
 
     @ModifyArgs(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;moveBy(DDD)V", ordinal = 0))
     private void modifyCameraDistance(Args args) {

@@ -2,8 +2,7 @@ package thunder.hack.modules.player;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import thunder.hack.ThunderHack;
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 
@@ -11,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import thunder.hack.modules.movement.ElytraPlus;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
 import net.minecraft.enchantment.Enchantment;

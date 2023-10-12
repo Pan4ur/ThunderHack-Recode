@@ -5,8 +5,9 @@ import meteordevelopment.orbit.IEventBus;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import thunder.hack.core.*;
+import thunder.hack.core.impl.*;
 import thunder.hack.notification.NotificationManager;
-import thunder.hack.utility.SoundUtil;
+import thunder.hack.utility.SoundUtility;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.utility.ThunderUtility;
@@ -85,7 +86,7 @@ public class ThunderHack implements ModInitializer {
 
         Render2DEngine.initShaders();
 
-        SoundUtil.registerSounds();
+        SoundUtility.registerSounds();
         syncVersion();
         ThunderUtility.parseChangeLog();
         ModuleManager.rpc.startRpc();

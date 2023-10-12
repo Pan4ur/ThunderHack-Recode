@@ -1,9 +1,11 @@
-package thunder.hack.core;
+package thunder.hack.core.impl;
+
+import thunder.hack.core.IManager;
 
 import java.io.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class WayPointManager {
+public class WayPointManager implements IManager {
     private static CopyOnWriteArrayList<WayPoint> wayPoints = new CopyOnWriteArrayList<>();
 
     public void addWayPoint(WayPoint macro) {

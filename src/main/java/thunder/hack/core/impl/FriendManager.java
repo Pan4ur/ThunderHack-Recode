@@ -1,15 +1,16 @@
-package thunder.hack.core;
+package thunder.hack.core.impl;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import net.minecraft.entity.player.PlayerEntity;
+import thunder.hack.core.IManager;
 
 import java.io.*;
 import java.util.*;
 
 import static thunder.hack.modules.Module.mc;
 
-public class FriendManager {
+public class FriendManager implements IManager {
     public static List<String> friends = new ArrayList<>();
 
     public boolean isFriend(String name) {

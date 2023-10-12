@@ -1,9 +1,8 @@
 package thunder.hack.modules.player;
 
 import thunder.hack.ThunderHack;
-import thunder.hack.core.ModuleManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.movement.Timer;
 
 public class TpsSync extends Module {
     public TpsSync() {
