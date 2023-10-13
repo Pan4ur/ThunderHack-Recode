@@ -9,6 +9,8 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.world.HoleUtility;
@@ -28,6 +30,7 @@ public class HoleESP extends Module {
 
     private final Setting<Float> height = new Setting<>("Height", 1f, 0.01f, 5f);
     private final Setting<Float> lineWith = new Setting<>("Line Width", 0.5f, 0.01f, 5f);
+    public final Setting<Boolean> culling = new Setting<>("Culling", true, v-> mode.getValue() == Mode.Fade || mode.getValue() == Mode.Fade2);
 
     private enum Mode {
         Fade,
@@ -56,7 +59,7 @@ public class HoleESP extends Module {
         for (BoxWithColor pwc : positions) {
             switch (mode.getValue()) {
                 case Fade -> renderFade(pwc);
-                case Fade2 -> renderFade2(pwc, stack);
+                case Fade2 -> renderFade2(pwc);
                 case CubeFill -> renderFill(pwc);
                 case CubeOutline -> renderOutline(pwc);
                 case CubeBoth -> {
@@ -69,38 +72,53 @@ public class HoleESP extends Module {
 
     public void renderFade(@NotNull HoleESP.BoxWithColor posWithColor) {
         Render3DEngine.FADE_QUEUE.add(
-                new Render3DEngine.FadeAction(posWithColor.box, Render2DEngine.applyOpacity(posWithColor.color(), 60), Render2DEngine.applyOpacity(posWithColor.color(), 0))
+                new Render3DEngine.FadeAction(posWithColor.box, getColor(posWithColor.box, posWithColor.color(), 60), getColor(posWithColor.box, posWithColor.color(), 0))
         );
         Render3DEngine.OUTLINE_SIDE_QUEUE.add(
-                new Render3DEngine.OutlineSideAction(posWithColor.box, posWithColor.color(), lineWith.getValue(), Direction.DOWN)
+                new Render3DEngine.OutlineSideAction(posWithColor.box, getColor(posWithColor.box, posWithColor.color(), posWithColor.color.getAlpha()), lineWith.getValue(), Direction.DOWN)
         );
     }
 
 
-    public void renderFade2(@NotNull HoleESP.BoxWithColor boxWithColor, MatrixStack stack) {
+    public void renderFade2(@NotNull HoleESP.BoxWithColor boxWithColor) {
         Render3DEngine.FADE_QUEUE.add(
-                new Render3DEngine.FadeAction(boxWithColor.box, Render2DEngine.applyOpacity(boxWithColor.color(), 60), Render2DEngine.applyOpacity(boxWithColor.color(), 0)
+                new Render3DEngine.FadeAction(boxWithColor.box, getColor(boxWithColor.box, boxWithColor.color(), 60), getColor(boxWithColor.box, boxWithColor.color(), 0)
                 ));
+
         Render3DEngine.drawHoleOutline(
-                boxWithColor.box, boxWithColor.color(), lineWith.getValue()
+                boxWithColor.box, getColor(boxWithColor.box, boxWithColor.color(), boxWithColor.color.getAlpha()), lineWith.getValue()
         );
 
         Render3DEngine.FILLED_QUEUE.add(
                 new Render3DEngine.FillAction(new Box(boxWithColor.box.minX, boxWithColor.box.minY, boxWithColor.box.minZ,
-                        boxWithColor.box.maxX, boxWithColor.box.minY + 0.01f, boxWithColor.box.maxZ), boxWithColor.color()
+                        boxWithColor.box.maxX, boxWithColor.box.minY + 0.01f, boxWithColor.box.maxZ), getColor(boxWithColor.box, boxWithColor.color(), boxWithColor.color.getAlpha())
                 )
         );
     }
 
+    private Color getColor(Box box, Color color, int alpha) {
+        float dist = PlayerUtility.squaredDistance2d(box.getCenter().getX(), box.getCenter().getZ());
+        float factor = dist / (rangeXZ.getPow2Value());
+
+        factor = 1f - easeOutExpo(factor);
+
+        factor = MathUtility.clamp(factor, 0f, 1f);
+
+        return Render2DEngine.injectAlpha(color, (int) (factor * alpha));
+    }
+
+    private float easeOutExpo(float x){
+        return x == 1f ? 1f : (float) (1f - Math.pow(2f, -10f * x));
+    }
     public void renderOutline(@NotNull HoleESP.BoxWithColor boxWithColor) {
         Render3DEngine.OUTLINE_QUEUE.add(
-                new Render3DEngine.OutlineAction(boxWithColor.box, boxWithColor.color(), lineWith.getValue())
+                new Render3DEngine.OutlineAction(boxWithColor.box, getColor(boxWithColor.box, boxWithColor.color(), boxWithColor.color.getAlpha()), lineWith.getValue())
         );
     }
 
     public void renderFill(@NotNull HoleESP.BoxWithColor boxWithColor) {
         Render3DEngine.FILLED_QUEUE.add(
-                new Render3DEngine.FillAction(boxWithColor.box(), boxWithColor.color())
+                new Render3DEngine.FillAction(boxWithColor.box(), getColor(boxWithColor.box, boxWithColor.color(), boxWithColor.color.getAlpha()))
         );
     }
 

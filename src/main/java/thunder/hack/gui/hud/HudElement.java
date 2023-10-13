@@ -9,12 +9,10 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 
 public class HudElement extends Module {
-    int height;
-    int width;
-    int dragX, dragY = 0;
+
     private boolean mousestate = false;
-    float x1 = 0;
-    float y1 = 0;
+    private float x1, y1, dragX, dragY;
+    private int height, width;
 
     public HudElement(String name, int width, int height) {
         super(name, Category.HUD);
@@ -59,12 +57,27 @@ public class HudElement extends Module {
         }
     }
 
+    public void setWidth(int width){
+        this.width = width;
+    }
+
+    public void setHeight(int height){
+        this.height = height;
+    }
+
+    public void setBounds(int w, int h){
+        setWidth(w);
+        setHeight(h);
+    }
+
     @EventHandler
     public void onMouse(EventMouse event) {
         if (event.getAction() == 0) {
+            HudEditorGui.currentlyDragging = null;
             m_butt = false;
         }
-        if (event.getAction() == 1 && isHovering()) {
+        if (event.getAction() == 1 && isHovering() && HudEditorGui.currentlyDragging == null) {
+            HudEditorGui.currentlyDragging = this;
             m_butt = true;
         }
     }
@@ -83,9 +96,5 @@ public class HudElement extends Module {
 
     public float getY() {
         return pos.getValue().y;
-    }
-
-    public void setHeight(int h) {
-        this.height = h;
     }
 }

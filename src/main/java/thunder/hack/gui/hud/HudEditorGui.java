@@ -22,6 +22,8 @@ import java.util.List;
 import static thunder.hack.modules.Module.mc;
 
 public class HudEditorGui extends Screen {
+    public static HudElement currentlyDragging;
+
     private Animation openAnimation, bgAnimation, rAnimation;
     private final List<AbstractWindow> windows;
 

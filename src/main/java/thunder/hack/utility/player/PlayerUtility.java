@@ -4,6 +4,8 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PendingUpdateManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
@@ -60,5 +62,13 @@ public final class PlayerUtility {
 
     private static PendingUpdateManager getUpdateManager(ClientWorld world) {
         return ((IClientWorldMixin) world).acquirePendingUpdateManager();
+    }
+
+    public static float squaredDistance2d(double x, double z) {
+        if (mc.player == null) return 0f;
+
+        double d = mc.player.getX() - x;
+        double f = mc.player.getZ() - z;
+        return (float) (d * d + f * f);
     }
 }

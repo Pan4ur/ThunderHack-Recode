@@ -73,6 +73,7 @@ public class Radar extends HudElement {
                     color2.getValue().getColorObject(), color2.getValue().getColorObject(), color2.getValue().getColorObject(), color2.getValue().getColorObject()
             );
 
+            setBounds(size.getValue(), size.getValue());
 
             for (PlayerEntity entityPlayer : players) {
                 if (entityPlayer == mc.player)

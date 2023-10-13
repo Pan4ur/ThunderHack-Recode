@@ -13,6 +13,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
 
@@ -249,6 +250,9 @@ public class Render3DEngine {
         float maxY = (float) (box.maxY - mc.getEntityRenderDispatcher().camera.getPos().getY());
         float maxZ = (float) (box.maxZ - mc.getEntityRenderDispatcher().camera.getPos().getZ());
 
+        if(ModuleManager.holeESP.culling.getValue())
+            RenderSystem.enableCull();
+
         buffer.vertex(posMatrix, minX, minY, minZ).color(c.getRGB()).next();
         buffer.vertex(posMatrix, minX, maxY, minZ).color(c1.getRGB()).next();
         buffer.vertex(posMatrix, maxX, maxY, minZ).color(c1.getRGB()).next();
@@ -273,6 +277,9 @@ public class Render3DEngine {
         buffer.vertex(posMatrix, minX, maxY, maxZ).color(c1.getRGB()).next();
         buffer.vertex(posMatrix, maxX, maxY, maxZ).color(c1.getRGB()).next();
         buffer.vertex(posMatrix, maxX, maxY, minZ).color(c1.getRGB()).next();
+
+        if(ModuleManager.holeESP.culling.getValue())
+            RenderSystem.disableCull();
     }
 
     public static void drawLine(@NotNull Vec3d vec1, @NotNull Vec3d vec2, Color color, float width) {

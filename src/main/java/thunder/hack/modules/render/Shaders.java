@@ -5,7 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ShaderManager;
+import thunder.hack.core.ShaderManager;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -37,7 +37,7 @@ public class Shaders extends Module {
     public final Setting<Float> gradient = new Setting<>("Gradient", 2f, 0f, 20f);
     public final Setting<Integer> alpha2 = new Setting<>("GradientAlpha", 170, 0, 255);
     public final Setting<Integer> lineWidth = new Setting<>("LineWidth", 2, 0, 20);
-    public final Setting<Integer> quality = new Setting<>("Quality", 10, 1, 30);
+    public final Setting<Integer> quality = new Setting<>("Quality", 3, 0, 20);
     public final Setting<Integer> octaves = new Setting<>("SmokeOctaves", 10, 5, 30);
     public final Setting<Integer> fillAlpha = new Setting<>("FillAlpha", 170, 0, 255);
     public final Setting<Boolean> glow = new Setting<>("SmokeGlow", true);
@@ -51,23 +51,30 @@ public class Shaders extends Module {
     public final Setting<ColorSetting> fillColor3 = new Setting<>("SmokeFil2", new ColorSetting(0x8800FF00)).withParent(colors);
 
     public boolean shouldRender(Entity entity) {
-        if (entity == null) return false;
-        if (mc.player == null) return false;
-        if (mc.player.squaredDistanceTo(entity.getPos()) > maxRange.getPow2Value()) return false;
+        if (entity == null)
+            return false;
+
+        if (mc.player == null)
+            return false;
+
+        if (mc.player.squaredDistanceTo(entity.getPos()) > maxRange.getPow2Value())
+            return false;
+
         if (entity instanceof PlayerEntity) {
-            if (entity == mc.player) return false;
-            if (ThunderHack.friendManager.isFriend((PlayerEntity) entity)) {
+            if (entity == mc.player)
+                return false;
+            if (ThunderHack.friendManager.isFriend((PlayerEntity) entity))
                 return friends.getValue();
-            }
             return players.getValue();
         }
 
-        if (entity instanceof EndCrystalEntity) return crystals.getValue();
+        if (entity instanceof EndCrystalEntity)
+            return crystals.getValue();
 
         return switch (entity.getType().getSpawnGroup()) {
-            case CREATURE, WATER_AMBIENT, WATER_CREATURE -> creatures.getValue();
+            case CREATURE, WATER_CREATURE -> creatures.getValue();
             case MONSTER -> monsters.getValue();
-            case AMBIENT -> ambients.getValue();
+            case AMBIENT, WATER_AMBIENT -> ambients.getValue();
             default -> others.getValue();
         };
     }
