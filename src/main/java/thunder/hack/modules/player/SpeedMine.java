@@ -43,6 +43,7 @@ import static net.minecraft.enchantment.EnchantmentHelper.hasAquaAffinity;
 
 public class SpeedMine extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
+    public final Setting<StartMode> startMode = new Setting<>("StartMode", StartMode.StartAbort, v -> mode.getValue() == Mode.Packet);
     public final Setting<SwitchMode> switchMode = new Setting<>("SwitchMode", SwitchMode.Alternative, v -> mode.getValue() == Mode.Packet);
     private final Setting<Float> factor = new Setting<>("Factor", 1f, 0.5f, 2f, v -> mode.getValue() == Mode.Packet);
     private final Setting<Float> startDmg = new Setting<>("StartDmg", 0f, 0f, 1f, v -> mode.getValue() == Mode.Damage);
@@ -299,7 +300,7 @@ public class SpeedMine extends Module {
                     mineBreaks = 0;
                     if (minePosition != null && mineFacing != null) {
                         sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, minePosition, mineFacing));
-                        sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, minePosition, mineFacing));
+                        sendPacket(new PlayerActionC2SPacket(startMode.getValue() == StartMode.StartAbort ? PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK : PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, minePosition, mineFacing));
                     }
                 }
             }
@@ -361,5 +362,10 @@ public class SpeedMine extends Module {
         Normal,
         None,
         Alternative
+    }
+
+    public enum StartMode {
+        StartAbort,
+        StartStop
     }
 }
