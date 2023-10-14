@@ -55,6 +55,13 @@ public class NoRender extends Module {
     public static Setting<Boolean> fireEntity = new Setting<>("FireEntity", true);
     public Setting<Boolean> antiTitle = new Setting<>("AntiTitle", false);
     public Setting<Boolean> antiPlayerCollision = new Setting<>("AntiPlayerCollision", true);
+    public Setting<NoScoreBoard> noScoreBoard = new Setting<>("NoScoreBoard", NoScoreBoard.None);
+    public Setting<Float> sbX = new Setting<>("BoardX", 1.0f, 0.0f, 10.0f, v-> noScoreBoard.getValue() == NoScoreBoard.Position);
+    public Setting<Float> sbY = new Setting<>("BoardY", 1.0f, 0.0f, 10.0f, v-> noScoreBoard.getValue() == NoScoreBoard.Position);
+
+    public enum NoScoreBoard {
+        Off, Position, None
+    }
 
     int potionCouter, xpCounter, arrowCounter, itemsCounter;
 
