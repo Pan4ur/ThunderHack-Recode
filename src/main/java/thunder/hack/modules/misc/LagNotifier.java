@@ -62,12 +62,13 @@ public class LagNotifier extends Module {
 
         if (!rubberbandTimer.passedMs(5000) && rubberbandNotify.getValue()) {
             DecimalFormat decimalFormat = new DecimalFormat("#.#");
-            FontRenderers.modules.drawCenteredString(context.getMatrices(), isRu() ? "Обнаружен руббербенд! " : "Rubberband detected! " + decimalFormat.format((5000f - (float) rubberbandTimer.getTimeMs()) / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
+
+            FontRenderers.modules.drawCenteredString(context.getMatrices(), (isRu() ? "Обнаружен руббербенд! " : "Rubberband detected! ") + decimalFormat.format((5000f - (float) rubberbandTimer.getTimeMs()) / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
         }
 
         if (packetTimer.passedMs(5000) && serverResponseNotify.getValue()) {
             DecimalFormat decimalFormat = new DecimalFormat("#.#");
-            FontRenderers.modules.drawCenteredString(context.getMatrices(), isRu() ? "Сервер перестал отвечать! " : "The server stopped responding! " + decimalFormat.format((float) packetTimer.getTimeMs() / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
+            FontRenderers.modules.drawCenteredString(context.getMatrices(), (isRu() ? "Сервер перестал отвечать! " : "The server stopped responding! ") + decimalFormat.format((float) packetTimer.getTimeMs() / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
 
             RenderSystem.setShaderColor(1f, 0.87f, 0f, 1f);
             context.drawTexture(ICON, (int) ((float) mc.getWindow().getScaledWidth() / 2f - 40), (int) ((float) mc.getWindow().getScaledHeight() / 3f - 120), 0, 0, 80, 80, 80, 80);
