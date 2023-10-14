@@ -47,14 +47,13 @@ public class CombatManager implements IManager {
 
     @EventHandler
     public void onPostTick(EventPostTick event) {
-        if (Module.fullNullCheck()) {
+        if (Module.fullNullCheck())
             return;
-        }
         for (PlayerEntity player : MC.world.getPlayers()) {
-            if (AntiBot.bots.contains(player)) return;
-            if (player.getHealth() <= 0 && popList.containsKey(player.getName().getString())) {
+            if (AntiBot.bots.contains(player)) continue;
+
+            if (player.getHealth() <= 0 && popList.containsKey(player.getName().getString()))
                 popList.remove(player.getName().getString(), popList.get(player.getName().getString()));
-            }
         }
     }
 
@@ -68,42 +67,21 @@ public class CombatManager implements IManager {
                 .filter(e -> !e.isDead())
                 .filter(entityPlayer -> !ThunderHack.friendManager.isFriend(entityPlayer.getName().getString()))
                 .filter(entityPlayer -> entityPlayer != MC.player)
-                .filter(entityPlayer -> MC.player.distanceTo(entityPlayer) < range)
+                .filter(entityPlayer -> MC.player.squaredDistanceTo(entityPlayer) < range * range)
                 .sorted(Comparator.comparing(e -> MC.player.distanceTo(e)))
                 .collect(Collectors.toList());
     }
 
     public PlayerEntity getNearestTarget(float range) {
-        return MC.world.getPlayers()
-                .stream()
-                .filter(e -> e != MC.player)
-                .filter(e -> !e.isDead())
-                .filter(e -> !ThunderHack.friendManager.isFriend(e.getName().getString()))
-                .filter(e -> e.getHealth() > 0)
-                .filter(entityPlayer -> MC.player.distanceTo(entityPlayer) < range)
-                .min(Comparator.comparing(t -> MC.player.distanceTo(t))).orElse(null);
+        return getTargets(range).stream().min(Comparator.comparing(t -> MC.player.distanceTo(t))).orElse(null);
     }
 
     public PlayerEntity getTargetByHP(float range) {
-        return MC.world.getPlayers()
-                .stream()
-                .filter(e -> e != MC.player)
-                .filter(e -> !e.isDead())
-                .filter(e -> !ThunderHack.friendManager.isFriend(e.getName().getString()))
-                .filter(e -> e.getHealth() > 0)
-                .filter(entityPlayer -> MC.player.distanceTo(entityPlayer) < range)
-                .min(Comparator.comparing(t -> (t.getHealth() + t.getAbsorptionAmount()))).orElse(null);
+        return getTargets(range).stream().min(Comparator.comparing(t -> (t.getHealth() + t.getAbsorptionAmount()))).orElse(null);
     }
 
     public PlayerEntity getTargetByFOV(float range) {
-        return MC.world.getPlayers()
-                .stream()
-                .filter(e -> e != MC.player)
-                .filter(e -> !e.isDead())
-                .filter(e -> !ThunderHack.friendManager.isFriend(e.getName().getString()))
-                .filter(e -> e.getHealth() > 0)
-                .filter(entityPlayer -> MC.player.distanceTo(entityPlayer) < range)
-                .min(Comparator.comparing(this::getFOVAngle)).orElse(null);
+        return getTargets(range).stream().min(Comparator.comparing(this::getFOVAngle)).orElse(null);
     }
 
     private float getFOVAngle(@NotNull LivingEntity e) {

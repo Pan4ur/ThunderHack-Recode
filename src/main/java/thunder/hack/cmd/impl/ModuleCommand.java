@@ -49,7 +49,7 @@ public class ModuleCommand extends Command {
 
                     return SINGLE_SUCCESS;
                 })).then(arg("setting", StringArgumentType.word())
-                        .then(arg("settingValue", StringArgumentType.string()).executes(context -> {
+                        .then(arg("settingValue", StringArgumentType.greedyString()).executes(context -> {
                             Module module = context.getArgument("module", Module.class);
                             Setting setting = module.getSettingByName(context.getArgument("setting", String.class));
                             String settingValue = context.getArgument("settingValue", String.class);

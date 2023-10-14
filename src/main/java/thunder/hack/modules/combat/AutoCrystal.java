@@ -66,6 +66,8 @@ public class AutoCrystal extends Module {
     private final Setting<Float> yawAngle = new Setting<>("YawAngle", 180.0f, 1.0f, 180.0f, v -> rotate.getValue() && yawStep.getValue() && page.getValue() == Pages.Main);
     private final Setting<TargetLogic> targetLogic = new Setting<>("TargetLogic", TargetLogic.Distance, v -> page.getValue() == Pages.Main);
     private final Setting<Float> targetRange = new Setting<>("TargetRange", 10.0f, 1.0f, 15f, v -> page.getValue() == Pages.Main);
+    public static final Setting<Integer> selfPredictTicks = new Setting<>("SelfPredictTicks", 3, 0, 20, v -> page.getValue() == Pages.Main);
+    private final Setting<OnBreakBlock> onBreakBlock = new Setting<>("OnBreakBlock", OnBreakBlock.Smart, v -> page.getValue() == Pages.Main);
 
     /* MULTITHREADING */
     private final Setting<Boolean> multiThread = new Setting<>("MultiThread", false, v -> page.getValue() == Pages.MultiThread);
@@ -78,7 +80,7 @@ public class AutoCrystal extends Module {
     private final Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 0, 0, 1000, v -> page.getValue() == Pages.Place);
     private final Setting<Float> placeRange = new Setting<>("PlaceRange", 5f, 1.0f, 6f, v -> page.getValue() == Pages.Place);
     private final Setting<Float> placeWallRange = new Setting<>("PlaceWallRange", 3.5f, 1.0f, 6f, v -> page.getValue() == Pages.Place);
-    public static final Setting<Integer> predictTicks = new Setting<>("PredictTicks", 3, 0, 10, v -> page.getValue() == Pages.Place);
+    public static final Setting<Integer> predictTicks = new Setting<>("PredictTicks", 3, 0, 20, v -> page.getValue() == Pages.Place);
 
     /*   BREAK   */
     private final Setting<Integer> breakDelay = new Setting<>("BreakDelay", 0, 0, 1000, v -> page.getValue() == Pages.Break);
@@ -269,7 +271,6 @@ public class AutoCrystal extends Module {
         }
     }
 
-
     @EventHandler
     public void onPacketSend(PacketEvent.@NotNull Send e) {
         if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket) switchTimer.reset();
@@ -281,10 +282,9 @@ public class AutoCrystal extends Module {
             if (bestPosition != null && placeTimer.passedMs(placeDelay.getValue()))
                 placeCrystal(bestPosition);
 
-            if (bestCrystal != null && breakTimer.passedMs(placeDelay.getValue()))
+            if (bestCrystal != null && breakTimer.passedMs(breakDelay.getValue()))
                 attackCrystal(bestCrystal);
         }
-
         tickBusy = false;
     }
 
@@ -417,14 +417,15 @@ public class AutoCrystal extends Module {
 
         int prevSlot = -1;
         SearchInvResult antiWeaknessResult = InventoryUtility.getAntiWeaknessItem();
-        SearchInvResult antiWeaknessResultInv = InventoryUtility.findInInventory(itemStack -> itemStack.getItem() instanceof SwordItem
+        SearchInvResult antiWeaknessResultInv = InventoryUtility.findInInventory(itemStack ->
+                itemStack.getItem() instanceof SwordItem
                 || itemStack.getItem() instanceof PickaxeItem
                 || itemStack.getItem() instanceof AxeItem
                 || itemStack.getItem() instanceof ShovelItem);
-        if (antiWeakness.getValue() != Switch.NONE) {
+
+        if (antiWeakness.getValue() != Switch.NONE)
             if (weaknessEffect != null && (strengthEffect == null || strengthEffect.getAmplifier() < weaknessEffect.getAmplifier()))
                 prevSlot = switchTo(antiWeaknessResult, antiWeaknessResultInv, antiWeakness);
-        }
 
         sendPacket(PlayerInteractEntityC2SPacket.attack(crystal, mc.player.isSneaking()));
         sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -553,36 +554,42 @@ public class AutoCrystal extends Module {
     }
 
     public void calcPosition() {
-        if (ModuleManager.speedMine.isWorth()) {
+            if (ModuleManager.speedMine.isWorth()) {
+                if (onBreakBlock.getValue() == OnBreakBlock.Smart) {
+                    // если цивбрикаем - то ставим над
+                    if (mc.world.isAir(SpeedMine.minePosition.down())) {
+                        PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
+                        if (autoMineData != null) {
+                            bestPosition = autoMineData.bhr;
+                            return;
+                        }
+                    }
 
-            // если цивбрикаем - то ставим над
-            if(mc.world.isAir(SpeedMine.minePosition.down())){
-                PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
-                if (autoMineData != null) {
-                    bestPosition = autoMineData.bhr;
-                    return;
+                    // иначе ставим рядом, чтоб трахнуть сурраунд
+                    for (Direction dir : Direction.values()) {
+                        if (dir == Direction.UP || dir == Direction.DOWN) continue;
+                        PlaceData autoMineData = getPlaceData(SpeedMine.minePosition.down().offset(dir), null);
+                        if (autoMineData != null) {
+                            bestPosition = autoMineData.bhr;
+                            return;
+                        }
+                    }
+
+                    // если ставить некуда, то ставим все-таки над
+                    PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
+                    if (autoMineData != null) {
+                        bestPosition = autoMineData.bhr;
+                        return;
+                    }
+                } else {
+                    PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
+                    if (autoMineData != null) {
+                        bestPosition = autoMineData.bhr;
+                        return;
+                    }
                 }
             }
 
-            // иначе ставим рядом, чтоб трахнуть сурраунд
-            boolean found = false;
-            for (Direction dir : Direction.values()) {
-                if (dir == Direction.UP || dir == Direction.DOWN) continue;
-                PlaceData autoMineData = getPlaceData(SpeedMine.minePosition.down().offset(dir), null);
-                if (autoMineData != null) {
-                    bestPosition = autoMineData.bhr;
-                    found = true;
-                    break;
-                }
-            }
-
-            // если ставить некуда, то ставим все-таки над
-            if (!found) {
-                PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
-                if (autoMineData != null)
-                    bestPosition = autoMineData.bhr;
-            }
-        }
 
         if (target == null) {
             renderPos = null;
@@ -1097,6 +1104,10 @@ public class AutoCrystal extends Module {
 
     public enum Render {
         Fade, Slide, Default
+    }
+
+    public enum OnBreakBlock {
+        PlaceOn, Smart
     }
 
     public enum Remove {

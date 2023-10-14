@@ -51,7 +51,10 @@ public final class ExplosionUtility {
     }
 
     public static float getSelfExplosionDamage(Vec3d explosionPos) {
-        return getExplosionDamage1(explosionPos, mc.player);
+        if(AutoCrystal.selfPredictTicks.getValue() == 0)
+            return getExplosionDamage1(explosionPos, mc.player);
+        else
+            return getExplosionDamageWPredict(explosionPos, mc.player, PredictUtility.predictPlayer(mc.player, AutoCrystal.selfPredictTicks.getValue()));
     }
 
     public static float getExplosionDamage1(Vec3d explosionPos, PlayerEntity target) {

@@ -2,7 +2,6 @@ package thunder.hack.setting;
 
 
 import com.google.gson.JsonPrimitive;
-import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.*;
 
 import java.util.function.Predicate;
@@ -149,7 +148,6 @@ public class Setting<T> {
         this.value = this.plannedValue;
     }
 
-
     public String getType() {
         if (this.isEnumSetting()) {
             return "Enum";
@@ -183,7 +181,6 @@ public class Setting<T> {
         return !this.isPositionSetting() && !this.isNumberSetting() && !(this.value instanceof PositionSetting) && !(this.value instanceof JsonPrimitive) && !(this.value instanceof String) && !(this.value instanceof ColorSetting) && !(this.value instanceof Parent) && !(this.value instanceof Bind) && !(this.value instanceof Character) && !(this.value instanceof Boolean);
     }
 
-
     public boolean isBindSetting() {
         return this.value instanceof Bind;
     }
@@ -199,7 +196,6 @@ public class Setting<T> {
     public boolean isPositionSetting() {
         return this.value instanceof PositionSetting;
     }
-
 
     public T getDefaultValue() {
         return this.defaultValue;
