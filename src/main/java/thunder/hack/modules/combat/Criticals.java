@@ -14,13 +14,13 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
 public class Criticals extends Module {
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.FunnyGame);
+
+    public static boolean cancelCrit;
+
     public Criticals() {
         super("Criticals", Category.COMBAT);
     }
-
-    public Setting<Mode> mode = new Setting<>("Mode", Mode.FunnyGame);
-
-    public static boolean cancelCrit;
 
     @EventHandler
     public void onPacketSend(PacketEvent.@NotNull Send event) {

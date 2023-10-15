@@ -15,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec2f;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.ModuleManager;
@@ -69,7 +70,7 @@ public final class Core {
     }
 
     @EventHandler
-    public void onPacketSend(PacketEvent.Send e) {
+    public void onPacketSend(PacketEvent.@NotNull Send e) {
         if (e.getPacket() instanceof PlayerMoveC2SPacket.PositionAndOnGround || e.getPacket() instanceof PlayerMoveC2SPacket.Full || e.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround) {
             lastPacket.reset();
         }

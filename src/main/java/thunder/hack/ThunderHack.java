@@ -45,7 +45,6 @@ public class ThunderHack implements ModInitializer {
     public static AsyncManager asyncManager = new AsyncManager();
     public static MacroManager macroManager = new MacroManager();
     public static CommandManager commandManager = new CommandManager();
-
     public static Core core = new Core();
     /*--------------------------------------------------------*/
 

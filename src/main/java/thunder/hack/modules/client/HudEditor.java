@@ -9,10 +9,6 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 
 public class HudEditor extends Module {
-    public HudEditor() {
-        super("HudEditor", Module.Category.CLIENT);
-    }
-
     public static final Setting<ClickGui.colorModeEn> colorMode = new Setting<>("ColorMode", ClickGui.colorModeEn.Static);
     public static final Setting<Integer> colorSpeed = new Setting<>("ColorSpeed", 18, 2, 54);
     public static final Setting<Boolean> glow = new Setting<>("Glow", true);
@@ -22,15 +18,20 @@ public class HudEditor extends Module {
     public static final Setting<ColorSetting> textColor = new Setting<>("TextColorColor", new ColorSetting(new Color(0xFFFFFFFF, true).getRGB()));
     public static final Setting<Float> hudRound = new Setting<>("HudRound", 6f, 1f, 10f);
 
+    public HudEditor() {
+        super("HudEditor", Module.Category.CLIENT);
+    }
+
     public static Color getColor(int count) {
-        int index = count;
         return switch (colorMode.getValue()) {
-            case Sky -> Render2DEngine.skyRainbow(colorSpeed.getValue(), index);
-            case LightRainbow -> Render2DEngine.rainbow(colorSpeed.getValue(), index, .6f, 1, 1);
-            case Rainbow -> Render2DEngine.rainbow(colorSpeed.getValue(), index, 1f, 1, 1);
-            case Fade -> Render2DEngine.fade(colorSpeed.getValue(), index, hcolor1.getValue().getColorObject(), 1);
-            case DoubleColor -> Render2DEngine.TwoColoreffect(hcolor1.getValue().getColorObject(), acolor.getValue().getColorObject(), Math.abs(System.currentTimeMillis() / 10) / 100.0 + (count));
-            case Analogous -> Render2DEngine.interpolateColorsBackAndForth(colorSpeed.getValue(), index, hcolor1.getValue().getColorObject(), Render2DEngine.getAnalogousColor(acolor.getValue().getColorObject()), true);
+            case Sky -> Render2DEngine.skyRainbow(colorSpeed.getValue(), count);
+            case LightRainbow -> Render2DEngine.rainbow(colorSpeed.getValue(), count, .6f, 1, 1);
+            case Rainbow -> Render2DEngine.rainbow(colorSpeed.getValue(), count, 1f, 1, 1);
+            case Fade -> Render2DEngine.fade(colorSpeed.getValue(), count, hcolor1.getValue().getColorObject(), 1);
+            case DoubleColor ->
+                    Render2DEngine.TwoColoreffect(hcolor1.getValue().getColorObject(), acolor.getValue().getColorObject(), Math.abs(System.currentTimeMillis() / 10) / 100.0 + (count));
+            case Analogous ->
+                    Render2DEngine.interpolateColorsBackAndForth(colorSpeed.getValue(), count, hcolor1.getValue().getColorObject(), Render2DEngine.getAnalogousColor(acolor.getValue().getColorObject()), true);
             default -> hcolor1.getValue().getColorObject();
         };
     }

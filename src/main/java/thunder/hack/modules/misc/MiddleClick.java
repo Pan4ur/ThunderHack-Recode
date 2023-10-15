@@ -202,22 +202,34 @@ public class MiddleClick extends Module {
                 mc.player.getInventory().selectedSlot = epSlot;
                 sendPacket(new UpdateSelectedSlotC2SPacket(epSlot));
 
-                try {sleep(delay);} catch (Exception ignore) {}
+                try {
+                    sleep(delay);
+                } catch (Exception ignore) {
+                }
                 mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
 
-                try {sleep(delay);} catch (Exception ignore) {}
+                try {
+                    sleep(delay);
+                } catch (Exception ignore) {
+                }
                 mc.player.getInventory().selectedSlot = originalSlot;
                 sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
                 super.run();
             } else {
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, epSlot, originalSlot, SlotActionType.SWAP, mc.player);
 
-                try {sleep(delay);} catch (Exception ignore) {}
+                try {
+                    sleep(delay);
+                } catch (Exception ignore) {
+                }
                 if (ModuleManager.aura.isEnabled() && Aura.target != null)
                     sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
                 mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
 
-                try {sleep(delay);} catch (Exception ignore) {}
+                try {
+                    sleep(delay);
+                } catch (Exception ignore) {
+                }
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, epSlot, originalSlot, SlotActionType.SWAP, mc.player);
 
                 super.run();

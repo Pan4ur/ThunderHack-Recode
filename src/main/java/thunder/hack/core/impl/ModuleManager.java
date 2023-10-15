@@ -204,6 +204,7 @@ public class ModuleManager implements IManager {
 
 
     public ModuleManager() {
+        modules.add(new AutoAnchorRecode());
         for (Field field : getClass().getDeclaredFields()) {
             if (Module.class.isAssignableFrom(field.getType())) {
                 field.setAccessible(true);
