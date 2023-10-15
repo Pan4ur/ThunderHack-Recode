@@ -16,6 +16,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.explosion.Explosion;
 import thunder.hack.modules.combat.AutoAnchor;
+import thunder.hack.modules.combat.AutoAnchorRecode;
 import thunder.hack.modules.combat.AutoCrystal;
 
 import java.util.Objects;
@@ -40,21 +41,21 @@ public final class ExplosionUtility {
         anchorIgnore = anchorPos;
         terrainIgnore = true;
 
-        if (AutoAnchor.predictTicks.getValue() == 0)
+        if (AutoAnchorRecode.predictTicks.getValue() == 0)
             final_result = getExplosionDamage1(anchorPos.up().toCenterPos(), target);
         else
-            final_result = getExplosionDamageWPredict(anchorPos.toCenterPos(), target, PredictUtility.predictPlayer(target, AutoAnchor.predictTicks.getValue()));
+            final_result = getExplosionDamageWPredict(anchorPos.toCenterPos(), target, PredictUtility.predictPlayer(target, AutoAnchorRecode.predictTicks.getValue()));
 
         anchorIgnore = null;
         terrainIgnore = false;
         return final_result;
     }
 
-    public static float getSelfExplosionDamage(Vec3d explosionPos) {
-        if(AutoCrystal.selfPredictTicks.getValue() == 0)
+    public static float getSelfExplosionDamage(Vec3d explosionPos, int predictTicks) {
+        if (predictTicks == 0)
             return getExplosionDamage1(explosionPos, mc.player);
         else
-            return getExplosionDamageWPredict(explosionPos, mc.player, PredictUtility.predictPlayer(mc.player, AutoCrystal.selfPredictTicks.getValue()));
+            return getExplosionDamageWPredict(explosionPos, mc.player, PredictUtility.predictPlayer(mc.player, predictTicks));
     }
 
     public static float getExplosionDamage1(Vec3d explosionPos, PlayerEntity target) {

@@ -15,6 +15,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
@@ -31,6 +32,7 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.world.HoleUtility;
 
 import java.util.*;
 
@@ -47,10 +49,9 @@ public class AutoAnchorRecode extends Module {
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
     private final Setting<Integer> logicTimeout = new Setting<>("Logic Timeout", 30, 1, 2000);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
-    private final Setting<YawStepMode> yawStep = new Setting<>("YawStep", YawStepMode.Off);
-    private final Setting<Integer> yawAngle = new Setting<>("YawAngle", 54, 5, 180, v -> yawStep.getValue() != YawStepMode.Off);
-    public static final Setting<Integer> predictTicks = new Setting<>("PredictTicks", 5, 0, 40);
-    private final Setting<Boolean> instant = new Setting<>("Instant", false);
+    private final Setting<YawStepMode> yawStep = new Setting<>("Yaw Step", YawStepMode.Off);
+    private final Setting<Integer> yawAngle = new Setting<>("Yaw Angle", 54, 5, 180, v -> yawStep.getValue() != YawStepMode.Off);
+    public static final Setting<Integer> predictTicks = new Setting<>("Predict Ticks", 5, 0, 40);
     private final Setting<Float> range = new Setting<>("Place Range", 5f, 1f, 7f);
     private final Setting<Integer> chargeCount = new Setting<>("Charge Count", 1, 1, 4);
 
@@ -67,9 +68,9 @@ public class AutoAnchorRecode extends Module {
     private final Setting<Boolean> glowStoneDisable = new Setting<>("Disable No GlowStone", true).withParent(disable);
     private final Setting<Boolean> dimensionDisable = new Setting<>("Disable Nether", true).withParent(disable);
 
-    private int prevAnchorAmount, anchorSpeed, invTimer;
     private final Map<BlockPos, Integer> charges = new HashMap<>();
     private final Timer logicTimer = new Timer();
+    private final Timer placeTimer = new Timer();
     private PlayerEntity target;
     private BlockPos targetPos;
 
@@ -101,61 +102,58 @@ public class AutoAnchorRecode extends Module {
     }
 
     @Override
-    public void onThread() {
-        if (fullNullCheck()) return;
-        if (!logicTimer.passedMs(logicTimeout.getValue())) return;
-
-        if (target == null) {
-            target = ThunderHack.combatManager.getNearestTarget(targetRange.getValue());
-            return;
-        }
-        if (target.getPos().squaredDistanceTo(mc.player.getEyePos()) > targetRange.getPow2Value()) {
-            target = null;
-            return;
-        }
-        logicTimer.reset();
-
-        // Finding new best target pos
-        BlockPos best = findAnchorBlocks().stream()
-                .filter(this::isFriendsSafe)
-                .max(Comparator.comparingDouble(bp -> ExplosionUtility.getAnchorExplosionDamage(bp, target)))
-                .orElse(null);
-
-        if (targetPos != null && best != null) {
-            if (ExplosionUtility.getAnchorExplosionDamage(targetPos, mc.player) >= ExplosionUtility.getAnchorExplosionDamage(best, mc.player)) {
-                targetPos = best;
-            }
-            if (mc.player.squaredDistanceTo(targetPos.toCenterPos()) >= range.getPow2Value()) {
-                targetPos = null;
-                return;
-            }
-            if (!InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false) && !mc.world.getBlockState(targetPos).getBlock().equals(Blocks.RESPAWN_ANCHOR)) {
-                targetPos = null;
-                return;
-            }
-        }
-
-        if (targetPos == null) {
-            targetPos = best;
-            doPlace();
-        }
-    }
-
-    @Override
     public String getDisplayInfo() {
-        return anchorSpeed + " a/s";
+        return target != null ? target.getEntityName() : null;
     }
 
     @EventHandler
+    @SuppressWarnings("unused")
     private void onSync(EventSync event) {
-        if (invTimer++ >= 20) {
-            anchorSpeed = prevAnchorAmount - InventoryUtility.getItemCount(Items.END_CRYSTAL);
-            prevAnchorAmount = InventoryUtility.getItemCount(Items.RESPAWN_ANCHOR);
-            invTimer = 0;
-        }
+        new Thread(() -> {
+            if (fullNullCheck()) return;
+            if (!logicTimer.passedMs(logicTimeout.getValue())) return;
+
+            if (target == null) {
+                target = ThunderHack.combatManager.getNearestTarget(targetRange.getValue());
+                return;
+            }
+            if (target.getPos().squaredDistanceTo(mc.player.getEyePos()) > targetRange.getPow2Value()) {
+                target = null;
+                return;
+            }
+            logicTimer.reset();
+
+            // Finding new best target pos
+            BlockPos best = findAnchorBlocks().stream()
+                    .filter(this::isFriendsSafe)
+                    .max(Comparator.comparingDouble(bp -> ExplosionUtility.getAnchorExplosionDamage(bp, target)))
+                    .orElse(null);
+
+            if (targetPos != null && best != null) {
+                if (ExplosionUtility.getSelfExplosionDamage(targetPos.toCenterPos(), predictTicks.getValue()) >= ExplosionUtility.getAnchorExplosionDamage(best, mc.player)) {
+                    targetPos = best;
+                }
+                if (mc.player.squaredDistanceTo(targetPos.toCenterPos()) >= range.getPow2Value()) {
+                    targetPos = null;
+                    return;
+                }
+                if (!InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false)
+                        && !mc.world.getBlockState(targetPos).getBlock().equals(Blocks.RESPAWN_ANCHOR)) {
+                    targetPos = null;
+                    return;
+                }
+            }
+
+            if (targetPos == null) {
+                targetPos = best;
+                return;
+            }
+            doPlace();
+        }).start();
     }
 
     @EventHandler
+    @SuppressWarnings("unused")
     private void onBlockStateChange(EventSetBlockState event) {
         if (mc.player != null && mc.world != null && !shouldPause()) {
             if (!event.getPos().equals(targetPos)) {
@@ -164,12 +162,12 @@ public class AutoAnchorRecode extends Module {
             final BlockState blockState = mc.world.getBlockState(targetPos);
 
             if (!(blockState.getBlock() instanceof RespawnAnchorBlock)) {
-                if (blockState.isReplaceable()) {
+                if (InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false)) {
                     doPlace();
                 }
                 return;
             }
-            if (charges.get(targetPos) >= chargeCount.getValue()) {
+            if (charges.containsKey(targetPos) && charges.get(targetPos) >= chargeCount.getValue()) {
                 doBreak();
                 return;
             }
@@ -180,19 +178,20 @@ public class AutoAnchorRecode extends Module {
 
     private @NotNull List<BlockPos> findAnchorBlocks() {
         List<BlockPos> positions = new ArrayList<>();
+        BlockPos centerPos = mc.player.getBlockPos();
 
-        if (mc.player != null && mc.world != null) {
-            BlockPos centerPos = mc.player.getBlockPos();
+        int r = (int) Math.ceil(range.getValue()) + 1;
+        int h = range.getValue().intValue();
 
-            final Iterable<BlockPos> checkBlocks = BlockPos.iterateOutwards(centerPos.up(),
-                    range.getValue().intValue() + 1,
-                    range.getValue().intValue() + 1,
-                    range.getValue().intValue() + 1
-            );
-            for (BlockPos pos : checkBlocks) {
-                if (mc.player.squaredDistanceTo(pos.toCenterPos()) <= range.getPow2Value()
-                        && (InteractionUtility.canPlaceBlock(pos, interactMode.getValue(), false))) {
-                    positions.add(pos);
+        for (int i = centerPos.getX() - r; i < centerPos.getX() + r; i++) {
+            for (int j = centerPos.getY() - h; j < centerPos.getY() + h; j++) {
+                for (int k = centerPos.getZ() - r; k < centerPos.getZ() + r; k++) {
+                    BlockPos pos = new BlockPos(i, j, k);
+                    if (mc.player.squaredDistanceTo(pos.toCenterPos()) <= range.getPow2Value()
+                            && (InteractionUtility.canPlaceBlock(pos, interactMode.getValue(), false))
+                            || mc.world.getBlockState(pos).getBlock().equals(Blocks.RESPAWN_ANCHOR)) {
+                        positions.add(pos);
+                    }
                 }
             }
         }
@@ -221,18 +220,64 @@ public class AutoAnchorRecode extends Module {
     }
 
     private void doPlace() {
-        InteractionUtility.placeBlock(targetPos,
-                rotate.getValue(),
-                interactMode.getValue(),
-                InteractionUtility.PlaceMode.Packet,
-                InventoryUtility.getAnchor(),
-                true,
-                false
-        );
-        if (instant.getValue()) {
+        if (targetPos == null
+                || target == null
+                || mc.player.getHealth() + mc.player.getAbsorptionAmount() - ExplosionUtility.getSelfExplosionDamage(targetPos.toCenterPos(), predictTicks.getValue()) <= 0
+                || !ThunderHack.friendManager.getNearFriends().stream()
+                .filter(friend -> friend.getHealth() + friend.getAbsorptionAmount() - ExplosionUtility.getAnchorExplosionDamage(targetPos, friend) <= 0)
+                .toList()
+                .isEmpty()
+                || !InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false)) return;
+
+        if (HoleUtility.isHole(target.getBlockPos())) {
+            if (placeTimer.passedMs(500)) {
+                for (int i = 0; i < chargeCount.getValue(); i++)
+                    doCharge();
+                doBreak();
+                placeTimer.reset();
+            }
+            if (InteractionUtility.canPlaceBlock(target.getBlockPos().up(2), interactMode.getValue(), false)) {
+                targetPos = target.getBlockPos().up(2);
+                InteractionUtility.placeBlock(targetPos,
+                        rotate.getValue(),
+                        interactMode.getValue(),
+                        InteractionUtility.PlaceMode.Packet,
+                        InventoryUtility.getAnchor(),
+                        true,
+                        false
+                );
+            } else {
+                BlockPos bp = target.getBlockPos();
+                for (int i = 2; i > 0; i--) {
+                    for (Vec3i vec : HoleUtility.VECTOR_PATTERN) {
+                        BlockPos check = bp.add(vec).up(i);
+                        if (InteractionUtility.canPlaceBlock(check, interactMode.getValue(), false)) {
+                            InteractionUtility.placeBlock(check,
+                                    rotate.getValue(),
+                                    interactMode.getValue(),
+                                    InteractionUtility.PlaceMode.Packet,
+                                    InventoryUtility.getAnchor(),
+                                    true,
+                                    false
+                            );
+                            return;
+                        }
+                    }
+                }
+            }
+        } else if (placeTimer.passedMs(500)) {
+            InteractionUtility.placeBlock(targetPos,
+                    rotate.getValue(),
+                    interactMode.getValue(),
+                    InteractionUtility.PlaceMode.Packet,
+                    InventoryUtility.getAnchor(),
+                    true,
+                    false
+            );
             for (int i = 0; i < chargeCount.getValue(); i++)
                 doCharge();
             doBreak();
+            placeTimer.reset();
         }
     }
 
@@ -242,6 +287,7 @@ public class AutoAnchorRecode extends Module {
             disable(isRu() ? "В хотбаре не найден светящийся камень! Отключаем..." : "No glowstone found in hotbar! Disabling...");
             return;
         }
+        if (targetPos == null) return;
 
         // Charging
         BlockPos targetPosCopy = new BlockPos(targetPos);
@@ -263,6 +309,8 @@ public class AutoAnchorRecode extends Module {
     }
 
     private void doBreak() {
+        if (targetPos == null)
+            return;
         BlockPos targetPosCopy = new BlockPos(targetPos);
         int preSlot = mc.player.getInventory().selectedSlot;
         if (mc.player.getMainHandStack().getItem().equals(Items.GLOWSTONE)) {

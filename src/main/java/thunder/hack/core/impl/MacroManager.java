@@ -23,10 +23,10 @@ public class MacroManager implements IManager {
             if (file.exists()) {
                 try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                     while (reader.ready()) {
-                        String[] nameandkey = reader.readLine().split(":");
-                        String name = nameandkey[0];
-                        String key = nameandkey[1];
-                        String command = nameandkey[2];
+                        String[] nameKey = reader.readLine().split(":");
+                        String name = nameKey[0];
+                        String key = nameKey[1];
+                        String command = nameKey[2];
                         addMacro(new Macro(name, command, Integer.parseInt(key)));
                     }
 
@@ -39,8 +39,9 @@ public class MacroManager implements IManager {
     public void saveMacro() {
         File file = new File("ThunderHackRecode/misc/macro.txt");
         try {
-            new File("ThunderHackRecode").mkdirs();
-            file.createNewFile();
+            if (new File("ThunderHackRecode").mkdirs()) {
+                file.createNewFile();
+            }
         } catch (Exception ignored) {
 
         }

@@ -1,9 +1,7 @@
 package thunder.hack.utility.player;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.FluidBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
@@ -26,6 +24,16 @@ import java.util.*;
 import static thunder.hack.modules.Module.mc;
 
 public final class InteractionUtility {
+    private static final List<Block> SHIFT_BLOCKS = Arrays.asList(
+            Blocks.ENDER_CHEST, Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.CRAFTING_TABLE,
+            Blocks.BIRCH_TRAPDOOR, Blocks.BAMBOO_TRAPDOOR, Blocks.DARK_OAK_TRAPDOOR, Blocks.CHERRY_TRAPDOOR,
+            Blocks.ANVIL, Blocks.BREWING_STAND, Blocks.HOPPER, Blocks.DROPPER, Blocks.DISPENSER,
+            Blocks.ACACIA_TRAPDOOR, Blocks.ENCHANTING_TABLE, Blocks.WHITE_SHULKER_BOX, Blocks.ORANGE_SHULKER_BOX,
+            Blocks.MAGENTA_SHULKER_BOX, Blocks.LIGHT_BLUE_SHULKER_BOX, Blocks.YELLOW_SHULKER_BOX, Blocks.LIME_SHULKER_BOX,
+            Blocks.PINK_SHULKER_BOX, Blocks.GRAY_SHULKER_BOX, Blocks.CYAN_SHULKER_BOX, Blocks.PURPLE_SHULKER_BOX,
+            Blocks.BLUE_SHULKER_BOX, Blocks.BROWN_SHULKER_BOX, Blocks.GREEN_SHULKER_BOX, Blocks.RED_SHULKER_BOX, Blocks.BLACK_SHULKER_BOX
+    );
+
     public static Map<BlockPos, Long> awaiting = new HashMap<>();
 
     public static boolean canSee(Entity entity) {
@@ -46,31 +54,34 @@ public final class InteractionUtility {
         return false;
     }
 
-    public static Vec3d getEyesPos(Entity entity) {
+    public static Vec3d getEyesPos(@NotNull Entity entity) {
         return entity.getPos().add(0, entity.getEyeHeight(entity.getPose()), 0);
     }
 
-    public static float[] calculateAngle(Vec3d to) {
+    public static float @NotNull [] calculateAngle(Vec3d to) {
         assert mc.player != null;
         return calculateAngle(getEyesPos(mc.player), to);
     }
 
-    public static float[] calculateAngle(Vec3d from, Vec3d to) {
+    public static float @NotNull [] calculateAngle(@NotNull Vec3d from, @NotNull Vec3d to) {
         double difX = to.x - from.x;
         double difY = (to.y - from.y) * -1.0;
         double difZ = to.z - from.z;
         double dist = MathHelper.sqrt((float) (difX * difX + difZ * difZ));
+
         float yD = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);
         float pD = (float) MathHelper.clamp(MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difY, dist))), -90f, 90f);
+
         return new float[]{yD, pD};
     }
 
     public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, int slot, boolean returnSlot, boolean ignoreEntities) {
         int prevItem = mc.player.getInventory().selectedSlot;
-        if (slot != -1) {
-            InventoryUtility.switchTo(slot);
-        } else return false;
+        if (slot != -1) InventoryUtility.switchTo(slot);
+        else return false;
+
         boolean result = placeBlock(bp, rotate, interact, mode, ignoreEntities);
+
         if (returnSlot) InventoryUtility.switchTo(prevItem);
         return result;
     }
@@ -86,13 +97,16 @@ public final class InteractionUtility {
 
     public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, boolean ignoreEntities) {
         BlockHitResult result = getPlaceResult(bp, interact, ignoreEntities);
-        if (result == null) return false;
+        if (result == null || mc.world == null || mc.interactionManager == null || mc.player == null) return false;
+
         boolean sprint = mc.player.isSprinting();
         boolean sneak = needSneak(mc.world.getBlockState(result.getBlockPos()).getBlock()) && !mc.player.isSneaking();
+
         if (sprint)
             mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
         if (sneak)
             mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
+
         float[] angle = calculateAngle(result.getPos());
         if (rotate)
             mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
@@ -109,6 +123,7 @@ public final class InteractionUtility {
             mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
         if (sprint)
             mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+
         mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         return true;
     }
@@ -159,7 +174,7 @@ public final class InteractionUtility {
     }
 
 
-    public static ArrayList<BlockPosWithFacing> getSupportBlocks(BlockPos bp) {
+    public static @NotNull ArrayList<BlockPosWithFacing> getSupportBlocks(@NotNull BlockPos bp) {
         ArrayList<BlockPosWithFacing> list = new ArrayList<>();
 
         if (mc.world.getBlockState(bp.add(0, -1, 0)).isSolid() || awaiting.containsKey(bp.add(0, -1, 0)))
@@ -183,7 +198,7 @@ public final class InteractionUtility {
         return list;
     }
 
-    public static BlockPosWithFacing checkNearBlocks(BlockPos blockPos) {
+    public static @Nullable BlockPosWithFacing checkNearBlocks(@NotNull BlockPos blockPos) {
         if (mc.world.getBlockState(blockPos.add(0, -1, 0)).isSolid())
             return new BlockPosWithFacing(blockPos.add(0, -1, 0), Direction.UP);
         else if (mc.world.getBlockState(blockPos.add(-1, 0, 0)).isSolid())
@@ -197,14 +212,14 @@ public final class InteractionUtility {
         return null;
     }
 
-    public static float squaredDistanceFromEyes(Vec3d vec) {
+    public static float squaredDistanceFromEyes(@NotNull Vec3d vec) {
         double d0 = vec.x - mc.player.getX();
         double d1 = vec.z - mc.player.getZ();
         double d2 = vec.y - (mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose()));
         return (float) (d0 * d0 + d1 * d1 + d2 * d2);
     }
 
-    public static List<Direction> getStrictDirections(BlockPos bp) {
+    public static @NotNull List<Direction> getStrictDirections(@NotNull BlockPos bp) {
         List<Direction> visibleSides = new ArrayList<>();
         Vec3d positionVector = bp.toCenterPos();
 
@@ -279,23 +294,7 @@ public final class InteractionUtility {
         return null;
     }
 
-    public record BlockPosWithFacing(BlockPos position, Direction facing) {
-    }
-
-    public record BreakData(Direction dir, Vec3d vector) {
-    }
-
-    private static final List<Block> shiftBlocks = Arrays.asList(
-            Blocks.ENDER_CHEST, Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.CRAFTING_TABLE,
-            Blocks.BIRCH_TRAPDOOR, Blocks.BAMBOO_TRAPDOOR, Blocks.DARK_OAK_TRAPDOOR, Blocks.CHERRY_TRAPDOOR,
-            Blocks.ANVIL, Blocks.BREWING_STAND, Blocks.HOPPER, Blocks.DROPPER, Blocks.DISPENSER,
-            Blocks.ACACIA_TRAPDOOR, Blocks.ENCHANTING_TABLE, Blocks.WHITE_SHULKER_BOX, Blocks.ORANGE_SHULKER_BOX,
-            Blocks.MAGENTA_SHULKER_BOX, Blocks.LIGHT_BLUE_SHULKER_BOX, Blocks.YELLOW_SHULKER_BOX, Blocks.LIME_SHULKER_BOX,
-            Blocks.PINK_SHULKER_BOX, Blocks.GRAY_SHULKER_BOX, Blocks.CYAN_SHULKER_BOX, Blocks.PURPLE_SHULKER_BOX,
-            Blocks.BLUE_SHULKER_BOX, Blocks.BROWN_SHULKER_BOX, Blocks.GREEN_SHULKER_BOX, Blocks.RED_SHULKER_BOX, Blocks.BLACK_SHULKER_BOX
-    );
-
-    public static Vec3d getVisibleDirectionPoint(Direction dir, BlockPos bp) {
+    public static @Nullable Vec3d getVisibleDirectionPoint(Direction dir, BlockPos bp) {
         Box brutBox = null;
         if (dir == Direction.DOWN) brutBox = new Box(new Vec3d(0.1f, 0f, 0.1f), new Vec3d(0.9f, 0f, 0.9f));
         if (dir == Direction.NORTH) brutBox = new Box(new Vec3d(0.1f, 0.1f, 0f), new Vec3d(0.9f, 0.9f, 0f));
@@ -348,7 +347,13 @@ public final class InteractionUtility {
     }
 
     public static boolean needSneak(Block in) {
-        return shiftBlocks.contains(in);
+        return SHIFT_BLOCKS.contains(in);
+    }
+
+    public record BlockPosWithFacing(BlockPos position, Direction facing) {
+    }
+
+    public record BreakData(Direction dir, Vec3d vector) {
     }
 
     public enum PlaceMode {

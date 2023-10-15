@@ -637,7 +637,7 @@ public class AutoCrystal extends Module {
                 continue;
 
             float damage = ExplosionUtility.getExplosionDamage2(ent.getPos(), target);
-            float selfDamage = ExplosionUtility.getSelfExplosionDamage(ent.getPos());
+            float selfDamage = ExplosionUtility.getSelfExplosionDamage(ent.getPos(), selfPredictTicks.getValue());
 
             boolean overrideDamage = shouldOverrideDamage(damage, selfDamage);
 
@@ -770,7 +770,7 @@ public class AutoCrystal extends Module {
         Vec3d crystalVec = new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ());
 
         float damage = target == null ? 10f : ExplosionUtility.getExplosionDamage2(crystalVec, target);
-        float selfDamage = ExplosionUtility.getSelfExplosionDamage(crystalVec);
+        float selfDamage = ExplosionUtility.getSelfExplosionDamage(crystalVec, selfPredictTicks.getValue());
         boolean overrideDamage = shouldOverrideDamage(damage, selfDamage);
 
         if (protectFriends.getValue()) {

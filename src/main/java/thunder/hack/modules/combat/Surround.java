@@ -276,7 +276,7 @@ public class Surround extends Module {
                 || mc.player.squaredDistanceTo(entity) > range.getPow2Value()
                 || !breakCrystal.getValue())
             return;
-        if (antiSelfPop.getValue() && mc.player.getHealth() + mc.player.getAbsorptionAmount() - ExplosionUtility.getSelfExplosionDamage(entity.getPos()) <= 2)
+        if (antiSelfPop.getValue() && mc.player.getHealth() + mc.player.getAbsorptionAmount() - ExplosionUtility.getSelfExplosionDamage(entity.getPos(), AutoCrystal.selfPredictTicks.getValue()) <= 2)
             return;
 
         int preSlot = mc.player.getInventory().selectedSlot;

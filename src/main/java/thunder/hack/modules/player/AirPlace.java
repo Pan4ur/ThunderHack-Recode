@@ -35,6 +35,7 @@ public class AirPlace extends Module {
 
     @Override
     public void onUpdate() {
+        if (mc.player.isUsingItem()) return;
         HitResult hitResult = mc.getCameraEntity().raycast(range.getValue(), 0, false);
 
         if (hitResult instanceof BlockHitResult) hit = (BlockHitResult) hitResult;

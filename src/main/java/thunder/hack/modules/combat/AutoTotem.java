@@ -23,6 +23,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -69,11 +70,11 @@ public class AutoTotem extends Module {
     }
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.Receive e) {
+    public void onPacketReceive(PacketEvent.@NotNull Receive e) {
         if (e.getPacket() instanceof EntitySpawnS2CPacket spawn && hotbarFallBack.getValue()) {
             if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
                 if (mc.player.squaredDistanceTo(spawn.getX(), spawn.getY(), spawn.getZ()) < 36) {
-                    if (fallBackCalc.getValue() && ExplosionUtility.getSelfExplosionDamage(new Vec3d(spawn.getX(), spawn.getY(), spawn.getZ())) < mc.player.getHealth() + mc.player.getAbsorptionAmount() + 4f)
+                    if (fallBackCalc.getValue() && ExplosionUtility.getSelfExplosionDamage(new Vec3d(spawn.getX(), spawn.getY(), spawn.getZ()), AutoCrystal.selfPredictTicks.getValue()) < mc.player.getHealth() + mc.player.getAbsorptionAmount() + 4f)
                         return;
                     runInstant();
                 }
@@ -227,7 +228,7 @@ public class AutoTotem extends Module {
 
             if (onCrystal.getValue()) {
                 if (!(entity instanceof EndCrystalEntity)) continue;
-                if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos()) < 0.5) {
+                if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos(), AutoCrystal.selfPredictTicks.getValue()) < 0.5) {
                     item = Items.TOTEM_OF_UNDYING;
                     break;
                 }
@@ -235,7 +236,7 @@ public class AutoTotem extends Module {
 
             if (onTnt.getValue()) {
                 if (!(entity instanceof TntEntity)) continue;
-                if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos()) < 0.5) {
+                if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos(), AutoCrystal.selfPredictTicks.getValue()) < 0.5) {
                     item = Items.TOTEM_OF_UNDYING;
                     break;
                 }
@@ -243,7 +244,7 @@ public class AutoTotem extends Module {
 
             if (onMinecartTnt.getValue()) {
                 if (!(entity instanceof TntMinecartEntity)) continue;
-                if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos()) < 0.5) {
+                if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos(), AutoCrystal.selfPredictTicks.getValue()) < 0.5) {
                     item = Items.TOTEM_OF_UNDYING;
                     break;
                 }
