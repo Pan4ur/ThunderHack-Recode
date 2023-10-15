@@ -46,12 +46,6 @@ public abstract class Module {
     public void onDisable() {
     }
 
-    public void onLoad() {
-    }
-
-    public void onTick() {
-    }
-
     public void onLogin() {
     }
 
@@ -99,9 +93,6 @@ public abstract class Module {
     }
 
     public void onThread() {
-    }
-
-    public void onPostRender3D(MatrixStack stack) {
     }
 
     public void enable() {

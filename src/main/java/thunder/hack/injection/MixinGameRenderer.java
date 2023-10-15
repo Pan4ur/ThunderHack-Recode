@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.DimensionEffects;
 import net.minecraft.item.SwordItem;
 import net.minecraft.resource.ResourceFactory;
 import com.mojang.datafixers.util.Pair;
@@ -65,7 +66,7 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V", shift = At.Shift.AFTER))
     public void postRender3dHook(float tickDelta, long limitTime, MatrixStack matrix, CallbackInfo ci) {
-        ThunderHack.moduleManager.onPostRender3D(matrix);
+        ThunderHack.shaderManager.renderShaders();
     }
 
     @Inject(method = "tiltViewWhenHurt", at = @At("HEAD"), cancellable = true)

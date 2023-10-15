@@ -72,7 +72,7 @@ public class ClickGui extends Module {
     }
 
     @Override
-    public void onTick() {
+    public void onUpdate() {
         if (!(ClickGui.mc.currentScreen instanceof ClickUI)) disable();
     }
 

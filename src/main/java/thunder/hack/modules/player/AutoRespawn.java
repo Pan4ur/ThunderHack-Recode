@@ -21,7 +21,7 @@ public class AutoRespawn extends Module {
     }
 
     @Override
-    public void onTick() {
+    public void onUpdate() {
         if (fullNullCheck()) return;
 
         if (timer.passedMs(2100)) {

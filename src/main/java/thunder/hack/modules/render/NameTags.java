@@ -265,7 +265,7 @@ public class NameTags extends Module {
                 if (pe.getOwner() != null) ownerName = pe.getOwner().getDisplayName().getString();
             } else if (ent instanceof HorseEntity he) {
                 if (he.getOwnerUuid() != null) ownerName = he.getOwnerUuid().toString();
-            } else if (ent instanceof TameableEntity te && te.isTamed()) {
+            } else if (ent instanceof TameableEntity te && te.isTamed() && te.getOwner() != null) {
                 ownerName = te.getOwner().getDisplayName().getString();
             } else continue;
 

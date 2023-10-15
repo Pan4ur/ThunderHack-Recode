@@ -45,8 +45,7 @@ public final class Core {
         if (!fullNullCheck()) {
             ThunderHack.moduleManager.onUpdate();
             ThunderHack.moduleManager.sortModules();
-        }
-        if (!fullNullCheck()) {
+
             if (ModuleManager.clickGui.getBind().getKey() == -1) {
                 Command.sendMessage(Formatting.RED + "Default clickgui keybind --> P");
                 ModuleManager.clickGui.setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(), false, false);
@@ -58,7 +57,6 @@ public final class Core {
         }
 
         ThunderGui2.getInstance().onTick();
-        ThunderHack.moduleManager.onTick();
 
         HashMap<BlockPos, Long> cache = new HashMap<>(InteractionUtility.awaiting);
         if (!cache.isEmpty()) {

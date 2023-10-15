@@ -23,6 +23,7 @@ import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventBreakBlock;
 import thunder.hack.events.impl.EventStopUsingItem;
 import thunder.hack.modules.player.Reach;
+import thunder.hack.modules.player.SpeedMine;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -51,9 +52,20 @@ public class MixinClientPlayerInteractionManager {
         return ModuleManager.speedMine.isEnabled() ? 0 : this.blockBreakingCooldown;
     }
 
+
+    @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"), cancellable = true)
+    public void updateBlockBreakingProgress(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        if (ModuleManager.speedMine.isEnabled() && ModuleManager.speedMine.mode.getValue() == SpeedMine.Mode.Packet) {
+            cir.setReturnValue(false);
+        }
+    }
+
     @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
     private void attackBlockHook(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        ThunderHack.EVENT_BUS.post(new EventAttackBlock(pos, direction));
+        EventAttackBlock event = new EventAttackBlock(pos, direction);
+        ThunderHack.EVENT_BUS.post(event);
+        if (event.isCancelled())
+            cir.setReturnValue(false);
     }
 
     @Inject(method = "stopUsingItem", at = @At("HEAD"), cancellable = true)

@@ -248,7 +248,6 @@ public class ModuleManager implements IManager {
     public void onLoad() {
         modules.sort(Comparator.comparing(Module::getName));
         modules.stream().filter(Module::listening).forEach((ThunderHack.EVENT_BUS)::subscribe);
-        modules.forEach(Module::onLoad);
 
         if (ConfigManager.firstLaunch) {
             ModuleManager.notifications.enable();
@@ -259,10 +258,6 @@ public class ModuleManager implements IManager {
     public void onUpdate() {
         if (Module.fullNullCheck()) return;
         modules.stream().filter(Module::isEnabled).forEach(Module::onUpdate);
-    }
-
-    public void onTick() {
-        modules.stream().filter(Module::isEnabled).forEach(Module::onTick);
     }
 
     public void onRender2D(DrawContext context) {
@@ -280,11 +275,6 @@ public class ModuleManager implements IManager {
 
     public void onPreRender3D(MatrixStack stack) {
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onPreRender3D(stack));
-    }
-
-    public void onPostRender3D(MatrixStack stack) {
-        modules.stream().filter(Module::isEnabled).forEach(module -> module.onPostRender3D(stack));
-        ThunderHack.shaderManager.renderShaders();
     }
 
     public void sortModules() {
@@ -326,13 +316,12 @@ public class ModuleManager implements IManager {
     }
 
     public void onKeyReleased(int eventKey) {
-        if (eventKey == -1 || eventKey == 0 || mc.currentScreen instanceof ClickUI) {
+        if (eventKey == -1 || eventKey == 0 || mc.currentScreen instanceof ClickUI)
             return;
-        }
+
         modules.forEach(module -> {
-            if (module.getBind().getKey() == eventKey && module.getBind().isHold()) {
+            if (module.getBind().getKey() == eventKey && module.getBind().isHold())
                 module.disable();
-            }
         });
     }
 
@@ -348,13 +337,12 @@ public class ModuleManager implements IManager {
     }
 
     public void onMoseKeyReleased(int eventKey) {
-        if (eventKey == -1 || mc.currentScreen instanceof ClickUI) {
+        if (eventKey == -1 || mc.currentScreen instanceof ClickUI)
             return;
-        }
+
         modules.forEach(module -> {
-            if (Objects.equals(module.getBind().getBind(), "M" + eventKey) && module.getBind().isHold()) {
+            if (Objects.equals(module.getBind().getBind(), "M" + eventKey) && module.getBind().isHold())
                 module.disable();
-            }
         });
     }
 
