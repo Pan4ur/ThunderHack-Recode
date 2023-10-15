@@ -61,7 +61,6 @@ public class ElytraPlus extends Module {
     private final Setting<Integer> manualHeight = new Setting<>("Height", 121, 1, 256, v -> ((mode.getValue() == Mode.Boost && cruiseControl.getValue())) && forceHeight.getValue());
     public Setting<Float> speed = new Setting<>("Speed", 1.0f, 0.1f, 10.0f, v -> mode.getValue() == Mode.Control);
     private final Setting<Float> sneakDownSpeed = new Setting<>("DownSpeed", 1.0F, 0.1F, 10.0F, v -> mode.getValue() == Mode.Control);
-    private final Setting<Boolean> BoostTimer = new Setting<>("Timer", true, v -> mode.getValue() == Mode.Boost);
     public Setting<Boolean> speedLimit = new Setting<>("SpeedLimit", true, v -> (mode.getValue() != Mode.FireWork && mode.getValue() != Mode.Sunrise && mode.getValue() != Mode.Pitch40Infinite));
     public Setting<Float> maxSpeed = new Setting<>("MaxSpeed", 2.5f, 0.1f, 10.0f, v -> speedLimit.getValue() && mode.getValue() != Mode.Pitch40Infinite && mode.getValue() != Mode.FireWork );
     public Setting<Boolean> noDrag = new Setting<>("NoDrag", false, v -> (mode.getValue() != Mode.FireWork && mode.getValue() != Mode.Sunrise && mode.getValue() != Mode.Pitch40Infinite));
@@ -218,7 +217,7 @@ public class ElytraPlus extends Module {
         if (strictTimer.passedMs(1500) && !strictTimer.passedMs(2000)) ThunderHack.TICK_TIMER = 1.0f;
 
         if (!mc.player.isFallFlying()) {
-            if (hasTouchedGround && BoostTimer.getValue() && !mc.player.isOnGround() && mc.player.fallDistance > 0)
+            if (hasTouchedGround && !mc.player.isOnGround() && mc.player.fallDistance > 0 && instantFly.getValue())
                 ThunderHack.TICK_TIMER = 0.3f;
 
             if (!mc.player.isOnGround() && instantFly.getValue() && mc.player.getVelocity().getY() < 0D) {

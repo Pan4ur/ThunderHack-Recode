@@ -4,10 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
-import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
+import net.minecraft.network.packet.s2c.play.*;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -37,12 +34,12 @@ public class Velocity extends Module {
     public Setting<Float> failRate = new Setting<>("FailRate", 0.3f, 0.0f, 1.0f, v -> mode.getValue() == modeEn.Jump && fail.getValue());
     public Setting<Float> jumpRate = new Setting<>("FailJumpRate", 0.25f, 0.0f, 1.0f, v -> mode.getValue() == modeEn.Jump && fail.getValue());
 
-    private boolean doJump, failJump, skip, flag;
-    private int grimTicks = 0;
-
     public Velocity() {
         super("Velocity", Module.Category.MOVEMENT);
     }
+
+    private boolean doJump, failJump, skip, flag;
+    private int grimTicks = 0;
 
     @EventHandler
     public void onPacketReceived(PacketEvent.Receive e) {
@@ -86,7 +83,8 @@ public class Velocity extends Module {
             }
         }
 
-        if (onlyAura.getValue() && ModuleManager.aura.isDisabled()) return;
+        if (onlyAura.getValue() && ModuleManager.aura.isDisabled())
+            return;
 
         if (e.getPacket() instanceof EntityVelocityUpdateS2CPacket pac) {
             if (pac.getId() == mc.player.getId()) {
@@ -116,7 +114,7 @@ public class Velocity extends Module {
                     ((ISPacketEntityVelocity) pac).setMotionZ((int) ((float) pac.getVelocityZ() * horizontal.getValue() / 100f));
                 } else if (mode.getValue() == modeEn.Sunrise) {
                     e.setCancelled(true);
-                    mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), -999.0, mc.player.getZ(), true));
+                    sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), -999.0, mc.player.getZ(), true));
                 } else if (mode.getValue() == modeEn.Cancel) {
                     e.setCancelled(true);
                 } else if (mode.getValue() == modeEn.Jump && mc.player.isOnGround()) {

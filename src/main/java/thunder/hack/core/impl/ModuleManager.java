@@ -168,6 +168,8 @@ public class ModuleManager implements IManager {
     public static AntiBot antiBot = new AntiBot();
     public static AntiAim antiAim = new AntiAim();
     public static AutoSex autoSex = new AutoSex();
+    public static Tracers tracers = new Tracers();
+    public static Paimon paimon = new Paimon();
     public static BowPop bowPop = new BowPop();
     public static XCarry xCarry = new XCarry();
     public static Trails trails = new Trails();

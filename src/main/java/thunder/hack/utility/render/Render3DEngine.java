@@ -294,7 +294,7 @@ public class Render3DEngine {
         RenderSystem.disableCull();
         RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
         RenderSystem.lineWidth(width);
-        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+        buffer.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.LINES);
         vertexLine(matrices, buffer, 0f, 0f, 0f, (float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1), color);
         tessellator.draw();
         RenderSystem.enableCull();

@@ -22,6 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class Search extends Module {
+
     public static CopyOnWriteArrayList<BlockVec> blocks = new CopyOnWriteArrayList<>();
     public static ArrayList<Block> defaultBlocks = new ArrayList<>();
     private final Setting<Integer> range = new Setting<>("Range", 100, 1, 128);
