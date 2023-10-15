@@ -1,5 +1,6 @@
 package thunder.hack.modules.combat;
 
+import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -29,6 +30,7 @@ import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -88,7 +90,7 @@ public class SelfTrap extends Module {
     }
 
     @EventHandler
-    public void onSync(EventSync e){
+    public void onSync(EventSync e) {
         if (placeTiming.getValue() == PlaceTiming.Vanilla && rotate.getValue()) {
             BlockPos targetBlock = getSequentialPos();
             if (targetBlock != null) {
@@ -96,7 +98,7 @@ public class SelfTrap extends Module {
                 if (result != null) {
                     float[] angle = InteractionUtility.calculateAngle(result.getPos());
                     mc.player.setYaw(angle[0]);
-                    mc.player.setYaw(angle[1]);
+                    mc.player.setPitch(angle[1]);
                 }
             }
         }
@@ -176,21 +178,16 @@ public class SelfTrap extends Module {
 
     private List<BlockPos> getBlocks() {
         List<BlockPos> blocks = new ArrayList<>();
-        for (BlockPos bp : getPlayerBlocks(mc.player)) {
-            blocks.add(bp.east().up());
-            blocks.add(bp.west().up());
-            blocks.add(bp.south().up());
-            blocks.add(bp.north().up());
+        for (BlockPos bp : getAffectedBlocks(mc.player)) {
+
+            for (Direction dir : Direction.values()) {
+                if (dir == Direction.UP || dir == Direction.DOWN) continue;
+                blocks.add(bp.offset(dir));
+                blocks.add(bp.offset(dir).up());
+                blocks.add(bp.offset(dir).down());
+            }
+
             blocks.add(bp.down());
-            blocks.add(bp.east());
-            blocks.add(bp.west());
-            blocks.add(bp.south());
-            blocks.add(bp.north());
-            blocks.add(bp.down());
-            blocks.add(bp.east().down());
-            blocks.add(bp.west().down());
-            blocks.add(bp.south().down());
-            blocks.add(bp.north().down());
             blocks.add(bp.up().up());
 
             if (!InteractionUtility.canPlaceBlock(bp.up().up(), interact.getValue(), false)) {
@@ -201,30 +198,7 @@ public class SelfTrap extends Module {
             }
         }
 
-        return blocks;
-    }
-
-    private List<BlockPos> getPlayerBlocks(PlayerEntity pl) {
-        List<BlockPos> tempPos = new ArrayList<>();
-        BlockPos center = getPlayerPos(pl);
-        tempPos.add(center);
-        tempPos.add(center.north());
-        tempPos.add(center.north().east());
-        tempPos.add(center.west());
-        tempPos.add(center.west().north());
-        tempPos.add(center.south());
-        tempPos.add(center.south().west());
-        tempPos.add(center.east());
-        tempPos.add(center.east().south());
-
-        List<BlockPos> tempPos2 = new ArrayList<>();
-
-        for (BlockPos bp : tempPos) {
-            if (!mc.world.getNonSpectatingEntities(PlayerEntity.class, new Box(bp)).isEmpty()) {
-                tempPos2.add(bp);
-            }
-        }
-        return tempPos2;
+        return blocks.stream().sorted(Comparator.comparing(b -> mc.player.squaredDistanceTo(b.toCenterPos()) * -1)).toList();
     }
 
     private int getSlot() {
@@ -260,6 +234,45 @@ public class SelfTrap extends Module {
             }
         }
         return slot;
+    }
+
+    private List<BlockPos> getAffectedBlocks(PlayerEntity pl) {
+        List<BlockPos> tempPos = new ArrayList<>();
+        List<BlockPos> finalPos = new ArrayList<>();
+        List<Box> boxes = new ArrayList<>();
+
+        for (PlayerEntity player : mc.world.getPlayers()) {
+            if (player.squaredDistanceTo(pl) < 9 && player != pl)
+                boxes.add(player.getBoundingBox());
+        }
+
+        boxes.add(pl.getBoundingBox());
+
+        BlockPos center = getPlayerPos(pl);
+
+        tempPos.add(center);
+        tempPos.add(center.north());
+        tempPos.add(center.north().east());
+        tempPos.add(center.west());
+        tempPos.add(center.west().north());
+        tempPos.add(center.south());
+        tempPos.add(center.south().west());
+        tempPos.add(center.east());
+        tempPos.add(center.east().south());
+
+        for (BlockPos bp : tempPos)
+            if (new Box(bp).intersects(pl.getBoundingBox()))
+                finalPos.add(bp);
+
+        for(BlockPos bp : Lists.newArrayList(finalPos)) {
+            for(Box box : boxes){
+                if (new Box(bp).intersects(box))
+                    finalPos.add(BlockPos.ofFloored(box.getCenter()));
+            }
+        }
+
+
+        return finalPos;
     }
 
     private BlockPos getPlayerPos(PlayerEntity pl) {
