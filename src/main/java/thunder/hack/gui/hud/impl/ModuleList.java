@@ -39,12 +39,18 @@ public class ModuleList extends HudElement {
         reverse = getPosX() > (float) (mc.getWindow().getScaledWidth() / 2);
         int offset = 0;
         int offset2 = 0;
+        float yTotal = 0;
+        float maxWidth = 0;
 
-        int yTotal = 0;
-        for (int i = 0; i < ThunderHack.moduleManager.sortedModules.size(); ++i) {
+        for (Module module : ThunderHack.moduleManager.sortedModules) {
+            stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
+            if(stringWidth > maxWidth)
+                maxWidth = stringWidth;
             yTotal += FontRenderers.modules.getFontHeight() + 3;
         }
-        setHeight(yTotal);
+
+        float reversedX = getPosX() + maxWidth;
+
 
         //Если режим - ЦветнойТекст, то мы рендерим сначала эффект свечения, а затем плитки
         if (mode.getValue() == Mode.ColorText) {
@@ -75,7 +81,7 @@ public class ModuleList extends HudElement {
                 if (reverse) {
                     stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
                     if (glow.getValue())
-                        Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX() - (float) stringWidth - 3, getPosY() + (float) offset2 - 1, stringWidth + 4, 9f, gste.getValue(), color1);
+                        Render2DEngine.drawBlurredShadow(context.getMatrices(), reversedX - (float) stringWidth - 3, getPosY() + (float) offset2 - 1, stringWidth + 4, 9f, gste.getValue(), color1);
                 }
                 offset2 += 8;
             }
@@ -106,21 +112,19 @@ public class ModuleList extends HudElement {
             if (mode.getValue() == Mode.ColorRect) {
                 if (!reverse) {
                     stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
-                    if (glow.getValue()) {
+                    if (glow.getValue())
                         Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX() - 3, getPosY() + (float) offset - 1, (float) stringWidth + 4.0f, 9.0f, gste.getValue(), color1);
-                    }
                     Render2DEngine.drawRect(context.getMatrices(), getPosX(), getPosY() + (float) offset, (float) stringWidth + 1.0f, 9f, color1);
                     Render2DEngine.drawRect(context.getMatrices(), getPosX() - 2.0f, getPosY() + (float) offset, 1.0f, 9f, color4.getValue().getColorObject());
                     FontRenderers.modules.drawString(context.getMatrices(), module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : ""), getPosX() + 3.0f, getPosY() + 2.0f + (float) offset, -1, false);
                 }
                 if (reverse) {
                     stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
-                    if (glow.getValue()) {
-                        Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX() - (float) stringWidth - 3, getPosY() + (float) offset - 1, stringWidth + 4, 9f, gste.getValue(), color1);
-                    }
-                    Render2DEngine.drawRect(context.getMatrices(), getPosX() - (float) stringWidth, getPosY() + (float) offset, 1.0f + stringWidth, 9f, color1);
-                    Render2DEngine.drawRect(context.getMatrices(), getPosX() + 1f, getPosY() + (float) offset, 4.0f, 9f, color4.getValue().getColorObject());
-                    FontRenderers.modules.drawString(context.getMatrices(), module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : ""), getPosX() - stringWidth + 2.0f, getPosY() + 2.0f + (float) offset, -1, false);
+                    if (glow.getValue())
+                        Render2DEngine.drawBlurredShadow(context.getMatrices(), reversedX - (float) stringWidth - 3, getPosY() + (float) offset - 1, stringWidth + 4, 9f, gste.getValue(), color1);
+                    Render2DEngine.drawRect(context.getMatrices(), reversedX - (float) stringWidth, getPosY() + (float) offset, 1.0f + stringWidth, 9f, color1);
+                    Render2DEngine.drawRect(context.getMatrices(), reversedX + 1f, getPosY() + (float) offset, 4.0f, 9f, color4.getValue().getColorObject());
+                    FontRenderers.modules.drawString(context.getMatrices(), module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : ""), reversedX - stringWidth + 2.0f, getPosY() + 2.0f + (float) offset, -1, false);
                 }
             } else {
                 if (!reverse) {
@@ -131,13 +135,15 @@ public class ModuleList extends HudElement {
                 }
                 if (reverse) {
                     stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
-                    Render2DEngine.drawRect(context.getMatrices(), getPosX() - (float) stringWidth, getPosY() + (float) offset - 1f, stringWidth + 1f, 9.0f, color3.getValue().getColorObject());
-                    Render2DEngine.drawRect(context.getMatrices(), getPosX() + 1f, getPosY() + (float) offset, 2.0f, 9.0f, color1);
-                    FontRenderers.modules.drawString(context.getMatrices(), module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : ""), getPosX() - stringWidth + 2.0f, getPosY() + 2.0f + (float) offset, color1.getRGB(), false);
+                    Render2DEngine.drawRect(context.getMatrices(), reversedX - (float) stringWidth, getPosY() + (float) offset - 1f, stringWidth + 1f, 9.0f, color3.getValue().getColorObject());
+                    Render2DEngine.drawRect(context.getMatrices(), reversedX + 1f, getPosY() + (float) offset, 2.0f, 9.0f, color1);
+                    FontRenderers.modules.drawString(context.getMatrices(), module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : ""), reversedX - stringWidth + 2.0f, getPosY() + 2.0f + (float) offset, color1.getRGB(), false);
                 }
             }
             offset += 9;
         }
+
+        setBounds((int) maxWidth, (int) yTotal);
     }
 
     private enum cMode {
