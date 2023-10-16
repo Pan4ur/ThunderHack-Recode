@@ -9,13 +9,9 @@ import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.combat.AntiBot;
-import thunder.hack.modules.movement.Velocity;
-import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 
@@ -31,7 +27,7 @@ public class Paimon extends HudElement {
 
     private final Identifier PAIMON = new Identifier("textures/paimon.png");
 
-    public Setting<Integer> scale = new Setting<>("Scale", 100, 0, 100);
+    public Setting<Integer> scale = new Setting<>("Scale", 50, 0, 100);
 
     public static int currentFrame;
     private String message = "";
@@ -40,13 +36,15 @@ public class Paimon extends HudElement {
 
 
     @Override
-    public void onUpdate(){
+    public void onUpdate() {
         for (PlayerEntity player : mc.world.getPlayers()) {
             if (player == mc.player || AntiBot.bots.contains(player) || player.getHealth() > 0 || !ThunderHack.combatManager.popList.containsKey(player.getName().getString()))
                 continue;
 
-            if (isRu()) message =  player.getName().getString() + " попнул " + (ThunderHack.combatManager.popList.get(player.getName().getString()) > 1 ? ThunderHack.combatManager.popList.get(player.getName().getString()) + "" + " тотемов и сдох!" : "тотем и сдох!");
-            else message =  player.getName().getString() + " popped " + (ThunderHack.combatManager.popList.get(player.getName().getString()) > 1 ? ThunderHack.combatManager.popList.get(player.getName().getString()) + "" + " totems and died EZ LMAO!" : "totem and died EZ LMAO!");
+            if (isRu())
+                message = player.getName().getString() + " попнул " + (ThunderHack.combatManager.popList.get(player.getName().getString()) > 1 ? ThunderHack.combatManager.popList.get(player.getName().getString()) + "" + " тотемов и сдох!" : "тотем и сдох!");
+            else
+                message = player.getName().getString() + " popped " + (ThunderHack.combatManager.popList.get(player.getName().getString()) > 1 ? ThunderHack.combatManager.popList.get(player.getName().getString()) + "" + " totems and died EZ LMAO!" : "totem and died EZ LMAO!");
             lastPop.reset();
         }
     }
@@ -63,20 +61,20 @@ public class Paimon extends HudElement {
         context.drawTexture(PAIMON, (int) getPosX(), (int) getPosY(), 0, currentFrame * 200, 200, 200, 200, 10600);
         context.getMatrices().pop();
 
-        if(!lastPop.passedMs(2000)) {
+        if (!lastPop.passedMs(2000)) {
             float w = FontRenderers.sf_bold.getStringWidth(message) + 8;
-            float factor = MathUtility.clamp(lastPop.getPassedTimeMs(), 0 , 500) / 500f;
+            float factor = MathUtility.clamp(lastPop.getPassedTimeMs(), 0, 500) / 500f;
             Render2DEngine.drawRound(context.getMatrices(), getPosX() + scale.getValue() / 3f, getPosY() + 70 - scale.getValue(), factor * w, 10, 3, new Color(0xFCD7DD));
 
-            Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(),factor * w + getPosX() + 20, 20 + getPosY(), 1f);
-            FontRenderers.sf_bold.drawString(context.getMatrices(),message ,  getPosX() + 2 + scale.getValue() / 3f, getPosY() + 72 - scale.getValue(), new Color(0x484848).getRGB());
+            Render2DEngine.addWindow(context.getMatrices(), getPosX() + scale.getValue() / 3f, getPosY()  + 72 - scale.getValue(), factor * w + getPosX() + scale.getValue() / 3f, 20 + getPosY()  + 72 - scale.getValue(), 1f);
+            FontRenderers.sf_bold.drawString(context.getMatrices(), message, getPosX() + 2 + scale.getValue() / 3f, getPosY() + 72 - scale.getValue(), new Color(0x484848).getRGB());
             Render2DEngine.popWindow();
         }
 
-        if(frameRate.passedMs(32)){
+        if (frameRate.passedMs(32)) {
             frameRate.reset();
             currentFrame++;
-            if(currentFrame > 52)
+            if (currentFrame > 52)
                 currentFrame = 0;
         }
 
@@ -89,8 +87,10 @@ public class Paimon extends HudElement {
     public void onTotemPop(@NotNull TotemPopEvent event) {
         if (event.getEntity() == mc.player) return;
 
-        if (isRu()) message =  event.getEntity().getName().getString() + " попнул " + (event.getPops() > 1 ? event.getPops() + "" + " тотемов!" : "тотем!");
-        else message =  event.getEntity().getName().getString() + " popped " + (event.getPops() > 1 ? event.getPops() + "" + " totems!" : " a totem!");
+        if (isRu())
+            message = event.getEntity().getName().getString() + " попнул " + (event.getPops() > 1 ? event.getPops() + "" + " тотемов!" : "тотем!");
+        else
+            message = event.getEntity().getName().getString() + " popped " + (event.getPops() > 1 ? event.getPops() + "" + " totems!" : " a totem!");
         lastPop.reset();
     }
 }

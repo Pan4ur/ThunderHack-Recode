@@ -1,6 +1,5 @@
 package thunder.hack.modules.render;
 
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
@@ -29,9 +28,12 @@ public class Tracers extends Module {
         mc.options.getBobView().setValue(false);
 
         for (PlayerEntity player : ThunderHack.asyncManager.getAsyncPlayers()) {
+            if (player == mc.player)
+                continue;
+
             Color color1 = color.getValue().getColorObject();
 
-            if(ThunderHack.friendManager.isFriend(player))
+            if (ThunderHack.friendManager.isFriend(player))
                 color1 = friendColor.getValue().getColorObject();
 
             Vec3d vec2 = new Vec3d(0, 0, 75)
