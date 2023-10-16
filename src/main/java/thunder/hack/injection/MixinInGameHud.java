@@ -59,7 +59,7 @@ public abstract class MixinInGameHud {
 
     @Inject(at = @At(value = "HEAD"), method = "renderStatusEffectOverlay", cancellable = true)
     public void renderStatusEffectOverlayHook(DrawContext context, CallbackInfo ci) {
-        if (ModuleManager.potionHud.isEnabled()) {
+        if (ModuleManager.potionHud.isEnabled() || (ModuleManager.legacyHud.isEnabled() && ModuleManager.legacyHud.potions.getValue())) {
             ci.cancel();
         }
     }

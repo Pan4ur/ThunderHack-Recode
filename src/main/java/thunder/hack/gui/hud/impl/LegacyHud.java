@@ -41,7 +41,7 @@ public class LegacyHud extends Module {
     private final Setting<Boolean> totems = new Setting<>("Totems", false);
     private final Setting<Boolean> greeter = new Setting<>("Welcomer", false);
     private final Setting<Boolean> speed = new Setting<>("Speed", false);
-    private final Setting<Boolean> potions = new Setting<>("Potions", false);
+    public final Setting<Boolean> potions = new Setting<>("Potions", false);
     private final Setting<Boolean> ping = new Setting<>("Ping", false);
     private final Setting<Boolean> tps = new Setting<>("TPS", false);
     private final Setting<Boolean> extraTps = new Setting<>("ExtraTPS", true, v-> tps.getValue());

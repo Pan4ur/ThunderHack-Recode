@@ -100,6 +100,7 @@ public class ModuleManager implements IManager {
     public static AutoAnchor autoAnchor = new AutoAnchor();
     public static AntiHunger antiHunger = new AntiHunger();
     public static Animations animations = new Animations();
+    public static DamageTint damageTint = new DamageTint();
     public static DamageFly damageFly = new DamageFly();
     public static WayPoints wayPoints = new WayPoints();
     public static WaterMark waterMark = new WaterMark();
@@ -148,6 +149,7 @@ public class ModuleManager implements IManager {
     public static ArmorHud armorHud = new ArmorHud();
     public static AirPlace airPlace = new AirPlace();
     public static SelfTrap selfTrap = new SelfTrap();
+    public static AntiVoid antiVoid = new AntiVoid();
     public static AutoBed autoBed = new AutoBed();
     public static VoidESP voidESP = new VoidESP();
     public static Tracker tracker = new Tracker();
