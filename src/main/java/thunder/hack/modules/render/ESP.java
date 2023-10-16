@@ -8,15 +8,14 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.AreaEffectCloudEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.TntEntity;
+import net.minecraft.entity.*;
+import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.*;
+import org.jetbrains.annotations.NotNull;
+import org.joml.Vector4d;
+import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.RadarRewrite;
 import thunder.hack.injection.accesors.IBeaconBlockEntity;
@@ -24,6 +23,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
@@ -47,6 +47,24 @@ public class ESP extends Module {
     private final Setting<ColorSetting> burrowTextColor = new Setting<>("BurrowTextColor", new ColorSetting(new Color(-1)), v -> burrow.getValue());
     private final Setting<ColorSetting> burrowColor = new Setting<>("BurrowColor", new ColorSetting(new Color(-1)), v -> burrow.getValue());
     private final Setting<Boolean> pearls = new Setting<>("Pearls", false);
+
+    private final Setting<Parent> boxEsp = new Setting<>("Box", new Parent(false, 0));
+    private final Setting<Boolean> players = new Setting<>("Players", true).withParent(boxEsp);
+    private final Setting<Boolean> friends = new Setting<>("Friends", true).withParent(boxEsp);
+    private final Setting<Boolean> crystals = new Setting<>("Crystals", true).withParent(boxEsp);
+    private final Setting<Boolean> creatures = new Setting<>("Creatures", false).withParent(boxEsp);
+    private final Setting<Boolean> monsters = new Setting<>("Monsters", false).withParent(boxEsp);
+    private final Setting<Boolean> ambients = new Setting<>("Ambients", false).withParent(boxEsp);
+    private final Setting<Boolean> others = new Setting<>("Others", false).withParent(boxEsp);
+
+    private final Setting<Parent> boxColors = new Setting<>("BoxColors", new Parent(false, 0));
+    public final Setting<ColorSetting> playersC = new Setting<>("PlayersC", new ColorSetting(new Color(0xFF9200))).withParent(boxColors);
+    public final Setting<ColorSetting> friendsC = new Setting<>("FriendsC", new ColorSetting(new Color(0x30FF00))).withParent(boxColors);
+    public final Setting<ColorSetting> crystalsC = new Setting<>("CrystalsC", new ColorSetting(new Color(0x00BBFF))).withParent(boxColors);
+    public final Setting<ColorSetting> creaturesC = new Setting<>("CreaturesC", new ColorSetting(new Color(0xA0A4A6))).withParent(boxColors);
+    public final Setting<ColorSetting> monstersC = new Setting<>("MonstersC", new ColorSetting(new Color(0xFF0000))).withParent(boxColors);
+    public final Setting<ColorSetting> ambientsC = new Setting<>("AmbientsC", new ColorSetting(new Color(0x7B00FF))).withParent(boxColors);
+    public final Setting<ColorSetting> othersC = new Setting<>("OthersC", new ColorSetting(new Color(0xFF0062))).withParent(boxColors);
 
     public void onRender3D(MatrixStack stack) {
         if (lingeringPotions.getValue()) {
@@ -210,6 +228,9 @@ public class ESP extends Module {
     public void onRender2D(DrawContext context) {
         if (pearls.getValue()) {
             for (Entity ent : mc.world.getEntities()) {
+                if(shouldRender(ent))
+                    drawBox(ent, context);
+
                 if (ent instanceof EnderPearlEntity pearl) {
                     float xOffset = mc.getWindow().getScaledWidth() / 2f;
                     float yOffset = mc.getWindow().getScaledHeight() / 2f;
@@ -229,6 +250,98 @@ public class ESP extends Module {
                     FontRenderers.modules.drawCenteredString(context.getMatrices(), String.format("%.1f", mc.player.distanceTo(pearl)) + "m", (float) (Math.sin(Math.toRadians(yaw)) * 50f) + xOffset, (float) (yOffset - (Math.cos(Math.toRadians(yaw)) * 50f)) - 20, -1);
                 }
             }
+        }
+    }
+
+    public boolean shouldRender(Entity entity) {
+        if (entity == null)
+            return false;
+
+        if (mc.player == null)
+            return false;
+
+        if (entity instanceof PlayerEntity) {
+            if (entity == mc.player)
+                return false;
+            if (ThunderHack.friendManager.isFriend((PlayerEntity) entity))
+                return friends.getValue();
+            return players.getValue();
+        }
+
+        if (entity instanceof EndCrystalEntity)
+            return crystals.getValue();
+
+        return switch (entity.getType().getSpawnGroup()) {
+            case CREATURE, WATER_CREATURE -> creatures.getValue();
+            case MONSTER -> monsters.getValue();
+            case AMBIENT, WATER_AMBIENT -> ambients.getValue();
+            default -> others.getValue();
+        };
+    }
+
+    public Color getEntityColor(Entity entity) {
+        if (entity == null)
+            return new Color(-1);
+
+        if (entity instanceof PlayerEntity) {
+            if (ThunderHack.friendManager.isFriend((PlayerEntity) entity))
+                return friendsC.getValue().getColorObject();
+            return playersC.getValue().getColorObject();
+        }
+
+        if (entity instanceof EndCrystalEntity)
+            return crystalsC.getValue().getColorObject();
+
+        return switch (entity.getType().getSpawnGroup()) {
+            case CREATURE, WATER_CREATURE -> creaturesC.getValue().getColorObject();
+            case MONSTER -> monstersC.getValue().getColorObject();
+            case AMBIENT, WATER_AMBIENT -> ambientsC.getValue().getColorObject();
+            default -> othersC.getValue().getColorObject();
+        };
+    }
+
+    public void drawBox(@NotNull Entity ent, DrawContext context) {
+        double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
+        double y = ent.prevY + (ent.getY() - ent.prevY) * mc.getTickDelta();
+        double z = ent.prevZ + (ent.getZ() - ent.prevZ) * mc.getTickDelta();
+        Box axisAlignedBB2 = ent.getBoundingBox();
+        Box axisAlignedBB = new Box(axisAlignedBB2.minX - ent.getX() + x - 0.05, axisAlignedBB2.minY - ent.getY() + y, axisAlignedBB2.minZ - ent.getZ() + z - 0.05, axisAlignedBB2.maxX - ent.getX() + x + 0.05, axisAlignedBB2.maxY - ent.getY() + y + 0.15, axisAlignedBB2.maxZ - ent.getZ() + z + 0.05);
+        Vec3d[] vectors = new Vec3d[]{new Vec3d(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.maxZ)};
+
+        Color col = getEntityColor(ent);
+
+        Vector4d position = null;
+        for (Vec3d vector : vectors) {
+            vector = Render3DEngine.worldSpaceToScreenSpace(new Vec3d(vector.x, vector.y, vector.z));
+            if (vector.z > 0 && vector.z < 1) {
+                if (position == null) position = new Vector4d(vector.x, vector.y, vector.z, 0);
+                position.x = Math.min(vector.x, position.x);
+                position.y = Math.min(vector.y, position.y);
+                position.z = Math.max(vector.x, position.z);
+                position.w = Math.max(vector.y, position.w);
+            }
+        }
+
+        if (position != null) {
+            double posX = position.x;
+            double posY = position.y;
+            double endPosX = position.z;
+            double endPosY = position.w;
+
+            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 1F), (float) posY, (float) (posX + 0.5), (float) (endPosY + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
+            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 1F), (float) (posY - 0.5), (float) (endPosX + 0.5), (float) (posY + 0.5 + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
+            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (endPosX - 0.5 - 0.5), (float) posY, (float) (endPosX + 0.5), (float) (endPosY + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
+            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 1), (float) (endPosY - 0.5 - 0.5), (float) (endPosX + 0.5), (float) (endPosY + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
+
+            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 0.5f), (float) posY, (float) (posX + 0.5 - 0.5), (float) endPosY, col, col, col, col);
+            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) posX, (float) (endPosY - 0.5f), (float) endPosX, (float) endPosY, col, col, col, col);
+            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 0.5), (float) posY, (float) endPosX, (float) (posY + 0.5), col, col, col, col);
+            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (endPosX - 0.5), (float) posY, (float) endPosX, (float) endPosY, col, col, col, col);
+
+            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 5), (float) posY, (float) posX - 3, (float) endPosY, Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
+
+            if(ent instanceof LivingEntity lent && lent.getHealth() != 0)
+                Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 5), (float) (endPosY + (posY - endPosY) * lent.getHealth() / 20f), (float) posX - 3, (float) endPosY, Color.RED, Color.RED, Color.RED, Color.RED);
         }
     }
 
