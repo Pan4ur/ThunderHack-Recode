@@ -15,7 +15,7 @@
 - Default ClickGui keybind - **```P```**
 - Default prefix  - **```@```**
 - Middle click on module to bind
-- DoxWare 2.0 is a ratted TH Recode rename, be aware :)
+- DoxWare 2.0 and gumballoff is a ratted TH Recode rename, be aware :)
 - selfdox попросил меня написать тут что у него самое большое кол-во ело на сс
 - А у 06ED'a самая красивая попа
 - А кен просто крутой
@@ -30,6 +30,12 @@
 - [ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus) - To play on 1.12.2 servers (!!!will fuck up the silent switch in SpeedMine and ShieldBreaker in Aura!!!)
 - [InGameAccountSwitcher](https://www.curseforge.com/minecraft/mc-mods/in-game-account-switcher) - To switch accounts in game
 - [NotEnoughCrashes](https://www.curseforge.com/minecraft/mc-mods/not-enough-crashes/files) - :^)
+
+## Credits
+- [Ai_24](https://www.youtube.com/@Ai_24) for showcase
+- [KiLAB Gaming](https://www.youtube.com/@KiLABGaming) for CCO
+- @meteordevelopment for orbit
+- @ladysnake for satin
 
 ## ScreenShots
 ![image](https://cdn.discordapp.com/attachments/934396624111824900/1149001329675604048/2023-09-06_18.06.52.png)
