@@ -97,7 +97,6 @@ public class ModuleManager implements IManager {
     public static CevBreaker cevBreaker = new CevBreaker();
     public static AutoSprint autoSprint = new AutoSprint();
     public static AutoGApple autoGApple = new AutoGApple();
-    public static AutoAnchor autoAnchor = new AutoAnchor();
     public static AntiHunger antiHunger = new AntiHunger();
     public static Animations animations = new Animations();
     public static DamageTint damageTint = new DamageTint();
@@ -206,7 +205,7 @@ public class ModuleManager implements IManager {
 
 
     public ModuleManager() {
-        modules.add(new AutoAnchorRecode());
+        modules.add(new AutoAnchor());
         for (Field field : getClass().getDeclaredFields()) {
             if (Module.class.isAssignableFrom(field.getType())) {
                 field.setAccessible(true);
@@ -283,7 +282,7 @@ public class ModuleManager implements IManager {
     }
 
     public void sortModules() {
-        sortedModules = getEnabledModules().stream().filter(Module::isDrawn).sorted(Comparator.comparing(module -> FontRenderers.getSettingsRenderer().getStringWidth(module.getFullArrayString()) * -1)).collect(Collectors.toList());
+        sortedModules = getEnabledModules().stream().filter(Module::isDrawn).sorted(Comparator.comparing(module -> FontRenderers.getModulesRenderer().getStringWidth(module.getFullArrayString()) * -1)).collect(Collectors.toList());
     }
 
     public void onLogout() {

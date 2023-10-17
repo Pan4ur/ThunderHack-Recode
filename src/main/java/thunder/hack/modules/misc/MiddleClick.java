@@ -30,6 +30,7 @@ public class MiddleClick extends Module {
     private final Setting<Integer> swapDelay = new Setting<>("SwapDelay", 100, 0, 1000, v -> !silentPearl.getValue());
     private final Setting<Boolean> xp = new Setting<>("XP", false);
     private final Setting<Boolean> noWasteXp = new Setting<>("Anti Waste", true, v -> xp.getValue());
+    public final Setting<Boolean> antiPickUp = new Setting<>("AntiPickUp", true);
     private final Setting<Integer> durability = new Setting<>("Stop On", 90, v -> xp.getValue());
     private final Setting<Boolean> feetExp = new Setting<>("FeetXP", false, v -> xp.getValue());
     private final Setting<Boolean> silent = new Setting<>("SilentXP", true, v -> xp.getValue());

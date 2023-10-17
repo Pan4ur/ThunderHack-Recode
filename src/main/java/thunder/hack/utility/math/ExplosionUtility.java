@@ -16,7 +16,6 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.explosion.Explosion;
 import thunder.hack.modules.combat.AutoAnchor;
-import thunder.hack.modules.combat.AutoAnchorRecode;
 import thunder.hack.modules.combat.AutoCrystal;
 
 import java.util.Objects;
@@ -41,10 +40,10 @@ public final class ExplosionUtility {
         anchorIgnore = anchorPos;
         terrainIgnore = true;
 
-        if (AutoAnchorRecode.predictTicks.getValue() == 0)
+        if (AutoAnchor.predictTicks.getValue() == 0)
             final_result = getExplosionDamage1(anchorPos.up().toCenterPos(), target);
         else
-            final_result = getExplosionDamageWPredict(anchorPos.toCenterPos(), target, PredictUtility.predictPlayer(target, AutoAnchorRecode.predictTicks.getValue()));
+            final_result = getExplosionDamageWPredict(anchorPos.toCenterPos(), target, PredictUtility.predictPlayer(target, AutoAnchor.predictTicks.getValue()));
 
         anchorIgnore = null;
         terrainIgnore = false;

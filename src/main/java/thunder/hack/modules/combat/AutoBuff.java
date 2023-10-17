@@ -32,11 +32,9 @@ public class AutoBuff extends Module {
     }
 
     public static int getPotionSlot(Potions potion) {
-        for (int i = 0; i < 9; ++i) {
-            if (isStackPotion(mc.player.getInventory().getStack(i), potion)) {
+        for (int i = 0; i < 9; ++i)
+            if (isStackPotion(mc.player.getInventory().getStack(i), potion))
                 return i;
-            }
-        }
         return -1;
     }
 

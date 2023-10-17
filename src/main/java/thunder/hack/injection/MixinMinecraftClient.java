@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventPostTick;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.gui.font.FontRenderers;
@@ -72,6 +73,12 @@ public class MixinMinecraftClient {
     @Inject(method = "onResolutionChanged", at = @At("TAIL"))
     private void captureResize(CallbackInfo ci) {
         WindowResizeCallback.EVENT.invoker().onResized((MinecraftClient) (Object) this, this.window);
+    }
+
+    @Inject(method = "doItemPick", at = @At("HEAD"), cancellable = true)
+    private void doItemPickHook(CallbackInfo ci) {
+        if(ModuleManager.middleClick.isEnabled() && ModuleManager.middleClick.antiPickUp.getValue())
+            ci.cancel();
     }
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/Window;setIcon(Lnet/minecraft/resource/ResourcePack;Lnet/minecraft/client/util/Icons;)V"))
