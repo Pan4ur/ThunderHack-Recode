@@ -34,7 +34,7 @@ import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.SearchInvResult;
 
-public class AutoTotem extends Module {
+public final class AutoTotem extends Module {
     public Setting<OffHand> offhand = new Setting<>("Item", OffHand.Totem);
     public Setting<Float> healthF = new Setting<>("HP", 16f, 0f, 20f);
     public Setting<Float> healthS = new Setting<>("ShieldGappleHp", 16f, 0f, 20f, v -> offhand.getValue() == OffHand.Shield);
@@ -56,11 +56,13 @@ public class AutoTotem extends Module {
     public Setting<Boolean> crapple = new Setting<>("CrappleSpoof", true, v -> offhand.getValue() == OffHand.GApple);
 
     private enum OffHand {Totem, Crystal, GApple, Shield}
+    private static AutoTotem instance;
 
     private int delay;
 
     public AutoTotem() {
         super("AutoTotem", Category.COMBAT);
+        instance = this;
     }
 
     @EventHandler
@@ -263,5 +265,9 @@ public class AutoTotem extends Module {
         }
         if (item == mc.player.getMainHandStack().getItem() && mc.options.useKey.isPressed()) return -1;
         return itemSlot;
+    }
+
+    public static AutoTotem getInstance() {
+        return instance;
     }
 }

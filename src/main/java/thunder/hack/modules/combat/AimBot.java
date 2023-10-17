@@ -12,6 +12,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventSync;
@@ -32,11 +33,7 @@ import static net.minecraft.util.hit.HitResult.Type.ENTITY;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
 import static thunder.hack.core.impl.PlayerManager.calcAngleVec;
 
-public class AimBot extends Module {
-    public AimBot() {
-        super("AimBot", Category.COMBAT);
-    }
-
+public final class AimBot extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.BowAim);
     private final Setting<Rotation> rotation = new Setting<>("Rotation", Rotation.Silent, v -> mode.getValue() != Mode.AimAssist);
     public final Setting<Float> aimRange = new Setting<>("Range", 20f, 1f, 30f, v -> mode.getValue() != Mode.AimAssist);
@@ -57,6 +54,12 @@ public class AimBot extends Module {
     private float rotationYaw, rotationPitch;
     private Box debug_box;
     private float assistAcceleration;
+    private static AimBot instance;
+
+    public AimBot() {
+        super("AimBot", Category.COMBAT);
+        instance = this;
+    }
 
     @EventHandler
     public void onSync(EventSync event) {
@@ -164,7 +167,7 @@ public class AimBot extends Module {
     }
 
 
-    private float calculateArc(PlayerEntity target, double duration) {
+    private float calculateArc(@NotNull PlayerEntity target, double duration) {
         double yArc = target.getY() + (double) (target.getEyeHeight(target.getPose())) - (mc.player.getY() + (double) mc.player.getEyeHeight(mc.player.getPose()));
         double dX = target.getX() - mc.player.getX();
         double dZ = target.getZ() - mc.player.getZ();
@@ -268,7 +271,7 @@ public class AimBot extends Module {
         return mc.player.squaredDistanceTo(getResolvedPos(entity)) > aimRange.getPow2Value();
     }
 
-    public float getYawToEntityNew(Entity entity) {
+    public float getYawToEntityNew(@NotNull Entity entity) {
         return getYawBetween(mc.player.getYaw(), mc.player.getX(), mc.player.getZ(), entity.getX(), entity.getZ());
     }
 
@@ -279,7 +282,7 @@ public class AimBot extends Module {
         return yaw + MathHelper.wrapDegrees(yaw1 - yaw);
     }
 
-    private Vec3d getResolvedPos(Entity pl) {
+    private Vec3d getResolvedPos(@NotNull Entity pl) {
         return new Vec3d(pl.getX() + pl.getVelocity().x * predict.getValue(), pl.getY(), pl.getZ() + pl.getVelocity().z * predict.getValue());
     }
 
@@ -294,5 +297,9 @@ public class AimBot extends Module {
 
     private enum Mode {
         CSAim, AimAssist, BowAim
+    }
+
+    public static AimBot getInstance() {
+        return instance;
     }
 }

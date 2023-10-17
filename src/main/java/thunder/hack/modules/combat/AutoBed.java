@@ -48,11 +48,7 @@ import java.util.Objects;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class AutoBed extends Module {
-    public AutoBed() {
-        super("AutoBed", Category.COMBAT);
-    }
-
+public final class AutoBed extends Module {
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("InteractMode", InteractionUtility.Interact.Vanilla);
     public static final Setting<Float> range = new Setting<>("Range", 4f, 2f, 6.0f);
     public static final Setting<Float> wallRange = new Setting<>("WallRange", 4f, 0f, 6.0f);
@@ -77,8 +73,15 @@ public class AutoBed extends Module {
     private PlayerEntity target;
     private BedData bestBed, bestPos;
 
-    private Timer placeTimer = new Timer();
-    private Timer explodeTimer = new Timer();
+    private final Timer placeTimer = new Timer();
+    private final Timer explodeTimer = new Timer();
+
+    private static AutoBed instance;
+
+    public AutoBed() {
+        super("AutoBed", Category.COMBAT);
+        instance = this;
+    }
 
     @EventHandler
     public void onSync(EventSync e) {
@@ -367,6 +370,10 @@ public class AutoBed extends Module {
     }
 
     private record BedData(BlockHitResult hitResult, float damage, float selfDamage, Direction dir) {
+    }
+
+    public static AutoBed getInstance() {
+        return instance;
     }
 }
 

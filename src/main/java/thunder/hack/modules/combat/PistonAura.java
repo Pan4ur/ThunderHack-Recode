@@ -48,11 +48,7 @@ import java.util.stream.Collectors;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class PistonAura extends Module {
-    public PistonAura() {
-        super("PistonAura", Category.COMBAT);
-    }
-
+public final class PistonAura extends Module {
     public Setting<Integer> placeDelay = new Setting<>("Delay/Place", 1, 0, 25);
     public Setting<Integer> blocksPerTick = new Setting<>("Block/Tick", 3, 1, 4);
     public Setting<Pattern> patternsSetting = new Setting<>("Pattern", Pattern.All);
@@ -78,6 +74,17 @@ public class PistonAura extends Module {
     private Stage stage = Stage.Searching;
     private EndCrystalEntity lastCrystal;
     private Vec3d rotations;
+
+    private static PistonAura instance;
+
+    public PistonAura() {
+        super("PistonAura", Category.COMBAT);
+        instance = this;
+    }
+
+    public static PistonAura getInstance() {
+        return instance;
+    }
 
     public void reset() {
         builtTrap = false;

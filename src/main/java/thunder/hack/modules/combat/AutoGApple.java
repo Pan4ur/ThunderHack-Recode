@@ -7,17 +7,20 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 
-public class AutoGApple extends Module {
-    public AutoGApple() {
-        super("AutoGApple", Category.COMBAT);
-    }
-
+public final class AutoGApple extends Module {
     public final Setting<Integer> Delay = new Setting("UseDelay", 0, 0, 2000);
     private final Setting<Float> health = new Setting<>("health", 15f, 1f, 36f);
     public Setting<Boolean> absorption = new Setting<>("Absorption", false);
 
     private boolean isActive;
     private final Timer useDelay = new Timer();
+
+    private static AutoGApple instance;
+
+    public AutoGApple() {
+        super("AutoGApple", Category.COMBAT);
+        instance = this;
+    }
 
     @EventHandler
     public void onUpdate(PostPlayerUpdateEvent e) {
@@ -38,5 +41,9 @@ public class AutoGApple extends Module {
 
     private boolean GapInOffHand() {
         return !mc.player.getOffHandStack().isEmpty() && (mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE);
+    }
+
+    public static AutoGApple getInstance() {
+        return instance;
     }
 }

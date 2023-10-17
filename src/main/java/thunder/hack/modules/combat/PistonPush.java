@@ -27,7 +27,7 @@ import thunder.hack.utility.world.HoleUtility;
 import java.awt.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PistonPush extends Module {
+public final class PistonPush extends Module {
     private final Setting<Float> range = new Setting<>("Target Range", 5.f, 1.5f, 7.f);
     private final Setting<Integer> blocksPerTick = new Setting<>("Blocks/Tick", 2, 1, 2);
     private final Setting<Integer> delayPerPlace = new Setting<>("Delay/Place", 0, 0, 5);
@@ -53,8 +53,15 @@ public class PistonPush extends Module {
 
     private final ConcurrentHashMap<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
 
+    private static PistonPush instance;
+
     public PistonPush() {
         super("PistonPush", Category.COMBAT);
+        instance = this;
+    }
+
+    public static PistonPush getInstance() {
+        return instance;
     }
 
     @Override

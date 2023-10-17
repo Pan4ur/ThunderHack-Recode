@@ -14,14 +14,21 @@ import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
-public class TriggerBot extends Module {
-    public TriggerBot() {
-        super("TriggerBot", Category.COMBAT);
-    }
-
+public final class TriggerBot extends Module {
     public final Setting<Float> attackRange = new Setting<>("Range", 3f, 1f, 7.0f);
     public final Setting<Boolean> smartCrit = new Setting<>("SmartCrit", true);
     public final Setting<Boolean> ignoreWalls = new Setting<>("IgnoreWals", false);
+
+    private static TriggerBot instance;
+
+    public TriggerBot() {
+        super("TriggerBot", Category.COMBAT);
+        instance = this;
+    }
+
+    public static TriggerBot getInstance() {
+        return instance;
+    }
 
     @EventHandler
     public void onAttack(PlayerUpdateEvent e) {

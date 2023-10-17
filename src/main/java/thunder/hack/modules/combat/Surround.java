@@ -41,7 +41,7 @@ import java.util.Objects;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class Surround extends Module {
+public final class Surround extends Module {
     private final Setting<Sequential> useSequential = new Setting<>("Use Sequence", Sequential.None);
     private final Setting<PlaceTiming> placeTiming = new Setting<>("Place Timing", PlaceTiming.Default);
     private final Setting<Float> range = new Setting<>("Range", 5f, 0f, 7f);
@@ -87,9 +87,15 @@ public class Surround extends Module {
     private boolean wasTp = false;
     private int delay;
     private double prevY;
+    private static Surround instance;
 
     public Surround() {
         super("Surround", Category.COMBAT);
+        instance = this;
+    }
+
+    public static Surround getInstance() {
+        return instance;
     }
 
     @Override

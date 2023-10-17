@@ -21,7 +21,7 @@ import thunder.hack.utility.world.HoleUtility;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class AutoMine extends Module {
+public final class AutoMine extends Module {
     private final Setting<Float> range = new Setting<>("Range", 5f, 1f, 7f);
     private final Setting<Boolean> autoDisable = new Setting<>("Auto Disable", true);
     private final Setting<Boolean> autoSwitch = new Setting<>("Switch", true);
@@ -36,6 +36,8 @@ public class AutoMine extends Module {
     private final Setting<Boolean> antiCev = new Setting<>("Cev", true).withParent(logic);
     private final Setting<Boolean> antiCiv = new Setting<>("Civ", true).withParent(logic);
 
+    private static AutoMine instance;
+
     private BlockPos blockPos;
 
     private enum TargetLogic {
@@ -46,6 +48,7 @@ public class AutoMine extends Module {
 
     public AutoMine() {
         super("AutoMine", Category.COMBAT);
+        instance = this;
     }
 
     @Override
@@ -167,5 +170,9 @@ public class AutoMine extends Module {
 
     public boolean checkPickaxe() {
         return mc.player.getMainHandStack().getItem() instanceof PickaxeItem;
+    }
+
+    public static AutoMine getInstance() {
+        return instance;
     }
 }

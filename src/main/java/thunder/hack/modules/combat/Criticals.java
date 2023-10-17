@@ -13,13 +13,20 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
-public class Criticals extends Module {
+public final class Criticals extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.FunnyGame);
+
+    private static Criticals instance;
 
     public static boolean cancelCrit;
 
     public Criticals() {
         super("Criticals", Category.COMBAT);
+        instance = this;
+    }
+
+    public static Criticals getInstance() {
+        return instance;
     }
 
     @EventHandler

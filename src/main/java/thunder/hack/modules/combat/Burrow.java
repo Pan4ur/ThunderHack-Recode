@@ -30,11 +30,7 @@ import thunder.hack.utility.player.SearchInvResult;
 
 import java.lang.reflect.Field;
 
-public class Burrow extends Module {
-    public Burrow() {
-        super("Burrow", Category.COMBAT);
-    }
-
+public final class Burrow extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
     private final Setting<OffsetMode> offsetMode = new Setting<>("Mode", OffsetMode.Smart, v -> mode.getValue() == Mode.Default);
     public Setting<Float> vClip = new Setting<>("V-Clip", -9.0F, -256.0F, 256.0F, v -> offsetMode.getValue() == OffsetMode.Constant && mode.getValue() == Mode.Default);
@@ -64,6 +60,12 @@ public class Burrow extends Module {
     private volatile double last_z;
     private final Timer scaleTimer = new Timer();
     private final Timer timer = new Timer();
+    private static Burrow instance;
+
+    public Burrow() {
+        super("Burrow", Category.COMBAT);
+        instance  = this;
+    }
 
     @Override
     public void onEnable() {
@@ -346,6 +348,10 @@ public class Burrow extends Module {
 
     public static BlockPos getPlayerPos() {
         return Math.abs(mc.player.getVelocity().y) > 0.1 ? BlockPos.ofFloored(mc.player.getPos()) : getPosition(mc.player);
+    }
+
+    public static Burrow getInstance() {
+        return instance;
     }
 
     public enum OffsetMode {

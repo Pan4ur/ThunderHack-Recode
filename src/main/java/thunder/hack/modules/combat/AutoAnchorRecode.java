@@ -17,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventSetBlockState;
@@ -38,7 +39,7 @@ import java.util.*;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class AutoAnchorRecode extends Module {
+public final class AutoAnchorRecode extends Module {
     private final Setting<Float> targetRange = new Setting<>("Target Range", 10f, 1f, 20f);
     private final Setting<Integer> minDamage = new Setting<>("Min Target Damage", 5, 1, 36);
     private final Setting<Integer> maxDamage = new Setting<>("Max Self Damage", 8, 0, 36);
@@ -74,8 +75,11 @@ public class AutoAnchorRecode extends Module {
     private PlayerEntity target;
     private BlockPos targetPos;
 
+    private static AutoAnchorRecode instance;
+
     public AutoAnchorRecode() {
         super("AutoAnchorRecode", Category.COMBAT);
+        instance = this;
     }
 
     @Override
@@ -97,12 +101,10 @@ public class AutoAnchorRecode extends Module {
     public void onRender3D(MatrixStack stack) {
         if (targetPos != null)
             Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(new Box(targetPos), HudEditor.getColor(0), 2));
-
-        super.onRender3D(stack);
     }
 
     @Override
-    public String getDisplayInfo() {
+    public @Nullable String getDisplayInfo() {
         return target != null ? target.getEntityName() : null;
     }
 
@@ -246,7 +248,8 @@ public class AutoAnchorRecode extends Module {
                         true,
                         false
                 );
-            } else {
+            } else if (!mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.RESPAWN_ANCHOR)
+                    && !mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.GLOWSTONE)) {
                 BlockPos bp = target.getBlockPos();
                 for (int i = 2; i > 0; i--) {
                     for (Vec3i vec : HoleUtility.VECTOR_PATTERN) {
@@ -340,6 +343,10 @@ public class AutoAnchorRecode extends Module {
     private void interact(BlockHitResult result, Hand hand) {
         sendPacket(new PlayerInteractBlockC2SPacket(hand, result, PlayerUtility.getWorldActionId(mc.world)));
         sendPacket(new HandSwingC2SPacket(hand));
+    }
+
+    public static AutoAnchorRecode getInstance() {
+        return instance;
     }
 
     private enum YawStepMode {

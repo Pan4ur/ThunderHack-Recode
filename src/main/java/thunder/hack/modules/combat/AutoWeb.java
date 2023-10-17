@@ -35,11 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.utility.player.InteractionUtility.squaredDistanceFromEyes;
 
-public class AutoWeb extends Module {
-    public AutoWeb() {
-        super("AutoWeb", Category.COMBAT);
-    }
-
+public final class AutoWeb extends Module {
     private final Setting<Integer> range = new Setting<>("Range", 5, 1, 7);
     private final Setting<Integer> placeWallRange = new Setting<>("WallRange", 5, 1, 7);
     private final Setting<PlaceTiming> placeTiming = new Setting<>("PlaceTiming", PlaceTiming.Default);
@@ -58,8 +54,14 @@ public class AutoWeb extends Module {
     public static Timer inactivityTimer = new Timer();
 
     private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
+    private static AutoWeb instance;
 
     private int delay = 0;
+
+    public AutoWeb() {
+        super("AutoWeb", Category.COMBAT);
+        instance = this;
+    }
 
     public void onRender3D(MatrixStack stack) {
         renderPoses.forEach((pos, time) -> {
@@ -201,6 +203,10 @@ public class AutoWeb extends Module {
             }
         }
         return slot;
+    }
+
+    public static AutoWeb getInstance() {
+        return instance;
     }
 
     private enum PlaceTiming {

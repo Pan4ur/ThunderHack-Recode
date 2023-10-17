@@ -7,9 +7,12 @@ import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 
-public class AntiServerRP extends Module {
+public final class AntiServerRP extends Module {
+    private static AntiServerRP instance;
+
     public AntiServerRP() {
         super("AntiServerRP", Category.CLIENT);
+        instance = this;
     }
 
     @EventHandler
@@ -18,5 +21,9 @@ public class AntiServerRP extends Module {
             sendPacket(new ResourcePackStatusC2SPacket(ResourcePackStatusC2SPacket.Status.ACCEPTED));
             e.cancel();
         }
+    }
+
+    public static AntiServerRP getInstance() {
+        return instance;
     }
 }

@@ -57,7 +57,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class CevBreaker extends Module {
+public final class CevBreaker extends Module {
     private final Setting<Float> range = new Setting<>("Target Range", 5.f, 0.f, 7.f);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
     private final Setting<Boolean> trap = new Setting<>("Trap Player", false);
@@ -110,8 +110,11 @@ public class CevBreaker extends Module {
     private final ConcurrentHashMap<BlockPos, Long> renderTrapPoses = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<BlockPos, Long> renderStructurePoses = new ConcurrentHashMap<>();
 
+    private static CevBreaker instance;
+
     public CevBreaker() {
         super("CevBreaker", Category.COMBAT);
+        instance = this;
     }
 
     @Override
@@ -537,7 +540,12 @@ public class CevBreaker extends Module {
         }
     }
 
+    public static CevBreaker getInstance() {
+        return instance;
+    }
+
     public enum BreakMode {
-        Packet, Normal
+        Packet,
+        Normal
     }
 }

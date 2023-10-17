@@ -10,12 +10,15 @@ import thunder.hack.injection.accesors.IGameMessageS2CPacket;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
-public class Media extends Module {
+public final class Media extends Module {
     public static final Setting<Boolean> skinProtect = new Setting<>("Skin Protect", true);
     public static final Setting<Boolean> nickProtect = new Setting<>("Nick Protect", true);
 
+    private static Media instance;
+
     public Media() {
         super("Media", Category.CLIENT);
+        instance = this;
     }
 
     @EventHandler
@@ -28,5 +31,9 @@ public class Media extends Module {
                 }
             }
         }
+    }
+
+    public static Media getInstance() {
+        return instance;
     }
 }

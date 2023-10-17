@@ -8,7 +8,7 @@ import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 
-public class HudEditor extends Module {
+public final class HudEditor extends Module {
     public static final Setting<ClickGui.colorModeEn> colorMode = new Setting<>("ColorMode", ClickGui.colorModeEn.Static);
     public static final Setting<Integer> colorSpeed = new Setting<>("ColorSpeed", 18, 2, 54);
     public static final Setting<Boolean> glow = new Setting<>("Glow", true);
@@ -18,8 +18,11 @@ public class HudEditor extends Module {
     public static final Setting<ColorSetting> textColor = new Setting<>("TextColorColor", new ColorSetting(new Color(0xFFFFFFFF, true).getRGB()));
     public static final Setting<Float> hudRound = new Setting<>("HudRound", 6f, 1f, 10f);
 
+    private static HudEditor instance;
+
     public HudEditor() {
         super("HudEditor", Module.Category.CLIENT);
+        instance = this;
     }
 
     public static Color getColor(int count) {
@@ -40,5 +43,9 @@ public class HudEditor extends Module {
     public void onEnable() {
         mc.setScreen(HudEditorGui.getHudGui());
         disable();
+    }
+
+    public static HudEditor getInstance() {
+        return instance;
     }
 }

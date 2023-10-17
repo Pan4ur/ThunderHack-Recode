@@ -21,10 +21,6 @@ import thunder.hack.utility.player.InventoryUtility;
 import static thunder.hack.utility.player.MovementUtility.isMoving;
 
 public class TargetStrafe extends Module {
-    public TargetStrafe() {
-        super("TargetStrafe", Category.COMBAT);
-    }
-
     public Setting<Boolean> jump = new Setting<>("Jump", true);
     public Setting<Float> distance = new Setting<>("Distance", 1.3F, 0.2F, 7f);
 
@@ -37,6 +33,16 @@ public class TargetStrafe extends Module {
     public static boolean needSwap, needSprintState, skip, switchDir, disabled;
     public static int noSlowTicks, jumpTicks, waterTicks;
     static long disableTime;
+    private static TargetStrafe instance;
+
+    public TargetStrafe() {
+        super("TargetStrafe", Category.COMBAT);
+        instance = this;
+    }
+
+    public static TargetStrafe getInstance() {
+        return instance;
+    }
 
     @Override
     public void onEnable() {

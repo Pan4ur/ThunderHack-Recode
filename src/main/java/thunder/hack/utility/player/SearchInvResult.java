@@ -23,8 +23,13 @@ public record SearchInvResult(int slot, boolean found, ItemStack stack) {
         return mc.player.getInventory().selectedSlot == slot;
     }
 
+    public boolean isInHotBar() {
+        return slot < 9;
+    }
+
     public void switchTo() {
-        if (found && slot < 9)
+        if (found && isInHotBar())
             InventoryUtility.switchTo(slot);
+
     }
 }

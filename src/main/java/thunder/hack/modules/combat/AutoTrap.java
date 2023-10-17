@@ -13,6 +13,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
@@ -31,11 +32,7 @@ import thunder.hack.utility.render.Render3DEngine;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AutoTrap extends Module {
-    public AutoTrap() {
-        super("AutoTrap", Category.COMBAT);
-    }
-
+public final class AutoTrap extends Module {
     private final Setting<Float> range = new Setting<>("Range", 5f, 2f, 7f);
     private final Setting<PlaceTiming> placeTiming = new Setting<>("PlaceTiming", PlaceTiming.Default);
     private final Setting<Integer> blocksPerTick = new Setting<>("Block/Tick", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
@@ -56,12 +53,17 @@ public class AutoTrap extends Module {
     private final Setting<ColorSetting> renderLineColor = new Setting<>("Line", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<Integer> renderLineWidth = new Setting<>("LineWidth", 2, 1, 5).withParent(renderCategory);
 
-    private ArrayList<BlockPos> sequentialBlocks = new ArrayList<>();
+    private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
+    private final ArrayList<BlockPos> sequentialBlocks = new ArrayList<>();
     public static Timer inactivityTimer = new Timer();
+    private static AutoTrap instance;
 
     private int delay;
 
-    private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
+    public AutoTrap() {
+        super("AutoTrap", Category.COMBAT);
+        instance = this;
+    }
 
     public void onRender3D(MatrixStack stack) {
         renderPoses.forEach((pos, time) -> {
@@ -273,8 +275,12 @@ public class AutoTrap extends Module {
         return finalPos;
     }
 
-    private BlockPos getPlayerPos(PlayerEntity pl) {
+    private BlockPos getPlayerPos(@NotNull PlayerEntity pl) {
         return BlockPos.ofFloored(pl.getX(), pl.getY() - Math.floor(pl.getY()) > 0.8 ? Math.floor(pl.getY()) + 1.0 : Math.floor(pl.getY()), pl.getZ());
+    }
+
+    public static AutoTrap getInstance() {
+        return instance;
     }
 
     private enum PlaceTiming {

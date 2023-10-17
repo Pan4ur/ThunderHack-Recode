@@ -7,13 +7,16 @@ import thunder.hack.setting.impl.ColorSetting;
 
 import java.awt.*;
 
-public class ThunderHackGui extends Module {
+public final class ThunderHackGui extends Module {
     public static final Setting<ColorSetting> onColor1 = new Setting<>("OnColor1", new ColorSetting(new Color(71, 0, 117, 255).getRGB()));
     public static final Setting<ColorSetting> onColor2 = new Setting<>("OnColor2", new ColorSetting(new Color(32, 1, 96, 255).getRGB()));
     public static final Setting<Float> scrollSpeed = new Setting<>("ScrollSpeed", 1f, 0.1F, 2.0F);
 
+    private static ThunderHackGui instance;
+
     public ThunderHackGui() {
         super("ThunderGui", Category.CLIENT);
+        instance = this;
     }
 
     @Override
@@ -36,5 +39,9 @@ public class ThunderHackGui extends Module {
             case 9 -> new Color(50, 35, 60, 178);
             default -> new Color(37, 27, 41, 250); // плита под категориями
         };
+    }
+
+    public static ThunderHackGui getInstance() {
+        return instance;
     }
 }

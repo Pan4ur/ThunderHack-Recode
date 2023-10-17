@@ -12,7 +12,7 @@ public class ClickGui extends Module {
     private static ClickGui INSTANCE = new ClickGui();
 
     public Setting<scrollModeEn> scrollMode = new Setting<>("ScrollMode", scrollModeEn.Old);
-    public Setting<Integer> catHeight = new Setting<Integer>("CategoryHeight", 300, 100, 720);
+    public Setting<Integer> catHeight = new Setting<>("CategoryHeight", 300, 100, 720);
 
     private final Setting<colorModeEn> colorMode = new Setting<>("ColorMode", colorModeEn.Static);
     public final Setting<ColorSetting> hcolor1 = new Setting<>("Main", new ColorSetting(-6974059));
@@ -20,7 +20,7 @@ public class ClickGui extends Module {
     public final Setting<ColorSetting> plateColor = new Setting<>("Plate", new ColorSetting(-14474718));
     public final Setting<ColorSetting> disabled = new Setting<>("Disabled", new ColorSetting(new Color(24, 24, 27)));
     public final Setting<ColorSetting> catColor = new Setting<>("Category", new ColorSetting(-15395563));
-    public Setting<Integer> colorSpeed = new Setting<Integer>("ColorSpeed", 18, 2, 54);
+    public Setting<Integer> colorSpeed = new Setting<>("ColorSpeed", 18, 2, 54);
     public Setting<Boolean> showBinds = new Setting<>("ShowBinds", true);
     public Setting<Boolean> outline = new Setting<>("Outline", false);
     public Setting<Boolean> descriptions = new Setting<>("Descriptions", true);

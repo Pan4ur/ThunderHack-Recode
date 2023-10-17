@@ -15,7 +15,7 @@ import net.minecraft.util.Hand;
 
 import java.util.Random;
 
-public class BowPop extends Module {
+public final class BowPop extends Module {
     public Setting<Boolean> rotation =new Setting<>("Rotation", false);
     public Setting<ModeEn> Mode =new Setting<>("Mode", ModeEn.Maximum);
     public Setting<Float> factor =new Setting<>("Factor", 1f, 1f, 20f);
@@ -32,10 +32,12 @@ public class BowPop extends Module {
     public final Setting<Boolean> snowballs = new Setting<>("Snowballs", true).withParent(selection);
 
     public static Timer delayTimer = new Timer();
+    private static BowPop instance;
     private final Random rnd = new Random();
 
     public BowPop() {
         super("BowPop", Category.COMBAT);
+        instance = this;
     }
 
     @EventHandler
@@ -104,6 +106,10 @@ public class BowPop extends Module {
         int n = rnd.nextInt(29000000);
         if (rnd.nextBoolean()) return n;
         return -n;
+    }
+
+    public static BowPop getInstance() {
+        return instance;
     }
 
     private enum exploitEn {

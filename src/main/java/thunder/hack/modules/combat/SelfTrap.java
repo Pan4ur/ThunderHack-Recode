@@ -35,12 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SelfTrap extends Module {
-
-    public SelfTrap() {
-        super("SelfTrap", Category.COMBAT);
-    }
-
+public final class SelfTrap extends Module {
     private final Setting<PlaceTiming> placeTiming = new Setting<>("PlaceTiming", PlaceTiming.Default);
     private final Setting<Integer> blocksPerTick = new Setting<>("Block/Tick", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10, v -> placeTiming.getValue() != PlaceTiming.Sequential);
@@ -60,12 +55,23 @@ public class SelfTrap extends Module {
     private final Setting<ColorSetting> renderLineColor = new Setting<>("Line", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<Integer> renderLineWidth = new Setting<>("LineWidth", 2, 1, 5).withParent(renderCategory);
 
-    private ArrayList<BlockPos> sequentialBlocks = new ArrayList<>();
+    private final ArrayList<BlockPos> sequentialBlocks = new ArrayList<>();
     public static Timer inactivityTimer = new Timer();
 
     private int delay;
 
     private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
+
+    private static SelfTrap instance;
+
+    public SelfTrap() {
+        super("SelfTrap", Category.COMBAT);
+        instance = this;
+    }
+
+    public static SelfTrap getInstance() {
+        return instance;
+    }
 
     public void onRender3D(MatrixStack stack) {
         renderPoses.forEach((pos, time) -> {

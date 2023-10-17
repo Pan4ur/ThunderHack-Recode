@@ -56,7 +56,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class AutoCrystal extends Module {
+public final class AutoCrystal extends Module {
 
     /*   MAIN   */
     private static final Setting<Pages> page = new Setting<>("Page", Pages.Main);
@@ -165,8 +165,11 @@ public class AutoCrystal extends Module {
     private BreakThread breakThread;
     private final AtomicBoolean stopThreads = new AtomicBoolean(false);
 
+    private static AutoCrystal instance;
+
     public AutoCrystal() {
         super("AutoCrystal", Category.COMBAT);
+        instance = this;
     }
 
     @Override
@@ -553,7 +556,7 @@ public class AutoCrystal extends Module {
         }
     }
 
-    public void calcPosition() {
+    public synchronized void calcPosition() {
             if (ModuleManager.speedMine.isWorth()) {
                 if (onBreakBlock.getValue() == OnBreakBlock.Smart) {
                     // если цивбрикаем - то ставим над
@@ -862,7 +865,7 @@ public class AutoCrystal extends Module {
         return new BlockHitResult(crystalVector, mc.world.isInBuildLimit(bp.up()) ? Direction.UP : Direction.DOWN, bp, false);
     }
 
-    public BlockHitResult getStrictInteract(@NotNull BlockPos bp) {
+    public @Nullable BlockHitResult getStrictInteract(@NotNull BlockPos bp) {
         float bestDistance = 999f;
         Direction bestDirection = null;
         Vec3d bestVector = null;
@@ -1073,6 +1076,9 @@ public class AutoCrystal extends Module {
         }
     }
 
+    public static AutoCrystal getInstance() {
+        return instance;
+    }
 
     private enum Pages {
         Place, Break, Pause, Render, Damages, Main, Switch, Remove, MultiThread

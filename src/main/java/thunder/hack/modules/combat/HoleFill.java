@@ -31,7 +31,7 @@ import java.util.*;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class HoleFill extends Module {
+public final class HoleFill extends Module {
     private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
     private final Setting<Float> placeRange = new Setting<>("Range", 5f, 1f, 6f);
@@ -60,6 +60,10 @@ public class HoleFill extends Module {
     private final Setting<ColorSetting> renderLineColor = new Setting<>("Render Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<Integer> renderLineWidth = new Setting<>("Render Line Width", 2, 1, 5).withParent(renderCategory);
 
+    public static HoleFill getInstance() {
+        return instance;
+    }
+
     private enum Mode {
         Always,
         Target
@@ -81,9 +85,11 @@ public class HoleFill extends Module {
     public static final Timer inactivityTimer = new Timer();
     private int tickCounter = 0;
     private boolean selfFillNeed = false;
+    private static HoleFill instance;
 
     public HoleFill() {
         super("HoleFill", Category.COMBAT);
+        instance = this;
     }
 
     @Override

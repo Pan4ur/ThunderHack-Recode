@@ -17,7 +17,7 @@ import net.minecraft.potion.PotionUtil;
 import net.minecraft.util.Hand;
 import thunder.hack.utility.player.PlayerUtility;
 
-public class AutoBuff extends Module {
+public final class AutoBuff extends Module {
     private final Setting<Boolean> strenght = new Setting<>("Strenght", true);
     private final Setting<Boolean> speed = new Setting<>("SpeedPot", true);
     private final Setting<Boolean> fire = new Setting<>("FireRes", true);
@@ -26,9 +26,11 @@ public class AutoBuff extends Module {
 
     public Setting<Integer> health = new Setting<>("Health", 8, 0, 20);
     public Timer timer = new Timer();
+    private static AutoBuff instance;
 
     public AutoBuff() {
         super("AutoBuff", Category.COMBAT);
+        instance = this;
     }
 
     public static int getPotionSlot(Potions potion) {
@@ -66,6 +68,10 @@ public class AutoBuff extends Module {
             }
         }
         return false;
+    }
+
+    public static AutoBuff getInstance() {
+        return instance;
     }
 
     @EventHandler

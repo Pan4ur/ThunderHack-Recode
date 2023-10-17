@@ -36,7 +36,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class Blocker extends Module {
+public final class Blocker extends Module {
     private final Setting<Integer> actionShift = new Setting<>("Place Per Tick", 1, 1, 5);
     private final Setting<Integer> actionInterval = new Setting<>("Delay", 0, 0, 5);
     private final Setting<Boolean> crystalBreaker = new Setting<>("Destroy Crystal", false);
@@ -64,10 +64,12 @@ public class Blocker extends Module {
 
     private final List<BlockPos> placePositions = new CopyOnWriteArrayList<>();
     public static final Timer inactivityTimer = new Timer();
+    private static Blocker instance;
     private int tickCounter = 0;
 
     public Blocker() {
         super("Blocker", Category.COMBAT);
+        instance = this;
     }
 
     @Override
@@ -178,5 +180,9 @@ public class Blocker extends Module {
                 }
             }
         }
+    }
+
+    public static Blocker getInstance() {
+        return instance;
     }
 }

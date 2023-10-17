@@ -12,11 +12,14 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.utility.render.Render3DEngine;
 
-public class WayPoints extends Module {
-    private final Identifier icon = new Identifier("textures/waypoint.png");
+public final class WayPoints extends Module {
+    private static final Identifier ICON = new Identifier("textures/waypoint.png");
+
+    private static WayPoints instance;
 
     public WayPoints() {
         super("WayPoints", Category.CLIENT);
+        instance = this;
     }
 
     @Override
@@ -63,7 +66,7 @@ public class WayPoints extends Module {
 
                     context.getMatrices().push();
                     context.getMatrices().translate(posX - 10, (posY - 35), 0);
-                    context.drawTexture(icon, 0, 0, 20, 20, 0, 0, 20, 20, 20, 20);
+                    context.drawTexture(ICON, 0, 0, 20, 20, 0, 0, 20, 20, 20, 20);
                     context.getMatrices().pop();
 
                     FontRenderers.sf_bold_mini.drawString(context.getMatrices(), wp.name(), tagX, (float) posY - 10, -1);
@@ -72,5 +75,9 @@ public class WayPoints extends Module {
                 }
             }
         }
+    }
+
+    public static WayPoints getInstance() {
+        return instance;
     }
 }

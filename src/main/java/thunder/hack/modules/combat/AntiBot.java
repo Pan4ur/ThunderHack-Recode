@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class AntiBot extends Module {
+public final class AntiBot extends Module {
     public static ArrayList<PlayerEntity> bots = new ArrayList<>();
     public Setting<Boolean> remove = new Setting<>("Remove", false);
     public Setting<Boolean> onlyAura = new Setting<>("OnlyAura", true);
@@ -24,8 +24,11 @@ public class AntiBot extends Module {
     private int botsNumber = 0;
     private int ticks = 0;
 
+    private static AntiBot instance;
+
     public AntiBot() {
         super("AntiBot", Category.COMBAT);
+        instance = this;
     }
 
     @EventHandler
@@ -80,6 +83,10 @@ public class AntiBot extends Module {
     @Override
     public String getDisplayInfo() {
         return String.valueOf(botsNumber);
+    }
+
+    public static AntiBot getInstance() {
+        return instance;
     }
 
     public enum Mode {

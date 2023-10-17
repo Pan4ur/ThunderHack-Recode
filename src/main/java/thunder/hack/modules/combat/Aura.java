@@ -57,7 +57,7 @@ import static net.minecraft.util.math.MathHelper.wrapDegrees;
 import static thunder.hack.modules.client.MainSettings.isRu;
 import static thunder.hack.utility.math.MathUtility.random;
 
-public class Aura extends Module {
+public final class Aura extends Module {
     public static final Setting<Float> attackRange = new Setting<>("Attack Range", 3.1f, 2f, 6.0f);
     public static final Setting<Mode> mode = new Setting<>("Rotation", Mode.Universal);
     public static final Setting<RayTrace> rayTrace = new Setting<>("RayTrace", RayTrace.OnlyTarget);
@@ -99,8 +99,11 @@ public class Aura extends Module {
     private int hitTicks;
     public static boolean lookingAtHitbox, attackAllowed;
 
+    private static Aura instance;
+
     public Aura() {
         super("Aura", Category.COMBAT);
+        instance = this;
     }
 
     @EventHandler
@@ -603,6 +606,10 @@ public class Aura extends Module {
         double difZ = e.getZ() - mc.player.getY();
         float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);
         return Math.abs(yaw - MathHelper.wrapDegrees(mc.player.getYaw()));
+    }
+
+    public static Aura getInstance() {
+        return instance;
     }
 
     public enum Mode {
