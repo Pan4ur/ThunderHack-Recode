@@ -5,6 +5,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -17,7 +18,7 @@ public class DropAllCommand extends Command {
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            new Thread(() -> {
+            ThunderHack.asyncManager.run(() -> {
                 for (int i = 5; i <= 45; i++) {
                     MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, i, 1, SlotActionType.THROW, MC.player);
                     try {
@@ -27,7 +28,9 @@ public class DropAllCommand extends Command {
                     }
                 }
                 MC.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
-            });
+            }, 1);
+
+            sendMessage("ok");
             return SINGLE_SUCCESS;
         });
     }

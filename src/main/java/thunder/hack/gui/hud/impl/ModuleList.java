@@ -30,120 +30,99 @@ public class ModuleList extends HudElement {
         super("ArrayList", 50, 30);
     }
 
-    boolean reverse;
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
 
         int stringWidth;
-        reverse = getPosX() > (float) (mc.getWindow().getScaledWidth() / 2);
+        boolean reverse = getPosX() > (float) (mc.getWindow().getScaledWidth() / 2);
         int offset = 0;
         int offset2 = 0;
         float yTotal = 0;
         float maxWidth = 0;
 
         for (Module module : ThunderHack.moduleManager.sortedModules) {
+            if (shouldRender(module))
+                continue;
             stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
-            if(stringWidth > maxWidth)
+            if (stringWidth > maxWidth)
                 maxWidth = stringWidth;
             yTotal += FontRenderers.modules.getFontHeight() + 3;
         }
 
-        float reversedX = getPosX() + maxWidth;
+        float reversedX = getPosX() + 50;
 
-
-        //Если режим - ЦветнойТекст, то мы рендерим сначала эффект свечения, а затем плитки
         if (mode.getValue() == Mode.ColorText) {
-            for (int k = 0; k < ThunderHack.moduleManager.sortedModules.size(); k++) {
-                Module module = ThunderHack.moduleManager.sortedModules.get(k);
-                if (!module.isDrawn()) {
+            for (Module module : ThunderHack.moduleManager.sortedModules) {
+                if (shouldRender(module))
                     continue;
-                }
-                if (hrender.getValue() && module.getCategory() == Category.RENDER) {
-                    continue;
-                }
-                if (hhud.getValue() && module.getCategory() == Category.HUD) {
-                    continue;
-                }
-                Color color1 = null;
-                if (cmode.getValue() == cMode.Rainbow) {
-                    color1 = Render2DEngine.astolfo(offset2, yTotal, saturation.getValue(), rainbowSpeed.getValue());
-                } else if (cmode.getValue() == cMode.DoubleColor) {
-                    color1 = Render2DEngine.TwoColoreffect(color.getValue().getColorObject(), color2.getValue().getColorObject(), Math.abs(System.currentTimeMillis() / 10) / 100.0 + offset2 * ((20f - rainbowSpeed.getValue()) / 200));
-                } else {
-                    color1 = new Color(color.getValue().getColor()).darker();
-                }
+
+                Color color1 = getColor(offset2, yTotal);
+
+                stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
+
                 if (!reverse) {
-                    stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
                     if (glow.getValue())
-                        Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX() - 3, getPosY() + (float) offset2 - 1, (float) stringWidth + 4.0f, 9.0f, gste.getValue(), color1);
+                        Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX(), getPosY() + (float) offset2 - 1, (float) stringWidth + 4.0f, 9.0f, gste.getValue(), color1);
                 }
                 if (reverse) {
-                    stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
                     if (glow.getValue())
                         Render2DEngine.drawBlurredShadow(context.getMatrices(), reversedX - (float) stringWidth - 3, getPosY() + (float) offset2 - 1, stringWidth + 4, 9f, gste.getValue(), color1);
                 }
-                offset2 += 8;
+                offset2 += 9;
             }
         }
-        //
 
-        for (int k = 0; k < ThunderHack.moduleManager.sortedModules.size(); k++) {
-            Module module = ThunderHack.moduleManager.sortedModules.get(k);
-            if (!module.isDrawn()) {
+        for (Module module : ThunderHack.moduleManager.sortedModules) {
+            if (shouldRender(module))
                 continue;
-            }
-            if (hrender.getValue() && module.getCategory() == Category.RENDER) {
-                continue;
-            }
-            if (hhud.getValue() && module.getCategory() == Category.HUD) {
-                continue;
-            }
-            Color color1 = null;
 
-            if (cmode.getValue() == cMode.Rainbow) {
-                color1 = Render2DEngine.astolfo(offset, yTotal, saturation.getValue(), rainbowSpeed.getValue());
-            } else if (cmode.getValue() == cMode.DoubleColor) {
-                color1 = Render2DEngine.TwoColoreffect(color.getValue().getColorObject(), color2.getValue().getColorObject(), Math.abs(System.currentTimeMillis() / 10) / 100.0 + offset * ((20f - rainbowSpeed.getValue()) / 200));
-            } else {
-                color1 = new Color(color.getValue().getColor()).darker();
-            }
+            Color color1 = getColor(offset, yTotal);
 
             if (mode.getValue() == Mode.ColorRect) {
-                if (!reverse) {
-                    stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
+                stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
+                if (reverse) {
+                    if (glow.getValue())
+                        Render2DEngine.drawBlurredShadow(context.getMatrices(), reversedX - (float) stringWidth - 3, getPosY() + (float) offset - 1, stringWidth + 4, 9f, gste.getValue(), color1);
+                    Render2DEngine.drawRect(context.getMatrices(), reversedX - (float) stringWidth, getPosY() + (float) offset, 1.0f + stringWidth, 9f, color1);
+                    Render2DEngine.drawRect(context.getMatrices(), reversedX + 1f, getPosY() + (float) offset, 4.0f, 9f, color4.getValue().getColorObject());
+                    FontRenderers.modules.drawString(context.getMatrices(), module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : ""), reversedX - stringWidth + 2.0f, getPosY() + 2.0f + (float) offset, -1, false);
+                } else {
                     if (glow.getValue())
                         Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX() - 3, getPosY() + (float) offset - 1, (float) stringWidth + 4.0f, 9.0f, gste.getValue(), color1);
                     Render2DEngine.drawRect(context.getMatrices(), getPosX(), getPosY() + (float) offset, (float) stringWidth + 1.0f, 9f, color1);
                     Render2DEngine.drawRect(context.getMatrices(), getPosX() - 2.0f, getPosY() + (float) offset, 1.0f, 9f, color4.getValue().getColorObject());
                     FontRenderers.modules.drawString(context.getMatrices(), module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : ""), getPosX() + 3.0f, getPosY() + 2.0f + (float) offset, -1, false);
                 }
-                if (reverse) {
-                    stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
-                    if (glow.getValue())
-                        Render2DEngine.drawBlurredShadow(context.getMatrices(), reversedX - (float) stringWidth - 3, getPosY() + (float) offset - 1, stringWidth + 4, 9f, gste.getValue(), color1);
-                    Render2DEngine.drawRect(context.getMatrices(), reversedX - (float) stringWidth, getPosY() + (float) offset, 1.0f + stringWidth, 9f, color1);
-                    Render2DEngine.drawRect(context.getMatrices(), reversedX + 1f, getPosY() + (float) offset, 4.0f, 9f, color4.getValue().getColorObject());
-                    FontRenderers.modules.drawString(context.getMatrices(), module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : ""), reversedX - stringWidth + 2.0f, getPosY() + 2.0f + (float) offset, -1, false);
-                }
             } else {
-                if (!reverse) {
-                    stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
+                stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
+                if (reverse) {
+                    Render2DEngine.drawRect(context.getMatrices(), reversedX - (float) stringWidth, getPosY() + (float) offset - 1f, stringWidth + 1f, 9.0f, color3.getValue().getColorObject());
+                    Render2DEngine.drawRect(context.getMatrices(), reversedX + 1f, getPosY() + (float) offset, 2.0f, 9.0f, color1);
+                    FontRenderers.modules.drawString(context.getMatrices(), module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : ""), reversedX - stringWidth + 2.0f, getPosY() + 2.0f + (float) offset, color1.getRGB(), false);
+                } else {
                     Render2DEngine.drawRect(context.getMatrices(), getPosX(), getPosY() + (float) offset - 1f, (float) stringWidth + 1.0f, 9.0f, color3.getValue().getColorObject());
                     Render2DEngine.drawRect(context.getMatrices(), getPosX() - 2.0f, getPosY() + (float) offset, 2.0f, 8.0f, color1);
                     FontRenderers.modules.drawString(context.getMatrices(), module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : ""), getPosX() + 3.0f, getPosY() + 2.0f + (float) offset, color1.getRGB(), false);
                 }
-                if (reverse) {
-                    stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
-                    Render2DEngine.drawRect(context.getMatrices(), reversedX - (float) stringWidth, getPosY() + (float) offset - 1f, stringWidth + 1f, 9.0f, color3.getValue().getColorObject());
-                    Render2DEngine.drawRect(context.getMatrices(), reversedX + 1f, getPosY() + (float) offset, 2.0f, 9.0f, color1);
-                    FontRenderers.modules.drawString(context.getMatrices(), module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : ""), reversedX - stringWidth + 2.0f, getPosY() + 2.0f + (float) offset, color1.getRGB(), false);
-                }
             }
             offset += 9;
         }
-
         setBounds((int) maxWidth, (int) yTotal);
+    }
+
+    private boolean shouldRender(Module m) {
+        return m.isDrawn() && (!hrender.getValue() || m.getCategory() != Category.RENDER) && (!hhud.getValue() || m.getCategory() != Category.HUD);
+    }
+
+    private Color getColor(int offset, float yTotal){
+        if (cmode.getValue() == cMode.Rainbow) {
+            return Render2DEngine.astolfo(offset, yTotal, saturation.getValue(), rainbowSpeed.getValue());
+        } else if (cmode.getValue() == cMode.DoubleColor) {
+            return Render2DEngine.TwoColoreffect(color.getValue().getColorObject(), color2.getValue().getColorObject(), Math.abs(System.currentTimeMillis() / 10) / 100.0 + offset * ((20f - rainbowSpeed.getValue()) / 200));
+        } else {
+            return new Color(color.getValue().getColor()).darker();
+        }
     }
 
     private enum cMode {
