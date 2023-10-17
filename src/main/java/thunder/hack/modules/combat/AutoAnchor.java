@@ -17,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventSetBlockState;
@@ -38,10 +39,7 @@ import java.util.*;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class AutoAnchor extends Module {
-
-    private final Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 500, 0, 1000);
-
+public final class AutoAnchor extends Module {
     private final Setting<Float> targetRange = new Setting<>("Target Range", 10f, 1f, 20f);
     private final Setting<Integer> minDamage = new Setting<>("Min Target Damage", 5, 1, 36);
     private final Setting<Integer> maxDamage = new Setting<>("Max Self Damage", 8, 0, 36);
@@ -77,8 +75,11 @@ public class AutoAnchor extends Module {
     private PlayerEntity target;
     private BlockPos targetPos;
 
+    private static AutoAnchor instance;
+
     public AutoAnchor() {
         super("AutoAnchorRecode", Category.COMBAT);
+        instance = this;
     }
 
     @Override
@@ -100,12 +101,10 @@ public class AutoAnchor extends Module {
     public void onRender3D(MatrixStack stack) {
         if (targetPos != null)
             Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(new Box(targetPos), HudEditor.getColor(0), 2));
-
-        super.onRender3D(stack);
     }
 
     @Override
-    public String getDisplayInfo() {
+    public @Nullable String getDisplayInfo() {
         return target != null ? target.getEntityName() : null;
     }
 
@@ -233,7 +232,7 @@ public class AutoAnchor extends Module {
                 || !InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false)) return;
 
         if (HoleUtility.isHole(target.getBlockPos())) {
-            if (placeTimer.passedMs(placeDelay.getValue())) {
+            if (placeTimer.passedMs(500)) {
                 for (int i = 0; i < chargeCount.getValue(); i++)
                     doCharge();
                 doBreak();
@@ -249,7 +248,8 @@ public class AutoAnchor extends Module {
                         true,
                         false
                 );
-            } else {
+            } else if (!mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.RESPAWN_ANCHOR)
+                    && !mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.GLOWSTONE)) {
                 BlockPos bp = target.getBlockPos();
                 for (int i = 2; i > 0; i--) {
                     for (Vec3i vec : HoleUtility.VECTOR_PATTERN) {
@@ -268,7 +268,7 @@ public class AutoAnchor extends Module {
                     }
                 }
             }
-        } else if (placeTimer.passedMs(placeDelay.getValue())) {
+        } else if (placeTimer.passedMs(500)) {
             InteractionUtility.placeBlock(targetPos,
                     rotate.getValue(),
                     interactMode.getValue(),
@@ -277,6 +277,9 @@ public class AutoAnchor extends Module {
                     true,
                     false
             );
+            for (int i = 0; i < chargeCount.getValue(); i++)
+                doCharge();
+            doBreak();
             placeTimer.reset();
         }
     }
@@ -340,6 +343,10 @@ public class AutoAnchor extends Module {
     private void interact(BlockHitResult result, Hand hand) {
         sendPacket(new PlayerInteractBlockC2SPacket(hand, result, PlayerUtility.getWorldActionId(mc.world)));
         sendPacket(new HandSwingC2SPacket(hand));
+    }
+
+    public static AutoAnchor getInstance() {
+        return instance;
     }
 
     private enum YawStepMode {

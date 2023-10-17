@@ -1,7 +1,6 @@
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.Items;
