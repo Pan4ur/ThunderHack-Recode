@@ -34,8 +34,8 @@
 ## Credits
 - [Ai_24](https://www.youtube.com/@Ai_24) for showcase
 - [KiLAB Gaming](https://www.youtube.com/@KiLABGaming) for CCO
-- @meteordevelopment for orbit
-- @ladysnake for satin
+- [@meteordevelopment](https://github.com/meteordevelopment) for orbit
+- [@ladysnake](https://github.com/ladysnake) for satin
 
 ## ScreenShots
 ![image](https://cdn.discordapp.com/attachments/934396624111824900/1149001329675604048/2023-09-06_18.06.52.png)
