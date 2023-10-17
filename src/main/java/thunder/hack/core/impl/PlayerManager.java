@@ -28,6 +28,7 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
+import thunder.hack.utility.Timer;
 
 public class PlayerManager implements IManager {
     public float serverYaw, serverPitch;
@@ -36,6 +37,7 @@ public class PlayerManager implements IManager {
     public double currentPlayerSpeed;
     public int ticksElytraFlying;
     public int serverSideSlot = 0;
+    public Timer switchTimer = new Timer();
 
     //Мы можем зайти в инвентарь, и сервер этого не узнает, пока мы не начнем кликать
     //Юзать везде!
@@ -74,6 +76,7 @@ public class PlayerManager implements IManager {
             inInventory = true;
         }
         if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket slot) {
+            switchTimer.reset();
             serverSideSlot = slot.getSelectedSlot();
         }
         if (event.getPacket() instanceof CloseHandledScreenC2SPacket) {
