@@ -78,7 +78,7 @@ public final class AutoAnchor extends Module {
     private static AutoAnchor instance;
 
     public AutoAnchor() {
-        super("AutoAnchorRecode", Category.COMBAT);
+        super("AutoAnchor", Category.COMBAT);
         instance = this;
     }
 
@@ -231,7 +231,8 @@ public final class AutoAnchor extends Module {
                 .isEmpty()
                 || !InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false)) return;
 
-        if (HoleUtility.isHole(target.getBlockPos())) {
+        if (HoleUtility.isHole(target.getBlockPos()) || mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.RESPAWN_ANCHOR)
+                && mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.GLOWSTONE)) {
             if (placeTimer.passedMs(500)) {
                 for (int i = 0; i < chargeCount.getValue(); i++)
                     doCharge();

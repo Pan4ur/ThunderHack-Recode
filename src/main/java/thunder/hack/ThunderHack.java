@@ -1,5 +1,6 @@
 package thunder.hack;
 
+import com.mojang.logging.LogUtils;
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.IEventBus;
 import net.fabricmc.loader.api.FabricLoader;
@@ -90,6 +91,16 @@ public class ThunderHack implements ModInitializer {
         ThunderUtility.parseChangeLog();
         ModuleManager.rpc.startRpc();
         initTime = System.currentTimeMillis();
+        LogUtils.getLogger().info("""
+                                     \n /$$$$$$$$ /$$                                 /$$                     /$$   /$$                     /$$     \s
+                                     |__  $$__/| $$                                | $$                    | $$  | $$                    | $$     \s
+                                        | $$   | $$$$$$$  /$$   /$$ /$$$$$$$   /$$$$$$$  /$$$$$$   /$$$$$$ | $$  | $$  /$$$$$$   /$$$$$$$| $$   /$$
+                                        | $$   | $$__  $$| $$  | $$| $$__  $$ /$$__  $$ /$$__  $$ /$$__  $$| $$$$$$$$ |____  $$ /$$_____/| $$  /$$/
+                                        | $$   | $$  \\ $$| $$  | $$| $$  \\ $$| $$  | $$| $$$$$$$$| $$  \\__/| $$__  $$  /$$$$$$$| $$      | $$$$$$/\s
+                                        | $$   | $$  | $$| $$  | $$| $$  | $$| $$  | $$| $$_____/| $$      | $$  | $$ /$$__  $$| $$      | $$_  $$\s
+                                        | $$   | $$  | $$|  $$$$$$/| $$  | $$|  $$$$$$$|  $$$$$$$| $$      | $$  | $$|  $$$$$$$|  $$$$$$$| $$ \\  $$
+                                        |__/   |__/  |__/ \\______/ |__/  |__/ \\_______/ \\_______/|__/      |__/  |__/ \\_______/ \\_______/|__/  \\__/   \s
+                                        \nBy\s""" + ThunderUtility.getAuthors());
     }
 
     public static void syncVersion() {

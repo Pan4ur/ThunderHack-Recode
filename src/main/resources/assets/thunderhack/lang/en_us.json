@@ -25,6 +25,7 @@
   "descriptions.combat.surround": "Surrounds your legs using specified blocks.",
   "descriptions.combat.targetstrafe": "Strafes around target player.",
   "descriptions.combat.triggerbot": "Attacks the entity in the crosshairs.",
+  "descriptions.combat.quiver": "Automatically shoot yourself with tipped arrow.",
 
   "descriptions.misc.autoauth": "Logs you on the servers.",
   "descriptions.misc.autoez": "Writes EZ when killing a target.",

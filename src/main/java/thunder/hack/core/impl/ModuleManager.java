@@ -206,6 +206,7 @@ public class ModuleManager implements IManager {
 
     public ModuleManager() {
         modules.add(new AutoAnchor());
+        modules.add(new Quiver());
         for (Field field : getClass().getDeclaredFields()) {
             if (Module.class.isAssignableFrom(field.getType())) {
                 field.setAccessible(true);

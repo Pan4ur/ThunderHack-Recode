@@ -1,5 +1,9 @@
 package thunder.hack.utility;
 
+import net.fabricmc.loader.api.metadata.Person;
+import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -11,6 +15,15 @@ import static thunder.hack.modules.Module.mc;
 
 public final class ThunderUtility {
     public static List<String> changeLog = new ArrayList<>();
+
+    public static @NotNull String getAuthors() {
+        List<String> names = ThunderHack.MOD_META.getAuthors()
+                .stream()
+                .map(Person::getName)
+                .toList();
+
+        return String.join(", ", names);
+    }
 
     public static String solveName(String notSolved) {
         AtomicReference<String> mb = new AtomicReference<>("FATAL ERROR");
