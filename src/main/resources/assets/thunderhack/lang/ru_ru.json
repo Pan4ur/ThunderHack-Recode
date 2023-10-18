@@ -24,6 +24,7 @@
   "descriptions.combat.surround": "Защищает твои ножки указанными блоками.",
   "descriptions.combat.targetstrafe": "Стрейфится вокруг цели.",
   "descriptions.combat.triggerbot": "Атакует существ под прицелом.",
+  "descriptions.combat.quiver": "Автоматически бафает стрелами.",
 
   "descriptions.misc.autoauth": "Регистрирует тебя на серверах.",
   "descriptions.misc.autoez": "Пишет EZ при убийстве цели.",

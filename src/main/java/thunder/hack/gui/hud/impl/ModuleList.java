@@ -54,7 +54,7 @@ public class ModuleList extends HudElement {
 
         if (mode.getValue() == Mode.ColorText) {
             for (Module module : ThunderHack.moduleManager.sortedModules) {
-                if (shouldRender(module))
+                if (!shouldRender(module))
                     continue;
 
                 Color color1 = getColor(offset2, yTotal);
@@ -74,7 +74,7 @@ public class ModuleList extends HudElement {
         }
 
         for (Module module : ThunderHack.moduleManager.sortedModules) {
-            if (shouldRender(module))
+            if (!shouldRender(module))
                 continue;
 
             Color color1 = getColor(offset, yTotal);
