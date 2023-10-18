@@ -24,6 +24,7 @@ public class Velocity extends Module {
 
     public Setting<Boolean> onlyAura = new Setting<>("OnlyAura", false);
     public Setting<Boolean> autoDisable = new Setting<>("DisableOnVerify", false);
+    public Setting<Boolean> cc = new Setting<>("CC", false);
     public static Setting<Boolean> noPush = new Setting<>("NoPush", false);
     private final Setting<modeEn> mode = new Setting<>("Mode", modeEn.Matrix);
     public Setting<Float> vertical = new Setting<>("Vertical", 0.0f, 0.0f, 100.0f, v -> mode.getValue() == modeEn.Custom);
@@ -39,11 +40,16 @@ public class Velocity extends Module {
     }
 
     private boolean doJump, failJump, skip, flag;
-    private int grimTicks = 0;
+    private int grimTicks, ccCooldown;
 
     @EventHandler
     public void onPacketReceived(PacketEvent.Receive e) {
         if (fullNullCheck()) return;
+
+        if(ccCooldown > 0) {
+            ccCooldown--;
+            return;
+        }
 
         if (e.getPacket() instanceof GameMessageS2CPacket && autoDisable.getValue()) {
             String text = ((GameMessageS2CPacket) e.getPacket()).content().getString();
@@ -122,6 +128,9 @@ public class Velocity extends Module {
                     ((ISPacketEntityVelocity) pac).setMotionZ((int) ((float) pac.getVelocityZ() * horizontal.getValue() / 100f));
                 }
             }
+        }
+        if(e.getPacket() instanceof PlayerPositionLookS2CPacket && cc.getValue()) {
+            ccCooldown = 5;
         }
     }
 

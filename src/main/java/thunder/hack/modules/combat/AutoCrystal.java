@@ -934,12 +934,6 @@ public class AutoCrystal extends Module {
         }
     }
 
-    private record PlaceData(BlockHitResult bhr, float damage, float selfDamage, boolean overrideDamage) {
-    }
-
-    private record CrystalData(EndCrystalEntity crystal, float damage, float selfDamage, boolean overrideDamage) {
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTick(EventTick e) {
         if (multiThread.getValue())
@@ -1010,6 +1004,11 @@ public class AutoCrystal extends Module {
         }
     }
 
+    private record PlaceData(BlockHitResult bhr, float damage, float selfDamage, boolean overrideDamage) {
+    }
+
+    private record CrystalData(EndCrystalEntity crystal, float damage, float selfDamage, boolean overrideDamage) {
+    }
 
     private enum Pages {
         Place, Break, Pause, Render, Damages, Main, Switch, Remove, MultiThread

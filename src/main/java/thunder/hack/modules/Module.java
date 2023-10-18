@@ -1,5 +1,6 @@
 package thunder.hack.modules;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
@@ -102,6 +103,8 @@ public abstract class Module {
         if (isOn()) ThunderHack.EVENT_BUS.subscribe(this);
         if (fullNullCheck()) return;
 
+        LogUtils.getLogger().info("[ThunderHack] enabled " + this.getName());
+
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
             ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль включен!" : "Was Enabled!", 2, Notification.Type.ENABLED);
 
@@ -125,6 +128,8 @@ public abstract class Module {
 
         if (fullNullCheck()) return;
         onDisable();
+
+        LogUtils.getLogger().info("[ThunderHack] disabled " + this.getName());
 
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
             ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль выключен!" : "Was Disabled!", 2, Notification.Type.DISABLED);
