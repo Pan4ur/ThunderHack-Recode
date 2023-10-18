@@ -79,6 +79,8 @@ public class ModuleManager implements IManager {
     public static EntitySpeed entitySpeed = new EntitySpeed();
     public static WaterSpeed waterSpeed = new WaterSpeed();
     public static TriggerBot triggerBot = new TriggerBot();
+
+    public static AntiZoglinAttack antiZoglinAttack = new AntiZoglinAttack();
     public static TPSCounter tpsCounter = new TPSCounter();
     public static StorageEsp storageEsp = new StorageEsp();
     public static StaffBoard staffBoard = new StaffBoard();
