@@ -1,9 +1,7 @@
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.RespawnAnchorBlock;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,16 +13,19 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.EventSetBlockState;
+import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
+import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.ExplosionUtility;
@@ -35,7 +36,9 @@ import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.world.HoleUtility;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
@@ -48,7 +51,7 @@ public final class AutoAnchor extends Module {
     private final Setting<Boolean> antiFriendPop = new Setting<>("Anti Friend Pop", false);
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
-    private final Setting<Integer> logicTimeout = new Setting<>("Logic Timeout", 30, 1, 2000);
+    private final Setting<Integer> logicDelay = new Setting<>("Logic Delay", 30, 1, 2000);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
     private final Setting<YawStepMode> yawStep = new Setting<>("Yaw Step", YawStepMode.Off);
     private final Setting<Integer> yawAngle = new Setting<>("Yaw Angle", 54, 5, 180, v -> yawStep.getValue() != YawStepMode.Off);
@@ -69,11 +72,24 @@ public final class AutoAnchor extends Module {
     private final Setting<Boolean> glowStoneDisable = new Setting<>("Disable No GlowStone", true).withParent(disable);
     private final Setting<Boolean> dimensionDisable = new Setting<>("Disable Nether", true).withParent(disable);
 
+    // Render
+    private final Setting<Parent> renderCategory = new Setting<>("Render Category", new Parent(false, 0));
+    private final Setting<Boolean> render = new Setting<>("Render", true).withParent(renderCategory);
+    private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Fade).withParent(renderCategory);
+    private final Setting<Boolean> renderSelfDamage = new Setting<>("Self Damage", true).withParent(renderCategory);
+    private final Setting<Boolean> drawDamage = new Setting<>("Render Damage", true).withParent(renderCategory);
+    private final Setting<ColorSetting> fillColor = new Setting<>("Block Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
+    private final Setting<ColorSetting> lineColor = new Setting<>("Block Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
+    private final Setting<Integer> lineWidth = new Setting<>("Block Line Width", 2, 1, 10);
+    private final Setting<Integer> slideDelay = new Setting<>("Slide Delay", 200, 1, 1000);
+    private final Setting<ColorSetting> textColor = new Setting<>("Text Color", new ColorSetting(Color.WHITE)).withParent(renderCategory);
+
     private final Map<BlockPos, Integer> charges = new HashMap<>();
     private final Timer logicTimer = new Timer();
     private final Timer placeTimer = new Timer();
     private PlayerEntity target;
     private BlockPos targetPos;
+    private boolean rotated;
 
     private static AutoAnchor instance;
 
@@ -87,7 +103,9 @@ public final class AutoAnchor extends Module {
         if (mc.world == null) return;
         if (dimensionDisable.getValue() && mc.world.getDimension().respawnAnchorWorks()) {
             disable(isRu() ? "Ты в незере! Отключаем..." : "You are in the nether! Disabling...");
+            return;
         }
+        rotated = false;
     }
 
     @Override
@@ -111,9 +129,28 @@ public final class AutoAnchor extends Module {
     @EventHandler
     @SuppressWarnings("unused")
     private void onSync(EventSync event) {
+        if (rotate.getValue() && targetPos != null && mc.player != null) {
+            float[] angle = InteractionUtility.calculateAngle(targetPos.toCenterPos());
+            if (yawStep.getValue() == YawStepMode.On) {
+                float yawDelta = MathHelper.wrapDegrees(angle[0] - ((IClientPlayerEntity) mc.player).getLastYaw());
+                if (Math.abs(yawDelta) > yawAngle.getValue()) {
+                    angle[0] = ((IClientPlayerEntity) mc.player).getLastYaw() + (yawDelta * (yawAngle.getValue() / Math.abs(yawDelta)));
+                    rotated = false;
+                } else rotated = true;
+            } else rotated = true;
+
+            double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
+            mc.player.setYaw((float) (angle[0] - (angle[0] - ((IClientPlayerEntity) mc.player).getLastYaw()) % gcdFix));
+            mc.player.setPitch((float) (angle[1] - (angle[1] - ((IClientPlayerEntity) mc.player).getLastPitch()) % gcdFix));
+        }
+    }
+
+    @EventHandler
+    @SuppressWarnings("unused")
+    private void onPostSync(EventPostSync event) {
         new Thread(() -> {
             if (fullNullCheck()) return;
-            if (!logicTimer.passedMs(logicTimeout.getValue())) return;
+            if (!logicTimer.passedMs(logicDelay.getValue())) return;
 
             if (target == null) {
                 target = ThunderHack.combatManager.getNearestTarget(targetRange.getValue());
@@ -154,31 +191,7 @@ public final class AutoAnchor extends Module {
         }).start();
     }
 
-    @EventHandler
-    @SuppressWarnings("unused")
-    private void onBlockStateChange(EventSetBlockState event) {
-        if (mc.player != null && mc.world != null && !shouldPause()) {
-            if (!event.getPos().equals(targetPos)) {
-                return;
-            }
-            final BlockState blockState = mc.world.getBlockState(targetPos);
-
-            if (!(blockState.getBlock() instanceof RespawnAnchorBlock)) {
-                if (InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false)) {
-                    doPlace();
-                }
-                return;
-            }
-            if (charges.containsKey(targetPos) && charges.get(targetPos) >= chargeCount.getValue()) {
-                doBreak();
-                return;
-            }
-
-            doCharge();
-        }
-    }
-
-    private @NotNull List<BlockPos> findAnchorBlocks() {
+    private synchronized @NotNull List<BlockPos> findAnchorBlocks() {
         List<BlockPos> positions = new ArrayList<>();
         BlockPos centerPos = mc.player.getBlockPos();
 
@@ -201,7 +214,7 @@ public final class AutoAnchor extends Module {
         return positions;
     }
 
-    private boolean isFriendsSafe(BlockPos blockPos) {
+    private synchronized boolean isFriendsSafe(BlockPos blockPos) {
         for (AbstractClientPlayerEntity player : ThunderHack.friendManager.getNearFriends()) {
             if (ExplosionUtility.getAnchorExplosionDamage(blockPos, player) > maxFDamage.getValue()) {
                 return false;
@@ -214,6 +227,15 @@ public final class AutoAnchor extends Module {
         return target == null || !(ExplosionUtility.getAnchorExplosionDamage(blockPos, target) < minDamage.getValue());
     }
 
+    private boolean shouldFriendsPop(BlockPos pos) {
+        for (AbstractClientPlayerEntity player : ThunderHack.friendManager.getNearFriends()) {
+            if (mc.player.getHealth() + mc.player.getAbsorptionAmount() - ExplosionUtility.getAnchorExplosionDamage(pos, player) <= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean shouldPause() {
         return (onAura.getValue() && ModuleManager.aura.isEnabled())
                 || (onAC.getValue() && ModuleManager.autoCrystal.isEnabled())
@@ -223,7 +245,9 @@ public final class AutoAnchor extends Module {
 
     private void doPlace() {
         if (targetPos == null
+                || shouldPause()
                 || target == null
+                || (rotate.getValue() && !rotated)
                 || mc.player.getHealth() + mc.player.getAbsorptionAmount() - ExplosionUtility.getSelfExplosionDamage(targetPos.toCenterPos(), predictTicks.getValue()) <= 0
                 || !ThunderHack.friendManager.getNearFriends().stream()
                 .filter(friend -> friend.getHealth() + friend.getAbsorptionAmount() - ExplosionUtility.getAnchorExplosionDamage(targetPos, friend) <= 0)
@@ -268,6 +292,8 @@ public final class AutoAnchor extends Module {
                         }
                     }
                 }
+            } else if (mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.RESPAWN_ANCHOR)) {
+                doCharge();
             }
         } else if (placeTimer.passedMs(500)) {
             InteractionUtility.placeBlock(targetPos,
@@ -291,13 +317,17 @@ public final class AutoAnchor extends Module {
             disable(isRu() ? "В хотбаре не найден светящийся камень! Отключаем..." : "No glowstone found in hotbar! Disabling...");
             return;
         }
-        if (targetPos == null) return;
+        if (targetPos == null || (rotate.getValue() && !rotated)) return;
 
         // Charging
         BlockPos targetPosCopy = new BlockPos(targetPos);
         int preSlot = mc.player.getInventory().selectedSlot;
         glowResult.switchTo();
         InteractionUtility.BreakData data = InteractionUtility.getBreakData(targetPosCopy, InteractionUtility.Interact.Vanilla);
+
+        if ((mc.player.getHealth() + mc.player.getAbsorptionAmount() - ExplosionUtility.getAnchorExplosionDamage(targetPosCopy, mc.player) <= 0 && antiSelfPop.getValue())
+                || (shouldFriendsPop(targetPosCopy) && antiFriendPop.getValue()))
+            return;
 
         if (data != null && data.vector() != null) {
             BlockHitResult result = new BlockHitResult(data.vector(), data.dir(), targetPosCopy, false);
@@ -313,7 +343,7 @@ public final class AutoAnchor extends Module {
     }
 
     private void doBreak() {
-        if (targetPos == null)
+        if (targetPos == null || (rotate.getValue() && !rotated))
             return;
         BlockPos targetPosCopy = new BlockPos(targetPos);
         int preSlot = mc.player.getInventory().selectedSlot;
@@ -343,11 +373,18 @@ public final class AutoAnchor extends Module {
 
     private void interact(BlockHitResult result, Hand hand) {
         sendPacket(new PlayerInteractBlockC2SPacket(hand, result, PlayerUtility.getWorldActionId(mc.world)));
-        sendPacket(new HandSwingC2SPacket(hand));
+        if (swing.getValue()) mc.player.swingHand(hand);
+        else sendPacket(new HandSwingC2SPacket(hand));
     }
 
     public static AutoAnchor getInstance() {
         return instance;
+    }
+
+    public enum RenderMode {
+        Fade,
+        Slide,
+        Default
     }
 
     private enum YawStepMode {

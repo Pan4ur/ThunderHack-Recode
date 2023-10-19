@@ -36,18 +36,21 @@ public final class ExplosionUtility {
     }
 
     public synchronized static float getAnchorExplosionDamage(BlockPos anchorPos, PlayerEntity target) {
-        float final_result;
+        float finalResult;
         anchorIgnore = anchorPos;
         terrainIgnore = true;
+        BlockState preState = mc.world.getBlockState(anchorPos);
+        mc.world.setBlockState(anchorPos, Blocks.AIR.getDefaultState());
 
         if (AutoAnchor.predictTicks.getValue() == 0)
-            final_result = getExplosionDamage1(anchorPos.up().toCenterPos(), target);
+            finalResult = getExplosionDamage1(anchorPos.up().toCenterPos(), target);
         else
-            final_result = getExplosionDamageWPredict(anchorPos.toCenterPos(), target, PredictUtility.predictPlayer(target, AutoAnchor.predictTicks.getValue()));
+            finalResult = getExplosionDamageWPredict(anchorPos.toCenterPos(), target, PredictUtility.predictPlayer(target, AutoAnchor.predictTicks.getValue()));
 
         anchorIgnore = null;
         terrainIgnore = false;
-        return final_result;
+        mc.world.setBlockState(anchorPos, preState);
+        return finalResult;
     }
 
     public static float getSelfExplosionDamage(Vec3d explosionPos, int predictTicks) {
@@ -59,7 +62,7 @@ public final class ExplosionUtility {
 
     public static float getExplosionDamage1(Vec3d explosionPos, PlayerEntity target) {
         try {
-            if (mc.world.getDifficulty() == Difficulty.PEACEFUL) return 0f;
+            if (mc.world.getDifficulty() == Difficulty.PEACEFUL || mc.player.isCreative()) return 0f;
 
             Explosion explosion = new Explosion(mc.world, null, explosionPos.x, explosionPos.y, explosionPos.z, 6f, false, Explosion.DestructionType.DESTROY);
 
@@ -115,7 +118,7 @@ public final class ExplosionUtility {
     }
 
     public static float getExplosionDamageWPredict(Vec3d explosionPos, PlayerEntity target, PlayerEntity predict) {
-        if (mc.world.getDifficulty() == Difficulty.PEACEFUL) return 0f;
+        if (mc.world.getDifficulty() == Difficulty.PEACEFUL || mc.player.isCreative()) return 0f;
 
         Explosion explosion = new Explosion(mc.world, null, explosionPos.x, explosionPos.y, explosionPos.z, 6f, false, Explosion.DestructionType.DESTROY);
         if (!new Box(

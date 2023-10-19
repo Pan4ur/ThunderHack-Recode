@@ -296,6 +296,7 @@ public class AutoCrystal extends Module {
         }
     }
 
+    @Override
     public void onRender3D(MatrixStack stack) {
         removeAttackedCrystals();
         if (render.getValue()) {
