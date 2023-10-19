@@ -33,7 +33,7 @@ public final class TriggerBot extends Module {
     @EventHandler
     public void onAttack(PlayerUpdateEvent e) {
         if (!autoCrit()) return;
-        Entity ent = ThunderHack.playerManager.getRtxTarger(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());
+        Entity ent = ThunderHack.playerManager.getRtxTarget(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());
         if (ent != null && !ThunderHack.friendManager.isFriend(ent.getName().getString())) {
             mc.interactionManager.attackEntity(mc.player, ent);
             mc.player.swingHand(Hand.MAIN_HAND);

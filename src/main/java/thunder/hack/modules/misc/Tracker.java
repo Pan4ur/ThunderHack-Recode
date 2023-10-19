@@ -92,7 +92,7 @@ public class Tracker extends Module {
     public void onUpdate() {
         boolean found = false;
         for (PlayerEntity player : mc.world.getPlayers()) {
-            if (player == null || player.equals(mc.player) || ModuleManager.freeCam.dummy == player) continue;
+            if (player == null || player.equals(mc.player)) continue;
 
             if (found && only1v1.getValue()) {
                 disable(isRu() ? "Ты не в дуели! Отключаю.." : "Disabled, you are not in a 1v1! Disabling...");

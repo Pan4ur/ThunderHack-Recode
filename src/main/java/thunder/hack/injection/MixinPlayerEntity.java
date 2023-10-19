@@ -25,15 +25,6 @@ import static thunder.hack.modules.Module.mc;
 
 @Mixin(value = PlayerEntity.class, priority = 800)
 public class MixinPlayerEntity {
-    @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerEntity;noClip:Z", opcode = Opcodes.PUTFIELD))
-    void noClipHook(PlayerEntity playerEntity, boolean value) {
-        if (ModuleManager.freeCam.isEnabled() && !mc.player.isOnGround()) {
-            playerEntity.noClip = true;
-        } else {
-            playerEntity.noClip = playerEntity.isSpectator();
-        }
-    }
-
     @Inject(method = "getAttackCooldownProgressPerTick", at = @At("HEAD"), cancellable = true)
     public void getAttackCooldownProgressPerTickHook(CallbackInfoReturnable<Float> cir) {
         if (ModuleManager.aura.isEnabled() && Aura.switchMode.getValue() == Aura.Switch.Silent) {

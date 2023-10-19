@@ -2,6 +2,7 @@ package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
@@ -36,12 +37,17 @@ public class ChatUtils extends Module {
     public final Setting<Boolean> totems = new Setting<>("Totems", false);
     public final Setting<Boolean> time = new Setting<>("Time", false);
     public final Setting<Boolean> mention = new Setting<>("Mention", false);
+
+    public final Setting<Boolean> ZOV = new Setting<>("ZOV", false);
+
     private final Setting<Boolean> antiCoordLeak = new Setting<>("AntiCoordLeak", false);
 
     private final Timer timer = new Timer();
     private final Timer antiSpam = new Timer();
 
     private final LinkedHashMap<UUID, String> nameMap = new LinkedHashMap<>();
+
+    String skip;
 
     @Override
     public void onDisable() {
@@ -104,16 +110,6 @@ public class ChatUtils extends Module {
             if (pac.content.getString().contains(mc.player.getName().getString())) {
                 ThunderHack.notificationManager.publicity("ChatUtils", MainSettings.language.getValue() == MainSettings.Language.RU ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
                 mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 5f, 1f);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onPacketSend(PacketEvent.Send e) {
-        if (e.getPacket() instanceof ChatMessageC2SPacket pac && antiCoordLeak.getValue()) {
-            if (antiCoordLeak.getValue() && pac.chatMessage.replaceAll("\\D", "").length() >= 6) {
-                sendMessage("[ChatUtils] " + (MainSettings.language.getValue() == MainSettings.Language.RU ? "В сообщении содержатся координаты!" : "The message contains coordinates!"));
-                e.cancel();
             }
         }
     }
@@ -183,6 +179,45 @@ public class ChatUtils extends Module {
             " pop <pop> times ur eyes don't work right? ",
             " cringelord popped <pop> times so ez "
     };
+
+    @EventHandler
+    public void onPacketSend(PacketEvent.Send e) {
+
+        if (e.getPacket() instanceof ChatMessageC2SPacket pac && antiCoordLeak.getValue()) {
+            if (antiCoordLeak.getValue() && pac.chatMessage.replaceAll("\\D", "").length() >= 6) {
+                sendMessage("[ChatUtils] " + (MainSettings.language.getValue() == MainSettings.Language.RU ? "В сообщении содержатся координаты!" : "The message contains coordinates!"));
+                e.cancel();
+            }
+        }
+
+        if (fullNullCheck()) return;
+        if (e.getPacket() instanceof ChatMessageC2SPacket pac && ZOV.getValue()) {
+
+            if (Objects.equals(pac.chatMessage(), skip)) {
+                return;
+            }
+
+            if (mc.player.getMainHandStack().getItem() == Items.FILLED_MAP || mc.player.getOffHandStack().getItem() == Items.FILLED_MAP)
+                return;
+
+            if (pac.chatMessage().startsWith("/") || pac.chatMessage().startsWith(ThunderHack.commandManager.getPrefix()))
+                return;
+
+            StringBuilder newString = new StringBuilder();
+            for (char Z : pac.chatMessage().toCharArray()) {
+                if ('З' == Z || 'з' == Z) {
+                    newString.append("Z");
+                } else if ('В' == Z || 'в' == Z) {
+                    newString.append("V");
+                } else {
+                    newString.append(Z);
+                }
+            }
+            skip = newString.toString();
+            mc.player.networkHandler.sendChatMessage(skip);
+            e.cancel();
+        }
+    }
 
     private enum Welcomer {
         Off, Server, Client
