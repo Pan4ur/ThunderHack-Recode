@@ -71,7 +71,7 @@ public class KeyBinds extends HudElement {
     }
 
     @NotNull
-    private static String getShortKeyName(Module feature) {
+    public static String getShortKeyName(Module feature) {
         String sbind = feature.getBind().getBind();
         return switch (feature.getBind().getBind()) {
             case "LEFT_CONTROL" -> "LCtrl";

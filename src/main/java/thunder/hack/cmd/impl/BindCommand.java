@@ -6,12 +6,18 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.ModuleArgumentType;
+import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.Bind;
 
+import java.util.Objects;
+
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static thunder.hack.gui.hud.impl.KeyBinds.getShortKeyName;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class BindCommand extends Command {
@@ -55,5 +61,22 @@ public class BindCommand extends Command {
                     return SINGLE_SUCCESS;
                 }))
         );
+
+        builder.then(literal("list").executes(context -> {
+            StringBuilder binds = new StringBuilder("Binds: ");
+            for (Module feature : ThunderHack.moduleManager.modules) {
+                if (!Objects.equals(feature.getBind().getBind(), "None")) {
+                    binds.append("\n- ").append(feature.getName() + " -> " + getShortKeyName(feature) + (feature.getBind().isHold() ? "[hold]" : ""));
+                }
+            }
+            sendMessage(binds.toString());
+            return SINGLE_SUCCESS;
+        }));
+
+        builder.then(literal("reset").executes(context -> {
+            for (Module mod : ThunderHack.moduleManager.modules) mod.setBind(new Bind(-1, false, false));
+            sendMessage("Done!");
+            return SINGLE_SUCCESS;
+        }));
     }
 }
