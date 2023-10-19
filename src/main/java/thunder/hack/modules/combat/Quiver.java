@@ -26,6 +26,7 @@ public class Quiver extends Module {
 
     private static Quiver instance;
 
+    private int preBowSlot;
     private int invPreSlot;
     private int count;
 
@@ -37,13 +38,24 @@ public class Quiver extends Module {
     @Override
     public void onEnable() {
         count = 0;
+        invPreSlot = -1;
+        preBowSlot = -1;
+    }
+
+    @Override
+    public void onDisable() {
+        if (invPreSlot != -1) {
+            switchInvSlot(9, invPreSlot);
+        }
+        if (preBowSlot != -1) {
+            InventoryUtility.switchTo(preBowSlot);
+        }
     }
 
     @EventHandler
     @SuppressWarnings("unused")
     private void onSync(EventSync event) {
         if (count >= shootCount.getValue()) {
-            switchInvSlot(9, invPreSlot);
             disable();
             return;
         }
@@ -56,6 +68,8 @@ public class Quiver extends Module {
         }
 
         SearchInvResult result = InventoryUtility.findItemInHotBar(Items.BOW);
+        if (result.found() && preBowSlot == -1)
+            preBowSlot = mc.player.getInventory().selectedSlot;
         if (!result.found()) {
             disable(isRu() ? "В хотбаре отсутствует лук! Отключение..." : "No bow in hotbar! Disabling...");
             return;
@@ -63,13 +77,17 @@ public class Quiver extends Module {
         result.switchTo();
 
         if (BowItem.getPullProgress(mc.player.getItemUseTime()) >= 0.15) {
-            sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), -90, mc.player.isOnGround()));
-            mc.options.useKey.setPressed(false);
-            mc.interactionManager.stopUsingItem(mc.player);
-            count++;
+            shoot();
             return;
         }
         mc.options.useKey.setPressed(true);
+    }
+
+    private void shoot() {
+        sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), -90, mc.player.isOnGround()));
+        mc.options.useKey.setPressed(false);
+        mc.interactionManager.stopUsingItem(mc.player);
+        count++;
     }
 
     private boolean getArrow() {
