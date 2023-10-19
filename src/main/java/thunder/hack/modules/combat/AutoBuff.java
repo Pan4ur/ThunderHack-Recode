@@ -18,13 +18,14 @@ import net.minecraft.util.Hand;
 import thunder.hack.utility.player.PlayerUtility;
 
 public final class AutoBuff extends Module {
-    private final Setting<Boolean> strenght = new Setting<>("Strenght", true);
+    private final Setting<Boolean> strength = new Setting<>("Strength", true);
     private final Setting<Boolean> speed = new Setting<>("SpeedPot", true);
     private final Setting<Boolean> fire = new Setting<>("FireRes", true);
     private final Setting<Boolean> heal = new Setting<>("Heal", true);
     private final Setting<Boolean> regen = new Setting<>("Regeneration", true);
 
     public Setting<Integer> health = new Setting<>("Health", 8, 0, 20);
+    private final Setting<Boolean> onDaGround = new Setting<>("Only while on ground", true);
     public Timer timer = new Timer();
     private static AutoBuff instance;
 
@@ -81,7 +82,7 @@ public final class AutoBuff extends Module {
 
     private boolean shouldThrow() {
         return (!mc.player.hasStatusEffect(StatusEffects.SPEED) && isPotionOnHotBar(Potions.SPEED) && speed.getValue())
-                || (!mc.player.hasStatusEffect(StatusEffects.STRENGTH) && isPotionOnHotBar(Potions.STRENGTH) && strenght.getValue())
+                || (!mc.player.hasStatusEffect(StatusEffects.STRENGTH) && isPotionOnHotBar(Potions.STRENGTH) && strength.getValue())
                 || (!mc.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE) && isPotionOnHotBar(Potions.FIRERES) && fire.getValue())
                 || (mc.player.getHealth() + mc.player.getAbsorptionAmount() < health.getValue() && isPotionOnHotBar(Potions.HEAL) && heal.getValue());
     }
@@ -90,12 +91,14 @@ public final class AutoBuff extends Module {
     public void onPostSync(EventPostSync e) {
         if (Aura.target != null && mc.player.getAttackCooldownProgress(1) > 0.5f)
             return;
+        if (onDaGround.getValue() && !(mc.player.isOnGround()))
+            return;
         mc.executeTask(() -> {
             if (mc.player.age > 80 && shouldThrow() && timer.passedMs(1000)) {
                 if (!mc.player.hasStatusEffect(StatusEffects.SPEED) && isPotionOnHotBar(Potions.SPEED) && speed.getValue()) {
                     throwPotion(Potions.SPEED);
                 }
-                if (!mc.player.hasStatusEffect(StatusEffects.STRENGTH) && isPotionOnHotBar(Potions.STRENGTH) && strenght.getValue()) {
+                if (!mc.player.hasStatusEffect(StatusEffects.STRENGTH) && isPotionOnHotBar(Potions.STRENGTH) && strength.getValue()) {
                     throwPotion(Potions.STRENGTH);
                 }
                 if (!mc.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE) && isPotionOnHotBar(Potions.FIRERES) && fire.getValue()) {
