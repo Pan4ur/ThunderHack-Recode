@@ -15,6 +15,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
+import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
@@ -254,27 +255,16 @@ public class AutoCrystal extends Module {
     }
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.Receive e) {
-        if (target != null && e.getPacket() instanceof EntitySpawnS2CPacket spawn)
-            onSpawnPacket(spawn);
-    }
-
-    @EventHandler
     public void onCrystalSpawn(@NotNull EventEntitySpawn e) {
-        if (e.getEntity() != null && e.getEntity() instanceof EndCrystalEntity && !placedCrystals.isEmpty()) {
-            Map<BlockPos, Long> cachedList = new HashMap<>(placedCrystals);
-            for (BlockPos bp : cachedList.keySet())
-                if (e.getEntity().squaredDistanceTo(bp.toCenterPos().add(0, 0.5f, 0)) < 1) {
-                    if (!multiThread.getValue() && timing.getValue() == Timing.NORMAL && breakTimer.passedMs(breakDelay.getValue())) {
+        if (e.getEntity() != null && e.getEntity() instanceof EndCrystalEntity crystal && !placedCrystals.isEmpty())
+            for (BlockPos bp : new HashMap<>(placedCrystals).keySet())
+                if (crystal.squaredDistanceTo(bp.toCenterPos()) < 0.3 && !multiThread.getValue() && timing.getValue() == Timing.NORMAL && breakTimer.passedMs(breakDelay.getValue()))
                         new Thread(() -> {
                             getCrystalToExplode();
-                            if (bestCrystal == e.getEntity())
-                                attackCrystal((EndCrystalEntity) e.getEntity());
+                            if (bestCrystal == crystal)
+                                attackCrystal(crystal);
+                            placedCrystals.remove(bp);
                         }).start();
-                    }
-                    placedCrystals.remove(bp);
-                }
-        }
     }
 
     @EventHandler
@@ -945,28 +935,6 @@ public class AutoCrystal extends Module {
         }).start();
     }
 
-    private void onSpawnPacket(@NotNull EntitySpawnS2CPacket spawn) {
-        if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
-            if (!placedCrystals.isEmpty()) {
-                Map<BlockPos, Long> cachedList = new HashMap<>(placedCrystals);
-                for (BlockPos bp : cachedList.keySet())
-                    if (spawn.getX() == bp.getX() + 0.5 && spawn.getZ() == bp.getZ() + 0.5 && spawn.getY() == bp.getY() + 1f) {
-                        placedCrystals.remove(bp);
-                        if (!multiThread.getValue()) {
-                            new Thread(() -> {
-                                EndCrystalEntity fakeCrystal = new EndCrystalEntity(mc.world, spawn.getX(), spawn.getY(), spawn.getZ());
-                                fakeCrystal.setId(spawn.getId());
-                                mc.world.addEntity(fakeCrystal);
-                                getCrystalToExplode();
-                                if (bestCrystal == fakeCrystal)
-                                    attackCrystal(fakeCrystal);
-                            }).start();
-                        }
-                    }
-            }
-        }
-    }
-
     private class PlaceThread extends Thread {
         @Override
         public void run() {
@@ -989,12 +957,11 @@ public class AutoCrystal extends Module {
         @Override
         public void run() {
             while (ModuleManager.autoCrystal.isEnabled()) {
-                while (ThunderHack.asyncManager.ticking.get()) {
-                }
-                while (!breakTimer.passedMs(breakDelay.getValue())) {
+                while (ThunderHack.asyncManager.ticking.get() || !breakTimer.passedMs(breakDelay.getValue())) {
                 }
 
                 getCrystalToExplode();
+
                 if (bestCrystal != null)
                     attackCrystal(bestCrystal);
 

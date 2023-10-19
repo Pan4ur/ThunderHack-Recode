@@ -45,6 +45,7 @@ public class SpeedMine extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
     public final Setting<StartMode> startMode = new Setting<>("StartMode", StartMode.StartAbort, v -> mode.getValue() == Mode.Packet);
     public final Setting<SwitchMode> switchMode = new Setting<>("SwitchMode", SwitchMode.Alternative, v -> mode.getValue() == Mode.Packet);
+    private final Setting<Integer> swapDelay = new Setting<>("SwapDelay", 50, 0, 1000, v -> switchMode.getValue() == SwitchMode.Alternative && mode.getValue() == Mode.Packet);
     private final Setting<Float> factor = new Setting<>("Factor", 1f, 0.5f, 2f, v -> mode.getValue() == Mode.Packet);
     private final Setting<Float> startDmg = new Setting<>("StartDmg", 0f, 0f, 1f, v -> mode.getValue() == Mode.Damage);
     private final Setting<Float> finishDmg = new Setting<>("FinishDmg", 1f, 0f, 1f, v -> mode.getValue() == Mode.Damage);
@@ -112,11 +113,7 @@ public class SpeedMine extends Module {
 
                     if (progress >= 1) {
                         if (switchMode.getValue() == SwitchMode.Alternative) {
-                            if (invPickSlot < 9) {
-                                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 30, invPickSlot, SlotActionType.SWAP, mc.player);
-                                closeScreen();
-                            }
-                            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 30, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+                            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, invPickSlot < 9 ? invPickSlot + 36 : invPickSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
                             closeScreen();
                         } else if (switchMode.getValue() == SwitchMode.Normal || switchMode.getValue() == SwitchMode.Silent) {
                             prevSlot = mc.player.getInventory().selectedSlot;
@@ -133,10 +130,15 @@ public class SpeedMine extends Module {
                             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, minePosition, mineFacing));
 
                         if (switchMode.getValue() == SwitchMode.Alternative) {
-                            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 30, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                            closeScreen();
-                            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 30, invPickSlot, SlotActionType.SWAP, mc.player);
-                            closeScreen();
+                            if(swapDelay.getValue() != 0) {
+                                ThunderHack.asyncManager.run(() -> {
+                                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, invPickSlot < 9 ? invPickSlot + 36 : invPickSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+                                    closeScreen();
+                                }, swapDelay.getValue());
+                            } else {
+                                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, invPickSlot < 9 ? invPickSlot + 36 : invPickSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+                                closeScreen();
+                            }
                         } else if (switchMode.getValue() == SwitchMode.Silent) {
                             InventoryUtility.switchTo(prevSlot);
                         }
