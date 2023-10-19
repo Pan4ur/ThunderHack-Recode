@@ -12,7 +12,7 @@ import static thunder.hack.modules.combat.Criticals.getEntity;
 
 public class AntiZoglinAttack extends Module {
     public AntiZoglinAttack() {
-        super("AntiZombifiedPiglinAttack", Category.PLAYER);
+        super("AntiZoglinAttack", Category.PLAYER);
     }
 
     @EventHandler

@@ -18,6 +18,7 @@ import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.player.NoEntityTrace;
 import thunder.hack.modules.render.NoRender;
 import thunder.hack.utility.math.FrameRateCounter;
+import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.MSAAFramebuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -92,9 +93,12 @@ public abstract class MixinGameRenderer {
         if (ModuleManager.aura.isEnabled() && Aura.target != null && mc.player.distanceTo(Aura.target) <= Aura.attackRange.getValue() && Aura.mode.getValue() != Aura.Mode.None) {
             mc.getProfiler().pop();
             info.cancel();
-            // TODO vector from aura
+            //add vector from aura
             mc.crosshairTarget = new EntityHitResult(Aura.target);
         }
+
+        if(ModuleManager.freeCam.isEnabled())
+            mc.crosshairTarget = ThunderHack.playerManager.getRtxTarget(ModuleManager.freeCam.getFakeYaw(), ModuleManager.freeCam.getFakePitch(), ModuleManager.freeCam.getFakeX(), ModuleManager.freeCam.getFakeY(), ModuleManager.freeCam.getFakeZ());
     }
 
     @Inject(method = "loadPrograms", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)

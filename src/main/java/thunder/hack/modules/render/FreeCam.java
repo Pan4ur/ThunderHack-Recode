@@ -1,151 +1,109 @@
 package thunder.hack.modules.render;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Vec2f;
-import thunder.hack.events.impl.*;
+import meteordevelopment.orbit.EventPriority;
+import thunder.hack.events.impl.EventKeyboardInput;
+import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.movement.HoleSnap;
 import thunder.hack.setting.Setting;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.util.math.Vec3d;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.MovementUtility;
-import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.PlayerEntityCopy;
+import thunder.hack.utility.render.Render2DEngine;
 
 public class FreeCam extends Module {
-    private final Setting<Float> speed = new Setting<>("Speed", 1f, 0.0f, 5.0f);
+    private final Setting<Float> speed = new Setting<>("HSpeed", 1f, 0.0f, 3f);
+    private final Setting<Float> hspeed = new Setting<>("VSpeed", 0.42f, 0.0f, 3f);
 
-    public PlayerEntityCopy dummy;
-    private Vec3d playerPos;
-    private Vec2f playerRot;
-    private Entity riding;
-
-    private boolean prevFlying;
-    private float prevFlySpeed;
-
-    public Vec3d prevPos;
-    public Vec2f prevRotate;
+    private float fakeYaw, fakePitch, prevFakeYaw, prevFakePitch;
+    private double fakeX, fakeY, fakeZ, prevFakeX, prevFakeY, prevFakeZ;
 
     public FreeCam() {
-        super("Freecam", Category.RENDER);
+        super("FreeCam", Category.RENDER);
     }
 
     @Override
     public void onEnable() {
         mc.chunkCullingEnabled = false;
 
-        playerPos = new Vec3d(mc.player.getX(), mc.player.getY(), mc.player.getZ());
-        playerRot = new Vec2f(mc.player.getYaw(), mc.player.getPitch());
+        fakePitch = mc.player.getPitch();
+        fakeYaw = mc.player.getYaw();
 
-        dummy = new PlayerEntityCopy();
+        prevFakePitch = fakePitch;
+        prevFakeYaw = fakeYaw;
 
-        dummy.spawn();
+        fakeX = mc.player.getX();
+        fakeY = mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose());
+        fakeZ = mc.player.getZ();
 
-        if (mc.player.getVehicle() != null) {
-            riding = mc.player.getVehicle();
-            mc.player.getVehicle().removeAllPassengers();
-        }
-
-        if (mc.player.isSprinting()) sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
-
-        prevFlying = mc.player.getAbilities().flying;
-        prevFlySpeed = mc.player.getAbilities().getFlySpeed();
+        prevFakeX = mc.player.getX();
+        prevFakeY = mc.player.getY();
+        prevFakeZ = mc.player.getZ();
     }
 
 
     @Override
     public void onDisable() {
-        if (fullNullCheck() || dummy == null) return;
-
+        if (fullNullCheck()) return;
         mc.chunkCullingEnabled = true;
 
-        dummy.deSpawn();
-        mc.player.noClip = false;
-        mc.player.getAbilities().flying = prevFlying;
-        mc.player.getAbilities().setFlySpeed(prevFlySpeed);
-
-        mc.player.refreshPositionAndAngles(playerPos.getX(), playerPos.getY(), playerPos.getZ(), playerRot.x, playerRot.y);
-        mc.player.setVelocity(Vec3d.ZERO);
-
-        if (riding != null && mc.world.getEntityById(riding.getId()) != null) mc.player.startRiding(riding);
     }
 
-    public PlayerEntityCopy getPlayer() {
-        return dummy;
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onSync(EventSync e){
+
+        prevFakeYaw = fakeYaw;
+        prevFakePitch = fakePitch;
+
+        fakeYaw = mc.player.getYaw();
+        fakePitch = mc.player.getPitch();
     }
+
 
     @EventHandler
-    public void onSync(EventSync event) {
-        if (fullNullCheck() || dummy == null) {
-            disable("NPE protection");
-            return;
-        }
+    public void onKeyboardInput(EventKeyboardInput e) {
+        if (mc.player == null) return;
 
-        HitResult result = mc.crosshairTarget;
-        if (result != null) {
-            if (result instanceof BlockHitResult && !mc.world.getBlockState(((BlockHitResult) result).getBlockPos()).isAir()) {
-                float[] rotations = InteractionUtility.calculateAngle(getPlayer().getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0), result.getPos());
-                getPlayer().setYaw(rotations[0]);
-                getPlayer().setHeadYaw(rotations[0]);
-                getPlayer().setPitch(rotations[1]);
-            } else if (!(result instanceof BlockHitResult)) {
-                float[] rotations = InteractionUtility.calculateAngle(getPlayer().getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0), result.getPos());
-                getPlayer().setYaw(rotations[0]);
-                getPlayer().setHeadYaw(rotations[0]);
-                getPlayer().setPitch(rotations[1]);
-            }
-        }
+        double[] motion = MovementUtility.forward(speed.getValue());
 
-        getPlayer().setStackInHand(Hand.MAIN_HAND, mc.player.getMainHandStack());
-        getPlayer().setStackInHand(Hand.OFF_HAND, mc.player.getOffHandStack());
+        prevFakeX = fakeX;
+        prevFakeY = fakeY;
+        prevFakeZ = fakeZ;
 
-        prevPos = mc.player.getPos();
-        prevRotate = new Vec2f(mc.player.getYaw(), mc.player.getPitch());
+        fakeX += motion[0];
+        fakeZ += motion[1];
 
-        mc.player.setPosition(getPlayer().getPos());
-        mc.player.setYaw(getPlayer().getYaw());
-        mc.player.setPitch(getPlayer().getPitch());
-        mc.player.setOnGround(getPlayer().isOnGround());
+        if (mc.options.jumpKey.isPressed())
+            fakeY += hspeed.getValue();
+
+        if (mc.options.sneakKey.isPressed())
+            fakeY -= hspeed.getValue();
+
+        mc.player.input.movementForward = 0;
+        mc.player.input.movementSideways = 0;
+        mc.player.input.jumping = false;
+        mc.player.input.sneaking = false;
     }
 
-    @EventHandler
-    public void onPostSync(EventPostSync event) {
-        if (fullNullCheck()) {
-            disable("NPE protection");
-            return;
-        }
 
-        if (prevPos == null || prevRotate == null) return;
-        mc.player.setPosition(prevPos);
-        mc.player.setYaw(prevRotate.x);
-        mc.player.setPitch(prevRotate.y);
+    public float getFakeYaw() {
+        return (float) Render2DEngine.interpolate(prevFakeYaw, fakeYaw, mc.getTickDelta());
     }
 
-    @EventHandler
-    public void onMove(EventMove event) {
-        if (fullNullCheck()) {
-            disable("NPE protection");
-            return;
-        }
-
-        mc.player.noClip = true;
+    public float getFakePitch() {
+        return (float) Render2DEngine.interpolate(prevFakePitch, fakePitch, mc.getTickDelta());
     }
 
-    @EventHandler
-    public void onTick(PlayerUpdateEvent event) {
-        if (fullNullCheck()) {
-            disable("NPE protection");
-            return;
-        }
+    public double getFakeX() {
+        return Render2DEngine.interpolate(prevFakeX, fakeX, mc.getTickDelta());
+    }
 
-        mc.player.setOnGround(false);
-        if (!MovementUtility.isMoving()) mc.player.setVelocity(Vec3d.ZERO);
-        mc.player.getAbilities().setFlySpeed(speed.getValue() / 5f);
-        mc.player.getAbilities().flying = true;
-        mc.player.setPose(EntityPose.STANDING);
+    public double getFakeY() {
+        return Render2DEngine.interpolate(prevFakeY, fakeY, mc.getTickDelta());
+    }
+
+    public double getFakeZ() {
+        return Render2DEngine.interpolate(prevFakeZ, fakeZ, mc.getTickDelta());
     }
 }

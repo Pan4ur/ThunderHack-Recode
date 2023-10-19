@@ -15,6 +15,13 @@ public class Timer {
         return getMs(System.nanoTime() - time) >= ms;
     }
 
+    public boolean every(long ms) {
+        boolean passed = getMs(System.nanoTime() - time) >= ms;
+        if(passed)
+            reset();
+        return passed;
+    }
+
     public void setMs(long ms) {
         this.time = System.nanoTime() - ms * 1000000L;
     }

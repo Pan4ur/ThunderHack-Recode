@@ -277,7 +277,8 @@ public class LegacyHud extends Module {
                 float green = (float) (is.getMaxDamage() - is.getDamage()) / (float) is.getMaxDamage();
                 float red = 1.0F - green;
                 int dmg = 100 - (int) (red * 100.0F);
-                context.drawText(mc.textRenderer,Text.of(dmg + ""), (x + 8 - getStringWidth(dmg + "") / 2), (y - 11), new Color((int) (red * 255.0F), (int) (green * 255.0F), 0).getRGB(), true);
+
+                context.drawText(mc.textRenderer,Text.of(dmg + ""), (x + 8 - getStringWidth(dmg + "") / 2), (y - 11), new Color((int) MathUtility.clamp((red * 255.0F), 0, 255f), (int) MathUtility.clamp((green * 255.0F), 0, 255f), 0).getRGB(), true);
             }
         }
     }

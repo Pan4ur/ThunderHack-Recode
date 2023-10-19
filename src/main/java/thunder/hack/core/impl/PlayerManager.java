@@ -131,7 +131,7 @@ public class PlayerManager implements IManager {
         return false;
     }
 
-    public Entity getRtxTarger(float yaw, float pitch, float distance, boolean ignoreWalls) {
+    public Entity getRtxTarget(float yaw, float pitch, float distance, boolean ignoreWalls) {
         Entity targetedEntity = null;
         HitResult result = ignoreWalls ? null : rayTrace(distance, yaw, pitch);
         Vec3d vec3d = MC.player.getPos().add(0, MC.player.getEyeHeight(MC.player.getPose()), 0);
@@ -157,6 +157,36 @@ public class PlayerManager implements IManager {
 
     public HitResult rayTrace(double dst, float yaw, float pitch) {
         Vec3d vec3d = MC.player.getCameraPosVec(MC.getTickDelta());
+        Vec3d vec3d2 = getRotationVector(pitch, yaw);
+        Vec3d vec3d3 = vec3d.add(vec3d2.x * dst, vec3d2.y * dst, vec3d2.z * dst);
+        return MC.world.raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, MC.player));
+    }
+
+    public HitResult getRtxTarget(float yaw, float pitch, double x, double y, double z) {
+        HitResult result = rayTrace(5, yaw, pitch, x, y, z);
+        Vec3d vec3d = new Vec3d(x, y, z).add(0, MC.player.getEyeHeight(MC.player.getPose()), 0);
+        double distancePow2 = 25;
+        if (result != null)
+            distancePow2 = result.getPos().squaredDistanceTo(vec3d);
+        Vec3d vec3d2 = getRotationVector(pitch, yaw);
+        Vec3d vec3d3 = vec3d.add(vec3d2.x * 5, vec3d2.y * 5, vec3d2.z * 5);
+        Box box = new Box(x-.3, y, z-.3, x+.3, y + MC.player.getEyeHeight(MC.player.getPose()), z+.3).stretch(vec3d2.multiply(5)).expand(1.0, 1.0, 1.0);
+        EntityHitResult entityHitResult = ProjectileUtil.raycast(MC.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator(), distancePow2);
+        if (entityHitResult != null) {
+            Entity entity2 = entityHitResult.getEntity();
+            Vec3d vec3d4 = entityHitResult.getPos();
+            double g = vec3d.squaredDistanceTo(vec3d4);
+            if (g < distancePow2 || result == null) {
+                if (entity2 instanceof LivingEntity) {
+                    return entityHitResult;
+                }
+            }
+        }
+        return result;
+    }
+
+    public HitResult rayTrace(double dst, float yaw, float pitch, double x, double y, double z) {
+        Vec3d vec3d = new Vec3d(x,y,z);
         Vec3d vec3d2 = getRotationVector(pitch, yaw);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * dst, vec3d2.y * dst, vec3d2.z * dst);
         return MC.world.raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, MC.player));

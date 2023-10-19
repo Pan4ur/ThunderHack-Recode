@@ -36,6 +36,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
     private float originalPrevHeadYaw;
     private float originalPrevBodyYaw;
 
+
     @Inject(method = "render", at = @At("HEAD"))
     public void onRenderPre(T livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
         if (MinecraftClient.getInstance().player != null && livingEntity == MinecraftClient.getInstance().player && MainSettings.renderRotations.getValue()) {
@@ -57,6 +58,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
         }
         lastEntity = livingEntity;
     }
+
 
     @Inject(method = "render", at = @At("TAIL"))
     public void onRenderPost(T livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {

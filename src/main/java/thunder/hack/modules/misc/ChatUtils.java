@@ -197,21 +197,19 @@ public class ChatUtils extends Module {
                 return;
             }
 
-            // Чтоб не добавляло когда ты вводишь капчу на сервере
             if (mc.player.getMainHandStack().getItem() == Items.FILLED_MAP || mc.player.getOffHandStack().getItem() == Items.FILLED_MAP)
                 return;
 
             if (pac.chatMessage().startsWith("/") || pac.chatMessage().startsWith(ThunderHack.commandManager.getPrefix()))
                 return;
+
             StringBuilder newString = new StringBuilder();
-            for (char Z: pac.chatMessage().toCharArray()) {
-                if ('З' == Z || 'з' == Z){
+            for (char Z : pac.chatMessage().toCharArray()) {
+                if ('З' == Z || 'з' == Z) {
                     newString.append("Z");
-                }
-                else if ('В' == Z || 'в' == Z){
+                } else if ('В' == Z || 'в' == Z) {
                     newString.append("V");
-                }
-                else {
+                } else {
                     newString.append(Z);
                 }
             }
