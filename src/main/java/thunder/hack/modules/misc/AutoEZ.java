@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
@@ -19,7 +20,7 @@ import java.util.Random;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class AutoEZ extends Module {
+public final class AutoEZ extends Module {
     public static ArrayList<String> EZWORDS = new ArrayList<>();
     public Setting<Boolean> global = new Setting<>("global", true);
 
@@ -41,10 +42,12 @@ public class AutoEZ extends Module {
     private final Setting<ModeEn> mode = new Setting<>("Mode", ModeEn.Basic);
     private final Setting<ServerMode> server = new Setting<>("Server", ServerMode.Universal);
 
+    private static AutoEZ instance;
 
     public AutoEZ() {
         super("AutoEZ", Category.MISC);
         loadEZ();
+        instance = this;
     }
 
     public static void loadEZ() {
@@ -91,6 +94,10 @@ public class AutoEZ extends Module {
         }
     }
 
+    public static AutoEZ getInstance() {
+        return instance;
+    }
+
     @Override
     public void onEnable() {
         loadEZ();
@@ -125,7 +132,7 @@ public class AutoEZ extends Module {
     }
 
     @EventHandler
-    public void onPacket(PacketEvent.Receive e) {
+    public void onPacket(PacketEvent.@NotNull Receive e) {
         if (!(e.getPacket() instanceof EntityStatusS2CPacket pac)) return;
         if (pac.getStatus() == EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES) {
             if (server.getValue() != ServerMode.Universal) return;

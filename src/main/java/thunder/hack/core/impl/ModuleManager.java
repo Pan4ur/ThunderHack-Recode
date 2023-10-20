@@ -30,7 +30,7 @@ public class ModuleManager implements IManager {
     public static LevitationControl levitationControl = new LevitationControl();
     public static InventoryCleaner inventoryCleaner = new InventoryCleaner();
     public static NoCommentExploit noCommentExploit = new NoCommentExploit();
-    public static AntiFriendAttack antiFriendAttack = new AntiFriendAttack();
+    public static AntiAttack antiAttack = new AntiAttack();
     public static TotemPopCounter totemPopCounter = new TotemPopCounter();
     public static HotbarReplenish hotbarReplenish = new HotbarReplenish();
     public static DurabilityAlert durabilityAlert = new DurabilityAlert();
@@ -80,7 +80,6 @@ public class ModuleManager implements IManager {
     public static WaterSpeed waterSpeed = new WaterSpeed();
     public static TriggerBot triggerBot = new TriggerBot();
 
-    public static AntiZoglinAttack antiZoglinAttack = new AntiZoglinAttack();
     public static TPSCounter tpsCounter = new TPSCounter();
     public static StorageEsp storageEsp = new StorageEsp();
     public static StaffBoard staffBoard = new StaffBoard();

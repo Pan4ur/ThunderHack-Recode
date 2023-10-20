@@ -17,7 +17,8 @@ public class EbatteSratte extends Module {
     private final Setting<Server> server = new Setting<>("Server", Server.FunnyGame);
     private final Setting<Messages> mode = new Setting<>("Mode", Messages.Default);
 
-    private static final String[] WORDS = new String[]{"Я TBOЮ MATЬ БЛЯTЬ ПOДВEСИЛ НА КОЛ ОНА EБAHAЯ БЛЯДИHA",
+    private static final String[] WORDS = new String[]{
+            "Я TBOЮ MATЬ БЛЯTЬ ПOДВEСИЛ НА КОЛ ОНА EБAHAЯ БЛЯДИHA",
             "МАМАШУ ТВОЮ АРМАТУРОЙ С ШИПАМИ ПО ХРЕБТУ ПИЗДИЛ",
             "Я ТВОЕЙ МАТЕРИ ПИЗДАК РАЗОРВАЛ СЫН БЛЯДИНЫ ТЫ ЕБАННОЙ",
             "ВГЕТАЙ ТАНДЕРХАК СЫН ЕБАННОЙ ШЛЮХИ",
@@ -72,7 +73,7 @@ public class EbatteSratte extends Module {
 
                 mc.getNetworkHandler().sendChatMessage(
                         chatPrefix + entity.getName().getString() + " " +
-                        (mode.getValue() == Messages.Default ? WORDS[n] : words.get(n))
+                                (mode.getValue() == Messages.Default ? WORDS[n] : words.get(n))
                 );
 
                 timer.reset();

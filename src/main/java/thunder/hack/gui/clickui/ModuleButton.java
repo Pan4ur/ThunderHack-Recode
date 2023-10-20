@@ -1,6 +1,7 @@
 package thunder.hack.gui.clickui;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -66,7 +67,7 @@ public class ModuleButton extends AbstractButton {
         hovered = Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height);
 
         if(hovered)
-            ClickUI.currentDescription = Text.translatable(module.getDescription()).getString();
+            ClickUI.currentDescription = I18n.translate(module.getDescription());
 
         double ix = x + 5;
         double iy = y + height / 2 - (6 / 2f);

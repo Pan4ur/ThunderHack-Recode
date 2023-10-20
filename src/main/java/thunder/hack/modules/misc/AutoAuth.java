@@ -13,15 +13,18 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class AutoAuth extends Module {
+public final class AutoAuth extends Module {
+    private final Setting<Mode> passwordMode = new Setting<>("Password Mode", Mode.Custom);
+    private final Setting<String> cpass = new Setting<>("Password", "babidjon777", v -> passwordMode.getValue() == Mode.Custom);
+    private final Setting<Boolean> showPasswordInChat = new Setting<>("Show Pass In Chat", true);
+
+    private static AutoAuth instance;
+    private String password;
+
     public AutoAuth() {
         super("AutoAuth", Category.MISC);
+        instance = this;
     }
-
-    private String password;
-    private final Setting<Mode> passwordMode = new Setting<>("Password Mode", Mode.Custom);
-    public Setting<String> cpass = new Setting<>("Password", "babidjon777", v -> passwordMode.getValue() == Mode.Custom);
-    public Setting<Boolean> showPasswordInChat = new Setting<>("Show Pass In Chat", true);
 
     private enum Mode {
         Custom, Random, Qwerty
@@ -66,5 +69,9 @@ public class AutoAuth extends Module {
                 ThunderHack.notificationManager.publicity("AutoAuth", "Выполнен вход!", 4, Notification.Type.SUCCESS);
             }
         }
+    }
+
+    public static AutoAuth getInstance() {
+        return instance;
     }
 }

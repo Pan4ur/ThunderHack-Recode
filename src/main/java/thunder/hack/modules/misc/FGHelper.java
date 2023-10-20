@@ -18,6 +18,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -57,7 +58,7 @@ public class FGHelper extends Module {
     private final Timer inviteTimer = new Timer();
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.Receive event) {
+    public void onPacketReceive(PacketEvent.@NotNull Receive event) {
         if (event.getPacket() instanceof GameMessageS2CPacket && photomath.getValue()) {
             final GameMessageS2CPacket packet = event.getPacket();
             if (packet.content().getString().contains("Решите: ") && Objects.equals(ThunderUtility.solveName(packet.content().getString()), "FATAL ERROR")) {
@@ -216,7 +217,7 @@ public class FGHelper extends Module {
     }
 
     @EventHandler
-    public void onPacketSend(PacketEvent.Send e) {
+    public void onPacketSend(PacketEvent.@NotNull Send e) {
         if (e.getPacket() instanceof CommandExecutionC2SPacket) {
             checktimer.reset();
         }

@@ -11,6 +11,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.TotemPopEvent;
@@ -71,7 +72,7 @@ public class ChatUtils extends Module {
         if (welcomer.getValue() != Welcomer.Off && antiSpam.passedMs(3000)) {
             if (e.getPacket() instanceof PlayerListS2CPacket pck) {
                 int n2 = (int) Math.floor(Math.random() * qq.length);
-                String string1 = "server";
+                String string1;
                 if (mc.player.networkHandler.getServerInfo() != null) {
                     string1 = qq[n2].replace("SERVERIP1D5A9E", mc.player.networkHandler.getServerInfo().address);
                 } else string1 = "server";
@@ -102,7 +103,7 @@ public class ChatUtils extends Module {
             }
         }
         if (e.getPacket() instanceof GameMessageS2CPacket pac && time.getValue()) {
-            IGameMessageS2CPacket pac2 = (IGameMessageS2CPacket) e.getPacket();
+            IGameMessageS2CPacket pac2 = e.getPacket();
             pac2.setContent(Text.of("[" + Formatting.GRAY + new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime()) + Formatting.RESET + "] ").copy().append(pac.content));
         }
 
@@ -124,13 +125,13 @@ public class ChatUtils extends Module {
         }
     }
 
-    private String getPrefix() {
+    private @NotNull String getPrefix() {
         if (prefix.getValue() == Prefix.Green) return ">";
         if (prefix.getValue() == Prefix.Global) return "!";
         return "";
     }
 
-    public boolean antiBot(String s) {
+    public boolean antiBot(@NotNull String s) {
         if (s.contains("soon_") || s.contains("_npc") || s.contains("CIT-")) {
             return true;
         }
@@ -181,8 +182,7 @@ public class ChatUtils extends Module {
     };
 
     @EventHandler
-    public void onPacketSend(PacketEvent.Send e) {
-
+    public void onPacketSend(PacketEvent.@NotNull Send e) {
         if (e.getPacket() instanceof ChatMessageC2SPacket pac && antiCoordLeak.getValue()) {
             if (antiCoordLeak.getValue() && pac.chatMessage.replaceAll("\\D", "").length() >= 6) {
                 sendMessage("[ChatUtils] " + (MainSettings.language.getValue() == MainSettings.Language.RU ? "В сообщении содержатся координаты!" : "The message contains coordinates!"));

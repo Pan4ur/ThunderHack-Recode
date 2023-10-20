@@ -54,7 +54,8 @@ public class MiddleClick extends Module {
     }
 
     @EventHandler
-    public void onPreMotion(EventSync event) {
+    @SuppressWarnings("unused")
+    private void onSync(EventSync event) {
         if (fullNullCheck()) return;
 
         if (xp.getValue() && feetExp.getValue() && mc.options.pickItemKey.isPressed())

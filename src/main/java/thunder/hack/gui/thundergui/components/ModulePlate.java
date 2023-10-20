@@ -1,5 +1,6 @@
 package thunder.hack.gui.thundergui.components;
 
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import thunder.hack.cmd.Command;
@@ -133,10 +134,10 @@ public class ModulePlate {
         if (!listening_bind && module.getDescription() != null) {
             int step = 0;
             StringBuilder firstString = new StringBuilder();
-            for(String word : Text.translatable(module.getDescription()).getString().split(" ")){
+            for (String word : I18n.translate(module.getDescription()).split(" ")) {
                 firstString.append(word + " ");
                 String[] splitString2 = firstString.toString().split("\n");
-                if(FontRenderers.settings.getStringWidth(splitString2[step]) > 70){
+                if (FontRenderers.settings.getStringWidth(splitString2[step]) > 70) {
                     firstString.append("\n");
                     step++;
                 }
@@ -144,10 +145,10 @@ public class ModulePlate {
             FontRenderers.settings.drawString(stack, firstString.toString(), posX + 5, posY + 14, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
         }
 
-        if(listening_bind){
-            Render2DEngine.drawRound(stack,posX + 5, posY + 5,40,20,3,Color.BLACK);
+        if (listening_bind) {
+            Render2DEngine.drawRound(stack, posX + 5, posY + 5, 40, 20, 3, Color.BLACK);
 
-            if(!holdbind) {
+            if (!holdbind) {
                 Render2DEngine.drawRound(stack, posX + 6, posY + 6, 38, 8, 2, Render2DEngine.injectAlpha(ThunderHackGui.onColor1.getValue().getColorObject(), 170));
                 FontRenderers.settings.drawCenteredString(stack, "Toggle", posX + 25, posY + 7, -1);
                 FontRenderers.settings.drawCenteredString(stack, "Hold", posX + 25, posY + 17, new Color(0xA8FFFFFF, true).getRGB());

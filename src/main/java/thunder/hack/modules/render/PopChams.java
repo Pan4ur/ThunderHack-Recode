@@ -15,6 +15,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.injection.accesors.IEntity;
@@ -28,15 +29,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static thunder.hack.utility.render.Render3DEngine.cleanup;
 import static thunder.hack.utility.render.Render3DEngine.setup;
 
-public class PopChams extends Module {
+public final class PopChams extends Module {
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
     private final Setting<Integer> ySpeed = new Setting<>("Y Speed", 0, -10, 10);
     private final Setting<Integer> aSpeed = new Setting<>("Alpha Speed", 5, 1, 100);
 
     private final CopyOnWriteArrayList<Person> popList = new CopyOnWriteArrayList<>();
+    private static PopChams instance;
 
     public PopChams() {
         super("PopChams", Category.RENDER);
+        instance = this;
     }
 
     @Override
@@ -66,7 +69,8 @@ public class PopChams extends Module {
     }
 
     @EventHandler
-    public void onTotemPop(TotemPopEvent e) {
+    @SuppressWarnings("unused")
+    private void onTotemPop(@NotNull TotemPopEvent e) {
         if (e.getEntity().equals(mc.player) || mc.world == null) return;
 
         PlayerEntity entity = new PlayerEntity(mc.world, BlockPos.ORIGIN, e.getEntity().bodyYaw, new GameProfile(e.getEntity().getUuid(), e.getEntity().getName().getString())) {
@@ -92,7 +96,7 @@ public class PopChams extends Module {
         popList.add(new Person(entity));
     }
 
-    private void renderEntity(MatrixStack matrices, LivingEntity entity, BipedEntityModel<PlayerEntity> modelBase, int alpha) {
+    private void renderEntity(@NotNull MatrixStack matrices, @NotNull LivingEntity entity, @NotNull BipedEntityModel<PlayerEntity> modelBase, int alpha) {
         double x = entity.getX() - mc.getEntityRenderDispatcher().camera.getPos().getX();
         double y = entity.getY() - mc.getEntityRenderDispatcher().camera.getPos().getY();
         double z = entity.getZ() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
@@ -118,7 +122,7 @@ public class PopChams extends Module {
         matrices.pop();
     }
 
-    private static void prepareScale(MatrixStack matrixStack) {
+    private static void prepareScale(@NotNull MatrixStack matrixStack) {
         matrixStack.scale(-1.0F, -1.0F, 1.0F);
         matrixStack.scale(1.6f, 1.8f, 1.6f);
         matrixStack.translate(0.0F, -1.501F, 0.0F);
@@ -150,5 +154,9 @@ public class PopChams extends Module {
         public int getAlpha() {
             return MathUtility.clamp(alpha, 0, 255);
         }
+    }
+
+    public static PopChams getInstance() {
+        return instance;
     }
 }

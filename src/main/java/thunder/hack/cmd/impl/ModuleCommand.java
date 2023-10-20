@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,7 @@ public class ModuleCommand extends Command {
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(arg("module", ModuleArgumentType.create()).executes(context -> {
             Module module = context.getArgument("module", Module.class);
-            sendMessage(module.getDisplayName() + " : " + module.getDescription());
+            sendMessage(module.getDisplayName() + " : " + I18n.translate(module.getDescription()));
 
             for (Setting setting2 : module.getSettings()) {
                 sendMessage(setting2.getName() + " : " + setting2.getValue());

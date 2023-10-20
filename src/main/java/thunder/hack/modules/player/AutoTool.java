@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AutoTool extends Module {
-
     public static Setting<Boolean> swapBack = new Setting<>("SwapBack", true);
     public static Setting<Boolean> saveItem = new Setting<>("SaveItem", true);
     public static Setting<Boolean> silent = new Setting<>("Silent", false);
@@ -31,7 +30,7 @@ public class AutoTool extends Module {
 
     @Override
     public void onUpdate() {
-        if (mc.crosshairTarget == null || !(mc.crosshairTarget instanceof BlockHitResult)) return;
+        if (!(mc.crosshairTarget instanceof BlockHitResult)) return;
 
         BlockHitResult result = (BlockHitResult) mc.crosshairTarget;
         BlockPos pos = result.getBlockPos();
