@@ -30,10 +30,10 @@ public class FontRenderers {
     }
     
     public static @NotNull RendererFontAdapter createDefault(float size, String name) throws IOException, FontFormatException {
-        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("fonts/" + name + ".ttf"))).deriveFont(Font.PLAIN, size / 2f), size / 2f);
+        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("assets/thunderhack/fonts/" + name + ".ttf"))).deriveFont(Font.PLAIN, size / 2f), size / 2f);
     }
     
     public static @NotNull RendererFontAdapter createIcons(float size) throws IOException, FontFormatException {
-        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("fonts/icons.ttf"))).deriveFont(Font.PLAIN, size / 2f), size / 2f);
+        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("assets/thunderhack/fonts/icons.ttf"))).deriveFont(Font.PLAIN, size / 2f), size / 2f);
     }
 }

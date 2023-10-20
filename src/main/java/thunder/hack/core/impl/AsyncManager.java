@@ -110,4 +110,8 @@ public class AsyncManager implements IManager {
             runnable.run();
         });
     }
+
+    public void run(Runnable runnable) {
+        executor.execute(runnable::run);
+    }
 }

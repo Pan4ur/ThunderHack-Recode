@@ -8,16 +8,14 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
-import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.packet.c2s.play.*;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -53,12 +51,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class AutoCrystal extends Module {
-
     /*   MAIN   */
     private static final Setting<Pages> page = new Setting<>("Page", Pages.Main);
     private final Setting<Timing> timing = new Setting<>("Timing", Timing.NORMAL, v -> page.getValue() == Pages.Main);
@@ -69,9 +63,6 @@ public class AutoCrystal extends Module {
     private final Setting<Float> targetRange = new Setting<>("TargetRange", 10.0f, 1.0f, 15f, v -> page.getValue() == Pages.Main);
     public static final Setting<Integer> selfPredictTicks = new Setting<>("SelfPredictTicks", 3, 0, 20, v -> page.getValue() == Pages.Main);
     private final Setting<OnBreakBlock> onBreakBlock = new Setting<>("OnBreakBlock", OnBreakBlock.Smart, v -> page.getValue() == Pages.Main);
-
-    /* MULTITHREADING */
-    private final Setting<Boolean> multiThread = new Setting<>("MultiThread", false, v -> page.getValue() == Pages.MultiThread);
 
     /*   PLACE   */
     private final Setting<Interact> interact = new Setting<>("Interact", Interact.Default, v -> page.getValue() == Pages.Place);
@@ -139,6 +130,7 @@ public class AutoCrystal extends Module {
 
     private final Timer placeTimer = new Timer();
     private final Timer breakTimer = new Timer();
+    private final Timer blockRecalcTimer = new Timer();
 
     // позиция и время постановки
     private final Map<BlockPos, Long> placedCrystals = new HashMap<>();
@@ -149,16 +141,13 @@ public class AutoCrystal extends Module {
 
     private int prevCrystalsAmount, crystalSpeed, invTimer;
 
-    private boolean rotated, tickBusy, prevMthread;
+    private boolean rotated, tickBusy;
+
+    private long confirmTime;
 
     private BlockPos renderPos, prevRenderPos;
     private long renderMultiplier;
     private final Map<BlockPos, Long> renderPositions = new ConcurrentHashMap<>();
-
-    // Threads
-    private PlaceThread placeThread;
-    private BreakThread breakThread;
-    private final AtomicBoolean stopThreads = new AtomicBoolean(false);
 
     public AutoCrystal() {
         super("AutoCrystal", Category.COMBAT);
@@ -179,28 +168,13 @@ public class AutoCrystal extends Module {
         prevRenderPos = null;
         target = null;
         renderMultiplier = 0;
+        confirmTime = 0;
         renderPositions.clear();
-
-        prevMthread = multiThread.getValue();
-
-        stopThreads.set(false);
-
-        if (multiThread.getValue()) {
-            placeThread = new PlaceThread();
-            breakThread = new BreakThread();
-
-            placeThread.start();
-            breakThread.start();
-        }
     }
 
     @Override
     public void onDisable() {
         target = null;
-        if (placeThread != null)
-            stopThreads.set(true);
-        if (breakThread != null)
-            stopThreads.set(true);
     }
 
     @EventHandler
@@ -213,11 +187,6 @@ public class AutoCrystal extends Module {
 
         if (target != null && (target.isDead() || target.getHealth() < 0)) {
             target = null;
-            return;
-        }
-
-        if (prevMthread != multiThread.getValue()) {
-            disable(isRu() ? "Включи модуль заново!" : "Re-enable me!");
             return;
         }
 
@@ -251,31 +220,60 @@ public class AutoCrystal extends Module {
         String info = crystalSpeed + " c/s";
         if (bestPosition != null)
             info = crystalSpeed + " c/s | " + bestPosition.getSide().toString().toUpperCase();
-        return info;
+        return info + " ct: " + confirmTime;
     }
 
     @EventHandler
     public void onCrystalSpawn(@NotNull EventEntitySpawn e) {
-        if (e.getEntity() != null && e.getEntity() instanceof EndCrystalEntity crystal && !placedCrystals.isEmpty())
-            for (BlockPos bp : new HashMap<>(placedCrystals).keySet())
-                if (crystal.squaredDistanceTo(bp.toCenterPos()) < 0.3 && !multiThread.getValue() && timing.getValue() == Timing.NORMAL && breakTimer.passedMs(breakDelay.getValue()))
-                        new Thread(() -> {
-                            getCrystalToExplode();
-                            if (bestCrystal == crystal)
-                                attackCrystal(crystal);
-                            placedCrystals.remove(bp);
-                        }).start();
+        if (e.getEntity() instanceof EndCrystalEntity crystal && !placedCrystals.isEmpty()) {
+            HashMap<BlockPos, Long> cache = new HashMap<>(placedCrystals);
+            for (BlockPos bp : cache.keySet())
+                if (crystal.squaredDistanceTo(bp.toCenterPos()) < 0.3 && timing.getValue() == Timing.NORMAL && breakTimer.passedMs(breakDelay.getValue())) {
+                    confirmTime = System.currentTimeMillis() - cache.get(bp);
+                    ThunderHack.asyncManager.run(() -> {
+                        getCrystalToExplode();
+                        if (bestCrystal == crystal) {
+                            attackCrystal(crystal, instantPlace.getValue());
+                            debug("done");
+                        }
+                        placedCrystals.remove(bp);
+                    });
+                }
+        }
     }
 
     @EventHandler
-    public void onPostSync(EventPostSync e) {
-        if (!multiThread.getValue()) {
-            if (bestPosition != null && placeTimer.passedMs(placeDelay.getValue()))
-                placeCrystal(bestPosition);
-
-            if (bestCrystal != null && breakTimer.passedMs(breakDelay.getValue()))
-                attackCrystal(bestCrystal);
+    public void onPacketReceive(PacketEvent.Receive e) {
+        if (e.getPacket() instanceof ExplosionS2CPacket explosion) {
+            for (Entity ent : Lists.newArrayList(mc.world.getEntities())) {
+                if (ent instanceof EndCrystalEntity crystal
+                        && crystal.squaredDistanceTo(new Vec3d(explosion.getX(), explosion.getY(), explosion.getZ())) <= 36
+                        && !deadCrystals.containsKey(crystal)) {
+                    debug("Removed " + crystal.getPos().toString() + " (due to explosion)");
+                    deadCrystals.put(crystal, System.currentTimeMillis());
+                }
+            }
         }
+    }
+
+    @EventHandler
+    public void onBlockDestruct(EventSetBlockState e) {
+        if (e.getPrevState() == null || e.getState() == null)
+            return;
+        if (target != null && target.squaredDistanceTo(e.getPos().toCenterPos()) <= 4 && e.getState().isAir() && !e.getPrevState().isAir() && blockRecalcTimer.every(200)) {
+            debug("Detected change of state " + e.getPos() + ", recalculating...");
+            ThunderHack.asyncManager.run(this::calcPosition);
+        }
+    }
+
+
+    @EventHandler
+    public void onPostSync(EventPostSync e) {
+        if (bestPosition != null && placeTimer.passedMs(placeDelay.getValue()))
+            placeCrystal(bestPosition);
+
+        if (bestCrystal != null && breakTimer.passedMs(breakDelay.getValue()))
+            attackCrystal(bestCrystal, false);
         tickBusy = false;
     }
 
@@ -299,6 +297,7 @@ public class AutoCrystal extends Module {
     @Override
     public void onRender3D(MatrixStack stack) {
         removeAttackedCrystals();
+
         if (render.getValue()) {
             Map<BlockPos, Long> cache = new ConcurrentHashMap<>(renderPositions);
 
@@ -392,7 +391,7 @@ public class AutoCrystal extends Module {
         return ModuleManager.pistonAura.isEnabled() && pistonAura.getValue();
     }
 
-    public void attackCrystal(EndCrystalEntity crystal) {
+    public void attackCrystal(EndCrystalEntity crystal, boolean instant) {
         if (!canDoAC() || target == null)
             return;
 
@@ -423,9 +422,9 @@ public class AutoCrystal extends Module {
         if (remove.getValue() != Remove.OFF)
             deadCrystals.put(crystal, System.currentTimeMillis());
 
-        if (instantPlace.getValue()) {
+        if (instant) {
             calcPosition();
-            if(bestPosition != null && placeTimer.passedMs(placeDelay.getValue()))
+            if (bestPosition != null && placeTimer.passedMs(placeDelay.getValue()))
                 placeCrystal(bestPosition);
         }
 
@@ -853,10 +852,14 @@ public class AutoCrystal extends Module {
                 if (dir == Direction.UP || dir == Direction.DOWN)
                     continue;
 
-                if (!mc.world.isAir(bp.offset(dir)))
+                Vec3d directionVec = new Vec3d(bp.getX() + 0.5 + dir.getVector().getX() * 0.5, bp.getY() + 0.5 + dir.getVector().getY() * 0.5, bp.getZ() + 0.5 + dir.getVector().getZ() * 0.5);
+
+                float deltaX = (float) (mc.player.getX() - directionVec.getX());
+                float deltaZ = (float) (mc.player.getZ() - directionVec.getZ());
+
+                if (!mc.world.isAir(bp.offset(dir)) && ( deltaZ > 0.25 || deltaX > 0.25) )
                     continue;
 
-                Vec3d directionVec = new Vec3d(bp.getX() + 0.5 + dir.getVector().getX() * 0.5, bp.getY() + 0.5 + dir.getVector().getY() * 0.5, bp.getZ() + 0.5 + dir.getVector().getZ() * 0.5);
                 float distance = PlayerUtility.squaredDistanceFromEyes(directionVec);
                 if (bestDistance > distance) {
                     bestDirection = dir;
@@ -927,50 +930,12 @@ public class AutoCrystal extends Module {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTick(EventTick e) {
-        if (multiThread.getValue())
-            return;
-
-        new Thread(() -> {
+        ThunderHack.asyncManager.run(() -> {
             calcPosition();
             getCrystalToExplode();
-        }).start();
+        });
     }
 
-    private class PlaceThread extends Thread {
-        @Override
-        public void run() {
-            while (ModuleManager.autoCrystal.isEnabled()) {
-                while (ThunderHack.asyncManager.ticking.get() || !placeTimer.passedMs(placeDelay.getValue())) {
-                }
-
-                calcPosition();
-
-                if (bestPosition != null)
-                    placeCrystal(bestPosition);
-
-                if (stopThreads.get())
-                    placeThread.interrupt();
-            }
-        }
-    }
-
-    private class BreakThread extends Thread {
-        @Override
-        public void run() {
-            while (ModuleManager.autoCrystal.isEnabled()) {
-                while (ThunderHack.asyncManager.ticking.get() || !breakTimer.passedMs(breakDelay.getValue())) {
-                }
-
-                getCrystalToExplode();
-
-                if (bestCrystal != null)
-                    attackCrystal(bestCrystal);
-
-                if (stopThreads.get())
-                    breakThread.interrupt();
-            }
-        }
-    }
 
     private record PlaceData(BlockHitResult bhr, float damage, float selfDamage, boolean overrideDamage) {
     }
@@ -979,7 +944,7 @@ public class AutoCrystal extends Module {
     }
 
     private enum Pages {
-        Place, Break, Pause, Render, Damages, Main, Switch, Remove, MultiThread
+        Place, Break, Pause, Render, Damages, Main, Switch, Remove
     }
 
     private enum Switch {

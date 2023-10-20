@@ -90,6 +90,7 @@ public class ThunderHack implements ModInitializer {
         syncVersion();
         ThunderUtility.parseChangeLog();
         ModuleManager.rpc.startRpc();
+
         initTime = System.currentTimeMillis();
         LogUtils.getLogger().info("""
                                      \n /$$$$$$$$ /$$                                 /$$                     /$$   /$$                     /$$     \s
