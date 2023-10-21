@@ -72,6 +72,7 @@
     "MixinWorldChunk",
     "accesors.IBeaconBlockEntity",
     "accesors.IEntity",
+    "accesors.IExplosion",
     "accesors.IExplosionS2CPacket",
     "accesors.IGameMessageS2CPacket",
     "accesors.IHeldItemRenderer",

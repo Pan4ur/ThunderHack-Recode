@@ -12,6 +12,8 @@ import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CommandManager;
+import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
@@ -249,6 +251,11 @@ public abstract class Module {
     public void sendMessage(String message) {
         if (fullNullCheck()) return;
         mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + message));
+    }
+
+    public void debug(String message) {
+        if (fullNullCheck() || !MainSettings.debug.getValue()) return;
+        mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] [\uD83D\uDD27] " + message));
     }
 
     public Setting<?> getSettingByName(String name) {

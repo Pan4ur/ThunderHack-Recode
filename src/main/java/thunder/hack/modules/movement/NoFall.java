@@ -123,6 +123,9 @@ public class NoFall extends Module {
     }
 
     public boolean isFalling() {
+        if(mc.player.isFallFlying())
+            return false;
+
         switch (fallDistance.getValue()) {
             case Custom -> {
                 return mc.player.fallDistance > fallDistanceValue.getValue();

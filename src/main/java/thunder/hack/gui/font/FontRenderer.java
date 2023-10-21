@@ -302,7 +302,10 @@ public class FontRenderer implements Closeable {
                 continue;
             }
             Glyph glyph = locateGlyph1(c1);
-            currentLine += glyph.width() / (float) this.scaleMul;
+
+            float gWidth = glyph == null ? 1f : glyph.width();
+
+            currentLine += gWidth / (float) this.scaleMul;
         }
         return Math.max(currentLine, maxPreviousLines);
     }

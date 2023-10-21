@@ -24,6 +24,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventEntityRemoved;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
@@ -812,7 +813,7 @@ public final class PistonAura extends Module {
         synchronized (mc.world.getPlayers()) {
             List<PlayerEntity> playerList = new ArrayList<>();
             for (PlayerEntity player : mc.world.getPlayers()) {
-                if (mc.player != player && mc.player.squaredDistanceTo(player) <= range * range) {
+                if (mc.player != player && !ThunderHack.friendManager.isFriend(player) && mc.player.squaredDistanceTo(player) <= range * range) {
                     playerList.add(player);
                 }
             }

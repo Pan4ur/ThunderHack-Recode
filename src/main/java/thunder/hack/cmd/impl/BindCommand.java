@@ -66,7 +66,7 @@ public class BindCommand extends Command {
             StringBuilder binds = new StringBuilder("Binds: ");
             for (Module feature : ThunderHack.moduleManager.modules) {
                 if (!Objects.equals(feature.getBind().getBind(), "None")) {
-                    binds.append("\n- ").append(feature.getName() + " -> " + getShortKeyName(feature) + (feature.getBind().isHold() ? "[hold]" : ""));
+                    binds.append("\n- ").append(feature.getName()).append(" -> ").append(getShortKeyName(feature)).append(feature.getBind().isHold() ? "[hold]" : "");
                 }
             }
             sendMessage(binds.toString());

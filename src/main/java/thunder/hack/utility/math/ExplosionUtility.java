@@ -15,6 +15,8 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.explosion.Explosion;
+import thunder.hack.cmd.Command;
+import thunder.hack.injection.accesors.IExplosion;
 import thunder.hack.modules.combat.AutoAnchor;
 import thunder.hack.modules.combat.AutoCrystal;
 
@@ -26,6 +28,8 @@ public final class ExplosionUtility {
     public static boolean terrainIgnore = false;
     public static BlockPos anchorIgnore = null;
 
+    public static Explosion explosion;
+
     public static float getExplosionDamage2(Vec3d crystalPos, PlayerEntity target) {
         try {
             if (AutoCrystal.predictTicks.getValue() == 0) return getExplosionDamage1(crystalPos, target);
@@ -36,21 +40,18 @@ public final class ExplosionUtility {
     }
 
     public synchronized static float getAnchorExplosionDamage(BlockPos anchorPos, PlayerEntity target) {
-        float finalResult;
+        float final_result;
         anchorIgnore = anchorPos;
         terrainIgnore = true;
-        BlockState preState = mc.world.getBlockState(anchorPos);
-        mc.world.setBlockState(anchorPos, Blocks.AIR.getDefaultState());
 
         if (AutoAnchor.predictTicks.getValue() == 0)
-            finalResult = getExplosionDamage1(anchorPos.up().toCenterPos(), target);
+            final_result = getExplosionDamage1(anchorPos.up().toCenterPos(), target);
         else
-            finalResult = getExplosionDamageWPredict(anchorPos.toCenterPos(), target, PredictUtility.predictPlayer(target, AutoAnchor.predictTicks.getValue()));
+            final_result = getExplosionDamageWPredict(anchorPos.toCenterPos(), target, PredictUtility.predictPlayer(target, AutoAnchor.predictTicks.getValue()));
 
         anchorIgnore = null;
         terrainIgnore = false;
-        mc.world.setBlockState(anchorPos, preState);
-        return finalResult;
+        return final_result;
     }
 
     public static float getSelfExplosionDamage(Vec3d explosionPos, int predictTicks) {
@@ -62,9 +63,19 @@ public final class ExplosionUtility {
 
     public static float getExplosionDamage1(Vec3d explosionPos, PlayerEntity target) {
         try {
-            if (mc.world.getDifficulty() == Difficulty.PEACEFUL || mc.player.isCreative()) return 0f;
+            if (mc.world.getDifficulty() == Difficulty.PEACEFUL)
+                return 0f;
 
-            Explosion explosion = new Explosion(mc.world, null, explosionPos.x, explosionPos.y, explosionPos.z, 6f, false, Explosion.DestructionType.DESTROY);
+            if(explosion == null) {
+                explosion = new Explosion(mc.world, mc.player, 1f, 33f, 7f, 6f, false, Explosion.DestructionType.DESTROY);
+            }
+
+            ((IExplosion) explosion).setX(explosionPos.x);
+            ((IExplosion) explosion).setY(explosionPos.y);
+            ((IExplosion) explosion).setZ(explosionPos.z);
+
+            if(((IExplosion) explosion).getWorld() != mc.world)
+                ((IExplosion) explosion).setWorld(mc.world);
 
             double maxDist = 12;
             if (!new Box(MathHelper.floor(explosionPos.x - maxDist - 1.0), MathHelper.floor(explosionPos.y - maxDist - 1.0), MathHelper.floor(explosionPos.z - maxDist - 1.0), MathHelper.floor(explosionPos.x + maxDist + 1.0), MathHelper.floor(explosionPos.y + maxDist + 1.0), MathHelper.floor(explosionPos.z + maxDist + 1.0)).intersects(target.getBoundingBox())) {
@@ -118,9 +129,20 @@ public final class ExplosionUtility {
     }
 
     public static float getExplosionDamageWPredict(Vec3d explosionPos, PlayerEntity target, PlayerEntity predict) {
-        if (mc.world.getDifficulty() == Difficulty.PEACEFUL || mc.player.isCreative()) return 0f;
+        if (mc.world.getDifficulty() == Difficulty.PEACEFUL)
+            return 0f;
 
-        Explosion explosion = new Explosion(mc.world, null, explosionPos.x, explosionPos.y, explosionPos.z, 6f, false, Explosion.DestructionType.DESTROY);
+        if(explosion == null) {
+            explosion = new Explosion(mc.world, mc.player, 1f, 33f, 7f, 6f, false, Explosion.DestructionType.DESTROY);
+        }
+
+        ((IExplosion) explosion).setX(explosionPos.x);
+        ((IExplosion) explosion).setY(explosionPos.y);
+        ((IExplosion) explosion).setZ(explosionPos.z);
+
+        if(((IExplosion) explosion).getWorld() != mc.world)
+            ((IExplosion) explosion).setWorld(mc.world);
+
         if (!new Box(
                 MathHelper.floor(explosionPos.x - 11d),
                 MathHelper.floor(explosionPos.y - 11d),

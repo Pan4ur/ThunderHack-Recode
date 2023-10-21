@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.IManager;
 import thunder.hack.events.impl.EventPostTick;
@@ -72,7 +73,7 @@ public class CombatManager implements IManager {
                 .collect(Collectors.toList());
     }
 
-    public PlayerEntity getNearestTarget(float range) {
+    public @Nullable PlayerEntity getNearestTarget(float range) {
         return getTargets(range).stream().min(Comparator.comparing(t -> MC.player.distanceTo(t))).orElse(null);
     }
 

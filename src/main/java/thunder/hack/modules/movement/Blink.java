@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.common.KeepAliveC2SPacket;
+import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -24,8 +25,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Blink extends Module {
     private final Setting<Boolean> pulse = new Setting<>("Pulse", false);
-    private final Setting<Boolean> strict = new Setting<>("Strict", false);
-    private final Setting<Float> factor = new Setting<>("Factor", 1F, 0.01F, 10F);
+    private final Setting<Boolean> autoDisable = new Setting<>("AutoDisable", false);
+    private final Setting<Integer> disablePackets = new Setting<>("DisablePackets", 17, 1, 1000, v-> autoDisable.getValue() );
+    private final Setting<Integer> pulsePackets = new Setting<>("PulsePackets", 20, 1, 1000, v-> pulse.getValue());
     private final Setting<Boolean> render = new Setting<>("Render", true);
     private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Circle, value -> render.getValue());
     private final Setting<ColorSetting> circleColor = new Setting<>("Color", new ColorSetting(0xFFda6464, true), value -> render.getValue() && renderMode.getValue() == RenderMode.Circle || renderMode.getValue() == RenderMode.Both);
@@ -40,6 +42,8 @@ public class Blink extends Module {
     private Vec3d lastPos = new Vec3d(0, 0, 0);
     private final Queue<Packet<?>> storedPackets = new LinkedList<>();
     private final AtomicBoolean sending = new AtomicBoolean(false);
+
+    private Packet<?> lastPacket;
 
     public Blink() {
         super("Blink", Category.MOVEMENT);
@@ -80,15 +84,15 @@ public class Blink extends Module {
         if (fullNullCheck()) return;
 
         Packet<?> packet = event.getPacket();
-        if (sending.get()) return;
+
+        if (sending.get()) {
+            return;
+        }
+
         if (pulse.getValue()) {
             if (packet instanceof PlayerMoveC2SPacket) {
-                if (strict.getValue() && !((PlayerMoveC2SPacket) packet).isOnGround()) {
-                    sendPackets();
-                } else {
-                    event.cancel();
-                    storedPackets.add(packet);
-                }
+                event.cancel();
+                storedPackets.add(packet);
             }
         } else if (!(packet instanceof ChatMessageC2SPacket || packet instanceof TeleportConfirmC2SPacket || packet instanceof KeepAliveC2SPacket || packet instanceof AdvancementTabC2SPacket || packet instanceof ClientStatusC2SPacket)) {
             event.cancel();
@@ -101,8 +105,14 @@ public class Blink extends Module {
         if (fullNullCheck()) return;
 
         if (pulse.getValue()) {
-            if (storedPackets.size() >= factor.getValue() * 10F) {
+            if (storedPackets.size() >= pulsePackets.getValue()) {
                 sendPackets();
+            }
+        }
+
+        if(autoDisable.getValue()) {
+            if (storedPackets.size() >= disablePackets.getValue()) {
+                disable();
             }
         }
     }

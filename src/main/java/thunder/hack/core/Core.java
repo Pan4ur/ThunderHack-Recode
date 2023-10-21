@@ -6,6 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -15,6 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec2f;
+import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
@@ -27,6 +29,7 @@ import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.utility.Macro;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.player.InteractionUtility;
 
 import java.util.*;
@@ -111,6 +114,10 @@ public final class Core {
                 skullTimer.reset();
                 mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_SKELETON_DEATH, SoundCategory.BLOCKS, 1f, 1f);
             }
+        }
+
+        if(e.getPacket() instanceof GameJoinS2CPacket) {
+            ThunderHack.moduleManager.onLogin();
         }
     }
 
