@@ -13,14 +13,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSetBlockState;
 
-import static thunder.hack.modules.Module.mc;
-
 @Mixin({WorldChunk.class})
 public class MixinWorldChunk {
 
+    @Shadow @Final World world;
+
     @Inject(method = "setBlockState", at = @At("RETURN"))
     private void setBlockStateHook(BlockPos pos, BlockState state, boolean moved, CallbackInfoReturnable<BlockState> cir) {
-        if (mc.world.isClient) {
+        if (world.isClient) {
             ThunderHack.EVENT_BUS.post(new EventSetBlockState(pos, cir.getReturnValue(), state));
         }
     }

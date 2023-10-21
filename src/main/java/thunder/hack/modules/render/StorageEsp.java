@@ -1,13 +1,20 @@
 package thunder.hack.modules.render;
 
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.ItemFrameEntity;
+import net.minecraft.entity.vehicle.ChestMinecartEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
+import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
@@ -30,19 +37,18 @@ public class StorageEsp extends Module {
     public final Setting<Boolean> hopper = new Setting<>("Hopper", false);
     public final Setting<Boolean> barrels = new Setting<>("Barrel", false);
 
-    //public final Setting<Boolean> cart = new Setting<>("Minecart", false);
-    //public final Setting<Boolean> frame = new Setting<>("ItemFrame", false);
+    public final Setting<Boolean> cart = new Setting<>("Minecart", false);
+    public final Setting<Boolean> frame = new Setting<>("ItemFrame", false);
     private final Setting<ColorSetting> chestColor = new Setting<>("ChestColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> shulkColor = new Setting<>("ShulkerColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> echestColor = new Setting<>("EChestColor", new ColorSetting(0x8800FF00));
-    //private final Setting<ColorSetting> frameColor = new Setting<>("FrameColor", new ColorSetting(0x8800FF00));
+    private final Setting<ColorSetting> frameColor = new Setting<>("FrameColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> shulkerframeColor = new Setting<>("ShulkFrameColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> furnaceColor = new Setting<>("FurnaceColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> hopperColor = new Setting<>("HopperColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> dispenserColor = new Setting<>("DispenserColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> barrelColor = new Setting<>("BarrelColor", new ColorSetting(0x8800FF00));
-
-    //  private final Setting<ColorSetting> minecartColor = new Setting<>("MinecartColor", new ColorSetting(0x8800FF00)));
+    private final Setting<ColorSetting> minecartColor = new Setting<>("MinecartColor", new ColorSetting(0x8800FF00));
 
     public void onRender3D(MatrixStack stack) {
         for (BlockEntity blockEntity : getBlockEntities()) {
@@ -68,10 +74,33 @@ public class StorageEsp extends Module {
             }
             if (outline.getValue()) {
                 if (blockEntity instanceof ChestBlockEntity) {
-                    Render3DEngine.drawBoxOutline(chestbox, color, 1f);
+                    Render3DEngine.drawBoxOutline(chestbox, Render2DEngine.injectAlpha(color, 255), 1f);
                 } else if (blockEntity instanceof EnderChestBlockEntity) {
-                    Render3DEngine.drawBoxOutline(chestbox, color, 1f);
-                } else Render3DEngine.drawBoxOutline(new Box(blockEntity.getPos()), color, 1f);
+                    Render3DEngine.drawBoxOutline(chestbox, Render2DEngine.injectAlpha(color, 255), 1f);
+                } else
+                    Render3DEngine.drawBoxOutline(new Box(blockEntity.getPos()), Render2DEngine.injectAlpha(color, 255), 1f);
+            }
+        }
+
+        for (Entity ent : ThunderHack.asyncManager.getAsyncEntities()) {
+            if (ent instanceof ItemFrameEntity iframe && frame.getValue()) {
+                Color frameColor1 = frameColor.getValue().getColorObject();
+                if (iframe.getHeldItemStack().getItem() instanceof BlockItem bitem && bitem.getBlock() instanceof ShulkerBoxBlock)
+                    frameColor1 = shulkerframeColor.getValue().getColorObject();
+
+                if (fill.getValue())
+                    Render3DEngine.drawFilledBox(stack, iframe.getBoundingBox(), frameColor1);
+
+                if (outline.getValue())
+                    Render3DEngine.drawBoxOutline(iframe.getBoundingBox(), Render2DEngine.injectAlpha(frameColor1, 255), 1f);
+            }
+
+            if (ent instanceof ChestMinecartEntity mcart && cart.getValue()) {
+                if (fill.getValue())
+                    Render3DEngine.drawFilledBox(stack, mcart.getBoundingBox(), minecartColor.getValue().getColorObject());
+
+                if (outline.getValue())
+                    Render3DEngine.drawBoxOutline(mcart.getBoundingBox(), Render2DEngine.injectAlpha(minecartColor.getValue().getColorObject(), 255), 1f);
             }
         }
     }
