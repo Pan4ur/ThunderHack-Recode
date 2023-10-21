@@ -111,7 +111,7 @@ public class AsyncManager implements IManager {
         });
     }
 
-    public void run(Runnable runnable) {
-        executor.execute(runnable::run);
+    public void run(Runnable r) {
+        executor.execute(r);
     }
 }
