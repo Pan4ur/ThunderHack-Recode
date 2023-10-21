@@ -79,7 +79,6 @@ public class ModuleManager implements IManager {
     public static EntitySpeed entitySpeed = new EntitySpeed();
     public static WaterSpeed waterSpeed = new WaterSpeed();
     public static TriggerBot triggerBot = new TriggerBot();
-
     public static TPSCounter tpsCounter = new TPSCounter();
     public static StorageEsp storageEsp = new StorageEsp();
     public static StaffBoard staffBoard = new StaffBoard();
@@ -151,6 +150,7 @@ public class ModuleManager implements IManager {
     public static SelfTrap selfTrap = new SelfTrap();
     public static AntiVoid antiVoid = new AntiVoid();
     public static AutoBed autoBed = new AutoBed();
+    public static TNTAura tntAura = new TNTAura();
     public static VoidESP voidESP = new VoidESP();
     public static Tracker tracker = new Tracker();
     public static TpsSync tpsSync = new TpsSync();
