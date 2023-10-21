@@ -5,8 +5,8 @@ import net.minecraft.util.math.BlockPos;
 import thunder.hack.events.Event;
 
 public class EventPlaceBlock extends Event {
-    private BlockPos blockPos;
-    private Block block;
+    private final BlockPos blockPos;
+    private final Block block;
 
     public EventPlaceBlock(BlockPos blockPos, Block block) {
         this.blockPos = blockPos;

@@ -1,6 +1,6 @@
 package thunder.hack.events;
 
-public abstract class Event {
+public class Event {
     private boolean cancelled = false;
 
     public boolean isCancelled() {
@@ -12,6 +12,6 @@ public abstract class Event {
     }
 
     public void cancel() {
-        this.cancelled = true;
+        cancelled = true;
     }
 }

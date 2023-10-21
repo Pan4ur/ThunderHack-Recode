@@ -162,6 +162,13 @@ public final class AutoAnchor extends Module {
             }
             logicTimer.reset();
 
+            if (HoleUtility.isHole(target.getBlockPos())
+                    || mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.RESPAWN_ANCHOR)) {
+                targetPos = target.getBlockPos().up(2);
+                doPlace();
+                return;
+            }
+
             // Finding new best target pos
             BlockPos best = findAnchorBlocks().stream()
                     .filter(this::isFriendsSafe)
@@ -255,8 +262,7 @@ public final class AutoAnchor extends Module {
                 .isEmpty()
                 || !InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false)) return;
 
-        if (HoleUtility.isHole(target.getBlockPos()) || mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.RESPAWN_ANCHOR)
-                && mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.GLOWSTONE)) {
+        if (HoleUtility.isHole(target.getBlockPos()) || mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.RESPAWN_ANCHOR)) {
             if (placeTimer.passedMs(500)) {
                 for (int i = 0; i < chargeCount.getValue(); i++)
                     doCharge();
@@ -273,8 +279,7 @@ public final class AutoAnchor extends Module {
                         true,
                         false
                 );
-            } else if (!mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.RESPAWN_ANCHOR)
-                    && !mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.GLOWSTONE)) {
+            } else if (!mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.RESPAWN_ANCHOR)) {
                 BlockPos bp = target.getBlockPos();
                 for (int i = 2; i > 0; i--) {
                     for (Vec3i vec : HoleUtility.VECTOR_PATTERN) {

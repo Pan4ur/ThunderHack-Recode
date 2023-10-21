@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.registry.BuiltinRegistries;
@@ -20,9 +21,11 @@ public abstract class Command {
     protected static final MinecraftClient MC = MinecraftClient.getInstance();
 
     protected final List<String> names;
+    private final String description;
 
     public Command(String... names) {
         this.names = Arrays.asList(names);
+        this.description = "descriptions.commands." + this.names.get(0);
     }
 
     public abstract void executeBuild(LiteralArgumentBuilder<CommandSource> builder);
@@ -30,11 +33,6 @@ public abstract class Command {
     public static void sendMessage(String message) {
         if (MC.player == null) return;
         MC.player.sendMessage(Text.of(thunder.hack.core.impl.CommandManager.getClientMessage() + " "  + message));
-    }
-
-    public static void sendMessageWithoutTH(String message) {
-        if (MC.player == null) return;
-        MC.player.sendMessage(Text.of(message));
     }
 
     protected static <T> @NotNull RequiredArgumentBuilder<CommandSource, T> arg(final String name, final ArgumentType<T> type) {
@@ -55,5 +53,9 @@ public abstract class Command {
 
     public String getName() {
         return names.get(0);
+    }
+
+    public String getDescription() {
+        return I18n.translate(description);
     }
 }

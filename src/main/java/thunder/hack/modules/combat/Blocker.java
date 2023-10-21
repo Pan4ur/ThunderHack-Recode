@@ -16,6 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.events.impl.EventPlaceBlock;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -49,6 +50,7 @@ public final class Blocker extends Module {
     private final Setting<Boolean> antiCev = new Setting<>("Anti Cev", true).withParent(logic);
     private final Setting<Boolean> antiCiv = new Setting<>("Anti Civ", true).withParent(logic);
     private final Setting<Boolean> expand = new Setting<>("Expand", true).withParent(logic);
+    private final Setting<Boolean> antiTntAura = new Setting<>("Anti TNT", false).withParent(logic);
 
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
@@ -149,7 +151,8 @@ public final class Blocker extends Module {
     }
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.@NotNull Receive e) {
+    @SuppressWarnings("unused")
+    private void onPacketReceive(PacketEvent.@NotNull Receive e) {
         final BlockPos playerPos = mc.player.getBlockPos();
         if (e.getPacket() instanceof BlockBreakingProgressS2CPacket) {
             BlockBreakingProgressS2CPacket packet = e.getPacket();
@@ -179,6 +182,14 @@ public final class Blocker extends Module {
                         placePositions.add(playerPos.add(checkPos.up(2)));
                 }
             }
+        }
+    }
+
+    @EventHandler
+    @SuppressWarnings("unused")
+    private void onPlaceBlock(@NotNull EventPlaceBlock event) {
+        if (event.getBlockPos().equals(mc.player.getBlockPos().up(2)) && antiTntAura.getValue()) {
+            placePositions.add(event.getBlockPos());
         }
     }
 
