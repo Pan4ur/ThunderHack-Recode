@@ -33,7 +33,7 @@ public class Strafe extends Module {
 
     public static double oldSpeed, contextFriction, fovval;
     public static boolean needSwap, needSprintState,disabled;
-    public static int noSlowTicks,waterTicks,jumpTicks;
+    public static int noSlowTicks;
     static long disableTime;
 
     public Strafe() {
@@ -146,7 +146,7 @@ public class Strafe extends Module {
         if (ModuleManager.speed.isEnabled()) {
             return false;
         }
-        if (mc.player.isSubmergedInWater() || waterTicks > 0) {
+        if (mc.player.isSubmergedInWater()) {
             return false;
         }
         return !mc.player.getAbilities().flying;
@@ -159,12 +159,12 @@ public class Strafe extends Module {
     @EventHandler
     public void onMove(EventMove event) {
         int elytraSlot = InventoryUtility.getElytra();
-
         if (boost.getValue() == Boost.Elytra && elytraSlot != -1) {
             if (isMoving() && !mc.player.isOnGround() && mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, event.getY(), 0.0f)).iterator().hasNext() && disabled) {
                 oldSpeed = setSpeed.getValue();
             }
         }
+
         if (canStrafe()) {
             if (isMoving()) {
                 double[] motions = MovementUtility.forward(calculateSpeed(event));
@@ -180,21 +180,13 @@ public class Strafe extends Module {
         } else {
             oldSpeed = 0;
         }
-
     }
 
     @EventHandler
-    public void updateValues(EventSync e) {
-        oldSpeed = ThunderHack.playerManager.currentPlayerSpeed * contextFriction;
-        if (mc.player.isSubmergedInWater()) {
-            waterTicks = 10;
-        } else {
-            waterTicks--;
-        }
-        if (jumpTicks > 0) {
-            jumpTicks--;
-        }
+    public void onSync(EventSync e) {
+        oldSpeed = Math.hypot(mc.player.getX() - mc.player.prevX, mc.player.getZ() - mc.player.prevZ) * contextFriction;
     }
+
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
@@ -202,6 +194,7 @@ public class Strafe extends Module {
             oldSpeed = 0;
         }
         EntityVelocityUpdateS2CPacket velocity;
+
         if (e.getPacket() instanceof EntityVelocityUpdateS2CPacket && (velocity = e.getPacket()).getId() == mc.player.getId() && boost.getValue() == Boost.Damage) {
             if (mc.player.isOnGround()) return;
 
