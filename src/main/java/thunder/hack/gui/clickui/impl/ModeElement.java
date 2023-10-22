@@ -15,12 +15,12 @@ import thunder.hack.utility.render.animation.Direction;
 
 import java.awt.*;
 
+import static thunder.hack.gui.clickui.ClickUI.arrow;
+
 public class ModeElement extends AbstractElement {
     public Setting setting2;
     private boolean open;
     private double wheight;
-
-    final Identifier arrow = new Identifier("textures/arrow.png");
 
     private final Animation rotation = new DecelerateAnimation(240, 1, Direction.FORWARDS);
 

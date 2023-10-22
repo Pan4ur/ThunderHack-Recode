@@ -15,10 +15,10 @@ import net.minecraft.util.math.RotationAxis;
 
 import java.awt.*;
 
+import static thunder.hack.gui.clickui.ClickUI.arrow;
+
 public class ParentElement extends AbstractElement {
     private final Setting<Parent> parentSetting;
-
-    final Identifier arrow = new Identifier("textures/arrow.png");
 
     public ParentElement(Setting setting) {
         super(setting);

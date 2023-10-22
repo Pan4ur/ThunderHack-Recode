@@ -28,9 +28,10 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 public class ClickUI extends Screen {
     public static List<AbstractWindow> windows;
 
-    private Identifier pic1 = new Identifier("textures/pic1.png");
-    private Identifier pic2 = new Identifier("textures/pic2.png");
-    private Identifier pic3 = new Identifier("textures/pic3.png");
+    private final Identifier pic1 = new Identifier("textures/pic1.png");
+    private final Identifier pic2 = new Identifier("textures/pic2.png");
+    private final Identifier pic3 = new Identifier("textures/pic3.png");
+    public static final Identifier arrow = new Identifier("textures/arrow.png");
 
     private boolean firstOpen;
     private float scrollY;

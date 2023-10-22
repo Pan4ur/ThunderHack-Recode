@@ -19,10 +19,10 @@ import thunder.hack.utility.render.animation.Direction;
 
 import java.awt.*;
 
+import static thunder.hack.gui.clickui.ClickUI.arrow;
+
 public class BooleanParentElement extends AbstractElement {
     private final Setting<BooleanParent> parentSetting;
-
-    final Identifier arrow = new Identifier("textures/arrow.png");
 
     public BooleanParentElement(Setting setting) {
         super(setting);
