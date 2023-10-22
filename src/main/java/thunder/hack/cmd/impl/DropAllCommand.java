@@ -12,7 +12,7 @@ import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
 public class DropAllCommand extends Command {
     public DropAllCommand() {
-        super("dropall");
+        super("dropall", "drop");
     }
 
     @Override
