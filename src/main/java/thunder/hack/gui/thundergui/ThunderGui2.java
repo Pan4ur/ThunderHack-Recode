@@ -295,6 +295,9 @@ public class ThunderGui2 extends Screen {
                     if (setting.getValue() instanceof Boolean && !setting.getName().equals("Enabled") && !setting.getName().equals("Drawn")) {
                         settings.add(new BooleanComponent(setting));
                     }
+                    if (setting.isBooleanParent()) {
+                        settings.add(new BooleanParentComponent(setting));
+                    }
                     if (setting.isEnumSetting()) {
                         settings.add(new ModeComponent(setting));
                     }

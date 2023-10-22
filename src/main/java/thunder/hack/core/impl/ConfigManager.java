@@ -12,10 +12,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.render.Search;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.Bind;
-import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.setting.impl.EnumConverter;
-import thunder.hack.setting.impl.PositionSetting;
+import thunder.hack.setting.impl.*;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -322,6 +319,9 @@ public class ConfigManager implements IManager {
                             ((PositionSetting) setting2.getValue()).setX(array3.get(0).getAsFloat());
                             ((PositionSetting) setting2.getValue()).setY(array3.get(1).getAsFloat());
                             continue;
+                        case "BooleanParent":
+                            ((BooleanParent) setting2.getValue()).setState(mobject.getAsJsonPrimitive(setting2.getName()).getAsBoolean());
+                            continue;
                         case "Enum":
                             try {
                                 EnumConverter converter = new EnumConverter(((Enum) setting2.getValue()).getClass());
@@ -369,6 +369,10 @@ public class ConfigManager implements IManager {
                 array.add(new JsonPrimitive(num1));
 
                 attribs.add(setting.getName(), array);
+                continue;
+            }
+            if (setting.isBooleanParent()) {
+                attribs.add(setting.getName(), jp.parse(String.valueOf(((BooleanParent)setting.getValue()).getState())));
                 continue;
             }
             if (setting.isBindSetting()) {

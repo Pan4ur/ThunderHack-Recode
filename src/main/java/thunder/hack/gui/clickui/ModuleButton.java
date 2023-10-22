@@ -14,10 +14,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.Bind;
-import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.setting.impl.Parent;
-import thunder.hack.setting.impl.PositionSetting;
+import thunder.hack.setting.impl.*;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
@@ -45,6 +42,8 @@ public class ModuleButton extends AbstractButton {
                 elements.add(new CheckBoxElement(setting));
             } else if (setting.getValue() instanceof ColorSetting) {
                 elements.add(new ColorPickerElement(setting));
+            }else if (setting.getValue() instanceof BooleanParent) {
+                elements.add(new BooleanParentElement(setting));
             } else if (setting.isNumberSetting() && setting.hasRestriction()) {
                 elements.add(new SliderElement(setting));
             } else if (setting.isEnumSetting() && !(setting.getValue() instanceof Parent) && !(setting.getValue() instanceof PositionSetting)) {

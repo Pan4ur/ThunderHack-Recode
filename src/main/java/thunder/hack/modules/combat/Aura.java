@@ -40,6 +40,7 @@ import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
 import thunder.hack.utility.player.InventoryUtility;
@@ -71,9 +72,9 @@ public final class Aura extends Module {
     public final Setting<Boolean> dropSprint = new Setting<>("DropSprint", true);
     public final Setting<Boolean> pauseInInventory = new Setting<>("PauseInInventory", true);
     public static final Setting<Boolean> clientLook = new Setting<>("ClientLook", false);
-    public static final Setting<Boolean> oldDelay = new Setting<>("OldDelay", false);
-    public static final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 15, v -> oldDelay.getValue());
-    public static final Setting<Integer> maxCPS = new Setting<>("MaxCPS", 12, 1, 15, v -> oldDelay.getValue());
+    private static final Setting<BooleanParent> oldDelay = new Setting<>("OldDelay", new BooleanParent(false));
+    public static final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 15).withParent(oldDelay);
+    public static final Setting<Integer> maxCPS = new Setting<>("MaxCPS", 12, 1, 15).withParent(oldDelay);
     public final Setting<Grim> grimAC = new Setting<>("GrimAC", Grim.None);
     public final Setting<Boolean> esp = new Setting<>("ESP", true);
     public static final Setting<Sort> sort = new Setting<>("Sort", Sort.Distance);
@@ -237,7 +238,7 @@ public final class Aura extends Module {
         if (mc.getCurrentServerEntry() != null && mc.getCurrentServerEntry().address.equals("ngrief.me") && mc.player.getMainHandStack().getItem() instanceof AxeItem) {
             return 21;
         }
-        return oldDelay.getValue() ? 1 + (int) (20f / random(minCPS.getValue(), maxCPS.getValue())) : 11;
+        return oldDelay.getValue().getState() ? 1 + (int) (20f / random(minCPS.getValue(), maxCPS.getValue())) : 11;
     }
 
     @EventHandler
@@ -257,7 +258,7 @@ public final class Aura extends Module {
             rotationYaw = mc.player.getYaw();
             rotationPitch = mc.player.getPitch();
         }
-        if (oldDelay.getValue()) {
+        if (oldDelay.getValue().getState()) {
             if (minCPS.getValue() > maxCPS.getValue())
                 minCPS.setValue(maxCPS.getValue());
         }
@@ -298,7 +299,7 @@ public final class Aura extends Module {
 
         if (pauseInInventory.getValue() && ThunderHack.playerManager.inInventory) return false;
 
-        if (getAttackCooldown() < 0.9f && !oldDelay.getValue()) return false;
+        if (getAttackCooldown() < 0.9f && !oldDelay.getValue().getState()) return false;
 
         boolean mergeWithTargetStrafe = !ModuleManager.targetStrafe.isEnabled() || !ModuleManager.targetStrafe.jump.getValue();
         boolean mergeWithSpeed = !ModuleManager.speed.isEnabled() || mc.player.isOnGround();

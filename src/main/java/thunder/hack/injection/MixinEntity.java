@@ -63,7 +63,7 @@ public abstract class MixinEntity implements IEntity {
 
     @Inject(method = "getBoundingBox", at = {@At("HEAD")}, cancellable = true)
     public final void getBoundingBox(CallbackInfoReturnable<Box> cir) {
-        if (ModuleManager.hitBox.isEnabled() && (Object) this != mc.player) {
+        if (ModuleManager.hitBox.isEnabled() && mc != null && mc.player != null &&((Entity) (Object) this).getId() != mc.player.getId()) {
             cir.setReturnValue(new Box(this.boundingBox.minX - HitBox.XZExpand.getValue() / 2f, this.boundingBox.minY - HitBox.YExpand.getValue() / 2f, this.boundingBox.minZ - HitBox.XZExpand.getValue() / 2f, this.boundingBox.maxX + HitBox.XZExpand.getValue() / 2f, this.boundingBox.maxY + HitBox.YExpand.getValue() / 2f, this.boundingBox.maxZ + HitBox.XZExpand.getValue() / 2f));
         }
     }

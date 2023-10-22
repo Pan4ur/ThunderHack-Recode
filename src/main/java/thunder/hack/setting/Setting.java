@@ -13,7 +13,7 @@ public class Setting<T> {
     private T plannedValue;
     private T min;
     private T max;
-    private Setting<Parent> parent = null;
+    private Setting<?> parent = null;
 
     private boolean hasRestriction;
     private Predicate<T> visibility;
@@ -158,8 +158,16 @@ public class Setting<T> {
         if (this.isPositionSetting()) {
             return "PositionSetting";
         }
+        if (this.isBooleanParent()) {
+            return "BooleanParent";
+        }
         return this.getClassName(this.defaultValue);
     }
+
+    public boolean isBooleanParent() {
+        return this.value instanceof BooleanParent;
+    }
+
 
     public <T> String getClassName(T value) {
         return value.getClass().getSimpleName();
@@ -178,7 +186,7 @@ public class Setting<T> {
     }
 
     public boolean isEnumSetting() {
-        return !this.isPositionSetting() && !this.isNumberSetting() && !(this.value instanceof PositionSetting) && !(this.value instanceof JsonPrimitive) && !(this.value instanceof String) && !(this.value instanceof ColorSetting) && !(this.value instanceof Parent) && !(this.value instanceof Bind) && !(this.value instanceof Character) && !(this.value instanceof Boolean);
+        return !this.isPositionSetting() && !this.isBooleanParent() && !this.isNumberSetting() && !(this.value instanceof PositionSetting) && !(this.value instanceof JsonPrimitive) && !(this.value instanceof String) && !(this.value instanceof ColorSetting) && !(this.value instanceof Parent) && !(this.value instanceof Bind) && !(this.value instanceof Character) && !(this.value instanceof Boolean);
     }
 
     public boolean isBindSetting() {
@@ -209,20 +217,21 @@ public class Setting<T> {
         return this.hasRestriction;
     }
 
-    public Setting<T> withParent(Setting<Parent> parent) {
+    public Setting<T> withParent(Setting<?> parent) {
         this.parent = parent;
         return this;
     }
 
-    public Setting<Parent> getParent() {
-        return parent;
-    }
-
     public boolean isVisible() {
         if (parent != null) {
-            if (!parent.getValue().isExtended()) {
-                return false;
-            }
+
+            if(parent.getValue() instanceof BooleanParent bp)
+                if (!bp.isExtended())
+                    return false;
+
+            if(parent.getValue() instanceof Parent p)
+                if (!p.isExtended())
+                    return false;
         }
         if (this.visibility == null) {
             return true;

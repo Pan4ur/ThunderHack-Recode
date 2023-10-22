@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.command.CommandRegistryAccess;
@@ -12,6 +13,7 @@ import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
 
 import java.util.Arrays;
 import java.util.List;
@@ -53,6 +55,10 @@ public abstract class Command {
 
     public String getName() {
         return names.get(0);
+    }
+
+    public String getAliases() {
+        return String.join(", ", names.stream().filter(n -> !n.equals(names.get(0))).toList());
     }
 
     public String getDescription() {

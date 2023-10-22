@@ -21,6 +21,7 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
@@ -47,11 +48,12 @@ public final class AutoTrap extends Module {
     private final Setting<Boolean> netherite = new Setting<>("Netherite", false).withParent(blocks);
     private final Setting<Boolean> cryingObsidian = new Setting<>("CryingObsidian", true).withParent(blocks);
     private final Setting<Boolean> dirt = new Setting<>("Dirt", false).withParent(blocks);
-    private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
-    private final Setting<RenderMode> renderMode = new Setting<>("RenderMode", RenderMode.Fade).withParent(renderCategory);
-    private final Setting<ColorSetting> renderFillColor = new Setting<>("Fill", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
-    private final Setting<ColorSetting> renderLineColor = new Setting<>("Line", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
-    private final Setting<Integer> renderLineWidth = new Setting<>("LineWidth", 2, 1, 5).withParent(renderCategory);
+
+    private final Setting<BooleanParent> render = new Setting<>("Render", new BooleanParent(true));
+    private final Setting<RenderMode> renderMode = new Setting<>("RenderMode", RenderMode.Fade).withParent(render);
+    private final Setting<ColorSetting> renderFillColor = new Setting<>("Fill", new ColorSetting(HudEditor.getColor(0))).withParent(render);
+    private final Setting<ColorSetting> renderLineColor = new Setting<>("Line", new ColorSetting(HudEditor.getColor(0))).withParent(render);
+    private final Setting<Integer> renderLineWidth = new Setting<>("LineWidth", 2, 1, 5).withParent(render);
 
     private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
     private final ArrayList<BlockPos> sequentialBlocks = new ArrayList<>();
@@ -66,6 +68,9 @@ public final class AutoTrap extends Module {
     }
 
     public void onRender3D(MatrixStack stack) {
+        if(!render.getValue().getState())
+            return;
+
         renderPoses.forEach((pos, time) -> {
             if (System.currentTimeMillis() - time > 500) {
                 renderPoses.remove(pos);
