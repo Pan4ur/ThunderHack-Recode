@@ -200,7 +200,6 @@ public class ModuleManager implements IManager {
     public static XRay xray = new XRay();
     public static Step step = new Step();
     public static Aura aura = new Aura();
-    public static RPC rpc = new RPC();
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
 
@@ -208,6 +207,10 @@ public class ModuleManager implements IManager {
     public ModuleManager() {
         modules.add(new AutoAnchor());
         modules.add(new Quiver());
+
+        if(!ThunderHack.isOnLinux())
+            modules.add(new RPC());
+
         for (Field field : getClass().getDeclaredFields()) {
             if (Module.class.isAssignableFrom(field.getType())) {
                 field.setAccessible(true);
@@ -257,7 +260,8 @@ public class ModuleManager implements IManager {
 
         if (ConfigManager.firstLaunch) {
             ModuleManager.notifications.enable();
-            rpc.enable();
+            if(!ThunderHack.isOnLinux())
+                RPC.getInstance().enable();
         }
     }
 

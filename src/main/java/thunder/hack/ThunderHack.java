@@ -9,6 +9,7 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.*;
+import thunder.hack.modules.client.RPC;
 import thunder.hack.notification.NotificationManager;
 import thunder.hack.utility.SoundUtility;
 import thunder.hack.utility.ThunderUtility;
@@ -92,8 +93,9 @@ public class ThunderHack implements ModInitializer {
         SoundUtility.registerSounds();
         syncVersion();
         ThunderUtility.parseChangeLog();
-        ModuleManager.rpc.startRpc();
 
+        if(!isOnLinux())
+            RPC.getInstance().startRpc();
 
         LogUtils.getLogger().info("""
                 \n /$$$$$$$$ /$$                                 /$$                     /$$   /$$                     /$$     \s
@@ -113,9 +115,14 @@ public class ThunderHack implements ModInitializer {
 
     public static void syncVersion() {
         try {
-            if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersion.txt").openStream())).readLine().equals(VERSION)) isOutdated = true;
+            if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersion.txt").openStream())).readLine().equals(VERSION))
+                isOutdated = true;
         } catch (Exception ignored) {
         }
+    }
+
+    public static boolean isOnLinux() {
+        return !(System.getProperty("os.name").startsWith("Windows"));
     }
 
     public enum KeyListening {

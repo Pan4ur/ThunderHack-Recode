@@ -72,16 +72,11 @@ public class ConfigManager implements IManager {
     public void loadSearch() {
         try {
             File file = new File("ThunderHackRecode/misc/search.txt");
-
-            if (file.exists()) {
+            if (file.exists())
                 try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                    while (reader.ready()) {
-                        String name = reader.readLine();
-                        Search.defaultBlocks.add(SearchCommand.getRegisteredBlock(name));
-                    }
-
+                    while (reader.ready())
+                        Search.defaultBlocks.add(SearchCommand.getRegisteredBlock(reader.readLine()));
                 }
-            }
         } catch (Exception ignored) {
         }
     }
