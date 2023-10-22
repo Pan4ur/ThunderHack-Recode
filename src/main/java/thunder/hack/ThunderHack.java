@@ -3,16 +3,17 @@ package thunder.hack;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.IEventBus;
+import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import thunder.hack.core.*;
+import net.minecraft.util.math.BlockPos;
+import thunder.hack.core.Core;
 import thunder.hack.core.impl.*;
 import thunder.hack.notification.NotificationManager;
 import thunder.hack.utility.SoundUtility;
-import net.fabricmc.api.ModInitializer;
-import net.minecraft.util.math.BlockPos;
 import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.render.Render2DEngine;
+
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -59,6 +60,8 @@ public class ThunderHack implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        initTime = System.currentTimeMillis();
+
         EVENT_BUS.registerLambdaFactory("thunder.hack", (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
 
         EVENT_BUS.subscribe(notificationManager);
@@ -91,24 +94,26 @@ public class ThunderHack implements ModInitializer {
         ThunderUtility.parseChangeLog();
         ModuleManager.rpc.startRpc();
 
-        initTime = System.currentTimeMillis();
+
         LogUtils.getLogger().info("""
-                                     \n /$$$$$$$$ /$$                                 /$$                     /$$   /$$                     /$$     \s
-                                     |__  $$__/| $$                                | $$                    | $$  | $$                    | $$     \s
-                                        | $$   | $$$$$$$  /$$   /$$ /$$$$$$$   /$$$$$$$  /$$$$$$   /$$$$$$ | $$  | $$  /$$$$$$   /$$$$$$$| $$   /$$
-                                        | $$   | $$__  $$| $$  | $$| $$__  $$ /$$__  $$ /$$__  $$ /$$__  $$| $$$$$$$$ |____  $$ /$$_____/| $$  /$$/
-                                        | $$   | $$  \\ $$| $$  | $$| $$  \\ $$| $$  | $$| $$$$$$$$| $$  \\__/| $$__  $$  /$$$$$$$| $$      | $$$$$$/\s
-                                        | $$   | $$  | $$| $$  | $$| $$  | $$| $$  | $$| $$_____/| $$      | $$  | $$ /$$__  $$| $$      | $$_  $$\s
-                                        | $$   | $$  | $$|  $$$$$$/| $$  | $$|  $$$$$$$|  $$$$$$$| $$      | $$  | $$|  $$$$$$$|  $$$$$$$| $$ \\  $$
-                                        |__/   |__/  |__/ \\______/ |__/  |__/ \\_______/ \\_______/|__/      |__/  |__/ \\_______/ \\_______/|__/  \\__/   \s
-                                        \nBy\s""" + ThunderUtility.getAuthors());
+                \n /$$$$$$$$ /$$                                 /$$                     /$$   /$$                     /$$     \s
+                |__  $$__/| $$                                | $$                    | $$  | $$                    | $$     \s
+                   | $$   | $$$$$$$  /$$   /$$ /$$$$$$$   /$$$$$$$  /$$$$$$   /$$$$$$ | $$  | $$  /$$$$$$   /$$$$$$$| $$   /$$
+                   | $$   | $$__  $$| $$  | $$| $$__  $$ /$$__  $$ /$$__  $$ /$$__  $$| $$$$$$$$ |____  $$ /$$_____/| $$  /$$/
+                   | $$   | $$  \\ $$| $$  | $$| $$  \\ $$| $$  | $$| $$$$$$$$| $$  \\__/| $$__  $$  /$$$$$$$| $$      | $$$$$$/\s
+                   | $$   | $$  | $$| $$  | $$| $$  | $$| $$  | $$| $$_____/| $$      | $$  | $$ /$$__  $$| $$      | $$_  $$\s
+                   | $$   | $$  | $$|  $$$$$$/| $$  | $$|  $$$$$$$|  $$$$$$$| $$      | $$  | $$|  $$$$$$$|  $$$$$$$| $$ \\  $$
+                   |__/   |__/  |__/ \\______/ |__/  |__/ \\_______/ \\_______/|__/      |__/  |__/ \\_______/ \\_______/|__/  \\__/   \s
+                   \n \t\t\t\t\t\tBy\s""" + ThunderUtility.getAuthors());
+
+        LogUtils.getLogger().info("[ThunderHack] Init time: " + (System.currentTimeMillis() - initTime) + " ms.");
+
+        initTime = System.currentTimeMillis();
     }
 
     public static void syncVersion() {
         try {
-            if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersion.txt").openStream())).readLine().equals(VERSION)) {
-                isOutdated = true;
-            }
+            if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersion.txt").openStream())).readLine().equals(VERSION)) isOutdated = true;
         } catch (Exception ignored) {
         }
     }
