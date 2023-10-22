@@ -120,6 +120,8 @@ public final class AutoTotem extends Module {
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
                     sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
 
+                    debug(slot + " " + nearest_slot);
+
                     sendPacket(new UpdateSelectedSlotC2SPacket(nearest_slot));
                     mc.player.getInventory().selectedSlot = nearest_slot;
 
@@ -142,6 +144,8 @@ public final class AutoTotem extends Module {
             } else {
                 sendPacket(new UpdateSelectedSlotC2SPacket(slot));
                 mc.player.getInventory().selectedSlot = slot;
+
+                debug(slot + " select");
 
                 sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
 

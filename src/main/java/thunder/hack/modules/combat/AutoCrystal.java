@@ -113,7 +113,7 @@ public class AutoCrystal extends Module {
 
     /*   Remove   */
     private final Setting<Remove> remove = new Setting<>("Remove", Remove.Fake, v -> page.getValue() == Pages.Remove);
-    private final Setting<Integer> removeDelay = new Setting<>("RemoveDelay", 10, 0, 200, v -> page.getValue() == Pages.Remove);
+    private final Setting<Integer> removeDelay = new Setting<>("RemoveDelay", 0, 0, 200, v -> page.getValue() == Pages.Remove);
 
     /*   RENDER   */
     private final Setting<Boolean> render = new Setting<>("Render", true, v -> page.getValue() == Pages.Render);
@@ -688,19 +688,13 @@ public class AutoCrystal extends Module {
     public boolean isSafe(float damage, float selfDamage, boolean overrideDamage) {
         if(mc.player == null || mc.world == null) return false;
 
-        double safetyIndex = 1;
-        if (selfDamage + 0.5 > mc.player.getHealth() + mc.player.getAbsorptionAmount() && !overrideDamage) {
-            safetyIndex = -9999;
-        } else if (safety.getValue() == Safety.STABLE) {
-            double efficiency = damage - selfDamage;
-            if (efficiency < 0 && Math.abs(efficiency) < 0.25)
-                efficiency = 0;
-            safetyIndex = efficiency;
-        } else if (safety.getValue() == Safety.BALANCE) {
-            double balance = damage * safetyBalance.getValue();
-            safetyIndex = balance - selfDamage;
-        }
-        return safetyIndex >= 0;
+        if(overrideDamage)
+            return true;
+
+        if (selfDamage + 0.5 > mc.player.getHealth() + mc.player.getAbsorptionAmount()) return false;
+        else if (safety.getValue() == Safety.STABLE) return damage - selfDamage > 0;
+        else if (safety.getValue() == Safety.BALANCE) return (damage * safetyBalance.getValue()) - selfDamage > 0;
+        return true;
     }
 
     private @Nullable BlockHitResult filterPositions(@NotNull List<PlaceData> clearedList) {
@@ -977,12 +971,12 @@ public class AutoCrystal extends Module {
     public void removeAttackedCrystals() {
         if (remove.getValue() == Remove.ON && !deadCrystals.isEmpty()) {
             Map<EndCrystalEntity, Long> cache = new HashMap<>(deadCrystals);
-            cache.forEach((crystal, time) -> {
+            cache.forEach((c, time) -> {
                 if (System.currentTimeMillis() - time >= removeDelay.getValue()) {
-                    crystal.kill();
-                    crystal.setRemoved(Entity.RemovalReason.KILLED);
-                    crystal.onRemoved();
-                    deadCrystals.remove(crystal);
+                    c.kill();
+                    c.setRemoved(Entity.RemovalReason.KILLED);
+                    c.onRemoved();
+                    deadCrystals.remove(c);
                 }
             });
         }
@@ -997,7 +991,6 @@ public class AutoCrystal extends Module {
             getCrystalToExplode();
         });
     }
-
 
     private record PlaceData(BlockHitResult bhr, float damage, float selfDamage, boolean overrideDamage) {
     }
