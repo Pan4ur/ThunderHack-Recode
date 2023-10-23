@@ -83,7 +83,6 @@ public class ClickGui extends Module {
 
     @EventHandler
     public void onSettingChange(SettingEvent e) {
-        sendMessage("ad");
         if(e.getSetting() == mode) {
              setGui();
         }
