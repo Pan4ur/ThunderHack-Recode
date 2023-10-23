@@ -166,11 +166,13 @@ public final class AutoTotem extends Module {
     }
 
     public int getItemSlot() {
+        SearchInvResult gapple = InventoryUtility.findItemInInventory(Items.ENCHANTED_GOLDEN_APPLE);
+        SearchInvResult crapple = InventoryUtility.findItemInInventory(Items.GOLDEN_APPLE);
+        SearchInvResult shield = InventoryUtility.findItemInInventory(Items.SHIELD);
+
         int itemSlot = -1;
-        int gappleSlot = InventoryUtility.getItemSlot(Items.ENCHANTED_GOLDEN_APPLE);
-        int crappleSlot = InventoryUtility.getItemSlot(Items.GOLDEN_APPLE);
-        int shieldSlot = InventoryUtility.getItemSlot(Items.SHIELD);
         Item item = null;
+
         if (offhand.getValue() == OffHand.Totem) {
             if (!mc.player.getOffHandStack().getName().toString().toLowerCase().contains("руна") && !mc.player.getOffHandStack().getName().toString().toLowerCase().contains("шар")) {
                 item = Items.TOTEM_OF_UNDYING;
@@ -178,34 +180,34 @@ public final class AutoTotem extends Module {
         } else if (offhand.getValue() == OffHand.Crystal) {
             item = Items.END_CRYSTAL;
         } else if (offhand.getValue() == OffHand.GApple) {
-            if (crapple.getValue()) {
+            if (this.crapple.getValue()) {
                 if (mc.player.hasStatusEffect(StatusEffects.ABSORPTION)) {
-                    if (crappleSlot != -1) item = Items.GOLDEN_APPLE;
-                    else if (gappleSlot != -1) item = Items.ENCHANTED_GOLDEN_APPLE;
-                } else if (gappleSlot != -1) item = Items.ENCHANTED_GOLDEN_APPLE;
+                    if (crapple.found()) item = Items.GOLDEN_APPLE;
+                    else if (gapple.found()) item = Items.ENCHANTED_GOLDEN_APPLE;
+                } else if (gapple.found()) item = Items.ENCHANTED_GOLDEN_APPLE;
             } else {
-                if (gappleSlot != -1) item = Items.ENCHANTED_GOLDEN_APPLE;
-                else if (crappleSlot != -1) item = Items.GOLDEN_APPLE;
+                if (gapple.found()) item = Items.ENCHANTED_GOLDEN_APPLE;
+                else if (crapple.found()) item = Items.GOLDEN_APPLE;
             }
-        } else { //if else if else
-            if (shieldSlot != -1) {
+        } else {
+            if (shield.found()) {
                 if (mc.player.getHealth() + mc.player.getAbsorptionAmount() <= healthS.getValue()) {
-                    if (gappleSlot != -1) item = Items.ENCHANTED_GOLDEN_APPLE;
-                    else if (crappleSlot != -1) item = Items.GOLDEN_APPLE;
+                    if (gapple.found()) item = Items.ENCHANTED_GOLDEN_APPLE;
+                    else if (crapple.found()) item = Items.GOLDEN_APPLE;
                 } else {
                     if (!mc.player.getItemCooldownManager().isCoolingDown(Items.SHIELD))
                         item = Items.SHIELD;
                     else {
-                        if (gappleSlot != -1) item = Items.ENCHANTED_GOLDEN_APPLE;
-                        else if (crappleSlot != -1) item = Items.GOLDEN_APPLE;
+                        if (gapple.found()) item = Items.ENCHANTED_GOLDEN_APPLE;
+                        else if (crapple.found()) item = Items.GOLDEN_APPLE;
                     }
                 }
-            } else if (crappleSlot != -1) item = Items.GOLDEN_APPLE;
+            } else if (crapple.found()) item = Items.GOLDEN_APPLE;
         }
 
         if (rcGap.getValue() && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed()) {
-            if (crappleSlot != -1) item = Items.GOLDEN_APPLE;
-            if (gappleSlot != -1) item = Items.ENCHANTED_GOLDEN_APPLE;
+            if (crapple.found()) item = Items.GOLDEN_APPLE;
+            if (gapple.found()) item = Items.ENCHANTED_GOLDEN_APPLE;
         }
 
         if (onFall.getValue() && (mc.player.getHealth() + mc.player.getAbsorptionAmount()) - (((mc.player.fallDistance - 3) / 2F) + 3.5F) < 0.5)
@@ -257,7 +259,7 @@ public final class AutoTotem extends Module {
             }
         }
 
-        if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) <= healthF.getValue() && InventoryUtility.getItemSlot(Items.TOTEM_OF_UNDYING) != -1)
+        if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) <= healthF.getValue() && InventoryUtility.findItemInInventory(Items.TOTEM_OF_UNDYING).found())
             item = Items.TOTEM_OF_UNDYING;
 
         for (int i = 9; i < 45; i++) {

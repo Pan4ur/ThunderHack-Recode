@@ -123,7 +123,7 @@ public final class AutoBed extends Module {
     @EventHandler
     public void onPostSync(EventPostSync e) {
         if (!(mc.player.getMainHandStack().getItem() instanceof BedItem) && autoSwap.getValue()) {
-            SearchInvResult hotBarResult = InventoryUtility.findBedInHotbar();
+            SearchInvResult hotBarResult = InventoryUtility.findBedInHotBar();
             if (hotBarResult.found()) {
                 hotBarResult.switchTo();
             } else if (switchToHotbar.getValue()) {

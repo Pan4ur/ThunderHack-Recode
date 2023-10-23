@@ -251,21 +251,6 @@ public final class InventoryUtility {
         return slot;
     }
 
-    @Deprecated
-    public static int getItemSlot(Item input) {
-        if (input == mc.player.getOffHandStack().getItem()) return 999;
-        for (int i = 36; i >= 0; i--) {
-            final Item item = mc.player.getInventory().getStack(i).getItem();
-            if (item == input) {
-                if (i < 9) {
-                    i += 36;
-                }
-                return i;
-            }
-        }
-        return -1;
-    }
-
     public static SearchInvResult findInHotBar(Searcher searcher) {
         if (mc.player != null) {
             for (int i = 0; i < 9; ++i) {
@@ -381,19 +366,13 @@ public final class InventoryUtility {
             baseDamage += 3 * strength;
         }
 
-        // Reduce by resistance
-        // baseDamage = resistanceReduction(target, damage);
-
         // Reduce by armour
         baseDamage = DamageUtil.getDamageLeft(baseDamage, ent.getArmor(), (float) ent.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
-
-        // Reduce by enchants
-        // damage = normalProtReduction(target, damage);
 
         return baseDamage;
     }
 
-    public static SearchInvResult findBedInHotbar() {
+    public static SearchInvResult findBedInHotBar() {
         if (mc.player == null) return SearchInvResult.notFound();
         for (int b1 = 0; b1 < 9; b1++) {
             ItemStack itemStack = mc.player.getInventory().getStack(b1);

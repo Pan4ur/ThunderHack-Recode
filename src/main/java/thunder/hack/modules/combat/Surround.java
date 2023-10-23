@@ -115,7 +115,7 @@ public final class Surround extends Module {
 
     @Override
     public void onUpdate() {
-        if ((mc.player.isDead() || mc.player.getHealth() + mc.player.getAbsorptionAmount() <= 0) && onDeath.getValue())
+        if ((mc.player.isDead() || !mc.player.isAlive() || mc.player.getHealth() + mc.player.getAbsorptionAmount() <= 0) && onDeath.getValue())
             disable(isRu() ? "Выключен из-за смерти." : "Disable because you died.");
     }
 

@@ -237,6 +237,9 @@ public class AutoCrystal extends Module {
             if (confirmInfo.getValue()) info.append("c: ").append(confirmTime).append(" | ");
             if (calcInfo.getValue()) info.append("calc: ").append(calcTime).append(" | ");
         }
+        if (info.toString().isBlank())
+            return null;
+
         return info.length() < 4 ? info.toString() : info.substring(0, info.length() - 3);
     }
 

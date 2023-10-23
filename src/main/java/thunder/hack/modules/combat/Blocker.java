@@ -51,6 +51,7 @@ public final class Blocker extends Module {
     private final Setting<Boolean> antiCiv = new Setting<>("Anti Civ", true).withParent(logic);
     private final Setting<Boolean> expand = new Setting<>("Expand", true).withParent(logic);
     private final Setting<Boolean> antiTntAura = new Setting<>("Anti TNT", false).withParent(logic);
+    private final Setting<Boolean> antiAutoAnchor = new Setting<>("Anti Anchor", false).withParent(logic);
 
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
@@ -158,7 +159,7 @@ public final class Blocker extends Module {
             BlockBreakingProgressS2CPacket packet = e.getPacket();
             BlockPos pos = packet.getPos();
 
-            if (antiCev.getValue() && pos.equals(playerPos.up(2)))
+            if (antiCev.getValue() && playerPos.up(2).equals(pos))
                 placePositions.add(playerPos.up(3));
 
             if (HoleUtility.getSurroundPoses(playerPos).contains(pos)) {
@@ -178,7 +179,7 @@ public final class Blocker extends Module {
 
             if (antiCiv.getValue()) {
                 for (BlockPos checkPos : HoleUtility.getSurroundPoses(playerPos)) {
-                    if (pos.equals(checkPos.up()))
+                    if (checkPos.up().equals(pos))
                         placePositions.add(playerPos.add(checkPos.up(2)));
                 }
             }
@@ -188,7 +189,14 @@ public final class Blocker extends Module {
     @EventHandler
     @SuppressWarnings("unused")
     private void onPlaceBlock(@NotNull EventPlaceBlock event) {
-        if (event.getBlockPos().equals(mc.player.getBlockPos().up(2)) && antiTntAura.getValue()) {
+        if (event.getBlockPos().equals(mc.player.getBlockPos().up(2))
+                && event.getBlock().equals(Blocks.TNT)
+                && antiTntAura.getValue()) {
+            placePositions.add(event.getBlockPos());
+        }
+        if (event.getBlockPos().equals(mc.player.getBlockPos().up(2))
+                && event.getBlock().equals(Blocks.RESPAWN_ANCHOR)
+                && antiAutoAnchor.getValue()) {
             placePositions.add(event.getBlockPos());
         }
     }

@@ -105,11 +105,11 @@ public class ElytraSwap extends Module {
                 disable(isRu() ? "У тебя нет нагрудника!" : "You don't have a chestplate!");
                 return;
             }
-        } else if (InventoryUtility.getItemSlot(Items.ELYTRA) != -1) {
-            int slot = InventoryUtility.getItemSlot(Items.ELYTRA);
-            clickSlot(slot);
+        } else if (InventoryUtility.findItemInInventory(Items.ELYTRA).found()) {
+            SearchInvResult result = InventoryUtility.findItemInInventory(Items.ELYTRA);
+            clickSlot(result.slot());
             clickSlot(6);
-            clickSlot(slot);
+            clickSlot(result.slot());
             sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
         } else {
             disable(isRu() ? "У тебя нет элитры!" : "You don't have an elytra!");

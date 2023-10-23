@@ -10,6 +10,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CommandManager;
 import thunder.hack.core.impl.ModuleManager;
@@ -35,7 +36,7 @@ public abstract class Module {
     private final Category category;
     private final String displayName;
 
-    public static MinecraftClient mc = MinecraftClient.getInstance();
+    public static final MinecraftClient mc = MinecraftClient.getInstance();
 
     public Module(@NotNull String name, @NotNull Category category) {
         this.displayName = name;
@@ -99,7 +100,7 @@ public abstract class Module {
     }
 
     public void enable() {
-        this.enabled.setValue(true);
+        enabled.setValue(true);
 
         if (!fullNullCheck()) onEnable();
         if (isOn()) ThunderHack.EVENT_BUS.subscribe(this);
@@ -131,7 +132,7 @@ public abstract class Module {
         if (fullNullCheck()) return;
         onDisable();
 
-        LogUtils.getLogger().info("[ThunderHack] disabled " + this.getName());
+        LogUtils.getLogger().info("[ThunderHack] disabled " + getName());
 
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
             ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль выключен!" : "Was Disabled!", 2, Notification.Type.DISABLED);
@@ -258,7 +259,7 @@ public abstract class Module {
         mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] [\uD83D\uDD27] " + message));
     }
 
-    public Setting<?> getSettingByName(String name) {
+    public @Nullable Setting<?> getSettingByName(String name) {
         for (Setting<?> setting : getSettings()) {
             if (!setting.getName().equalsIgnoreCase(name)) continue;
             return setting;
