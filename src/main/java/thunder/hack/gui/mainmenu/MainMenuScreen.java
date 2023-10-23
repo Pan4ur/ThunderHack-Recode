@@ -13,7 +13,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.gui.clickui.ClickUI;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.ThunderUtility;
@@ -42,7 +42,7 @@ public class MainMenuScreen extends Screen {
         buttons.add(new MainMenuButton(-110, -29, I18n.translate("menu.options")
                 .toUpperCase(Locale.ROOT)
                 .replace(".", ""), () -> mc.setScreen(new OptionsScreen(this, mc.options))));
-        buttons.add(new MainMenuButton(4, -29, "CLICKGUI", () -> mc.setScreen(ClickUI.getClickGui())));
+        buttons.add(new MainMenuButton(4, -29, "CLICKGUI", () -> ModuleManager.clickGui.setGui()));
         buttons.add(new MainMenuButton(-110, 12, I18n.translate("menu.quit").toUpperCase(Locale.ROOT), () -> mc.scheduleStop(), true));
     }
 

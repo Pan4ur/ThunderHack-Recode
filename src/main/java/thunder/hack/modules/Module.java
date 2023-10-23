@@ -273,7 +273,7 @@ public abstract class Module {
         RENDER("Render"),
         MOVEMENT("Movement"),
         PLAYER("Player"),
-        CLIENT("ThunderHack"),
+        CLIENT("Client"),
         HUD("HUD");
 
         private final String name;

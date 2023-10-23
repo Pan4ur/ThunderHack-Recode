@@ -1,4 +1,4 @@
-package thunder.hack.gui.clickui;
+package thunder.hack.gui.clickui.normal;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.DrawContext;
@@ -10,6 +10,7 @@ import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ConfigManager;
 import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.gui.clickui.AbstractWindow;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;

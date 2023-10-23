@@ -11,7 +11,8 @@ import thunder.hack.core.IManager;
 import thunder.hack.events.impl.EventPostTick;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.EventTick;
-import thunder.hack.gui.clickui.ClickUI;
+import thunder.hack.gui.clickui.normal.ClickUI;
+import thunder.hack.gui.clickui.small.SmallClickUI;
 import thunder.hack.gui.mainmenu.MainMenuScreen;
 import thunder.hack.modules.Module;
 import thunder.hack.utility.Timer;
@@ -71,7 +72,7 @@ public class AsyncManager implements IManager {
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 if(updateTimer.passedMs(16)) {
-                    if (mc != null && (mc.currentScreen instanceof MainMenuScreen || mc.currentScreen instanceof ClickUI)) {
+                    if (mc != null && (mc.currentScreen instanceof MainMenuScreen || mc.currentScreen instanceof ClickUI || mc.currentScreen instanceof SmallClickUI)) {
                         MainMenuProgram.increaseTime();
                     }
                     updateTimer.reset();

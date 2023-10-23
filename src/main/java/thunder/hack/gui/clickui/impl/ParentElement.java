@@ -4,18 +4,16 @@ import net.minecraft.client.gui.DrawContext;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.Animation;
 import thunder.hack.utility.render.animation.DecelerateAnimation;
 import thunder.hack.utility.render.animation.Direction;
 import thunder.hack.setting.Setting;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 
 import java.awt.*;
 
-import static thunder.hack.gui.clickui.ClickUI.arrow;
+import static thunder.hack.gui.clickui.normal.ClickUI.arrow;
 
 public class ParentElement extends AbstractElement {
     private final Setting<Parent> parentSetting;

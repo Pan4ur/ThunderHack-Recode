@@ -2,6 +2,8 @@ package thunder.hack.setting;
 
 
 import com.google.gson.JsonPrimitive;
+import thunder.hack.ThunderHack;
+import thunder.hack.events.impl.SettingEvent;
 import thunder.hack.setting.impl.*;
 
 import java.util.function.Predicate;
@@ -86,6 +88,7 @@ public class Setting<T> {
             }
         }
         this.value = this.plannedValue;
+        ThunderHack.EVENT_BUS.post(new SettingEvent(this));
     }
 
     public float getPow2Value() {
@@ -141,11 +144,13 @@ public class Setting<T> {
     public void increaseEnum() {
         this.plannedValue = (T) EnumConverter.increaseEnum((Enum) this.value);
         this.value = this.plannedValue;
+        ThunderHack.EVENT_BUS.post(new SettingEvent(this));
     }
 
     public void setEnumByNumber(int id) {
         this.plannedValue = (T) EnumConverter.setEnumInt((Enum) this.value, id);
         this.value = this.plannedValue;
+        ThunderHack.EVENT_BUS.post(new SettingEvent(this));
     }
 
     public String getType() {

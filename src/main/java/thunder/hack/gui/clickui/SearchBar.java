@@ -3,6 +3,7 @@ package thunder.hack.gui.clickui;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.ClickGui;
@@ -23,10 +24,12 @@ public class SearchBar extends AbstractButton {
 
         boolean isHovered = Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height);
 
+        float sc = ModuleManager.clickGui.mode.getValue() == ClickGui.Mode.Small ? 5f : 7f;
+
         Render2DEngine.drawRoundDoubleColor(context.getMatrices(), x + 4, y + 1f, width - 8, height - 2, 3f, ClickGui.getInstance().getColor(200), ClickGui.getInstance().getColor(0));
         Render2DEngine.drawRound(context.getMatrices(), (float) (x + 4.5f), (float) (y + 1.5f), (float) (width - 9), (float) (height - 3), 3f, Render2DEngine.injectAlpha(ClickGui.getInstance().plateColor.getValue().getColorObject(), isHovered ? 220 : 255));
-        if (!listening) FontRenderers.sf_medium.drawGradientString(context.getMatrices(), "Search...", (float) (x + 7f), (float) (y + 7f), 2, false);
-        else FontRenderers.sf_medium.drawGradientString(context.getMatrices(), moduleName + (mc.player == null || ((mc.player.age / 10) % 2 == 0) ? " " : "_"), (float) (x + 7f), (float) (y + 7f), 2, false);
+        if (!listening) FontRenderers.sf_medium.drawGradientString(context.getMatrices(), "Search...", (float) (x + 7f), (float) (y + sc), 2, false);
+        else FontRenderers.sf_medium.drawGradientString(context.getMatrices(), moduleName + (mc.player == null || ((mc.player.age / 10) % 2 == 0) ? " " : "_"), (float) (x + 7f), (float) (y + sc), 2, false);
     }
 
     @Override

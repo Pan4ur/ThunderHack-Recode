@@ -1,4 +1,4 @@
-package thunder.hack.gui.clickui;
+package thunder.hack.gui.clickui.normal;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.resource.language.I18n;
@@ -7,6 +7,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.cmd.Command;
+import thunder.hack.gui.clickui.AbstractButton;
+import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.clickui.impl.*;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.TargetHud;

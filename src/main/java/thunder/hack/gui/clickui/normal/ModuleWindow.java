@@ -1,8 +1,12 @@
-package thunder.hack.gui.clickui;
+package thunder.hack.gui.clickui.normal;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.gui.clickui.AbstractButton;
+import thunder.hack.gui.clickui.AbstractElement;
+import thunder.hack.gui.clickui.AbstractWindow;
+import thunder.hack.gui.clickui.SearchBar;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
@@ -56,7 +60,6 @@ public class ModuleWindow extends AbstractWindow {
         context.getMatrices().push();
 
         boolean popStack = false;
-        //RoundedShader.drawRoundDoubleColor(matrixStack,(float) x + 2, (float) (y + height - 8), (float) width - 4, (float) ((getButtonsHeight() + 11) * animation.getOutput()), 3, ClickGui.getInstance().getColor(200),ClickGui.getInstance().getColor(0));
 
         float height1;
         if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old || (getButtonsHeight() + 8) < ModuleManager.clickGui.catHeight.getValue()) {
@@ -66,11 +69,11 @@ public class ModuleWindow extends AbstractWindow {
         }
 
         if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old || (getButtonsHeight() + 8) < ModuleManager.clickGui.catHeight.getValue()) {
-            if(ModuleManager.clickGui.outline.getValue())
+            if (ModuleManager.clickGui.outline.getValue())
                 Render2DEngine.drawRound(context.getMatrices(), (float) x + 2, (float) (y + height - 7), (float) width - 4, height1 + 2, 3, ClickGui.getInstance().getColor(1));
             Render2DEngine.drawRound(context.getMatrices(), (float) x + 3, (float) (y + height - 6), (float) width - 6, height1, 3, ClickGui.getInstance().plateColor.getValue().getColorObject());
         } else {
-            if(ModuleManager.clickGui.outline.getValue())
+            if (ModuleManager.clickGui.outline.getValue())
                 Render2DEngine.drawRound(context.getMatrices(), (float) x + 2, (float) (y + height - 7), (float) width - 4, height1 + 2, 3, ClickGui.getInstance().getColor(1));
             Render2DEngine.drawRound(context.getMatrices(), (float) x + 3, (float) (y + height - 6), (float) width - 6, height1, 3, ClickGui.getInstance().plateColor.getValue().getColorObject());
             Render2DEngine.addWindow(context.getMatrices(), (float) x + 3, (float) (y + height - 6), (float) (x + 3 + (float) width - 6), (float) ((y + height - 6) + (float) ((ModuleManager.clickGui.catHeight.getValue()) * animation.getOutput())), 1f);
@@ -82,28 +85,13 @@ public class ModuleWindow extends AbstractWindow {
             for (AbstractButton button : buttons) {
                 if (button instanceof ModuleButton mb && SearchBar.listening && !mb.module.getName().toLowerCase().contains(SearchBar.moduleName))
                     continue;
-                /*
-                if (button.getY() + button.getHeight() > y && button.getY() - button.getHeight() < height1) {
-                    button.setHiden(false);
+
+                if (popStack && buttons.get(0).getY() + moduleOffset < y + height) {
+                    button.setY(y + height + moduleOffset);
                 } else {
-                    button.setHiden(true);
+                    button.setY(y + height);
+                    moduleOffset = 0f;
                 }
-                 */
-
-                AbstractButton lastElement = buttons.get(buttons.size() - 1);
-
-                if (popStack && lastElement.getY() + lastElement.getHeight() + moduleOffset < height1) {
-                    //button.setY(y);
-                } //else {
-
-                    if (popStack && buttons.get(0).getY() + moduleOffset < y + height) {
-                        button.setY(y + height + moduleOffset);
-                    } else {
-                        button.setY(y + height);
-                        moduleOffset = 0f;
-                    }
-               // }
-
 
                 button.setX(x + 2);
                 button.setWidth(width - 4);

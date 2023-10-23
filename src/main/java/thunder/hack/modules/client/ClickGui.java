@@ -1,6 +1,9 @@
 package thunder.hack.modules.client;
 
-import thunder.hack.gui.clickui.ClickUI;
+import meteordevelopment.orbit.EventHandler;
+import thunder.hack.events.impl.SettingEvent;
+import thunder.hack.gui.clickui.normal.ClickUI;
+import thunder.hack.gui.clickui.small.SmallClickUI;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
@@ -10,6 +13,8 @@ import java.awt.*;
 
 public class ClickGui extends Module {
     private static ClickGui INSTANCE = new ClickGui();
+
+    public Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
 
     public Setting<scrollModeEn> scrollMode = new Setting<>("ScrollMode", scrollModeEn.Old);
     public Setting<Integer> catHeight = new Setting<>("CategoryHeight", 300, 100, 720);
@@ -64,16 +69,29 @@ public class ClickGui extends Module {
 
     @Override
     public void onEnable() {
-        mc.setScreen(ClickUI.getClickGui());
+        setGui();
+    }
+
+    public void setGui() {
+        if(mode.getValue() == Mode.Default) mc.setScreen(ClickUI.getClickGui());
+        else mc.setScreen(SmallClickUI.getClickGui());
     }
 
     private void setInstance() {
         INSTANCE = this;
     }
 
+    @EventHandler
+    public void onSettingChange(SettingEvent e) {
+        sendMessage("ad");
+        if(e.getSetting() == mode) {
+             setGui();
+        }
+    }
+
     @Override
     public void onUpdate() {
-        if (!(ClickGui.mc.currentScreen instanceof ClickUI)) disable();
+        if (!(ClickGui.mc.currentScreen instanceof ClickUI) && !(ClickGui.mc.currentScreen instanceof SmallClickUI)) disable();
     }
 
     public enum colorModeEn {
@@ -89,6 +107,11 @@ public class ClickGui extends Module {
     public enum scrollModeEn {
         New,
         Old
+    }
+
+    public enum Mode {
+        Default,
+        Small
     }
 }
 

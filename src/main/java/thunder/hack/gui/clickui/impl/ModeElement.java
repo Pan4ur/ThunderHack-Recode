@@ -2,7 +2,6 @@ package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
@@ -15,7 +14,7 @@ import thunder.hack.utility.render.animation.Direction;
 
 import java.awt.*;
 
-import static thunder.hack.gui.clickui.ClickUI.arrow;
+import static thunder.hack.gui.clickui.normal.ClickUI.arrow;
 
 public class ModeElement extends AbstractElement {
     public Setting setting2;

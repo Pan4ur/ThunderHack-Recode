@@ -4,7 +4,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.IManager;
-import thunder.hack.gui.clickui.ClickUI;
+import thunder.hack.gui.clickui.normal.ClickUI;
+import thunder.hack.gui.clickui.small.SmallClickUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.*;
 import thunder.hack.modules.Module;
@@ -19,8 +20,6 @@ import thunder.hack.modules.render.*;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static thunder.hack.modules.Module.mc;
 
 @SuppressWarnings("unused")
 public class ModuleManager implements IManager {
@@ -209,7 +208,7 @@ public class ModuleManager implements IManager {
         modules.add(new Quiver());
         modules.add(new FastLatency());
 
-        if(!ThunderHack.isOnLinux())
+        if (!ThunderHack.isOnLinux())
             modules.add(new RPC());
 
         for (Field field : getClass().getDeclaredFields()) {
@@ -261,7 +260,7 @@ public class ModuleManager implements IManager {
 
         if (ConfigManager.firstLaunch) {
             ModuleManager.notifications.enable();
-            if(!ThunderHack.isOnLinux())
+            if (!ThunderHack.isOnLinux())
                 RPC.getInstance().enable();
         }
     }
@@ -316,7 +315,7 @@ public class ModuleManager implements IManager {
     }
 
     public void onKeyPressed(int eventKey) {
-        if (eventKey == -1 || eventKey == 0 || mc.currentScreen instanceof ClickUI) {
+        if (eventKey == -1 || eventKey == 0 || mc.currentScreen instanceof ClickUI || mc.currentScreen instanceof SmallClickUI) {
             return;
         }
         modules.forEach(module -> {
@@ -327,7 +326,7 @@ public class ModuleManager implements IManager {
     }
 
     public void onKeyReleased(int eventKey) {
-        if (eventKey == -1 || eventKey == 0 || mc.currentScreen instanceof ClickUI)
+        if (eventKey == -1 || eventKey == 0 || mc.currentScreen instanceof ClickUI || mc.currentScreen instanceof SmallClickUI)
             return;
 
         modules.forEach(module -> {
@@ -337,7 +336,7 @@ public class ModuleManager implements IManager {
     }
 
     public void onMoseKeyPressed(int eventKey) {
-        if (eventKey == -1 || mc.currentScreen instanceof ClickUI) {
+        if (eventKey == -1 || mc.currentScreen instanceof ClickUI || mc.currentScreen instanceof SmallClickUI) {
             return;
         }
         modules.forEach(module -> {
@@ -348,7 +347,7 @@ public class ModuleManager implements IManager {
     }
 
     public void onMoseKeyReleased(int eventKey) {
-        if (eventKey == -1 || mc.currentScreen instanceof ClickUI)
+        if (eventKey == -1 || mc.currentScreen instanceof ClickUI || mc.currentScreen instanceof SmallClickUI)
             return;
 
         modules.forEach(module -> {

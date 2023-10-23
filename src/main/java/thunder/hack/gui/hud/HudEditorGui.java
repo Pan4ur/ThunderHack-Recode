@@ -8,7 +8,7 @@ import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.AbstractWindow;
-import thunder.hack.gui.clickui.ModuleWindow;
+import thunder.hack.gui.clickui.normal.ModuleWindow;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.render.MSAAFramebuffer;
@@ -16,6 +16,7 @@ import thunder.hack.utility.render.animation.Animation;
 import thunder.hack.utility.render.animation.DecelerateAnimation;
 import thunder.hack.utility.render.animation.Direction;
 import thunder.hack.utility.render.animation.EaseBackIn;
+
 
 import java.util.List;
 
@@ -64,10 +65,9 @@ public class HudEditorGui extends Screen {
             double offset = 0;
             int windowHeight = 18;
 
-            int i = 0;
             for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
                 if (!category.getName().contains("HUD")) continue;
-                ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category), i, x + offset, y, 108, windowHeight);
+                ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category),0, x + offset, y, 108, windowHeight);
                 window.setOpen(true);
                 windows.add(window);
                 offset += 110;
@@ -75,7 +75,6 @@ public class HudEditorGui extends Screen {
                 if (offset > mc.getWindow().getScaledWidth()) {
                     offset = 0;
                 }
-                i++;
             }
             firstOpen = false;
         }

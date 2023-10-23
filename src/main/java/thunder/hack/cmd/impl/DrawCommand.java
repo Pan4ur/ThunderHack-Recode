@@ -6,7 +6,6 @@ import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.ModuleArgumentType;
-import thunder.hack.gui.clickui.ClickUI;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
 
@@ -21,9 +20,6 @@ public class DrawCommand extends Command {
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(arg("module", ModuleArgumentType.create()).executes(context -> {
             Module module = context.getArgument("module", Module.class);
-
-            if (module.getDisplayName().toLowerCase().contains("click"))
-                mc.currentScreen = ClickUI.getClickGui();
 
             module.setDrawn(!module.isDrawn());
 

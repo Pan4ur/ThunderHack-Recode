@@ -2,14 +2,12 @@ package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
-import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -19,7 +17,7 @@ import thunder.hack.utility.render.animation.Direction;
 
 import java.awt.*;
 
-import static thunder.hack.gui.clickui.ClickUI.arrow;
+import static thunder.hack.gui.clickui.normal.ClickUI.arrow;
 
 public class BooleanParentElement extends AbstractElement {
     private final Setting<BooleanParent> parentSetting;

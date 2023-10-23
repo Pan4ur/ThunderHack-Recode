@@ -1,9 +1,9 @@
 package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
+import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.math.MathUtility;
-import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.FrameRateCounter;
