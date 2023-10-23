@@ -44,12 +44,11 @@ public class Spider extends Module {
         if (!mc.player.horizontalCollision) return;
 
         if (mode.getValue() == Mode.Default) {
-            mc.player.setVelocity(mc.player.getVelocity().offset(Direction.UP,0.2));
+            mc.player.setVelocity(mc.player.getVelocity().getX(), 0.21, mc.player.getVelocity().getZ());
         } else if (mode.getValue() == Mode.Matrix) {
-            if (mc.player.age % delay.getValue() == 0) mc.player.setOnGround(true);
-            else mc.player.setOnGround(false);
+            mc.player.setOnGround(mc.player.age % delay.getValue() == 0);
             mc.player.prevY -= 2.0E-232;
-            if (mc.player.isOnGround()) mc.player.setVelocity(mc.player.getVelocity().offset(Direction.UP,0.42));
+            if (mc.player.isOnGround()) mc.player.setVelocity(mc.player.getVelocity().getX(), 0.42, mc.player.getVelocity().getZ());
         }
     }
 
@@ -57,7 +56,7 @@ public class Spider extends Module {
     public void onSync(EventSync event) {
         if (mc.options.jumpKey.isPressed() && mc.player.getVelocity().getY() <= -0.3739040364667221 && mode.getValue() == Mode.MatrixNew) {
             mc.player.setOnGround(true);
-            mc.player.setVelocity(mc.player.getVelocity().offset(Direction.UP,0.481145141919180));
+            mc.player.setVelocity(mc.player.getVelocity().getX(), 0.481145141919180, mc.player.getVelocity().getZ());
         }
         if (mc.player.age % delay.getValue() == 0 && mc.player.horizontalCollision && MovementUtility.isMoving() && mode.getValue() == Mode.Blocks) {
             int find = -2;

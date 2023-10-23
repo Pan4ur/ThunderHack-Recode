@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
@@ -94,12 +95,12 @@ public class AutoCrystal extends Module {
     private final Setting<Integer> switchDelay = new Setting<>("SwitchDelay", 100, 0, 1000, v -> page.getValue() == Pages.Pause).withParent(switchPause);
 
     /*   DAMAGES   */
-    private final Setting<Sort> sort = new Setting<>("Sort", Sort.DAMAGE, v -> page.getValue() == Pages.Damages);
-    private final Setting<Float> minDamage = new Setting<>("MinDamage", 6.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
-    private final Setting<Float> maxSelfDamage = new Setting<>("MaxSelfDamage", 10.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
+    public final Setting<Sort> sort = new Setting<>("Sort", Sort.DAMAGE, v -> page.getValue() == Pages.Damages);
+    public final Setting<Float> minDamage = new Setting<>("MinDamage", 6.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
+    public final Setting<Float> maxSelfDamage = new Setting<>("MaxSelfDamage", 10.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
     private final Setting<Safety> safety = new Setting<>("Safety", Safety.NONE, v -> page.getValue() == Pages.Damages);
     private final Setting<Float> safetyBalance = new Setting<>("SafetyBalance", 1.1f, 0.1f, 3f, v -> page.getValue() == Pages.Damages && safety.getValue() == Safety.BALANCE);
-    private final Setting<Boolean> protectFriends = new Setting<>("ProtectFriends", true, v -> page.getValue() == Pages.Damages);
+    public final Setting<Boolean> protectFriends = new Setting<>("ProtectFriends", true, v -> page.getValue() == Pages.Damages);
     private final Setting<Boolean> overrideSelfDamage = new Setting<>("OverrideSelfDamage", true, v -> page.getValue() == Pages.Damages);
     private final Setting<Float> lethalMultiplier = new Setting<>("LethalMultiplier", 1.0f, 0.0f, 5f, v -> page.getValue() == Pages.Damages);
     private final Setting<BooleanParent> armorBreaker = new Setting<>("ArmorBreaker", new BooleanParent(true), v -> page.getValue() == Pages.Damages);
@@ -147,7 +148,7 @@ public class AutoCrystal extends Module {
 
     private final Map<EndCrystalEntity, Long> deadCrystals = new HashMap<>();
 
-    private float renderDamage, renderSelfDamage;
+    public float renderDamage, renderSelfDamage;
 
     private int prevCrystalsAmount, crystalSpeed, invTimer;
 
@@ -237,9 +238,6 @@ public class AutoCrystal extends Module {
             if (confirmInfo.getValue()) info.append("c: ").append(confirmTime).append(" | ");
             if (calcInfo.getValue()) info.append("calc: ").append(calcTime).append(" | ");
         }
-        if (info.toString().isBlank())
-            return null;
-
         return info.length() < 4 ? info.toString() : info.substring(0, info.length() - 3);
     }
 
@@ -726,7 +724,7 @@ public class AutoCrystal extends Module {
         return bestData.bhr;
     }
 
-    private boolean shouldOverride(float damage) {
+    public boolean shouldOverride(float damage) {
         if (target == null) return false;
 
         boolean override = target.getHealth() + target.getAbsorptionAmount() <= facePlaceHp.getValue();
@@ -772,7 +770,7 @@ public class AutoCrystal extends Module {
         return bestData.crystal;
     }
 
-    private @Nullable PlaceData getPlaceData(BlockPos bp, PlayerEntity target) {
+    public @Nullable PlaceData getPlaceData(BlockPos bp, PlayerEntity target) {
         if(mc.player == null || mc.world == null) return null;
 
 
@@ -808,20 +806,23 @@ public class AutoCrystal extends Module {
         if (damage < 1.5f) return null;
         if (selfDamage > maxSelfDamage.getValue() && !overrideDamage) return null;
 
-        BlockHitResult interactResult = null;
-
-        switch (interact.getValue()) {
-            case Default -> interactResult = getDefaultInteract(crystalVec, bp);
-            case Strict -> interactResult = getStrictInteract(bp);
-            case Legit -> interactResult = getLegitInteract(bp);
-        }
-
+        BlockHitResult interactResult = getInteractResult(bp, crystalVec);
         if (interactResult == null) return null;
 
         return new PlaceData(interactResult, damage, selfDamage, overrideDamage);
     }
 
-    private boolean checkEntities(@NotNull BlockPos base) {
+    public BlockHitResult getInteractResult(BlockPos bp, Vec3d crystalVec){
+        BlockHitResult interactResult = null;
+        switch (interact.getValue()) {
+            case Default -> interactResult = getDefaultInteract(crystalVec, bp);
+            case Strict -> interactResult = getStrictInteract(bp);
+            case Legit -> interactResult = getLegitInteract(bp);
+        }
+        return interactResult;
+    }
+
+    public boolean checkEntities(@NotNull BlockPos base) {
         if(mc.player == null || mc.world == null) return false;
 
 
@@ -996,7 +997,7 @@ public class AutoCrystal extends Module {
         });
     }
 
-    private record PlaceData(BlockHitResult bhr, float damage, float selfDamage, boolean overrideDamage) {
+    public record PlaceData(BlockHitResult bhr, float damage, float selfDamage, boolean overrideDamage) {
     }
 
     private record CrystalData(EndCrystalEntity crystal, float damage, float selfDamage, boolean overrideDamage) {

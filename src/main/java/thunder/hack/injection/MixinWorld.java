@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import thunder.hack.modules.combat.AutoCrystal;
+import thunder.hack.modules.combat.AutoCrystalBase;
 import thunder.hack.utility.math.ExplosionUtility;
 
 import static thunder.hack.modules.Module.mc;
@@ -17,15 +19,16 @@ import static thunder.hack.modules.Module.mc;
 public abstract class MixinWorld {
     @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)
     public void blockStateHook(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
+        if ((ExplosionUtility.anchorIgnore != null && ExplosionUtility.anchorIgnore == pos)) {
+            cir.setReturnValue(Blocks.AIR.getDefaultState());
+            return;
+        }
+
         if (ExplosionUtility.terrainIgnore && mc.world != null && !mc.world.isInBuildLimit(pos)) {
             WorldChunk worldChunk = mc.world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
 
             BlockState tempState = worldChunk.getBlockState(pos);
 
-            if ((ExplosionUtility.anchorIgnore != null && ExplosionUtility.anchorIgnore == pos)) {
-                cir.setReturnValue(Blocks.AIR.getDefaultState());
-                return;
-            }
             if (tempState.getBlock() == Blocks.OBSIDIAN
                     || tempState.getBlock() == Blocks.BEDROCK
                     || tempState.getBlock() == Blocks.ENDER_CHEST

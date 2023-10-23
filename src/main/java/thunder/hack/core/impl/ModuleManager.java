@@ -33,6 +33,7 @@ public class ModuleManager implements IManager {
     public static TotemPopCounter totemPopCounter = new TotemPopCounter();
     public static HotbarReplenish hotbarReplenish = new HotbarReplenish();
     public static DurabilityAlert durabilityAlert = new DurabilityAlert();
+    public static AutoCrystalBase autoCrystalBase = new AutoCrystalBase();
     public static TimerIndicator timerIndicator = new TimerIndicator();
     public static ThunderHackGui thunderHackGui = new ThunderHackGui();
     public static NoServerRotate noServerRotate = new NoServerRotate();

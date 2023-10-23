@@ -149,6 +149,10 @@ public final class InteractionUtility {
             return null;
         }
 
+        if(interact == Interact.AirPlace) {
+            return ExplosionUtility.rayCastBlock(new RaycastContext(InteractionUtility.getEyesPos(mc.player), bp.toCenterPos(), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player), bp);
+        }
+
         ArrayList<BlockPosWithFacing> supports = getSupportBlocks(bp);
         for (BlockPosWithFacing support : supports) {
             if (interact != Interact.Vanilla) {
@@ -363,6 +367,7 @@ public final class InteractionUtility {
     public enum Interact {
         Vanilla,
         Strict,
-        Legit
+        Legit,
+        AirPlace
     }
 }
