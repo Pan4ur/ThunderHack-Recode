@@ -13,6 +13,13 @@ import static java.lang.Math.abs;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class HitBoxTricks extends Module {
+
+
+    
+    // I think it's useless now
+
+    
+    
     public HitBoxTricks() {
         super("HitBoxTricks", Category.PLAYER);
     }
