@@ -27,7 +27,7 @@ public class LoginCommand extends Command {
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(arg("name", StringArgumentType.word()).executes(context -> {
             login(context.getArgument("name", String.class));
-            sendMessage("Аккаунт изменен на: " + MC.getSession().getUsername());
+            sendMessage("Аккаунт изменен на: " + mc.getSession().getUsername());
 
             return SINGLE_SUCCESS;
         }));
@@ -49,14 +49,14 @@ public class LoginCommand extends Command {
 
 
     public void setSession(Session session) {
-        IMinecraftClient mca = (IMinecraftClient) MC;
+        IMinecraftClient mca = (IMinecraftClient) mc;
         mca.setSessionT(session);
-        MC.getGameProfile().getProperties().clear();
+        mc.getGameProfile().getProperties().clear();
         UserApiService apiService;
         apiService = UserApiService.OFFLINE;
         mca.setUserApiService(apiService);
-        mca.setSocialInteractionsManagerT(new SocialInteractionsManager(MC, apiService));
-        mca.setProfileKeys(ProfileKeys.create(apiService, session, MC.runDirectory.toPath()));
+        mca.setSocialInteractionsManagerT(new SocialInteractionsManager(mc, apiService));
+        mca.setProfileKeys(ProfileKeys.create(apiService, session, mc.runDirectory.toPath()));
         mca.setAbuseReportContextT(AbuseReportContext.create(ReporterEnvironment.ofIntegratedServer(), apiService));
     }
 }

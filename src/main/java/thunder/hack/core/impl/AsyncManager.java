@@ -12,7 +12,6 @@ import thunder.hack.events.impl.EventPostTick;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.gui.clickui.ClickUI;
-import thunder.hack.gui.hud.impl.Paimon;
 import thunder.hack.gui.mainmenu.MainMenuScreen;
 import thunder.hack.modules.Module;
 import thunder.hack.utility.Timer;
@@ -36,10 +35,10 @@ public class AsyncManager implements IManager {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPostTick(EventPostTick e) {
-        if (MC.world == null) return;
+        if (mc.world == null) return;
 
-        threadSafeEntityList = Lists.newArrayList(MC.world.getEntities());
-        threadSafePlayersList = Lists.newArrayList(MC.world.getPlayers());
+        threadSafeEntityList = Lists.newArrayList(mc.world.getEntities());
+        threadSafePlayersList = Lists.newArrayList(mc.world.getPlayers());
         ticking.set(false);
     }
 
@@ -72,7 +71,7 @@ public class AsyncManager implements IManager {
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 if(updateTimer.passedMs(16)) {
-                    if (MC != null && (MC.currentScreen instanceof MainMenuScreen || MC.currentScreen instanceof ClickUI)) {
+                    if (mc != null && (mc.currentScreen instanceof MainMenuScreen || mc.currentScreen instanceof ClickUI)) {
                         MainMenuProgram.increaseTime();
                     }
                     updateTimer.reset();

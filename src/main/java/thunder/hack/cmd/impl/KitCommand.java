@@ -157,7 +157,7 @@ public class KitCommand extends Command {
 
         StringBuilder jsonInventory = new StringBuilder();
 
-        for (ItemStack item : MC.player.getInventory().main) {
+        for (ItemStack item : mc.player.getInventory().main) {
             jsonInventory.append(item.getTranslationKey()).append(" ");
         }
         completeJson.addProperty(name, jsonInventory.toString());

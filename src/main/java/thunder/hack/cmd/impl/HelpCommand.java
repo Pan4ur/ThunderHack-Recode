@@ -25,7 +25,7 @@ public class HelpCommand extends Command {
             AtomicBoolean flip = new AtomicBoolean(false);
 
             ThunderHack.commandManager.getCommands().forEach(command -> {
-                        MC.player.sendMessage(Text.of(
+                        mc.player.sendMessage(Text.of(
                                 (flip.get() ? Formatting.LIGHT_PURPLE : Formatting.DARK_PURPLE)
                                         + ThunderHack.commandManager.getPrefix()
                                         + (flip.get() ? Formatting.AQUA : Formatting.DARK_AQUA)

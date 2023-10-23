@@ -160,6 +160,7 @@
   "descriptions.thunderhack.notifications": "Уведомления о действиях ThunderHack.",
   "descriptions.thunderhack.optifinecapes": "Позволяет видеть плащи Optifine",
   "descriptions.thunderhack.discordrpc": "Дискорд статус",
+  "descriptions.thunderhack.fastlatency": "Вычисляет пинг быстрее, чем метод Minecraft.",
   "descriptions.thunderhack.thundergui": "Еще один вариант графического интерфейса.",
   "descriptions.thunderhack.waypoints": "Отображает вейпоинты.",
 
@@ -184,5 +185,5 @@
   "descriptions.commands.staff": "Добавить игроков в staffBoard (игроки будут видны если они в ванише).",
   "descriptions.commands.tracker": "Добавить игроков в Tracker.",
   "descriptions.commands.vclip": "Клипнуться вертикально.",
-  "descriptions.commands.waypoint": "Добавить вейпоинт (надо включить WayPoints!!!).",
+  "descriptions.commands.waypoint": "Добавить вейпоинт (надо включить WayPoints!!!)."
 }

@@ -1,12 +1,14 @@
 package thunder.hack.core.impl;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
+import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.core.IManager;
 import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.modules.client.FastLatency;
 import thunder.hack.utility.Timer;
-import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
-import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import thunder.hack.utility.math.MathUtility;
 
 import java.math.BigDecimal;
@@ -56,5 +58,17 @@ public class ServerManager implements IManager {
             }
             time = System.currentTimeMillis();
         }
+    }
+
+
+    public static int getPing() {
+        if (mc.getNetworkHandler() == null) return 0;
+
+        if (FastLatency.instance.isEnabled())
+            return FastLatency.instance.resolvedPing;
+
+        PlayerListEntry playerListEntry = mc.getNetworkHandler().getPlayerListEntry(mc.player.getUuid());
+        if (playerListEntry == null) return 0;
+        return playerListEntry.getLatency();
     }
 }

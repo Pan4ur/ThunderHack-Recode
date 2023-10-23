@@ -159,7 +159,8 @@
   "descriptions.thunderhack.media": "Hides nicknames and skins of other players.",
   "descriptions.thunderhack.notifications": "ThunderHack actions notifications.",
   "descriptions.thunderhack.optifinecapes": "Allows to use Optifine capes without optifine.",
-  "descriptions.thunderhack.discordrpc": "ThunderHack discord rich presence",
+  "descriptions.thunderhack.discordrpc": "ThunderHack discord rich presence.",
+  "descriptions.thunderhack.fastlatency": "Calculates ping faster than the minecraft method.",
   "descriptions.thunderhack.thundergui": "Another variant of gui.",
   "descriptions.thunderhack.waypoints": "Renders specified waypoints.",
 

@@ -31,7 +31,7 @@ public class CombatManager implements IManager {
 
         if (event.getPacket() instanceof EntityStatusS2CPacket pac) {
             if (pac.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING) {
-                Entity ent = pac.getEntity(MC.world);
+                Entity ent = pac.getEntity(mc.world);
                 if (!(ent instanceof PlayerEntity)) return;
                 if (popList == null) {
                     popList = new HashMap<>();
@@ -50,7 +50,7 @@ public class CombatManager implements IManager {
     public void onPostTick(EventPostTick event) {
         if (Module.fullNullCheck())
             return;
-        for (PlayerEntity player : MC.world.getPlayers()) {
+        for (PlayerEntity player : mc.world.getPlayers()) {
             if (AntiBot.bots.contains(player)) continue;
 
             if (player.getHealth() <= 0 && popList.containsKey(player.getName().getString()))
@@ -64,17 +64,17 @@ public class CombatManager implements IManager {
     }
 
     public List<PlayerEntity> getTargets(float range) {
-        return MC.world.getPlayers().stream()
+        return mc.world.getPlayers().stream()
                 .filter(e -> !e.isDead())
                 .filter(entityPlayer -> !ThunderHack.friendManager.isFriend(entityPlayer.getName().getString()))
-                .filter(entityPlayer -> entityPlayer != MC.player)
-                .filter(entityPlayer -> MC.player.squaredDistanceTo(entityPlayer) < range * range)
-                .sorted(Comparator.comparing(e -> MC.player.distanceTo(e)))
+                .filter(entityPlayer -> entityPlayer != mc.player)
+                .filter(entityPlayer -> mc.player.squaredDistanceTo(entityPlayer) < range * range)
+                .sorted(Comparator.comparing(e -> mc.player.distanceTo(e)))
                 .collect(Collectors.toList());
     }
 
     public @Nullable PlayerEntity getNearestTarget(float range) {
-        return getTargets(range).stream().min(Comparator.comparing(t -> MC.player.distanceTo(t))).orElse(null);
+        return getTargets(range).stream().min(Comparator.comparing(t -> mc.player.distanceTo(t))).orElse(null);
     }
 
     public PlayerEntity getTargetByHP(float range) {
@@ -86,10 +86,10 @@ public class CombatManager implements IManager {
     }
 
     private float getFOVAngle(@NotNull LivingEntity e) {
-        double difX = e.getX() - MC.player.getPos().x;
-        double difZ = e.getZ() - MC.player.getPos().z;
+        double difX = e.getX() - mc.player.getPos().x;
+        double difZ = e.getZ() - mc.player.getPos().z;
         float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);
-        double plYaw = MathHelper.wrapDegrees(MC.player.getYaw());
+        double plYaw = MathHelper.wrapDegrees(mc.player.getYaw());
         return (float) Math.abs(yaw - plYaw);
     }
 }

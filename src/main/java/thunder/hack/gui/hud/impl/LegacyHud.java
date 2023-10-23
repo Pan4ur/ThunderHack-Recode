@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static thunder.hack.core.impl.ServerManager.getPing;
 import static thunder.hack.gui.hud.impl.PotionHud.getDuration;
 
 public class LegacyHud extends Module {
@@ -119,7 +120,7 @@ public class LegacyHud extends Module {
                 context.drawText(mc.textRenderer, Text.of(str), (width - getStringWidth(str) - 2), (height - 2 - i), color, true);
             }
             String fpsText = "FPS " + Formatting.WHITE + FrameRateCounter.INSTANCE.getFps();
-            String str1 = "Ping " + Formatting.WHITE + PingHud.getPing();
+            String str1 = "Ping " + Formatting.WHITE + getPing();
             if (getStringWidth(str1) > getStringWidth(fpsText)) {
                 if (ping.getValue()) {
                     i += 10;
@@ -170,7 +171,7 @@ public class LegacyHud extends Module {
                 context.drawText(mc.textRenderer, Text.of(str), (width - getStringWidth(str) - 2), (2 + i++ * 10), color, true);
             }
             String fpsText = "FPS " + Formatting.WHITE + FrameRateCounter.INSTANCE.getFps();
-            String str1 = "Ping " + Formatting.WHITE + PingHud.getPing();
+            String str1 = "Ping " + Formatting.WHITE + getPing();
             if (getStringWidth(str1) > getStringWidth(fpsText)) {
                 if (ping.getValue()) {
                     context.drawText(mc.textRenderer, Text.of(str1), (width - getStringWidth(str1) - 2), (2 + i++ * 10), color, true);

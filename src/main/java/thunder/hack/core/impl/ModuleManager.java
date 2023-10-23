@@ -207,6 +207,7 @@ public class ModuleManager implements IManager {
     public ModuleManager() {
         modules.add(new AutoAnchor());
         modules.add(new Quiver());
+        modules.add(new FastLatency());
 
         if(!ThunderHack.isOnLinux())
             modules.add(new RPC());

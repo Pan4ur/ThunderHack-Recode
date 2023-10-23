@@ -20,14 +20,14 @@ public class DropAllCommand extends Command {
         builder.executes(context -> {
             ThunderHack.asyncManager.run(() -> {
                 for (int i = 5; i <= 45; i++) {
-                    MC.interactionManager.clickSlot(MC.player.currentScreenHandler.syncId, i, 1, SlotActionType.THROW, MC.player);
+                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 1, SlotActionType.THROW, mc.player);
                     try {
                         Thread.sleep(70);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }
-                MC.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
+                mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
             }, 1);
 
             sendMessage("ok");

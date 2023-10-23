@@ -1,6 +1,5 @@
 package thunder.hack.cmd.impl;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandSource;
@@ -8,7 +7,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
-import thunder.hack.cmd.args.FriendArgumentType;
 import thunder.hack.cmd.args.SearchArgumentType;
 import thunder.hack.modules.render.Search;
 
@@ -26,7 +24,7 @@ public class SearchCommand extends Command {
             Search.defaultBlocks.clear();
             sendMessage("Search got reset.");
 
-            MC.worldRenderer.reload();
+            mc.worldRenderer.reload();
             return SINGLE_SUCCESS;
         }));
 
@@ -41,7 +39,7 @@ public class SearchCommand extends Command {
                 sendMessage(Formatting.RED + (isRu() ? "Такого блока нет!" : "There is no such block!"));
             }
 
-            MC.worldRenderer.reload();
+            mc.worldRenderer.reload();
 
             return SINGLE_SUCCESS;
         })));
@@ -57,7 +55,7 @@ public class SearchCommand extends Command {
                 sendMessage(Formatting.RED + (isRu() ? "Такого блока нет!" : "There is no such block!"));
             }
 
-            MC.worldRenderer.reload();
+            mc.worldRenderer.reload();
 
             return SINGLE_SUCCESS;
         })));

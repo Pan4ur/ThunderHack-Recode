@@ -13,7 +13,6 @@ import thunder.hack.core.impl.WayPointManager;
 import thunder.hack.modules.client.MainSettings;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import static thunder.hack.modules.Module.mc;
 
 public class WayPointCommand extends Command {
     public WayPointCommand() {
@@ -48,13 +47,13 @@ public class WayPointCommand extends Command {
 
         builder.then(literal("add").then(arg("name", StringArgumentType.word()).executes(context -> {
             String name = context.getArgument("name", String.class);
-            WayPointManager.WayPoint wp = new WayPointManager.WayPoint((int) MC.player.getX(), (int) MC.player.getY(), (int) MC.player.getZ(), name, (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address));
+            WayPointManager.WayPoint wp = new WayPointManager.WayPoint((int) mc.player.getX(), (int) mc.player.getY(), (int) mc.player.getZ(), name, (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address));
             ThunderHack.wayPointManager.addWayPoint(wp);
 
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                sendMessage("Добавлена метка " + name + " с координатами x: " + ((int) MC.player.getX()) + " y: " + ((int) MC.player.getY()) + " z: " + ((int) MC.player.getZ()));
+                sendMessage("Добавлена метка " + name + " с координатами x: " + ((int) mc.player.getX()) + " y: " + ((int) mc.player.getY()) + " z: " + ((int) mc.player.getZ()));
             } else {
-                sendMessage("Added waypoint " + name + " with coords x: " + ((int) MC.player.getX()) + " y: " + ((int) MC.player.getY()) + " z: " + ((int) MC.player.getZ()));
+                sendMessage("Added waypoint " + name + " with coords x: " + ((int) mc.player.getX()) + " y: " + ((int) mc.player.getY()) + " z: " + ((int) mc.player.getZ()));
             }
 
             return SINGLE_SUCCESS;

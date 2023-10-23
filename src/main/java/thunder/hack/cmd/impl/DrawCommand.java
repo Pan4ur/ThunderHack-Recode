@@ -23,7 +23,7 @@ public class DrawCommand extends Command {
             Module module = context.getArgument("module", Module.class);
 
             if (module.getDisplayName().toLowerCase().contains("click"))
-                MC.currentScreen = ClickUI.getClickGui();
+                mc.currentScreen = ClickUI.getClickGui();
 
             module.setDrawn(!module.isDrawn());
 

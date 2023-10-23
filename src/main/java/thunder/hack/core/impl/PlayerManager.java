@@ -47,27 +47,27 @@ public class PlayerManager implements IManager {
     public void onSync(EventSync event) {
         if (Module.fullNullCheck()) return;
 
-        yaw = MC.player.getYaw();
-        pitch = MC.player.getPitch();
-        lastYaw = ((IClientPlayerEntity) MC.player).getLastYaw();
-        lastPitch = ((IClientPlayerEntity) MC.player).getLastPitch();
+        yaw = mc.player.getYaw();
+        pitch = mc.player.getPitch();
+        lastYaw = ((IClientPlayerEntity) mc.player).getLastYaw();
+        lastPitch = ((IClientPlayerEntity) mc.player).getLastPitch();
 
-        if (MC.currentScreen == null) inInventory = false;
-        if (MC.player.isFallFlying() && MC.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
+        if (mc.currentScreen == null) inInventory = false;
+        if (mc.player.isFallFlying() && mc.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
             ticksElytraFlying++;
         } else ticksElytraFlying = 0;
     }
 
     @EventHandler
     public void onTick(EventTick e) {
-        currentPlayerSpeed = Math.hypot(MC.player.getX() - MC.player.prevX, MC.player.getZ() - MC.player.prevZ);
+        currentPlayerSpeed = Math.hypot(mc.player.getX() - mc.player.prevX, mc.player.getZ() - mc.player.prevZ);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void postSync(EventPostSync event) {
         if (Module.fullNullCheck()) return;
-        MC.player.setYaw(this.yaw);
-        MC.player.setPitch(this.pitch);
+        mc.player.setYaw(this.yaw);
+        mc.player.setPitch(this.pitch);
     }
 
     @EventHandler
@@ -111,13 +111,13 @@ public class PlayerManager implements IManager {
     public boolean checkRtx(float yaw, float pitch, float distance, boolean ignoreWalls, Aura.RayTrace rt) {
         Entity targetedEntity;
         HitResult result = ignoreWalls ? null : rayTrace(distance, yaw, pitch);
-        Vec3d vec3d = MC.player.getPos().add(0, MC.player.getEyeHeight(MC.player.getPose()), 0);
+        Vec3d vec3d = mc.player.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
         double distancePow2 = Math.pow(distance, 2);
         if (result != null) distancePow2 = result.getPos().squaredDistanceTo(vec3d);
         Vec3d vec3d2 = getRotationVector(pitch, yaw);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * distance, vec3d2.y * distance, vec3d2.z * distance);
-        Box box = MC.player.getBoundingBox().stretch(vec3d2.multiply(distance)).expand(1.0, 1.0, 1.0);
-        EntityHitResult entityHitResult = ProjectileUtil.raycast(MC.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator(), distancePow2);
+        Box box = mc.player.getBoundingBox().stretch(vec3d2.multiply(distance)).expand(1.0, 1.0, 1.0);
+        EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator(), distancePow2);
         if (entityHitResult != null) {
             Entity entity2 = entityHitResult.getEntity();
             Vec3d vec3d4 = entityHitResult.getPos();
@@ -134,13 +134,13 @@ public class PlayerManager implements IManager {
     public Entity getRtxTarget(float yaw, float pitch, float distance, boolean ignoreWalls) {
         Entity targetedEntity = null;
         HitResult result = ignoreWalls ? null : rayTrace(distance, yaw, pitch);
-        Vec3d vec3d = MC.player.getPos().add(0, MC.player.getEyeHeight(MC.player.getPose()), 0);
+        Vec3d vec3d = mc.player.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
         double distancePow2 = Math.pow(distance, 2);
         if (result != null) distancePow2 = result.getPos().squaredDistanceTo(vec3d);
         Vec3d vec3d2 = getRotationVector(pitch, yaw);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * distance, vec3d2.y * distance, vec3d2.z * distance);
-        Box box = MC.player.getBoundingBox().stretch(vec3d2.multiply(distance)).expand(1.0, 1.0, 1.0);
-        EntityHitResult entityHitResult = ProjectileUtil.raycast(MC.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator(), distancePow2);
+        Box box = mc.player.getBoundingBox().stretch(vec3d2.multiply(distance)).expand(1.0, 1.0, 1.0);
+        EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator(), distancePow2);
         if (entityHitResult != null) {
             Entity entity2 = entityHitResult.getEntity();
             Vec3d vec3d4 = entityHitResult.getPos();
@@ -156,22 +156,22 @@ public class PlayerManager implements IManager {
     }
 
     public HitResult rayTrace(double dst, float yaw, float pitch) {
-        Vec3d vec3d = MC.player.getCameraPosVec(MC.getTickDelta());
+        Vec3d vec3d = mc.player.getCameraPosVec(mc.getTickDelta());
         Vec3d vec3d2 = getRotationVector(pitch, yaw);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * dst, vec3d2.y * dst, vec3d2.z * dst);
-        return MC.world.raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, MC.player));
+        return mc.world.raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
     }
 
     public HitResult getRtxTarget(float yaw, float pitch, double x, double y, double z) {
         HitResult result = rayTrace(5, yaw, pitch, x, y, z);
-        Vec3d vec3d = new Vec3d(x, y, z).add(0, MC.player.getEyeHeight(MC.player.getPose()), 0);
+        Vec3d vec3d = new Vec3d(x, y, z).add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
         double distancePow2 = 25;
         if (result != null)
             distancePow2 = result.getPos().squaredDistanceTo(vec3d);
         Vec3d vec3d2 = getRotationVector(pitch, yaw);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * 5, vec3d2.y * 5, vec3d2.z * 5);
-        Box box = new Box(x-.3, y, z-.3, x+.3, y + MC.player.getEyeHeight(MC.player.getPose()), z+.3).stretch(vec3d2.multiply(5)).expand(1.0, 1.0, 1.0);
-        EntityHitResult entityHitResult = ProjectileUtil.raycast(MC.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator(), distancePow2);
+        Box box = new Box(x-.3, y, z-.3, x+.3, y + mc.player.getEyeHeight(mc.player.getPose()), z+.3).stretch(vec3d2.multiply(5)).expand(1.0, 1.0, 1.0);
+        EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator(), distancePow2);
         if (entityHitResult != null) {
             Entity entity2 = entityHitResult.getEntity();
             Vec3d vec3d4 = entityHitResult.getPos();
@@ -189,23 +189,23 @@ public class PlayerManager implements IManager {
         Vec3d vec3d = new Vec3d(x,y,z);
         Vec3d vec3d2 = getRotationVector(pitch, yaw);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * dst, vec3d2.y * dst, vec3d2.z * dst);
-        return MC.world.raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, MC.player));
+        return mc.world.raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
     }
 
     public static float[] calcAngle(Vec3d to) {
         if (to == null) return null;
-        double difX = to.x - MC.player.getEyePos().x;
-        double difY = (to.y - MC.player.getEyePos().y) * -1.0;
-        double difZ = to.z - MC.player.getEyePos().z;
+        double difX = to.x - mc.player.getEyePos().x;
+        double difY = (to.y - mc.player.getEyePos().y) * -1.0;
+        double difZ = to.z - mc.player.getEyePos().z;
         double dist = MathHelper.sqrt((float) (difX * difX + difZ * difZ));
         return new float[]{(float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0), (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difY, dist)))};
     }
 
     public static Vec2f calcAngleVec(Vec3d to) {
         if (to == null) return null;
-        double difX = to.x - MC.player.getEyePos().x;
-        double difY = (to.y - MC.player.getEyePos().y) * -1.0;
-        double difZ = to.z - MC.player.getEyePos().z;
+        double difX = to.x - mc.player.getEyePos().x;
+        double difY = (to.y - mc.player.getEyePos().y) * -1.0;
+        double difZ = to.z - mc.player.getEyePos().z;
         double dist = MathHelper.sqrt((float) (difX * difX + difZ * difZ));
         return new Vec2f((float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0), (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difY, dist))));
     }

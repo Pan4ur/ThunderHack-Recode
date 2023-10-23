@@ -7,6 +7,8 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
 
+import static thunder.hack.core.impl.ServerManager.getPing;
+
 public class PingHud extends HudElement {
 
     public PingHud() {
@@ -16,12 +18,5 @@ public class PingHud extends HudElement {
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
         FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "Ping " + Formatting.WHITE + getPing(), getPosX(), getPosY(), HudEditor.getColor(1).getRGB(), false);
-    }
-
-    public static int getPing() {
-        if (mc.getNetworkHandler() == null) return 0;
-        PlayerListEntry playerListEntry = mc.getNetworkHandler().getPlayerListEntry(mc.player.getUuid());
-        if (playerListEntry == null) return 0;
-        return playerListEntry.getLatency();
     }
 }
