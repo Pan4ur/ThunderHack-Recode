@@ -101,6 +101,7 @@ public class AutoCrystalBase extends Module {
             InventoryUtility.saveSlot();
             obbyResult.switchTo();
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, bestData.bhr());
+            sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             if (render.getValue().getState())
                 BlockAnimationUtility.renderBlock(bestData.position(),
                         renderLineColor.getValue().getColorObject(),
@@ -122,7 +123,7 @@ public class AutoCrystalBase extends Module {
     }
 
     public boolean isWorth() {
-        return ModuleManager.autoCrystal.isEnabled() && bestData != null && ModuleManager.autoCrystal.renderDamage < bestData.damage;
+        return ModuleManager.autoCrystal.isEnabled() && bestData != null && ModuleManager.autoCrystal.renderDamage > 2 && ModuleManager.autoCrystal.renderDamage < bestData.damage;
     }
 
     public void calcPosition(float range, Vec3d center) {
