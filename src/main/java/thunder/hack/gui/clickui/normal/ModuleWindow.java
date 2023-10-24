@@ -32,7 +32,7 @@ public class ModuleWindow extends AbstractWindow {
         buttons = new ArrayList<>();
         ICON = new Identifier("textures/" + category.getName().toLowerCase() + ".png");
 
-        if (category.getName().equals("ThunderHack")) {
+        if (category.getName().equals("Client")) {
             SearchBar search = new SearchBar();
             search.setHeight(17);
             buttons.add(search);
