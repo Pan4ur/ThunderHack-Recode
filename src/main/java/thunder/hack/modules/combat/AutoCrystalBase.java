@@ -1,5 +1,6 @@
 package thunder.hack.modules.combat;
 
+import net.minecraft.network.packet.c2s.play.*;
 import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
