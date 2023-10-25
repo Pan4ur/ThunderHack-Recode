@@ -61,7 +61,7 @@ public class HudEditorGui extends Screen {
         rAnimation = new DecelerateAnimation(300, 1f);
         bgAnimation = new DecelerateAnimation(300, 1f);
         if (firstOpen) {
-            double x = 20, y = 20;
+            double x = 60, y = 20;
             double offset = 0;
             int windowHeight = 18;
 

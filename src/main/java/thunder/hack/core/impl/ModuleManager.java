@@ -29,11 +29,11 @@ public class ModuleManager implements IManager {
     public static LevitationControl levitationControl = new LevitationControl();
     public static InventoryCleaner inventoryCleaner = new InventoryCleaner();
     public static NoCommentExploit noCommentExploit = new NoCommentExploit();
-    public static AntiAttack antiAttack = new AntiAttack();
     public static TotemPopCounter totemPopCounter = new TotemPopCounter();
     public static HotbarReplenish hotbarReplenish = new HotbarReplenish();
     public static DurabilityAlert durabilityAlert = new DurabilityAlert();
     public static AutoCrystalBase autoCrystalBase = new AutoCrystalBase();
+    public static CrosshairArrows crosshairArrows = new CrosshairArrows();
     public static TimerIndicator timerIndicator = new TimerIndicator();
     public static ThunderHackGui thunderHackGui = new ThunderHackGui();
     public static NoServerRotate noServerRotate = new NoServerRotate();
@@ -100,6 +100,7 @@ public class ModuleManager implements IManager {
     public static AntiHunger antiHunger = new AntiHunger();
     public static Animations animations = new Animations();
     public static DamageTint damageTint = new DamageTint();
+    public static AntiAttack antiAttack = new AntiAttack();
     public static DamageFly damageFly = new DamageFly();
     public static WayPoints wayPoints = new WayPoints();
     public static WaterMark waterMark = new WaterMark();
@@ -149,6 +150,7 @@ public class ModuleManager implements IManager {
     public static AirPlace airPlace = new AirPlace();
     public static SelfTrap selfTrap = new SelfTrap();
     public static AntiVoid antiVoid = new AntiVoid();
+    public static KillFeed killFeed = new KillFeed();
     public static AutoBed autoBed = new AutoBed();
     public static TNTAura tntAura = new TNTAura();
     public static VoidESP voidESP = new VoidESP();
@@ -320,9 +322,8 @@ public class ModuleManager implements IManager {
             return;
         }
         modules.forEach(module -> {
-            if (module.getBind().getKey() == eventKey) {
+            if (module.getBind().getKey() == eventKey)
                 module.toggle();
-            }
         });
     }
 

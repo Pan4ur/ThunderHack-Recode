@@ -10,25 +10,26 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import thunder.hack.ThunderHack;
-import thunder.hack.modules.client.MainSettings;
-import thunder.hack.utility.Macro;
+import thunder.hack.core.impl.MacroManager;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-public class MacroArgumentType implements ArgumentType<Macro> {
-    private static final Collection<String> EXAMPLES = ThunderHack.macroManager.getMacros().stream().map(Macro::getName).limit(5).toList();
+import static thunder.hack.modules.client.MainSettings.isRu;
+
+public class MacroArgumentType implements ArgumentType<MacroManager.Macro> {
+    private static final Collection<String> EXAMPLES = ThunderHack.macroManager.getMacros().stream().map(MacroManager.Macro::name).limit(5).toList();
 
     public static MacroArgumentType create() {
         return new MacroArgumentType();
     }
 
     @Override
-    public Macro parse(StringReader reader) throws CommandSyntaxException {
-        Macro macro = ThunderHack.macroManager.getMacroByName(reader.readString());
+    public MacroManager.Macro parse(StringReader reader) throws CommandSyntaxException {
+        MacroManager.Macro macro = ThunderHack.macroManager.getMacroByName(reader.readString());
 
         if (macro == null) throw new DynamicCommandExceptionType(
-                name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Макроса " + name.toString() + " не существует(" : "Macro with name " + name.toString() + " does not exists(")
+                name -> Text.literal(isRu() ? "Макроса " + name.toString() + " не существует(" : "Macro with name " + name.toString() + " does not exists(")
         ).create(reader.readString());
 
         return macro;
@@ -36,7 +37,7 @@ public class MacroArgumentType implements ArgumentType<Macro> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(ThunderHack.macroManager.getMacros().stream().map(Macro::getName), builder);
+        return CommandSource.suggestMatching(ThunderHack.macroManager.getMacros().stream().map(MacroManager.Macro::name), builder);
     }
 
     @Override

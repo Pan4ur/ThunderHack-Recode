@@ -35,10 +35,11 @@ public class GradientGlowProgram extends GlProgram {
     }
 
     public void setParameters(float x, float y, float width, float height, float radius, float softness, Color color1, Color color2, Color color3, Color color4) {
-        this.radius.set(radius * 2);
-        this.uSize.set(width * 2, height * 2);
+        int i = mc.options.getGuiScale().getValue();
+        this.radius.set(radius * i);
+        this.uSize.set(width * i, height * i);
         this.softness.set(softness);
-        this.uLocation.set(x * 2, -y * 2 + mc.getWindow().getScaledHeight() * 2 - height * 2);
+        this.uLocation.set(x * i, -y * i + mc.getWindow().getScaledHeight() * i - height * i);
         this.color1.set(color1.getRed() / 255f, color1.getGreen() / 255f, color1.getBlue() / 255f, color1.getAlpha() / 255f);
         this.color2.set(color2.getRed() / 255f, color2.getGreen() / 255f, color2.getBlue() / 255f, color2.getAlpha() / 255f);
         this.color3.set(color3.getRed() / 255f, color3.getGreen() / 255f, color3.getBlue() / 255f, color3.getAlpha() / 255f);

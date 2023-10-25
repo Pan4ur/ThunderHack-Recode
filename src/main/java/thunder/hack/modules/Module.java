@@ -107,6 +107,7 @@ public abstract class Module {
         if (fullNullCheck()) return;
 
         LogUtils.getLogger().info("[ThunderHack] enabled " + this.getName());
+        ThunderHack.moduleManager.sortModules();
 
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
             ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль включен!" : "Was Enabled!", 2, Notification.Type.ENABLED);
@@ -128,6 +129,8 @@ public abstract class Module {
         }
 
         enabled.setValue(false);
+
+        ThunderHack.moduleManager.sortModules();
 
         if (fullNullCheck()) return;
         onDisable();

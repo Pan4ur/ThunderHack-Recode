@@ -9,6 +9,7 @@ import net.minecraft.world.GameMode;
 import thunder.hack.cmd.impl.StaffCommand;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -19,13 +20,8 @@ import java.util.stream.Collectors;
 
 public class StaffBoard extends HudElement {
     private static final Pattern validUserPattern = Pattern.compile("^\\w{3,16}$");
-    public final Setting<ColorSetting> shadowColor = new Setting<>("ShadowColor", new ColorSetting(0xFF101010));
-    public final Setting<ColorSetting> color2 = new Setting<>("Color", new ColorSetting(0xFF101010));
-    public final Setting<ColorSetting> color3 = new Setting<>("Color2", new ColorSetting(0xC59B9B9B));
-    public final Setting<ColorSetting> textColor = new Setting<>("TextColor", new ColorSetting(0xBEBEBE));
-    List<String> players = new ArrayList<>();
-    List<String> notSpec = new ArrayList<>();
-    private final LinkedHashMap<UUID, String> nameMap = new LinkedHashMap<>();
+    private List<String> players = new ArrayList<>();
+    private List<String> notSpec = new ArrayList<>();
 
     public StaffBoard() {
         super("StaffBoard", 50, 50);
@@ -68,7 +64,7 @@ public class StaffBoard extends HudElement {
     public List<String> getVanish() {
         List<String> list = new ArrayList<>();
         for (Team s : mc.world.getScoreboard().getTeams()) {
-            if (s.getPrefix().getString().length() == 0 || mc.isInSingleplayer()) continue;
+            if (s.getPrefix().getString().isEmpty() || mc.isInSingleplayer()) continue;
             String name = Arrays.asList(s.getPlayerList().stream().toArray()).toString().replace("[", "").replace("]", "");
 
             if (getOnlinePlayer().contains(name) || name.isEmpty())
@@ -98,11 +94,37 @@ public class StaffBoard extends HudElement {
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        int y_offset1 = 11;
         List<String> all = new java.util.ArrayList<>();
         all.addAll(players);
         all.addAll(notSpec);
         float scale_x = 50;
+        for (String player : all) {
+            if (player != null) {
+                String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "VANISH" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "VANISH " + Formatting.YELLOW + "(NEAR!)" : Formatting.GREEN + "ACTIVE");
+                if (FontRenderers.modules.getStringWidth(a) > scale_x)
+                    scale_x = FontRenderers.modules.getStringWidth(a);
+            }
+        }
+
+        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "StaffBoard", getPosX() + scale_x / 2 + 10, getPosY() + 2 , -1);
+        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + scale_x / 2f - 2 + 10, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
+        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + scale_x / 2f - 2 + 10, getPosY() + 13.7f, getPosX() + 2 + scale_x - 4 + 20, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+
+        int y_offset = 11;
+        for (String player : all) {
+            String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "VANISH" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "VANISH " + Formatting.YELLOW + "(NEAR!)" : Formatting.GREEN + "ACTIVE");
+            FontRenderers.modules.drawString(context.getMatrices(), a, getPosX() + 5, getPosY() + 18 + y_offset, -1, false);
+            y_offset += 13;
+        }
+    }
+
+    public void onRenderShaders(DrawContext context) {
+        int y_offset1 = 11;
+        float scale_x = 50;
+        List<String> all = new java.util.ArrayList<>();
+        all.addAll(players);
+        all.addAll(notSpec);
+
         for (String player : all) {
             if (player != null) {
                 String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "VANISH" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "VANISH " + Formatting.YELLOW + "(NEAR!)" : Formatting.GREEN + "ACTIVE");
@@ -113,28 +135,15 @@ public class StaffBoard extends HudElement {
             y_offset1 += 13;
         }
 
-        Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX(), getPosY(), scale_x + 20, 20 + y_offset1, 20, shadowColor.getValue().getColorObject());
-
-        Render2DEngine.drawRound(context.getMatrices(), getPosX(), getPosY(), scale_x + 20, 20 + y_offset1, 7f, color2.getValue().getColorObject());
-        FontRenderers.modules.drawCenteredString(context.getMatrices(), "StaffBoard", getPosX() + (scale_x + 20) / 2, getPosY() + 5, textColor.getValue().getColor());
-        Render2DEngine.drawRound(context.getMatrices(), getPosX() + 2, getPosY() + 13, scale_x + 16, 1, 0.5f, color3.getValue().getColorObject());
-
-        int y_offset = 11;
-        for (String player : all) {
-            String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "VANISH" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "VANISH " + Formatting.YELLOW + "(NEAR!)" : Formatting.GREEN + "ACTIVE");
-            FontRenderers.modules.drawString(context.getMatrices(), a, getPosX() + 5, getPosY() + 18 + y_offset, -1, false);
-            y_offset += 13;
-        }
-    }
-
-    @Override
-    public void onDisable() {
-        nameMap.clear();
+        Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), scale_x + 20, 20 + y_offset1, HudEditor.hudRound.getValue(), 10);
+        Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, scale_x + 20 + 1, 21 + y_offset1, HudEditor.hudRound.getValue());
+        Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), scale_x + 20, 20 + y_offset1, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+        setBounds((int) (scale_x + 20), 20 + y_offset1);
     }
 
     @Override
     public void onUpdate() {
-        if (mc.player.age % 10 == 0) {
+        if (mc.player != null && mc.player.age % 10 == 0) {
             players = getVanish();
             notSpec = getOnlinePlayerD();
             players.sort(String::compareTo);

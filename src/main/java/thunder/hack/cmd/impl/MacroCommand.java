@@ -10,12 +10,11 @@ import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.MacroArgumentType;
 import thunder.hack.core.impl.MacroManager;
-import thunder.hack.modules.client.MainSettings;
-import thunder.hack.utility.Macro;
 
 import java.lang.reflect.Field;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class MacroCommand extends Command {
     public MacroCommand() {
@@ -25,28 +24,21 @@ public class MacroCommand extends Command {
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("list").executes(context -> {
-            if (MainSettings.language.getValue() == MainSettings.Language.RU) {
-                sendMessage("Макросы:");
-            } else {
-                sendMessage("Macro list:");
-            }
-
-
+            sendMessage(isRu() ? "Макросы:" : "Macro list:");
             sendMessage(" ");
-            ThunderHack.macroManager.getMacros().forEach(macro -> sendMessage(macro.getName() + (macro.getBind() != -1 ? " [" + toString(macro.getBind()) + "]" : "") + " {" + macro.getText() + "}"));
-
+            ThunderHack.macroManager.getMacros().forEach(macro -> sendMessage(macro.name() + (macro.bind() != -1 ? " [" + toString(macro.bind()) + "]" : "") + " {" + macro.text() + "}"));
             return SINGLE_SUCCESS;
         }));
 
         builder.then(literal("remove").then(arg("macro", MacroArgumentType.create()).executes(context -> {
-            Macro macro = context.getArgument("macro", Macro.class);
+            MacroManager.Macro macro = context.getArgument("macro", MacroManager.Macro.class);
             if (macro == null) {
-                sendMessage("Не существует такого макроса!");
+                sendMessage(isRu() ? "Не существует такого макроса!" : "Wrong macro name!");
                 return SINGLE_SUCCESS;
             }
 
             ThunderHack.macroManager.removeMacro(macro);
-            sendMessage("Удален макрос " + macro.getName());
+            sendMessage((isRu() ? "Удален макрос " : "Removed macro ") + macro.name());
 
             return SINGLE_SUCCESS;
         })));
@@ -60,13 +52,13 @@ public class MacroCommand extends Command {
                                     String args = context.getArgument("args", String.class);
 
                                     if (InputUtil.fromTranslationKey("key.keyboard." + bind.toLowerCase()).getCode() == -1) {
-                                        sendMessage("Неправильный бинд!");
+                                        sendMessage(isRu() ? "Неправильный бинд!" : "Wrong bind!");
                                         return SINGLE_SUCCESS;
                                     }
 
-                                    Macro macro = new Macro(name, args, InputUtil.fromTranslationKey("key.keyboard." + bind.toLowerCase()).getCode());
+                                    MacroManager.Macro macro = new MacroManager.Macro(name, args, InputUtil.fromTranslationKey("key.keyboard." + bind.toLowerCase()).getCode());
                                     MacroManager.addMacro(macro);
-                                    sendMessage("Добавлен макрос " + name + " на кнопку " + toString(macro.getBind()));
+                                    sendMessage(isRu() ? "Добавлен макрос " + name + " на кнопку " + toString(macro.bind()) : "Added macro " + name + " to " + toString(macro.bind()));
 
                                     return SINGLE_SUCCESS;
                                 })))));

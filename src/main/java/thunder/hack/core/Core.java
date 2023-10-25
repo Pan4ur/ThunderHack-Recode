@@ -16,10 +16,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec2f;
-import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
+import thunder.hack.core.impl.MacroManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.gui.font.FontRenderers;
@@ -27,14 +27,13 @@ import thunder.hack.gui.hud.impl.RadarRewrite;
 import thunder.hack.gui.thundergui.ThunderGui2;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.MainSettings;
-import thunder.hack.utility.Macro;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.player.InteractionUtility;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static thunder.hack.modules.Module.fullNullCheck;
 import static thunder.hack.modules.Module.mc;
 
 public final class Core {
@@ -46,47 +45,41 @@ public final class Core {
 
     @EventHandler
     public void onTick(PlayerUpdateEvent event) {
-        if (!fullNullCheck()) {
-            ThunderHack.moduleManager.onUpdate();
-            ThunderHack.moduleManager.sortModules();
+        if (fullNullCheck()) return;
 
-            if (ModuleManager.clickGui.getBind().getKey() == -1) {
-                Command.sendMessage(Formatting.RED + "Default clickgui keybind --> P");
-                ModuleManager.clickGui.setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(), false, false);
-            }
-        }
-
-        if (!Objects.equals(ThunderHack.commandManager.getPrefix(), MainSettings.prefix.getValue().toString())) {
-            ThunderHack.commandManager.setPrefix(MainSettings.prefix.getValue());
-        }
-
+        ThunderHack.moduleManager.onUpdate();
         ThunderGui2.getInstance().onTick();
 
-        HashMap<BlockPos, Long> cache = new HashMap<>(InteractionUtility.awaiting);
-        if (!cache.isEmpty()) {
-            cache.forEach((bp, time) -> {
-                if (System.currentTimeMillis() - time > 300) {
-                    InteractionUtility.awaiting.remove(bp);
-                }
-            });
+        if (ModuleManager.clickGui.getBind().getKey() == -1) {
+            Command.sendMessage(Formatting.RED + "Default clickgui keybind --> P");
+            ModuleManager.clickGui.setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(), false, false);
         }
+
+        if (!Objects.equals(ThunderHack.commandManager.getPrefix(), MainSettings.prefix.getValue().toString()))
+            ThunderHack.commandManager.setPrefix(MainSettings.prefix.getValue());
+
+        new HashMap<>(InteractionUtility.awaiting).forEach((bp, time) -> {
+            if (System.currentTimeMillis() - time > 300)
+                InteractionUtility.awaiting.remove(bp);
+        });
     }
 
     @EventHandler
     public void onPacketSend(PacketEvent.@NotNull Send e) {
-        if (e.getPacket() instanceof PlayerMoveC2SPacket.PositionAndOnGround || e.getPacket() instanceof PlayerMoveC2SPacket.Full || e.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround) {
+        if (e.getPacket() instanceof PlayerMoveC2SPacket && !(e.getPacket() instanceof PlayerMoveC2SPacket.OnGroundOnly))
             lastPacket.reset();
-        }
 
-        if (e.getPacket() instanceof ClientCommandC2SPacket command) {
-            if (command.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING || command.getMode() == ClientCommandC2SPacket.Mode.STOP_SPRINTING) {
+        if (e.getPacket() instanceof ClientCommandC2SPacket c) {
+            if (c.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING || c.getMode() == ClientCommandC2SPacket.Mode.STOP_SPRINTING) {
                 if (lock_sprint) {
                     e.setCancelled(true);
                     return;
                 }
 
-                if (command.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING) serversprint = true;
-                if (command.getMode() == ClientCommandC2SPacket.Mode.STOP_SPRINTING) serversprint = false;
+                switch (c.getMode()) {
+                    case START_SPRINTING -> serversprint = true;
+                    case STOP_SPRINTING -> serversprint = false;
+                }
             }
         }
     }
@@ -94,7 +87,6 @@ public final class Core {
     @EventHandler
     public void onSync(EventSync event) {
         if (fullNullCheck()) return;
-
         thunder.hack.modules.movement.Timer.onEntitySync(event);
     }
 
@@ -116,15 +108,13 @@ public final class Core {
             }
         }
 
-        if(e.getPacket() instanceof GameJoinS2CPacket) {
+        if (e.getPacket() instanceof GameJoinS2CPacket)
             ThunderHack.moduleManager.onLogin();
-        }
     }
 
     @EventHandler
     public void onEntitySpawn(EventEntitySpawn e) {
-        List<BlockPos> cache = new ArrayList<>(InteractionUtility.awaiting.keySet());
-        cache.forEach(bp -> {
+        new ArrayList<>(InteractionUtility.awaiting.keySet()).forEach(bp -> {
             if (e.getEntity() != null && bp.getSquaredDistance(e.getEntity().getPos()) < 4.)
                 InteractionUtility.awaiting.remove(bp);
         });
@@ -138,9 +128,7 @@ public final class Core {
             RenderSystem.setShaderColor(1f, 1f, 1f, alpha);
             e.drawTexture(SKULL, xPos, yPos, 0, 0, 300, 300, 300, 300);
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        } else {
-            showSkull = false;
-        }
+        } else showSkull = false;
     }
 
     public void drawGps(DrawContext e) {
@@ -163,8 +151,8 @@ public final class Core {
     @EventHandler
     public void onKeyPress(EventKeyPress event) {
         if (event.getKey() == -1) return;
-        for (Macro m : ThunderHack.macroManager.getMacros()) {
-            if (m.getBind() == event.getKey()) {
+        for (MacroManager.Macro m : ThunderHack.macroManager.getMacros()) {
+            if (m.bind() == event.getKey()) {
                 m.runMacro();
             }
         }
@@ -187,9 +175,5 @@ public final class Core {
         double x = vec.x - mc.player.getPos().x;
         double z = vec.y - mc.player.getPos().z;
         return (float) -(Math.atan2(x, z) * (180 / Math.PI));
-    }
-
-    public static boolean fullNullCheck() {
-        return mc.player == null || mc.world == null;
     }
 }

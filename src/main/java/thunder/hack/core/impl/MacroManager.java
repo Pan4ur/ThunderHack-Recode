@@ -1,7 +1,6 @@
 package thunder.hack.core.impl;
 
 import thunder.hack.core.IManager;
-import thunder.hack.utility.Macro;
 
 import java.io.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -47,7 +46,7 @@ public class MacroManager implements IManager {
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (Macro macro : macros) {
-                writer.write(macro.getName() + ":" + macro.getBind() + ":" + macro.getText() + "\n");
+                writer.write(macro.name + ":" + macro.bind + ":" + macro.text + "\n");
             }
         } catch (Exception ignored) {
         }
@@ -61,12 +60,18 @@ public class MacroManager implements IManager {
         return macros;
     }
 
-    public Macro getMacroByName(String name) {
-        for (Macro macro : getMacros()) {
-            if (macro.getName().equalsIgnoreCase(name)) {
-                return macro;
-            }
-        }
+    public Macro getMacroByName(String n) {
+        for (Macro m : getMacros())
+            if (m.name.equalsIgnoreCase(n))
+                return m;
         return null;
+    }
+
+    public record Macro(String name, String text, int bind) {
+        public void runMacro() {
+            if (mc.player == null) return;
+            if (text.contains("/")) mc.player.networkHandler.sendChatCommand(text.replace("/", ""));
+            else mc.player.networkHandler.sendChatMessage(text);
+        }
     }
 }
