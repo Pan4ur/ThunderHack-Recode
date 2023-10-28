@@ -7,6 +7,7 @@ import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.modules.client.ClickGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -46,8 +47,11 @@ public class SliderElement extends AbstractElement {
         if (setting.getValue() instanceof Integer)
             value = String.valueOf(MathUtility.round((Integer) setting.getValue(), 2));
 
+        if(setting.parent != null) {
+            Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, (float) (1f), 18, ClickGui.getInstance().getColor(1));
+        }
 
-        FontRenderers.settings.drawString(matrixStack, setting.getName(), (int) (x + 6), (int) (y + 4), new Color(-1).getRGB());
+        FontRenderers.settings.drawString(matrixStack, setting.getName(), (setting.parent != null ? 2f : 0f) + (int) (x + 6), (int) (y + 4), new Color(-1).getRGB());
 
         if (!listening) {
             FontRenderers.getSettingsRenderer().drawString(matrixStack, value, (int) (x + width - 6 - FontRenderers.getSettingsRenderer().getStringWidth(value)), (int) y + 5, new Color(-1).getRGB());
@@ -90,6 +94,7 @@ public class SliderElement extends AbstractElement {
         }
         if (listening)
             ThunderHack.currentKeyListener = ThunderHack.KeyListening.Sliders;
+        super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
@@ -115,7 +120,6 @@ public class SliderElement extends AbstractElement {
                 case GLFW.GLFW_KEY_ENTER -> {
                     try {
                         this.searchNumber();
-
                     } catch (Exception e) {
                         Stringnumber = "";
                         listening = false;
@@ -126,8 +130,13 @@ public class SliderElement extends AbstractElement {
                     this.Stringnumber = removeLastChar(this.Stringnumber);
                     return;
                 }
-            }
 
+                case GLFW.GLFW_KEY_DELETE -> {
+                    Stringnumber = "";
+                    listening = false;
+                    return;
+                }
+            }
             this.Stringnumber = this.Stringnumber + GLFW.glfwGetKeyName(keyCode, 0);
         }
     }

@@ -159,7 +159,7 @@ public class FGHelper extends Module {
             if (mc.player.hurtTime > 0) pvpTimer.reset();
             if (near.getValue()) if (mc.player.age % 30 == 0) mc.player.networkHandler.sendChatCommand("near");
             if (farmilka.getValue()) {
-                for (Entity ent : mc.world.getEntities()) {
+                for (Entity ent : ThunderHack.asyncManager.getAsyncEntities()) {
                     if (ent instanceof PlayerEntity) continue;
                     if (ent instanceof LivingEntity) {
                         if (((LivingEntity) ent).isDead())

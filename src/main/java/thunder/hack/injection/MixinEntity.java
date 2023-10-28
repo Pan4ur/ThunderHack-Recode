@@ -2,6 +2,7 @@ package thunder.hack.injection;
 
 import net.minecraft.entity.MovementType;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -43,7 +44,7 @@ public abstract class MixinEntity implements IEntity {
     public List<Trails.Trail> trails = new ArrayList<>();
 
     @ModifyArgs(method = "pushAwayFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;addVelocity(DDD)V"))
-    private void pushAwayFromHook(Args args) {
+    public void pushAwayFromHook(Args args) {
         if ((Object) this == MinecraftClient.getInstance().player) {
             PushEvent event = new PushEvent(args.get(0), args.get(1), args.get(2));
             ThunderHack.EVENT_BUS.post(event);
@@ -69,7 +70,7 @@ public abstract class MixinEntity implements IEntity {
     }
 
     @Inject(method = "move", at = @At("HEAD"))
-    private void onMove(MovementType movementType, Vec3d movement, CallbackInfo ci) {
+    public void onMove(MovementType movementType, Vec3d movement, CallbackInfo ci) {
         ThunderHack.EVENT_BUS.post(new EventEntityMoving((Entity) (Object) this, movementType, movement));
     }
 
@@ -87,7 +88,7 @@ public abstract class MixinEntity implements IEntity {
     }
 
     @Inject(method = "isGlowing", at = @At("HEAD"), cancellable = true)
-    void isGlowingHook(CallbackInfoReturnable<Boolean> cir) {
+    public void isGlowingHook(CallbackInfoReturnable<Boolean> cir) {
         Shaders shaders = ModuleManager.shaders;
         if (shaders.isEnabled()) {
             cir.setReturnValue(shaders.shouldRender((Entity) (Object) this));
@@ -95,7 +96,7 @@ public abstract class MixinEntity implements IEntity {
     }
 
     @Inject(method = "isOnFire", at = @At("HEAD"), cancellable = true)
-    void isOnFireHook(CallbackInfoReturnable<Boolean> cir) {
+    public void isOnFireHook(CallbackInfoReturnable<Boolean> cir) {
         if (ModuleManager.noRender.isEnabled() && NoRender.fireEntity.getValue()) {
             cir.setReturnValue(false);
         }

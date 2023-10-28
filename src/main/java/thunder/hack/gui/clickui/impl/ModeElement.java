@@ -48,7 +48,11 @@ public class ModeElement extends AbstractElement {
 
         matrixStack.pop();
 
-        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting2.getName(), (int) (x + 6), (int) (y + wheight / 2 - (6 / 2f)) + 3, new Color(-1).getRGB());
+        if(setting.parent != null) {
+            Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, (float) (1f), 17, ClickGui.getInstance().getColor(1));
+        }
+
+        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting2.getName(), (setting.parent != null ? 2f : 0f) + (int) (x + 6), (int) (y + wheight / 2 - (6 / 2f)) + 3, new Color(-1).getRGB());
         FontRenderers.getSettingsRenderer().drawString(matrixStack, setting2.currentEnumName(), (int) (x + width - 16 - FontRenderers.getSettingsRenderer().getStringWidth(setting.currentEnumName())), 3 + (int) (y + wheight / 2 - (6 / 2f)), new Color(-1).getRGB());
 
         if (open) {
@@ -79,6 +83,7 @@ public class ModeElement extends AbstractElement {
                 offsetY += 12;
             }
         }
+        super.mouseClicked(mouseX, mouseY, button);
     }
 
 

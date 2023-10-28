@@ -260,12 +260,12 @@ public class AutoCrystal extends Module {
         if (bestCrystal == crystal) {
             attackCrystal(crystal);
             debug("end sequence");
-            if (instantPlace.getValue().getState()) {
+            if (instantPlace.getValue().getState() && placeTimer.passedMs(placeDelay.getValue())) {
                 debug("placing after attack");
                 if (recalculate.getValue() != Recalc.OFF)
                     calcPosition(recalculate.getValue() == Recalc.FAST ? 2f : placeRange.getValue(), recalculate.getValue() == Recalc.FAST ? crystal.getPos() : mc.player.getPos());
 
-                if (bestPosition != null && placeTimer.passedMs(placeDelay.getValue()))
+                if (bestPosition != null)
                     placeCrystal(bestPosition);
             }
         }

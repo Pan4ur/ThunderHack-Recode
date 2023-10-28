@@ -56,6 +56,7 @@ public final class AutoTotem extends Module {
     public Setting<Boolean> crapple = new Setting<>("CrappleSpoof", true, v -> offhand.getValue() == OffHand.GApple);
 
     private enum OffHand {Totem, Crystal, GApple, Shield}
+
     private static AutoTotem instance;
 
     private int delay;
@@ -174,7 +175,8 @@ public final class AutoTotem extends Module {
         Item item = null;
 
         if (offhand.getValue() == OffHand.Totem) {
-            if (!mc.player.getOffHandStack().getName().toString().toLowerCase().contains("руна") && !mc.player.getOffHandStack().getName().toString().toLowerCase().contains("шар")) {
+            if (!mc.player.getOffHandStack().getName().toString().toLowerCase().contains("руна")
+                    && !mc.player.getOffHandStack().getName().toString().toLowerCase().contains("шар")) {
                 item = Items.TOTEM_OF_UNDYING;
             }
         } else if (offhand.getValue() == OffHand.Crystal) {
@@ -205,9 +207,14 @@ public final class AutoTotem extends Module {
             } else if (crapple.found()) item = Items.GOLDEN_APPLE;
         }
 
+        if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) <= healthF.getValue() && InventoryUtility.findItemInInventory(Items.TOTEM_OF_UNDYING).found())
+            item = Items.TOTEM_OF_UNDYING;
+
         if (rcGap.getValue() && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed()) {
-            if (crapple.found()) item = Items.GOLDEN_APPLE;
-            if (gapple.found()) item = Items.ENCHANTED_GOLDEN_APPLE;
+            if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
+                item = Items.GOLDEN_APPLE;
+            if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+                item = Items.ENCHANTED_GOLDEN_APPLE;
         }
 
         if (onFall.getValue() && (mc.player.getHealth() + mc.player.getAbsorptionAmount()) - (((mc.player.fallDistance - 3) / 2F) + 3.5F) < 0.5)
@@ -258,9 +265,6 @@ public final class AutoTotem extends Module {
                 }
             }
         }
-
-        if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) <= healthF.getValue() && InventoryUtility.findItemInInventory(Items.TOTEM_OF_UNDYING).found())
-            item = Items.TOTEM_OF_UNDYING;
 
         for (int i = 9; i < 45; i++) {
             if (mc.player.getOffHandStack().getItem() == item) return -1;

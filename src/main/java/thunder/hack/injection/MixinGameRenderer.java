@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.DimensionEffects;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.item.SwordItem;
 import net.minecraft.resource.ResourceFactory;
@@ -91,7 +90,7 @@ public abstract class MixinGameRenderer {
             mc.getProfiler().pop();
             info.cancel();
         }
-        if (ModuleManager.aura.isEnabled() && Aura.target != null && mc.player.distanceTo(Aura.target) <= Aura.attackRange.getValue() && Aura.mode.getValue() != Aura.Mode.None) {
+        if (ModuleManager.aura.isEnabled() && Aura.target != null && mc.player.distanceTo(Aura.target) <= Aura.attackRange.getValue() && Aura.rotationMode.getValue() != Aura.Rotation.None) {
             mc.getProfiler().pop();
             info.cancel();
             //add vector from aura

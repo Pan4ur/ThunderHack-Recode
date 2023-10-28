@@ -34,6 +34,8 @@ public class BindElement extends AbstractElement {
             isListening = false;
         }
         if (hovered && button == 0) isListening = !isListening;
+
+        super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override

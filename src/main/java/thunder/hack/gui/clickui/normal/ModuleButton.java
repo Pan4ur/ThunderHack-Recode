@@ -3,7 +3,6 @@ package thunder.hack.gui.clickui.normal;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.cmd.Command;
@@ -41,7 +40,7 @@ public class ModuleButton extends AbstractButton {
 
         for (Setting setting : module.getSettings()) {
             if (setting.getValue() instanceof Boolean && !setting.getName().equals("Enabled") && !setting.getName().equals("Drawn")) {
-                elements.add(new CheckBoxElement(setting));
+                elements.add(new BooleanElement(setting));
             } else if (setting.getValue() instanceof ColorSetting) {
                 elements.add(new ColorPickerElement(setting));
             }else if (setting.getValue() instanceof BooleanParent) {
@@ -75,7 +74,7 @@ public class ModuleButton extends AbstractButton {
 
         if(isHiden()) return;
 
-        offset_animation = CheckBoxElement.fast(1f, 0f, 15f);
+        offset_animation = BooleanElement.fast(1f, 0f, 15f);
         if (target_offset != offsetY) {
             offsetY = interp(offsetY, target_offset, offset_animation);
         } else offset_animation = 1f;
@@ -125,7 +124,7 @@ public class ModuleButton extends AbstractButton {
             if (isOpen()) {
                 Render2DEngine.popWindow();
             }
-        } else category_animation = CheckBoxElement.fast(1, 0, 1f);
+        } else category_animation = BooleanElement.fast(1, 0, 1f);
 
 
         if (module.isEnabled()) {
@@ -272,7 +271,7 @@ public class ModuleButton extends AbstractButton {
                 if (element.isVisible())
                     offsetY += element.getHeight();
             }
-            category_animation = CheckBoxElement.fast(category_animation, 0, 8f);
+            category_animation = BooleanElement.fast(category_animation, 0, 8f);
             offsetY1 = (float) interp(offsetY1, offsetY, category_animation);
         }
         return offsetY1;
