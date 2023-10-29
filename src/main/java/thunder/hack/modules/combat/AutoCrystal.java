@@ -278,7 +278,7 @@ public class AutoCrystal extends Module {
         if (e.getPacket() instanceof ExplosionS2CPacket explosion) {
             for (Entity ent : Lists.newArrayList(mc.world.getEntities())) {
                 if (ent instanceof EndCrystalEntity crystal
-                        && crystal.squaredDistanceTo(new Vec3d(explosion.getX(), explosion.getY(), explosion.getZ())) <= 36
+                        && crystal.squaredDistanceTo(explosion.getX(), explosion.getY(), explosion.getZ()) <= 144
                         && !deadCrystals.containsKey(crystal)) {
                     debug("Removed " + crystal.getPos().toString() + " (due to explosion)");
                     deadCrystals.put(crystal, System.currentTimeMillis());

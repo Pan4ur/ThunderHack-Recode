@@ -51,8 +51,11 @@ public class LogoutSpots extends Module {
                 for (UUID uuid : playerCache.keySet()) {
                     if (!uuid.equals(uuid2)) continue;
                     final PlayerEntity pl = playerCache.get(uuid);
-                    sendMessage(pl.getName().getString() + " logged out at  X: " + (int) pl.getX() + " Y: " + (int) pl.getY() + " Z: " + (int) pl.getZ());
-                    if (!logoutCache.containsKey(uuid)) logoutCache.put(uuid, pl);
+                    if(pl != null) {
+                        sendMessage(pl.getName().getString() + " logged out at  X: " + (int) pl.getX() + " Y: " + (int) pl.getY() + " Z: " + (int) pl.getZ());
+                        if (!logoutCache.containsKey(uuid))
+                            logoutCache.put(uuid, pl);
+                    }
                 }
             }
             playerCache.clear();
@@ -76,34 +79,37 @@ public class LogoutSpots extends Module {
     public void onRender3D(MatrixStack event) {
         for (UUID uuid : logoutCache.keySet()) {
             final PlayerEntity data = logoutCache.get(uuid);
-            Render3DEngine.drawBoxOutline(data.getBoundingBox(), color.getValue().getColorObject(), 2);
+            if(data != null) {
+                Render3DEngine.drawBoxOutline(data.getBoundingBox(), color.getValue().getColorObject(), 2);
+            }
         }
     }
 
     public void onRender2D(DrawContext context) {
         for (UUID uuid : logoutCache.keySet()) {
             final PlayerEntity data = logoutCache.get(uuid);
+            if(data != null) {
+                Vec3d vector = new Vec3d(data.getX(), data.getY() + 2, data.getZ());
+                Vector4d position = null;
 
-            Vec3d vector = new Vec3d(data.getX(), data.getY() + 2, data.getZ());
-            Vector4d position = null;
+                vector = Render3DEngine.worldSpaceToScreenSpace(new Vec3d(vector.x, vector.y, vector.z));
+                if (vector.z > 0 && vector.z < 1) {
+                    position = new Vector4d(vector.x, vector.y, vector.z, 0);
+                    position.x = Math.min(vector.x, position.x);
+                    position.y = Math.min(vector.y, position.y);
+                    position.z = Math.max(vector.x, position.z);
+                }
 
-            vector = Render3DEngine.worldSpaceToScreenSpace(new Vec3d(vector.x, vector.y, vector.z));
-            if (vector.z > 0 && vector.z < 1) {
-                position = new Vector4d(vector.x, vector.y, vector.z, 0);
-                position.x = Math.min(vector.x, position.x);
-                position.y = Math.min(vector.y, position.y);
-                position.z = Math.max(vector.x, position.z);
-            }
+                String string = data.getName().getString() + " " + String.format("%.1f", (data.getHealth() + data.getAbsorptionAmount())) + " X: " + (int) data.getX() + " " + " Z: " + (int) data.getZ();
 
-            String string = data.getName().getString() + " " + String.format("%.1f", (data.getHealth() + data.getAbsorptionAmount())) + " X: " + (int) data.getX() + " " + " Z: " + (int) data.getZ();
+                if (position != null) {
+                    float diff = (float) (position.z - position.x) / 2;
+                    float textWidth = (FontRenderers.sf_bold.getStringWidth(string) * 1);
+                    float tagX = (float) ((position.x + diff - textWidth / 2) * 1);
 
-            if (position != null) {
-                float diff = (float) (position.z - position.x) / 2;
-                float textWidth = (FontRenderers.sf_bold.getStringWidth(string) * 1);
-                float tagX = (float) ((position.x + diff - textWidth / 2) * 1);
-
-                Render2DEngine.drawRect(context.getMatrices(), tagX - 2, (float) (position.y - 13f), textWidth + 4, 11, new Color(0x99000001, true));
-                FontRenderers.sf_bold.drawString(context.getMatrices(), string, tagX, (float) position.y - 10, -1);
+                    Render2DEngine.drawRect(context.getMatrices(), tagX - 2, (float) (position.y - 13f), textWidth + 4, 11, new Color(0x99000001, true));
+                    FontRenderers.sf_bold.drawString(context.getMatrices(), string, tagX, (float) position.y - 10, -1);
+                }
             }
         }
     }
