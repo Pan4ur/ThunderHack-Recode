@@ -1,14 +1,12 @@
 package thunder.hack.modules.client;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.events.impl.DeathEvent;
 import thunder.hack.events.impl.EventAttack;
-import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.combat.AutoCrystal;
@@ -63,16 +61,13 @@ public class SoundFX extends Module {
     }
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.@NotNull Receive e) {
-        if (!(e.getPacket() instanceof EntityStatusS2CPacket pac)) return;
-        if (pac.getStatus() == EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES && killSound.getValue() != KillSound.OFF) {
-            if (Aura.target != null && Aura.target == pac.getEntity(mc.world)) {
-                playSound("kill");
-                return;
-            }
-            if (AutoCrystal.target != null && AutoCrystal.target == pac.getEntity(mc.world)) {
-                playSound("kill");
-            }
+    public void onDeath(DeathEvent e) {
+        if (Aura.target != null && Aura.target == e.getPlayer()) {
+            playSound("kill");
+            return;
+        }
+        if (AutoCrystal.target != null && AutoCrystal.target == e.getPlayer()) {
+            playSound("kill");
         }
     }
 
@@ -93,7 +88,7 @@ public class SoundFX extends Module {
     }
 
     public void playScroll() {
-        if(scrollTimer.every(50)) {
+        if (scrollTimer.every(50)) {
             if (scrollSound.getValue() == ScrollSound.KeyBoard) {
                 playSound(SoundUtility.KEYPRESS_SOUNDEVENT);
             } else if (scrollSound.getValue() == ScrollSound.Custom) {
@@ -103,7 +98,7 @@ public class SoundFX extends Module {
     }
 
     private void playSound(SoundEvent sound) {
-        if(mc.player != null && mc.world != null)
+        if (mc.player != null && mc.world != null)
             mc.world.playSound(mc.player, mc.player.getBlockPos(), sound, SoundCategory.BLOCKS, (float) volume.getValue() / 100f, 1f);
     }
 

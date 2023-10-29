@@ -122,6 +122,9 @@ public class FontRenderer implements Closeable {
     }
 
     public void drawString(@NotNull MatrixStack stack, @NotNull String s, float x, float y, float r, float g, float b, float a) {
+        if(s.isEmpty())
+            return;
+
         sizeCheck();
         float r2 = r, g2 = g, b2 = b;
         stack.push();
@@ -170,6 +173,8 @@ public class FontRenderer implements Closeable {
                 continue;
             }
             Glyph glyph = locateGlyph1(c);
+            if(glyph == null)
+                continue;
             if (glyph.value() != ' ') {
                 Identifier i1 = glyph.owner().bindToTexture;
                 DrawEntry entry = new DrawEntry(xOffset, yOffset, r2, g2, b2, glyph);

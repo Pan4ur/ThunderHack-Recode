@@ -43,11 +43,7 @@ public class ConfigManager implements IManager {
         if (!ConfigsFolder.exists()) ConfigsFolder.mkdirs();
         if (!TempFolder.exists()) TempFolder.mkdirs();
         if (!MiscFolder.exists()) MiscFolder.mkdirs();
-        if (!SoundsFolder.exists()) {
-            SoundsFolder.mkdirs();
-            if(!ModuleManager.soundFX.isEnabled())
-                ModuleManager.soundFX.enable();
-        }
+        if (!SoundsFolder.exists()) SoundsFolder.mkdirs();
         loadSearch();
     }
 
