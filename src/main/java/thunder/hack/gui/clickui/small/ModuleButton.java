@@ -6,9 +6,11 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.cmd.Command;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractButton;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.clickui.impl.*;
+import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.TargetHud;
 import thunder.hack.modules.Module;
@@ -29,7 +31,7 @@ public class ModuleButton extends AbstractButton {
     private final List<AbstractElement> elements;
     public final Module module;
     private boolean open;
-    private boolean hovered;
+    private boolean hovered, prevHovered;
 
     private boolean binding = false;
     private boolean holdbind = false;
@@ -66,8 +68,13 @@ public class ModuleButton extends AbstractButton {
     public void render(DrawContext context, int mouseX, int mouseY, float delta, Color color) {
         hovered = Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height);
 
-        if(hovered)
-            SmallClickUI.currentDescription = I18n.translate(module.getDescription());
+        if(hovered) {
+            if(!prevHovered)
+                ModuleManager.soundFX.playScroll();
+            ClickUI.currentDescription = I18n.translate(module.getDescription());
+        }
+
+        prevHovered = hovered;
 
         double ix = x + 5;
         double iy = y + height / 2 - (6 / 2f);

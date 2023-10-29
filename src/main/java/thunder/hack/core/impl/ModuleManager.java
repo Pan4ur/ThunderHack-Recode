@@ -134,7 +134,6 @@ public class ModuleManager implements IManager {
     public static KeyBinds keyBinds = new KeyBinds();
     public static HoleSnap holeSnap = new HoleSnap();
     public static HoleFill holeFill = new HoleFill();
-    public static HitSound hitSound = new HitSound();
     public static FGHelper fgHelper = new FGHelper();
     public static ExtraTab extraTab = new ExtraTab();
     public static ClickGui clickGui = new ClickGui();
@@ -149,6 +148,7 @@ public class ModuleManager implements IManager {
     public static SelfTrap selfTrap = new SelfTrap();
     public static AntiVoid antiVoid = new AntiVoid();
     public static KillFeed killFeed = new KillFeed();
+    public static SoundFX soundFX = new SoundFX();
     public static AutoBed autoBed = new AutoBed();
     public static TNTAura tntAura = new TNTAura();
     public static VoidESP voidESP = new VoidESP();
@@ -263,6 +263,7 @@ public class ModuleManager implements IManager {
             ModuleManager.notifications.enable();
             if (!ThunderHack.isOnLinux())
                 RPC.getInstance().enable();
+            soundFX.enable();
         }
     }
 
