@@ -26,7 +26,7 @@ public class KeyBinds extends HudElement {
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
 
-        float max_width = 40;
+        float max_width = 50;
         for (Module feature : ThunderHack.moduleManager.modules) {
             if (feature.isDisabled() && onlyEnabled.getValue()) continue;
             if (!Objects.equals(feature.getBind().getBind(), "None") && feature != ModuleManager.clickGui && feature != ModuleManager.thunderHackGui) {
@@ -54,7 +54,7 @@ public class KeyBinds extends HudElement {
 
     public void onRenderShaders(DrawContext context) {
         int y_offset1 = 0;
-        float max_width = 40;
+        float max_width = 50;
         for (Module feature : ThunderHack.moduleManager.modules) {
             if (feature.isDisabled() && onlyEnabled.getValue()) continue;
             if (!Objects.equals(feature.getBind().getBind(), "None") && feature != ModuleManager.clickGui && feature != ModuleManager.thunderHackGui) {

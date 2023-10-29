@@ -34,6 +34,7 @@ public class ModuleManager implements IManager {
     public static DurabilityAlert durabilityAlert = new DurabilityAlert();
     public static AutoCrystalBase autoCrystalBase = new AutoCrystalBase();
     public static CrosshairArrows crosshairArrows = new CrosshairArrows();
+    public static PearlBlockThrow pearlBlockThrow = new PearlBlockThrow();
     public static TimerIndicator timerIndicator = new TimerIndicator();
     public static ThunderHackGui thunderHackGui = new ThunderHackGui();
     public static NoServerRotate noServerRotate = new NoServerRotate();
@@ -53,12 +54,10 @@ public class ModuleManager implements IManager {
     public static RadarRewrite radarRewrite = new RadarRewrite();
     public static PVPResources pvpResources = new PVPResources();
     public static NoServerSlot noServerSlot = new NoServerSlot();
-    public static NoPitchLimit noPitchLimit = new NoPitchLimit();
     public static NoCameraClip noCameraClip = new NoCameraClip();
     public static MainSettings mainSettings = new MainSettings();
     public static ItemScroller itemScroller = new ItemScroller();
     public static HitParticles hitParticles = new HitParticles();
-    public static HitBoxTricks hitBoxTricks = new HitBoxTricks();
     public static ElytraRecast elytraRecast = new ElytraRecast();
     public static EbatteSratte ebatteSratte = new EbatteSratte();
     public static ChestStealer chestStealer = new ChestStealer();
@@ -142,7 +141,6 @@ public class ModuleManager implements IManager {
     public static AutoTrap autoTrap = new AutoTrap();
     public static AutoTool autoTool = new AutoTool();
     public static AutoSoup autoSoup = new AutoSoup();
-    public static AutoMend autoMend = new AutoMend();
     public static AutoFish autoFish = new AutoFish();
     public static AutoBuff autoBuff = new AutoBuff();
     public static AutoAuth autoAuth = new AutoAuth();

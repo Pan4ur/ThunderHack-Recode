@@ -27,6 +27,7 @@ public class ElytraReplace extends Module {
                 clickSlot(result);
                 mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                 ThunderHack.notificationManager.publicity("ElytraReplace", isRu() ? "Меняем элитру на новую!" : "Swapping the old elytra for a new one!",2, Notification.Type.SUCCESS);
+                sendMessage(isRu() ? "Меняем элитру на новую!" : "Swapping the old elytra for a new one!");
             }
         }
     }

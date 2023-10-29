@@ -88,6 +88,7 @@ public final class Aura extends Module {
     public final Setting<Boolean> tpDisable = new Setting<>("TPDisable", false).withParent(advanced);
     public final Setting<Boolean> pullDown = new Setting<>("PullDown", false).withParent(advanced);
     public final Setting<Float> pullValue = new Setting<>("PullValue", 3f, 0f, 20f, v -> pullDown.getValue()).withParent(advanced);
+    public final Setting<AttackHand> attackHand = new Setting<>("AttackHand", AttackHand.MainHand).withParent(advanced);
     public final Setting<RayTraceAngle> rayTraceAngle = new Setting<>("TraceAngle", RayTraceAngle.Calculated).withParent(advanced);
     public final Setting<Resolver> resolver = new Setting<>("Resolver", Resolver.Advantage).withParent(advanced);
     public final Setting<Integer> minYawStep = new Setting<>("MinYawStep", 65, 1, 180).withParent(advanced);
@@ -117,7 +118,7 @@ public final class Aura extends Module {
     private Vec3d rotationMotion = Vec3d.ZERO;
 
     private int hitTicks;
-    public static boolean lookingAtHitbox;
+    private boolean lookingAtHitbox;
 
     private static Aura instance;
 
@@ -189,7 +190,7 @@ public final class Aura extends Module {
         int prevSlot = switchMethod();
         mc.interactionManager.attackEntity(mc.player, target);
         Criticals.cancelCrit = false;
-        mc.player.swingHand(Hand.MAIN_HAND);
+        swingHand();
         hitTicks = getHitTicks();
         if (prevSlot != -1)
             InventoryUtility.switchTo(prevSlot);
@@ -340,17 +341,24 @@ public final class Aura extends Module {
             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, axeSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
             sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
             mc.interactionManager.attackEntity(mc.player, target);
-            mc.player.swingHand(Hand.MAIN_HAND);
+            swingHand();
             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, axeSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
             sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
         } else {
             sendPacket(new UpdateSelectedSlotC2SPacket(axeSlot));
             mc.interactionManager.attackEntity(mc.player, target);
-            mc.player.swingHand(Hand.MAIN_HAND);
+            swingHand();
             sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
         }
         hitTicks = 10;
         return true;
+    }
+
+    private void swingHand() {
+        switch (attackHand.getValue()) {
+            case OffHand -> mc.player.swingHand(Hand.OFF_HAND);
+            case MainHand -> mc.player.swingHand(Hand.MAIN_HAND);
+        }
     }
 
     public static boolean isAboveWater() {
@@ -393,6 +401,9 @@ public final class Aura extends Module {
             if (targetVec == null)
                 return;
 
+            float prevYaw = rotationYaw;
+            float prevPitch = rotationPitch;
+
             float delta_yaw = wrapDegrees((float) wrapDegrees(Math.toDegrees(Math.atan2(targetVec.z - mc.player.getZ(), (targetVec.x - mc.player.getX()))) - 90) - rotationYaw);
             float delta_pitch = ((float) (-Math.toDegrees(Math.atan2(targetVec.y - (mc.player.getPos().y + mc.player.getEyeHeight(mc.player.getPose())), Math.sqrt(Math.pow((targetVec.x - mc.player.getX()), 2) + Math.pow(targetVec.z - mc.player.getZ(), 2))))) - rotationPitch);
 
@@ -421,8 +432,8 @@ public final class Aura extends Module {
             }
 
             lookingAtHitbox = ThunderHack.playerManager.checkRtx(
-                    rayTraceAngle.getValue() == RayTraceAngle.Calculated ? rotationYaw : mc.player.getYaw(),
-                    rayTraceAngle.getValue() == RayTraceAngle.Calculated ? rotationPitch : mc.player.getPitch(),
+                    rayTraceAngle.getValue() == RayTraceAngle.Calculated ? rotationYaw : prevYaw,
+                    rayTraceAngle.getValue() == RayTraceAngle.Calculated ? rotationPitch : prevPitch,
                     attackRange.getValue(), ignoreWalls.getValue().getState(), rayTrace.getValue());
         }
     }
@@ -679,5 +690,9 @@ public final class Aura extends Module {
 
     public enum Mode {
         Interact, Track
+    }
+
+    public enum AttackHand {
+        MainHand, OffHand, None
     }
 }
