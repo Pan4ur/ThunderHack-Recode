@@ -47,7 +47,7 @@ public class BooleanParentElement extends AbstractElement {
         context.drawTexture(arrow, (int) (x + width - 14), (int) (y + (17 - 6) / 2), 0, 0, 6, 6, 6, 6);
         matrixStack.pop();
 
-        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName() ,(int) (x + 6), (int) (y + height / 2 - 2), new Color(-1).getRGB());
+        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName() ,(int) (x + 6), (y + height / 2 - (6 / 2f)) + 2, new Color(-1).getRGB());
 
         animation = fast(animation, getParentSetting().getValue().getState() ? 1 : 0, 15f);
         double paddingX = 7 * animation;
@@ -71,6 +71,7 @@ public class BooleanParentElement extends AbstractElement {
             if(button == 0) getParentSetting().getValue().setState(!getParentSetting().getValue().getState());
             else getParentSetting().getValue().setExtended(!getParentSetting().getValue().isExtended());
         }
+        super.mouseClicked(mouseX, mouseY, button);
     }
 
     public Setting<BooleanParent> getParentSetting() {

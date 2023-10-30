@@ -260,12 +260,12 @@ public class AutoCrystal extends Module {
         if (bestCrystal == crystal) {
             attackCrystal(crystal);
             debug("end sequence");
-            if (instantPlace.getValue().getState()) {
+            if (instantPlace.getValue().getState() && placeTimer.passedMs(placeDelay.getValue())) {
                 debug("placing after attack");
                 if (recalculate.getValue() != Recalc.OFF)
                     calcPosition(recalculate.getValue() == Recalc.FAST ? 2f : placeRange.getValue(), recalculate.getValue() == Recalc.FAST ? crystal.getPos() : mc.player.getPos());
 
-                if (bestPosition != null && placeTimer.passedMs(placeDelay.getValue()))
+                if (bestPosition != null)
                     placeCrystal(bestPosition);
             }
         }
@@ -278,7 +278,7 @@ public class AutoCrystal extends Module {
         if (e.getPacket() instanceof ExplosionS2CPacket explosion) {
             for (Entity ent : Lists.newArrayList(mc.world.getEntities())) {
                 if (ent instanceof EndCrystalEntity crystal
-                        && crystal.squaredDistanceTo(new Vec3d(explosion.getX(), explosion.getY(), explosion.getZ())) <= 36
+                        && crystal.squaredDistanceTo(explosion.getX(), explosion.getY(), explosion.getZ()) <= 144
                         && !deadCrystals.containsKey(crystal)) {
                     debug("Removed " + crystal.getPos().toString() + " (due to explosion)");
                     deadCrystals.put(crystal, System.currentTimeMillis());

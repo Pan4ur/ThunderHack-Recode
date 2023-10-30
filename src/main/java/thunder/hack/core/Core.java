@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
@@ -53,6 +54,11 @@ public final class Core {
         if (ModuleManager.clickGui.getBind().getKey() == -1) {
             Command.sendMessage(Formatting.RED + "Default clickgui keybind --> P");
             ModuleManager.clickGui.setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(), false, false);
+        }
+
+        for(PlayerEntity p : mc.world.getPlayers()) {
+            if(p.isDead() || p.getHealth() == 0)
+                ThunderHack.EVENT_BUS.post(new DeathEvent(p));
         }
 
         if (!Objects.equals(ThunderHack.commandManager.getPrefix(), MainSettings.prefix.getValue().toString()))

@@ -29,6 +29,7 @@ public class StringElement extends AbstractElement {
             listening = !listening;
         if (listening)
             ThunderHack.currentKeyListener = ThunderHack.KeyListening.Strings;
+        super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override

@@ -70,8 +70,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         ThunderHack.EVENT_BUS.post(event);
         EventSprint e = new EventSprint(isSprinting());
         ThunderHack.EVENT_BUS.post(e);
-        EventAfterRotate ear = new EventAfterRotate();
-        ThunderHack.EVENT_BUS.post(ear);
+        ThunderHack.EVENT_BUS.post(new EventAfterRotate());
         if (e.getSprintState() != mc.player.lastSprinting) {
             if (e.getSprintState())
                 mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(this, ClientCommandC2SPacket.Mode.START_SPRINTING));

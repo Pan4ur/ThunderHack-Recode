@@ -170,6 +170,8 @@ public class ColorPickerElement extends AbstractElement {
         else if (copyHovered) ThunderHack.copy_color = getColorSetting().getColorObject();
 
         else if (pasteHovered) getColorSetting().setColor(ThunderHack.copy_color.getRGB());
+
+        super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override

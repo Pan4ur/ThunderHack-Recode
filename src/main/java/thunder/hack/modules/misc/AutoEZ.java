@@ -5,6 +5,7 @@ import net.minecraft.entity.EntityStatuses;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.events.impl.DeathEvent;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
@@ -132,18 +133,14 @@ public final class AutoEZ extends Module {
     }
 
     @EventHandler
-    public void onPacket(PacketEvent.@NotNull Receive e) {
-        if (!(e.getPacket() instanceof EntityStatusS2CPacket pac)) return;
-        if (pac.getStatus() == EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES) {
-            if (server.getValue() != ServerMode.Universal) return;
-            if (Aura.target != null && Aura.target == pac.getEntity(mc.world)) {
-                sayEZ(pac.getEntity(mc.world).getName().getString());
-                return;
-            }
-            if (AutoCrystal.target != null && AutoCrystal.target == pac.getEntity(mc.world)) {
-                sayEZ(pac.getEntity(mc.world).getName().getString());
-            }
+    public void onDeath(DeathEvent e) {
+        if (server.getValue() != ServerMode.Universal) return;
+        if (Aura.target != null && Aura.target == e.getPlayer()) {
+            sayEZ(e.getPlayer().getName().getString());
+            return;
         }
+        if (AutoCrystal.target != null && AutoCrystal.target == e.getPlayer())
+            sayEZ(e.getPlayer().getName().getString());
     }
 
     public void sayEZ(String pn) {

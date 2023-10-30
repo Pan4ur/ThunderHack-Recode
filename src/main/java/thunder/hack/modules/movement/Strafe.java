@@ -12,7 +12,6 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
@@ -30,9 +29,10 @@ public class Strafe extends Module {
     public Setting<Float> setSpeed = new Setting<>("speed", 1.3F, 0.0F, 2f, v -> boost.getValue() == Boost.Elytra);
     private final Setting<Float> velReduction = new Setting<>("Reduction", 6.0f, 0.1f, 10f, v -> boost.getValue() == Boost.Damage);
     private final Setting<Float> maxVelocitySpeed = new Setting<>("MaxVelocity", 0.8f, 0.1f, 2f, v -> boost.getValue() == Boost.Damage);
+    private final Setting<Boolean> sunrise = new Setting<>("Sunrise", true, v -> boost.getValue() == Boost.Elytra);
 
     public static double oldSpeed, contextFriction, fovval;
-    public static boolean needSwap, needSprintState,disabled;
+    public static boolean needSwap, needSprintState, disabled;
     public static int noSlowTicks;
     static long disableTime;
 
@@ -44,24 +44,23 @@ public class Strafe extends Module {
         float speedAttributes = getAIMoveSpeed();
         final float frictionFactor = mc.world.getBlockState(new BlockPos.Mutable().set(mc.player.getX(), getBoundingBox().getMin(Direction.Axis.Y) - move.getY(), mc.player.getZ())).getBlock().getSlipperiness() * 0.91F;
         float n6 = mc.player.hasStatusEffect(StatusEffects.JUMP_BOOST) && mc.player.isUsingItem() ? 0.88f : (float) (oldSpeed > 0.32 && mc.player.isUsingItem() ? 0.88 : 0.91F);
-        if (mc.player.isOnGround()) {
+        if (mc.player.isOnGround())
             n6 = frictionFactor;
-        }
+
         float n7 = (float) (0.1631f / Math.pow(n6, 3.0f));
         float n8;
         if (mc.player.isOnGround()) {
             n8 = speedAttributes * n7;
-            if (move.getY() > 0) {
-                n8 += boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && disabled ? 0.65f : 0.2f;
-            }
+            if (move.getY() > 0)
+                n8 += boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && (disabled && System.currentTimeMillis() - disableTime < 300) ? 0.65f : 0.2f;
             disabled = false;
-        } else {
-            n8 = 0.0255f;
-        }
+        } else n8 = 0.0255f;
+
         boolean noslow = false;
         double max2 = oldSpeed + n8;
         double max = 0.0;
-        if (mc.player.isUsingItem() && move.getY() <= 0) {
+
+        if (mc.player.isUsingItem() && move.getY() <= 0 && !sunrise.getValue()) {
             double n10 = oldSpeed + n8 * 0.25;
             double motionY2 = move.getY();
             if (motionY2 != 0.0 && Math.abs(motionY2) < 0.08) {
@@ -76,18 +75,15 @@ public class Strafe extends Module {
         } else {
             noSlowTicks = 0;
         }
-        if (noSlowTicks > 3) {
-            max2 = max - 0.019;
-        } else {
-            max2 = Math.max(noslow ? 0 : 0.25, max2) - (mc.player.age % 2 == 0 ? 0.001 : 0.002);
-        }
+
+        if (noSlowTicks > 3) max2 = max - 0.019;
+        else max2 = Math.max(noslow ? 0 : 0.25, max2) - (mc.player.age % 2 == 0 ? 0.001 : 0.002);
+
         contextFriction = n6;
         if (!mc.player.isOnGround()) {
             needSprintState = !mc.player.lastSprinting;
             needSwap = true;
-        } else {
-            needSprintState = false;
-        }
+        } else needSprintState = false;
         return max2;
     }
 
@@ -120,7 +116,6 @@ public class Strafe extends Module {
     }
 
 
-
     @Override
     public void onEnable() {
         oldSpeed = 0.0;
@@ -129,7 +124,7 @@ public class Strafe extends Module {
     }
 
     @Override
-    public void onDisable(){
+    public void onDisable() {
         mc.options.getFovEffectScale().setValue(fovval);
     }
 
@@ -228,7 +223,9 @@ public class Strafe extends Module {
 
     @EventHandler
     public void onUpdate(PlayerUpdateEvent event) {
-        if ((boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && !mc.player.isOnGround() && mc.player.fallDistance > 0 && !disabled)) {
+
+        if ((boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && !mc.player.isOnGround() && mc.player.fallDistance > 0 && !disabled)
+                && (!mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, -1.1f, 0.0f)).iterator().hasNext() || !sunrise.getValue())) {
             disabler(InventoryUtility.getElytra());
         }
         elytraFix();
@@ -246,7 +243,8 @@ public class Strafe extends Module {
                 boolean needDrop = nullSlot == 999;
                 if (needDrop) nullSlot = 9;
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, nullSlot, 1, SlotActionType.PICKUP, mc.player);
-                if (needDrop) mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, -999, 0, SlotActionType.PICKUP, mc.player);
+                if (needDrop)
+                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, -999, 0, SlotActionType.PICKUP, mc.player);
                 delay.reset();
             }
         }

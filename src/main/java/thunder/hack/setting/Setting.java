@@ -15,7 +15,7 @@ public class Setting<T> {
     private T plannedValue;
     private T min;
     private T max;
-    private Setting<?> parent = null;
+    public Setting<?> parent = null;
 
     private boolean hasRestriction;
     private Predicate<T> visibility;

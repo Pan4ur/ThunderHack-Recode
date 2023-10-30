@@ -37,6 +37,8 @@ public class NoFall extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
+        if(fullNullCheck())
+            return;
         if (isFalling()) {
             if (mode.getValue() == Mode.Rubberband) sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
             if (mode.getValue() == Mode.Items) {

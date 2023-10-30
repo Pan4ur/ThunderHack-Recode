@@ -29,23 +29,9 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 public class ConfigManager implements IManager {
     public static File MainFolder = new File(mc.runDirectory, "ThunderHackRecode");
     public static File ConfigsFolder = new File(MainFolder, "configs");
-    public static File CustomImages = new File(MainFolder, "images");
     public static File TempFolder = new File(MainFolder, "temp");
-    public static File SkinsFolder = new File(TempFolder, "skins");
-    public static File CapesFolder = new File(TempFolder, "capes");
-    public static File HeadsFolder = new File(TempFolder, "heads");
-    public static File DiscordEmbeds = new File(TempFolder, "embeds");
     public static File MiscFolder = new File(MainFolder, "misc");
-    public static File KitsFolder = new File(MiscFolder, "kits");
-    //friends
-    //enemies
-    //webhook
-    //rpc
-    //autoEz
-    //currentcfg
-    //macro
-    //search
-    //alts
+    public static File SoundsFolder = new File(MiscFolder, "sounds");
 
     public static boolean firstLaunch = false;
 
@@ -55,14 +41,9 @@ public class ConfigManager implements IManager {
             firstLaunch = true;
         }
         if (!ConfigsFolder.exists()) ConfigsFolder.mkdirs();
-        if (!CustomImages.exists()) CustomImages.mkdirs();
         if (!TempFolder.exists()) TempFolder.mkdirs();
-        if (!SkinsFolder.exists()) SkinsFolder.mkdirs();
-        if (!CapesFolder.exists()) CapesFolder.mkdirs();
-        if (!HeadsFolder.exists()) HeadsFolder.mkdirs();
         if (!MiscFolder.exists()) MiscFolder.mkdirs();
-        if (!KitsFolder.exists()) KitsFolder.mkdirs();
-        if (!DiscordEmbeds.exists()) DiscordEmbeds.mkdirs();
+        if (!SoundsFolder.exists()) SoundsFolder.mkdirs();
         loadSearch();
     }
 

@@ -111,8 +111,7 @@ public abstract class Module {
 
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
             ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль включен!" : "Was Enabled!", 2, Notification.Type.ENABLED);
-
-            mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundUtility.ENABLE_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
+            ModuleManager.soundFX.playEnable();
         }
     }
 
@@ -139,8 +138,7 @@ public abstract class Module {
 
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
             ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль выключен!" : "Was Disabled!", 2, Notification.Type.DISABLED);
-
-            mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundUtility.DISABLE_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
+            ModuleManager.soundFX.playDisable();
         }
     }
 

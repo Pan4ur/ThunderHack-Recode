@@ -11,8 +11,8 @@ import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 
-public class CheckBoxElement extends AbstractElement {
-    public CheckBoxElement(Setting setting) {super(setting);}
+public class BooleanElement extends AbstractElement {
+    public BooleanElement(Setting setting) {super(setting);}
 
     float animation = 0f;
 
@@ -24,7 +24,12 @@ public class CheckBoxElement extends AbstractElement {
         Color color = ClickGui.getInstance().getColor(0);
         Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 21), (float) (y + height / 2 - 4), 15, 8, 4, paddingX > 4 ? color : new Color(0xFFB2B1B1));
         Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 20 + paddingX), (float) (y + height / 2 - 3), 6, 6, 3, new Color(-1));
-        FontRenderers.settings.drawString(context.getMatrices(),setting.getName(), (int) (x + 6), (int) (y + height / 2 - (6 / 2f)) + 2, new Color(-1).getRGB());
+
+        if(setting.parent != null) {
+            Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, (float) (1f), 15, ClickGui.getInstance().getColor(1));
+        }
+
+        FontRenderers.settings.drawString(context.getMatrices(),setting.getName(), (setting.parent != null ? 2f : 0f) + (x + 6), (y + height / 2 - (6 / 2f)) + 2, new Color(-1).getRGB());
     }
 
     @Override
@@ -32,6 +37,7 @@ public class CheckBoxElement extends AbstractElement {
         if (hovered && button == 0) {
             setting.setValue(!((Boolean) setting.getValue()));
         }
+        super.mouseClicked(mouseX, mouseY, button);
     }
 
     public static double deltaTime() {

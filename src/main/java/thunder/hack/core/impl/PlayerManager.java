@@ -20,11 +20,10 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.asm.mixin.Unique;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.IManager;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.EventTick;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
@@ -32,8 +31,9 @@ import thunder.hack.utility.Timer;
 
 public class PlayerManager implements IManager {
     public float serverYaw, serverPitch;
-    private float yaw, pitch;
-    public float lastYaw, lastPitch;
+    public float yaw;
+    private float pitch;
+    public float lastYaw, lastPitch, rotationYaw;
     public double currentPlayerSpeed;
     public int ticksElytraFlying;
     public int serverSideSlot = 0;
@@ -66,6 +66,7 @@ public class PlayerManager implements IManager {
     @EventHandler(priority = EventPriority.LOWEST)
     public void postSync(EventPostSync event) {
         if (Module.fullNullCheck()) return;
+        rotationYaw = mc.player.getYaw();
         mc.player.setYaw(this.yaw);
         mc.player.setPitch(this.pitch);
     }
@@ -109,6 +110,9 @@ public class PlayerManager implements IManager {
     }
 
     public boolean checkRtx(float yaw, float pitch, float distance, boolean ignoreWalls, Aura.RayTrace rt) {
+        if(rt == Aura.RayTrace.OFF)
+            return true;
+
         Entity targetedEntity;
         HitResult result = ignoreWalls ? null : rayTrace(distance, yaw, pitch);
         Vec3d vec3d = mc.player.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
@@ -120,12 +124,9 @@ public class PlayerManager implements IManager {
         EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator(), distancePow2);
         if (entityHitResult != null) {
             Entity entity2 = entityHitResult.getEntity();
-            Vec3d vec3d4 = entityHitResult.getPos();
-            double g = vec3d.squaredDistanceTo(vec3d4);
-            if (g < distancePow2 || result == null) {
+            if (vec3d.squaredDistanceTo(entityHitResult.getPos()) < distancePow2 || result == null) {
                 targetedEntity = entity2;
-                if (targetedEntity == Aura.target || rt == Aura.RayTrace.OnlyTarget) return true;
-
+                return targetedEntity == Aura.target || Aura.target == null || rt != Aura.RayTrace.AllEntities;
             }
         }
         return false;
@@ -170,7 +171,7 @@ public class PlayerManager implements IManager {
             distancePow2 = result.getPos().squaredDistanceTo(vec3d);
         Vec3d vec3d2 = getRotationVector(pitch, yaw);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * 5, vec3d2.y * 5, vec3d2.z * 5);
-        Box box = new Box(x-.3, y, z-.3, x+.3, y + mc.player.getEyeHeight(mc.player.getPose()), z+.3).stretch(vec3d2.multiply(5)).expand(1.0, 1.0, 1.0);
+        Box box = new Box(x - .3, y, z - .3, x + .3, y + mc.player.getEyeHeight(mc.player.getPose()), z + .3).stretch(vec3d2.multiply(5)).expand(1.0, 1.0, 1.0);
         EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator(), distancePow2);
         if (entityHitResult != null) {
             Entity entity2 = entityHitResult.getEntity();
@@ -186,7 +187,7 @@ public class PlayerManager implements IManager {
     }
 
     public HitResult rayTrace(double dst, float yaw, float pitch, double x, double y, double z) {
-        Vec3d vec3d = new Vec3d(x,y,z);
+        Vec3d vec3d = new Vec3d(x, y, z);
         Vec3d vec3d2 = getRotationVector(pitch, yaw);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * dst, vec3d2.y * dst, vec3d2.z * dst);
         return mc.world.raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));

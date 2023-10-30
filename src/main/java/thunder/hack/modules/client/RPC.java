@@ -142,7 +142,7 @@ public final class RPC extends Module {
         } else if (mc.currentScreen instanceof MultiplayerScreen || mc.currentScreen instanceof AddServerScreen) {
             result = isRu() ? "Выбирает сервер" : "Picks a server";
         } else if (mc.getCurrentServerEntry() != null) {
-            result = isRu() ? (showIP.getValue() ? "Играет на " + mc.getCurrentServerEntry().address : "сервере") : (showIP.getValue() ? "Playing on " + mc.getCurrentServerEntry().address : "server");
+            result = isRu() ? (showIP.getValue() ? "Играет на " + mc.getCurrentServerEntry().address : "Играет на сервере") : (showIP.getValue() ? "Playing on " + mc.getCurrentServerEntry().address : "Playing on server");
             if (mc.getCurrentServerEntry().address.equals("ngrief.me"))
                 result = mc.getCurrentServerEntry().address + " " + getNexusDetails();
         } else if (mc.isInSingleplayer()) {

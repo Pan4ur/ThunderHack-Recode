@@ -3,7 +3,9 @@ package thunder.hack.gui.clickui.impl;
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.modules.client.ClickGui;
 import thunder.hack.setting.impl.Parent;
+import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.Animation;
 import thunder.hack.utility.render.animation.DecelerateAnimation;
 import thunder.hack.utility.render.animation.Direction;
@@ -36,6 +38,10 @@ public class ParentElement extends AbstractElement {
         float tx = (float) (x + width - 11);
         float ty = (float) (y + (17 / 2));
 
+        if(getParentSetting().getValue().isExtended()) {
+            Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, (float) (getWidth() - 8f), (float) (getHeight()), ClickGui.getInstance().getColor(1));
+        }
+
         matrixStack.push();
         matrixStack.translate(tx, ty, 0);
         matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) (-180f * rotation.getOutput())));
@@ -43,7 +49,7 @@ public class ParentElement extends AbstractElement {
         context.drawTexture(arrow, (int) (x + width - 14), (int) (y + (17 - 6) / 2), 0, 0, 6, 6, 6, 6);
         matrixStack.pop();
 
-        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName() ,(int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy() )), (int) (y + height / 2 - 2), new Color(-1).getRGB());
+        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName() ,(int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy() )), (y + height / 2 - (6 / 2f)) + 2, new Color(-1).getRGB());
     }
 
     @Override
@@ -51,6 +57,7 @@ public class ParentElement extends AbstractElement {
         if (hovered) {
             getParentSetting().getValue().setExtended(!getParentSetting().getValue().isExtended());
         }
+        super.mouseClicked(mouseX, mouseY, button);
     }
 
     public Setting<Parent> getParentSetting() {
