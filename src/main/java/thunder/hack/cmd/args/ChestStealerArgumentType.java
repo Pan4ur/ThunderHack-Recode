@@ -28,7 +28,7 @@ public class ChestStealerArgumentType implements ArgumentType<String> {
     }
 
     @Override
-    public String parse(StringReader reader) throws CommandSyntaxException {
+    public String parse(@NotNull StringReader reader) throws CommandSyntaxException {
         String blockName = reader.readString();
         if (!getRegistered().contains(blockName)) throw new DynamicCommandExceptionType(
                 name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Такого предмета нет!" : "There is no such item!")

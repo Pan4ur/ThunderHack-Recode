@@ -209,7 +209,7 @@ public class ModuleManager implements IManager {
         modules.add(new Quiver());
         modules.add(new FastLatency());
 
-        if (!ThunderHack.isOnLinux())
+        if (ThunderHack.isOnWindows())
             modules.add(new RPC());
 
         for (Field field : getClass().getDeclaredFields()) {
@@ -261,7 +261,7 @@ public class ModuleManager implements IManager {
 
         if (ConfigManager.firstLaunch) {
             ModuleManager.notifications.enable();
-            if (!ThunderHack.isOnLinux())
+            if (ThunderHack.isOnWindows())
                 RPC.getInstance().enable();
             soundFX.enable();
         }

@@ -24,6 +24,7 @@ import thunder.hack.events.impl.*;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
@@ -36,6 +37,7 @@ import thunder.hack.utility.render.BlockAnimationUtility;
 import thunder.hack.utility.world.HoleUtility;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -73,7 +75,7 @@ public final class Surround extends Module {
     private final Setting<OnTpAction> onTp = new Setting<>("On Tp", OnTpAction.None).withParent(autoDisable);
     private final Setting<Boolean> onDeath = new Setting<>("On Death", false).withParent(autoDisable);
 
-    private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
+    private final Setting<BooleanParent> renderCategory = new Setting<>("Render", new BooleanParent(true));
     private final Setting<BlockAnimationUtility.BlockRenderMode> renderMode = new Setting<>("RenderMode", BlockAnimationUtility.BlockRenderMode.All).withParent(renderCategory);
     private final Setting<BlockAnimationUtility.BlockAnimationMode> animationMode = new Setting<>("AnimationMode", BlockAnimationUtility.BlockAnimationMode.Fade).withParent(renderCategory);
     private final Setting<ColorSetting> renderFillColor = new Setting<>("RenderFillColor", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
@@ -262,7 +264,7 @@ public final class Surround extends Module {
             validInteraction = InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), InteractionUtility.PlaceMode.Normal, slot, true, false);
         }
 
-        if (validInteraction) {
+        if (validInteraction && renderCategory.getValue().getState()) {
             BlockAnimationUtility.renderBlock(pos,
                     renderLineColor.getValue().getColorObject(),
                     renderLineWidth.getValue(),
@@ -316,7 +318,8 @@ public final class Surround extends Module {
             if (breakCrystal.getValue()) {
                 Lists.newArrayList(mc.world.getNonSpectatingEntities(EndCrystalEntity.class, new Box(bp))).stream()
                         .filter(entity -> mc.player.squaredDistanceTo(entity) <= range.getPow2Value())
-                        .forEach(this::removeCrystal);
+                        .min(Comparator.comparing(crystal -> mc.player.distanceTo(crystal)))
+                        .ifPresent(this::removeCrystal);
             }
 
             if (new Box(bp).intersects(mc.player.getBoundingBox()))
@@ -337,13 +340,13 @@ public final class Surround extends Module {
         if (center.getValue() == CenterMode.Disabled && mc.player != null) {
             int z;
             int x;
-            double decimalX = Math.abs(mc.player.getX()) - Math.floor(Math.abs(mc.player.getX()));
-            double decimalZ = Math.abs(mc.player.getZ()) - Math.floor(Math.abs(mc.player.getZ()));
-            int lengthXPos = calcLength(decimalX, false);
-            int lengthXNeg = calcLength(decimalX, true);
-            int lengthZPos = calcLength(decimalZ, false);
-            int lengthZNeg = calcLength(decimalZ, true);
-            ArrayList<BlockPos> tempOffsets = new ArrayList<>();
+            final double decimalX = Math.abs(mc.player.getX()) - Math.floor(Math.abs(mc.player.getX()));
+            final double decimalZ = Math.abs(mc.player.getZ()) - Math.floor(Math.abs(mc.player.getZ()));
+            final int lengthXPos = calcLength(decimalX, false);
+            final int lengthXNeg = calcLength(decimalX, true);
+            final int lengthZPos = calcLength(decimalZ, false);
+            final int lengthZNeg = calcLength(decimalZ, true);
+            final ArrayList<BlockPos> tempOffsets = new ArrayList<>();
             offsets.addAll(getOverlapPos());
 
             for (x = 1; x < lengthXPos + 1; ++x) {
@@ -382,14 +385,15 @@ public final class Surround extends Module {
         return offsets;
     }
 
-    public static boolean getDown(BlockPos pos) {
+    private boolean getDown(BlockPos pos) {
         if (mc.world == null) return false;
 
-        for (Direction e : Direction.values())
-            if (!mc.world.getBlockState(pos.add(e.getVector())).isReplaceable())
+        for (Direction dir : Direction.values())
+            if (!mc.world.getBlockState(pos.add(dir.getVector())).isReplaceable())
                 return false;
 
-        return true;
+        return mc.world.getBlockState(pos).isReplaceable()
+                && interact.getValue() != InteractionUtility.Interact.AirPlace;
     }
 
     private int calcOffset(double dec) {
@@ -404,7 +408,7 @@ public final class Surround extends Module {
     }
 
     private @NotNull List<BlockPos> getOverlapPos() {
-        ArrayList<BlockPos> positions = new ArrayList<>();
+        List<BlockPos> positions = new ArrayList<>();
 
         if (mc.player != null) {
             double decimalX = mc.player.getX() - Math.floor(mc.player.getX());
@@ -430,7 +434,7 @@ public final class Surround extends Module {
     }
 
     private int getSlot() {
-        List<Block> canUseBlocks = new ArrayList<>();
+        final List<Block> canUseBlocks = new ArrayList<>();
 
         if (obsidian.getValue()) canUseBlocks.add(Blocks.OBSIDIAN);
         if (enderChest.getValue()) canUseBlocks.add(Blocks.ENDER_CHEST);

@@ -45,7 +45,7 @@ public class Nuker extends Module {
     private final Setting<BlockSelection> blocks = new Setting<>("Blocks", BlockSelection.Select);
     private final Setting<Boolean> flatten = new Setting<>("Flatten", false);
     private final Setting<Boolean> creative = new Setting<>("Creative", false);
-    private final Setting<Float> range = new Setting<>("Range", 4.2f, 1.5f, 5f);
+    private final Setting<Float> range = new Setting<>("Range", 4.2f, 1.5f, 25f);
     private final Setting<ColorMode> colorMode = new Setting<>("ColorMode", ColorMode.Sync);
     public final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x2250b4b4), v -> colorMode.getValue() == ColorMode.Custom);
 
