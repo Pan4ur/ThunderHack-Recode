@@ -47,7 +47,6 @@ import thunder.hack.utility.render.Render3DEngine;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 

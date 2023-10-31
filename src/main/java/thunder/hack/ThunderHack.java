@@ -94,7 +94,7 @@ public class ThunderHack implements ModInitializer {
         syncVersion();
         ThunderUtility.parseChangeLog();
 
-        if(!isOnLinux())
+        if (isOnWindows())
             RPC.getInstance().startRpc();
 
         LogUtils.getLogger().info("""
@@ -121,8 +121,8 @@ public class ThunderHack implements ModInitializer {
         }
     }
 
-    public static boolean isOnLinux() {
-        return !(System.getProperty("os.name").startsWith("Windows"));
+    public static boolean isOnWindows() {
+        return System.getProperty("os.name").startsWith("Windows");
     }
 
     public enum KeyListening {

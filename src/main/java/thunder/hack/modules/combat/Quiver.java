@@ -20,7 +20,7 @@ import java.util.List;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class Quiver extends Module {
+public final class Quiver extends Module {
     private final Setting<Integer> shootCount = new Setting<>("Shoot Count", 1, 1, 10);
     private final Setting<Boolean> onlyInHole = new Setting<>("Only In Hole", false);
 
@@ -39,7 +39,7 @@ public class Quiver extends Module {
     public void onEnable() {
         count = 0;
         invPreSlot = -1;
-        preBowSlot = -1;
+        preBowSlot = mc.player.getInventory().selectedSlot;
     }
 
     @Override
@@ -68,8 +68,6 @@ public class Quiver extends Module {
         }
 
         SearchInvResult result = InventoryUtility.findItemInHotBar(Items.BOW);
-        if (result.found() && preBowSlot == -1)
-            preBowSlot = mc.player.getInventory().selectedSlot;
         if (!result.found()) {
             disable(isRu() ? "В хотбаре отсутствует лук! Отключение..." : "No bow in hotbar! Disabling...");
             return;
