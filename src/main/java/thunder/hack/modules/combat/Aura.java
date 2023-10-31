@@ -583,7 +583,7 @@ public final class Aura extends Module {
                     if (PlayerUtility.squaredDistanceFromEyes(v1) > getSquaredRotateDistance())
                         continue;
                     rotation = PlayerManager.calcAngle(new Vec3d(target.getX() + x1, target.getY() + y1, target.getZ() + z1));
-                    if (ThunderHack.playerManager.checkRtx(rotation[0], rotation[1], (float) Math.sqrt(getSquaredRotateDistance()), false, rayTrace.getValue()))
+                    if (ThunderHack.playerManager.checkRtx(rotation[0], rotation[1], (float) Math.sqrt(getSquaredRotateDistance()), ignoreWalls.getValue().getState(), rayTrace.getValue()))
                         return true;
                 }
             }
