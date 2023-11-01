@@ -257,7 +257,7 @@ public final class CevBreaker extends Module {
         }
 
         // Rotations
-        if (rotate.getValue()) {
+        if (rotate.getValue() && rotations != null) {
             float[] yp = InteractionUtility.calculateAngle(rotations);
             final double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
             yp[0] = (float) (yp[0] - (yp[0] - ((IClientPlayerEntity) mc.player).getLastYaw()) % gcdFix);
