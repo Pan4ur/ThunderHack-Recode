@@ -202,17 +202,28 @@ public final class Aura extends Module {
             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
 
         boolean sprint = Core.serversprint;
-        if (sprint && dropSprint.getValue() && !moveFix.getValue())
-            sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
-
+        if (sprint && dropSprint.getValue())
+            disableSprint();
         return new boolean[]{blocking, sprint};
     }
 
     public void postAttack(boolean sprint, boolean block) {
-        if (sprint && dropSprint.getValue() && !moveFix.getValue())
-            sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+        if (sprint && dropSprint.getValue())
+            enableSprint();
         if (block && unpressShield.getValue())
             sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
+    }
+
+    private void disableSprint() {
+        mc.player.setSprinting(false);
+        mc.options.sprintKey.setPressed(false);
+        sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+    }
+
+    private void enableSprint() {
+        mc.player.setSprinting(true);
+        mc.options.sprintKey.setPressed(true);
+        sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
     }
 
     public void resolvePlayers() {

@@ -168,13 +168,13 @@ public class NameTags extends Module {
                             String encName = " ";
 
                             switch (id) {
-                                case "minecraft:blast_protection" -> encName = "B" + level;
-                                case "minecraft:protection" -> encName = "P" + level;
-                                case "minecraft:thorns" -> encName = "T" + level;
-                                case "minecraft:sharpness" -> encName = "S" + level;
-                                case "minecraft:efficiency" -> encName = "E" + level;
-                                case "minecraft:unbreaking" -> encName = "U" + level;
-                                case "minecraft:power" -> encName = "PO" + level;
+                                case "minecraft:blast_protection", "blast_protection" -> encName = "B" + level;
+                                case "minecraft:protection", "protection" -> encName = "P" + level;
+                                case "minecraft:thorns", "thorns" -> encName = "T" + level;
+                                case "minecraft:sharpness", "sharpness" -> encName = "S" + level;
+                                case "minecraft:efficiency", "efficiency" -> encName = "E" + level;
+                                case "minecraft:unbreaking", "unbreaking" -> encName = "U" + level;
+                                case "minecraft:power", "power" -> encName = "PO" + level;
                                 default -> {
                                     continue;
                                 }

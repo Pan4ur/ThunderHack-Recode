@@ -48,7 +48,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Redirect(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"), require = 0)
     private boolean tickMovementHook(ClientPlayerEntity player) {
-        if (ModuleManager.noSlow.isEnabled())
+        if (ModuleManager.noSlow.isEnabled() && ModuleManager.noSlow.canNoSlow())
             return false;
         return player.isUsingItem();
     }
@@ -117,7 +117,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "pushOutOfBlocks", at = @At("HEAD"), cancellable = true)
     private void onPushOutOfBlocksHook(double x, double d, CallbackInfo info) {
-        if (ModuleManager.velocity.isEnabled() && Velocity.noPush.getValue()) {
+        if (ModuleManager.velocity.isEnabled() && ModuleManager.velocity.blocks.getValue()) {
             info.cancel();
         }
     }

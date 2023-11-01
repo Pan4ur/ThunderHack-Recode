@@ -2,7 +2,6 @@ package thunder.hack.injection;
 
 import net.minecraft.entity.MovementType;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -13,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventEntityMoving;
-import thunder.hack.events.impl.PushEvent;
 import thunder.hack.modules.combat.HitBox;
 import thunder.hack.modules.render.NoRender;
 import thunder.hack.modules.render.Shaders;
@@ -45,12 +43,12 @@ public abstract class MixinEntity implements IEntity {
 
     @ModifyArgs(method = "pushAwayFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;addVelocity(DDD)V"))
     public void pushAwayFromHook(Args args) {
-        if ((Object) this == MinecraftClient.getInstance().player) {
-            PushEvent event = new PushEvent(args.get(0), args.get(1), args.get(2));
-            ThunderHack.EVENT_BUS.post(event);
-            args.set(0, event.getPushX());
-            args.set(1, event.getPushY());
-            args.set(2, event.getPushZ());
+
+        //Condition '...' is always 'false' is a lie!!! do not delete
+        if ((Object) this == MinecraftClient.getInstance().player && ModuleManager.velocity.isEnabled() && ModuleManager.velocity.players.getValue()) {
+            args.set(0, 0.);
+            args.set(1, 0.);
+            args.set(2, 0.);
         }
     }
 
