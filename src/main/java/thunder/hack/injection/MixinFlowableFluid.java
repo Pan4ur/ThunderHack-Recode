@@ -14,7 +14,7 @@ import java.util.Iterator;
 public class MixinFlowableFluid {
     @Redirect(method = "getVelocity", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;hasNext()Z", ordinal = 0))
     private boolean getVelocityHook(Iterator<Direction> var9) {
-        if (ModuleManager.velocity.isEnabled() && Velocity.noPush.getValue()) {
+        if (ModuleManager.velocity.isEnabled() && ModuleManager.velocity.water.getValue()) {
             return false;
         }
         return var9.hasNext();

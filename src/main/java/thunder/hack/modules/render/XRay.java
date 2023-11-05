@@ -117,19 +117,12 @@ public class XRay extends Module {
             for (BlockPos pos : ores) {
                 Block block = mc.world.getBlockState(pos).getBlock();
                 if (block == Blocks.DIAMOND_ORE && diamond.getValue()) draw(stack, pos, 0, 255, 255);
-                if (block == Blocks.DEEPSLATE_DIAMOND_ORE && diamond.getValue()) draw(stack, pos, 0, 255, 255);
                 if (block == Blocks.GOLD_ORE && gold.getValue()) draw(stack, pos, 255, 215, 0);
-                if (block == Blocks.DEEPSLATE_GOLD_ORE && gold.getValue()) draw(stack, pos, 255, 215, 0);
                 if (block == Blocks.IRON_ORE && iron.getValue()) draw(stack, pos, 213, 213, 213);
-                if (block == Blocks.DEEPSLATE_IRON_ORE && iron.getValue()) draw(stack, pos, 213, 213, 213);
                 if (block == Blocks.EMERALD_ORE && emerald.getValue()) draw(stack, pos, 0, 255, 77);
-                if (block == Blocks.DEEPSLATE_EMERALD_ORE && emerald.getValue()) draw(stack, pos, 0, 255, 77);
                 if (block == Blocks.REDSTONE_ORE && redstone.getValue()) draw(stack, pos, 255, 0, 0);
-                if (block == Blocks.DEEPSLATE_REDSTONE_ORE && redstone.getValue()) draw(stack, pos, 255, 0, 0);
                 if (block == Blocks.COAL_ORE && coal.getValue()) draw(stack, pos, 0, 0, 0);
-                if (block == Blocks.DEEPSLATE_COAL_ORE && coal.getValue()) draw(stack, pos, 0, 0, 0);
                 if (block == Blocks.LAPIS_ORE && lapis.getValue()) draw(stack, pos, 38, 97, 156);
-                if (block == Blocks.DEEPSLATE_LAPIS_ORE && lapis.getValue()) draw(stack, pos, 38, 97, 156);
                 if (block == Blocks.ANCIENT_DEBRIS && netherite.getValue()) draw(stack, pos, 255, 255, 255);
             }
             if (displayBlock != null && (done != all)) draw(stack, displayBlock, 255, 0, 60);

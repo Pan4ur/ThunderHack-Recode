@@ -8,11 +8,11 @@ import net.minecraft.network.packet.s2c.play.*;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.PushEvent;
 import thunder.hack.injection.accesors.IExplosionS2CPacket;
 import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.player.MovementUtility;
 
 public class Velocity extends Module {
@@ -25,7 +25,11 @@ public class Velocity extends Module {
     public Setting<Boolean> onlyAura = new Setting<>("OnlyAura", false);
     public Setting<Boolean> autoDisable = new Setting<>("DisableOnVerify", false);
     public Setting<Boolean> cc = new Setting<>("CC", false);
-    public static Setting<Boolean> noPush = new Setting<>("NoPush", false);
+    public Setting<Boolean> fishingHook = new Setting<>("FishingHook", true);
+    public static Setting<Parent> antiPush = new Setting<>("AntiPush", new Parent(false, 0));
+    public Setting<Boolean> blocks = new Setting<>("Blocks", true).withParent(antiPush);
+    public Setting<Boolean> players = new Setting<>("Players", true).withParent(antiPush);
+    public Setting<Boolean> water = new Setting<>("Water", true).withParent(antiPush);
     private final Setting<modeEn> mode = new Setting<>("Mode", modeEn.Matrix);
     public Setting<Float> vertical = new Setting<>("Vertical", 0.0f, 0.0f, 100.0f, v -> mode.getValue() == modeEn.Custom);
     private final Setting<jumpModeEn> jumpMode = new Setting<>("JumpMode", jumpModeEn.Jump, v -> mode.getValue() == modeEn.Jump);
@@ -46,7 +50,7 @@ public class Velocity extends Module {
     public void onPacketReceived(PacketEvent.Receive e) {
         if (fullNullCheck()) return;
 
-        if(ccCooldown > 0) {
+        if (ccCooldown > 0) {
             ccCooldown--;
             return;
         }
@@ -56,9 +60,12 @@ public class Velocity extends Module {
             if (text.contains("Тебя проверяют на чит АКБ, ник хелпера - ")) disable(":^)");
         }
 
-        if (e.getPacket() instanceof EntityStatusS2CPacket pac && (pac = e.getPacket()).getStatus() == 31 && pac.getEntity(Velocity.mc.world) instanceof FishingBobberEntity) {
-            FishingBobberEntity fishHook = (FishingBobberEntity) pac.getEntity(Velocity.mc.world);
-            if (fishHook.getHookedEntity() == Velocity.mc.player) {
+        if (e.getPacket() instanceof EntityStatusS2CPacket pac
+                && pac.getStatus() == 31
+                && pac.getEntity(mc.world) instanceof FishingBobberEntity
+                && fishingHook.getValue()) {
+            FishingBobberEntity fishHook = (FishingBobberEntity) pac.getEntity(mc.world);
+            if (fishHook.getHookedEntity() == mc.player) {
                 e.setCancelled(true);
             }
         }
@@ -129,7 +136,7 @@ public class Velocity extends Module {
                 }
             }
         }
-        if(e.getPacket() instanceof PlayerPositionLookS2CPacket && cc.getValue()) {
+        if (e.getPacket() instanceof PlayerPositionLookS2CPacket && cc.getValue()) {
             ccCooldown = 5;
         }
     }
@@ -183,15 +190,6 @@ public class Velocity extends Module {
     @Override
     public void onEnable() {
         grimTicks = 0;
-    }
-
-    @EventHandler
-    public void onPush(PushEvent event) {
-        if (noPush.getValue()) {
-            event.setPushX(event.getPushX() * 0);
-            event.setPushY(event.getPushY() * 0);
-            event.setPushZ(event.getPushZ() * 0);
-        }
     }
 
     public enum modeEn {
