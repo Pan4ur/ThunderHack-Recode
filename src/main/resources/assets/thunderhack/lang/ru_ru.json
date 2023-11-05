@@ -5,7 +5,7 @@
   "descriptions.combat.autoanchor": "Автоматически ставит и взрывает якоря.",
   "descriptions.combat.autobuff": "Aвтоматически бросает под тебя зелья с эффектами.",
   "descriptions.combat.autocrystal": "Автоматически ставит и взрывает кристаллы.",
-  "descriptions.combat.autocrystal": "Автоматически ставит обсидиан для кристаллов.",
+  "descriptions.combat.autocrystalbase": "Автоматически ставит обсидиан для кристаллов.",
   "descriptions.combat.autogapple": "Автоматически ест золотые яблоки.",
   "descriptions.combat.automine": "Автоматически ломает Surround цели.",
   "descriptions.combat.autototem": "Автоматически помещает тотем и другие предметы в левую руку.",
@@ -167,6 +167,7 @@
   "descriptions.client.fastlatency": "Вычисляет пинг быстрее, чем метод Minecraft.",
   "descriptions.client.thundergui": "Еще один вариант графического интерфейса.",
   "descriptions.client.waypoints": "Отображает вейпоинты.",
+  "descriptions.client.soundfx": "Изменяет разные звуки в игре.",
 
   "descriptions.commands.bind": "Добавить бинд к модулю.",
   "descriptions.commands.cfg": "Выбрать/сохранить конфигурацию.",
@@ -189,5 +190,6 @@
   "descriptions.commands.staff": "Добавить игроков в staffBoard (игроки будут видны если они в ванише).",
   "descriptions.commands.tracker": "Добавить игроков в Tracker.",
   "descriptions.commands.vclip": "Клипнуться вертикально.",
-  "descriptions.commands.waypoint": "Добавить вейпоинт (надо включить WayPoints!!!)."
+  "descriptions.commands.waypoint": "Добавить вейпоинт (надо включить WayPoints!!!).",
+  "descriptions.combat.autocrystalbase": "Automatically places obsidian for crystal."
 }

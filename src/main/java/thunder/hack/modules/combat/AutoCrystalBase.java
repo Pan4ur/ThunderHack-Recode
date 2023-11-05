@@ -37,10 +37,6 @@ import java.util.List;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class AutoCrystalBase extends Module {
-    public AutoCrystalBase() {
-        super("AutoCrystalBase", Category.COMBAT);
-    }
-
     private final Setting<TargetLogic> targetLogic = new Setting<>("TargetLogic", TargetLogic.Distance);
     private final Setting<Integer> range = new Setting<>("Range", 5, 1, 7);
     private final Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 300, 0, 3000);
@@ -49,6 +45,7 @@ public class AutoCrystalBase extends Module {
     private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
     private final Setting<Boolean> notification = new Setting<>("Notification", true);
     private final Setting<Boolean> disableNoObby = new Setting<>("DisableNoObby", false);
+
     private final Setting<BooleanParent> render = new Setting<>("Render", new BooleanParent(true));
     private final Setting<BlockAnimationUtility.BlockRenderMode> renderMode = new Setting<>("RenderMode", BlockAnimationUtility.BlockRenderMode.All).withParent(render);
     private final Setting<BlockAnimationUtility.BlockAnimationMode> animationMode = new Setting<>("AnimationMode", BlockAnimationUtility.BlockAnimationMode.Fade).withParent(render);
@@ -60,6 +57,10 @@ public class AutoCrystalBase extends Module {
     private ObbyData bestData;
     private final Timer placeTimer = new Timer();
     private final Timer calcTimer = new Timer();
+
+    public AutoCrystalBase() {
+        super("AutoCrystalBase", Category.COMBAT);
+    }
 
     @EventHandler
     public void onTick(EventTick e) {
@@ -124,7 +125,10 @@ public class AutoCrystalBase extends Module {
     }
 
     public boolean isWorth() {
-        return ModuleManager.autoCrystal.isEnabled() && bestData != null && ModuleManager.autoCrystal.renderDamage > 2 && ModuleManager.autoCrystal.renderDamage < bestData.damage;
+        return ModuleManager.autoCrystal.isEnabled()
+                && bestData != null
+                && ModuleManager.autoCrystal.renderDamage > 2
+                && ModuleManager.autoCrystal.renderDamage < bestData.damage;
     }
 
     public void calcPosition(float range, Vec3d center) {
@@ -166,6 +170,7 @@ public class AutoCrystalBase extends Module {
     private ObbyData filterPositions(@NotNull List<ObbyData> clearedList) {
         ObbyData bestData = null;
         float bestVal = 0f;
+
         for (ObbyData data : clearedList) {
             if ((ModuleManager.autoCrystal.shouldOverride(data.damage) || data.damage > ModuleManager.autoCrystal.minDamage.getValue())) {
                 if (ModuleManager.autoCrystal.sort.getValue() == AutoCrystal.Sort.DAMAGE) {
@@ -181,6 +186,7 @@ public class AutoCrystalBase extends Module {
                 }
             }
         }
+
         return bestData;
     }
 

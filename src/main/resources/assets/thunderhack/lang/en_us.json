@@ -168,6 +168,7 @@
   "descriptions.client.fastlatency": "Calculates ping faster than the minecraft method.",
   "descriptions.client.thundergui": "Another variant of gui.",
   "descriptions.client.waypoints": "Renders specified waypoints.",
+  "descriptions.client.soundfx": "Changes different sounds in the game.",
 
   "descriptions.commands.bind": "Add bind to module.",
   "descriptions.commands.cfg": "Select/save a config.",

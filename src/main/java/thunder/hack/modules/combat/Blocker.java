@@ -5,6 +5,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -16,9 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.events.impl.EventPlaceBlock;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.*;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -46,6 +45,11 @@ public final class Blocker extends Module {
     private final Setting<Boolean> newBlocks = new Setting<>("1.16 Blocks", true);
     private final Setting<Boolean> allowAnchors = new Setting<>("Allow Anchors", false, (value) -> newBlocks.getValue());
 
+    private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
+    private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
+    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Normal);
+    private final Setting<Boolean> swing = new Setting<>("Swing", true);
+
     private final Setting<Parent> logic = new Setting<>("Logic", new Parent(false, 0));
     private final Setting<Boolean> antiCev = new Setting<>("Anti Cev", true).withParent(logic);
     private final Setting<Boolean> antiCiv = new Setting<>("Anti Civ", true).withParent(logic);
@@ -53,10 +57,10 @@ public final class Blocker extends Module {
     private final Setting<Boolean> antiTntAura = new Setting<>("Anti TNT", false).withParent(logic);
     private final Setting<Boolean> antiAutoAnchor = new Setting<>("Anti Anchor", false).withParent(logic);
 
-    private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
-    private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
-    private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Normal);
-    private final Setting<Boolean> swing = new Setting<>("Swing", true);
+    private final Setting<Parent> detect = new Setting<>("Detect", new Parent(false, 1)).withParent(logic);
+    private final Setting<Boolean> onPacket = new Setting<>("On Break Packet", true).withParent(detect);
+    private final Setting<Boolean> onAttackBlock = new Setting<>("On Attack Block", false).withParent(detect);
+    private final Setting<Boolean> onBreak = new Setting<>("On Break", true).withParent(detect);
 
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
     private final Setting<BlockAnimationUtility.BlockRenderMode> renderMode = new Setting<>("RenderMode", BlockAnimationUtility.BlockRenderMode.All).withParent(renderCategory);
@@ -153,37 +157,25 @@ public final class Blocker extends Module {
 
     @EventHandler
     @SuppressWarnings("unused")
-    private void onPacketReceive(PacketEvent.@NotNull Receive e) {
-        final BlockPos playerPos = mc.player.getBlockPos();
-        if (e.getPacket() instanceof BlockBreakingProgressS2CPacket) {
-            BlockBreakingProgressS2CPacket packet = e.getPacket();
-            BlockPos pos = packet.getPos();
-
-            if (antiCev.getValue() && playerPos.up(2).equals(pos))
-                placePositions.add(playerPos.up(3));
-
-            if (HoleUtility.getSurroundPoses(mc.player.getPos()).contains(pos)) {
-                if (mc.world.getBlockState(pos).getBlock() == Blocks.BEDROCK || mc.world.getBlockState(pos).isReplaceable())
-                    return;
-                
-                placePositions.add(pos.up());
-
-                if (expand.getValue()) {
-                    for (Vec3i vec : HoleUtility.VECTOR_PATTERN) {
-                        if (InteractionUtility.canPlaceBlock(pos.add(vec), interactMode.getValue(), false)) {
-                            placePositions.add(pos.add(vec));
-                        }
-                    }
-                }
-            }
-
-            if (antiCiv.getValue()) {
-                for (BlockPos checkPos : HoleUtility.getSurroundPoses(mc.player.getPos())) {
-                    if (checkPos.up().equals(pos))
-                        placePositions.add(playerPos.add(checkPos.up(2)));
-                }
-            }
+    private void onPacketReceive(PacketEvent.@NotNull Receive event) {
+        if (event.getPacket() instanceof BlockBreakingProgressS2CPacket && onPacket.getValue()) {
+            BlockBreakingProgressS2CPacket packet = event.getPacket();
+            doLogic(packet.getPos());
         }
+    }
+
+    @EventHandler
+    @SuppressWarnings("unused")
+    private void onAttackBlock(EventAttackBlock event) {
+        if (!onAttackBlock.getValue()) return;
+        doLogic(event.getBlockPos());
+    }
+
+    @EventHandler
+    @SuppressWarnings("unused")
+    private void onBreak(EventBreakBlock event) {
+        if (!onBreak.getValue()) return;
+        doLogic(event.getPos());
     }
 
     @EventHandler
@@ -203,5 +195,48 @@ public final class Blocker extends Module {
 
     public static Blocker getInstance() {
         return instance;
+    }
+
+    private void doLogic(BlockPos pos) {
+        BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
+
+        if (antiCev.getValue()) {
+            for (BlockPos checkPos : HoleUtility.getHolePoses(mc.player.getPos()).stream()
+                    .map(bp -> bp.up(2))
+                    .toList()) {
+                if (checkPos.equals(pos)) {
+                    placePositions.add(checkPos.up());
+                    return;
+                }
+            }
+        }
+
+        if (HoleUtility.getSurroundPoses(mc.player.getPos()).contains(pos)) {
+            if (mc.world.getBlockState(pos).getBlock() == Blocks.BEDROCK || mc.world.getBlockState(pos).isReplaceable())
+                return;
+
+            placePositions.add(pos.up());
+
+            if (expand.getValue()) {
+                for (Vec3i vec : HoleUtility.VECTOR_PATTERN) {
+                    BlockPos checkPos = pos.add(vec);
+                    if (InteractionUtility.canPlaceBlock(checkPos, interactMode.getValue(), true)) {
+                        if (mc.world.getNonSpectatingEntities(PlayerEntity.class, new Box(checkPos)).isEmpty())
+                            placePositions.add(checkPos);
+                    }
+                }
+            }
+
+            return;
+        }
+
+        if (antiCiv.getValue()) {
+            for (BlockPos checkPos : HoleUtility.getSurroundPoses(mc.player.getPos())) {
+                if (checkPos.up().equals(pos)) {
+                    placePositions.add(playerPos.add(checkPos.up(2)));
+                    return;
+                }
+            }
+        }
     }
 }

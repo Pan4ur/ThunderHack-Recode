@@ -24,7 +24,7 @@ import static thunder.hack.core.impl.ConfigManager.SoundsFolder;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 
-public class SoundFX extends Module {
+public final class SoundFX extends Module {
     public SoundFX() {
         super("SoundFX", Category.CLIENT);
     }
@@ -36,7 +36,7 @@ public class SoundFX extends Module {
     private final Setting<KillSound> killSound = new Setting<>("KillSound", KillSound.OFF);
     private final Setting<ScrollSound> scrollSound = new Setting<>("ScrollSound", ScrollSound.KeyBoard);
 
-    private Timer scrollTimer = new Timer();
+    private final Timer scrollTimer = new Timer();
 
     @EventHandler
     @SuppressWarnings("unused")
@@ -61,6 +61,7 @@ public class SoundFX extends Module {
     }
 
     @EventHandler
+    @SuppressWarnings("unused")
     public void onDeath(DeathEvent e) {
         if (Aura.target != null && Aura.target == e.getPlayer()) {
             playSound("kill");
