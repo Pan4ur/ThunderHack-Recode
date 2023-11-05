@@ -162,7 +162,7 @@ public final class Blocker extends Module {
             if (antiCev.getValue() && playerPos.up(2).equals(pos))
                 placePositions.add(playerPos.up(3));
 
-            if (HoleUtility.getSurroundPoses(playerPos).contains(pos)) {
+            if (HoleUtility.getSurroundPoses(mc.player.getPos()).contains(pos)) {
                 if (mc.world.getBlockState(pos).getBlock() == Blocks.BEDROCK || mc.world.getBlockState(pos).isReplaceable())
                     return;
                 
@@ -178,7 +178,7 @@ public final class Blocker extends Module {
             }
 
             if (antiCiv.getValue()) {
-                for (BlockPos checkPos : HoleUtility.getSurroundPoses(playerPos)) {
+                for (BlockPos checkPos : HoleUtility.getSurroundPoses(mc.player.getPos())) {
                     if (checkPos.up().equals(pos))
                         placePositions.add(playerPos.add(checkPos.up(2)));
                 }

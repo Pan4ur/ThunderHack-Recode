@@ -111,7 +111,7 @@ public class CrosshairArrows extends HudElement {
         bufferBuilder.vertex(matrix, (x + size * tracerWidth.getValue()), (y + size), 0.0F).color(color).next();
         bufferBuilder.vertex(matrix, x, y, 0.0F).color(color).next();
 
-        if(down.getValue().getState()) {
+        if(down.getValue().isEnabled()) {
             color = Render2DEngine.darker(new Color(color), 0.6f).getRGB();
             bufferBuilder.vertex(matrix, (x - size * tracerWidth.getValue()), (y + size), 0.0F).color(color).next();
             bufferBuilder.vertex(matrix, (x + size * tracerWidth.getValue()), (y + size), 0.0F).color(color).next();

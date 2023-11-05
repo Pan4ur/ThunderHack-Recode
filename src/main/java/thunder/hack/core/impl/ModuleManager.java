@@ -257,7 +257,7 @@ public class ModuleManager implements IManager {
 
     public void onLoad() {
         modules.sort(Comparator.comparing(Module::getName));
-        modules.stream().filter(Module::listening).forEach((ThunderHack.EVENT_BUS)::subscribe);
+        modules.stream().filter(Module::listening).forEach(ThunderHack.EVENT_BUS::subscribe);
 
         if (ConfigManager.firstLaunch) {
             ModuleManager.notifications.enable();

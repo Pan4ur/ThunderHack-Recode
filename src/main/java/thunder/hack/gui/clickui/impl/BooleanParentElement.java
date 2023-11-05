@@ -49,7 +49,7 @@ public class BooleanParentElement extends AbstractElement {
 
         FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName() ,(int) (x + 6), (y + height / 2 - (6 / 2f)) + 2, new Color(-1).getRGB());
 
-        animation = fast(animation, getParentSetting().getValue().getState() ? 1 : 0, 15f);
+        animation = fast(animation, getParentSetting().getValue().isEnabled() ? 1 : 0, 15f);
         double paddingX = 7 * animation;
         Color color = ClickGui.getInstance().getColor(0);
         Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 36), (float) (y + height / 2 - 4), 15, 8, 4, paddingX > 4 ? color : new Color(0xFFB2B1B1));
@@ -68,7 +68,7 @@ public class BooleanParentElement extends AbstractElement {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (hovered) {
-            if(button == 0) getParentSetting().getValue().setState(!getParentSetting().getValue().getState());
+            if(button == 0) getParentSetting().getValue().setEnabled(!getParentSetting().getValue().isEnabled());
             else getParentSetting().getValue().setExtended(!getParentSetting().getValue().isExtended());
         }
         super.mouseClicked(mouseX, mouseY, button);

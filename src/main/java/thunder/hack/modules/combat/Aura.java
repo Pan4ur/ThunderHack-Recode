@@ -44,6 +44,7 @@ import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.Parent;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
@@ -79,6 +80,8 @@ public final class Aura extends Module {
 
     /*   ADVANCED   */
     public final Setting<Parent> advanced = new Setting<>("Advanced", new Parent(false, 0));
+    public final Setting<Boolean> useDelay = new Setting<>("Use Delay", false).withParent(advanced);
+    public final Setting<Integer> delay = new Setting<>("Delay", 0, 1, 10000, v -> useDelay.getValue()).withParent(advanced);
     public final Setting<Boolean> dropSprint = new Setting<>("DropSprint", true).withParent(advanced);
     public final Setting<Boolean> pauseInInventory = new Setting<>("PauseInInventory", true).withParent(advanced);
     public final Setting<RayTrace> rayTrace = new Setting<>("RayTrace", RayTrace.OnlyTarget).withParent(advanced);
@@ -121,6 +124,7 @@ public final class Aura extends Module {
     private boolean lookingAtHitbox;
 
     private static Aura instance;
+    private final Timer delayTimer = new Timer();
 
     public Aura() {
         super("Aura", Category.COMBAT);
@@ -161,6 +165,12 @@ public final class Aura extends Module {
         boolean readyForAttack = autoCrit() && (lookingAtHitbox || skipRayTraceCheck());
         calcRotations(readyForAttack);
         restorePlayers();
+
+        if (!delayTimer.passedMs(delay.getValue()) && useDelay.getValue())
+            readyForAttack = false;
+        else if (readyForAttack)
+            delayTimer.reset();
+
 
         if (readyForAttack) {
             if (shieldBreaker(false))
@@ -251,7 +261,7 @@ public final class Aura extends Module {
         if (mc.getCurrentServerEntry() != null && mc.getCurrentServerEntry().address.equals("ngrief.me") && mc.player.getMainHandStack().getItem() instanceof AxeItem) {
             return 21;
         }
-        return oldDelay.getValue().getState() ? 1 + (int) (20f / random(minCPS.getValue(), maxCPS.getValue())) : 11;
+        return oldDelay.getValue().isEnabled() ? 1 + (int) (20f / random(minCPS.getValue(), maxCPS.getValue())) : 11;
     }
 
     @EventHandler
@@ -264,7 +274,7 @@ public final class Aura extends Module {
             rotationPitch = mc.player.getPitch();
         }
 
-        if (oldDelay.getValue().getState())
+        if (oldDelay.getValue().isEnabled())
             if (minCPS.getValue() > maxCPS.getValue())
                 minCPS.setValue(maxCPS.getValue());
 
@@ -293,6 +303,7 @@ public final class Aura extends Module {
         rotationMotion = Vec3d.ZERO;
         rotationYaw = mc.player.getYaw();
         rotationPitch = mc.player.getPitch();
+        delayTimer.reset();
     }
 
     private boolean autoCrit() {
@@ -311,7 +322,7 @@ public final class Aura extends Module {
 
         if (pauseInInventory.getValue() && ThunderHack.playerManager.inInventory) return false;
 
-        if (getAttackCooldown() < 0.9f && !oldDelay.getValue().getState()) return false;
+        if (getAttackCooldown() < 0.9f && !oldDelay.getValue().isEnabled()) return false;
 
         boolean mergeWithTargetStrafe = !ModuleManager.targetStrafe.isEnabled() || !ModuleManager.targetStrafe.jump.getValue();
         boolean mergeWithSpeed = !ModuleManager.speed.isEnabled() || mc.player.isOnGround();
@@ -434,7 +445,7 @@ public final class Aura extends Module {
             lookingAtHitbox = ThunderHack.playerManager.checkRtx(
                     rayTraceAngle.getValue() == RayTraceAngle.Calculated ? rotationYaw : prevYaw,
                     rayTraceAngle.getValue() == RayTraceAngle.Calculated ? rotationPitch : prevPitch,
-                    attackRange.getValue(), ignoreWalls.getValue().getState(), rayTrace.getValue());
+                    attackRange.getValue(), ignoreWalls.getValue().isEnabled(), rayTrace.getValue());
         }
     }
 

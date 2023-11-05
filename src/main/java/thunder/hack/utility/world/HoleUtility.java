@@ -2,13 +2,14 @@ package thunder.hack.utility.world;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -20,73 +21,79 @@ public final class HoleUtility {
             new Vec3i(-1, 0, 0)
     };
 
-    public static @NotNull List<BlockPos> getSurroundPoses(BlockPos from) {
-        List<BlockPos> surroundPoses = new ArrayList<>();
-        if (mc.world == null) return surroundPoses;
+    public static @NotNull List<BlockPos> getHolePoses(@NotNull Vec3d from) {
+        List<BlockPos> positions = new ArrayList<>();
 
-        getHolePoses(from).forEach(checkPos -> {
-            for (Vec3i pattern : VECTOR_PATTERN) {
-                BlockPos newPos = checkPos.add(pattern);
-
-                if (!isReplaceable(newPos))
-                    surroundPoses.add(newPos);
+        double decimalX = from.getX() - Math.floor(from.getX());
+        double decimalZ = from.getZ() - Math.floor(from.getZ());
+        int offX = calcOffset(decimalX);
+        int offZ = calcOffset(decimalZ);
+        positions.add(getPos(from));
+        for (int x = 0; x <= Math.abs(offX); ++x) {
+            for (int z = 0; z <= Math.abs(offZ); ++z) {
+                int properX = x * offX;
+                int properZ = z * offZ;
+                positions.add(Objects.requireNonNull(getPos(from)).add(properX, 0, properZ));
             }
-        });
-
-        return surroundPoses;
-    }
-
-    public static @NotNull List<BlockPos> getHolePoses(BlockPos from) {
-        final List<BlockPos> checkQuad = findQuadPoses(from);
-        final List<BlockPos> checkDouble = findDoublePoses(from);
-
-        if (checkDouble != null && checkDouble.size() == 2) return checkDouble;
-        if (checkQuad != null && checkQuad.size() == 4) return checkQuad;
-
-        return List.of(from);
-    }
-
-    public static @Nullable List<BlockPos> findQuadPoses(BlockPos checkFrom) {
-        if (mc.world == null) return null;
-        final List<BlockPos> quadPoses = new ArrayList<>();
-
-        quadPoses.add(checkFrom);
-
-        if (mc.world.getBlockState(checkFrom.add(1, 0, 1)).isReplaceable()) {
-            quadPoses.add(checkFrom.add(1, 0, 1));
-            quadPoses.add(checkFrom.add(1, 0, 0));
-            quadPoses.add(checkFrom.add(0, 0, 1));
-        } else if (mc.world.getBlockState(checkFrom.add(1, 0, -1)).isReplaceable()) {
-            quadPoses.add(checkFrom.add(1, 0, -1));
-            quadPoses.add(checkFrom.add(1, 0, 0));
-            quadPoses.add(checkFrom.add(0, 0, -1));
-        } else if (mc.world.getBlockState(checkFrom.add(-1, 0, 1)).isReplaceable()) {
-            quadPoses.add(checkFrom.add(-1, 0, 1));
-            quadPoses.add(checkFrom.add(-1, 0, 0));
-            quadPoses.add(checkFrom.add(0, 0, 1));
-        } else if (mc.world.getBlockState(checkFrom.add(-1, 0, -1)).isReplaceable()) {
-            quadPoses.add(checkFrom.add(-1, 0, -1));
-            quadPoses.add(checkFrom.add(-1, 0, 0));
-            quadPoses.add(checkFrom.add(0, 0, -1));
         }
 
-        return quadPoses;
+        return positions;
     }
 
-    public static @Nullable @Unmodifiable List<BlockPos> findDoublePoses(BlockPos checkFrom) {
-        if (mc.world == null) return null;
+    public static @NotNull List<BlockPos> getSurroundPoses(@NotNull Vec3d from) {
+        final BlockPos fromPos = BlockPos.ofFloored(from);
+        final ArrayList<BlockPos> tempOffsets = new ArrayList<>();
 
-        for (Vec3i vec : VECTOR_PATTERN) {
-            if (isReplaceable(checkFrom.add(vec)))
-                return List.of(checkFrom, checkFrom.add(vec));
+        final double decimalX = Math.abs(from.getX()) - Math.floor(Math.abs(from.getX()));
+        final double decimalZ = Math.abs(from.getZ()) - Math.floor(Math.abs(from.getZ()));
+        final int lengthXPos = calcLength(decimalX, false);
+        final int lengthXNeg = calcLength(decimalX, true);
+        final int lengthZPos = calcLength(decimalZ, false);
+        final int lengthZNeg = calcLength(decimalZ, true);
+
+        for (int x = 1; x < lengthXPos + 1; ++x) {
+            tempOffsets.add(addToPlayer(fromPos, x, 0.0, 1 + lengthZPos));
+            tempOffsets.add(addToPlayer(fromPos, x, 0.0, -(1 + lengthZNeg)));
+        }
+        for (int x = 0; x <= lengthXNeg; ++x) {
+            tempOffsets.add(addToPlayer(fromPos, -x, 0.0, 1 + lengthZPos));
+            tempOffsets.add(addToPlayer(fromPos, -x, 0.0, -(1 + lengthZNeg)));
+        }
+        for (int z = 1; z < lengthZPos + 1; ++z) {
+            tempOffsets.add(addToPlayer(fromPos, 1 + lengthXPos, 0.0, z));
+            tempOffsets.add(addToPlayer(fromPos, -(1 + lengthXNeg), 0.0, z));
+        }
+        for (int z = 0; z <= lengthZNeg; ++z) {
+            tempOffsets.add(addToPlayer(fromPos, 1 + lengthXPos, 0.0, -z));
+            tempOffsets.add(addToPlayer(fromPos, -(1 + lengthXNeg), 0.0, -z));
         }
 
-        return null;
+        return tempOffsets;
+    }
+
+    private static @NotNull BlockPos getPos(@NotNull Vec3d from) {
+        return BlockPos.ofFloored(from.getX(), from.getY() - Math.floor(from.getY()) > 0.8 ? Math.floor(from.getY()) + 1.0 : Math.floor(from.getY()), from.getZ());
+    }
+
+    public static int calcOffset(double dec) {
+        return dec >= 0.7 ? 1 : (dec <= 0.3 ? -1 : 0);
+    }
+
+    public static int calcLength(double decimal, boolean negative) {
+        if (negative) return decimal <= 0.3 ? 1 : 0;
+        return decimal >= 0.7 ? 1 : 0;
+    }
+
+    public static BlockPos addToPlayer(@NotNull BlockPos playerPos, double x, double y, double z) {
+        if (playerPos.getX() < 0) x = -x;
+        if (playerPos.getY() < 0) y = -y;
+        if (playerPos.getZ() < 0) z = -z;
+        return playerPos.add(BlockPos.ofFloored(x, y, z));
     }
 
     public static boolean isHole(BlockPos pos) {
         return validIndestructible(pos) || validBedrock(pos)
-                || validTwoBlockIndestructibleXZ(pos) || validTwoBlockBedrockXZ(pos)
+                || validTwoBlockIndestructible(pos) || validTwoBlockBedrock(pos)
                 || validQuadIndestructible(pos) || validQuadBedrock(pos);
     }
 
@@ -113,7 +120,7 @@ public final class HoleUtility {
                 && isReplaceable(pos.add(0, 2, 0));
     }
 
-    public static boolean validTwoBlockBedrockXZ(@NotNull BlockPos pos) {
+    public static boolean validTwoBlockBedrock(@NotNull BlockPos pos) {
         if (!isReplaceable(pos)) return false;
         Vec3i addVec = getTwoBlocksDirection(pos);
 
@@ -138,7 +145,7 @@ public final class HoleUtility {
         return true;
     }
 
-    public static boolean validTwoBlockIndestructibleXZ(@NotNull BlockPos pos) {
+    public static boolean validTwoBlockIndestructible(@NotNull BlockPos pos) {
         if (!isReplaceable(pos)) return false;
         Vec3i addVec = getTwoBlocksDirection(pos);
 

@@ -17,6 +17,7 @@ import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.world.HoleUtility;
 
 import java.util.List;
+import java.util.Objects;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
@@ -63,7 +64,7 @@ public final class Quiver extends Module {
                 || (mc.player.isUsingItem() && !mc.player.getMainHandStack().getItem().equals(Items.BOW)))
             return;
         if (!getArrow()) {
-            disable(isRu() ? "В интвенторе отсутствуют стрелы! Отключение..." : "No arrows in hotbar! Disabling...");
+            disable(isRu() ? "В интвенторе отсутствуют нужные стрелы! Отключение..." : "No arrows in hotbar! Disabling...");
             return;
         }
 
@@ -112,7 +113,10 @@ public final class Quiver extends Module {
     private boolean switchInvSlot(int from, int to) {
         if (from == -1 || to == -1) return false;
 
-        sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+        sendPacket(new ClientCommandC2SPacket(
+                Objects.requireNonNull(mc.player),
+                ClientCommandC2SPacket.Mode.STOP_SPRINTING
+        ));
         clickSlot(from);
         clickSlot(to);
         clickSlot(from);

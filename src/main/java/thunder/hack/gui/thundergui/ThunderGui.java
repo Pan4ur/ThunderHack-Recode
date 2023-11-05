@@ -27,16 +27,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static thunder.hack.modules.Module.mc;
 
-public class ThunderGui2 extends Screen {
+public class ThunderGui extends Screen {
     public static CurrentMode currentMode = CurrentMode.Modules;
     public static boolean scroll_lock = false;
     public static ModulePlate selected_plate, prev_selected_plate;
     public static BetterAnimation open_animation = new BetterAnimation(5);
     public static boolean open_direction = false;
-    private static ThunderGui2 INSTANCE;
+    private static ThunderGui INSTANCE;
 
     static {
-        INSTANCE = new ThunderGui2();
+        INSTANCE = new ThunderGui();
     }
 
     public final ArrayList<ModulePlate> components = new ArrayList<>();
@@ -80,7 +80,7 @@ public class ThunderGui2 extends Screen {
     public static int mouse_x;
     public static int mouse_y;
 
-    public ThunderGui2() {
+    public ThunderGui() {
         super(Text.of("ThunderGui2"));
         this.setInstance();
         this.load();
@@ -92,14 +92,14 @@ public class ThunderGui2 extends Screen {
         return false;
     }
 
-    public static ThunderGui2 getInstance() {
+    public static ThunderGui getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new ThunderGui2();
+            INSTANCE = new ThunderGui();
         }
         return INSTANCE;
     }
 
-    public static ThunderGui2 getThunderGui() {
+    public static ThunderGui getThunderGui() {
         open_animation = new BetterAnimation();
         //open_animation.setTick(5);
         open_direction = true;

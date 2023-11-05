@@ -149,12 +149,12 @@ public class HoleESP extends Module {
                     if (HoleUtility.validIndestructible(pos)) {
                     } else if (HoleUtility.validBedrock(pos)) {
                         color = bedrockColor.getValue().getColorObject();
-                    } else if (HoleUtility.validTwoBlockBedrockXZ(pos)) {
+                    } else if (HoleUtility.validTwoBlockBedrock(pos)) {
                         boolean east = mc.world.isAir(pos.offset(Direction.EAST));
                         boolean south = mc.world.isAir(pos.offset(Direction.SOUTH));
                         box = new Box(box.minX, box.minY, box.minZ, box.maxX + (east ? 1 : 0), box.maxY, box.maxZ + (south ? 1 : 0));
                         color = bedrockColor.getValue().getColorObject();
-                    } else if (HoleUtility.validTwoBlockIndestructibleXZ(pos)) {
+                    } else if (HoleUtility.validTwoBlockIndestructible(pos)) {
                         boolean east = mc.world.isAir(pos.offset(Direction.EAST));
                         boolean south = mc.world.isAir(pos.offset(Direction.SOUTH));
                         box = new Box(box.minX, box.minY, box.minZ, box.maxX + (east ? 1 : 0), box.maxY, box.maxZ + (south ? 1 : 0));

@@ -23,7 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class ConfigManager implements IManager {
@@ -301,7 +300,7 @@ public class ConfigManager implements IManager {
                             ((PositionSetting) setting2.getValue()).setY(array3.get(1).getAsFloat());
                             continue;
                         case "BooleanParent":
-                            ((BooleanParent) setting2.getValue()).setState(mobject.getAsJsonPrimitive(setting2.getName()).getAsBoolean());
+                            ((BooleanParent) setting2.getValue()).setEnabled(mobject.getAsJsonPrimitive(setting2.getName()).getAsBoolean());
                             continue;
                         case "Enum":
                             try {
@@ -353,7 +352,7 @@ public class ConfigManager implements IManager {
                 continue;
             }
             if (setting.isBooleanParent()) {
-                attribs.add(setting.getName(), jp.parse(String.valueOf(((BooleanParent)setting.getValue()).getState())));
+                attribs.add(setting.getName(), jp.parse(String.valueOf(((BooleanParent)setting.getValue()).isEnabled())));
                 continue;
             }
             if (setting.isBindSetting()) {

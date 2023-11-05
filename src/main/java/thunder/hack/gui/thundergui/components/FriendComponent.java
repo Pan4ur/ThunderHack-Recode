@@ -7,7 +7,7 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.gui.thundergui.ThunderGui2;
+import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.util.Identifier;
 
@@ -102,10 +102,10 @@ public class FriendComponent {
 
     public void render(DrawContext context, int MouseX, int MouseY) {
         if (scrollPosY != posY) {
-            scroll_animation = ThunderGui2.fast(scroll_animation, 1, 15f);
+            scroll_animation = ThunderGui.fast(scroll_animation, 1, 15f);
             posY = (int) Render2DEngine.interpolate(prevPosY, scrollPosY, scroll_animation);
         }
-        if ((posY > ThunderGui2.getInstance().main_posY + ThunderGui2.getInstance().height) || posY < ThunderGui2.getInstance().main_posY) {
+        if ((posY > ThunderGui.getInstance().main_posY + ThunderGui.getInstance().height) || posY < ThunderGui.getInstance().main_posY) {
             return;
         }
         Render2DEngine.drawRound(context.getMatrices(),posX + 5, posY, 285, 30, 4f, Render2DEngine.applyOpacity(new Color(44, 35, 52, 255), getFadeFactor()));
@@ -172,12 +172,12 @@ public class FriendComponent {
     }
 
     public void mouseClicked(int MouseX, int MouseY, int clickedButton) {
-        if ((posY > ThunderGui2.getInstance().main_posY + ThunderGui2.getInstance().height) || posY < ThunderGui2.getInstance().main_posY) {
+        if ((posY > ThunderGui.getInstance().main_posY + ThunderGui.getInstance().height) || posY < ThunderGui.getInstance().main_posY) {
             return;
         }
         if (Render2DEngine.isHovered(MouseX, MouseY, posX + 268, posY + 10, 10, 10)) {
             ThunderHack.friendManager.removeFriend(name);
-            ThunderGui2.getInstance().loadFriends();
+            ThunderGui.getInstance().loadFriends();
         }
     }
 

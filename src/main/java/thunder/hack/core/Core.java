@@ -25,7 +25,7 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.RadarRewrite;
-import thunder.hack.gui.thundergui.ThunderGui2;
+import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.utility.Timer;
@@ -49,7 +49,7 @@ public final class Core {
         if (fullNullCheck()) return;
 
         ThunderHack.moduleManager.onUpdate();
-        ThunderGui2.getInstance().onTick();
+        ThunderGui.getInstance().onTick();
 
         if (ModuleManager.clickGui.getBind().getKey() == -1) {
             Command.sendMessage(Formatting.RED + "Default clickgui keybind --> P");

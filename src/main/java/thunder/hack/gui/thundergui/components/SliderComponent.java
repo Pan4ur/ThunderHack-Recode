@@ -3,7 +3,7 @@ package thunder.hack.gui.thundergui.components;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.gui.thundergui.ThunderGui2;
+import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -41,7 +41,7 @@ public class SliderComponent extends SettingElement {
     @Override
     public void render(MatrixStack stack, int mouseX, int mouseY, float partialTicks) {
         super.render(stack,mouseX, mouseY, partialTicks);
-        if ((getY() > ThunderGui2.getInstance().main_posY + ThunderGui2.getInstance().height) || getY() < ThunderGui2.getInstance().main_posY) {
+        if ((getY() > ThunderGui.getInstance().main_posY + ThunderGui.getInstance().height) || getY() < ThunderGui.getInstance().main_posY) {
             return;
         }
 
@@ -96,7 +96,7 @@ public class SliderComponent extends SettingElement {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if ((getY() > ThunderGui2.getInstance().main_posY + ThunderGui2.getInstance().height) || getY() < ThunderGui2.getInstance().main_posY) {
+        if ((getY() > ThunderGui.getInstance().main_posY + ThunderGui.getInstance().height) || getY() < ThunderGui.getInstance().main_posY) {
             return;
         }
         if (mouseX > x + 154 && mouseX < x + 176 && mouseY > y + height - 11 && mouseY < y + height - 4) {
@@ -170,7 +170,7 @@ public class SliderComponent extends SettingElement {
     public void checkMouseWheel(float value) {
         super.checkMouseWheel(value);
         if (isHovered()) {
-            ThunderGui2.scroll_lock = true;
+            ThunderGui.scroll_lock = true;
         } else {
             return;
         }

@@ -1,6 +1,6 @@
 package thunder.hack.modules.client;
 
-import thunder.hack.gui.thundergui.ThunderGui2;
+import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -21,7 +21,7 @@ public final class ThunderHackGui extends Module {
 
     @Override
     public void onEnable() {
-        mc.setScreen(ThunderGui2.getThunderGui());
+        mc.setScreen(ThunderGui.getThunderGui());
         disable();
     }
 

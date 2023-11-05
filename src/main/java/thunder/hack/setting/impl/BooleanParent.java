@@ -1,10 +1,10 @@
 package thunder.hack.setting.impl;
 
 public class BooleanParent {
-    private boolean state, extended;
+    private boolean enabled, extended;
 
-    public BooleanParent(boolean state) {
-        this.state = state;
+    public BooleanParent(boolean enabled) {
+        this.enabled = enabled;
         extended = false;
     }
 
@@ -16,11 +16,11 @@ public class BooleanParent {
         this.extended = extended;
     }
 
-    public boolean getState() {
-        return state;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setState(boolean state) {
-        this.state = state;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

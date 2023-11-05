@@ -2,10 +2,9 @@ package thunder.hack.gui.thundergui.components;
 
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
 import thunder.hack.cmd.Command;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.gui.thundergui.ThunderGui2;
+import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ThunderHackGui;
 import thunder.hack.setting.impl.Bind;
@@ -42,11 +41,11 @@ public class ModulePlate {
 
     public void render(MatrixStack stack, int MouseX, int MouseY) {
         if (scrollPosY != posY) {
-            scroll_animation = ThunderGui2.fast(scroll_animation, 1, 15f);
+            scroll_animation = ThunderGui.fast(scroll_animation, 1, 15f);
             posY = (int) Render2DEngine.interpolate(prevPosY, scrollPosY, scroll_animation);
         }
 
-        if ((posY > ThunderGui2.getInstance().main_posY + ThunderGui2.getInstance().height) || posY < ThunderGui2.getInstance().main_posY) {
+        if ((posY > ThunderGui.getInstance().main_posY + ThunderGui.getInstance().height) || posY < ThunderGui.getInstance().main_posY) {
             return;
         }
 
@@ -76,7 +75,7 @@ public class ModulePlate {
         //  Stencil.write(false);
         //  Particles.roundedRect(posX - 0.5, posY - 0.5, 91, 31, 8, Render2DEngine.applyOpacity(new Color(0, 0, 0, 255), getFadeFactor()));
         // Stencil.erase(true);
-        if (ThunderGui2.selected_plate != this)
+        if (ThunderGui.selected_plate != this)
             FontRenderers.icons.drawString(stack, "H", (int) (posX + 80f), (int) (posY + 22f), Render2DEngine.applyOpacity(new Color(0xFFECECEC, true).getRGB(), getFadeFactor()));
         else {
             String gear = "H";
@@ -196,7 +195,7 @@ public class ModulePlate {
     }
 
     public void mouseClicked(int mouseX, int mouseY, int clickedButton) {
-        if ((posY > ThunderGui2.getInstance().main_posY + ThunderGui2.getInstance().height) || posY < ThunderGui2.getInstance().main_posY) {
+        if ((posY > ThunderGui.getInstance().main_posY + ThunderGui.getInstance().height) || posY < ThunderGui.getInstance().main_posY) {
             return;
         }
         if (listening_bind) {
@@ -221,7 +220,7 @@ public class ModulePlate {
                     module.toggle();
                     break;
                 case 1:
-                    ThunderGui2.selected_plate = this;
+                    ThunderGui.selected_plate = this;
                     break;
                 case 2:
                     listening_bind = !listening_bind;

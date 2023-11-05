@@ -8,7 +8,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
 import static thunder.hack.utility.world.HoleUtility.validIndestructible;
-import static thunder.hack.utility.world.HoleUtility.validTwoBlockIndestructibleXZ;
+import static thunder.hack.utility.world.HoleUtility.validTwoBlockIndestructible;
 
 public class HoleAnchor extends Module {
     private final Setting<Integer> pitch = new Setting<>("Pitch", 60, 0, 90);
@@ -25,9 +25,9 @@ public class HoleAnchor extends Module {
                     validIndestructible(BlockPos.ofFloored(mc.player.getPos()).down(1))
                             || validIndestructible(BlockPos.ofFloored(mc.player.getPos()).down(2))
                             || validIndestructible(BlockPos.ofFloored(mc.player.getPos()).down(3))
-                            || validTwoBlockIndestructibleXZ(BlockPos.ofFloored(mc.player.getPos()).down(1))
-                            || validTwoBlockIndestructibleXZ(BlockPos.ofFloored(mc.player.getPos()).down(2))
-                            || validTwoBlockIndestructibleXZ(BlockPos.ofFloored(mc.player.getPos()).down(3))
+                            || validTwoBlockIndestructible(BlockPos.ofFloored(mc.player.getPos()).down(1))
+                            || validTwoBlockIndestructible(BlockPos.ofFloored(mc.player.getPos()).down(2))
+                            || validTwoBlockIndestructible(BlockPos.ofFloored(mc.player.getPos()).down(3))
             ) {
                 if (!pull.getValue()) {
                     mc.player.setVelocity(0, mc.player.getVelocity().getY(), 0);

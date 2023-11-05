@@ -8,6 +8,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventSync;
@@ -16,6 +17,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
+import thunder.hack.utility.math.PredictUtility;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.Timer;
 import net.minecraft.block.Blocks;
@@ -60,10 +62,6 @@ public final class HoleFill extends Module {
     private final Setting<ColorSetting> renderLineColor = new Setting<>("Render Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
     private final Setting<Integer> renderLineWidth = new Setting<>("Render Line Width", 2, 1, 5).withParent(renderCategory);
 
-    public static HoleFill getInstance() {
-        return instance;
-    }
-
     private enum Mode {
         Always,
         Target
@@ -80,6 +78,13 @@ public final class HoleFill extends Module {
         Burrow,
         Trap
     }
+
+    private static final Vec3i[] HOLE_VECTORS = {
+            new Vec3i(-1, 0, -1),
+            new Vec3i(1, 0, -1),
+            new Vec3i(-1, 0, 1),
+            new Vec3i(1, 0, 1),
+    };
 
     private boolean burrowWasEnabled = false;
     public static final Timer inactivityTimer = new Timer();
@@ -121,16 +126,18 @@ public final class HoleFill extends Module {
                 .orElse(null);
 
         if (mode.getValue() == Mode.Target && target == null) return;
+        final PlayerEntity predicted = PredictUtility.predictPlayer(Objects.requireNonNull(target), 3);
 
         int blocksPlaced = 0;
 
         while (blocksPlaced < actionShift.getValue()) {
             BlockPos pos;
+
             if (mode.getValue() == Mode.Target) {
                 pos = holes.stream()
                         .filter(this::isHole)
                         .filter(p -> mc.player.getPos().distanceTo(p.toCenterPos()) <= placeRange.getValue())
-                        .filter(p -> target.getPos().distanceTo(p.toCenterPos()) <= rangeToTarget.getValue())
+                        .filter(p -> predicted.getPos().distanceTo(p.toCenterPos()) <= rangeToTarget.getValue())
                         .filter(p -> {
                             if (p.equals(mc.player.getBlockPos()) && selfFill.getValue()) {
                                 selfFillNeed = true;
@@ -156,7 +163,7 @@ public final class HoleFill extends Module {
             }
 
             if (pos != null) {
-                List<BlockPos> poses = HoleUtility.getHolePoses(pos).stream()
+                List<BlockPos> poses = getHolePoses(pos).stream()
                         .filter(blockPos -> mc.player.getPos().distanceTo(blockPos.toCenterPos()) <= placeRange.getValue())
                         .toList();
                 boolean broke = false;
@@ -230,6 +237,37 @@ public final class HoleFill extends Module {
         }
     }
 
+    private @NotNull @Unmodifiable List<BlockPos> getHolePoses(BlockPos fromPos) {
+        if (HoleUtility.validQuadBedrock(fromPos) || HoleUtility.validQuadIndestructible(fromPos)) {
+            for (Vec3i vec : HOLE_VECTORS) {
+                if (mc.world.getBlockState(fromPos.add(vec)).isReplaceable()
+                        && mc.world.getBlockState(fromPos.add(vec.getX(), 0, 0)).isReplaceable()
+                        && mc.world.getBlockState(fromPos.add(0, 0, vec.getZ())).isReplaceable()) {
+                    return List.of(
+                            fromPos,
+                            fromPos.add(vec),
+                            fromPos.add(vec.getX(), 0, 0),
+                            fromPos.add(0, 0, vec.getZ())
+                    );
+                }
+            }
+        }
+
+        if (HoleUtility.validTwoBlockBedrock(fromPos) || HoleUtility.validTwoBlockIndestructible(fromPos)) {
+            for (Vec3i vec : HoleUtility.VECTOR_PATTERN) {
+                if (mc.world.getBlockState(fromPos).isReplaceable()
+                        && mc.world.getBlockState(fromPos.add(vec)).isReplaceable()) {
+                    return List.of(
+                            fromPos,
+                            fromPos.add(vec)
+                    );
+                }
+            }
+        }
+
+        return List.of(fromPos);
+    }
+
     private @NotNull List<BlockPos> findHoles() {
         List<BlockPos> positions = new ArrayList<>();
         BlockPos centerPos = mc.player.getBlockPos();
@@ -268,6 +306,7 @@ public final class HoleFill extends Module {
                 }
             }
         }
+
         return -1;
     }
 
@@ -297,8 +336,12 @@ public final class HoleFill extends Module {
     }
 
     private boolean isHole(BlockPos pos) {
-        return ((HoleUtility.validTwoBlockIndestructibleXZ(pos) || HoleUtility.validTwoBlockBedrockXZ(pos)) && fillDouble.getValue())
+        return ((HoleUtility.validTwoBlockIndestructible(pos) || HoleUtility.validTwoBlockBedrock(pos)) && fillDouble.getValue())
                 || ((HoleUtility.validQuadBedrock(pos) || HoleUtility.validQuadIndestructible(pos)) && fillQuad.getValue())
                 || ((HoleUtility.validBedrock(pos) || HoleUtility.validIndestructible(pos)) && fillSingle.getValue());
+    }
+
+    public static HoleFill getInstance() {
+        return instance;
     }
 }

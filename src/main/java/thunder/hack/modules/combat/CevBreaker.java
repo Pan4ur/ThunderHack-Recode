@@ -205,12 +205,12 @@ public final class CevBreaker extends Module {
         // Trap
         if (trap.getValue()) {
             List<BlockPos> trapBlocks = new ArrayList<>();
-            for (BlockPos surroundBlock : HoleUtility.getSurroundPoses(target.getBlockPos()).stream().map(BlockPos::up).toList()) {
+            for (BlockPos surroundBlock : HoleUtility.getSurroundPoses(target.getPos()).stream().map(BlockPos::up).toList()) {
                 if (InteractionUtility.canPlaceBlock(surroundBlock, interact.getValue(), false)) {
                     trapBlocks.add(surroundBlock);
                 }
             }
-            for (BlockPos headPos : HoleUtility.getHolePoses(target.getBlockPos()).stream().map(pos -> pos.up(2)).filter(pos -> !pos.equals(currentMineBlockPos)).toList()) {
+            for (BlockPos headPos : HoleUtility.getHolePoses(target.getPos()).stream().map(pos -> pos.up(2)).filter(pos -> !pos.equals(currentMineBlockPos)).toList()) {
                 if (InteractionUtility.canPlaceBlock(headPos, interact.getValue(), false)) {
                     trapBlocks.add(headPos);
                 }

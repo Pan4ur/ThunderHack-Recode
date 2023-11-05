@@ -189,10 +189,10 @@ public class AutoCrystal extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        if(mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.world == null) return;
 
         switch (targetLogic.getValue()) {
-            case HP -> target = ThunderHack.combatManager.getTargetByHP(targetRange.getValue());
+            case HP -> target = ThunderHack.combatManager.getTargetByHealth(targetRange.getValue());
             case Distance -> target = ThunderHack.combatManager.getNearestTarget(targetRange.getValue());
             case FOV -> target = ThunderHack.combatManager.getTargetByFOV(targetRange.getValue());
         }
@@ -254,13 +254,13 @@ public class AutoCrystal extends Module {
     }
 
     private void handleSpawn(EndCrystalEntity crystal) {
-        if(mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.world == null) return;
 
         getCrystalToExplode();
         if (bestCrystal == crystal) {
             attackCrystal(crystal);
             debug("end sequence");
-            if (instantPlace.getValue().getState() && placeTimer.passedMs(placeDelay.getValue())) {
+            if (instantPlace.getValue().isEnabled() && placeTimer.passedMs(placeDelay.getValue())) {
                 debug("placing after attack");
                 if (recalculate.getValue() != Recalc.OFF)
                     calcPosition(recalculate.getValue() == Recalc.FAST ? 2f : placeRange.getValue(), recalculate.getValue() == Recalc.FAST ? crystal.getPos() : mc.player.getPos());
@@ -273,7 +273,7 @@ public class AutoCrystal extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
-        if(mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.world == null) return;
 
         if (e.getPacket() instanceof ExplosionS2CPacket explosion) {
             for (Entity ent : Lists.newArrayList(mc.world.getEntities())) {
@@ -289,7 +289,7 @@ public class AutoCrystal extends Module {
 
     @EventHandler
     public void onBlockDestruct(EventSetBlockState e) {
-        if(mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.world == null) return;
 
         if (e.getPrevState() == null || e.getState() == null)
             return;
@@ -313,7 +313,7 @@ public class AutoCrystal extends Module {
     public void rotateMethod() {
         if (bestPosition != null && mc.player != null) {
             float[] angle = InteractionUtility.calculateAngle(bestPosition.getPos());
-            if (yawStep.getValue().getState()) {
+            if (yawStep.getValue().isEnabled()) {
                 float yaw_delta = MathHelper.wrapDegrees(angle[0] - ((IClientPlayerEntity) mc.player).getLastYaw());
                 if (Math.abs(yaw_delta) > yawAngle.getValue()) {
                     angle[0] = ((IClientPlayerEntity) mc.player).getLastYaw() + (yaw_delta * (yawAngle.getValue() / Math.abs(yaw_delta)));
@@ -379,7 +379,7 @@ public class AutoCrystal extends Module {
     }
 
     public boolean shouldPause() {
-        if(mc.player == null || mc.world == null || mc.interactionManager == null) return true;
+        if (mc.player == null || mc.world == null || mc.interactionManager == null) return true;
 
         boolean offhand = mc.player.getOffHandStack().getItem() instanceof EndCrystalItem;
         if (mc.interactionManager.isBreakingBlock() && !offhand && mining.getValue())
@@ -404,7 +404,7 @@ public class AutoCrystal extends Module {
 
         boolean silent = autoSwitch.getValue() == Switch.SILENT || autoSwitch.getValue() == Switch.INVENTORY;
 
-        return switchPause.getValue().getState() && !ThunderHack.playerManager.switchTimer.passedMs(switchDelay.getValue()) && !silent && !silentWeakness;
+        return switchPause.getValue().isEnabled() && !ThunderHack.playerManager.switchTimer.passedMs(switchDelay.getValue()) && !silent && !silentWeakness;
     }
 
     public boolean rotationMarkedDirty() {
@@ -427,7 +427,7 @@ public class AutoCrystal extends Module {
     }
 
     public void attackCrystal(EndCrystalEntity crystal) {
-        if(mc.player == null || mc.world == null || mc.interactionManager == null) return;
+        if (mc.player == null || mc.world == null || mc.interactionManager == null) return;
 
         if (shouldPause() || target == null)
             return;
@@ -472,7 +472,7 @@ public class AutoCrystal extends Module {
     }
 
     private int switchTo(SearchInvResult result, SearchInvResult resultInv, @NotNull Setting<Switch> antiWeakness) {
-        if(mc.player == null || mc.world == null || mc.interactionManager == null) return -1;
+        if (mc.player == null || mc.world == null || mc.interactionManager == null) return -1;
 
         int prevSlot = mc.player.getInventory().selectedSlot;
 
@@ -533,7 +533,7 @@ public class AutoCrystal extends Module {
     }
 
     private boolean checkOtherEntities(Box posBoundingBox) {
-        if(mc.player == null || mc.world == null) return false;
+        if (mc.player == null || mc.world == null) return false;
 
         Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
 
@@ -552,7 +552,7 @@ public class AutoCrystal extends Module {
     }
 
     private void postPlaceSwitch(int slot) {
-        if(mc.player == null || mc.world == null || mc.interactionManager == null) return;
+        if (mc.player == null || mc.world == null || mc.interactionManager == null) return;
 
         if (autoSwitch.getValue() == Switch.SILENT && slot != -1) {
             mc.player.getInventory().selectedSlot = slot;
@@ -566,7 +566,7 @@ public class AutoCrystal extends Module {
     }
 
     public void calcPosition(float range, Vec3d center) {
-        if(mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.world == null) return;
 
         if (ModuleManager.speedMine.isWorth()) {
             if (onBreakBlock.getValue() == OnBreakBlock.Smart) {
@@ -621,6 +621,7 @@ public class AutoCrystal extends Module {
     private @NotNull List<PlaceData> getPossibleBlocks(PlayerEntity target, Vec3d center, float range) {
         List<PlaceData> blocks = new ArrayList<>();
         BlockPos playerPos = BlockPos.ofFloored(center);
+
         for (int x = (int) Math.floor(playerPos.getX() - range); x <= Math.ceil(playerPos.getX() + range); x++) {
             for (int y = (int) Math.floor(playerPos.getY() - range); y <= Math.ceil(playerPos.getY() + range); y++) {
                 for (int z = (int) Math.floor(playerPos.getZ() - range); z <= Math.ceil(playerPos.getZ() + range); z++) {
@@ -630,13 +631,14 @@ public class AutoCrystal extends Module {
                 }
             }
         }
+
         return blocks;
     }
 
     private @NotNull List<CrystalData> getPossibleCrystals(PlayerEntity target) {
         List<CrystalData> crystals = new ArrayList<>();
 
-        if(mc.player == null || mc.world == null) return crystals;
+        if (mc.player == null || mc.world == null) return crystals;
 
         Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
         for (Entity ent : entities) {
@@ -687,9 +689,9 @@ public class AutoCrystal extends Module {
     }
 
     public boolean isSafe(float damage, float selfDamage, boolean overrideDamage) {
-        if(mc.player == null || mc.world == null) return false;
+        if (mc.player == null || mc.world == null) return false;
 
-        if(overrideDamage)
+        if (overrideDamage)
             return true;
 
         if (selfDamage + 0.5 > mc.player.getHealth() + mc.player.getAbsorptionAmount()) return false;
@@ -728,7 +730,7 @@ public class AutoCrystal extends Module {
 
         boolean override = target.getHealth() + target.getAbsorptionAmount() <= facePlaceHp.getValue();
 
-        if (armorBreaker.getValue().getState())
+        if (armorBreaker.getValue().isEnabled())
             for (ItemStack armor : target.getArmorItems())
                 if (armor != null && !armor.getItem().equals(Items.AIR) && ((armor.getMaxDamage() - armor.getDamage()) / (float) armor.getMaxDamage()) * 100 < armorScale.getValue()) {
                     override = true;
@@ -770,7 +772,7 @@ public class AutoCrystal extends Module {
     }
 
     public @Nullable PlaceData getPlaceData(BlockPos bp, PlayerEntity target) {
-        if(mc.player == null || mc.world == null) return null;
+        if (mc.player == null || mc.world == null) return null;
 
 
         Block base = mc.world.getBlockState(bp).getBlock();
@@ -811,7 +813,7 @@ public class AutoCrystal extends Module {
         return new PlaceData(interactResult, damage, selfDamage, overrideDamage);
     }
 
-    public BlockHitResult getInteractResult(BlockPos bp, Vec3d crystalVec){
+    public BlockHitResult getInteractResult(BlockPos bp, Vec3d crystalVec) {
         BlockHitResult interactResult = null;
         switch (interact.getValue()) {
             case Default -> interactResult = getDefaultInteract(crystalVec, bp);
@@ -822,7 +824,7 @@ public class AutoCrystal extends Module {
     }
 
     public boolean checkEntities(@NotNull BlockPos base) {
-        if(mc.player == null || mc.world == null) return false;
+        if (mc.player == null || mc.world == null) return false;
 
 
         Box posBoundingBox = new Box(base.up());
@@ -847,7 +849,7 @@ public class AutoCrystal extends Module {
 
     public boolean shouldOverrideDamage(float damage, float selfDamage) {
         if (overrideSelfDamage.getValue() && target != null) {
-            if(mc.player == null || mc.world == null) return false;
+            if (mc.player == null || mc.world == null) return false;
 
             boolean targetSafe = (target.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING
                     || target.getMainHandStack().getItem() == Items.TOTEM_OF_UNDYING);
@@ -876,7 +878,7 @@ public class AutoCrystal extends Module {
     }
 
     private @Nullable BlockHitResult getDefaultInteract(Vec3d crystalVector, BlockPos bp) {
-        if(mc.player == null || mc.world == null) return null;
+        if (mc.player == null || mc.world == null) return null;
 
 
         if (PlayerUtility.squaredDistanceFromEyes(crystalVector) > placeRange.getPow2Value())
@@ -892,7 +894,7 @@ public class AutoCrystal extends Module {
     }
 
     public BlockHitResult getStrictInteract(@NotNull BlockPos bp) {
-        if(mc.player == null || mc.world == null) return null;
+        if (mc.player == null || mc.world == null) return null;
 
         float bestDistance = 999f;
         Direction bestDirection = null;
@@ -940,7 +942,7 @@ public class AutoCrystal extends Module {
     }
 
     public BlockHitResult getLegitInteract(BlockPos bp) {
-        if(mc.player == null || mc.world == null) return null;
+        if (mc.player == null || mc.world == null) return null;
 
         float bestDistance = 999f;
         BlockHitResult bestResult = null;
@@ -988,7 +990,7 @@ public class AutoCrystal extends Module {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTick(EventTick e) {
-        if(mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.world == null) return;
 
         ThunderHack.asyncManager.run(() -> {
             calcPosition(placeRange.getValue(), mc.player.getPos());

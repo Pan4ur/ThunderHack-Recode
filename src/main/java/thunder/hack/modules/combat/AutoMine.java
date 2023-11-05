@@ -32,6 +32,7 @@ public final class AutoMine extends Module {
 
     private final Setting<Parent> logic = new Setting<>("Logic", new Parent(false, 0));
     private final Setting<TargetLogic> targetLogic = new Setting<>("TargetLogic", TargetLogic.Distance).withParent(logic);
+    private final Setting<Boolean> antiBurrow = new Setting<>("Burrow", false).withParent(logic);
     private final Setting<Boolean> antiSurround = new Setting<>("Surround", true).withParent(logic);
     private final Setting<Boolean> antiCev = new Setting<>("Cev", true).withParent(logic);
     private final Setting<Boolean> antiCiv = new Setting<>("Civ", true).withParent(logic);
@@ -74,7 +75,7 @@ public final class AutoMine extends Module {
         boolean found = false;
 
         switch (targetLogic.getValue()) {
-            case HP -> target = ThunderHack.combatManager.getTargetByHP(range.getValue() + 1f);
+            case HP -> target = ThunderHack.combatManager.getTargetByHealth(range.getValue() + 1f);
             case Distance -> target = ThunderHack.combatManager.getNearestTarget(range.getValue() + 1f);
             case FOV -> target = ThunderHack.combatManager.getTargetByFOV(range.getValue() + 1f);
         }
@@ -85,9 +86,15 @@ public final class AutoMine extends Module {
 
         if (!HoleUtility.isHole(targetPos)) return;
 
-        // 1 прогон - ищем на которые можно поставить
-        if (antiSurround.getValue()) {
-            for (BlockPos offset : HoleUtility.getSurroundPoses(targetPos)) {
+        // 1 прогон - на буров
+        if (antiBurrow.getValue() && !mc.world.getBlockState(targetPos).isReplaceable()) {
+            minePos = targetPos;
+            found = true;
+        }
+
+        // 2 прогон - ищем на которые можно поставить
+        if (antiSurround.getValue() && !found) {
+            for (BlockPos offset : HoleUtility.getSurroundPoses(target.getPos())) {
                 if (mc.world.getBlockState(offset).getBlock() != Blocks.OBSIDIAN)
                     continue;
                 if (!mc.world.isAir(offset.add(0, 1, 0)))
@@ -100,9 +107,9 @@ public final class AutoMine extends Module {
             }
         }
 
-        // 2 прогон кив брейкаем
+        // 3 прогон кив брейкаем
         if (!found && antiCiv.getValue()) {
-            for (BlockPos pos : HoleUtility.getSurroundPoses(targetPos).stream()
+            for (BlockPos pos : HoleUtility.getSurroundPoses(target.getPos()).stream()
                     .map(BlockPos::up)
                     .toList()) {
                 if (!mc.world.getBlockState(pos).getBlock().equals(Blocks.OBSIDIAN) || !mc.world.isAir(pos)) continue;
@@ -114,7 +121,7 @@ public final class AutoMine extends Module {
             }
         }
 
-        // 3 прогон кев брейкаем
+        // 4 прогон кев брейкаем
         if (!found
                 && antiCev.getValue()
                 && mc.world.getBlockState(targetPos.up(2)).getBlock().equals(Blocks.OBSIDIAN)
@@ -123,9 +130,9 @@ public final class AutoMine extends Module {
             found = true;
         }
 
-        // 4 прогон - ищем любой
+        // 5 прогон - ищем любой
         if (!found && !oldVers.getValue() && antiSurround.getValue()) {
-            for (BlockPos pos2 : HoleUtility.getSurroundPoses(targetPos)) {
+            for (BlockPos pos2 : HoleUtility.getSurroundPoses(target.getPos())) {
                 if (mc.world.getBlockState(pos2).getBlock() != Blocks.OBSIDIAN)
                     continue;
                 if (mc.player.squaredDistanceTo(pos2.toCenterPos()) < range.getPow2Value()) {

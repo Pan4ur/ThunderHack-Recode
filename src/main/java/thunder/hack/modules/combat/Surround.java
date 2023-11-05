@@ -264,7 +264,7 @@ public final class Surround extends Module {
             validInteraction = InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), InteractionUtility.PlaceMode.Normal, slot, true, false);
         }
 
-        if (validInteraction && renderCategory.getValue().getState()) {
+        if (validInteraction && renderCategory.getValue().isEnabled()) {
             BlockAnimationUtility.renderBlock(pos,
                     renderLineColor.getValue().getColorObject(),
                     renderLineWidth.getValue(),
@@ -342,28 +342,28 @@ public final class Surround extends Module {
             int x;
             final double decimalX = Math.abs(mc.player.getX()) - Math.floor(Math.abs(mc.player.getX()));
             final double decimalZ = Math.abs(mc.player.getZ()) - Math.floor(Math.abs(mc.player.getZ()));
-            final int lengthXPos = calcLength(decimalX, false);
-            final int lengthXNeg = calcLength(decimalX, true);
-            final int lengthZPos = calcLength(decimalZ, false);
-            final int lengthZNeg = calcLength(decimalZ, true);
+            final int lengthXPos = HoleUtility.calcLength(decimalX, false);
+            final int lengthXNeg = HoleUtility.calcLength(decimalX, true);
+            final int lengthZPos = HoleUtility.calcLength(decimalZ, false);
+            final int lengthZNeg = HoleUtility.calcLength(decimalZ, true);
             final ArrayList<BlockPos> tempOffsets = new ArrayList<>();
             offsets.addAll(getOverlapPos());
 
             for (x = 1; x < lengthXPos + 1; ++x) {
-                tempOffsets.add(addToPlayer(playerPos, x, 0.0, 1 + lengthZPos));
-                tempOffsets.add(addToPlayer(playerPos, x, 0.0, -(1 + lengthZNeg)));
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, x, 0.0, 1 + lengthZPos));
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, x, 0.0, -(1 + lengthZNeg)));
             }
             for (x = 0; x <= lengthXNeg; ++x) {
-                tempOffsets.add(addToPlayer(playerPos, -x, 0.0, 1 + lengthZPos));
-                tempOffsets.add(addToPlayer(playerPos, -x, 0.0, -(1 + lengthZNeg)));
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, -x, 0.0, 1 + lengthZPos));
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, -x, 0.0, -(1 + lengthZNeg)));
             }
             for (z = 1; z < lengthZPos + 1; ++z) {
-                tempOffsets.add(addToPlayer(playerPos, 1 + lengthXPos, 0.0, z));
-                tempOffsets.add(addToPlayer(playerPos, -(1 + lengthXNeg), 0.0, z));
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, 1 + lengthXPos, 0.0, z));
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, -(1 + lengthXNeg), 0.0, z));
             }
             for (z = 0; z <= lengthZNeg; ++z) {
-                tempOffsets.add(addToPlayer(playerPos, 1 + lengthXPos, 0.0, -z));
-                tempOffsets.add(addToPlayer(playerPos, -(1 + lengthXNeg), 0.0, -z));
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, 1 + lengthXPos, 0.0, -z));
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, -(1 + lengthXNeg), 0.0, -z));
             }
 
             for (BlockPos pos : tempOffsets) {
@@ -396,25 +396,14 @@ public final class Surround extends Module {
                 && interact.getValue() != InteractionUtility.Interact.AirPlace;
     }
 
-    private int calcOffset(double dec) {
-        return dec >= 0.7 ? 1 : (dec <= 0.3 ? -1 : 0);
-    }
-
-    private BlockPos addToPlayer(@NotNull BlockPos playerPos, double x, double y, double z) {
-        if (playerPos.getX() < 0) x = -x;
-        if (playerPos.getY() < 0) y = -y;
-        if (playerPos.getZ() < 0) z = -z;
-        return playerPos.add(BlockPos.ofFloored(x, y, z));
-    }
-
     private @NotNull List<BlockPos> getOverlapPos() {
         List<BlockPos> positions = new ArrayList<>();
 
         if (mc.player != null) {
             double decimalX = mc.player.getX() - Math.floor(mc.player.getX());
             double decimalZ = mc.player.getZ() - Math.floor(mc.player.getZ());
-            int offX = calcOffset(decimalX);
-            int offZ = calcOffset(decimalZ);
+            int offX = HoleUtility.calcOffset(decimalX);
+            int offZ = HoleUtility.calcOffset(decimalZ);
             positions.add(getPlayerPos());
             for (int x = 0; x <= Math.abs(offX); ++x) {
                 for (int z = 0; z <= Math.abs(offZ); ++z) {
@@ -426,11 +415,6 @@ public final class Surround extends Module {
         }
 
         return positions;
-    }
-
-    private int calcLength(double decimal, boolean negative) {
-        if (negative) return decimal <= 0.3 ? 1 : 0;
-        return decimal >= 0.7 ? 1 : 0;
     }
 
     private int getSlot() {

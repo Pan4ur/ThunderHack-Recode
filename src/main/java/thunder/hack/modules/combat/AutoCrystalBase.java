@@ -71,7 +71,7 @@ public class AutoCrystalBase extends Module {
         }
 
         switch (targetLogic.getValue()) {
-            case HP -> target = ThunderHack.combatManager.getTargetByHP(15);
+            case HP -> target = ThunderHack.combatManager.getTargetByHealth(15);
             case Distance -> target = ThunderHack.combatManager.getNearestTarget(15);
             case FOV -> target = ThunderHack.combatManager.getTargetByFOV(15);
         }
@@ -103,7 +103,7 @@ public class AutoCrystalBase extends Module {
             obbyResult.switchTo();
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, bestData.bhr());
             sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-            if (render.getValue().getState())
+            if (render.getValue().isEnabled())
                 BlockAnimationUtility.renderBlock(bestData.position(),
                         renderLineColor.getValue().getColorObject(),
                         renderLineWidth.getValue(),

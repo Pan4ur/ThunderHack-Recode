@@ -73,11 +73,23 @@ public class CombatManager implements IManager {
                 .collect(Collectors.toList());
     }
 
+    public @Nullable PlayerEntity getTarget(float range, @NotNull TargetBy targetBy) {
+        PlayerEntity target = null;
+
+        switch (targetBy) {
+            case FOV -> target = getTargetByFOV(range);
+            case Health -> target = getTargetByHealth(range);
+            case Distance -> target = getNearestTarget(range);
+        }
+
+        return target;
+    }
+
     public @Nullable PlayerEntity getNearestTarget(float range) {
         return getTargets(range).stream().min(Comparator.comparing(t -> mc.player.distanceTo(t))).orElse(null);
     }
 
-    public PlayerEntity getTargetByHP(float range) {
+    public PlayerEntity getTargetByHealth(float range) {
         return getTargets(range).stream().min(Comparator.comparing(t -> (t.getHealth() + t.getAbsorptionAmount()))).orElse(null);
     }
 
@@ -91,5 +103,11 @@ public class CombatManager implements IManager {
         float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);
         double plYaw = MathHelper.wrapDegrees(mc.player.getYaw());
         return (float) Math.abs(yaw - plYaw);
+    }
+
+    public enum TargetBy {
+        Distance,
+        FOV,
+        Health
     }
 }

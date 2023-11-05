@@ -68,7 +68,7 @@ public final class AutoTrap extends Module {
     }
 
     public void onRender3D(MatrixStack stack) {
-        if(!render.getValue().getState())
+        if(!render.getValue().isEnabled())
             return;
 
         renderPoses.forEach((pos, time) -> {

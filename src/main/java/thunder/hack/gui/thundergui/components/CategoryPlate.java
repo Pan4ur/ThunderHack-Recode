@@ -1,7 +1,7 @@
 package thunder.hack.gui.thundergui.components;
 
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.gui.thundergui.ThunderGui2;
+import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.modules.Module;
 import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.math.MathUtility;
@@ -48,10 +48,10 @@ public class CategoryPlate {
 
     public void mouseClicked(int mouseX, int mouseY, int clickedButton) {
         if (isHovered(mouseX, mouseY)) {
-            ThunderGui2.getInstance().new_category = this.cat;
-            if (ThunderGui2.getInstance().current_category == null) {
-                ThunderGui2.getInstance().current_category = Module.Category.HUD;
-                ThunderGui2.getInstance().new_category = this.cat;
+            ThunderGui.getInstance().new_category = this.cat;
+            if (ThunderGui.getInstance().current_category == null) {
+                ThunderGui.getInstance().current_category = Module.Category.HUD;
+                ThunderGui.getInstance().new_category = this.cat;
             }
         }
     }
