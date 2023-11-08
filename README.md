@@ -15,7 +15,7 @@
 - Default ClickGui keybind - **```P```**
 - Default prefix  - **```@```**
 - Middle click on module to bind
-- DoxWare 2.0 and gumballoff is a ratted TH Recode rename, be aware :)
+- DoxWare 2.0, gumballoff and Quick Client are ratted TH Recode renames, be aware :)
 - selfdox попросил меня написать тут что у него самое большое кол-во ело на сс
 - А у 06ED'a самая красивая попа
 - А кен просто крутой
