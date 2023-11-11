@@ -217,7 +217,7 @@ public final class Aura extends Module {
         return new boolean[]{blocking, sprint};
     }
 
-    public void postAttack(boolean sprint, boolean block) {
+    public void postAttack(boolean block, boolean sprint) {
         if (sprint && dropSprint.getValue())
             enableSprint();
         if (block && unpressShield.getValue())
