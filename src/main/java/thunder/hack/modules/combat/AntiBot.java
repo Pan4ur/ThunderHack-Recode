@@ -33,19 +33,13 @@ public final class AntiBot extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        if (!onlyAura.getValue())
-            for (PlayerEntity player : AntiBot.mc.world.getPlayers())
-                isABot(player);
-        else if (Aura.target instanceof PlayerEntity ent)
-            isABot(ent);
+        if (!onlyAura.getValue()) mc.world.getPlayers().forEach(this::isABot);
+        else if (Aura.target instanceof PlayerEntity ent) isABot(ent);
 
-        for (PlayerEntity bot : bots) {
-            if (remove.getValue()) {
-                try {
-                    mc.world.removeEntity(bot.getId(), Entity.RemovalReason.KILLED);
-                } catch (Exception ignored) {}
-            }
-        }
+        bots.forEach(b -> {
+            if (remove.getValue())
+                try {mc.world.removeEntity(b.getId(), Entity.RemovalReason.KILLED);} catch (Exception ignored) {}
+        });
 
         if (timer.passedMs(10000)) {
             bots.clear();
@@ -56,6 +50,9 @@ public final class AntiBot extends Module {
     }
 
     private void isABot(PlayerEntity ent){
+        if(bots.contains(ent))
+            return;
+
         if (mode.getValue() == Mode.MotionCheck) {
             double speed = (ent.getX() - ent.prevX) * (ent.getX() - ent.prevX) + (ent.getZ() - ent.prevZ) * (ent.getZ() - ent.prevZ);
             if (speed > 0.5 && !bots.contains(ent)) {

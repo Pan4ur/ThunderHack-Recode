@@ -80,13 +80,13 @@ public final class Aura extends Module {
 
     /*   ADVANCED   */
     public final Setting<Parent> advanced = new Setting<>("Advanced", new Parent(false, 0));
-    public final Setting<Boolean> useDelay = new Setting<>("Use Delay", false).withParent(advanced);
-    public final Setting<Integer> delay = new Setting<>("Delay", 0, 1, 10000, v -> useDelay.getValue()).withParent(advanced);
+    public final Setting<Boolean> pauseWhileEating = new Setting<>("PauseWhileEating", false).withParent(advanced);
     public final Setting<Boolean> dropSprint = new Setting<>("DropSprint", true).withParent(advanced);
     public final Setting<Boolean> pauseInInventory = new Setting<>("PauseInInventory", true).withParent(advanced);
     public final Setting<RayTrace> rayTrace = new Setting<>("RayTrace", RayTrace.OnlyTarget).withParent(advanced);
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Track).withParent(advanced);
     public final Setting<Boolean> unpressShield = new Setting<>("UnpressShield", true).withParent(advanced);
+    public final Setting<Boolean> sunrisePitch = new Setting<>("SunrisePitch", false).withParent(advanced);
     public final Setting<Boolean> deathDisable = new Setting<>("DeathDisable", true).withParent(advanced);
     public final Setting<Boolean> tpDisable = new Setting<>("TPDisable", false).withParent(advanced);
     public final Setting<Boolean> pullDown = new Setting<>("PullDown", false).withParent(advanced);
@@ -153,24 +153,21 @@ public final class Aura extends Module {
 
     @EventHandler
     public void onPlayerUpdate(PlayerUpdateEvent e) {
-        handleKill();
         resolvePlayers();
+        auraLogic();
+        restorePlayers();
+    }
+
+    public void auraLogic() {
+        handleKill();
         updateTarget();
 
         if (target == null) {
-            restorePlayers();
             return;
         }
 
         boolean readyForAttack = autoCrit() && (lookingAtHitbox || skipRayTraceCheck());
         calcRotations(readyForAttack);
-        restorePlayers();
-
-        if (!delayTimer.passedMs(delay.getValue()) && useDelay.getValue())
-            readyForAttack = false;
-        else if (readyForAttack)
-            delayTimer.reset();
-
 
         if (readyForAttack) {
             if (shieldBreaker(false))
@@ -328,6 +325,10 @@ public final class Aura extends Module {
 
         if (hitTicks > 0) return false;
 
+        if (mc.player.isUsingItem() && pauseWhileEating.getValue()
+                && (mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE))
+            return true;
+
         // я хз почему оно не критует когда фд больше 1.14
         if (mc.player.fallDistance > 1 && mc.player.fallDistance < 1.14) return false;
 
@@ -418,7 +419,10 @@ public final class Aura extends Module {
             return;
 
         if (rotationMode.getValue() == Rotation.Universal) {
-            Vec3d targetVec = getLegitLook(target);
+            Vec3d targetVec;
+
+            if(mc.player.isFallFlying()) targetVec = target.getEyePos();
+            else targetVec = getLegitLook(target);
 
             if (targetVec == null)
                 return;
@@ -438,7 +442,13 @@ public final class Aura extends Module {
                 delta_yaw = delta_yaw - 180;
 
             float deltaYaw = MathHelper.clamp(MathHelper.abs(delta_yaw), -yawStep, yawStep);
-            float deltaPitch = MathHelper.clamp(delta_pitch, -pitchStep, pitchStep);
+
+            float deltaPitch;
+            if(!sunrisePitch.getValue()) deltaPitch = MathHelper.clamp(delta_pitch, -pitchStep, pitchStep);
+            else {
+                float max = Math.max(ready ? Math.abs(delta_pitch) : 1.0F, 2.0F);
+                deltaPitch = delta_pitch > 0 ? max : -max;
+            }
 
             float newYaw = rotationYaw + (delta_yaw > 0 ? deltaYaw : -deltaYaw);
             float newPitch = MathHelper.clamp(rotationPitch + deltaPitch, -90.0F, 90.0F);
@@ -487,8 +497,9 @@ public final class Aura extends Module {
         float dst = attackRange.getValue();
         dst += 2f;
         if (mc.player.isFallFlying() && target != null) dst += 15f;
-        if (mode.getValue() == Mode.Interact || rotationMode.getValue() == Rotation.None)
+        if (mode.getValue() == Mode.Interact || rotationMode.getValue() == Rotation.None || rayTrace.getValue() == RayTrace.OFF)
             dst = attackRange.getValue();
+
         return dst * dst;
     }
 
@@ -716,5 +727,9 @@ public final class Aura extends Module {
 
     public enum AttackHand {
         MainHand, OffHand, None
+    }
+
+    public enum EventMode {
+        Render, Update
     }
 }
