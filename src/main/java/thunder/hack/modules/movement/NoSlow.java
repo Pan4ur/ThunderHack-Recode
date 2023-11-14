@@ -20,12 +20,12 @@ public class NoSlow extends Module {
 
     @Override
     public void onUpdate() {
-        if(returnSneak) {
+        if (returnSneak) {
             mc.options.sneakKey.setPressed(false);
             returnSneak = false;
         }
 
-        if (mc.player.isUsingItem() && !mc.player.isRiding()) {
+        if (mc.player.isUsingItem() && !mc.player.isRiding() && !mc.player.isFallFlying()) {
             if (mode.getValue() == Mode.StrictNCP)
                 sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
 
@@ -46,21 +46,16 @@ public class NoSlow extends Module {
             }
 
             if (mode.getValue() == Mode.Matrix) {
-                if (!ModuleManager.strafe.isEnabled()) {
-                    if (mc.player.isOnGround() && !mc.options.jumpKey.isPressed()) {
-                        mc.player.setVelocity(mc.player.getVelocity().x * 0.3, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.3);
-                    } else if (mc.player.fallDistance > 0.2f)
-                        mc.player.setVelocity(mc.player.getVelocity().x * 0.95f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.95f);
-                } else {
-                    if (!mc.player.isOnGround() && mc.player.fallDistance > 0.2f)
-                        mc.player.setVelocity(mc.player.getVelocity().x * 0.7, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.7f);
-                }
+                if (mc.player.isOnGround() && !mc.options.jumpKey.isPressed()) {
+                    mc.player.setVelocity(mc.player.getVelocity().x * 0.3, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.3);
+                } else if (mc.player.fallDistance > 0.2f)
+                    mc.player.setVelocity(mc.player.getVelocity().x * 0.95f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.95f);
             }
         }
     }
 
     public boolean canNoSlow() {
-        if(mode.getValue() == Mode.MusteryGrief && mc.player.isOnGround() && !mc.options.jumpKey.isPressed() )
+        if (mode.getValue() == Mode.MusteryGrief && mc.player.isOnGround() && !mc.options.jumpKey.isPressed())
             return false;
         if (!mainHand.getValue() && mc.player.getActiveHand() == Hand.MAIN_HAND)
             return mode.getValue() != Mode.MusteryGrief && mode.getValue() != Mode.Grim;

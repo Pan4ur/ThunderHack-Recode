@@ -20,7 +20,7 @@ public class ChestStealer extends Module {
 
     private final Setting<Integer> delay = new Setting<>("Delay", 100, 0, 1000);
     private final Setting<Boolean> random = new Setting<>("Random", false);
-    public Setting<Sort> sort = new Setting<>("Sort", Sort.None);
+    private final Setting<Sort> sort = new Setting<>("Sort", Sort.None);
 
     public List<String> items = new ArrayList<>();
 

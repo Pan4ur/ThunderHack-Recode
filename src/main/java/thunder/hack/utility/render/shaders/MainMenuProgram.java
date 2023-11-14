@@ -9,6 +9,8 @@ import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL30;
 import thunder.hack.utility.render.WindowResizeCallback;
 
+import static thunder.hack.modules.Module.mc;
+
 public class MainMenuProgram extends GlProgram {
 
     private GlUniform Time;
@@ -25,12 +27,12 @@ public class MainMenuProgram extends GlProgram {
     }
 
     public void setParameters(float x, float y, float width, float height) {
-        this.uSize.set(width * 2, height * 2);
+        this.uSize.set(width * mc.options.getGuiScale().getValue(), height * mc.options.getGuiScale().getValue());
         this.Time.set((float) time_);
     }
 
     public static void increaseTime() {
-        time_ += 0.001f;
+        time_ += 0.01f;
     }
 
     @Override
