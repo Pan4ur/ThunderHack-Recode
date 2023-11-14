@@ -20,14 +20,15 @@ public class AutoLeave extends Module {
 
     private final Setting<Boolean> antiKTLeave = new Setting<>("AntiKTLeave", true);
     private final Setting<Boolean> autoDisable = new Setting<>("AutoDisable", true);
+    private final Setting<Boolean> fastLeave = new Setting<>("InstantLeave", true);
     private final Setting<Parent> leaveIf = new Setting<>("Leave if", new Parent(false, 0));
-    private final Setting<Boolean> playerNear = new Setting<>("PlayerNear", true).withParent(leaveIf);
-    private final Setting<Boolean> low_hp = new Setting<>("LowHp", true).withParent(leaveIf);
-    private final Setting<Boolean> totems = new Setting<>("Totems", true).withParent(leaveIf);
+    private final Setting<Boolean> low_hp = new Setting<>("LowHp", false).withParent(leaveIf);
+    private final Setting<Boolean> totems = new Setting<>("Totems", false).withParent(leaveIf);
     private final Setting<Integer> totemsCount = new Setting("TotemsCount", 2, 0, 10, v -> totems.getValue());
     private final Setting<Float> leaveHp = new Setting("HP", 8.0f, 1f, 20.0f, v -> low_hp.getValue());
-    private final Setting<Boolean> fastLeave = new Setting<>("InstantLeave", true).withParent(leaveIf);
-    private final Setting<StaffMode> staff = new Setting<>("Staff", StaffMode.None).withParent(leaveIf);
+    private final Setting<LeaveMode> staff = new Setting<>("Staff", LeaveMode.None).withParent(leaveIf);
+    private final Setting<LeaveMode> players = new Setting<>("Players", LeaveMode.Leave).withParent(leaveIf);
+
     private final Timer chatDelay = new Timer();
 
     // Будет хуева если мы ливнем в кт
@@ -45,17 +46,24 @@ public class AutoLeave extends Module {
             return;
 
         for (PlayerEntity pl : mc.world.getPlayers()) {
-            if (pl != mc.player && !ThunderHack.friendManager.isFriend(pl) && playerNear.getValue()) {
-                leave(MainSettings.isRu() ? "Ливнул т.к. рядом появился игрок" : "Logged out because there was a player");
+            if (pl != mc.player && !ThunderHack.friendManager.isFriend(pl) && players.getValue() != LeaveMode.None) {
+                switch (players.getValue()) {
+                    case Hub -> {
+                        sendMessage(MainSettings.isRu() ? "Ливнул т.к. рядом появился игрок!" : "Logged out because there was a player!");
+                        mc.player.networkHandler.sendChatCommand("hub");
+                    }
+                    case Leave -> leave(MainSettings.isRu() ? "Ливнул т.к. рядом появился игрок" : "Logged out because there was a player");
+                }
             }
         }
+        
         if (totems.getValue() && InventoryUtility.getItemCount(Items.TOTEM_OF_UNDYING) <= totemsCount.getValue())
             leave(MainSettings.isRu() ? "Ливнул т.к. кончились тотемы" : "Logged out because out of totems");
 
         if (mc.player.getHealth() < leaveHp.getValue() && low_hp.getValue())
             leave(MainSettings.isRu() ? "Ливнул т.к. мало хп" : "Logged out because ur hp is low");
 
-        if(staff.getValue() != StaffMode.None && ModuleManager.staffBoard.isDisabled() && mc.player.age % 5 == 0)
+        if(staff.getValue() != LeaveMode.None && ModuleManager.staffBoard.isDisabled() && mc.player.age % 5 == 0)
             sendMessage(MainSettings.isRu() ? "Включи StaffBoard!" : "Turn on StaffBoard!");
     }
 
@@ -82,7 +90,7 @@ public class AutoLeave extends Module {
         }
     }
 
-    private enum StaffMode {
+    private enum LeaveMode {
         None, Hub, Leave
     }
 }

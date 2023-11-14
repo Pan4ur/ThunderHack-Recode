@@ -12,7 +12,7 @@ public class FastUse extends Module {
         super("FastUse", Category.PLAYER);
     }
 
-    private final Setting<Integer> delay = new Setting<>("Delay", 0, 0, 20);
+    private final Setting<Integer> delay = new Setting<>("Delay", 0, 0, 5);
     public Setting<Boolean> blocks = new Setting<>("Blocks", false);
     public Setting<Boolean> crystals = new Setting<>("Crystals", false);
     public Setting<Boolean> xp = new Setting<>("XP", false);
@@ -20,9 +20,8 @@ public class FastUse extends Module {
 
     @Override
     public void onUpdate() {
-        if (check(mc.player.getMainHandStack().getItem()))
+        if (check(mc.player.getMainHandStack().getItem()) && ((IMinecraftClient) mc).getUseCooldown() > delay.getValue())
             ((IMinecraftClient) mc).setUseCooldown(delay.getValue());
-
     }
 
     public boolean check(Item item) {
