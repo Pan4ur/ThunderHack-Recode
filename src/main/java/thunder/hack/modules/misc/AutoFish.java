@@ -62,8 +62,10 @@ public class AutoFish extends Module {
         if(!cooldown.passedMs(1000))
             return;
 
-        if (timeout.passedMs(25000))
+        if (timeout.passedMs(25000)) {
             catchFish();
+            timeout.reset();
+        }
 
         if (mc.player.fishHook != null) {
             boolean caughtFish = mc.player.fishHook.getDataTracker().get(FishingBobberEntity.CAUGHT_FISH);

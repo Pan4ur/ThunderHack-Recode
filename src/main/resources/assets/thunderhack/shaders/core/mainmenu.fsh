@@ -208,5 +208,5 @@ void main() {
             float b=max(dot(n, normalize(prp-p)), 0.0);
             fragColor=vec4((b*c+pow(b, 8.0))*(1.0-f*.01), 1.0)+pc;
         }
-    } else fragColor=vec4(0, 0, 0, 1f)+pc;//background color
+    } else fragColor=vec4(0, 0, 0, 1.)+pc;//background color
 }
