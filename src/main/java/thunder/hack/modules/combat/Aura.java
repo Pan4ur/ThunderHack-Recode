@@ -57,7 +57,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 import static net.minecraft.util.UseAction.BLOCK;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
@@ -88,6 +87,7 @@ public final class Aura extends Module {
     public final Setting<Boolean> pauseInInventory = new Setting<>("PauseInInventory", true).withParent(advanced);
     public final Setting<RayTrace> rayTrace = new Setting<>("RayTrace", RayTrace.OnlyTarget).withParent(advanced);
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Track).withParent(advanced);
+    public final Setting<Integer> interactTicks = new Setting<>("InteractTicks", 3, 1, 10, v -> mode.getValue() == Mode.Interact).withParent(advanced);
     public final Setting<Boolean> unpressShield = new Setting<>("UnpressShield", true).withParent(advanced);
     public final Setting<Boolean> deathDisable = new Setting<>("DeathDisable", true).withParent(advanced);
     public final Setting<Boolean> tpDisable = new Setting<>("TPDisable", false).withParent(advanced);
@@ -123,6 +123,7 @@ public final class Aura extends Module {
     private Vec3d rotationMotion = Vec3d.ZERO;
 
     private int hitTicks;
+    private int trackticks;
     private boolean lookingAtHitbox;
 
     private static Aura instance;
@@ -182,7 +183,7 @@ public final class Aura extends Module {
     }
 
     private boolean skipRayTraceCheck() {
-        return rotationMode.getValue() == Rotation.None || rayTrace.getValue() == RayTrace.OFF || mode.getValue() == Mode.Interact;
+        return rotationMode.getValue() == Rotation.None || rayTrace.getValue() == RayTrace.OFF || (mode.getValue() == Mode.Interact && interactTicks.getValue() <= 1);
     }
 
     public void attack() {
@@ -423,6 +424,12 @@ public final class Aura extends Module {
     }
 
     private void calcRotations(boolean ready) {
+        if(ready) {
+            trackticks = interactTicks.getValue();
+        } else if(trackticks > 0) {
+            trackticks--;
+        }
+
         if (target == null)
             return;
 
@@ -459,7 +466,7 @@ public final class Aura extends Module {
 
                 double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
 
-                if (ready || mode.getValue() == Mode.Track) {
+                if (trackticks > 0 || mode.getValue() == Mode.Track) {
                     rotationYaw = (float) (newYaw - (newYaw - rotationYaw) % gcdFix);
                     rotationPitch = (float) (newPitch - (newPitch - rotationPitch) % gcdFix);
                 } else {

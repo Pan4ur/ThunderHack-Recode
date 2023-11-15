@@ -59,6 +59,7 @@
     "MixinBlock",
     "MixinBlockItem",
     "MixinCobwebBlock",
+    "MixinDownloadingTerrainScreen",
     "MixinEntity",
     "MixinEntityLiving",
     "MixinFlowableFluid",

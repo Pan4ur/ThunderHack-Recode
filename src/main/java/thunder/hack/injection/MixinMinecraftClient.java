@@ -1,10 +1,16 @@
 package thunder.hack.injection;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gui.screen.AddServerScreen;
+import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.Icons;
 import net.minecraft.client.util.MacWindowUtil;
 import net.minecraft.resource.ResourcePack;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.system.MemoryStack;
@@ -23,6 +29,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import thunder.hack.gui.mainmenu.MainMenuScreen;
 import thunder.hack.modules.Module;
 import thunder.hack.utility.render.WindowResizeCallback;
 import net.minecraft.client.util.Window;
@@ -57,6 +64,16 @@ public class MixinMinecraftClient {
         }
     }
 
+    @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
+    public void setScreenHook(Screen c, CallbackInfo ci) {
+        if(ModuleManager.mystFinder.isEnabled() && !(c instanceof DownloadingTerrainScreen) && c != null) {
+            if(c instanceof MultiplayerScreen || c instanceof MainMenuScreen || c instanceof TitleScreen) {
+                ModuleManager.mystFinder.disable();
+                return;
+            }
+            ci.cancel();
+        }
+    }
 
     @Inject(method = "tick", at = @At("HEAD"))
     void preTickHook(CallbackInfo ci) {
@@ -69,6 +86,8 @@ public class MixinMinecraftClient {
     }
 
     @Shadow @Final private Window window;
+
+    @Shadow private static MinecraftClient instance;
 
     @Inject(method = "onResolutionChanged", at = @At("TAIL"))
     private void captureResize(CallbackInfo ci) {

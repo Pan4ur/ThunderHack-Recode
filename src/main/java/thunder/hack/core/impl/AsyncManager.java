@@ -71,6 +71,9 @@ public class AsyncManager implements IManager {
         @Override
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
+                if(ModuleManager.mystFinder.isEnabled())
+                    ModuleManager.mystFinder.handleESC();
+
                 if(updateTimer.passedMs(16)) {
                     if (mc != null && (mc.currentScreen instanceof MainMenuScreen || mc.currentScreen instanceof ClickUI || mc.currentScreen instanceof SmallClickUI)) {
                         MainMenuProgram.increaseTime();

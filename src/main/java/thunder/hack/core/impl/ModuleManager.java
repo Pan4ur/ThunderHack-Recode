@@ -100,6 +100,8 @@ public class ModuleManager implements IManager {
     public static Animations animations = new Animations();
     public static DamageTint damageTint = new DamageTint();
     public static AntiAttack antiAttack = new AntiAttack();
+    public static MystFinder mystFinder = new MystFinder();
+    public static ToolSaver toolSaver = new ToolSaver();
     public static DamageFly damageFly = new DamageFly();
     public static WayPoints wayPoints = new WayPoints();
     public static WaterMark waterMark = new WaterMark();
