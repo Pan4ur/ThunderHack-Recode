@@ -62,6 +62,7 @@ public class MystFinder extends Module {
         if(timeOut.passedS(timeOutV.getValue()))
             disable("Не удалось найти мистик(");
 
+        if(currentAn < ankaBounds()[0]) currentAn = ankaBounds()[0];
         if (currentAn > ankaBounds()[1]) currentAn = ankaBounds()[0];
         else currentAn++;
 
@@ -69,7 +70,7 @@ public class MystFinder extends Module {
             mc.player.networkHandler.sendChatCommand("an" + currentAn);
 
         if (mystTimer.every(mystDelay.getValue()))
-            mc.player.networkHandler.sendChatCommand("myst delay");
+            mc.player.networkHandler.sendChatCommand("event delay");
     }
 
     @EventHandler

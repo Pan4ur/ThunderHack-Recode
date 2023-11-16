@@ -45,7 +45,7 @@ public class Tracers extends Module {
             double y = player.prevY + (player.getY() - player.prevY) * mc.getTickDelta();
             double z = player.prevZ + (player.getZ() - player.prevZ) * mc.getTickDelta();
 
-            Render3DEngine.drawLine(vec2.x, vec2.y, vec2.z, x, y + height.getValue(), z, color1, 1f);
+            Render3DEngine.drawLineDebug(vec2.x, vec2.y, vec2.z, x, y + height.getValue(), z, color1, 1f);
         }
 
         mc.options.getBobView().setValue(prevBob);

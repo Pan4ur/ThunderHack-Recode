@@ -63,8 +63,10 @@ public class AutoFish extends Module {
             return;
 
         if (timeout.passedMs(25000)) {
-            catchFish();
+            sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+            sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             timeout.reset();
+            cooldown.reset();
         }
 
         if (mc.player.fishHook != null) {

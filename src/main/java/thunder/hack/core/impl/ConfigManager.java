@@ -477,4 +477,35 @@ public class ConfigManager implements IManager {
         } catch (Exception ignored) {
         }
     }
+
+    public void loadInvCleaner() {
+        try {
+            File file = new File("ThunderHackRecode/misc/invcleaner.txt");
+
+            if (file.exists()) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    while (reader.ready()) {
+                        ModuleManager.inventoryCleaner.items.add(reader.readLine());
+                    }
+
+                }
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void saveInvCleaner() {
+        File file = new File("ThunderHackRecode/misc/invcleaner.txt");
+        try {
+            file.createNewFile();
+        } catch (Exception ignored) {
+
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (String item : ModuleManager.inventoryCleaner.items) {
+                writer.write(item + "\n");
+            }
+        } catch (Exception ignored) {
+        }
+    }
 }
