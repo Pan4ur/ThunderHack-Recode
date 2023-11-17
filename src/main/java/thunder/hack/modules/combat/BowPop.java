@@ -16,14 +16,14 @@ import net.minecraft.util.Hand;
 import java.util.Random;
 
 public final class BowPop extends Module {
-    public Setting<Boolean> rotation =new Setting<>("Rotation", false);
-    public Setting<ModeEn> Mode =new Setting<>("Mode", ModeEn.Maximum);
-    public Setting<Float> factor =new Setting<>("Factor", 1f, 1f, 20f);
-    public Setting<exploitEn> exploit =new Setting<>("Exploit", exploitEn.Strong);
-    public Setting<Float> scale =new Setting<>("Scale", 0.01f, 0.01f, 0.4f);
-    public Setting<Boolean> minimize =new Setting<>("Minimize", false);
-    public Setting<Float> delay =new Setting<>("Delay", 5f, 0f, 10f);
-    public final Setting<Parent> selection = new Setting<>("Selection", new Parent(false,0));
+    public Setting<Boolean> rotation = new Setting<>("Rotation", false);
+    public Setting<ModeEn> Mode = new Setting<>("Mode", ModeEn.Maximum);
+    public Setting<Float> factor = new Setting<>("Factor", 1f, 1f, 20f);
+    public Setting<exploitEn> exploit = new Setting<>("Exploit", exploitEn.Strong);
+    public Setting<Float> scale = new Setting<>("Scale", 0.01f, 0.01f, 0.4f);
+    public Setting<Boolean> minimize = new Setting<>("Minimize", false);
+    public Setting<Float> delay = new Setting<>("Delay", 5f, 0f, 10f);
+    public final Setting<Parent> selection = new Setting<>("Selection", new Parent(false, 0));
     public final Setting<Boolean> bow = new Setting<>("Bows", true).withParent(selection);
     public final Setting<Boolean> pearls = new Setting<>("EPearls", true).withParent(selection);
     public final Setting<Boolean> xp = new Setting<>("XP", true).withParent(selection);
@@ -41,7 +41,7 @@ public final class BowPop extends Module {
     }
 
     @EventHandler
-    protected void onPacketSend(PacketEvent.Send event) {
+    private void onPacketSend(PacketEvent.Send event) {
         if (fullNullCheck() || !delayTimer.passedMs((long) (delay.getValue() * 1000))) return;
         if (event.getPacket() instanceof PlayerActionC2SPacket && ((PlayerActionC2SPacket) event.getPacket()).getAction() == PlayerActionC2SPacket.Action.RELEASE_USE_ITEM && (mc.player.getActiveItem().getItem() == Items.BOW && bow.getValue())
                 || event.getPacket() instanceof PlayerInteractItemC2SPacket && ((PlayerInteractItemC2SPacket) event.getPacket()).getHand() == Hand.MAIN_HAND && ((mc.player.getMainHandStack().getItem() == Items.ENDER_PEARL && pearls.getValue()) || (mc.player.getMainHandStack().getItem() == Items.EXPERIENCE_BOTTLE && xp.getValue()) || (mc.player.getMainHandStack().getItem() == Items.EGG && eggs.getValue()) || (mc.player.getMainHandStack().getItem() == Items.SPLASH_POTION && potions.getValue()) || (mc.player.getMainHandStack().getItem() == Items.SNOWBALL && snowballs.getValue()))) {

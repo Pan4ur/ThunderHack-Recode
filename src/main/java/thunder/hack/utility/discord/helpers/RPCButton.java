@@ -1,5 +1,8 @@
 package thunder.hack.utility.discord.helpers;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 
 public class RPCButton implements Serializable {
@@ -13,8 +16,8 @@ public class RPCButton implements Serializable {
     public String getUrl() {
         return this.url;
     }
-    
-    public static RPCButton create(String substring, final String s) {
+
+    public static @NotNull RPCButton create(String substring, final String s) {
         substring = substring.substring(0, Math.min(substring.length(), 31));
         return new RPCButton(substring, s);
     }

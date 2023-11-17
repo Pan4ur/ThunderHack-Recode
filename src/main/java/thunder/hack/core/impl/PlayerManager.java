@@ -19,6 +19,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Unique;
 import thunder.hack.cmd.Command;
@@ -64,14 +65,17 @@ public class PlayerManager implements IManager {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
+    @SuppressWarnings("unused")
     public void postSync(EventPostSync event) {
-        if (Module.fullNullCheck()) return;
+        if (mc.player != null) return;
+
         rotationYaw = mc.player.getYaw();
-        mc.player.setYaw(this.yaw);
-        mc.player.setPitch(this.pitch);
+        mc.player.setYaw(yaw);
+        mc.player.setPitch(pitch);
     }
 
     @EventHandler
+    @SuppressWarnings("unused")
     public void onSyncWithServer(PacketEvent.@NotNull Send event) {
         if (event.getPacket() instanceof ClickSlotC2SPacket) {
             inInventory = true;
@@ -110,7 +114,7 @@ public class PlayerManager implements IManager {
     }
 
     public boolean checkRtx(float yaw, float pitch, float distance, boolean ignoreWalls, Aura.RayTrace rt) {
-        if(rt == Aura.RayTrace.OFF)
+        if (rt == Aura.RayTrace.OFF)
             return true;
 
         Entity targetedEntity;
@@ -211,7 +215,7 @@ public class PlayerManager implements IManager {
         return new Vec2f((float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0), (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difY, dist))));
     }
 
-    private Vec3d getRotationVector(float yaw, float pitch) {
+    private @NotNull Vec3d getRotationVector(float yaw, float pitch) {
         return new Vec3d(MathHelper.sin(-pitch * 0.017453292F) * MathHelper.cos(yaw * 0.017453292F), -MathHelper.sin(yaw * 0.017453292F), MathHelper.cos(-pitch * 0.017453292F) * MathHelper.cos(yaw * 0.017453292F));
     }
 

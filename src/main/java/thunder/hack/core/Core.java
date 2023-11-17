@@ -38,13 +38,14 @@ import static thunder.hack.modules.Module.fullNullCheck;
 import static thunder.hack.modules.Module.mc;
 
 public final class Core {
-    public static boolean lock_sprint, serversprint, hold_mouse0, showSkull;
-    public static Map<String, Identifier> heads = new ConcurrentHashMap<>();
+    public static boolean lockSprint, serverSprint, hold_mouse0, showSkull;
+    public static final Map<String, Identifier> HEADS = new ConcurrentHashMap<>();
     private final Identifier SKULL = new Identifier("textures/skull.png");
     private final Timer skullTimer = new Timer();
     private final Timer lastPacket = new Timer();
 
     @EventHandler
+    @SuppressWarnings("unused")
     public void onTick(PlayerUpdateEvent event) {
         if (fullNullCheck()) return;
 
@@ -56,8 +57,8 @@ public final class Core {
             ModuleManager.clickGui.setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(), false, false);
         }
 
-        for(PlayerEntity p : mc.world.getPlayers()) {
-            if(p.isDead() || p.getHealth() == 0)
+        for (PlayerEntity p : mc.world.getPlayers()) {
+            if (p.isDead() || p.getHealth() == 0)
                 ThunderHack.EVENT_BUS.post(new DeathEvent(p));
         }
 
@@ -77,14 +78,14 @@ public final class Core {
 
         if (e.getPacket() instanceof ClientCommandC2SPacket c) {
             if (c.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING || c.getMode() == ClientCommandC2SPacket.Mode.STOP_SPRINTING) {
-                if (lock_sprint) {
+                if (lockSprint) {
                     e.setCancelled(true);
                     return;
                 }
 
                 switch (c.getMode()) {
-                    case START_SPRINTING -> serversprint = true;
-                    case STOP_SPRINTING -> serversprint = false;
+                    case START_SPRINTING -> serverSprint = true;
+                    case STOP_SPRINTING -> serverSprint = false;
                 }
             }
         }
@@ -119,6 +120,7 @@ public final class Core {
     }
 
     @EventHandler
+    @SuppressWarnings("unused")
     public void onEntitySpawn(EventEntitySpawn e) {
         new ArrayList<>(InteractionUtility.awaiting.keySet()).forEach(bp -> {
             if (e.getEntity() != null && bp.getSquaredDistance(e.getEntity().getPos()) < 4.)

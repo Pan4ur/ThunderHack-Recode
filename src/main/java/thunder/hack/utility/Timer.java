@@ -17,7 +17,7 @@ public class Timer {
 
     public boolean every(long ms) {
         boolean passed = getMs(System.nanoTime() - time) >= ms;
-        if(passed)
+        if (passed)
             reset();
         return passed;
     }

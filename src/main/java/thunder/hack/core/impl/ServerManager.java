@@ -19,7 +19,7 @@ public class ServerManager implements IManager {
     private final Timer timeDelay = new Timer();
     private final ArrayDeque<Float> tpsResult = new ArrayDeque<>(20);
     private long time;
-    private long ticktime;
+    private long tickTime;
     private float tps;
 
     public float getTPS() {
@@ -27,7 +27,7 @@ public class ServerManager implements IManager {
     }
 
     public float getTPS2() {
-        return round2(20.0f * ((float) ticktime / 1000f));
+        return round2(20.0f * ((float) tickTime / 1000f));
     }
 
     public static float round2(double value) {
@@ -43,12 +43,12 @@ public class ServerManager implements IManager {
         }
         if (event.getPacket() instanceof WorldTimeUpdateS2CPacket) {
             if (time != 0L) {
-                ticktime = System.currentTimeMillis() - time;
+                tickTime = System.currentTimeMillis() - time;
 
                 if (tpsResult.size() > 20)
                     tpsResult.poll();
 
-                tpsResult.add(20.0f * (1000.0f / (float) (ticktime)));
+                tpsResult.add(20.0f * (1000.0f / (float) (tickTime)));
 
                 float average = 0.0f;
 
@@ -62,7 +62,7 @@ public class ServerManager implements IManager {
 
 
     public static int getPing() {
-        if (mc.getNetworkHandler() == null) return 0;
+        if (mc.getNetworkHandler() == null || mc.player == null) return 0;
 
         if (FastLatency.instance.isEnabled())
             return FastLatency.instance.resolvedPing;

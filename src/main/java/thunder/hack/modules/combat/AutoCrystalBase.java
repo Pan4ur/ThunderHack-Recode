@@ -82,9 +82,9 @@ public class AutoCrystalBase extends Module {
             return;
         }
 
-        if (calcTimer.every(calcDelay.getValue())) ThunderHack.asyncManager.run(() -> {
-            calcPosition(range.getValue(), mc.player.getPos());
-        });
+        if (calcTimer.every(calcDelay.getValue())) ThunderHack.asyncManager.run(
+                () -> calcPosition(range.getValue(), mc.player.getPos())
+        );
     }
 
     @EventHandler

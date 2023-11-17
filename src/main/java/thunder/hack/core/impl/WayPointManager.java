@@ -17,7 +17,7 @@ public class WayPointManager implements IManager {
     public void onLoad() {
         wayPoints = new CopyOnWriteArrayList<>();
         try {
-            File file = new File("ThunderHackRecode/misc/waypoints.txt");
+            File file = new File(ConfigManager.CONFIG_FOLDER_NAME + "/misc/waypoints.txt");
 
             if (file.exists()) {
                 try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -37,16 +37,17 @@ public class WayPointManager implements IManager {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void saveWayPoints() {
-        File file = new File("ThunderHackRecode/misc/waypoints.txt");
+        File file = new File(ConfigManager.CONFIG_FOLDER_NAME + "/misc/waypoints.txt");
         try {
-            new File("ThunderHackRecode").mkdirs();
+            new File(ConfigManager.CONFIG_FOLDER_NAME).mkdirs();
             file.createNewFile();
         } catch (Exception ignored) {
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (WayPoint wayPoint : wayPoints) {
-                writer.write(wayPoint.x + ":" + wayPoint.y + ":" + wayPoint.z + ":" + wayPoint.name + ":" + wayPoint.server +"\n");
+                writer.write(wayPoint.x + ":" + wayPoint.y + ":" + wayPoint.z + ":" + wayPoint.name + ":" + wayPoint.server + "\n");
             }
         } catch (Exception ignored) {
         }

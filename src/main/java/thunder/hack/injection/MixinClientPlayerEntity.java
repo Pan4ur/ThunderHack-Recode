@@ -18,7 +18,6 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
-import thunder.hack.modules.movement.Velocity;
 
 import static thunder.hack.modules.Module.fullNullCheck;
 import static thunder.hack.modules.Module.mc;
@@ -80,7 +79,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             mc.player.lastSprinting = e.getSprintState();
         }
         pre_sprint_state = mc.player.lastSprinting;
-        Core.lock_sprint = true;
+        Core.lockSprint = true;
 
         if (event.isCancelled()) info.cancel();
     }
@@ -89,7 +88,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     private void sendMovementPacketsPostHook(CallbackInfo info) {
         if (fullNullCheck()) return;
         mc.player.lastSprinting = pre_sprint_state;
-        Core.lock_sprint = false;
+        Core.lockSprint = false;
         EventPostSync event = new EventPostSync();
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) info.cancel();

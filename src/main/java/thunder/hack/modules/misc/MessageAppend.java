@@ -11,14 +11,13 @@ import thunder.hack.setting.Setting;
 import java.util.Objects;
 
 public class MessageAppend extends Module {
-
-    public Setting<String> word = new Setting<>("word", " TH RECODE");
+    private final Setting<String> word = new Setting<>("word", " TH RECODE");
+    private String skip;
 
     public MessageAppend() {
         super("MessageAppend", Category.MISC);
     }
 
-    String skip;
 
     @EventHandler
     public void onPacketSend(PacketEvent.Send e) {
@@ -29,7 +28,7 @@ public class MessageAppend extends Module {
             }
 
             // Чтоб не добавляло когда ты вводишь капчу на сервере
-            if(mc.player.getMainHandStack().getItem() == Items.FILLED_MAP || mc.player.getOffHandStack().getItem() == Items.FILLED_MAP)
+            if (mc.player.getMainHandStack().getItem() == Items.FILLED_MAP || mc.player.getOffHandStack().getItem() == Items.FILLED_MAP)
                 return;
 
             if (pac.chatMessage().startsWith("/") || pac.chatMessage().startsWith(ThunderHack.commandManager.getPrefix()))

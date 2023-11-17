@@ -47,7 +47,7 @@ public class FriendManager implements IManager {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void saveFriends() {
-        File file = new File("ThunderHackRecode/misc/friends.txt");
+        File file = new File(ConfigManager.CONFIG_FOLDER_NAME + "/misc/friends.txt");
         try {
             file.createNewFile();
         } catch (Exception ignored) {
@@ -62,7 +62,7 @@ public class FriendManager implements IManager {
 
     public static void loadFriends() {
         try {
-            File file = new File("ThunderHackRecode/misc/friends.txt");
+            File file = new File(ConfigManager.CONFIG_FOLDER_NAME + "/misc/friends.txt");
 
             if (file.exists()) {
                 try (final BufferedReader reader = new BufferedReader(new FileReader(file))) {

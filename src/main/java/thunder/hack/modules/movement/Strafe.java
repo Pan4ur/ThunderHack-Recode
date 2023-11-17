@@ -211,8 +211,8 @@ public class Strafe extends Module {
     @EventHandler
     public void actionEvent(EventSprint eventAction) {
         if (canStrafe()) {
-            if (Core.serversprint != needSprintState) {
-                eventAction.setSprintState(!Core.serversprint);
+            if (Core.serverSprint != needSprintState) {
+                eventAction.setSprintState(!Core.serverSprint);
             }
         }
         if (needSwap) {

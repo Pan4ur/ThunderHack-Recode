@@ -25,30 +25,32 @@ import java.util.stream.Collectors;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class ConfigManager implements IManager {
-    public static File MainFolder = new File(mc.runDirectory, "ThunderHackRecode");
-    public static File ConfigsFolder = new File(MainFolder, "configs");
-    public static File TempFolder = new File(MainFolder, "temp");
-    public static File MiscFolder = new File(MainFolder, "misc");
-    public static File SoundsFolder = new File(MiscFolder, "sounds");
+    public static final String CONFIG_FOLDER_NAME = "ThunderHackRecode";
+    public static final File MAIN_FOLDER = new File(mc.runDirectory, CONFIG_FOLDER_NAME);
+    public static final File CONFIGS_FOLDER = new File(MAIN_FOLDER, "configs");
+    public static final File TEMP_FOLDER = new File(MAIN_FOLDER, "temp");
+    public static final File MISC_FOLDER = new File(MAIN_FOLDER, "misc");
+    public static final File SOUNDS_FOLDER = new File(MISC_FOLDER, "sounds");
 
     public static boolean firstLaunch = false;
 
     public ConfigManager() {
-        if (!MainFolder.exists()) {
-            MainFolder.mkdirs();
+        if (!MAIN_FOLDER.exists()) {
+            MAIN_FOLDER.mkdirs();
             firstLaunch = true;
         }
-        if (!ConfigsFolder.exists()) ConfigsFolder.mkdirs();
-        if (!TempFolder.exists()) TempFolder.mkdirs();
-        if (!MiscFolder.exists()) MiscFolder.mkdirs();
-        if (!SoundsFolder.exists()) SoundsFolder.mkdirs();
+        if (!CONFIGS_FOLDER.exists()) CONFIGS_FOLDER.mkdirs();
+        if (!TEMP_FOLDER.exists()) TEMP_FOLDER.mkdirs();
+        if (!MISC_FOLDER.exists()) MISC_FOLDER.mkdirs();
+        if (!SOUNDS_FOLDER.exists()) SOUNDS_FOLDER.mkdirs();
         loadSearch();
     }
 
     public void loadSearch() {
         try {
-            File file = new File("ThunderHackRecode/misc/search.txt");
+            File file = new File(CONFIG_FOLDER_NAME + "/misc/search.txt");
             if (file.exists())
                 try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                     while (reader.ready())
@@ -58,10 +60,9 @@ public class ConfigManager implements IManager {
         }
     }
 
-
     public void loadDefault(String name) {
         MainSettings.Language prevLang = MainSettings.language.getValue();
-        Path path = Paths.get("ThunderHackRecode/configs/" + name + ".th");
+        Path path = Paths.get(CONFIG_FOLDER_NAME + "/configs/" + name + ".th");
         try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("cfg/" + name + ".th");
              OutputStream out = Files.newOutputStream(path)) {
             if (in == null) return;
@@ -74,9 +75,9 @@ public class ConfigManager implements IManager {
     }
 
     public void saveSearch() {
-        File file = new File("ThunderHackRecode/misc/search.txt");
+        File file = new File(CONFIG_FOLDER_NAME + "/misc/search.txt");
         try {
-            new File("ThunderHackRecode").mkdirs();
+            new File(CONFIG_FOLDER_NAME).mkdirs();
             file.createNewFile();
         } catch (Exception ignored) {
         }
@@ -90,7 +91,7 @@ public class ConfigManager implements IManager {
     }
 
     public static @NotNull String getConfigDate(String name) {
-        File file = new File(ConfigsFolder, name + ".th");
+        File file = new File(CONFIGS_FOLDER, name + ".th");
         if (!file.exists()) {
             return "none";
         }
@@ -103,7 +104,7 @@ public class ConfigManager implements IManager {
     public File currentConfig = null;
 
     public void load(String name) {
-        File file = new File(ConfigsFolder, name + ".th");
+        File file = new File(CONFIGS_FOLDER, name + ".th");
         if (!file.exists()) {
             if (isRu()) Command.sendMessage("Конфига " + name + " не существует!");
             else Command.sendMessage("Config " + name + " does not exist!");
@@ -120,7 +121,7 @@ public class ConfigManager implements IManager {
     }
 
     public void loadModuleOnly(String name, Module module) {
-        File file = new File(ConfigsFolder, name + ".th");
+        File file = new File(CONFIGS_FOLDER, name + ".th");
         if (!file.exists()) {
             if (isRu()) Command.sendMessage("Конфига " + name + " не существует!");
             else Command.sendMessage("Config " + name + " does not exist!");
@@ -181,12 +182,12 @@ public class ConfigManager implements IManager {
             JsonArray array = null;
             try {
                 array = (JsonArray) parser.parse(reader);
-            } catch (ClassCastException e) {
+            } catch (ClassCastException ignored) {
             }
 
             JsonArray modules = null;
             try {
-                JsonObject modulesObject = (JsonObject) array.get(0);
+                JsonObject modulesObject = (JsonObject) Objects.requireNonNull(array).get(0);
                 modules = modulesObject.getAsJsonArray("Modules");
             } catch (Exception ignored) {
             }
@@ -217,7 +218,7 @@ public class ConfigManager implements IManager {
     }
 
     public void save(String name) {
-        File file = new File(ConfigsFolder, name + ".th");
+        File file = new File(CONFIGS_FOLDER, name + ".th");
         if (file.exists()) {
             Command.sendMessage(isRu() ? "Перезаписываем " + name + "..." : "Overwriting " + name + "...");
             file.delete();
@@ -252,7 +253,8 @@ public class ConfigManager implements IManager {
     private void parseModule(JsonObject object) throws NullPointerException {
         Module module = ThunderHack.moduleManager.modules.stream()
                 .filter(m -> object.getAsJsonObject(m.getName()) != null)
-                .findFirst().orElse(null);
+                .findFirst()
+                .orElse(null);
 
         if (module != null) {
             JsonObject mobject = object.getAsJsonObject(module.getName());
@@ -319,7 +321,7 @@ public class ConfigManager implements IManager {
         }
     }
 
-    private JsonArray getModuleArray() {
+    private @NotNull JsonArray getModuleArray() {
         JsonArray modulesArray = new JsonArray();
         for (Module m : ThunderHack.moduleManager.modules) {
             modulesArray.add(getModuleObject(m));
@@ -327,7 +329,7 @@ public class ConfigManager implements IManager {
         return modulesArray;
     }
 
-    public JsonObject getModuleObject(Module m) {
+    public JsonObject getModuleObject(@NotNull Module m) {
         JsonObject attribs = new JsonObject();
         JsonParser jp = new JsonParser();
 
@@ -387,12 +389,12 @@ public class ConfigManager implements IManager {
         return moduleObject;
     }
 
-    public boolean delete(File file) {
+    public boolean delete(@NotNull File file) {
         return file.delete();
     }
 
     public boolean delete(String name) {
-        File file = new File(ConfigsFolder, name + ".th");
+        File file = new File(CONFIGS_FOLDER, name + ".th");
         if (!file.exists()) {
             return false;
         }
@@ -400,12 +402,12 @@ public class ConfigManager implements IManager {
     }
 
     public List<String> getConfigList() {
-        if (!MainFolder.exists() || MainFolder.listFiles() == null) return null;
+        if (!MAIN_FOLDER.exists() || MAIN_FOLDER.listFiles() == null) return null;
 
         List<String> list = new ArrayList<>();
 
-        if (ConfigsFolder.listFiles() != null) {
-            for (File file : Arrays.stream(ConfigsFolder.listFiles()).filter(f -> f.getName().endsWith(".th")).collect(Collectors.toList())) {
+        if (CONFIGS_FOLDER.listFiles() != null) {
+            for (File file : Arrays.stream(Objects.requireNonNull(CONFIGS_FOLDER.listFiles())).filter(f -> f.getName().endsWith(".th")).collect(Collectors.toList())) {
                 list.add(file.getName().replace(".th", ""));
             }
         }
@@ -413,7 +415,7 @@ public class ConfigManager implements IManager {
     }
 
     public void saveCurrentConfig() {
-        File file = new File("ThunderHackRecode/misc/currentcfg.txt");
+        File file = new File(CONFIG_FOLDER_NAME + "/misc/currentcfg.txt");
         try {
             if (file.exists()) {
                 FileWriter writer = new FileWriter(file);
@@ -431,7 +433,7 @@ public class ConfigManager implements IManager {
     }
 
     public File getCurrentConfig() {
-        File file = new File("ThunderHackRecode/misc/currentcfg.txt");
+        File file = new File(CONFIG_FOLDER_NAME + "/misc/currentcfg.txt");
         String name = "config";
         try {
             if (file.exists()) {
@@ -443,13 +445,13 @@ public class ConfigManager implements IManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        currentConfig = new File(ConfigsFolder, name + ".th");
+        currentConfig = new File(CONFIGS_FOLDER, name + ".th");
         return currentConfig;
     }
 
     public void loadChestStealer() {
         try {
-            File file = new File("ThunderHackRecode/misc/search.txt");
+            File file = new File(CONFIG_FOLDER_NAME + "/misc/search.txt");
 
             if (file.exists()) {
                 try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -464,7 +466,7 @@ public class ConfigManager implements IManager {
     }
 
     public void saveChestStealer() {
-        File file = new File("ThunderHackRecode/misc/search.txt");
+        File file = new File(CONFIG_FOLDER_NAME + "/misc/search.txt");
         try {
             file.createNewFile();
         } catch (Exception ignored) {

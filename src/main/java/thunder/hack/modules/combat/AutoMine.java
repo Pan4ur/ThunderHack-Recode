@@ -155,7 +155,8 @@ public final class AutoMine extends Module {
             }
 
             if (!requirePickaxe.getValue() || mc.player.getMainHandStack().getItem() instanceof PickaxeItem) {
-                if (ModuleManager.speedMine.isEnabled() && SpeedMine.minePosition != null && SpeedMine.minePosition.equals(minePos))
+                if (ModuleManager.speedMine.isEnabled()
+                        && (SpeedMine.minePosition != null || SpeedMine.progress != 0))
                     return;
                 InteractionUtility.BreakData data = InteractionUtility.getBreakData(minePos, InteractionUtility.Interact.Strict);
                 if (data == null)

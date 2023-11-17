@@ -20,7 +20,7 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 import java.io.File;
 
-import static thunder.hack.core.impl.ConfigManager.SoundsFolder;
+import static thunder.hack.core.impl.ConfigManager.SOUNDS_FOLDER;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 
@@ -106,7 +106,7 @@ public final class SoundFX extends Module {
     public void playSound(String name) {
         try {
             Clip clip = AudioSystem.getClip();
-            clip.open(AudioSystem.getAudioInputStream(new File(SoundsFolder, name + ".wav").getAbsoluteFile()));
+            clip.open(AudioSystem.getAudioInputStream(new File(SOUNDS_FOLDER, name + ".wav").getAbsoluteFile()));
             FloatControl floatControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
             floatControl.setValue((floatControl.getMaximum() - floatControl.getMinimum() * ((float) volume.getValue() / 100f)) + floatControl.getMinimum());
             clip.start();

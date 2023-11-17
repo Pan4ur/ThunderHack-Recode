@@ -43,7 +43,7 @@ public class MainMenuScreen extends Screen {
                 .toUpperCase(Locale.ROOT)
                 .replace(".", ""), () -> mc.setScreen(new OptionsScreen(this, mc.options))));
         buttons.add(new MainMenuButton(4, -29, "CLICKGUI", () -> ModuleManager.clickGui.setGui()));
-        buttons.add(new MainMenuButton(-110, 12, I18n.translate("menu.quit").toUpperCase(Locale.ROOT), () -> mc.scheduleStop(), true));
+        buttons.add(new MainMenuButton(-110, 12, I18n.translate("menu.quit").toUpperCase(Locale.ROOT), mc::scheduleStop, true));
     }
 
     private static MainMenuScreen INSTANCE = new MainMenuScreen();
@@ -70,7 +70,6 @@ public class MainMenuScreen extends Screen {
         Color c3 = HudEditor.getColor(180);
         Color c4 = HudEditor.getColor(90);
 
-
         Render2DEngine.drawMainMenuShader(context.getMatrices(), 0, 0, halfOfWidth * 2f, halfOfHeight * 2);
 
         Render2DEngine.drawGradientGlow(context.getMatrices(), c1, c2, c3, c4, mainX, mainY, mainWidth, mainHeight, 20, 10);
@@ -82,7 +81,6 @@ public class MainMenuScreen extends Screen {
         MSAAFramebuffer.use(() -> {
             // Smooth zone
             boolean hoveredLogo = Render2DEngine.isHovered(mouseX, mouseY, (int) (halfOfWidth - 157), (int) (halfOfHeight - 140), 300, 70);
-
 
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();

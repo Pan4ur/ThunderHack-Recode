@@ -88,7 +88,6 @@ public final class AutoBed extends Module {
         target = findTarget();
 
         if (mc.world.getDimension().bedWorks() && dimCheck.getValue()) {
-        //if (!(Objects.equals(mc.world.getRegistryKey().getValue().getPath(), "the_nether"))) { зачем?
             disable(isRu() ? "Кровати не взрываются в этом измерении!" : "Beds don't explode in this dimension!");
             return;
         }
@@ -158,6 +157,7 @@ public final class AutoBed extends Module {
         }
     }
 
+    @Override
     public void onRender3D(MatrixStack stack) {
         if (bestPos != null && render.getValue()) {
             Box box = new Box(bestPos.hitResult.getBlockPos().up());

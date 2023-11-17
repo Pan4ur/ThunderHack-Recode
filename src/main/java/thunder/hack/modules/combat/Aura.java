@@ -211,7 +211,7 @@ public final class Aura extends Module {
         if (blocking && unpressShield.getValue())
             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
 
-        boolean sprint = Core.serversprint;
+        boolean sprint = Core.serverSprint;
         if (sprint && dropSprint.getValue())
             disableSprint();
         return new boolean[]{blocking, sprint};
