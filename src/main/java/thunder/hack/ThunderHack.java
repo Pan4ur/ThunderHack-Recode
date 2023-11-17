@@ -76,6 +76,7 @@ public class ThunderHack implements ModInitializer {
         configManager.load(configManager.getCurrentConfig());
         moduleManager.onLoad();
         configManager.loadChestStealer();
+        configManager.loadInvCleaner();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             FriendManager.saveFriends();
@@ -83,6 +84,7 @@ public class ThunderHack implements ModInitializer {
             wayPointManager.saveWayPoints();
             macroManager.saveMacro();
             configManager.saveChestStealer();
+            configManager.saveInvCleaner();
         }));
 
         macroManager.onLoad();

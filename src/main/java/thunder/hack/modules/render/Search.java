@@ -96,7 +96,7 @@ public class Search extends Module {
                         .rotateY(-(float) Math.toRadians(mc.gameRenderer.getCamera().getYaw()))
                         .add(mc.cameraEntity.getEyePos());
 
-                Render3DEngine.drawLine(vec2.x, vec2.y, vec2.z, vec.x + 0.5f, vec.y + 0.5f, vec.z + 0.5f, color.getValue().getColorObject(), 1f);
+                Render3DEngine.drawLineDebug(vec2.x, vec2.y, vec2.z, vec.x + 0.5f, vec.y + 0.5f, vec.z + 0.5f, color.getValue().getColorObject(), 1f);
             }
         }
     }

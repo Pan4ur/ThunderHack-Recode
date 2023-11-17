@@ -84,7 +84,7 @@ public class MainMenuScreen extends Screen {
 
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, hoveredLogo ? 0.4f : 0.3f);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, hoveredLogo ? 0.8f : 0.6f);
             context.drawTexture(TH_LOGO, (int) (halfOfWidth - 157), (int) (halfOfHeight - 140), 0, 0, 300, 70, 300, 70);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.disableBlend();
@@ -93,7 +93,7 @@ public class MainMenuScreen extends Screen {
 
             boolean hovered = Render2DEngine.isHovered(mouseX, mouseY, halfOfWidth - 50, halfOfHeight + 70, 100, 10);
 
-            FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "<-- Back to default menu", halfOfWidth, halfOfHeight + 70, hovered ? -1 : Render2DEngine.applyOpacity(-1, 0.4f));
+            FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "<-- Back to default menu", halfOfWidth, halfOfHeight + 70, hovered ? -1 : Render2DEngine.applyOpacity(-1, 0.6f));
             FontRenderers.sf_medium.drawString(context.getMatrices(), "By Pan4ur & 06ED", halfOfWidth * 2 - FontRenderers.sf_medium.getStringWidth("By Pan4ur & 06ED") - 5f, halfOfHeight * 2 - 10, Render2DEngine.applyOpacity(-1, 0.4f));
 
             int offsetY = 10;

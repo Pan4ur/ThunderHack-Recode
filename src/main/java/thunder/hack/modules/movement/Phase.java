@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -16,6 +17,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
+import thunder.hack.utility.player.PlayerUtility;
 
 import static thunder.hack.modules.player.AutoTool.getTool;
 
@@ -102,7 +104,7 @@ public class Phase extends Module {
                     mc.player.setYaw(angle[0]);
                     mc.player.setPitch(80f);
                     InventoryUtility.switchTo(epSlot);
-                    mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
+                    sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
                     InventoryUtility.switchTo(prevItem);
                 }
                 clipTimer = 20;

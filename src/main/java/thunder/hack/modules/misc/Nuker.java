@@ -3,6 +3,7 @@ package thunder.hack.modules.misc;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.Formatting;
@@ -45,6 +46,7 @@ public class Nuker extends Module {
     private final Setting<BlockSelection> blocks = new Setting<>("Blocks", BlockSelection.Select);
     private final Setting<Boolean> flatten = new Setting<>("Flatten", false);
     private final Setting<Boolean> creative = new Setting<>("Creative", false);
+    private final Setting<Boolean> avoidLava = new Setting<>("AvoidLava", false);
     private final Setting<Float> range = new Setting<>("Range", 4.2f, 1.5f, 25f);
     private final Setting<ColorMode> colorMode = new Setting<>("ColorMode", ColorMode.Sync);
     public final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x2250b4b4), v -> colorMode.getValue() == ColorMode.Custom);
@@ -126,6 +128,9 @@ public class Nuker extends Module {
                 if (flatten.getValue() && b.getY() < mc.player.getY())
                     continue;
 
+                if(avoidLava.getValue() && checkLava(b))
+                    continue;
+
                 BlockState state = mc.world.getBlockState(b);
 
                 if (PlayerUtility.squaredDistanceFromEyes(b.toCenterPos()) <= range.getPow2Value()) {
@@ -184,6 +189,8 @@ public class Nuker extends Module {
             if (flatten.getValue() && b.getY() < mc.player.getY())
                 continue;
             if (PlayerUtility.squaredDistanceFromEyes(b.toCenterPos()) <= range.getPow2Value()) {
+                if(avoidLava.getValue() && checkLava(b))
+                    continue;
                 if (state.getBlock() == targetBlockType || (blocks.getValue().equals(BlockSelection.All) && state.getBlock() != BEDROCK)) {
                     for (float x1 = 0f; x1 <= 1f; x1 += 0.2f) {
                         for (float y1 = 0f; y1 <= 1; y1 += 0.2f) {
@@ -199,6 +206,13 @@ public class Nuker extends Module {
             }
         }
         return null;
+    }
+
+    private boolean checkLava(BlockPos base) {
+        for(Direction dir : Direction.values())
+            if(mc.world.getBlockState(base.offset(dir)).getBlock() == Blocks.LAVA)
+                return true;
+        return false;
     }
 
     public class NukerThread extends Thread {

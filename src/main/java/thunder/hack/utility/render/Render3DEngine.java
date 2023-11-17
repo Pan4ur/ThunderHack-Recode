@@ -282,6 +282,26 @@ public class Render3DEngine {
             RenderSystem.disableCull();
     }
 
+    public static void drawLineDebug(@NotNull Vec3d vec1, @NotNull Vec3d vec2, Color color, float width) {
+        drawLine(vec1.x, vec1.y, vec1.z, vec2.x, vec2.y, vec2.z, color, width);
+    }
+
+    public static void drawLineDebug(double x1, double y1, double z1, double x2, double y2, double z2, Color color, float width) {
+        setup();
+        MatrixStack matrices = matrixFrom(x1, y1, z1);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        RenderSystem.disableCull();
+        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
+        RenderSystem.lineWidth(width);
+        buffer.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.LINES);
+        vertexLine(matrices, buffer, 0f, 0f, 0f, (float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1), color);
+        tessellator.draw();
+        RenderSystem.enableCull();
+        RenderSystem.lineWidth(1f);
+        cleanup();
+    }
+
     public static void drawLine(@NotNull Vec3d vec1, @NotNull Vec3d vec2, Color color, float width) {
         drawLine(vec1.x, vec1.y, vec1.z, vec2.x, vec2.y, vec2.z, color, width);
     }
@@ -294,7 +314,7 @@ public class Render3DEngine {
         RenderSystem.disableCull();
         RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
         RenderSystem.lineWidth(width);
-        buffer.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.LINES);
+        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
         vertexLine(matrices, buffer, 0f, 0f, 0f, (float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1), color);
         tessellator.draw();
         RenderSystem.enableCull();

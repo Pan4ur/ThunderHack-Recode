@@ -35,25 +35,24 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.SearchInvResult;
 
 public final class AutoTotem extends Module {
-    public Setting<OffHand> offhand = new Setting<>("Item", OffHand.Totem);
-    public Setting<Float> healthF = new Setting<>("HP", 16f, 0f, 20f);
-    public Setting<Float> healthS = new Setting<>("ShieldGappleHp", 16f, 0f, 20f, v -> offhand.getValue() == OffHand.Shield);
-    public Setting<Boolean> matrix = new Setting<>("Matrix", true);
-    public Setting<Boolean> stopMotion = new Setting<>("stopMotion", false);
-    public Setting<Boolean> resetAttackCooldown = new Setting<>("ResetAttackCooldown", false);
-
-    public final Setting<Parent> safety = new Setting<>("Safety", new Parent(false, 0));
-    public Setting<Boolean> hotbarFallBack = new Setting<>("HotbarFallback", false).withParent(safety);
-    public Setting<Boolean> fallBackCalc = new Setting<>("FallBackCalc", true, v -> hotbarFallBack.getValue()).withParent(safety);
-    public Setting<Boolean> onElytra = new Setting<>("OnElytra", true).withParent(safety);
-    public Setting<Boolean> onFall = new Setting<>("OnFall", true).withParent(safety);
-    public Setting<Boolean> onCrystal = new Setting<>("OnCrystal", true).withParent(safety);
-    public Setting<Boolean> onObsidianPlace = new Setting<>("OnObsidianPlace", false).withParent(safety);
-    public Setting<Boolean> onCrystalInHand = new Setting<>("OnCrystalInHand", false).withParent(safety);
-    public Setting<Boolean> onMinecartTnt = new Setting<>("OnMinecartTNT", true).withParent(safety);
-    public Setting<Boolean> onTnt = new Setting<>("OnTNT", true).withParent(safety);
-    public Setting<Boolean> rcGap = new Setting<>("RCGap", false);
-    public Setting<Boolean> crapple = new Setting<>("CrappleSpoof", true, v -> offhand.getValue() == OffHand.GApple);
+    private final Setting<OffHand> offhand = new Setting<>("Item", OffHand.Totem);
+    private final Setting<Float> healthF = new Setting<>("HP", 16f, 0f, 20f);
+    private final Setting<Float> healthS = new Setting<>("ShieldGappleHp", 16f, 0f, 20f, v -> offhand.getValue() == OffHand.Shield);
+    private final Setting<Boolean> matrix = new Setting<>("Matrix", true);
+    private final Setting<Boolean> stopMotion = new Setting<>("stopMotion", false);
+    private final Setting<Boolean> resetAttackCooldown = new Setting<>("ResetAttackCooldown", false);
+    private final Setting<Parent> safety = new Setting<>("Safety", new Parent(false, 0));
+    private final Setting<Boolean> hotbarFallBack = new Setting<>("HotbarFallback", false).withParent(safety);
+    private final Setting<Boolean> fallBackCalc = new Setting<>("FallBackCalc", true, v -> hotbarFallBack.getValue()).withParent(safety);
+    private final Setting<Boolean> onElytra = new Setting<>("OnElytra", true).withParent(safety);
+    private final Setting<Boolean> onFall = new Setting<>("OnFall", true).withParent(safety);
+    private final Setting<Boolean> onCrystal = new Setting<>("OnCrystal", true).withParent(safety);
+    private final Setting<Boolean> onObsidianPlace = new Setting<>("OnObsidianPlace", false).withParent(safety);
+    private final Setting<Boolean> onCrystalInHand = new Setting<>("OnCrystalInHand", false).withParent(safety);
+    private final Setting<Boolean> onMinecartTnt = new Setting<>("OnMinecartTNT", true).withParent(safety);
+    private final Setting<Boolean> onTnt = new Setting<>("OnTNT", true).withParent(safety);
+    private final Setting<Boolean> rcGap = new Setting<>("RCGap", false);
+    private final Setting<Boolean> crapple = new Setting<>("CrappleSpoof", true, v -> offhand.getValue() == OffHand.GApple);
 
     private enum OffHand {Totem, Crystal, GApple, Shield}
 
@@ -167,6 +166,8 @@ public final class AutoTotem extends Module {
     }
 
     public int getItemSlot() {
+        if(mc.player == null || mc.world == null) return -1;
+
         SearchInvResult gapple = InventoryUtility.findItemInInventory(Items.ENCHANTED_GOLDEN_APPLE);
         SearchInvResult crapple = InventoryUtility.findItemInInventory(Items.GOLDEN_APPLE);
         SearchInvResult shield = InventoryUtility.findItemInInventory(Items.SHIELD);
@@ -192,7 +193,7 @@ public final class AutoTotem extends Module {
                 else if (crapple.found()) item = Items.GOLDEN_APPLE;
             }
         } else {
-            if (shield.found()) {
+            if (shield.found() || mc.player.getOffHandStack().getItem() == Items.SHIELD) {
                 if (mc.player.getHealth() + mc.player.getAbsorptionAmount() <= healthS.getValue()) {
                     if (gapple.found()) item = Items.ENCHANTED_GOLDEN_APPLE;
                     else if (crapple.found()) item = Items.GOLDEN_APPLE;
@@ -204,7 +205,7 @@ public final class AutoTotem extends Module {
                         else if (crapple.found()) item = Items.GOLDEN_APPLE;
                     }
                 }
-            } else if (crapple.found()) item = Items.GOLDEN_APPLE;
+            } else if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE) item = Items.GOLDEN_APPLE;
         }
 
         if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) <= healthF.getValue() && InventoryUtility.findItemInInventory(Items.TOTEM_OF_UNDYING).found())

@@ -7,6 +7,7 @@ import net.minecraft.scoreboard.Team;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 import thunder.hack.cmd.impl.StaffCommand;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
@@ -113,6 +114,10 @@ public class StaffBoard extends HudElement {
         int y_offset = 11;
         for (String player : all) {
             String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "VANISH" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "VANISH " + Formatting.YELLOW + "(NEAR!)" : Formatting.GREEN + "ACTIVE");
+
+            if(a.contains("VANISH") && ModuleManager.autoLeave.isEnabled())
+                ModuleManager.autoLeave.onStaff();
+
             FontRenderers.modules.drawString(context.getMatrices(), a, getPosX() + 5, getPosY() + 18 + y_offset, -1, false);
             y_offset += 13;
         }

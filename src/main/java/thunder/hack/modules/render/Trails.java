@@ -36,25 +36,25 @@ public class Trails extends Module {
         super("Trails", Category.RENDER);
     }
 
-    public final Setting<Boolean> pearls = new Setting("Pearls", false);
-    public final Setting<Boolean> xp = new Setting("Xp", false);
-    public final Setting<Boolean> arrows = new Setting("Arrows", false);
+    private final Setting<Boolean> pearls = new Setting<>("Pearls", false);
+    private final Setting<Boolean> xp = new Setting<>("Xp", false);
+    private final Setting<Boolean> arrows = new Setting<>("Arrows", false);
     private final Setting<Players> players = new Setting<>("Players", Players.Particles);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
-    public Setting<Float> down = new Setting<>("Down", 0.5F, 0.0F, 2.0F);
-    public Setting<Float> width = new Setting<>("Height", 1.3F, 0.1F, 2.0F);
-    public Setting<Integer> speed = new Setting<>("Speed", 2, 1, 20, v-> players.getValue() == Players.Particles);
+    private final Setting<Float> down = new Setting<>("Down", 0.5F, 0.0F, 2.0F);
+    private final Setting<Float> width = new Setting<>("Height", 1.3F, 0.1F, 2.0F);
+    private final Setting<Integer> speed = new Setting<>("Speed", 2, 1, 20, v-> players.getValue() == Players.Particles);
     private final Setting<HitParticles.Mode> mode = new Setting<>("Mode", HitParticles.Mode.Stars, v-> players.getValue() == Players.Particles);
     private final Setting<HitParticles.Physics> physics = new Setting<>("Physics", HitParticles.Physics.Fall, v-> players.getValue() == Players.Particles);
-    public Setting<Integer> starsScale = new Setting<>("Scale", 3, 1, 10, v-> players.getValue() == Players.Particles);
-    public Setting<Integer> amount = new Setting<>("Amount", 2, 1, 5, v-> players.getValue() == Players.Particles);
-    public Setting<Integer> lifeTime = new Setting<>("LifeTime", 2, 1, 10, v-> players.getValue() == Players.Particles);
+    private final Setting<Integer> starsScale = new Setting<>("Scale", 3, 1, 10, v-> players.getValue() == Players.Particles);
+    private final Setting<Integer> amount = new Setting<>("Amount", 2, 1, 5, v-> players.getValue() == Players.Particles);
+    private final Setting<Integer> lifeTime = new Setting<>("LifeTime", 2, 1, 10, v-> players.getValue() == Players.Particles);
     private final Setting<Mode> lmode = new Setting<>("ColorMode", Mode.Sync);
-    public final Setting<ColorSetting> lcolor = new Setting<>("Color2", new ColorSetting(0x2250b4b4), v -> lmode.getValue() == Mode.Custom);
+    private final Setting<ColorSetting> lcolor = new Setting<>("Color2", new ColorSetting(0x2250b4b4), v -> lmode.getValue() == Mode.Custom);
 
     private List<Particle> particles = new ArrayList<>();
 
-    public void onPreRender3D(MatrixStack stack) {
+    public void onRender3D(MatrixStack stack) {
         for (Entity en : ThunderHack.asyncManager.getAsyncEntities()) {
             if (en instanceof EnderPearlEntity && pearls.getValue())
                 calcTrajectory(en);
@@ -65,8 +65,9 @@ public class Trails extends Module {
             if (en instanceof ExperienceBottleEntity && xp.getValue())
                 calcTrajectory(en);
         }
+    }
 
-
+    public void onPreRender3D(MatrixStack stack) {
         if (players.getValue() == Players.Trail) {
             for (PlayerEntity entity : mc.world.getPlayers()) {
 
@@ -101,19 +102,12 @@ public class Trails extends Module {
             }
         } else if (players.getValue() == Players.Particles) {
             RenderSystem.enableDepthTest();
-            if (mc.player != null && mc.world != null) {
-                for (Particle particle : particles) {
-                    particle.render(stack);
-                }
-            }
+            if (mc.player != null && mc.world != null)
+                particles.forEach(p -> p.render(stack));
             RenderSystem.disableDepthTest();
         } else if(players.getValue() == Players.Cute){
             for (PlayerEntity entity : mc.world.getPlayers()) {
-                // if (entity == mc.player && mc.options.getPerspective().isFirstPerson())
-                //     continue;
-
                 float alpha = color.getValue().getAlpha() / 255f;
-
                 if (!((IEntity) entity).thunderHack_Recode$getTrails().isEmpty()) {
                     stack.push();
                     RenderSystem.disableCull();
@@ -311,7 +305,7 @@ public class Trails extends Module {
         }
 
         public void update() {
-            double sp = Math.sqrt(motionX * motionX + motionZ * motionZ) * 1;
+            double sp = starsScale.getValue() / 10f;
             x += motionX;
             y += motionY;
             z += motionZ;
@@ -319,14 +313,16 @@ public class Trails extends Module {
             if (posBlock(x, y - starsScale.getValue() / 10f, z)) {
                 motionY = -motionY / 1.1;
             } else {
-                if (posBlock(x, y, z) || posBlock(x, y, z) || posBlock(x, y, z) || posBlock(x - sp, y, z - sp)
-                        || posBlock(x + sp, y, z + sp) || posBlock(x + sp, y, z - sp) || posBlock(x - sp, y, z + sp)
-                        || posBlock(x + sp, y, z) || posBlock(x - sp, y, z) || posBlock(x, y, z + sp) || posBlock(x, y, z - sp)
-                        || posBlock(x - sp, y, z - sp) || posBlock(x + sp, y, z + sp) || posBlock(x + sp, y, z - sp)
-                        || posBlock(x - sp, y, z + sp) || posBlock(x + sp, y, z) || posBlock(x - sp, y, z) || posBlock(x, y, z + sp)
-                        || posBlock(x, y, z - sp) || posBlock(x - sp, y, z - sp) || posBlock(x + sp, y, z + sp) || posBlock(x + sp, y, z - sp)
-                        || posBlock(x - sp, y, z + sp) || posBlock(x + sp, y, z) || posBlock(x - sp, y, z) || posBlock(x, y, z + sp)
-                        || posBlock(x, y, z - sp)) {
+                if (    posBlock(x, y, z)
+                        || posBlock(x - sp, y, z - sp)
+                        || posBlock(x + sp, y, z + sp)
+                        || posBlock(x + sp, y, z - sp)
+                        || posBlock(x - sp, y, z + sp)
+                        || posBlock(x + sp, y, z)
+                        || posBlock(x - sp, y, z)
+                        || posBlock(x, y, z - sp)
+                        || posBlock(x, y, z + sp)
+                ) {
                     motionX = -motionX;
                     motionZ = -motionZ;
                 }
