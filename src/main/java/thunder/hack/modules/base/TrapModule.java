@@ -61,6 +61,7 @@ public abstract class TrapModule extends IndestructibleModule {
                     float[] angle = InteractionUtility.calculateAngle(result.getPos());
                     mc.player.setYaw(angle[0]);
                     mc.player.setPitch(angle[1]);
+
                 }
             }
         }

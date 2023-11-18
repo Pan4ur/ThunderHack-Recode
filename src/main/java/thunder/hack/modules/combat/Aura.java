@@ -158,7 +158,9 @@ public final class Aura extends Module {
         handleKill();
         updateTarget();
 
-        if (target == null) {
+        Item handItem = mc.player.getMainHandStack().getItem();
+        if (target == null || (onlyWeapon.getValue()
+                && !(handItem instanceof SwordItem || handItem instanceof AxeItem))) {
             return;
         }
 
@@ -168,8 +170,6 @@ public final class Aura extends Module {
         if (readyForAttack) {
             if (shieldBreaker(false))
                 return;
-
-            final Item handItem = mc.player.getMainHandStack().getItem();
 
             if (switchMode.getValue() == Switch.None && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem))
                 return;
@@ -268,7 +268,7 @@ public final class Aura extends Module {
     }
 
     @EventHandler
-    public void onUpdate(PlayerUpdateEvent e){
+    public void onUpdate(PlayerUpdateEvent e) {
         resolvePlayers();
         auraLogic();
         restorePlayers();
@@ -424,9 +424,9 @@ public final class Aura extends Module {
     }
 
     private void calcRotations(boolean ready) {
-        if(ready) {
+        if (ready) {
             trackticks = interactTicks.getValue();
-        } else if(trackticks > 0) {
+        } else if (trackticks > 0) {
             trackticks--;
         }
 
@@ -513,7 +513,7 @@ public final class Aura extends Module {
     }
 
     private double getYawDelta(float currentY, Vec3d v) {
-        return Math.abs(-Math.toDegrees(Math.atan2(v.y - mc.player.getEyePos().getY(), Math.hypot(v.x - mc.player.getX(),v.z - mc.player.getZ()))) - currentY);
+        return Math.abs(-Math.toDegrees(Math.atan2(v.y - mc.player.getEyePos().getY(), Math.hypot(v.x - mc.player.getX(), v.z - mc.player.getZ()))) - currentY);
     }
 
     public void onRender3D(MatrixStack stack) {

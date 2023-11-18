@@ -67,7 +67,7 @@ public class PlayerManager implements IManager {
     @EventHandler(priority = EventPriority.LOWEST)
     @SuppressWarnings("unused")
     public void postSync(EventPostSync event) {
-        if (mc.player != null) return;
+        if (mc.player == null) return;
 
         rotationYaw = mc.player.getYaw();
         mc.player.setYaw(yaw);
