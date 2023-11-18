@@ -65,7 +65,6 @@ public class PlayerManager implements IManager {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    @SuppressWarnings("unused")
     public void postSync(EventPostSync event) {
         if (mc.player == null) return;
 
@@ -75,7 +74,6 @@ public class PlayerManager implements IManager {
     }
 
     @EventHandler
-    @SuppressWarnings("unused")
     public void onSyncWithServer(PacketEvent.@NotNull Send event) {
         if (event.getPacket() instanceof ClickSlotC2SPacket) {
             inInventory = true;
