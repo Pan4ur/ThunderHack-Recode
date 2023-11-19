@@ -63,6 +63,7 @@ public class ModuleManager implements IManager {
     public static ChestStealer chestStealer = new ChestStealer();
     public static AutoTpAccept autoTpAccept = new AutoTpAccept();
     public static AntiServerRP antiServerRP = new AntiServerRP();
+    public static PearlChaser pearlChaser = new PearlChaser();
     public static WorldTweaks worldTweaks = new WorldTweaks();
     public static VisualRange visualRange = new VisualRange();
     public static Speedometer speedometer = new Speedometer();
