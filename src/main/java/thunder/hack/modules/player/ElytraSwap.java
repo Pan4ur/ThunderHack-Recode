@@ -30,7 +30,6 @@ public class ElytraSwap extends Module {
     private final Setting<Bind> switchButton = new Setting<>("SwitchButton", new Bind(-1, false, false), v -> mode.getValue() == Mode.Bind);
     private final Setting<Bind> fireWorkButton = new Setting<>("FireWorkButton", new Bind(-1, false, false), v -> mode.getValue() == Mode.Bind);
     private final Setting<Boolean> startFireWork = new Setting<>("StartFireWork", true, v -> mode.getValue() == Mode.Bind);
-
     private final Setting<FireWorkMode> fireWorkMode = new Setting<>("FireWorkMode", FireWorkMode.Normal, v -> mode.getValue() == Mode.Bind);
 
     private final Timer switchTimer = new Timer();
@@ -52,11 +51,11 @@ public class ElytraSwap extends Module {
 
     @Override
     public void onUpdate() {
-        if (mode.getValue() == Mode.Bind) {
-            if (switchButton.getValue().getKey() != -1 && InputUtil.isKeyPressed(mc.getWindow().getHandle(), switchButton.getValue().getKey()) && switchTimer.every(500))
+        if (mode.getValue() == Mode.Bind && mc.currentScreen == null) {
+            if (switchButton.getValue().getKey() != -1 && isKeyPressed(switchButton.getValue().getKey()) && switchTimer.every(500))
                 swapChest(false);
 
-            if (fireWorkButton.getValue().getKey() != -1 && InputUtil.isKeyPressed(mc.getWindow().getHandle(), fireWorkButton.getValue().getKey()) && fireworkTimer.every(500))
+            if (fireWorkButton.getValue().getKey() != -1 && isKeyPressed(fireWorkButton.getValue().getKey()) && fireworkTimer.every(500) && mc.player.isFallFlying())
                 useFireWork();
         }
     }
@@ -67,7 +66,6 @@ public class ElytraSwap extends Module {
                 && command.getMode() == ClientCommandC2SPacket.Mode.START_FALL_FLYING
                 && mode.getValue() == Mode.Bind
                 && startFireWork.getValue()) {
-            sendMessage("Aaa");
             useFireWork();
         }
     }

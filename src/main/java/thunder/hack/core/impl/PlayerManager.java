@@ -22,23 +22,20 @@ import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Unique;
+import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.IManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
+import thunder.hack.modules.movement.NoSlow;
 import thunder.hack.utility.Timer;
 
 public class PlayerManager implements IManager {
-    public float serverYaw, serverPitch;
-    public float yaw;
-    private float pitch;
-    public float lastYaw, lastPitch, rotationYaw;
-    public double currentPlayerSpeed;
-    public int ticksElytraFlying;
-    public int serverSideSlot = 0;
-    public Timer switchTimer = new Timer();
+    public float yaw, pitch, lastYaw, lastPitch, currentPlayerSpeed;
+    public int ticksElytraFlying, serverSideSlot;
+    public final Timer switchTimer = new Timer();
 
     //Мы можем зайти в инвентарь, и сервер этого не узнает, пока мы не начнем кликать
     //Юзать везде!
@@ -61,14 +58,12 @@ public class PlayerManager implements IManager {
 
     @EventHandler
     public void onTick(EventTick e) {
-        currentPlayerSpeed = Math.hypot(mc.player.getX() - mc.player.prevX, mc.player.getZ() - mc.player.prevZ);
+        currentPlayerSpeed = (float) Math.hypot(mc.player.getX() - mc.player.prevX, mc.player.getZ() - mc.player.prevZ);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void postSync(EventPostSync event) {
         if (mc.player == null) return;
-
-        rotationYaw = mc.player.getYaw();
         mc.player.setYaw(yaw);
         mc.player.setPitch(pitch);
     }
@@ -79,35 +74,16 @@ public class PlayerManager implements IManager {
             inInventory = true;
         }
         if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket slot) {
+            if(serverSideSlot == slot.getSelectedSlot() && !(ModuleManager.noSlow.isEnabled() && NoSlow.mode.getValue() == NoSlow.Mode.StrictNCP)) {
+                event.cancel();
+                ModuleManager.mainSettings.debug("Double slot packet!");
+            }
+
             switchTimer.reset();
             serverSideSlot = slot.getSelectedSlot();
         }
         if (event.getPacket() instanceof CloseHandledScreenC2SPacket) {
             inInventory = false;
-        }
-        if (event.getPacket() instanceof PlayerMoveC2SPacket move) {
-            serverYaw = move.getYaw(serverYaw);
-            serverPitch = move.getPitch(serverPitch);
-        }
-        if (event.getPacket() instanceof PlayerMoveC2SPacket.PositionAndOnGround move) {
-            serverYaw = move.getYaw(serverYaw);
-            serverPitch = move.getPitch(serverPitch);
-        }
-        if (event.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround move) {
-            serverYaw = move.getYaw(serverYaw);
-            serverPitch = move.getPitch(serverPitch);
-        }
-        if (event.getPacket() instanceof PlayerMoveC2SPacket.Full move) {
-            serverYaw = move.getYaw(serverYaw);
-            serverPitch = move.getPitch(serverPitch);
-        }
-    }
-
-    @EventHandler
-    public void getServerPosLook(PacketEvent.@NotNull Receive event) {
-        if (event.getPacket() instanceof PlayerPositionLookS2CPacket posLook) {
-            serverYaw = posLook.getYaw();
-            serverPitch = posLook.getPitch();
         }
     }
 

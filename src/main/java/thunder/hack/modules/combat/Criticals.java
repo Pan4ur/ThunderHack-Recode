@@ -14,7 +14,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
 public final class Criticals extends Module {
-    private final Setting<Mode> mode = new Setting<>("Mode", Mode.FunnyGame);
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.UpdatedNCP);
 
     private static Criticals instance;
 
@@ -40,25 +40,33 @@ public final class Criticals extends Module {
     public void doCrit() {
         if (isDisabled() || mc.player == null || mc.world == null)
             return;
-
         if ((mc.player.isOnGround() || mc.player.getAbilities().flying) && !mc.player.isInLava() && !mc.player.isSubmergedInWater()) {
-            if (mode.getValue() == Mode.Strict && mc.world.getBlockState(mc.player.getBlockPos()).getBlock() != Blocks.COBWEB) {
-                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 0.062600301692775, mc.player.getZ(), false));
-                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 0.07260029960661, mc.player.getZ(), false));
-                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), false));
-                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), false));
-            } else if (mode.getValue() == Mode.Ncp) {
-                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 0.0625D, mc.player.getZ(), false));
-                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), false));
-            } else if (mode.getValue() == Mode.FunnyGame) {
-                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 0.00001058293536, mc.player.getZ(), false));
-                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 0.00000916580235, mc.player.getZ(), false));
-                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 0.00000010371854, mc.player.getZ(), false));
-            } else if (mode.getValue() == Mode.New2b2t) {
-                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 0.000000271875, mc.player.getZ(), false));
-                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), false));
+            switch (mode.getValue()) {
+                case OldNCP -> {
+                    critPacket(0.00001058293536, false);
+                    critPacket(0.00000916580235, false);
+                    critPacket(0.00000010371854, false);
+                }
+                case Ncp -> {
+                    critPacket(0.0625D, false);
+                    critPacket(0., false);
+                }
+                case UpdatedNCP -> {
+                    critPacket(0.000000271875, false);
+                    critPacket(0., false);
+                }
+                case Strict -> {
+                    critPacket(0.062600301692775, false);
+                    critPacket(0.07260029960661, false);
+                    critPacket(0., false);
+                    critPacket(0., false);
+                }
             }
         }
+    }
+
+    private void critPacket(double yDelta, boolean ground) {
+        sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + yDelta, mc.player.getZ(), ground));
     }
 
     public static Entity getEntity(@NotNull PlayerInteractEntityC2SPacket packet) {
@@ -81,6 +89,6 @@ public final class Criticals extends Module {
     }
 
     public enum Mode {
-        Ncp, Strict, FunnyGame, New2b2t
+        Ncp, Strict, OldNCP, UpdatedNCP
     }
 }

@@ -12,6 +12,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
+import net.minecraft.item.Items;
 import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector4d;
@@ -28,6 +29,8 @@ import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
+
+import static thunder.hack.gui.clickui.impl.BooleanParentElement.fast;
 
 public class ESP extends Module {
     public ESP() {
@@ -47,6 +50,8 @@ public class ESP extends Module {
     private final Setting<ColorSetting> burrowTextColor = new Setting<>("BurrowTextColor", new ColorSetting(new Color(-1)), v -> burrow.getValue());
     private final Setting<ColorSetting> burrowColor = new Setting<>("BurrowColor", new ColorSetting(new Color(-1)), v -> burrow.getValue());
     private final Setting<Boolean> pearls = new Setting<>("Pearls", false);
+    private final Setting<Boolean> dizorentRadius = new Setting<>("DizorentRadius", true);
+    private final Setting<ColorSetting> dizorentColor = new Setting<>("DizorentColor", new ColorSetting(new Color(0xB300F1CC, true)), v -> dizorentRadius.getValue());
 
     private final Setting<Parent> boxEsp = new Setting<>("Box", new Parent(false, 0));
     private final Setting<Boolean> players = new Setting<>("Players", true).withParent(boxEsp);
@@ -65,6 +70,8 @@ public class ESP extends Module {
     public final Setting<ColorSetting> monstersC = new Setting<>("MonstersC", new ColorSetting(new Color(0xFF0000))).withParent(boxColors);
     public final Setting<ColorSetting> ambientsC = new Setting<>("AmbientsC", new ColorSetting(new Color(0x7B00FF))).withParent(boxColors);
     public final Setting<ColorSetting> othersC = new Setting<>("OthersC", new ColorSetting(new Color(0xFF0062))).withParent(boxColors);
+
+    float dizorentAnimation = 0f;
 
     public void onRender3D(MatrixStack stack) {
         if (lingeringPotions.getValue()) {
@@ -125,6 +132,55 @@ public class ESP extends Module {
                     immediate.draw();
                     RenderSystem.disableBlend();
                     RenderSystem.enableDepthTest();
+                }
+            }
+        }
+
+        if (dizorentRadius.getValue()) {
+            dizorentAnimation = fast(dizorentAnimation, mc.player.getMainHandStack().getItem() == Items.ENDER_EYE ? 10 : 0, 15f);
+
+            if(mc.player.getMainHandStack().getItem() == Items.ENDER_EYE) {
+                double x = Render2DEngine.interpolate(mc.player.prevX, mc.player.getX(), mc.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getX();
+                double y = Render2DEngine.interpolate(mc.player.prevY, mc.player.getY(), mc.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getY();
+                double z = Render2DEngine.interpolate(mc.player.prevZ, mc.player.getZ(), mc.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getZ();
+
+
+                stack.push();
+                stack.translate(x, y, z);
+
+                Tessellator tessellator = Tessellator.getInstance();
+                BufferBuilder bufferBuilder = tessellator.getBuffer();
+                Render3DEngine.setup();
+                RenderSystem.disableDepthTest();
+                RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+                bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+                for (int i = 0; i <= 360; i += 6) {
+                    double v = Math.sin(Math.toRadians(i));
+                    double u = Math.cos(Math.toRadians(i));
+                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * dizorentAnimation, (float) 0, (float) v * dizorentAnimation).color(Render2DEngine.injectAlpha(new Color(dizorentColor.getValue().getColor()), 100).getRGB()).next();
+                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), 0, 0, 0).color(Render2DEngine.injectAlpha(new Color(dizorentColor.getValue().getColor()), 0).getRGB()).next();
+                }
+                tessellator.draw();
+
+                RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+                bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+                for (int i = 0; i <= 360; i += 6) {
+                    double v = Math.sin(Math.toRadians(i));
+                    double u = Math.cos(Math.toRadians(i));
+                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * dizorentAnimation, (float) 0, (float) v * dizorentAnimation).color(Render2DEngine.injectAlpha(new Color(dizorentColor.getValue().getColor()), 255).getRGB()).next();
+                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * (dizorentAnimation - 0.04f), (float) 0, (float) v * (dizorentAnimation - 0.04f)).color(Render2DEngine.injectAlpha(new Color(dizorentColor.getValue().getColor()), 255).getRGB()).next();
+                }
+                tessellator.draw();
+
+                Render3DEngine.cleanup();
+                RenderSystem.enableDepthTest();
+                stack.translate(-x, -y, -z);
+                stack.pop();
+
+                for(PlayerEntity pl : ThunderHack.asyncManager.getAsyncPlayers()) {
+                    if(mc.player.squaredDistanceTo(pl.getPos()) > 100 || pl == mc.player)
+                        continue;
+                    Render3DEngine.drawTargetEsp(stack, pl);
                 }
             }
         }

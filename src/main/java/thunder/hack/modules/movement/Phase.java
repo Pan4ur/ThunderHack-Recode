@@ -36,7 +36,6 @@ public class Phase extends Module {
     public int clipTimer;
     public int afterPearlTime;
 
-
     private enum Mode {
         Vanilla, Pearl, Sunrise
     }

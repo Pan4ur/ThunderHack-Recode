@@ -14,17 +14,17 @@ public class WaterSpeed extends Module {
         super("WaterSpeed", Category.MOVEMENT);
     }
 
-    public final Setting<Mode> mode = new Setting<>("Mode", Mode.HollyWorld);
+    public final Setting<Mode> mode = new Setting<>("Mode", Mode.DolphinGrace);
 
     private float acceleration = 0f;
 
     public enum Mode {
-        HollyWorld, HollyWorld2
+        DolphinGrace, Intave
     }
 
     @Override
     public void onUpdate() {
-        if (mode.getValue() == Mode.HollyWorld) {
+        if (mode.getValue() == Mode.DolphinGrace) {
             if (mc.player.isSwimming()) mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, 2, 2));
             else mc.player.removeStatusEffect(StatusEffects.DOLPHINS_GRACE);
         }
@@ -32,7 +32,7 @@ public class WaterSpeed extends Module {
 
     @EventHandler
     public void onMove(EventMove e) {
-        if (mode.getValue() == Mode.HollyWorld2) {
+        if (mode.getValue() == Mode.Intave) {
             if (mc.player.isSwimming()) {
                 double[] dirSpeed = MovementUtility.forward(acceleration / (mc.player.input.movementSideways != 0 ? 2.2f : 2f));
                 e.setX(e.getX() + dirSpeed[0]);
@@ -47,8 +47,7 @@ public class WaterSpeed extends Module {
 
     @Override
     public void onDisable() {
-        if (mode.getValue() == Mode.HollyWorld) {
+        if (mode.getValue() == Mode.DolphinGrace)
             mc.player.removeStatusEffect(StatusEffects.DOLPHINS_GRACE);
-        }
     }
 }

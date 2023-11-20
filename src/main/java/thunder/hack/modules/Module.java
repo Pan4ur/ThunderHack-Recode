@@ -3,6 +3,7 @@ package thunder.hack.modules;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.screen.slot.SlotActionType;
@@ -258,6 +259,10 @@ public abstract class Module {
     public void debug(String message) {
         if (fullNullCheck() || !MainSettings.debug.getValue()) return;
         mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] [\uD83D\uDD27] " + message));
+    }
+
+    public boolean isKeyPressed(int button) {
+       return InputUtil.isKeyPressed(mc.getWindow().getHandle(), button);
     }
 
     public @Nullable Setting<?> getSettingByName(String name) {

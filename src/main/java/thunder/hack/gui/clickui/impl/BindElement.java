@@ -41,7 +41,7 @@ public class BindElement extends AbstractElement {
     @Override
     public void keyTyped(int keyCode) {
         if (isListening) {
-            if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_SPACE || keyCode == GLFW.GLFW_KEY_DELETE) {
+            if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_DELETE) {
                 Bind b = new Bind(-1,false,false);
                 setting.setValue(b);
             } else {
