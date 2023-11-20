@@ -51,6 +51,7 @@ public class PearlChaser extends Module {
                         if (player.equals(mc.player))
                             lastOurPearlId = e.getEntity().getId();
                     });
+
     }
 
     @EventHandler(priority = EventPriority.LOW)
