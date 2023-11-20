@@ -64,17 +64,6 @@ public class MixinMinecraftClient {
         }
     }
 
-    @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
-    public void setScreenHook(Screen c, CallbackInfo ci) {
-        if(ModuleManager.mystFinder.isEnabled() && !(c instanceof DownloadingTerrainScreen) && c != null) {
-            if(c instanceof MultiplayerScreen || c instanceof MainMenuScreen || c instanceof TitleScreen) {
-                ModuleManager.mystFinder.disable();
-                return;
-            }
-            ci.cancel();
-        }
-    }
-
     @Inject(method = "tick", at = @At("HEAD"))
     void preTickHook(CallbackInfo ci) {
         if (!Module.fullNullCheck()) ThunderHack.EVENT_BUS.post(new EventTick());
