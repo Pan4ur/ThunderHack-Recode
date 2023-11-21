@@ -10,24 +10,19 @@
 
 
 ## Info
-- Minecraft version: ```fabric``` 1.20.2
-- Client version: v 1.3
-- Default ClickGui keybind - **```P```**
+- Minecraft version: ```fabric``` 1.20.2 and 1.20.1
+- Default ClickGui keybind - **```P```** (That's not true! Go to discord and ask!)
 - Default prefix  - **```@```**
 - Middle click on module to bind
 - DoxWare 2.0, gumballoff and Quick Client are ratted TH Recode renames, be aware :)
-- selfdox попросил меня написать тут что у него самое большое кол-во ело на сс
-- А у 06ED'a самая красивая попа
-- А кен просто крутой
-- А я тоже крутой
 
 ## Requirements
 - [FabricApi 1.20.2](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files)
 - [Java 17+](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 
 ## Recommended to use
-- [Sodium](https://modrinth.com/mod/sodium/version/mc1.20.2-0.5.3) & [Lithium](https://modrinth.com/mod/lithium/version/mc1.20.2-0.12.0) - For optimisation
-- [ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus) - To play on 1.12.2 servers (!!!will fuck up the silent switch in SpeedMine and ShieldBreaker in Aura!!!)
+- [Sodium](https://modrinth.com/mod/sodium/version/mc1.20.2-0.5.3) - For optimisation
+- [ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus) - To play on 1.12.2 servers
 - [InGameAccountSwitcher](https://www.curseforge.com/minecraft/mc-mods/in-game-account-switcher) - To switch accounts in game
 - [NotEnoughCrashes](https://www.curseforge.com/minecraft/mc-mods/not-enough-crashes/files) - :^)
 
@@ -38,4 +33,4 @@
 - [@ladysnake](https://github.com/ladysnake) for satin
 
 ## ScreenShots
-![image](https://cdn.discordapp.com/attachments/934396624111824900/1149001329675604048/2023-09-06_18.06.52.png)
+![image](https://media.discordapp.net/attachments/934396624111824900/1176572202066378822/2023-11-21_20.16.11.png?ex=656f5b40&is=655ce640&hm=4ce030e0849e75f8b266b5fda2a5f2e0cecd8c36b629da995ee5a14952a280cd&=&width=1585&height=848)
