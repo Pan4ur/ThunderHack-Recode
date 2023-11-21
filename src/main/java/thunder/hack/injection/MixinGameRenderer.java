@@ -69,13 +69,6 @@ public abstract class MixinGameRenderer {
         ThunderHack.shaderManager.renderShaders();
     }
 
-    @Inject(method = "tiltViewWhenHurt", at = @At("HEAD"), cancellable = true)
-    private void tiltViewWhenHurtHook(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        if (ModuleManager.noRender.isEnabled() && NoRender.hurtCam.getValue()) {
-            ci.cancel();
-        }
-    }
-
     @Redirect(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;lerp(FFF)F"))
     private float applyCameraTransformationsMathHelperLerpProxy(float delta, float first, float second) {
         if (ModuleManager.noRender.isEnabled() && NoRender.nausea.getValue()) return 0;

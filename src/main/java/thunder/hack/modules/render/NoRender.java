@@ -42,7 +42,6 @@ public class NoRender extends Module {
     public Setting<Boolean> fireworks = new Setting<>("Fireworks", false);
     public static Setting<Boolean> armor = new Setting<>("Armor", false);
     public static Setting<Boolean> bossbar = new Setting<>("Bossbar", false);
-    public static Setting<Boolean> hurtCam = new Setting<>("HurtCam", false);
     public static Setting<Boolean> fireOverlay = new Setting<>("FireOverlay", false);
     public static Setting<Boolean> waterOverlay = new Setting<>("WaterOverlay", false);
     public static Setting<Boolean> blockOverlay = new Setting<>("BlockOverlay", false);
