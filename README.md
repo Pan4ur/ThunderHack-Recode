@@ -1,6 +1,12 @@
 <p align="center">
     <img src="https://i.imgur.com/ZiJ0r7y.png" style="width: 69%">
 </p>
+
+
+<div align="center">
+<img src="https://media.discordapp.net/attachments/1029422095295336579/1052963246300205226/speed-3.gif" style="width: 69%">
+</div>
+
  
 <div align="center">
     
