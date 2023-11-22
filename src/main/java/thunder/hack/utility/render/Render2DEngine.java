@@ -32,6 +32,7 @@ import java.util.Stack;
 import static thunder.hack.modules.Module.mc;
 
 public class Render2DEngine {
+
     public static RoundedGradientProgram ROUNDED_GRADIENT_PROGRAM;
     public static RoundedProgram ROUNDED_PROGRAM;
     public static GradientGlowProgram GRADIENT_GLOW_PROGRAM;
@@ -39,6 +40,7 @@ public class Render2DEngine {
 
     public static final Identifier star = new Identifier("textures/star.png");
     public static final Identifier heart = new Identifier("textures/heart.png");
+    public static final Identifier capture = new Identifier("textures/capture.png");
 
     public static HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
     final static Stack<Rectangle> clipStack = new Stack<>();

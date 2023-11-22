@@ -36,6 +36,10 @@ public class Render3DEngine {
     public static final Matrix4f lastModMat = new Matrix4f();
     public static final Matrix4f lastWorldSpaceMatrix = new Matrix4f();
 
+    private static float prevCircleStep;
+    private static float circleStep;
+    private float prevAdditionYaw;
+
     public static void onRender3D(MatrixStack stack) {
         if (!FILLED_QUEUE.isEmpty() || !FADE_QUEUE.isEmpty() || !FILLED_SIDE_QUEUE.isEmpty()) {
             Tessellator tessellator = Tessellator.getInstance();
@@ -645,6 +649,45 @@ public class Render3DEngine {
         Render3DEngine.cleanup();
         stack.translate(-x, -y, -z);
         stack.pop();
+    }
+
+    public static void drawOldTargetEsp(MatrixStack stack, Entity target) {
+        double cs = prevCircleStep + (circleStep - prevCircleStep) * mc.getTickDelta();
+        double prevSinAnim = absSinAnimation(cs - 0.45f);
+        double sinAnim = absSinAnimation(cs);
+        double x = target.prevX + (target.getX() - target.prevX) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getX();
+        double y = target.prevY + (target.getY() - target.prevY) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getY() + prevSinAnim * target.getHeight();
+        double z = target.prevZ + (target.getZ() - target.prevZ) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
+        double nextY = target.prevY + (target.getY() - target.prevY) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getY() + sinAnim * target.getHeight();
+        stack.push();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableCull();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+        float cos;
+        float sin;
+        for (int i = 0; i <= 30; i++) {
+            cos = (float) (x + Math.cos(i * 6.28 / 30) * target.getWidth() * 0.8);
+            sin = (float) (z + Math.sin(i * 6.28 / 30) * target.getWidth() * 0.8);
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), cos, (float) nextY, sin).color(Render2DEngine.injectAlpha(HudEditor.getColor(i), 170).getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(),  cos, (float) y, sin).color(Render2DEngine.injectAlpha(HudEditor.getColor(i), 0).getRGB()).next();
+        }
+        tessellator.draw();
+        RenderSystem.enableCull();
+        RenderSystem.disableBlend();
+        stack.pop();
+    }
+
+    public static void updateTargetESP() {
+        prevCircleStep = circleStep;
+        circleStep += 0.15f;
+    }
+
+    public static double absSinAnimation(double input) {
+        return Math.abs(1 + Math.sin(input)) / 2;
     }
 
     public record FillAction(Box box, Color color) {

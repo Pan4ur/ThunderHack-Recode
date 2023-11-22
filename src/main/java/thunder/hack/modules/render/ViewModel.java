@@ -14,9 +14,6 @@ public class ViewModel extends Module {
         super("ViewModel", Category.RENDER);
     }
 
-    public Setting<Boolean> oldAnimationsM = new Setting<>("DisableSwapMain", false);
-    public Setting<Boolean> oldAnimationsOff = new Setting<>("DisableSwapOff", false);
-
     public final Setting<Parent> mainHand = new Setting<>("MainHand", new Parent(false, 0));
     public final Setting<Parent> scaleMain = new Setting<>("Scale", new Parent(false, 1)).withParent(mainHand);
     public final Setting<Float> scaleMainX = new Setting<>("scaleMainX", 1f, 0.1f, 5f).withParent(scaleMain);
@@ -54,8 +51,6 @@ public class ViewModel extends Module {
     public Setting<Boolean> animateOffY = new Setting<>("animateOffY", false).withParent(animateOff);
     public Setting<Boolean> animateOffZ = new Setting<>("animateOffZ", false).withParent(animateOff);
     public final Setting<Float> speedAnimateOff = new Setting<>("speedAnimateOff", 1f, 1f, 5f).withParent(rotationOff);
-    public static Setting<Boolean> slowAnimation = new Setting<>("SlowAnimation", true);
-    public static Setting<Integer> slowAnimationVal = new Setting<>("SlowValue", 6, 1, 50);
     public final Setting<Parent> eatMod = new Setting<>("Eat", new Parent(false, 0));
     public final Setting<Float> eatX = new Setting<>("EatX", 1f, -1f, 2f).withParent(eatMod);
     public final Setting<Float> eatY = new Setting<>("EatY", 1f, -1f, 2f).withParent(eatMod);
@@ -90,20 +85,6 @@ public class ViewModel extends Module {
             event.getStack().multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotationOffX.getValue()));
             event.getStack().multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotationOffY.getValue()));
             event.getStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotationOffZ.getValue()));
-        }
-    }
-
-    @Override
-    public void onUpdate() {
-        if (fullNullCheck()) return;
-        if (oldAnimationsM.getValue() && ((IHeldItemRenderer) mc.getEntityRenderDispatcher().getHeldItemRenderer()).getEquippedProgressMainHand() <= 1f) {
-            ((IHeldItemRenderer) mc.getEntityRenderDispatcher().getHeldItemRenderer()).setEquippedProgressMainHand(1f);
-            ((IHeldItemRenderer) mc.getEntityRenderDispatcher().getHeldItemRenderer()).setItemStackMainHand(mc.player.getMainHandStack());
-        }
-
-        if (oldAnimationsOff.getValue() && ((IHeldItemRenderer) mc.getEntityRenderDispatcher().getHeldItemRenderer()).getEquippedProgressOffHand() <= 1f) {
-            ((IHeldItemRenderer) mc.getEntityRenderDispatcher().getHeldItemRenderer()).setEquippedProgressOffHand(1f);
-            ((IHeldItemRenderer) mc.getEntityRenderDispatcher().getHeldItemRenderer()).setItemStackOffHand(mc.player.getOffHandStack());
         }
     }
 }

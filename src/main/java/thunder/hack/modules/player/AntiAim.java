@@ -30,13 +30,14 @@ public class AntiAim extends Module {
     @EventHandler
     public void onSync(EventSync e) {
         if(allowInteract.getValue() && (mc.options.attackKey.isPressed() || mc.options.attackKey.isPressed())) return;
+        double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
         if (yawMode.getValue() != Mode.None) {
-            mc.player.setYaw(rotationYaw);
+            mc.player.setYaw((float) (rotationYaw - (rotationYaw - mc.player.getYaw()) % gcdFix));
             if (bodySync.getValue())
                 mc.player.setBodyYaw(rotationYaw);
         }
         if (pitchMode.getValue() != Mode.None)
-            mc.player.setPitch(rotationPitch);
+            mc.player.setPitch((float) (rotationPitch - (rotationPitch - mc.player.getPitch()) % gcdFix));
     }
 
     @EventHandler

@@ -1,8 +1,11 @@
 package thunder.hack.modules.combat;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.OtherClientPlayerEntity;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -28,18 +31,19 @@ import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
+import org.joml.Vector4d;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.core.impl.PlayerManager;
 import thunder.hack.events.impl.*;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
@@ -51,6 +55,7 @@ import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.render.animation.CaptureMark;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,7 +82,7 @@ public final class Aura extends Module {
     private static final Setting<BooleanParent> oldDelay = new Setting<>("OldDelay", new BooleanParent(false));
     public static final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 15).withParent(oldDelay);
     public static final Setting<Integer> maxCPS = new Setting<>("MaxCPS", 12, 1, 15).withParent(oldDelay);
-    public final Setting<Boolean> esp = new Setting<>("ESP", true);
+    public final Setting<ESP> esp = new Setting<>("ESP", ESP.ThunderHack);
     public static final Setting<Sort> sort = new Setting<>("Sort", Sort.Distance);
 
     /*   ADVANCED   */
@@ -291,6 +296,9 @@ public final class Aura extends Module {
 
         if (target != null && pullDown.getValue())
             mc.player.addVelocity(0f, -pullValue.getValue() / 1000f, 0f);
+
+        CaptureMark.tick();
+        Render3DEngine.updateTargetESP();
     }
 
     @EventHandler
@@ -508,13 +516,14 @@ public final class Aura extends Module {
         if (mc.player.isFallFlying() || ModuleManager.elytraPlus.isEnabled()) return null;
         return new ArrayList<>(Arrays.asList(trgt.getEyePos(), trgt.getPos().add(0, trgt.getEyeHeight(trgt.getPose()) / 2f, 0f), trgt.getPos().add(0, 0.05f, 0f)))
                 .stream()
-                .min(Comparator.comparing(p -> getYawDelta(rotationPitch, p)))
+                .min(Comparator.comparing(p -> getPitchDelta(rotationPitch, p)))
                 .orElse(null);
     }
 
-    private double getYawDelta(float currentY, Vec3d v) {
+    private double getPitchDelta(float currentY, Vec3d v) {
         return Math.abs(-Math.toDegrees(Math.atan2(v.y - mc.player.getEyePos().getY(), Math.hypot(v.x - mc.player.getX(), v.z - mc.player.getZ()))) - currentY);
     }
+
 
     public void onRender3D(MatrixStack stack) {
         Item handItem = mc.player.getMainHandStack().getItem();
@@ -524,13 +533,19 @@ public final class Aura extends Module {
                 && !(handItem instanceof SwordItem || handItem instanceof AxeItem)))
             return;
 
-        if (esp.getValue())
-            Render3DEngine.drawTargetEsp(stack, target);
+        switch(esp.getValue()) {
+            case CelkaPasta -> Render3DEngine.drawOldTargetEsp(stack, target);
+            case NurikZapen -> CaptureMark.render(target);
+            case ThunderHack -> Render3DEngine.drawTargetEsp(stack, target);
+        }
 
         if (clientLook.getValue() && rotationMode.getValue() != Rotation.None) {
             mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.prevYaw, rotationYaw, mc.getTickDelta()));
             mc.player.setPitch((float) Render2DEngine.interpolate(mc.player.prevPitch, rotationPitch, mc.getTickDelta()));
         }
+    }
+
+    public void onRender2D(DrawContext context) {
     }
 
     @Override
@@ -774,7 +789,7 @@ public final class Aura extends Module {
         MainHand, OffHand, None
     }
 
-    public enum EventMode {
-        Render, Update
+    public enum ESP {
+        Off, ThunderHack, NurikZapen, CelkaPasta
     }
 }

@@ -2,19 +2,21 @@ package thunder.hack.modules.render;
 
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import thunder.hack.events.impl.EventKeyboardInput;
+import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.movement.HoleSnap;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.MovementUtility;
-import thunder.hack.utility.player.PlayerEntityCopy;
 import thunder.hack.utility.render.Render2DEngine;
 
 public class FreeCam extends Module {
     private final Setting<Float> speed = new Setting<>("HSpeed", 1f, 0.0f, 3f);
     private final Setting<Float> hspeed = new Setting<>("VSpeed", 0.42f, 0.0f, 3f);
+    private final Setting<Boolean> freeze = new Setting<>("Freeze", false);
+
 
     private float fakeYaw, fakePitch, prevFakeYaw, prevFakePitch;
     private double fakeX, fakeY, fakeZ, prevFakeX, prevFakeY, prevFakeZ;
@@ -47,11 +49,10 @@ public class FreeCam extends Module {
     public void onDisable() {
         if (fullNullCheck()) return;
         mc.chunkCullingEnabled = true;
-
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onSync(EventSync e){
+    public void onSync(EventSync e) {
 
         prevFakeYaw = fakeYaw;
         prevFakePitch = fakePitch;
@@ -86,6 +87,21 @@ public class FreeCam extends Module {
         mc.player.input.sneaking = false;
     }
 
+    @EventHandler(priority = EventPriority.LOW)
+    public void onMove(EventMove e) {
+        if (freeze.getValue()) {
+            e.setX(0.);
+            e.setY(0.);
+            e.setZ(0.);
+            e.cancel();
+        }
+    }
+
+    @EventHandler
+    public void onPacketSend(PacketEvent.Send e) {
+        if (freeze.getValue() && e.getPacket() instanceof PlayerMoveC2SPacket)
+            e.cancel();
+    }
 
     public float getFakeYaw() {
         return (float) Render2DEngine.interpolate(prevFakeYaw, fakeYaw, mc.getTickDelta());

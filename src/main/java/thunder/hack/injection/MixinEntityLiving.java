@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventTravel;
+import thunder.hack.modules.render.Animations;
 import thunder.hack.modules.render.ViewModel;
 import thunder.hack.utility.interfaces.IEntityLiving;
 
@@ -26,8 +27,8 @@ public class MixinEntityLiving implements IEntityLiving {
 
     @Inject(method = {"getHandSwingDuration"}, at = {@At("HEAD")}, cancellable = true)
     private void getArmSwingAnimationEnd(final CallbackInfoReturnable<Integer> info) {
-        if (ModuleManager.viewModel.isEnabled() && ViewModel.slowAnimation.getValue())
-            info.setReturnValue(ViewModel.slowAnimationVal.getValue());
+        if (ModuleManager.animations.isEnabled() && Animations.slowAnimation.getValue())
+            info.setReturnValue(Animations.slowAnimationVal.getValue());
     }
 
     double prevServerX, prevServerY, prevServerZ;
