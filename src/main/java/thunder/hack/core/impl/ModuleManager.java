@@ -63,6 +63,7 @@ public class ModuleManager implements IManager {
     public static ChestStealer chestStealer = new ChestStealer();
     public static AutoTpAccept autoTpAccept = new AutoTpAccept();
     public static AntiServerRP antiServerRP = new AntiServerRP();
+    public static TotemCounter totemCounter = new TotemCounter();
     public static PearlChaser pearlChaser = new PearlChaser();
     public static WorldTweaks worldTweaks = new WorldTweaks();
     public static VisualRange visualRange = new VisualRange();
@@ -101,6 +102,7 @@ public class ModuleManager implements IManager {
     public static Animations animations = new Animations();
     public static DamageTint damageTint = new DamageTint();
     public static AntiAttack antiAttack = new AntiAttack();
+    public static GapplesHud gapplesHud = new GapplesHud();
     public static ToolSaver toolSaver = new ToolSaver();
     public static DamageFly damageFly = new DamageFly();
     public static WayPoints wayPoints = new WayPoints();
@@ -131,6 +133,7 @@ public class ModuleManager implements IManager {
     public static Scaffold scaffold = new Scaffold();
     public static PopChams popChams = new PopChams();
     public static NoRender noRender = new NoRender();
+    public static FTHelper fTHelper = new FTHelper();
     public static NameTags nameTags = new NameTags();
     public static LongJump longJump = new LongJump();
     public static KeyBinds keyBinds = new KeyBinds();

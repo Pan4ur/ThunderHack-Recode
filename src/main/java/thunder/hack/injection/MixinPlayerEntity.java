@@ -3,8 +3,10 @@ package thunder.hack.injection;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventAttack;
+import thunder.hack.events.impl.EventEatFood;
 import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.modules.client.Media;
@@ -79,13 +82,16 @@ public class MixinPlayerEntity {
 
     @Inject(method = "jump", at = @At("HEAD"))
     private void onJumpPre(CallbackInfo ci) {
-        final EventPlayerJump event = new EventPlayerJump(true);
-        ThunderHack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(new EventPlayerJump(true));
     }
 
     @Inject(method = "jump", at = @At("RETURN"))
     private void onJumpPost(CallbackInfo ci) {
-        final EventPlayerJump event = new EventPlayerJump(false);
-        ThunderHack.EVENT_BUS.post(event);
+        ThunderHack.EVENT_BUS.post(new EventPlayerJump(false));
+    }
+
+    @Inject(method = "eatFood", at = @At("RETURN"))
+    public void eatFoodHook(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
+        ThunderHack.EVENT_BUS.post(new EventEatFood(cir.getReturnValue()));
     }
 }

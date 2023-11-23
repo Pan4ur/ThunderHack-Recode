@@ -27,7 +27,7 @@ public class TimerIndicator extends HudElement {
         float f5 = Math.min(Timer.violation, f4);
         status = (int) (((f4 - f5) / f4) * 100);
         status = MathUtility.clamp(status, 0, 100);
-        FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), status >= 99 ? "100%" : status + "%", getPosX() + 31, getPosY() + 2, new Color(200, 200, 200, 255).getRGB());
+        //FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), status >= 99 ? "100%" : status + "%", getPosX() + 31, getPosY() + 2, new Color(200, 200, 200, 255).getRGB());
     }
 
     @Override

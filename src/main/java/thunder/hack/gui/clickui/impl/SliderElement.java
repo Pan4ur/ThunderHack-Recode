@@ -5,6 +5,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
+import thunder.hack.cmd.Command;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.ClickGui;
@@ -17,50 +18,29 @@ import java.util.Objects;
 
 public class SliderElement extends AbstractElement {
 
+    private final float min, max;
     private float animation;
-    private double stranimation;
-    private boolean dragging;
-
-    private final float min;
-    private final float max;
+    private boolean dragging, listening;
+    public String Stringnumber = "";
 
     public SliderElement(Setting setting) {
         super(setting);
-        this.min = ((Number) setting.getMin()).floatValue();
-        this.max = ((Number) setting.getMax()).floatValue();
+        min = ((Number) setting.getMin()).floatValue();
+        max = ((Number) setting.getMax()).floatValue();
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        double currentPos = (((Number) setting.getValue()).floatValue() - min) / (max - min);
-        stranimation = stranimation + (((Number) setting.getValue()).floatValue() * 100 / 100 - stranimation) / 2.0D;
-        animation = Render2DEngine.scrollAnimate(animation, (float) currentPos, .5f);
+        animation = Render2DEngine.scrollAnimate(animation, (((Number) setting.getValue()).floatValue() - min) / (max - min), 0.9f);
 
         MatrixStack matrixStack = context.getMatrices();
 
-        String value = "";
-
-        if (setting.getValue() instanceof Float)
-            value = String.valueOf(MathUtility.round((Float) setting.getValue(), 2));
-
-        if (setting.getValue() instanceof Integer)
-            value = String.valueOf(MathUtility.round((Integer) setting.getValue(), 2));
-
-        if(setting.parent != null) {
-            Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, (float) (1f), 18, ClickGui.getInstance().getColor(1));
-        }
+        if(setting.parent != null)
+            Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, 1f, 18, ClickGui.getInstance().getColor(1));
 
         FontRenderers.settings.drawString(matrixStack, setting.getName(), (setting.parent != null ? 2f : 0f) + (int) (x + 6), (int) (y + 4), new Color(-1).getRGB());
-
-        if (!listening) {
-            FontRenderers.getSettingsRenderer().drawString(matrixStack, value, (int) (x + width - 6 - FontRenderers.getSettingsRenderer().getStringWidth(value)), (int) y + 5, new Color(-1).getRGB());
-        } else {
-            if (Objects.equals(Stringnumber, ""))
-                FontRenderers.getSettingsRenderer().drawString(matrixStack, "...", (int) (x + width - 6 - FontRenderers.getSettingsRenderer().getStringWidth(value)), (int) y + 5, new Color(-1).getRGB());
-            else
-                FontRenderers.getSettingsRenderer().drawString(matrixStack, Stringnumber, (int) (x + width - 6 - FontRenderers.getSettingsRenderer().getStringWidth(value)), (int) y + 5, new Color(-1).getRGB());
-        }
+        FontRenderers.settings.drawString(matrixStack, listening ? (Objects.equals(Stringnumber, "") ? "..." : Stringnumber) : setting.getValue() + "", (int) (x + width - 6 - FontRenderers.getSettingsRenderer().getStringWidth(setting.getValue() + "")), (int) y + 5, new Color(-1).getRGB());
 
         Render2DEngine.drawRound(matrixStack, (float) (x + 6), (float) (y + height - 6), (float) (width - 12), 1, 0.5f, new Color(0xff0E0E0E));
         Render2DEngine.drawRound(matrixStack, (float) (x + 6), (float) (y + height - 6), (float) ((width - 12) * animation), 1, 0.5f, new Color(0xFFE1E1E1));
@@ -73,24 +53,21 @@ public class SliderElement extends AbstractElement {
     }
 
     private void setValue(int mouseX, double x, double width) {
-        double diff = ((Number) setting.getMax()).floatValue() - ((Number) setting.getMin()).floatValue();
-        double percentBar = MathHelper.clamp(((float) mouseX - x) / width, 0.0, 1.0);
-        double value = ((Number) setting.getMin()).floatValue() + percentBar * diff;
-
-        if (this.setting.getValue() instanceof Float) {
-            this.setting.setValue((float) value);
-        } else if (this.setting.getValue() instanceof Integer) {
-            this.setting.setValue((int) value);
+        float value = Render2DEngine.interpolateFloat(((Number) setting.getMin()).floatValue(), ((Number) setting.getMax()).floatValue(), MathHelper.clamp(((float) mouseX - x) / width, 0.0, 1.0));
+        if (setting.getValue() instanceof Float) {
+            setting.setValue(MathUtility.round2(value));
+        } else if (setting.getValue() instanceof Integer) {
+            setting.setValue((int) value);
         }
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (button == 0 && hovered) {
-            this.dragging = true;
+            dragging = true;
         } else if (hovered) {
             Stringnumber = "";
-            this.listening = true;
+            listening = true;
         }
         if (listening)
             ThunderHack.currentKeyListener = ThunderHack.KeyListening.Sliders;
@@ -99,18 +76,15 @@ public class SliderElement extends AbstractElement {
 
     @Override
     public void mouseReleased(int mouseX, int mouseY, int button) {
-        this.dragging = false;
+        dragging = false;
     }
-
-    public boolean listening;
-    public String Stringnumber = "";
 
     @Override
     public void keyTyped(int keyCode) {
         if (ThunderHack.currentKeyListener != ThunderHack.KeyListening.Sliders)
             return;
 
-        if (this.listening) {
+        if (listening) {
             switch (keyCode) {
                 case GLFW.GLFW_KEY_ESCAPE -> {
                     listening = false;
@@ -119,7 +93,7 @@ public class SliderElement extends AbstractElement {
                 }
                 case GLFW.GLFW_KEY_ENTER -> {
                     try {
-                        this.searchNumber();
+                        searchNumber();
                     } catch (Exception e) {
                         Stringnumber = "";
                         listening = false;
@@ -127,7 +101,7 @@ public class SliderElement extends AbstractElement {
                     return;
                 }
                 case GLFW.GLFW_KEY_BACKSPACE -> {
-                    this.Stringnumber = removeLastChar(this.Stringnumber);
+                    Stringnumber = removeLastChar(Stringnumber);
                     return;
                 }
 
@@ -137,25 +111,25 @@ public class SliderElement extends AbstractElement {
                     return;
                 }
             }
-            this.Stringnumber = this.Stringnumber + GLFW.glfwGetKeyName(keyCode, 0);
+            Stringnumber = Stringnumber + GLFW.glfwGetKeyName(keyCode, 0);
         }
     }
 
     public static String removeLastChar(String str) {
         String output = "";
-        if (str != null && str.length() > 0) {
+        if (str != null && !str.isEmpty()) {
             output = str.substring(0, str.length() - 1);
         }
         return output;
     }
 
     private void searchNumber() {
-        if (this.setting.getValue() instanceof Float) {
-            this.setting.setValue(Float.valueOf(Stringnumber));
+        if (setting.getValue() instanceof Float) {
+            setting.setValue(Float.valueOf(Stringnumber));
             Stringnumber = "";
             listening = false;
-        } else if (this.setting.getValue() instanceof Integer) {
-            this.setting.setValue(Integer.valueOf(Stringnumber));
+        } else if (setting.getValue() instanceof Integer) {
+            setting.setValue(Integer.valueOf(Stringnumber));
             Stringnumber = "";
             listening = false;
         }

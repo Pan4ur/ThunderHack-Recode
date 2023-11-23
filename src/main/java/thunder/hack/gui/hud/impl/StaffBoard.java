@@ -90,7 +90,7 @@ public class StaffBoard extends HudElement {
         if (mc.getCurrentServerEntry() != null && mc.getCurrentServerEntry().address.contains("mcfunny")) {
             return name.contains("helper") || name.contains("moder") || name.contains("модер") || name.contains("хелпер");
         }
-        return name.contains("helper") || name.contains("moder") || name.contains("admin") || name.contains("owner") || name.contains("curator") || name.contains("куратор") || name.contains("модер") || name.contains("админ") || name.contains("хелпер");
+        return name.contains("helper") || name.contains("moder") || name.contains("admin") || name.contains("owner") || name.contains("curator") || name.contains("куратор") || name.contains("модер") || name.contains("админ") || name.contains("хелпер") || name.contains("поддержка");
     }
 
     public void onRender2D(DrawContext context) {
@@ -98,51 +98,51 @@ public class StaffBoard extends HudElement {
         List<String> all = new java.util.ArrayList<>();
         all.addAll(players);
         all.addAll(notSpec);
-        float scale_x = 50;
+        float scale_x = 35;
         for (String player : all) {
             if (player != null) {
-                String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "VANISH" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "VANISH " + Formatting.YELLOW + "(NEAR!)" : Formatting.GREEN + "ACTIVE");
-                if (FontRenderers.modules.getStringWidth(a) > scale_x)
-                    scale_x = FontRenderers.modules.getStringWidth(a);
+                String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "SPEC" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "SPEC " + Formatting.YELLOW + "(GM3)" : Formatting.GREEN + "Z");
+                if (FontRenderers.sf_bold_mini.getStringWidth(a) > scale_x)
+                    scale_x = FontRenderers.sf_bold_mini.getStringWidth(a);
             }
         }
 
-        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "StaffBoard", getPosX() + scale_x / 2 + 10, getPosY() + 2 , -1);
-        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + scale_x / 2f - 2 + 10, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
-        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + scale_x / 2f - 2 + 10, getPosY() + 13.7f, getPosX() + 2 + scale_x - 4 + 20, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "StaffBoard", getPosX() + (scale_x + 15) / 2f, getPosY() + 2 , -1);
+        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + (scale_x + 15) / 2f, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
+        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + (scale_x + 15) / 2f, getPosY() + 13.7f, getPosX() + scale_x + 13, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
 
-        int y_offset = 11;
+        int y_offset = 5;
         for (String player : all) {
-            String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "VANISH" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "VANISH " + Formatting.YELLOW + "(NEAR!)" : Formatting.GREEN + "ACTIVE");
+            String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "SPEC" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "SPEC " + Formatting.YELLOW + "(GM3)" : Formatting.GREEN + "Z");
 
-            if(a.contains("VANISH") && ModuleManager.autoLeave.isEnabled())
+            if(a.contains("SPEC") && ModuleManager.autoLeave.isEnabled())
                 ModuleManager.autoLeave.onStaff();
 
-            FontRenderers.modules.drawString(context.getMatrices(), a, getPosX() + 5, getPosY() + 18 + y_offset, -1, false);
-            y_offset += 13;
+            FontRenderers.sf_bold_mini.drawString(context.getMatrices(), a, getPosX() + 5, getPosY() + 18 + y_offset, -1, false);
+            y_offset += 11;
         }
     }
 
     public void onRenderShaders(DrawContext context) {
-        int y_offset1 = 11;
-        float scale_x = 50;
+        int y_offset1 = 5;
+        float scale_x = 35;
         List<String> all = new java.util.ArrayList<>();
         all.addAll(players);
         all.addAll(notSpec);
 
         for (String player : all) {
             if (player != null) {
-                String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "VANISH" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "VANISH " + Formatting.YELLOW + "(NEAR!)" : Formatting.GREEN + "ACTIVE");
-                if (FontRenderers.modules.getStringWidth(a) > scale_x) {
-                    scale_x = FontRenderers.modules.getStringWidth(a);
+                String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "SPEC" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "SPEC " + Formatting.YELLOW + "(GM3)" : Formatting.GREEN + "Z");
+                if (FontRenderers.sf_bold_mini.getStringWidth(a) > scale_x) {
+                    scale_x = FontRenderers.sf_bold_mini.getStringWidth(a);
                 }
             }
-            y_offset1 += 13;
+            y_offset1 += 11;
         }
 
-        Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), scale_x + 20, 20 + y_offset1, HudEditor.hudRound.getValue(), 10);
-        Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, scale_x + 20 + 1, 21 + y_offset1, HudEditor.hudRound.getValue());
-        Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), scale_x + 20, 20 + y_offset1, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+        Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), scale_x + 15, 20 + y_offset1, HudEditor.hudRound.getValue(), 10);
+        Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, scale_x + 15 + 1, 21 + y_offset1, HudEditor.hudRound.getValue());
+        Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), scale_x + 15, 20 + y_offset1, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
         setBounds((int) (scale_x + 20), 20 + y_offset1);
     }
 

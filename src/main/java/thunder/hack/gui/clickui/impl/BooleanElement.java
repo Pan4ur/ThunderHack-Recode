@@ -21,12 +21,15 @@ public class BooleanElement extends AbstractElement {
         super.render(context,mouseX, mouseY, delta);
         animation = fast(animation, (boolean) setting.getValue() ? 1 : 0, 15f);
         double paddingX = 7 * animation;
-        Color color = ClickGui.getInstance().getColor(0);
-        Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 21), (float) (y + height / 2 - 4), 15, 8, 4, paddingX > 4 ? color : new Color(0xFFB2B1B1));
+
+
+        Render2DEngine.drawBlurredShadow(context.getMatrices(),(float) (x + width - 21), (float) (y + height / 2 - 4), 15, 8, 8, Render2DEngine.injectAlpha(new Color(0x000000), (int) (100 * (paddingX / 7f))));
+
+        Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 21), (float) (y + height / 2 - 4), 15, 8, 4, paddingX > 4 ? ClickGui.getInstance().getColor(0) : new Color(0xFFB2B1B1));
         Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 20 + paddingX), (float) (y + height / 2 - 3), 6, 6, 3, new Color(-1));
 
         if(setting.parent != null) {
-            Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, (float) (1f), 15, ClickGui.getInstance().getColor(1));
+            Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, 1f, 15, ClickGui.getInstance().getColor(1));
         }
 
         FontRenderers.settings.drawString(context.getMatrices(),setting.getName(), (setting.parent != null ? 2f : 0f) + (x + 6), (y + height / 2 - (6 / 2f)) + 2, new Color(-1).getRGB());

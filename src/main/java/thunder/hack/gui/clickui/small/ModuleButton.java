@@ -89,12 +89,12 @@ public class ModuleButton extends AbstractButton {
         if (isOpen()) {
             Color sbg = ClickGui.getInstance().disabled.getValue().getColorObject();
 
-            Render2DEngine.drawRoundDoubleColor(context.getMatrices(), x + 4, y + height - 10, (width - 8), (height) + getElementsHeight() - 6, 2f, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(200), 0.8f) : sbg, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(0), 0.8f) : sbg);
+            Render2DEngine.drawRoundDoubleColor(context.getMatrices(), x + 4, y + height - 12, (width - 8), (height) + getElementsHeight() - 2, 2f, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(200), 0.8f) : sbg, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(0), 0.8f) : sbg);
 
-            if (isOpen()) Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle((float) x, (float) (y + height - 15), (float) ((width) + x + 6), (float) ((height) + y + getElementsHeight())));
+            Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle((float) x, (float) (y + height - 15), (float) ((width) + x + 6), (float) ((height) + y + getElementsHeight())));
 
             context.getMatrices().push();
-            TargetHud.sizeAnimation(context.getMatrices(), x + width / 2 + 6, y + height / 2 - 15, 1f - category_animation);
+            TargetHud.sizeAnimation(context.getMatrices(), x + width / 2 + 6, y + height / 2 - 12, 1f - category_animation);
             double offsetY = 0;
             for (AbstractElement element : elements) {
                 if (!element.isVisible())
@@ -128,9 +128,7 @@ public class ModuleButton extends AbstractButton {
             context.getMatrices().pop();
 
             Render2DEngine.drawBlurredShadow(context.getMatrices(), (int) x + 3, (int) (y + height), (int) width - 6, 3, 13, new Color(0, 0, 0, 255));
-            if (isOpen()) {
-                Render2DEngine.popWindow();
-            }
+            Render2DEngine.popWindow();
         } else category_animation = BooleanElement.fast(1, 0, 1f);
 
 

@@ -193,7 +193,6 @@ public class Scaffold extends Module {
     @EventHandler
     public void onMove(EventMove event) {
         if (fullNullCheck()) return;
-
         if (safewalk.getValue())
             doSafeWalk(event);
     }

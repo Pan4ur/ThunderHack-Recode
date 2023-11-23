@@ -52,6 +52,7 @@ public class NoRender extends Module {
     public Setting<Boolean> items = new Setting<>("Items", false);
     public Setting<Boolean> crystals = new Setting<>("Crystals", false);
     public static Setting<Boolean> fireEntity = new Setting<>("FireEntity", true);
+    public static Setting<Boolean> breakParticles = new Setting<>("BreakParticles", true);
     public Setting<Boolean> antiTitle = new Setting<>("AntiTitle", false);
     public Setting<Boolean> antiPlayerCollision = new Setting<>("AntiPlayerCollision", true);
     public Setting<NoScoreBoard> noScoreBoard = new Setting<>("NoScoreBoard", NoScoreBoard.None);

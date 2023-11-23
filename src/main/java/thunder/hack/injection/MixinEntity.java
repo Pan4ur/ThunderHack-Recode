@@ -1,6 +1,7 @@
 package thunder.hack.injection;
 
 import net.minecraft.entity.MovementType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Shadow;
@@ -75,6 +76,13 @@ public abstract class MixinEntity implements IEntity {
     @Inject(method = "isOnFire", at = @At("HEAD"), cancellable = true)
     public void isOnFireHook(CallbackInfoReturnable<Boolean> cir) {
         if (ModuleManager.noRender.isEnabled() && NoRender.fireEntity.getValue()) {
+            cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
+    public void isInvisibleToHook(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
+        if (ModuleManager.fTHelper.isEnabled() && ModuleManager.fTHelper.trueSight.getValue()) {
             cir.setReturnValue(false);
         }
     }

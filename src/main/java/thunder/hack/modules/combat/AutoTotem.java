@@ -5,6 +5,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.TntEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
@@ -36,7 +37,7 @@ import thunder.hack.utility.player.SearchInvResult;
 
 public final class AutoTotem extends Module {
     private final Setting<OffHand> offhand = new Setting<>("Item", OffHand.Totem);
-    private final Setting<Float> healthF = new Setting<>("HP", 16f, 0f, 20f);
+    private final Setting<Float> healthF = new Setting<>("HP", 16f, 0f, 36f);
     private final Setting<Float> healthS = new Setting<>("ShieldGappleHp", 16f, 0f, 20f, v -> offhand.getValue() == OffHand.Shield);
     private final Setting<Boolean> matrix = new Setting<>("Matrix", true);
     private final Setting<Boolean> stopMotion = new Setting<>("stopMotion", false);
@@ -60,6 +61,8 @@ public final class AutoTotem extends Module {
 
     private int delay;
 
+    private Item prevItem;
+
     public AutoTotem() {
         super("AutoTotem", Category.COMBAT);
         instance = this;
@@ -69,6 +72,7 @@ public final class AutoTotem extends Module {
     public void onSync(EventSync e) {
         swapTo(getItemSlot());
         delay--;
+
     }
 
     @EventHandler
@@ -176,10 +180,10 @@ public final class AutoTotem extends Module {
         Item item = null;
 
         if (offhand.getValue() == OffHand.Totem) {
-            if (!mc.player.getOffHandStack().getName().toString().toLowerCase().contains("руна")
-                    && !mc.player.getOffHandStack().getName().toString().toLowerCase().contains("шар")) {
-                item = Items.TOTEM_OF_UNDYING;
+            if (mc.player.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING) {
+                prevItem = mc.player.getOffHandStack().getItem();
             }
+            item = prevItem;
         } else if (offhand.getValue() == OffHand.Crystal) {
             item = Items.END_CRYSTAL;
         } else if (offhand.getValue() == OffHand.GApple) {
@@ -195,23 +199,22 @@ public final class AutoTotem extends Module {
         } else {
             if (shield.found() || mc.player.getOffHandStack().getItem() == Items.SHIELD) {
                 if (mc.player.getHealth() + mc.player.getAbsorptionAmount() <= healthS.getValue()) {
-                    if (gapple.found()) item = Items.ENCHANTED_GOLDEN_APPLE;
-                    else if (crapple.found()) item = Items.GOLDEN_APPLE;
+                    if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE) item = Items.GOLDEN_APPLE;
+                    else if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE) item = Items.ENCHANTED_GOLDEN_APPLE;
                 } else {
-                    if (!mc.player.getItemCooldownManager().isCoolingDown(Items.SHIELD))
-                        item = Items.SHIELD;
+                    if (!mc.player.getItemCooldownManager().isCoolingDown(Items.SHIELD)) item = Items.SHIELD;
                     else {
-                        if (gapple.found()) item = Items.ENCHANTED_GOLDEN_APPLE;
-                        else if (crapple.found()) item = Items.GOLDEN_APPLE;
+                        if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE) item = Items.GOLDEN_APPLE;
+                        else if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE) item = Items.ENCHANTED_GOLDEN_APPLE;
                     }
                 }
             } else if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE) item = Items.GOLDEN_APPLE;
         }
 
-        if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) <= healthF.getValue() && InventoryUtility.findItemInInventory(Items.TOTEM_OF_UNDYING).found())
+        if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) <= healthF.getValue() && (InventoryUtility.findItemInInventory(Items.TOTEM_OF_UNDYING).found() || mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING))
             item = Items.TOTEM_OF_UNDYING;
 
-        if (rcGap.getValue() && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed()) {
+        if (rcGap.getValue() && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed() && mc.player.getOffHandStack().getItem() != Items.GOLDEN_APPLE) {
             if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
                 item = Items.GOLDEN_APPLE;
             if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
@@ -274,7 +277,17 @@ public final class AutoTotem extends Module {
                 break;
             }
         }
+
         if (item == mc.player.getMainHandStack().getItem() && mc.options.useKey.isPressed()) return -1;
+
+        if(offhand.getValue() == OffHand.Totem) {
+            if (item == Items.TOTEM_OF_UNDYING && mc.player.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING) {
+                prevItem = mc.player.getOffHandStack().getItem();
+            }
+        }
+
+
+
         return itemSlot;
     }
 

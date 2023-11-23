@@ -78,7 +78,7 @@ public class ElytraPlus extends Module {
     private final thunder.hack.utility.Timer strictTimer = new thunder.hack.utility.Timer();
 
     private boolean hasElytra, infiniteFlag, hasTouchedGround, elytraEquiped, flying, startFallFlying;
-    private float acceleration, height, prevClientPitch, infinitePitch;
+    private float acceleration, height, prevClientPitch, infinitePitch, lastInfinitePitch;
     public static long lastStartFalling;
 
     private ItemStack prevArmorItemCopy, getStackInSlotCopy;
@@ -117,7 +117,7 @@ public class ElytraPlus extends Module {
         if (mode.getValue() == Mode.Pitch40Infinite) {
             if (e.isPre()) {
                 prevClientPitch = mc.player.getPitch();
-                mc.player.setPitch(getInfinitePitch());
+                mc.player.setPitch(lastInfinitePitch);
             } else mc.player.setPitch(prevClientPitch);
         }
         if (mode.getValue() == Mode.FireWork) {
@@ -137,7 +137,7 @@ public class ElytraPlus extends Module {
 
         if (mode.getValue() == Mode.Pitch40Infinite) {
             ItemStack is = mc.player.getEquippedStack(EquipmentSlot.CHEST);
-            if (is.isOf(Items.ELYTRA)) mc.player.setPitch(getInfinitePitch());
+            if (is.isOf(Items.ELYTRA)) mc.player.setPitch(lastInfinitePitch);
             if (is.isOf(Items.ELYTRA) && is.getDamage() > 380 && mc.player.age % 100 == 0) {
                 ThunderHack.notificationManager.publicity("Elytra+", isRu() ? "Элитра скоро сломается!" : "Elytra's about to break!", 2, Notification.Type.WARNING);
                 mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.AMBIENT, 10.0f, 1.0F);
@@ -191,6 +191,9 @@ public class ElytraPlus extends Module {
     public void onPlayerUpdate(PlayerUpdateEvent e) {
         if (mode.getValue() == Mode.FireWork) {
             fireWorkOnPlayerUpdate();
+        }
+        if (mode.getValue() == Mode.Pitch40Infinite) {
+            lastInfinitePitch = getInfinitePitch();
         }
     }
 

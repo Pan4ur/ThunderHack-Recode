@@ -126,7 +126,8 @@ public final class HoleFill extends Module {
                 .orElse(null);
 
         if (mode.getValue() == Mode.Target && target == null) return;
-        final PlayerEntity predicted = PredictUtility.predictPlayer(Objects.requireNonNull(target), 3);
+        if(target == null) return;
+        final PlayerEntity predicted = PredictUtility.predictPlayer(target, 3);
 
         int blocksPlaced = 0;
 

@@ -141,6 +141,7 @@ public final class Core {
 
     public void drawGps(DrawContext e) {
         if (ThunderHack.gps_position != null) {
+            float dst = getDistance(ThunderHack.gps_position);
             float xOffset = mc.getWindow().getScaledWidth() / 2f;
             float yOffset = mc.getWindow().getScaledHeight() / 2f;
             float yaw = getRotations(new Vec2f(ThunderHack.gps_position.getX(), ThunderHack.gps_position.getZ())) - mc.player.getYaw();
@@ -152,7 +153,10 @@ public final class Core {
             e.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-yaw));
             e.getMatrices().translate(-xOffset, -yOffset, 0.0F);
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-            FontRenderers.modules.drawCenteredString(e.getMatrices(), "gps (" + getDistance(ThunderHack.gps_position) + "m)", (float) (Math.sin(Math.toRadians(yaw)) * 50f) + xOffset, (float) (yOffset - (Math.cos(Math.toRadians(yaw)) * 50f)) - 20, -1);
+            FontRenderers.modules.drawCenteredString(e.getMatrices(), "gps (" + dst + "m)", (float) (Math.sin(Math.toRadians(yaw)) * 50f) + xOffset, (float) (yOffset - (Math.cos(Math.toRadians(yaw)) * 50f)) - 20, -1);
+
+            if(dst < 10)
+                ThunderHack.gps_position = null;
         }
     }
 

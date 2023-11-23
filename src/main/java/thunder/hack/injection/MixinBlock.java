@@ -3,14 +3,18 @@ package thunder.hack.injection;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.modules.render.NoRender;
 import thunder.hack.modules.render.XRay;
 
 @Mixin(Block.class)
@@ -27,5 +31,11 @@ public abstract class MixinBlock {
         if (MinecraftClient.getInstance() == null) return;
         if (ModuleManager.xray.isEnabled())
             cir.setReturnValue(!XRay.isCheckableOre(state.getBlock()));
+    }
+
+    @Inject(method = "spawnBreakParticles", at = @At("HEAD"), cancellable = true)
+    public void spawnBreakParticlesHook(World world, PlayerEntity player, BlockPos pos, BlockState state, CallbackInfo ci) {
+        if(ModuleManager.noRender.isEnabled() && NoRender.breakParticles.getValue())
+          ci.cancel();
     }
 }
