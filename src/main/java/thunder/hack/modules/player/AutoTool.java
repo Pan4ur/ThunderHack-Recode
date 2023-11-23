@@ -30,10 +30,12 @@ public class AutoTool extends Module {
 
     @Override
     public void onUpdate() {
-        if (!(mc.crosshairTarget instanceof BlockHitResult)) return;
-
+        if (!(mc.crosshairTarget instanceof BlockHitResult )) return;
         BlockHitResult result = (BlockHitResult) mc.crosshairTarget;
         BlockPos pos = result.getBlockPos();
+        if(mc.world.getBlockState(pos).isAir())
+            return;
+
         if (getTool(pos) != -1 && mc.options.attackKey.isPressed()) {
             lastItem.add(mc.player.getInventory().selectedSlot);
 
