@@ -41,6 +41,7 @@ public class Render2DEngine {
     public static final Identifier star = new Identifier("textures/star.png");
     public static final Identifier heart = new Identifier("textures/heart.png");
     public static final Identifier capture = new Identifier("textures/capture.png");
+    public static final Identifier firefly = new Identifier("textures/firefly.png");
 
     public static HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
     final static Stack<Rectangle> clipStack = new Stack<>();

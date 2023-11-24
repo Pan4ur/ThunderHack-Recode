@@ -104,6 +104,7 @@ public class ModuleManager implements IManager {
     public static DamageTint damageTint = new DamageTint();
     public static AntiAttack antiAttack = new AntiAttack();
     public static GapplesHud gapplesHud = new GapplesHud();
+    public static FireFlies fireFlies = new FireFlies();
     public static ToolSaver toolSaver = new ToolSaver();
     public static DamageFly damageFly = new DamageFly();
     public static WayPoints wayPoints = new WayPoints();
