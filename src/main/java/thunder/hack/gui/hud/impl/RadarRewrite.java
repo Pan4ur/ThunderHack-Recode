@@ -16,14 +16,11 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.animation.AstolfoAnimation;
 
 import java.awt.*;
 import java.util.Objects;
 
 public class RadarRewrite extends HudElement {
-    public static AstolfoAnimation astolfo = new AstolfoAnimation();
-
     public static Setting<Boolean> glow = new Setting<>("Glow", false);
     private final Setting<Float> width = new Setting<>("Height", 2.28f, 0.1f, 5f);
     private static final Setting<Float> down = new Setting<>("Down", 3.63f, 0.1F, 20.0F);
@@ -55,11 +52,6 @@ public class RadarRewrite extends HudElement {
 
     public static double interp(double d, double d2) {
         return d2 + (d - d2) * (double) mc.getTickDelta();
-    }
-
-    @Override
-    public void onUpdate() {
-        astolfo.update();
     }
 
     public void onRender2D(DrawContext context) {
@@ -180,7 +172,7 @@ public class RadarRewrite extends HudElement {
             float stage = (i - start) / 360f;
             if (!Objects.equals(direction, ""))
                 switch (Mode2.getValue()) {
-                    case Astolfo -> color = new Color(astolfo.getColor(stage));
+                    case Astolfo -> color = new Color(Render2DEngine.astolfo(false, (int) stage).getRGB());
                     case TwoColor ->
                             color = Render2DEngine.TwoColoreffect(cColor.getValue().getColorObject(), cColor2.getValue().getColorObject(), Math.abs(System.currentTimeMillis() / 1000.) + i * ((20f - colorOffset1.getValue()) / 200));
                 }

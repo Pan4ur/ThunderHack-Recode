@@ -225,44 +225,10 @@ public class Strafe extends Module {
 
     @EventHandler
     public void onUpdate(PlayerUpdateEvent event) {
-
         if ((boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && !mc.player.isOnGround() && mc.player.fallDistance > 0 && !disabled)
                 && (!mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, -1.1f, 0.0f)).iterator().hasNext() || !sunrise.getValue())) {
             disabler(InventoryUtility.getElytra());
         }
-        elytraFix();
-    }
-
-    private final thunder.hack.utility.Timer delay = new Timer();
-
-
-    public void elytraFix() {
-        ItemStack stack = mc.player.currentScreenHandler.getCursorStack();
-        if (stack.getItem() instanceof ArmorItem && delay.passedMs(300)) {
-            if (((ArmorItem) stack.getItem()).getType() == ArmorItem.Type.CHESTPLATE && mc.player.getInventory().getArmorStack(2).getItem() == Items.ELYTRA) {
-                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 6, 0, SlotActionType.PICKUP, mc.player);
-                int nullSlot = findEmptySlot();
-                boolean needDrop = nullSlot == 999;
-                if (needDrop) nullSlot = 9;
-                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, nullSlot, 1, SlotActionType.PICKUP, mc.player);
-                if (needDrop)
-                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, -999, 0, SlotActionType.PICKUP, mc.player);
-                delay.reset();
-            }
-        }
-    }
-
-    public static int findEmptySlot() {
-        for (int i = 0; i < 36; i++) {
-            ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.isEmpty()) {
-                if (i < 9) {
-                    i += 36;
-                }
-                return i;
-            }
-        }
-        return 999;
     }
 
     private enum Boost {

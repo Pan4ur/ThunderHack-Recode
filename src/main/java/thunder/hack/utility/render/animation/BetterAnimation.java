@@ -1,6 +1,5 @@
 package thunder.hack.utility.render.animation;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.MathHelper;
 
 import static thunder.hack.modules.Module.mc;

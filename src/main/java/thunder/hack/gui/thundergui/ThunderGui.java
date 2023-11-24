@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static thunder.hack.modules.Module.mc;
+import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class ThunderGui extends Screen {
     public static CurrentMode currentMode = CurrentMode.Modules;
@@ -101,7 +102,6 @@ public class ThunderGui extends Screen {
 
     public static ThunderGui getThunderGui() {
         open_animation = new BetterAnimation();
-        //open_animation.setTick(5);
         open_direction = true;
         return getInstance();
     }
@@ -112,14 +112,6 @@ public class ThunderGui extends Screen {
             output = str.substring(0, str.length() - 1);
         }
         return output;
-    }
-
-    public static double deltaTime() {
-        return 0.016;
-    }
-
-    public static float fast(float end, float start, float multiple) {
-        return (1 - MathUtility.clamp((float) (deltaTime() * multiple), 0, 1)) * end + MathUtility.clamp((float) (deltaTime() * multiple), 0, 1) * start;
     }
 
     private void setInstance() {
@@ -174,7 +166,6 @@ public class ThunderGui extends Screen {
         context.getMatrices().push();
         mouse_x = mouseX;
         mouse_y = mouseY;
-        //TargetHud.sizeAnimation(context.getMatrices(),main_posX + main_width / 2f, main_posY + main_height / 2f, open_animation.getAnimationd());
         if (open_animation.getAnimationd() > 0) {
             if (!MSAAFramebuffer.framebufferInUse()) {
                 MSAAFramebuffer.use(() -> {
@@ -339,7 +330,6 @@ public class ThunderGui extends Screen {
         if (currentMode != CurrentMode.Modules) {
             searching = false;
 
-            //Render2DEngine.addWindow(context.getMatrices(),(float) Render2DEngine.interpolate(main_posX + 80, main_posX + 200, manager_animation), main_posY + 39, (float) Render2DEngine.interpolate(399, 195, manager_animation) + main_posX + 36, (float) main_height + main_posY - 3, open_animation.getAnimationd());
             Render2DEngine.addWindow(context.getMatrices(), (float) Render2DEngine.interpolate(main_posX + 80, main_posX + 200, manager_animation), main_posY + 39, (float) Render2DEngine.interpolate(399, 195, manager_animation) + main_posX + 36, (float) main_height + main_posY - 3, 1d);
 
             Render2DEngine.drawRound(context.getMatrices(), main_posX + 100, (float) main_posY + 40, (float) 295, (float) main_height - 44, 4f, ThunderHackGui.getColorByTheme(7));
@@ -350,7 +340,6 @@ public class ThunderGui extends Screen {
             Render2DEngine.popWindow();
         }
 
-        //Render2DEngine.addWindow(context.getMatrices(),main_posX + 79, main_posY + 35, main_posX + 396 + 40, main_posY + main_height, open_animation.getAnimationd());
         Render2DEngine.addWindow(context.getMatrices(), main_posX + 79, main_posY + 35, main_posX + 396 + 40, main_posY + main_height, 1d);
 
         this.components.forEach(components -> components.render(context.getMatrices(), mouseX, mouseY));
@@ -414,7 +403,6 @@ public class ThunderGui extends Screen {
         if (scissorX2 < scissorX1) scissorX2 = scissorX1;
         if (scissorY2 < scissorY1) scissorY2 = scissorY1;
 
-        //Render2DEngine.addWindow(context.getMatrices(),scissorX1, scissorY1, scissorX2, scissorY2, open_animation.getAnimationd());
         Render2DEngine.addWindow(context.getMatrices(), scissorX1, scissorY1, scissorX2, scissorY2, 1d);
 
         if (!settings.isEmpty()) {

@@ -4,6 +4,7 @@ import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.client.util.math.MatrixStack;
+import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.io.IOException;
 
@@ -30,7 +31,7 @@ public class SettingElement {
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
         hovered = Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height);
         if (scroll_offsetY != y) {
-            scroll_animation = ThunderGui.fast(scroll_animation, 1, 15f);
+            scroll_animation = AnimationUtility.fast(scroll_animation, 1, 15f);
             y = (int) Render2DEngine.interpolate(prev_offsetY, scroll_offsetY, scroll_animation);
         }
     }

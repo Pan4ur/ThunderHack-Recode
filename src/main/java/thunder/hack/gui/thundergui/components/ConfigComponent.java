@@ -6,6 +6,7 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.modules.client.ThunderHackGui;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
 
@@ -36,7 +37,7 @@ public class ConfigComponent {
 
     public void render(DrawContext context, int MouseX, int MouseY) {
         if (scrollPosY != posY) {
-            scroll_animation = ThunderGui.fast(scroll_animation, 1, 15f);
+            scroll_animation = AnimationUtility.fast(scroll_animation, 1, 15f);
             posY = (int) Render2DEngine.interpolate(prevPosY, scrollPosY, scroll_animation);
         }
 

@@ -33,37 +33,37 @@ import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.PlayerUtility;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.player.ElytraSwap.getChestPlateSlot;
 
 public class ElytraPlus extends Module {
     public ElytraPlus() {
         super("Elytra+", Category.MOVEMENT);
     }
 
-    private final Setting<Mode> mode = new Setting("Mode", Mode.FireWork);
-    private final Setting<Float> xzSpeed = new Setting<>("XZSpeed", 1.55f, 0.5f, 3f, v -> mode.getValue() == Mode.FireWork || mode.getValue() == Mode.Sunrise);
-    private final Setting<Float> ySpeed = new Setting<>("YSpeed", 0.47f, 0f, 2f, v -> mode.getValue() == Mode.FireWork || mode.getValue() == Mode.Sunrise);
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.FireWork);
+    private final Setting<Float> xzSpeed = new Setting<>("XZSpeed", 1.55f, 0.1f, 10f, v -> mode.getValue() != Mode.Boost && mode.getValue() != Mode.Pitch40Infinite);
+    private final Setting<Float> ySpeed = new Setting<>("YSpeed", 0.47f, 0f, 2f, v -> mode.getValue() == Mode.FireWork || mode.getValue() == Mode.SunriseOld);
     private final Setting<Integer> fireSlot = new Setting<>("FireSlot", 1, 1, 9, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Float> fireDelay = new Setting<>("FireDelay", 1.5f, 0f, 1.5f, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> stayMad = new Setting<>("GroundSafe", false, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> keepFlying = new Setting<>("KeepFlying", false, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> disableOnFlag = new Setting<>("DisableOnFlag", false, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> allowFireSwap = new Setting<>("AllowFireSwap", false, v -> mode.getValue() == Mode.FireWork);
-    private final Setting<Boolean> bowBomb = new Setting<>("BowBomb", false, v -> mode.getValue() == Mode.FireWork || mode.getValue() == Mode.Sunrise);
-    public Setting<Bind> bombKey = new Setting<>("BombKey", new Bind(-1, false, false), v -> mode.getValue() == Mode.Sunrise);
-    private final Setting<Boolean> instantFly = new Setting<>("InstantFly", true, v -> (mode.getValue() != Mode.FireWork && mode.getValue() != Mode.Sunrise && mode.getValue() != Mode.Pitch40Infinite));
-    public Setting<Boolean> cruiseControl = new Setting<>("CruiseControl", false, v -> mode.getValue() == Mode.Boost);
-    public Setting<Float> factor = new Setting<>("Factor", 1.5f, 0.1f, 50.0f, v -> (mode.getValue() != Mode.FireWork && mode.getValue() != Mode.Sunrise && mode.getValue() != Mode.Pitch40Infinite));
-    public Setting<Float> upFactor = new Setting<>("UpFactor", 1.0f, 0.0f, 10.0f, v -> mode.getValue() != Mode.Boost);
-    public Setting<Float> downFactor = new Setting<>("DownFactor", 1.0f, 0.0f, 10.0f, v -> (mode.getValue() != Mode.FireWork && mode.getValue() != Mode.Sunrise && mode.getValue() != Mode.Pitch40Infinite));
-    public Setting<Boolean> stopMotion = new Setting<>("StopMotion", true, v -> mode.getValue() == Mode.Boost);
-    public Setting<Float> minUpSpeed = new Setting<>("MinUpSpeed", 0.5f, 0.1f, 5.0f, v -> mode.getValue() == Mode.Boost && cruiseControl.getValue());
-    public Setting<Boolean> forceHeight = new Setting<>("ForceHeight", false, v -> (mode.getValue() == Mode.Boost && cruiseControl.getValue()));
-    private final Setting<Integer> manualHeight = new Setting<>("Height", 121, 1, 256, v -> ((mode.getValue() == Mode.Boost && cruiseControl.getValue())) && forceHeight.getValue());
-    public Setting<Float> speed = new Setting<>("Speed", 1.0f, 0.1f, 10.0f, v -> mode.getValue() == Mode.Control);
+    private final Setting<Boolean> bowBomb = new Setting<>("BowBomb", false, v -> mode.getValue() == Mode.FireWork || mode.getValue() == Mode.SunriseOld);
+    private final Setting<Bind> bombKey = new Setting<>("BombKey", new Bind(-1, false, false), v -> mode.getValue() == Mode.SunriseOld);
+    private final Setting<Boolean> instantFly = new Setting<>("InstantFly", true, v -> (mode.getValue() == Mode.Boost || mode.getValue() == Mode.Control));
+    private final Setting<Boolean> cruiseControl = new Setting<>("CruiseControl", false, v -> mode.getValue() == Mode.Boost);
+    private final Setting<Float> factor = new Setting<>("Factor", 1.5f, 0.1f, 50.0f, v -> mode.getValue() == Mode.Boost);
+    private final Setting<Float> upFactor = new Setting<>("UpFactor", 1.0f, 0.0f, 10.0f, v -> (mode.getValue() == Mode.Boost || mode.getValue() == Mode.Control));
+    private final Setting<Float> downFactor = new Setting<>("DownFactor", 1.0f, 0.0f, 10.0f, v -> (mode.getValue() == Mode.Boost || mode.getValue() == Mode.Control));
+    private final Setting<Boolean> stopMotion = new Setting<>("StopMotion", true, v -> mode.getValue() == Mode.Boost);
+    private final Setting<Float> minUpSpeed = new Setting<>("MinUpSpeed", 0.5f, 0.1f, 5.0f, v -> mode.getValue() == Mode.Boost && cruiseControl.getValue());
+    private final Setting<Boolean> forceHeight = new Setting<>("ForceHeight", false, v -> (mode.getValue() == Mode.Boost && cruiseControl.getValue()));
+    private final Setting<Integer> manualHeight = new Setting<>("Height", 121, 1, 256, v -> mode.getValue() == Mode.Boost && cruiseControl.getValue() && forceHeight.getValue());
     private final Setting<Float> sneakDownSpeed = new Setting<>("DownSpeed", 1.0F, 0.1F, 10.0F, v -> mode.getValue() == Mode.Control);
-    public Setting<Boolean> speedLimit = new Setting<>("SpeedLimit", true, v -> (mode.getValue() != Mode.FireWork && mode.getValue() != Mode.Sunrise && mode.getValue() != Mode.Pitch40Infinite));
-    public Setting<Float> maxSpeed = new Setting<>("MaxSpeed", 2.5f, 0.1f, 10.0f, v -> speedLimit.getValue() && mode.getValue() != Mode.Pitch40Infinite && mode.getValue() != Mode.FireWork );
-    public Setting<Boolean> noDrag = new Setting<>("NoDrag", false, v -> (mode.getValue() != Mode.FireWork && mode.getValue() != Mode.Sunrise && mode.getValue() != Mode.Pitch40Infinite));
+    private final Setting<Boolean> speedLimit = new Setting<>("SpeedLimit", true, v -> (mode.getValue() == Mode.Boost || mode.getValue() == Mode.Control));
+    private final Setting<Float> maxSpeed = new Setting<>("MaxSpeed", 2.5f, 0.1f, 10.0f, v -> (mode.getValue() == Mode.Boost || mode.getValue() == Mode.Control));
+    private final Setting<Boolean> noDrag = new Setting<>("NoDrag", false, v -> (mode.getValue() == Mode.Boost || mode.getValue() == Mode.Control));
     private final Setting<Float> packetDelay = new Setting<>("Limit", 1F, 0.1F, 5F, v -> mode.getValue() == Mode.Boost);
     private final Setting<Float> staticDelay = new Setting<>("Delay", 5F, 0.1F, 20F, v -> mode.getValue() == Mode.Boost);
     private final Setting<Float> timeout = new Setting<>("Timeout", 0.5F, 0.1F, 1F, v -> mode.getValue() == Mode.Boost);
@@ -71,7 +71,7 @@ public class ElytraPlus extends Module {
     private final Setting<Float> infiniteMinSpeed = new Setting<>("InfiniteMinSpeed", 25f, 10f, 70f, v -> mode.getValue() == Mode.Pitch40Infinite);
     private final Setting<Integer> infiniteMaxHeight = new Setting<>("InfiniteMaxHeight", 200, 50, 360, v -> mode.getValue() == Mode.Pitch40Infinite);
 
-    public enum Mode {FireWork, Sunrise, Boost, Control, Pitch40Infinite}
+    public enum Mode {FireWork, SunriseOld, Boost, Control, Pitch40Infinite, SunriseNew}
 
     private final thunder.hack.utility.Timer instantFlyTimer = new thunder.hack.utility.Timer();
     private final thunder.hack.utility.Timer staticTimer = new thunder.hack.utility.Timer();
@@ -128,13 +128,26 @@ public class ElytraPlus extends Module {
                 } else mc.player.setPitch(prevClientPitch);
             }
         }
+        if (mode.getValue() == Mode.SunriseNew) {
+            if (mc.options.jumpKey.isPressed()) {
+                if (e.isPre()) {
+                    prevClientPitch = mc.player.getPitch();
+                    mc.player.setPitch(-45f);
+                } else mc.player.setPitch(prevClientPitch);
+            } else if (mc.options.sneakKey.isPressed()) {
+                if (e.isPre()) {
+                    prevClientPitch = mc.player.getPitch();
+                    mc.player.setPitch(45f);
+                } else mc.player.setPitch(prevClientPitch);
+            }
+        }
     }
 
     @EventHandler
     public void onSync(EventSync e) {
-        if (mode.getValue() == Mode.Sunrise) doSunrise();
+        if (mode.getValue() == Mode.SunriseOld) doSunrise();
+        if (mode.getValue() == Mode.SunriseNew) doSunriseNew();
         if (mode.getValue() == Mode.Control || mode.getValue() == Mode.Boost) doPreLegacy();
-
         if (mode.getValue() == Mode.Pitch40Infinite) {
             ItemStack is = mc.player.getEquippedStack(EquipmentSlot.CHEST);
             if (is.isOf(Items.ELYTRA)) mc.player.setPitch(lastInfinitePitch);
@@ -147,6 +160,50 @@ public class ElytraPlus extends Module {
         if (mode.getValue() == Mode.FireWork) fireworkOnSync();
     }
 
+    private void doSunriseNew() {
+        if (mc.player.horizontalCollision) acceleration = 0;
+        int elytra = InventoryUtility.getElytra();
+        if (elytra == -1) return;
+        if (mc.player.isOnGround()) {
+            mc.player.jump();
+            acceleration = 0;
+        }
+        if (mc.options.jumpKey.isPressed() || mc.options.sneakKey.isPressed()) {
+            acceleration = 0;
+            takeOnElytra();
+        } else {
+            takeOnChestPlate();
+            if (mc.player.age % 8 == 0)
+                matrixDisabler(elytra);
+
+            MovementUtility.setMotion(Math.min((acceleration = (acceleration + 8.0F / xzSpeed.getValue())) / 100.0F, xzSpeed.getValue()));
+            if (!MovementUtility.isMoving()) acceleration = 0;
+            mc.player.setVelocity(mc.player.getVelocity().getX(), -0.005F, mc.player.getVelocity().getZ());
+        }
+    }
+
+    private void takeOnElytra() {
+        int elytra = InventoryUtility.getElytra();
+        if (elytra == -1) return;
+        elytra = elytra >= 0 && elytra < 9 ? elytra + 36 : elytra;
+        if (elytra != -2) {
+            clickSlot(elytra);
+            clickSlot(6);
+            clickSlot(elytra);
+            mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+        }
+    }
+
+    private void takeOnChestPlate() {
+        int slot = getChestPlateSlot();
+        if (slot == -1) return;
+        if (slot != -2) {
+            clickSlot(slot);
+            clickSlot(6);
+            clickSlot(slot);
+        }
+    }
+
     private float getInfinitePitch() {
         if (mc.player.getY() < infiniteMaxHeight.getValue()) {
             if (ThunderHack.playerManager.currentPlayerSpeed * 72f < infiniteMinSpeed.getValue() && !infiniteFlag)
@@ -155,8 +212,8 @@ public class ElytraPlus extends Module {
                 infiniteFlag = false;
         } else infiniteFlag = true;
 
-        if (infiniteFlag) infinitePitch++;
-        else infinitePitch--;
+        if (infiniteFlag) infinitePitch+=3;
+        else infinitePitch-=3;
 
         infinitePitch = MathUtility.clamp(infinitePitch, -40, 40);
         return infinitePitch;
@@ -193,7 +250,7 @@ public class ElytraPlus extends Module {
             fireWorkOnPlayerUpdate();
         }
         if (mode.getValue() == Mode.Pitch40Infinite) {
-            lastInfinitePitch = getInfinitePitch();
+            lastInfinitePitch = PlayerUtility.fixAngle(getInfinitePitch());
         }
     }
 
@@ -201,7 +258,8 @@ public class ElytraPlus extends Module {
     public void onPacketReceive(PacketEvent.Receive e) {
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             acceleration = 0;
-            if (disableOnFlag.getValue() && mode.getValue() == Mode.FireWork) disable(isRu() ? "Выключен из-за флага!" : "Disabled due to flag!");
+            if (disableOnFlag.getValue() && mode.getValue() == Mode.FireWork)
+                disable(isRu() ? "Выключен из-за флага!" : "Disabled due to flag!");
         }
     }
 
@@ -234,8 +292,8 @@ public class ElytraPlus extends Module {
     }
 
     private void doSunrise() {
-        if (mc.player.horizontalCollision) acceleration = 0;
-
+        if (mc.player.horizontalCollision)
+            acceleration = 0;
         if (mc.player.verticalCollision) {
             acceleration = 0;
             mc.player.setVelocity(mc.player.getVelocity().getX(), 0.41999998688697815, mc.player.getVelocity().getZ());
@@ -249,16 +307,14 @@ public class ElytraPlus extends Module {
         if (mc.player.fallDistance > 0.25f) {
             MovementUtility.setMotion(Math.min((acceleration = (acceleration + 11.0F / xzSpeed.getValue())) / 100.0F, xzSpeed.getValue()));
             if (!MovementUtility.isMoving()) acceleration = 0;
-            if (!bowBomb.getValue() && !mc.player.isOnGround())
+
+            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), bombKey.getValue().getKey())) {
+                MovementUtility.setMotion(0.8f);
+                mc.player.setVelocity(mc.player.getVelocity().getX(), mc.player.age % 2 == 0 ? 0.41999998688697815 : -0.41999998688697815, mc.player.getVelocity().getZ());
+                acceleration = 70;
+            } else
                 mc.player.setVelocity(mc.player.getVelocity().getX(), -0.01F - (mc.player.age % 2 == 0 ? 1.0E-4F : 0.006F), mc.player.getVelocity().getZ());
-            if (bowBomb.getValue()) {
-                if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), bombKey.getValue().getKey())) {
-                    MovementUtility.setMotion(0.8f);
-                    mc.player.setVelocity(mc.player.getVelocity().getX(), mc.player.age % 2 == 0 ? 0.41999998688697815 : -0.41999998688697815, mc.player.getVelocity().getZ());
-                    acceleration = 70;
-                } else
-                    mc.player.setVelocity(mc.player.getVelocity().getX(), -0.01F - (mc.player.age % 2 == 0 ? 1.0E-4F : 0.006F), mc.player.getVelocity().getZ());
-            }
+
 
             if (!mc.player.isSneaking() && mc.options.jumpKey.isPressed())
                 mc.player.setVelocity(mc.player.getVelocity().getX(), ySpeed.getValue(), mc.player.getVelocity().getZ());
@@ -281,8 +337,8 @@ public class ElytraPlus extends Module {
         float moveForward = mc.player.input.movementForward;
 
         if (cruiseControl.getValue()) {
-            if (mc.options.jumpKey.isPressed()) height += upFactor.getValue() * 0.5;
-            else if (mc.player.input.sneaking) height -= downFactor.getValue() * 0.5;
+            if (mc.options.jumpKey.isPressed()) height += upFactor.getValue() * 0.5f;
+            else if (mc.options.sneakKey.isPressed()) height -= downFactor.getValue() * 0.5f;
 
             if (forceHeight.getValue()) height = manualHeight.getValue();
 
@@ -400,7 +456,7 @@ public class ElytraPlus extends Module {
         }
 
         if (!mc.options.jumpKey.isPressed()) {
-            double[] dir = MovementUtility.forward(speed.getValue());
+            double[] dir = MovementUtility.forward(xzSpeed.getValue());
             e.setX(dir[0]);
             e.setZ(dir[1]);
         }

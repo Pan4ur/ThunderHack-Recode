@@ -4,7 +4,9 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.s2c.play.EntityAnimationS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.PacketEvent;
@@ -15,6 +17,7 @@ import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,23 +32,21 @@ public class KillFeed extends HudElement {
 
     private final List<String> players = new ArrayList<>();
 
+    private float vAnimation, hAnimation;
+
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        float scale_x = 50;
-        for (String player : players) {
-            if (FontRenderers.modules.getStringWidth(player) > scale_x)
-                scale_x = FontRenderers.modules.getStringWidth(player);
-        }
+        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KillFeed", getPosX() + hAnimation / 2, getPosY() + 2, -1);
+        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
+        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
 
-        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KillFeed", getPosX() + scale_x / 2 + 10, getPosY() + 2, -1);
-        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + scale_x / 2f - 2 + 10, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
-        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + scale_x / 2f - 2 + 10, getPosY() + 13.7f, getPosX() + 2 + scale_x - 4 + 20, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
-
+        Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
         int y_offset = 6;
         for (String player : players) {
             FontRenderers.modules.drawString(context.getMatrices(), player, getPosX() + 5, getPosY() + 18 + y_offset, -1, false);
             y_offset += 10;
         }
+        Render2DEngine.popWindow();
     }
 
     public void onRenderShaders(DrawContext context) {
@@ -58,9 +59,12 @@ public class KillFeed extends HudElement {
             y_offset1 += 10;
         }
 
-        Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), scale_x + 20, 20 + y_offset1, HudEditor.hudRound.getValue(), 10);
-        Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, scale_x + 20 + 1, 21 + y_offset1, HudEditor.hudRound.getValue());
-        Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), scale_x + 20, 20 + y_offset1, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+        vAnimation = AnimationUtility.fast(vAnimation, 20 + y_offset1, 15);
+        hAnimation = AnimationUtility.fast(hAnimation, scale_x + 20, 15);
+
+        Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue(), 10);
+        Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, hAnimation + 1, 1 + vAnimation, HudEditor.hudRound.getValue());
+        Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
         setBounds((int) (scale_x + 20), 20 + y_offset1);
     }
 

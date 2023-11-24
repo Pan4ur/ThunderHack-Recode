@@ -13,20 +13,13 @@ import net.minecraft.client.util.math.MatrixStack;
 import java.awt.*;
 
 import static thunder.hack.utility.math.MathUtility.clamp;
+import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class BooleanComponent extends SettingElement {
     float animation = 0f;
 
     public BooleanComponent(Setting setting) {
         super(setting);
-    }
-
-    public static double deltaTime() {
-        return FrameRateCounter.INSTANCE.getFps() > 0 ? (1.0000 / FrameRateCounter.INSTANCE.getFps() ) : 1;
-    }
-
-    public static float fast(float end, float start, float multiple) {
-        return (1 - MathUtility.clamp((float) (deltaTime() * multiple), 0, 1)) * end + MathUtility.clamp((float) (deltaTime() * multiple), 0, 1) * start;
     }
 
     @Override

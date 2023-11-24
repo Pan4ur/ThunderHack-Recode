@@ -11,9 +11,6 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.animation.Animation;
-import thunder.hack.utility.render.animation.Direction;
-import thunder.hack.utility.render.animation.EaseBackIn;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -21,8 +18,6 @@ import java.util.List;
 
 public class ModuleWindow extends AbstractWindow {
     private final Identifier ICON;
-
-    private final Animation animation = new EaseBackIn(270, 1f, 1.03f, Direction.BACKWARDS);
 
     private boolean scrollHover;
     private List<AbstractButton> buttons;
@@ -50,16 +45,15 @@ public class ModuleWindow extends AbstractWindow {
 
         scrollHover = Render2DEngine.isHovered(mouseX, mouseY, x, y + height, width, 4000);
 
-        animation.setDirection(isOpen() ? Direction.FORWARDS : Direction.BACKWARDS);
         context.getMatrices().push();
 
         boolean popStack = false;
 
         float height1;
         if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old || (getButtonsHeight() + 8) < ModuleManager.clickGui.catHeight.getValue()) {
-            height1 = (float) ((getButtonsHeight() + 8) * animation.getOutput());
+            height1 = (float) ((getButtonsHeight() + 8));
         } else {
-            height1 = (float) ((ModuleManager.clickGui.catHeight.getValue()) * animation.getOutput());
+            height1 = (float) ((ModuleManager.clickGui.catHeight.getValue()));
         }
 
         if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old || (getButtonsHeight() + 8) < ModuleManager.clickGui.catHeight.getValue()) {
@@ -70,11 +64,11 @@ public class ModuleWindow extends AbstractWindow {
             if (ModuleManager.clickGui.outline.getValue())
                 Render2DEngine.drawRound(context.getMatrices(), (float) x + 2, (float) (y + height - 7), (float) width - 4, height1 + 2, 3, ClickGui.getInstance().getColor(1));
             Render2DEngine.drawRound(context.getMatrices(), (float) x + 3, (float) (y + height - 6), (float) width - 6, height1, 3, ClickGui.getInstance().plateColor.getValue().getColorObject());
-            Render2DEngine.addWindow(context.getMatrices(), (float) x + 3, (float) (y + height - 6), (float) (x + 3 + (float) width - 6), (float) ((y + height - 6) + (float) ((ModuleManager.clickGui.catHeight.getValue()) * animation.getOutput())), 1f);
+            Render2DEngine.addWindow(context.getMatrices(), (float) x + 3, (float) (y + height - 6), (float) (x + 3 + (float) width - 6), (float) ((y + height - 6) + (float) ((ModuleManager.clickGui.catHeight.getValue()))), 1f);
             popStack = true;
         }
 
-        if (animation.finished(Direction.FORWARDS)) {
+        if (isOpen()) {
             Render2DEngine.drawBlurredShadow(context.getMatrices(), (int) x + 4, (int) (y + height - 6), (int) width - 8, 8, 7, new Color(0, 0, 0, 180));
             for (AbstractButton button : buttons) {
                 if (button instanceof ModuleButton mb && SearchBar.listening && !mb.module.getName().toLowerCase().contains(SearchBar.moduleName))

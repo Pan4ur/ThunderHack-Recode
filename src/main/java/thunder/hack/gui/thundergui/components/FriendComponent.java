@@ -10,6 +10,7 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.util.Identifier;
+import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
 import java.io.IOException;
@@ -102,7 +103,7 @@ public class FriendComponent {
 
     public void render(DrawContext context, int MouseX, int MouseY) {
         if (scrollPosY != posY) {
-            scroll_animation = ThunderGui.fast(scroll_animation, 1, 15f);
+            scroll_animation = AnimationUtility.fast(scroll_animation, 1, 15f);
             posY = (int) Render2DEngine.interpolate(prevPosY, scrollPosY, scroll_animation);
         }
         if ((posY > ThunderGui.getInstance().main_posY + ThunderGui.getInstance().height) || posY < ThunderGui.getInstance().main_posY) {

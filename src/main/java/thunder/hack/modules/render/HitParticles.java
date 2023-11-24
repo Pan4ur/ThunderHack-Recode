@@ -91,7 +91,15 @@ public class HitParticles extends Module {
             if (posBlock(x, y - starsScale.getValue() / 10f, z)) {
                 motionY = -motionY / 1.1;
             } else {
-                if (posBlock(x, y, z) || posBlock(x, y, z) || posBlock(x, y, z) || posBlock(x - sp, y, z - sp) || posBlock(x + sp, y, z + sp) || posBlock(x + sp, y, z - sp) || posBlock(x - sp, y, z + sp) || posBlock(x + sp, y, z) || posBlock(x - sp, y, z) || posBlock(x, y, z + sp) || posBlock(x, y, z - sp) || posBlock(x - sp, y, z - sp) || posBlock(x + sp, y, z + sp) || posBlock(x + sp, y, z - sp) || posBlock(x - sp, y, z + sp) || posBlock(x + sp, y, z) || posBlock(x - sp, y, z) || posBlock(x, y, z + sp) || posBlock(x, y, z - sp) || posBlock(x - sp, y, z - sp) || posBlock(x + sp, y, z + sp) || posBlock(x + sp, y, z - sp) || posBlock(x - sp, y, z + sp) || posBlock(x + sp, y, z) || posBlock(x - sp, y, z) || posBlock(x, y, z + sp) || posBlock(x, y, z - sp)) {
+                if (posBlock(x - sp, y, z - sp)
+                        || posBlock(x + sp, y, z + sp)
+                        || posBlock(x + sp, y, z - sp)
+                        || posBlock(x - sp, y, z + sp)
+                        || posBlock(x + sp, y, z)
+                        || posBlock(x - sp, y, z)
+                        || posBlock(x, y, z + sp)
+                        || posBlock(x, y, z - sp)
+                ) {
                     motionX = -motionX;
                     motionZ = -motionZ;
                 }

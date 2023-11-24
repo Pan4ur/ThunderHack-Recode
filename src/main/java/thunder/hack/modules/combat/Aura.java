@@ -625,8 +625,7 @@ public final class Aura extends Module {
         float[] rotation;
 
         // Если мы перестали смотреть на цель
-        if (!lookingAtHitbox) {
-
+        if (!ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), ignoreWalls.getValue().isEnabled(), rayTrace.getValue())) {
             float[] rotation1 = PlayerManager.calcAngle(target.getPos().add(0, target.getEyeHeight(target.getPose()) / 2f, 0));
 
             // Проверяем видимость центра игрока

@@ -30,7 +30,8 @@ import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
 
-import static thunder.hack.gui.clickui.impl.BooleanParentElement.fast;
+import static thunder.hack.utility.render.animation.AnimationUtility.fast;
+
 
 public class ESP extends Module {
     public ESP() {

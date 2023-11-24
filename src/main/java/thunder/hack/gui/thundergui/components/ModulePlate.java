@@ -9,6 +9,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ThunderHackGui;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
 import java.util.Objects;
@@ -41,7 +42,7 @@ public class ModulePlate {
 
     public void render(MatrixStack stack, int MouseX, int MouseY) {
         if (scrollPosY != posY) {
-            scroll_animation = ThunderGui.fast(scroll_animation, 1, 15f);
+            scroll_animation = AnimationUtility.fast(scroll_animation, 1, 15f);
             posY = (int) Render2DEngine.interpolate(prevPosY, scrollPosY, scroll_animation);
         }
 

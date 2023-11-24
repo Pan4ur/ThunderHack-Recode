@@ -14,6 +14,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -23,6 +24,8 @@ public class StaffBoard extends HudElement {
     private static final Pattern validUserPattern = Pattern.compile("^\\w{3,16}$");
     private List<String> players = new ArrayList<>();
     private List<String> notSpec = new ArrayList<>();
+
+    private float vAnimation, hAnimation;
 
     public StaffBoard() {
         super("StaffBoard", 50, 50);
@@ -98,19 +101,13 @@ public class StaffBoard extends HudElement {
         List<String> all = new java.util.ArrayList<>();
         all.addAll(players);
         all.addAll(notSpec);
-        float scale_x = 35;
-        for (String player : all) {
-            if (player != null) {
-                String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "SPEC" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "SPEC " + Formatting.YELLOW + "(GM3)" : Formatting.GREEN + "Z");
-                if (FontRenderers.sf_bold_mini.getStringWidth(a) > scale_x)
-                    scale_x = FontRenderers.sf_bold_mini.getStringWidth(a);
-            }
-        }
 
-        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "StaffBoard", getPosX() + (scale_x + 15) / 2f, getPosY() + 2 , -1);
-        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + (scale_x + 15) / 2f, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
-        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + (scale_x + 15) / 2f, getPosY() + 13.7f, getPosX() + scale_x + 13, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
 
+        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "StaffBoard", getPosX() + hAnimation / 2f, getPosY() + 2 , -1);
+        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + hAnimation / 2f, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
+        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + hAnimation / 2f, getPosY() + 13.7f, getPosX() + hAnimation - 2, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+
+        Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
         int y_offset = 5;
         for (String player : all) {
             String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "SPEC" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "SPEC " + Formatting.YELLOW + "(GM3)" : Formatting.GREEN + "Z");
@@ -121,6 +118,7 @@ public class StaffBoard extends HudElement {
             FontRenderers.sf_bold_mini.drawString(context.getMatrices(), a, getPosX() + 5, getPosY() + 18 + y_offset, -1, false);
             y_offset += 11;
         }
+        Render2DEngine.popWindow();
     }
 
     public void onRenderShaders(DrawContext context) {
@@ -140,9 +138,12 @@ public class StaffBoard extends HudElement {
             y_offset1 += 11;
         }
 
-        Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), scale_x + 15, 20 + y_offset1, HudEditor.hudRound.getValue(), 10);
-        Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, scale_x + 15 + 1, 21 + y_offset1, HudEditor.hudRound.getValue());
-        Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), scale_x + 15, 20 + y_offset1, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+        vAnimation = AnimationUtility.fast(vAnimation, 20 + y_offset1, 15);
+        hAnimation = AnimationUtility.fast(hAnimation, scale_x + 15, 15);
+
+        Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue(), 10);
+        Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, hAnimation + 1, 1 + vAnimation, HudEditor.hudRound.getValue());
+        Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
         setBounds((int) (scale_x + 20), 20 + y_offset1);
     }
 

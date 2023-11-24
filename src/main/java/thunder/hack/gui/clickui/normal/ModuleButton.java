@@ -5,7 +5,6 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractButton;
@@ -19,6 +18,7 @@ import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.*;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -26,6 +26,7 @@ import java.util.List;
 
 import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class ModuleButton extends AbstractButton {
     private final List<AbstractElement> elements;
@@ -45,7 +46,7 @@ public class ModuleButton extends AbstractButton {
                 elements.add(new BooleanElement(setting));
             } else if (setting.getValue() instanceof ColorSetting) {
                 elements.add(new ColorPickerElement(setting));
-            }else if (setting.getValue() instanceof BooleanParent) {
+            } else if (setting.getValue() instanceof BooleanParent) {
                 elements.add(new BooleanParentElement(setting));
             } else if (setting.isNumberSetting() && setting.hasRestriction()) {
                 elements.add(new SliderElement(setting));
@@ -68,8 +69,8 @@ public class ModuleButton extends AbstractButton {
     public void render(DrawContext context, int mouseX, int mouseY, float delta, Color color) {
         hovered = Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height);
 
-        if(hovered) {
-            if(!prevHovered)
+        if (hovered) {
+            if (!prevHovered)
                 ModuleManager.soundFX.playScroll();
             ClickUI.currentDescription = I18n.translate(module.getDescription());
         }
@@ -79,9 +80,9 @@ public class ModuleButton extends AbstractButton {
         double ix = x + 5;
         double iy = y + height / 2 - (6 / 2f);
 
-        if(isHiden()) return;
+        if (isHiden()) return;
 
-        offset_animation = BooleanElement.fast(1f, 0f, 15f);
+        offset_animation = fast(1f, 0f, 15f);
         if (target_offset != offsetY) {
             offsetY = interp(offsetY, target_offset, offset_animation);
         } else offset_animation = 1f;
@@ -91,7 +92,8 @@ public class ModuleButton extends AbstractButton {
 
             Render2DEngine.drawRoundDoubleColor(context.getMatrices(), x + 4, y + height - 16, (width - 8), (height) + getElementsHeight(), 3f, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(200), 0.8f) : sbg, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(0), 0.8f) : sbg);
 
-            if (isOpen()) Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle((float) x, (float) (y + height - 15), (float) ((width) + x + 6), (float) ((height) + y + getElementsHeight())));
+            if (isOpen())
+                Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle((float) x, (float) (y + height - 15), (float) ((width) + x + 6), (float) ((height) + y + getElementsHeight())));
 
             context.getMatrices().push();
             TargetHud.sizeAnimation(context.getMatrices(), x + width / 2 + 6, y + height / 2 - 15, 1f - category_animation);
@@ -106,19 +108,14 @@ public class ModuleButton extends AbstractButton {
                 element.setWidth(width);
                 element.setHeight(15);
 
-                if (element instanceof ColorPickerElement)
-                    element.setHeight(66);
-
-                else if (element instanceof SliderElement)
-                    element.setHeight(18);
-
-                if (element instanceof ModeElement) {
-                    ModeElement combobox = (ModeElement) element;
-                    combobox.setWHeight(17);
-
-                    if (combobox.isOpen()) {
-                        element.setHeight(15 + (combobox.getSetting().getModes().length * 12));
-                    } else element.setHeight(17);
+                if (element instanceof ColorPickerElement) element.setHeight(66);
+                else if (element instanceof SliderElement) element.setHeight(18);
+                else if (element instanceof ModeElement mode) {
+                    mode.setWHeight(17);
+                    if (mode.isOpen())
+                        mode.animation2 = (AnimationUtility.fast((float) mode.animation2, (float) (15 + (mode.getSetting().getModes().length * 12)), 25));
+                    else mode.animation2 = (AnimationUtility.fast((float) mode.animation2, 17, 25));
+                    element.setHeight(mode.animation2);
                 }
 
                 element.render(context, mouseX, mouseY, delta);
@@ -131,7 +128,7 @@ public class ModuleButton extends AbstractButton {
             if (isOpen()) {
                 Render2DEngine.popWindow();
             }
-        } else category_animation = BooleanElement.fast(1, 0, 1f);
+        } else category_animation = fast(1, 0, 1f);
 
 
         if (module.isEnabled()) {
@@ -180,7 +177,7 @@ public class ModuleButton extends AbstractButton {
             }
         }
 
-        if(hovered && InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT)){
+        if (hovered && InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT)) {
             FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"), (int) ix + 1f, (int) iy + 3 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
         } else {
             if (this.binding) {
@@ -192,7 +189,7 @@ public class ModuleButton extends AbstractButton {
     }
 
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if(isHiden()) return;
+        if (isHiden()) return;
 
         if (this.binding) {
             if (mouseX > x + 52 && mouseX < x + 80 && mouseY > y && mouseY < y + height) {
@@ -211,9 +208,9 @@ public class ModuleButton extends AbstractButton {
             binding = false;
         }
         if (hovered) {
-            if(InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT) && button == 0){
+            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT) && button == 0) {
                 module.setDrawn(!module.isDrawn());
-                if(MainSettings.isRu()){
+                if (MainSettings.isRu()) {
                     Command.sendMessage("Модуль " + Formatting.GREEN + module.getName() + Formatting.WHITE + " теперь " + (module.isDrawn() ? "виден в ArrayList" : "не виден в ArrayList"));
                 } else {
                     Command.sendMessage(Formatting.GREEN + module.getName() + Formatting.WHITE + " is now " + (module.isDrawn() ? "visible in ArrayList" : "invisible in ArrayList"));
@@ -243,7 +240,7 @@ public class ModuleButton extends AbstractButton {
     }
 
     public void keyTyped(int keyCode) {
-        if(isHiden()) return;
+        if (isHiden()) return;
 
         if (isOpen()) {
             for (AbstractElement element : elements)
@@ -278,7 +275,7 @@ public class ModuleButton extends AbstractButton {
                 if (element.isVisible())
                     offsetY += element.getHeight();
             }
-            category_animation = BooleanElement.fast(category_animation, 0, 8f);
+            category_animation = fast(category_animation, 0, 8f);
             offsetY1 = (float) interp(offsetY1, offsetY, category_animation);
         }
         return offsetY1;

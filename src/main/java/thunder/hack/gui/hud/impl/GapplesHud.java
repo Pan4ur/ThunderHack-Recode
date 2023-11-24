@@ -11,6 +11,7 @@ import net.minecraft.util.math.RotationAxis;
 import thunder.hack.events.impl.EventEatFood;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
@@ -21,7 +22,6 @@ public class GapplesHud extends HudElement {
     }
 
     private float angle, prevAngle;
-    private boolean flip;
 
     public void onRender2D(DrawContext context) {
 
@@ -33,6 +33,11 @@ public class GapplesHud extends HudElement {
 
         float factor = angle > 0 ? angle / 15f : 0f;
         float factor2 = 1f - mc.player.getItemUseTime() / 40f;
+
+        if(mc.player.getActiveItem().getItem() != Items.GOLDEN_APPLE)
+            factor2 = 1f;
+
+        factor2 = MathUtility.clamp(factor2, 0f, 1f);
 
         context.getMatrices().push();
         context.getMatrices().translate(xPos, yPos, 0);
@@ -49,7 +54,7 @@ public class GapplesHud extends HudElement {
         context.getMatrices().translate((xPos + 28), (yPos - 1), 0);
         context.getMatrices().scale(factor2, factor2, 1f);
         context.drawItem(Items.GOLDEN_APPLE.getDefaultStack(), -8, -8);
-        context.getMatrices().scale( 1f / factor2 + 0.1f, 1f / factor2 + 0.1f, 1f);
+        context.getMatrices().scale( factor2 != 0 ? 1f / factor2 : 1f, factor2 != 0 ? 1f / factor2 : 1f, 1f);
         context.getMatrices().translate(-(xPos + 28), -(yPos - 1), 0);
 
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
@@ -64,9 +69,8 @@ public class GapplesHud extends HudElement {
 
     @EventHandler
     public void onEatFood(EventEatFood e) {
-        if(e.getFood().getItem() == Items.GOLDEN_APPLE) {
+        if(e.getFood().getItem() == Items.GOLDEN_APPLE)
             angle = 15;
-        }
     }
 
     @Override

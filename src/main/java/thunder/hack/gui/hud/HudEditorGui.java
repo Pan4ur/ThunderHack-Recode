@@ -12,11 +12,6 @@ import thunder.hack.gui.clickui.normal.ModuleWindow;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.render.MSAAFramebuffer;
-import thunder.hack.utility.render.animation.Animation;
-import thunder.hack.utility.render.animation.DecelerateAnimation;
-import thunder.hack.utility.render.animation.Direction;
-import thunder.hack.utility.render.animation.EaseBackIn;
-
 
 import java.util.List;
 
@@ -25,7 +20,6 @@ import static thunder.hack.modules.Module.mc;
 public class HudEditorGui extends Screen {
     public static HudElement currentlyDragging;
 
-    private Animation openAnimation, bgAnimation, rAnimation;
     private final List<AbstractWindow> windows;
 
     private boolean firstOpen;
@@ -57,9 +51,6 @@ public class HudEditorGui extends Screen {
 
     @Override
     protected void init() {
-        openAnimation = new EaseBackIn(270, .4f, 1.13f);
-        rAnimation = new DecelerateAnimation(300, 1f);
-        bgAnimation = new DecelerateAnimation(300, 1f);
         if (firstOpen) {
             double x = 60, y = 20;
             double offset = 0;
@@ -83,21 +74,6 @@ public class HudEditorGui extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-
-        if (openAnimation.isDone() && openAnimation.getDirection().equals(Direction.BACKWARDS)) {
-            windows.forEach(AbstractWindow::onClose);
-            mc.currentScreen = null;
-        }
-
-        double anim = (openAnimation.getOutput() + .6f);
-
-        double centerX = width >> 1;
-        double centerY = height >> 1;
-
-        context.getMatrices().translate(centerX, centerY, 0);
-        context.getMatrices().scale((float) anim, (float) anim, 1);
-        context.getMatrices().translate(-centerX, -centerY, 0);
-
         for (AbstractWindow window : windows) {
             if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 264)) {
                 window.setY(window.getY() + 2);
@@ -164,17 +140,13 @@ public class HudEditorGui extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        windows.forEach(w -> {
-            w.keyTyped(keyCode);
-        });
+        windows.forEach(w -> w.keyTyped(keyCode));
 
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            bgAnimation.setDirection(Direction.BACKWARDS);
-            rAnimation.setDirection(Direction.BACKWARDS);
-            openAnimation.setDirection(Direction.BACKWARDS);
             super.keyPressed(keyCode, scanCode, modifiers);
             return true;
         }
+
         return false;
     }
 

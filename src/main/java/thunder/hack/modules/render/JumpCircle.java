@@ -11,7 +11,6 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
-import thunder.hack.utility.render.animation.AstolfoAnimation;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ public class JumpCircle extends Module {
         super("JumpCircle", Category.RENDER);
     }
 
-    public static AstolfoAnimation astolfo = new AstolfoAnimation();
     static List<Circle> circles = new ArrayList<>();
     private List<PlayerEntity> cache = new CopyOnWriteArrayList<>();
 
@@ -47,7 +45,6 @@ public class JumpCircle extends Module {
             }
         });
 
-        astolfo.update();
         for (Circle circle : circles) {
             circle.update();
         }
@@ -122,7 +119,7 @@ public class JumpCircle extends Module {
                 return Render2DEngine.rainbow(stage, 1f, 1f).getRGB();
             }
             case Astolfo -> {
-                return astolfo.getColor(((stage + 90) / 360.));
+                return Render2DEngine.astolfo(false, stage * 10).getRGB();
             }
             case Custom -> {
                 return color.getValue().getColorObject().getRGB();

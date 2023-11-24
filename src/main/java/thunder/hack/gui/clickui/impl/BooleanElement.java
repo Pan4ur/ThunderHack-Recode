@@ -11,6 +11,8 @@ import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 
+import static thunder.hack.utility.render.animation.AnimationUtility.fast;
+
 public class BooleanElement extends AbstractElement {
     public BooleanElement(Setting setting) {super(setting);}
 
@@ -41,13 +43,5 @@ public class BooleanElement extends AbstractElement {
             setting.setValue(!((Boolean) setting.getValue()));
         }
         super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    public static double deltaTime() {
-        return FrameRateCounter.INSTANCE.getFps() > 0 ? (1.0000 / FrameRateCounter.INSTANCE.getFps()) : 1;
-    }
-
-    public static float fast(float end, float start, float multiple) {
-        return (1 - MathUtility.clamp((float) (deltaTime() * multiple), 0, 1)) * end + MathUtility.clamp((float) (deltaTime() * multiple), 0, 1) * start;
     }
 }

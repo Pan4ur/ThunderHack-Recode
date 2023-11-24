@@ -8,36 +8,35 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.animation.Animation;
-import thunder.hack.utility.render.animation.DecelerateAnimation;
-import thunder.hack.utility.render.animation.Direction;
 
 import java.awt.*;
 
 import static thunder.hack.gui.clickui.normal.ClickUI.arrow;
+import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class ModeElement extends AbstractElement {
     public Setting setting2;
     private boolean open;
     private double wheight;
-
-    private final Animation rotation = new DecelerateAnimation(240, 1, Direction.FORWARDS);
+    private float animation;
+    public double animation2;
 
     public ModeElement(Setting setting) {
         super(setting);
         this.setting2 = setting;
+        animation2 = height;
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        rotation.setDirection(open ? Direction.BACKWARDS : Direction.FORWARDS);
+        animation = fast(animation, open ? 0 : 1, 15f);
 
         float tx = (float) (x + width - 11);
         float ty = (float) (y + (wheight / 2));
 
         MatrixStack matrixStack = context.getMatrices();
 
-        float thetaRotation = (float) (-180f * rotation.getOutput());
+        float thetaRotation = -180f * animation;
         matrixStack.push();
 
         matrixStack.translate(tx, ty, 0);
@@ -48,18 +47,17 @@ public class ModeElement extends AbstractElement {
 
         matrixStack.pop();
 
-        if(setting.parent != null) {
-            Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, (float) (1f), 17, ClickGui.getInstance().getColor(1));
-        }
+        if(setting.parent != null)
+            Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, 1f, 17, ClickGui.getInstance().getColor(1));
 
         FontRenderers.getSettingsRenderer().drawString(matrixStack, setting2.getName(), (setting.parent != null ? 2f : 0f) + (int) (x + 6), (int) (y + wheight / 2 - (6 / 2f)) + 3, new Color(-1).getRGB());
-        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting2.currentEnumName(), (int) (x + width - 16 - FontRenderers.getSettingsRenderer().getStringWidth(setting.currentEnumName())), 3 + (int) (y + wheight / 2 - (6 / 2f)), new Color(-1).getRGB());
+        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting2.currentEnumName(), (int) (x + width - 18 - FontRenderers.getSettingsRenderer().getStringWidth(setting.currentEnumName())), 3 + (int) (y + wheight / 2 - 3f), new Color(-1).getRGB());
 
         if (open) {
             Color color = ClickGui.getInstance().getColor(0);
             double offsetY = 0;
             for (int i = 0; i <= setting2.getModes().length - 1; i++) {
-                FontRenderers.getSettingsRenderer().drawString(matrixStack, setting2.getModes()[i], (int) x + (int) width / 2f - (FontRenderers.getSettingsRenderer().getStringWidth(setting2.getModes()[i]) / 2f), (int) (y + wheight + ((12 >> 1) - (6 / 2f) - 1) + offsetY), setting2.currentEnumName().equalsIgnoreCase(setting2.getModes()[i]) ? color.getRGB() : new Color(-1).getRGB());
+                FontRenderers.getSettingsRenderer().drawString(matrixStack, setting2.getModes()[i], (int) x + (int) width / 2f - (FontRenderers.getSettingsRenderer().getStringWidth(setting2.getModes()[i]) / 2f), (int) (y + wheight + 2 + offsetY), setting2.currentEnumName().equalsIgnoreCase(setting2.getModes()[i]) ? color.getRGB() : new Color(-1).getRGB());
                 offsetY += 12;
             }
         }

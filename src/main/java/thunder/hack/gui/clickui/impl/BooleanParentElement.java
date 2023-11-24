@@ -11,13 +11,11 @@ import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.animation.Animation;
-import thunder.hack.utility.render.animation.DecelerateAnimation;
-import thunder.hack.utility.render.animation.Direction;
 
 import java.awt.*;
 
 import static thunder.hack.gui.clickui.normal.ClickUI.arrow;
+import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class BooleanParentElement extends AbstractElement {
     private final Setting<BooleanParent> parentSetting;
@@ -27,8 +25,7 @@ public class BooleanParentElement extends AbstractElement {
         this.parentSetting = setting;
     }
 
-    private final Animation rotation = new DecelerateAnimation(240, 1, Direction.FORWARDS);
-    float animation = 0f;
+    float animation, arrowAnimation;
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
@@ -36,33 +33,26 @@ public class BooleanParentElement extends AbstractElement {
 
         MatrixStack matrixStack = context.getMatrices();
 
-        rotation.setDirection(getParentSetting().getValue().isExtended() ? Direction.BACKWARDS : Direction.FORWARDS);
         float tx = (float) (x + width - 11);
-        float ty = (float) (y + (17 / 2));
+        float ty = (float) (y + 8.5f);
+
+        arrowAnimation = fast(arrowAnimation, getParentSetting().getValue().isExtended() ? 0 : 1, 15f);
 
         matrixStack.push();
         matrixStack.translate(tx, ty, 0);
-        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) (-180f * rotation.getOutput())));
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-180f * arrowAnimation));
         matrixStack.translate(-tx, -ty, 0);
-        context.drawTexture(arrow, (int) (x + width - 14), (int) (y + (17 - 6) / 2), 0, 0, 6, 6, 6, 6);
+        context.drawTexture(arrow, (int) (x + width - 14), (int) (y + 6), 0, 0, 6, 6, 6, 6);
         matrixStack.pop();
 
-        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName() ,(int) (x + 6), (y + height / 2 - (6 / 2f)) + 2, new Color(-1).getRGB());
+        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName() ,x + 6, y + height / 2 - 1f, new Color(-1).getRGB());
 
         animation = fast(animation, getParentSetting().getValue().isEnabled() ? 1 : 0, 15f);
+
         double paddingX = 7 * animation;
         Color color = ClickGui.getInstance().getColor(0);
         Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 36), (float) (y + height / 2 - 4), 15, 8, 4, paddingX > 4 ? color : new Color(0xFFB2B1B1));
         Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 35 + paddingX), (float) (y + height / 2 - 3), 6, 6, 3, new Color(-1));
-
-    }
-
-    public static double deltaTime() {
-        return FrameRateCounter.INSTANCE.getFps() > 0 ? (1.0000 / FrameRateCounter.INSTANCE.getFps()) : 1;
-    }
-
-    public static float fast(float end, float start, float multiple) {
-        return (1 - MathUtility.clamp((float) (deltaTime() * multiple), 0, 1)) * end + MathUtility.clamp((float) (deltaTime() * multiple), 0, 1) * start;
     }
 
     @Override

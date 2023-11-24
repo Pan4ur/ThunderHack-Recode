@@ -36,9 +36,8 @@ public class BetterDynamicAnimation {
     }
 
     public double getAnimationD() {
-        float pt = mc.getTickDelta();
         double delta = dstValue - value;
-        double animation = createAnimation((prevStep + (step - prevStep) * pt) / (double) maxTicks);
+        double animation = createAnimation((prevStep + (step - prevStep) * mc.getTickDelta()) / (double) maxTicks);
         return value + delta * animation;
     }
 }

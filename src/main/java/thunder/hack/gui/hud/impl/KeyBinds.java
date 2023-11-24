@@ -11,6 +11,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.util.Objects;
 
@@ -23,24 +24,16 @@ public class KeyBinds extends HudElement {
         super("KeyBinds", 100, 100);
     }
 
+    private float vAnimation, hAnimation;
+
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
 
-        float max_width = 50;
-        for (Module feature : ThunderHack.moduleManager.modules) {
-            if (feature.isDisabled() && onlyEnabled.getValue()) continue;
-            if (!Objects.equals(feature.getBind().getBind(), "None") && feature != ModuleManager.clickGui && feature != ModuleManager.thunderHackGui) {
-                float width = FontRenderers.sf_bold_mini.getStringWidth("[" + getShortKeyName(feature) + "]  " + feature.getName()) * 1.2f;
-                if (width > max_width) {
-                    max_width = width;
-                }
-            }
-        }
+        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KeyBinds", getPosX() + hAnimation / 2, getPosY() + 2, HudEditor.textColor.getValue().getColor());
+        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
+        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
 
-        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KeyBinds", getPosX() + max_width / 2, getPosY() + 3, HudEditor.textColor.getValue().getColor());
-        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + max_width / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
-        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + max_width / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + max_width - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
-
+        Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
         int y_offset = 2;
         for (Module feature : ThunderHack.moduleManager.modules) {
             if (feature.isDisabled() && onlyEnabled.getValue())
@@ -50,6 +43,7 @@ public class KeyBinds extends HudElement {
                 y_offset += 10;
             }
         }
+        Render2DEngine.popWindow();
     }
 
     public void onRenderShaders(DrawContext context) {
@@ -64,10 +58,14 @@ public class KeyBinds extends HudElement {
                     max_width = width;
             }
         }
-        Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), max_width, 20 + y_offset1, HudEditor.hudRound.getValue(), 10);
-        Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, max_width + 1, 21 + y_offset1, HudEditor.hudRound.getValue());
-        Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), max_width, 20 + y_offset1, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
-        setBounds((int)  max_width, 20 + y_offset1);
+
+        vAnimation = AnimationUtility.fast(vAnimation, 20 + y_offset1, 15);
+        hAnimation = AnimationUtility.fast(hAnimation, max_width, 15);
+
+        Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue(), 10);
+        Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, hAnimation + 1, vAnimation + 1, HudEditor.hudRound.getValue());
+        Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+        setBounds((int) max_width, 20 + y_offset1);
     }
 
     @NotNull

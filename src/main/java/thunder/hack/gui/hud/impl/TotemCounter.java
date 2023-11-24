@@ -21,7 +21,6 @@ public class TotemCounter extends HudElement {
     }
 
     private float angle, prevAngle;
-    private boolean flip;
 
     public void onRender2D(DrawContext context) {
 
@@ -52,9 +51,8 @@ public class TotemCounter extends HudElement {
 
     @EventHandler
     public void onTotemPop(TotemPopEvent e) {
-        if(e.getEntity() == mc.player) {
+        if(e.getEntity() == mc.player)
             angle = -15;
-        }
     }
 
     @Override

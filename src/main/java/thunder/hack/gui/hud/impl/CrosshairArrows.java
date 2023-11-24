@@ -15,7 +15,6 @@ import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.animation.AstolfoAnimation;
 
 import java.awt.*;
 
@@ -27,7 +26,6 @@ public class CrosshairArrows extends HudElement {
         super("CrosshairArrows", 0, 0);
     }
 
-    public static AstolfoAnimation astolfo = new AstolfoAnimation();
 
     public static Setting<Boolean> glow = new Setting<>("Glow", false);
     private final Setting<Float> width = new Setting<>("Height", 2.28f, 0.1f, 5f);
@@ -41,11 +39,6 @@ public class CrosshairArrows extends HudElement {
     private final Setting<triangleModeEn> triangleMode = new Setting<>("TracerCMode", triangleModeEn.Astolfo);
     private final Setting<ColorSetting> colorf = new Setting<>("Friend", new ColorSetting(new Color(0x00E800)));
     private final Setting<ColorSetting> colors = new Setting<>("Tracer", new ColorSetting(new Color(0xFFFF00)));
-
-    @Override
-    public void onUpdate() {
-        astolfo.update();
-    }
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);

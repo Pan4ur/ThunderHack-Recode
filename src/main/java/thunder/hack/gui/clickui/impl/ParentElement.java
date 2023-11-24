@@ -6,9 +6,6 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.animation.Animation;
-import thunder.hack.utility.render.animation.DecelerateAnimation;
-import thunder.hack.utility.render.animation.Direction;
 import thunder.hack.setting.Setting;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
@@ -16,16 +13,17 @@ import net.minecraft.util.math.RotationAxis;
 import java.awt.*;
 
 import static thunder.hack.gui.clickui.normal.ClickUI.arrow;
+import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class ParentElement extends AbstractElement {
     private final Setting<Parent> parentSetting;
+    private float animation;
 
     public ParentElement(Setting setting) {
         super(setting);
         this.parentSetting = setting;
     }
 
-    private final Animation rotation = new DecelerateAnimation(240, 1, Direction.FORWARDS);
 
 
     @Override
@@ -34,22 +32,22 @@ public class ParentElement extends AbstractElement {
 
         MatrixStack matrixStack = context.getMatrices();
 
-        rotation.setDirection(getParentSetting().getValue().isExtended() ? Direction.BACKWARDS : Direction.FORWARDS);
-        float tx = (float) (x + width - 11);
-        float ty = (float) (y + (17 / 2));
+        float tx = (float) (x + width - 11f);
+        float ty = (float) y + 8.5f;
 
-        if(getParentSetting().getValue().isExtended()) {
+        if(getParentSetting().getValue().isExtended())
             Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, (float) (getWidth() - 8f), (float) (getHeight()), ClickGui.getInstance().getColor(1));
-        }
+
+        animation = fast(animation, getParentSetting().getValue().isExtended() ? 0 : 1, 15f);
 
         matrixStack.push();
         matrixStack.translate(tx, ty, 0);
-        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) (-180f * rotation.getOutput())));
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-180f * animation));
         matrixStack.translate(-tx, -ty, 0);
-        context.drawTexture(arrow, (int) (x + width - 14), (int) (y + (17 - 6) / 2), 0, 0, 6, 6, 6, 6);
+        context.drawTexture(arrow, (int) (x + width - 14), (int) (y + 5.5f), 0, 0, 6, 6, 6, 6);
         matrixStack.pop();
 
-        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName() ,(int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy() )), (y + height / 2 - (6 / 2f)) + 2, new Color(-1).getRGB());
+        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName() ,(int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy() )), (y + height / 2 - 1f), new Color(-1).getRGB());
     }
 
     @Override

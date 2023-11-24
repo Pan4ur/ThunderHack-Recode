@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.injection.accesors.IClientWorldMixin;
+import thunder.hack.utility.math.MathUtility;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -59,6 +60,14 @@ public final class PlayerUtility {
 
     private static PendingUpdateManager getUpdateManager(ClientWorld world) {
         return ((IClientWorldMixin) world).acquirePendingUpdateManager();
+    }
+
+    public static float fixAngle(float angle) {
+        return Math.round(angle / ((float) (getGCD() * 0.15D))) * (float) (getGCD() * 0.15D);
+    }
+
+    public static float getGCD() {
+        return (float) (Math.pow((float) (mc.options.getMouseSensitivity().getValue() * 0.6D + 0.2D), 3) * 8.0F);
     }
 
     public static float squaredDistance2d(double x, double z) {

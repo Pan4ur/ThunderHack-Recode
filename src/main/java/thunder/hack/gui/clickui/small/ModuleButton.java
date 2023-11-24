@@ -26,6 +26,7 @@ import java.util.List;
 
 import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class ModuleButton extends AbstractButton {
     private final List<AbstractElement> elements;
@@ -81,7 +82,7 @@ public class ModuleButton extends AbstractButton {
 
         if(isHiden()) return;
 
-        offset_animation = BooleanElement.fast(1f, 0f, 15f);
+        offset_animation = fast(1f, 0f, 15f);
         if (target_offset != offsetY) {
             offsetY = interp(offsetY, target_offset, offset_animation);
         } else offset_animation = 1f;
@@ -129,7 +130,7 @@ public class ModuleButton extends AbstractButton {
 
             Render2DEngine.drawBlurredShadow(context.getMatrices(), (int) x + 3, (int) (y + height), (int) width - 6, 3, 13, new Color(0, 0, 0, 255));
             Render2DEngine.popWindow();
-        } else category_animation = BooleanElement.fast(1, 0, 1f);
+        } else category_animation = fast(1, 0, 1f);
 
 
         if (module.isEnabled()) {
@@ -271,7 +272,7 @@ public class ModuleButton extends AbstractButton {
                 if (element.isVisible())
                     offsetY += element.getHeight();
             }
-            category_animation = BooleanElement.fast(category_animation, 0, 8f);
+            category_animation = fast(category_animation, 0, 8f);
             offsetY1 = (float) interp(offsetY1, offsetY, category_animation);
         }
         return offsetY1;
