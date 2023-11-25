@@ -1,12 +1,15 @@
 package thunder.hack.modules.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 import org.joml.Vector4d;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
@@ -61,10 +64,6 @@ public class ItemESP extends Module {
                 float posX = (float) position.x;
                 float posY = (float) position.y;
                 float endPosX = (float) position.z;
-                float endPosY = (float) position.w;
-
-                if (espMode.getValue() == ESPMode.Rect)
-                    drawRect(context.getMatrices(), posX, posY, endPosX, endPosY);
 
                 float diff = (endPosX - posX) / 2f;
                 float textWidth = (FontRenderers.sf_bold_mini.getStringWidth(ent.getDisplayName().getString()) * 1);
@@ -76,6 +75,42 @@ public class ItemESP extends Module {
                 FontRenderers.sf_bold_mini.drawString(context.getMatrices(), ent.getDisplayName().getString(), tagX, (float) posY - 10, tcolor.getValue().getColor());
             }
         }
+
+        if (espMode.getValue() == ESPMode.Rect) {
+            Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
+            BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+            Render2DEngine.setupRender();
+            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+            for (Entity ent : mc.world.getEntities()) {
+                if (!(ent instanceof ItemEntity)) continue;
+                Vec3d[] vectors = getPoints(ent);
+
+                Vector4d position = null;
+                for (Vec3d vector : vectors) {
+                    vector = Render3DEngine.worldSpaceToScreenSpace(new Vec3d(vector.x, vector.y, vector.z));
+                    if (vector.z > 0 && vector.z < 1) {
+                        if (position == null)
+                            position = new Vector4d(vector.x, vector.y, vector.z, 0);
+                        position.x = Math.min(vector.x, position.x);
+                        position.y = Math.min(vector.y, position.y);
+                        position.z = Math.max(vector.x, position.z);
+                        position.w = Math.max(vector.y, position.w);
+                    }
+                }
+
+                if (position != null) {
+                    float posX = (float) position.x;
+                    float posY = (float) position.y;
+                    float endPosX = (float) position.z;
+                    float endPosY = (float) position.w;
+
+                    drawRect(bufferBuilder, matrix, posX, posY, endPosX, endPosY);
+                }
+            }
+            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            Render2DEngine.endRender();
+        }
     }
 
     public void onRender3D(MatrixStack stack) {
@@ -85,19 +120,16 @@ public class ItemESP extends Module {
                     Render3DEngine.drawCircle3D(stack, ent, radius.getValue(), circleColor.getValue().getColor(), cPoints.getValue(), useHudColor.getValue(), cOffset.getValue());
     }
 
-    private void drawRect(MatrixStack stack, float posX, float posY, float endPosX, float endPosY) {
+    private void drawRect(BufferBuilder bufferBuilder, Matrix4f stack, float posX, float posY, float endPosX, float endPosY) {
         Color black = Color.BLACK;
-
-        Render2DEngine.drawRectDumbWay(stack, posX - 1F, posY, (posX + 0.5f), endPosY + 0.5f, black, black, black, black);
-        Render2DEngine.drawRectDumbWay(stack, posX - 1F, (posY - 0.5f), endPosX + 0.5f, posY + 1f, black, black, black, black);
-        Render2DEngine.drawRectDumbWay(stack, endPosX - 1f, posY, endPosX + 0.5f, endPosY + 0.5f, black, black, black, black);
-        Render2DEngine.drawRectDumbWay(stack, posX - 1, endPosY - 1f, endPosX + 0.5f, endPosY + 0.5f, black, black, black, black);
-
-        Render2DEngine.drawRectDumbWay(stack, posX - 0.5f, posY, posX, endPosY, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270));
-        Render2DEngine.drawRectDumbWay(stack, posX, endPosY - 0.5f, endPosX, endPosY, HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(180), HudEditor.getColor(0));
-        Render2DEngine.drawRectDumbWay(stack, posX - 0.5f, posY, endPosX, (posY + 0.5f), HudEditor.getColor(180), HudEditor.getColor(90), HudEditor.getColor(90), HudEditor.getColor(180));
-        Render2DEngine.drawRectDumbWay(stack, endPosX - 0.5f, posY, endPosX, endPosY, HudEditor.getColor(90), HudEditor.getColor(270), HudEditor.getColor(270), HudEditor.getColor(90));
-
+        Render2DEngine.setRectPoints(bufferBuilder, stack, posX - 1F, posY, (posX + 0.5f), endPosY + 0.5f, black, black, black, black);
+        Render2DEngine.setRectPoints(bufferBuilder, stack, posX - 1F, (posY - 0.5f), endPosX + 0.5f, posY + 1f, black, black, black, black);
+        Render2DEngine.setRectPoints(bufferBuilder, stack, endPosX - 1f, posY, endPosX + 0.5f, endPosY + 0.5f, black, black, black, black);
+        Render2DEngine.setRectPoints(bufferBuilder, stack, posX - 1, endPosY - 1f, endPosX + 0.5f, endPosY + 0.5f, black, black, black, black);
+        Render2DEngine.setRectPoints(bufferBuilder, stack, posX - 0.5f, posY, posX, endPosY, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270));
+        Render2DEngine.setRectPoints(bufferBuilder, stack, posX, endPosY - 0.5f, endPosX, endPosY, HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(180), HudEditor.getColor(0));
+        Render2DEngine.setRectPoints(bufferBuilder, stack, posX - 0.5f, posY, endPosX, (posY + 0.5f), HudEditor.getColor(180), HudEditor.getColor(90), HudEditor.getColor(90), HudEditor.getColor(180));
+        Render2DEngine.setRectPoints(bufferBuilder, stack, endPosX - 0.5f, posY, endPosX, endPosY, HudEditor.getColor(90), HudEditor.getColor(270), HudEditor.getColor(270), HudEditor.getColor(90));
     }
 
     @NotNull

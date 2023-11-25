@@ -183,6 +183,15 @@ public class Render2DEngine {
         endRender();
     }
 
+    public static void setRectPoints(BufferBuilder bufferBuilder,Matrix4f matrix, float x, float y, float x1, float y1, Color c1, Color c2, Color c3, Color c4) {
+
+
+        bufferBuilder.vertex(matrix, x, y1, 0.0F).color(c1.getRGB()).next();
+        bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(c2.getRGB()).next();
+        bufferBuilder.vertex(matrix, x1, y, 0.0F).color(c3.getRGB()).next();
+        bufferBuilder.vertex(matrix, x, y, 0.0F).color(c4.getRGB()).next();
+    }
+
     public static boolean isHovered(double mouseX, double mouseY, double x, double y, double width, double height) {
         return mouseX >= x && mouseX - width <= x && mouseY >= y && mouseY - height <= y;
     }

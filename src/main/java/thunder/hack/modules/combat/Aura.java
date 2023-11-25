@@ -73,7 +73,9 @@ public final class Aura extends Module {
     public static final Setting<Rotation> rotationMode = new Setting<>("Rotation", Rotation.Universal);
     public static final Setting<Switch> switchMode = new Setting<>("Switch", Switch.None);
     public final Setting<Boolean> onlyWeapon = new Setting<>("OnlyWeapon", false, v -> switchMode.getValue() != Switch.Silent);
-    public final Setting<Boolean> smartCrit = new Setting<>("SmartCrit", true);
+    public final Setting<BooleanParent> smartCrit = new Setting<>("SmartCrit", new BooleanParent(true));
+    public final Setting<Boolean> onlySpace = new Setting<>("OnlySpace", false).withParent(smartCrit);
+    public final Setting<Boolean> autoJump = new Setting<>("AutoJump", false).withParent(smartCrit);
     public final Setting<BooleanParent> ignoreWalls = new Setting<>("IgnoreWalls", new BooleanParent(true));
     public final Setting<Boolean> wallsBypass = new Setting<>("Bypass", false).withParent(ignoreWalls);
     public final Setting<Boolean> shieldBreaker = new Setting<>("ShieldBreaker", true);
@@ -168,6 +170,9 @@ public final class Aura extends Module {
                 && !(handItem instanceof SwordItem || handItem instanceof AxeItem))) {
             return;
         }
+
+        if(!mc.options.jumpKey.isPressed() && mc.player.isOnGround() && autoJump.getValue())
+            mc.player.jump();
 
         boolean readyForAttack = autoCrit() && (lookingAtHitbox || skipRayTraceCheck());
         calcRotations(autoCrit());
@@ -327,10 +332,10 @@ public final class Aura extends Module {
 
     private boolean autoCrit() {
         boolean reasonForSkipCrit =
-                !smartCrit.getValue()
+                !smartCrit.getValue().isEnabled()
                         || mc.player.getAbilities().flying
                         || (mc.player.isFallFlying() || ModuleManager.elytraPlus.isEnabled())
-                        || mc.player.hasStatusEffect(StatusEffects.SLOWNESS)
+                        || mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
                         || mc.player.isHoldingOntoLadder()
                         || mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos())).getBlock() == Blocks.COBWEB;
 
@@ -354,7 +359,7 @@ public final class Aura extends Module {
         boolean mergeWithTargetStrafe = !ModuleManager.targetStrafe.isEnabled() || !ModuleManager.targetStrafe.jump.getValue();
         boolean mergeWithSpeed = !ModuleManager.speed.isEnabled() || mc.player.isOnGround();
 
-        if (!mc.options.jumpKey.isPressed() && mergeWithTargetStrafe && mergeWithSpeed)
+        if (!mc.options.jumpKey.isPressed() && mergeWithTargetStrafe && mergeWithSpeed && !onlySpace.getValue() && !autoJump.getValue())
             return true;
 
         if (mc.player.isInLava())

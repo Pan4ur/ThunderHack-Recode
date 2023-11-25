@@ -117,6 +117,10 @@ public class Velocity extends Module {
                         e.cancel();
                         grimTicks = 6;
                     }
+                    case GrimNew -> {
+                        e.cancel();
+                        flag = true;
+                    }
                 }
             }
         }
@@ -134,6 +138,10 @@ public class Velocity extends Module {
                     ((IExplosionS2CPacket) explosion).setMotionZ(((IExplosionS2CPacket) explosion).getMotionZ() * horizontal.getValue() / 100f);
                     ((IExplosionS2CPacket) explosion).setMotionY(((IExplosionS2CPacket) explosion).getMotionY() * vertical.getValue() / 100f);
                 }
+                case GrimNew -> {
+                    e.cancel();
+                    flag = true;
+                }
             }
         }
 
@@ -146,14 +154,15 @@ public class Velocity extends Module {
         }
 
         // LAGBACK
-        if (e.getPacket() instanceof PlayerPositionLookS2CPacket && cc.getValue()) {
-            ccCooldown = 5;
+        if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
+            if(cc.getValue() || mode.getValue() == modeEn.GrimNew)
+                ccCooldown = 5;
         }
     }
 
 
-    @EventHandler
-    public void onSync(EventSync e) {
+    @Override
+    public void onUpdate() {
         switch (mode.getValue()) {
             case Matrix -> {
                 if (mc.player.hurtTime > 0 && !mc.player.isOnGround()) {
@@ -194,6 +203,15 @@ public class Velocity extends Module {
                     }
                 }
             }
+            case GrimNew -> {
+                if (flag) {
+                    if(ccCooldown <= 0) {
+                        sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
+                        sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, BlockPos.ofFloored(mc.player.getPos()), Direction.DOWN));
+                    }
+                    flag = false;
+                }
+            }
         }
         if (grimTicks > 0)
             grimTicks--;
@@ -205,7 +223,7 @@ public class Velocity extends Module {
     }
 
     public enum modeEn {
-        Matrix, Cancel, Sunrise, Custom, Redirect, OldGrim, Jump
+        Matrix, Cancel, Sunrise, Custom, Redirect, OldGrim, Jump, GrimNew
     }
 
     public enum jumpModeEn {
