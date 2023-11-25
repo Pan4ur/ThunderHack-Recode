@@ -37,7 +37,7 @@ public class Speed extends Module {
     private thunder.hack.utility.Timer startDelay = new thunder.hack.utility.Timer();
 
     public enum Mode {
-        StrictStrafe, MatrixJB, NCP, FGLowRider, MatrixDamage
+        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage
     }
 
     @Override
@@ -78,7 +78,7 @@ public class Speed extends Module {
 
     @Override
     public void onUpdate() {
-        if (mode.getValue() == Mode.FGLowRider) {
+        if (mode.getValue() == Mode.ElytraLowHop) {
             if (mc.player.isOnGround()) {
                 mc.player.jump();
                 return;

@@ -41,7 +41,7 @@ public class KillFeed extends HudElement {
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
 
         Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
-        int y_offset = 6;
+        int y_offset = 3;
         for (String player : players) {
             FontRenderers.modules.drawString(context.getMatrices(), player, getPosX() + 5, getPosY() + 18 + y_offset, -1, false);
             y_offset += 10;
@@ -50,8 +50,8 @@ public class KillFeed extends HudElement {
     }
 
     public void onRenderShaders(DrawContext context) {
-        int y_offset1 = 6;
-        float scale_x = 50;
+        int y_offset1 = 3;
+        float scale_x = 20;
 
         for (String player : players) {
             if (FontRenderers.modules.getStringWidth(player) > scale_x)
@@ -73,11 +73,11 @@ public class KillFeed extends HudElement {
         if (!(e.getPacket() instanceof EntityStatusS2CPacket pac)) return;
         if (pac.getStatus() == EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES && pac.getEntity(mc.world) instanceof PlayerEntity pl) {
             if (Aura.target != null && Aura.target == pac.getEntity(mc.world)) {
-                players.add(Formatting.RED +  "EZ -" + Formatting.RESET + pl.getName().getString());
+                players.add(Formatting.RED +  "EZ - " + Formatting.RESET + pl.getName().getString());
                 return;
             }
             if (AutoCrystal.target != null && AutoCrystal.target == pac.getEntity(mc.world)) {
-                players.add(Formatting.RED +  "EZ -" + Formatting.RESET + pl.getName().getString());
+                players.add(Formatting.RED +  "EZ - " + Formatting.RESET + pl.getName().getString());
             }
             if(pl == mc.player && resetOnDeath.getValue())
                 players.clear();

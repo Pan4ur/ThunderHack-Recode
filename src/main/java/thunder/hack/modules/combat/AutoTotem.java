@@ -214,7 +214,7 @@ public final class AutoTotem extends Module {
         if ((mc.player.getHealth() + mc.player.getAbsorptionAmount()) <= healthF.getValue() && (InventoryUtility.findItemInInventory(Items.TOTEM_OF_UNDYING).found() || mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING))
             item = Items.TOTEM_OF_UNDYING;
 
-        if (rcGap.getValue() && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed() && mc.player.getOffHandStack().getItem() != Items.GOLDEN_APPLE) {
+        if (rcGap.getValue() && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed()) {
             if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
                 item = Items.GOLDEN_APPLE;
             if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)

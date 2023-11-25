@@ -47,9 +47,9 @@ public class WaterMark extends HudElement {
             FontRenderers.thglitch.drawString(context.getMatrices(), "THUNDERHACK", getPosX() + 5.5, getPosY() + 5, -1);
             FontRenderers.monsterrat.drawGradientString(context.getMatrices(), "recode", getPosX() + 35.5f, getPosY() + 21f, 1, true);
         } else if (mode.getValue() == Mode.Small) {
-            String info = Formatting.GRAY + "| " + Formatting.RESET + username + Formatting.GRAY + " | " + Formatting.RESET + getPing() + " ms" + Formatting.GRAY + " | " + Formatting.RESET + (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address);
-            FontRenderers.sf_bold.drawGradientString(context.getMatrices(), ru.getValue() ? textUtil + " " : "ThunderHack ", getPosX() + 2, getPosY() + 3, 10, true);
-            FontRenderers.sf_bold.drawString(context.getMatrices(), info, getPosX() + 2 + FontRenderers.sf_bold.getStringWidth("ThunderHack "), getPosY() + 3, HudEditor.textColor.getValue().getColor());
+            String info = Formatting.DARK_GRAY+ "| " + Formatting.RESET + username + Formatting.DARK_GRAY + " | " + Formatting.RESET + getPing() + " ms" + Formatting.DARK_GRAY + " | " + Formatting.RESET + (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address);
+            FontRenderers.sf_bold.drawGradientString(context.getMatrices(), ru.getValue() ? textUtil + " " : "ThunderHack ", getPosX() + 2, getPosY() + 2.5f, 10, true);
+            FontRenderers.sf_bold.drawString(context.getMatrices(), info, getPosX() + 2 + FontRenderers.sf_bold.getStringWidth("ThunderHack "), getPosY() + 2.5f, HudEditor.textColor.getValue().getColor());
         } else {
             FontRenderers.monsterrat.drawGradientString(context.getMatrices(), "ThunderHack v" + ThunderHack.VERSION, getPosX() + 5.5f, getPosY() + 5, 10, true);
         }
@@ -59,12 +59,11 @@ public class WaterMark extends HudElement {
         String username = ((ModuleManager.media.isEnabled() && Media.nickProtect.getValue()) || ModuleManager.nameProtect.isEnabled()) ? (ModuleManager.nameProtect.isEnabled() ? ModuleManager.nameProtect.getName() : "Protected") : mc.getSession().getUsername();
 
         if (mode.getValue() == Mode.Big) {
-            //  Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX(), getPosY(), 103, 30, 8, HudEditor.getColor(270));
-            Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 103, 30, HudEditor.hudRound.getValue(), 10);
-            Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, 104, 31, HudEditor.hudRound.getValue());
-            Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), 103, 30, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+            Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 106, 30, HudEditor.hudRound.getValue(), 10);
+            Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, 107, 31, HudEditor.hudRound.getValue());
+            Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), 106, 30, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
         } else if (mode.getValue() == Mode.Small) {
-            String info = Formatting.GRAY + "| " + Formatting.RESET + username + Formatting.GRAY + " | " + Formatting.RESET + getPing() + " ms" + Formatting.GRAY + " | " + Formatting.RESET + (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address);
+            String info = Formatting.DARK_GRAY + "| " + Formatting.RESET + username + Formatting.DARK_GRAY + " | " + Formatting.RESET + getPing() + " ms" + Formatting.DARK_GRAY + " | " + Formatting.RESET + (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address);
             Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), FontRenderers.sf_bold.getStringWidth("ThunderHack " + info) + 5, 10, 3, 10);
             Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 1f, getPosY() - 1f, FontRenderers.sf_bold.getStringWidth("ThunderHack " + info) + 7, 12, 3);
             Render2DEngine.drawRoundShader(context.getMatrices(), getPosX() - 0.5f, getPosY() - 0.5f, FontRenderers.sf_bold.getStringWidth("ThunderHack " + info) + 6, 11, 3, HudEditor.plateColor.getValue().getColorObject());
