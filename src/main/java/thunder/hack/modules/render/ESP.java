@@ -22,11 +22,13 @@ import thunder.hack.gui.hud.impl.RadarRewrite;
 import thunder.hack.injection.accesors.IBeaconBlockEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.render.animation.CaptureMark;
 
 import java.awt.*;
 
@@ -39,6 +41,7 @@ public class ESP extends Module {
     }
 
     private final Setting<Boolean> lingeringPotions = new Setting<>("LingeringPotions", false);
+    private final Setting<Boolean> renderHealth = new Setting<>("renderHealth", true);
     private final Setting<Boolean> tntFuse = new Setting<>("TNTFuse", false);
     private Setting<Float> tntrange = new Setting<>("TNTRange", 8.0f, 0f, 8f);
     private final Setting<ColorSetting> tntFuseText = new Setting<>("TNTFuseText", new ColorSetting(new Color(-1)), v -> tntFuse.getValue());
@@ -53,7 +56,8 @@ public class ESP extends Module {
     private final Setting<Boolean> pearls = new Setting<>("Pearls", false);
     private final Setting<Boolean> dizorentRadius = new Setting<>("DizorentRadius", true);
     private final Setting<ColorSetting> dizorentColor = new Setting<>("DizorentColor", new ColorSetting(new Color(0xB300F1CC, true)), v -> dizorentRadius.getValue());
-
+    private final Setting<Boolean> outline = new Setting<>("Outline", true);
+    private final Setting<ESP.COLORS> colorMode = new Setting<>("ColorMode", COLORS.SyncColor);
     private final Setting<Parent> boxEsp = new Setting<>("Box", new Parent(false, 0));
     private final Setting<Boolean> players = new Setting<>("Players", true).withParent(boxEsp);
     private final Setting<Boolean> friends = new Setting<>("Friends", true).withParent(boxEsp);
@@ -71,6 +75,8 @@ public class ESP extends Module {
     public final Setting<ColorSetting> monstersC = new Setting<>("MonstersC", new ColorSetting(new Color(0xFF0000))).withParent(boxColors);
     public final Setting<ColorSetting> ambientsC = new Setting<>("AmbientsC", new ColorSetting(new Color(0x7B00FF))).withParent(boxColors);
     public final Setting<ColorSetting> othersC = new Setting<>("OthersC", new ColorSetting(new Color(0xFF0062))).withParent(boxColors);
+    public final Setting<ColorSetting> healthB = new Setting<>("healthB", new ColorSetting(new Color(0xff1100))).withParent(boxColors);
+    public final Setting<ColorSetting> healthU = new Setting<>("healthU", new ColorSetting(new Color(0x2fff00))).withParent(boxColors);
 
     float dizorentAnimation = 0f;
 
@@ -385,20 +391,35 @@ public class ESP extends Module {
             double endPosX = position.z;
             double endPosY = position.w;
 
-            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 1F), (float) posY, (float) (posX + 0.5), (float) (endPosY + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
-            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 1F), (float) (posY - 0.5), (float) (endPosX + 0.5), (float) (posY + 0.5 + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
-            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (endPosX - 0.5 - 0.5), (float) posY, (float) (endPosX + 0.5), (float) (endPosY + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
-            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 1), (float) (endPosY - 0.5 - 0.5), (float) (endPosX + 0.5), (float) (endPosY + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
+            if(outline.getValue()) {
+                Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 1F), (float) posY, (float) (posX + 0.5), (float) (endPosY + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
+                Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 1F), (float) (posY - 0.5), (float) (endPosX + 0.5), (float) (posY + 0.5 + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
+                Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (endPosX - 0.5 - 0.5), (float) posY, (float) (endPosX + 0.5), (float) (endPosY + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
+                Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 1), (float) (endPosY - 0.5 - 0.5), (float) (endPosX + 0.5), (float) (endPosY + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
+            }
 
-            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 0.5f), (float) posY, (float) (posX + 0.5 - 0.5), (float) endPosY, col, col, col, col);
-            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) posX, (float) (endPosY - 0.5f), (float) endPosX, (float) endPosY, col, col, col, col);
-            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 0.5), (float) posY, (float) endPosX, (float) (posY + 0.5), col, col, col, col);
-            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (endPosX - 0.5), (float) posY, (float) endPosX, (float) endPosY, col, col, col, col);
+            switch(colorMode.getValue()) {
+                case Custom -> {
+                    Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 0.5f), (float) posY, (float) (posX + 0.5 - 0.5), (float) endPosY, col, col, col, col);
+                    Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) posX, (float) (endPosY - 0.5f), (float) endPosX, (float) endPosY, col, col, col, col);
+                    Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 0.5), (float) posY, (float) endPosX, (float) (posY + 0.5), col, col, col, col);
+                    Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (endPosX - 0.5), (float) posY, (float) endPosX, (float) endPosY, col, col, col, col);
+                }
+                case SyncColor -> {
+                    Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 0.5f), (float) posY, (float) (posX + 0.5 - 0.5), (float) endPosY, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270));
+                    Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) posX, (float) (endPosY - 0.5f), (float) endPosX, (float) endPosY, HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(180), HudEditor.getColor(0));
+                    Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 0.5), (float) posY, (float) endPosX, (float) (posY + 0.5), HudEditor.getColor(180), HudEditor.getColor(90), HudEditor.getColor(90), HudEditor.getColor(180));
+                    Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (endPosX - 0.5), (float) posY, (float) endPosX, (float) endPosY, HudEditor.getColor(90), HudEditor.getColor(270), HudEditor.getColor(270), HudEditor.getColor(90));
+                }
+            }
 
-            Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 5), (float) posY, (float) posX - 3, (float) endPosY, Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
-
-            if(ent instanceof LivingEntity lent && lent.getHealth() != 0)
-                Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 5), (float) (endPosY + (posY - endPosY) * lent.getHealth() / 20f), (float) posX - 3, (float) endPosY, Color.RED, Color.RED, Color.RED, Color.RED);
+            if(ent instanceof LivingEntity lent && lent.getHealth() != 0 && renderHealth.getValue()) {
+                Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 5), (float) posY, (float) posX - 3, (float) endPosY, Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
+                switch(colorMode.getValue()) {
+                    case Custom -> Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 5), (float) (endPosY + (posY - endPosY) * lent.getHealth() / 20f), (float) posX - 3, (float) endPosY, healthB.getValue().getColorObject(), healthB.getValue().getColorObject(), healthU.getValue().getColorObject(), healthU.getValue().getColorObject());
+                    case SyncColor ->  Render2DEngine.drawRectDumbWay(context.getMatrices(), (float) (posX - 5), (float) (endPosY + (posY - endPosY) * lent.getHealth() / 20f), (float) posX - 3, (float) endPosY, HudEditor.getColor(90), HudEditor.getColor(90), HudEditor.getColor(270), HudEditor.getColor(270));
+                }
+            }
         }
     }
 
@@ -407,5 +428,8 @@ public class ESP extends Module {
         double x = vec.x - mc.player.getPos().x;
         double z = vec.y - mc.player.getPos().z;
         return (float) -(Math.atan2(x, z) * (180 / Math.PI));
+    }
+    public enum COLORS {
+        SyncColor, Custom
     }
 }
