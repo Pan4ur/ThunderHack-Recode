@@ -27,9 +27,11 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.RadarRewrite;
 import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.modules.client.ClickGui;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InteractionUtility;
+import thunder.hack.utility.render.Render2DEngine;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -148,12 +150,12 @@ public final class Core {
             e.getMatrices().translate(xOffset, yOffset, 0.0F);
             e.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
             e.getMatrices().translate(-xOffset, -yOffset, 0.0F);
-            RadarRewrite.drawTracerPointer(e.getMatrices(), xOffset, yOffset - 50, 12.5f, ClickGui.getInstance().getColor(1).getRGB());
+            Render2DEngine.drawTracerPointer(e.getMatrices(), xOffset, yOffset - 50, 12.5f, 0.5f, 3.63f, true, true, HudEditor.getColor(1).getRGB());
             e.getMatrices().translate(xOffset, yOffset, 0.0F);
             e.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-yaw));
             e.getMatrices().translate(-xOffset, -yOffset, 0.0F);
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-            FontRenderers.modules.drawCenteredString(e.getMatrices(), "gps (" + dst + "m)", (float) (Math.sin(Math.toRadians(yaw)) * 50f) + xOffset, (float) (yOffset - (Math.cos(Math.toRadians(yaw)) * 50f)) - 20, -1);
+            FontRenderers.modules.drawCenteredString(e.getMatrices(), "gps (" + dst + "m)", (float) (Math.sin(Math.toRadians(yaw)) * 50f) + xOffset, (float) (yOffset - (Math.cos(Math.toRadians(yaw)) * 50f)) - 23, -1);
 
             if(dst < 10)
                 ThunderHack.gps_position = null;

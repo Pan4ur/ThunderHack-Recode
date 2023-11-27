@@ -25,6 +25,7 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.RadarRewrite;
 import thunder.hack.injection.accesors.IBeaconBlockEntity;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -308,7 +309,7 @@ public class ESP extends Module {
                     context.getMatrices().translate(xOffset, yOffset, 0.0F);
                     context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
                     context.getMatrices().translate(-xOffset, -yOffset, 0.0F);
-                    RadarRewrite.drawTracerPointer(context.getMatrices(), xOffset, yOffset - 50, 12.5f, HudEditor.getColor(1).getRGB());
+                    Render2DEngine.drawTracerPointer(context.getMatrices(), xOffset, yOffset - 50, 12.5f, 0.5f, 3.63f, true, true, ClickGui.getInstance().getColor(1).getRGB());
                     context.getMatrices().translate(xOffset, yOffset, 0.0F);
                     context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-yaw));
                     context.getMatrices().translate(-xOffset, -yOffset, 0.0F);

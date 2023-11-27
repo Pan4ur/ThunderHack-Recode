@@ -9,6 +9,7 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 
 public final class HudEditor extends Module {
+    public static final Setting<ArrowsStyle> arrowsStyle = new Setting<>("ArrowsStyle", ArrowsStyle.Default);
     public static final Setting<ClickGui.colorModeEn> colorMode = new Setting<>("ColorMode", ClickGui.colorModeEn.Static);
     public static final Setting<Integer> colorSpeed = new Setting<>("ColorSpeed", 18, 2, 54);
     public static final Setting<Boolean> glow = new Setting<>("Glow", true);
@@ -47,5 +48,9 @@ public final class HudEditor extends Module {
 
     public static HudEditor getInstance() {
         return instance;
+    }
+
+    public enum ArrowsStyle {
+        Default, New
     }
 }

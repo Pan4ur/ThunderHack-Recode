@@ -19,6 +19,10 @@ public class Crosshair extends Module {
 
     public final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x2250b4b4));
     private final Setting<Boolean> dynamic = new Setting<>("Dynamic", true);
+    private final Setting<Float> range = new Setting<>("Range", 30.0f, 0.1f, 120f);
+    private final Setting<Float> speed = new Setting<>("Speed", 3.0f, 0.1f, 20f);
+    private final Setting<Float> backSpeed = new Setting<>("BackSpeed", 5.0f, 0.1f, 20f);
+
 
     private enum Mode {
         Custom, Sync
@@ -33,19 +37,19 @@ public class Crosshair extends Module {
         float midY = mc.getWindow().getScaledHeight() / 2f;
 
         if(mc.player.prevHeadYaw - mc.player.getHeadYaw() > 0) {
-            xAnim = AnimationUtility.fast(xAnim, midX - 30f, 3);
+            xAnim = AnimationUtility.fast(xAnim, midX - range.getValue(), speed.getValue());
         } else if(mc.player.prevHeadYaw - mc.player.getHeadYaw() < 0) {
-            xAnim = AnimationUtility.fast(xAnim, midX + 30f, 3);
+            xAnim = AnimationUtility.fast(xAnim, midX + range.getValue(), speed.getValue());
         } else  {
-            xAnim = AnimationUtility.fast(xAnim, midX, 5);
+            xAnim = AnimationUtility.fast(xAnim, midX, backSpeed.getValue());
         }
 
         if(prevPitch - mc.player.getPitch() > 0) {
-            yAnim = AnimationUtility.fast(yAnim, midY - 30f, 3);
+            yAnim = AnimationUtility.fast(yAnim, midY - range.getValue(), speed.getValue());
         } else if(prevPitch - mc.player.getPitch() < 0) {
-            yAnim = AnimationUtility.fast(yAnim, midY + 30f, 3);
+            yAnim = AnimationUtility.fast(yAnim, midY + range.getValue(), speed.getValue());
         } else  {
-            yAnim = AnimationUtility.fast(yAnim, midY, 5);
+            yAnim = AnimationUtility.fast(yAnim, midY, backSpeed.getValue());
         }
 
         prevPitch = mc.player.getPitch();

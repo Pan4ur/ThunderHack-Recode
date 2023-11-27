@@ -53,7 +53,7 @@ public class Notification {
         Render2DEngine.verticalGradient(matrix, x1 + 25, y1 + 11, x1 + 25.5f, y1 + 22, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
 
         FontRenderers.sf_bold_mini.drawString(matrix, title, x1 + 30, y1 + 6, HudEditor.textColor.getValue().getColor());
-        FontRenderers.sf_bold_mini.drawString(matrix, message, x1 + 30, (int) y1 + 15, icolor2.getRGB());
+        FontRenderers.sf_bold_mini.drawString(matrix, message, x1 + 30, y1 + 15, icolor2.getRGB());
 
         String icon = "I";
         switch (type) {
@@ -66,18 +66,12 @@ public class Notification {
 
         FontRenderers.mid_icons.drawString(matrix, icon, x1 + 5, y1 + 7, icolor2.getRGB());
 
-        if (animationTimer.passedMs(50)) {
+        if (animationTimer.every(50)) {
             animation.update(direction);
-            animationTimer.reset();
         }
     }
 
     public void renderShaders(MatrixStack matrix, float getY) {
-        direction = isFinished();
-        animationX = (float) (width * animation.getAnimationd());
-
-        posY = animate(posY, getY);
-
         int x1 = (int) ((mc.getWindow().getScaledWidth() - 6) - width + animationX);
         int y1 = (int) posY;
 

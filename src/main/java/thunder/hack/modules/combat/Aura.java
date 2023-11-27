@@ -22,10 +22,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ShulkerBulletEntity;
-import net.minecraft.item.AxeItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.item.SwordItem;
+import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
@@ -166,8 +163,7 @@ public final class Aura extends Module {
         updateTarget();
 
         Item handItem = mc.player.getMainHandStack().getItem();
-        if (target == null || (onlyWeapon.getValue()
-                && !(handItem instanceof SwordItem || handItem instanceof AxeItem))) {
+        if (target == null || (switchMode.getValue() != Switch.Silent && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem))) {
             return;
         }
 
@@ -287,6 +283,10 @@ public final class Aura extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
+        Item handItem = mc.player.getMainHandStack().getItem();
+        if((onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem)) && switchMode.getValue() != Switch.Silent)
+            return;
+
         if (target != null && rotationMode.getValue() != Rotation.None) {
             mc.player.setYaw(rotationYaw);
             mc.player.setPitch(rotationPitch);
@@ -505,9 +505,14 @@ public final class Aura extends Module {
                 if (Math.abs(additionYaw - prevYaw) <= 3.0f)
                     additionYaw = prevYaw + 3.1f;
 
+                if (trackticks > 0 || mode.getValue() == Mode.Track) {
+                    rotationYaw = rotationYaw + (yawDelta > 0.0f ? additionYaw : -additionYaw) * 1.0001f;
+                    rotationPitch = MathHelper.clamp(rotationPitch + (pitchDelta > 0.0f ? additionPitch : -additionPitch) * 1.0001f, -90.0f, 90.0f);
+                } else {
+                    rotationYaw = mc.player.getYaw();
+                    rotationPitch = mc.player.getPitch();
+                }
 
-                rotationYaw = rotationYaw + (yawDelta > 0.0f ? additionYaw : -additionYaw) * 1.0001f;
-                rotationPitch = MathHelper.clamp(rotationPitch + (pitchDelta > 0.0f ? additionPitch : -additionPitch) * 1.0001f, -90.0f, 90.0f);
                 prevYaw = additionYaw;
                 lookingAtHitbox = ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), ignoreWalls.getValue().isEnabled(), rayTrace.getValue());
             }
