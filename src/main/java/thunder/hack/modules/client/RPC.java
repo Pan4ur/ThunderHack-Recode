@@ -1,10 +1,8 @@
 package thunder.hack.modules.client;
 
-import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.client.gui.screen.AddServerScreen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -14,7 +12,6 @@ import thunder.hack.utility.discord.DiscordRPC;
 import thunder.hack.utility.discord.DiscordRichPresence;
 
 import java.io.*;
-import java.util.List;
 import java.util.Objects;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
@@ -97,7 +94,7 @@ public final class RPC extends Module {
                         case Stats ->
                                 presence.state = "Hacks: " + ThunderHack.moduleManager.getEnabledModules().size() + " / " + ThunderHack.moduleManager.modules.size();
                         case Custom -> presence.state = state.getValue();
-                        case Version -> presence.state = "v1.2 for mc 1.20.1";
+                        case Version -> presence.state = "v1.3 for mc 1.20.2";
                     }
 
                     if (nickname.getValue()) {

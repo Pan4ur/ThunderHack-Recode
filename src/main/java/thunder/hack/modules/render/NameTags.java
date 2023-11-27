@@ -22,6 +22,7 @@ import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector4d;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -93,7 +94,7 @@ public class NameTags extends Module {
             if (ping.getValue()) final_string += getEntityPing(ent) + "ms ";
             if (gamemode.getValue()) final_string += translateGamemode(getEntityGamemode(ent)) + " ";
 
-            final_string += ent.getDisplayName().getString() + " ";
+            final_string += (ent.getDisplayName().getString()) + " ";
 
             if (health.getValue()) final_string += getHealthColor(ent) + round2(ent.getAbsorptionAmount() + ent.getHealth()) + " ";
             if (distance.getValue()) final_string += String.format("%.1f", mc.player.distanceTo(ent)) + "m ";

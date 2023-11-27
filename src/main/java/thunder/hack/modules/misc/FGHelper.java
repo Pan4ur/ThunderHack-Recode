@@ -37,7 +37,6 @@ public class FGHelper extends Module {
 
     private final Setting<Mode> mode = new Setting("Server", Mode.Survival);
     private final Setting<Boolean> photomath = new Setting<>("PhotoMath", false, v -> mode.getValue() == Mode.Survival);
-    private final Setting<Boolean> spam = new Setting<>("Spam", false, v -> photomath.getValue() && mode.getValue() == Mode.Survival);
     private final Setting<Boolean> cappuccino = new Setting<>("Cappuccino", true, v -> mode.getValue() == Mode.Survival);
     private final Setting<Integer> triggerhealth = new Setting<>("TriggerHealth", 10, 1, 36, v -> mode.getValue() == Mode.Survival && cappuccino.getValue());
     private final Setting<Boolean> americano = new Setting<>("Americano", true, v -> mode.getValue() == Mode.Survival);
@@ -55,6 +54,9 @@ public class FGHelper extends Module {
     private final Timer timer = new Timer();
     private final Timer pvpTimer = new Timer();
     private final Timer inviteTimer = new Timer();
+    private final Timer atphtimer = new Timer();
+    private final Timer checktimer = new Timer();
+    private boolean flag = false;
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
@@ -63,8 +65,7 @@ public class FGHelper extends Module {
             if (packet.content().getString().contains("Решите: ") && Objects.equals(ThunderUtility.solveName(packet.content().getString()), "FATAL ERROR")) {
                 try {
                     int solve = Integer.parseInt(StringUtils.substringBetween(packet.content().getString(), "Решите: ", " + ")) + Integer.parseInt(StringUtils.substringBetween(packet.content().getString(), " + ", " кто первый"));
-                    for (int i = 0; i < (spam.getValue() ? 9 : 1); i++)
-                        mc.player.networkHandler.sendChatMessage(String.valueOf(solve));
+                    mc.player.networkHandler.sendChatMessage(String.valueOf(solve));
                 } catch (Exception ignored) {
                 }
             }
@@ -206,10 +207,6 @@ public class FGHelper extends Module {
     public enum Mode {
         Survival, Grief
     }
-
-    Timer atphtimer = new Timer();
-    Timer checktimer = new Timer();
-    private boolean flag = false;
 
     public boolean check(String checkstring) {
         return checktimer.passedMs(3000) && (Objects.equals(ThunderUtility.solveName(checkstring), "FATAL ERROR"));

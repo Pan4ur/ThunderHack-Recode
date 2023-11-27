@@ -16,6 +16,7 @@ public class ModuleList extends HudElement {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.ColorText);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
     private final Setting<Float> rainbowSpeed = new Setting<>("Speed", 10.0f, 1.0f, 20.0f);
+    private final Setting<Float> offset1 = new Setting<>("Offset", 10.0f, 1.0f, 20.0f);
     private final Setting<Float> saturation = new Setting<>("Saturation", 0.5f, 0.1f, 1.0f);
     private final Setting<Integer> gste = new Setting<>("GS", 30, 1, 50);
     private final Setting<Boolean> glow = new Setting<>("glow", false);
@@ -119,7 +120,7 @@ public class ModuleList extends HudElement {
         if (cmode.getValue() == cMode.Rainbow) {
             return Render2DEngine.astolfo(offset, yTotal, saturation.getValue(), rainbowSpeed.getValue());
         } else if (cmode.getValue() == cMode.DoubleColor) {
-            return Render2DEngine.TwoColoreffect(color.getValue().getColorObject(), color2.getValue().getColorObject(), Math.abs(System.currentTimeMillis() / 10) / 100.0 + offset * ((20f - rainbowSpeed.getValue()) / 200));
+            return Render2DEngine.TwoColoreffect(color.getValue().getColorObject(), color2.getValue().getColorObject(), rainbowSpeed.getValue(), offset * offset1.getValue());
         } else {
             return new Color(color.getValue().getColor()).darker();
         }

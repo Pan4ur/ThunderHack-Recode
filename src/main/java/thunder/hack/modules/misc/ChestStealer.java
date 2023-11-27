@@ -1,17 +1,28 @@
 package thunder.hack.modules.misc;
 
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.EnderChestBlockEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.Direction;
+import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.InteractionUtility;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static thunder.hack.modules.render.StorageEsp.getBlockEntities;
 
 public class ChestStealer extends Module {
 
@@ -22,21 +33,39 @@ public class ChestStealer extends Module {
     private final Setting<Integer> delay = new Setting<>("Delay", 100, 0, 1000);
     private final Setting<Boolean> random = new Setting<>("Random", false);
     private final Setting<Boolean> close = new Setting<>("Close", false);
+    private final Setting<Boolean> autoMyst = new Setting<>("AutoMyst", false);
     private final Setting<Sort> sort = new Setting<>("Sort", Sort.None);
 
     public List<String> items = new ArrayList<>();
     private final Timer timer = new Timer();
+    private final Timer autoMystDelay = new Timer();
     private final Random rnd = new Random();
 
     public void onRender3D(MatrixStack stack) {
         if (mc.player.currentScreenHandler instanceof GenericContainerScreenHandler chest) {
             for (int i = 0; i < chest.getInventory().size(); i++) {
                 Slot slot = chest.getSlot(i);
-                if (slot.hasStack() && isAllowed(slot.getStack()) && timer.every(delay.getValue() + (random.getValue() ? rnd.nextInt(delay.getValue()) : 0)))
+                if (slot.hasStack() && isAllowed(slot.getStack()) && timer.every(delay.getValue() + (random.getValue() ? rnd.nextInt(delay.getValue()) : 0))) {
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 0, SlotActionType.QUICK_MOVE, mc.player);
+                    autoMystDelay.reset();
+                }
             }
             if (isContainerEmpty(chest) && close.getValue())
-                mc.player.currentScreenHandler.onClosed(mc.player);
+                mc.player.closeScreen();
+        }
+    }
+
+    @EventHandler
+    public void onPlayerUpdate(PlayerUpdateEvent event) {
+        if(autoMyst.getValue() && mc.currentScreen == null && autoMystDelay.passedMs(3000)) {
+            for(BlockEntity be : getBlockEntities()) {
+                if(be instanceof EnderChestBlockEntity) {
+                    if(mc.player.squaredDistanceTo(be.getPos().toCenterPos()) > 25)
+                        continue;
+                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(be.getPos().toCenterPos().add(MathUtility.random(-0.4, 0.4),0.375,MathUtility.random(-0.4, 0.4)), Direction.UP, be.getPos(), false));
+                    mc.player.swingHand(Hand.MAIN_HAND);
+                }
+            }
         }
     }
 

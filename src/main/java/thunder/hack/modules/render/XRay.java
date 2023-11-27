@@ -98,7 +98,7 @@ public class XRay extends Module {
             if (toCheck.isEmpty()) return;
             BlockPos pos = toCheck.remove(0);
             ++done;
-            sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos, Direction.UP));
+            mc.interactionManager.updateBlockBreakingProgress(pos, mc.player.getHorizontalFacing());
             displayBlock = pos;
         }
     }

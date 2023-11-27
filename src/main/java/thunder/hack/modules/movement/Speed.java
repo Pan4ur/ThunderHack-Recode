@@ -85,15 +85,12 @@ public class Speed extends Module {
             }
             if (mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.29, 0, -0.29).offset(0.0, -3, 0.0f)).iterator().hasNext() && elytraDelay.passedMs(150) && startDelay.passedMs(500)) {
                 int elytra = InventoryUtility.getElytra();
-                if (elytra == -1) {
-                    disable(isRu() ? "Для этого режима нужна элитра!" : "You need elytra for this mode!");
-                } else {
-                    Strafe.disabler(elytra);
-                }
+                if (elytra == -1) disable(isRu() ? "Для этого режима нужна элитра!" : "You need elytra for this mode!");
+                else Strafe.disabler(elytra);
+
                 mc.player.setVelocity(mc.player.getVelocity().getX(), 0f, mc.player.getVelocity().getZ());
-                if (isMoving()) {
+                if (isMoving())
                     MovementUtility.setMotion(0.85);
-                }
                 elytraDelay.reset();
             }
         }

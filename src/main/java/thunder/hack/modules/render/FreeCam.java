@@ -3,10 +3,7 @@ package thunder.hack.modules.render;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import thunder.hack.events.impl.EventKeyboardInput;
-import thunder.hack.events.impl.EventMove;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.*;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
@@ -18,7 +15,7 @@ public class FreeCam extends Module {
     private final Setting<Boolean> freeze = new Setting<>("Freeze", false);
 
 
-    private float fakeYaw, fakePitch, prevFakeYaw, prevFakePitch;
+    private float fakeYaw, fakePitch, prevFakeYaw, prevFakePitch, prevScroll;
     private double fakeX, fakeY, fakeZ, prevFakeX, prevFakeY, prevFakeZ;
 
     public FreeCam() {
@@ -101,6 +98,20 @@ public class FreeCam extends Module {
     public void onPacketSend(PacketEvent.Send e) {
         if (freeze.getValue() && e.getPacket() instanceof PlayerMoveC2SPacket)
             e.cancel();
+    }
+
+    @EventHandler
+    public void onScroll(EventMouse e) {
+        if(e.getAction() == 2) {
+            if(e.getButton() > 0) {
+                sendMessage("+");
+                speed.setValue(speed.getValue() + 0.05f);
+            } else {
+                sendMessage("-");
+                speed.setValue(speed.getValue() - 0.05f);
+            }
+            prevScroll = e.getButton();
+        }
     }
 
     public float getFakeYaw() {

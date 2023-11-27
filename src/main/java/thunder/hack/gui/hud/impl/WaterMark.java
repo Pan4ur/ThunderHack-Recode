@@ -8,6 +8,7 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.client.Media;
+import thunder.hack.modules.misc.NameProtect;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.TextUtil;
@@ -41,7 +42,7 @@ public class WaterMark extends HudElement {
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        String username = ((ModuleManager.media.isEnabled() && Media.nickProtect.getValue()) || ModuleManager.nameProtect.isEnabled()) ? (ModuleManager.nameProtect.isEnabled() ? ModuleManager.nameProtect.getName() : "Protected") : mc.getSession().getUsername();
+        String username = ((ModuleManager.media.isEnabled() && Media.nickProtect.getValue()) || ModuleManager.nameProtect.isEnabled()) ? (ModuleManager.nameProtect.isEnabled() ? NameProtect.newName.getValue() : "Protected") : mc.getSession().getUsername();
 
         if (mode.getValue() == Mode.Big) {
             FontRenderers.thglitch.drawString(context.getMatrices(), "THUNDERHACK", getPosX() + 5.5, getPosY() + 5, -1);
@@ -56,7 +57,7 @@ public class WaterMark extends HudElement {
     }
 
     public void onRenderShaders(DrawContext context) {
-        String username = ((ModuleManager.media.isEnabled() && Media.nickProtect.getValue()) || ModuleManager.nameProtect.isEnabled()) ? (ModuleManager.nameProtect.isEnabled() ? ModuleManager.nameProtect.getName() : "Protected") : mc.getSession().getUsername();
+        String username = ((ModuleManager.media.isEnabled() && Media.nickProtect.getValue()) || ModuleManager.nameProtect.isEnabled()) ? (ModuleManager.nameProtect.isEnabled() ? NameProtect.newName.getValue() : "Protected") : mc.getSession().getUsername();
 
         if (mode.getValue() == Mode.Big) {
             Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 106, 30, HudEditor.hudRound.getValue(), 10);

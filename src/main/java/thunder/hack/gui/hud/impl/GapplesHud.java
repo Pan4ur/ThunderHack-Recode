@@ -37,7 +37,7 @@ public class GapplesHud extends HudElement {
         if(mc.player.getActiveItem().getItem() != Items.GOLDEN_APPLE)
             factor2 = 1f;
 
-        factor2 = MathUtility.clamp(factor2, 0f, 1f);
+        factor2 = MathUtility.clamp(factor2, 0.01f, 1f);
 
         context.getMatrices().push();
         context.getMatrices().translate(xPos, yPos, 0);

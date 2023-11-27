@@ -1,7 +1,6 @@
 package thunder.hack.modules.player;
 
 import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.SlotActionType;
 import thunder.hack.modules.Module;
@@ -17,20 +16,20 @@ public class MouseElytraFix extends Module {
 
     @Override
     public void onUpdate() {
-        ItemStack stack = mc.player.currentScreenHandler.getCursorStack();
-        if (stack.getItem() instanceof ArmorItem armor && delay.passedMs(300)) {
-            if (armor.getType() == ArmorItem.Type.CHESTPLATE && mc.player.getInventory().getStack(38).getItem() == Items.ELYTRA) {
-                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 6, 0, SlotActionType.PICKUP, mc.player);
-                int nullSlot = findEmptySlot();
-                boolean needDrop = nullSlot == 999;
-                if (needDrop) nullSlot = 9;
-                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, nullSlot, 0, SlotActionType.PICKUP, mc.player);
-                if (needDrop)
-                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, -999, 0, SlotActionType.PICKUP, mc.player);
-                sendMessage("fixed");
-                delay.reset();
-            }
+        if (mc.player.currentScreenHandler.getCursorStack().getItem() instanceof ArmorItem armor) {
+            if (delay.every(300) && armor.getType() == ArmorItem.Type.CHESTPLATE)
+                if (mc.player.getInventory().getArmorStack(2).getItem() == Items.ELYTRA) {
+                    mc.interactionManager.clickSlot(0, 6, 1, SlotActionType.PICKUP, mc.player);
+                    int empty = findEmptySlot();
+                    boolean needDrop = (empty == 999);
+                    if (needDrop)
+                        empty = 9;
+                    mc.interactionManager.clickSlot(0, empty, 1, SlotActionType.PICKUP, mc.player);
+                    if (needDrop)
+                        mc.interactionManager.clickSlot(0, -999, 1, SlotActionType.PICKUP, mc.player);
+                }
         }
+
     }
 
     public static int findEmptySlot() {

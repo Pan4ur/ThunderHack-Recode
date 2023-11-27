@@ -9,6 +9,7 @@ import net.minecraft.item.SwordItem;
 import net.minecraft.resource.ResourceFactory;
 import com.mojang.datafixers.util.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -45,6 +46,18 @@ import static thunder.hack.modules.Module.mc;
 public abstract class MixinGameRenderer {
     @Shadow
     public abstract void render(float tickDelta, long startTime, boolean tick);
+
+    @Shadow
+    private float zoom;
+
+    @Shadow
+    private float zoomX;
+
+    @Shadow
+    private float zoomY;
+
+    @Shadow
+    private float viewDistance;
 
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", shift = At.Shift.BEFORE), method = "render")
     void postHudRenderHook(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
@@ -99,7 +112,21 @@ public abstract class MixinGameRenderer {
         GlProgram.forEachProgram(loader -> shadersToLoad.add(new Pair<>(loader.getLeft().apply(factory), loader.getRight())));
     }
 
-    @Inject(at = @At("TAIL"), method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D", cancellable = true)
+    @Inject(method = "getBasicProjectionMatrix",at = @At("TAIL"), cancellable = true)
+    public void getBasicProjectionMatrixHook(double fov, CallbackInfoReturnable<Matrix4f> cir) {
+        if(ModuleManager.aspectRatio.isEnabled()) {
+            MatrixStack matrixStack = new MatrixStack();
+            matrixStack.peek().getPositionMatrix().identity();
+            if (zoom != 1.0f) {
+                matrixStack.translate(zoomX, -zoomY, 0.0f);
+                matrixStack.scale(zoom, zoom, 1.0f);
+            }
+            matrixStack.peek().getPositionMatrix().mul(new Matrix4f().setPerspective((float)(fov * 0.01745329238474369), ModuleManager.aspectRatio.ratio.getValue(), 0.05f, viewDistance * 4.0f));
+            cir.setReturnValue(matrixStack.peek().getPositionMatrix());
+        }
+    }
+
+    @Inject(method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D", at = @At("TAIL"), cancellable = true)
     public void getFov(Camera camera, float tickDelta, boolean changingFov, CallbackInfoReturnable<Double> cb) {
         if (ModuleManager.fov.isEnabled()) {
             if (cb.getReturnValue() == 70

@@ -488,10 +488,10 @@ public class Render2DEngine {
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), MathHelper.clamp(alpha, 0, 255));
     }
 
-    public static Color TwoColoreffect(Color cl1, Color cl2, double speed) {
-        double thing = speed / 4.0 % 1.0;
-        float val = MathHelper.clamp((float) Math.sin(Math.PI * 6 * thing) / 2.0f + 0.5f, 0.0f, 1.0f);
-        return new Color(lerp((float) cl1.getRed() / 255.0f, (float) cl2.getRed() / 255.0f, val), lerp((float) cl1.getGreen() / 255.0f, (float) cl2.getGreen() / 255.0f, val), lerp((float) cl1.getBlue() / 255.0f, (float) cl2.getBlue() / 255.0f, val));
+    public static Color TwoColoreffect(Color cl1, Color cl2, double speed, double count) {
+        int angle = (int) (((System.currentTimeMillis()) / speed + count) % 360);
+        angle = (angle >= 180 ? 360 - angle : angle) * 2;
+        return interpolateColorHue(cl1, cl2, angle / 360f);
     }
 
     public static float lerp(float a, float b, float f) {

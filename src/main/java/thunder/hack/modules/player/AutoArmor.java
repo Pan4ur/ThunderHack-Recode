@@ -1,6 +1,7 @@
 package thunder.hack.modules.player;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.model.ModelUtil;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.PlayerUpdateEvent;
@@ -9,6 +10,7 @@ import thunder.hack.modules.Module;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Stack;
 
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
@@ -54,14 +56,14 @@ public class AutoArmor extends Module {
         armorMap.put(EquipmentSlot.CHEST, new int[] { 38, getProtection(mc.player.getInventory().getStack(38)), -1, -1 });
         armorMap.put(EquipmentSlot.HEAD, new int[] { 39, getProtection(mc.player.getInventory().getStack(39)), -1, -1 });
 
-        for (int s = 0; s < 36; s++) {
-            int prot = getProtection(mc.player.getInventory().getStack(s));
+        for (int i = 0; i < 36; i++) {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            int prot = getProtection(stack);
             if (prot > 0) {
-                EquipmentSlot slot = (mc.player.getInventory().getStack(s).getItem() instanceof ElytraItem ? EquipmentSlot.CHEST : ((ArmorItem) mc.player.getInventory().getStack(s).getItem()).getSlotType());
                 for (Entry<EquipmentSlot, int[]> e: armorMap.entrySet()) {
-                    if (e.getKey() == slot) {
+                    if (e.getKey() == (stack.getItem() instanceof ElytraItem ? EquipmentSlot.CHEST : ((ArmorItem) stack.getItem()).getSlotType())) {
                         if (prot > e.getValue()[1] && prot > e.getValue()[3]) {
-                            e.getValue()[2] = s;
+                            e.getValue()[2] = i;
                             e.getValue()[3] = prot;
                         }
                     }
@@ -93,14 +95,15 @@ public class AutoArmor extends Module {
     }
 
     private int getProtection(ItemStack is) {
-        if (is.getItem() instanceof ArmorItem || is.getItem() == Items.ELYTRA) {
+        if (is.getItem() instanceof ArmorItem || is.getItem() instanceof ElytraItem) {
             int prot = 0;
 
             if (is.getItem() instanceof ElytraItem) {
                 if (!ElytraItem.isUsable(is))
                     return 0;
                 prot = 1;
-                if(ModuleManager.elytraRecast.isEnabled() || ModuleManager.elytraPlus.isEnabled()){
+                if(ModuleManager.elytraRecast.isEnabled() || ModuleManager.elytraPlus.isEnabled()
+                        || (ModuleManager.elytraSwap.isEnabled() && mc.player.getInventory().getStack(38).getItem() instanceof ElytraItem)){
                     prot = 999;
                 }
             }

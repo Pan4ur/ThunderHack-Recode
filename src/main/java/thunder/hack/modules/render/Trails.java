@@ -14,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;
@@ -70,9 +71,7 @@ public class Trails extends Module {
     public void onPreRender3D(MatrixStack stack) {
         if (players.getValue() == Players.Trail) {
             for (PlayerEntity entity : mc.world.getPlayers()) {
-
                 float alpha = color.getValue().getAlpha() / 255f;
-
                 if (!((IEntity) entity).thunderHack_Recode$getTrails().isEmpty()) {
                     stack.push();
                     RenderSystem.disableCull();

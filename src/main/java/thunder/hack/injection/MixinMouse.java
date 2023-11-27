@@ -21,4 +21,11 @@ public class MixinMouse {
             ThunderHack.EVENT_BUS.post(new EventMouse(button, action));
         }
     }
+
+    @Inject(method = "onMouseScroll", at = @At("HEAD"))
+    private void onMouseScrollHook(long window, double horizontal, double vertical, CallbackInfo ci) {
+        if (window == mc.getWindow().getHandle()) {
+            ThunderHack.EVENT_BUS.post(new EventMouse((int) vertical, 2));
+        }
+    }
 }

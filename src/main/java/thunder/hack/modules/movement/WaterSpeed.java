@@ -1,13 +1,18 @@
 package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.render.entity.model.ParrotEntityModel;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import thunder.hack.events.impl.EventMove;
+import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.MovementUtility;
+
+import static net.minecraft.entity.EntityPose.STANDING;
 
 public class WaterSpeed extends Module {
     public WaterSpeed() {

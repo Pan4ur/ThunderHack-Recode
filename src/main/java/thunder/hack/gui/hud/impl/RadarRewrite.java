@@ -174,7 +174,7 @@ public class RadarRewrite extends HudElement {
                 switch (Mode2.getValue()) {
                     case Astolfo -> color = new Color(Render2DEngine.astolfo(false, (int) stage).getRGB());
                     case TwoColor ->
-                            color = Render2DEngine.TwoColoreffect(cColor.getValue().getColorObject(), cColor2.getValue().getColorObject(), Math.abs(System.currentTimeMillis() / 1000.) + i * ((20f - colorOffset1.getValue()) / 200));
+                            color = Render2DEngine.TwoColoreffect(cColor.getValue().getColorObject(), cColor2.getValue().getColorObject(), 10, stage * (colorOffset1.getValue() * 500));
                 }
 
             cos = (float) Math.cos(i * Math.PI / 180);

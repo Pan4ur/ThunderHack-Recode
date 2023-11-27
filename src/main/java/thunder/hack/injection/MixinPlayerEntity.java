@@ -22,6 +22,7 @@ import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.modules.client.Media;
 import thunder.hack.modules.combat.Aura;
+import thunder.hack.modules.misc.NameProtect;
 import thunder.hack.modules.movement.AutoSprint;
 
 import static thunder.hack.modules.Module.mc;

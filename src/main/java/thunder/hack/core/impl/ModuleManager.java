@@ -79,6 +79,7 @@ public class ModuleManager implements IManager {
     public static AutoRespawn autoRespawn = new AutoRespawn();
     public static AutoCrystal autoCrystal = new AutoCrystal();
     public static EntitySpeed entitySpeed = new EntitySpeed();
+    public static AspectRatio aspectRatio = new AspectRatio();
     public static WaterSpeed waterSpeed = new WaterSpeed();
     public static TriggerBot triggerBot = new TriggerBot();
     public static TPSCounter tpsCounter = new TPSCounter();
