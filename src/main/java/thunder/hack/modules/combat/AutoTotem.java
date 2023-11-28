@@ -11,6 +11,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.TntMinecartEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.SwordItem;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -20,6 +21,7 @@ import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -124,23 +126,18 @@ public final class AutoTotem extends Module {
             if (slot >= 9) {
                 if (matrix.getValue()) {
                     sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
-
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
-                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-
                     debug(slot + " " + nearest_slot);
-
                     sendPacket(new UpdateSelectedSlotC2SPacket(nearest_slot));
                     mc.player.getInventory().selectedSlot = nearest_slot;
-
+                    ItemStack itemstack = mc.player.getOffHandStack();
+                    mc.player.setStackInHand(Hand.OFF_HAND, mc.player.getMainHandStack());
+                    mc.player.setStackInHand(Hand.MAIN_HAND, itemstack);
                     sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-
                     sendPacket(new UpdateSelectedSlotC2SPacket(prevCurrentItem));
                     mc.player.getInventory().selectedSlot = prevCurrentItem;
-
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
                     sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-
                     if (resetAttackCooldown.getValue()) mc.player.resetLastAttackedTicks();
                 } else {
                     sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
