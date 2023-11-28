@@ -35,7 +35,7 @@ public class ThunderHack implements ModInitializer {
     public static long initTime;
     public static KeyListening currentKeyListener;
 
-    /*-----------------    Managers  ---------------------*/
+    /*-----------------    Managers    ---------------------*/
     public static NotificationManager notificationManager = new NotificationManager();
     public static WayPointManager wayPointManager = new WayPointManager();
     public static ModuleManager moduleManager = new ModuleManager();
@@ -107,10 +107,10 @@ public class ThunderHack implements ModInitializer {
                    | $$   | $$  \\ $$| $$  | $$| $$  \\ $$| $$  | $$| $$$$$$$$| $$  \\__/| $$__  $$  /$$$$$$$| $$      | $$$$$$/\s
                    | $$   | $$  | $$| $$  | $$| $$  | $$| $$  | $$| $$_____/| $$      | $$  | $$ /$$__  $$| $$      | $$_  $$\s
                    | $$   | $$  | $$|  $$$$$$/| $$  | $$|  $$$$$$$|  $$$$$$$| $$      | $$  | $$|  $$$$$$$|  $$$$$$$| $$ \\  $$
-                   |__/   |__/  |__/ \\______/ |__/  |__/ \\_______/ \\_______/|__/      |__/  |__/ \\_______/ \\_______/|__/  \\__/   \s
-                   \n \t\t\t\t\t\tBy\s""" + ThunderUtility.getAuthors());
+                   |__/   |__/  |__/ \\______/ |__/  |__/ \\_______/ \\_______/|__/      |__/  |__/ \\_______/ \\_______/|__/  \\__/""");
 
-        LogUtils.getLogger().info("[ThunderHack] Init time: " + (System.currentTimeMillis() - initTime) + " ms.");
+        LogUtils.getLogger()
+                .info("[ThunderHack] Init time: " + (System.currentTimeMillis() - initTime) + " ms.");
 
         initTime = System.currentTimeMillis();
     }
