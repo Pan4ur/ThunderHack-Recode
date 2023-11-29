@@ -254,7 +254,7 @@ public class Render3DEngine {
         float maxY = (float) (box.maxY - mc.getEntityRenderDispatcher().camera.getPos().getY());
         float maxZ = (float) (box.maxZ - mc.getEntityRenderDispatcher().camera.getPos().getZ());
 
-        if(ModuleManager.holeESP.culling.getValue())
+        if (ModuleManager.holeESP.culling.getValue())
             RenderSystem.enableCull();
 
         buffer.vertex(posMatrix, minX, minY, minZ).color(c.getRGB()).next();
@@ -282,7 +282,7 @@ public class Render3DEngine {
         buffer.vertex(posMatrix, maxX, maxY, maxZ).color(c1.getRGB()).next();
         buffer.vertex(posMatrix, maxX, maxY, minZ).color(c1.getRGB()).next();
 
-        if(ModuleManager.holeESP.culling.getValue())
+        if (ModuleManager.holeESP.culling.getValue())
             RenderSystem.disableCull();
     }
 
@@ -624,7 +624,7 @@ public class Render3DEngine {
         Render3DEngine.cleanup();
     }
 
-    public static void drawCircle3D(MatrixStack stack,Entity ent, float radius, int color, int points, boolean hudColor, int colorOffset) {
+    public static void drawCircle3D(MatrixStack stack, Entity ent, float radius, int color, int points, boolean hudColor, int colorOffset) {
         Render3DEngine.setup();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -639,7 +639,7 @@ public class Render3DEngine {
 
         Matrix4f matrix = stack.peek().getPositionMatrix();
         for (int i = 0; i <= points; i++) {
-            if(hudColor)
+            if (hudColor)
                 color = HudEditor.getColor(i * colorOffset).getRGB();
 
             bufferBuilder.vertex(matrix, (float) (radius * Math.cos(i * 6.28 / points)), 0f, (float) (radius * Math.sin(i * 6.28 / points))).color(color).next();
@@ -673,7 +673,7 @@ public class Render3DEngine {
             cos = (float) (x + Math.cos(i * 6.28 / 30) * target.getWidth() * 0.8);
             sin = (float) (z + Math.sin(i * 6.28 / 30) * target.getWidth() * 0.8);
             bufferBuilder.vertex(stack.peek().getPositionMatrix(), cos, (float) nextY, sin).color(Render2DEngine.injectAlpha(HudEditor.getColor(i), 170).getRGB()).next();
-            bufferBuilder.vertex(stack.peek().getPositionMatrix(),  cos, (float) y, sin).color(Render2DEngine.injectAlpha(HudEditor.getColor(i), 0).getRGB()).next();
+            bufferBuilder.vertex(stack.peek().getPositionMatrix(), cos, (float) y, sin).color(Render2DEngine.injectAlpha(HudEditor.getColor(i), 0).getRGB()).next();
         }
         tessellator.draw();
         RenderSystem.enableCull();
@@ -688,6 +688,13 @@ public class Render3DEngine {
 
     public static double absSinAnimation(double input) {
         return Math.abs(1 + Math.sin(input)) / 2;
+    }
+
+    public static Vec3d interpolatePos(float prevposX, float prevposY, float prevposZ, float posX, float posY, float posZ) {
+        double x = prevposX + ((posX - prevposX) * mc.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getX();
+        double y = prevposY + ((posY - prevposY) * mc.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getY();
+        double z = prevposZ + ((posZ - prevposZ) * mc.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getZ();
+        return new Vec3d(x, y, z);
     }
 
     public record FillAction(Box box, Color color) {

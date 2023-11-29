@@ -5,6 +5,8 @@ import meteordevelopment.orbit.EventPriority;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ItemFrameEntity;
+import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
@@ -12,12 +14,11 @@ import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -87,6 +88,14 @@ public class PlayerManager implements IManager {
         }
     }
 
+    @EventHandler
+    public void onPacketReceive(PacketEvent.@NotNull Receive event) {
+        if(event.getPacket() instanceof UpdateSelectedSlotS2CPacket slot) {
+            switchTimer.reset();
+            serverSideSlot = slot.getSlot();
+        }
+    }
+
     public boolean checkRtx(float yaw, float pitch, float distance, boolean ignoreWalls, Aura.RayTrace rt) {
         if (rt == Aura.RayTrace.OFF)
             return true;
@@ -101,6 +110,8 @@ public class PlayerManager implements IManager {
         Box box = mc.player.getBoundingBox().stretch(vec3d2.multiply(distance)).expand(1.0, 1.0, 1.0);
         EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator(), distancePow2);
         if (entityHitResult != null) {
+            if(entityHitResult.getEntity() instanceof FireworkRocketEntity)
+                return false;
             Entity entity2 = entityHitResult.getEntity();
             if (vec3d.squaredDistanceTo(entityHitResult.getPos()) < distancePow2 || result == null) {
                 targetedEntity = entity2;
@@ -109,6 +120,7 @@ public class PlayerManager implements IManager {
         }
         return false;
     }
+
 
     public Entity getRtxTarget(float yaw, float pitch, float distance, boolean ignoreWalls) {
         Entity targetedEntity = null;

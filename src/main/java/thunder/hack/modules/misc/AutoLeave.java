@@ -21,6 +21,7 @@ public class AutoLeave extends Module {
     private final Setting<Boolean> antiKTLeave = new Setting<>("AntiKTLeave", true);
     private final Setting<Boolean> autoDisable = new Setting<>("AutoDisable", true);
     private final Setting<Boolean> fastLeave = new Setting<>("InstantLeave", true);
+    public static Setting<String> command = new Setting<>("Command", "hub");
     private final Setting<Parent> leaveIf = new Setting<>("Leave if", new Parent(false, 0));
     private final Setting<Boolean> low_hp = new Setting<>("LowHp", false).withParent(leaveIf);
     private final Setting<Boolean> totems = new Setting<>("Totems", false).withParent(leaveIf);
@@ -28,6 +29,7 @@ public class AutoLeave extends Module {
     private final Setting<Float> leaveHp = new Setting("HP", 8.0f, 1f, 20.0f, v -> low_hp.getValue());
     private final Setting<LeaveMode> staff = new Setting<>("Staff", LeaveMode.None).withParent(leaveIf);
     private final Setting<LeaveMode> players = new Setting<>("Players", LeaveMode.Leave).withParent(leaveIf);
+    private final Setting<Integer> distance = new Setting<>("Distance", 256, 8, 256, v -> players.getValue() != LeaveMode.None).withParent(leaveIf);
 
     private final Timer chatDelay = new Timer();
 
@@ -46,11 +48,11 @@ public class AutoLeave extends Module {
             return;
 
         for (PlayerEntity pl : mc.world.getPlayers()) {
-            if (pl != mc.player && !ThunderHack.friendManager.isFriend(pl) && players.getValue() != LeaveMode.None) {
+            if (pl != mc.player && !ThunderHack.friendManager.isFriend(pl) && players.getValue() != LeaveMode.None && mc.player.squaredDistanceTo(pl.getPos()) <= distance.getValue() * distance.getValue()) {
                 switch (players.getValue()) {
-                    case Hub -> {
+                    case Command -> {
                         sendMessage(MainSettings.isRu() ? "Ливнул т.к. рядом появился игрок!" : "Logged out because there was a player!");
-                        mc.player.networkHandler.sendChatCommand("hub");
+                        mc.player.networkHandler.sendChatCommand(command.getValue());
                     }
                     case Leave -> leave(MainSettings.isRu() ? "Ливнул т.к. рядом появился игрок" : "Logged out because there was a player");
                 }
@@ -81,9 +83,9 @@ public class AutoLeave extends Module {
 
         if(hurtTimer.passedMs(30000) || !antiKTLeave.getValue()) {
             switch (staff.getValue()) {
-                case Hub -> {
+                case Command -> {
                     sendMessage(MainSettings.isRu() ? "Ливнул т.к. хелпер в спеке!" : "Logged out because helper in vanish!");
-                    mc.player.networkHandler.sendChatCommand("hub");
+                    mc.player.networkHandler.sendChatCommand(command.getValue());
                 }
                 case Leave -> leave(MainSettings.isRu() ? "Ливнул т.к. хелпер в спеке!" : "Logged out because helper in vanish!");
             }
@@ -91,6 +93,6 @@ public class AutoLeave extends Module {
     }
 
     private enum LeaveMode {
-        None, Hub, Leave
+        None, Command, Leave
     }
 }

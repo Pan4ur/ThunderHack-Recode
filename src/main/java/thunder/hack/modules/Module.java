@@ -262,6 +262,8 @@ public abstract class Module {
     }
 
     public boolean isKeyPressed(int button) {
+        if(button == -1)
+            return false;
        return InputUtil.isKeyPressed(mc.getWindow().getHandle(), button);
     }
 

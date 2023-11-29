@@ -1,5 +1,6 @@
 package thunder.hack.modules.misc;
 
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.projectile.FishingBobberEntity;
@@ -9,8 +10,11 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import thunder.hack.ThunderHack;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
@@ -25,6 +29,7 @@ public class AutoFish extends Module {
         super("AutoFish", Category.MISC);
     }
 
+    private final Setting<DetectMode> detectMode = new Setting<>("DetectMode", DetectMode.DataTracker);
     private final Setting<Boolean> rodSave = new Setting<>("RodSave", true);
     private final Setting<Boolean> changeRod = new Setting<>("ChangeRod", false);
     private final Setting<Boolean> autoSell = new Setting<>("AutoSell", false);
@@ -32,6 +37,10 @@ public class AutoFish extends Module {
     private boolean flag = false;
     private final Timer timeout = new Timer();
     private final Timer cooldown = new Timer();
+
+    private enum DetectMode {
+        Sound, DataTracker
+    }
 
 
     @Override
@@ -43,6 +52,14 @@ public class AutoFish extends Module {
     @Override
     public void onDisable() {
         flag = false;
+    }
+
+
+    @EventHandler
+    private void onPacketReceive(PacketEvent.ReceivePost e) {
+        if(e.getPacket() instanceof PlaySoundS2CPacket sound && detectMode.getValue() == DetectMode.Sound)
+            if(sound.getSound().value().equals(SoundEvents.ENTITY_FISHING_BOBBER_SPLASH) && mc.player.fishHook != null && mc.player.fishHook.squaredDistanceTo(sound.getX(), sound.getY(), sound.getZ()) < 9f)
+                catchFish();
     }
 
     @Override
@@ -62,14 +79,14 @@ public class AutoFish extends Module {
         if(!cooldown.passedMs(1000))
             return;
 
-        if (timeout.passedMs(25000)) {
+        if (timeout.passedMs(45000)) {
             sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
             sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             timeout.reset();
             cooldown.reset();
         }
 
-        if (mc.player.fishHook != null) {
+        if (mc.player.fishHook != null && detectMode.getValue() == DetectMode.DataTracker) {
             boolean caughtFish = mc.player.fishHook.getDataTracker().get(FishingBobberEntity.CAUGHT_FISH);
             if (!flag && caughtFish) {
                 catchFish();

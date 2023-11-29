@@ -40,6 +40,8 @@ public class Render2DEngine {
 
     public static final Identifier star = new Identifier("textures/star.png");
     public static final Identifier heart = new Identifier("textures/heart.png");
+    public static final Identifier dollar = new Identifier("textures/dollar.png");
+    public static final Identifier snowflake = new Identifier("textures/snowflake.png");
     public static final Identifier capture = new Identifier("textures/capture.png");
     public static final Identifier firefly = new Identifier("textures/firefly.png");
     public static final Identifier arrow = new Identifier("textures/triangle.png");
@@ -258,10 +260,10 @@ public class Render2DEngine {
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-        bufferBuilder.vertex(matrix, (float) x0, (float) y1, (float) z).texture((u + 0.0F) / (float) textureWidth, (v + (float) regionHeight) / (float) textureHeight).next();
+        bufferBuilder.vertex(matrix, (float) x0, (float) y1, (float) z).texture((u) / (float) textureWidth, (v + (float) regionHeight) / (float) textureHeight).next();
         bufferBuilder.vertex(matrix, (float) x1, (float) y1, (float) z).texture((u + (float) regionWidth) / (float) textureWidth, (v + (float) regionHeight) / (float) textureHeight).next();
-        bufferBuilder.vertex(matrix, (float) x1, (float) y0, (float) z).texture((u + (float) regionWidth) / (float) textureWidth, (v + 0.0F) / (float) textureHeight).next();
-        bufferBuilder.vertex(matrix, (float) x0, (float) y0, (float) z).texture((u + 0.0F) / (float) textureWidth, (v + 0.0F) / (float) textureHeight).next();
+        bufferBuilder.vertex(matrix, (float) x1, (float) y0, (float) z).texture((u + (float) regionWidth) / (float) textureWidth, (v) / (float) textureHeight).next();
+        bufferBuilder.vertex(matrix, (float) x0, (float) y0, (float) z).texture((u) / (float) textureWidth, (v + 0.0F) / (float) textureHeight).next();
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
     }
 
@@ -564,7 +566,7 @@ public class Render2DEngine {
     public static Color TwoColoreffect(Color cl1, Color cl2, double speed, double count) {
         int angle = (int) (((System.currentTimeMillis()) / speed + count) % 360);
         angle = (angle >= 180 ? 360 - angle : angle) * 2;
-        return interpolateColorHue(cl1, cl2, angle / 360f);
+        return interpolateColorC(cl1, cl2, angle / 360f);
     }
 
 

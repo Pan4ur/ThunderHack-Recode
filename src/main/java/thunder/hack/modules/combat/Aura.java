@@ -500,7 +500,7 @@ public final class Aura extends Module {
                 double deltaZ = ent.getZ() - mc.player.getZ();
                 float yawDelta = MathHelper.wrapDegrees((float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(deltaZ, deltaX)) - 90.0) - rotationYaw) / 1.0001f;
                 float pitchDelta = ((float) -Math.toDegrees(Math.atan2(ent.getY() - mc.player.getEyePos().getY(), Math.hypot(deltaX, deltaZ))) - rotationPitch) / 1.0001f;
-                float additionYaw = Math.min(Math.max((int) Math.abs(yawDelta), 1), 80);
+                float additionYaw = Math.min(Math.max((int) Math.abs(yawDelta), 1), 65);
                 float additionPitch = Math.max(ready ? Math.abs(pitchDelta) : 1.0f, 2.0f);
                 if (Math.abs(additionYaw - prevYaw) <= 3.0f)
                     additionYaw = prevYaw + 3.1f;
@@ -523,7 +523,6 @@ public final class Aura extends Module {
         if (!mc.player.canSee(trgt) && wallsBypass.getValue())
             return trgt.getPos().add(random(-0.15, 0.15), trgt.getBoundingBox().getLengthY(), random(-0.15, 0.15));
 
-        if (mc.player.isFallFlying() || ModuleManager.elytraPlus.isEnabled()) return null;
         return new ArrayList<>(Arrays.asList(trgt.getEyePos(), trgt.getPos().add(0, trgt.getEyeHeight(trgt.getPose()) / 2f, 0f), trgt.getPos().add(0, 0.05f, 0f)))
                 .stream()
                 .min(Comparator.comparing(p -> getPitchDelta(rotationPitch, p)))
@@ -533,7 +532,6 @@ public final class Aura extends Module {
     private double getPitchDelta(float currentY, Vec3d v) {
         return Math.abs(-Math.toDegrees(Math.atan2(v.y - mc.player.getEyePos().getY(), Math.hypot(v.x - mc.player.getX(), v.z - mc.player.getZ()))) - currentY);
     }
-
 
     public void onRender3D(MatrixStack stack) {
         Item handItem = mc.player.getMainHandStack().getItem();
@@ -555,9 +553,6 @@ public final class Aura extends Module {
         }
     }
 
-    public void onRender2D(DrawContext context) {
-    }
-
     @Override
     public void onDisable() {
         target = null;
@@ -573,7 +568,6 @@ public final class Aura extends Module {
 
         return dst * dst;
     }
-
 
     /*
      * Эта хуеверть основанна на приципе "DVD Logo"
@@ -672,7 +666,7 @@ public final class Aura extends Module {
     }
 
     public boolean isInRange(Entity target) {
-        if (PlayerUtility.squaredDistanceFromEyes(target.getPos()) > getSquaredRotateDistance() + /*squared*/ 4f)
+        if (PlayerUtility.squaredDistanceFromEyes(target.getPos()) > getSquaredRotateDistance() + /*squared*/ 6.25f)
             return false;
 
         float[] rotation;

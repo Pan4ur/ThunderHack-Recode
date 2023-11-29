@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import thunder.hack.modules.render.WorldTweaks;
 
 @Mixin(BackgroundRenderer.class)
 public class MixinBackgroundRenderer {
@@ -21,6 +22,12 @@ public class MixinBackgroundRenderer {
                 RenderSystem.setShaderFogStart(viewDistance * 4);
                 RenderSystem.setShaderFogEnd(viewDistance * 4.25f);
             }
+        }
+
+        if(ModuleManager.worldTweaks.isEnabled() && WorldTweaks.fogModify.getValue().isEnabled()) {
+            RenderSystem.setShaderFogStart(WorldTweaks.fogStart.getValue());
+            RenderSystem.setShaderFogEnd(WorldTweaks.fogEnd.getValue());
+            RenderSystem.setShaderFogColor(WorldTweaks.fogColor.getValue().getGlRed(), WorldTweaks.fogColor.getValue().getGlGreen(), WorldTweaks.fogColor.getValue().getGlBlue());
         }
     }
 

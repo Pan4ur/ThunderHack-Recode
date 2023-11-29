@@ -309,7 +309,7 @@ public class ESP extends Module {
                     context.getMatrices().translate(xOffset, yOffset, 0.0F);
                     context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
                     context.getMatrices().translate(-xOffset, -yOffset, 0.0F);
-                    Render2DEngine.drawTracerPointer(context.getMatrices(), xOffset, yOffset - 50, 12.5f, 0.5f, 3.63f, true, true, ClickGui.getInstance().getColor(1).getRGB());
+                    Render2DEngine.drawTracerPointer(context.getMatrices(), xOffset, yOffset - 50, 12.5f, 0.5f, 3.63f, true, true, HudEditor.getColor(1).getRGB());
                     context.getMatrices().translate(xOffset, yOffset, 0.0F);
                     context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-yaw));
                     context.getMatrices().translate(-xOffset, -yOffset, 0.0F);

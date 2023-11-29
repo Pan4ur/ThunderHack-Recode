@@ -76,7 +76,7 @@ public final class Surround extends IndestructibleModule {
     }
 
     @SuppressWarnings("unused")
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onPostSync(EventPostSync event) {
         if (prevY != mc.player.getY() && onYChange.getValue() && !wasTp) {
             disable(isRu() ? "Отключён из-за изменения Y!" : "Disabled due to Y change!");

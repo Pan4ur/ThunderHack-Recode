@@ -18,10 +18,6 @@ public class Shaders extends Module {
 
     //Thanks to @0x3C50 for Shader rendering example
 
-    public Setting<ShaderManager.Shader> mode = new Setting<>("Mode", ShaderManager.Shader.Default);
-    public Setting<ShaderManager.Shader> handsMode = new Setting<>("HandsMode", ShaderManager.Shader.Default);
-
-    public final Setting<Integer> maxRange = new Setting<>("MaxRange", 64, 16, 256);
 
     private final Setting<Parent> select = new Setting<>("Select", new Parent(false, 0));
     private final Setting<Boolean> hands = new Setting<>("Hands", true).withParent(select);
@@ -32,6 +28,11 @@ public class Shaders extends Module {
     private final Setting<Boolean> monsters = new Setting<>("Monsters", false).withParent(select);
     private final Setting<Boolean> ambients = new Setting<>("Ambients", false).withParent(select);
     private final Setting<Boolean> others = new Setting<>("Others", false).withParent(select);
+
+    public Setting<ShaderManager.Shader> mode = new Setting<>("Mode", ShaderManager.Shader.Default);
+    public Setting<ShaderManager.Shader> handsMode = new Setting<>("HandsMode", ShaderManager.Shader.Default);
+
+    public final Setting<Integer> maxRange = new Setting<>("MaxRange", 64, 16, 256);
 
     public final Setting<Float> factor = new Setting<>("GradientFactor", 2f, 0f, 20f);
     public final Setting<Float> gradient = new Setting<>("Gradient", 2f, 0f, 20f);
