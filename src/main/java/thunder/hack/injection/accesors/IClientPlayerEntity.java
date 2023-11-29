@@ -21,4 +21,7 @@ public interface IClientPlayerEntity {
 
     @Accessor(value = "lastPitch")
     void setLastPitch(float pitch);
+
+    @Accessor(value = "mountJumpStrength")
+    void setMountJumpStrength(float v);
 }

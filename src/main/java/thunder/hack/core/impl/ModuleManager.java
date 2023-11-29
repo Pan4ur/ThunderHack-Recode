@@ -16,6 +16,7 @@ import thunder.hack.modules.movement.Timer;
 import thunder.hack.modules.movement.*;
 import thunder.hack.modules.player.*;
 import thunder.hack.modules.render.*;
+import thunder.hack.modules.render.Particles;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -65,6 +66,7 @@ public class ModuleManager implements IManager {
     public static AutoTpAccept autoTpAccept = new AutoTpAccept();
     public static AntiServerRP antiServerRP = new AntiServerRP();
     public static TotemCounter totemCounter = new TotemCounter();
+    public static PerfectDelay perfectDelay = new PerfectDelay();
     public static PearlChaser pearlChaser = new PearlChaser();
     public static WorldTweaks worldTweaks = new WorldTweaks();
     public static VisualRange visualRange = new VisualRange();
@@ -105,7 +107,7 @@ public class ModuleManager implements IManager {
     public static DamageTint damageTint = new DamageTint();
     public static AntiAttack antiAttack = new AntiAttack();
     public static GapplesHud gapplesHud = new GapplesHud();
-    public static FireFlies fireFlies = new FireFlies();
+    public static Particles particles = new Particles();
     public static ToolSaver toolSaver = new ToolSaver();
     public static DamageFly damageFly = new DamageFly();
     public static WayPoints wayPoints = new WayPoints();

@@ -237,6 +237,10 @@ public class NameTags extends Module {
                 if (spawner.getLogic() == null || spawner.getLogic().renderedEntity == null) continue;
                 String final_string = spawner.getLogic().renderedEntity.getName().getString() + " " + String.format("%.1f", ((float) spawner.getLogic().spawnDelay / 20f)) + "s";
 
+                if(spawner.getLogic().getRotation() == spawner.getLogic().getLastRotation())
+                    final_string = spawner.getLogic().renderedEntity.getName().getString() + " loot!";
+
+
                 if (position != null) {
                     double posX = position.x;
                     double posY = position.y;

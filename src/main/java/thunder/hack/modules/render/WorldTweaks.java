@@ -5,12 +5,20 @@ import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.BooleanParent;
+import thunder.hack.setting.impl.ColorSetting;
+
+import java.awt.*;
 
 public class WorldTweaks extends Module {
     public WorldTweaks() {
         super("WorldTweaks", Category.MISC);
     }
 
+    public static final Setting<BooleanParent> fogModify = new Setting("FogModify", new BooleanParent(true));
+    public static final Setting<Integer> fogStart = new Setting("FogStart", 21, 0, 256);
+    public static final Setting<Integer> fogEnd = new Setting("FogEnd", 21, 10, 256);
+    public static final Setting<ColorSetting> fogColor = new Setting<>("FogColor", new ColorSetting(new Color(0xA900FF)));
     public final Setting<Boolean> ctime = new Setting<>("ChangeTime", false);
     public final Setting<Integer> ctimeVal = new Setting("Time", 21, 0, 23);
 
