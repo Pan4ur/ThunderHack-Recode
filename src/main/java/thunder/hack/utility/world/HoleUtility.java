@@ -92,9 +92,13 @@ public final class HoleUtility {
     }
 
     public static boolean isHole(BlockPos pos) {
-        return validIndestructible(pos) || validBedrock(pos)
+        return isSingleHole(pos)
                 || validTwoBlockIndestructible(pos) || validTwoBlockBedrock(pos)
                 || validQuadIndestructible(pos) || validQuadBedrock(pos);
+    }
+
+    public static boolean isSingleHole(BlockPos pos) {
+        return validIndestructible(pos) || validBedrock(pos);
     }
 
     public static boolean validIndestructible(@NotNull BlockPos pos) {

@@ -55,7 +55,7 @@ public class AutoSex extends Module {
 
         switch (mode.getValue()) {
             case Active -> {
-                if (sneakTimer.passedMs((long) MathUtility.random(80, 120))) {
+                if (sneakTimer.passedMs((long) MathUtility.random(200, 1200))) {
                     mc.options.sneakKey.setPressed(!mc.options.sneakKey.isPressed());
                     sneakTimer.reset();
                 }
@@ -66,7 +66,7 @@ public class AutoSex extends Module {
             }
         }
 
-        if (messageTimer.passedMs(msgDelay.getValue() * 1000)) {
+        if (messageTimer.passedMs(msgDelay.getValue() * 1000) && mc.getNetworkHandler() != null) {
             List<String> messages = Arrays.stream(mode.getValue() == SexMode.Active ? ACTIVE_MESSAGES : PASSIVE_MESSAGES).toList();
             mc.getNetworkHandler().sendChatCommand("msg " + target.getName().getString() + " " + messages.get((int) (Math.random() * messages.size())));
             messageTimer.reset();

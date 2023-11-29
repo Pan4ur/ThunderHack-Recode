@@ -106,7 +106,8 @@ public class SpeedMine extends Module {
 
         } else if (mode.getValue() == Mode.Packet) {
             if (minePosition != null) {
-                if (mineBreaks >= breakAttempts.getValue() || mc.player.squaredDistanceTo(minePosition.toCenterPos()) > range.getPow2Value()) {
+                if (mineBreaks >= breakAttempts.getValue()
+                        || mc.player.squaredDistanceTo(minePosition.toCenterPos()) > range.getPow2Value()) {
                     minePosition = null;
                     mineFacing = null;
                     progress = 0;
@@ -179,6 +180,7 @@ public class SpeedMine extends Module {
         if (mode.getValue() != Mode.Packet
                 || mc.world == null
                 || minePosition == null
+                || !render.getValue().isEnabled()
                 || mc.world.isAir(minePosition))
             return;
 
