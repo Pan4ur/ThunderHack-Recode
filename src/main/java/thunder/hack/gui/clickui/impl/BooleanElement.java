@@ -14,7 +14,9 @@ import java.awt.*;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class BooleanElement extends AbstractElement {
-    public BooleanElement(Setting setting) {super(setting);}
+    public BooleanElement(Setting setting, boolean small) {
+        super(setting, small);
+    }
 
     float animation = 0f;
 
@@ -34,7 +36,11 @@ public class BooleanElement extends AbstractElement {
             Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, 1f, 15, ClickGui.getInstance().getColor(1));
         }
 
-        FontRenderers.settings.drawString(context.getMatrices(),setting.getName(), (setting.parent != null ? 2f : 0f) + (x + 6), (y + height / 2 - (6 / 2f)) + 2, new Color(-1).getRGB());
+        if(!isSmall()) {
+            FontRenderers.settings.drawString(context.getMatrices(), setting.getName(), (setting.parent != null ? 2f : 0f) + (x + 6), (y + height / 2 - (6 / 2f)) + 2, new Color(-1).getRGB());
+        } else {
+            FontRenderers.sf_medium_mini.drawString(context.getMatrices(), setting.getName(), (setting.parent != null ? 2f : 0f) + (x + 6), (y + height / 2 - (6 / 2f)) + 2, new Color(-1).getRGB());
+        }
     }
 
     @Override

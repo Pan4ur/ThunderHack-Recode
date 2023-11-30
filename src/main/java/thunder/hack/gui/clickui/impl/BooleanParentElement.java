@@ -20,8 +20,8 @@ import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 public class BooleanParentElement extends AbstractElement {
     private final Setting<BooleanParent> parentSetting;
 
-    public BooleanParentElement(Setting setting) {
-        super(setting);
+    public BooleanParentElement(Setting setting, boolean small) {
+        super(setting, small);
         this.parentSetting = setting;
     }
 
@@ -45,7 +45,11 @@ public class BooleanParentElement extends AbstractElement {
         context.drawTexture(arrow, (int) (x + width - 14), (int) (y + 6), 0, 0, 6, 6, 6, 6);
         matrixStack.pop();
 
-        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName() ,x + 6, y + height / 2 - 1f, new Color(-1).getRGB());
+        if(!isSmall()) {
+            FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName(), x + 6, y + height / 2 - 1f, new Color(-1).getRGB());
+        } else {
+            FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), x + 6, y + height / 2 - 1f, new Color(-1).getRGB());
+        }
 
         animation = fast(animation, getParentSetting().getValue().isEnabled() ? 1 : 0, 15f);
 

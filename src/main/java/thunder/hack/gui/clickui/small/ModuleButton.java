@@ -43,21 +43,21 @@ public class ModuleButton extends AbstractButton {
 
         for (Setting setting : module.getSettings()) {
             if (setting.getValue() instanceof Boolean && !setting.getName().equals("Enabled") && !setting.getName().equals("Drawn")) {
-                elements.add(new BooleanElement(setting));
+                elements.add(new BooleanElement(setting, true));
             } else if (setting.getValue() instanceof ColorSetting) {
-                elements.add(new ColorPickerElement(setting));
+                elements.add(new ColorPickerElement(setting, true));
             }else if (setting.getValue() instanceof BooleanParent) {
-                elements.add(new BooleanParentElement(setting));
+                elements.add(new BooleanParentElement(setting, true));
             } else if (setting.isNumberSetting() && setting.hasRestriction()) {
-                elements.add(new SliderElement(setting));
+                elements.add(new SliderElement(setting, true));
             } else if (setting.isEnumSetting() && !(setting.getValue() instanceof Parent) && !(setting.getValue() instanceof PositionSetting)) {
-                elements.add(new ModeElement(setting));
+                elements.add(new ModeElement(setting, true));
             } else if (setting.getValue() instanceof Bind && !setting.getName().equals("Keybind")) {
-                elements.add(new BindElement(setting));
+                elements.add(new BindElement(setting, true));
             } else if ((setting.getValue() instanceof String || setting.getValue() instanceof Character) && !setting.getName().equalsIgnoreCase("displayName")) {
-                elements.add(new StringElement(setting));
+                elements.add(new StringElement(setting, true));
             } else if (setting.getValue() instanceof Parent) {
-                elements.add(new ParentElement(setting));
+                elements.add(new ParentElement(setting, true));
             }
         }
     }
@@ -105,7 +105,7 @@ public class ModuleButton extends AbstractButton {
                 element.setX(x);
                 element.setY(y + height + 2);
                 element.setWidth(width);
-                element.setHeight(15);
+                element.setHeight(13);
 
                 if (element instanceof ColorPickerElement)
                     element.setHeight(66);
@@ -113,13 +113,11 @@ public class ModuleButton extends AbstractButton {
                 else if (element instanceof SliderElement)
                     element.setHeight(18);
 
-                if (element instanceof ModeElement) {
-                    ModeElement combobox = (ModeElement) element;
-                    combobox.setWHeight(17);
-
+                if (element instanceof ModeElement combobox) {
+                    combobox.setWHeight(13);
                     if (combobox.isOpen()) {
-                        element.setHeight(15 + (combobox.getSetting().getModes().length * 12));
-                    } else element.setHeight(17);
+                        element.setHeight(13 + (combobox.getSetting().getModes().length * 12));
+                    } else element.setHeight(13);
                 }
 
                 element.render(context, mouseX, mouseY, delta);
@@ -148,7 +146,7 @@ public class ModuleButton extends AbstractButton {
 
         if (!ClickGui.getInstance().showBinds.getValue()) {
             if (module.getSettings().size() > 3)
-                FontRenderers.sf_medium.drawString(context.getMatrices(), isOpen() ? "-" : "+", x + width - 12, y + 7, -1);
+                FontRenderers.sf_medium_modules.drawString(context.getMatrices(), isOpen() ? "-" : "+", x + width - 12, y + 7, -1);
         } else {
             if (!module.getBind().getBind().equalsIgnoreCase("none")) {
                 String sbind = module.getBind().getBind();
@@ -171,17 +169,17 @@ public class ModuleButton extends AbstractButton {
                     sbind = "RAlt";
                 }
                 if (!binding)
-                    FontRenderers.sf_medium.drawString(context.getMatrices(), sbind, (int) x + (int) width - 11 - (int) FontRenderers.sf_medium.getStringWidth(sbind), (int) y + 5 + (hovered ? -1 : 0), new Color(-1).getRGB());
+                    FontRenderers.sf_medium_modules.drawString(context.getMatrices(), sbind, (int) x + (int) width - 11 - (int) FontRenderers.sf_medium_modules.getStringWidth(sbind), (int) y + 6 + (hovered ? -1 : 0), new Color(-1).getRGB());
             }
             if (binding)
-                FontRenderers.sf_medium.drawString(context.getMatrices(), holdbind ? (Formatting.GRAY + "Toggle / " + Formatting.RESET + "Hold") : (Formatting.RESET + "Toggle " + Formatting.GRAY + "/ Hold"), (int) x + (int) width - 11 - (int) FontRenderers.sf_medium.getStringWidth("Toggle/Hold"), (int) y + 8 + (hovered ? -1 : 0), new Color(-1).getRGB());
+                FontRenderers.sf_medium_modules.drawString(context.getMatrices(), holdbind ? (Formatting.GRAY + "Toggle / " + Formatting.RESET + "Hold") : (Formatting.RESET + "Toggle " + Formatting.GRAY + "/ Hold"), (int) x + (int) width - 11 - (int) FontRenderers.sf_medium_modules.getStringWidth("Toggle/Hold"), (int) iy + 2 + (hovered ? -1 : 0), new Color(-1).getRGB());
         }
 
         if(hovered && InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT)){
-            FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"), (int) ix + 1f, (int) iy + 3 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"), (int) ix + 1f, (int) iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
         } else {
-            if (this.binding) FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "PressKey", (int) ix, (int) iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
-            else FontRenderers.sf_medium.drawString(context.getMatrices(), module.getName(), (int) ix + 2, (int) iy + 1 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            if (this.binding) FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "PressKey", (int) ix, (int) iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            else FontRenderers.sf_medium_modules.drawString(context.getMatrices(), module.getName(), (int) ix + 2, (int) iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
         }
     }
 
@@ -189,12 +187,13 @@ public class ModuleButton extends AbstractButton {
         if(isHiden()) return;
 
         if (this.binding) {
-            if (mouseX > x + 52 && mouseX < x + 80 && mouseY > y && mouseY < y + height) {
+            Command.sendMessage((mouseX - x) + "");
+            if (mouseX > x + 37 && mouseX < x + 58 && mouseY > y && mouseY < y + height) {
                 holdbind = false;
                 module.getBind().setHold(false);
                 return;
             }
-            if (mouseX > x + 80 && mouseX < x + 104 && mouseY > y && mouseY < y + height) {
+            if (mouseX > x + 62 && mouseX < x + 77 && mouseY > y && mouseY < y + height) {
                 holdbind = true;
                 module.getBind().setHold(true);
                 return;

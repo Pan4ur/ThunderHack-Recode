@@ -34,8 +34,8 @@ public class ColorPickerElement extends AbstractElement {
         return (ColorSetting) colorSetting.getValue();
     }
 
-    public ColorPickerElement(Setting setting) {
-        super(setting);
+    public ColorPickerElement(Setting setting, boolean small) {
+        super(setting, small);
         this.colorSetting = setting;
         prevColor = getColorSetting().getColorObject();
         updatePos();
@@ -48,7 +48,7 @@ public class ColorPickerElement extends AbstractElement {
         MatrixStack matrixStack = context.getMatrices();
 
         Render2DEngine.drawRound(matrixStack, (float) x + 5, (float) y + 2, (float) width - 10, (float) height - 4, 4, new Color(bgcolor));
-        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName(),  x + 8, (int) y + 8, new Color(-1).getRGB());
+        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName(), x + 8, (int) y + 8, new Color(-1).getRGB());
 
         Render2DEngine.drawBlurredShadow(matrixStack, (float) (x + width - 25f), (float) (y + 5f), 14, 7, 10, getColorSetting().getColorObject());
         Render2DEngine.drawRound(matrixStack, (float) (x + width - 25), (float) (y + 5), 14, 7, 1, getColorSetting().getColorObject());
@@ -60,13 +60,13 @@ public class ColorPickerElement extends AbstractElement {
         boolean dark2 = Render2DEngine.isDark(getColorSetting().getColorObject());
 
         Render2DEngine.drawRound(matrixStack, (float) (x + width - 65f), (float) (y + 5f), 33, 7, 1, getColorSetting().isRainbow() ? getColorSetting().getColorObject() : new Color(0x424242));
-        FontRenderers.getSettingsRenderer().drawString(matrixStack, "Rainbow",  (x + width - 62),  (y + 8), rainbowHovered ? new Color(0xA3FFFFFF, true).getRGB() : (dark2 ? Color.WHITE.getRGB() : Color.BLACK.getRGB()));
+        FontRenderers.getSettingsRenderer().drawString(matrixStack, "Rainbow", (x + width - 62), (y + 8), rainbowHovered ? new Color(0xA3FFFFFF, true).getRGB() : (dark2 ? Color.WHITE.getRGB() : Color.BLACK.getRGB()));
 
         Render2DEngine.drawRound(matrixStack, (float) (x + 9f), (float) (y + 54f), 40, 7, 1, new Color(0x424242));
-        FontRenderers.getSettingsRenderer().drawString(matrixStack, "Сopy",  (x + 19),  (y + 57), copyHovered ? new Color(0xA3FFFFFF, true).getRGB() : Color.WHITE.getRGB());
+        FontRenderers.getSettingsRenderer().drawString(matrixStack, "Сopy", (x + 19), (y + 57), copyHovered ? new Color(0xA3FFFFFF, true).getRGB() : Color.WHITE.getRGB());
 
         Render2DEngine.drawRound(matrixStack, (float) (x + width - 49f), (float) (y + 54f), 40, 7, 1, ThunderHack.copy_color);
-        FontRenderers.getSettingsRenderer().drawString(matrixStack, "Paste",  (x + width - 37),  (y + 57), pasteHovered ? new Color(0xA3FFFFFF, true).getRGB() : dark ? Color.WHITE.getRGB() : Color.BLACK.getRGB());
+        FontRenderers.getSettingsRenderer().drawString(matrixStack, "Paste", (x + width - 37), (y + 57), pasteHovered ? new Color(0xA3FFFFFF, true).getRGB() : dark ? Color.WHITE.getRGB() : Color.BLACK.getRGB());
 
         renderPicker(matrixStack, mouseX, mouseY, getColorSetting().getColorObject());
     }

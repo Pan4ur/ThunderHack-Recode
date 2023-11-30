@@ -20,6 +20,7 @@ public class FontRenderers {
     public static FontAdapter sf_bold_mini;
     public static FontAdapter sf_medium;
     public static FontAdapter sf_medium_mini;
+    public static FontAdapter sf_medium_modules;
 
     public static FontAdapter getSettingsRenderer() {
         return settings;

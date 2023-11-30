@@ -43,21 +43,21 @@ public class ModuleButton extends AbstractButton {
 
         for (Setting setting : module.getSettings()) {
             if (setting.getValue() instanceof Boolean && !setting.getName().equals("Enabled") && !setting.getName().equals("Drawn")) {
-                elements.add(new BooleanElement(setting));
+                elements.add(new BooleanElement(setting, false));
             } else if (setting.getValue() instanceof ColorSetting) {
-                elements.add(new ColorPickerElement(setting));
+                elements.add(new ColorPickerElement(setting, false));
             } else if (setting.getValue() instanceof BooleanParent) {
-                elements.add(new BooleanParentElement(setting));
+                elements.add(new BooleanParentElement(setting, false));
             } else if (setting.isNumberSetting() && setting.hasRestriction()) {
-                elements.add(new SliderElement(setting));
+                elements.add(new SliderElement(setting, false));
             } else if (setting.isEnumSetting() && !(setting.getValue() instanceof Parent) && !(setting.getValue() instanceof PositionSetting)) {
-                elements.add(new ModeElement(setting));
+                elements.add(new ModeElement(setting, false));
             } else if (setting.getValue() instanceof Bind && !setting.getName().equals("Keybind")) {
-                elements.add(new BindElement(setting));
+                elements.add(new BindElement(setting, false));
             } else if ((setting.getValue() instanceof String || setting.getValue() instanceof Character) && !setting.getName().equalsIgnoreCase("displayName")) {
-                elements.add(new StringElement(setting));
+                elements.add(new StringElement(setting, false));
             } else if (setting.getValue() instanceof Parent) {
-                elements.add(new ParentElement(setting));
+                elements.add(new ParentElement(setting, false));
             }
         }
     }

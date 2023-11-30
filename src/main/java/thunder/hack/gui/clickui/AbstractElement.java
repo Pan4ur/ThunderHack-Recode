@@ -19,11 +19,13 @@ public abstract class AbstractElement {
     protected double offsetY;
 
     protected boolean hovered;
+    protected boolean small;
 
     protected int bgcolor = new Color(24, 24, 27).getRGB();
 
-    public AbstractElement(Setting setting) {
+    public AbstractElement(Setting setting,boolean small) {
         this.setting = setting;
+        this.small = small;
     }
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
@@ -90,5 +92,9 @@ public abstract class AbstractElement {
 
     public boolean isVisible() {
         return setting.isVisible();
+    }
+
+    public boolean isSmall() {
+        return small;
     }
 }

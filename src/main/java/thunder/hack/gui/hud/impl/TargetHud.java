@@ -87,7 +87,10 @@ public class TargetHud extends HudElement {
             return "*:*";
         } else {
             int var1 = pe.getDuration();
-            return Integer.toString(var1);
+            int mins = var1 / 1200;
+            int sec = (var1 % 1200) / 20;
+
+            return mins + ":" + sec;
         }
     }
 
@@ -183,10 +186,10 @@ public class TargetHud extends HudElement {
                 }
 
                 if ((target.hurtTime == 9 && !sentParticles)) {
-                    for (int i = 0; i <= 10; i++) {
+                    for (int i = 0; i <= 6; i++) {
                         final Particles p = new Particles();
                         final Color c = Particles.mixColors(color.getValue().getColorObject(), color2.getValue().getColorObject(), (Math.sin(ticks + getPosX() * 0.4f + i) + 1) * 0.5f);
-                        p.init(getPosX() + 19, getPosY() + 19, ((Math.random() - 0.5) * 2) * 1.4, ((Math.random() - 0.5) * 2) * 1.4, 100, c);
+                        p.init(getPosX(), getPosY(), MathUtility.random(-3f, 3f), MathUtility.random(-3f, 3f), 20, c);
                         particles.add(p);
                     }
                     sentParticles = true;
@@ -228,7 +231,7 @@ public class TargetHud extends HudElement {
                 healthanimation.setValue(health);
                 health = (float) healthanimation.getAnimationD();
 
-                Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX() + 54, getPosY() + 34 - 14, 90, 10, blurRadius.getValue(), HudEditor.getColor(0));
+                Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX() + 55, getPosY() + 22, 90, 8, blurRadius.getValue(), HudEditor.getColor(0));
 
                 Render2DEngine.drawGradientRound(context.getMatrices(), getPosX() + 55, getPosY() + 35 - 14, 90, 10, 2f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
                 Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 55, getPosY() + 35 - 14, (int) MathUtility.clamp((90 * (health / 20)), 3, 90), 10, 2f);
@@ -287,7 +290,7 @@ public class TargetHud extends HudElement {
                 RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
                 RenderSystem.setShaderColor(1f, 1f - hurtPercent, 1f - hurtPercent, 1f);
                 Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 3.5f + hurtPercent, getPosY() + 3.5f + hurtPercent, 40 - hurtPercent * 2, 40, 8, 8, 8, 8, 64, 64);
-                Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 3.5f + hurtPercent, getPosY() + 3.5f + hurtPercent, 40, 40, 40, 8, 8, 8, 64, 64);
+                Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 3.5f + hurtPercent, getPosY() + 3.5f + hurtPercent, 40 - hurtPercent * 2, 40, 40, 8, 8, 8, 64, 64);
                 RenderSystem.defaultBlendFunc();
 
                 // Баллон
@@ -419,7 +422,7 @@ public class TargetHud extends HudElement {
             if (!entity.hasStatusEffect(potion) || !potRanOut) continue;
             finalString.append(getPotionName(potion)).append(potionEffect.getAmplifier() < 1 ? "" : potionEffect.getAmplifier() + 1).append(" ").append(getDurationString(potionEffect)).append(" ");
         }
-        FontRenderers.settings.drawString(ms, finalString.toString(), getPosX() + 55, getPosY() + 14, new Color(0x8D8D8D).getRGB(), false);
+        FontRenderers.settings.drawString(ms, finalString.toString(), getPosX() + 55, getPosY() + 15, new Color(0x8D8D8D).getRGB(), false);
     }
 
     public enum HPmodeEn {

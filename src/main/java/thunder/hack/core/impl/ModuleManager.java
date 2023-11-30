@@ -130,6 +130,7 @@ public class ModuleManager implements IManager {
     public static AutoLeave autoLeave = new AutoLeave();
     public static AutoFlyme autoFlyme = new AutoFlyme();
     public static AutoArmor autoArmor = new AutoArmor();
+    public static Cooldowns cooldowns = new Cooldowns();
     public static AutoMine autoMine = new AutoMine();
     public static ViewLock viewLock = new ViewLock();
     public static Velocity velocity = new Velocity();

@@ -29,19 +29,23 @@ public class Particles {
         RenderSystem.enableBlend();
         RenderSystem.setShaderTexture(0, star);
         RenderSystem.setShaderColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, (float) (opacity / 255f));
-        Render2DEngine.renderTexture(matrices, x, y, size, size, 0, 0, 256, 256, 256, 256);
+        Render2DEngine.renderTexture(matrices, x + size / 2f, y + size / 2f, size, size, 0, 0, 256, 256, 256, 256);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 
     public void updatePosition() {
-        x += deltaX * 2;
-        y += deltaY * 2;
+        x += deltaX;
+        y += deltaY;
+
         deltaY *= 0.95;
         deltaX *= 0.95;
+
         opacity -= 2f;
-        size /= 1.1;
-        if (opacity < 1) opacity = 1;
+        size /= 1.01;
+
+        if (opacity < 1)
+            opacity = 1;
     }
 
     public void init(final double x, final double y, final double deltaX, final double deltaY, final double size, final Color color) {

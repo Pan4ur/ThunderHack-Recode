@@ -10,8 +10,8 @@ import thunder.hack.setting.Setting;
 import static thunder.hack.modules.Module.mc;
 
 public class StringElement extends AbstractElement {
-    public StringElement(Setting setting) {
-        super(setting);
+    public StringElement(Setting setting, boolean small) {
+        super(setting, small);
     }
 
     public boolean listening;
@@ -20,7 +20,11 @@ public class StringElement extends AbstractElement {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        FontRenderers.getSettingsRenderer().drawString(context.getMatrices(), listening ? currentString + (mc.player == null || mc.player.age % 5 == 0 ? "_" : "") : (String) setting.getValue(), x + 6, y + height / 2, -1);
+        if(!isSmall()) {
+            FontRenderers.getSettingsRenderer().drawString(context.getMatrices(), listening ? currentString + (mc.player == null || mc.player.age % 5 == 0 ? "_" : "") : (String) setting.getValue(), x + 6, y + height / 2, -1);
+        } else {
+            FontRenderers.sf_medium_mini.drawString(context.getMatrices(), listening ? currentString + (mc.player == null || mc.player.age % 5 == 0 ? "_" : "") : (String) setting.getValue(), x + 6, y + height / 2, -1);
+        }
     }
 
     @Override
