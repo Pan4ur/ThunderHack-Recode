@@ -58,6 +58,8 @@
     "MixinAbstractHorseEntity",
     "MixinBlock",
     "MixinBlockItem",
+    "MixinBoatEntity",
+    "MixinBoatEntityRenderer",
     "MixinCobwebBlock",
     "MixinEntity",
     "MixinEntityLiving",

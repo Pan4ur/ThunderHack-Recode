@@ -76,7 +76,7 @@ public class Timer extends Module {
         } else if (mode.getValue() == Mode.NORMAL) {
             ThunderHack.TICK_TIMER = speed.getValue();
         } else {
-            if (!MovementUtility.isMoving() || violation > 39f || !InputUtil.isKeyPressed(mc.getWindow().getHandle(), boostKey.getValue().getKey())) {
+            if ( violation > 39f || !InputUtil.isKeyPressed(mc.getWindow().getHandle(), boostKey.getValue().getKey())) {
                 ThunderHack.TICK_TIMER = 1f;
                 return;
             }
@@ -119,7 +119,7 @@ public class Timer extends Module {
                 disable(isRu() ? "Перед повторным использованием необходимо постоять на месте!" : "Standing still is required before reuse!");
                 return;
             }
-            event.setCancelled(true);
+            event.cancel();
             event.setIterations(shiftTicks.getValue());
             violation = 40f;
             disable(isRu() ? "Тики пропущены! Отключаю.." : "Ticks shifted! Disabling..");

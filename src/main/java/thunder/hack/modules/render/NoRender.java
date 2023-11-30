@@ -18,7 +18,7 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.ParticleEvent;
 import thunder.hack.modules.Module;
-import thunder.hack.notification.Notification;
+import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 
 import java.util.ArrayList;
@@ -137,9 +137,9 @@ public class NoRender extends Module {
 
     @EventHandler
     public void onParticle(ParticleEvent.AddParticle e) {
-        if (elderGuardian.getValue() && e.particle instanceof ElderGuardianAppearanceParticle) e.setCancelled(true);
-        else if (explosions.getValue() && e.particle instanceof ExplosionLargeParticle) e.setCancelled(true);
-        else if (campFire.getValue() && e.particle instanceof CampfireSmokeParticle) e.setCancelled(true);
-        else if (fireworks.getValue() && (e.particle instanceof FireworksSparkParticle.FireworkParticle || e.particle instanceof FireworksSparkParticle.Flash)) e.setCancelled(true);
+        if (elderGuardian.getValue() && e.particle instanceof ElderGuardianAppearanceParticle) e.cancel();
+        else if (explosions.getValue() && e.particle instanceof ExplosionLargeParticle) e.cancel();
+        else if (campFire.getValue() && e.particle instanceof CampfireSmokeParticle) e.cancel();
+        else if (fireworks.getValue() && (e.particle instanceof FireworksSparkParticle.FireworkParticle || e.particle instanceof FireworksSparkParticle.Flash)) e.cancel();
     }
 }

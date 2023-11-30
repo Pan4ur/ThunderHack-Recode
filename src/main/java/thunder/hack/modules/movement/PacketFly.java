@@ -127,7 +127,7 @@ public class PacketFly extends Module {
                     && teleport.y == pac.getY()
                     && teleport.z == pac.getZ()
             ) {
-                event.setCancelled(true);
+                event.cancel();
                 return;
             }
             ((IPlayerPositionLookS2CPacket) pac).setYaw(mc.player.getYaw());
@@ -143,7 +143,7 @@ public class PacketFly extends Module {
                 movePackets.remove((PlayerMoveC2SPacket) event.getPacket());
                 return;
             }
-            event.setCancelled(true);
+            event.cancel();
         }
     }
 
@@ -162,7 +162,7 @@ public class PacketFly extends Module {
             if (mode.getValue() != Mode.Rubber && teleportId == 0) {
                 return;
             }
-            event.setCancelled(true);
+            event.cancel();
             event.setX(mc.player.getVelocity().x);
             event.setY(mc.player.getVelocity().y);
             event.setZ(mc.player.getVelocity().z);

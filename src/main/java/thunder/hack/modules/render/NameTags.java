@@ -379,7 +379,9 @@ public class NameTags extends Module {
         return Formatting.RED + "";
     }
 
-    public static float round2(double value) {
+    public static float round2(float value) {
+        if(Float.isNaN(value) || Float.isInfinite(value))
+            return 1f;
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(1, RoundingMode.HALF_UP);
         return bd.floatValue();

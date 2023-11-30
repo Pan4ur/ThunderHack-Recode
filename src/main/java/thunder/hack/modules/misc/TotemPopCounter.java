@@ -8,7 +8,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.AntiBot;
-import thunder.hack.notification.Notification;
+import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 
 import static thunder.hack.modules.client.MainSettings.isRu;

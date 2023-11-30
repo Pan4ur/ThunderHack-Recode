@@ -11,7 +11,7 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
-import thunder.hack.notification.Notification;
+import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render2DEngine;

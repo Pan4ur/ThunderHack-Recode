@@ -7,11 +7,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
@@ -22,7 +20,6 @@ import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.modules.client.Media;
 import thunder.hack.modules.combat.Aura;
-import thunder.hack.modules.misc.NameProtect;
 import thunder.hack.modules.movement.AutoSprint;
 
 import static thunder.hack.modules.Module.mc;
@@ -94,5 +91,11 @@ public class MixinPlayerEntity {
     @Inject(method = "eatFood", at = @At("RETURN"))
     public void eatFoodHook(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
         ThunderHack.EVENT_BUS.post(new EventEatFood(cir.getReturnValue()));
+    }
+
+    @Inject(method = "shouldDismount", at = @At("HEAD"), cancellable = true)
+    protected void shouldDismountHook(CallbackInfoReturnable<Boolean> cir) {
+          if(ModuleManager.boatFly.isEnabled() && ModuleManager.boatFly.allowShift.getValue())
+            cir.setReturnValue(false);
     }
 }

@@ -1,7 +1,6 @@
 package thunder.hack.modules.player;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -10,6 +9,7 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -26,6 +26,7 @@ public class ElytraSwap extends Module {
         super("ElytraSwap", Category.PLAYER);
     }
 
+    private final Setting<Boolean> delay = new Setting<>("Delay", false);
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Enable);
     private final Setting<Bind> switchButton = new Setting<>("SwitchButton", new Bind(-1, false, false), v -> mode.getValue() == Mode.Bind);
     private final Setting<Bind> fireWorkButton = new Setting<>("FireWorkButton", new Bind(-1, false, false), v -> mode.getValue() == Mode.Bind);
@@ -34,6 +35,8 @@ public class ElytraSwap extends Module {
 
     private final Timer switchTimer = new Timer();
     private final Timer fireworkTimer = new Timer();
+
+    public static boolean swapping = false;
 
     private enum Mode {
         Enable, Bind
@@ -109,24 +112,62 @@ public class ElytraSwap extends Module {
     }
 
     private void swapChest(boolean disable) {
+        SearchInvResult result = InventoryUtility.findItemInInventory(Items.ELYTRA);
+
+
         if (mc.player.getInventory().getStack(38).getItem() == Items.ELYTRA) {
             int slot = getChestPlateSlot();
             if (slot != -1) {
-                clickSlot(slot);
-                clickSlot(6);
-                clickSlot(slot);
-                sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                if(delay.getValue())
+                ThunderHack.asyncManager.run(() -> {
+                    swapping = true;
+                    clickSlot(slot);
+                    try {
+                        Thread.sleep(200);
+                    } catch (Exception ignored) {
+                    }
+                    clickSlot(6);
+                    try {
+                        Thread.sleep(200);
+                    } catch (Exception ignored) {
+                    }
+                    clickSlot(slot);
+                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                    swapping = false;
+                });
+                else {
+                    clickSlot(slot);
+                    clickSlot(6);
+                    clickSlot(slot);
+                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                }
             } else {
                 if (disable) disable(isRu() ? "У тебя нет нагрудника!" : "You don't have a chestplate!");
                 else sendMessage(isRu() ? "У тебя нет нагрудника!" : "You don't have a chestplate!");
                 return;
             }
-        } else if (InventoryUtility.findItemInInventory(Items.ELYTRA).found()) {
-            SearchInvResult result = InventoryUtility.findItemInInventory(Items.ELYTRA);
-            clickSlot(result.slot());
-            clickSlot(6);
-            clickSlot(result.slot());
-            sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+        } else if (result.found()) {
+            if(delay.getValue())
+            new Thread(() -> {
+                swapping = true;
+                clickSlot(result.slot());
+                try {
+                    Thread.sleep(200);
+                } catch (Exception ignored) {}
+                clickSlot(6);
+                try {
+                    Thread.sleep(200);
+                } catch (Exception ignored) {}
+                clickSlot(result.slot());
+                sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                swapping = false;
+            }).start();
+            else {
+                clickSlot(result.slot());
+                clickSlot(6);
+                clickSlot(result.slot());
+                sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+            }
         } else {
             if (disable) disable(isRu() ? "У тебя нет элитры!" : "You don't have an elytra!");
             else sendMessage(isRu() ? "У тебя нет элитры!" : "You don't have an elytra!");

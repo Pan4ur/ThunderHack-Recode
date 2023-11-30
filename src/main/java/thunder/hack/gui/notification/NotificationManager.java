@@ -1,4 +1,4 @@
-package thunder.hack.notification;
+package thunder.hack.gui.notification;
 
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.ThunderHack;

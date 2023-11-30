@@ -69,7 +69,7 @@ public class Velocity extends Module {
                 && fishingHook.getValue()) {
             FishingBobberEntity fishHook = (FishingBobberEntity) pac.getEntity(mc.world);
             if (fishHook.getHookedEntity() == mc.player) {
-                e.setCancelled(true);
+                e.cancel();
             }
         }
 
@@ -79,7 +79,7 @@ public class Velocity extends Module {
                 switch (mode.getValue()) {
                     case Matrix -> {
                         if (!flag) {
-                            e.setCancelled(true);
+                            e.cancel();
                             flag = true;
                         } else {
                             flag = false;
@@ -103,11 +103,11 @@ public class Velocity extends Module {
                         ((ISPacketEntityVelocity) pac).setMotionZ((int) ((float) pac.getVelocityZ() * horizontal.getValue() / 100f));
                     }
                     case Sunrise -> {
-                        e.setCancelled(true);
+                        e.cancel();
                         sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), -999.0, mc.player.getZ(), true));
                     }
                     case Cancel -> {
-                        e.setCancelled(true);
+                        e.cancel();
                     }
                     case Jump -> {
                         ((ISPacketEntityVelocity) pac).setMotionX((int) ((float) pac.getVelocityX() * horizontal.getValue() / 100f));

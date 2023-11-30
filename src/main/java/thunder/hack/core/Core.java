@@ -81,7 +81,7 @@ public final class Core {
         if (e.getPacket() instanceof ClientCommandC2SPacket c) {
             if (c.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING || c.getMode() == ClientCommandC2SPacket.Mode.STOP_SPRINTING) {
                 if (lockSprint) {
-                    e.setCancelled(true);
+                    e.cancel();
                     return;
                 }
 

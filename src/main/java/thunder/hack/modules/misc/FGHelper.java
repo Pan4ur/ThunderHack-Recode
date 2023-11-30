@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
-import thunder.hack.notification.Notification;
+import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.Timer;

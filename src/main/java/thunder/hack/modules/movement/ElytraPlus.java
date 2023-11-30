@@ -24,7 +24,7 @@ import net.minecraft.util.math.Vec3d;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.*;
 import thunder.hack.modules.Module;
-import thunder.hack.notification.Notification;
+import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.math.MathUtility;
@@ -41,6 +41,7 @@ public class ElytraPlus extends Module {
     }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.FireWork);
+    private final Setting<AntiKick> antiKick = new Setting<>("Mode", AntiKick.Jitter, v-> mode.getValue() == Mode.FireWork);
     private final Setting<Float> xzSpeed = new Setting<>("XZSpeed", 1.55f, 0.1f, 10f, v -> mode.getValue() != Mode.Boost && mode.getValue() != Mode.Pitch40Infinite);
     private final Setting<Float> ySpeed = new Setting<>("YSpeed", 0.47f, 0f, 2f, v -> mode.getValue() == Mode.FireWork || mode.getValue() == Mode.SunriseOld);
     private final Setting<Integer> fireSlot = new Setting<>("FireSlot", 1, 1, 9, v -> mode.getValue() == Mode.FireWork);
@@ -72,6 +73,8 @@ public class ElytraPlus extends Module {
     private final Setting<Integer> infiniteMaxHeight = new Setting<>("InfiniteMaxHeight", 200, 50, 360, v -> mode.getValue() == Mode.Pitch40Infinite);
 
     public enum Mode {FireWork, SunriseOld, Boost, Control, Pitch40Infinite, SunriseNew}
+
+    public enum AntiKick {Off, Jitter, Glide}
 
     private final thunder.hack.utility.Timer instantFlyTimer = new thunder.hack.utility.Timer();
     private final thunder.hack.utility.Timer staticTimer = new thunder.hack.utility.Timer();
@@ -161,13 +164,20 @@ public class ElytraPlus extends Module {
     }
 
     private void doSunriseNew() {
-        if (mc.player.horizontalCollision) acceleration = 0;
+        if (mc.player.horizontalCollision)
+            acceleration = 0;
+
         int elytra = InventoryUtility.getElytra();
         if (elytra == -1) return;
         if (mc.player.isOnGround()) {
             mc.player.jump();
             acceleration = 0;
+            return;
         }
+
+        if(mc.player.fallDistance <= 0)
+            return;
+
         if (mc.options.jumpKey.isPressed() || mc.options.sneakKey.isPressed()) {
             acceleration = 0;
             takeOnElytra();
@@ -696,11 +706,15 @@ public class ElytraPlus extends Module {
         if (!MovementUtility.isMoving() && mc.options.jumpKey.isPressed() && mc.player.isFallFlying() && flying)
             mc.player.setPitch(-90f);
 
-        if (ThunderHack.playerManager.ticksElytraFlying < 5) mc.player.setPitch(-45f);
+        if (ThunderHack.playerManager.ticksElytraFlying < 5 && !mc.player.isOnGround())
+            mc.player.setPitch(-45f);
     }
 
     public void fireworkOnMove(EventMove e) {
         if (mc.player.isFallFlying() && flying) {
+            if(mc.player.horizontalCollision || mc.player.verticalCollision)
+                currentSpeed = 0;
+
             if (ThunderHack.playerManager.ticksElytraFlying < 4) {
                 e.setY(0.2f);
                 e.cancel();
@@ -711,9 +725,13 @@ public class ElytraPlus extends Module {
             } else if (mc.options.sneakKey.isPressed()) {
                 e.setY(-ySpeed.getValue());
             } else if (bowBomb.getValue() && checkGround(2.0f)) {
-                e.setY((float) (mc.player.age % 2 == 0 ? (double) 0.42f : (double) -0.42f));
+                e.setY(mc.player.age % 2 == 0 ?  0.42f :  -0.42f);
             } else {
-                e.setY((float) (mc.player.age % 2 == 0 ? (double) 0.08f : (double) -0.08f));
+                switch (antiKick.getValue()) {
+                    case Jitter -> e.setY(mc.player.age % 2 == 0 ?  0.08f :  -0.08f);
+                    case Glide -> e.setY(-0.08f);
+                    case Off -> e.setY(0f);
+                }
             }
             MovementUtility.modifyEventSpeed(e, xzSpeed.getValue() * Math.min((float) (currentSpeed += 9) / 100.0f, 1.0f));
             if (stayMad.getValue() && !checkGround(3.0f) && ThunderHack.playerManager.ticksElytraFlying > 10) {
@@ -751,6 +769,7 @@ public class ElytraPlus extends Module {
         currentSpeed = 0;
         startFallFlying = false;
         if (keepFlying.getValue()) return;
+        mc.player.setVelocity(0, mc.player.getVelocity().getY(),0);
         new Thread(() -> {
             sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
             ThunderHack.TICK_TIMER = 0.1f;

@@ -6,7 +6,7 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;
-import thunder.hack.notification.Notification;
+import thunder.hack.gui.notification.Notification;
 import thunder.hack.utility.player.InventoryUtility;
 
 import static thunder.hack.modules.client.MainSettings.isRu;

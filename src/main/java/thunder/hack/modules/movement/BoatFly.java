@@ -2,12 +2,10 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.render.entity.BoatEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.BoatEntity;
-import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityAttachS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityS2CPacket;
@@ -23,31 +21,38 @@ import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.player.MovementUtility;
 
 import java.util.ArrayList;
 
 public class BoatFly extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
-    private final Setting<Boolean> slotClick = new Setting<>("ClickSlot", false);
-    private final Setting<Boolean> limit = new Setting<>("Limit", true);
-    private final Setting<Boolean> phase = new Setting<>("Phase", true);
-    private final Setting<Boolean> gravity = new Setting<>("Gravity", true);
-    private final Setting<Boolean> ongroundpacket = new Setting<>("OnGroundPacket", false);
-    private final Setting<Boolean> spoofpackets = new Setting<>("SpoofPackets", false);
-    private final Setting<Boolean> cancelrotations = new Setting<>("CancelRotations", true);
-    private final Setting<Boolean> cancel = new Setting<>("Cancel", true);
-    private final Setting<Boolean> remount = new Setting<>("Remount", true);
-    private final Setting<Boolean> pause = new Setting<>("Pause", false);
-    private final Setting<Integer> enableticks = new Setting<>("EnableTicks", 10, 1, 100, v -> pause.getValue());
-    private final Setting<Integer> waitTicks = new Setting<>("WaitTicks", 10, 1, 100, v -> pause.getValue());
+
+    private final Setting<Boolean> phase = new Setting<>("Phase", false);
+    private final Setting<Boolean> gravity = new Setting<>("Gravity", false);
     private final Setting<Boolean> automount = new Setting<>("AutoMount", true);
-    private final Setting<Boolean> stopunloaded = new Setting<>("StopUnloaded", true);
+    public final Setting<Boolean> allowShift = new Setting<>("AllowShift", true);
     private final Setting<Float> speed = new Setting<>("Speed", 2f, 0.0f, 25f);
     private final Setting<Float> yspeed = new Setting<>("YSpeed", 1f, 0.0f, 10f);
-    private final Setting<Float> glidespeed = new Setting<>("GlideSpeed", 1f, 0.0f, 10f);
-    private final Setting<Float> timer = new Setting<>("Timer", 1f, 0.1f, 5f);
-    private final Setting<Float> jitter = new Setting<>("Jitter", 0.1f, 0.0f, 10f);
+
+    // For pro players
+    public final Setting<Parent> advanced = new Setting<>("Advanced", new Parent(false, 0));
+    private final Setting<Float> glidespeed = new Setting<>("GlideSpeed", 0f, 0f, 10f).withParent(advanced);
+    private final Setting<Boolean> slotClick = new Setting<>("ClickSlot", false).withParent(advanced);
+    private final Setting<Boolean> limit = new Setting<>("Limit", true).withParent(advanced);
+    private final Setting<Boolean> ongroundpacket = new Setting<>("OnGroundPacket", false).withParent(advanced);
+    private final Setting<Boolean> spoofpackets = new Setting<>("SpoofPackets", false).withParent(advanced);
+    private final Setting<Float> jitter = new Setting<>("Jitter", 0.1f, 0.0f, 10f, v-> spoofpackets.getValue()).withParent(advanced);
+    private final Setting<Boolean> cancelrotations = new Setting<>("CancelRotations", true).withParent(advanced);
+    private final Setting<Boolean> cancel = new Setting<>("Cancel", true).withParent(advanced);
+    private final Setting<Boolean> pause = new Setting<>("Pause", false).withParent(advanced);
+    private final Setting<Integer> enableticks = new Setting<>("EnableTicks", 10, 1, 100, v -> pause.getValue()).withParent(advanced);
+    private final Setting<Integer> waitTicks = new Setting<>("WaitTicks", 10, 1, 100, v -> pause.getValue()).withParent(advanced);
+    private final Setting<Boolean> stopunloaded = new Setting<>("StopUnloaded", true).withParent(advanced);
+    private final Setting<Float> timer = new Setting<>("Timer", 1f, 0.1f, 5f).withParent(advanced);
+    public final Setting<Boolean> hideBoat = new Setting<>("HideBoat", true).withParent(advanced);
+
 
     private final ArrayList<VehicleMoveC2SPacket> vehiclePackets = new ArrayList<>();
     private int ticksEnabled = 0;
@@ -123,8 +128,10 @@ public class BoatFly extends Module {
         if (!ev.isPre()) return;
         if (fullNullCheck()) return;
 
+
         if (mc.player.getControllingVehicle() == null) {
-            if (automount.getValue()) mountToBoat();
+            if (automount.getValue())
+                mountToBoat();
             return;
         }
 
@@ -213,9 +220,6 @@ public class BoatFly extends Module {
             sendMovePacket(new VehicleMoveC2SPacket(entityBoat));
         }
 
-        if (remount.getValue())
-            mc.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket.interact(entity, false, Hand.MAIN_HAND));
-
         ev.cancel();
         ++ticksEnabled;
     }
@@ -245,7 +249,13 @@ public class BoatFly extends Module {
 
         if (returnGravity && event.getPacket() instanceof VehicleMoveC2SPacket) event.cancel();
 
-        if (!mc.player.isRiding() || returnGravity || waitedCooldown) return;
+        if(mc.player.isRiding() && event.getPacket() instanceof ClientCommandC2SPacket commandC2SPacket
+                && (commandC2SPacket.getMode() == ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY || commandC2SPacket.getMode() == ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY)
+                && allowShift.getValue())
+            event.cancel();
+
+        if (!mc.player.isRiding() || returnGravity || waitedCooldown)
+            return;
 
         Vec3d boatPos = mc.player.getControllingVehicle().getPos();
         if ((!mc.world.isChunkLoaded((int) boatPos.getX() >> 4, (int) boatPos.getZ() >> 4) || boatPos.getY() < -60) && stopunloaded.getValue())

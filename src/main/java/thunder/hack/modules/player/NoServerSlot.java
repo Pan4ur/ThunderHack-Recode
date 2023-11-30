@@ -14,7 +14,7 @@ public class NoServerSlot extends Module {
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof UpdateSelectedSlotS2CPacket) {
-            event.setCancelled(true);
+            event.cancel();
             sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
         }
     }

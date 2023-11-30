@@ -36,7 +36,7 @@ import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.injection.accesors.IWorldRenderer;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.player.SpeedMine;
-import thunder.hack.notification.Notification;
+import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;

@@ -21,7 +21,7 @@ public class PortalGodMode extends Module {
     public void onPacketSend(PacketEvent.Send e) {
         if (e.getPacket() instanceof TeleportConfirmC2SPacket && confirmTimer.getPassedTimeMs() < 5000) {
             teleported = true;
-            e.setCancelled(true);
+            e.cancel();
         }
     }
 

@@ -10,7 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.*;
 import thunder.hack.modules.client.RPC;
-import thunder.hack.notification.NotificationManager;
+import thunder.hack.gui.notification.NotificationManager;
 import thunder.hack.utility.SoundUtility;
 import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -35,7 +35,7 @@ public class ThunderHack implements ModInitializer {
     public static long initTime;
     public static KeyListening currentKeyListener;
 
-    /*-----------------    Managers    ---------------------*/
+    /*-----------------    Managers  ---------------------*/
     public static NotificationManager notificationManager = new NotificationManager();
     public static WayPointManager wayPointManager = new WayPointManager();
     public static ModuleManager moduleManager = new ModuleManager();
@@ -107,10 +107,10 @@ public class ThunderHack implements ModInitializer {
                    | $$   | $$  \\ $$| $$  | $$| $$  \\ $$| $$  | $$| $$$$$$$$| $$  \\__/| $$__  $$  /$$$$$$$| $$      | $$$$$$/\s
                    | $$   | $$  | $$| $$  | $$| $$  | $$| $$  | $$| $$_____/| $$      | $$  | $$ /$$__  $$| $$      | $$_  $$\s
                    | $$   | $$  | $$|  $$$$$$/| $$  | $$|  $$$$$$$|  $$$$$$$| $$      | $$  | $$|  $$$$$$$|  $$$$$$$| $$ \\  $$
-                   |__/   |__/  |__/ \\______/ |__/  |__/ \\_______/ \\_______/|__/      |__/  |__/ \\_______/ \\_______/|__/  \\__/""");
+                   |__/   |__/  |__/ \\______/ |__/  |__/ \\_______/ \\_______/|__/      |__/  |__/ \\_______/ \\_______/|__/  \\__/   \s
+                   \n \t\t\t\t\t\tBy\s""" + ThunderUtility.getAuthors());
 
-        LogUtils.getLogger()
-                .info("[ThunderHack] Init time: " + (System.currentTimeMillis() - initTime) + " ms.");
+        LogUtils.getLogger().info("[ThunderHack] Init time: " + (System.currentTimeMillis() - initTime) + " ms.");
 
         initTime = System.currentTimeMillis();
     }

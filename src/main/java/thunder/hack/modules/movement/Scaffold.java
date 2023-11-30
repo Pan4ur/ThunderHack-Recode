@@ -187,7 +187,7 @@ public class Scaffold extends Module {
         event.setX(x);
         event.setY(y);
         event.setZ(z);
-        event.setCancelled(true);
+        event.cancel();
     }
 
     @EventHandler

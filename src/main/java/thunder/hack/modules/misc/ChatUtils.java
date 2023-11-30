@@ -18,7 +18,7 @@ import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.injection.accesors.IGameMessageS2CPacket;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
-import thunder.hack.notification.Notification;
+import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 

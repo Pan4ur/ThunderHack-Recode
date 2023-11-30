@@ -14,6 +14,7 @@ import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import thunder.hack.ThunderHack;
+import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -56,9 +57,9 @@ public class AutoFish extends Module {
 
 
     @EventHandler
-    private void onPacketReceive(PacketEvent.ReceivePost e) {
+    public void onPacketReceive(PacketEvent.Receive e) {
         if(e.getPacket() instanceof PlaySoundS2CPacket sound && detectMode.getValue() == DetectMode.Sound)
-            if(sound.getSound().value().equals(SoundEvents.ENTITY_FISHING_BOBBER_SPLASH) && mc.player.fishHook != null && mc.player.fishHook.squaredDistanceTo(sound.getX(), sound.getY(), sound.getZ()) < 9f)
+            if(sound.getSound().value().equals(SoundEvents.ENTITY_FISHING_BOBBER_SPLASH) && mc.player.fishHook != null && mc.player.fishHook.squaredDistanceTo(sound.getX(), sound.getY(), sound.getZ()) < 4f)
                 catchFish();
     }
 
@@ -79,7 +80,7 @@ public class AutoFish extends Module {
         if(!cooldown.passedMs(1000))
             return;
 
-        if (timeout.passedMs(45000)) {
+        if (timeout.passedMs(45000) && mc.player.getMainHandStack().getItem() instanceof FishingRodItem) {
             sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
             sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             timeout.reset();

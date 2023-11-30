@@ -1,6 +1,7 @@
-package thunder.hack.notification;
+package thunder.hack.gui.notification;
 
 import net.minecraft.client.util.math.MatrixStack;
+import thunder.hack.cmd.Command;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.Timer;
@@ -39,10 +40,7 @@ public class Notification {
     }
 
     public void render(MatrixStack matrix, float getY) {
-        Color icolor2 = new Color(170, 170, 170, (int) MathUtility.clamp((1 - animation.getAnimationd()), 0, 255));
-
-        direction = isFinished();
-        animationX = (float) (width * animation.getAnimationd());
+        animationX = width * (1f - (float) animation.getAnimationd());
 
         posY = animate(posY, getY);
 
@@ -53,7 +51,7 @@ public class Notification {
         Render2DEngine.verticalGradient(matrix, x1 + 25, y1 + 11, x1 + 25.5f, y1 + 22, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
 
         FontRenderers.sf_bold_mini.drawString(matrix, title, x1 + 30, y1 + 6, HudEditor.textColor.getValue().getColor());
-        FontRenderers.sf_bold_mini.drawString(matrix, message, x1 + 30, y1 + 15, icolor2.getRGB());
+        FontRenderers.sf_bold_mini.drawString(matrix, message, x1 + 30, y1 + 15, HudEditor.textColor.getValue().getColor());
 
         String icon = "I";
         switch (type) {
@@ -64,11 +62,8 @@ public class Notification {
             case WARNING -> icon = "L";
         }
 
-        FontRenderers.mid_icons.drawString(matrix, icon, x1 + 5, y1 + 7, icolor2.getRGB());
-
-        if (animationTimer.every(50)) {
-            animation.update(direction);
-        }
+        FontRenderers.mid_icons.drawString(matrix, icon, x1 + 5, y1 + 7, HudEditor.textColor.getValue().getColor());
+        animation.update(isFinished());
     }
 
     public void renderShaders(MatrixStack matrix, float getY) {

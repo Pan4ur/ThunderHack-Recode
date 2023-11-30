@@ -201,7 +201,7 @@ public class TargetStrafe extends Module {
 
                 event.setX(speed * -Math.sin(Math.toRadians(wrapDS(x, z))));
                 event.setZ(speed * Math.cos(Math.toRadians(wrapDS(x, z))));
-                event.setCancelled(true);
+                event.cancel();
 
             }
         } else {

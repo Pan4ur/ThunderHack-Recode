@@ -109,7 +109,7 @@ public class Speed extends Module {
                 }
 
                 if (shiftTicks.getValue() > 0 && (MathUtility.clamp((int) (100 - Math.min(violation, 100)), 0, 100) > 90)) {
-                    event.setCancelled(true);
+                    event.cancel();
                     event.setIterations(shiftTicks.getValue());
                 }
             }
