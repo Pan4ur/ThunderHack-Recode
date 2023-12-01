@@ -135,6 +135,7 @@ public class AutoCrystalBase extends Module {
         if (mc.player == null || mc.world == null) return;
 
         if (target == null) {
+            bestData = null;
             return;
         }
 
