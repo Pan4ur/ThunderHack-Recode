@@ -22,6 +22,7 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventBreakBlock;
 import thunder.hack.events.impl.EventStopUsingItem;
+import thunder.hack.modules.player.NoInteract;
 import thunder.hack.modules.player.Reach;
 import thunder.hack.modules.player.SpeedMine;
 
@@ -32,14 +33,20 @@ public class MixinClientPlayerInteractionManager {
     @Inject(method = "interactBlock", at = @At("HEAD"), cancellable = true)
     private void interactBlock(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir) {
         Block bs = mc.world.getBlockState(hitResult.getBlockPos()).getBlock();
-        if (ModuleManager.noInteract.isEnabled() && (bs == Blocks.CHEST ||
+        if (ModuleManager.noInteract.isEnabled() && (
+                bs == Blocks.CHEST ||
                 bs == Blocks.TRAPPED_CHEST ||
                 bs == Blocks.FURNACE ||
                 bs == Blocks.ANVIL ||
                 bs == Blocks.CRAFTING_TABLE ||
+                bs == Blocks.HOPPER ||
+                bs == Blocks.JUKEBOX ||
+                bs == Blocks.NOTE_BLOCK ||
+                bs == Blocks.ENDER_CHEST ||
                 bs instanceof ShulkerBoxBlock ||
                 bs instanceof FenceBlock ||
-                bs instanceof FenceGateBlock)) {
+                bs instanceof FenceGateBlock)
+        && (ModuleManager.aura.isEnabled() || !NoInteract.onlyAura.getValue())) {
             cir.setReturnValue(ActionResult.PASS);
         }
     }

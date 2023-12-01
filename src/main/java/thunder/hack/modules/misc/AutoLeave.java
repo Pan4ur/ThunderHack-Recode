@@ -70,6 +70,10 @@ public class AutoLeave extends Module {
     }
 
     private void leave(String message) {
+        if(!chatDelay.passedMs(1000))
+            return;
+        chatDelay.reset();
+
         if (fastLeave.getValue()) sendPacket(new UpdateSelectedSlotC2SPacket(228));
         else mc.player.networkHandler.getConnection().disconnect(Text.of("[AutoLeave] " + message));
         if(autoDisable.getValue())
@@ -77,7 +81,7 @@ public class AutoLeave extends Module {
     }
 
     public void onStaff() {
-        if(!chatDelay.passedMs(500))
+        if(!chatDelay.passedMs(1000))
             return;
         chatDelay.reset();
 

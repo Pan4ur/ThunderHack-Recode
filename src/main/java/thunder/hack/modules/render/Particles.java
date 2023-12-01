@@ -47,8 +47,8 @@ public class Particles extends Module {
     }
 
 
-    private ArrayList<ParticleBase> fireFlies = new ArrayList<>();
-    private ArrayList<ParticleBase> particles = new ArrayList<>();
+    private final ArrayList<ParticleBase> fireFlies = new ArrayList<>();
+    private final ArrayList<ParticleBase> particles = new ArrayList<>();
 
     @Override
     public void onUpdate() {
@@ -69,9 +69,9 @@ public class Particles extends Module {
         for (int j = particles.size(); j < count.getValue(); j++) {
             if (mode.getValue() != Mode.Off)
                 particles.add(new ParticleBase(
-                        (float) (mc.player.getX() + MathUtility.random(-64f, 64f)),
-                        (float) (mc.player.getY() + MathUtility.random(2, 64f)),
-                        (float) (mc.player.getZ() + MathUtility.random(-64f, 64f)),
+                        (float) (mc.player.getX() + MathUtility.random(-48f, 48f)),
+                        (float) (mc.player.getY() + MathUtility.random(2, 48f)),
+                        (float) (mc.player.getZ() + MathUtility.random(-48f, 48f)),
                         MathUtility.random(-0.4f, 0.4f),
                         MathUtility.random(-0.1f, 0.1f),
                         MathUtility.random(-0.4f, 0.4f)));

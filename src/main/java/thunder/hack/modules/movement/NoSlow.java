@@ -9,14 +9,13 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.PlayerUtility;
 
 public class NoSlow extends Module {
-    public static Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
-    public Setting<Boolean> mainHand = new Setting<>("MainHand", true, v -> mode.getValue() == Mode.Grim || mode.getValue() == Mode.MusteryGrief);
-
-    private boolean returnSneak;
-
     public NoSlow() {
         super("NoSlow", Category.MOVEMENT);
     }
+
+    public static final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
+    private final Setting<Boolean> mainHand = new Setting<>("MainHand", true, v -> mode.getValue() == Mode.Grim || mode.getValue() == Mode.MusteryGrief);
+    private boolean returnSneak;
 
     @Override
     public void onUpdate() {
@@ -26,30 +25,35 @@ public class NoSlow extends Module {
         }
 
         if (mc.player.isUsingItem() && !mc.player.isRiding() && !mc.player.isFallFlying()) {
-            if (mode.getValue() == Mode.StrictNCP)
-                sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
-
-            if (mode.getValue() == Mode.MusteryGrief) {
-                if (mc.player.isOnGround() && mc.options.jumpKey.isPressed()) {
-                    mc.options.sneakKey.setPressed(true);
-                    returnSneak = true;
+            switch (mode.getValue()) {
+                case StrictNCP ->
+                        sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+                case MusteryGrief -> {
+                    if (mc.player.isOnGround() && mc.options.jumpKey.isPressed()) {
+                        mc.options.sneakKey.setPressed(true);
+                        returnSneak = true;
+                    }
                 }
-            }
-
-            if (mode.getValue() == Mode.Grim) {
-                if (mc.player.getActiveHand() == Hand.OFF_HAND) {
-                    sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot % 8 + 1));
-                    sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
-                } else if (mainHand.getValue()) {
-                    sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                case Grim -> {
+                    if (mc.player.getActiveHand() == Hand.OFF_HAND) {
+                        sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot % 8 + 1));
+                        sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+                    } else if (mainHand.getValue()) {
+                        sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                    }
                 }
-            }
-
-            if (mode.getValue() == Mode.Matrix) {
-                if (mc.player.isOnGround() && !mc.options.jumpKey.isPressed()) {
-                    mc.player.setVelocity(mc.player.getVelocity().x * 0.3, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.3);
-                } else if (mc.player.fallDistance > 0.2f)
-                    mc.player.setVelocity(mc.player.getVelocity().x * 0.95f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.95f);
+                case Matrix -> {
+                    if (mc.player.isOnGround() && !mc.options.jumpKey.isPressed()) {
+                        mc.player.setVelocity(mc.player.getVelocity().x * 0.3, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.3);
+                    } else if (mc.player.fallDistance > 0.2f)
+                        mc.player.setVelocity(mc.player.getVelocity().x * 0.95f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.95f);
+                }
+                case FunTime -> {
+                    if (mc.player.getActiveHand() == Hand.OFF_HAND)
+                        sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                    else
+                        sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                }
             }
         }
     }
@@ -58,12 +62,11 @@ public class NoSlow extends Module {
         if (mode.getValue() == Mode.MusteryGrief && mc.player.isOnGround() && !mc.options.jumpKey.isPressed())
             return false;
         if (!mainHand.getValue() && mc.player.getActiveHand() == Hand.MAIN_HAND)
-            return mode.getValue() != Mode.MusteryGrief && mode.getValue() != Mode.Grim;
+            return mode.getValue() != Mode.MusteryGrief && mode.getValue() != Mode.Grim && mode.getValue() != Mode.FunTime;
         return true;
     }
 
     public enum Mode {
-        NCP, StrictNCP, Matrix, Grim, MusteryGrief
+        NCP, StrictNCP, Matrix, Grim, MusteryGrief, FunTime
     }
-
 }

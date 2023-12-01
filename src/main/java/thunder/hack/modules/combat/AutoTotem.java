@@ -14,10 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.SwordItem;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
@@ -37,11 +34,11 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.SearchInvResult;
 
 public final class AutoTotem extends Module {
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Matrix);
     private final Setting<OffHand> offhand = new Setting<>("Item", OffHand.Totem);
     private final Setting<Float> healthF = new Setting<>("HP", 16f, 0f, 36f);
     private final Setting<Float> healthS = new Setting<>("ShieldGappleHp", 16f, 0f, 20f, v -> offhand.getValue() == OffHand.Shield);
     private final Setting<Boolean> calcAbsorption = new Setting<>("CalcAbsorption", true);
-    private final Setting<Boolean> matrix = new Setting<>("Matrix", true);
     private final Setting<Boolean> stopMotion = new Setting<>("stopMotion", false);
     private final Setting<Boolean> resetAttackCooldown = new Setting<>("ResetAttackCooldown", false);
     private final Setting<Parent> safety = new Setting<>("Safety", new Parent(false, 0));
@@ -58,6 +55,9 @@ public final class AutoTotem extends Module {
     private final Setting<Boolean> crappleSpoof = new Setting<>("CrappleSpoof", true, v -> offhand.getValue() == OffHand.GApple);
 
     private enum OffHand {Totem, Crystal, GApple, Shield}
+
+    private enum Mode {Deafult, Matrix, MatrixPick}
+
 
     private static AutoTotem instance;
 
@@ -124,36 +124,44 @@ public final class AutoTotem extends Module {
             int nearest_slot = findNearestCurrentItem();
             int prevCurrentItem = mc.player.getInventory().selectedSlot;
             if (slot >= 9) {
-                if (matrix.getValue()) {
-                    sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
-                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
-                    debug(slot + " " + nearest_slot);
-                    sendPacket(new UpdateSelectedSlotC2SPacket(nearest_slot));
-                    mc.player.getInventory().selectedSlot = nearest_slot;
-                    ItemStack itemstack = mc.player.getOffHandStack();
-                    mc.player.setStackInHand(Hand.OFF_HAND, mc.player.getMainHandStack());
-                    mc.player.setStackInHand(Hand.MAIN_HAND, itemstack);
-                    sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-                    sendPacket(new UpdateSelectedSlotC2SPacket(prevCurrentItem));
-                    mc.player.getInventory().selectedSlot = prevCurrentItem;
-                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
-                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                    if (resetAttackCooldown.getValue()) mc.player.resetLastAttackedTicks();
-                } else {
-                    sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
-                    clickSlot(slot);
-                    clickSlot(45);
-                    clickSlot(slot);
-                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                switch (mode.getValue()) {
+                    case Deafult -> {
+                        sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+                        clickSlot(slot);
+                        clickSlot(45);
+                        clickSlot(slot);
+                        sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                    }
+                    case Matrix -> {
+                        sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
+                        debug(slot + " " + nearest_slot);
+                        sendPacket(new UpdateSelectedSlotC2SPacket(nearest_slot));
+                        mc.player.getInventory().selectedSlot = nearest_slot;
+                        ItemStack itemstack = mc.player.getOffHandStack();
+                        mc.player.setStackInHand(Hand.OFF_HAND, mc.player.getMainHandStack());
+                        mc.player.setStackInHand(Hand.MAIN_HAND, itemstack);
+                        sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+                        sendPacket(new UpdateSelectedSlotC2SPacket(prevCurrentItem));
+                        mc.player.getInventory().selectedSlot = prevCurrentItem;
+                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
+                        sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                        if (resetAttackCooldown.getValue())
+                            mc.player.resetLastAttackedTicks();
+                    }
+                    case MatrixPick -> {
+                        debug(slot + " pick");
+                        sendPacket(new PickFromInventoryC2SPacket(slot));
+                        sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+                        int prevSlot = mc.player.getInventory().selectedSlot;
+                        ThunderHack.asyncManager.run(() -> mc.player.getInventory().selectedSlot = prevSlot, 300);
+                    }
                 }
             } else {
                 sendPacket(new UpdateSelectedSlotC2SPacket(slot));
                 mc.player.getInventory().selectedSlot = slot;
-
                 debug(slot + " select");
-
                 sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-
                 sendPacket(new UpdateSelectedSlotC2SPacket(prevCurrentItem));
                 mc.player.getInventory().selectedSlot = prevCurrentItem;
                 if (resetAttackCooldown.getValue())
@@ -164,10 +172,10 @@ public final class AutoTotem extends Module {
     }
 
     public static int findNearestCurrentItem() {
-        int currentItem = mc.player.getInventory().selectedSlot;
-        if (currentItem == 8) return 7;
-        if (currentItem == 0) return 1;
-        return currentItem - 1;
+        int i = mc.player.getInventory().selectedSlot;
+        if (i == 8) return 7;
+        if (i == 0) return 1;
+        return i - 1;
     }
 
     public int getItemSlot() {

@@ -90,7 +90,7 @@ public class ModuleButton extends AbstractButton {
         if (isOpen()) {
             Color sbg = ClickGui.getInstance().disabled.getValue().getColorObject();
 
-            Render2DEngine.drawRoundDoubleColor(context.getMatrices(), x + 4, y + height - 12, (width - 8), (height) + getElementsHeight() - 2, 2f, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(200), 0.8f) : sbg, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(0), 0.8f) : sbg);
+            Render2DEngine.drawRoundDoubleColor(context.getMatrices(), x + 4, y + height - 12, (width - 8), (height) + getElementsHeight(), 2f, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(200), 0.8f) : sbg, module.isEnabled() ? Render2DEngine.applyOpacity(ClickGui.getInstance().getColor(0), 0.8f) : sbg);
 
             Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle((float) x, (float) (y + height - 15), (float) ((width) + x + 6), (float) ((height) + y + getElementsHeight())));
 
@@ -126,7 +126,7 @@ public class ModuleButton extends AbstractButton {
             }
             context.getMatrices().pop();
 
-            Render2DEngine.drawBlurredShadow(context.getMatrices(), (int) x + 3, (int) (y + height), (int) width - 6, 3, 13, new Color(0, 0, 0, 255));
+            Render2DEngine.drawBlurredShadow(context.getMatrices(),  (float) x + 3,  (float) (y + height),  (float) width - 6, 3, 13, new Color(0, 0, 0, 255));
             Render2DEngine.popWindow();
         } else category_animation = fast(1, 0, 1f);
 
@@ -169,17 +169,17 @@ public class ModuleButton extends AbstractButton {
                     sbind = "RAlt";
                 }
                 if (!binding)
-                    FontRenderers.sf_medium_modules.drawString(context.getMatrices(), sbind, (int) x + (int) width - 11 - (int) FontRenderers.sf_medium_modules.getStringWidth(sbind), (int) y + 6 + (hovered ? -1 : 0), new Color(-1).getRGB());
+                    FontRenderers.sf_medium_modules.drawString(context.getMatrices(), sbind,  x +  width - 11 -  FontRenderers.sf_medium_modules.getStringWidth(sbind),  y + 6 + (hovered ? -1 : 0), new Color(-1).getRGB());
             }
             if (binding)
-                FontRenderers.sf_medium_modules.drawString(context.getMatrices(), holdbind ? (Formatting.GRAY + "Toggle / " + Formatting.RESET + "Hold") : (Formatting.RESET + "Toggle " + Formatting.GRAY + "/ Hold"), (int) x + (int) width - 11 - (int) FontRenderers.sf_medium_modules.getStringWidth("Toggle/Hold"), (int) iy + 2 + (hovered ? -1 : 0), new Color(-1).getRGB());
+                FontRenderers.sf_medium_modules.drawString(context.getMatrices(), holdbind ? (Formatting.GRAY + "Toggle / " + Formatting.RESET + "Hold") : (Formatting.RESET + "Toggle " + Formatting.GRAY + "/ Hold"),  x +  width - 11 -  FontRenderers.sf_medium_modules.getStringWidth("Toggle/Hold"),  iy + 2 + (hovered ? -1 : 0), new Color(-1).getRGB());
         }
 
         if(hovered && InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT)){
-            FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"), (int) ix + 1f, (int) iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"),  ix + 1f,  iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
         } else {
-            if (this.binding) FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "PressKey", (int) ix, (int) iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
-            else FontRenderers.sf_medium_modules.drawString(context.getMatrices(), module.getName(), (int) ix + 2, (int) iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            if (this.binding) FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "PressKey",  ix,  iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            else FontRenderers.sf_medium_modules.drawString(context.getMatrices(), module.getName(),  ix + 2,  iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
         }
     }
 

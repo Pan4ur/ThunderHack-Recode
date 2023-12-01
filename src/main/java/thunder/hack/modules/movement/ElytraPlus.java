@@ -728,7 +728,7 @@ public class ElytraPlus extends Module {
                 e.setY(mc.player.age % 2 == 0 ?  0.42f :  -0.42f);
             } else {
                 switch (antiKick.getValue()) {
-                    case Jitter -> e.setY(mc.player.age % 2 == 0 ?  0.08f :  -0.08f);
+                    case Jitter ->  e.setY((float) (mc.player.age % 2 == 0 ? (double) 0.08f : (double) -0.08f));
                     case Glide -> e.setY(-0.08f);
                     case Off -> e.setY(0f);
                 }

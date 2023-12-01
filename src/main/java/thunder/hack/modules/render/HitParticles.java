@@ -83,7 +83,7 @@ public class HitParticles extends Module {
         }
 
         public void update() {
-            double sp = Math.sqrt(motionX * motionX + motionZ * motionZ) * 1;
+            double sp = Math.sqrt(motionX * motionX + motionZ * motionZ);
             x += motionX;
             y += motionY;
             z += motionZ;

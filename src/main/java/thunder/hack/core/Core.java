@@ -9,6 +9,7 @@ import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Formatting;
@@ -20,11 +21,13 @@ import net.minecraft.util.math.Vec2f;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
+import thunder.hack.core.impl.FriendManager;
 import thunder.hack.core.impl.MacroManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.RadarRewrite;
+import thunder.hack.gui.notification.Notification;
 import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
@@ -38,6 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.modules.Module.fullNullCheck;
 import static thunder.hack.modules.Module.mc;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public final class Core {
     public static boolean lockSprint, serverSprint, hold_mouse0, showSkull;
@@ -45,6 +49,7 @@ public final class Core {
     private final Identifier SKULL = new Identifier("textures/skull.png");
     private final Timer skullTimer = new Timer();
     private final Timer lastPacket = new Timer();
+    private final Timer autoSave = new Timer();
 
     @EventHandler
     @SuppressWarnings("unused")
@@ -71,6 +76,16 @@ public final class Core {
             if (System.currentTimeMillis() - time > 300)
                 InteractionUtility.awaiting.remove(bp);
         });
+
+        if(autoSave.every(600000)) {
+            FriendManager.saveFriends();
+            ThunderHack.configManager.save(ThunderHack.configManager.getCurrentConfig());
+            ThunderHack.wayPointManager.saveWayPoints();
+            ThunderHack.macroManager.saveMacro();
+            ThunderHack.configManager.saveChestStealer();
+            ThunderHack.configManager.saveInvCleaner();
+            ThunderHack.notificationManager.publicity("AutoSave", isRu() ? "Сохраняю конфиг.." : "Saving config..", 3, Notification.Type.INFO);
+        }
     }
 
     @EventHandler
@@ -119,6 +134,16 @@ public final class Core {
 
         if (e.getPacket() instanceof GameJoinS2CPacket)
             ThunderHack.moduleManager.onLogin();
+
+        if(e.getPacket() instanceof PlayerPositionLookS2CPacket && autoSave.every(200000)) {
+            FriendManager.saveFriends();
+            ThunderHack.configManager.save(ThunderHack.configManager.getCurrentConfig());
+            ThunderHack.wayPointManager.saveWayPoints();
+            ThunderHack.macroManager.saveMacro();
+            ThunderHack.configManager.saveChestStealer();
+            ThunderHack.configManager.saveInvCleaner();
+            ThunderHack.notificationManager.publicity("AutoSave", isRu() ? "Сохраняю конфиг.." : "Saving config..", 3, Notification.Type.INFO);
+        }
     }
 
     @EventHandler

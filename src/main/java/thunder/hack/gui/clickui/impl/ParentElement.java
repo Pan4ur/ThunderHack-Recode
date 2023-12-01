@@ -35,9 +35,6 @@ public class ParentElement extends AbstractElement {
         float tx = (float) (x + width - 11f);
         float ty = (float) y + 8.5f;
 
-        if(getParentSetting().getValue().isExtended())
-            Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, (float) (getWidth() - 8f), (float) (getHeight()), ClickGui.getInstance().getColor(1));
-
         animation = fast(animation, getParentSetting().getValue().isExtended() ? 0 : 1, 15f);
 
         matrixStack.push();
