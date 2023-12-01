@@ -3,20 +3,18 @@ package thunder.hack.modules.combat;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.PickaxeItem;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.impl.CombatManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.player.InteractionUtility;
-import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.world.HoleUtility;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
@@ -24,28 +22,20 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 public final class AutoMine extends Module {
     private final Setting<Float> range = new Setting<>("Range", 5f, 1f, 7f);
     private final Setting<Boolean> autoDisable = new Setting<>("Auto Disable", true);
-    private final Setting<Boolean> autoSwitch = new Setting<>("Switch", true);
-    private final Setting<Boolean> requirePickaxe = new Setting<>("Only Pickaxe", false);
     private final Setting<Boolean> oldVers = new Setting<>("1.12 Mode", false);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
     private final Setting<Boolean> swing = new Setting<>("Swing", false);
 
     private final Setting<Parent> logic = new Setting<>("Logic", new Parent(false, 0));
-    private final Setting<TargetLogic> targetLogic = new Setting<>("TargetLogic", TargetLogic.Distance).withParent(logic);
+    private final Setting<CombatManager.TargetBy> targetLogic = new Setting<>("Target By", CombatManager.TargetBy.Distance).withParent(logic);
     private final Setting<Boolean> antiBurrow = new Setting<>("Burrow", false).withParent(logic);
     private final Setting<Boolean> antiSurround = new Setting<>("Surround", true).withParent(logic);
     private final Setting<Boolean> antiCev = new Setting<>("Cev", true).withParent(logic);
     private final Setting<Boolean> antiCiv = new Setting<>("Civ", true).withParent(logic);
 
     private static AutoMine instance;
-
     private BlockPos blockPos;
-
-    private enum TargetLogic {
-        Distance,
-        HP,
-        FOV
-    }
+    private PlayerEntity target;
 
     public AutoMine() {
         super("AutoMine", Category.COMBAT);
@@ -58,9 +48,9 @@ public final class AutoMine extends Module {
     }
 
     @EventHandler
-    public void onSync(EventSync event) {
+    @SuppressWarnings("unused")
+    private void onSync(EventSync event) {
         if (fullNullCheck()) return;
-        if (requirePickaxe.getValue() && !checkPickaxe()) return;
 
         if (blockPos != null && mc.world.isAir(blockPos)) {
             if (autoDisable.getValue()) {
@@ -70,21 +60,16 @@ public final class AutoMine extends Module {
             blockPos = null;
         }
 
-        BlockPos minePos = null;
-        PlayerEntity target = null;
-        boolean found = false;
-
-        switch (targetLogic.getValue()) {
-            case HP -> target = ThunderHack.combatManager.getTargetByHealth(range.getValue() + 1f);
-            case Distance -> target = ThunderHack.combatManager.getNearestTarget(range.getValue() + 1f);
-            case FOV -> target = ThunderHack.combatManager.getTargetByFOV(range.getValue() + 1f);
+        if (target == null || target.isDead()) {
+            target = ThunderHack.combatManager.getTarget(range.getValue() + 1, targetLogic.getValue());
+            return;
         }
-
-        if (target == null) return;
-
         BlockPos targetPos = BlockPos.ofFloored(target.getPos());
+        if (!HoleUtility.isHole(targetPos))
+            return;
 
-        if (!HoleUtility.isHole(targetPos)) return;
+        boolean found = false;
+        BlockPos minePos = null;
 
         // 1 прогон - на буров
         if (antiBurrow.getValue() && !mc.world.getBlockState(targetPos).isReplaceable()) {
@@ -105,10 +90,17 @@ public final class AutoMine extends Module {
                     break;
                 }
             }
+
+            if (!found
+                    && !mc.world.getBlockState(targetPos.down()).isReplaceable()
+                    && mc.world.getBlockState(targetPos.down(2)).isAir()) {
+                minePos = targetPos.down(2);
+                found = true;
+            }
         }
 
         // 3 прогон кив брейкаем
-        if (!found && antiCiv.getValue()) {
+        if (!found && antiCiv.getValue())
             for (BlockPos pos : HoleUtility.getSurroundPoses(target.getPos()).stream()
                     .map(BlockPos::up)
                     .toList()) {
@@ -119,7 +111,6 @@ public final class AutoMine extends Module {
                     break;
                 }
             }
-        }
 
         // 4 прогон кев брейкаем
         if (!found
@@ -131,7 +122,7 @@ public final class AutoMine extends Module {
         }
 
         // 5 прогон - ищем любой
-        if (!found && !oldVers.getValue() && antiSurround.getValue()) {
+        if (!found && !oldVers.getValue() && antiSurround.getValue())
             for (BlockPos pos2 : HoleUtility.getSurroundPoses(target.getPos())) {
                 if (mc.world.getBlockState(pos2).getBlock() != Blocks.OBSIDIAN)
                     continue;
@@ -140,44 +131,27 @@ public final class AutoMine extends Module {
                     break;
                 }
             }
-        }
 
-        if (minePos != null) {
-            if (autoSwitch.getValue())
-                InventoryUtility.getPickAxe().switchTo();
-
-            if (rotate.getValue()) {
-                float[] rotation = getRotations(minePos);
-                if (rotation != null) {
-                    mc.player.setYaw(rotation[0]);
-                    mc.player.setPitch(rotation[1]);
-                }
-            }
-
-            if (!requirePickaxe.getValue() || mc.player.getMainHandStack().getItem() instanceof PickaxeItem) {
-                if (ModuleManager.speedMine.isEnabled()
-                        && (SpeedMine.minePosition != null || SpeedMine.progress != 0))
-                    return;
-                InteractionUtility.BreakData data = InteractionUtility.getBreakData(minePos, InteractionUtility.Interact.Strict);
-                if (data == null)
-                    return;
-
-                if (ModuleManager.speedMine.isEnabled()) mc.interactionManager.attackBlock(minePos, data.dir());
-                else mc.interactionManager.updateBlockBreakingProgress(minePos, data.dir());
-
-                if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
-                blockPos = minePos;
+        if (minePos == null)
+            return;
+        if (rotate.getValue()) {
+            float[] rotation = getRotations(minePos);
+            if (rotation != null) {
+                mc.player.setYaw(rotation[0]);
+                mc.player.setPitch(rotation[1]);
             }
         }
+
+        if (SpeedMine.getInstance().isEnabled())
+            SpeedMine.getInstance().addBlockToMine(minePos, null, false);
+
+        if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
+        blockPos = minePos;
     }
 
     public static float @Nullable [] getRotations(@NotNull BlockPos blockPos) {
         InteractionUtility.BreakData data = InteractionUtility.getBreakData(blockPos, InteractionUtility.Interact.Strict);
         return data == null ? null : InteractionUtility.calculateAngle(data.vector());
-    }
-
-    public boolean checkPickaxe() {
-        return mc.player.getMainHandStack().getItem() instanceof PickaxeItem;
     }
 
     public static AutoMine getInstance() {

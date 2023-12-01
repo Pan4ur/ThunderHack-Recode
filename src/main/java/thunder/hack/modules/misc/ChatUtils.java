@@ -29,26 +29,23 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class ChatUtils extends Module {
-    public ChatUtils() {
-        super("ChatUtils", Category.MISC);
-    }
-
-    private final Setting<Welcomer> welcomer = new Setting("Welcomer", Welcomer.Off);
-    private final Setting<Prefix> prefix = new Setting("Prefix", Prefix.None);
-    public final Setting<Boolean> totems = new Setting<>("Totems", false);
-    public final Setting<Boolean> time = new Setting<>("Time", false);
-    public final Setting<Boolean> mention = new Setting<>("Mention", false);
-
-    public final Setting<Boolean> ZOV = new Setting<>("ZOV", false);
-
+    private final Setting<Welcomer> welcomer = new Setting<>("Welcomer", Welcomer.Off);
+    private final Setting<Prefix> prefix = new Setting<>("Prefix", Prefix.None);
+    private final Setting<Boolean> totems = new Setting<>("Totems", false);
+    private final Setting<Boolean> time = new Setting<>("Time", false);
+    private final Setting<Boolean> mention = new Setting<>("Mention", false);
+    private final Setting<Boolean> zov = new Setting<>("ZOV", false);
     private final Setting<Boolean> antiCoordLeak = new Setting<>("AntiCoordLeak", false);
 
     private final Timer timer = new Timer();
     private final Timer antiSpam = new Timer();
 
     private final LinkedHashMap<UUID, String> nameMap = new LinkedHashMap<>();
+    private String skip;
 
-    String skip;
+    public ChatUtils() {
+        super("ChatUtils", Category.MISC);
+    }
 
     @Override
     public void onDisable() {
@@ -68,9 +65,9 @@ public class ChatUtils extends Module {
     }
 
     @EventHandler
-    public void onPacketReceive(PacketEvent.Receive e) {
+    public void onPacketReceive(PacketEvent.Receive event) {
         if (welcomer.getValue() != Welcomer.Off && antiSpam.passedMs(3000)) {
-            if (e.getPacket() instanceof PlayerListS2CPacket pck) {
+            if (event.getPacket() instanceof PlayerListS2CPacket pck) {
                 int n2 = (int) Math.floor(Math.random() * qq.length);
                 String string1;
                 if (mc.player.networkHandler.getServerInfo() != null) {
@@ -88,7 +85,8 @@ public class ChatUtils extends Module {
                     }
                 }
             }
-            if (e.getPacket() instanceof PlayerRemoveS2CPacket pac) {
+
+            if (event.getPacket() instanceof PlayerRemoveS2CPacket pac) {
                 for (UUID uuid2 : pac.profileIds) {
                     if (!nameMap.containsKey(uuid2)) return;
                     if (antiBot(nameMap.get(uuid2))) return;
@@ -102,12 +100,13 @@ public class ChatUtils extends Module {
                 }
             }
         }
-        if (e.getPacket() instanceof GameMessageS2CPacket pac && time.getValue()) {
-            IGameMessageS2CPacket pac2 = e.getPacket();
+
+        if (event.getPacket() instanceof GameMessageS2CPacket pac && time.getValue()) {
+            IGameMessageS2CPacket pac2 = event.getPacket();
             pac2.setContent(Text.of("[" + Formatting.GRAY + new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime()) + Formatting.RESET + "] ").copy().append(pac.content));
         }
 
-        if (e.getPacket() instanceof GameMessageS2CPacket pac && mention.getValue()) {
+        if (event.getPacket() instanceof GameMessageS2CPacket pac && mention.getValue()) {
             if (pac.content.getString().contains(mc.player.getName().getString())) {
                 ThunderHack.notificationManager.publicity("ChatUtils", MainSettings.language.getValue() == MainSettings.Language.RU ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
                 mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 5f, 1f);
@@ -191,7 +190,7 @@ public class ChatUtils extends Module {
         }
 
         if (fullNullCheck()) return;
-        if (e.getPacket() instanceof ChatMessageC2SPacket pac && ZOV.getValue()) {
+        if (e.getPacket() instanceof ChatMessageC2SPacket pac && zov.getValue()) {
 
             if (Objects.equals(pac.chatMessage(), skip)) {
                 return;
