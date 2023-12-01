@@ -90,6 +90,7 @@
   "descriptions.render.tunnelesp": "Подсвечивает туннели.",
   "descriptions.render.viewmodel": "Модификация рук.",
   "descriptions.render.voidesp": "Подсвечивает пустоту.",
+  "descriptions.render.particles": "Различные частицы в мире.",
 
   "descriptions.movement.antivoid": "Не позволяет упасть в бездну.",
   "descriptions.movement.antiweb": "Действия при столкновении с паутиной.",

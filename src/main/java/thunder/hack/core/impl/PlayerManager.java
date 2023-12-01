@@ -38,8 +38,8 @@ public class PlayerManager implements IManager {
     public int ticksElytraFlying, serverSideSlot;
     public final Timer switchTimer = new Timer();
 
-    //Мы можем зайти в инвентарь, и сервер этого не узнает, пока мы не начнем кликать
-    //Юзать везде!
+    // Мы можем зайти в инвентарь, и сервер этого не узнает, пока мы не начнем кликать
+    // Юзать везде!
     public boolean inInventory;
 
     @EventHandler
@@ -75,7 +75,7 @@ public class PlayerManager implements IManager {
             inInventory = true;
         }
         if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket slot) {
-            if(serverSideSlot == slot.getSelectedSlot() && !(ModuleManager.noSlow.isEnabled() && NoSlow.mode.getValue() == NoSlow.Mode.StrictNCP)) {
+            if (serverSideSlot == slot.getSelectedSlot() && !(ModuleManager.noSlow.isEnabled() && NoSlow.mode.getValue() == NoSlow.Mode.StrictNCP)) {
                 event.cancel();
                 ModuleManager.mainSettings.debug("Double slot packet!");
             }
@@ -90,7 +90,7 @@ public class PlayerManager implements IManager {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.@NotNull Receive event) {
-        if(event.getPacket() instanceof UpdateSelectedSlotS2CPacket slot) {
+        if (event.getPacket() instanceof UpdateSelectedSlotS2CPacket slot) {
             switchTimer.reset();
             serverSideSlot = slot.getSlot();
         }
@@ -110,7 +110,7 @@ public class PlayerManager implements IManager {
         Box box = mc.player.getBoundingBox().stretch(vec3d2.multiply(distance)).expand(1.0, 1.0, 1.0);
         EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator() && entity.canHit(), distancePow2);
         if (entityHitResult != null) {
-            if(entityHitResult.getEntity() instanceof FireworkRocketEntity)
+            if (entityHitResult.getEntity() instanceof FireworkRocketEntity)
                 return false;
             Entity entity2 = entityHitResult.getEntity();
             if (vec3d.squaredDistanceTo(entityHitResult.getPos()) < distancePow2 || result == null) {

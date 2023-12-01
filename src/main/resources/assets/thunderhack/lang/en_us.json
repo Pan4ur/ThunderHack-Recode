@@ -90,6 +90,7 @@
   "descriptions.render.tunnelesp": "Highlights tunnels.",
   "descriptions.render.viewmodel": "Hands modification.",
   "descriptions.render.voidesp": "Highlights void holes.",
+  "descriptions.render.particles": "Various particles in the world.",
 
   "descriptions.movement.antivoid": "Keeps you from falling into the void.",
   "descriptions.movement.antiweb": "Action when collided with a spider web.",

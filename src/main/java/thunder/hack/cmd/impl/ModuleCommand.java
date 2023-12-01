@@ -33,7 +33,7 @@ public class ModuleCommand extends Command {
             Module module = context.getArgument("module", Module.class);
             sendMessage(module.getDisplayName() + " : " + I18n.translate(module.getDescription()));
 
-            for (Setting setting2 : module.getSettings()) {
+            for (Setting<?> setting2 : module.getSettings()) {
                 sendMessage(setting2.getName() + " : " + setting2.getValue());
             }
 
@@ -101,47 +101,56 @@ public class ModuleCommand extends Command {
         });
     }
 
-    public static void setCommandValue(Module feature, Setting setting, JsonElement element) {
+    public static void setCommandValue(@NotNull Module feature, Setting setting, JsonElement element) {
         String str;
-        for (Setting setting2 : feature.getSettings()) {
-            if (Objects.equals(setting.getName(), setting2.getName())) {
-                switch (setting2.getType()) {
-                    case "Parent", "Bind":
+        for (Setting checkSetting : feature.getSettings()) {
+            if (Objects.equals(setting.getName(), checkSetting.getName())) {
+                switch (checkSetting.getType()) {
+                    case "Parent", "Bind" -> {
                         return;
-                    case "Boolean":
-                        setting2.setValue(Boolean.valueOf(element.getAsBoolean()));
+                    }
+                    case "Boolean" -> {
+                        checkSetting.setValue(Boolean.valueOf(element.getAsBoolean()));
                         return;
-                    case "Double":
-                        setting2.setValue(Double.valueOf(element.getAsDouble()));
+                    }
+                    case "Double" -> {
+                        checkSetting.setValue(Double.valueOf(element.getAsDouble()));
                         return;
-                    case "Float":
-                        setting2.setValue(Float.valueOf(element.getAsFloat()));
+                    }
+                    case "Float" -> {
+                        checkSetting.setValue(Float.valueOf(element.getAsFloat()));
                         return;
-                    case "Integer":
-                        setting2.setValue(Integer.valueOf(element.getAsInt()));
+                    }
+                    case "Integer" -> {
+                        checkSetting.setValue(Integer.valueOf(element.getAsInt()));
                         return;
-                    case "String":
+                    }
+                    case "String" -> {
                         str = element.getAsString();
-                        setting2.setValue(str.replace("_", " "));
+                        checkSetting.setValue(str.replace("_", " "));
                         return;
-                    case "ColorSetting":
+                    }
+                    case "ColorSetting" -> {
                         JsonArray array = element.getAsJsonArray();
-                        ((ColorSetting) setting2.getValue()).setColor(array.get(0).getAsInt());
-                        ((ColorSetting) setting2.getValue()).setRainbow(array.get(1).getAsBoolean());
-                        ((ColorSetting) setting2.getValue()).setGlobalOffset(array.get(2).getAsInt());
+                        ((ColorSetting) checkSetting.getValue()).setColor(array.get(0).getAsInt());
+                        ((ColorSetting) checkSetting.getValue()).setRainbow(array.get(1).getAsBoolean());
+                        ((ColorSetting) checkSetting.getValue()).setGlobalOffset(array.get(2).getAsInt());
                         return;
-                    case "PositionSetting":
+                    }
+                    case "PositionSetting" -> {
                         JsonArray array3 = element.getAsJsonArray();
-                        ((PositionSetting) setting2.getValue()).setX(array3.get(0).getAsFloat());
-                        ((PositionSetting) setting2.getValue()).setY(array3.get(1).getAsFloat());
+                        ((PositionSetting) checkSetting.getValue()).setX(array3.get(0).getAsFloat());
+                        ((PositionSetting) checkSetting.getValue()).setY(array3.get(1).getAsFloat());
                         return;
-                    case "Enum":
+                    }
+                    case "Enum" -> {
                         try {
-                            EnumConverter converter = new EnumConverter(((Enum) setting2.getValue()).getClass());
+                            EnumConverter converter = new EnumConverter(((Enum) checkSetting.getValue()).getClass());
                             Enum value = converter.doBackward(element);
-                            setting2.setValue((value == null) ? setting2.getDefaultValue() : value);
+                            checkSetting.setValue((value == null) ? checkSetting.getDefaultValue() : value);
                         } catch (Exception ignored) {
                         }
+                    }
                 }
             }
         }

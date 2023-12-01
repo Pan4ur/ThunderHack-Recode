@@ -19,8 +19,8 @@ import static thunder.hack.modules.Module.mc;
 
 public class HudEditorGui extends Screen {
     public static HudElement currentlyDragging;
-
     private final List<AbstractWindow> windows;
+    private static HudEditorGui instance = new HudEditorGui();
 
     private boolean firstOpen;
     private double dWheel;
@@ -29,24 +29,8 @@ public class HudEditorGui extends Screen {
         super(Text.of("HudEditorGui"));
         windows = Lists.newArrayList();
         firstOpen = true;
+
         this.setInstance();
-    }
-
-    private static HudEditorGui INSTANCE = new HudEditorGui();
-
-    public static HudEditorGui getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new HudEditorGui();
-        }
-        return INSTANCE;
-    }
-
-    public static HudEditorGui getHudGui() {
-        return HudEditorGui.getInstance();
-    }
-
-    private void setInstance() {
-        INSTANCE = this;
     }
 
     @Override
@@ -57,7 +41,7 @@ public class HudEditorGui extends Screen {
             int windowHeight = 18;
 
             for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
-                if (!category.getName().contains("HUD")) continue;
+                if (category != Module.Category.HUD) continue;
                 ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category),0, x + offset, y, 108, windowHeight);
                 window.setOpen(true);
                 windows.add(window);
@@ -67,8 +51,10 @@ public class HudEditorGui extends Screen {
                     offset = 0;
                 }
             }
+
             firstOpen = false;
         }
+
         windows.forEach(AbstractWindow::init);
     }
 
@@ -153,5 +139,20 @@ public class HudEditorGui extends Screen {
     @Override
     public void removed() {
         ThunderHack.EVENT_BUS.unsubscribe(this);
+    }
+
+    public static HudEditorGui getInstance() {
+        if (instance == null) {
+            instance = new HudEditorGui();
+        }
+        return instance;
+    }
+
+    public static HudEditorGui getHudGui() {
+        return HudEditorGui.getInstance();
+    }
+
+    private void setInstance() {
+        instance = this;
     }
 }

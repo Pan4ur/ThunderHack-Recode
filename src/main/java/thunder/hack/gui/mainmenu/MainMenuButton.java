@@ -15,9 +15,9 @@ public class MainMenuButton {
     private final String name;
     private final Runnable action;
 
-    public MainMenuButton(float posx, float posY, @NotNull String name, Runnable action, boolean isExit) {
+    public MainMenuButton(float posX, float posY, @NotNull String name, Runnable action, boolean isExit) {
         this.name = name;
-        this.posX = posx;
+        this.posX = posX;
         this.posY = posY;
 
         this.action = action;
@@ -26,8 +26,8 @@ public class MainMenuButton {
         this.height = 38f;
     }
 
-    public MainMenuButton(float posx, float posY, @NotNull String name, Runnable action) {
-        this(posx, posY, name, action, false);
+    public MainMenuButton(float posX, float posY, @NotNull String name, Runnable action) {
+        this(posX, posY, name, action, false);
     }
 
     public void onRender(DrawContext context, float mouseX, float mouseY) {
@@ -55,7 +55,6 @@ public class MainMenuButton {
     }
 
     public void onClick(int mouseX, int mouseY) {
-
         float halfOfWidth = mc.getWindow().getScaledWidth() / 2f;
         float halfOfHeight = mc.getWindow().getScaledHeight() / 2f;
         boolean hovered = Render2DEngine.isHovered(mouseX, mouseY,halfOfWidth +  posX, halfOfHeight +  posY, width, height);
