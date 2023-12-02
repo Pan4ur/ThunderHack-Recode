@@ -81,7 +81,7 @@ public class ElytraPlus extends Module {
     private final thunder.hack.utility.Timer strictTimer = new thunder.hack.utility.Timer();
 
     private boolean hasElytra, infiniteFlag, hasTouchedGround, elytraEquiped, flying, startFallFlying;
-    private float acceleration, height, prevClientPitch, infinitePitch, lastInfinitePitch;
+    private float acceleration, accelerationY, height, prevClientPitch, infinitePitch, lastInfinitePitch;
     public static long lastStartFalling;
 
     private ItemStack prevArmorItemCopy, getStackInSlotCopy;
@@ -90,7 +90,7 @@ public class ElytraPlus extends Module {
     private int prevElytraSlot = -1;
     private int slotWithFireWorks = -1;
     private long lastFireworkTime;
-    private int currentSpeed, ticksInAir;
+    private int  ticksInAir;
 
     @Override
     public void onEnable() {
@@ -104,6 +104,7 @@ public class ElytraPlus extends Module {
 
         infiniteFlag = false;
         acceleration = 0;
+        accelerationY = 0;
 
         if (mc.player != null) {
             height = (float) mc.player.getY();
@@ -277,6 +278,7 @@ public class ElytraPlus extends Module {
     public void onPacketReceive(PacketEvent.Receive e) {
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             acceleration = 0;
+            accelerationY = 0;
             if (disableOnFlag.getValue() && mode.getValue() == Mode.FireWork)
                 disable(isRu() ? "Выключен из-за флага!" : "Disabled due to flag!");
         }
@@ -698,7 +700,8 @@ public class ElytraPlus extends Module {
             return;
         }
 
-        if (!MovementUtility.isMoving()) currentSpeed = 0;
+        if (!MovementUtility.isMoving())
+            acceleration = 0;
         if (!canFly()) return;
 
         if (!mc.player.isFallFlying() && !startFallFlying && mc.player.getVelocity().getY() < 0.0) {
@@ -721,18 +724,21 @@ public class ElytraPlus extends Module {
 
     public void fireworkOnMove(EventMove e) {
         if (mc.player.isFallFlying() && flying) {
-            if(mc.player.horizontalCollision || mc.player.verticalCollision)
-                currentSpeed = 0;
+            if(mc.player.horizontalCollision || mc.player.verticalCollision) {
+                acceleration = 0;
+                accelerationY = 0;
+            }
 
             if (ThunderHack.playerManager.ticksElytraFlying < 4) {
                 e.setY(0.2f);
                 e.cancel();
                 return;
             }
+
             if (mc.options.jumpKey.isPressed()) {
-                e.setY(ySpeed.getValue());
+                e.setY(ySpeed.getValue() * Math.min((accelerationY += 9) / 100.0f, 1.0f));
             } else if (mc.options.sneakKey.isPressed()) {
-                e.setY(-ySpeed.getValue());
+                e.setY(-ySpeed.getValue() * Math.min((accelerationY += 9) / 100.0f, 1.0f));
             } else if (bowBomb.getValue() && checkGround(2.0f)) {
                 e.setY(mc.player.age % 2 == 0 ?  0.42f :  -0.42f);
             } else {
@@ -742,11 +748,19 @@ public class ElytraPlus extends Module {
                     case Off -> e.setY(0f);
                 }
             }
-            sendMessage(xzSpeed.getValue() * Math.min((float) (currentSpeed += 9) / 100.0f, 1.0f) + "");
-            MovementUtility.modifyEventSpeed(e, xzSpeed.getValue() * Math.min((float) (currentSpeed += 9) / 100.0f, 1.0f));
-            if (stayMad.getValue() && !checkGround(3.0f) && ThunderHack.playerManager.ticksElytraFlying > 10) {
-                e.setY(0.42f);
+
+            if(!MovementUtility.isMoving())
+                acceleration = 0;
+
+            if(mc.player.input.movementSideways > 0) {
+                mc.player.input.movementSideways = 1;
+            } else if(mc.player.input.movementSideways < 0) {
+                mc.player.input.movementSideways = -1;
             }
+            
+            MovementUtility.modifyEventSpeed(e, xzSpeed.getValue() * Math.min((acceleration += 9) / 100.0f, 1.0f));
+            if (stayMad.getValue() && !checkGround(3.0f) && ThunderHack.playerManager.ticksElytraFlying > 10)
+                e.setY(0.42f);
             e.cancel();
         }
     }
@@ -776,7 +790,6 @@ public class ElytraPlus extends Module {
     }
 
     public void fireworkOnDisable() {
-        currentSpeed = 0;
         startFallFlying = false;
         if (keepFlying.getValue()) return;
         mc.player.setVelocity(0, mc.player.getVelocity().getY(),0);
