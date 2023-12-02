@@ -16,10 +16,7 @@ import org.lwjgl.opengl.GL40C;
 import thunder.hack.gui.font.Texture;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.math.MathUtility;
-import thunder.hack.utility.render.shaders.GradientGlowProgram;
-import thunder.hack.utility.render.shaders.MainMenuProgram;
-import thunder.hack.utility.render.shaders.RoundedGradientProgram;
-import thunder.hack.utility.render.shaders.RoundedProgram;
+import thunder.hack.utility.render.shaders.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -33,6 +30,7 @@ import static thunder.hack.modules.Module.mc;
 
 public class Render2DEngine {
 
+    public static TextureColorProgram TEXTURE_COLOR_PROGRAM;
     public static RoundedGradientProgram ROUNDED_GRADIENT_PROGRAM;
     public static RoundedProgram ROUNDED_PROGRAM;
     public static GradientGlowProgram GRADIENT_GLOW_PROGRAM;
@@ -229,7 +227,30 @@ public class Render2DEngine {
     }
 
     public static void drawGradientBlurredShadow(MatrixStack matrices, float x, float y, float width, float height, int blurRadius, Color color1, Color color2, Color color3, Color color4) {
-        drawBlurredShadow(matrices, x, y, width, height, blurRadius, color1);
+        if (!HudEditor.glow.getValue()) return;
+        width = width + blurRadius * 2;
+        height = height + blurRadius * 2;
+        x = x - blurRadius;
+        y = y - blurRadius;
+
+        int identifier = (int) (width * height + width * blurRadius);
+        if (shadowCache.containsKey(identifier)) {
+            shadowCache.get(identifier).bind();
+            RenderSystem.defaultBlendFunc();
+        } else {
+            BufferedImage original = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB);
+            Graphics g = original.getGraphics();
+            g.setColor(new Color(-1));
+            g.fillRect(blurRadius, blurRadius, (int) (width - blurRadius * 2), (int) (height - blurRadius * 2));
+            g.dispose();
+            GaussianFilter op = new GaussianFilter(blurRadius);
+            BufferedImage blurred = op.filter(original, null);
+            shadowCache.put(identifier, new BlurredShadow(blurred));
+            return;
+        }
+        RenderSystem.enableBlend();
+        renderGradientTexture(matrices, x, y, width, height, 0, 0, width, height, width, height, color1, color2, color3, color4);
+        RenderSystem.disableBlend();
     }
 
     public static void registerBufferedImageTexture(Texture i, BufferedImage bi) {
@@ -264,6 +285,22 @@ public class Render2DEngine {
         bufferBuilder.vertex(matrix, (float) x1, (float) y1, (float) z).texture((u + (float) regionWidth) / (float) textureWidth, (v + (float) regionHeight) / (float) textureHeight).next();
         bufferBuilder.vertex(matrix, (float) x1, (float) y0, (float) z).texture((u + (float) regionWidth) / (float) textureWidth, (v) / (float) textureHeight).next();
         bufferBuilder.vertex(matrix, (float) x0, (float) y0, (float) z).texture((u) / (float) textureWidth, (v + 0.0F) / (float) textureHeight).next();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+    }
+
+    public static void renderGradientTexture(MatrixStack matrices, double x0, double y0, double width, double height, float u, float v, double regionWidth, double regionHeight, double textureWidth, double textureHeight,
+        Color c1, Color c2, Color c3, Color c4) {
+        double x1 = x0 + width;
+        double y1 = y0 + height;
+        double z = 0;
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
+        RenderSystem.setShader(() -> Render2DEngine.TEXTURE_COLOR_PROGRAM.backingProgram);
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+        bufferBuilder.vertex(matrix, (float) x0, (float) y1, (float) z).texture((u) / (float) textureWidth, (v + (float) regionHeight) / (float) textureHeight).color(c1.getRGB()).next();
+        bufferBuilder.vertex(matrix, (float) x1, (float) y1, (float) z).texture((u + (float) regionWidth) / (float) textureWidth, (v + (float) regionHeight) / (float) textureHeight).color(c2.getRGB()).next();
+        bufferBuilder.vertex(matrix, (float) x1, (float) y0, (float) z).texture((u + (float) regionWidth) / (float) textureWidth, (v) / (float) textureHeight).color(c3.getRGB()).next();
+        bufferBuilder.vertex(matrix, (float) x0, (float) y0, (float) z).texture((u) / (float) textureWidth, (v + 0.0F) / (float) textureHeight).color(c4.getRGB()).next();
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
     }
 
@@ -783,6 +820,7 @@ public class Render2DEngine {
         ROUNDED_PROGRAM = new RoundedProgram();
         GRADIENT_GLOW_PROGRAM = new GradientGlowProgram();
         MAIN_MENU_PROGRAM = new MainMenuProgram();
+        TEXTURE_COLOR_PROGRAM = new TextureColorProgram();
     }
 
     public static class BlurredShadow {

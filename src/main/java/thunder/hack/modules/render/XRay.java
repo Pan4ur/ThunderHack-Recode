@@ -1,35 +1,58 @@
 package thunder.hack.modules.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import jdk.jfr.EventSettings;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import org.lwjgl.opengl.GL40C;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventMove;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.SettingEvent;
 import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.gui.hud.impl.TargetHud;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.InteractionUtility;
+import thunder.hack.utility.Timer;
+import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.MovementUtility;
+import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class XRay extends Module {
+
+    public XRay() {
+        super("XRay", Category.MISC);
+    }
+
+    public final Setting<Boolean> wallHack = new Setting<>("WallHack", false);
     private final Setting<Boolean> brutForce = new Setting<>("OreDeobf", false);
-    private final Setting<Boolean> rotate = new Setting<>("Rotate", false, v -> brutForce.getValue());
     private final Setting<Boolean> fast = new Setting<>("Fast", false, v -> brutForce.getValue());
-    private final Setting<Integer> checkSpeed = new Setting<>("CheckSpeed", 4, 1, 5, v -> brutForce.getValue());
-    private final Setting<Integer> rxz = new Setting<>("RadiusXZ", 5, 5, 64, v -> brutForce.getValue());
-    private final Setting<Integer> ry = new Setting<>("RadiusY", 5, 2, 50, v -> brutForce.getValue());
+    private final Setting<Integer> delay = new Setting<>("Delay", 25, 1, 100, v -> brutForce.getValue());
+    private final Setting<Integer> radius = new Setting<>("Radius", 5, 5, 64, v -> brutForce.getValue());
+    private final Setting<Integer> up = new Setting<>("Up", 5, 2, 50, v -> brutForce.getValue());
+    private final Setting<Integer> down = new Setting<>("Down", 5, 2, 50, v -> brutForce.getValue());
     private static final Setting<Boolean> netherite = new Setting<>("Netherite", false);
     private static final Setting<Boolean> diamond = new Setting<>("Diamond ", false);
     private static final Setting<Boolean> gold = new Setting<>("Gold", false);
@@ -41,73 +64,90 @@ public class XRay extends Module {
     private static final Setting<Boolean> water = new Setting<>("Water", false);
     private static final Setting<Boolean> lava = new Setting<>("Lava", false);
 
+
+    private final Timer delayTimer = new Timer();
     private final ArrayList<BlockPos> ores = new ArrayList<>();
     private final ArrayList<BlockPos> toCheck = new ArrayList<>();
     private BlockPos displayBlock;
     private int done;
     private int all;
-
-    public XRay() {
-        super("XRay", Category.MISC);
-    }
+    private Box area = new Box(BlockPos.ORIGIN);
 
     @Override
     public void onEnable() {
         ores.clear();
         toCheck.clear();
-        for (BlockPos pos : getBlocks()) {
-            if (mc.world.isAir(pos)) continue;
-
-            if (fast.getValue()) if (pos.getX() % 2 == 0 || pos.getZ() % 2 == 0 || pos.getY() % 2 == 0) continue;
-
-            toCheck.add(pos);
-        }
+        toCheck.addAll(getBlocks());
         all = toCheck.size();
         done = 0;
         mc.chunkCullingEnabled = false;
         mc.worldRenderer.reload();
+        area = new Box(mc.player.getX() - radius.getValue(), mc.player.getY() - down.getValue(), mc.player.getZ() - radius.getValue(),
+                mc.player.getX() + radius.getValue(), mc.player.getY() + up.getValue(), mc.player.getZ() + radius.getValue());
     }
-
 
     @Override
     public void onDisable() {
         mc.worldRenderer.reload();
         mc.chunkCullingEnabled = true;
-
     }
 
-    @EventHandler
-    public void onSync(EventSync e) {
-        if (!brutForce.getValue()) return;
-        if (toCheck.isEmpty()) return;
-        if (!rotate.getValue()) return;
+    @Override
+    public void onThread() {
+        // FABOS IDI NAHUI
 
-        BlockPos pos = toCheck.get(0);
-        InteractionUtility.BreakData bdata = InteractionUtility.getBreakData(pos, InteractionUtility.Interact.Strict);
-        if (bdata != null) {
-            float[] angle = InteractionUtility.calculateAngle(bdata.vector());
-            mc.player.setYaw(angle[0]);
-            mc.player.setPitch(angle[1]);
+        if (toCheck.isEmpty() || !brutForce.getValue())
+            return;
+
+        if(mc.isInSingleplayer()){
+            disable(isRu() ? "Братан, ты в синглплеере" : "Bro, you're in singleplayer");
         }
-    }
 
-    @EventHandler
-    public void onPostSync(EventPostSync e) {
-        if (!brutForce.getValue()) return;
-        for (int i = 0; i < checkSpeed.getValue(); ++i) {
-            if (toCheck.isEmpty()) return;
-            BlockPos pos = toCheck.remove(0);
-            ++done;
-            mc.interactionManager.updateBlockBreakingProgress(pos, mc.player.getHorizontalFacing());
+        if (delayTimer.every(delay.getValue())) {
+            int index = toCheck.size() - 1 <= 1 ? 0 : ThreadLocalRandom.current().nextInt(0, toCheck.size() - 1);
+            BlockPos pos = toCheck.remove(index);
+            mc.interactionManager.attackBlock(pos, mc.player.getHorizontalFacing());
+            mc.interactionManager.cancelBlockBreaking();
+            sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             displayBlock = pos;
+            ++done;
         }
     }
 
     @EventHandler
     public void onReceivePacket(PacketEvent.Receive e) {
-        if (e.getPacket() instanceof BlockUpdateS2CPacket pac) {
-            if (isCheckableOre(pac.getState().getBlock())) {
+        if (e.getPacket() instanceof BlockUpdateS2CPacket pac)
+            if (isCheckableOre(pac.getState().getBlock()) && !ores.contains(pac.getPos()))
                 ores.add(pac.getPos());
+    }
+
+    @EventHandler
+    public void  onSettingChange(SettingEvent e) {
+        if(e.getSetting() == wallHack) {
+            mc.worldRenderer.reload();
+        }
+    }
+
+    @EventHandler
+    public void onMove(EventMove e) {
+        if(brutForce.getValue()) {
+            if(all != done) {
+                e.setZ(0);
+                e.setX(0);
+                e.cancel();
+                if(mc.player.age % 8 == 0 && MovementUtility.isMoving())
+                    sendMessage(isRu() ? "Не двигайся пока идет деобфускация!" : "Don't move while deobf!");
+            } else {
+                Box newArea = new Box(mc.player.getX() - radius.getValue(), mc.player.getY() - down.getValue(), mc.player.getZ() - radius.getValue(),
+                        mc.player.getX() + radius.getValue(), mc.player.getY() + up.getValue(), mc.player.getZ() + radius.getValue());
+
+                if(!newArea.intersects(area)) {
+                    area = newArea;
+                    toCheck.clear();
+                    toCheck.addAll(getBlocks());
+                    all = toCheck.size();
+                    done = 0;
+                }
             }
         }
     }
@@ -128,6 +168,9 @@ public class XRay extends Module {
             if (displayBlock != null && (done != all)) draw(stack, displayBlock, 255, 0, 60);
         } catch (Exception ignored) {
         }
+
+        if(brutForce.getValue())
+            Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(area, HudEditor.getColor(1), 2));
     }
 
     private void draw(MatrixStack stack, BlockPos pos, int r, int g, int b) {
@@ -136,8 +179,27 @@ public class XRay extends Module {
     }
 
     public void onRender2D(DrawContext context) {
-        if (brutForce.getValue())
-            FontRenderers.modules.drawCenteredString(context.getMatrices(), "Done: " + done + " / " + "All: " + all, mc.getWindow().getScaledWidth() / 2f, 50, -1);
+        if (brutForce.getValue()) {
+
+            float posX = mc.getWindow().getScaledWidth() / 2f - 68;
+            float posY = mc.getWindow().getScaledHeight() / 2f + 68;
+
+            // Основа
+            Render2DEngine.drawGradientBlurredShadow(context.getMatrices(), posX + 2, posY + 2, 133, 44, 14, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+            Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), posX, posY, 137, 47.5f, 9);
+            Render2DEngine.drawRound(context.getMatrices(), posX + 0.5f, posY + 0.5f, 136f, 46, 9, Render2DEngine.injectAlpha(Color.BLACK, 220));
+
+            // Баллон
+            Render2DEngine.drawGradientRound(context.getMatrices(), posX + 4, posY + 32, 129, 11, 4f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
+
+            Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270),
+                    posX + 4, posY + 32, (int) MathHelper.clamp((129 * ((float) done / Math.max((float) all, 1))), 8, 129), 11, 4f);
+
+            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), (int) ((float) done / (float) all * 100) + "%", posX + 68, posY + 33f, -1);
+            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(),"XRay", posX + 68, posY + 7, -1);
+            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(),done + " / " + all + (isRu() ? " Осталось: " : " Estimated time: ") + MathUtility.round((all - done) * delay.getValue() / 1000f, 1) + "s", posX + 68, posY + 18, -1);
+
+        }
     }
 
     public static boolean isCheckableOre(Block block) {
@@ -157,10 +219,16 @@ public class XRay extends Module {
 
     private ArrayList<BlockPos> getBlocks() {
         ArrayList<BlockPos> positions = new ArrayList<>();
-        for (int x = (int) (mc.player.getX() - rxz.getValue()); x < mc.player.getX() + rxz.getValue(); x++)
-            for (int y = (int) (mc.player.getY() - ry.getValue()); y < mc.player.getY() + ry.getValue(); y++)
-                for (int z = (int) (mc.player.getZ() - rxz.getValue()); z < mc.player.getZ() + rxz.getValue(); z++)
-                    positions.add(new BlockPos(x, y, z));
+        for (int x = (int) (mc.player.getX() - radius.getValue()); x < mc.player.getX() + radius.getValue(); x++)
+            for (int y = (int) (mc.player.getY() - down.getValue()); y < mc.player.getY() + up.getValue(); y++)
+                for (int z = (int) (mc.player.getZ() - radius.getValue()); z < mc.player.getZ() + radius.getValue(); z++) {
+                    BlockPos pos = new BlockPos(x, y, z);
+                    if (mc.world.isAir(pos))
+                        continue;
+                    if (fast.getValue() && (x % 2 == 0 || y % 2 == 0 || z % 2 == 0))
+                        continue;
+                    positions.add(pos);
+                }
         return positions;
     }
 }

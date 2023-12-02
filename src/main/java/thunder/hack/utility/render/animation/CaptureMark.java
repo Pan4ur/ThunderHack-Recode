@@ -10,6 +10,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
 
 import static thunder.hack.modules.Module.mc;
+import static thunder.hack.utility.render.Render2DEngine.TEXTURE_COLOR_PROGRAM;
 
 
 public class CaptureMark {
@@ -40,7 +41,7 @@ public class CaptureMark {
         RenderSystem.setShaderTexture(0, Render2DEngine.capture);
         matrices.translate(-0.75, -0.75, -0.01);
         Matrix4f matrix = matrices.peek().getPositionMatrix();
-        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+        RenderSystem.setShader(() -> TEXTURE_COLOR_PROGRAM.backingProgram);
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
         bufferBuilder.vertex(matrix,  0,  1.5f,  0).texture(0f, 1f).color(HudEditor.getColor(90).getRGB()).next();

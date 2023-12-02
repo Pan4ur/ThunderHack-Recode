@@ -20,12 +20,12 @@ import java.util.function.Function;
 public class GlProgram {
     private static final List<Pair<Function<ResourceFactory, ShaderProgram>, Consumer<ShaderProgram>>> REGISTERED_PROGRAMS = new ArrayList<>();
 
-    protected ShaderProgram backingProgram;
+    public ShaderProgram backingProgram;
 
     public GlProgram(Identifier id, VertexFormat vertexFormat) {
         REGISTERED_PROGRAMS.add(new Pair<>(resourceFactory -> {
             try {
-                return new OwoShaderProgram(resourceFactory, id.toString(), vertexFormat);
+                return new THShaderProgram(resourceFactory, id.toString(), vertexFormat);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to initialized shader program", e);
             }
@@ -51,8 +51,8 @@ public class GlProgram {
         REGISTERED_PROGRAMS.forEach(loader);
     }
 
-    public static class OwoShaderProgram extends ShaderProgram {
-        private OwoShaderProgram(ResourceFactory factory, String name, VertexFormat format) throws IOException {
+    public static class THShaderProgram extends ShaderProgram {
+        private THShaderProgram(ResourceFactory factory, String name, VertexFormat format) throws IOException {
             super(factory, name, format);
         }
     }

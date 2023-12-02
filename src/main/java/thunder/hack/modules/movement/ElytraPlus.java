@@ -148,19 +148,28 @@ public class ElytraPlus extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        if (mode.getValue() == Mode.SunriseOld) doSunrise();
-        if (mode.getValue() == Mode.SunriseNew) doSunriseNew();
-        if (mode.getValue() == Mode.Control || mode.getValue() == Mode.Boost) doPreLegacy();
-        if (mode.getValue() == Mode.Pitch40Infinite) {
-            ItemStack is = mc.player.getEquippedStack(EquipmentSlot.CHEST);
-            if (is.isOf(Items.ELYTRA)) mc.player.setPitch(lastInfinitePitch);
-            if (is.isOf(Items.ELYTRA) && is.getDamage() > 380 && mc.player.age % 100 == 0) {
-                ThunderHack.notificationManager.publicity("Elytra+", isRu() ? "Элитра скоро сломается!" : "Elytra's about to break!", 2, Notification.Type.WARNING);
-                mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.AMBIENT, 10.0f, 1.0F);
+        switch (mode.getValue()) {
+            case SunriseOld -> {
+                doSunrise();
+            }
+            case SunriseNew -> {
+                doSunriseNew();
+            }
+            case Boost, Control -> {
+                doPreLegacy();
+            }
+            case FireWork -> {
+                fireworkOnSync();
+            }
+            case Pitch40Infinite -> {
+                ItemStack is = mc.player.getEquippedStack(EquipmentSlot.CHEST);
+                if (is.isOf(Items.ELYTRA)) mc.player.setPitch(lastInfinitePitch);
+                if (is.isOf(Items.ELYTRA) && is.getDamage() > 380 && mc.player.age % 100 == 0) {
+                    ThunderHack.notificationManager.publicity("Elytra+", isRu() ? "Элитра скоро сломается!" : "Elytra's about to break!", 2, Notification.Type.WARNING);
+                    mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.AMBIENT, 10.0f, 1.0F);
+                }
             }
         }
-
-        if (mode.getValue() == Mode.FireWork) fireworkOnSync();
     }
 
     private void doSunriseNew() {
@@ -728,11 +737,12 @@ public class ElytraPlus extends Module {
                 e.setY(mc.player.age % 2 == 0 ?  0.42f :  -0.42f);
             } else {
                 switch (antiKick.getValue()) {
-                    case Jitter ->  e.setY((float) (mc.player.age % 2 == 0 ? (double) 0.08f : (double) -0.08f));
+                    case Jitter ->  e.setY(mc.player.age % 2 == 0 ? 0.08f : -0.08f);
                     case Glide -> e.setY(-0.08f);
                     case Off -> e.setY(0f);
                 }
             }
+            sendMessage(xzSpeed.getValue() * Math.min((float) (currentSpeed += 9) / 100.0f, 1.0f) + "");
             MovementUtility.modifyEventSpeed(e, xzSpeed.getValue() * Math.min((float) (currentSpeed += 9) / 100.0f, 1.0f));
             if (stayMad.getValue() && !checkGround(3.0f) && ThunderHack.playerManager.ticksElytraFlying > 10) {
                 e.setY(0.42f);

@@ -266,7 +266,7 @@ public class TargetHud extends HudElement {
             } else if (Mode.getValue() == ModeEn.NurikZapen) {
                 float hurtPercent = (target.hurtTime) / 6f;
                 // Основа
-                Render2DEngine.drawGradientBlurredShadow(context.getMatrices(), getPosX(), getPosY(), 137, 48, 17, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+                Render2DEngine.drawGradientBlurredShadow(context.getMatrices(), getPosX() + 2, getPosY() + 2, 133, 44, 14, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
                 Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 137, 47.5f, 9);
                 Render2DEngine.drawRound(context.getMatrices(), getPosX() + 0.5f, getPosY() + 0.5f, 136f, 46, 9, Render2DEngine.injectAlpha(Color.BLACK, 220));
 
