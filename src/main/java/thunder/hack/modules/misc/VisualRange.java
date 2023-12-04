@@ -56,9 +56,11 @@ public class VisualRange extends Module {
         else message = Formatting.GRAY + entity.getName().getString();
 
         if (enter) message += Formatting.GREEN + " was found!";
-        else message += Formatting.RED + " left!";
+        else message += Formatting.RED + " left to X:" + (int)entity.getX() + " Z:" + (int) entity.getZ();
 
-        if (mode.getValue() == Mode.Chat) sendMessage(message);
+        if (mode.getValue() == Mode.Chat)
+            sendMessage(message);
+
         if (mode.getValue() == Mode.Notification)
             ThunderHack.notificationManager.publicity("VisualRange", message, 2, Notification.Type.WARNING);
 

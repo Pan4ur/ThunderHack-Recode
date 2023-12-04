@@ -85,6 +85,7 @@ public class AsyncManager implements IManager {
                                 module.onThread();
                             }
                         }
+                        Thread.sleep(100);
                     } else Thread.yield();
                 } catch (Exception exception) {
                     exception.printStackTrace();
