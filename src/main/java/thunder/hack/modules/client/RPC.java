@@ -1,7 +1,7 @@
 package thunder.hack.modules.client;
 
-import net.minecraft.client.gui.screen.AddServerScreen;
 import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screen.multiplayer.AddServerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;

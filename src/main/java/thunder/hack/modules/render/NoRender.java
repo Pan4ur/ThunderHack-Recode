@@ -1,10 +1,6 @@
 package thunder.hack.modules.render;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.particle.CampfireSmokeParticle;
-import net.minecraft.client.particle.ElderGuardianAppearanceParticle;
-import net.minecraft.client.particle.ExplosionLargeParticle;
-import net.minecraft.client.particle.FireworksSparkParticle;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -16,7 +12,6 @@ import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.ParticleEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
@@ -52,7 +47,7 @@ public class NoRender extends Module {
     public Setting<Boolean> items = new Setting<>("Items", false);
     public Setting<Boolean> crystals = new Setting<>("Crystals", false);
     public static Setting<Boolean> fireEntity = new Setting<>("FireEntity", true);
-    public static Setting<Boolean> breakParticles = new Setting<>("BreakParticles", true);
+    public Setting<Boolean> breakParticles = new Setting<>("BreakParticles", true);
     public Setting<Boolean> antiTitle = new Setting<>("AntiTitle", false);
     public Setting<Boolean> antiPlayerCollision = new Setting<>("AntiPlayerCollision", true);
     public Setting<NoScoreBoard> noScoreBoard = new Setting<>("NoScoreBoard", NoScoreBoard.None);
@@ -132,14 +127,5 @@ public class NoRender extends Module {
         itemsCounter = 0;
         potionCouter = 0;
         xpCounter = 0;
-    }
-
-
-    @EventHandler
-    public void onParticle(ParticleEvent.AddParticle e) {
-        if (elderGuardian.getValue() && e.particle instanceof ElderGuardianAppearanceParticle) e.cancel();
-        else if (explosions.getValue() && e.particle instanceof ExplosionLargeParticle) e.cancel();
-        else if (campFire.getValue() && e.particle instanceof CampfireSmokeParticle) e.cancel();
-        else if (fireworks.getValue() && (e.particle instanceof FireworksSparkParticle.FireworkParticle || e.particle instanceof FireworksSparkParticle.Flash)) e.cancel();
     }
 }

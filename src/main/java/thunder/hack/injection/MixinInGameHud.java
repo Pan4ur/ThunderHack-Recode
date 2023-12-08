@@ -3,11 +3,15 @@ package thunder.hack.injection;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
-import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.scoreboard.Team;
+import net.minecraft.scoreboard.number.NumberFormat;
+import net.minecraft.scoreboard.number.StyledNumberFormat;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -24,9 +28,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static thunder.hack.modules.Module.mc;
@@ -83,9 +86,13 @@ public abstract class MixinInGameHud {
 
     @Unique
     private void renderScoreboardSidebarCustom(DrawContext context, ScoreboardObjective objective) {
+        /*
+
+        !!!! FIND ANOTHER WAY !!!!
+
         int i;
         Scoreboard scoreboard = objective.getScoreboard();
-        Collection<ScoreboardPlayerScore> collection = scoreboard.getAllPlayerScores(objective);
+        Collection<ScoreboardPlayerScore> collection = scoreboard.getScore(objective);
         List list = collection.stream().filter(score -> score.getPlayerName() != null && !score.getPlayerName().startsWith("#")).collect(Collectors.toList());
         collection = list.size() > 15 ? Lists.newArrayList(Iterables.skip(list, collection.size() - 15)) : list;
         ArrayList<Pair<ScoreboardPlayerScore, MutableText>> list2 = Lists.newArrayListWithCapacity(collection.size());
@@ -121,6 +128,8 @@ public abstract class MixinInGameHud {
             context.fill(s - 2, t - 1, u, t, q);
             context.drawText(mc.textRenderer, text, s + j / 2 - i / 2, t - mc.textRenderer.fontHeight, -1, false);
         }
+
+         */
     }
 
     @Inject(method = "renderCrosshair", at = @At(value = "HEAD"), cancellable = true)

@@ -27,9 +27,9 @@ import static thunder.hack.modules.Module.mc;
 
 public final class ExplosionUtility {
     /*
-    *░█▀▀░█░░░█▀▀░█▀█░█▀█░░░█░█░█▀█░░░█▄█░█▀▀░█░█░█
-    *░█░░░█░░░█▀▀░█▀█░█░█░░░█░█░█▀▀░░░█░█░█▀▀░▀░▀░▀
-    *░▀▀▀░▀▀▀░▀▀▀░▀░▀░▀░▀░░░▀▀▀░▀░░░░░▀░▀░▀▀▀░▀░▀░▀
+     *░█▀▀░█░░░█▀▀░█▀█░█▀█░░░█░█░█▀█░░░█▄█░█▀▀░█░█░█
+     *░█░░░█░░░█▀▀░█▀█░█░█░░░█░█░█▀▀░░░█░█░█▀▀░▀░▀░▀
+     *░▀▀▀░▀▀▀░▀▀▀░▀░▀░▀░▀░░░▀▀▀░▀░░░░░▀░▀░▀▀▀░▀░▀░▀
      */
 
     public static boolean terrainIgnore = false;
@@ -89,7 +89,7 @@ public final class ExplosionUtility {
                 return 0f;
             }
 
-            if (!target.isImmuneToExplosion() && !target.isInvulnerable()) {
+            if (!target.isImmuneToExplosion(explosion) && !target.isInvulnerable()) {
                 double distExposure = MathHelper.sqrt((float) target.squaredDistanceTo(explosionPos)) / maxDist;
                 if (distExposure <= 1.0) {
                     double xDiff = target.getX() - explosionPos.x;
@@ -120,7 +120,7 @@ public final class ExplosionUtility {
 
                         if (toDamage <= 0f) toDamage = 0f;
                         else {
-                            int protAmount = EnchantmentHelper.getProtectionAmount(target.getArmorItems(), explosion.getDamageSource());
+                            int protAmount = EnchantmentHelper.getProtectionAmount(target.getArmorItems(), mc.world.getDamageSources().explosion(explosion));
                             if (protAmount > 0) {
                                 toDamage = DamageUtil.getInflictedDamage(toDamage, protAmount);
                             }
@@ -161,7 +161,7 @@ public final class ExplosionUtility {
             return 0f;
         }
 
-        if (!target.isImmuneToExplosion() && !target.isInvulnerable()) {
+        if (!target.isImmuneToExplosion(explosion) && !target.isInvulnerable()) {
             double distExposure = MathHelper.sqrt((float) predict.squaredDistanceTo(explosionPos)) / 12d;
             if (distExposure <= 1.0) {
                 double xDiff = predict.getX() - explosionPos.x;
@@ -193,7 +193,7 @@ public final class ExplosionUtility {
                     if (toDamage <= 0f) {
                         toDamage = 0f;
                     } else {
-                        int protAmount = EnchantmentHelper.getProtectionAmount(target.getArmorItems(), explosion.getDamageSource());
+                        int protAmount = EnchantmentHelper.getProtectionAmount(target.getArmorItems(), mc.world.getDamageSources().explosion(explosion));
                         if (protAmount > 0) {
                             toDamage = DamageUtil.getInflictedDamage(toDamage, protAmount);
                         }
@@ -251,7 +251,7 @@ public final class ExplosionUtility {
                 return 0f;
             }
 
-            if (!target.isImmuneToExplosion() && !target.isInvulnerable()) {
+            if (!target.isImmuneToExplosion(explosion) && !target.isInvulnerable()) {
                 double distExposure = MathHelper.sqrt((float) target.squaredDistanceTo(explosionPos)) / maxDist;
                 if (distExposure <= 1.0) {
                     double xDiff = target.getX() - explosionPos.x;
@@ -282,7 +282,7 @@ public final class ExplosionUtility {
 
                         if (toDamage <= 0f) toDamage = 0f;
                         else {
-                            int protAmount = EnchantmentHelper.getProtectionAmount(target.getArmorItems(), explosion.getDamageSource());
+                            int protAmount = EnchantmentHelper.getProtectionAmount(target.getArmorItems(), mc.world.getDamageSources().explosion(explosion));
                             if (protAmount > 0) {
                                 toDamage = DamageUtil.getInflictedDamage(toDamage, protAmount);
                             }

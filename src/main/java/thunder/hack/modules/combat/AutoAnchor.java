@@ -123,7 +123,7 @@ public final class AutoAnchor extends Module {
 
     @Override
     public @Nullable String getDisplayInfo() {
-        return target != null ? target.getEntityName() : null;
+        return target != null ? target.getName().getString() : null;
     }
 
     @EventHandler

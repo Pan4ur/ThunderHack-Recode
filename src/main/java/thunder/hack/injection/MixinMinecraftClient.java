@@ -1,38 +1,31 @@
 package thunder.hack.injection;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.screen.AddServerScreen;
-import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.RunArgs;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.Icons;
 import net.minecraft.client.util.MacWindowUtil;
+import net.minecraft.client.util.Window;
 import net.minecraft.resource.ResourcePack;
-import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventPostTick;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.gui.font.FontRenderers;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.RunArgs;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import thunder.hack.gui.mainmenu.MainMenuScreen;
 import thunder.hack.modules.Module;
 import thunder.hack.utility.render.WindowResizeCallback;
-import net.minecraft.client.util.Window;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,9 +68,12 @@ public class MixinMinecraftClient {
         if (!Module.fullNullCheck()) ThunderHack.EVENT_BUS.post(new EventPostTick());
     }
 
-    @Shadow @Final private Window window;
+    @Shadow
+    @Final
+    private Window window;
 
-    @Shadow private static MinecraftClient instance;
+    @Shadow
+    private static MinecraftClient instance;
 
     @Inject(method = "onResolutionChanged", at = @At("TAIL"))
     private void captureResize(CallbackInfo ci) {
@@ -86,7 +82,7 @@ public class MixinMinecraftClient {
 
     @Inject(method = "doItemPick", at = @At("HEAD"), cancellable = true)
     private void doItemPickHook(CallbackInfo ci) {
-        if(ModuleManager.middleClick.isEnabled() && ModuleManager.middleClick.antiPickUp.getValue())
+        if (ModuleManager.middleClick.isEnabled() && ModuleManager.middleClick.antiPickUp.getValue())
             ci.cancel();
     }
 

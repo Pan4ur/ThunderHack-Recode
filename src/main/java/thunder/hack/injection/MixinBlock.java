@@ -32,10 +32,4 @@ public abstract class MixinBlock {
         if (ModuleManager.xray.isEnabled() && ModuleManager.xray.wallHack.getValue())
             cir.setReturnValue(!XRay.isCheckableOre(state.getBlock()));
     }
-
-    @Inject(method = "spawnBreakParticles", at = @At("HEAD"), cancellable = true)
-    public void spawnBreakParticlesHook(World world, PlayerEntity player, BlockPos pos, BlockState state, CallbackInfo ci) {
-        if(ModuleManager.noRender.isEnabled() && NoRender.breakParticles.getValue())
-          ci.cancel();
-    }
 }

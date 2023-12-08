@@ -18,7 +18,8 @@ public final class AntiServerRP extends Module {
     @EventHandler
     public void onPacketReceive(PacketEvent.@NotNull Receive e) {
         if (e.getPacket() instanceof ResourcePackSendS2CPacket) {
-            sendPacket(new ResourcePackStatusC2SPacket(ResourcePackStatusC2SPacket.Status.ACCEPTED));
+            // ???
+            sendPacket(new ResourcePackStatusC2SPacket(mc.player.getUuid(), ResourcePackStatusC2SPacket.Status.ACCEPTED));
             e.cancel();
         }
     }

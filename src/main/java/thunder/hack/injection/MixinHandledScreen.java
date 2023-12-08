@@ -28,6 +28,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -49,7 +50,12 @@ import static thunder.hack.modules.render.Tooltips.hasItems;
 
 @Mixin(value = {HandledScreen.class})
 public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen implements ScreenHandlerProvider<T> {
+
+    @Unique
     private final Timer delayTimer = new Timer();
+
+    @Unique
+    private Runnable postRender;
 
     protected MixinHandledScreen(Text title) {
         super(title);
@@ -100,9 +106,9 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (focusedSlot != null && !focusedSlot.getStack().isEmpty() && client.player.playerScreenHandler.getCursorStack().isEmpty()) {
-            if (hasItems(focusedSlot.getStack()) && ModuleManager.tooltips.storage.getValue()) {
-                renderShulkerToolTip(context, mouseX, mouseY, focusedSlot.getStack());
-            } else if (focusedSlot.getStack().getItem() == Items.FILLED_MAP && ModuleManager.tooltips.maps.getValue()) {
+            if (hasItems(focusedSlot.getStack()) && Tooltips.storage.getValue()) {
+                renderShulkerToolTip(context, mouseX, mouseY, 0, 0, focusedSlot.getStack());
+            } else if (focusedSlot.getStack().getItem() == Items.FILLED_MAP && Tooltips.maps.getValue()) {
                 drawMapPreview(context, focusedSlot.getStack(), mouseX, mouseY);
             }
         }
@@ -116,8 +122,9 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
                 Slot slot = mc.player.currentScreenHandler.slots.get(i1);
                 if (slot.getStack().isEmpty()) continue;
 
-                if (slot.getStack().getItem() instanceof BlockItem && ((BlockItem) slot.getStack().getItem()).getBlock() instanceof ShulkerBoxBlock) {
-                    renderShulkerToolTip(context, xOffset, yOffset + 67, slot.getStack());
+                if (slot.getStack().getItem() instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
+                    if (!renderShulkerToolTip(context, xOffset, yOffset + 67, mouseX, mouseY, slot.getStack()))
+                        continue;
                     clickableRects.put(new Render2DEngine.Rectangle(xOffset, yOffset, xOffset + 176, yOffset + 67), slot.id);
                     yOffset += 67;
                     if (stage == 0) {
@@ -132,7 +139,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
                             xOffset = 170;
                             stage = 2;
                         }
-                    } else if (stage == 2) {
+                    } else {
                         if (yOffset + 67 >= mc.getWindow().getScaledHeight()) {
                             yOffset = 20;
                             xOffset = mc.getWindow().getScaledWidth() - 352;
@@ -141,26 +148,33 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
                     }
                 }
             }
+
+            if(postRender != null) {
+                postRender.run();
+                postRender = null;
+            }
         }
     }
 
-    public void renderShulkerToolTip(DrawContext context, int mouseX, int mouseY, ItemStack stack) {
+    public boolean renderShulkerToolTip(DrawContext context, int offsetX, int offsetY, int mouseX, int mouseY, ItemStack stack) {
         try {
             NbtCompound compoundTag = stack.getSubNbt("BlockEntityTag");
             DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(27, ItemStack.EMPTY);
             Inventories.readNbt(compoundTag, itemStacks);
             float[] colors = new float[]{1F, 1F, 1F};
             Item focusedItem = stack.getItem();
-            if (focusedItem instanceof BlockItem && ((BlockItem) focusedItem).getBlock() instanceof ShulkerBoxBlock) {
+            if (focusedItem instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
                 try {
                     colors = Objects.requireNonNull(ShulkerBoxBlock.getColor(stack.getItem())).getColorComponents();
                 } catch (NullPointerException npe) {
                     colors = new float[]{1F, 1F, 1F};
                 }
             }
-            draw(context, itemStacks, mouseX, mouseY, colors);
+            draw(context, itemStacks, offsetX, offsetY, mouseX, mouseY, colors);
         } catch (Exception ignore) {
+            return false;
         }
+        return true;
     }
 
 
@@ -171,23 +185,26 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
         }
     }
 
-    private void draw(DrawContext context, DefaultedList<ItemStack> itemStacks, int mouseX, int mouseY, float[] colors) {
-        // RenderSystem.ligh();
+    private void draw(DrawContext context, DefaultedList<ItemStack> itemStacks, int offsetX, int offsetY, int mouseX, int mouseY, float[] colors) {
         RenderSystem.disableDepthTest();
         GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
 
-        mouseX += 8;
-        mouseY -= 82;
+        offsetX += 8;
+        offsetY -= 82;
 
-        drawBackground(context, mouseX, mouseY, colors);
+        drawBackground(context, offsetX, offsetY, colors);
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         DiffuseLighting.enableGuiDepthLighting();
         int row = 0;
         int i = 0;
         for (ItemStack itemStack : itemStacks) {
-            context.drawItem(itemStack, mouseX + 8 + i * 18, mouseY + 7 + row * 18);
-            context.drawItemInSlot(mc.textRenderer, itemStack, mouseX + 8 + i * 18, mouseY + 7 + row * 18);
+            context.drawItem(itemStack, offsetX + 8 + i * 18, offsetY + 7 + row * 18);
+            context.drawItemInSlot(mc.textRenderer, itemStack, offsetX + 8 + i * 18, offsetY + 7 + row * 18);
+
+            if (mouseX > offsetX + 8 + i * 18 && mouseX < offsetX + 28 + i * 18 && mouseY > offsetY + 7 + row * 18 && mouseY < offsetY + 27 + row * 18)
+                postRender = () -> context.drawTooltip(textRenderer, getTooltipFromItem(mc, itemStack), itemStack.getTooltipData(), mouseX, mouseY);
+
             i++;
             if (i >= 9) {
                 i = 0;

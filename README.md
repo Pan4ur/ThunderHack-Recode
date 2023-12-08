@@ -16,19 +16,19 @@
 
 
 ## Info
-- Minecraft version: ```fabric``` 1.20.2 and 1.20.1
+- Minecraft version: ```fabric``` 1.20.4
 - Default ClickGui keybind - **```P```** (That's not true! Go to discord and ask!)
 - Default prefix  - **```@```**
 - Middle click on module to bind
 - DoxWare 2.0, gumballoff and Quick Client are ratted TH Recode renames, be aware :)
 
 ## Requirements
-- [FabricApi 1.20.2](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files)
+- [FabricApi 1.20.4](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/4933446)
 - [Java 17+](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 
 ## Recommended to use
 - [Sodium](https://modrinth.com/mod/sodium/version/mc1.20.2-0.5.3) - For optimisation
-- [ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus) - To play on 1.12.2 servers
+- [ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus) - To play on all servers
 - [InGameAccountSwitcher](https://www.curseforge.com/minecraft/mc-mods/in-game-account-switcher) - To switch accounts in game
 - [NotEnoughCrashes](https://www.curseforge.com/minecraft/mc-mods/not-enough-crashes/files) - :^)
 

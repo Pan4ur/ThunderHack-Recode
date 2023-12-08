@@ -234,11 +234,11 @@ public class NameTags extends Module {
                     position.y = Math.min(vector.y, position.y);
                     position.z = Math.max(vector.x, position.z);
                 }
-                if (spawner.getLogic() == null || spawner.getLogic().renderedEntity == null) continue;
-                String final_string = spawner.getLogic().renderedEntity.getName().getString() + " " + String.format("%.1f", ((float) spawner.getLogic().spawnDelay / 20f)) + "s";
+                if (spawner.getLogic() == null || spawner.getLogic().getRenderedEntity(mc.world, spawner.getPos()) == null) continue;
+                String final_string = spawner.getLogic().getRenderedEntity(mc.world, spawner.getPos()).getName().getString() + " " + String.format("%.1f", ((float) spawner.getLogic().spawnDelay / 20f)) + "s";
 
-                if(spawner.getLogic().getRotation() == spawner.getLogic().getLastRotation() && spawner.getLogic().getRotation() == 0f)
-                    final_string = spawner.getLogic().renderedEntity.getName().getString() + " loot!";
+                if(spawner.getLogic().getRotation() == spawner.getLogic().getLastRotation() && spawner.getLogic().getRotation() == 0f && (float) spawner.getLogic().spawnDelay / 20f == 1f)
+                    final_string = spawner.getLogic().getRenderedEntity(mc.world, spawner.getPos()).getName().getString() + " loot!";
 
 
                 if (position != null) {
