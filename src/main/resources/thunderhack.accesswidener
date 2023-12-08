@@ -17,10 +17,6 @@ accessible field net/minecraft/network/packet/c2s/play/PlayerMoveC2SPacket pitch
 accessible field net/minecraft/network/packet/c2s/play/ChatMessageC2SPacket chatMessage Ljava/lang/String;
 accessible field net/minecraft/entity/LimbAnimator pos F
 accessible field net/minecraft/network/packet/s2c/play/PlayerRemoveS2CPacket profileIds Ljava/util/List;
-accessible field net/minecraft/world/MobSpawnerLogic spawnDelay I
-accessible field net/minecraft/world/MobSpawnerLogic minSpawnDelay I
-accessible field net/minecraft/world/MobSpawnerLogic maxSpawnDelay I
-accessible field net/minecraft/world/MobSpawnerLogic renderedEntity Lnet/minecraft/entity/Entity;
 accessible field net/minecraft/client/network/ClientPlayerInteractionManager currentBreakingProgress F
 accessible field net/minecraft/client/Mouse cursorDeltaY D
 accessible field net/minecraft/client/Mouse cursorDeltaX D
