@@ -2,6 +2,7 @@ package thunder.hack.gui.thundergui.components;
 
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.RotationAxis;
 import thunder.hack.cmd.Command;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui;
@@ -13,6 +14,8 @@ import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
 import java.util.Objects;
+
+import static thunder.hack.modules.Module.mc;
 
 public class ModulePlate {
 
@@ -79,25 +82,16 @@ public class ModulePlate {
         if (ThunderGui.selected_plate != this)
             FontRenderers.icons.drawString(stack, "H", (int) (posX + 80f), (int) (posY + 22f), Render2DEngine.applyOpacity(new Color(0xFFECECEC, true).getRGB(), getFadeFactor()));
         else {
-            String gear = "H";
-            switch (progress) {
-                case 0:
-                    gear = "H";
-                    break;
-                case 1:
-                    gear = "N";
-                    break;
-                case 2:
-                    gear = "O";
-                    break;
-                case 3:
-                    gear = "P";
-                    break;
-                case 4:
-                    gear = "Q";
-                    break;
-            }
-            FontRenderers.big_icons.drawString(stack, gear, (int) (posX + 80f), (int) (posY + 5f), Render2DEngine.applyOpacity(new Color(0xFF646464, true).getRGB(), getFadeFactor()));
+
+            stack.push();
+            stack.translate((posX + 91f), (posY + 15f), 0.0F);
+            stack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(mc.player.age * 4));
+            stack.translate(-(posX + 91f), -(posY + 15f), 0.0F);
+            FontRenderers.big_icons.drawString(stack, "H", (posX + 78f), (posY + 5f), Render2DEngine.applyOpacity(new Color(0xFF646464, true).getRGB(), getFadeFactor()));
+            stack.translate((posX + 91f), (posY + 15f), 0.0F);
+            stack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-mc.player.age * 4));
+            stack.translate(-(posX + 91f), -(posY + 15f), 0.0F);
+            stack.pop();
         }
 
         if (!listening_bind) {
@@ -137,12 +131,12 @@ public class ModulePlate {
             for (String word : I18n.translate(module.getDescription()).split(" ")) {
                 firstString.append(word + " ");
                 String[] splitString2 = firstString.toString().split("\n");
-                if (FontRenderers.settings.getStringWidth(splitString2[step]) > 70) {
+                if (FontRenderers.sf_medium_mini.getStringWidth(splitString2[step]) > 70) {
                     firstString.append("\n");
                     step++;
                 }
             }
-            FontRenderers.settings.drawString(stack, firstString.toString(), posX + 5, posY + 14, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
+            FontRenderers.sf_medium_mini.drawString(stack, firstString.toString(), posX + 5, posY + 14, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
         }
 
         if (listening_bind) {

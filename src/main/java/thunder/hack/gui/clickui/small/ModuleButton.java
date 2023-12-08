@@ -46,7 +46,7 @@ public class ModuleButton extends AbstractButton {
                 elements.add(new BooleanElement(setting, true));
             } else if (setting.getValue() instanceof ColorSetting) {
                 elements.add(new ColorPickerElement(setting, true));
-            }else if (setting.getValue() instanceof BooleanParent) {
+            } else if (setting.getValue() instanceof BooleanParent) {
                 elements.add(new BooleanParentElement(setting, true));
             } else if (setting.isNumberSetting() && setting.hasRestriction()) {
                 elements.add(new SliderElement(setting, true));
@@ -69,8 +69,8 @@ public class ModuleButton extends AbstractButton {
     public void render(DrawContext context, int mouseX, int mouseY, float delta, Color color) {
         hovered = Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height);
 
-        if(hovered) {
-            if(!prevHovered)
+        if (hovered) {
+            if (!prevHovered)
                 ModuleManager.soundFX.playScroll();
             ClickUI.currentDescription = I18n.translate(module.getDescription());
         }
@@ -80,7 +80,7 @@ public class ModuleButton extends AbstractButton {
         double ix = x + 5;
         double iy = y + height / 2 - (6 / 2f);
 
-        if(isHiden()) return;
+        if (isHiden()) return;
 
         offset_animation = fast(1f, 0f, 15f);
         if (target_offset != offsetY) {
@@ -126,7 +126,7 @@ public class ModuleButton extends AbstractButton {
             }
             context.getMatrices().pop();
 
-            Render2DEngine.drawBlurredShadow(context.getMatrices(),  (float) x + 3,  (float) (y + height),  (float) width - 6, 3, 13, new Color(0, 0, 0, 255));
+            Render2DEngine.drawBlurredShadow(context.getMatrices(), (float) x + 3, (float) (y + height), (float) width - 6, 3, 13, new Color(0, 0, 0, 255));
             Render2DEngine.popWindow();
         } else category_animation = fast(1, 0, 1f);
 
@@ -169,22 +169,28 @@ public class ModuleButton extends AbstractButton {
                     sbind = "RAlt";
                 }
                 if (!binding)
-                    FontRenderers.sf_medium_modules.drawString(context.getMatrices(), sbind,  x +  width - 11 -  FontRenderers.sf_medium_modules.getStringWidth(sbind),  y + 6 + (hovered ? -1 : 0), new Color(-1).getRGB());
+                    FontRenderers.sf_medium_modules.drawString(context.getMatrices(), sbind, x + width - 11 - FontRenderers.sf_medium_modules.getStringWidth(sbind), y + 6 + (hovered ? -1 : 0), new Color(-1).getRGB());
             }
             if (binding)
-                FontRenderers.sf_medium_modules.drawString(context.getMatrices(), holdbind ? (Formatting.GRAY + "Toggle / " + Formatting.RESET + "Hold") : (Formatting.RESET + "Toggle " + Formatting.GRAY + "/ Hold"),  x +  width - 11 -  FontRenderers.sf_medium_modules.getStringWidth("Toggle/Hold"),  iy + 2 + (hovered ? -1 : 0), new Color(-1).getRGB());
+                FontRenderers.sf_medium_modules.drawString(context.getMatrices(), holdbind ? (Formatting.GRAY + "Toggle / " + Formatting.RESET + "Hold") : (Formatting.RESET + "Toggle " + Formatting.GRAY + "/ Hold"), x + width - 11 - FontRenderers.sf_medium_modules.getStringWidth("Toggle/Hold"), iy + 2 + (hovered ? -1 : 0), new Color(-1).getRGB());
         }
 
-        if(hovered && InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT)){
-            FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"),  ix + 1f,  iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+        if (hovered && InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT)) {
+            FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"), ix + 1f, iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
         } else {
-            if (this.binding) FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "PressKey",  ix,  iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
-            else FontRenderers.sf_medium_modules.drawString(context.getMatrices(), module.getName(),  ix + 2,  iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            if (this.binding)
+                FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "PressKey", ix, iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            else {
+                if (ClickGui.getInstance().textSide.getValue() == ClickGui.TextSide.Left)
+                    FontRenderers.sf_medium_modules.drawString(context.getMatrices(), module.getName(), ix + 2, iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+                else
+                    FontRenderers.sf_medium_modules.drawCenteredString(context.getMatrices(), module.getName(), ix + 38, iy - 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            }
         }
     }
 
     public void mouseClicked(int mouseX, int mouseY, int button) {
-        if(isHiden()) return;
+        if (isHiden()) return;
 
         if (this.binding) {
             Command.sendMessage((mouseX - x) + "");
@@ -204,9 +210,9 @@ public class ModuleButton extends AbstractButton {
             binding = false;
         }
         if (hovered) {
-            if(InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT) && button == 0){
+            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT) && button == 0) {
                 module.setDrawn(!module.isDrawn());
-                if(MainSettings.isRu()){
+                if (MainSettings.isRu()) {
                     Command.sendMessage("Модуль " + Formatting.GREEN + module.getName() + Formatting.WHITE + " теперь " + (module.isDrawn() ? "виден в ArrayList" : "не виден в ArrayList"));
                 } else {
                     Command.sendMessage(Formatting.GREEN + module.getName() + Formatting.WHITE + " is now " + (module.isDrawn() ? "visible in ArrayList" : "invisible in ArrayList"));
@@ -236,7 +242,7 @@ public class ModuleButton extends AbstractButton {
     }
 
     public void keyTyped(int keyCode) {
-        if(isHiden()) return;
+        if (isHiden()) return;
 
         if (isOpen()) {
             for (AbstractElement element : elements)

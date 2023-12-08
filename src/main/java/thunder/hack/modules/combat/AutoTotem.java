@@ -8,6 +8,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.TntEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.TntMinecartEntity;
 import net.minecraft.item.Item;
@@ -50,6 +51,9 @@ public final class AutoTotem extends Module {
     private final Setting<Boolean> onObsidianPlace = new Setting<>("OnObsidianPlace", false).withParent(safety);
     private final Setting<Boolean> onCrystalInHand = new Setting<>("OnCrystalInHand", false).withParent(safety);
     private final Setting<Boolean> onMinecartTnt = new Setting<>("OnMinecartTNT", true).withParent(safety);
+    private final Setting<Boolean> onCreeper = new Setting<>("OnCreeper", true).withParent(safety);
+    private final Setting<Boolean> onAnchor = new Setting<>("OnAnchor", true).withParent(safety);
+
     private final Setting<Boolean> onTnt = new Setting<>("OnTNT", true).withParent(safety);
     private final Setting<Boolean> rcGap = new Setting<>("RCGap", false);
     private final Setting<Boolean> crappleSpoof = new Setting<>("CrappleSpoof", true, v -> offhand.getValue() == OffHand.GApple);
@@ -202,28 +206,38 @@ public final class AutoTotem extends Module {
             case GApple -> {
                 if (crappleSpoof.getValue()) {
                     if (mc.player.hasStatusEffect(StatusEffects.ABSORPTION) && mc.player.getStatusEffect(StatusEffects.ABSORPTION).getAmplifier() > 2) {
-                        if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE) item = Items.GOLDEN_APPLE;
-                        else if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE) item = Items.ENCHANTED_GOLDEN_APPLE;
+                        if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
+                            item = Items.GOLDEN_APPLE;
+                        else if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+                            item = Items.ENCHANTED_GOLDEN_APPLE;
                     } else {
-                       if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE) item = Items.ENCHANTED_GOLDEN_APPLE;
-                       else if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE) item = Items.GOLDEN_APPLE;
+                        if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+                            item = Items.ENCHANTED_GOLDEN_APPLE;
+                        else if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
+                            item = Items.GOLDEN_APPLE;
                     }
                 } else {
-                    if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE) item = Items.GOLDEN_APPLE;
-                    else if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE) item = Items.ENCHANTED_GOLDEN_APPLE;
+                    if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
+                        item = Items.GOLDEN_APPLE;
+                    else if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+                        item = Items.ENCHANTED_GOLDEN_APPLE;
                 }
             }
 
             case Shield -> {
                 if (shield.found() || mc.player.getOffHandStack().getItem() == Items.SHIELD) {
                     if (getTriggerHealth() <= healthS.getValue()) {
-                        if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE) item = Items.GOLDEN_APPLE;
-                        else if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE) item = Items.ENCHANTED_GOLDEN_APPLE;
+                        if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
+                            item = Items.GOLDEN_APPLE;
+                        else if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+                            item = Items.ENCHANTED_GOLDEN_APPLE;
                     } else {
                         if (!mc.player.getItemCooldownManager().isCoolingDown(Items.SHIELD)) item = Items.SHIELD;
                         else {
-                            if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE) item = Items.GOLDEN_APPLE;
-                            else if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE) item = Items.ENCHANTED_GOLDEN_APPLE;
+                            if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
+                                item = Items.GOLDEN_APPLE;
+                            else if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+                                item = Items.ENCHANTED_GOLDEN_APPLE;
                         }
                     }
                 } else if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
@@ -289,6 +303,26 @@ public final class AutoTotem extends Module {
                     break;
                 }
             }
+
+            if (onCreeper.getValue()) {
+                if (!(entity instanceof CreeperEntity)) continue;
+                if ((getTriggerHealth()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos(), AutoCrystal.selfPredictTicks.getValue()) < 0.5) {
+                    item = Items.TOTEM_OF_UNDYING;
+                    break;
+                }
+            }
+        }
+
+        if (onAnchor.getValue()) {
+            for (int x = -6; x <= 6; x++)
+                for (int y = -6; y <= 6; y++)
+                    for (int z = -6; z <= 6; z++) {
+                        BlockPos bp = new BlockPos(x, y, z);
+                        if (mc.world.getBlockState(bp).getBlock() == Blocks.RESPAWN_ANCHOR) {
+                            item = Items.TOTEM_OF_UNDYING;
+                            break;
+                        }
+                    }
         }
 
         for (int i = 9; i < 45; i++) {

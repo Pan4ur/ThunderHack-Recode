@@ -49,7 +49,6 @@ public class JumpCircle extends Module {
             circle.update();
         }
         circles.removeIf(Circle::update);
-        //mc.player.distanceTraveled = 4f;
     }
 
     public void onPreRender3D(MatrixStack stack) {
@@ -125,7 +124,7 @@ public class JumpCircle extends Module {
                 return color.getValue().getColorObject().getRGB();
             }
             default -> {
-                return getColor2(color.getValue().getColorObject(), color2.getValue().getColorObject(), stage).getRGB();
+                return Render2DEngine.TwoColoreffect(color.getValue().getColorObject(), color2.getValue().getColorObject(), 10, stage * colorOffset1.getValue()).getRGB();
             }
         }
     }

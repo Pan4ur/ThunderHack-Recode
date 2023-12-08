@@ -34,6 +34,8 @@ public class ConfigManager implements IManager {
     public static final File MISC_FOLDER = new File(MAIN_FOLDER, "misc");
     public static final File SOUNDS_FOLDER = new File(MISC_FOLDER, "sounds");
 
+    public File currentConfig = null;
+
     public static boolean firstLaunch = false;
 
     public ConfigManager() {
@@ -101,8 +103,6 @@ public class ConfigManager implements IManager {
         return obj.format(sol);
     }
 
-    public File currentConfig = null;
-
     public void load(String name) {
         File file = new File(CONFIGS_FOLDER, name + ".th");
         if (!file.exists()) {
@@ -112,7 +112,8 @@ public class ConfigManager implements IManager {
             return;
         }
 
-        if (currentConfig != null) save(currentConfig);
+        if (currentConfig != null)
+            save(currentConfig);
 
         ThunderHack.moduleManager.onUnload();
         ThunderHack.moduleManager.onUnloadPost();

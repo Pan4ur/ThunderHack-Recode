@@ -9,6 +9,7 @@ public final class MainSettings extends Module {
     public static Setting<Boolean> renderRotations = new Setting<>("RenderRotations", true);
     public static Setting<Boolean> skullEmoji = new Setting<>("SkullEmoji", true);
     public static Setting<Boolean> debug = new Setting<>("Debug", false);
+    public static Setting<Boolean> customBob = new Setting<>("CustomBob", true);
     public static Setting<Language> language = new Setting<>("Language", Language.ENG);
     public static Setting<String> prefix = new Setting<>("Prefix", "@");
 

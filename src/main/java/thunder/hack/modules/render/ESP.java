@@ -60,7 +60,6 @@ public class ESP extends Module {
     private final Setting<ColorSetting> dizorentColor = new Setting<>("DizorentColor", new ColorSetting(new Color(0xB300F1CC, true)), v -> dizorentRadius.getValue());
 
 
-
     private final Setting<Parent> boxEsp = new Setting<>("Box", new Parent(false, 0));
     private final Setting<Boolean> players = new Setting<>("Players", true).withParent(boxEsp);
     private final Setting<Boolean> friends = new Setting<>("Friends", true).withParent(boxEsp);
@@ -317,19 +316,19 @@ public class ESP extends Module {
                     FontRenderers.modules.drawCenteredString(context.getMatrices(), String.format("%.1f", mc.player.distanceTo(pearl)) + "m", (float) (Math.sin(Math.toRadians(yaw)) * 50f) + xOffset, (float) (yOffset - (Math.cos(Math.toRadians(yaw)) * 50f)) - 20, -1);
                 }
             }
-
-            Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-            BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-            Render2DEngine.setupRender();
-            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-            for (Entity ent : mc.world.getEntities()) {
-                if (shouldRender(ent))
-                    drawBox(bufferBuilder, ent, matrix);
-            }
-            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-            Render2DEngine.endRender();
         }
+
+        Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        Render2DEngine.setupRender();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        for (Entity ent : mc.world.getEntities()) {
+            if (shouldRender(ent))
+                drawBox(bufferBuilder, ent, matrix);
+        }
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        Render2DEngine.endRender();
     }
 
     public boolean shouldRender(Entity entity) {
@@ -434,8 +433,8 @@ public class ESP extends Module {
             if(ent instanceof LivingEntity lent && lent.getHealth() != 0 && renderHealth.getValue()) {
                 Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 5), (float) posY, (float) posX - 3, (float) endPosY, Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
                 switch(colorMode.getValue()) {
-                    case Custom -> Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 5), (float) (endPosY + (posY - endPosY) * lent.getHealth() / 20f), (float) posX - 3, (float) endPosY, healthB.getValue().getColorObject(), healthB.getValue().getColorObject(), healthU.getValue().getColorObject(), healthU.getValue().getColorObject());
-                    case SyncColor ->  Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 5), (float) (endPosY + (posY - endPosY) * lent.getHealth() / 20f), (float) posX - 3, (float) endPosY, HudEditor.getColor(90), HudEditor.getColor(90), HudEditor.getColor(270), HudEditor.getColor(270));
+                    case Custom -> Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 5), (float) (endPosY + (posY - endPosY) * lent.getHealth() / lent.getMaxHealth()), (float) posX - 3, (float) endPosY, healthB.getValue().getColorObject(), healthB.getValue().getColorObject(), healthU.getValue().getColorObject(), healthU.getValue().getColorObject());
+                    case SyncColor ->  Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 5), (float) (endPosY + (posY - endPosY) * lent.getHealth() / lent.getMaxHealth()), (float) posX - 3, (float) endPosY, HudEditor.getColor(90), HudEditor.getColor(90), HudEditor.getColor(270), HudEditor.getColor(270));
                 }
             } }
     }

@@ -104,8 +104,8 @@ public class Timer extends Module {
                 e.cancel();
             }
             if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
-              //  violation = 40f;
-             //   disable(isRu() ? "Отключён т.к. ты получил велосити!" : "Disabled because you got velocity packet!");
+                violation = 40f;
+                disable(isRu() ? "Отключён т.к. ты получил велосити!" : "Disabled because you got velocity packet!");
             }
         }
     }

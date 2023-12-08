@@ -39,6 +39,7 @@ public class ChatUtils extends Module {
 
     private final Timer timer = new Timer();
     private final Timer antiSpam = new Timer();
+    private final Timer messageTimer = new Timer();
 
     private final LinkedHashMap<UUID, String> nameMap = new LinkedHashMap<>();
     private String skip;
@@ -107,7 +108,7 @@ public class ChatUtils extends Module {
         }
 
         if (event.getPacket() instanceof GameMessageS2CPacket pac && mention.getValue()) {
-            if (pac.content.getString().contains(mc.player.getName().getString())) {
+            if (pac.content.getString().contains(mc.player.getName().getString()) && messageTimer.passedMs(1000)) {
                 ThunderHack.notificationManager.publicity("ChatUtils", MainSettings.language.getValue() == MainSettings.Language.RU ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
                 mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 5f, 1f);
             }
@@ -182,11 +183,13 @@ public class ChatUtils extends Module {
 
     @EventHandler
     public void onPacketSend(PacketEvent.@NotNull Send e) {
-        if (e.getPacket() instanceof ChatMessageC2SPacket pac && antiCoordLeak.getValue()) {
+        if (e.getPacket() instanceof ChatMessageC2SPacket pac) {
             if (antiCoordLeak.getValue() && pac.chatMessage.replaceAll("\\D", "").length() >= 6) {
                 sendMessage("[ChatUtils] " + (MainSettings.language.getValue() == MainSettings.Language.RU ? "В сообщении содержатся координаты!" : "The message contains coordinates!"));
                 e.cancel();
             }
+
+            messageTimer.reset();
         }
 
         if (fullNullCheck()) return;

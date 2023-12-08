@@ -175,12 +175,15 @@ public class ModuleButton extends AbstractButton {
         }
 
         if (hovered && InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT)) {
-            FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"), (int) ix + 1f, (int) iy + 3 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"), ix + 1f, iy + 3 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
         } else {
             if (this.binding) {
-                FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "PressKey", (int) ix, (int) iy + 3 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+                FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "PressKey", ix, iy + 3 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
             } else {
-                FontRenderers.sf_medium.drawString(context.getMatrices(), module.getName(), (int) ix + 2, (int) iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+                if (ClickGui.getInstance().textSide.getValue() == ClickGui.TextSide.Left)
+                    FontRenderers.sf_medium.drawString(context.getMatrices(), module.getName(), ix + 2, iy + 1 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+                else
+                    FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), module.getName(), ix + 46, iy - 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
             }
         }
     }

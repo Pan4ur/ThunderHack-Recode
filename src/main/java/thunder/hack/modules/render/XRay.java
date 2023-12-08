@@ -238,7 +238,6 @@ public class XRay extends Module {
         if (lava.getValue() && block == Blocks.LAVA) return true;
         if (quartz.getValue() && block == Blocks.NETHER_QUARTZ_ORE) return true;
         if (lapis.getValue() && (block == Blocks.LAPIS_ORE || block == Blocks.DEEPSLATE_LAPIS_ORE)) return true;
-
         return lapis.getValue() && (block == Blocks.LAPIS_ORE || block == Blocks.DEEPSLATE_LAPIS_ORE);
     }
 
@@ -252,9 +251,7 @@ public class XRay extends Module {
             for (int y = (int) (mc.player.getY() - down_); y < mc.player.getY() + up_; y++)
                 for (int z = (int) (mc.player.getZ() - radius_); z < mc.player.getZ() + radius_; z++) {
                     BlockPos pos = new BlockPos(x, y, z);
-                    if (mc.world.isAir(pos))
-                        continue;
-                    if (fast.getValue() && !funTimebypass.getValue() && (x % 2 == 0 || y % 2 == 0 || z % 2 == 0))
+                    if (mc.world.isAir(pos) || (fast.getValue() && !funTimebypass.getValue() && (x % 2 == 0 || y % 2 == 0 || z % 2 == 0)))
                         continue;
                     positions.add(pos);
                 }

@@ -37,7 +37,7 @@ public class Animations extends Module {
     public boolean flip;
 
     private enum Mode {
-        Default, One, Two, Three, Four, Five, Six, Seven, Eight
+        Default, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven
     }
 
 
@@ -62,6 +62,13 @@ public class Animations extends Module {
     }
 
     private void renderSwordAnimation(MatrixStack matrices, float m, float f, boolean bl2, float swingProgress, float equipProgress, Arm arm) {
+        if(arm == Arm.LEFT) {
+            matrices.translate(0, 0, 0);
+            applyEquipOffset(matrices, arm, equipProgress);
+            applySwingOffset(matrices, arm, swingProgress);
+            return;
+        }
+
         switch (mode.getValue()) {
             case Default -> {
                 matrices.translate(0, 0, 0);
@@ -126,6 +133,30 @@ public class Animations extends Module {
 
                 float a = -MathHelper.sin(swingProgress * 3f) / 2f + 1f;
                 matrices.scale(a, a, a);
+            }
+            case Nine -> {
+                float g = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
+                matrices.translate(0, 0, 0);
+                applyEquipOffset(matrices, arm, 0);
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(50f));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-30f * (1f-g) - 30f));
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(110f));
+            }
+            case Ten -> {
+                float g = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
+                matrices.translate(0, 0, 0);
+                applyEquipOffset(matrices, arm, 0);
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(50f));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-60f * g - 50));
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(110f));
+            }
+            case Eleven -> {
+                float g = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
+                matrices.translate(0, 0, 0);
+                applyEquipOffset(matrices, arm, 0);
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(50f));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-60f));
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(110f + 20f * g));
             }
         }
     }

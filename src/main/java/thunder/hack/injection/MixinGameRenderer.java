@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.player.NoEntityTrace;
 import thunder.hack.modules.render.NoRender;
@@ -139,6 +140,14 @@ public abstract class MixinGameRenderer {
 
             if (mc.player.isSubmergedInWater()) return;
             cb.setReturnValue(ModuleManager.fov.fovModifier.getValue().doubleValue());
+        }
+    }
+
+    @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
+    private void bobViewHook(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+        if(MainSettings.customBob.getValue()) {
+            ThunderHack.core.bobView(matrices, tickDelta);
+            ci.cancel();
         }
     }
 }

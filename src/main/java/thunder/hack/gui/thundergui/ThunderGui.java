@@ -13,7 +13,6 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ThunderHackGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.MSAAFramebuffer;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterAnimation;
@@ -236,7 +235,7 @@ public class ThunderGui extends Screen {
         context.getMatrices().scale(1, 1, 1);
         context.getMatrices().pop();
 
-        FontRenderers.settings.drawString(context.getMatrices(), "recode v1.2", main_posX + 55, main_posY + 30, ThunderHackGui.getColorByTheme(3).getRGB());
+        FontRenderers.settings.drawString(context.getMatrices(), "recode v" + ThunderHack.VERSION, main_posX + 91 - (FontRenderers.settings.getStringWidth("recode v" + ThunderHack.VERSION)), main_posY + 30, ThunderHackGui.getColorByTheme(3).getRGB());
 
         // Левая плита под категриями
         Render2DEngine.drawRound(context.getMatrices(), main_posX + 5, main_posY + 40, 90, 120, 7f, ThunderHackGui.getColorByTheme(4));
@@ -412,7 +411,7 @@ public class ThunderGui extends Screen {
                     continue;
                 }
                 element.setOffsetY(offsetY);
-                element.setX(main_posX + 215);
+                element.setX(main_posX + 210);
                 element.setY(main_posY + 45 + scroll);
                 element.setWidth(175);
                 element.setHeight(15);
@@ -480,7 +479,6 @@ public class ThunderGui extends Screen {
         }
         if (isHoveringItem(main_posX + 105, main_posY + 14, 11, 11, (float) mouseX, (float) mouseY)) {
             try {
-                //   Desktop.getDesktop().browse(new File("ThunderHack/configs/").toURI());
                 net.minecraft.util.Util.getOperatingSystem().open(new File("ThunderHackRecode/configs/").toURI());
             } catch (Exception e) {
                 Command.sendMessage("Не удалось открыть проводник!");
@@ -556,7 +554,6 @@ public class ThunderGui extends Screen {
     }
 
     public void keyTyped(String typedChar, int keyCode) throws IOException {
-
         if (ThunderHack.currentKeyListener != ThunderHack.KeyListening.Sliders && ThunderHack.currentKeyListener != ThunderHack.KeyListening.ThunderGui)
             return;
 
@@ -569,13 +566,20 @@ public class ThunderGui extends Screen {
         components.forEach(component -> component.keyTyped(typedChar, keyCode));
 
         if (searching) {
+            if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT || keyCode == GLFW.GLFW_KEY_RIGHT_SHIFT)
+                return;
+
             components.clear();
-            if (search_string.equalsIgnoreCase("search")) {
+
+            if (search_string.equalsIgnoreCase("search"))
                 search_string = "";
-            }
+
             int module_y = 0;
+
             for (Module module : ThunderHack.moduleManager.getModulesSearch(search_string)) {
-                components.add(new ModulePlate(module, main_posX + 100, main_posY + 40 + module_y, module_y / 35));
+                ModulePlate mPlate = new ModulePlate(module, main_posX + 100, main_posY + 40 + module_y, module_y / 35);
+                if (!components.contains(mPlate))
+                    components.add(mPlate);
                 module_y += 35;
             }
 
@@ -590,7 +594,6 @@ public class ThunderGui extends Screen {
             }
 
             search_string = (search_string + typedChar);
-
         }
         if (listening_config) {
             if (config_string.equalsIgnoreCase("Save config")) {

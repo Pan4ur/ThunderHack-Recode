@@ -1,5 +1,6 @@
 package thunder.hack.modules.render;
 
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.modules.Module;

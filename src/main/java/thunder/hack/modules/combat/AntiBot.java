@@ -3,6 +3,7 @@ package thunder.hack.modules.combat;
 import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.misc.FakePlayer;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
@@ -18,7 +19,7 @@ public final class AntiBot extends Module {
     public static ArrayList<PlayerEntity> bots = new ArrayList<>();
     public Setting<Boolean> remove = new Setting<>("Remove", false);
     public Setting<Boolean> onlyAura = new Setting<>("OnlyAura", true);
-    private final Setting<Mode> mode = new Setting("Mode", Mode.MotionCheck);
+    private final Setting<Mode> mode = new Setting("Mode", Mode.UUIDCheck);
     public Setting<Integer> checkticks = new Setting("checkTicks", 3, 0, 10, v -> mode.getValue() == Mode.MotionCheck);
     private final Timer timer = new Timer();
     private int botsNumber = 0;
@@ -64,12 +65,9 @@ public final class AntiBot extends Module {
                 ticks++;
             }
         } else {
-            if (!ent.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + ent.getName().getString()).getBytes(StandardCharsets.UTF_8))) && ent instanceof OtherClientPlayerEntity) {
-                sendMessage(ent.getName().getString() + " is a bot!");
-                ++botsNumber;
-                bots.add(ent);
-            }
-            if (!ent.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + ent.getName().getString()).getBytes(StandardCharsets.UTF_8))) && ent.isInvisible() && ent instanceof OtherClientPlayerEntity) {
+            if (!ent.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + ent.getName().getString()).getBytes(StandardCharsets.UTF_8))) && ent instanceof OtherClientPlayerEntity
+                    && (FakePlayer.fakePlayer == null || ent.getId() != FakePlayer.fakePlayer.getId())
+                    && !ent.getName().getString().contains("-")) {
                 sendMessage(ent.getName().getString() + " is a bot!");
                 ++botsNumber;
                 bots.add(ent);

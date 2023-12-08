@@ -6,7 +6,7 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractButton;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.clickui.AbstractWindow;
-import thunder.hack.gui.clickui.SearchBar;
+import thunder.hack.gui.clickui.impl.SearchBar;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;

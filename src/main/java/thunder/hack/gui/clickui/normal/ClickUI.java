@@ -141,17 +141,17 @@ public class ClickUI extends Screen {
             if (!MSAAFramebuffer.framebufferInUse()) {
                 MSAAFramebuffer.use(() -> {
                     for (AbstractWindow window : windows) {
-                        window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().hcolor1.getValue().getColorObject());
+                        window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().mainColor.getValue().getColorObject());
                     }
                 });
             } else {
                 for (AbstractWindow window : windows) {
-                    window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().hcolor1.getValue().getColorObject());
+                    window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().mainColor.getValue().getColorObject());
                 }
             }
         } else {
             for (AbstractWindow window : windows) {
-                window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().hcolor1.getValue().getColorObject());
+                window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().mainColor.getValue().getColorObject());
             }
         }
         if (!setup && ConfigManager.firstLaunch) {

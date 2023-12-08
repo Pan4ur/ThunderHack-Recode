@@ -29,7 +29,7 @@ public class AutoLeave extends Module {
     private final Setting<Float> leaveHp = new Setting("HP", 8.0f, 1f, 20.0f, v -> low_hp.getValue());
     private final Setting<LeaveMode> staff = new Setting<>("Staff", LeaveMode.None).withParent(leaveIf);
     private final Setting<LeaveMode> players = new Setting<>("Players", LeaveMode.Leave).withParent(leaveIf);
-    private final Setting<Integer> distance = new Setting<>("Distance", 256, 8, 256, v -> players.getValue() != LeaveMode.None).withParent(leaveIf);
+    private final Setting<Integer> distance = new Setting<>("Distance", 256, 4, 256, v -> players.getValue() != LeaveMode.None).withParent(leaveIf);
 
     private final Timer chatDelay = new Timer();
 
@@ -51,6 +51,7 @@ public class AutoLeave extends Module {
             if (pl != mc.player && !ThunderHack.friendManager.isFriend(pl) && players.getValue() != LeaveMode.None && mc.player.squaredDistanceTo(pl.getPos()) <= distance.getValue() * distance.getValue()) {
                 switch (players.getValue()) {
                     case Command -> {
+                        if(autoDisable.getValue()) disable();
                         sendMessage(MainSettings.isRu() ? "Ливнул т.к. рядом появился игрок!" : "Logged out because there was a player!");
                         mc.player.networkHandler.sendChatCommand(command.getValue());
                     }
@@ -74,10 +75,11 @@ public class AutoLeave extends Module {
             return;
         chatDelay.reset();
 
-        if (fastLeave.getValue()) sendPacket(new UpdateSelectedSlotC2SPacket(228));
-        else mc.player.networkHandler.getConnection().disconnect(Text.of("[AutoLeave] " + message));
         if(autoDisable.getValue())
             disable(message);
+
+        if (fastLeave.getValue()) sendPacket(new UpdateSelectedSlotC2SPacket(228));
+        else mc.player.networkHandler.getConnection().disconnect(Text.of("[AutoLeave] " + message));
     }
 
     public void onStaff() {
@@ -90,6 +92,8 @@ public class AutoLeave extends Module {
                 case Command -> {
                     sendMessage(MainSettings.isRu() ? "Ливнул т.к. хелпер в спеке!" : "Logged out because helper in vanish!");
                     mc.player.networkHandler.sendChatCommand(command.getValue());
+                    if(autoDisable.getValue())
+                        disable();
                 }
                 case Leave -> leave(MainSettings.isRu() ? "Ливнул т.к. хелпер в спеке!" : "Logged out because helper in vanish!");
             }

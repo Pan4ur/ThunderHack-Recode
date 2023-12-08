@@ -3,6 +3,7 @@ package thunder.hack.core.impl;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.ThunderHack;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.IManager;
 import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.clickui.small.SmallClickUI;
@@ -376,12 +377,7 @@ public class ModuleManager implements IManager {
             if (module.getName().toLowerCase().contains(string.toLowerCase()))
                 modulesCategory.add(module);
         });
-
-        modules.forEach(module -> {
-            if (module.getDescription().toLowerCase().contains(string.toLowerCase()))
-                modulesCategory.add(module);
-        });
-
+        Command.sendMessage(modulesCategory.toString());
         return modulesCategory;
     }
 }

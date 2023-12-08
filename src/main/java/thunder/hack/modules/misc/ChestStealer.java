@@ -16,7 +16,6 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
-import thunder.hack.utility.player.InteractionUtility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,16 +35,18 @@ public class ChestStealer extends Module {
     private final Setting<Boolean> autoMyst = new Setting<>("AutoMyst", false);
     private final Setting<Sort> sort = new Setting<>("Sort", Sort.None);
 
-    public List<String> items = new ArrayList<>();
-    private final Timer timer = new Timer();
+    public final List<String> items = new ArrayList<>();
     private final Timer autoMystDelay = new Timer();
+    private final Timer timer = new Timer();
     private final Random rnd = new Random();
 
     public void onRender3D(MatrixStack stack) {
         if (mc.player.currentScreenHandler instanceof GenericContainerScreenHandler chest) {
             for (int i = 0; i < chest.getInventory().size(); i++) {
                 Slot slot = chest.getSlot(i);
-                if (slot.hasStack() && isAllowed(slot.getStack()) && timer.every(delay.getValue() + (random.getValue() ? rnd.nextInt(delay.getValue()) : 0))) {
+                if (slot.hasStack() && isAllowed(slot.getStack())
+                        && timer.every(delay.getValue() + (random.getValue() && delay.getValue() != 0 ? rnd.nextInt(delay.getValue()) : 0))
+                        && !(mc.currentScreen.getTitle().getString().contains("Аукцион") || mc.currentScreen.getTitle().getString().contains("покупки"))) {
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 0, SlotActionType.QUICK_MOVE, mc.player);
                     autoMystDelay.reset();
                 }
@@ -57,13 +58,14 @@ public class ChestStealer extends Module {
 
     @EventHandler
     public void onPlayerUpdate(PlayerUpdateEvent event) {
-        if(autoMyst.getValue() && mc.currentScreen == null && autoMystDelay.passedMs(3000)) {
-            for(BlockEntity be : getBlockEntities()) {
-                if(be instanceof EnderChestBlockEntity) {
-                    if(mc.player.squaredDistanceTo(be.getPos().toCenterPos()) > 25)
+        if (autoMyst.getValue() && mc.currentScreen == null && autoMystDelay.passedMs(3000)) {
+            for (BlockEntity be : getBlockEntities()) {
+                if (be instanceof EnderChestBlockEntity) {
+                    if (mc.player.squaredDistanceTo(be.getPos().toCenterPos()) > 39)
                         continue;
-                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(be.getPos().toCenterPos().add(MathUtility.random(-0.4, 0.4),0.375,MathUtility.random(-0.4, 0.4)), Direction.UP, be.getPos(), false));
+                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(be.getPos().toCenterPos().add(MathUtility.random(-0.4, 0.4), 0.375, MathUtility.random(-0.4, 0.4)), Direction.UP, be.getPos(), false));
                     mc.player.swingHand(Hand.MAIN_HAND);
+                    break;
                 }
             }
         }
@@ -79,7 +81,7 @@ public class ChestStealer extends Module {
     }
 
     private boolean isContainerEmpty(GenericContainerScreenHandler container) {
-        for(int i = 0; i < (container.getInventory().size() == 90 ? 54 : 27); i++)
+        for (int i = 0; i < (container.getInventory().size() == 90 ? 54 : 27); i++)
             if (container.getSlot(i).hasStack()) return false;
         return true;
     }

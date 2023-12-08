@@ -15,21 +15,21 @@ public class ClickGui extends Module {
     private static ClickGui INSTANCE = new ClickGui();
 
     public Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
-
+    public Setting<TextSide> textSide = new Setting<>("TextSide", TextSide.Left);
     public Setting<scrollModeEn> scrollMode = new Setting<>("ScrollMode", scrollModeEn.Old);
     public Setting<Integer> catHeight = new Setting<>("CategoryHeight", 300, 100, 720);
 
-    private final Setting<colorModeEn> colorMode = new Setting<>("ColorMode", colorModeEn.Static);
-    public final Setting<ColorSetting> hcolor1 = new Setting<>("Main", new ColorSetting(-6974059));
-    public final Setting<ColorSetting> acolor = new Setting<>("Main2", new ColorSetting(-8365735));
+    public final Setting<colorModeEn> colorMode = new Setting<>("ColorMode", colorModeEn.Static);
+    public final Setting<ColorSetting> mainColor = new Setting<>("Main", new ColorSetting(-6974059));
+    public final Setting<ColorSetting> secondaryColor = new Setting<>("Secondary", new ColorSetting(-8365735));
     public final Setting<ColorSetting> plateColor = new Setting<>("Plate", new ColorSetting(-14474718));
     public final Setting<ColorSetting> disabled = new Setting<>("Disabled", new ColorSetting(new Color(24, 24, 27)));
     public final Setting<ColorSetting> catColor = new Setting<>("Category", new ColorSetting(-15395563));
-    public Setting<Integer> colorSpeed = new Setting<>("ColorSpeed", 18, 2, 54);
-    public Setting<Boolean> showBinds = new Setting<>("ShowBinds", true);
-    public Setting<Boolean> outline = new Setting<>("Outline", false);
-    public Setting<Boolean> descriptions = new Setting<>("Descriptions", true);
-    public Setting<Boolean> msaa = new Setting<>("MSAA", true);
+    public final Setting<Integer> colorSpeed = new Setting<>("ColorSpeed", 18, 2, 54);
+    public final Setting<Boolean> showBinds = new Setting<>("ShowBinds", true);
+    public final Setting<Boolean> outline = new Setting<>("Outline", false);
+    public final Setting<Boolean> descriptions = new Setting<>("Descriptions", true);
+    public final Setting<Boolean> msaa = new Setting<>("MSAA", true);
 
 /*
     я хотел, а потом опять забил
@@ -59,11 +59,10 @@ public class ClickGui extends Module {
             case Sky -> Render2DEngine.skyRainbow(colorSpeed.getValue(), count);
             case LightRainbow -> Render2DEngine.rainbow(colorSpeed.getValue(), count, .6f, 1, 1);
             case Rainbow -> Render2DEngine.rainbow(colorSpeed.getValue(), count, 1f, 1, 1);
-            case Fade -> Render2DEngine.fade(colorSpeed.getValue(), count, hcolor1.getValue().getColorObject(), 1);
-            case DoubleColor -> Render2DEngine.interpolateColorsBackAndForth(colorSpeed.getValue(), count,
-                    hcolor1.getValue().getColorObject(), new Color(0xFFFFFFFF), true);
-            case Analogous -> Render2DEngine.interpolateColorsBackAndForth(colorSpeed.getValue(), count, hcolor1.getValue().getColorObject(), Render2DEngine.getAnalogousColor(acolor.getValue().getColorObject()), true);
-            default -> hcolor1.getValue().getColorObject();
+            case Fade -> Render2DEngine.fade(colorSpeed.getValue(), count, mainColor.getValue().getColorObject(), 1);
+            case DoubleColor -> Render2DEngine.TwoColoreffect(mainColor.getValue().getColorObject(), secondaryColor.getValue().getColorObject(), colorSpeed.getValue(), count);
+            case Analogous -> Render2DEngine.interpolateColorsBackAndForth(colorSpeed.getValue(), count, mainColor.getValue().getColorObject(), Render2DEngine.getAnalogousColor(secondaryColor.getValue().getColorObject()), true);
+            default -> mainColor.getValue().getColorObject();
         };
     }
 
@@ -111,6 +110,11 @@ public class ClickGui extends Module {
     public enum Mode {
         Default,
         Small
+    }
+
+    public enum TextSide {
+        Left,
+        Center
     }
 }
 
