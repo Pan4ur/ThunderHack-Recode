@@ -160,6 +160,7 @@ public class ModuleManager implements IManager {
     public static SelfTrap selfTrap = new SelfTrap();
     public static AntiVoid antiVoid = new AntiVoid();
     public static KillFeed killFeed = new KillFeed();
+    public static AutoBuy autoBuy = new AutoBuy();
     public static SoundFX soundFX = new SoundFX();
     public static AutoBed autoBed = new AutoBed();
     public static TNTAura tntAura = new TNTAura();

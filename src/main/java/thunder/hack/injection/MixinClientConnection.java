@@ -25,7 +25,7 @@ public class MixinClientConnection {
         }
     }
 
-    @Inject(method = "handlePacket", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "handlePacket", at = @At("TAIL"), cancellable = true)
     private static <T extends PacketListener> void onHandlePacketPost(Packet<T> packet, PacketListener listener, CallbackInfo info) {
         if(Module.fullNullCheck()) return;
         PacketEvent.ReceivePost event = new PacketEvent.ReceivePost(packet);

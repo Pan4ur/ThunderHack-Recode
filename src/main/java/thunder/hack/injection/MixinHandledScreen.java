@@ -161,6 +161,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
             NbtCompound compoundTag = stack.getSubNbt("BlockEntityTag");
             DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(27, ItemStack.EMPTY);
             Inventories.readNbt(compoundTag, itemStacks);
+
             float[] colors = new float[]{1F, 1F, 1F};
             Item focusedItem = stack.getItem();
             if (focusedItem instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {

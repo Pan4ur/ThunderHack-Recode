@@ -18,6 +18,7 @@
     "MixinClientWorld",
     "MixinEntityRenderer",
     "MixinGameRenderer",
+    "MixinGenericContainerScreen",
     "MixinHandledScreen",
     "MixinHeldItemRenderer",
     "MixinInGameHud",

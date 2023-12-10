@@ -98,7 +98,7 @@ public final class SoundFX extends Module {
         }
     }
 
-    private void playSound(SoundEvent sound) {
+    public void playSound(SoundEvent sound) {
         if (mc.player != null && mc.world != null)
             mc.world.playSound(mc.player, mc.player.getBlockPos(), sound, SoundCategory.BLOCKS, (float) volume.getValue() / 100f, 1f);
     }

@@ -9,6 +9,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.registry.Registries;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
@@ -390,6 +391,17 @@ public final class InventoryUtility {
                 return new SearchInvResult(b1, true, mc.player.getInventory().getStack(b1));
         }
         return SearchInvResult.notFound();
+    }
+
+    public static Item getItem(String Name) {
+        if(Name == null) return Items.AIR;
+        for (Block block : Registries.BLOCK)
+            if (block.getTranslationKey().replace("block.minecraft.","").equals(Name.toLowerCase()))
+                return Item.fromBlock(block);
+        for (Item item : Registries.ITEM)
+            if (item.getTranslationKey().replace("item.minecraft.","").equals(Name.toLowerCase()))
+                return item;
+        return Items.DIRT;
     }
 
     public static int getBedsCount() {

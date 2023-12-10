@@ -114,6 +114,9 @@ public class AutoLeave extends Module {
     public static boolean isStaff(String name) {
         if(name == null)
             return false;
+
+        name = name.toLowerCase();
+
         return name.contains("helper") || name.contains("moder") || name.contains("admin") || name.contains("owner") || name.contains("curator") || name.contains("куратор") || name.contains("модер") || name.contains("админ") || name.contains("хелпер") || name.contains("поддержка");
     }
 

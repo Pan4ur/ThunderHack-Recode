@@ -11,11 +11,11 @@ import java.io.IOException;
 public class SettingElement {
     protected Setting setting;
 
-    protected double x, y, width, height;
-    protected double offsetY;
+    protected float x, y, width, height;
+    protected float offsetY;
 
-    protected double prev_offsetY;
-    protected double scroll_offsetY;
+    protected float prev_offsetY;
+    protected float scroll_offsetY;
     protected float scroll_animation;
 
 
@@ -75,7 +75,7 @@ public class SettingElement {
         return x;
     }
 
-    public void setX(double x) {
+    public void setX(float x) {
         this.x = x;
     }
 
@@ -83,7 +83,7 @@ public class SettingElement {
         return y;
     }
 
-    public void setY(double y) {
+    public void setY(float y) {
         prev_offsetY = this.y;
         this.scroll_offsetY = y + offsetY;
     }
@@ -92,19 +92,19 @@ public class SettingElement {
         return width;
     }
 
-    public void setWidth(double width) {
+    public void setWidth(float width) {
         this.width = width;
     }
 
-    public double getHeight() {
+    public float getHeight() {
         return height;
     }
 
-    public void setHeight(double height) {
+    public void setHeight(float height) {
         this.height = height;
     }
 
-    public void setOffsetY(double offsetY) {
+    public void setOffsetY(float offsetY) {
         this.offsetY = offsetY;
     }
 

@@ -12,6 +12,7 @@ import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.CommandManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.modules.client.MainSettings;

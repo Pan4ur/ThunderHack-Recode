@@ -2,17 +2,21 @@ package thunder.hack.core.impl;
 
 import com.google.gson.*;
 import net.minecraft.block.Block;
+import net.minecraft.util.Pair;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.impl.SearchCommand;
 import thunder.hack.core.IManager;
+import thunder.hack.gui.autobuy.AutoBuyItem;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.AutoBuy;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.render.Search;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.*;
+import thunder.hack.utility.player.InventoryUtility;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -355,7 +359,7 @@ public class ConfigManager implements IManager {
                 continue;
             }
             if (setting.isBooleanParent()) {
-                attribs.add(setting.getName(), jp.parse(String.valueOf(((BooleanParent)setting.getValue()).isEnabled())));
+                attribs.add(setting.getName(), jp.parse(String.valueOf(((BooleanParent) setting.getValue()).isEnabled())));
                 continue;
             }
             if (setting.isBindSetting()) {
@@ -509,6 +513,69 @@ public class ConfigManager implements IManager {
                 writer.write(item + "\n");
             }
         } catch (Exception ignored) {
+        }
+    }
+
+    public void loadAutoBuy() {
+        try {
+            File file = new File(ConfigManager.CONFIG_FOLDER_NAME + "/misc/autobuy.txt");
+
+            if (file.exists()) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    while (reader.ready()) {
+                        String[] nameKey = reader.readLine().split(";");
+                        String name = nameKey[0];
+                        String price = nameKey[1];
+                        String count = nameKey[2];
+                        String enchantments;
+                        ArrayList<Pair<String, Integer>> list = new ArrayList<>();
+
+                        if(nameKey.length > 3) {
+                            enchantments = nameKey[3];
+                            for (String enc : enchantments.split(" ")) {
+                                list.add(AutoBuy.parseEnchant(enc));
+                            }
+                        }
+                        AutoBuy.items.add(new AutoBuyItem(InventoryUtility.getItem(name), list, Integer.parseInt(price), Integer.parseInt(count)));
+                    }
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void saveAutoBuy() {
+        File file = new File(ConfigManager.CONFIG_FOLDER_NAME + "/misc/autobuy.txt");
+        try {
+            if (new File(ConfigManager.CONFIG_FOLDER_NAME).mkdirs()) {
+                file.createNewFile();
+            }
+        } catch (Exception ignored) {
+
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (AutoBuyItem item : AutoBuy.items) {
+                writer.write(item.getItem().getTranslationKey().replace("block.minecraft.", "").replace("item.minecraft.", "") + ";" + item.getPrice() + ";" + item.getCount() + ";" + ArrayToString(item.getEnchantmentstoArray()) + "\n");
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    public static String ArrayToString(Object[] a) {
+        if (a == null)
+            return "null";
+        int iMax = a.length - 1;
+        if (iMax == -1)
+            return "";
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; ; i++) {
+            b.append(String.valueOf(a[i]));
+            if (i == iMax)
+                return b.toString();
+            b.append(" ");
         }
     }
 }

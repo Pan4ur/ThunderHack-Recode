@@ -405,7 +405,7 @@ public class ThunderGui extends Screen {
         Render2DEngine.addWindow(context.getMatrices(), scissorX1, scissorY1, scissorX2, scissorY2, 1d);
 
         if (!settings.isEmpty()) {
-            double offsetY = 0;
+            float offsetY = 0;
             for (SettingElement element : settings) {
                 if (!element.isVisible()) {
                     continue;
@@ -432,7 +432,7 @@ public class ThunderGui extends Screen {
                     }
                 }
                 element.render(context.getMatrices(), mouseX, mouseY, partialTicks);
-                offsetY += element.getHeight() + 3;
+                offsetY += element.getHeight() + 3f;
             }
         }
         if (selected_plate != null && settings_animation < 0.99) {
@@ -525,7 +525,7 @@ public class ThunderGui extends Screen {
 
         this.settings.forEach(component -> component.mouseClicked((int) mouseX, (int) mouseY, clickedButton));
         this.components.forEach(components -> components.mouseClicked((int) mouseX, (int) mouseY, clickedButton));
-        this.categories.forEach(category -> category.mouseClicked((int) mouseX, (int) mouseY, clickedButton));
+        this.categories.forEach(category -> category.mouseClicked((int) mouseX, (int) mouseY, 0));
         this.configs.forEach(component -> component.mouseClicked((int) mouseX, (int) mouseY, clickedButton));
         this.friends.forEach(component -> component.mouseClicked((int) mouseX, (int) mouseY, clickedButton));
         return super.mouseClicked(mouseX, mouseY, clickedButton);
