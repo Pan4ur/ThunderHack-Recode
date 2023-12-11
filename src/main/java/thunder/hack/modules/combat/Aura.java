@@ -502,7 +502,7 @@ public final class Aura extends Module {
                 double deltaZ = ent.getZ() - mc.player.getZ();
                 float yawDelta = MathHelper.wrapDegrees((float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(deltaZ, deltaX)) - 90.0) - rotationYaw) / 1.0001f;
                 float pitchDelta = ((float) -Math.toDegrees(Math.atan2(ent.getY() - mc.player.getEyePos().getY(), Math.hypot(deltaX, deltaZ))) - rotationPitch) / 1.0001f;
-                float additionYaw = Math.min(Math.max((int) Math.abs(yawDelta), 1), 80);
+                float additionYaw = Math.min(Math.max((int) Math.abs(yawDelta), 1), random(minYawStep.getValue(), maxYawStep.getValue()));
                 float additionPitch = Math.max(ready ? Math.abs(pitchDelta) : 1.0f, 2.0f);
                 if (Math.abs(additionYaw - prevYaw) <= 3.0f)
                     additionYaw = prevYaw + 3.1f;
