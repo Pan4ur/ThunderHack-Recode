@@ -78,7 +78,7 @@ public class ItemPlate {
             if (item.getItem() != null)
                 FontRenderers.sf_medium.drawString(stack, I18n.translate(item.getItem().getTranslationKey()), posX + 5, posY + 5, Render2DEngine.applyOpacity(-1, getFadeFactor()), false);
 
-            String ench =item.getEnchantmentstoArray().length == 0 ? "Любые" : String.join(" ", item.getEnchantmentstoArray());
+            String ench =item.getEnchantmentsToArray().length == 0 ? "Любые" : String.join(" ", item.getEnchantmentsToArray());
 
             FontRenderers.sf_medium_mini.drawString(stack, "Цена: " + item.getPrice(), posX + 5, posY + 13.5f, Render2DEngine.applyOpacity(-1, 0.7f), false);
             FontRenderers.sf_medium_mini.drawString(stack, "Мин.Кол-во: " + item.getCount(), posX + 5, posY + 19.5f, Render2DEngine.applyOpacity(-1, 0.7f), false);
@@ -145,12 +145,17 @@ public class ItemPlate {
         }
     }
 
-    public double getPosX() {
+    public float getPosX() {
         return this.posX;
     }
 
-    public double getPosY() {
+    public float getPosY() {
         return this.posY;
+    }
+
+    public void setPosY(float v) {
+        this.posY = v;
+        scrollPosY = posY;
     }
 
     public AutoBuyItem getAutoBuyItem() {

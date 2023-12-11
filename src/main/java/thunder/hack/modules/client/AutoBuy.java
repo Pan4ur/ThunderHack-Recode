@@ -6,7 +6,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -44,6 +43,7 @@ public class AutoBuy extends Module {
     public final Setting<Integer> minDelay = new Setting<>("MinUpdateDelay", 400, 50, 1000);
     public final Setting<Integer> maxDelay = new Setting<>("MaxUpdateDelay", 550, 100, 3000);
     public final Setting<Integer> reAhCount = new Setting<>("ReAhCount", 12, 2, 30);
+    public final Setting<Boolean> logFake = new Setting<>("LogFake", true);
 
     private final Timer updateTimer = new Timer();
     private final Timer reAhTimer = new Timer();
@@ -57,6 +57,8 @@ public class AutoBuy extends Module {
 
     private int updateCount;
     private static boolean active;
+    public static int successfully;
+
 
     @Override
     public void onEnable() {
@@ -74,6 +76,7 @@ public class AutoBuy extends Module {
             if (pac.content().getString().contains("успешно")) {
                 if (lastStack != null)
                     log.add(new ItemLog(lastStack.getLeft(), "успешно, за: " + lastStack.getRight() + " " + new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime())));
+                successfully++;
                 lastStack = null;
             }
 
@@ -84,6 +87,9 @@ public class AutoBuy extends Module {
             }
 
             if (pac.content().getString().contains("У Вас не хватает денег!")) {
+                if (lastStack != null)
+                    log.add(new ItemLog(lastStack.getLeft(), "не хватило денег, за: " + lastStack.getRight() + " " + new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime())));
+                lastStack = null;
                 disable("У Вас не хватает денег!");
             }
         }
@@ -102,8 +108,10 @@ public class AutoBuy extends Module {
         }
 
         if (fakeItemTimeout.passedMs(500) && lastStack != null) {
-            log.add(new ItemLog(lastStack.getLeft(), "фейк, за: " + lastStack.getRight() + " " + new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime())));
-            sendMessage("Fake");
+            if(logFake.getValue()) {
+                log.add(new ItemLog(lastStack.getLeft(), "фейк, за: " + lastStack.getRight() + " " + new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime())));
+                sendMessage("Fake");
+            }
             lastStack = null;
         }
 
@@ -114,9 +122,10 @@ public class AutoBuy extends Module {
             if (mc.currentScreen.getTitle().getString().contains("(")) {
                 int slot = 0;
                 for (ItemStack itemStack : chest.getStacks()) {
-                    if (getLoreTagList(itemStack) != null) {
-                        int price = getPrice(getLoreTagList(itemStack).toString());
-                        if (isGoodDeal(itemStack, price)) {
+                    NbtList lore = getLoreTagList(itemStack);
+                    if (lore != null) {
+                        int price = getPrice(lore.toString());
+                        if (isGoodDeal(itemStack, price, lore)) {
                             Buy(slot);
                             return;
                         }
@@ -127,10 +136,11 @@ public class AutoBuy extends Module {
                 mc.player.closeScreen();
             } else if (mc.currentScreen.getTitle().getString().contains("Аукционы") || mc.currentScreen.getTitle().getString().contains("Поиск")) {
                 for (ItemStack itemStack : chest.getStacks()) {
-                    if (getLoreTagList(itemStack) != null) {
-                        int price = getPrice(getLoreTagList(itemStack).toString());
-                        String seller = getSeller(getLoreTagList(itemStack).toString());
-                        if (isGoodDeal(itemStack, price) && buyTimer.every(1000)) {
+                    NbtList lore = getLoreTagList(itemStack);
+                    if (lore != null) {
+                        int price = getPrice(lore.toString());
+                        String seller = getSeller(lore.toString());
+                        if (isGoodDeal(itemStack, price, lore) && buyTimer.every(1000)) {
                             sendMessage(itemStack.getName().getString() + " " + price + " " + seller);
                             lastStack = new Pair<>(itemStack, price);
                             sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
@@ -155,35 +165,39 @@ public class AutoBuy extends Module {
         }
     }
 
-    public boolean isGoodDeal(ItemStack is, int price) {
-        if (is.getItem() == Items.PLAYER_HEAD && !is.getName().getString().contains("★"))
-            return false;
-
+    public boolean isGoodDeal(ItemStack is, int price, NbtList lore) {
         if (is.getItem() instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
             NbtCompound compoundTag = is.getSubNbt("BlockEntityTag");
             DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(27, ItemStack.EMPTY);
             if (compoundTag != null) {
                 Inventories.readNbt(compoundTag, itemStacks);
-                for (ItemStack s : itemStacks) {
-                    if (isGoodDeal(s, (int) (price * shulkerMultiplier.getValue()))) {
+                for (ItemStack s : itemStacks)
+                    if (isGoodDeal(s, (int) (price * shulkerMultiplier.getValue()), lore))
                         return true;
-                    }
-                }
             }
         }
 
         for (AutoBuyItem abItem : items)
             if (is.getItem() == abItem.getItem() && is.getCount() >= abItem.getCount() && price <= abItem.getPrice()) {
+                if (abItem.checkForStar() && !is.getName().getString().contains("★"))
+                    return false;
+
+                if(!abItem.getAttributes().isEmpty())
+                    for (String atr : abItem.getAttributes())
+                        if(!lore.toString().toLowerCase().contains(atr.toLowerCase()) && !is.getName().getString().toLowerCase().contains(atr.toLowerCase()))
+                            return false;
+
                 if (abItem.getEnchantments().isEmpty()) {
                     return true;
                 } else {
                     if (is.getEnchantments().isEmpty())
                         return false;
+
                     ArrayList<Pair<String, Integer>> ench = getABEnchants(is);
                     int matches = 0;
                     for (Pair<String, Integer> expected : abItem.getEnchantments()) {
                         for (Pair<String, Integer> real : ench) {
-                            if (real.getLeft().contains(expected.getLeft()) && real.getRight() >= expected.getRight())
+                            if (real.getLeft().equals(expected.getLeft()) && real.getRight() >= expected.getRight())
                                 matches++;
                         }
                     }
@@ -196,7 +210,7 @@ public class AutoBuy extends Module {
 
     public void Buy(int slot) {
         sendMessage("buy 1 =" + slot);
-        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, 0, SlotActionType.QUICK_MOVE, mc.player);
+        clickSlot(slot, SlotActionType.QUICK_MOVE);
         sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
         mc.player.closeScreen();
         updateTimer.setMs(-1000);
@@ -240,8 +254,8 @@ public class AutoBuy extends Module {
     }
 
     public static Pair<String, Integer> parseEnchant(String val) {
-        if (!val.contains(":"))
-            return new Pair<>(val, 0);
+        if (val.isEmpty()) return null;
+        if (!val.contains(":")) return new Pair<>(val, 0);
         String[] array = val.split(":");
         String id = array[0];
         String lvl = array[1];

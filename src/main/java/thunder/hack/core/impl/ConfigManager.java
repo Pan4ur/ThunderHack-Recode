@@ -19,6 +19,7 @@ import thunder.hack.setting.impl.*;
 import thunder.hack.utility.player.InventoryUtility;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -339,7 +340,6 @@ public class ConfigManager implements IManager {
         JsonParser jp = new JsonParser();
 
         for (Setting setting : m.getSettings()) {
-
             if (setting.isColorSetting()) {
                 JsonArray array = new JsonArray();
                 array.add(new JsonPrimitive(((ColorSetting) setting.getValue()).getRawColor()));
@@ -521,25 +521,32 @@ public class ConfigManager implements IManager {
             File file = new File(ConfigManager.CONFIG_FOLDER_NAME + "/misc/autobuy.txt");
 
             if (file.exists()) {
-                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
                     while (reader.ready()) {
                         String[] nameKey = reader.readLine().split(";");
                         String name = nameKey[0];
                         String price = nameKey[1];
                         String count = nameKey[2];
-                        String enchantments;
-                        ArrayList<Pair<String, Integer>> list = new ArrayList<>();
+                        String enchantments = nameKey[3];
+                        String attributes = nameKey[4];
+                        String checkForStar = nameKey[5];
 
-                        if(nameKey.length > 3) {
-                            enchantments = nameKey[3];
-                            for (String enc : enchantments.split(" ")) {
-                                list.add(AutoBuy.parseEnchant(enc));
-                            }
+                        ArrayList<Pair<String, Integer>> enchList = new ArrayList<>();
+                        for (String enc : enchantments.split(" ")) {
+                            Pair<String, Integer> ench = AutoBuy.parseEnchant(enc);
+                            if (ench != null)
+                                enchList.add(ench);
                         }
-                        AutoBuy.items.add(new AutoBuyItem(InventoryUtility.getItem(name), list, Integer.parseInt(price), Integer.parseInt(count)));
+
+                        ArrayList<String> attribList = new ArrayList<>();
+                        for (String attr : attributes.split(",")) {
+                            if (!attr.isEmpty())
+                                attribList.add(attr);
+                        }
+
+                        AutoBuy.items.add(new AutoBuyItem(InventoryUtility.getItem(name), enchList, attribList, Integer.parseInt(price), Integer.parseInt(count), Boolean.parseBoolean(checkForStar)));
                     }
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -556,9 +563,9 @@ public class ConfigManager implements IManager {
         } catch (Exception ignored) {
 
         }
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             for (AutoBuyItem item : AutoBuy.items) {
-                writer.write(item.getItem().getTranslationKey().replace("block.minecraft.", "").replace("item.minecraft.", "") + ";" + item.getPrice() + ";" + item.getCount() + ";" + ArrayToString(item.getEnchantmentstoArray()) + "\n");
+                writer.write(item.getItem().getTranslationKey().replace("block.minecraft.", "").replace("item.minecraft.", "") + ";" + item.getPrice() + ";" + item.getCount() + ";" + ArrayToString(item.getEnchantmentsToArray()) + ";" + ArrayToStringСomma(item.getAttributesToArray()) + ";" + item.checkForStar() + "\n");
             }
         } catch (Exception ignored) {
         }
@@ -576,6 +583,21 @@ public class ConfigManager implements IManager {
             if (i == iMax)
                 return b.toString();
             b.append(" ");
+        }
+    }
+
+    public static String ArrayToStringСomma(Object[] a) {
+        if (a == null)
+            return "null";
+        int iMax = a.length - 1;
+        if (iMax == -1)
+            return "";
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; ; i++) {
+            b.append(String.valueOf(a[i]));
+            if (i == iMax)
+                return b.toString();
+            b.append(",");
         }
     }
 }

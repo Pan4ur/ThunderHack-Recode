@@ -246,8 +246,12 @@ public abstract class Module {
 
     public static void clickSlot(int id) {
         if (id == -1 || mc.interactionManager == null || mc.player == null) return;
-
         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, id, 0, SlotActionType.PICKUP, mc.player);
+    }
+
+    public static void clickSlot(int id, SlotActionType type) {
+        if (id == -1 || mc.interactionManager == null || mc.player == null) return;
+        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, id, 0, type, mc.player);
     }
 
     public void sendMessage(String message) {

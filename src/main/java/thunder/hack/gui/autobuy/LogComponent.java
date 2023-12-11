@@ -1,12 +1,8 @@
 package thunder.hack.gui.autobuy;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.gui.thundergui.ThunderGui;
-import thunder.hack.modules.client.ThunderHackGui;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
@@ -49,28 +45,34 @@ public class LogComponent {
             return;
         }
 
-        Render2DEngine.drawRound(context.getMatrices(),posX + 5, posY, 285, 30, 4f, Render2DEngine.applyOpacity(new Color(44, 35, 52, 255), getFadeFactor()));
+        if (text.contains("успешно")) {
+            Render2DEngine.drawGradientRound(context.getMatrices(), posX + 5, posY, 285, 30, 4f,
+                    new Color(55, 44, 66, 255), new Color(55, 44, 66, 255),
+                    new Color(0, 80, 68, 255), new Color(0, 103, 88, 255));
+        } else {
+            Render2DEngine.drawRound(context.getMatrices(), posX + 5, posY, 285, 30, 4f, Render2DEngine.applyOpacity(new Color(44, 35, 52, 255), getFadeFactor()));
+        }
 
         if (first_open) {
-            Render2DEngine.addWindow(context.getMatrices(),posX + 5, posY, posX + 5 + 285, posY + 30,1f);
-            Render2DEngine.drawBlurredShadow(context.getMatrices(),MouseX - 20, MouseY - 20, 40, 40, 60, Render2DEngine.applyOpacity(new Color(0xC3555A7E, true), getFadeFactor()));
+            Render2DEngine.addWindow(context.getMatrices(), posX + 5, posY, posX + 5 + 285, posY + 30, 1f);
+            Render2DEngine.drawBlurredShadow(context.getMatrices(), MouseX - 20, MouseY - 20, 40, 40, 60, Render2DEngine.applyOpacity(new Color(0xC3555A7E, true), getFadeFactor()));
             Render2DEngine.popWindow();
             first_open = false;
         }
 
         if (isHovered(MouseX, MouseY)) {
-            Render2DEngine.addWindow(context.getMatrices(),posX + 5, posY, posX + 5 + 285, posY + 30,1f);
-            Render2DEngine.drawBlurredShadow(context.getMatrices(),MouseX - 20, MouseY - 20, 40, 40, 60, Render2DEngine.applyOpacity(new Color(0xC3555A7E, true), getFadeFactor()));
+            Render2DEngine.addWindow(context.getMatrices(), posX + 5, posY, posX + 5 + 285, posY + 30, 1f);
+            Render2DEngine.drawBlurredShadow(context.getMatrices(), MouseX - 20, MouseY - 20, 40, 40, 60, Render2DEngine.applyOpacity(new Color(0xC3555A7E, true), getFadeFactor()));
             Render2DEngine.popWindow();
         }
 
-        if(item != null) {
+        if (item != null) {
             context.drawItem(item, posX + 12, posY + 7);
             context.drawItemInSlot(mc.textRenderer, item, posX + 12, posY + 7);
         }
 
         FontRenderers.modules.drawString(context.getMatrices(), item.getName().getString(), posX + 37, posY + 6, Render2DEngine.applyOpacity(-1, getFadeFactor()), false);
-        FontRenderers.settings.drawString(context.getMatrices(),text, posX + 37, posY + 17, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
+        FontRenderers.settings.drawString(context.getMatrices(), text, posX + 37, posY + 17, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
     }
 
     private float getFadeFactor() {

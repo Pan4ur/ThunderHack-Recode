@@ -8,14 +8,18 @@ import java.util.ArrayList;
 public class AutoBuyItem {
     private Item item;
     private ArrayList<Pair<String, Integer>> enchantments;
+    private ArrayList<String> attributes;
     private int price;
     private int count;
+    private boolean checkForStar;
 
-    public AutoBuyItem(Item item, ArrayList<Pair<String, Integer>> enchantments, int price, int count) {
+    public AutoBuyItem(Item item, ArrayList<Pair<String, Integer>> enchantments, ArrayList<String> atributes, int price, int count, boolean checkForStar) {
         this.item = item;
         this.enchantments = enchantments;
         this.price = price;
         this.count = count;
+        this.attributes = atributes;
+        this.checkForStar = checkForStar;
     }
 
     public Item getItem() {
@@ -26,11 +30,25 @@ public class AutoBuyItem {
         return enchantments;
     }
 
-    public String[] getEnchantmentstoArray() {
+    public ArrayList<String> getAttributes() {
+        return attributes;
+    }
+
+    public String[] getAttributesToArray() {
+        String[] array = new String[attributes.size()];
+        int i = 0;
+        for (String s : attributes) {
+            array[i] = s;
+            i++;
+        }
+        return array;
+    }
+
+    public String[] getEnchantmentsToArray() {
         String[] array = new String[enchantments.size()];
         int i = 0;
         for (Pair<String, Integer> pair : enchantments) {
-            array[i] = pair.getLeft()+":"+pair.getRight();
+            array[i] = pair.getLeft() + ":" + pair.getRight();
             i++;
         }
         return array;
@@ -42,6 +60,10 @@ public class AutoBuyItem {
 
     public void setEnchantments(ArrayList<Pair<String, Integer>> enchantments) {
         this.enchantments = enchantments;
+    }
+
+    public void setAttributes(ArrayList<String> attributes) {
+        this.attributes = attributes;
     }
 
     public void setPrice(int price) {
@@ -58,5 +80,13 @@ public class AutoBuyItem {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public boolean checkForStar() {
+        return checkForStar;
+    }
+
+    public void setCheckForStar(boolean checkForStar) {
+        this.checkForStar = checkForStar;
     }
 }

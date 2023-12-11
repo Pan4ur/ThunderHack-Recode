@@ -11,11 +11,13 @@ import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.components.SettingElement;
 import thunder.hack.modules.client.AutoBuy;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static thunder.hack.core.IManager.mc;
@@ -47,32 +49,44 @@ public class AutoBuyValue extends SettingElement {
             return;
         }
 
-        if (name.equals("Item") && item.getItem() != null) {
+        if (name.equals("Предмет") && item.getItem() != null) {
             value = item.getItem().getTranslationKey().replace("block.minecraft.", "").replace("item.minecraft.", "");
         }
-        if (name.equals("Price")) {
+        if (name.equals("Макс.Цена")) {
             value = item.getPrice() + "";
         }
-        if (name.equals("Count")) {
+        if (name.equals("Мин.Кол-во")) {
             value = item.getCount() + "";
         }
-        if (name.equals("Enchants")) {
-            value = String.join(" ", item.getEnchantmentstoArray());
+        if (name.equals("Зачары")) {
+            value = String.join(" ", item.getEnchantmentsToArray());
+        }
+        if (name.equals("Атрибуты")) {
+            value = String.join(",", item.getAttributesToArray());
         }
 
-        FontRenderers.sf_medium.drawString(stack, name, (float) getX(), (float) getY() + 5, isHovered() ? -1 : new Color(0xB0FFFFFF, true).getRGB(), false);
+        FontRenderers.sf_medium.drawString(stack, name, getX(), getY() + 5, isHovered() ? -1 : new Color(0xB0FFFFFF, true).getRGB(), false);
 
-        Render2DEngine.drawRound(stack, x + 50, y + height - 11, 120, 9, 0.5f, (mouseX > x + 50 && mouseX < x + 170 && mouseY > y + height - 11 && mouseY < y + height - 4) ? new Color(82, 57, 100, 178) : new Color(50, 35, 60, 178));
+        if(!name.equals("Проверять на звезду")) {
+            Render2DEngine.drawRound(stack, x + 50, y + height - 11, 120, 9, 0.5f, (mouseX > x + 50 && mouseX < x + 170 && mouseY > y + height - 11 && mouseY < y + height - 4) ? new Color(82, 57, 100, 178) : new Color(50, 35, 60, 178));
 
-        if (!listening) {
-            FontRenderers.sf_medium.drawString(stack, value, x + 53, y + height - 9, new Color(0xBAFFFFFF, true).getRGB(), false);
+            if (!listening) {
+                FontRenderers.sf_medium.drawString(stack, value, x + 53, y + height - 9, new Color(0xBAFFFFFF, true).getRGB(), false);
+            } else {
+                String s = getRegistered(Stringnumber);
+                if (name.equals("Предмет"))
+                    FontRenderers.sf_medium.drawString(stack, s, x + 53, y + height - 9, new Color(0x45FFFFFF, true).getRGB(), false);
+
+                FontRenderers.sf_medium.drawString(stack, Objects.equals(Stringnumber, "") ? "..." : Stringnumber + (mc.player != null && (mc.player.age / 10) % 2 == 1 ? "|" : "") , x + 53, y + height - 9, new Color(0xBAFFFFFF, true).getRGB(), false);
+            }
         } else {
+            if(item.checkForStar())
+                Render2DEngine.drawRound(stack, x + 92, y + height - 9, 5, 5, 0.5f, new Color(178, 100, 250, 255));
 
-            String s = getRegistered(Stringnumber);
-            if (name.equals("Item"))
-                FontRenderers.sf_medium.drawString(stack, s, x + 53, y + height - 9, new Color(0x45FFFFFF, true).getRGB(), false);
+            if (mouseX > x + 90 && mouseX < x + 99 && mouseY > y + height - 11 && mouseY < y + height - 2)
+                Render2DEngine.drawRound(stack, x + 92, y + height - 9, 5, 5, 0.5f, new Color(178, 100, 250, 150));
 
-            FontRenderers.sf_medium.drawString(stack, Objects.equals(Stringnumber, "") ? "..." : Stringnumber, x + 53, y + height - 9, new Color(0xBAFFFFFF, true).getRGB(), false);
+            Render2DEngine.drawRound(stack, x + 90, y + height - 11, 9, 9, 0.5f,  new Color(50, 35, 60, 178));
         }
     }
 
@@ -96,9 +110,15 @@ public class AutoBuyValue extends SettingElement {
             return;
         }
 
-        if (mouseX > x + 50 && mouseX < x + 170 && mouseY > y + height - 11 && mouseY < y + height - 4) {
-            Stringnumber = "";
-            this.listening = true;
+        if(!name.equals("Проверять на звезду")) {
+            if (mouseX > x + 50 && mouseX < x + 170 && mouseY > y + height - 11 && mouseY < y + height - 4) {
+                Stringnumber = value;
+                this.listening = true;
+            }
+        } else {
+            if (mouseX > x + 90 && mouseX < x + 99 && mouseY > y + height - 11 && mouseY < y + height - 2) {
+                item.setCheckForStar(!item.checkForStar());
+            }
         }
 
         if (listening) ThunderHack.currentKeyListener = ThunderHack.KeyListening.Strings;
@@ -120,16 +140,24 @@ public class AutoBuyValue extends SettingElement {
                 }
                 case GLFW.GLFW_KEY_ENTER: {
                     try {
-                        if (Objects.equals(name, "Count")) item.setCount(Integer.valueOf(Stringnumber));
-                        if (Objects.equals(name, "Price")) item.setPrice(Integer.valueOf(Stringnumber));
-                        if (Objects.equals(name, "Item")) item.setItem(InventoryUtility.getItem(Stringnumber));
-                        if (Objects.equals(name, "Enchants")) {
+                        if (Objects.equals(name, "Мин.Кол-во")) item.setCount(MathUtility.clamp(Integer.valueOf(Stringnumber), 0, 64));
+                        if (Objects.equals(name, "Макс.Цена")) item.setPrice(Integer.valueOf(Stringnumber));
+                        if (Objects.equals(name, "Предмет")) item.setItem(InventoryUtility.getItem(Stringnumber));
+                        if (Objects.equals(name, "Зачары")) {
                             String[] enchArray = Stringnumber.split(" ");
                             ArrayList<Pair<String, Integer>> list = new ArrayList<>();
                             for(String str : enchArray) {
-                                list.add(AutoBuy.parseEnchant(str));
+                                Pair<String, Integer> ench = AutoBuy.parseEnchant(str);
+                                if(ench != null)
+                                    list.add(ench);
                             }
                             item.setEnchantments(list);
+                        }
+                        if (Objects.equals(name, "Атрибуты")) {
+                            String[] atrArray = Stringnumber.split(",");
+                            ArrayList<String> list = new ArrayList<>();
+                            list.addAll(Arrays.asList(atrArray));
+                            item.setAttributes(list);
                         }
                     } catch (Exception e) {
                     }
@@ -158,6 +186,10 @@ public class AutoBuyValue extends SettingElement {
                 }
                 if (Objects.equals(GLFW.glfwGetKeyName(keyCode, 0), "-")) {
                     Stringnumber = Stringnumber + "_";
+                    return;
+                }
+                if (GLFW.glfwGetKeyName(keyCode, 0) != null) {
+                    Stringnumber = Stringnumber + GLFW.glfwGetKeyName(keyCode, 0).toUpperCase();
                     return;
                 }
             }

@@ -23,15 +23,15 @@ public class SettingElement {
 
     public SettingElement(Setting setting) {
         this.setting = setting;
-        scroll_animation = 0;
+        scroll_animation = 1f;
         prev_offsetY = y;
-        scroll_offsetY = 0;
+        scroll_offsetY = y;
     }
 
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
         hovered = Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height);
         if (scroll_offsetY != y) {
-            scroll_animation = AnimationUtility.fast(scroll_animation, 1, 15f);
+            scroll_animation = AnimationUtility.fast(scroll_animation, 1, 5f);
             y = (int) Render2DEngine.interpolate(prev_offsetY, scroll_offsetY, scroll_animation);
         }
     }
@@ -71,7 +71,7 @@ public class SettingElement {
         return setting;
     }
 
-    public double getX() {
+    public float getX() {
         return x;
     }
 
@@ -79,7 +79,7 @@ public class SettingElement {
         this.x = x;
     }
 
-    public double getY() {
+    public float getY() {
         return y;
     }
 
@@ -88,7 +88,11 @@ public class SettingElement {
         this.scroll_offsetY = y + offsetY;
     }
 
-    public double getWidth() {
+    public void setPrev_offsetY(float y) {
+        prev_offsetY = y;
+    }
+
+    public float getWidth() {
         return width;
     }
 
