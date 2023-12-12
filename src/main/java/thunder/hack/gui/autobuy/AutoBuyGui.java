@@ -1,9 +1,9 @@
 package thunder.hack.gui.autobuy;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
@@ -11,6 +11,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Pair;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.TargetHud;
@@ -25,12 +26,12 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static thunder.hack.core.IManager.mc;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class AutoBuyGui extends Screen {
@@ -146,7 +147,7 @@ public class AutoBuyGui extends Screen {
 
         if (reload.get()) {
             load();
-            if(!Objects.equals(search_string, "") && !Objects.equals(search_string, "Search")) {
+            if (!Objects.equals(search_string, "") && !Objects.equals(search_string, "Search")) {
                 components.clear();
                 int module_y = 35;
                 components.add(new ItemPlate(new AutoBuyItem(Items.AIR, new ArrayList<>(), new ArrayList<>(), -1, -1, false), main_posX + 100, main_posY + 40 + module_y, (int) (module_y / 35f)));
@@ -268,7 +269,7 @@ public class AutoBuyGui extends Screen {
         float maxYSlider = (components.size() * 35) + 35;
         float maxVisibleSlider = main_height - 35;
 
-        if(current_category == Category.Items) {
+        if (current_category == Category.Items) {
             Render2DEngine.drawRect(context.getMatrices(), main_posX + 193, main_posY + 40, 4, main_height - 45, ThunderHackGui.getColorByTheme(7));
             Render2DEngine.addWindow(context.getMatrices(), main_posX + 193, main_posY + 40, main_posX + 197, main_posY + 40 + main_height - 45, 1);
             Render2DEngine.drawRect(context.getMatrices(), main_posX + 194, main_posY + 40 - scroll + 1, 2, (main_height - 47) * Math.min((maxVisibleSlider / maxYSlider), 1f), ThunderHackGui.getColorByTheme(0));
@@ -355,7 +356,7 @@ public class AutoBuyGui extends Screen {
             dragging = true;
         }
 
-        if(isHoveringItem(main_posX + 193, main_posY + 40, 4, main_height - 45, (float) mouseX, (float) mouseY)) {
+        if (isHoveringItem(main_posX + 193, main_posY + 40, 4, main_height - 45, (float) mouseX, (float) mouseY)) {
             draggingSlider = true;
         }
 
@@ -365,10 +366,6 @@ public class AutoBuyGui extends Screen {
         }
 
         if (isHoveringItem(main_posX + 5, main_posY + 100, 90, 25, (float) mouseX, (float) mouseY)) {
-            for (Block block : Registries.BLOCK)
-                if (Item.fromBlock(block) != Items.AIR)
-                    AutoBuy.items.add(new AutoBuyItem(Item.fromBlock(block), new ArrayList<>(), new ArrayList<>(), 10, 1, false));
-
             for (Item item : Registries.ITEM)
                 if (item != Items.AIR)
                     AutoBuy.items.add(new AutoBuyItem(item, new ArrayList<>(), new ArrayList<>(), 10, 1, false));
@@ -376,10 +373,6 @@ public class AutoBuyGui extends Screen {
         }
 
         if (isHoveringItem(main_posX + 5, main_posY + 130, 90, 25, (float) mouseX, (float) mouseY)) {
-            for (Block block : Registries.BLOCK)
-                if (Item.fromBlock(block) != Items.AIR)
-                    AutoBuy.items.add(new AutoBuyItem(Item.fromBlock(block), new ArrayList<>(), new ArrayList<>(), 100, 1, false));
-
             for (Item item : Registries.ITEM)
                 if (item != Items.AIR)
                     AutoBuy.items.add(new AutoBuyItem(item, new ArrayList<>(), new ArrayList<>(), 100, 1, false));
@@ -391,7 +384,7 @@ public class AutoBuyGui extends Screen {
             AutoBuy.items.add(new AutoBuyItem(Items.NETHERITE_CHESTPLATE, new ArrayList<>(List.of(new Pair<>("protection", 4), new Pair<>("mending", 0))), new ArrayList<>(), 1000000, 1, false));
             AutoBuy.items.add(new AutoBuyItem(Items.NETHERITE_LEGGINGS, new ArrayList<>(List.of(new Pair<>("protection", 4), new Pair<>("mending", 0))), new ArrayList<>(), 1000000, 1, false));
             AutoBuy.items.add(new AutoBuyItem(Items.NETHERITE_BOOTS, new ArrayList<>(List.of(new Pair<>("protection", 4), new Pair<>("mending", 0))), new ArrayList<>(), 1000000, 1, false));
-            AutoBuy.items.add(new AutoBuyItem(Items.NETHERITE_PICKAXE, new ArrayList<>(List.of(new Pair<>("mending", 0))), new ArrayList<>(List.of("бульдозер","авто-плавка")), 1000000, 1, false));
+            AutoBuy.items.add(new AutoBuyItem(Items.NETHERITE_PICKAXE, new ArrayList<>(List.of(new Pair<>("mending", 0))), new ArrayList<>(List.of("бульдозер", "авто-плавка")), 1000000, 1, false));
             AutoBuy.items.add(new AutoBuyItem(Items.NETHERITE_SWORD, new ArrayList<>(List.of(new Pair<>("sharpness", 4))), new ArrayList<>(List.of("яд")), 1000000, 1, false));
             AutoBuy.items.add(new AutoBuyItem(Items.ENCHANTED_GOLDEN_APPLE, new ArrayList<>(), new ArrayList<>(), 10000, 1, false));
             AutoBuy.items.add(new AutoBuyItem(Items.GOLDEN_APPLE, new ArrayList<>(), new ArrayList<>(), 100000, 16, false));
@@ -461,18 +454,52 @@ public class AutoBuyGui extends Screen {
 
             components.clear();
 
-            if (search_string.equalsIgnoreCase("search"))
-                search_string = "";
+            switch (keyCode) {
+                case GLFW.GLFW_KEY_ESCAPE: {
+                    search_string = "Search";
+                    searching = false;
+                    return;
+                }
+                case GLFW.GLFW_KEY_LEFT_SHIFT, GLFW.GLFW_KEY_RIGHT_SHIFT: {
+                    return;
+                }
+                case GLFW.GLFW_KEY_ENTER: {
+                    search_string = "Search";
+                    searching = false;
+                    load();
+                    return;
+                }
+                case GLFW.GLFW_KEY_BACKSPACE: {
+                    search_string = removeLastChar(search_string);
+                    return;
+                }
+                case GLFW.GLFW_KEY_SPACE: {
+                    search_string = search_string + " ";
+                    return;
+                }
+            }
 
-            int module_y = 0;
+            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT) || InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT)) {
+                if (Objects.equals(GLFW.glfwGetKeyName(keyCode, 0), ";")) {
+                    search_string = search_string + ":";
+                    return;
+                }
+                if (Objects.equals(GLFW.glfwGetKeyName(keyCode, 0), "-")) {
+                    search_string = search_string + "_";
+                    return;
+                }
+                if (GLFW.glfwGetKeyName(keyCode, 0) != null) {
+                    search_string = search_string + GLFW.glfwGetKeyName(keyCode, 0).toUpperCase();
+                    return;
+                }
+            }
 
-            if (keyCode == GLFW.GLFW_KEY_ENTER) {
-                search_string = "Search";
-                searching = false;
-                load();
-            } else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
-                search_string = (removeLastChar(search_string));
-            } else search_string = (search_string + typedChar);
+            if (GLFW.glfwGetKeyName(keyCode, 0) == null)
+                return;
+
+            search_string = search_string + GLFW.glfwGetKeyName(keyCode, 0);
+
+            int module_y = 35;
 
             components.add(new ItemPlate(new AutoBuyItem(Items.AIR, new ArrayList<>(), new ArrayList<>(), -1, -1, false), main_posX + 100, main_posY + 40 + module_y, (int) (module_y / 35f)));
 
@@ -497,7 +524,7 @@ public class AutoBuyGui extends Screen {
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         final int dWheel = (int) (verticalAmount * 25);
 
-        if(!components.isEmpty()) {
+        if (!components.isEmpty()) {
             if (components.get(0).getPosY() > main_posY + 35 && dWheel > 0)
                 return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
 

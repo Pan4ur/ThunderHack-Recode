@@ -227,8 +227,8 @@ public class SmallClickUI extends Screen {
 
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "crystalpvp.cc", hx, hy - 45, -1);
                 FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "strict.2b2tpvp.org", hx, hy - 15, -1);
-                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "mcfunny.su (aka shit)", hx, hy + 15, -1);
-                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "rw, hw, ares, ft (GrimAc)", hx, hy + 45, -1);
+                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "MatrixAC", hx, hy + 15, -1);
+                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "FunTime (GrimAc)", hx, hy + 45, -1);
 
                 FontRenderers.modules.drawCenteredString(context.getMatrices(), "ThunderHack v" + ThunderHack.VERSION, hx, hy + 90, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70).getRGB());
             } else if (hstep == 3) {
