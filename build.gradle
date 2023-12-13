@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.2-SNAPSHOT'
+	id 'fabric-loom' version '1.4-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -54,7 +54,9 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	
 	modImpl("org.ladysnake:satin:${project.satin_version}")
-	libImpl("com.github.meteordevelopment:orbit:${project.orbit_version}")
+
+	libImpl("meteordevelopment:orbit:${project.orbit_version}")
+//	libImpl("se.michaelthelin.spotify:spotify-web-api-java:8.3.4");
 
 	configurations.libImpl.dependencies.each {
 		implementation(it)

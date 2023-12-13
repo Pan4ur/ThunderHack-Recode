@@ -7,6 +7,7 @@ import net.minecraft.client.gl.Framebuffer;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL30C;
+import thunder.hack.core.impl.ModuleManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,39 +15,25 @@ import java.util.List;
 import java.util.Map;
 
 public class MSAAFramebuffer extends Framebuffer {
-    public static final int MIN_SAMPLES = 2;
     public static final int MAX_SAMPLES = GL30.glGetInteger(GL30C.GL_MAX_SAMPLES);
     private static final Map<Integer, MSAAFramebuffer> INSTANCES = new HashMap<>();
-    private static final List<MSAAFramebuffer> ACTIVE_INSTANCES = new ArrayList<>();
 
     private final int samples;
     private int rboColor;
     private int rboDepth;
-    private boolean inUse;
 
     public MSAAFramebuffer(int samples) {
         super(true);
-        if (samples < MIN_SAMPLES || samples > MAX_SAMPLES) {
-            throw new IllegalArgumentException(String.format("The number of samples should be >= %s and <= %s, got %s.", MIN_SAMPLES, MAX_SAMPLES, samples));
-        }
-        if ((samples & (samples - 1)) != 0) {
-            throw new IllegalArgumentException("The number of samples must be a power of two.");
-        }
-
         this.samples = samples;
         setClearColor(1F, 1F, 1F, 0F);
-    }
-
-    public static boolean framebufferInUse() {
-        return !ACTIVE_INSTANCES.isEmpty();
     }
 
     public static MSAAFramebuffer getInstance(int samples) {
         return INSTANCES.computeIfAbsent(samples, x -> new MSAAFramebuffer(samples));
     }
 
-    public static void use(Runnable drawAction) {
-        use(Math.min(16, MAX_SAMPLES), MinecraftClient.getInstance().getFramebuffer(), drawAction);
+    public static void use(boolean fancy, Runnable drawAction) {
+        use(Math.min(fancy ? 8 : ModuleManager.radarRewrite.isEnabled() ? 4 : 2, MAX_SAMPLES), MinecraftClient.getInstance().getFramebuffer(), drawAction);
     }
 
     public static void use(int samples, @NotNull Framebuffer mainBuffer, @NotNull Runnable drawAction) {
@@ -79,11 +66,6 @@ public class MSAAFramebuffer extends Framebuffer {
     @Override
     public void initFbo(int width, int height, boolean getError) {
         RenderSystem.assertOnRenderThreadOrInit();
-        int maxSize = RenderSystem.maxSupportedTextureSize();
-        if (width <= 0 || width > maxSize || height <= 0 || height > maxSize) {
-            throw new IllegalArgumentException("Window " + width + "x" + height + " size out of bounds (max. size: " + maxSize + ")");
-        }
-
         viewportWidth = width;
         viewportHeight = height;
         textureWidth = width;
@@ -139,23 +121,5 @@ public class MSAAFramebuffer extends Framebuffer {
         depthAttachment = -1;
         textureWidth = -1;
         textureHeight = -1;
-    }
-
-    @Override
-    public void beginWrite(boolean setViewport) {
-        super.beginWrite(setViewport);
-        if (!inUse) {
-            ACTIVE_INSTANCES.add(this);
-            inUse = true;
-        }
-    }
-
-    @Override
-    public void endWrite() {
-        super.endWrite();
-        if (inUse) {
-            inUse = false;
-            ACTIVE_INSTANCES.remove(this);
-        }
     }
 }

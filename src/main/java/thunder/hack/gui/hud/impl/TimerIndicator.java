@@ -22,31 +22,25 @@ public class TimerIndicator extends HudElement {
     @Override
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        int status;
-        float f4 = 100 / Timer.speed.getValue();
-        float f5 = Math.min(Timer.violation, f4);
-        status = (int) (((f4 - f5) / f4) * 100);
-        status = MathUtility.clamp(status, 0, 100);
-        //FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), status >= 99 ? "100%" : status + "%", getPosX() + 31, getPosY() + 2, new Color(200, 200, 200, 255).getRGB());
+
     }
 
     @Override
     public void onRenderShaders(@NotNull DrawContext context) {
-        Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() + 0.5f, getPosY() + 0.5f, 61, 11, 3, 10);
+        Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), 61, 12, 3);
 
         int status;
         float timerStatus;
 
         float f4 = 100 / Timer.speed.getValue();
         float f5 = Math.min(Timer.violation, f4);
-        timerAnimation.setValue(((f4 - f5) / f4) * 61);
+        timerAnimation.setValue(((f4 - f5) / f4) * 58);
         timerStatus = (float) timerAnimation.getAnimationD();
         status = (int) (((f4 - f5) / f4) * 100);
         status = MathUtility.clamp(status, 0, 100);
-        timerStatus = MathUtility.clamp(timerStatus, 5, 61);
+        timerStatus = MathUtility.clamp(timerStatus, 5, 58);
 
-        Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), 62, 12, HudEditor.hudRound.getValue() - 3f, new Color(1));
-        Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() + 0.5f, getPosY() + 0.5f, (int) timerStatus, 11, HudEditor.hudRound.getValue() - 3f);
+        Render2DEngine.drawGradientRound(context.getMatrices(), getPosX() + 1.5f, getPosY() + 1f, (int) timerStatus, 9, HudEditor.hudRound.getValue() - 4, HudEditor.getColor(90), HudEditor.getColor(180), HudEditor.getColor(0), HudEditor.getColor(270));
         FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), status >= 99 ? "100%" : status + "%", getPosX() + 31, getPosY() + 2, new Color(200, 200, 200, 255).getRGB());
     }
 

@@ -42,7 +42,7 @@ public class HudEditorGui extends Screen {
 
             for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
                 if (category != Module.Category.HUD) continue;
-                ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category),0, x + offset, y, 108, windowHeight);
+                ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category), 0, x + offset, y, 108, windowHeight);
                 window.setOpen(true);
                 windows.add(window);
                 offset += 110;
@@ -80,17 +80,11 @@ public class HudEditorGui extends Screen {
         dWheel = 0;
 
         if (ClickGui.getInstance().msaa.getValue()) {
-            if (!MSAAFramebuffer.framebufferInUse()) {
-                MSAAFramebuffer.use(() -> {
-                    for (AbstractWindow window : windows) {
-                        window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().mainColor.getValue().getColorObject());
-                    }
-                });
-            } else {
+            MSAAFramebuffer.use(true, () -> {
                 for (AbstractWindow window : windows) {
                     window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().mainColor.getValue().getColorObject());
                 }
-            }
+            });
         } else {
             for (AbstractWindow window : windows) {
                 window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().mainColor.getValue().getColorObject());

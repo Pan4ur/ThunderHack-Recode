@@ -1,12 +1,11 @@
 package thunder.hack.gui.hud.impl;
 
+import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.s2c.play.EntityAnimationS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
-import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.PacketEvent;
@@ -42,7 +41,7 @@ public class KillFeed extends HudElement {
 
         Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
         int y_offset = 3;
-        for (String player : players) {
+        for (String player : Lists.newArrayList(players)) {
             FontRenderers.modules.drawString(context.getMatrices(), player, getPosX() + 5, getPosY() + 18 + y_offset, -1, false);
             y_offset += 10;
         }
@@ -53,7 +52,7 @@ public class KillFeed extends HudElement {
         int y_offset1 = 3;
         float scale_x = 20;
 
-        for (String player : players) {
+        for (String player : Lists.newArrayList(players)) {
             if (FontRenderers.modules.getStringWidth(player) > scale_x)
                 scale_x = FontRenderers.modules.getStringWidth(player);
             y_offset1 += 10;
@@ -62,9 +61,7 @@ public class KillFeed extends HudElement {
         vAnimation = AnimationUtility.fast(vAnimation, 20 + y_offset1, 15);
         hAnimation = AnimationUtility.fast(hAnimation, scale_x + 20, 15);
 
-        Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue(), 10);
-        Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, hAnimation + 1, 1 + vAnimation, HudEditor.hudRound.getValue());
-        Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+        Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue());
         setBounds((int) (scale_x + 20), 20 + y_offset1);
     }
 

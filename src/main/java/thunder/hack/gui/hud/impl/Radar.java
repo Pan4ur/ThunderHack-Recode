@@ -51,9 +51,7 @@ public class Radar extends HudElement {
 
     public void onRenderShaders(DrawContext context) {
         if (mode.getValue() == Mode.Rect) {
-            Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), size.getValue(), size.getValue(), HudEditor.hudRound.getValue(), 10);
-            Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, size.getValue() + 1, size.getValue() + 1, HudEditor.hudRound.getValue());
-            Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), size.getValue(), size.getValue(), HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+            Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), size.getValue(), size.getValue(), HudEditor.hudRound.getValue());
 
 
             Render2DEngine.drawRectDumbWay(context.getMatrices(),

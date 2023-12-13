@@ -60,14 +60,10 @@ public class WaterMark extends HudElement {
         String username = ((ModuleManager.media.isEnabled() && Media.nickProtect.getValue()) || ModuleManager.nameProtect.isEnabled()) ? (ModuleManager.nameProtect.isEnabled() ? NameProtect.newName.getValue() : "Protected") : mc.getSession().getUsername();
 
         if (mode.getValue() == Mode.Big) {
-            Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 106, 30, HudEditor.hudRound.getValue(), 10);
-            Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, 107, 31, HudEditor.hudRound.getValue());
-            Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), 106, 30, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+            Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), 106, 30, HudEditor.hudRound.getValue());
         } else if (mode.getValue() == Mode.Small) {
             String info = Formatting.DARK_GRAY + "| " + Formatting.RESET + username + Formatting.DARK_GRAY + " | " + Formatting.RESET + getPing() + " ms" + Formatting.DARK_GRAY + " | " + Formatting.RESET + (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address);
-            Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), FontRenderers.sf_bold.getStringWidth("ThunderHack " + info) + 5, 10, 3, 10);
-            Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 1f, getPosY() - 1f, FontRenderers.sf_bold.getStringWidth("ThunderHack " + info) + 7, 12, 3);
-            Render2DEngine.drawRoundShader(context.getMatrices(), getPosX() - 0.5f, getPosY() - 0.5f, FontRenderers.sf_bold.getStringWidth("ThunderHack " + info) + 6, 11, 3, HudEditor.plateColor.getValue().getColorObject());
+            Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), FontRenderers.sf_bold.getStringWidth("ThunderHack " + info) + 5, 10, 3);
         }
     }
 

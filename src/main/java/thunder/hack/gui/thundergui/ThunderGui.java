@@ -161,18 +161,13 @@ public class ThunderGui extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         if (Module.fullNullCheck()) renderBackground(context, mouseX, mouseY, delta);
-
         context.getMatrices().push();
         mouse_x = mouseX;
         mouse_y = mouseY;
         if (open_animation.getAnimationd() > 0) {
-            if (!MSAAFramebuffer.framebufferInUse()) {
-                MSAAFramebuffer.use(() -> {
-                    renderGui(context, mouseX, mouseY, delta);
-                });
-            } else {
+            MSAAFramebuffer.use(true, () -> {
                 renderGui(context, mouseX, mouseY, delta);
-            }
+            });
         }
         if (open_animation.getAnimationd() <= 0.01 && !open_direction) {
             open_animation = new BetterAnimation();

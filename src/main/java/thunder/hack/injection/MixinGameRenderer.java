@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.player.NoEntityTrace;
@@ -71,7 +72,7 @@ public abstract class MixinGameRenderer {
         Render3DEngine.lastModMat.set(RenderSystem.getModelViewMatrix());
         Render3DEngine.lastWorldSpaceMatrix.set(matrix.peek().getPositionMatrix());
         ThunderHack.moduleManager.onPreRender3D(matrix);
-        MSAAFramebuffer.use(() -> {
+        MSAAFramebuffer.use(false, () -> {
             ThunderHack.moduleManager.onRender3D(matrix);
             BlockAnimationUtility.onRender(matrix);
             Render3DEngine.onRender3D(matrix); // <- не двигать

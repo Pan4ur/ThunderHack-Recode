@@ -31,9 +31,7 @@ import static thunder.hack.modules.Module.mc;
 public class Render2DEngine {
 
     public static TextureColorProgram TEXTURE_COLOR_PROGRAM;
-    public static RoundedGradientProgram ROUNDED_GRADIENT_PROGRAM;
-    public static RoundedProgram ROUNDED_PROGRAM;
-    public static GradientGlowProgram GRADIENT_GLOW_PROGRAM;
+    public static HudShader HUD_SHADER;
     public static MainMenuProgram MAIN_MENU_PROGRAM;
 
     public static final Identifier star = new Identifier("textures/star.png");
@@ -716,14 +714,6 @@ public class Render2DEngine {
         return (int) interpolate(oldValue, newValue, (float) interpolationValue);
     }
 
-    public static void drawRoundShader(MatrixStack matrices, float x, float y, float width, float height, float radius, Color color) {
-        preShaderDraw(matrices, x, y, width, height);
-        ROUNDED_PROGRAM.setParameters(x, y, width, height, radius, color);
-        ROUNDED_PROGRAM.use();
-        Tessellator.getInstance().draw();
-        RenderSystem.disableBlend();
-    }
-
     public static void drawMainMenuShader(MatrixStack matrices, float x, float y, float width, float height) {
         preShaderDraw(matrices, x, y, width, height);
         MAIN_MENU_PROGRAM.setParameters(x, y, width, height);
@@ -732,18 +722,10 @@ public class Render2DEngine {
         RenderSystem.disableBlend();
     }
 
-    public static void drawGradientRoundShader(MatrixStack matrices, Color color1, Color color2, Color color3, Color color4, float x, float y, float width, float height, float radius) {
-        preShaderDraw(matrices, x, y, width, height);
-        ROUNDED_GRADIENT_PROGRAM.setParameters(x, y, width, height, radius, color1, color2, color3, color4);
-        ROUNDED_GRADIENT_PROGRAM.use();
-        Tessellator.getInstance().draw();
-        RenderSystem.disableBlend();
-    }
-
-    public static void drawGradientGlow(MatrixStack matrices, Color color1, Color color2, Color color3, Color color4, float x, float y, float width, float height, float radius, float softness) {
+    public static void drawHudBase(MatrixStack matrices, float x, float y, float width, float height, float radius) {
         preShaderDraw(matrices, x - 10, y - 10, width + 20, height + 20);
-        GRADIENT_GLOW_PROGRAM.setParameters(x, y, width, height, radius, softness, color1, color2, color3, color4);
-        GRADIENT_GLOW_PROGRAM.use();
+        HUD_SHADER.setParameters(x, y, width, height, radius);
+        HUD_SHADER.use();
         Tessellator.getInstance().draw();
         RenderSystem.disableBlend();
     }
@@ -816,9 +798,7 @@ public class Render2DEngine {
     }
 
     public static void initShaders() {
-        ROUNDED_GRADIENT_PROGRAM = new RoundedGradientProgram();
-        ROUNDED_PROGRAM = new RoundedProgram();
-        GRADIENT_GLOW_PROGRAM = new GradientGlowProgram();
+        HUD_SHADER = new HudShader();
         MAIN_MENU_PROGRAM = new MainMenuProgram();
         TEXTURE_COLOR_PROGRAM = new TextureColorProgram();
     }

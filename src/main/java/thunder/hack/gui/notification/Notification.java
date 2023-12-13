@@ -1,7 +1,6 @@
 package thunder.hack.gui.notification;
 
 import net.minecraft.client.util.math.MatrixStack;
-import thunder.hack.cmd.Command;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.Timer;
@@ -82,9 +81,7 @@ public class Notification {
         int x1 = (int) ((mc.getWindow().getScaledWidth() - 6) - width + animationX);
         int y1 = (int) posY;
 
-        Render2DEngine.drawGradientGlow(matrix, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), x1, y1, width, height, 5f, 10);
-        Render2DEngine.drawGradientRoundShader(matrix, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), x1 - 0.5f, y1 - 0.5f, width + 1, height + 1, 5f);
-        Render2DEngine.drawRoundShader(matrix, x1, y1, width, height, 5f, HudEditor.plateColor.getValue().getColorObject());
+        Render2DEngine.drawHudBase(matrix, x1, y1, width, height, 5f);
     }
 
     private boolean isFinished() {

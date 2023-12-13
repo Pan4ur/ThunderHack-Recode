@@ -30,27 +30,18 @@ public class Hotbar extends HudElement {
             int o = mc.getWindow().getScaledHeight() - 16 - 3;
 
             if (mc.player.getOffHandStack().isEmpty()) {
-                Render2DEngine.drawGradientGlow(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 90, mc.getWindow().getScaledHeight() - 25, 180, 20, HudEditor.hudRound.getValue(), 10);
-                Render2DEngine.drawGradientRoundShader(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 90.5f, mc.getWindow().getScaledHeight() - 25.5f, 181, 21, HudEditor.hudRound.getValue());
-                Render2DEngine.drawRoundShader(matrices, i - 90, mc.getWindow().getScaledHeight() - 22 + 1 - 4, 180f, 20, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
-                Render2DEngine.drawRoundShader(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, mc.getWindow().getScaledHeight() - 24, 18, 18, 5f, HudEditor.plateColor.getValue().getColorObject().brighter().brighter().brighter());
+                Render2DEngine.drawHudBase(matrices, i - 90, mc.getWindow().getScaledHeight() - 25, 180, 20, HudEditor.hudRound.getValue());
+                Render2DEngine.drawRound(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, mc.getWindow().getScaledHeight() - 24, 18, 18, 5f, HudEditor.plateColor.getValue().getColorObject().brighter().brighter().brighter());
             } else if (lmode.getValue() == Mode.Merged) {
-                Render2DEngine.drawGradientGlow(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 109, mc.getWindow().getScaledHeight() - 25, 198, 20, HudEditor.hudRound.getValue(), 10);
-                Render2DEngine.drawGradientRoundShader(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 109.5f, mc.getWindow().getScaledHeight() - 25.5f, 199, 21, HudEditor.hudRound.getValue());
-                Render2DEngine.drawRoundShader(matrices, i - 109, mc.getWindow().getScaledHeight() - 22 + 1 - 4, 198f, 20, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
-                Render2DEngine.drawRoundShader(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, mc.getWindow().getScaledHeight() - 24, 18, 18, 5f, HudEditor.plateColor.getValue().getColorObject().brighter().brighter().brighter());
+                Render2DEngine.drawHudBase(matrices, i - 109, mc.getWindow().getScaledHeight() - 25, 198, 20, HudEditor.hudRound.getValue());
+                Render2DEngine.drawRound(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, mc.getWindow().getScaledHeight() - 24, 18, 18, 5f, HudEditor.plateColor.getValue().getColorObject().brighter().brighter().brighter());
                 renderHotbarItem(context, i - 109, o - 5, playerEntity.getOffHandStack());
                 Render2DEngine.verticalGradient(matrices, i - 109 + 18, mc.getWindow().getScaledHeight() - 22 + 1 - 4, i - 108 + 18 - 0.5f, mc.getWindow().getScaledHeight() - 11 + 1 - 4, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
                 Render2DEngine.verticalGradient(matrices, i - 109 + 18, mc.getWindow().getScaledHeight() - 11 - 4, i - 108 + 18 - 0.5f, mc.getWindow().getScaledHeight() - 5, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
             } else {
-                Render2DEngine.drawGradientGlow(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 90, mc.getWindow().getScaledHeight() - 25, 180, 20, HudEditor.hudRound.getValue(), 10);
-                Render2DEngine.drawGradientRoundShader(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 91, mc.getWindow().getScaledHeight() - 22 + 1 - 5, 182, 22, HudEditor.hudRound.getValue());
-                Render2DEngine.drawRoundShader(matrices, i - 90, mc.getWindow().getScaledHeight() - 22 + 1 - 4, 180f, 20, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
-                Render2DEngine.drawRoundShader(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, mc.getWindow().getScaledHeight() - 24, 18, 18, 5f, HudEditor.plateColor.getValue().getColorObject().brighter().brighter().brighter());
-
-                Render2DEngine.drawGradientGlow(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 117, mc.getWindow().getScaledHeight() - 25, 22, 22, HudEditor.hudRound.getValue(), 10);
-                Render2DEngine.drawGradientRoundShader(matrices, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), i - 117, mc.getWindow().getScaledHeight() - 22 + 1 - 5, 22, 22, HudEditor.hudRound.getValue());
-                Render2DEngine.drawRoundShader(matrices, i - 116, mc.getWindow().getScaledHeight() - 22 + 1 - 4, 20f, 20, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
+                Render2DEngine.drawHudBase(matrices,i - 90, mc.getWindow().getScaledHeight() - 25, 180, 20, HudEditor.hudRound.getValue());
+                Render2DEngine.drawRound(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, mc.getWindow().getScaledHeight() - 24, 18, 18, 5f, HudEditor.plateColor.getValue().getColorObject().brighter().brighter().brighter());
+                Render2DEngine.drawHudBase(matrices, i - 117, mc.getWindow().getScaledHeight() - 25, 22, 22, HudEditor.hudRound.getValue());
                 renderHotbarItem(context, i - 114, o - 5, playerEntity.getOffHandStack());
             }
 

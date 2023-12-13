@@ -134,17 +134,11 @@ public class SmallClickUI extends Screen {
         scrollY = 0;
 
         if (ClickGui.getInstance().msaa.getValue()) {
-            if (!MSAAFramebuffer.framebufferInUse()) {
-                MSAAFramebuffer.use(() -> {
-                    for (AbstractWindow window : windows) {
-                        window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().mainColor.getValue().getColorObject());
-                    }
-                });
-            } else {
+            MSAAFramebuffer.use(true, () -> {
                 for (AbstractWindow window : windows) {
                     window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().mainColor.getValue().getColorObject());
                 }
-            }
+            });
         } else {
             for (AbstractWindow window : windows) {
                 window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().mainColor.getValue().getColorObject());

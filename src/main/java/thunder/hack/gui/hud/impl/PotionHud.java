@@ -64,10 +64,7 @@ public class PotionHud extends HudElement {
         vAnimation = AnimationUtility.fast(vAnimation, 20 + y_offset1, 15);
         hAnimation = AnimationUtility.fast(hAnimation, max_width, 15);
 
-        Render2DEngine.drawGradientGlow(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue(), 10);
-        Render2DEngine.drawGradientRoundShader(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX() - 0.5f, getPosY() - 0.5f, hAnimation + 1, 1 + vAnimation, HudEditor.hudRound.getValue());
-        Render2DEngine.drawRoundShader(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue(), HudEditor.plateColor.getValue().getColorObject());
-
+        Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue());
         setBounds((int) max_width, 20 + y_offset1);
     }
 

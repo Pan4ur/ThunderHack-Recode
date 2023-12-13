@@ -44,6 +44,7 @@ public class CommandManager implements IManager {
         add(new ResetBindsCommand());
         add(new InvCleanerCommand());
         add(new ChestStealerCommand());
+        add(new GarbageCleanerCommand());
     }
 
     private void add(Command command) {

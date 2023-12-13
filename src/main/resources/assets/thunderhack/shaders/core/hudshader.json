@@ -5,10 +5,9 @@
     "dstrgb": "1-srcalpha"
   },
   "vertex": "position",
-  "fragment": "thunderhack:gradientglow",
+  "fragment": "thunderhack:hudshader",
   "attributes": [],
-  "samplers": [
-  ],
+  "samplers": [],
   "uniforms": [
     { "name": "ModelViewMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
     { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
@@ -19,6 +18,7 @@
     { "name": "uSize", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] },
     { "name": "uLocation", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] },
     { "name": "radius", "type": "float", "count": 1, "values": [ 1.0] },
-    { "name": "softness", "type": "float", "count": 1, "values": [ 1.0] }
+    { "name": "blend", "type": "float", "count": 1, "values": [ 1.0] },
+    { "name": "alpha", "type": "float", "count": 1, "values": [ 1.0] }
   ]
 }

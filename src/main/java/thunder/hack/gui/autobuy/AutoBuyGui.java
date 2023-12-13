@@ -163,11 +163,7 @@ public class AutoBuyGui extends Screen {
             }
         }
 
-        if (!MSAAFramebuffer.framebufferInUse()) {
-            MSAAFramebuffer.use(() -> renderGui(context, mouseX, mouseY, delta));
-        } else {
-            renderGui(context, mouseX, mouseY, delta);
-        }
+        MSAAFramebuffer.use(true, () -> renderGui(context, mouseX, mouseY, delta));
 
         context.getMatrices().pop();
     }
