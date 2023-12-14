@@ -2,6 +2,7 @@ package thunder.hack.injection;
 
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Shadow;
@@ -31,12 +32,21 @@ import static thunder.hack.modules.Module.mc;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity implements IEntity {
+
+    @Shadow
+    protected abstract BlockPos getVelocityAffectingPos();
+
     @Shadow
     private Box boundingBox;
 
     @Override
     public List<Trails.Trail> thunderHack_Recode$getTrails() {
         return trails;
+    }
+
+    @Override
+    public BlockPos thunderHack_Recode$getVelocityBP() {
+        return getVelocityAffectingPos();
     }
 
     @Unique

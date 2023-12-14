@@ -1,15 +1,27 @@
 package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventMove;
+import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PostPlayerUpdateEvent;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.combat.AntiBot;
+import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.interfaces.IEntity;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
@@ -37,7 +49,7 @@ public class Speed extends Module {
     private thunder.hack.utility.Timer startDelay = new thunder.hack.utility.Timer();
 
     public enum Mode {
-        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage
+        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, FunTime
     }
 
     @Override
@@ -71,6 +83,37 @@ public class Speed extends Module {
             } else if (mc.player.fallDistance > 0 && useTimer.getValue()) {
                 ThunderHack.TICK_TIMER = 1.088f;
                 mc.player.addVelocity(0f, -0.003f, 0f);
+            }
+        }
+
+        if (mode.getValue() == Mode.FunTime) {
+            if((ModuleManager.antiBot.isDisabled() || ModuleManager.antiBot.remove.getValue()) && mc.player.age % 8 == 0)
+                sendMessage(Formatting.GOLD + "Включи AntiBot и убери чек remove!");
+
+            if (ModuleManager.aura.isDisabled() || Aura.target == null) {
+                for (Entity ent : ThunderHack.asyncManager.getAsyncEntities())
+                    if (ent != mc.player && mc.player.squaredDistanceTo(ent) < 49 && AntiBot.bots.contains(ent)) {
+                        mc.player.setPitch(95);
+                        mc.player.setYaw(mc.player.getYaw() + MathUtility.random(-0.5f,0.5f));
+                        break;
+                    }
+            }
+        }
+    }
+
+
+    // засекайте до обновы wild client (not paste)
+    @EventHandler
+    public void modifyVelocity(EventPlayerTravel e) {
+        if (mode.getValue() == Mode.FunTime && !e.isPre()) {
+            for(Entity ent : ThunderHack.asyncManager.getAsyncEntities()) {
+                if(ent != mc.player && mc.player.squaredDistanceTo(ent) <= (AntiBot.bots.contains(ent) ? 4.5f : 2.25)) {
+                    float p = mc.world.getBlockState(((IEntity) mc.player).thunderHack_Recode$getVelocityBP()).getBlock().getSlipperiness();
+                    float f = mc.player.isOnGround() ? p * 0.91f : 0.91f;
+                    float f2 = mc.player.isOnGround() ? p : 0.999f;
+                    mc.player.setVelocity(mc.player.getVelocity().getX() / f * f2, mc.player.getVelocity().getY(), mc.player.getVelocity().getZ() / f * f2);
+                    break;
+                }
             }
         }
     }
