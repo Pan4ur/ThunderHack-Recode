@@ -2,6 +2,7 @@ package thunder.hack.core.impl;
 
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -174,6 +175,23 @@ public class PlayerManager implements IManager {
             }
         }
         return result;
+    }
+
+    public boolean isInWeb() {
+        Box pBox = mc.player.getBoundingBox();
+        BlockPos pBlockPos = BlockPos.ofFloored(mc.player.getPos());
+
+        for (int x = pBlockPos.getX() - 2; x <= pBlockPos.getX() + 2; x++) {
+            for (int y = pBlockPos.getY() - 1; y <= pBlockPos.getY() + 4; y++) {
+                for (int z = pBlockPos.getZ() - 2; z <= pBlockPos.getZ() + 2; z++) {
+                    BlockPos bp = new BlockPos(x, y, z);
+                    if (pBox.intersects(new Box(bp)) && mc.world.getBlockState(bp).getBlock() == Blocks.COBWEB)
+                        return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public HitResult rayTrace(double dst, float yaw, float pitch, double x, double y, double z) {

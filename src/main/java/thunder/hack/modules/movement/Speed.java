@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -91,7 +92,7 @@ public class Speed extends Module {
                 sendMessage(Formatting.GOLD + "Включи AntiBot и убери чек remove!");
 
             if (ModuleManager.aura.isDisabled() || Aura.target == null) {
-                for (Entity ent : ThunderHack.asyncManager.getAsyncEntities())
+                for (PlayerEntity ent : ThunderHack.asyncManager.getAsyncPlayers())
                     if (ent != mc.player && mc.player.squaredDistanceTo(ent) < 49 && AntiBot.bots.contains(ent)) {
                         mc.player.setPitch(95);
                         mc.player.setYaw(mc.player.getYaw() + MathUtility.random(-0.5f,0.5f));
@@ -105,12 +106,12 @@ public class Speed extends Module {
     // засекайте до обновы wild client (not paste)
     @EventHandler
     public void modifyVelocity(EventPlayerTravel e) {
-        if (mode.getValue() == Mode.FunTime && !e.isPre()) {
-            for(Entity ent : ThunderHack.asyncManager.getAsyncEntities()) {
-                if(ent != mc.player && mc.player.squaredDistanceTo(ent) <= (AntiBot.bots.contains(ent) ? 4.5f : 2.25)) {
+        if (mode.getValue() == Mode.FunTime && !e.isPre() && ThunderHack.core.getSetBackTime() > 1000) {
+            for(PlayerEntity ent : ThunderHack.asyncManager.getAsyncPlayers()) {
+                if(ent != mc.player && mc.player.squaredDistanceTo(ent) <= (AntiBot.bots.contains(ent) ? 9f : 2.25)) {
                     float p = mc.world.getBlockState(((IEntity) mc.player).thunderHack_Recode$getVelocityBP()).getBlock().getSlipperiness();
                     float f = mc.player.isOnGround() ? p * 0.91f : 0.91f;
-                    float f2 = mc.player.isOnGround() ? p : 0.999f;
+                    float f2 = mc.player.isOnGround() ? p : 0.99f;
                     mc.player.setVelocity(mc.player.getVelocity().getX() / f * f2, mc.player.getVelocity().getY(), mc.player.getVelocity().getZ() / f * f2);
                     break;
                 }

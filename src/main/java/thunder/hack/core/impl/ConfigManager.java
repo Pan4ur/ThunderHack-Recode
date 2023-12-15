@@ -35,6 +35,7 @@ public class ConfigManager implements IManager {
     public static final String CONFIG_FOLDER_NAME = "ThunderHackRecode";
     public static final File MAIN_FOLDER = new File(mc.runDirectory, CONFIG_FOLDER_NAME);
     public static final File CONFIGS_FOLDER = new File(MAIN_FOLDER, "configs");
+    public static final File AUTOBUY_FOLDER = new File(MAIN_FOLDER, "autobuy");
     public static final File TEMP_FOLDER = new File(MAIN_FOLDER, "temp");
     public static final File MISC_FOLDER = new File(MAIN_FOLDER, "misc");
     public static final File SOUNDS_FOLDER = new File(MISC_FOLDER, "sounds");
@@ -569,6 +570,19 @@ public class ConfigManager implements IManager {
             }
         } catch (Exception ignored) {
         }
+    }
+
+    public List<String> getAutoBuyList() {
+        if (!MAIN_FOLDER.exists() || MAIN_FOLDER.listFiles() == null) return null;
+
+        List<String> list = new ArrayList<>();
+
+        if (AUTOBUY_FOLDER.listFiles() != null) {
+            for (File file : Arrays.stream(Objects.requireNonNull(AUTOBUY_FOLDER.listFiles())).filter(f -> f.getName().endsWith(".txt")).collect(Collectors.toList())) {
+                list.add(file.getName().replace(".txt", ""));
+            }
+        }
+        return list;
     }
 
     public static String ArrayToString(Object[] a) {

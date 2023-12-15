@@ -4,7 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CobwebBlock;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.util.math.Box;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventCollision;
 import thunder.hack.events.impl.PlayerUpdateEvent;
@@ -27,7 +27,7 @@ public class AntiWeb extends Module {
 
     @EventHandler
     public void onPlayerUpdate(PlayerUpdateEvent e) {
-        if (mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos())).getBlock() == Blocks.COBWEB) {
+        if (ThunderHack.playerManager.isInWeb()) {
             if (mode.getValue() == Mode.Timer) {
                 if (mc.player.isOnGround()) ThunderHack.TICK_TIMER = 1f;
                 else ThunderHack.TICK_TIMER = timer.getValue();

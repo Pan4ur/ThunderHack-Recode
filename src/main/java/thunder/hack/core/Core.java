@@ -51,6 +51,7 @@ public final class Core {
     private final Timer skullTimer = new Timer();
     private final Timer lastPacket = new Timer();
     private final Timer autoSave = new Timer();
+    private final Timer setBackTimer = new Timer();
 
     @EventHandler
     @SuppressWarnings("unused")
@@ -136,14 +137,18 @@ public final class Core {
         if (e.getPacket() instanceof GameJoinS2CPacket)
             ThunderHack.moduleManager.onLogin();
 
-        if(e.getPacket() instanceof PlayerPositionLookS2CPacket && autoSave.every(200000)) {
-            FriendManager.saveFriends();
-            ThunderHack.configManager.save(ThunderHack.configManager.getCurrentConfig());
-            ThunderHack.wayPointManager.saveWayPoints();
-            ThunderHack.macroManager.saveMacro();
-            ThunderHack.configManager.saveChestStealer();
-            ThunderHack.configManager.saveInvCleaner();
-            ThunderHack.notificationManager.publicity("AutoSave", isRu() ? "Сохраняю конфиг.." : "Saving config..", 3, Notification.Type.INFO);
+        if(e.getPacket() instanceof PlayerPositionLookS2CPacket) {
+            setBackTimer.reset();
+
+            if(autoSave.every(200000)) {
+                FriendManager.saveFriends();
+                ThunderHack.configManager.save(ThunderHack.configManager.getCurrentConfig());
+                ThunderHack.wayPointManager.saveWayPoints();
+                ThunderHack.macroManager.saveMacro();
+                ThunderHack.configManager.saveChestStealer();
+                ThunderHack.configManager.saveInvCleaner();
+                ThunderHack.notificationManager.publicity("AutoSave", isRu() ? "Сохраняю конфиг.." : "Saving config..", 3, Notification.Type.INFO);
+            }
         }
     }
 
@@ -208,6 +213,10 @@ public final class Core {
         double d0 = mc.player.getX() - bp.getX();
         double d2 = mc.player.getZ() - bp.getZ();
         return (int) (MathHelper.sqrt((float) (d0 * d0 + d2 * d2)));
+    }
+
+    public long getSetBackTime() {
+        return setBackTimer.getPassedTimeMs();
     }
 
     public static float getRotations(Vec2f vec) {

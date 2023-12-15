@@ -179,7 +179,7 @@ public class AutoBuyValue extends SettingElement {
                 }
             }
 
-            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT) || InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT)) {
+            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT) || InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT)) {
                 if (Objects.equals(GLFW.glfwGetKeyName(keyCode, 0), ";")) {
                     Stringnumber = Stringnumber + ":";
                     return;

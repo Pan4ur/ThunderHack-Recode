@@ -3,7 +3,6 @@ package thunder.hack.modules.movement;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
-import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.PlayerUtility;
@@ -26,8 +25,7 @@ public class NoSlow extends Module {
 
         if (mc.player.isUsingItem() && !mc.player.isRiding() && !mc.player.isFallFlying()) {
             switch (mode.getValue()) {
-                case StrictNCP ->
-                        sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+                case StrictNCP -> sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
                 case MusteryGrief -> {
                     if (mc.player.isOnGround() && mc.options.jumpKey.isPressed()) {
                         mc.options.sneakKey.setPressed(true);
@@ -54,6 +52,12 @@ public class NoSlow extends Module {
                     else
                         sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
                 }
+                case Matrix2 -> {
+                    if (mc.player.isOnGround())
+                        if (mc.player.age % 2 == 0)
+                            mc.player.setVelocity(mc.player.getVelocity().x * 0.5f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.5f);
+                    else mc.player.setVelocity(mc.player.getVelocity().x * 0.95f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.95f);
+                }
             }
         }
     }
@@ -67,6 +71,6 @@ public class NoSlow extends Module {
     }
 
     public enum Mode {
-        NCP, StrictNCP, Matrix, Grim, MusteryGrief, FunTime
+        NCP, StrictNCP, Matrix, Grim, MusteryGrief, FunTime, Matrix2
     }
 }
