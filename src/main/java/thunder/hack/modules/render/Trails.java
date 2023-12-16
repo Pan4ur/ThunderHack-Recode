@@ -274,7 +274,10 @@ public class Trails extends Module {
 
             if (y <= -65) break;
             if (e.getVelocity().x == 0 && e.getVelocity().y == 0 && e.getVelocity().z == 0) continue;
-            Render3DEngine.drawLine((float) lastPos.x, (float) lastPos.y, (float) lastPos.z, (float) x, (float) y, (float) z, lmode.getValue() == Mode.Sync ? HudEditor.getColor(i) : lcolor.getValue().getColorObject(), 2);
+
+            int alpha = (int) MathUtility.clamp((255f * (i / 8f)), 0 ,255);
+
+            Render3DEngine.drawLine((float) lastPos.x, (float) lastPos.y, (float) lastPos.z, (float) x, (float) y, (float) z, lmode.getValue() == Mode.Sync ? Render2DEngine.injectAlpha(HudEditor.getColor(i * 5), alpha) : Render2DEngine.injectAlpha(lcolor.getValue().getColorObject(), alpha), 2);
         }
     }
 

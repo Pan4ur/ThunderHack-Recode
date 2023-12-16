@@ -1,5 +1,6 @@
 package thunder.hack.utility.render.animation;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -36,7 +37,7 @@ public class CaptureMark {
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(Render2DEngine.interpolateFloat(prevEspValue, espValue, mc.getTickDelta())));
         RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
         RenderSystem.setShaderTexture(0, Render2DEngine.capture);
         matrices.translate(-0.75, -0.75, -0.01);
@@ -52,6 +53,7 @@ public class CaptureMark {
         immediate.draw();
         RenderSystem.enableCull();
         RenderSystem.disableDepthTest();
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.disableBlend();
     }
 

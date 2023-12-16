@@ -107,7 +107,7 @@ public class Particles extends Module {
         if(mode.getValue() != Mode.Off) {
             stack.push();
             RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
+            RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(false);
             RenderSystem.setShader(() -> TEXTURE_COLOR_PROGRAM.backingProgram);
@@ -116,6 +116,7 @@ public class Particles extends Module {
             particles.forEach(p -> p.render(bufferBuilder));
             BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
             RenderSystem.depthMask(true);
+            RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
             RenderSystem.disableDepthTest();
             RenderSystem.disableBlend();
             stack.pop();

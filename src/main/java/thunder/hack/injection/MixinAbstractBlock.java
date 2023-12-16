@@ -37,19 +37,4 @@ public abstract class MixinAbstractBlock {
         int effect = EnchantmentHelper.getLevel(EFFICIENCY, stack);
         return (float) Math.max(str + (str > 1.0 ? (effect * effect + 1.0) : 0.0), 0.0);
     }
-
-    /*private boolean canHarvestBlock(BlockState state, ItemStack stack) {
-        if (state.isToolRequired()) {
-            return true;
-        }
-        String tool = state.getBlock().getDefaultState()..getHa(state);
-        if (stack.isEmpty() || tool == null) {
-            return mc.player.canHarvest(state);
-        }
-        final int toolLevel = stack.getItem().getHarvestLevel(stack, tool, mc.player, state);
-        if (toolLevel < 0) {
-            return mc.player.canHarvest(state);
-        }
-        return toolLevel >= state.getBlock().getHarvestLevel(state);
-    }*/
 }

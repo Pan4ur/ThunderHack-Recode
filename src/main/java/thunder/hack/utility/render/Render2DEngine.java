@@ -1,5 +1,6 @@
 package thunder.hack.utility.render;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.NativeImage;
@@ -234,7 +235,6 @@ public class Render2DEngine {
         int identifier = (int) (width * height + width * blurRadius);
         if (shadowCache.containsKey(identifier)) {
             shadowCache.get(identifier).bind();
-            RenderSystem.defaultBlendFunc();
         } else {
             BufferedImage original = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB);
             Graphics g = original.getGraphics();
@@ -246,7 +246,9 @@ public class Render2DEngine {
             shadowCache.put(identifier, new BlurredShadow(blurred));
             return;
         }
+
         RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         renderGradientTexture(matrices, x, y, width, height, 0, 0, width, height, width, height, color1, color2, color3, color4);
         RenderSystem.disableBlend();
     }
@@ -517,7 +519,7 @@ public class Render2DEngine {
         RenderSystem.setShaderTexture(0, arrow);
         RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
         RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
         Matrix4f matrix = matrices.peek().getPositionMatrix();
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
@@ -530,6 +532,7 @@ public class Render2DEngine {
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         immediate.draw();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.disableBlend();
     }
 

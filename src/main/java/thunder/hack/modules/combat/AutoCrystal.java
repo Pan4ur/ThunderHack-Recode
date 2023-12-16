@@ -427,7 +427,7 @@ public class AutoCrystal extends Module {
     }
 
     public void attackCrystal(EndCrystalEntity crystal) {
-        if (mc.player == null || mc.world == null || mc.interactionManager == null) return;
+        if (mc.player == null || mc.world == null || mc.interactionManager == null || crystal == null) return;
 
         if (shouldPause() || target == null)
             return;

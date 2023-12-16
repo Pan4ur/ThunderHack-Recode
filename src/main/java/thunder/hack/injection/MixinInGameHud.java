@@ -37,7 +37,7 @@ import static thunder.hack.modules.Module.mc;
 @Mixin(InGameHud.class)
 public abstract class MixinInGameHud {
 
-    @Inject(at = @At(value = "HEAD"), method = "render", cancellable = true)
+    @Inject(at = @At(value = "HEAD"), method = "render")
     public void render(DrawContext context, float tickDelta, CallbackInfo ci) {
         ThunderHack.moduleManager.onRenderShaders(context);
         ThunderHack.notificationManager.onRenderShader(context);
@@ -52,8 +52,6 @@ public abstract class MixinInGameHud {
             ThunderHack.notificationManager.onRender2D(context);
         }
     }
-
-
 
     @Inject(at = @At(value = "HEAD"), method = "renderHotbar", cancellable = true)
     public void renderHotbarCustom(float tickDelta, DrawContext context, CallbackInfo ci) {

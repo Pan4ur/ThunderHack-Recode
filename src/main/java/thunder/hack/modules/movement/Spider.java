@@ -3,15 +3,19 @@ package thunder.hack.modules.movement;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -42,15 +46,36 @@ public class Spider extends Module {
     @Override
     public void onUpdate() {
         if (!mc.player.horizontalCollision) return;
+        if (mc.player.age % 2 == 0 && mc.options.jumpKey.isPressed() && mode.getValue() == Mode.FunTime) {
+            float pitch = mc.player.getPitch();
+            mc.player.setPitch(82);
+            int slot = getAtHotBar();
+            if (slot != -1) {
+                int originalSlot = mc.player.getInventory().selectedSlot;
+                mc.player.getInventory().selectedSlot = slot;
+                sendPacket(new UpdateSelectedSlotC2SPacket(slot));
+
+                mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
+                mc.player.swingHand(Hand.MAIN_HAND);
+
+                mc.player.getInventory().selectedSlot = originalSlot;
+                sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
+            }
+
+            mc.player.setPitch(pitch);
+        }
+
 
         if (mode.getValue() == Mode.Default) {
             mc.player.setVelocity(mc.player.getVelocity().getX(), 0.21, mc.player.getVelocity().getZ());
         } else if (mode.getValue() == Mode.Matrix) {
             mc.player.setOnGround(mc.player.age % delay.getValue() == 0);
             mc.player.prevY -= 2.0E-232;
-            if (mc.player.isOnGround()) mc.player.setVelocity(mc.player.getVelocity().getX(), 0.42, mc.player.getVelocity().getZ());
+            if (mc.player.isOnGround())
+                mc.player.setVelocity(mc.player.getVelocity().getX(), 0.42, mc.player.getVelocity().getZ());
         }
     }
+
 
     @EventHandler
     public void onSync(EventSync event) {
@@ -70,7 +95,7 @@ public class Spider extends Module {
                 BlockPos neighbour = BlockPos.ofFloored(mc.player.getX(), mc.player.getY() + 2, mc.player.getZ()).offset(side);
                 Direction opposite = side.getOpposite();
                 Vec3d hitVec = new Vec3d(neighbour.getX() + 0.5, neighbour.getY() + 0.5, neighbour.getZ() + 0.5).add(new Vec3d(opposite.getUnitVector()).multiply(0.5));
-                sendPacket(new PlayerInteractBlockC2SPacket( Hand.MAIN_HAND, new BlockHitResult(hitVec, opposite, neighbour, false), PlayerUtility.getWorldActionId(mc.world)));
+                sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(hitVec, opposite, neighbour, false), PlayerUtility.getWorldActionId(mc.world)));
                 sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
                 if (mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos()).add(0, 2, 0)).getBlock() != Blocks.AIR) {
                     sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, neighbour, opposite));
@@ -84,7 +109,16 @@ public class Spider extends Module {
         }
     }
 
+    private int getAtHotBar() {
+        for (int i = 0; i < 9; ++i) {
+            ItemStack itemStack = mc.player.getInventory().getStack(i);
+            if (!(itemStack.getItem() == Items.WATER_BUCKET)) continue;
+            return i;
+        }
+        return -1;
+    }
+
     public enum Mode {
-        Default, Matrix, MatrixNew, Blocks
+        Default, Matrix, MatrixNew, Blocks, FunTime
     }
 }

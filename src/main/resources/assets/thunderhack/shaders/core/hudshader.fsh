@@ -31,6 +31,7 @@ void main() {
     float smoothedAlpha = (1.0 - smoothstep(-10, 10, distance)) * color1.a;
     float smoothedAlpha2 = (1.0 - smoothstep(-1., 1., distance)) * color1.a;
 
+
     if (smoothedAlpha2 < 0.5) {
         fragColor = vec4(createGradient((gl_FragCoord.xy - uLocation) / uSize, color1.rgb, color2.rgb, color3.rgb, color4.rgb), smoothedAlpha);
     } else {

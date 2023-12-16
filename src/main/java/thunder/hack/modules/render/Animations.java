@@ -62,10 +62,12 @@ public class Animations extends Module {
     }
 
     private void renderSwordAnimation(MatrixStack matrices, float m, float f, boolean bl2, float swingProgress, float equipProgress, Arm arm) {
-        if(arm == Arm.LEFT) {
-            matrices.translate(0, 0, 0);
+        if(arm == Arm.LEFT && (mode.getValue() == Mode.Eleven || mode.getValue() == Mode.Ten || mode.getValue() == Mode.Nine || mode.getValue() == Mode.Three)) {
+           // matrices.translate(0, 0, 0);
             applyEquipOffset(matrices, arm, equipProgress);
+            matrices.translate(-ModuleManager.viewModel.positionMainX.getValue(), ModuleManager.viewModel.positionMainY.getValue(), ModuleManager.viewModel.positionMainZ.getValue());
             applySwingOffset(matrices, arm, swingProgress);
+            matrices.translate(ModuleManager.viewModel.positionMainX.getValue(), -ModuleManager.viewModel.positionMainY.getValue(), -ModuleManager.viewModel.positionMainZ.getValue());
             return;
         }
 
@@ -73,25 +75,26 @@ public class Animations extends Module {
             case Default -> {
                 matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, equipProgress);
+                matrices.translate(ModuleManager.viewModel.positionMainX.getValue(), ModuleManager.viewModel.positionMainY.getValue(), ModuleManager.viewModel.positionMainZ.getValue());
                 applySwingOffset(matrices, arm, swingProgress);
+                matrices.translate(-ModuleManager.viewModel.positionMainX.getValue(), -ModuleManager.viewModel.positionMainY.getValue(), -ModuleManager.viewModel.positionMainZ.getValue());
             }
             case One -> {
                 float n = -0.4F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
-                matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, n);
                 int i = arm == Arm.RIGHT ? 1 : -1;
-
+                matrices.translate(ModuleManager.viewModel.positionMainX.getValue(), ModuleManager.viewModel.positionMainY.getValue(), ModuleManager.viewModel.positionMainZ.getValue());
                 float f1 = MathHelper.sin(swingProgress * swingProgress * 3.1415927F);
                 matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) i * (45.0F + f1 * -20.0F)));
                 float g = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
                 matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) i * g * -20.0F));
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(g * 0.0F));
                 matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) i * -45.0F));
+                matrices.translate(-ModuleManager.viewModel.positionMainX.getValue(), -ModuleManager.viewModel.positionMainY.getValue(), -ModuleManager.viewModel.positionMainZ.getValue());
             }
             case Two -> {
                 matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, 0.2F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 6.2831855F));
-               // 12 timer
             }
             case Three -> {
                 float n = -0.4F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
@@ -99,64 +102,76 @@ public class Animations extends Module {
                 matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, n);
                 int i = arm == Arm.RIGHT ? 1 : -1;
+                matrices.translate(ModuleManager.viewModel.positionMainX.getValue(), ModuleManager.viewModel.positionMainY.getValue(), ModuleManager.viewModel.positionMainZ.getValue());
                 matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) i * (45.0F + f * -20.0F)));
                 matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) i * g * -70.0F));
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-70f));
                 matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) i * -45.0F));
+                matrices.translate(-ModuleManager.viewModel.positionMainX.getValue(), -ModuleManager.viewModel.positionMainY.getValue(), -ModuleManager.viewModel.positionMainZ.getValue());
             }
             case Four -> {
                 matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, 0);
+                matrices.translate(ModuleManager.viewModel.positionMainX.getValue(), ModuleManager.viewModel.positionMainY.getValue(), ModuleManager.viewModel.positionMainZ.getValue());
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(swingProgress > 0 ? -MathHelper.sin(swingProgress * 13f) * 37f : 0));
+                matrices.translate(-ModuleManager.viewModel.positionMainX.getValue(), -ModuleManager.viewModel.positionMainY.getValue(), -ModuleManager.viewModel.positionMainZ.getValue());
             }
-
             case Five -> {
                 matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, 0);
                 int i = arm == Arm.RIGHT ? 1 : -1;
                 float g = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
+                matrices.translate(ModuleManager.viewModel.positionMainX.getValue(), ModuleManager.viewModel.positionMainY.getValue(), ModuleManager.viewModel.positionMainZ.getValue());
                 matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) i * g * -20.0F));
+                matrices.translate(-ModuleManager.viewModel.positionMainX.getValue(), -ModuleManager.viewModel.positionMainY.getValue(), -ModuleManager.viewModel.positionMainZ.getValue());
             }
             case Six -> {
                 matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, equipProgress);
+                matrices.translate(ModuleManager.viewModel.positionMainX.getValue(), ModuleManager.viewModel.positionMainY.getValue(), ModuleManager.viewModel.positionMainZ.getValue());
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(swingProgress * (flip ? 360.0F : -360)));
+                matrices.translate(-ModuleManager.viewModel.positionMainX.getValue(), -ModuleManager.viewModel.positionMainY.getValue(), -ModuleManager.viewModel.positionMainZ.getValue());
             }
             case Eight -> {
                 matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, equipProgress);
+                matrices.translate(ModuleManager.viewModel.positionMainX.getValue(), ModuleManager.viewModel.positionMainY.getValue(), ModuleManager.viewModel.positionMainZ.getValue());
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(swingProgress * -360));
+                matrices.translate(-ModuleManager.viewModel.positionMainX.getValue(), -ModuleManager.viewModel.positionMainY.getValue(), -ModuleManager.viewModel.positionMainZ.getValue());
             }
             case Seven -> {
                 matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, equipProgress);
-
                 float a = -MathHelper.sin(swingProgress * 3f) / 2f + 1f;
                 matrices.scale(a, a, a);
             }
             case Nine -> {
                 float g = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
-                matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, 0);
+                matrices.translate(ModuleManager.viewModel.positionMainX.getValue(), ModuleManager.viewModel.positionMainY.getValue(), ModuleManager.viewModel.positionMainZ.getValue());
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(50f));
                 matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-30f * (1f-g) - 30f));
                 matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(110f));
+                matrices.translate(-ModuleManager.viewModel.positionMainX.getValue(), -ModuleManager.viewModel.positionMainY.getValue(), -ModuleManager.viewModel.positionMainZ.getValue());
             }
             case Ten -> {
                 float g = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
                 matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, 0);
+                matrices.translate(ModuleManager.viewModel.positionMainX.getValue(), ModuleManager.viewModel.positionMainY.getValue(), ModuleManager.viewModel.positionMainZ.getValue());
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(50f));
                 matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-60f * g - 50));
                 matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(110f));
+                matrices.translate(-ModuleManager.viewModel.positionMainX.getValue(), -ModuleManager.viewModel.positionMainY.getValue(), -ModuleManager.viewModel.positionMainZ.getValue());
             }
             case Eleven -> {
                 float g = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
-                matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, 0);
+                matrices.translate(ModuleManager.viewModel.positionMainX.getValue(), ModuleManager.viewModel.positionMainY.getValue(), ModuleManager.viewModel.positionMainZ.getValue());
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(50f));
                 matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-60f));
                 matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(110f + 20f * g));
+                matrices.translate(-ModuleManager.viewModel.positionMainX.getValue(), -ModuleManager.viewModel.positionMainY.getValue(), -ModuleManager.viewModel.positionMainZ.getValue());
             }
         }
     }

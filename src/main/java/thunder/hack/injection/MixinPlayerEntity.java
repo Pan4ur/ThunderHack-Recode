@@ -61,6 +61,9 @@ public class MixinPlayerEntity {
 
     @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
     private void onTravelhookPre(Vec3d movementInput, CallbackInfo ci) {
+        if(mc.player == null)
+            return;
+
         final EventPlayerTravel event = new EventPlayerTravel(movementInput, true);
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
@@ -72,6 +75,8 @@ public class MixinPlayerEntity {
 
     @Inject(method = "travel", at = @At("RETURN"), cancellable = true)
     private void onTravelhookPost(Vec3d movementInput, CallbackInfo ci) {
+        if(mc.player == null)
+            return;
         final EventPlayerTravel event = new EventPlayerTravel(movementInput, false);
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {

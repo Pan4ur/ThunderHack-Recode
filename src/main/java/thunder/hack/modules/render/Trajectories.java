@@ -137,26 +137,22 @@ public class Trajectories extends Module {
                 motionZ *= 0.99;
             }
 
-            if (item instanceof BowItem) {
-                motionY -= 0.05000000074505806;
-            } else if (mc.player.getMainHandStack().getItem() instanceof CrossbowItem) {
-                motionY -= 0.05000000074505806;
-            } else {
-                motionY -= 0.03f;
-            }
+            if (item instanceof BowItem) motionY -= 0.05000000074505806;
+            else if (mc.player.getMainHandStack().getItem() instanceof CrossbowItem) motionY -= 0.05000000074505806;
+            else motionY -= 0.03f;
+
 
             Vec3d pos = new Vec3d(x, y, z);
 
-
             for (Entity ent : mc.world.getEntities()) {
                 if (ent instanceof ArrowEntity || ent.equals(mc.player)) continue;
-                if (ent.getBoundingBox().intersects(new Box(x - 0.3, y - 0.3, z - 0.3, x + 0.3, y + 0.3, z + 0.2))) {
+                if (ent.getBoundingBox().intersects(new Box(x - 0.3, y - 0.3, z - 0.3, x + 0.3, y + 0.3, z + 0.3))) {
                     Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(
                             ent.getBoundingBox(),
-                            lmode.getValue() == Mode.Sync ? HudEditor.getColor(i) : lcolor.getValue().getColorObject(),
+                            lmode.getValue() == Mode.Sync ? HudEditor.getColor(i * 10) : lcolor.getValue().getColorObject(),
                             2f));
                     Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(
-                            ent.getBoundingBox(), lmode.getValue() == Mode.Sync ? Render2DEngine.injectAlpha(HudEditor.getColor(i), 100) : lcolor.getValue().getColorObject()
+                            ent.getBoundingBox(), lmode.getValue() == Mode.Sync ? Render2DEngine.injectAlpha(HudEditor.getColor(i * 10), 100) : lcolor.getValue().getColorObject()
                     ));
                     break;
                 }
@@ -165,10 +161,10 @@ public class Trajectories extends Module {
             BlockHitResult bhr = mc.world.raycast(new RaycastContext(lastPos, pos, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
             if (bhr != null && bhr.getType() == HitResult.Type.BLOCK) {
                 Render3DEngine.OUTLINE_SIDE_QUEUE.add(new Render3DEngine.OutlineSideAction(
-                        new Box(bhr.getBlockPos()), lmode.getValue() == Mode.Sync ? HudEditor.getColor(i) : lcolor.getValue().getColorObject(), 2f, bhr.getSide()
+                        new Box(bhr.getBlockPos()), lmode.getValue() == Mode.Sync ? HudEditor.getColor(i * 10) : lcolor.getValue().getColorObject(), 2f, bhr.getSide()
                 ));
                 Render3DEngine.FILLED_SIDE_QUEUE.add(new Render3DEngine.FillSideAction(
-                        new Box(bhr.getBlockPos()), lmode.getValue() == Mode.Sync ? Render2DEngine.injectAlpha(HudEditor.getColor(i), 100) : lcolor.getValue().getColorObject(), bhr.getSide()
+                        new Box(bhr.getBlockPos()), lmode.getValue() == Mode.Sync ? Render2DEngine.injectAlpha(HudEditor.getColor(i * 10), 100) : lcolor.getValue().getColorObject(), bhr.getSide()
                 ));
                 break;
             }

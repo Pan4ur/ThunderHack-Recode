@@ -14,15 +14,12 @@ public class ViewModel extends Module {
         super("ViewModel", Category.RENDER);
     }
 
+    public final Setting<Float> scale = new Setting<>("Scale", 1f, 0.1f, 1.5f);
+    public final Setting<Float> positionMainX = new Setting<>("positionMainX", 0f, -3.0f, 3f);
+    public final Setting<Float> positionMainY = new Setting<>("positionMainY", 0f, -3.0f, 3f);
+    public final Setting<Float> positionMainZ = new Setting<>("positionMainZ", 0f, -3.0f, 3f);
+
     public final Setting<Parent> mainHand = new Setting<>("MainHand", new Parent(false, 0));
-    public final Setting<Parent> scaleMain = new Setting<>("Scale", new Parent(false, 1)).withParent(mainHand);
-    public final Setting<Float> scaleMainX = new Setting<>("scaleMainX", 1f, 0.1f, 5f).withParent(scaleMain);
-    public final Setting<Float> scaleMainY = new Setting<>("scaleMainY", 1f, 0.1f, 5f).withParent(scaleMain);
-    public final Setting<Float> scaleMainZ = new Setting<>("scaleMainZ", 1f, 0.1f, 5f).withParent(scaleMain);
-    public final Setting<Parent> positionMain = new Setting<>("Position", new Parent(false, 1)).withParent(mainHand);
-    public final Setting<Float> positionMainX = new Setting<>("positionMainX", 0f, -3.0f, 3f).withParent(positionMain);
-    public final Setting<Float> positionMainY = new Setting<>("positionMainY", 0f, -3.0f, 3f).withParent(positionMain);
-    public final Setting<Float> positionMainZ = new Setting<>("positionMainZ", 0f, -3.0f, 3f).withParent(positionMain);
     public final Setting<Parent> rotationMain = new Setting<>("Rotation", new Parent(false, 1)).withParent(mainHand);
     public final Setting<Float> rotationMainX = new Setting<>("rotationMainX", 0f, -180.0f, 180f).withParent(rotationMain);
     public final Setting<Float> rotationMainY = new Setting<>("rotationMainY", 0f, -180.0f, 180f).withParent(rotationMain);
@@ -34,14 +31,6 @@ public class ViewModel extends Module {
     public final Setting<Float> speedAnimateMain = new Setting<>("speedAnimateMain", 1f, 1f, 5f).withParent(rotationMain);
 
     public final Setting<Parent> offHand = new Setting<>("OffHand", new Parent(false, 0));
-    public final Setting<Parent> scaleOff = new Setting<>("ScaleOff", new Parent(false, 1)).withParent(offHand);
-    public final Setting<Float> scaleOffX = new Setting<>("scaleOffX", 1f, 0.1f, 5f).withParent(scaleOff);
-    public final Setting<Float> scaleOffY = new Setting<>("scaleOffY", 1f, 0.1f, 5f).withParent(scaleOff);
-    public final Setting<Float> scaleOffZ = new Setting<>("scaleOffZ", 1f, 0.1f, 5f).withParent(scaleOff);
-    public final Setting<Parent> positionOff = new Setting<>("PositionOff", new Parent(false, 1)).withParent(offHand);
-    public final Setting<Float> positionOffX = new Setting<>("positionOffX", 0f, -3.0f, 3f).withParent(positionOff);
-    public final Setting<Float> positionOffY = new Setting<>("positionOffY", 0f, -3.0f, 3f).withParent(positionOff);
-    public final Setting<Float> positionOffZ = new Setting<>("positionOffZ", 0f, -3.0f, 3f).withParent(positionOff);
     public final Setting<Parent> rotationOff = new Setting<>("RotationOff", new Parent(false, 1)).withParent(offHand);
     public final Setting<Float> rotationOffX = new Setting<>("rotationOffX", 0f, -180.0f, 180f).withParent(rotationOff);
     public final Setting<Float> rotationOffY = new Setting<>("rotationOffY", 0f, -180.0f, 180f).withParent(rotationOff);
@@ -69,7 +58,7 @@ public class ViewModel extends Module {
             if (animateMainZ.getValue())
                 rotationMainZ.setValue((float) changeRotate(rotationMainZ.getValue(), speedAnimateMain.getValue()));
             event.getStack().translate(positionMainX.getValue(), positionMainY.getValue(), positionMainZ.getValue());
-            event.getStack().scale(scaleMainX.getValue(), scaleMainY.getValue(), scaleMainZ.getValue());
+            event.getStack().scale(scale.getValue(), scale.getValue(), scale.getValue());
             event.getStack().multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotationMainX.getValue()));
             event.getStack().multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotationMainY.getValue()));
             event.getStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotationMainZ.getValue()));
@@ -80,8 +69,8 @@ public class ViewModel extends Module {
                 rotationOffY.setValue((float) changeRotate(rotationOffY.getValue(), speedAnimateOff.getValue()));
             if (animateOffZ.getValue())
                 rotationOffZ.setValue((float) changeRotate(rotationOffZ.getValue(), speedAnimateOff.getValue()));
-            event.getStack().translate(positionOffX.getValue(), positionOffY.getValue(), positionOffZ.getValue());
-            event.getStack().scale(scaleOffX.getValue(), scaleOffY.getValue(), scaleOffZ.getValue());
+            event.getStack().translate(-positionMainX.getValue(), positionMainY.getValue(), positionMainZ.getValue());
+            event.getStack().scale(scale.getValue(), scale.getValue(), scale.getValue());
             event.getStack().multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotationOffX.getValue()));
             event.getStack().multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotationOffY.getValue()));
             event.getStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotationOffZ.getValue()));

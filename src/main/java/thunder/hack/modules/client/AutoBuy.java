@@ -37,7 +37,7 @@ public class AutoBuy extends Module {
         super("AutoBuy", Category.CLIENT);
     }
 
-    public final Setting<Float> shulkerMultiplier = new Setting<>("ShulkerMultiplier", 5f, 1f, 100f);
+    public final Setting<Float> shulkerMultiplier = new Setting<>("ShulkerMultiplier", 1.5f, 1f, 5f);
     public final Setting<Bind> openGui = new Setting<>("OpenGui", new Bind(-1, false, false));
     public final Setting<String> command = new Setting<>("Command", "ah");
     public final Setting<Integer> minDelay = new Setting<>("MinUpdateDelay", 400, 50, 1000);
@@ -49,13 +49,14 @@ public class AutoBuy extends Module {
     private final Timer reAhTimer = new Timer();
     private final Timer buyTimer = new Timer();
     private final Timer fakeItemTimeout = new Timer();
+    private final Timer chatTimer = new Timer();
 
     private Pair<ItemStack, Integer> lastStack;
 
     public static final ArrayList<AutoBuyItem> items = new ArrayList<>();
     public static final ArrayList<ItemLog> log = new ArrayList<>();
 
-    private int updateCount;
+    private int updateCount, messageCount;
     private static boolean active;
     public static int successfully;
 
@@ -97,6 +98,10 @@ public class AutoBuy extends Module {
 
     @Override
     public void onRender3D(MatrixStack stack) {
+        if(chatTimer.passedMs(2500)) {
+            messageCount = 0;
+        }
+
         if (!active)
             return;
 
@@ -116,7 +121,7 @@ public class AutoBuy extends Module {
         }
 
         if (mc.currentScreen == null && reAhTimer.every(ServerManager.getPing() + 100))
-            mc.player.networkHandler.sendChatCommand(command.getValue());
+            openAh(null, command.getValue());
 
         if (mc.player.currentScreenHandler instanceof GenericContainerScreenHandler chest) {
             if (mc.currentScreen.getTitle().getString().contains("(")) {
@@ -145,7 +150,7 @@ public class AutoBuy extends Module {
                             lastStack = new Pair<>(itemStack, price);
                             sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                             mc.player.closeScreen();
-                            mc.player.networkHandler.sendChatCommand("ah " + seller);
+                            openAh(seller, null);
                             updateCount = 0;
                             reAhTimer.setMs(-800);
                             fakeItemTimeout.reset();
@@ -165,16 +170,35 @@ public class AutoBuy extends Module {
         }
     }
 
+    private void openAh(String seller, String command)  {
+        if(messageCount > 4)
+            return;
+
+        if(seller != null)
+            mc.player.networkHandler.sendChatCommand("ah " + seller);
+        else
+            mc.player.networkHandler.sendChatCommand(command);
+
+        messageCount++;
+        chatTimer.reset();
+    }
+
     public boolean isGoodDeal(ItemStack is, int price, NbtList lore) {
         if (is.getItem() instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
+            boolean empty = true;
             NbtCompound compoundTag = is.getSubNbt("BlockEntityTag");
             DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(27, ItemStack.EMPTY);
             if (compoundTag != null) {
                 Inventories.readNbt(compoundTag, itemStacks);
-                for (ItemStack s : itemStacks)
+                for (ItemStack s : itemStacks) {
                     if (isGoodDeal(s, (int) (price * shulkerMultiplier.getValue()), lore))
                         return true;
+                    if(!s.isEmpty())
+                        empty = false;
+                }
             }
+            if(empty)
+                return false;
         }
 
         for (AutoBuyItem abItem : items)
