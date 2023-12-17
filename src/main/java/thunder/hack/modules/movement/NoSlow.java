@@ -14,7 +14,7 @@ public class NoSlow extends Module {
 
     public static final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
     private final Setting<Boolean> mainHand = new Setting<>("MainHand", true, v -> mode.getValue() == Mode.Grim || mode.getValue() == Mode.MusteryGrief);
-    private boolean returnSneak;
+    private boolean returnSneak, skip;
 
     @Override
     public void onUpdate() {
@@ -47,10 +47,12 @@ public class NoSlow extends Module {
                         mc.player.setVelocity(mc.player.getVelocity().x * 0.95f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.95f);
                 }
                 case FunTime -> {
-                    if (mc.player.getActiveHand() == Hand.OFF_HAND)
-                        sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
-                    else
+                    if (mc.player.getActiveHand() == Hand.OFF_HAND) {
+                        sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot % 8 + 1));
+                        sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+                    } else if (mainHand.getValue() && (mc.player.getItemUseTime() <= 3 || mc.player.age % 2 == 0)) {
                         sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                    }
                 }
                 case Matrix2 -> {
                     if (mc.player.isOnGround())
@@ -59,7 +61,7 @@ public class NoSlow extends Module {
                     else mc.player.setVelocity(mc.player.getVelocity().x * 0.95f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.95f);
                 }
             }
-        }
+        } else skip = false;
     }
 
     public boolean canNoSlow() {

@@ -16,13 +16,11 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector4d;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -50,8 +48,10 @@ public class NameTags extends Module {
     private final Setting<Boolean> pops = new Setting<>("TotemPops", true);
     private final Setting<Boolean> outline = new Setting<>("Outline", true);
     private final Setting<Boolean> enchantss = new Setting<>("Enchants", true);
-  //  private final Setting<Boolean> potions = new Setting<>("Potions", true);
-  //  private final Setting<Boolean> box = new Setting<>("Box", true);
+    private final Setting<Boolean> onlyHands = new Setting<>("OnlyHands", false, v -> enchantss.getValue());
+
+    private final Setting<Boolean> potions = new Setting<>("Potions", true);
+    //  private final Setting<Boolean> box = new Setting<>("Box", true);
     private final Setting<ColorSetting> fillColorA = new Setting<>("Color", new ColorSetting(0x80000000));
 
     public static final Setting<Font> font = new Setting<>("FontMode", Font.Fancy);
@@ -96,9 +96,11 @@ public class NameTags extends Module {
 
             final_string += (ent.getDisplayName().getString()) + " ";
 
-            if (health.getValue()) final_string += getHealthColor(ent) + round2(ent.getAbsorptionAmount() + ent.getHealth()) + " ";
+            if (health.getValue())
+                final_string += getHealthColor(ent) + round2(ent.getAbsorptionAmount() + ent.getHealth()) + " ";
             if (distance.getValue()) final_string += String.format("%.1f", mc.player.distanceTo(ent)) + "m ";
-            if (pops.getValue() && ThunderHack.combatManager.getPops(ent) != 0) final_string += (Formatting.RESET + "" + ThunderHack.combatManager.getPops(ent));
+            if (pops.getValue() && ThunderHack.combatManager.getPops(ent) != 0)
+                final_string += (Formatting.RESET + "" + ThunderHack.combatManager.getPops(ent));
 
             if (position != null) {
                 double posX = position.x;
@@ -130,70 +132,75 @@ public class NameTags extends Module {
                 context.getMatrices().translate(-(tagX - 2 + (textWidth + 4) / 2f), -(float) ((posY - 13f) + 6.5f), 0);
 
                 float item_offset = 0;
-                if (armorMode.getValue() != Armor.None) for (ItemStack armorComponent : stacks) {
-                    if (!armorComponent.isEmpty()) {
-                        if (armorMode.getValue() == Armor.Full) {
-                            context.getMatrices().push();
-                            context.getMatrices().translate(posX - 55 + item_offset, (float) (posY - 35f), 0);
-                            context.getMatrices().scale(1.1f, 1.1f, 1.1f);
-                            DiffuseLighting.disableGuiDepthLighting();
-                            context.drawItem(armorComponent, 0, 0);
-                            context.drawItemInSlot(mc.textRenderer, armorComponent, 0, 0);
-                            context.getMatrices().pop();
-                        } else {
-                            context.getMatrices().push();
-                            context.getMatrices().translate(posX - 35 + item_offset, (float) (posY - 20), 0);
-                            context.getMatrices().scale(0.7f, 0.7f, 0.7f);
-
-                            float durability = armorComponent.getMaxDamage() - armorComponent.getDamage();
-                            int percent = (int) ((durability / (float) armorComponent.getMaxDamage()) * 100F);
-
-                            Color color;
-                            if (percent < 33) {
-                                color = Color.RED;
-                            } else if (percent > 33 && percent < 66) {
-                                color = Color.YELLOW;
-                            } else {
-                                color = Color.GREEN;
-                            }
-                            context.drawText(mc.textRenderer, percent + "%", 0, 0, color.getRGB(), false);
-                            context.getMatrices().pop();
-                        }
-
-                        float enchantmentY = 0;
-
-                        NbtList enchants = armorComponent.getEnchantments();
-                        if (enchantss.getValue()) for (int index = 0; index < enchants.size(); ++index) {
-                            String id = enchants.getCompound(index).getString("id");
-                            short level = enchants.getCompound(index).getShort("lvl");
-                            String encName = " ";
-
-                            switch (id) {
-                                case "minecraft:blast_protection", "blast_protection" -> encName = "B" + level;
-                                case "minecraft:protection", "protection" -> encName = "P" + level;
-                                case "minecraft:thorns", "thorns" -> encName = "T" + level;
-                                case "minecraft:sharpness", "sharpness" -> encName = "S" + level;
-                                case "minecraft:efficiency", "efficiency" -> encName = "E" + level;
-                                case "minecraft:unbreaking", "unbreaking" -> encName = "U" + level;
-                                case "minecraft:power", "power" -> encName = "PO" + level;
-                                default -> {
-                                    continue;
-                                }
-                            }
-
-                            if (font.getValue() == Font.Fancy) {
-                                FontRenderers.sf_bold.drawString(context.getMatrices(), encName, posX - 50 + item_offset, (float) posY - 45 + enchantmentY, -1);
+                if (armorMode.getValue() != Armor.None)
+                    for (ItemStack armorComponent : stacks) {
+                        if (!armorComponent.isEmpty()) {
+                            if (armorMode.getValue() == Armor.Full) {
+                                context.getMatrices().push();
+                                context.getMatrices().translate(posX - 55 + item_offset, (float) (posY - 35f), 0);
+                                context.getMatrices().scale(1.1f, 1.1f, 1.1f);
+                                DiffuseLighting.disableGuiDepthLighting();
+                                context.drawItem(armorComponent, 0, 0);
+                                context.drawItemInSlot(mc.textRenderer, armorComponent, 0, 0);
+                                context.getMatrices().pop();
                             } else {
                                 context.getMatrices().push();
-                                context.getMatrices().translate((posX - 50f + item_offset), (posY - 45f + enchantmentY), 0);
-                                context.drawText(mc.textRenderer, encName, 0, 0, -1, false);
+                                context.getMatrices().translate(posX - 35 + item_offset, (float) (posY - 20), 0);
+                                context.getMatrices().scale(0.7f, 0.7f, 0.7f);
+
+                                float durability = armorComponent.getMaxDamage() - armorComponent.getDamage();
+                                int percent = (int) ((durability / (float) armorComponent.getMaxDamage()) * 100F);
+
+                                Color color;
+                                if (percent < 33) {
+                                    color = Color.RED;
+                                } else if (percent > 33 && percent < 66) {
+                                    color = Color.YELLOW;
+                                } else {
+                                    color = Color.GREEN;
+                                }
+                                context.drawText(mc.textRenderer, percent + "%", 0, 0, color.getRGB(), false);
                                 context.getMatrices().pop();
                             }
-                            enchantmentY -= 8;
+
+                            float enchantmentY = 0;
+
+                            NbtList enchants = armorComponent.getEnchantments();
+                            if (enchantss.getValue()) {
+                                if(!onlyHands.getValue() || (armorComponent == ent.getOffHandStack() || armorComponent == ent.getMainHandStack())) {
+                                    for (int index = 0; index < enchants.size(); ++index) {
+                                        String id = enchants.getCompound(index).getString("id");
+                                        short level = enchants.getCompound(index).getShort("lvl");
+                                        String encName = " ";
+
+                                        switch (id) {
+                                            case "minecraft:blast_protection", "blast_protection" -> encName = "B" + level;
+                                            case "minecraft:protection", "protection" -> encName = "P" + level;
+                                            case "minecraft:thorns", "thorns" -> encName = "T" + level;
+                                            case "minecraft:sharpness", "sharpness" -> encName = "S" + level;
+                                            case "minecraft:efficiency", "efficiency" -> encName = "E" + level;
+                                            case "minecraft:unbreaking", "unbreaking" -> encName = "U" + level;
+                                            case "minecraft:power", "power" -> encName = "PO" + level;
+                                            default -> {
+                                                continue;
+                                            }
+                                        }
+
+                                        if (font.getValue() == Font.Fancy) {
+                                            FontRenderers.sf_bold.drawString(context.getMatrices(), encName, posX - 50 + item_offset, (float) posY - 45 + enchantmentY, -1);
+                                        } else {
+                                            context.getMatrices().push();
+                                            context.getMatrices().translate((posX - 50f + item_offset), (posY - 45f + enchantmentY), 0);
+                                            context.drawText(mc.textRenderer, encName, 0, 0, -1, false);
+                                            context.getMatrices().pop();
+                                        }
+                                        enchantmentY -= 8;
+                                    }
+                                }
+                            }
                         }
+                        item_offset += 18f;
                     }
-                    item_offset += 18f;
-                }
 
                 Render2DEngine.drawRect(context.getMatrices(), tagX - 2, (float) (posY - 13f), textWidth + 4, 11, fillColorA.getValue().getColorObject());
 
@@ -214,7 +221,7 @@ public class NameTags extends Module {
                 }
                 context.getMatrices().pop();
 
-            //    if (box.getValue()) drawBox(ent, context);
+                //    if (box.getValue()) drawBox(ent, context);
             }
         }
 
@@ -234,10 +241,11 @@ public class NameTags extends Module {
                     position.y = Math.min(vector.y, position.y);
                     position.z = Math.max(vector.x, position.z);
                 }
-                if (spawner.getLogic() == null || spawner.getLogic().getRenderedEntity(mc.world, spawner.getPos()) == null) continue;
+                if (spawner.getLogic() == null || spawner.getLogic().getRenderedEntity(mc.world, spawner.getPos()) == null)
+                    continue;
                 String final_string = spawner.getLogic().getRenderedEntity(mc.world, spawner.getPos()).getName().getString() + " " + String.format("%.1f", ((float) spawner.getLogic().spawnDelay / 20f)) + "s";
 
-                if(spawner.getLogic().getRotation() == spawner.getLogic().getLastRotation() && spawner.getLogic().getRotation() == 0f && (float) spawner.getLogic().spawnDelay / 20f == 1f)
+                if (spawner.getLogic().getRotation() == spawner.getLogic().getLastRotation() && spawner.getLogic().getRotation() == 0f && (float) spawner.getLogic().spawnDelay / 20f == 1f)
                     final_string = spawner.getLogic().getRenderedEntity(mc.world, spawner.getPos()).getName().getString() + " loot!";
 
 
@@ -312,7 +320,6 @@ public class NameTags extends Module {
     }
 
 
-
     public void drawPotions(MatrixStack matrices, @NotNull PlayerEntity entity, float posX, float posY) {
         ArrayList<StatusEffectInstance> effects = new ArrayList<>(entity.getStatusEffects());
 
@@ -380,7 +387,7 @@ public class NameTags extends Module {
     }
 
     public static float round2(float value) {
-        if(Float.isNaN(value) || Float.isInfinite(value))
+        if (Float.isNaN(value) || Float.isInfinite(value))
             return 1f;
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(1, RoundingMode.HALF_UP);

@@ -60,8 +60,7 @@ public final class AutoTotem extends Module {
 
     private enum OffHand {Totem, Crystal, GApple, Shield}
 
-    private enum Mode {Deafult, Matrix, MatrixPick}
-
+    private enum Mode {Default, Matrix, MatrixPick}
 
     private static AutoTotem instance;
 
@@ -78,7 +77,6 @@ public final class AutoTotem extends Module {
     public void onSync(EventSync e) {
         swapTo(getItemSlot());
         delay--;
-
     }
 
     @EventHandler
@@ -129,7 +127,7 @@ public final class AutoTotem extends Module {
             int prevCurrentItem = mc.player.getInventory().selectedSlot;
             if (slot >= 9) {
                 switch (mode.getValue()) {
-                    case Deafult -> {
+                    case Default -> {
                         sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
                         clickSlot(slot);
                         clickSlot(45);

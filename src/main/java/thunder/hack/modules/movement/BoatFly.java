@@ -17,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
+import thunder.hack.events.impl.EventKeyboardInput;
 import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -249,12 +250,11 @@ public class BoatFly extends Module {
 
         if (returnGravity && event.getPacket() instanceof VehicleMoveC2SPacket) event.cancel();
 
-        if(mc.player.isRiding() && event.getPacket() instanceof ClientCommandC2SPacket commandC2SPacket
-                && (commandC2SPacket.getMode() == ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY || commandC2SPacket.getMode() == ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY)
-                && allowShift.getValue())
+        if(event.getPacket() instanceof PlayerInputC2SPacket && allowShift.getValue()) {
             event.cancel();
+        }
 
-        if (!mc.player.isRiding() || returnGravity || waitedCooldown)
+        if (mc.player.getControllingVehicle() == null || returnGravity || waitedCooldown)
             return;
 
         Vec3d boatPos = mc.player.getControllingVehicle().getPos();
