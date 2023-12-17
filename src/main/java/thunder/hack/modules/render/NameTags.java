@@ -15,6 +15,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.scoreboard.ReadableScoreboardScore;
+import net.minecraft.scoreboard.ScoreboardDisplaySlot;
+import net.minecraft.scoreboard.ScoreboardObjective;
+import net.minecraft.scoreboard.number.StyledNumberFormat;
+import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
@@ -49,6 +54,7 @@ public class NameTags extends Module {
     private final Setting<Boolean> outline = new Setting<>("Outline", true);
     private final Setting<Boolean> enchantss = new Setting<>("Enchants", true);
     private final Setting<Boolean> onlyHands = new Setting<>("OnlyHands", false, v -> enchantss.getValue());
+    private final Setting<Boolean> funtimeHp = new Setting<>("FunTimeHp", false);
 
     private final Setting<Boolean> potions = new Setting<>("Potions", true);
     //  private final Setting<Boolean> box = new Setting<>("Box", true);
@@ -96,8 +102,10 @@ public class NameTags extends Module {
 
             final_string += (ent.getDisplayName().getString()) + " ";
 
-            if (health.getValue())
-                final_string += getHealthColor(ent) + round2(ent.getAbsorptionAmount() + ent.getHealth()) + " ";
+            if (health.getValue()) {
+                final_string += getHealthColor(getHealth(ent)) + round2(getHealth(ent)) + " ";
+            }
+
             if (distance.getValue()) final_string += String.format("%.1f", mc.player.distanceTo(ent)) + "m ";
             if (pops.getValue() && ThunderHack.combatManager.getPops(ent) != 0)
                 final_string += (Formatting.RESET + "" + ThunderHack.combatManager.getPops(ent));
@@ -379,8 +387,28 @@ public class NameTags extends Module {
         };
     }
 
-    private @NotNull String getHealthColor(@NotNull PlayerEntity entity) {
-        int health = (int) ((int) entity.getHealth() + entity.getAbsorptionAmount());
+    public float getHealth(PlayerEntity ent) {
+        // Первый в комьюнити хп резольвер. Правда, еж?
+        if ((mc.getNetworkHandler() != null && mc.getNetworkHandler().getServerInfo() != null && mc.getNetworkHandler().getServerInfo().address.contains("funtime") || funtimeHp.getValue())) {
+            ScoreboardObjective scoreBoard = null;
+            String resolvedHp = "";
+            if ((ent.getScoreboard()).getObjectiveForSlot(ScoreboardDisplaySlot.BELOW_NAME) != null) {
+                scoreBoard = (ent.getScoreboard()).getObjectiveForSlot(ScoreboardDisplaySlot.BELOW_NAME);
+                if (scoreBoard != null) {
+                    ReadableScoreboardScore readableScoreboardScore = ent.getScoreboard().getScore(ent, scoreBoard);
+                    MutableText text2 = ReadableScoreboardScore.getFormattedScore(readableScoreboardScore, scoreBoard.getNumberFormatOr(StyledNumberFormat.EMPTY));
+                    resolvedHp = text2.getString();
+                }
+            }
+            float numValue = 0;
+            try {
+                numValue = Float.parseFloat(resolvedHp);
+            } catch (NumberFormatException ignored) {}
+            return numValue;
+        } else return ent.getHealth() + ent.getAbsorptionAmount();
+    }
+
+    private @NotNull String getHealthColor(float health) {
         if (health <= 15 && health > 7) return Formatting.YELLOW + "";
         if (health > 15) return Formatting.GREEN + "";
         return Formatting.RED + "";

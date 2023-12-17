@@ -22,6 +22,7 @@ import java.util.List;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class NoRender extends Module {
+
     public NoRender() {
         super("NoRender", Category.RENDER);
     }
@@ -32,6 +33,8 @@ public class NoRender extends Module {
     public Setting<Boolean> arrows = new Setting<>("Arrows", false);
     public Setting<Boolean> eggs = new Setting<>("Eggs", false);
     public Setting<Boolean> elderGuardian = new Setting<>("Guardian", false);
+    public Setting<Boolean> vignette = new Setting<>("Vignette", true);
+    public Setting<Boolean> portal = new Setting<>("Portal", true);
     public Setting<Boolean> explosions = new Setting<>("Explosions", false);
     public Setting<Boolean> campFire = new Setting<>("CampFire", false);
     public Setting<Boolean> fireworks = new Setting<>("Fireworks", false);

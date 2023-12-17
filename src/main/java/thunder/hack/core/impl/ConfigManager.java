@@ -146,7 +146,7 @@ public class ConfigManager implements IManager {
     public void load(@NotNull File config) {
         if (!config.exists()) save(config);
         try {
-            FileReader reader = new FileReader(config);
+            FileReader reader = new FileReader(config, StandardCharsets.UTF_8);
             JsonParser parser = new JsonParser();
 
             JsonArray array = null;
@@ -247,7 +247,7 @@ public class ConfigManager implements IManager {
             modulesObj.add("Modules", getModuleArray());
             array.add(modulesObj);
 
-            FileWriter writer = new FileWriter(config);
+            FileWriter writer = new FileWriter(config, StandardCharsets.UTF_8);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
             gson.toJson(array, writer);
@@ -377,7 +377,8 @@ public class ConfigManager implements IManager {
             }
             if (setting.isStringSetting()) {
                 String str = (String) setting.getValue();
-                setting.setValue(str.replace(" ", "_"));
+                attribs.add(setting.getName(), jp.parse(str.replace(" ", "_")));
+                continue;
             }
             if (setting.isEnumSetting()) {
                 EnumConverter converter = new EnumConverter(((Enum) setting.getValue()).getClass());

@@ -7,6 +7,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.entity.Entity;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.Team;
@@ -15,6 +16,7 @@ import net.minecraft.scoreboard.number.StyledNumberFormat;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Unique;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
@@ -131,6 +133,18 @@ public abstract class MixinInGameHud {
         }
 
          */
+    }
+
+    @Inject(method = "renderVignetteOverlay", at = @At(value = "HEAD"), cancellable = true)
+    private void renderVignetteOverlayHook(DrawContext context, Entity entity, CallbackInfo ci) {
+        if(ModuleManager.noRender.vignette.getValue())
+            ci.cancel();
+    }
+
+    @Inject(method = "renderPortalOverlay", at = @At(value = "HEAD"), cancellable = true)
+    private void renderPortalOverlayHook(DrawContext context, float nauseaStrength, CallbackInfo ci) {
+        if(ModuleManager.noRender.portal.getValue())
+            ci.cancel();
     }
 
     @Inject(method = "renderCrosshair", at = @At(value = "HEAD"), cancellable = true)

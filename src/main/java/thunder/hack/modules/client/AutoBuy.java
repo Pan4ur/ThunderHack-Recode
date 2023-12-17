@@ -40,6 +40,7 @@ public class AutoBuy extends Module {
     public final Setting<Float> shulkerMultiplier = new Setting<>("ShulkerMultiplier", 1.5f, 1f, 5f);
     public final Setting<Bind> openGui = new Setting<>("OpenGui", new Bind(-1, false, false));
     public final Setting<String> command = new Setting<>("Command", "ah");
+    public final Setting<String> an = new Setting<>("An", "an235");
     public final Setting<Integer> minDelay = new Setting<>("MinUpdateDelay", 400, 50, 1000);
     public final Setting<Integer> maxDelay = new Setting<>("MaxUpdateDelay", 550, 100, 3000);
     public final Setting<Integer> reAhCount = new Setting<>("ReAhCount", 12, 2, 30);
@@ -93,13 +94,33 @@ public class AutoBuy extends Module {
                 lastStack = null;
                 disable("У Вас не хватает денег!");
             }
+
+            if (pac.content().getString().contains("Данной команды не существует!")) {
+                updateTimer.setMs(-35000);
+                reAhTimer.setMs(-35000);
+                buyTimer.setMs(-35000);
+                chatTimer.setMs(-35000);
+                mc.player.networkHandler.sendChatCommand(an.getValue().toString());
+            }
+
+            if(pac.content().getString().contains("Здесь нет команд!")) {
+                mc.player.setPitch(1);
+            }
         }
     }
 
     @Override
     public void onRender3D(MatrixStack stack) {
-        if(chatTimer.passedMs(2500)) {
+        if(chatTimer.passedMs(3000)) {
             messageCount = 0;
+        }
+
+        if (mc.player.getX() == -3 && mc.player.getY() == 1 && mc.player.getZ() == 11 && chatTimer.passedMs(100)) {
+            updateTimer.setMs(-35000);
+            reAhTimer.setMs(-35000);
+            buyTimer.setMs(-35000);
+            chatTimer.setMs(-35000);
+            mc.player.networkHandler.sendChatCommand(an.getValue().toString());
         }
 
         if (!active)
