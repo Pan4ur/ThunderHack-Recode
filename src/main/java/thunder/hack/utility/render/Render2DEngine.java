@@ -90,7 +90,7 @@ public class Render2DEngine {
         double height = endY - y;
         width = Math.max(0, width);
         height = Math.max(0, height);
-        float d = (float) mc.getWindow().getScaleFactor();
+        float d = (float) Render3DEngine.getScaleFactor();
         int ay = (int) ((mc.getWindow().getScaledHeight() - (y + height)) * d);
         RenderSystem.enableScissor((int) (x * d), ay, (int) (width * d), (int) (height * d));
     }

@@ -13,9 +13,11 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import thunder.hack.ThunderHack;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.client.MainSettings;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -237,8 +239,14 @@ public class Render3DEngine {
         Matrix4f matrixProj = new Matrix4f(lastProjMat);
         Matrix4f matrixModel = new Matrix4f(lastModMat);
         matrixProj.mul(matrixModel).project(transformedCoordinates.x(), transformedCoordinates.y(), transformedCoordinates.z(), viewport, target);
-        return new Vec3d(target.x / mc.getWindow().getScaleFactor(), (displayHeight - target.y) / mc.getWindow().getScaleFactor(), target.z);
+
+        return new Vec3d(target.x / getScaleFactor(), (displayHeight - target.y) / getScaleFactor(), target.z);
     }
+
+    public static double getScaleFactor() {
+        return MainSettings.scaleFactorFix.getValue() ? MainSettings.scaleFactorFixValue.getValue() : mc.getWindow().getScaleFactor();
+    }
+
 
     @Deprecated
     @SuppressWarnings("unused")

@@ -8,6 +8,7 @@ import thunder.hack.events.impl.EventMouse;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
+import thunder.hack.utility.render.Render3DEngine;
 
 public class HudElement extends Module {
     private final Setting<PositionSetting> pos = new Setting<>("Position", new PositionSetting(0.5f, 0.5f));
@@ -57,11 +58,11 @@ public class HudElement extends Module {
     }
 
     public int normaliseX() {
-        return (int) (mc.mouse.getX() / mc.getWindow().getScaleFactor());
+        return (int) (mc.mouse.getX() / Render3DEngine.getScaleFactor());
     }
 
     public int normaliseY() {
-        return (int) (mc.mouse.getY() / mc.getWindow().getScaleFactor());
+        return (int) (mc.mouse.getY() / Render3DEngine.getScaleFactor());
     }
 
     public boolean isHovering() {
