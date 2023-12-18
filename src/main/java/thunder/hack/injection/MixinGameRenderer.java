@@ -98,7 +98,7 @@ public abstract class MixinGameRenderer {
             mc.getProfiler().pop();
             info.cancel();
         }
-        if (ModuleManager.aura.isEnabled() && Aura.target != null && mc.player.distanceTo(Aura.target) <= Aura.attackRange.getValue() && Aura.rotationMode.getValue() != Aura.Rotation.None) {
+        if (ModuleManager.aura.isEnabled() && Aura.target != null && mc.player.distanceTo(Aura.target) <= ModuleManager.aura.attackRange.getValue() && ModuleManager.aura.rotationMode.getValue() != Aura.Rotation.None) {
             mc.getProfiler().pop();
             info.cancel();
             //add vector from aura

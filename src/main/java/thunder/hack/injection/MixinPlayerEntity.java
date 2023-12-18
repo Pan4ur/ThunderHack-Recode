@@ -29,7 +29,7 @@ import static thunder.hack.modules.Module.mc;
 public class MixinPlayerEntity {
     @Inject(method = "getAttackCooldownProgressPerTick", at = @At("HEAD"), cancellable = true)
     public void getAttackCooldownProgressPerTickHook(CallbackInfoReturnable<Float> cir) {
-        if (ModuleManager.aura.isEnabled() && Aura.switchMode.getValue() == Aura.Switch.Silent) {
+        if (ModuleManager.aura.isEnabled() && ModuleManager.aura.switchMode.getValue() == Aura.Switch.Silent) {
             cir.setReturnValue(12.5f);
         }
     }
