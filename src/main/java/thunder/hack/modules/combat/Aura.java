@@ -66,9 +66,9 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 import static thunder.hack.utility.math.MathUtility.random;
 
 public final class Aura extends Module {
-    public static final Setting<Float> attackRange = new Setting<>("Range", 3.1f, 2f, 6.0f);
-    public static final Setting<Rotation> rotationMode = new Setting<>("Rotation", Rotation.Universal);
-    public static final Setting<Switch> switchMode = new Setting<>("Switch", Switch.None);
+    public final Setting<Float> attackRange = new Setting<>("Range", 3.1f, 2f, 6.0f);
+    public final Setting<Rotation> rotationMode = new Setting<>("Rotation", Rotation.Universal);
+    public final Setting<Switch> switchMode = new Setting<>("Switch", Switch.None);
     public final Setting<Boolean> onlyWeapon = new Setting<>("OnlyWeapon", false, v -> switchMode.getValue() != Switch.Silent);
     public final Setting<BooleanParent> smartCrit = new Setting<>("SmartCrit", new BooleanParent(true));
     public final Setting<Boolean> onlySpace = new Setting<>("OnlySpace", false).withParent(smartCrit);
@@ -77,12 +77,12 @@ public final class Aura extends Module {
     public final Setting<Boolean> wallsBypass = new Setting<>("Bypass", false).withParent(ignoreWalls);
     public final Setting<Boolean> shieldBreaker = new Setting<>("ShieldBreaker", true);
     public final Setting<Boolean> moveFix = new Setting<>("MoveFix", false);
-    public static final Setting<Boolean> clientLook = new Setting<>("ClientLook", false);
-    private static final Setting<BooleanParent> oldDelay = new Setting<>("OldDelay", new BooleanParent(false));
-    public static final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 15).withParent(oldDelay);
-    public static final Setting<Integer> maxCPS = new Setting<>("MaxCPS", 12, 1, 15).withParent(oldDelay);
+    public final Setting<Boolean> clientLook = new Setting<>("ClientLook", false);
+    public final Setting<BooleanParent> oldDelay = new Setting<>("OldDelay", new BooleanParent(false));
+    public final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 15).withParent(oldDelay);
+    public final Setting<Integer> maxCPS = new Setting<>("MaxCPS", 12, 1, 15).withParent(oldDelay);
     public final Setting<ESP> esp = new Setting<>("ESP", ESP.ThunderHack);
-    public static final Setting<Sort> sort = new Setting<>("Sort", Sort.Distance);
+    public final Setting<Sort> sort = new Setting<>("Sort", Sort.Distance);
 
     /*   ADVANCED   */
     public final Setting<Parent> advanced = new Setting<>("Advanced", new Parent(false, 0));
@@ -140,22 +140,28 @@ public final class Aura extends Module {
 
     @EventHandler
     public void modifyVelocity(EventPlayerTravel e) {
-        if (target != null && moveFix.getValue()) {
-            if (e.isPre()) {
-                prevClientYaw = mc.player.getYaw();
-                mc.player.setYaw(rotationYaw);
-            } else mc.player.setYaw(prevClientYaw);
+        Item handItem = mc.player.getMainHandStack().getItem();
+        if (target == null || !moveFix.getValue() || (switchMode.getValue() != Switch.Silent && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem)))
+            return;
+
+        if (e.isPre()) {
+            prevClientYaw = mc.player.getYaw();
+            mc.player.setYaw(rotationYaw);
+        } else {
+            mc.player.setYaw(prevClientYaw);
         }
     }
 
     @EventHandler
     public void modifyJump(EventPlayerJump e) {
-        if (target != null && moveFix.getValue()) {
-            if (e.isPre()) {
-                prevClientYaw = mc.player.getYaw();
-                mc.player.setYaw(rotationYaw);
-            } else mc.player.setYaw(prevClientYaw);
-        }
+        Item handItem = mc.player.getMainHandStack().getItem();
+        if (target == null || !moveFix.getValue() || (switchMode.getValue() != Switch.Silent && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem)))
+            return;
+
+        if (e.isPre()) {
+            prevClientYaw = mc.player.getYaw();
+            mc.player.setYaw(rotationYaw);
+        } else mc.player.setYaw(prevClientYaw);
     }
 
     public void auraLogic() {
@@ -170,7 +176,7 @@ public final class Aura extends Module {
         if (!mc.options.jumpKey.isPressed() && mc.player.isOnGround() && autoJump.getValue())
             mc.player.jump();
 
-        if(rotationMode.getValue() == Rotation.SunRise)
+        if (rotationMode.getValue() == Rotation.SunRise)
             lookingAtHitbox = ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), ignoreWalls.getValue().isEnabled(), rayTrace.getValue());
 
         boolean readyForAttack = autoCrit() && (lookingAtHitbox || skipRayTraceCheck());
@@ -484,6 +490,9 @@ public final class Aura extends Module {
                 if (trackticks > 0 || mode.getValue() == Mode.Track) {
                     rotationYaw = (float) (newYaw - (newYaw - rotationYaw) % gcdFix);
                     rotationPitch = (float) (newPitch - (newPitch - rotationPitch) % gcdFix);
+                    if (MovementUtility.sprintIsLegit(rotationYaw) && hitTicks > 1) {
+                        //   mc.player.setVelocity(mc.player.getVelocity().getX() * 1.3, mc.player.getVelocity().getY(), mc.player.getVelocity().getZ() * 1.3);
+                    }
                 } else {
                     rotationYaw = mc.player.getYaw();
                     rotationPitch = mc.player.getPitch();
@@ -502,7 +511,7 @@ public final class Aura extends Module {
                 double deltaZ = ent.getZ() - mc.player.getZ();
                 float yawDelta = MathHelper.wrapDegrees((float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(deltaZ, deltaX)) - 90.0) - rotationYaw) / 1.0001f;
                 float pitchDelta = ((float) -Math.toDegrees(Math.atan2(ent.getY() - mc.player.getEyePos().getY(), Math.hypot(deltaX, deltaZ))) - rotationPitch) / 1.0001f;
-                float additionYaw = Math.min(Math.max((int) Math.abs(yawDelta), 1), random(minYawStep.getValue(), maxYawStep.getValue()));
+                float additionYaw = Math.min(Math.max((int) Math.abs(yawDelta), 1), 80);
                 float additionPitch = Math.max(ready ? Math.abs(pitchDelta) : 1.0f, 2.0f);
                 if (Math.abs(additionYaw - prevYaw) <= 3.0f)
                     additionYaw = prevYaw + 3.1f;
@@ -690,8 +699,6 @@ public final class Aura extends Module {
                 }
             }
         }
-
-
         return false;
     }
 
@@ -753,8 +760,7 @@ public final class Aura extends Module {
         if (entity instanceof PlayerEntity && !Players.getValue()) return true;
         if (entity instanceof VillagerEntity && !Villagers.getValue()) return true;
         if (entity instanceof MobEntity && !Mobs.getValue()) return true;
-        if (entity instanceof AnimalEntity && !Animals.getValue()) return true;
-        return false;
+        return entity instanceof AnimalEntity && !Animals.getValue();
     }
 
     private float getFOVAngle(@NotNull LivingEntity e) {

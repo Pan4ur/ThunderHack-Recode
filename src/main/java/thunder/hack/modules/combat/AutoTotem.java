@@ -60,7 +60,7 @@ public final class AutoTotem extends Module {
 
     private enum OffHand {Totem, Crystal, GApple, Shield}
 
-    private enum Mode {Default, Matrix, MatrixPick}
+    private enum Mode {Default, Matrix, MatrixPick, NewVersion}
 
     private static AutoTotem instance;
 
@@ -158,6 +158,11 @@ public final class AutoTotem extends Module {
                         int prevSlot = mc.player.getInventory().selectedSlot;
                         ThunderHack.asyncManager.run(() -> mc.player.getInventory().selectedSlot = prevSlot, 300);
                     }
+                    case NewVersion -> {
+                        debug(slot + " swap");
+                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, 40, SlotActionType.SWAP, mc.player);
+                        sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                    }
                 }
             } else {
                 sendPacket(new UpdateSelectedSlotC2SPacket(slot));
@@ -192,7 +197,7 @@ public final class AutoTotem extends Module {
 
         switch (offhand.getValue()) {
             case Totem -> {
-                if (mc.player.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING)
+                if (mc.player.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING && !mc.player.getOffHandStack().isEmpty())
                     prevItem = mc.player.getOffHandStack().getItem();
                 item = prevItem;
             }
@@ -279,32 +284,30 @@ public final class AutoTotem extends Module {
             if (mc.player.squaredDistanceTo(entity) > 36) continue;
 
             if (onCrystal.getValue()) {
-                if (!(entity instanceof EndCrystalEntity)) continue;
-                if ((getTriggerHealth()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos(), AutoCrystal.selfPredictTicks.getValue()) < 0.5) {
-                    item = Items.TOTEM_OF_UNDYING;
-                    break;
+                if (entity instanceof EndCrystalEntity) {
+                    if ((getTriggerHealth()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos(), AutoCrystal.selfPredictTicks.getValue()) < 0.5) {
+                        item = Items.TOTEM_OF_UNDYING;
+                        break;
+                    }
                 }
             }
 
             if (onTnt.getValue()) {
-                if (!(entity instanceof TntEntity)) continue;
-                if ((getTriggerHealth()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos(), AutoCrystal.selfPredictTicks.getValue()) < 0.5) {
+                if (entity instanceof TntEntity) {
                     item = Items.TOTEM_OF_UNDYING;
                     break;
                 }
             }
 
             if (onMinecartTnt.getValue()) {
-                if (!(entity instanceof TntMinecartEntity)) continue;
-                if ((getTriggerHealth()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos(), AutoCrystal.selfPredictTicks.getValue()) < 0.5) {
+                if (entity instanceof TntMinecartEntity) {
                     item = Items.TOTEM_OF_UNDYING;
                     break;
                 }
             }
 
             if (onCreeper.getValue()) {
-                if (!(entity instanceof CreeperEntity)) continue;
-                if ((getTriggerHealth()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos(), AutoCrystal.selfPredictTicks.getValue()) < 0.5) {
+                if (entity instanceof CreeperEntity) {
                     item = Items.TOTEM_OF_UNDYING;
                     break;
                 }
@@ -332,12 +335,6 @@ public final class AutoTotem extends Module {
         }
 
         if (item == mc.player.getMainHandStack().getItem() && mc.options.useKey.isPressed()) return -1;
-
-        if (offhand.getValue() == OffHand.Totem) {
-            if (item == Items.TOTEM_OF_UNDYING && mc.player.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING) {
-                prevItem = mc.player.getOffHandStack().getItem();
-            }
-        }
 
         return itemSlot;
     }

@@ -38,7 +38,7 @@ public class Animations extends Module {
     public boolean flip;
 
     private enum Mode {
-        Default, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven
+        Default, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twelve, Thirteen
     }
 
 
@@ -63,7 +63,7 @@ public class Animations extends Module {
     }
 
     private void renderSwordAnimation(MatrixStack matrices, float f, float swingProgress, float equipProgress, Arm arm) {
-        if (arm == Arm.LEFT && (mode.getValue() == Mode.Eleven || mode.getValue() == Mode.Ten || mode.getValue() == Mode.Nine || mode.getValue() == Mode.Three)) {
+        if (arm == Arm.LEFT && (mode.getValue() == Mode.Eleven || mode.getValue() == Mode.Ten || mode.getValue() == Mode.Nine || mode.getValue() == Mode.Three || mode.getValue() == Mode.Thirteen)) {
             applyEquipOffset(matrices, arm, equipProgress);
             matrices.translate(-ModuleManager.viewModel.positionMainX.getValue(), ModuleManager.viewModel.positionMainY.getValue(), ModuleManager.viewModel.positionMainZ.getValue());
             applySwingOffset(matrices, arm, swingProgress);
@@ -73,7 +73,6 @@ public class Animations extends Module {
 
         switch (mode.getValue()) {
             case Default -> {
-                matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, equipProgress);
                 translateToViewModelOff(matrices);
                 applySwingOffset(matrices, arm, swingProgress);
@@ -93,13 +92,11 @@ public class Animations extends Module {
                 translateBack(matrices);
             }
             case Two -> {
-                matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, 0.2F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 6.2831855F));
             }
             case Three -> {
                 float n = -0.4F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
                 float g = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
-                matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, n);
                 int i = arm == Arm.RIGHT ? 1 : -1;
                 translateToViewModel(matrices);
@@ -110,14 +107,12 @@ public class Animations extends Module {
                 translateBack(matrices);
             }
             case Four -> {
-                matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, 0);
                 translateToViewModel(matrices);
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(swingProgress > 0 ? -MathHelper.sin(swingProgress * 13f) * 37f : 0));
                 translateBack(matrices);
             }
             case Five -> {
-                matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, 0);
                 int i = arm == Arm.RIGHT ? 1 : -1;
                 float g = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
@@ -126,21 +121,18 @@ public class Animations extends Module {
                 translateBack(matrices);
             }
             case Six -> {
-                matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, equipProgress);
                 translateToViewModel(matrices);
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(swingProgress * (flip ? 360.0F : -360)));
                 translateBack(matrices);
             }
             case Eight -> {
-                matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, equipProgress);
                 translateToViewModel(matrices);
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(swingProgress * -360));
                 translateBack(matrices);
             }
             case Seven -> {
-                matrices.translate(0, 0, 0);
                 applyEquipOffset(matrices, arm, equipProgress);
                 float a = -MathHelper.sin(swingProgress * 3f) / 2f + 1f;
                 matrices.scale(a, a, a);
@@ -171,6 +163,22 @@ public class Animations extends Module {
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(50f));
                 matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-60f));
                 matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(110f + 20f * g));
+                translateBack(matrices);
+            }
+            case Twelve -> {
+                float g = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
+                applyEquipOffset(matrices, arm, 0);
+                matrices.translate(0, 0, -g / 4f);
+                translateToViewModel(matrices);
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-120f));
+                translateBack(matrices);
+            }
+            case Thirteen -> {
+                float g = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
+                applyEquipOffset(matrices, arm, 0);
+                translateToViewModel(matrices);
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-MathHelper.sin(swingProgress * 3f) * 60f));
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-60f * g));
                 translateBack(matrices);
             }
         }
