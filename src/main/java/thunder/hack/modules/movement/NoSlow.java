@@ -67,8 +67,13 @@ public class NoSlow extends Module {
     public boolean canNoSlow() {
         if (mode.getValue() == Mode.MusteryGrief && mc.player.isOnGround() && !mc.options.jumpKey.isPressed())
             return false;
+
         if (!mainHand.getValue() && mc.player.getActiveHand() == Hand.MAIN_HAND)
             return mode.getValue() != Mode.MusteryGrief && mode.getValue() != Mode.Grim && mode.getValue() != Mode.FunTime;
+
+        if(mc.player.getOffHandStack().isFood() && mode.getValue() == Mode.FunTime && mc.player.getActiveHand() == Hand.MAIN_HAND)
+            return false;
+
         return true;
     }
 

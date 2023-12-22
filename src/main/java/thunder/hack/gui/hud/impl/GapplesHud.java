@@ -7,6 +7,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.RotationAxis;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventEatFood;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
@@ -32,8 +33,8 @@ public class GapplesHud extends HudElement {
         if (getItemCount(targetItem) == 0)
             return;
 
-        int xPos = mc.getWindow().getScaledWidth() / 2;
-        int yPos = mc.getWindow().getScaledHeight() / 2;
+        int xPos = (int) ModuleManager.crosshair.getAnimatedPosX();
+        int yPos = (int) ModuleManager.crosshair.getAnimatedPosY();
 
         float factor = angle > 0 ? angle / 15f : 0f;
         float factor2 = 1f - mc.player.getItemUseTime() / 40f;

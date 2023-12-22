@@ -7,6 +7,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.RotationAxis;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventEatFood;
 import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.gui.font.FontRenderers;
@@ -27,8 +28,8 @@ public class TotemCounter extends HudElement {
         if(getItemCount(Items.TOTEM_OF_UNDYING) == 0)
             return;
 
-        int xPos = mc.getWindow().getScaledWidth() / 2;
-        int yPos = mc.getWindow().getScaledHeight() / 2;
+        int xPos = (int) ModuleManager.crosshair.getAnimatedPosX();
+        int yPos = (int) ModuleManager.crosshair.getAnimatedPosY();
 
         float factor = Math.abs(angle < 0 ? angle / 15f : 0f);
 

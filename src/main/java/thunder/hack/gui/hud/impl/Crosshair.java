@@ -73,4 +73,16 @@ public class Crosshair extends Module {
             Render2DEngine.drawElipseSync(xAnim, yAnim, 1f, 1f, 270, progress + 270, 3.5f, color.getValue().getColorObject());
         }
     }
+
+    public float getAnimatedPosX() {
+        if(xAnim == 0)
+            return mc.getWindow().getScaledWidth() / 2f;
+        return xAnim;
+    }
+
+    public float getAnimatedPosY() {
+        if(yAnim == 0)
+            return mc.getWindow().getScaledHeight() / 2f;
+        return yAnim;
+    }
 }

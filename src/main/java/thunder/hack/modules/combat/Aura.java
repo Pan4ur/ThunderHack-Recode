@@ -316,6 +316,12 @@ public final class Aura extends Module {
     }
 
     @EventHandler
+    public void onPacketSend(PacketEvent.@NotNull Send e) {
+        if(e.getPacket() instanceof  PlayerInteractEntityC2SPacket pie && Criticals.getInteractType(pie) != Criticals.InteractType.ATTACK)
+           e.cancel();
+    }
+
+    @EventHandler
     public void onPacketReceive(PacketEvent.@NotNull Receive e) {
         if (e.getPacket() instanceof EntityStatusS2CPacket status)
             if (status.getStatus() == 30 && status.getEntity(mc.world) != null && target != null && status.getEntity(mc.world) == target)
@@ -765,7 +771,7 @@ public final class Aura extends Module {
 
     private float getFOVAngle(@NotNull LivingEntity e) {
         double difX = e.getX() - mc.player.getX();
-        double difZ = e.getZ() - mc.player.getY();
+        double difZ = e.getZ() - mc.player.getZ();
         float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);
         return Math.abs(yaw - MathHelper.wrapDegrees(mc.player.getYaw()));
     }

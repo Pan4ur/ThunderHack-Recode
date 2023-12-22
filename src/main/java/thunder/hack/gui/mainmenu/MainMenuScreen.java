@@ -17,8 +17,10 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.ThunderUtility;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.MSAAFramebuffer;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextUtil;
 
 import java.awt.*;
 import java.net.URI;
@@ -32,6 +34,9 @@ public class MainMenuScreen extends Screen {
     private static final Identifier TH_LOGO = new Identifier("textures/th.png");
     private final List<MainMenuButton> buttons = new ArrayList<>();
     public boolean confirm = false;
+    public static int ticksActive;
+    static ArrayList<Particle> particles = new ArrayList<>();
+    private TextUtil animatedText = new TextUtil("THUNDERHACK", "HAPPY NEW YEAR!");
 
     protected MainMenuScreen() {
         super(Text.of("THMainMenuScreen"));
@@ -49,10 +54,34 @@ public class MainMenuScreen extends Screen {
     private static MainMenuScreen INSTANCE = new MainMenuScreen();
 
     public static MainMenuScreen getInstance() {
+        particles.clear();
+        ticksActive = 0;
+
         if (INSTANCE == null) {
             INSTANCE = new MainMenuScreen();
         }
         return INSTANCE;
+    }
+
+    @Override
+    public void tick() {
+        ticksActive++;
+        animatedText.tick();
+
+        if(particles.size() < 100 && ticksActive > 40) {
+            particles.add(new Particle(0, mc.getWindow().getScaledHeight(), false));
+            particles.add(new Particle(0, mc.getWindow().getScaledHeight(), false));
+
+            particles.add(new Particle(mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight(), true));
+            particles.add(new Particle(mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight(), true));
+        }
+
+        if(ticksActive > 400) {
+            particles.clear();
+            ticksActive = 0;
+        }
+
+        particles.forEach(Particle::tick);
     }
 
     @Override
@@ -72,17 +101,16 @@ public class MainMenuScreen extends Screen {
 
         buttons.forEach(b -> b.onRender(context, mouseX, mouseY));
 
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        particles.forEach(p -> p.render(context));
+        RenderSystem.disableBlend();
+
         MSAAFramebuffer.use(true, () -> {
             // Smooth zone
-            boolean hoveredLogo = Render2DEngine.isHovered(mouseX, mouseY, (int) (halfOfWidth - 157), (int) (halfOfHeight - 140), 300, 70);
+            boolean hoveredLogo = Render2DEngine.isHovered(mouseX, mouseY, (int) (halfOfWidth - 120), (int) (halfOfHeight - 130), 210, 50);
 
-
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, hoveredLogo ? 0.8f : 0.6f);
-            context.drawTexture(TH_LOGO, (int) (halfOfWidth - 157), (int) (halfOfHeight - 140), 0, 0, 300, 70, 300, 70);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.disableBlend();
+            FontRenderers.thglitchBig.drawCenteredString(context.getMatrices(), animatedText.toString(), (int) (halfOfWidth), (int) (halfOfHeight - 120), new Color(255, 255, 255, hoveredLogo ? 230 : 180).getRGB());
 
             buttons.forEach(b -> b.onRenderText(context, mouseX, mouseY));
 
@@ -134,5 +162,37 @@ public class MainMenuScreen extends Screen {
             Util.getOperatingSystem().open(URI.create("https://thunderhack.onrender.com/"));
 
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    public static class Particle {
+
+        Color color;
+        float px, py, x, y, mx, my;
+
+        public Particle(int x, int y, boolean opposite) {
+            this.x = x;
+            this.y = y;
+            px = x;
+            py = y;
+            mx = opposite ? -MathUtility.random(7, 24) : MathUtility.random(7, 24);
+            my = MathUtility.random(1, 36);
+            color = HudEditor.getColor((int) mx * 20);
+        }
+
+        public void tick() {
+            px = x;
+            py = y;
+            x += mx;
+            y -= my;
+            my -= 0.5f;
+            mx *= 0.99f;
+            my *= 0.99f;
+        }
+
+        public void render(DrawContext context) {
+            RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1f);
+            context.drawTexture(Render2DEngine.star, (int) Render2DEngine.interpolate(px, x, mc.getTickDelta()), (int) Render2DEngine.interpolate(py, y, mc.getTickDelta()), 20, 20, 0, 0, 20, 20, 20, 20);
+            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        }
     }
 }

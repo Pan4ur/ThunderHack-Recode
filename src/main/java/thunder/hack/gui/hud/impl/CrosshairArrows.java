@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.RotationAxis;
 import org.joml.Matrix4f;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
@@ -42,8 +43,8 @@ public class CrosshairArrows extends HudElement {
         super.onRender2D(context);
         if (fullNullCheck()) return;
 
-        float middleW = mc.getWindow().getScaledWidth() * .5f;
-        float middleH = mc.getWindow().getScaledHeight() * .5f;
+        float middleW = ModuleManager.crosshair.getAnimatedPosX();
+        float middleH = ModuleManager.crosshair.getAnimatedPosY();
 
         int color = switch (triangleMode.getValue()) {
             case Custom -> colors.getValue().getColor();

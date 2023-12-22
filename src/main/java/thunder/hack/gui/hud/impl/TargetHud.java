@@ -18,7 +18,6 @@ import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.number.StyledNumberFormat;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.RotationAxis;
 import org.lwjgl.opengl.GL40C;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
@@ -58,6 +57,7 @@ public class TargetHud extends HudElement {
     private final Setting<ColorSetting> color = new Setting<>("Color1", new ColorSetting(-16492289), v -> Mode.getValue() == ModeEn.CelkaPasta);
     private final Setting<ColorSetting> color2 = new Setting<>("Color2", new ColorSetting(-16492289), v -> Mode.getValue() == ModeEn.CelkaPasta);
     private final Setting<Boolean> funTimeHP = new Setting<>("FunTimeHP", false);
+    private final Setting<Boolean> mini = new Setting<>("Mini", false, v -> Mode.getValue() == ModeEn.NurikZapen);
 
     private boolean sentParticles;
     private boolean direction = false;
@@ -273,64 +273,123 @@ public class TargetHud extends HudElement {
                 }
             } else if (Mode.getValue() == ModeEn.NurikZapen) {
                 float hurtPercent = (Render2DEngine.interpolateFloat(MathUtility.clamp(target.hurtTime + 1, 0, 10), target.hurtTime, mc.getTickDelta())) / 8f;
-                // Основа
-                Render2DEngine.drawGradientBlurredShadow(context.getMatrices(), getPosX() + 2, getPosY() + 2, 133, 44, 14, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
-                Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 137, 47.5f, 9);
-                Render2DEngine.drawRound(context.getMatrices(), getPosX() + 0.5f, getPosY() + 0.5f, 136f, 46, 9, Render2DEngine.injectAlpha(Color.BLACK, 220));
-
-                // Бошка
-                if (target instanceof PlayerEntity) {
-                    RenderSystem.setShaderTexture(0, ((AbstractClientPlayerEntity) target).getSkinTextures().texture());
-                } else {
-                    RenderSystem.setShaderTexture(0, mc.getEntityRenderDispatcher().getRenderer(target).getTexture(target));
-                }
-
-                context.getMatrices().push();
-                context.getMatrices().translate(getPosX() + 3.5f + 20, getPosY() + 3.5f + 20, 0);
-                context.getMatrices().scale(1 - hurtPercent / 15f, 1 - hurtPercent / 15f, 1f);
-                context.getMatrices().translate(-(getPosX() + 3.5f + 20), -(getPosY() + 3.5f + 20), 0);
-                RenderSystem.enableBlend();
-                RenderSystem.colorMask(false, false, false, true);
-                RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-                RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
-                RenderSystem.colorMask(true, true, true, true);
-                RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-                Render2DEngine.renderRoundedQuadInternal(context.getMatrices().peek().getPositionMatrix(), 1f, 1f, 1f, 1f, getPosX() + 3.5f, getPosY() + 3.5f, getPosX() + 3.5f + 40, getPosY() + 3.5f + 40, 7, 10);
-                RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
-                RenderSystem.setShaderColor(1f, 1f - hurtPercent / 2, 1f - hurtPercent / 2, 1f);
-                Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 3.5f, getPosY() + 3.5f, 40, 40, 8, 8, 8, 8, 64, 64);
-                Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 3.5f, getPosY() + 3.5f, 40, 40, 40, 8, 8, 8, 64, 64);
-                RenderSystem.defaultBlendFunc();
-                context.getMatrices().pop();
-
-                // Баллон
                 float health = Math.min(20, getHealth());
                 healthanimation.setValue(health);
                 health = (float) healthanimation.getAnimationD();
 
-                Render2DEngine.drawGradientRound(context.getMatrices(), getPosX() + 48, getPosY() + 32, 85, 11, 4f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
-                Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 48, getPosY() + 32, (int) MathUtility.clamp((85 * (health / 20)), 8, 85), 11, 4f);
+                if (mini.getValue()) {
+                    // Основа
+                    Render2DEngine.drawGradientBlurredShadow(context.getMatrices(), getPosX() + 2, getPosY() + 2, 91, 31, 12, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+                    Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 95, 35, 7);
+                    Render2DEngine.drawRound(context.getMatrices(), getPosX() + 0.5f, getPosY() + 0.5f, 94, 34, 7, Render2DEngine.injectAlpha(Color.BLACK, 220));
 
-                FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (((Math.round(10.0 * getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 92f, getPosY() + 32.5f, -1);
-                //
+                    // Бошка
+                    if (target instanceof PlayerEntity) {
+                        RenderSystem.setShaderTexture(0, ((AbstractClientPlayerEntity) target).getSkinTextures().texture());
+                    } else {
+                        RenderSystem.setShaderTexture(0, mc.getEntityRenderDispatcher().getRenderer(target).getTexture(target));
+                    }
 
-                //Имя
-                FontRenderers.sf_bold.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : target.getName().getString(), getPosX() + 48, getPosY() + 7, -1, false);
+                    context.getMatrices().push();
+                    context.getMatrices().translate(getPosX() + 2.5 + 15, getPosY() + 2.5 + 15, 0);
+                    context.getMatrices().scale(1 - hurtPercent / 20f, 1 - hurtPercent / 20f, 1f);
+                    context.getMatrices().translate(-(getPosX() + 2.5 + 15), -(getPosY() + 2.5 + 15), 0);
+                    RenderSystem.enableBlend();
+                    RenderSystem.colorMask(false, false, false, true);
+                    RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
+                    RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
+                    RenderSystem.colorMask(true, true, true, true);
+                    RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+                    Render2DEngine.renderRoundedQuadInternal(context.getMatrices().peek().getPositionMatrix(), 1f, 1f, 1f, 1f, getPosX() + 2.5, getPosY() + 2.5, getPosX() + 2.5 + 30, getPosY() + 2.5 + 30, 5, 10);
+                    RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
+                    RenderSystem.setShaderColor(1f, 1f - hurtPercent / 2, 1f - hurtPercent / 2, 1f);
+                    Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 2.5, getPosY() + 2.5, 30, 30, 8, 8, 8, 8, 64, 64);
+                    Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 2.5, getPosY() + 2.5, 30, 30, 40, 8, 8, 8, 64, 64);
+                    RenderSystem.defaultBlendFunc();
+                    context.getMatrices().pop();
 
-                if (target instanceof PlayerEntity) {
-                    //Броня
-                    List<ItemStack> armor = ((PlayerEntity) target).getInventory().armor;
-                    ItemStack[] items = new ItemStack[]{target.getMainHandStack(), armor.get(3), armor.get(2), armor.get(1), armor.get(0), target.getOffHandStack()};
+                    // Баллон
+                    Render2DEngine.drawGradientRound(context.getMatrices(), getPosX() + 38, getPosY() + 25, 52, 7, 2f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
+                    Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 38, getPosY() + 25, (int) MathUtility.clamp((52 * (health / 20)), 8, 52), 7, 2f);
 
-                    float xItemOffset = getPosX() + 48;
-                    for (ItemStack itemStack : items) {
-                        context.getMatrices().push();
-                        context.getMatrices().translate(xItemOffset, getPosY() + 15, 0);
-                        context.getMatrices().scale(0.75f, 0.75f, 0.75f);
-                        context.drawItem(itemStack, 0, 0);
-                        context.drawItemInSlot(mc.textRenderer, itemStack, 0, 0);
-                        context.getMatrices().pop();
-                        xItemOffset += 12;
+                    FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (((Math.round(10.0 * getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 65, getPosY() + 24f, -1);
+                    //
+
+                    //Имя
+                    FontRenderers.sf_bold_mini.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : target.getName().getString(), getPosX() + 38, getPosY() + 5, -1, false);
+
+                    if (target instanceof PlayerEntity) {
+                        //Броня
+                        List<ItemStack> armor = ((PlayerEntity) target).getInventory().armor;
+                        ItemStack[] items = new ItemStack[]{target.getMainHandStack(), armor.get(3), armor.get(2), armor.get(1), armor.get(0), target.getOffHandStack()};
+
+                        float xItemOffset = getPosX() + 38;
+                        for (ItemStack itemStack : items) {
+                            context.getMatrices().push();
+                            context.getMatrices().translate(xItemOffset, getPosY() + 13, 0);
+                            context.getMatrices().scale(0.5f, 0.5f, 0.5f);
+                            context.drawItem(itemStack, 0, 0);
+                            context.drawItemInSlot(mc.textRenderer, itemStack, 0, 0);
+                            context.getMatrices().pop();
+                            xItemOffset += 9;
+                        }
+                    }
+                } else {
+                    // Основа
+                    Render2DEngine.drawGradientBlurredShadow(context.getMatrices(), getPosX() + 2, getPosY() + 2, 133, 44, 14, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+                    Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 137, 47.5f, 9);
+                    Render2DEngine.drawRound(context.getMatrices(), getPosX() + 0.5f, getPosY() + 0.5f, 136f, 46, 9, Render2DEngine.injectAlpha(Color.BLACK, 220));
+
+                    // Бошка
+                    if (target instanceof PlayerEntity) {
+                        RenderSystem.setShaderTexture(0, ((AbstractClientPlayerEntity) target).getSkinTextures().texture());
+                    } else {
+                        RenderSystem.setShaderTexture(0, mc.getEntityRenderDispatcher().getRenderer(target).getTexture(target));
+                    }
+
+                    context.getMatrices().push();
+                    context.getMatrices().translate(getPosX() + 3.5f + 20, getPosY() + 3.5f + 20, 0);
+                    context.getMatrices().scale(1 - hurtPercent / 15f, 1 - hurtPercent / 15f, 1f);
+                    context.getMatrices().translate(-(getPosX() + 3.5f + 20), -(getPosY() + 3.5f + 20), 0);
+                    RenderSystem.enableBlend();
+                    RenderSystem.colorMask(false, false, false, true);
+                    RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
+                    RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
+                    RenderSystem.colorMask(true, true, true, true);
+                    RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+                    Render2DEngine.renderRoundedQuadInternal(context.getMatrices().peek().getPositionMatrix(), 1f, 1f, 1f, 1f, getPosX() + 3.5f, getPosY() + 3.5f, getPosX() + 3.5f + 40, getPosY() + 3.5f + 40, 7, 10);
+                    RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
+                    RenderSystem.setShaderColor(1f, 1f - hurtPercent / 2, 1f - hurtPercent / 2, 1f);
+                    Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 3.5f, getPosY() + 3.5f, 40, 40, 8, 8, 8, 8, 64, 64);
+                    Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 3.5f, getPosY() + 3.5f, 40, 40, 40, 8, 8, 8, 64, 64);
+                    RenderSystem.defaultBlendFunc();
+                    context.getMatrices().pop();
+
+                    // Баллон
+                    Render2DEngine.drawGradientRound(context.getMatrices(), getPosX() + 48, getPosY() + 32, 85, 11, 4f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
+                    Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 48, getPosY() + 32, (int) MathUtility.clamp((85 * (health / 20)), 8, 85), 11, 4f);
+
+                    FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (((Math.round(10.0 * getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 92f, getPosY() + 32.5f, -1);
+                    //
+
+                    //Имя
+                    FontRenderers.sf_bold.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : target.getName().getString(), getPosX() + 48, getPosY() + 7, -1, false);
+
+                    if (target instanceof PlayerEntity) {
+                        //Броня
+                        List<ItemStack> armor = ((PlayerEntity) target).getInventory().armor;
+                        ItemStack[] items = new ItemStack[]{target.getMainHandStack(), armor.get(3), armor.get(2), armor.get(1), armor.get(0), target.getOffHandStack()};
+
+                        float xItemOffset = getPosX() + 48;
+                        for (ItemStack itemStack : items) {
+                            context.getMatrices().push();
+                            context.getMatrices().translate(xItemOffset, getPosY() + 15, 0);
+                            context.getMatrices().scale(0.75f, 0.75f, 0.75f);
+                            context.drawItem(itemStack, 0, 0);
+                            context.drawItemInSlot(mc.textRenderer, itemStack, 0, 0);
+                            context.getMatrices().pop();
+                            xItemOffset += 12;
+                        }
                     }
                 }
             } else {
@@ -451,7 +510,8 @@ public class TargetHud extends HudElement {
             float numValue = 0;
             try {
                 numValue = Float.parseFloat(resolvedHp);
-            } catch (NumberFormatException ignored) {}
+            } catch (NumberFormatException ignored) {
+            }
             return numValue;
         } else return target.getHealth();
     }

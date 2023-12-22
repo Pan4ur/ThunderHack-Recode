@@ -5,7 +5,7 @@ import static thunder.hack.modules.Module.mc;
 public class TextUtil {
     private final String[] words;
     private String currentWord = "_", currentResult = "_";
-    private int arrayIndex = 0, currentIndex = 0;
+    private int arrayIndex, currentIndex, ticks;
     private boolean filip = false;
 
     public TextUtil(String...words) {
@@ -18,7 +18,8 @@ public class TextUtil {
     }
 
     public void tick() {
-        if (mc.player != null && mc.player.age % (filip ? 6 : 2) != 0)
+        ticks++;
+        if (ticks % (filip ? 2 : 1) != 0)
             return;
 
         if (!currentWord.isEmpty())
@@ -32,7 +33,7 @@ public class TextUtil {
         }
         if (!filip) currentIndex++;
         else currentIndex--;
-        if (currentIndex <= -5) {
+        if (currentIndex <= -20) {
             filip = false;
             currentIndex = 0;
         }

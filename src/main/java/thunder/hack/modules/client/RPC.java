@@ -94,7 +94,7 @@ public final class RPC extends Module {
                         case Stats ->
                                 presence.state = "Hacks: " + ThunderHack.moduleManager.getEnabledModules().size() + " / " + ThunderHack.moduleManager.modules.size();
                         case Custom -> presence.state = state.getValue();
-                        case Version -> presence.state = "v1.3 for mc 1.20.2";
+                        case Version -> presence.state = "v1.4 for mc 1.20.4";
                     }
 
                     if (nickname.getValue()) {
