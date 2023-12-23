@@ -26,6 +26,7 @@ public class Velocity extends Module {
      */
 
     public Setting<Boolean> onlyAura = new Setting<>("OnlyAura", false);
+    public Setting<Boolean> pauseInWater = new Setting<>("PauseInWater", false);
     public Setting<Boolean> autoDisable = new Setting<>("DisableOnVerify", false);
     public Setting<Boolean> cc = new Setting<>("CC", false);
     public Setting<Boolean> fishingHook = new Setting<>("FishingHook", true);
@@ -52,6 +53,9 @@ public class Velocity extends Module {
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (fullNullCheck()) return;
+
+        if(mc.player != null && (mc.player.isTouchingWater() || mc.player.isSubmergedInWater()) && pauseInWater.getValue())
+            return;
 
         if (ccCooldown > 0) {
             ccCooldown--;
@@ -163,6 +167,9 @@ public class Velocity extends Module {
 
     @Override
     public void onUpdate() {
+        if(mc.player != null && (mc.player.isTouchingWater() || mc.player.isSubmergedInWater()) && pauseInWater.getValue())
+            return;
+
         switch (mode.getValue()) {
             case Matrix -> {
                 if (mc.player.hurtTime > 0 && !mc.player.isOnGround()) {
