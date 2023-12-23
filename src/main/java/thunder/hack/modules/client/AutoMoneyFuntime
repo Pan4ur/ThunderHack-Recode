@@ -1,0 +1,78 @@
+package thunder.hack.modules.client;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.client.CPacketHeldItemChange;
+import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import thunder.hack.modules.Module;
+
+public class AutoMoneyFuntime extends Module {
+
+    private int[] hotbarSlots = {1, 2, 3};
+    private int[] anarhyNumbers = {101, 102, 103};
+    private int currentAnarhyIndex = 0;
+
+    public AutoMoneyFuntime() {
+        super("AutoMoneyFuntime", Category.Client);
+        MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    @SubscribeEvent
+    public void onGuiOpen(GuiOpenEvent event) {
+        if (event.getGui() instanceof GuiContainer) {
+            GuiContainer guiContainer = (GuiContainer) event.getGui();
+            if (guiContainer.inventorySlots != null) {
+                handleInventory(guiContainer);
+            }
+        }
+    }
+
+    private void handleInventory(GuiContainer guiContainer) {
+        for (int i = 0; i < hotbarSlots.length; i++) {
+            switchHotbarSlot(hotbarSlots[i]);
+            sellItems();
+            sendAnarhyCommand(anarhyNumbers[i]);
+
+            // чат гпт сам писал я не причём тут!!!
+            processInventoryContents(guiContainer);
+        }
+    }
+
+    private void switchHotbarSlot(int slot) {
+        Minecraft.getMinecraft().player.connection.sendPacket(new CPacketHeldItemChange(slot - 1));
+        Minecraft.getMinecraft().player.inventory.currentItem = slot - 1;
+        Minecraft.getMinecraft().playerController.updateController();
+    }
+
+    private void sellItems() {
+        sendCommand("/ah sell 10000");
+    }
+
+    private void sendAnarhyCommand(int number) {
+        String playerName = Minecraft.getMinecraft().getSession().getUsername();
+        sendCommand("/an" + number + " /ah " + playerName + " clicktostone clicktolime_stained_glass_pane");
+    }
+
+    private void sendCommand(String command) {
+        Minecraft.getMinecraft().player.sendChatMessage(command);
+    }
+
+    private void processInventoryContents(GuiContainer guiContainer) {
+        for (int slotIndex = 0; slotIndex < guiContainer.inventorySlots.inventorySlots.size(); slotIndex++) {
+            ItemStack stackInSlot = guiContainer.inventorySlots.getSlot(slotIndex).getStack();
+            
+            // Ваш код для обработки содержимого слота инвентаря
+            if (!stackInSlot.isEmpty()) {
+                clickItemInSlot(guiContainer, slotIndex);
+            }
+        }
+    }
+
+    private void clickItemInSlot(GuiContainer guiContainer, int slotIndex) {
+        PlayerControllerMP playerController = Minecraft.getMinecraft().playerController;
+        playerController.windowClick(guiContainer.inventorySlots.windowId, slotIndex, 0, ClickType.PICKUP, Minecraft.getMinecraft().player);
+        playerController.windowClick(guiContainer.inventorySlots.windowId, -999, 0, ClickType.PICKUP, Minecraft.getMinecraft().player);
+    }
+}
