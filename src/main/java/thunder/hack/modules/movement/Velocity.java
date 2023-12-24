@@ -26,7 +26,7 @@ public class Velocity extends Module {
      */
 
     public Setting<Boolean> onlyAura = new Setting<>("OnlyAura", false);
-    public Setting<Boolean> pauseInWater = new Setting<>("PauseInWater", false);
+    public Setting<Boolean> pauseInWater = new Setting<>("PauseInFluids", false);
     public Setting<Boolean> autoDisable = new Setting<>("DisableOnVerify", false);
     public Setting<Boolean> cc = new Setting<>("CC", false);
     public Setting<Boolean> fishingHook = new Setting<>("FishingHook", true);
@@ -54,7 +54,7 @@ public class Velocity extends Module {
     public void onPacketReceive(PacketEvent.Receive e) {
         if (fullNullCheck()) return;
 
-        if(mc.player != null && (mc.player.isTouchingWater() || mc.player.isSubmergedInWater()) && pauseInWater.getValue())
+        if(mc.player != null && (mc.player.isTouchingWater() || mc.player.isSubmergedInWater() || mc.player.isInLava()) && pauseInWater.getValue())
             return;
 
         if (ccCooldown > 0) {
