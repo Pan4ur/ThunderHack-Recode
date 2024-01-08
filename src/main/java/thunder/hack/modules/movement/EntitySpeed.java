@@ -32,6 +32,11 @@ public class EntitySpeed extends Module {
         acceleration = 0f;
     }
 
+    @Override
+    public void onDisable() {
+        ThunderHack.TICK_TIMER = 1f;
+    }
+
     @EventHandler
     public void onPlayerTravel(@NotNull EventPlayerTravel ev) {
         if (!ev.isPre()) return;
