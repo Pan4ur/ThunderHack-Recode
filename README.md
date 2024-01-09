@@ -20,7 +20,7 @@
 - Default ClickGui keybind - **```P```** (That's not true! Go to discord and ask!)
 - Default prefix  - **```@```**
 - Middle click on module to bind
-- DoxWare 2.0, gumballoff and Quick Client are ratted TH Recode renames, be aware :)
+- DoxWare 2.0, gumballoff and Quick Client are ratted TH Recode renames, beware!
 
 ## Requirements
 - [FabricApi 1.20.4](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/4933446)
