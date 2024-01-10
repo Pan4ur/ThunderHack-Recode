@@ -46,10 +46,7 @@ public class CrosshairArrows extends HudElement {
         float middleW = ModuleManager.crosshair.getAnimatedPosX();
         float middleH = ModuleManager.crosshair.getAnimatedPosY();
 
-        int color = switch (triangleMode.getValue()) {
-            case Custom -> colors.getValue().getColor();
-            case Astolfo -> Render2DEngine.astolfo(false, 1).getRGB();
-        };
+        int color = 0;
 
         context.getMatrices().push();
         context.getMatrices().translate(middleW, middleH, 0);
@@ -66,6 +63,10 @@ public class CrosshairArrows extends HudElement {
 
                 if (ThunderHack.friendManager.isFriend(e))
                     color = colorf.getValue().getColor();
+                else color = switch (triangleMode.getValue()) {
+                    case Custom -> colors.getValue().getColor();
+                    case Astolfo -> Render2DEngine.astolfo(false, 1).getRGB();
+                };
 
                 Render2DEngine.drawTracerPointer(context.getMatrices(), middleW, middleH - xOffset.getValue(), width.getValue() * 5F,tracerWidth.getValue(), downHeight.getValue(), down.getValue().isEnabled(), glow.getValue(), color);
 
