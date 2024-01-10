@@ -24,6 +24,7 @@ import static thunder.hack.modules.client.MainSettings.isRu;
 public class LagNotifier extends Module {
     private final Setting<Boolean> rubberbandNotify = new Setting<>("Rubberband", true);
     private final Setting<Boolean> serverResponseNotify = new Setting<>("ServerResponse", true);
+    private final Setting<Integer> responceTreshold = new Setting<>("ResponceTreshold", 5, 0, 15, v -> serverResponseNotify.getValue());
     private final Setting<Boolean> tpsNotify = new Setting<>("TPS", true);
 
     private final Identifier ICON = new Identifier("textures/lagg.png");
@@ -66,7 +67,7 @@ public class LagNotifier extends Module {
             FontRenderers.modules.drawCenteredString(context.getMatrices(), (isRu() ? "Обнаружен руббербенд! " : "Rubberband detected! ") + decimalFormat.format((5000f - (float) rubberbandTimer.getTimeMs()) / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
         }
 
-        if (packetTimer.passedMs(5000) && serverResponseNotify.getValue()) {
+        if (packetTimer.passedMs(responceTreshold.getValue() * 1000L) && serverResponseNotify.getValue()) {
             DecimalFormat decimalFormat = new DecimalFormat("#.#");
             FontRenderers.modules.drawCenteredString(context.getMatrices(), (isRu() ? "Сервер перестал отвечать! " : "The server stopped responding! ") + decimalFormat.format((float) packetTimer.getTimeMs() / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
 
