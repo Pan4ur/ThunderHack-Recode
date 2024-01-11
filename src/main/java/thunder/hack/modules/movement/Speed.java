@@ -94,7 +94,7 @@ public class Speed extends Module {
 
             if (ModuleManager.aura.isDisabled() || Aura.target == null) {
                 for (PlayerEntity ent : ThunderHack.asyncManager.getAsyncPlayers())
-                    if (ent != mc.player && mc.player.squaredDistanceTo(ent) < 49 && AntiBot.bots.contains(ent)) {
+                    if (ent != mc.player && mc.player.squaredDistanceTo(ent) < 49 && AntiBot.bots.contains(ent) && !withoutBot.getValue()) {
                         mc.player.setPitch(95);
                         mc.player.setYaw(mc.player.getYaw() + MathUtility.random(-0.5f,0.5f));
                         break;
@@ -109,7 +109,7 @@ public class Speed extends Module {
     public void modifyVelocity(EventPlayerTravel e) {
         if (mode.getValue() == Mode.FunTime && !e.isPre() && ThunderHack.core.getSetBackTime() > 1000) {
             for(PlayerEntity ent : ThunderHack.asyncManager.getAsyncPlayers()) {
-                if(ent != mc.player && mc.player.squaredDistanceTo(ent) <= (AntiBot.bots.contains(ent) ? 9f : 2.25) || withoutBot.getValue()) {
+                if(ent != mc.player && mc.player.squaredDistanceTo(ent) <= (AntiBot.bots.contains(ent) && !withoutBot.getValue() ? 9f : 2.25)) {
                     float p = mc.world.getBlockState(((IEntity) mc.player).thunderHack_Recode$getVelocityBP()).getBlock().getSlipperiness();
                     float f = mc.player.isOnGround() ? p * 0.91f : 0.91f;
                     float f2 = mc.player.isOnGround() ? p : 0.99f;
