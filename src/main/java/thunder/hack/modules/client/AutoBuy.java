@@ -43,13 +43,10 @@ public class AutoBuy extends Module {
     public final Setting<String> an = new Setting<>("An", "an235");
     public final Setting<Integer> minDelay = new Setting<>("MinUpdateDelay", 400, 50, 1000);
     public final Setting<Integer> maxDelay = new Setting<>("MaxUpdateDelay", 550, 100, 3000);
-    public final Setting<Integer> reAhCount = new Setting<>("ReAhCount", 12, 2, 30);
-    public final Setting<Boolean> logFake = new Setting<>("LogFake", true);
 
     private final Timer updateTimer = new Timer();
     private final Timer reAhTimer = new Timer();
     private final Timer buyTimer = new Timer();
-    private final Timer fakeItemTimeout = new Timer();
     private final Timer chatTimer = new Timer();
 
     private Pair<ItemStack, Integer> lastStack;
@@ -57,7 +54,7 @@ public class AutoBuy extends Module {
     public static final ArrayList<AutoBuyItem> items = new ArrayList<>();
     public static final ArrayList<ItemLog> log = new ArrayList<>();
 
-    private int updateCount, messageCount;
+    private int messageCount;
     private static boolean active;
     public static int successfully;
 
@@ -111,9 +108,8 @@ public class AutoBuy extends Module {
 
     @Override
     public void onRender3D(MatrixStack stack) {
-        if(chatTimer.passedMs(3000)) {
+        if(chatTimer.passedMs(3000))
             messageCount = 0;
-        }
 
         if (mc.player.getX() == -3 && mc.player.getY() == 1 && mc.player.getZ() == 11 && chatTimer.passedMs(100)) {
             updateTimer.setMs(-35000);
@@ -126,67 +122,34 @@ public class AutoBuy extends Module {
         if (!active)
             return;
 
-        if (updateCount > reAhCount.getValue()) {
-            updateCount = 0;
-            sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-            mc.player.closeScreen();
-            return;
-        }
-
-        if (fakeItemTimeout.passedMs(500) && lastStack != null) {
-            if(logFake.getValue()) {
-                log.add(new ItemLog(lastStack.getLeft(), "фейк, за: " + lastStack.getRight() + " " + new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime())));
-                sendMessage("Fake");
-            }
-            lastStack = null;
-        }
-
         if (mc.currentScreen == null && reAhTimer.every(ServerManager.getPing() + 100))
             openAh(null, command.getValue());
 
         if (mc.player.currentScreenHandler instanceof GenericContainerScreenHandler chest) {
-            if (mc.currentScreen.getTitle().getString().contains("(")) {
+            if (mc.currentScreen.getTitle().getString().contains("Аукционы") || mc.currentScreen.getTitle().getString().contains("Поиск")) {
                 int slot = 0;
                 for (ItemStack itemStack : chest.getStacks()) {
                     NbtList lore = getLoreTagList(itemStack);
                     if (lore != null) {
                         int price = getPrice(lore.toString());
-                        if (isGoodDeal(itemStack, price, lore)) {
-                            Buy(slot);
+                        if (isGoodDeal(itemStack, price, lore) && buyTimer.every(1000)) {
+                            sendMessage(itemStack.getName().getString() + " " + price);
+                            lastStack = new Pair<>(itemStack, price);
+                            int finalSlot = slot;
+                            new Thread(() -> {
+                                active = false;
+                                try {Thread.sleep((long) (800 + MathUtility.random(0, 50)));} catch (Exception ignored) {}
+                                Buy(finalSlot);
+                                try {Thread.sleep(500);} catch (Exception ignored) {}
+                                active = true;
+                            }).start();
                             return;
                         }
                     }
                     slot++;
                 }
-                sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                mc.player.closeScreen();
-            } else if (mc.currentScreen.getTitle().getString().contains("Аукционы") || mc.currentScreen.getTitle().getString().contains("Поиск")) {
-                for (ItemStack itemStack : chest.getStacks()) {
-                    NbtList lore = getLoreTagList(itemStack);
-                    if (lore != null) {
-                        int price = getPrice(lore.toString());
-                        String seller = getSeller(lore.toString());
-                        if (isGoodDeal(itemStack, price, lore) && buyTimer.every(1000)) {
-                            sendMessage(itemStack.getName().getString() + " " + price + " " + seller);
-                            lastStack = new Pair<>(itemStack, price);
-                            sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                            mc.player.closeScreen();
-                            openAh(seller, null);
-                            updateCount = 0;
-                            reAhTimer.setMs(-800);
-                            fakeItemTimeout.reset();
-                            return;
-                        }
-                    }
-                }
-
-                if (updateTimer.every((int) MathUtility.random(minDelay.getValue(), maxDelay.getValue()))) {
-                    if (updateCount++ < reAhCount.getValue()) clickSlot(49);
-                    else {
-                        sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                        mc.player.closeScreen();
-                    }
-                }
+                if (updateTimer.every((int) MathUtility.random(minDelay.getValue(), maxDelay.getValue())))
+                    clickSlot(49);
             }
         }
     }
@@ -256,11 +219,6 @@ public class AutoBuy extends Module {
     public void Buy(int slot) {
         sendMessage("buy 1 =" + slot);
         clickSlot(slot, SlotActionType.QUICK_MOVE);
-        sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-        mc.player.closeScreen();
-        updateTimer.setMs(-1000);
-        reAhTimer.setMs(-1000);
-        buyTimer.setMs(-1000);
     }
 
     public static NbtList getLoreTagList(ItemStack stack) {
