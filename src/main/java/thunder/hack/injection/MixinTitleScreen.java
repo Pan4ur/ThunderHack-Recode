@@ -35,8 +35,6 @@ public class MixinTitleScreen extends Screen {
     public void postInitHook(CallbackInfo ci) {
         if (MainSettings.customMainMenu.getValue() && !MainMenuScreen.getInstance().confirm) {
             mc.setScreen(MainMenuScreen.getInstance());
-            mc.getSoundManager().reloadSounds();
-            mc.getSoundManager().play(PositionedSoundInstance.master(SoundUtility.MAINMENU_SOUNDEVENT, 1.0f));
         }
 
         if (ThunderHack.isOutdated && !FabricLoader.getInstance().isDevelopmentEnvironment()) {
