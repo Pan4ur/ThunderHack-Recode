@@ -43,6 +43,7 @@ public class Speed extends Module {
     public final Setting<Float> boostFactor = new Setting<>("BoostFactor", 2f, 0f, 10f, v -> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Boolean> allowOffGround = new Setting<>("AllowOffGround", true, v -> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Integer> shiftTicks = new Setting<>("ShiftTicks", 0, 0, 10, v -> mode.getValue() == Mode.MatrixDamage);
+    public final Setting<Boolean> withoutBot = new Setting<>("WithoutBot", false, v -> mode.getValue() == Mode.FunTime);
 
     public double baseSpeed;
     private int stage, ticks;
@@ -108,7 +109,7 @@ public class Speed extends Module {
     public void modifyVelocity(EventPlayerTravel e) {
         if (mode.getValue() == Mode.FunTime && !e.isPre() && ThunderHack.core.getSetBackTime() > 1000) {
             for(PlayerEntity ent : ThunderHack.asyncManager.getAsyncPlayers()) {
-                if(ent != mc.player && mc.player.squaredDistanceTo(ent) <= (AntiBot.bots.contains(ent) ? 9f : 2.25)) {
+                if(ent != mc.player && mc.player.squaredDistanceTo(ent) <= (AntiBot.bots.contains(ent) ? 9f : 2.25) || withoutBot.getValue()) {
                     float p = mc.world.getBlockState(((IEntity) mc.player).thunderHack_Recode$getVelocityBP()).getBlock().getSlipperiness();
                     float f = mc.player.isOnGround() ? p * 0.91f : 0.91f;
                     float f2 = mc.player.isOnGround() ? p : 0.99f;
