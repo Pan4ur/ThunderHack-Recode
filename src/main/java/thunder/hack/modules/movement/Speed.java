@@ -89,7 +89,7 @@ public class Speed extends Module {
         }
 
         if (mode.getValue() == Mode.FunTime) {
-            if((ModuleManager.antiBot.isDisabled() || ModuleManager.antiBot.remove.getValue()) && mc.player.age % 8 == 0)
+            if((ModuleManager.antiBot.isDisabled() || ModuleManager.antiBot.remove.getValue()) && mc.player.age % 8 == 0 && !withoutBot.getValue())
                 sendMessage(Formatting.GOLD + "Включи AntiBot и убери чек remove!");
 
             if (ModuleManager.aura.isDisabled() || Aura.target == null) {
