@@ -4,6 +4,7 @@ import net.minecraft.block.*;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -21,6 +22,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventBreakBlock;
+import thunder.hack.events.impl.EventClickSlot;
 import thunder.hack.events.impl.EventStopUsingItem;
 import thunder.hack.modules.player.NoInteract;
 import thunder.hack.modules.player.Reach;
@@ -104,5 +106,13 @@ public class MixinClientPlayerInteractionManager {
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled())
             cir.setReturnValue(false);
+    }
+
+    @Inject(method = "clickSlot", at = @At("HEAD"), cancellable = true)
+    public void clickSlotHook(int syncId, int slotId, int button, SlotActionType actionType, PlayerEntity player, CallbackInfo ci) {
+        EventClickSlot event = new EventClickSlot(actionType, slotId, button, syncId);
+        ThunderHack.EVENT_BUS.post(event);
+        if (event.isCancelled())
+            ci.cancel();
     }
 }

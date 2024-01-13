@@ -150,6 +150,14 @@ public class AutoBuy extends Module {
                 }
                 if (updateTimer.every((int) MathUtility.random(minDelay.getValue(), maxDelay.getValue())))
                     clickSlot(49);
+            } else if(mc.currentScreen.getTitle().getString().contains("Подозрительная цена")) {
+                new Thread(() -> {
+                    active = false;
+                    try {Thread.sleep((long) (800 + MathUtility.random(0, 50)));} catch (Exception ignored) {}
+                    Buy(1);
+                    try {Thread.sleep(500);} catch (Exception ignored) {}
+                    active = true;
+                }).start();
             }
         }
     }
