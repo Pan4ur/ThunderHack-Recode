@@ -22,6 +22,9 @@ public interface IMinecraftClient {
     @Invoker("doItemUse")
     void idoItemUse();
 
+    @Invoker("doAttack")
+    boolean idoAttack();
+
     @Mutable
     @Accessor("profileKeys")
     void setProfileKeys(ProfileKeys keys);
