@@ -6,6 +6,7 @@
   "descriptions.combat.autobed": "Automatically places and explodes beds.",
   "descriptions.combat.autobuff": "Automatically throws potions with effects under you.",
   "descriptions.combat.autocrystal": "Automatically places and explodes crystals.",
+  "descriptions.movement.autowalk": "Going forward for you",
   "descriptions.combat.autocrystalbase": "Automatically places obsidian for crystal.",
   "descriptions.combat.autogapple": "Automatically eating golden apples.",
   "descriptions.combat.automine": "Automatically mines blocks using SpeedMine.",

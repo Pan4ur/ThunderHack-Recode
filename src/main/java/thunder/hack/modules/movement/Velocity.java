@@ -30,6 +30,7 @@ public class Velocity extends Module {
     public Setting<Boolean> autoDisable = new Setting<>("DisableOnVerify", false);
     public Setting<Boolean> cc = new Setting<>("CC", false);
     public Setting<Boolean> fishingHook = new Setting<>("FishingHook", true);
+    public Setting<Boolean> fire = new Setting<>("PauseFire", false);
     public static Setting<Parent> antiPush = new Setting<>("AntiPush", new Parent(false, 0));
     public Setting<Boolean> blocks = new Setting<>("Blocks", true).withParent(antiPush);
     public Setting<Boolean> players = new Setting<>("Players", true).withParent(antiPush);
@@ -56,6 +57,10 @@ public class Velocity extends Module {
 
         if(mc.player != null && (mc.player.isTouchingWater() || mc.player.isSubmergedInWater() || mc.player.isInLava()) && pauseInWater.getValue())
             return;
+
+        if(mc.player != null && mc.player.isOnFire() && fire.getValue() && (mc.player.hurtTime > 0)){
+            return;
+        }
 
         if (ccCooldown > 0) {
             ccCooldown--;
