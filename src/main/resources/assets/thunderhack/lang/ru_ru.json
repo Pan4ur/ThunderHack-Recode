@@ -5,6 +5,7 @@
   "descriptions.combat.autoanchor": "Автоматически ставит и взрывает якоря.",
   "descriptions.combat.autobuff": "Aвтоматически бросает под тебя зелья с эффектами.",
   "descriptions.combat.autocrystal": "Автоматически ставит и взрывает кристаллы.",
+  "descriptions.movement.autowalk": "Идет вперёд за вас",
   "descriptions.combat.autocrystalbase": "Автоматически ставит обсидиан для кристаллов.",
   "descriptions.combat.autogapple": "Автоматически ест золотые яблоки.",
   "descriptions.combat.automine": "Автоматически ломает Surround цели.",
