@@ -1,3 +1,5 @@
+package thunder.hack.gui.hud.impl;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
 import thunder.hack.ThunderHack;
