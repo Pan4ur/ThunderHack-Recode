@@ -1,5 +1,3 @@
-package thunder.hack.gui.hud.impl;
-
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
 import thunder.hack.ThunderHack;
@@ -11,9 +9,11 @@ import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
+import java.util.Comparator;
+import java.util.List;
 
 public class ModuleList extends HudElement {
-      private final Setting<Mode> mode = new Setting<>("Mode", Mode.ColorText);
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.ColorText);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
     private final Setting<Float> rainbowSpeed = new Setting<>("Speed", 10.0f, 1.0f, 20.0f);
     private final Setting<Float> offset1 = new Setting<>("Offset", 10.0f, 1.0f, 20.0f);
