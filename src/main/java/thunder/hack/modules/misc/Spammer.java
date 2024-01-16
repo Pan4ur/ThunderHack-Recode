@@ -86,7 +86,7 @@ public class Spammer extends Module {
             String c = SpamList.get(new Random().nextInt(SpamList.size()));
             if (c.charAt(0) == '/') {
                 c = c.replace("/", "");
-                mc.player.networkHandler.sendCommand(global.getValue() ? "!" + c : c);
+                mc.player.networkHandler.sendCommand(c);
             } else mc.player.networkHandler.sendChatMessage(global.getValue() ? "!" + c : c);
 
             timer_delay.reset();
