@@ -176,11 +176,9 @@ public final class Aura extends Module {
         if (!mc.options.jumpKey.isPressed() && mc.player.isOnGround() && autoJump.getValue())
             mc.player.jump();
 
-        if (rotationMode.getValue() == Rotation.SunRise)
-            lookingAtHitbox = ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), ignoreWalls.getValue().isEnabled(), rayTrace.getValue());
-
-        boolean readyForAttack = autoCrit() && (lookingAtHitbox || skipRayTraceCheck());
         calcRotations(autoCrit());
+        
+        boolean readyForAttack = autoCrit() && (lookingAtHitbox || skipRayTraceCheck());
 
         if (readyForAttack) {
             if (shieldBreaker(false))
