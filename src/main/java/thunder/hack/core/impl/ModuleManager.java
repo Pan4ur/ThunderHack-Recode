@@ -110,6 +110,8 @@ public class ModuleManager implements IManager {
     public static GapplesHud gapplesHud = new GapplesHud();
     public static Particles particles = new Particles();
     public static ToolSaver toolSaver = new ToolSaver();
+    public static PVETools pveTools = new PVETools();
+    public static GetNbtTags getNbtTags = new GetNbtTags();
     public static DamageFly damageFly = new DamageFly();
     public static WayPoints wayPoints = new WayPoints();
     public static WaterMark waterMark = new WaterMark();
