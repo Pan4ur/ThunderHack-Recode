@@ -135,6 +135,7 @@ public class ModuleManager implements IManager {
     public static AutoFlyme autoFlyme = new AutoFlyme();
     public static AutoArmor autoArmor = new AutoArmor();
     public static Cooldowns cooldowns = new Cooldowns();
+    public static TapeMouse tapeMouse = new TapeMouse();
     public static AutoMine autoMine = new AutoMine();
     public static ViewLock viewLock = new ViewLock();
     public static Velocity velocity = new Velocity();
