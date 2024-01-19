@@ -1,5 +1,6 @@
 package thunder.hack.modules.misc;
 
+import thunder.hack.setting.Setting;
 import thunder.hack.modules.Module;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
