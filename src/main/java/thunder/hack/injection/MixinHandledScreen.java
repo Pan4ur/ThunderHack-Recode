@@ -281,7 +281,11 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
         }
         for (Render2DEngine.Rectangle rect : clickableRects.keySet()) {
             if (rect.contains(mouseX, mouseY)) {
-                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, clickableRects.get(rect), 0, SlotActionType.PICKUP, mc.player);
+                if (ModuleManager.tooltips.shulkerRegear) {
+                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, clickableRects.get(rect), 0, SlotActionType.QUICK_MOVE, mc.player);
+                } else {
+                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, clickableRects.get(rect), 0, SlotActionType.PICKUP, mc.player);
+                }
             }
         }
     }
