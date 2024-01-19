@@ -11,7 +11,7 @@
 <div align="center">
     
 [![Discord Mine](https://img.shields.io/discord/1140266441082404924?label=discord&logo=discord&logoColor=white)](https://discord.gg/bJajFP3kCX)
-
+![pasted with <3](https://img.shields.io/badge/Ctrl%20+%20C-Ctrl%20+%20V-blue)
 </div>
 
 
