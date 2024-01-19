@@ -23,6 +23,7 @@ public class CommandManager implements IManager {
         add(new RpcCommand());
         add(new KitCommand());
         add(new GpsCommand());
+        add(new CalcCommand());
         add(new CfgCommand());
         add(new BindCommand());
         add(new DrawCommand());

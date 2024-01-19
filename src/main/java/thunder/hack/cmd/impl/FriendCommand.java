@@ -20,13 +20,11 @@ public class FriendCommand extends Command {
         builder.then(literal("reset").executes(context -> {
             ThunderHack.friendManager.clear();
             sendMessage("Friends got reset.");
-
             return SINGLE_SUCCESS;
         }));
 
         builder.then(literal("add").then(arg("player", StringArgumentType.word()).executes(context -> {
             String nickname = context.getArgument("player", String.class);
-
             ThunderHack.friendManager.addFriend(nickname);
             sendMessage(nickname + " has been friended");
             return SINGLE_SUCCESS;
