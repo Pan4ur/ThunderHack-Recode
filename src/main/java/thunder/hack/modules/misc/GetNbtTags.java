@@ -15,7 +15,7 @@ public class GetNbtTags extends Module {
     public void onEnable() {
         if (mc.player.getMainHandStack().hasNbt()) {
             String nbt = mc.player.getMainHandStack().getNbt().toString();
-            if (copy.getValue()) mc.keyboardHandler.setClipboard(this.getSelectedText());
+            if (copy.getValue()) mc.keyboardHandler.setClipboard(nbt));
             disable(nbt);
         }
         else{
