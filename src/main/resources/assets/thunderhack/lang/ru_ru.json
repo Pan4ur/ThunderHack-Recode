@@ -193,5 +193,5 @@
   "descriptions.commands.tracker": "Добавить игроков в Tracker.",
   "descriptions.commands.vclip": "Клипнуться вертикально.",
   "descriptions.commands.waypoint": "Добавить вейпоинт (надо включить WayPoints!!!).",
-  "descriptions.combat.autocrystalbase": "Automatically places obsidian for crystal."
+  "descriptions.commands.getnbt": "Добавить вейпоинт (надо включить WayPoints!!!)."
 }

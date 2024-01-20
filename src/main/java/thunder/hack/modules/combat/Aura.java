@@ -165,11 +165,17 @@ public final class Aura extends Module {
     }
 
     public void auraLogic() {
+        Item handItem = mc.player.getMainHandStack().getItem();
+
+        if((switchMode.getValue() != Switch.Silent && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem))) {
+            target = null;
+            return;
+        }
+
         handleKill();
         updateTarget();
 
-        Item handItem = mc.player.getMainHandStack().getItem();
-        if (target == null || (switchMode.getValue() != Switch.Silent && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem))) {
+        if (target == null) {
             return;
         }
 
