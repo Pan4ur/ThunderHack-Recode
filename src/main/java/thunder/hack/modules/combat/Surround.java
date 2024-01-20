@@ -32,7 +32,6 @@ public final class Surround extends IndestructibleModule {
     private final Setting<Integer> blocksPerTick = new Setting<>("Blocks/Place", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10, v -> placeTiming.getValue() != PlaceTiming.Sequential);
     private final Setting<CenterMode> center = new Setting<>("Center", CenterMode.Disabled);
-    private final Setting<Boolean> pauseEating = new Setting<>("Pause Eating", false);
 
     private final Setting<Parent> autoDisable = new Setting<>("Auto Disable", new Parent(false, 0));
     private final Setting<Boolean> onYChange = new Setting<>("On Y Change", true).withParent(autoDisable);
@@ -79,11 +78,6 @@ public final class Surround extends IndestructibleModule {
     @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPostSync(EventPostSync event) {
-        if (pauseEating.getValue()) {
-            if (mc.player.isUsingItem()) {
-                return;
-            }
-        }
         if (prevY != mc.player.getY() && onYChange.getValue() && !wasTp) {
             disable(isRu() ? "Отключён из-за изменения Y!" : "Disabled due to Y change!");
             return;
