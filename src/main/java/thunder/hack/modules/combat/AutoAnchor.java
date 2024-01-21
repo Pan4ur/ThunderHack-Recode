@@ -136,7 +136,6 @@ public final class AutoAnchor extends Module {
     @SuppressWarnings("unused")
     private void onPop(@NotNull TotemPopEvent event) {
         if (!event.getEntity().equals(target) || !render.getValue().isEnabled() || !pop.getValue()) return;
-        sendMessage("work");
 
         BlockAnimationUtility.renderBlock(
                 targetPos,
