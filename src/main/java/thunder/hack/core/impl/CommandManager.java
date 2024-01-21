@@ -33,12 +33,14 @@ public class CommandManager implements IManager {
         add(new MacroCommand());
         add(new StaffCommand());
         add(new VClipCommand());
+        add(new GetNbtCommand());
         add(new FriendCommand());
         add(new ModuleCommand());
         add(new PrefixCommand());
         add(new SearchCommand());
         add(new TrackerCommand());
         add(new DropAllCommand());
+        add(new TreasureCommand());
         add(new WayPointCommand());
         add(new OpenFolderCommand());
         add(new ResetBindsCommand());

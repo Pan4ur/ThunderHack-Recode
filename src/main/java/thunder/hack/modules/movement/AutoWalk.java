@@ -1,5 +1,7 @@
 package thunder.hack.modules.movement;
 
+import meteordevelopment.orbit.EventHandler;
+import thunder.hack.events.impl.EventKeyboardInput;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -11,8 +13,8 @@ public class AutoWalk extends Module {
         super("AutoWalk", Category.MOVEMENT);
     }
 
-    @Override
-    public void onUpdate() {
-        mc.options.forwardKey.setPressed(true);
+    @EventHandler
+    public void onKey(EventKeyboardInput e) {
+        mc.player.input.movementForward = 1f;
     }
 }

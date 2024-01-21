@@ -35,7 +35,6 @@ public class MainMenuScreen extends Screen {
     private final List<MainMenuButton> buttons = new ArrayList<>();
     public boolean confirm = false;
     public static int ticksActive;
-    static ArrayList<Particle> particles = new ArrayList<>();
     private TextUtil animatedText = new TextUtil("THUNDERHACK", "HAPPY NEW YEAR!");
 
     protected MainMenuScreen() {
@@ -54,7 +53,6 @@ public class MainMenuScreen extends Screen {
     private static MainMenuScreen INSTANCE = new MainMenuScreen();
 
     public static MainMenuScreen getInstance() {
-        particles.clear();
         ticksActive = 0;
 
         if (INSTANCE == null) {
@@ -68,20 +66,9 @@ public class MainMenuScreen extends Screen {
         ticksActive++;
         animatedText.tick();
 
-        if(particles.size() < 100 && ticksActive > 40) {
-            particles.add(new Particle(0, mc.getWindow().getScaledHeight(), false));
-            particles.add(new Particle(0, mc.getWindow().getScaledHeight(), false));
-
-            particles.add(new Particle(mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight(), true));
-            particles.add(new Particle(mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight(), true));
-        }
-
         if(ticksActive > 400) {
-            particles.clear();
             ticksActive = 0;
         }
-
-        particles.forEach(Particle::tick);
     }
 
     @Override
@@ -103,7 +90,6 @@ public class MainMenuScreen extends Screen {
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        particles.forEach(p -> p.render(context));
         RenderSystem.disableBlend();
 
         MSAAFramebuffer.use(true, () -> {
@@ -162,37 +148,5 @@ public class MainMenuScreen extends Screen {
             Util.getOperatingSystem().open(URI.create("https://thunderhack.onrender.com/"));
 
         return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    public static class Particle {
-
-        Color color;
-        float px, py, x, y, mx, my;
-
-        public Particle(int x, int y, boolean opposite) {
-            this.x = x;
-            this.y = y;
-            px = x;
-            py = y;
-            mx = opposite ? -MathUtility.random(7, 24) : MathUtility.random(7, 24);
-            my = MathUtility.random(1, 36);
-            color = HudEditor.getColor((int) mx * 20);
-        }
-
-        public void tick() {
-            px = x;
-            py = y;
-            x += mx;
-            y -= my;
-            my -= 0.5f;
-            mx *= 0.99f;
-            my *= 0.99f;
-        }
-
-        public void render(DrawContext context) {
-            RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1f);
-            context.drawTexture(Render2DEngine.star, (int) Render2DEngine.interpolate(px, x, mc.getTickDelta()), (int) Render2DEngine.interpolate(py, y, mc.getTickDelta()), 20, 20, 0, 0, 20, 20, 20, 20);
-            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        }
     }
 }

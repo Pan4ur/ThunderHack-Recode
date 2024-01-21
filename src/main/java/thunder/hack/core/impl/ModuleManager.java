@@ -110,14 +110,11 @@ public class ModuleManager implements IManager {
     public static GapplesHud gapplesHud = new GapplesHud();
     public static Particles particles = new Particles();
     public static ToolSaver toolSaver = new ToolSaver();
-    public static PVETools pveTools = new PVETools();
-    public static GetNbtTags getNbtTags = new GetNbtTags();
     public static DamageFly damageFly = new DamageFly();
     public static WayPoints wayPoints = new WayPoints();
     public static WaterMark waterMark = new WaterMark();
     public static ViewModel viewModel = new ViewModel();
     public static TunnelEsp tunnelEsp = new TunnelEsp();
-    public static AutoWalk autoWalk = new AutoWalk();
     public static TickShift tickShift = new TickShift();
     public static TargetHud targetHud = new TargetHud();
     public static SpeedMine speedMine = new SpeedMine();
@@ -164,6 +161,9 @@ public class ModuleManager implements IManager {
     public static SelfTrap selfTrap = new SelfTrap();
     public static AntiVoid antiVoid = new AntiVoid();
     public static KillFeed killFeed = new KillFeed();
+    public static AutoWalk autoWalk = new AutoWalk();
+    public static AutoEat autoEat = new AutoEat();
+    public static AntiAFK antiAFK = new AntiAFK();
     public static AutoBuy autoBuy = new AutoBuy();
     public static SoundFX soundFX = new SoundFX();
     public static AutoBed autoBed = new AutoBed();

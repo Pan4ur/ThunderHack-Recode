@@ -33,8 +33,7 @@ public class PVETools extends Module {
     // Sheeps
     private final Setting<Boolean> SheepPaint = new Setting<>("SheepPaint", false);
     private final Setting<Boolean> SheepShear = new Setting<>("SheepShear", false);
-    String CladHelperCoords;
-    String string;
+
 
     @EventHandler
     public void rotateAction(EventSync e) {
@@ -43,36 +42,10 @@ public class PVETools extends Module {
     @EventHandler
     public void postRotateAction(EventPostSync e) {
     }
-    @Override
-    public void onEnable() {
-        if(mc.player.getMainHandStack().getItem().toString().equals("filled_map")) {
-            if (cladHelper.getValue()) {
-                string = "";
-                CladHelperCoords = mc.player.getMainHandStack().getNbt().toString();
-                for (int i = CladHelperCoords.indexOf("x"); i < CladHelperCoords.indexOf("]") - 2; i++) {
-                    string += CladHelperCoords.charAt(i);
-                }
-                disable("Found! Coords: " + string);
-            }
-        }
-        else{
-            disable(isRu() ? "Возьми карту в руки!" : "Get map in hand!");
-        }
-    }
+
     @EventHandler
     public void onSync(EventSync e) {
-        if (autoHoe.getValue()) {
-            if (mc.crosshairTarget != null && mc.crosshairTarget instanceof BlockHitResult bhr) {
-                if (mc.world.getBlockState(bhr.getBlockPos()).getBlock() instanceof CropBlock block && block.getAge(mc.world.getBlockState(bhr.getBlockPos())) == 7) {
-                    mc.options.attackKey.setPressed(true);
-                }
-            }
-        }
     }
 
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    private void onPostSync(EventPostSync event) {
-        mc.options.attackKey.setPressed(false);
-    }
+    // ПИЗДЕЦ НЕ ТРОГАЙТЕ МОДУЛЬ!
 }
