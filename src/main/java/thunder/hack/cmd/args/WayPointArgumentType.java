@@ -17,7 +17,10 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 public class WayPointArgumentType implements ArgumentType<WayPointManager.WayPoint> {
-    private static final Collection<String> EXAMPLES = ThunderHack.wayPointManager.getWayPoints().stream().map(WayPointManager.WayPoint::name).limit(5).toList();
+    private static final Collection<String> EXAMPLES = ThunderHack.wayPointManager.getWayPoints().stream()
+            .map(WayPointManager.WayPoint::name)
+            .limit(5)
+            .toList();
 
     public static WayPointArgumentType create() {
         return new WayPointArgumentType();

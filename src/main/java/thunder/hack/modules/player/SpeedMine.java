@@ -44,7 +44,7 @@ import java.util.Objects;
 
 import static net.minecraft.enchantment.EnchantmentHelper.hasAquaAffinity;
 
-public class SpeedMine extends Module {
+public final class SpeedMine extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
     private final Setting<StartMode> startMode = new Setting<>("StartMode", StartMode.StartAbort, v -> mode.getValue() == Mode.Packet);
     private final Setting<SwitchMode> switchMode = new Setting<>("SwitchMode", SwitchMode.Alternative, v -> mode.getValue() == Mode.Packet);
@@ -112,10 +112,7 @@ public class SpeedMine extends Module {
         } else if (mode.getValue() == Mode.Packet) {
             if (minePosition != null) {
                 if (mineBreaks >= breakAttempts.getValue() || mc.player.squaredDistanceTo(minePosition.toCenterPos()) > range.getPow2Value()) {
-                    minePosition = null;
-                    mineFacing = null;
-                    progress = 0;
-                    mineBreaks = 0;
+                    reset();
                     return;
                 }
                 if (progress == 0 && !mc.world.isAir(minePosition) && attackTimer.passedMs(800)) {
@@ -260,7 +257,7 @@ public class SpeedMine extends Module {
 
     @EventHandler
     @SuppressWarnings("unused")
-    public void onEntitySync(EventSync event) {
+    private void onSync(EventSync event) {
         if (rotate.getValue() && progress > 0.95 && minePosition != null && mc.player != null) {
             float[] angle = PlayerManager.calcAngle(mc.player.getEyePos(), minePosition.toCenterPos());
 
@@ -273,13 +270,7 @@ public class SpeedMine extends Module {
     @SuppressWarnings("unused")
     private void onPacketSend(PacketEvent.@NotNull SendPost e) {
         if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket && resetOnSwitch.getValue()) {
-            progress = 0;
-            prevProgress = 0;
-
-            if (minePosition != null && mineFacing != null) {
-                sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, minePosition, mineFacing));
-                sendPacket(new PlayerActionC2SPacket(startMode.getValue() == StartMode.StartAbort ? PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK : PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, minePosition, mineFacing));
-            }
+            addBlockToMine(minePosition, mineFacing, true);
         }
     }
 
@@ -430,11 +421,11 @@ public class SpeedMine extends Module {
         return worth;
     }
 
-    public boolean addBlockToMine(BlockPos pos, @Nullable Direction facing, boolean allowReMine) {
+    public void addBlockToMine(BlockPos pos, @Nullable Direction facing, boolean allowReMine) {
         if (!allowReMine && (minePosition != null || progress != 0))
-            return false;
+            return;
         if (mc.player == null)
-            return false;
+            return;
 
         progress = 0;
         mineBreaks = 0;
@@ -445,7 +436,6 @@ public class SpeedMine extends Module {
             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos, mineFacing));
             sendPacket(new PlayerActionC2SPacket(startMode.getValue() == StartMode.StartAbort ? PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK : PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, minePosition, mineFacing));
         }
-        return true;
     }
 
     public static SpeedMine getInstance() {

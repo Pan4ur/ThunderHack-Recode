@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class EbatteSratte extends Module {
     private final Setting<Integer> delay = new Setting<>("Delay", 5, 1, 30);
     private final Setting<Server> server = new Setting<>("Server", Server.FunnyGame);
+    private final Setting<String> directCommand = new Setting<>("Command", "/w", v -> server.getValue() == Server.DirectMessage);
     private final Setting<Messages> mode = new Setting<>("Mode", Messages.Default);
 
     private static final String[] WORDS = new String[]{
@@ -67,7 +68,7 @@ public class EbatteSratte extends Module {
                 String chatPrefix = switch (server.getValue()) {
                     case FunnyGame -> "!";
                     case OldServer -> ">";
-                    case DirectMessage -> "/w ";
+                    case DirectMessage -> directCommand.getValue() + " ";
                     case Local -> "";
                 };
 
@@ -84,7 +85,9 @@ public class EbatteSratte extends Module {
     public void loadEZ() {
         try {
             File file = new File("ThunderHackRecode/misc/EbatteSratte.txt");
-            if (!file.exists()) file.createNewFile();
+            if (!file.exists() && !file.createNewFile())
+                sendMessage("Error with creating file");
+
             new Thread(() -> {
                 try {
                     FileInputStream fis = new FileInputStream(file);

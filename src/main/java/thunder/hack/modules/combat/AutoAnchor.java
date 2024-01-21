@@ -19,12 +19,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.events.impl.DeathEvent;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
@@ -33,10 +36,10 @@ import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
+import thunder.hack.utility.render.BlockAnimationUtility;
 import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.world.HoleUtility;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -51,6 +54,7 @@ public final class AutoAnchor extends Module {
     private final Setting<Boolean> antiFriendPop = new Setting<>("Anti Friend Pop", false);
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
+    private final Setting<Integer> actionDelay = new Setting<>("Action Delay", 500, 1, 2000);
     private final Setting<Integer> logicDelay = new Setting<>("Logic Delay", 30, 1, 2000);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
     private final Setting<YawStepMode> yawStep = new Setting<>("Yaw Step", YawStepMode.Off);
@@ -73,16 +77,12 @@ public final class AutoAnchor extends Module {
     private final Setting<Boolean> dimensionDisable = new Setting<>("Disable Nether", true).withParent(disable);
 
     // Render
-    private final Setting<Parent> renderCategory = new Setting<>("Render Category", new Parent(false, 0));
-    private final Setting<Boolean> render = new Setting<>("Render", true).withParent(renderCategory);
-    private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Fade).withParent(renderCategory);
-    private final Setting<Boolean> renderSelfDamage = new Setting<>("Self Damage", true).withParent(renderCategory);
-    private final Setting<Boolean> drawDamage = new Setting<>("Render Damage", true).withParent(renderCategory);
-    private final Setting<ColorSetting> fillColor = new Setting<>("Block Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
-    private final Setting<ColorSetting> lineColor = new Setting<>("Block Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
-    private final Setting<Integer> lineWidth = new Setting<>("Block Line Width", 2, 1, 10);
-    private final Setting<Integer> slideDelay = new Setting<>("Slide Delay", 200, 1, 1000);
-    private final Setting<ColorSetting> textColor = new Setting<>("Text Color", new ColorSetting(Color.WHITE)).withParent(renderCategory);
+    private final Setting<BooleanParent> render = new Setting<>("Render", new BooleanParent(false));
+    private final Setting<Boolean> pop = new Setting<>("Render Pop", true).withParent(render);
+    private final Setting<Boolean> death = new Setting<>("Render Death", true).withParent(render);
+    private final Setting<ColorSetting> fillColor = new Setting<>("Block Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(render);
+    private final Setting<ColorSetting> lineColor = new Setting<>("Block Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(render);
+    private final Setting<Integer> lineWidth = new Setting<>("Block Line Width", 2, 1, 10).withParent(render);
 
     private final Map<BlockPos, Integer> charges = new HashMap<>();
     private final Timer logicTimer = new Timer();
@@ -91,11 +91,8 @@ public final class AutoAnchor extends Module {
     private BlockPos targetPos;
     private boolean rotated;
 
-    private static AutoAnchor instance;
-
     public AutoAnchor() {
         super("AutoAnchor", Category.COMBAT);
-        instance = this;
     }
 
     @Override
@@ -117,13 +114,53 @@ public final class AutoAnchor extends Module {
 
     @Override
     public void onRender3D(MatrixStack stack) {
-        if (targetPos != null)
-            Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(new Box(targetPos), HudEditor.getColor(0), 2));
+        if (targetPos == null || !render.getValue().isEnabled()) return;
+
+        Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(
+                new Box(targetPos),
+                lineColor.getValue().getColorObject(),
+                lineWidth.getValue()
+        ));
+        Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(
+                new Box(targetPos),
+                fillColor.getValue().getColorObject()
+        ));
     }
 
     @Override
     public @Nullable String getDisplayInfo() {
         return target != null ? target.getName().getString() : null;
+    }
+
+    @EventHandler
+    @SuppressWarnings("unused")
+    private void onPop(@NotNull TotemPopEvent event) {
+        if (!event.getEntity().equals(target) || !render.getValue().isEnabled() || !pop.getValue()) return;
+        sendMessage("work");
+
+        BlockAnimationUtility.renderBlock(
+                targetPos,
+                lineColor.getValue().getColorObject(),
+                lineWidth.getValue(),
+                fillColor.getValue().getColorObject(),
+                BlockAnimationUtility.BlockAnimationMode.Flash,
+                BlockAnimationUtility.BlockRenderMode.All
+        );
+    }
+
+    @EventHandler
+    @SuppressWarnings("unused")
+    private void onDeath(@NotNull DeathEvent event) {
+        if (!event.getPlayer().equals(target) || !render.getValue().isEnabled() || !death.getValue()) return;
+
+        BlockAnimationUtility.renderBlock(
+                targetPos,
+                lineColor.getValue().getColorObject(),
+                lineWidth.getValue(),
+                fillColor.getValue().getColorObject(),
+                BlockAnimationUtility.BlockAnimationMode.Decrease,
+                BlockAnimationUtility.BlockRenderMode.All
+        );
     }
 
     @EventHandler
@@ -262,15 +299,8 @@ public final class AutoAnchor extends Module {
                 .isEmpty()
                 || !InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false)) return;
 
-        if (HoleUtility.isHole(target.getBlockPos()) || mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.RESPAWN_ANCHOR)) {
-            if (placeTimer.passedMs(500)) {
-                for (int i = 0; i < chargeCount.getValue(); i++)
-                    doCharge();
-                doBreak();
-                placeTimer.reset();
-            }
-            if (InteractionUtility.canPlaceBlock(target.getBlockPos().up(2), interactMode.getValue(), false)) {
-                targetPos = target.getBlockPos().up(2);
+        if (HoleUtility.isHole(target.getBlockPos())) {
+            if (InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false)) {
                 InteractionUtility.placeBlock(targetPos,
                         rotate.getValue(),
                         interactMode.getValue(),
@@ -279,11 +309,11 @@ public final class AutoAnchor extends Module {
                         true,
                         false
                 );
+                return;
             } else if (!mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.RESPAWN_ANCHOR)) {
-                BlockPos bp = target.getBlockPos();
                 for (int i = 2; i > 0; i--) {
-                    for (Vec3i vec : HoleUtility.VECTOR_PATTERN) {
-                        BlockPos check = bp.add(vec).up(i);
+                    for (BlockPos check : HoleUtility.getHolePoses(target.getPos())) {
+                        check = check.up(i);
                         if (InteractionUtility.canPlaceBlock(check, interactMode.getValue(), false)) {
                             InteractionUtility.placeBlock(check,
                                     rotate.getValue(),
@@ -297,10 +327,15 @@ public final class AutoAnchor extends Module {
                         }
                     }
                 }
-            } else if (mc.world.getBlockState(target.getBlockPos().up(2)).getBlock().equals(Blocks.RESPAWN_ANCHOR)) {
-                doCharge();
             }
-        } else if (placeTimer.passedMs(500)) {
+
+            if (placeTimer.passedMs(actionDelay.getValue())) {
+                for (int i = 0; i < chargeCount.getValue(); i++)
+                    doCharge();
+                doBreak();
+                placeTimer.reset();
+            }
+        } else if (placeTimer.passedMs(actionDelay.getValue())) {
             InteractionUtility.placeBlock(targetPos,
                     rotate.getValue(),
                     interactMode.getValue(),
@@ -380,16 +415,6 @@ public final class AutoAnchor extends Module {
         sendPacket(new PlayerInteractBlockC2SPacket(hand, result, PlayerUtility.getWorldActionId(mc.world)));
         if (swing.getValue()) mc.player.swingHand(hand);
         else sendPacket(new HandSwingC2SPacket(hand));
-    }
-
-    public static AutoAnchor getInstance() {
-        return instance;
-    }
-
-    public enum RenderMode {
-        Fade,
-        Slide,
-        Default
     }
 
     private enum YawStepMode {
