@@ -133,7 +133,7 @@ public class ModuleManager implements IManager {
     public static AutoArmor autoArmor = new AutoArmor();
     public static Cooldowns cooldowns = new Cooldowns();
     public static TapeMouse tapeMouse = new TapeMouse();
-    public static Breaker breaker = new Breaker();
+    public static AutoGear autoGear = new AutoGear();
     public static ViewLock viewLock = new ViewLock();
     public static Velocity velocity = new Velocity();
     public static Tooltips tooltips = new Tooltips();
@@ -162,6 +162,7 @@ public class ModuleManager implements IManager {
     public static AntiVoid antiVoid = new AntiVoid();
     public static KillFeed killFeed = new KillFeed();
     public static AutoWalk autoWalk = new AutoWalk();
+    public static Breaker breaker = new Breaker();
     public static AutoEat autoEat = new AutoEat();
     public static AntiAFK antiAFK = new AntiAFK();
     public static AutoBuy autoBuy = new AutoBuy();
