@@ -129,6 +129,10 @@ public class ThunderHack implements ModInitializer {
         return System.getProperty("os.name").startsWith("Windows");
     }
 
+    public static boolean isFuturePresent() {
+        return !FabricLoader.getInstance().getModContainer("future").isEmpty();
+    }
+
     public enum KeyListening {
         ThunderGui,
         ClickGui,

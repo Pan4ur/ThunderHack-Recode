@@ -42,8 +42,6 @@ import thunder.hack.utility.render.Render3DEngine;
 import java.awt.*;
 import java.util.Objects;
 
-import static net.minecraft.enchantment.EnchantmentHelper.hasAquaAffinity;
-
 public final class SpeedMine extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
     private final Setting<StartMode> startMode = new Setting<>("StartMode", StartMode.StartAbort, v -> mode.getValue() == Mode.Packet);
@@ -298,15 +296,22 @@ public final class SpeedMine extends Module {
             return false;
 
         for (PlayerEntity player : ThunderHack.asyncManager.getAsyncPlayers()) {
-            if (player == null) continue;
-            if (player == mc.player) continue;
+
+            if (player == null)
+                continue;
+
+            if (player == mc.player)
+                continue;
 
             mc.world.removeBlock(minePosition, false);
             float dmg = ExplosionUtility.getExplosionDamage1(minePosition.toCenterPos(), player);
             mc.world.setBlockState(minePosition, Blocks.OBSIDIAN.getDefaultState());
 
-            if (ThunderHack.friendManager.isFriend(player.getName().getString())) continue;
-            if (dmg > 7.5f) return true;
+            if (ThunderHack.friendManager.isFriend(player.getName().getString()))
+                continue;
+
+            if (dmg > 7.5f)
+                return true;
         }
 
         return false;

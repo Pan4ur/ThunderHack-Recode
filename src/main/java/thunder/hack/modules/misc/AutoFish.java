@@ -81,7 +81,7 @@ public class AutoFish extends Module {
             return;
 
         if (timeout.passedMs(45000) && mc.player.getMainHandStack().getItem() instanceof FishingRodItem) {
-            sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+            mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
             sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             timeout.reset();
             cooldown.reset();
@@ -99,7 +99,7 @@ public class AutoFish extends Module {
     private void catchFish() {
         ThunderHack.asyncManager.run(() -> {
 
-            sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+            mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
             sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
             if (autoSell.getValue() && timeout.passedMs(1000))
@@ -111,7 +111,7 @@ public class AutoFish extends Module {
                 throw new RuntimeException(e);
             }
 
-            sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+            mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
             sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             timeout.reset();
         }, (int) MathUtility.random(199, 349));
