@@ -43,7 +43,7 @@ public class AutoBuy extends Module {
     public final Setting<String> an = new Setting<>("An", "an235");
     public final Setting<Integer> minDelay = new Setting<>("MinUpdateDelay", 400, 50, 1000);
     public final Setting<Integer> maxDelay = new Setting<>("MaxUpdateDelay", 550, 100, 3000);
-    public final Setting<Integer> buyDelay = new Setting<>("BuyDelay", 600, 0, 3000);
+    public final Setting<Integer> buyDelay = new Setting<>("BuyDelay", 800, 0, 3000);
 
     private final Timer updateTimer = new Timer();
     private final Timer reAhTimer = new Timer();
