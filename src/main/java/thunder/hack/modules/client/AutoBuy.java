@@ -139,7 +139,7 @@ public class AutoBuy extends Module {
                             int finalSlot = slot;
                             new Thread(() -> {
                                 active = false;
-                                try {Thread.sleep((long) (800 + MathUtility.random(0, 50)));} catch (Exception ignored) {}
+                                try {Thread.sleep((long) (buyDelay.getValue() + MathUtility.random(0, 50)));} catch (Exception ignored) {}
                                 Buy(finalSlot);
                                 try {Thread.sleep(500);} catch (Exception ignored) {}
                                 active = true;
