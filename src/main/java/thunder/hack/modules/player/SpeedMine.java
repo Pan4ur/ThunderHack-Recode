@@ -287,30 +287,30 @@ public final class SpeedMine extends Module {
     }
 
     private boolean checkWorth() {
+        return checkWorth(7.5f, minePosition);
+    }
+
+    public boolean checkWorth(float damage, BlockPos pos) {
         if (isDisabled()
                 || mode.getValue() != Mode.Packet
-                || minePosition == null
+                || pos == null
                 || mc.world == null
                 || progress < 0.95
-                || mc.world.getBlockState(minePosition).getBlock() != Blocks.OBSIDIAN)
+                || mc.world.getBlockState(pos).getBlock() != Blocks.OBSIDIAN)
             return false;
 
         for (PlayerEntity player : ThunderHack.asyncManager.getAsyncPlayers()) {
-
-            if (player == null)
+            if (player == null
+                    || player == mc.player
+                    || ThunderHack.friendManager.isFriend(player))
                 continue;
 
-            if (player == mc.player)
-                continue;
+            BlockState currentState = mc.world.getBlockState(pos);
+            mc.world.removeBlock(pos, false);
+            float dmg = ExplosionUtility.getExplosionDamage1(pos.toCenterPos(), player);
+            mc.world.setBlockState(pos, currentState);
 
-            mc.world.removeBlock(minePosition, false);
-            float dmg = ExplosionUtility.getExplosionDamage1(minePosition.toCenterPos(), player);
-            mc.world.setBlockState(minePosition, Blocks.OBSIDIAN.getDefaultState());
-
-            if (ThunderHack.friendManager.isFriend(player.getName().getString()))
-                continue;
-
-            if (dmg > 7.5f)
+            if (dmg > damage)
                 return true;
         }
 

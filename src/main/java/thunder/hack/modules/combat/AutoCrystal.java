@@ -896,7 +896,7 @@ public class AutoCrystal extends Module {
     public BlockHitResult getStrictInteract(@NotNull BlockPos bp) {
         if (mc.player == null || mc.world == null) return null;
 
-        float bestDistance = 999f;
+        float bestDistance = Float.MAX_VALUE;
         Direction bestDirection = null;
         Vec3d bestVector = null;
 
@@ -944,7 +944,7 @@ public class AutoCrystal extends Module {
     public BlockHitResult getLegitInteract(BlockPos bp) {
         if (mc.player == null || mc.world == null) return null;
 
-        float bestDistance = 999f;
+        float bestDistance = Float.MAX_VALUE;
         BlockHitResult bestResult = null;
         for (float x = 0f; x <= 1f; x += 0.2f) {
             for (float y = 0f; y <= 1f; y += 0.2f) {

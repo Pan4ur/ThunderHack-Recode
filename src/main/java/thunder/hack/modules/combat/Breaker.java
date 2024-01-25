@@ -1,244 +1,107 @@
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CombatManager;
-import thunder.hack.events.impl.EventBreakBlock;
-import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
-import thunder.hack.modules.base.IndestructibleModule;
+import thunder.hack.modules.Module;
 import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.BooleanParent;
-import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.player.InteractionUtility;
+import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.world.HoleUtility;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+public final class Breaker extends Module {
+    private final Setting<Integer> range = new Setting<>("Range", 5, 1, 7);
+    private final Setting<ReMine> reMine = new Setting<>("Allow Re Mine", ReMine.Breaker);
+    private final Setting<Float> targetDamage = new Setting<>("Min Target Damage", 7f, 0f, 36f);
+    private final Setting<Float> selfDamage = new Setting<>("Max Self Damage", 4f, 0f, 36f);
 
-public final class Breaker extends IndestructibleModule {
-    private final Setting<Boolean> autoDisable = new Setting<>("Auto Disable", false);
-    private final Setting<Boolean> oldVers = new Setting<>("1.12 Mode", false);
-
-    private final Setting<Parent> logic = new Setting<>("Logic", new Parent(false, 0));
-    private final Setting<CombatManager.TargetBy> targetLogic = new Setting<>("Target By", CombatManager.TargetBy.Distance).withParent(logic);
-    private final Setting<Boolean> antiBurrow = new Setting<>("Burrow", false).withParent(logic);
-    private final Setting<Boolean> antiSurround = new Setting<>("Surround", true).withParent(logic);
-    private final Setting<Boolean> antiCev = new Setting<>("Cev", true).withParent(logic);
-    private final Setting<Boolean> antiCiv = new Setting<>("Civ", true).withParent(logic);
-
-    private final Setting<BooleanParent> autoPlace = new Setting<>("Auto Place", new BooleanParent(true));
-    private final Setting<Boolean> placeCiv = new Setting<>("Place Civ", false).withParent(autoPlace);
-    private final Setting<Boolean> placeCev = new Setting<>("Place Cev", true).withParent(autoPlace);
-
-    @SuppressWarnings("unused")
-    private final Setting<Parent> blocks = new Setting<>("Blocks", new Parent(false, 0), v -> false);
-
-    private static Breaker instance;
     private BlockPos blockPos;
-    private PlayerEntity target;
 
     public Breaker() {
         super("Breaker", Category.COMBAT);
-        instance = this;
-    }
-
-    @Override
-    public void onEnable() {
-        blockPos = null;
-        target = null;
     }
 
     @EventHandler
     @SuppressWarnings("unused")
-    private void onBreakBlock(@NotNull EventBreakBlock event) {
-        if (!event.getPos().equals(blockPos)) return;
-        if (autoDisable.getValue())
-            disable(isRu() ? "Сарраунд пробит! Отключаю..." : "Surround has been broken! Turning off...");
-        blockPos = null;
-    }
-
-    @EventHandler
-    @SuppressWarnings("unused")
-    private void onSync(EventSync event) {
-        if (mc.world == null || mc.player == null) return;
-
-        if (target == null || target.isDead() || !target.isInRange(mc.player, range.getValue() + 1)) {
-            target = ThunderHack.combatManager.getTarget(range.getValue() + 1, targetLogic.getValue());
+    private void onPostSync(EventSync event) {
+        if (mc.world == null || mc.player == null) {
             return;
         }
-        BlockPos targetPos = BlockPos.ofFloored(target.getPos());
-        if (!HoleUtility.isHole(targetPos)) {
-            target = null;
+        if (SpeedMine.minePosition != blockPos && reMine.getValue() != ReMine.Self) {
             return;
         }
 
-        boolean found = false;
-        BlockPos minePos = null;
+        ThunderHack.asyncManager.run(() -> {
+            if (blockPos != null
+                    && !mc.world.getBlockState(blockPos).isAir()
+                    && isDamagesCorrect(blockPos)) {
+                return;
+            }
 
-        // 1 прогон - на буров
-        if (antiBurrow.getValue() && !mc.world.getBlockState(targetPos).isReplaceable()) {
-            minePos = targetPos;
-            found = true;
-        }
+            PlayerEntity target = ThunderHack.combatManager.getTarget(range.getValue() + 1, CombatManager.TargetBy.FOV);
+            if (target == null) {
+                return;
+            }
 
-        // 2 прогон - ищем на которые можно поставить
-        if (antiSurround.getValue() && !found) {
-            for (BlockPos offset : HoleUtility.getSurroundPoses(target.getPos())) {
-                if (mc.world.getBlockState(offset).getBlock() != Blocks.OBSIDIAN)
+            for (BlockPos pos : getOffsets(target)) {
+                if (mc.player.squaredDistanceTo(pos.toCenterPos()) > range.getPow2Value()
+                        || !isDamagesCorrect(pos)) {
                     continue;
-                if (!mc.world.isAir(offset.add(0, 1, 0)))
-                    continue;
-                if (mc.player.squaredDistanceTo(offset.toCenterPos()) < range.getPow2Value()) {
-                    minePos = offset;
-                    found = true;
-                    break;
                 }
-            }
 
-            if (!found
-                    && HoleUtility.getHolePoses(target.getPos()).size() == 1
-                    && !mc.world.getBlockState(targetPos.down()).isReplaceable()
-                    && mc.world.getBlockState(targetPos.down(2)).isAir()) {
-                minePos = targetPos.down(2);
-                found = true;
-            }
-        }
-
-        // 3 прогон кив брейкаем
-        if (!found && antiCiv.getValue())
-            for (BlockPos pos : HoleUtility.getSurroundPoses(target.getPos()).stream()
-                    .map(BlockPos::up)
-                    .toList()) {
-                if (!mc.world.getBlockState(pos).getBlock().equals(Blocks.OBSIDIAN) || !mc.world.isAir(pos)) continue;
-                if (mc.player.squaredDistanceTo(pos.toCenterPos()) < range.getPow2Value()) {
-                    minePos = pos;
-                    found = true;
-                    break;
+                boolean canReMine;
+                switch (reMine.getValue()) {
+                    case Self -> canReMine = true;
+                    case Breaker, Both -> canReMine = SpeedMine.minePosition == blockPos;
+                    default -> canReMine = false;
                 }
+
+                SpeedMine.getInstance().addBlockToMine(pos, null, canReMine);
+                blockPos = pos;
+                break;
             }
-
-        // 4 прогон кев брейкаем
-        if (!found && antiCev.getValue()) {
-            for (BlockPos pos : HoleUtility.getHolePoses(target.getPos()).stream()
-                    .map(pos -> pos.up(2))
-                    .toList()) {
-                if (mc.world.getBlockState(pos).getBlock().equals(Blocks.OBSIDIAN)
-                        && mc.world.getBlockState(pos.up()).isAir()) {
-                    minePos = pos;
-                    found = true;
-                    break;
-                }
-            }
-        }
-
-        // 5 прогон - ищем любой
-        if (!found && !oldVers.getValue() && antiSurround.getValue())
-            for (BlockPos pos : HoleUtility.getSurroundPoses(target.getPos())) {
-                if (mc.world.getBlockState(pos).getBlock() != Blocks.OBSIDIAN)
-                    continue;
-                if (mc.player.squaredDistanceTo(pos.toCenterPos()) < range.getPow2Value()) {
-                    minePos = pos;
-                    break;
-                }
-            }
-
-        if (minePos == null) return;
-
-        if (rotate.getValue()) {
-            float[] rotation = getRotations(minePos);
-            if (rotation != null) {
-                mc.player.setYaw(rotation[0]);
-                mc.player.setPitch(rotation[1]);
-            }
-        }
-
-        if (SpeedMine.getInstance().isEnabled())
-            SpeedMine.getInstance().addBlockToMine(minePos, null, false);
-
-        if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
-        blockPos = minePos;
-    }
-
-    @EventHandler
-    @SuppressWarnings("unused")
-    private void onPostSync(EventPostSync event) {
-        if (mc.world == null
-                || blockPos == null
-                || target == null
-                || autoPlace.getValue().isEnabled())
-            return;
-        final List<BlockPos> poses = new ArrayList<>();
-        final List<BlockPos> prePoses = new ArrayList<>();
-
-        if (placeCiv.getValue()) {
-            for (BlockPos posToPlace : HoleUtility.getSurroundPoses(target.getPos()).stream()
-                    .map(BlockPos::up)
-                    .toList()) {
-                if (mc.world.getBlockState(posToPlace).isReplaceable() &&
-                        mc.world.getBlockState(posToPlace.up()).isReplaceable()) {
-                    poses.add(posToPlace);
-                    break;
-                }
-            }
-        }
-        if (placeCev.getValue() && poses.isEmpty()) {
-            for (BlockPos posToPlace : HoleUtility.getHolePoses(target.getPos()).stream()
-                    .map(pos -> pos.up(2))
-                    .toList()) {
-                if (mc.world.getBlockState(posToPlace).isReplaceable()
-                        && mc.world.getBlockState(posToPlace.up()).isReplaceable()
-                        && InteractionUtility.canPlaceBlock(posToPlace, interact.getValue(), true)) {
-                    prePoses.add(posToPlace);
-                    break;
-                }
-            }
-            if (prePoses.isEmpty()) {
-                for (BlockPos posToPlace : HoleUtility.getSurroundPoses(target.getPos()).stream()
-                        .map(pos -> pos.up(2))
-                        .toList()) {
-                    if (mc.world.getBlockState(posToPlace).isReplaceable()
-                            && InteractionUtility.canPlaceBlock(posToPlace, interact.getValue(), true)) {
-                        prePoses.add(posToPlace);
-                        break;
-                    }
-                }
-            }
-            if (prePoses.isEmpty()) {
-                for (BlockPos posToPlace : HoleUtility.getSurroundPoses(target.getPos()).stream()
-                        .map(BlockPos::up)
-                        .toList()) {
-                    if (mc.world.getBlockState(posToPlace).isReplaceable()
-                            && InteractionUtility.canPlaceBlock(posToPlace, interact.getValue(), true)) {
-                        prePoses.add(posToPlace);
-                        break;
-                    }
-                }
-            }
-            poses.addAll(prePoses);
-        }
-
-        poses.forEach(pos -> {
-            if (!placeBlock(pos)) return;
-            inactivityTimer.reset();
         });
     }
 
-    public static float @Nullable [] getRotations(@NotNull BlockPos blockPos) {
-        InteractionUtility.BreakData data = InteractionUtility.getBreakData(blockPos, InteractionUtility.Interact.Strict);
-        return data == null ? null : InteractionUtility.calculateAngle(data.vector());
+    private boolean isDamagesCorrect(final BlockPos check) {
+        if (mc.world == null) {
+            return false;
+        }
+
+        final BlockState currentState = mc.world.getBlockState(check);
+        mc.world.removeBlock(check, false);
+        final float currentDamage = ExplosionUtility.getExplosionDamage1(check.toCenterPos(), mc.player);
+        mc.world.setBlockState(check, currentState);
+
+        return SpeedMine.getInstance().checkWorth(targetDamage.getValue(), check)
+                && currentDamage >= selfDamage.getValue();
     }
 
-    public static Breaker getInstance() {
-        return instance;
+    private @NotNull List<BlockPos> getOffsets(final @NotNull PlayerEntity player) {
+        final List<BlockPos> blocks = new ArrayList<>();
+        final Vec3d pos = player.getPos();
+
+        blocks.addAll(HoleUtility.getHolePoses(pos).stream().map(BlockPos::down).toList());
+        blocks.addAll(HoleUtility.getSurroundPoses(pos));
+        blocks.addAll(HoleUtility.getSurroundPoses(pos).stream().map(BlockPos::up).toList());
+        blocks.addAll(HoleUtility.getHolePoses(pos).stream().map(bp -> bp.up(2)).toList());
+
+        return blocks;
+    }
+
+    private enum ReMine {
+        Self,
+        Breaker,
+        Both,
+        None
     }
 }
