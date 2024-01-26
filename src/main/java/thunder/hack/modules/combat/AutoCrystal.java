@@ -37,6 +37,7 @@ import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.autoCrystal.DeadManager;
 import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InteractionUtility;
@@ -145,7 +146,7 @@ public class AutoCrystal extends Module {
     // позиция и время постановки
     private final Map<BlockPos, Long> placedCrystals = new HashMap<>();
 
-    private final Map<EndCrystalEntity, Long> deadCrystals = new HashMap<>();
+    private final DeadManager deadManager = new DeadManager();
 
     public float renderDamage, renderSelfDamage;
 
@@ -169,7 +170,7 @@ public class AutoCrystal extends Module {
         renderDamage = 0;
         renderSelfDamage = 0;
         placedCrystals.clear();
-        deadCrystals.clear();
+        deadManager.reset();
         breakTimer.reset();
         placeTimer.reset();
         bestCrystal = null;
@@ -202,11 +203,6 @@ public class AutoCrystal extends Module {
             return;
         }
 
-        // Если застакало, то сбрасывааем "мертвые кристаллы"
-        if (breakTimer.passedMs(200))
-            deadCrystals.clear();
-
-
         // Right click gapple
         if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL && autoGapple.getValue()
                 && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() == Items.END_CRYSTAL) {
@@ -223,7 +219,7 @@ public class AutoCrystal extends Module {
         }
 
         // Rotate
-        if (rotate.getValue())
+        if (rotate.getValue() && !shouldPause())
             rotateMethod();
     }
 
@@ -279,9 +275,9 @@ public class AutoCrystal extends Module {
             for (Entity ent : Lists.newArrayList(mc.world.getEntities())) {
                 if (ent instanceof EndCrystalEntity crystal
                         && crystal.squaredDistanceTo(explosion.getX(), explosion.getY(), explosion.getZ()) <= 144
-                        && !deadCrystals.containsKey(crystal)) {
+                        && !deadManager.isDead(crystal)) {
                     debug("Removed " + crystal.getPos().toString() + " (due to explosion)");
-                    deadCrystals.put(crystal, System.currentTimeMillis());
+                    deadManager.setDead(crystal, System.currentTimeMillis());
                 }
             }
         }
@@ -313,6 +309,8 @@ public class AutoCrystal extends Module {
     public void rotateMethod() {
         if (bestPosition != null && mc.player != null) {
             float[] angle = InteractionUtility.calculateAngle(bestPosition.getPos());
+            angle[1] = angle[1] + MathUtility.random(-1,1);
+            angle[0] = (float) (angle[0] + Render2DEngine.interpolate(-2,2, Math.sin(mc.player.age % 80)) + MathUtility.random(-2,2));
             if (yawStep.getValue().isEnabled()) {
                 float yaw_delta = MathHelper.wrapDegrees(angle[0] - ((IClientPlayerEntity) mc.player).getLastYaw());
                 if (Math.abs(yaw_delta) > yawAngle.getValue()) {
@@ -329,7 +327,7 @@ public class AutoCrystal extends Module {
 
     @Override
     public void onRender3D(MatrixStack stack) {
-        removeAttackedCrystals();
+        deadManager.update(remove.getValue() == Remove.ON, removeDelay.getValue());
 
         if (render.getValue()) {
             Map<BlockPos, Long> cache = new ConcurrentHashMap<>(renderPositions);
@@ -382,7 +380,12 @@ public class AutoCrystal extends Module {
         if (mc.player == null || mc.world == null || mc.interactionManager == null) return true;
 
         boolean offhand = mc.player.getOffHandStack().getItem() instanceof EndCrystalItem;
+        boolean mainHand = mc.player.getMainHandStack().getItem() instanceof EndCrystalItem;
+
         if (mc.interactionManager.isBreakingBlock() && !offhand && mining.getValue())
+            return true;
+
+        if(!offhand && !mainHand && autoSwitch.getValue() != Switch.SILENT && autoSwitch.getValue() != Switch.INVENTORY)
             return true;
 
         if (mc.player.isUsingItem() && eating.getValue() && !offhand)
@@ -457,7 +460,7 @@ public class AutoCrystal extends Module {
         breakTimer.reset();
 
         if (remove.getValue() != Remove.OFF)
-            deadCrystals.put(crystal, System.currentTimeMillis());
+            deadManager.setDead(crystal, System.currentTimeMillis());
 
         if (prevSlot != -1) {
             if (antiWeakness.getValue() == Switch.SILENT) {
@@ -542,7 +545,7 @@ public class AutoCrystal extends Module {
             if (ent.getBoundingBox().intersects(posBoundingBox)) {
                 if (ent instanceof ExperienceOrbEntity)
                     continue;
-                if (ent instanceof EndCrystalEntity && deadCrystals.containsKey(ent))
+                if (ent instanceof EndCrystalEntity cr && deadManager.isDead(cr))
                     continue;
 
                 return true;
@@ -642,10 +645,10 @@ public class AutoCrystal extends Module {
 
         Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
         for (Entity ent : entities) {
-            if (!(ent instanceof EndCrystalEntity))
+            if (!(ent instanceof EndCrystalEntity cr))
                 continue;
 
-            if (deadCrystals.containsKey(ent))
+            if (deadManager.isDead(cr))
                 continue;
 
             if (PlayerUtility.squaredDistanceFromEyes(ent.getPos()) > explodeRange.getPow2Value())
@@ -880,7 +883,6 @@ public class AutoCrystal extends Module {
     private @Nullable BlockHitResult getDefaultInteract(Vec3d crystalVector, BlockPos bp) {
         if (mc.player == null || mc.world == null) return null;
 
-
         if (PlayerUtility.squaredDistanceFromEyes(crystalVector) > placeRange.getPow2Value())
             return null;
 
@@ -907,13 +909,13 @@ public class AutoCrystal extends Module {
             bestVector = new Vec3d(bp.getX() + 0.5, bp.getY() + 1, bp.getZ() + 0.5);
         } else if (mc.player.getEyePos().getY() < bp.getY() && mc.world.isAir(bp.down())) {
             bestDirection = Direction.DOWN;
-            bestVector = new Vec3d(bp.getX() + 0.5, bp.getY(), bp.getZ() + 0.5);
+            bestVector = new Vec3d(bp.getX() + 0.5, ccPlace.getValue() ? bp.getY() : bp.getY() + 1,bp.getZ() + 0.5);
         } else {
             for (Direction dir : Direction.values()) {
                 if (dir == Direction.UP || dir == Direction.DOWN)
                     continue;
 
-                Vec3d directionVec = new Vec3d(bp.getX() + 0.5 + dir.getVector().getX() * 0.5, bp.getY() + 0.5 + dir.getVector().getY() * 0.5, bp.getZ() + 0.5 + dir.getVector().getZ() * 0.5);
+                Vec3d directionVec = new Vec3d(bp.getX() + 0.5 + dir.getVector().getX() * 0.5, bp.getY() + 0.9, bp.getZ() + 0.5 + dir.getVector().getZ() * 0.5);
 
                 if (!mc.world.isAir(bp.offset(dir)))
                     continue;
@@ -972,20 +974,6 @@ public class AutoCrystal extends Module {
             }
         }
         return bestResult;
-    }
-
-    public void removeAttackedCrystals() {
-        if (remove.getValue() == Remove.ON && !deadCrystals.isEmpty()) {
-            Map<EndCrystalEntity, Long> cache = new HashMap<>(deadCrystals);
-            cache.forEach((c, time) -> {
-                if (System.currentTimeMillis() - time >= removeDelay.getValue()) {
-                    c.kill();
-                    c.setRemoved(Entity.RemovalReason.KILLED);
-                    c.onRemoved();
-                    deadCrystals.remove(c);
-                }
-            });
-        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

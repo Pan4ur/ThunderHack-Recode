@@ -90,11 +90,11 @@ public final class ExplosionUtility {
             }
 
             if (!target.isImmuneToExplosion(explosion) && !target.isInvulnerable()) {
-                double distExposure = MathHelper.sqrt((float) target.squaredDistanceTo(explosionPos)) / maxDist;
+                double distExposure = (float) target.squaredDistanceTo(explosionPos) / 144;
                 if (distExposure <= 1.0) {
                     double xDiff = target.getX() - explosionPos.x;
                     double yDiff = target.getY() - explosionPos.y;
-                    double zDiff = target.getX() - explosionPos.z;
+                    double zDiff = target.getZ() - explosionPos.z;
                     double diff = MathHelper.sqrt((float) (xDiff * xDiff + yDiff * yDiff + zDiff * zDiff));
                     if (diff != 0.0) {
                         terrainIgnore = true;
@@ -166,7 +166,7 @@ public final class ExplosionUtility {
             if (distExposure <= 1.0) {
                 double xDiff = predict.getX() - explosionPos.x;
                 double yDiff = predict.getY() - explosionPos.y;
-                double zDiff = predict.getX() - explosionPos.z;
+                double zDiff = predict.getZ() - explosionPos.z;
                 double diff = MathHelper.sqrt((float) (xDiff * xDiff + yDiff * yDiff + zDiff * zDiff));
                 if (diff != 0.0) {
                     terrainIgnore = true;
@@ -256,7 +256,7 @@ public final class ExplosionUtility {
                 if (distExposure <= 1.0) {
                     double xDiff = target.getX() - explosionPos.x;
                     double yDiff = target.getY() - explosionPos.y;
-                    double zDiff = target.getX() - explosionPos.z;
+                    double zDiff = target.getZ() - explosionPos.z;
                     double diff = MathHelper.sqrt((float) (xDiff * xDiff + yDiff * yDiff + zDiff * zDiff));
                     if (diff != 0.0) {
                         terrainIgnore = true;
