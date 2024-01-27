@@ -2,12 +2,14 @@ package thunder.hack.core.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.IManager;
 import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.clickui.small.SmallClickUI;
 import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.gui.hud.HudElement;
 import thunder.hack.gui.hud.impl.*;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.*;
@@ -294,7 +296,10 @@ public class ModuleManager implements IManager {
     }
 
     public void onRender2D(DrawContext context) {
+        HudElement.anyHovered = false;
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender2D(context));
+        if(!HudElement.anyHovered && !ClickUI.anyHovered)
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_CURSOR_NORMAL));
         ThunderHack.core.onRender2D(context);
     }
 

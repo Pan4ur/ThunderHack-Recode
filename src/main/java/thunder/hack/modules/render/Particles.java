@@ -43,6 +43,8 @@ public class Particles extends Module {
     private final Setting<Float> size = new Setting<>("Size", 1f, 0.1f, 6.0f);
     private final Setting<ColorMode> lmode = new Setting<>("ColorMode", ColorMode.Sync);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(3649978), v -> lmode.getValue() == ColorMode.Custom);
+    private final Setting<Physics> physics = new Setting<>("Physics", Physics.Fly, v -> mode.getValue() != Mode.Off);
+
 
     public enum ColorMode {
         Custom, Sync
@@ -52,6 +54,9 @@ public class Particles extends Module {
         Off, SnowFlake, Stars, Hearts, Dollars, Bloom;
     }
 
+    public enum Physics {
+        Drop, Fly
+    }
 
     private final ArrayList<ParticleBase> fireFlies = new ArrayList<>();
     private final ArrayList<ParticleBase> particles = new ArrayList<>();
@@ -73,14 +78,15 @@ public class Particles extends Module {
         }
 
         for (int j = particles.size(); j < count.getValue(); j++) {
+            boolean drop = physics.getValue() == Physics.Drop;
             if (mode.getValue() != Mode.Off)
                 particles.add(new ParticleBase(
                         (float) (mc.player.getX() + MathUtility.random(-48f, 48f)),
                         (float) (mc.player.getY() + MathUtility.random(2, 48f)),
                         (float) (mc.player.getZ() + MathUtility.random(-48f, 48f)),
-                        MathUtility.random(-0.4f, 0.4f),
-                        MathUtility.random(-0.1f, 0.1f),
-                        MathUtility.random(-0.4f, 0.4f)));
+                        drop ? 0 : MathUtility.random(-0.4f, 0.4f),
+                        drop ? MathUtility.random(-0.2f, -0.05f) : MathUtility.random(-0.1f, 0.1f),
+                        drop ? 0 : MathUtility.random(-0.4f, 0.4f)));
         }
     }
 
@@ -220,7 +226,8 @@ public class Particles extends Module {
             posZ += motionZ;
 
             motionX *= 0.9f;
-            motionY *= 0.9f;
+            if(physics.getValue() == Physics.Fly)
+                motionY *= 0.9f;
             motionZ *= 0.9f;
 
             motionY -= 0.001f;
