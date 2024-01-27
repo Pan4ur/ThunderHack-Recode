@@ -3,7 +3,9 @@ package thunder.hack.gui.clickui.impl;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.gui.clickui.AbstractElement;
+import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.setting.Setting;
@@ -15,6 +17,7 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 
 import static thunder.hack.gui.clickui.normal.ClickUI.arrow;
+import static thunder.hack.modules.Module.mc;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class BooleanParentElement extends AbstractElement {
@@ -57,6 +60,12 @@ public class BooleanParentElement extends AbstractElement {
         Color color = ClickGui.getInstance().getColor(0);
         Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 36), (float) (y + height / 2 - 4), 15, 8, 4, paddingX > 4 ? color : new Color(0xFFB2B1B1));
         Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 35 + paddingX), (float) (y + height / 2 - 3), 6, 6, 3, new Color(-1));
+
+        if(hovered) {
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(),
+                    GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
+            ClickUI.anyHovered = true;
+        }
     }
 
     @Override

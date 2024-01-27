@@ -1,16 +1,15 @@
 package thunder.hack.core.impl;
 
-import com.mojang.logging.LogUtils;
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.IManager;
-import thunder.hack.events.impl.client.EventClientInit;
 import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.clickui.small.SmallClickUI;
 import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.gui.hud.HudElement;
 import thunder.hack.gui.hud.impl.*;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.*;
@@ -103,6 +102,7 @@ public class ModuleManager implements IManager {
     public static FakePlayer fakePlayer = new FakePlayer();
     public static ElytraSwap elytraSwap = new ElytraSwap();
     public static ElytraPlus elytraPlus = new ElytraPlus();
+    public static CevBreaker cevBreaker = new CevBreaker();
     public static AutoSprint autoSprint = new AutoSprint();
     public static AutoGApple autoGApple = new AutoGApple();
     public static AntiHunger antiHunger = new AntiHunger();
@@ -209,6 +209,7 @@ public class ModuleManager implements IManager {
     public static AutoEZ autoEZ = new AutoEZ();
     public static AimBot aimBot = new AimBot();
     public static Timer timer = new Timer();
+    public static Regen regen = new Regen();
     public static Speed speed = new Speed();
     public static Reach reach = new Reach();
     public static Radar radar = new Radar();
@@ -225,10 +226,6 @@ public class ModuleManager implements IManager {
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
 
-    {
-        ThunderHack.EVENT_BUS.subscribe(this);
-        LogUtils.getLogger().warn("SUBSCRIBED");
-    }
 
     public ModuleManager() {
         modules.add(new AutoAnchor());
@@ -248,12 +245,6 @@ public class ModuleManager implements IManager {
                 }
             }
         }
-    }
-
-    @EventHandler
-    @SuppressWarnings("unused")
-    private void onInit(EventClientInit event) {
-        onLoad();
     }
 
     public Module get(String name) {
@@ -305,8 +296,11 @@ public class ModuleManager implements IManager {
     }
 
     public void onRender2D(DrawContext context) {
+        HudElement.anyHovered = false;
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender2D(context));
-        ThunderHack.CORE.onRender2D(context);
+        if(!HudElement.anyHovered && !ClickUI.anyHovered)
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_CURSOR_NORMAL));
+        ThunderHack.core.onRender2D(context);
     }
 
     public void onRenderShaders(DrawContext context) {

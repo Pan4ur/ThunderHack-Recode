@@ -69,7 +69,7 @@ public final class Breaker extends Module {
                     float selfDamage = ExplosionUtility.getExplosionDamage1(bp.toCenterPos(), mc.player);
                     mc.world.setBlockState(bp, currentState);
 
-                    if (ModuleManager.autoCrystal.renderDamage < damage && selfDamage < maxSelfDamage.getValue() && damage >= minDamage.getValue() && canPlaceOn)
+                    if ((Float.isNaN(ModuleManager.autoCrystal.renderDamage) || ModuleManager.autoCrystal.renderDamage < damage) && selfDamage < maxSelfDamage.getValue() && damage >= minDamage.getValue() && canPlaceOn)
                         list.add(new BreakData(bp, damage));
                 }
             }
