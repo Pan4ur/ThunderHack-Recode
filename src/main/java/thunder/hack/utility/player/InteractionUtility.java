@@ -251,6 +251,38 @@ public final class InteractionUtility {
         return visibleSides;
     }
 
+    public static @NotNull List<Direction> getStrictBlockDirections(@NotNull BlockPos bp) {
+        List<Direction> visibleSides = new ArrayList<>();
+        Vec3d pV = bp.toCenterPos();
+
+        double westDelta = getEyesPos(mc.player).x - (pV.add(0.5, 0, 0).x);
+        double eastDelta = getEyesPos(mc.player).x - (pV.add(-0.5, 0, 0).x);
+        double northDelta = getEyesPos(mc.player).z - (pV.add(0, 0, 0.5).z);
+        double southDelta = getEyesPos(mc.player).z - (pV.add(0, 0, -0.5).z);
+        double upDelta = getEyesPos(mc.player).y - (pV.add(0, 0.5, 0).y);
+        double downDelta = getEyesPos(mc.player).y - (pV.add(0, -0.5, 0).y);
+
+        if(westDelta > 0 && mc.world.getBlockState(bp.east()).isReplaceable())
+            visibleSides.add(Direction.EAST);
+
+        if(eastDelta < 0 && mc.world.getBlockState(bp.west()).isReplaceable())
+            visibleSides.add(Direction.WEST);
+
+        if(northDelta > 0 && mc.world.getBlockState(bp.south()).isReplaceable())
+            visibleSides.add(Direction.SOUTH);
+
+        if(southDelta < 0 && mc.world.getBlockState(bp.north()).isReplaceable())
+            visibleSides.add(Direction.NORTH);
+
+        if(upDelta > 0 && mc.world.getBlockState(bp.up()).isReplaceable())
+            visibleSides.add(Direction.UP);
+
+        if(downDelta < 0 && mc.world.getBlockState(bp.down()).isReplaceable())
+            visibleSides.add(Direction.DOWN);
+
+        return visibleSides;
+    }
+
     public static @Nullable BreakData getBreakData(BlockPos bp, Interact interact) {
         if (interact == Interact.Vanilla) return new BreakData(Direction.UP, bp.toCenterPos().add(0, 0.5, 0));
         if (interact == Interact.Strict) {
