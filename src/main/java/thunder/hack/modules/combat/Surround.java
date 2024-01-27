@@ -114,7 +114,7 @@ public final class Surround extends IndestructibleModule {
             BlockPos targetBlock = getSequentialPos();
             if (targetBlock == null)
                 return;
-            if (placeBlock(targetBlock)) {
+            if (placeBlock(targetBlock, true)) {
                 sequentialBlocks.add(targetBlock);
                 delay = placeDelay.getValue();
                 inactivityTimer.reset();
@@ -129,7 +129,7 @@ public final class Surround extends IndestructibleModule {
                 if (targetBlock == null)
                     break;
 
-                if (placeBlock(targetBlock)) {
+                if (placeBlock(targetBlock, true)) {
                     placed++;
                     delay = placeDelay.getValue();
                     inactivityTimer.reset();

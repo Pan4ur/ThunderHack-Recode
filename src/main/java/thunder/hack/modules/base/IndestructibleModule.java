@@ -77,6 +77,10 @@ public abstract class IndestructibleModule extends Module {
     }
 
     protected boolean placeBlock(BlockPos pos) {
+        return placeBlock(pos, false);
+    }
+
+    protected boolean placeBlock(BlockPos pos, boolean ignoreEntities) {
         if (shouldPause()) return false;
         boolean validInteraction = false;
         SearchInvResult result = getBlockResult();
@@ -94,10 +98,10 @@ public abstract class IndestructibleModule extends Module {
         }
 
         if (placeMode.getValue() == InteractMode.Packet || placeMode.getValue() == InteractMode.All) {
-            validInteraction = InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), InteractionUtility.PlaceMode.Packet, result.slot(), true, false);
+            validInteraction = InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), InteractionUtility.PlaceMode.Packet, result.slot(), true, ignoreEntities);
         }
         if (placeMode.getValue() == InteractMode.Normal || placeMode.getValue() == InteractMode.All) {
-            validInteraction = InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), InteractionUtility.PlaceMode.Normal, result.slot(), true, false);
+            validInteraction = InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), InteractionUtility.PlaceMode.Normal, result.slot(), true, ignoreEntities);
         }
 
         if (validInteraction && mc.player != null) {

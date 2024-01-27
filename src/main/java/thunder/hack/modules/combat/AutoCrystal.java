@@ -779,16 +779,17 @@ public class AutoCrystal extends Module {
 
 
         Block base = mc.world.getBlockState(bp).getBlock();
-        boolean freeSpace = mc.world.isAir(bp.up());
-        boolean legacyFreeSpace = mc.world.isAir(bp.up().up());
 
         if (base != Blocks.OBSIDIAN && base != Blocks.BEDROCK)
             return null;
 
-        if (!(freeSpace && (!oldVer.getValue() || legacyFreeSpace)))
+        boolean freeSpace = mc.world.isAir(bp.up());
+
+        if (!(freeSpace && (!oldVer.getValue() || mc.world.isAir(bp.up().up()))))
             return null;
 
-        if (checkEntities(bp)) return null;
+        if (checkEntities(bp))
+            return null;
 
         Vec3d crystalVec = new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ());
 
