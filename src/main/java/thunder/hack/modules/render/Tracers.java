@@ -11,6 +11,8 @@ import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
 
+import static thunder.hack.system.Systems.MANAGER;
+
 public class Tracers extends Module {
 
     public Tracers() {
@@ -27,13 +29,13 @@ public class Tracers extends Module {
         boolean prevBob = mc.options.getBobView().getValue();
         mc.options.getBobView().setValue(false);
 
-        for (PlayerEntity player : ThunderHack.asyncManager.getAsyncPlayers()) {
+        for (PlayerEntity player : MANAGER.ASYNC.getAsyncPlayers()) {
             if (player == mc.player)
                 continue;
 
             Color color1 = color.getValue().getColorObject();
 
-            if (ThunderHack.friendManager.isFriend(player))
+            if (MANAGER.FRIEND.isFriend(player))
                 color1 = friendColor.getValue().getColorObject();
 
             Vec3d vec2 = new Vec3d(0, 0, 75)

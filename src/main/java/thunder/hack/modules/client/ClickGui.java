@@ -1,7 +1,7 @@
 package thunder.hack.modules.client;
 
 import meteordevelopment.orbit.EventHandler;
-import thunder.hack.events.impl.SettingEvent;
+import thunder.hack.events.impl.client.SettingEvent;
 import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.clickui.small.SmallClickUI;
 import thunder.hack.modules.Module;

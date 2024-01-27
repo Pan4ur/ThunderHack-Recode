@@ -17,9 +17,9 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.EventAttackBlock;
-import thunder.hack.events.impl.EventSetBlockState;
-import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.entity.EventAttackBlock;
+import thunder.hack.events.impl.world.EventSetBlockState;
+import thunder.hack.events.impl.world.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.player.SpeedMine;
@@ -35,6 +35,7 @@ import java.awt.*;
 
 import static net.minecraft.block.Blocks.BEDROCK;
 import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.system.Systems.MANAGER;
 
 public class Nuker extends Module {
     public Nuker() {
@@ -221,7 +222,7 @@ public class Nuker extends Module {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     if (!Module.fullNullCheck()) {
-                        while (ThunderHack.asyncManager.ticking.get()) {
+                        while (MANAGER.ASYNC.ticking.get()) {
                         }
 
                         if ((targetBlockType != null || blocks.getValue().equals(BlockSelection.All)) && !mc.options.attackKey.isPressed() && blockData == null) {

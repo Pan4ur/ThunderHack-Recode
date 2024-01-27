@@ -1,23 +1,17 @@
 package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.EventMove;
-import thunder.hack.events.impl.EventPlayerTravel;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PostPlayerUpdateEvent;
+import thunder.hack.events.impl.entity.EventMove;
+import thunder.hack.events.impl.entity.EventPlayerTravel;
+import thunder.hack.events.impl.world.EventSync;
+import thunder.hack.events.impl.entity.PostPlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.AntiBot;
 import thunder.hack.modules.combat.Aura;
@@ -29,6 +23,7 @@ import thunder.hack.utility.player.MovementUtility;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 import static thunder.hack.modules.movement.Timer.violation;
+import static thunder.hack.system.Systems.MANAGER;
 import static thunder.hack.utility.player.MovementUtility.isMoving;
 
 public class Speed extends Module {
@@ -94,7 +89,7 @@ public class Speed extends Module {
                 sendMessage(Formatting.GOLD + "Включи AntiBot и убери чек remove!");
 
             if (ModuleManager.aura.isDisabled() || Aura.target == null) {
-                for (PlayerEntity ent : ThunderHack.asyncManager.getAsyncPlayers())
+                for (PlayerEntity ent : MANAGER.ASYNC.getAsyncPlayers())
                     if (ent != mc.player && mc.player.squaredDistanceTo(ent) < 49 && AntiBot.bots.contains(ent) && !withoutBot.getValue()) {
                         mc.player.setPitch(95);
                         mc.player.setYaw(mc.player.getYaw() + MathUtility.random(-0.5f,0.5f));
@@ -108,8 +103,8 @@ public class Speed extends Module {
     // засекайте до обновы wild client (not paste)
     @EventHandler
     public void modifyVelocity(EventPlayerTravel e) {
-        if (mode.getValue() == Mode.FunTime && !e.isPre() && ThunderHack.core.getSetBackTime() > 1000) {
-            for(PlayerEntity ent : ThunderHack.asyncManager.getAsyncPlayers()) {
+        if (mode.getValue() == Mode.FunTime && !e.isPre() && ThunderHack.CORE.getSetBackTime() > 1000) {
+            for(PlayerEntity ent : MANAGER.ASYNC.getAsyncPlayers()) {
                 if(ent != mc.player && mc.player.squaredDistanceTo(ent) <= (AntiBot.bots.contains(ent) && !withoutBot.getValue() ? 9f : 2.25)) {
                     float p = mc.world.getBlockState(((IEntity) mc.player).thunderHack_Recode$getVelocityBP()).getBlock().getSlipperiness();
                     float f = mc.player.isOnGround() ? p * 0.91f : 0.91f;
@@ -173,7 +168,7 @@ public class Speed extends Module {
 
         if (MovementUtility.isMoving()) {
             ThunderHack.TICK_TIMER = useTimer.getValue() ? 1.088f : 1f;
-            float currentSpeed = mode.getValue() == Mode.NCP && mc.player.input.movementForward <= 0 && prevForward > 0 ? ThunderHack.playerManager.currentPlayerSpeed * 0.66f : ThunderHack.playerManager.currentPlayerSpeed;
+            float currentSpeed = mode.getValue() == Mode.NCP && mc.player.input.movementForward <= 0 && prevForward > 0 ? MANAGER.PLAYER.currentPlayerSpeed * 0.66f : MANAGER.PLAYER.currentPlayerSpeed;
             if (stage == 1 && mc.player.isOnGround()) {
                 mc.player.setVelocity(mc.player.getVelocity().x, MovementUtility.getJumpSpeed(), mc.player.getVelocity().z);
                 event.setY(MovementUtility.getJumpSpeed());

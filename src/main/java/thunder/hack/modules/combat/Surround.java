@@ -1,20 +1,19 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.*;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import thunder.hack.events.impl.*;
+import thunder.hack.events.impl.entity.EventEntitySpawn;
+import thunder.hack.events.impl.world.EventPostSync;
+import thunder.hack.events.impl.world.PacketEvent;
 import thunder.hack.modules.base.IndestructibleModule;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;

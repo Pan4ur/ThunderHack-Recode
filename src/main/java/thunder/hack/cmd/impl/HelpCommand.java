@@ -11,6 +11,7 @@ import thunder.hack.cmd.Command;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static thunder.hack.system.Systems.MANAGER;
 
 public class HelpCommand extends Command {
     public HelpCommand() {
@@ -24,10 +25,10 @@ public class HelpCommand extends Command {
 
             AtomicBoolean flip = new AtomicBoolean(false);
 
-            ThunderHack.commandManager.getCommands().forEach(command -> {
+            MANAGER.COMMAND.getCommands().forEach(command -> {
                         mc.player.sendMessage(Text.of(
                                 (flip.get() ? Formatting.LIGHT_PURPLE : Formatting.DARK_PURPLE)
-                                        + ThunderHack.commandManager.getPrefix()
+                                        + MANAGER.COMMAND.getPrefix()
                                         + (flip.get() ? Formatting.AQUA : Formatting.DARK_AQUA)
                                         + command.getName()
                                         + (command.getAliases().isEmpty() ? "" : " (" + command.getAliases() + ")")

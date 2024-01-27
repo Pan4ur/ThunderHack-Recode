@@ -14,9 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.EventTick;
+import thunder.hack.events.impl.world.EventPostSync;
+import thunder.hack.events.impl.world.EventSync;
+import thunder.hack.events.impl.world.EventTick;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.gui.notification.Notification;
@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.system.Systems.MANAGER;
 
 public class AutoCrystalBase extends Module {
     private final Setting<TargetLogic> targetLogic = new Setting<>("TargetLogic", TargetLogic.Distance);
@@ -72,9 +73,9 @@ public class AutoCrystalBase extends Module {
         }
 
         switch (targetLogic.getValue()) {
-            case HP -> target = ThunderHack.combatManager.getTargetByHealth(15);
-            case Distance -> target = ThunderHack.combatManager.getNearestTarget(15);
-            case FOV -> target = ThunderHack.combatManager.getTargetByFOV(15);
+            case HP -> target = MANAGER.COMBAT.getTargetByHealth(15);
+            case Distance -> target = MANAGER.COMBAT.getNearestTarget(15);
+            case FOV -> target = MANAGER.COMBAT.getTargetByFOV(15);
         }
 
         if (target != null && (target.isDead() || target.getHealth() < 0)) {
@@ -82,7 +83,7 @@ public class AutoCrystalBase extends Module {
             return;
         }
 
-        if (calcTimer.every(calcDelay.getValue())) ThunderHack.asyncManager.run(
+        if (calcTimer.every(calcDelay.getValue())) MANAGER.ASYNC.run(
                 () -> calcPosition(range.getValue(), mc.player.getPos())
         );
     }
@@ -117,7 +118,7 @@ public class AutoCrystalBase extends Module {
                 String content;
                 if (isRu()) content = "Ставлю на" + Formatting.GRAY + " X:" + bestData.position().getX() + " Y:" + bestData.position().getY() + " Z:" + bestData.position().getZ() + Formatting.WHITE + " урон возрастет на " + Formatting.RED + MathUtility.round2(bestData.damage - ModuleManager.autoCrystal.renderDamage);
                 else content = "Placing obby on" + Formatting.GRAY + " X:" + bestData.position().getX() + " Y:" + bestData.position().getY() + " Z:" + bestData.position().getZ() + Formatting.WHITE + " damage will increase by " + Formatting.RED + MathUtility.round2(bestData.damage - ModuleManager.autoCrystal.renderDamage);
-                ThunderHack.notificationManager.publicity("AutoCrystalBase", content, 2, Notification.Type.INFO);
+                MANAGER.NOTIFICATION.publicity("AutoCrystalBase", content, 2, Notification.Type.INFO);
             }
 
             InventoryUtility.returnSlot();
@@ -208,7 +209,7 @@ public class AutoCrystalBase extends Module {
         if (ModuleManager.autoCrystal.protectFriends.getValue()) {
             List<PlayerEntity> players = Lists.newArrayList(mc.world.getPlayers());
             for (PlayerEntity pl : players) {
-                if (!ThunderHack.friendManager.isFriend(pl)) continue;
+                if (!MANAGER.FRIEND.isFriend(pl)) continue;
                 float fdamage = ExplosionUtility.getDamageOfGhostBlock(crystalVec, target, bp);
                 if (fdamage > selfDamage) {
                     selfDamage = fdamage;

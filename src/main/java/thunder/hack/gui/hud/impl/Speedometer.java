@@ -9,6 +9,8 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
 
+import static thunder.hack.system.Systems.MANAGER;
+
 public class Speedometer extends HudElement {
     public float speed = 0f;
     private final Setting<Boolean> bps = new Setting<>("BPS", false);
@@ -29,10 +31,10 @@ public class Speedometer extends HudElement {
     }
 
     public float getSpeedKpH() {
-        return (float) (ThunderHack.playerManager.currentPlayerSpeed * 72f);
+        return MANAGER.PLAYER.currentPlayerSpeed * 72f;
     }
 
     public float getSpeedMpS() {
-        return (float) (ThunderHack.playerManager.currentPlayerSpeed * 20f);
+        return MANAGER.PLAYER.currentPlayerSpeed * 20f;
     }
 }

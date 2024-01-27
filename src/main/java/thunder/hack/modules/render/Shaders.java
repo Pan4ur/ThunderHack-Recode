@@ -11,6 +11,8 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.Parent;
 
+import static thunder.hack.system.Systems.MANAGER;
+
 public class Shaders extends Module {
     public Shaders() {
         super("Shaders", Category.RENDER);
@@ -64,7 +66,7 @@ public class Shaders extends Module {
         if (entity instanceof PlayerEntity) {
             if (entity == mc.player)
                 return false;
-            if (ThunderHack.friendManager.isFriend((PlayerEntity) entity))
+            if (MANAGER.FRIEND.isFriend((PlayerEntity) entity))
                 return friends.getValue();
             return players.getValue();
         }
@@ -82,11 +84,11 @@ public class Shaders extends Module {
 
     public void onRender3D(MatrixStack matrices) {
         if (hands.getValue())
-            ThunderHack.shaderManager.renderShader(()-> mc.gameRenderer.renderHand(matrices, mc.gameRenderer.getCamera(), mc.getTickDelta()), handsMode.getValue());
+            MANAGER.SHADER.renderShader(()-> mc.gameRenderer.renderHand(matrices, mc.gameRenderer.getCamera(), mc.getTickDelta()), handsMode.getValue());
     }
 
     @Override
     public void onDisable() {
-        ThunderHack.shaderManager.reloadShaders();
+        MANAGER.SHADER.reloadShaders();
     }
 }

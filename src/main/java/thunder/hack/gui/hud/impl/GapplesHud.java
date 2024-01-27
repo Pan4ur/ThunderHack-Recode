@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.RotationAxis;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.EventEatFood;
+import thunder.hack.events.impl.entity.EventEatFood;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.setting.Setting;

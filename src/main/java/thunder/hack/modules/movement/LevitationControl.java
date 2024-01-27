@@ -2,7 +2,7 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.effect.StatusEffects;
-import thunder.hack.events.impl.EventMove;
+import thunder.hack.events.impl.entity.EventMove;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 

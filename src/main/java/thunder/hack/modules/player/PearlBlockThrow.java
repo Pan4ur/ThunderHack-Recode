@@ -4,7 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.Hand;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.world.PacketEvent;
 import thunder.hack.injection.accesors.IPlayerInteractBlockC2SPacket;
 import thunder.hack.modules.Module;
 

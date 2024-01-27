@@ -15,7 +15,7 @@ import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.world.EventPostSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.system.Systems.MANAGER;
 
 public class TNTAura extends Module {
     public TNTAura() {
@@ -94,7 +95,7 @@ public class TNTAura extends Module {
             return;
         }
 
-        PlayerEntity pl = ThunderHack.combatManager.getNearestTarget(range.getValue());
+        PlayerEntity pl = MANAGER.COMBAT.getNearestTarget(range.getValue());
 
         List<BlockPos> blocks = getBlocks(pl);
         if (!blocks.isEmpty()) {

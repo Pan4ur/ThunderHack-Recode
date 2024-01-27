@@ -19,6 +19,8 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 import java.util.Objects;
 
+import static thunder.hack.system.Systems.MANAGER;
+
 public class RadarRewrite extends HudElement {
     public static Setting<Boolean> glow = new Setting<>("Glow", false);
     private final Setting<Float> width = new Setting<>("Height", 2.28f, 0.1f, 5f);
@@ -77,7 +79,7 @@ public class RadarRewrite extends HudElement {
                 context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
                 context.getMatrices().translate(-(middleW + CRadius.getValue()), -(middleH + CRadius.getValue()), 0.0F);
 
-                if (ThunderHack.friendManager.isFriend(e))
+                if (MANAGER.FRIEND.isFriend(e))
                     color = colorf.getValue().getColor();
                 else color = switch (triangleMode.getValue()) {
                     case Custom -> colors.getValue().getColor();

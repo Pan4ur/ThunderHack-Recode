@@ -9,6 +9,7 @@ import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.FriendArgumentType;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static thunder.hack.system.Systems.MANAGER;
 
 public class FriendCommand extends Command {
     public FriendCommand() {
@@ -18,7 +19,7 @@ public class FriendCommand extends Command {
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("reset").executes(context -> {
-            ThunderHack.friendManager.clear();
+            MANAGER.FRIEND.clear();
             sendMessage("Friends got reset.");
 
             return SINGLE_SUCCESS;
@@ -27,7 +28,7 @@ public class FriendCommand extends Command {
         builder.then(literal("add").then(arg("player", StringArgumentType.word()).executes(context -> {
             String nickname = context.getArgument("player", String.class);
 
-            ThunderHack.friendManager.addFriend(nickname);
+            MANAGER.FRIEND.addFriend(nickname);
             sendMessage(nickname + " has been friended");
             return SINGLE_SUCCESS;
         })));
@@ -35,24 +36,24 @@ public class FriendCommand extends Command {
         builder.then(literal("remove").then(arg("player", FriendArgumentType.create()).executes(context -> {
             String nickname = context.getArgument("player", String.class);
 
-            ThunderHack.friendManager.removeFriend(nickname);
+            MANAGER.FRIEND.removeFriend(nickname);
             sendMessage(nickname + " has been unfriended");
             return SINGLE_SUCCESS;
         })));
 
         builder.then(arg("player", StringArgumentType.word()).executes(context -> {
             String nickname = context.getArgument("player", String.class);
-            sendMessage(nickname + (ThunderHack.friendManager.isFriend(nickname) ? " is friended." : " isn't friended."));
+            sendMessage(nickname + (MANAGER.FRIEND.isFriend(nickname) ? " is friended." : " isn't friended."));
 
             return SINGLE_SUCCESS;
         }));
 
         builder.executes(context -> {
-            if (ThunderHack.friendManager.getFriends().isEmpty()) {
+            if (MANAGER.FRIEND.getFriends().isEmpty()) {
                 sendMessage("Friend list empty D:");
             } else {
                 StringBuilder f = new StringBuilder("Friends: ");
-                for (String friend : ThunderHack.friendManager.getFriends()) {
+                for (String friend : MANAGER.FRIEND.getFriends()) {
                     try {
                         f.append(friend).append(", ");
                     } catch (Exception ignored) {

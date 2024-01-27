@@ -35,6 +35,7 @@ import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
 
+import static thunder.hack.system.Systems.MANAGER;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 
@@ -190,7 +191,7 @@ public class ESP extends Module {
                 stack.translate(-x, -y, -z);
                 stack.pop();
 
-                for (PlayerEntity pl : ThunderHack.asyncManager.getAsyncPlayers()) {
+                for (PlayerEntity pl : MANAGER.ASYNC.getAsyncPlayers()) {
                     if (mc.player.squaredDistanceTo(pl.getPos()) > 100 || pl == mc.player)
                         continue;
                     Render3DEngine.drawTargetEsp(stack, pl);
@@ -341,7 +342,7 @@ public class ESP extends Module {
         if (entity instanceof PlayerEntity) {
             if (entity == mc.player)
                 return false;
-            if (ThunderHack.friendManager.isFriend((PlayerEntity) entity))
+            if (MANAGER.FRIEND.isFriend((PlayerEntity) entity))
                 return friends.getValue();
             return players.getValue();
         }
@@ -362,7 +363,7 @@ public class ESP extends Module {
             return new Color(-1);
 
         if (entity instanceof PlayerEntity) {
-            if (ThunderHack.friendManager.isFriend((PlayerEntity) entity))
+            if (MANAGER.FRIEND.isFriend((PlayerEntity) entity))
                 return friendsC.getValue().getColorObject();
             return playersC.getValue().getColorObject();
         }

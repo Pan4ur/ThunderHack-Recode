@@ -11,7 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CombatManager;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.world.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
@@ -19,6 +19,8 @@ import thunder.hack.utility.math.ExplosionUtility;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+
+import static thunder.hack.system.Systems.MANAGER;
 
 public final class Breaker extends Module {
     private final Setting<CombatManager.TargetBy> targetBy = new Setting<>("TargetBy", CombatManager.TargetBy.Distance);
@@ -39,7 +41,7 @@ public final class Breaker extends Module {
         if (fullNullCheck())
             return;
 
-        PlayerEntity target = ThunderHack.combatManager.getTarget(range.getValue(), targetBy.getValue());
+        PlayerEntity target = MANAGER.COMBAT.getTarget(range.getValue(), targetBy.getValue());
 
         if (target == null)
             return;
@@ -78,7 +80,7 @@ public final class Breaker extends Module {
             }
         }
 
-        ThunderHack.asyncManager.run(() -> {
+        MANAGER.ASYNC.run(() -> {
             for (int x = -3; x <= 3; x++) {
                 for (int y = 0; y <= 4; y++) {
                     for (int z = -3; z <= 3; z++) {

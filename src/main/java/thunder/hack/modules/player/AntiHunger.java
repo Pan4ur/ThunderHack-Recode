@@ -4,7 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.world.PacketEvent;
 import thunder.hack.injection.accesors.IPlayerMoveC2SPacket;
 import thunder.hack.modules.Module;
 

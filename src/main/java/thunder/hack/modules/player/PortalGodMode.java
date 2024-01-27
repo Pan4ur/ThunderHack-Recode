@@ -4,7 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
 import net.minecraft.util.math.BlockPos;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.world.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.utility.Timer;
 

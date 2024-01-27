@@ -6,7 +6,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.world.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 

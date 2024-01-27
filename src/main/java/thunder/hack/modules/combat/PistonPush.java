@@ -10,8 +10,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.world.EventPostSync;
+import thunder.hack.events.impl.world.EventSync;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -26,6 +26,8 @@ import thunder.hack.utility.world.HoleUtility;
 
 import java.awt.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static thunder.hack.system.Systems.MANAGER;
 
 public final class PistonPush extends Module {
     private final Setting<Float> range = new Setting<>("Target Range", 5.f, 1.5f, 7.f);
@@ -274,7 +276,7 @@ public final class PistonPush extends Module {
     private boolean isPlayerTargetCorrect(PlayerEntity player) {
         if (player == null) return false;
 
-        return !ThunderHack.friendManager.isFriend(player)
+        return !MANAGER.FRIEND.isFriend(player)
                 && player != mc.player
                 && player.distanceTo(((mc.player))) <= range.getValue()
                 && !player.isDead()
@@ -283,7 +285,7 @@ public final class PistonPush extends Module {
     }
 
     private void findTarget() {
-        for (PlayerEntity player : ThunderHack.asyncManager.getAsyncPlayers()) {
+        for (PlayerEntity player : MANAGER.ASYNC.getAsyncPlayers()) {
             if (!isPlayerTargetCorrect(player)) continue;
 
             target = player;

@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.player.NoEntityTrace;
@@ -43,6 +42,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static thunder.hack.modules.Module.mc;
+import static thunder.hack.system.Systems.MANAGER;
 
 @Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer {
@@ -71,9 +71,9 @@ public abstract class MixinGameRenderer {
         Render3DEngine.lastProjMat.set(RenderSystem.getProjectionMatrix());
         Render3DEngine.lastModMat.set(RenderSystem.getModelViewMatrix());
         Render3DEngine.lastWorldSpaceMatrix.set(matrix.peek().getPositionMatrix());
-        ThunderHack.moduleManager.onPreRender3D(matrix);
+        MANAGER.MODULE.onPreRender3D(matrix);
         MSAAFramebuffer.use(false, () -> {
-            ThunderHack.moduleManager.onRender3D(matrix);
+            MANAGER.MODULE.onRender3D(matrix);
             BlockAnimationUtility.onRender(matrix);
             Render3DEngine.onRender3D(matrix); // <- не двигать
         });
@@ -81,7 +81,7 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V", shift = At.Shift.AFTER))
     public void postRender3dHook(float tickDelta, long limitTime, MatrixStack matrix, CallbackInfo ci) {
-        ThunderHack.shaderManager.renderShaders();
+        MANAGER.SHADER.renderShaders();
     }
 
     @Redirect(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;lerp(FFF)F"))
@@ -106,7 +106,7 @@ public abstract class MixinGameRenderer {
         }
 
         if(ModuleManager.freeCam.isEnabled())
-            mc.crosshairTarget = ThunderHack.playerManager.getRtxTarget(ModuleManager.freeCam.getFakeYaw(), ModuleManager.freeCam.getFakePitch(), ModuleManager.freeCam.getFakeX(), ModuleManager.freeCam.getFakeY(), ModuleManager.freeCam.getFakeZ());
+            mc.crosshairTarget = MANAGER.PLAYER.getRtxTarget(ModuleManager.freeCam.getFakeYaw(), ModuleManager.freeCam.getFakePitch(), ModuleManager.freeCam.getFakeX(), ModuleManager.freeCam.getFakeY(), ModuleManager.freeCam.getFakeZ());
     }
 
     @Inject(method = "loadPrograms", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
@@ -147,7 +147,7 @@ public abstract class MixinGameRenderer {
     @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
     private void bobViewHook(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
         if(MainSettings.customBob.getValue()) {
-            ThunderHack.core.bobView(matrices, tickDelta);
+            ThunderHack.CORE.bobView(matrices, tickDelta);
             ci.cancel();
         }
     }

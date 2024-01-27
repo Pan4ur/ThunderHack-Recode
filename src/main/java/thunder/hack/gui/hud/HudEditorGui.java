@@ -16,6 +16,7 @@ import thunder.hack.utility.render.MSAAFramebuffer;
 import java.util.List;
 
 import static thunder.hack.modules.Module.mc;
+import static thunder.hack.system.Systems.MANAGER;
 
 public class HudEditorGui extends Screen {
     public static HudElement currentlyDragging;
@@ -40,9 +41,9 @@ public class HudEditorGui extends Screen {
             double offset = 0;
             int windowHeight = 18;
 
-            for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
+            for (final Module.Category category : MANAGER.MODULE.getCategories()) {
                 if (category != Module.Category.HUD) continue;
-                ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category), 0, x + offset, y, 108, windowHeight);
+                ModuleWindow window = new ModuleWindow(category, MANAGER.MODULE.getModulesByCategory(category), 0, x + offset, y, 108, windowHeight);
                 window.setOpen(true);
                 windows.add(window);
                 offset += 110;

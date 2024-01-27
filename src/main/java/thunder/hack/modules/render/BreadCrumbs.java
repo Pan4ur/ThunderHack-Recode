@@ -5,7 +5,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
-import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.world.EventPostSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;

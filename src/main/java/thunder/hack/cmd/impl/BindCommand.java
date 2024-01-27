@@ -19,6 +19,7 @@ import java.util.Objects;
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static thunder.hack.gui.hud.impl.KeyBinds.getShortKeyName;
 import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.system.Systems.MANAGER;
 
 public class BindCommand extends Command {
     public BindCommand() {
@@ -64,7 +65,7 @@ public class BindCommand extends Command {
 
         builder.then(literal("list").executes(context -> {
             StringBuilder binds = new StringBuilder("Binds: ");
-            for (Module feature : ThunderHack.moduleManager.modules) {
+            for (Module feature : MANAGER.MODULE.modules) {
                 if (!Objects.equals(feature.getBind().getBind(), "None")) {
                     binds.append("\n- ").append(feature.getName()).append(" -> ").append(getShortKeyName(feature)).append(feature.getBind().isHold() ? "[hold]" : "");
                 }
@@ -74,7 +75,7 @@ public class BindCommand extends Command {
         }));
 
         builder.then(literal("reset").executes(context -> {
-            for (Module mod : ThunderHack.moduleManager.modules) mod.setBind(new Bind(-1, false, false));
+            for (Module mod : MANAGER.MODULE.modules) mod.setBind(new Bind(-1, false, false));
             sendMessage("Done!");
             return SINGLE_SUCCESS;
         }));

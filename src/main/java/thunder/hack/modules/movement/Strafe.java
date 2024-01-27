@@ -2,9 +2,6 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
@@ -15,11 +12,14 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.*;
+import thunder.hack.events.impl.entity.EventMove;
+import thunder.hack.events.impl.entity.EventSprint;
+import thunder.hack.events.impl.entity.PlayerUpdateEvent;
+import thunder.hack.events.impl.world.EventSync;
+import thunder.hack.events.impl.world.PacketEvent;
 import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
 

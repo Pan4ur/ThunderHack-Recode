@@ -35,23 +35,24 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static thunder.hack.modules.Module.mc;
+import static thunder.hack.system.Systems.MANAGER;
 
 @Mixin(InGameHud.class)
 public abstract class MixinInGameHud {
 
     @Inject(at = @At(value = "HEAD"), method = "render")
     public void render(DrawContext context, float tickDelta, CallbackInfo ci) {
-        ThunderHack.moduleManager.onRenderShaders(context);
-        ThunderHack.notificationManager.onRenderShader(context);
+        MANAGER.MODULE.onRenderShaders(context);
+        MANAGER.NOTIFICATION.onRenderShader(context);
 
         if (ClickGui.getInstance().msaa.getValue()) {
             MSAAFramebuffer.use(false, () -> {
-                ThunderHack.moduleManager.onRender2D(context);
-                ThunderHack.notificationManager.onRender2D(context);
+                MANAGER.MODULE.onRender2D(context);
+                MANAGER.NOTIFICATION.onRender2D(context);
             });
         } else {
-            ThunderHack.moduleManager.onRender2D(context);
-            ThunderHack.notificationManager.onRender2D(context);
+            MANAGER.MODULE.onRender2D(context);
+            MANAGER.NOTIFICATION.onRender2D(context);
         }
     }
 

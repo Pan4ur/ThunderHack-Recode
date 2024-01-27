@@ -1,9 +1,12 @@
 package thunder.hack.core.impl;
 
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import net.minecraft.entity.player.PlayerEntity;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.IManager;
+import thunder.hack.events.impl.client.EventClientInit;
 
 import java.io.*;
 import java.util.*;
@@ -12,6 +15,16 @@ import static thunder.hack.modules.Module.mc;
 
 public class FriendManager implements IManager {
     public static List<String> friends = new ArrayList<>();
+
+    {
+        ThunderHack.EVENT_BUS.subscribe(this);
+    }
+
+    @EventHandler
+    @SuppressWarnings("unused")
+    private void onInit(EventClientInit event) {
+        loadFriends();
+    }
 
     public boolean isFriend(String name) {
         return friends.stream().anyMatch(friend -> friend.equalsIgnoreCase(name));

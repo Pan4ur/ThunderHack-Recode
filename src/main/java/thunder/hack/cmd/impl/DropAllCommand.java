@@ -9,6 +9,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static thunder.hack.system.Systems.MANAGER;
 
 public class DropAllCommand extends Command {
     public DropAllCommand() {
@@ -18,7 +19,7 @@ public class DropAllCommand extends Command {
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            ThunderHack.asyncManager.run(() -> {
+            MANAGER.ASYNC.run(() -> {
                 for (int i = 5; i <= 45; i++) {
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 1, SlotActionType.THROW, mc.player);
                     try {

@@ -5,13 +5,15 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import static thunder.hack.modules.Module.mc;
 
 public class PredictUtility {
-    public static PlayerEntity predictPlayer(PlayerEntity entity, int ticks) {
+    public static @NotNull PlayerEntity predictPlayer(@NotNull PlayerEntity entity, int ticks) {
         Vec3d posVec = new Vec3d(entity.getX(), entity.getY(), entity.getZ());
         double motionX = entity.getX() - entity.prevX;
         double motionY = entity.getY() - entity.prevY;
@@ -34,8 +36,8 @@ public class PredictUtility {
         return equipAndReturn(entity, posVec);
     }
 
-    public static PlayerEntity equipAndReturn(PlayerEntity original, Vec3d posVec) {
-        PlayerEntity copyEntity = new PlayerEntity(mc.world, original.getBlockPos(), original.getYaw(), new GameProfile(UUID.fromString("66123666-1234-5432-6666-667563866600"), "PredictEntity339")) {
+    public static @NotNull PlayerEntity equipAndReturn(@NotNull PlayerEntity original, Vec3d posVec) {
+        PlayerEntity copyEntity = new PlayerEntity(Objects.requireNonNull(mc.world), original.getBlockPos(), original.getYaw(), new GameProfile(UUID.fromString("66123666-1234-5432-6666-667563866600"), "PredictEntity339")) {
             @Override
             public boolean isSpectator() {
                 return false;

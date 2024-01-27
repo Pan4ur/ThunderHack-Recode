@@ -9,15 +9,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.ThunderHack;
 
+import static thunder.hack.system.Systems.MANAGER;
+
 @Mixin(ClientPlayNetworkHandler.class)
 public class MixinClientPlayNetworkHandler {
     @Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
     private void onSendChatMessage(@NotNull String message, CallbackInfo ci) {
-        if (message.startsWith(ThunderHack.commandManager.getPrefix())) {
+        if (message.startsWith(MANAGER.COMMAND.getPrefix())) {
             try {
-                ThunderHack.commandManager.getDispatcher().execute(
-                        message.substring(ThunderHack.commandManager.getPrefix().length()),
-                        ThunderHack.commandManager.getSource()
+                MANAGER.COMMAND.getDispatcher().execute(
+                        message.substring(MANAGER.COMMAND.getPrefix().length()),
+                        MANAGER.COMMAND.getSource()
                 );
             } catch (CommandSyntaxException ignored) {}
 

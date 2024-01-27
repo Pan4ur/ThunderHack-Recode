@@ -15,6 +15,7 @@ import java.lang.reflect.Field;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.system.Systems.MANAGER;
 
 public class MacroCommand extends Command {
     public MacroCommand() {
@@ -26,7 +27,7 @@ public class MacroCommand extends Command {
         builder.then(literal("list").executes(context -> {
             sendMessage(isRu() ? "Макросы:" : "Macro list:");
             sendMessage(" ");
-            ThunderHack.macroManager.getMacros().forEach(macro -> sendMessage(macro.name() + (macro.bind() != -1 ? " [" + toString(macro.bind()) + "]" : "") + " {" + macro.text() + "}"));
+            MANAGER.MACRO.getMacros().forEach(macro -> sendMessage(macro.name() + (macro.bind() != -1 ? " [" + toString(macro.bind()) + "]" : "") + " {" + macro.text() + "}"));
             return SINGLE_SUCCESS;
         }));
 
@@ -37,7 +38,7 @@ public class MacroCommand extends Command {
                 return SINGLE_SUCCESS;
             }
 
-            ThunderHack.macroManager.removeMacro(macro);
+            MANAGER.MACRO.removeMacro(macro);
             sendMessage((isRu() ? "Удален макрос " : "Removed macro ") + macro.name());
 
             return SINGLE_SUCCESS;

@@ -7,7 +7,6 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PickFromInventoryC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
@@ -16,16 +15,16 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.world.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
-import thunder.hack.utility.player.SearchInvResult;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.system.Systems.MANAGER;
 
 public class MiddleClick extends Module {
     private final Setting<Boolean> friend = new Setting<>("Friend", true);
@@ -68,11 +67,11 @@ public class MiddleClick extends Module {
             mc.player.setPitch(90);
 
         if (friend.getValue() && mc.currentScreen == null && mc.options.pickItemKey.isPressed() && mc.targetedEntity != null && mc.targetedEntity instanceof PlayerEntity entity && timer.passedMs(800)) {
-            if (ThunderHack.friendManager.isFriend(entity.getName().getString())) {
-                ThunderHack.friendManager.removeFriend(entity.getName().getString());
+            if (MANAGER.FRIEND.isFriend(entity.getName().getString())) {
+                MANAGER.FRIEND.removeFriend(entity.getName().getString());
                 sendMessage(isRu() ? "§b" + entity.getName().getString() + "§r удален из друзей!" : "§b" + entity.getName().getString() + "§r removed from friends!");
             } else {
-                ThunderHack.friendManager.addFriend(entity.getName().getString());
+                MANAGER.FRIEND.addFriend(entity.getName().getString());
                 sendMessage(isRu() ? "Добавлен друг §b" + entity.getName().getString() : "Added friend §b" + entity.getName().getString());
             }
             timer.reset();

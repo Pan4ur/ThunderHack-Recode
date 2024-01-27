@@ -6,7 +6,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CombatManager;
-import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.world.EventPostSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InteractionUtility;
@@ -15,6 +15,8 @@ import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.world.HoleUtility;
 
 import java.util.Arrays;
+
+import static thunder.hack.system.Systems.MANAGER;
 
 public class AutoAnvil extends Module {
     private final Setting<Float> range = new Setting<>("Range", 5f, 1f, 7f);
@@ -33,7 +35,7 @@ public class AutoAnvil extends Module {
     private void onPostSync(EventPostSync event) {
         if (mc.player == null) return;
         if (target == null || target.isDead()) {
-            target = ThunderHack.combatManager.getTarget(range.getValue(), targetBy.getValue());
+            target = MANAGER.COMBAT.getTarget(range.getValue(), targetBy.getValue());
             return;
         }
 

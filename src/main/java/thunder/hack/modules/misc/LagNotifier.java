@@ -8,7 +8,7 @@ import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.util.Identifier;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.world.PacketEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.gui.notification.Notification;
@@ -20,6 +20,7 @@ import java.awt.*;
 import java.text.DecimalFormat;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.system.Systems.MANAGER;
 
 public class LagNotifier extends Module {
     private final Setting<Boolean> rubberbandNotify = new Setting<>("Rubberband", true);
@@ -76,17 +77,17 @@ public class LagNotifier extends Module {
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         }
 
-        if (ThunderHack.serverManager.getTPS() < 10 && notifyTimer.passedMs(60000) && tpsNotify.getValue()) {
+        if (MANAGER.SERVER.getTPS() < 10 && notifyTimer.passedMs(60000) && tpsNotify.getValue()) {
             String msg = isRu() ? "ТПС сервера ниже 10!" : "Server TPS is below 10!";
             if (ModuleManager.tpsSync.isDisabled()) msg += isRu() ? " Рекомендуется включить TPSSync" : "It is recommended to enable TPSSync";
-            ThunderHack.notificationManager.publicity("LagNotifier", msg, 8, Notification.Type.ERROR);
+            MANAGER.NOTIFICATION.publicity("LagNotifier", msg, 8, Notification.Type.ERROR);
 
             isLagging = true;
             notifyTimer.reset();
         }
 
-        if (ThunderHack.serverManager.getTPS() > 15 && isLagging) {
-            ThunderHack.notificationManager.publicity("LagNotifier", isRu() ? "ТПС сервера стабилизировался!" : "Server TPS has stabilized!", 8, Notification.Type.SUCCESS);
+        if (MANAGER.SERVER.getTPS() > 15 && isLagging) {
+            MANAGER.NOTIFICATION.publicity("LagNotifier", isRu() ? "ТПС сервера стабилизировался!" : "Server TPS has stabilized!", 8, Notification.Type.SUCCESS);
             isLagging = false;
         }
         Render2DEngine.endRender();

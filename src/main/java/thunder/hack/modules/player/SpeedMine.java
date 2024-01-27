@@ -21,11 +21,10 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.PlayerManager;
-import thunder.hack.events.impl.EventAttackBlock;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.entity.EventAttackBlock;
+import thunder.hack.events.impl.world.EventSync;
+import thunder.hack.events.impl.world.PacketEvent;
 import thunder.hack.injection.accesors.IInteractionManager;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -42,8 +41,11 @@ import thunder.hack.utility.render.Render3DEngine;
 import java.awt.*;
 import java.util.Objects;
 
+import static thunder.hack.system.Systems.MANAGER;
+
 public final class SpeedMine extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
+    private final Setting<Boolean> instant = new Setting<>("Instant", false, v -> mode.getValue() == Mode.Packet);
     private final Setting<StartMode> startMode = new Setting<>("StartMode", StartMode.StartAbort, v -> mode.getValue() == Mode.Packet);
     private final Setting<SwitchMode> switchMode = new Setting<>("SwitchMode", SwitchMode.Alternative, v -> mode.getValue() == Mode.Packet);
     private final Setting<Integer> swapDelay = new Setting<>("SwapDelay", 50, 0, 1000, v -> switchMode.getValue() == SwitchMode.Alternative && mode.getValue() == Mode.Packet);
@@ -148,7 +150,7 @@ public final class SpeedMine extends Module {
 
                     if (switchMode.getValue() == SwitchMode.Alternative) {
                         if (swapDelay.getValue() != 0) {
-                            ThunderHack.asyncManager.run(() -> {
+                            MANAGER.ASYNC.run(() -> {
                                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, invPickSlot < 9 ? invPickSlot + 36 : invPickSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
                                 closeScreen();
                             }, swapDelay.getValue());
@@ -160,8 +162,12 @@ public final class SpeedMine extends Module {
                         InventoryUtility.switchTo(prevSlot);
                     }
 
-                    progress = 0;
-                    mineBreaks++;
+                    if (!instant.getValue()) {
+                        progress = 0;
+                        mineBreaks++;
+                    } else {
+                        progress = 1;
+                    }
                 }
                 prevProgress = progress;
                 progress += getBlockStrength(mc.world.getBlockState(minePosition), minePosition);
@@ -299,10 +305,10 @@ public final class SpeedMine extends Module {
                 || mc.world.getBlockState(pos).getBlock() != Blocks.OBSIDIAN)
             return false;
 
-        for (PlayerEntity player : ThunderHack.asyncManager.getAsyncPlayers()) {
+        for (PlayerEntity player : MANAGER.ASYNC.getAsyncPlayers()) {
             if (player == null
                     || player == mc.player
-                    || ThunderHack.friendManager.isFriend(player))
+                    || MANAGER.FRIEND.isFriend(player))
                 continue;
 
             BlockState currentState = mc.world.getBlockState(pos);
@@ -331,6 +337,7 @@ public final class SpeedMine extends Module {
 
         if (mc.player == null)
             return 0;
+
         if (slot != -1 && mc.player.getInventory().getStack(slot) != null && !mc.player.getInventory().getStack(slot).isEmpty()) {
             destroySpeed *= mc.player.getInventory().getStack(slot).getMiningSpeedMultiplier(state);
         }
@@ -370,6 +377,7 @@ public final class SpeedMine extends Module {
 
         if (mc.world == null
                 || mc.player == null
+                || mc.player.getInventory().size() < 45
                 || mc.world.getBlockState(pos).getBlock() instanceof AirBlock)
             return -1;
 
@@ -415,7 +423,8 @@ public final class SpeedMine extends Module {
                 fixColorValue(startColor.getRed() + (int) (rDiff * progress)),
                 fixColorValue(startColor.getGreen() + (int) (gDiff * progress)),
                 fixColorValue(startColor.getBlue() + (int) (bDiff * progress)),
-                fixColorValue(startColor.getAlpha() + (int) (aDiff * progress)));
+                fixColorValue(startColor.getAlpha() + (int) (aDiff * progress))
+        );
     }
 
     private int fixColorValue(int colorVal) {

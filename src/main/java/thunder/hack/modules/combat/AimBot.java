@@ -15,7 +15,7 @@ import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.world.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
@@ -32,6 +32,7 @@ import static java.lang.Math.abs;
 import static net.minecraft.util.hit.HitResult.Type.ENTITY;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
 import static thunder.hack.core.impl.PlayerManager.calcAngleVec;
+import static thunder.hack.system.Systems.MANAGER;
 
 public final class AimBot extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.BowAim);
@@ -66,7 +67,7 @@ public final class AimBot extends Module {
         if (mode.getValue() == Mode.BowAim) {
             if (!(mc.player.getActiveItem().getItem() instanceof BowItem)) return;
 
-            PlayerEntity nearestTarget = ThunderHack.combatManager.getTargetByFOV(128);
+            PlayerEntity nearestTarget = MANAGER.COMBAT.getTargetByFOV(128);
 
             if (nearestTarget == null) return;
 
@@ -100,7 +101,7 @@ public final class AimBot extends Module {
                 return;
             }
             rotationYaw = Float.NaN;
-            PlayerEntity nearestTarget = ThunderHack.combatManager.getNearestTarget(5);
+            PlayerEntity nearestTarget = MANAGER.COMBAT.getNearestTarget(5);
             assistAcceleration += aimStrength.getValue() / 10000f;
 
             if (nearestTarget != null) {
@@ -266,7 +267,7 @@ public final class AimBot extends Module {
         if (!(entity instanceof PlayerEntity)) return true;
         if (entity == mc.player) return true;
         if (entity.isInvisible() && ignoreInvisible.getValue()) return true;
-        if (ThunderHack.friendManager.isFriend((PlayerEntity) entity)) return true;
+        if (MANAGER.FRIEND.isFriend((PlayerEntity) entity)) return true;
         if (Math.abs(getYawToEntityNew(entity)) > fov.getValue()) return true;
         return mc.player.squaredDistanceTo(getResolvedPos(entity)) > aimRange.getPow2Value();
     }

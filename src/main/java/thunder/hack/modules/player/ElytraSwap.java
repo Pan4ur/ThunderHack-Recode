@@ -10,7 +10,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.world.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
@@ -20,6 +20,7 @@ import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.system.Systems.MANAGER;
 
 public class ElytraSwap extends Module {
     public ElytraSwap() {
@@ -65,7 +66,7 @@ public class ElytraSwap extends Module {
 
     @EventHandler
     public void onPacketSend(PacketEvent.SendPost e) {
-        if(e.getPacket() instanceof ClientCommandC2SPacket command
+        if (e.getPacket() instanceof ClientCommandC2SPacket command
                 && command.getMode() == ClientCommandC2SPacket.Mode.START_FALL_FLYING
                 && mode.getValue() == Mode.Bind
                 && startFireWork.getValue()) {
@@ -118,23 +119,23 @@ public class ElytraSwap extends Module {
         if (mc.player.getInventory().getStack(38).getItem() == Items.ELYTRA) {
             int slot = getChestPlateSlot();
             if (slot != -1) {
-                if(delay.getValue())
-                ThunderHack.asyncManager.run(() -> {
-                    swapping = true;
-                    clickSlot(slot);
-                    try {
-                        Thread.sleep(200);
-                    } catch (Exception ignored) {
-                    }
-                    clickSlot(6);
-                    try {
-                        Thread.sleep(200);
-                    } catch (Exception ignored) {
-                    }
-                    clickSlot(slot);
-                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                    swapping = false;
-                });
+                if (delay.getValue())
+                    MANAGER.ASYNC.run(() -> {
+                        swapping = true;
+                        clickSlot(slot);
+                        try {
+                            Thread.sleep(200);
+                        } catch (Exception ignored) {
+                        }
+                        clickSlot(6);
+                        try {
+                            Thread.sleep(200);
+                        } catch (Exception ignored) {
+                        }
+                        clickSlot(slot);
+                        sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                        swapping = false;
+                    });
                 else {
                     clickSlot(slot);
                     clickSlot(6);
@@ -147,21 +148,23 @@ public class ElytraSwap extends Module {
                 return;
             }
         } else if (result.found()) {
-            if(delay.getValue())
-            new Thread(() -> {
-                swapping = true;
-                clickSlot(result.slot());
-                try {
-                    Thread.sleep(200);
-                } catch (Exception ignored) {}
-                clickSlot(6);
-                try {
-                    Thread.sleep(200);
-                } catch (Exception ignored) {}
-                clickSlot(result.slot());
-                sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                swapping = false;
-            }).start();
+            if (delay.getValue())
+                new Thread(() -> {
+                    swapping = true;
+                    clickSlot(result.slot());
+                    try {
+                        Thread.sleep(200);
+                    } catch (Exception ignored) {
+                    }
+                    clickSlot(6);
+                    try {
+                        Thread.sleep(200);
+                    } catch (Exception ignored) {
+                    }
+                    clickSlot(result.slot());
+                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                    swapping = false;
+                }).start();
             else {
                 clickSlot(result.slot());
                 clickSlot(6);

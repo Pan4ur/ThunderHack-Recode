@@ -4,17 +4,16 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.PlayerUpdateEvent;
-import thunder.hack.injection.accesors.ILivingEntity;
+import thunder.hack.events.impl.entity.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
+
+import static thunder.hack.system.Systems.MANAGER;
 
 public final class TriggerBot extends Module {
     public final Setting<Float> attackRange = new Setting<>("Range", 3f, 1f, 7.0f);
@@ -45,8 +44,8 @@ public final class TriggerBot extends Module {
             return;
         }
         if (!autoCrit()) return;
-        Entity ent = ThunderHack.playerManager.getRtxTarget(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());
-        if (ent != null && !ThunderHack.friendManager.isFriend(ent.getName().getString())) {
+        Entity ent = MANAGER.PLAYER.getRtxTarget(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());
+        if (ent != null && !MANAGER.FRIEND.isFriend(ent.getName().getString())) {
             mc.interactionManager.attackEntity(mc.player, ent);
             mc.player.swingHand(Hand.MAIN_HAND);
             delay = 10;

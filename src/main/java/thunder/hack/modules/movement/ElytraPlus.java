@@ -22,7 +22,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.*;
+import thunder.hack.events.impl.entity.EventMove;
+import thunder.hack.events.impl.entity.EventTravel;
+import thunder.hack.events.impl.entity.PlayerUpdateEvent;
+import thunder.hack.events.impl.world.EventSync;
+import thunder.hack.events.impl.world.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
@@ -34,6 +38,7 @@ import thunder.hack.utility.player.PlayerUtility;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
 import static thunder.hack.modules.player.ElytraSwap.getChestPlateSlot;
+import static thunder.hack.system.Systems.MANAGER;
 
 public class ElytraPlus extends Module {
     public ElytraPlus() {
@@ -125,7 +130,7 @@ public class ElytraPlus extends Module {
             } else mc.player.setPitch(prevClientPitch);
         }
         if (mode.getValue() == Mode.FireWork) {
-            if (ThunderHack.playerManager.ticksElytraFlying < 4) {
+            if (MANAGER.PLAYER.ticksElytraFlying < 4) {
                 if (e.isPre()) {
                     prevClientPitch = mc.player.getPitch();
                     mc.player.setPitch(-45f);
@@ -166,7 +171,7 @@ public class ElytraPlus extends Module {
                 ItemStack is = mc.player.getEquippedStack(EquipmentSlot.CHEST);
                 if (is.isOf(Items.ELYTRA)) mc.player.setPitch(lastInfinitePitch);
                 if (is.isOf(Items.ELYTRA) && is.getDamage() > 380 && mc.player.age % 100 == 0) {
-                    ThunderHack.notificationManager.publicity("Elytra+", isRu() ? "Элитра скоро сломается!" : "Elytra's about to break!", 2, Notification.Type.WARNING);
+                    MANAGER.NOTIFICATION.publicity("Elytra+", isRu() ? "Элитра скоро сломается!" : "Elytra's about to break!", 2, Notification.Type.WARNING);
                     mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.AMBIENT, 10.0f, 1.0F);
                 }
             }
@@ -226,9 +231,9 @@ public class ElytraPlus extends Module {
 
     private float getInfinitePitch() {
         if (mc.player.getY() < infiniteMaxHeight.getValue()) {
-            if (ThunderHack.playerManager.currentPlayerSpeed * 72f < infiniteMinSpeed.getValue() && !infiniteFlag)
+            if (MANAGER.PLAYER.currentPlayerSpeed * 72f < infiniteMinSpeed.getValue() && !infiniteFlag)
                 infiniteFlag = true;
-            if (ThunderHack.playerManager.currentPlayerSpeed * 72f > infiniteMaxSpeed.getValue() && infiniteFlag)
+            if (MANAGER.PLAYER.currentPlayerSpeed * 72f > infiniteMaxSpeed.getValue() && infiniteFlag)
                 infiniteFlag = false;
         } else infiniteFlag = true;
 
@@ -363,7 +368,7 @@ public class ElytraPlus extends Module {
 
             if (forceHeight.getValue()) height = manualHeight.getValue();
 
-            double horizSpeed = ThunderHack.playerManager.currentPlayerSpeed;
+            double horizSpeed = MANAGER.PLAYER.currentPlayerSpeed;
             double horizPct = MathHelper.clamp(horizSpeed / 1.7, 0.0, 1.0);
             double heightPct = 1 - Math.sqrt(horizPct);
             double minAngle = 0.6;
@@ -708,7 +713,7 @@ public class ElytraPlus extends Module {
             sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
             startFallFlying = true;
         }
-        if (ThunderHack.playerManager.ticksElytraFlying < 4) {
+        if (MANAGER.PLAYER.ticksElytraFlying < 4) {
             mc.options.jumpKey.setPressed(false);
         }
         doFireWork(true);
@@ -718,7 +723,7 @@ public class ElytraPlus extends Module {
         if (!MovementUtility.isMoving() && mc.options.jumpKey.isPressed() && mc.player.isFallFlying() && flying)
             mc.player.setPitch(-90f);
 
-        if (ThunderHack.playerManager.ticksElytraFlying < 5 && !mc.player.isOnGround())
+        if (MANAGER.PLAYER.ticksElytraFlying < 5 && !mc.player.isOnGround())
             mc.player.setPitch(-45f);
     }
 
@@ -729,7 +734,7 @@ public class ElytraPlus extends Module {
                 accelerationY = 0;
             }
 
-            if (ThunderHack.playerManager.ticksElytraFlying < 4) {
+            if (MANAGER.PLAYER.ticksElytraFlying < 4) {
                 e.setY(0.2f);
                 e.cancel();
                 return;
@@ -759,7 +764,7 @@ public class ElytraPlus extends Module {
             }
             
             MovementUtility.modifyEventSpeed(e, xzSpeed.getValue() * Math.min((acceleration += 9) / 100.0f, 1.0f));
-            if (stayMad.getValue() && !checkGround(3.0f) && ThunderHack.playerManager.ticksElytraFlying > 10)
+            if (stayMad.getValue() && !checkGround(3.0f) && MANAGER.PLAYER.ticksElytraFlying > 10)
                 e.setY(0.42f);
             e.cancel();
         }

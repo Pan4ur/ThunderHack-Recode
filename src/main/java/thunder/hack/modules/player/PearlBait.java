@@ -3,7 +3,7 @@ package thunder.hack.modules.player;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import thunder.hack.events.impl.EventEntitySpawn;
+import thunder.hack.events.impl.entity.EventEntitySpawn;
 import thunder.hack.modules.Module;
 
 import java.util.Comparator;

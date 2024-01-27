@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.EventEntityMoving;
+import thunder.hack.events.impl.entity.EventEntityMoving;
 import thunder.hack.modules.combat.HitBox;
 import thunder.hack.modules.render.NoRender;
 import thunder.hack.modules.render.Shaders;

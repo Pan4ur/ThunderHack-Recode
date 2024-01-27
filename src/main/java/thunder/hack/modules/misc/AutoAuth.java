@@ -3,7 +3,7 @@ package thunder.hack.modules.misc;
 import meteordevelopment.orbit.EventHandler;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.world.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
@@ -12,6 +12,7 @@ import net.minecraft.util.Formatting;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.system.Systems.MANAGER;
 
 public final class AutoAuth extends Module {
     private final Setting<Mode> passwordMode = new Setting<>("Password Mode", Mode.Custom);
@@ -63,10 +64,10 @@ public final class AutoAuth extends Module {
                 mc.getNetworkHandler().sendChatCommand("reg " + this.password + " " + this.password);
                 if (this.showPasswordInChat.getValue())
                     sendMessage("Твой пароль: " + Formatting.RED + this.password);
-                ThunderHack.notificationManager.publicity("AutoAuth", "Выполнена регистрация!", 4, Notification.Type.SUCCESS);
+                MANAGER.NOTIFICATION.publicity("AutoAuth", "Выполнена регистрация!", 4, Notification.Type.SUCCESS);
             } else if (pac.content().getString().contains("Авторизуйтесь") || pac.content().getString().contains("/l")) {
                 mc.getNetworkHandler().sendChatCommand("login " + this.password);
-                ThunderHack.notificationManager.publicity("AutoAuth", "Выполнен вход!", 4, Notification.Type.SUCCESS);
+                MANAGER.NOTIFICATION.publicity("AutoAuth", "Выполнен вход!", 4, Notification.Type.SUCCESS);
             }
         }
     }

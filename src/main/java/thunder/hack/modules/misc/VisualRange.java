@@ -7,13 +7,15 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Formatting;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.EventEntityRemoved;
-import thunder.hack.events.impl.EventEntitySpawn;
+import thunder.hack.events.impl.entity.EventEntityRemoved;
+import thunder.hack.events.impl.entity.EventEntitySpawn;
 import thunder.hack.modules.Module;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 
 import java.util.ArrayList;
+
+import static thunder.hack.system.Systems.MANAGER;
 
 public class VisualRange extends Module {
     private static final ArrayList<String> entities = new ArrayList<>();
@@ -51,7 +53,7 @@ public class VisualRange extends Module {
 
     public void notify(Entity entity, boolean enter) {
         String message = "";
-        if (ThunderHack.friendManager.isFriend(entity.getName().getString()))
+        if (MANAGER.FRIEND.isFriend(entity.getName().getString()))
             message = Formatting.AQUA + entity.getName().getString();
         else message = Formatting.GRAY + entity.getName().getString();
 
@@ -62,7 +64,7 @@ public class VisualRange extends Module {
             sendMessage(message);
 
         if (mode.getValue() == Mode.Notification)
-            ThunderHack.notificationManager.publicity("VisualRange", message, 2, Notification.Type.WARNING);
+            MANAGER.NOTIFICATION.publicity("VisualRange", message, 2, Notification.Type.WARNING);
 
         if (soundpl.getValue()) {
             try {
@@ -77,7 +79,7 @@ public class VisualRange extends Module {
 
     public boolean isValid(Entity entity) {
         if (!(entity instanceof PlayerEntity)) return false;
-        return entity != mc.player && (!ThunderHack.friendManager.isFriend(entity.getName().getString()) || friends.getValue());
+        return entity != mc.player && (!MANAGER.FRIEND.isFriend(entity.getName().getString()) || friends.getValue());
     }
 
     public enum Mode {

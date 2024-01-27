@@ -11,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.IManager;
-import thunder.hack.events.impl.EventPostTick;
-import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.TotemPopEvent;
+import thunder.hack.events.impl.world.EventPostTick;
+import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.world.TotemPopEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.AntiBot;
 
@@ -22,8 +22,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static thunder.hack.system.Systems.MANAGER;
+
 public class CombatManager implements IManager {
     public HashMap<String, Integer> popList = new HashMap<>();
+
+    {
+        ThunderHack.EVENT_BUS.subscribe(this);
+    }
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive event) {
@@ -66,7 +72,7 @@ public class CombatManager implements IManager {
     public List<PlayerEntity> getTargets(float range) {
         return mc.world.getPlayers().stream()
                 .filter(e -> !e.isDead())
-                .filter(entityPlayer -> !ThunderHack.friendManager.isFriend(entityPlayer.getName().getString()))
+                .filter(entityPlayer -> !MANAGER.FRIEND.isFriend(entityPlayer.getName().getString()))
                 .filter(entityPlayer -> entityPlayer != mc.player)
                 .filter(entityPlayer -> mc.player.squaredDistanceTo(entityPlayer) < range * range)
                 .sorted(Comparator.comparing(e -> mc.player.distanceTo(e)))

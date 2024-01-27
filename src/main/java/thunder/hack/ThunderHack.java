@@ -9,8 +9,10 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.*;
+import thunder.hack.events.impl.client.EventClientInit;
+import thunder.hack.events.impl.client.EventClientPreInit;
 import thunder.hack.modules.client.RPC;
-import thunder.hack.gui.notification.NotificationManager;
+import thunder.hack.system.Systems;
 import thunder.hack.utility.SoundUtility;
 import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -21,35 +23,25 @@ import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
 
+import static thunder.hack.system.Systems.MANAGER;
+
 
 public class ThunderHack implements ModInitializer {
+    // Main client constants
     public static final ModMetadata MOD_META;
     public static final String MOD_ID = "thunderhack";
     public static final IEventBus EVENT_BUS = new EventBus();
     public static final String VERSION = "1.4b2212";
 
     public static boolean isOutdated = false;
+    public static KeyListening currentKeyListener;
+    public static long initTime;
+
     public static float TICK_TIMER = 1f;
     public static BlockPos gps_position;
     public static Color copy_color = new Color(-1);
-    public static long initTime;
-    public static KeyListening currentKeyListener;
 
-    /*-----------------    Managers  ---------------------*/
-    public static NotificationManager notificationManager = new NotificationManager();
-    public static WayPointManager wayPointManager = new WayPointManager();
-    public static ModuleManager moduleManager = new ModuleManager();
-    public static FriendManager friendManager = new FriendManager();
-    public static ServerManager serverManager = new ServerManager();
-    public static PlayerManager playerManager = new PlayerManager();
-    public static CombatManager combatManager = new CombatManager();
-    public static ConfigManager configManager = new ConfigManager();
-    public static ShaderManager shaderManager = new ShaderManager();
-    public static AsyncManager asyncManager = new AsyncManager();
-    public static MacroManager macroManager = new MacroManager();
-    public static CommandManager commandManager = new CommandManager();
-    public static Core core = new Core();
-    /*--------------------------------------------------------*/
+    public final static Core CORE = new Core();
 
     static {
         MOD_META = FabricLoader.getInstance()
@@ -58,42 +50,20 @@ public class ThunderHack implements ModInitializer {
                 .getMetadata();
     }
 
-
     @Override
     public void onInitialize() {
         initTime = System.currentTimeMillis();
 
         EVENT_BUS.registerLambdaFactory("thunder.hack", (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
+        EVENT_BUS.subscribe(CORE);
+        Systems.loadSystems();
 
-        EVENT_BUS.subscribe(notificationManager);
-        EVENT_BUS.subscribe(serverManager);
-        EVENT_BUS.subscribe(playerManager);
-        EVENT_BUS.subscribe(combatManager);
-        EVENT_BUS.subscribe(asyncManager);
-        EVENT_BUS.subscribe(core);
+        EVENT_BUS.post(new EventClientPreInit());
+        EVENT_BUS.post(new EventClientInit());
 
-        FriendManager.loadFriends();
-        configManager.load(configManager.getCurrentConfig());
-        moduleManager.onLoad();
-        configManager.loadChestStealer();
-        configManager.loadInvCleaner();
-        configManager.loadAutoBuy();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            FriendManager.saveFriends();
-            configManager.save(configManager.getCurrentConfig());
-            wayPointManager.saveWayPoints();
-            macroManager.saveMacro();
-            configManager.saveChestStealer();
-            configManager.saveInvCleaner();
-            configManager.saveAutoBuy();
-        }));
-
-        macroManager.onLoad();
-        wayPointManager.onLoad();
+        Runtime.getRuntime().addShutdownHook(new Thread(ThunderHack::saveConfig));
 
         Render2DEngine.initShaders();
-
         SoundUtility.registerSounds();
         syncVersion();
         ThunderUtility.parseChangeLog();
@@ -117,6 +87,16 @@ public class ThunderHack implements ModInitializer {
         initTime = System.currentTimeMillis();
     }
 
+    public static void saveConfig() {
+        FriendManager.saveFriends();
+        MANAGER.CONFIG.save(MANAGER.CONFIG.getCurrentConfig());
+        MANAGER.WAYPOINT.saveWayPoints();
+        MANAGER.MACRO.saveMacro();
+        MANAGER.CONFIG.saveChestStealer();
+        MANAGER.CONFIG.saveInvCleaner();
+        MANAGER.CONFIG.saveAutoBuy();
+    }
+
     public static void syncVersion() {
         try {
             if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersion.txt").openStream())).readLine().equals(VERSION))
@@ -130,7 +110,7 @@ public class ThunderHack implements ModInitializer {
     }
 
     public static boolean isFuturePresent() {
-        return !FabricLoader.getInstance().getModContainer("future").isEmpty();
+        return FabricLoader.getInstance().getModContainer("future").isPresent();
     }
 
     public enum KeyListening {

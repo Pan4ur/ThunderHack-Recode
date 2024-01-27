@@ -15,8 +15,8 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.RaycastContext;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.world.EventPostSync;
+import thunder.hack.events.impl.world.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static thunder.hack.system.Systems.MANAGER;
 import static thunder.hack.utility.player.InteractionUtility.squaredDistanceFromEyes;
 
 public final class AutoWeb extends Module {
@@ -152,7 +153,7 @@ public final class AutoWeb extends Module {
     }
 
     private BlockPos getSequentialPos() {
-        PlayerEntity target = ThunderHack.combatManager.getNearestTarget(range.getValue());
+        PlayerEntity target = MANAGER.COMBAT.getNearestTarget(range.getValue());
         if (target != null) {
 
             BlockPos targetBp = BlockPos.ofFloored(target.getPos());

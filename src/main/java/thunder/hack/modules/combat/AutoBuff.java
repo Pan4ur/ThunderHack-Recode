@@ -1,8 +1,8 @@
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
-import thunder.hack.events.impl.EventAfterRotate;
-import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.world.EventAfterRotate;
+import thunder.hack.events.impl.world.EventPostSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;

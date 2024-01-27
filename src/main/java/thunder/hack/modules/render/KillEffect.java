@@ -19,6 +19,8 @@ import java.awt.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static thunder.hack.system.Systems.MANAGER;
+
 public class KillEffect extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Orthodox);
     private final Setting<Integer> speed = new Setting<>("Y Speed", 0, -10, 10, value -> mode.getValue() == Mode.Orthodox);
@@ -76,7 +78,7 @@ public class KillEffect extends Module {
 
     @Override
     public void onUpdate() {
-        ThunderHack.asyncManager.getAsyncEntities().forEach(entity -> {
+        MANAGER.ASYNC.getAsyncEntities().forEach(entity -> {
             if (!(entity instanceof PlayerEntity)) return;
             if (entity == mc.player || renderEntities.containsKey(entity) || lightingEntities.containsKey(entity)) return;
             if (entity.isAlive() || ((PlayerEntity) entity).getHealth() != 0) return;

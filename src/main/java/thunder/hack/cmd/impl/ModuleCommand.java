@@ -21,6 +21,7 @@ import thunder.hack.setting.impl.PositionSetting;
 import java.util.Objects;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static thunder.hack.system.Systems.MANAGER;
 
 public class ModuleCommand extends Command {
     public ModuleCommand() {
@@ -87,10 +88,10 @@ public class ModuleCommand extends Command {
         builder.executes(context -> {
             sendMessage("Modules: ");
 
-            for (Module.Category category : ThunderHack.moduleManager.getCategories()) {
+            for (Module.Category category : MANAGER.MODULE.getCategories()) {
                 StringBuilder modules = new StringBuilder(category.getName() + ": ");
 
-                for (Module module1 : ThunderHack.moduleManager.getModulesByCategory(category)) {
+                for (Module module1 : MANAGER.MODULE.getModulesByCategory(category)) {
                     modules.append(module1.isEnabled() ? Formatting.GREEN : Formatting.RED).append(module1.getName()).append(Formatting.WHITE).append(", ");
                 }
 

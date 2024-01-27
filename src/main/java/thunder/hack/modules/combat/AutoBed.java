@@ -25,8 +25,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.world.EventPostSync;
+import thunder.hack.events.impl.world.EventSync;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -47,6 +47,7 @@ import java.awt.*;
 import java.util.Objects;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.system.Systems.MANAGER;
 
 public final class AutoBed extends Module {
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("InteractMode", InteractionUtility.Interact.Vanilla);
@@ -176,7 +177,7 @@ public final class AutoBed extends Module {
     }
 
     private PlayerEntity findTarget() {
-        return ThunderHack.combatManager.getNearestTarget(12f);
+        return MANAGER.COMBAT.getNearestTarget(12f);
     }
 
     private BedData findBedToExplode() {

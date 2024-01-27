@@ -15,6 +15,8 @@ import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.util.Objects;
 
+import static thunder.hack.system.Systems.MANAGER;
+
 public class KeyBinds extends HudElement {
     public final Setting<ColorSetting> oncolor = new Setting<>("OnColor", new ColorSetting(0xBEBEBE));
     public final Setting<ColorSetting> offcolor = new Setting<>("OffColor", new ColorSetting(0x646464));
@@ -35,7 +37,7 @@ public class KeyBinds extends HudElement {
 
         Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
         int y_offset = 2;
-        for (Module feature : ThunderHack.moduleManager.modules) {
+        for (Module feature : MANAGER.MODULE.modules) {
             if (feature.isDisabled() && onlyEnabled.getValue())
                 continue;
             if (!Objects.equals(feature.getBind().getBind(), "None") && feature != ModuleManager.clickGui && feature != ModuleManager.thunderHackGui) {
@@ -49,7 +51,7 @@ public class KeyBinds extends HudElement {
     public void onRenderShaders(DrawContext context) {
         int y_offset1 = 0;
         float max_width = 50;
-        for (Module feature : ThunderHack.moduleManager.modules) {
+        for (Module feature : MANAGER.MODULE.modules) {
             if (feature.isDisabled() && onlyEnabled.getValue()) continue;
             if (!Objects.equals(feature.getBind().getBind(), "None") && feature != ModuleManager.clickGui && feature != ModuleManager.thunderHackGui) {
                 y_offset1 += 10;

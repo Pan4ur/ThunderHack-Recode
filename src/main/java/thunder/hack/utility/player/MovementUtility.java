@@ -1,17 +1,13 @@
 package thunder.hack.utility.player;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.MathHelper;
 import thunder.hack.ThunderHack;
-import thunder.hack.cmd.Command;
-import thunder.hack.core.impl.PlayerManager;
-import thunder.hack.events.impl.EventMove;
-import thunder.hack.events.impl.EventTravel;
-import thunder.hack.injection.accesors.IClientPlayerEntity;
+import thunder.hack.events.impl.entity.EventMove;
 import thunder.hack.modules.Module;
 
 import static thunder.hack.modules.Module.mc;
+import static thunder.hack.system.Systems.MANAGER;
 
 public final class MovementUtility {
 
@@ -134,6 +130,6 @@ public final class MovementUtility {
     }
 
     public static boolean sprintIsLegit(float yaw) {
-        return (Math.abs(Math.abs(MathHelper.wrapDegrees(yaw)) - Math.abs(MathHelper.wrapDegrees(ThunderHack.playerManager.yaw))) < 40);
+        return (Math.abs(Math.abs(MathHelper.wrapDegrees(yaw)) - Math.abs(MathHelper.wrapDegrees(MANAGER.PLAYER.yaw))) < 40);
     }
 }

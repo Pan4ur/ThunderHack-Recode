@@ -13,8 +13,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.TotemPopEvent;
+import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.world.TotemPopEvent;
 import thunder.hack.injection.accesors.IGameMessageS2CPacket;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.MainSettings;
@@ -27,6 +27,8 @@ import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.UUID;
+
+import static thunder.hack.system.Systems.MANAGER;
 
 public class ChatUtils extends Module {
     private final Setting<Welcomer> welcomer = new Setting<>("Welcomer", Welcomer.Off);
@@ -109,7 +111,7 @@ public class ChatUtils extends Module {
 
         if (event.getPacket() instanceof GameMessageS2CPacket pac && mention.getValue()) {
             if (pac.content.getString().contains(mc.player.getName().getString()) && messageTimer.passedMs(1000)) {
-                ThunderHack.notificationManager.publicity("ChatUtils", MainSettings.language.getValue() == MainSettings.Language.RU ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
+                MANAGER.NOTIFICATION.publicity("ChatUtils", MainSettings.language.getValue() == MainSettings.Language.RU ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
                 mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 5f, 1f);
             }
         }
@@ -202,7 +204,7 @@ public class ChatUtils extends Module {
             if (mc.player.getMainHandStack().getItem() == Items.FILLED_MAP || mc.player.getOffHandStack().getItem() == Items.FILLED_MAP)
                 return;
 
-            if (pac.chatMessage().startsWith("/") || pac.chatMessage().startsWith(ThunderHack.commandManager.getPrefix()))
+            if (pac.chatMessage().startsWith("/") || pac.chatMessage().startsWith(MANAGER.COMMAND.getPrefix()))
                 return;
 
             StringBuilder newString = new StringBuilder();

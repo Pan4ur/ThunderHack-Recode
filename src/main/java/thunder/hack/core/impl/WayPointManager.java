@@ -1,12 +1,25 @@
 package thunder.hack.core.impl;
 
+import meteordevelopment.orbit.EventHandler;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.IManager;
+import thunder.hack.events.impl.client.EventClientInit;
 
 import java.io.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class WayPointManager implements IManager {
     private static CopyOnWriteArrayList<WayPoint> wayPoints = new CopyOnWriteArrayList<>();
+
+    {
+        ThunderHack.EVENT_BUS.subscribe(this);
+    }
+
+    @EventHandler
+    @SuppressWarnings("unused")
+    private void onInit(EventClientInit event) {
+        onLoad();
+    }
 
     public void addWayPoint(WayPoint macro) {
         if (!wayPoints.contains(macro)) {

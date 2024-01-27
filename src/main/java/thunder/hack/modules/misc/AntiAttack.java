@@ -6,11 +6,12 @@ import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.world.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
 import static thunder.hack.modules.combat.Criticals.getEntity;
+import static thunder.hack.system.Systems.MANAGER;
 
 public final class AntiAttack extends Module {
     private final Setting<Boolean> friend = new Setting<>("Friend", true);
@@ -29,7 +30,7 @@ public final class AntiAttack extends Module {
         if (e.getPacket() instanceof PlayerInteractEntityC2SPacket pac) {
             Entity entity = getEntity(pac);
             if (entity == null) return;
-            if (ThunderHack.friendManager.isFriend(entity.getName().getString()) && friend.getValue())
+            if (MANAGER.FRIEND.isFriend(entity.getName().getString()) && friend.getValue())
                 e.cancel();
             if (entity instanceof ZombifiedPiglinEntity && zoglin.getValue())
                 e.cancel();

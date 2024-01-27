@@ -19,7 +19,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.StringUtils;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.world.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
@@ -29,6 +29,8 @@ import thunder.hack.utility.player.PlayerUtility;
 
 import java.util.ArrayList;
 import java.util.Objects;
+
+import static thunder.hack.system.Systems.MANAGER;
 
 public class FGHelper extends Module {
     public FGHelper() {
@@ -78,7 +80,7 @@ public class FGHelper extends Module {
                     int yCord = Integer.parseInt(StringUtils.substringBetween(packet.content().getString(), "Y: ", " Z:"));
                     int zCord = Integer.parseInt(StringUtils.substringBetween(packet.content().getString() + "nigga", "Z: ", "nigga"));
                     ThunderHack.gps_position = new BlockPos(xCord, yCord, zCord);
-                    ThunderHack.notificationManager.publicity("FGHelper", "Поставлена метка на аирдроп! X: " + xCord + " Y: " + yCord + " Z: " + zCord, 5, Notification.Type.SUCCESS);
+                    MANAGER.NOTIFICATION.publicity("FGHelper", "Поставлена метка на аирдроп! X: " + xCord + " Y: " + yCord + " Z: " + zCord, 5, Notification.Type.SUCCESS);
                 } catch (Exception ignored) {
                 }
             }
@@ -160,7 +162,7 @@ public class FGHelper extends Module {
             if (mc.player.hurtTime > 0) pvpTimer.reset();
             if (near.getValue()) if (mc.player.age % 30 == 0) mc.player.networkHandler.sendChatCommand("near");
             if (farmilka.getValue()) {
-                for (Entity ent : ThunderHack.asyncManager.getAsyncEntities()) {
+                for (Entity ent : MANAGER.ASYNC.getAsyncEntities()) {
                     if (ent instanceof PlayerEntity) continue;
                     if (ent instanceof LivingEntity) {
                         if (((LivingEntity) ent).isDead())

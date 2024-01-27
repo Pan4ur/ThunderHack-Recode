@@ -4,8 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Item;
 import net.minecraft.screen.slot.SlotActionType;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.events.impl.EventClickSlot;
-import thunder.hack.injection.MixinClientPlayerInteractionManager;
+import thunder.hack.events.impl.entity.EventClickSlot;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
