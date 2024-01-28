@@ -12,8 +12,6 @@ import thunder.hack.core.impl.CommandManager;
 
 import java.util.Objects;
 
-import static thunder.hack.system.Systems.MANAGER;
-
 @Mixin(Screen.class)
 public abstract class MixinScreen {
     /*@ModifyArgs(method = "renderTooltip(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/item/ItemStack;II)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;renderTooltip(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/item/ItemStack;II)V"))
@@ -33,13 +31,10 @@ public abstract class MixinScreen {
 
     @Inject(method = "handleTextClick", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;error(Ljava/lang/String;Ljava/lang/Object;)V", ordinal = 1, remap = false), cancellable = true)
     private void onRunCommand(Style style, CallbackInfoReturnable<Boolean> cir) {
-        if (Objects.requireNonNull(style.getClickEvent()).getValue().startsWith(MANAGER.COMMAND.getPrefix()))
+        if (Objects.requireNonNull(style.getClickEvent()).getValue().startsWith(ThunderHack.commandManager.getPrefix()))
             try {
-                MANAGER.COMMAND.getDispatcher()
-                        .execute(style.getClickEvent()
-                                .getValue()
-                                .substring(MANAGER.COMMAND.getPrefix().length()),
-                                MANAGER.COMMAND.getSource());
+                CommandManager manager = ThunderHack.commandManager;
+                manager.getDispatcher().execute(style.getClickEvent().getValue().substring(ThunderHack.commandManager.getPrefix().length()), manager.getSource());
                 cir.setReturnValue(true);
             } catch (CommandSyntaxException ignored) {
             }

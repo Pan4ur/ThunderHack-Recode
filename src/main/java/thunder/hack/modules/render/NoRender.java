@@ -10,8 +10,8 @@ import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.world.EventSync;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.system.Systems.MANAGER;
 
 public class NoRender extends Module {
 
@@ -73,7 +72,7 @@ public class NoRender extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        for (Entity ent : MANAGER.ASYNC.getAsyncEntities()) {
+        for (Entity ent : ThunderHack.asyncManager.getAsyncEntities()) {
             if (ent instanceof PotionEntity) {
                 potionCouter++;
                 if (potions.getValue()) mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
@@ -100,21 +99,21 @@ public class NoRender extends Module {
 
         if (auto.getValue()) {
             if (arrowCounter > 64)
-                MANAGER.NOTIFICATION.publicity("NoRender", isRu() ? "Превышен лимит стрел! Удаляю..." : "Arrows limit reached! Removing...", 3, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("NoRender", isRu() ? "Превышен лимит стрел! Удаляю..." : "Arrows limit reached! Removing...", 3, Notification.Type.SUCCESS);
 
             if (itemsCounter > 16)
-                MANAGER.NOTIFICATION.publicity("NoRender", isRu() ? "Превышен лимит вещей! Удаляю..." : "Item limit reached! Removing...", 3, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("NoRender", isRu() ? "Превышен лимит вещей! Удаляю..." : "Item limit reached! Removing...", 3, Notification.Type.SUCCESS);
 
             if (xpCounter > 16)
-                MANAGER.NOTIFICATION.publicity("NoRender", isRu() ? "Превышен лимит пузырьков опыта! Удаляю..." : "XP orbs limit reached! Removing...", 3, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("NoRender", isRu() ? "Превышен лимит пузырьков опыта! Удаляю..." : "XP orbs limit reached! Removing...", 3, Notification.Type.SUCCESS);
 
             if (potionCouter > 8)
-                MANAGER.NOTIFICATION.publicity("NoRender", isRu() ? "Превышен лимит зелий! Удаляю..." : "Potions limit reached! Removing...", 3, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("NoRender", isRu() ? "Превышен лимит зелий! Удаляю..." : "Potions limit reached! Removing...", 3, Notification.Type.SUCCESS);
 
 
             List<Integer> toRemove = new ArrayList<>();
 
-            for (Entity ent  : MANAGER.ASYNC.getAsyncEntities()) {
+            for (Entity ent  : ThunderHack.asyncManager.getAsyncEntities()) {
                 if (ent instanceof ArrowEntity && arrowCounter > 64) toRemove.add(ent.getId());
                 if (ent instanceof ItemEntity && itemsCounter > 16) toRemove.add(ent.getId());
                 if (ent instanceof ExperienceBottleEntity && xpCounter > 16) toRemove.add(ent.getId());

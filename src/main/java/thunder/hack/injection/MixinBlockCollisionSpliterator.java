@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.world.EventCollision;
+import thunder.hack.events.impl.EventCollision;
 
 @Mixin(value = BlockCollisionSpliterator.class, priority = 800)
 public abstract class MixinBlockCollisionSpliterator {

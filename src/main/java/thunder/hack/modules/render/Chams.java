@@ -2,7 +2,7 @@ package thunder.hack.modules.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
-import thunder.hack.events.impl.render.EventHeldItemRenderer;
+import thunder.hack.events.impl.EventHeldItemRenderer;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;

@@ -8,8 +8,6 @@ import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 
-import static thunder.hack.system.Systems.MANAGER;
-
 public class TPSCounter extends HudElement {
     public TPSCounter() {
         super("TPS", 50, 10);
@@ -19,7 +17,7 @@ public class TPSCounter extends HudElement {
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        String str = "TPS " + Formatting.WHITE + MANAGER.SERVER.getTPS() + (extraTps.getValue() ? " [" + MANAGER.SERVER.getTPS2() + "]" : "");
+        String str = "TPS " + Formatting.WHITE + ThunderHack.serverManager.getTPS() + (extraTps.getValue() ? " [" + ThunderHack.serverManager.getTPS2() + "]" : "");
         FontRenderers.getModulesRenderer().drawString(context.getMatrices(), str, getPosX(), getPosY(), HudEditor.getColor(1).getRGB(), false);
     }
 }

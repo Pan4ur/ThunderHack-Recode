@@ -4,13 +4,11 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
 import java.util.Objects;
-
-import static thunder.hack.system.Systems.MANAGER;
 
 public class MessageAppend extends Module {
     private final Setting<String> word = new Setting<>("word", " TH RECODE");
@@ -33,7 +31,7 @@ public class MessageAppend extends Module {
             if (mc.player.getMainHandStack().getItem() == Items.FILLED_MAP || mc.player.getOffHandStack().getItem() == Items.FILLED_MAP)
                 return;
 
-            if (pac.chatMessage().startsWith("/") || pac.chatMessage().startsWith(MANAGER.COMMAND.getPrefix()))
+            if (pac.chatMessage().startsWith("/") || pac.chatMessage().startsWith(ThunderHack.commandManager.getPrefix()))
                 return;
 
             skip = pac.chatMessage() + word.getValue();

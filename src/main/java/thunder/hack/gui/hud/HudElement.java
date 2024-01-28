@@ -5,7 +5,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.events.impl.client.EventMouse;
+import thunder.hack.events.impl.EventMouse;
+import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
@@ -13,7 +14,6 @@ import thunder.hack.utility.render.Render3DEngine;
 
 public class HudElement extends Module {
     private final Setting<PositionSetting> pos = new Setting<>("Position", new PositionSetting(0.5f, 0.5f));
-
     private boolean mouseState = false, mouseButton = false;
     private float x, y, dragX, dragY;
     private int height, width;

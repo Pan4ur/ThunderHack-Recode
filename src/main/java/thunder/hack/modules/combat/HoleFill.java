@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.world.EventSync;
+import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -32,7 +32,6 @@ import thunder.hack.utility.world.HoleUtility;
 import java.util.*;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.system.Systems.MANAGER;
 
 public final class HoleFill extends Module {
     private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
@@ -122,12 +121,12 @@ public final class HoleFill extends Module {
 
         List<BlockPos> holes = findHoles();
 
-        PlayerEntity target = MANAGER.COMBAT.getTargets(placeRange.getValue()).stream()
+        PlayerEntity target = ThunderHack.combatManager.getTargets(placeRange.getValue()).stream()
                 .min(Comparator.comparing(e -> mc.player.squaredDistanceTo(e)))
                 .orElse(null);
 
         if (mode.getValue() == Mode.Target && target == null) return;
-        if (target == null) return;
+        if(target == null) return;
         final PlayerEntity predicted = PredictUtility.predictPlayer(target, 3);
 
         int blocksPlaced = 0;

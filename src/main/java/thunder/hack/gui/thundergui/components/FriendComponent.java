@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.net.URL;
 
 import static thunder.hack.modules.Module.mc;
-import static thunder.hack.system.Systems.MANAGER;
 
 public class FriendComponent {
     float scroll_animation = 0f;
@@ -178,7 +177,7 @@ public class FriendComponent {
             return;
         }
         if (Render2DEngine.isHovered(MouseX, MouseY, posX + 268, posY + 10, 10, 10)) {
-            MANAGER.FRIEND.removeFriend(name);
+            ThunderHack.friendManager.removeFriend(name);
             ThunderGui.getInstance().loadFriends();
         }
     }

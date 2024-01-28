@@ -3,14 +3,14 @@ package thunder.hack.modules.movement;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CobwebBlock;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.world.EventCollision;
-import thunder.hack.events.impl.entity.PlayerUpdateEvent;
+import thunder.hack.events.impl.EventCollision;
+import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
-
-import static thunder.hack.system.Systems.MANAGER;
 
 public class AntiWeb extends Module {
     public AntiWeb() {
@@ -27,7 +27,7 @@ public class AntiWeb extends Module {
 
     @EventHandler
     public void onPlayerUpdate(PlayerUpdateEvent e) {
-        if (MANAGER.PLAYER.isInWeb()) {
+        if (ThunderHack.playerManager.isInWeb()) {
             if (mode.getValue() == Mode.Timer) {
                 if (mc.player.isOnGround()) ThunderHack.TICK_TIMER = 1f;
                 else ThunderHack.TICK_TIMER = timer.getValue();

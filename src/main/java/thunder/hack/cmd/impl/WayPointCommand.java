@@ -13,7 +13,6 @@ import thunder.hack.core.impl.WayPointManager;
 import thunder.hack.modules.client.MainSettings;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import static thunder.hack.system.Systems.MANAGER;
 
 public class WayPointCommand extends Command {
     public WayPointCommand() {
@@ -27,7 +26,7 @@ public class WayPointCommand extends Command {
             else sendMessage("WayPoints:");
 
             sendMessage(" ");
-            MANAGER.WAYPOINT.getWayPoints().forEach(wp -> sendMessage(wp.name() + "X: " + wp.x() + " Y: " + wp.y() + " Z: " + wp.z() + " Server: " + wp.server()));
+            ThunderHack.wayPointManager.getWayPoints().forEach(wp -> sendMessage(wp.name() + "X: " + wp.x() + " Y: " + wp.y() + " Z: " + wp.z() + " Server: " + wp.server()));
 
             return SINGLE_SUCCESS;
         }));
@@ -35,7 +34,7 @@ public class WayPointCommand extends Command {
         builder.then(literal("remove").then(arg("name", WayPointArgumentType.create()).executes(context -> {
             WayPointManager.WayPoint wp = context.getArgument("name", WayPointManager.WayPoint.class);
 
-            MANAGER.WAYPOINT.removeWayPoint(wp);
+            ThunderHack.wayPointManager.removeWayPoint(wp);
 
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
                 sendMessage("Удалена метка " + wp.name());
@@ -49,7 +48,7 @@ public class WayPointCommand extends Command {
         builder.then(literal("add").then(arg("name", StringArgumentType.word()).executes(context -> {
             String name = context.getArgument("name", String.class);
             WayPointManager.WayPoint wp = new WayPointManager.WayPoint((int) mc.player.getX(), (int) mc.player.getY(), (int) mc.player.getZ(), name, (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address));
-            MANAGER.WAYPOINT.addWayPoint(wp);
+            ThunderHack.wayPointManager.addWayPoint(wp);
 
             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
                 sendMessage("Добавлена метка " + name + " с координатами x: " + ((int) mc.player.getX()) + " y: " + ((int) mc.player.getY()) + " z: " + ((int) mc.player.getZ()));
@@ -65,7 +64,7 @@ public class WayPointCommand extends Command {
                             BlockPos pos = new BlockPos(context.getArgument("x", Integer.class), context.getArgument("y", Integer.class), context.getArgument("z", Integer.class));
 
                             WayPointManager.WayPoint wp = new WayPointManager.WayPoint(pos.getX(), pos.getY(), pos.getZ(), name, (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address));
-                            MANAGER.WAYPOINT.addWayPoint(wp);
+                            ThunderHack.wayPointManager.addWayPoint(wp);
 
                             if (MainSettings.language.getValue() == MainSettings.Language.RU) {
                                 sendMessage("Добавлена метка " + name + " с координатами x: " + pos.getX() + " y: " + pos.getY() + " z: " + pos.getZ());

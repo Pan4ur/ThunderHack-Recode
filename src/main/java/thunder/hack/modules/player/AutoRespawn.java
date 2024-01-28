@@ -7,8 +7,6 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 
-import static thunder.hack.system.Systems.MANAGER;
-
 public class AutoRespawn extends Module {
     private final Timer timer = new Timer();
     private final Setting<Boolean> deathcoords = new Setting<>("deathcoords", true);
@@ -31,20 +29,20 @@ public class AutoRespawn extends Module {
         }
 
         if (mc.currentScreen instanceof DeathScreen) {
-            if (flag) {
-                if (deathcoords.getValue())
+            if (flag){
+                if(deathcoords.getValue())
                     sendMessage(Formatting.GOLD + "[PlayerDeath] " + Formatting.YELLOW + (int) mc.player.getX() + " " + (int) mc.player.getY() + " " + (int) mc.player.getZ());
                 mc.player.requestRespawn();
                 mc.setScreen(null);
 
-                MANAGER.ASYNC.run(() -> {
+                ThunderHack.asyncManager.run(()-> {
                     if (autokit.getValue() && mc.player != null) {
                         mc.player.networkHandler.sendChatCommand("kit " + kit.getValue());
                     }
                     if (autohome.getValue() && mc.player != null) {
                         mc.player.networkHandler.sendChatCommand("home");
                     }
-                }, 1000);
+                },1000);
                 flag = false;
             }
         } else {

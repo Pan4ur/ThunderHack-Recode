@@ -1,7 +1,6 @@
 package thunder.hack.core.impl;
 
 import com.google.gson.*;
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.util.Pair;
 import org.apache.commons.io.IOUtils;
@@ -10,7 +9,6 @@ import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.impl.SearchCommand;
 import thunder.hack.core.IManager;
-import thunder.hack.events.impl.client.EventClientInit;
 import thunder.hack.gui.autobuy.AutoBuyItem;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.AutoBuy;
@@ -31,7 +29,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.system.Systems.MANAGER;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class ConfigManager implements IManager {
@@ -57,17 +54,6 @@ public class ConfigManager implements IManager {
         if (!MISC_FOLDER.exists()) MISC_FOLDER.mkdirs();
         if (!SOUNDS_FOLDER.exists()) SOUNDS_FOLDER.mkdirs();
         loadSearch();
-
-        ThunderHack.EVENT_BUS.subscribe(this);
-    }
-
-    @EventHandler
-    @SuppressWarnings("unused")
-    private void init(EventClientInit event) {
-        load(getCurrentConfig());
-        loadChestStealer();
-        loadInvCleaner();
-        loadAutoBuy();
     }
 
     public void loadSearch() {
@@ -135,10 +121,10 @@ public class ConfigManager implements IManager {
         if (currentConfig != null)
             save(currentConfig);
 
-        MANAGER.MODULE.onUnload();
-        MANAGER.MODULE.onUnloadPost();
+        ThunderHack.moduleManager.onUnload();
+        ThunderHack.moduleManager.onUnloadPost();
         load(file);
-        MANAGER.MODULE.onLoad();
+        ThunderHack.moduleManager.onLoad();
     }
 
     public void loadModuleOnly(String name, Module module) {
@@ -150,11 +136,11 @@ public class ConfigManager implements IManager {
             return;
         }
 
-        MANAGER.MODULE.onUnload();
-        MANAGER.MODULE.onUnloadPost();
+        ThunderHack.moduleManager.onUnload();
+        ThunderHack.moduleManager.onUnloadPost();
 
         loadModuleOnly(file, module);
-        MANAGER.MODULE.onLoad();
+        ThunderHack.moduleManager.onLoad();
     }
 
     public void load(@NotNull File config) {
@@ -215,7 +201,7 @@ public class ConfigManager implements IManager {
 
             if (modules != null) {
                 modules.forEach(m -> {
-                    Module module1 = MANAGER.MODULE.modules.stream()
+                    Module module1 = ThunderHack.moduleManager.modules.stream()
                             .filter(m1 -> m.getAsJsonObject().getAsJsonObject(m1.getName()) != null)
                             .findFirst().orElse(null);
 
@@ -272,7 +258,7 @@ public class ConfigManager implements IManager {
     }
 
     private void parseModule(JsonObject object) throws NullPointerException {
-        Module module = MANAGER.MODULE.modules.stream()
+        Module module = ThunderHack.moduleManager.modules.stream()
                 .filter(m -> object.getAsJsonObject(m.getName()) != null)
                 .findFirst()
                 .orElse(null);
@@ -344,7 +330,7 @@ public class ConfigManager implements IManager {
 
     private @NotNull JsonArray getModuleArray() {
         JsonArray modulesArray = new JsonArray();
-        for (Module m : MANAGER.MODULE.modules) {
+        for (Module m : ThunderHack.moduleManager.modules) {
             modulesArray.add(getModuleObject(m));
         }
         return modulesArray;
@@ -373,7 +359,6 @@ public class ConfigManager implements IManager {
                 attribs.add(setting.getName(), array);
                 continue;
             }
-
             if (setting.isBooleanParent()) {
                 attribs.add(setting.getName(), jp.parse(String.valueOf(((BooleanParent) setting.getValue()).isEnabled())));
                 continue;

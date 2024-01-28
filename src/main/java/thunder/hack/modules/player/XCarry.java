@@ -2,7 +2,7 @@ package thunder.hack.modules.player;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 
 public class XCarry extends Module {

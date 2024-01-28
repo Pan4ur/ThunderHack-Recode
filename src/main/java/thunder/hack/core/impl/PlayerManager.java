@@ -7,24 +7,28 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.asm.mixin.Unique;
 import thunder.hack.ThunderHack;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.IManager;
-import thunder.hack.events.impl.world.EventPostSync;
-import thunder.hack.events.impl.world.EventSync;
-import thunder.hack.events.impl.world.EventTick;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
@@ -32,6 +36,7 @@ import thunder.hack.modules.movement.NoSlow;
 import thunder.hack.utility.Timer;
 
 import static net.minecraft.util.math.MathHelper.clamp;
+import static thunder.hack.modules.Module.mc;
 
 public class PlayerManager implements IManager {
     public float yaw, pitch, lastYaw, lastPitch, currentPlayerSpeed;
@@ -43,10 +48,6 @@ public class PlayerManager implements IManager {
     // Мы можем зайти в инвентарь, и сервер этого не узнает, пока мы не начнем кликать
     // Юзать везде!
     public boolean inInventory;
-
-    {
-        ThunderHack.EVENT_BUS.subscribe(this);
-    }
 
     @EventHandler
     public void onSync(EventSync event) {

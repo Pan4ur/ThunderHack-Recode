@@ -1,19 +1,20 @@
 package thunder.hack.modules.combat;
 
+import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.*;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import thunder.hack.events.impl.entity.EventEntitySpawn;
-import thunder.hack.events.impl.world.EventPostSync;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.*;
 import thunder.hack.modules.base.IndestructibleModule;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
@@ -25,14 +26,12 @@ import java.util.List;
 import java.util.Objects;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.system.Systems.MANAGER;
 
 public final class Surround extends IndestructibleModule {
     private final Setting<PlaceTiming> placeTiming = new Setting<>("Place Timing", PlaceTiming.Default);
     private final Setting<Integer> blocksPerTick = new Setting<>("Blocks/Place", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10, v -> placeTiming.getValue() != PlaceTiming.Sequential);
     private final Setting<CenterMode> center = new Setting<>("Center", CenterMode.Disabled);
-    private final Setting<Boolean> thread = new Setting<>("Thread", false);
 
     private final Setting<Parent> autoDisable = new Setting<>("Auto Disable", new Parent(false, 0));
     private final Setting<Boolean> onYChange = new Setting<>("On Y Change", true).withParent(autoDisable);
@@ -111,14 +110,6 @@ public final class Surround extends IndestructibleModule {
         if (!getBlockResult().found())
             disable(isRu() ? "Нет блоков!" : "No blocks!");
 
-        if (thread.getValue()) {
-            MANAGER.ASYNC.run(this::logic);
-            return;
-        }
-        logic();
-    }
-
-    private void logic() {
         if (placeTiming.getValue() == PlaceTiming.Vanilla || placeTiming.getValue() == PlaceTiming.Sequential) {
             BlockPos targetBlock = getSequentialPos();
             if (targetBlock == null)

@@ -12,8 +12,6 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.utility.render.Render3DEngine;
 
-import static thunder.hack.system.Systems.MANAGER;
-
 public final class WayPoints extends Module {
     private static final Identifier ICON = new Identifier("textures/waypoint.png");
 
@@ -26,12 +24,12 @@ public final class WayPoints extends Module {
 
     @Override
     public void onEnable() {
-        sendMessage(MANAGER.COMMAND.getPrefix() + "waypoint add x y z name");
+        sendMessage(ThunderHack.commandManager.getPrefix() + "waypoint add x y z name");
     }
 
     public void onRender2D(DrawContext context) {
-        if (!MANAGER.WAYPOINT.getWayPoints().isEmpty()) {
-            for (WayPointManager.WayPoint wp : MANAGER.WAYPOINT.getWayPoints()) {
+        if (!ThunderHack.wayPointManager.getWayPoints().isEmpty()) {
+            for (WayPointManager.WayPoint wp : ThunderHack.wayPointManager.getWayPoints()) {
                 if (wp.name() == null) continue;
                 if (mc.isInSingleplayer()) continue;
                 if (!mc.getNetworkHandler().getServerInfo().address.contains(wp.server())) continue;

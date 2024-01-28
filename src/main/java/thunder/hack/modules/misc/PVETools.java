@@ -1,10 +1,22 @@
 package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import thunder.hack.events.impl.world.EventPostSync;
-import thunder.hack.events.impl.world.EventSync;
+import meteordevelopment.orbit.EventPriority;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ButtonBlock;
+import net.minecraft.block.CarrotsBlock;
+import net.minecraft.block.CropBlock;
+import net.minecraft.util.hit.BlockHitResult;
+import thunder.hack.ThunderHack;
+import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.gui.notification.Notification;
+import thunder.hack.gui.notification.NotificationManager;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.Notifications;
 import thunder.hack.setting.Setting;
+
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class PVETools extends Module {
     public PVETools() {

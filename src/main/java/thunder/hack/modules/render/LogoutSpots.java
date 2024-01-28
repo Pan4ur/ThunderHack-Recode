@@ -9,7 +9,7 @@ import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector4d;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;

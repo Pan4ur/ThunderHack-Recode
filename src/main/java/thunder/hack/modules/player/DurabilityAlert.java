@@ -16,7 +16,6 @@ import thunder.hack.utility.Timer;
 import java.awt.*;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.system.Systems.MANAGER;
 
 public class DurabilityAlert extends Module {
     public DurabilityAlert() {
@@ -34,7 +33,7 @@ public class DurabilityAlert extends Module {
     public void onUpdate() {
         if (friends.getValue()) {
             for (PlayerEntity player : mc.world.getPlayers()) {
-                if (!MANAGER.FRIEND.isFriend(player)) continue;
+                if (!ThunderHack.friendManager.isFriend(player)) continue;
                 if (player == mc.player) continue;
                 for (ItemStack stack : player.getInventory().armor) {
                     if (stack.isEmpty() || !(stack.getItem() instanceof ArmorItem)) continue;

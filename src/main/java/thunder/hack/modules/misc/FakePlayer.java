@@ -16,9 +16,9 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.entity.EventAttack;
-import thunder.hack.events.impl.world.EventSync;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.EventAttack;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
@@ -72,7 +72,7 @@ public class FakePlayer extends Module {
     public void onPacketReceive(PacketEvent.Receive e) {
         if (e.getPacket() instanceof ExplosionS2CPacket explosion && fakePlayer != null && fakePlayer.hurtTime == 0) {
             fakePlayer.onDamaged(mc.world.getDamageSources().generic());
-            fakePlayer.setHealth(fakePlayer.getHealth() + fakePlayer.getAbsorptionAmount() - ExplosionUtility.getExplosionDamage2(new Vec3d(explosion.getX(), explosion.getY(), explosion.getZ()), fakePlayer));
+            fakePlayer.setHealth(fakePlayer.getHealth() + fakePlayer.getAbsorptionAmount() - ExplosionUtility.getAutoCrystalDamage(new Vec3d(explosion.getX(), explosion.getY(), explosion.getZ()), fakePlayer));
             if (fakePlayer.isDead()) {
                 if (fakePlayer.tryUseTotem(mc.world.getDamageSources().generic())) {
                     fakePlayer.setHealth(10f);

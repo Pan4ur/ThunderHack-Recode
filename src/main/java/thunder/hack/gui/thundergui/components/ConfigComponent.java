@@ -10,8 +10,6 @@ import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
 
-import static thunder.hack.system.Systems.MANAGER;
-
 public class ConfigComponent {
     float scroll_animation = 0f;
     private final String name;
@@ -47,7 +45,7 @@ public class ConfigComponent {
             return;
         }
 
-        if (MANAGER.CONFIG.currentConfig.getName().equals(name + ".th")) {
+        if (ThunderHack.configManager.currentConfig.getName().equals(name + ".th")) {
             Render2DEngine.drawGradientRound(context.getMatrices(),posX + 5, posY, 285, 30, 4f,
                     Render2DEngine.applyOpacity(new Color(55, 44, 66, 255), getFadeFactor()),
                     Render2DEngine.applyOpacity(new Color(25, 20, 30, 255), getFadeFactor()),
@@ -113,10 +111,10 @@ public class ConfigComponent {
             return;
         }
         if (Render2DEngine.isHovered(MouseX, MouseY, posX + 252, posY + 10, 10, 10))
-            MANAGER.CONFIG.load(name);
+            ThunderHack.configManager.load(name);
 
         if (Render2DEngine.isHovered(MouseX, MouseY, posX + 268, posY + 10, 10, 10)) {
-            MANAGER.CONFIG.delete(name);
+            ThunderHack.configManager.delete(name);
             ThunderGui.getInstance().loadConfigs();
         }
     }

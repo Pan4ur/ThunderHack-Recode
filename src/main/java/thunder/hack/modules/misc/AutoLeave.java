@@ -14,8 +14,6 @@ import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InventoryUtility;
 
-import static thunder.hack.system.Systems.MANAGER;
-
 public class AutoLeave extends Module {
     public AutoLeave() {
         super("AutoLeave", Category.MISC);
@@ -59,7 +57,7 @@ public class AutoLeave extends Module {
             }
 
 
-            if (pl != mc.player && !MANAGER.FRIEND.isFriend(pl) && players.getValue() != LeaveMode.None && mc.player.squaredDistanceTo(pl.getPos()) <= distance.getValue() * distance.getValue()) {
+            if (pl != mc.player && !ThunderHack.friendManager.isFriend(pl) && players.getValue() != LeaveMode.None && mc.player.squaredDistanceTo(pl.getPos()) <= distance.getValue() * distance.getValue()) {
                 switch (players.getValue()) {
                     case Command -> {
                         if (autoDisable.getValue()) disable();

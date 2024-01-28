@@ -1,14 +1,16 @@
 package thunder.hack.modules.player;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.model.ModelUtil;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.entity.PlayerUpdateEvent;
+import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Stack;
 
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
@@ -19,6 +21,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 

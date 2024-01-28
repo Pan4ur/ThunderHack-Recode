@@ -20,7 +20,6 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 
 import static thunder.hack.gui.hud.impl.RadarRewrite.getRotations;
-import static thunder.hack.system.Systems.MANAGER;
 
 public class CrosshairArrows extends HudElement {
 
@@ -62,7 +61,7 @@ public class CrosshairArrows extends HudElement {
                 context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
                 context.getMatrices().translate(-middleW, -middleH, 0.0F);
 
-                if (MANAGER.FRIEND.isFriend(e))
+                if (ThunderHack.friendManager.isFriend(e))
                     color = colorf.getValue().getColor();
                 else color = switch (triangleMode.getValue()) {
                     case Custom -> colors.getValue().getColor();

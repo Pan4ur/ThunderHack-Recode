@@ -1,8 +1,8 @@
 package thunder.hack.injection;
 
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.client.EventKeyPress;
-import thunder.hack.events.impl.client.EventKeyRelease;
+import thunder.hack.events.impl.EventKeyPress;
+import thunder.hack.events.impl.EventKeyRelease;
 import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.clickui.small.SmallClickUI;
 import thunder.hack.gui.hud.HudEditorGui;
@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static thunder.hack.modules.Module.mc;
-import static thunder.hack.system.Systems.MANAGER;
 
 @Mixin(Keyboard.class)
 public class MixinKeyboard {
@@ -23,8 +22,8 @@ public class MixinKeyboard {
         boolean whitelist = mc.currentScreen == null || mc.currentScreen instanceof ClickUI || mc.currentScreen instanceof SmallClickUI || mc.currentScreen instanceof HudEditorGui;
         if (!whitelist) return;
 
-        if (action == 0) MANAGER.MODULE.onKeyReleased(key);
-        if (action == 1) MANAGER.MODULE.onKeyPressed(key);
+        if (action == 0) ThunderHack.moduleManager.onKeyReleased(key);
+        if (action == 1) ThunderHack.moduleManager.onKeyPressed(key);
         if (action == 2) action = 1;
 
         switch (action) {

@@ -9,7 +9,6 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.Bind;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import static thunder.hack.system.Systems.MANAGER;
 
 public class ResetBindsCommand extends Command {
     public ResetBindsCommand() {
@@ -19,7 +18,7 @@ public class ResetBindsCommand extends Command {
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            for (Module mod : MANAGER.MODULE.modules) mod.setBind(new Bind(-1, false, false));
+            for (Module mod : ThunderHack.moduleManager.modules) mod.setBind(new Bind(-1, false, false));
             return SINGLE_SUCCESS;
         });
     }

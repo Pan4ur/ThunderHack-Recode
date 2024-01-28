@@ -25,8 +25,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.world.EventPostSync;
-import thunder.hack.events.impl.world.EventSync;
+import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.EventSync;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -47,7 +47,6 @@ import java.awt.*;
 import java.util.Objects;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.system.Systems.MANAGER;
 
 public final class AutoBed extends Module {
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("InteractMode", InteractionUtility.Interact.Vanilla);
@@ -177,7 +176,7 @@ public final class AutoBed extends Module {
     }
 
     private PlayerEntity findTarget() {
-        return MANAGER.COMBAT.getNearestTarget(12f);
+        return ThunderHack.combatManager.getNearestTarget(12f);
     }
 
     private BedData findBedToExplode() {
@@ -193,8 +192,8 @@ public final class AutoBed extends Module {
                     BlockHitResult bhr = getInteractResult(b);
 
                     mc.world.removeBlock(b, false);
-                    float damage = ExplosionUtility.getExplosionDamage1(b.toCenterPos().add(0, -0.5, 0), target);
-                    float selfDamage = ExplosionUtility.getExplosionDamage1(b.toCenterPos().add(0, -0.5, 0), mc.player);
+                    float damage = ExplosionUtility.getExplosionDamage(b.toCenterPos().add(0, -0.5, 0), target);
+                    float selfDamage = ExplosionUtility.getExplosionDamage(b.toCenterPos().add(0, -0.5, 0), mc.player);
                     mc.world.setBlockState(b, state);
 
                     if (damage < minDamage.getValue())
@@ -239,8 +238,8 @@ public final class AutoBed extends Module {
                         if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != b)
                             continue;
 
-                        float damage = ExplosionUtility.getExplosionDamage1(b.up().toCenterPos().add(0, -0.5, 0), target);
-                        float selfDamage = ExplosionUtility.getExplosionDamage1(b.up().toCenterPos().add(0, -0.5, 0), mc.player);
+                        float damage = ExplosionUtility.getExplosionDamage(b.up().toCenterPos().add(0, -0.5, 0), target);
+                        float selfDamage = ExplosionUtility.getExplosionDamage(b.up().toCenterPos().add(0, -0.5, 0), mc.player);
 
                         if (damage < minDamage.getValue())
                             continue;
@@ -265,8 +264,8 @@ public final class AutoBed extends Module {
                             if(!mc.world.getBlockState(offset).isReplaceable())
                                 continue;
 
-                            float dirdamage = ExplosionUtility.getExplosionDamage1(offset.toCenterPos().add(0, -0.5, 0), target);
-                            float dirSelfDamage = ExplosionUtility.getExplosionDamage1(offset.toCenterPos().add(0, -0.5, 0), mc.player);
+                            float dirdamage = ExplosionUtility.getExplosionDamage(offset.toCenterPos().add(0, -0.5, 0), target);
+                            float dirSelfDamage = ExplosionUtility.getExplosionDamage(offset.toCenterPos().add(0, -0.5, 0), mc.player);
                             if (dirdamage > bestDirdmg && dirSelfDamage <= maxSelfDamage.getValue()) {
                                 bestDir = dir;
                                 bestDirdmg = dirdamage;

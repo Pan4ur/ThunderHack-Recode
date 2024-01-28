@@ -25,7 +25,6 @@ import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.system.Systems.MANAGER;
 
 public class ClickUI extends Screen {
     public static List<AbstractWindow> windows;
@@ -83,9 +82,9 @@ public class ClickUI extends Screen {
             int windowHeight = 18;
 
             int i = 0;
-            for (final Module.Category category : MANAGER.MODULE.getCategories()) {
+            for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
                 if (category.getName().contains("HUD")) continue;
-                ModuleWindow window = new ModuleWindow(category, MANAGER.MODULE.getModulesByCategory(category), i, x + offset, y, 108, windowHeight);
+                ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category), i, x + offset, y, 108, windowHeight);
                 window.setOpen(true);
                 windows.add(window);
                 offset += 110;
@@ -282,35 +281,35 @@ public class ClickUI extends Screen {
                 }
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 20, 180, 20)) {
                     hstep = 5;
-                    MANAGER.ASYNC.run(() -> setup = true, 3000);
+                    ThunderHack.asyncManager.run(() -> setup = true, 3000);
                 }
             } else if (hstep == 2) {
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 20, 180, 20)) {
                     // strict
-                    MANAGER.CONFIG.loadDefault("strict");
+                    ThunderHack.configManager.loadDefault("strict");
                     hstep = 3;
-                    MANAGER.ASYNC.run(() -> setup = true, 3000);
+                    ThunderHack.asyncManager.run(() -> setup = true, 3000);
                 }
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 50, 180, 20)) {
                     //cc
-                    MANAGER.CONFIG.loadDefault("cc");
+                    ThunderHack.configManager.loadDefault("cc");
                     hstep = 3;
-                    MANAGER.ASYNC.run(() -> setup = true, 3000);
+                    ThunderHack.asyncManager.run(() -> setup = true, 3000);
                 }
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy + 10, 180, 20)) {
                     // fg
-                    MANAGER.CONFIG.loadDefault("fg");
+                    ThunderHack.configManager.loadDefault("fg");
                     hstep = 3;
-                    MANAGER.ASYNC.run(() -> setup = true, 3000);
+                    ThunderHack.asyncManager.run(() -> setup = true, 3000);
                 }
 
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy + 40, 180, 20)) {
                     // grim
-                    MANAGER.CONFIG.loadDefault("grim");
+                    ThunderHack.configManager.loadDefault("grim");
                     hstep = 3;
-                    MANAGER.ASYNC.run(() -> setup = true, 3000);
+                    ThunderHack.asyncManager.run(() -> setup = true, 3000);
                 }
             }
             return false;

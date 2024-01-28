@@ -9,7 +9,6 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -36,7 +35,7 @@ public abstract class IndestructibleModule extends Module {
     protected final Setting<Float> range = new Setting<>("Range", 5f, 0f, 7f);
     protected final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
     protected final Setting<InteractMode> placeMode = new Setting<>("Place Mode", InteractMode.Normal);
-    protected final Setting<RotateMode> rotate = new Setting<>("Rotate", RotateMode.Disabled);
+    protected final Setting<Boolean> rotate = new Setting<>("Rotate", true);
     protected final Setting<Boolean> swing = new Setting<>("Swing", false);
 
     protected final Setting<BooleanParent> crystalBreaker = new Setting<>("Crystal Breaker", new BooleanParent(false));
@@ -99,18 +98,10 @@ public abstract class IndestructibleModule extends Module {
         }
 
         if (placeMode.getValue() == InteractMode.Packet || placeMode.getValue() == InteractMode.All) {
-            validInteraction = InteractionUtility.placeBlock(pos,
-                    rotate.getValue() == RotateMode.Block || rotate.getValue() == RotateMode.Both,
-                    interact.getValue(), InteractionUtility.PlaceMode.Packet,
-                    result.slot(), true,
-                    ignoreEntities);
+            validInteraction = InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), InteractionUtility.PlaceMode.Packet, result.slot(), true, ignoreEntities);
         }
         if (placeMode.getValue() == InteractMode.Normal || placeMode.getValue() == InteractMode.All) {
-            validInteraction = InteractionUtility.placeBlock(pos,
-                    rotate.getValue() == RotateMode.Block || rotate.getValue() == RotateMode.Both,
-                    interact.getValue(), InteractionUtility.PlaceMode.Normal,
-                    result.slot(), true,
-                    ignoreEntities);
+            validInteraction = InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), InteractionUtility.PlaceMode.Normal, result.slot(), true, ignoreEntities);
         }
 
         if (validInteraction && mc.player != null) {
@@ -142,11 +133,6 @@ public abstract class IndestructibleModule extends Module {
                 return;
 
             result.switchTo();
-        }
-
-        if (rotate.getValue() == RotateMode.Crystal || rotate.getValue() == RotateMode.Both) {
-            float[] angle = InteractionUtility.calculateAngle(entity.getPos());
-            sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
         }
 
         if (breakCrystalMode.getValue() == InteractMode.Packet || breakCrystalMode.getValue() == InteractMode.All)
@@ -204,12 +190,5 @@ public abstract class IndestructibleModule extends Module {
         Packet,
         Normal,
         All
-    }
-
-    protected enum RotateMode {
-        Block,
-        Crystal,
-        Disabled,
-        Both
     }
 }

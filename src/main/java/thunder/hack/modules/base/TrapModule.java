@@ -9,9 +9,9 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import thunder.hack.events.impl.world.EventPostSync;
-import thunder.hack.events.impl.world.EventSync;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.world.HoleUtility;
@@ -53,7 +53,7 @@ public abstract class TrapModule extends IndestructibleModule {
             return;
         }
 
-        if (placeTiming.getValue() == PlaceTiming.Vanilla && rotate.getValue() != RotateMode.Disabled) {
+        if (placeTiming.getValue() == PlaceTiming.Vanilla && rotate.getValue()) {
             BlockPos targetBlock = getBlockToPlace();
             if (targetBlock != null && mc.player != null) {
                 BlockHitResult result = InteractionUtility.getPlaceResult(targetBlock, interact.getValue(), false);

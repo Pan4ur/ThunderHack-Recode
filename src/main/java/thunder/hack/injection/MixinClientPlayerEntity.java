@@ -17,13 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.entity.EventMove;
-import thunder.hack.events.impl.entity.EventSprint;
-import thunder.hack.events.impl.entity.PlayerUpdateEvent;
-import thunder.hack.events.impl.entity.PostPlayerUpdateEvent;
-import thunder.hack.events.impl.world.EventAfterRotate;
-import thunder.hack.events.impl.world.EventPostSync;
-import thunder.hack.events.impl.world.EventSync;
+import thunder.hack.events.impl.*;
 
 import static thunder.hack.modules.Module.fullNullCheck;
 import static thunder.hack.modules.Module.mc;

@@ -10,8 +10,6 @@ import thunder.hack.utility.math.MathUtility;
 import java.util.Arrays;
 import java.util.List;
 
-import static thunder.hack.system.Systems.MANAGER;
-
 public class AutoSex extends Module {
     private final Setting<Integer> targetRange = new Setting<>("Target Range", 5, 1, 10);
     private final Setting<SexMode> mode = new Setting<>("Sex Mode", SexMode.Active);
@@ -47,7 +45,7 @@ public class AutoSex extends Module {
     public void onUpdate() {
         if (fullNullCheck()) return;
         if (target == null) {
-            target = MANAGER.COMBAT.getNearestTarget(targetRange.getValue());
+            target = ThunderHack.combatManager.getNearestTarget(targetRange.getValue());
             return;
         }
         if (target.getPos().squaredDistanceTo(mc.player.getPos()) >= targetRange.getPow2Value()) {

@@ -18,13 +18,17 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.events.impl.entity.EventEntitySpawn;
-import thunder.hack.events.impl.world.EventPostSync;
-import thunder.hack.events.impl.world.EventSync;
+import thunder.hack.events.impl.EventEntitySpawn;
+import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.render.Trajectories;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.PlayerUtility;
+import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.Comparator;
 

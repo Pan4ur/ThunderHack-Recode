@@ -39,8 +39,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 
-import static thunder.hack.system.Systems.MANAGER;
-
 public class NameTags extends Module {
     private final Setting<Float> scale = new Setting<>("Scale", 1f, 0.1f, 10f);
     private final Setting<Float> height = new Setting<>("Height", 2f, 0.1f, 10f);
@@ -109,8 +107,8 @@ public class NameTags extends Module {
             }
 
             if (distance.getValue()) final_string += String.format("%.1f", mc.player.distanceTo(ent)) + "m ";
-            if (pops.getValue() && MANAGER.COMBAT.getPops(ent) != 0)
-                final_string += (Formatting.RESET + "" + MANAGER.COMBAT.getPops(ent));
+            if (pops.getValue() && ThunderHack.combatManager.getPops(ent) != 0)
+                final_string += (Formatting.RESET + "" + ThunderHack.combatManager.getPops(ent));
 
             if (position != null) {
                 double posX = position.x;

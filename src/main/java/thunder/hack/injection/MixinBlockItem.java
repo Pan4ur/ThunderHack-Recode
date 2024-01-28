@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.entity.EventPlaceBlock;
+import thunder.hack.events.impl.EventPlaceBlock;
 
 @Mixin(BlockItem.class)
 public class MixinBlockItem {

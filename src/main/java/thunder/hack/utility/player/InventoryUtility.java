@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
-import static thunder.hack.system.Systems.MANAGER;
 
 public final class InventoryUtility {
     private static int cachedSlot = -1;
@@ -324,7 +323,7 @@ public final class InventoryUtility {
 
     public static void switchTo(int slot) {
         if (mc.player == null || mc.getNetworkHandler() == null) return;
-        if (mc.player.getInventory().selectedSlot == slot && MANAGER.PLAYER.serverSideSlot == slot) return;
+        if (mc.player.getInventory().selectedSlot == slot && ThunderHack.playerManager.serverSideSlot == slot) return;
         mc.player.getInventory().selectedSlot = slot;
         mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
     }

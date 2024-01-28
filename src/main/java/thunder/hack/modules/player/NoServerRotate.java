@@ -2,7 +2,7 @@ package thunder.hack.modules.player;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IPlayerPositionLookS2CPacket;
 import thunder.hack.modules.Module;
 

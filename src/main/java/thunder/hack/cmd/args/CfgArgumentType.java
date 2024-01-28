@@ -15,10 +15,8 @@ import thunder.hack.modules.client.MainSettings;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import static thunder.hack.system.Systems.MANAGER;
-
 public class CfgArgumentType implements ArgumentType<String> {
-    private static final Collection<String> EXAMPLES = MANAGER.CONFIG.getConfigList().stream().limit(5).toList();
+    private static final Collection<String> EXAMPLES = ThunderHack.configManager.getConfigList().stream().limit(5).toList();
 
     public static CfgArgumentType create() {
         return new CfgArgumentType();
@@ -27,7 +25,7 @@ public class CfgArgumentType implements ArgumentType<String> {
     @Override
     public String parse(StringReader reader) throws CommandSyntaxException {
         String config = reader.readString();
-        if (!MANAGER.CONFIG.getConfigList().contains(config)) throw new DynamicCommandExceptionType(
+        if (!ThunderHack.configManager.getConfigList().contains(config)) throw new DynamicCommandExceptionType(
                 name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Конфига " + name.toString() + " не существует(" : "Config " + name.toString() + " does not exists(")
         ).create(config);
 
@@ -36,7 +34,7 @@ public class CfgArgumentType implements ArgumentType<String> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(MANAGER.CONFIG.getConfigList(), builder);
+        return CommandSource.suggestMatching(ThunderHack.configManager.getConfigList(), builder);
     }
 
     @Override

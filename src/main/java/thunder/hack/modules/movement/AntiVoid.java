@@ -5,7 +5,7 @@ import meteordevelopment.orbit.EventPriority;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.entity.EventMove;
+import thunder.hack.events.impl.EventMove;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 

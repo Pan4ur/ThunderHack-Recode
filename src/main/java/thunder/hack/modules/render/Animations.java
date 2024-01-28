@@ -18,8 +18,8 @@ import net.minecraft.util.math.RotationAxis;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.render.EventHeldItemRenderer;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.EventHeldItemRenderer;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IHeldItemRenderer;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -38,7 +38,7 @@ public class Animations extends Module {
     public boolean flip;
 
     private enum Mode {
-        Default, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twelve, Thirteen, Disabled
+        Default, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twelve, Thirteen
     }
 
 

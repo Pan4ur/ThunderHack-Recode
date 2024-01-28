@@ -14,8 +14,6 @@ import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
 
-import static thunder.hack.system.Systems.MANAGER;
-
 public class ModuleList extends HudElement {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.ColorText);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
@@ -45,7 +43,7 @@ public class ModuleList extends HudElement {
         float maxWidth = 0;
         float reversedX = getPosX() + 50;
 
-        List<Module> list = MANAGER.MODULE.getEnabledModules().stream().sorted(Comparator.comparing(module -> FontRenderers.modules.getStringWidth(module.getFullArrayString()) * -1)).toList();
+        List<Module> list = ThunderHack.moduleManager.getEnabledModules().stream().sorted(Comparator.comparing(module -> FontRenderers.modules.getStringWidth(module.getFullArrayString()) * -1)).toList();
 
         for (Module module : list) {
             if (!shouldRender(module))

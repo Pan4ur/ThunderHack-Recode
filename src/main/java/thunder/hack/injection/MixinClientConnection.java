@@ -1,7 +1,7 @@
 package thunder.hack.injection;
 
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.PacketEvent;
 
 import thunder.hack.modules.Module;
 import net.minecraft.network.ClientConnection;

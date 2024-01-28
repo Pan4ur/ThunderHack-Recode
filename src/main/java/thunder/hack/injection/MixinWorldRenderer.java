@@ -16,7 +16,6 @@ import thunder.hack.core.impl.ShaderManager;
 import thunder.hack.modules.render.Fullbright;
 
 import static thunder.hack.modules.Module.mc;
-import static thunder.hack.system.Systems.MANAGER;
 
 @Mixin(WorldRenderer.class)
 public abstract class MixinWorldRenderer {
@@ -40,8 +39,8 @@ public abstract class MixinWorldRenderer {
     void replaceShaderHook(PostEffectProcessor instance, float tickDelta) {
         ShaderManager.Shader shaders = ModuleManager.shaders.mode.getValue();
         if (ModuleManager.shaders.isEnabled() && mc.world != null) {
-            if (MANAGER.SHADER.fullNullCheck()) return;
-            MANAGER.SHADER.setupShader(shaders, MANAGER.SHADER.getShaderOutline(shaders));
+            if (ThunderHack.shaderManager.fullNullCheck()) return;
+            ThunderHack.shaderManager.setupShader(shaders, ThunderHack.shaderManager.getShaderOutline(shaders));
         } else {
             instance.render(tickDelta);
         }

@@ -30,7 +30,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.system.Systems.MANAGER;
 import static thunder.hack.utility.render.Render2DEngine.*;
 
 public class Trails extends Module {
@@ -57,7 +56,7 @@ public class Trails extends Module {
     private List<Particle> particles = new ArrayList<>();
 
     public void onRender3D(MatrixStack stack) {
-        for (Entity en : MANAGER.ASYNC.getAsyncEntities()) {
+        for (Entity en : ThunderHack.asyncManager.getAsyncEntities()) {
             if (en instanceof EnderPearlEntity && pearls.getValue())
                 calcTrajectory(en);
 
@@ -194,7 +193,7 @@ public class Trails extends Module {
             ((IEntity) player).thunderHack_Recode$getTrails().removeIf(Trail::update);
         }
 
-        if (MANAGER.PLAYER.currentPlayerSpeed != 0) {
+        if (ThunderHack.playerManager.currentPlayerSpeed != 0) {
             ((IEntity) mc.player).thunderHack_Recode$getTrails().add(new Trail(new Vec3d(mc.player.prevX, mc.player.prevY, mc.player.prevZ), mc.player.getPos(), color.getValue().getColorObject()));
             for (int i = 0; i < amount.getValue(); i++) {
                 particles.add(new Particle(mc.player.getX(), MathUtility.random((float) (mc.player.getY() + mc.player.getHeight()), (float) mc.player.getY()), mc.player.getZ(), c));

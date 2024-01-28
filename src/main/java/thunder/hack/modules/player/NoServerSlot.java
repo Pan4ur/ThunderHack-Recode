@@ -1,7 +1,7 @@
 package thunder.hack.modules.player;
 
 import meteordevelopment.orbit.EventHandler;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;

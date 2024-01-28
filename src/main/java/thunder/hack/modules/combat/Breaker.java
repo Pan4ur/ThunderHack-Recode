@@ -11,7 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CombatManager;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.world.EventSync;
+import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
@@ -19,8 +19,6 @@ import thunder.hack.utility.math.ExplosionUtility;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-
-import static thunder.hack.system.Systems.MANAGER;
 
 public final class Breaker extends Module {
     private final Setting<CombatManager.TargetBy> targetBy = new Setting<>("TargetBy", CombatManager.TargetBy.Distance);
@@ -37,15 +35,10 @@ public final class Breaker extends Module {
 
     @EventHandler
     @SuppressWarnings("unused")
-    private void onPostSync(EventSync event) {
-        if (fullNullCheck())
-            return;
+    private void onSync(EventSync event) {
+        PlayerEntity target = ThunderHack.combatManager.getTarget(range.getValue(), targetBy.getValue());
 
-        PlayerEntity target = MANAGER.COMBAT.getTarget(range.getValue(), targetBy.getValue());
-
-        if (target == null)
-            return;
-
+        if (target == null) return;
 
         if (blockPos != null) {
             if (ModuleManager.speedMine.isEnabled()) {
@@ -59,53 +52,47 @@ public final class Breaker extends Module {
         ArrayList<BreakData> list = new ArrayList<>();
 
         if (cevPriority.getValue()) {
-            for (int y = 0; y <= 4; y++) {
+            for (int y = 0; y <= 3; y++) {
                 BlockPos bp = BlockPos.ofFloored(target.getX(), target.getY() + y, target.getZ());
                 if (mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN && mc.world.isAir(bp.up()) && !bp.equals(BlockPos.ofFloored(target.getPos()).down())) {
-                    boolean canPlaceOn = ModuleManager.autoCrystal.getInteractResult(bp, new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ())) != null;
+                    if(ModuleManager.autoCrystal.getInteractResult(bp, new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ())) == null) continue;
                     BlockState currentState = mc.world.getBlockState(bp);
                     mc.world.removeBlock(bp, false);
-                    float damage = ExplosionUtility.getExplosionDamage1(bp.toCenterPos(), target);
-                    float selfDamage = ExplosionUtility.getExplosionDamage1(bp.toCenterPos(), mc.player);
+                    float damage = ExplosionUtility.getExplosionDamage(bp.toCenterPos(), target);
+                    float selfDamage = ExplosionUtility.getExplosionDamage(bp.toCenterPos(), mc.player);
                     mc.world.setBlockState(bp, currentState);
-
-                    if ((Float.isNaN(ModuleManager.autoCrystal.renderDamage) || ModuleManager.autoCrystal.renderDamage < damage) && selfDamage < maxSelfDamage.getValue() && damage >= minDamage.getValue() && canPlaceOn)
-                        list.add(new BreakData(bp, damage));
+                    if ((Float.isNaN(ModuleManager.autoCrystal.renderDamage) || ModuleManager.autoCrystal.renderDamage < damage) && selfDamage < maxSelfDamage.getValue() && damage >= minDamage.getValue()) list.add(new BreakData(bp, damage));
                 }
             }
             BreakData best = list.stream().max(Comparator.comparing(BreakData::damage)).orElse(null);
-            if(best != null) {
+            if (best != null && cevPriority.getValue()) {
                 blockPos = best.blockPos();
                 return;
             }
         }
 
-        MANAGER.ASYNC.run(() -> {
-            for (int x = -3; x <= 3; x++) {
-                for (int y = 0; y <= 4; y++) {
-                    for (int z = -3; z <= 3; z++) {
-                        BlockPos bp = BlockPos.ofFloored(target.getX() + x, target.getY() + y, target.getZ() + z);
-                        if (mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN && mc.world.isAir(bp.up()) && !bp.equals(BlockPos.ofFloored(target.getPos()).down())) {
-                            boolean canPlaceOn = ModuleManager.autoCrystal.getInteractResult(bp, new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ())) != null;
-                            BlockState currentState = mc.world.getBlockState(bp);
-                            mc.world.removeBlock(bp, false);
-                            float damage = ExplosionUtility.getExplosionDamage1(bp.toCenterPos(), target);
-                            float selfDamage = ExplosionUtility.getExplosionDamage1(bp.toCenterPos(), mc.player);
-                            mc.world.setBlockState(bp, currentState);
-
-                            if (ModuleManager.autoCrystal.renderDamage < damage && selfDamage < maxSelfDamage.getValue() && damage >= minDamage.getValue() && canPlaceOn)
-                                list.add(new BreakData(bp, damage));
-                        }
+        for (int x = -2; x <= 2; x++) {
+            for (int y = 0; y <= 3; y++) {
+                for (int z = -2; z <= 2; z++) {
+                    if (y > 1 && (x == -2 || z == -2 || x == 2 || z == 2))
+                        continue;
+                    BlockPos bp = BlockPos.ofFloored(target.getX() + x, target.getY() + y, target.getZ() + z);
+                    if (mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN && mc.world.isAir(bp.up()) && !bp.equals(BlockPos.ofFloored(target.getPos()).down())) {
+                        if(ModuleManager.autoCrystal.getInteractResult(bp, new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ())) == null) continue;
+                        BlockState currentState = mc.world.getBlockState(bp);
+                        mc.world.removeBlock(bp, false);
+                        float damage = ExplosionUtility.getExplosionDamage(bp.toCenterPos(), target);
+                        float selfDamage = ExplosionUtility.getExplosionDamage(bp.toCenterPos(), mc.player);
+                        mc.world.setBlockState(bp, currentState);
+                        if (ModuleManager.autoCrystal.renderDamage < damage && selfDamage < maxSelfDamage.getValue() && damage >= minDamage.getValue()) list.add(new BreakData(bp, damage));
                     }
                 }
             }
+        }
 
-            BreakData best = list.stream().max(Comparator.comparing(BreakData::damage)).orElse(null);
-            blockPos = best == null ? null : best.blockPos();
-        });
+        BreakData best = list.stream().max(Comparator.comparing(BreakData::damage)).orElse(null);
+        blockPos = best == null ? null : best.blockPos();
     }
-
-
 
     private record BreakData(BlockPos blockPos, float damage) {
     }

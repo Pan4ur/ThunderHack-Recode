@@ -16,10 +16,8 @@ import thunder.hack.modules.client.MainSettings;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import static thunder.hack.system.Systems.MANAGER;
-
 public class WayPointArgumentType implements ArgumentType<WayPointManager.WayPoint> {
-    private static final Collection<String> EXAMPLES = MANAGER.WAYPOINT.getWayPoints().stream()
+    private static final Collection<String> EXAMPLES = ThunderHack.wayPointManager.getWayPoints().stream()
             .map(WayPointManager.WayPoint::name)
             .limit(5)
             .toList();
@@ -30,7 +28,7 @@ public class WayPointArgumentType implements ArgumentType<WayPointManager.WayPoi
 
     @Override
     public WayPointManager.WayPoint parse(StringReader reader) throws CommandSyntaxException {
-        WayPointManager.WayPoint wp = MANAGER.WAYPOINT.getWayPointByName(reader.readString());
+        WayPointManager.WayPoint wp = ThunderHack.wayPointManager.getWayPointByName(reader.readString());
 
         if (wp == null) throw new DynamicCommandExceptionType(
                 name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Вейпоинта " + name.toString() + " не существует(" : "Waypoint " + name.toString() + " does not exists(")
@@ -41,7 +39,7 @@ public class WayPointArgumentType implements ArgumentType<WayPointManager.WayPoi
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(MANAGER.WAYPOINT.getWayPoints().stream().map(WayPointManager.WayPoint::name), builder);
+        return CommandSource.suggestMatching(ThunderHack.wayPointManager.getWayPoints().stream().map(WayPointManager.WayPoint::name), builder);
     }
 
     @Override

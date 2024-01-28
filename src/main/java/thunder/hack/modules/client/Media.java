@@ -5,7 +5,7 @@ import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IGameMessageS2CPacket;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;

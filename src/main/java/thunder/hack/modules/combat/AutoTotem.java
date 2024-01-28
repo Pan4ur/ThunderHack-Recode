@@ -25,16 +25,14 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.world.EventSync;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.SearchInvResult;
-
-import static thunder.hack.system.Systems.MANAGER;
 
 public final class AutoTotem extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Matrix);
@@ -158,7 +156,7 @@ public final class AutoTotem extends Module {
                         sendPacket(new PickFromInventoryC2SPacket(slot));
                         sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
                         int prevSlot = mc.player.getInventory().selectedSlot;
-                        MANAGER.ASYNC.run(() -> mc.player.getInventory().selectedSlot = prevSlot, 300);
+                        ThunderHack.asyncManager.run(() -> mc.player.getInventory().selectedSlot = prevSlot, 300);
                     }
                     case NewVersion -> {
                         debug(slot + " swap");
@@ -268,8 +266,8 @@ public final class AutoTotem extends Module {
             item = Items.TOTEM_OF_UNDYING;
 
         if (onCrystalInHand.getValue()) {
-            for (PlayerEntity pl : MANAGER.ASYNC.getAsyncPlayers()) {
-                if (MANAGER.FRIEND.isFriend(pl)) continue;
+            for (PlayerEntity pl : ThunderHack.asyncManager.getAsyncPlayers()) {
+                if (ThunderHack.friendManager.isFriend(pl)) continue;
                 if (pl == mc.player) continue;
                 if (mc.player.squaredDistanceTo(pl) < 36) {
                     if (pl.getMainHandStack().getItem() == Items.OBSIDIAN

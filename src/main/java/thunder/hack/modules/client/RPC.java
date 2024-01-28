@@ -15,7 +15,6 @@ import java.io.*;
 import java.util.Objects;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.system.Systems.MANAGER;
 
 public final class RPC extends Module {
     private static final DiscordRPC rpc = DiscordRPC.INSTANCE;
@@ -93,7 +92,7 @@ public final class RPC extends Module {
 
                     switch (smode.getValue()) {
                         case Stats ->
-                                presence.state = "Hacks: " + MANAGER.MODULE.getEnabledModules().size() + " / " + MANAGER.MODULE.modules.size();
+                                presence.state = "Hacks: " + ThunderHack.moduleManager.getEnabledModules().size() + " / " + ThunderHack.moduleManager.modules.size();
                         case Custom -> presence.state = state.getValue();
                         case Version -> presence.state = "v1.4 for mc 1.20.4";
                     }

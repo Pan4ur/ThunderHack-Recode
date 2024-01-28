@@ -2,7 +2,7 @@ package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Items;
-import thunder.hack.events.impl.entity.PostPlayerUpdateEvent;
+import thunder.hack.events.impl.PostPlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;

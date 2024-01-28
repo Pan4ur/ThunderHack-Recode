@@ -21,8 +21,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.system.Systems.MANAGER;
-
 public class StorageEsp extends Module {
     public StorageEsp() {
         super("StorageEsp", Category.RENDER);
@@ -84,7 +82,7 @@ public class StorageEsp extends Module {
             }
         }
 
-        for (Entity ent : MANAGER.ASYNC.getAsyncEntities()) {
+        for (Entity ent : ThunderHack.asyncManager.getAsyncEntities()) {
             if (ent instanceof ItemFrameEntity iframe && frame.getValue()) {
                 Color frameColor1 = frameColor.getValue().getColorObject();
                 if (iframe.getHeldItemStack().getItem() instanceof BlockItem bitem && bitem.getBlock() instanceof ShulkerBoxBlock)

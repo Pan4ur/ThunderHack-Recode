@@ -1,22 +1,24 @@
 package thunder.hack.modules;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.CommandManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.modules.client.MainSettings;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
-import thunder.hack.utility.UtilsMixin;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -24,9 +26,8 @@ import java.util.List;
 import java.util.Objects;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.system.Systems.MANAGER;
 
-public abstract class Module implements UtilsMixin {
+public abstract class Module {
     private final Setting<Bind> bind = new Setting<>("Keybind", new Bind(-1, false, false));
     private final Setting<Boolean> drawn = new Setting<>("Drawn", true);
     private final Setting<Boolean> enabled = new Setting<>("Enabled", false);
@@ -34,6 +35,8 @@ public abstract class Module implements UtilsMixin {
     private final String description;
     private final Category category;
     private final String displayName;
+
+    public static final MinecraftClient mc = MinecraftClient.getInstance();
 
     public Module(@NotNull String name, @NotNull Category category) {
         this.displayName = name;
@@ -71,6 +74,12 @@ public abstract class Module implements UtilsMixin {
     public void onUnload() {
     }
 
+    protected void sendPacket(Packet<?> packet) {
+        if (mc.getNetworkHandler() == null) return;
+
+        mc.getNetworkHandler().sendPacket(packet);
+    }
+
     public String getDisplayInfo() {
         return null;
     }
@@ -98,10 +107,10 @@ public abstract class Module implements UtilsMixin {
         if (fullNullCheck()) return;
 
         LogUtils.getLogger().info("[ThunderHack] enabled " + this.getName());
-        MANAGER.MODULE.sortModules();
+        ThunderHack.moduleManager.sortModules();
 
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
-            MANAGER.NOTIFICATION.publicity(getDisplayName(), isRu() ? "Модуль включен!" : "Was Enabled!", 2, Notification.Type.ENABLED);
+            ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль включен!" : "Was Enabled!", 2, Notification.Type.ENABLED);
             ModuleManager.soundFX.playEnable();
         }
     }
@@ -120,7 +129,7 @@ public abstract class Module implements UtilsMixin {
 
         enabled.setValue(false);
 
-        MANAGER.MODULE.sortModules();
+        ThunderHack.moduleManager.sortModules();
 
         if (fullNullCheck()) return;
         onDisable();
@@ -128,7 +137,7 @@ public abstract class Module implements UtilsMixin {
         LogUtils.getLogger().info("[ThunderHack] disabled " + getName());
 
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
-            MANAGER.NOTIFICATION.publicity(getDisplayName(), isRu() ? "Модуль выключен!" : "Was Disabled!", 2, Notification.Type.DISABLED);
+            ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль выключен!" : "Was Disabled!", 2, Notification.Type.DISABLED);
             ModuleManager.soundFX.playDisable();
         }
     }

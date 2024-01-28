@@ -8,9 +8,9 @@ import net.minecraft.entity.Entity;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.IManager;
-import thunder.hack.events.impl.world.EventPostTick;
-import thunder.hack.events.impl.world.EventSync;
-import thunder.hack.events.impl.world.EventTick;
+import thunder.hack.events.impl.EventPostTick;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.EventTick;
 import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.clickui.small.SmallClickUI;
 import thunder.hack.gui.mainmenu.MainMenuScreen;
@@ -24,8 +24,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static thunder.hack.system.Systems.MANAGER;
-
 public class AsyncManager implements IManager {
     private ClientService clientService = new ClientService();
     public static ExecutorService executor = Executors.newCachedThreadPool();
@@ -35,10 +33,6 @@ public class AsyncManager implements IManager {
     private volatile Iterable<Entity> threadSafeEntityList = Collections.emptyList();
     private volatile List<AbstractClientPlayerEntity> threadSafePlayersList = Collections.emptyList();
     public final AtomicBoolean ticking = new AtomicBoolean(false);
-
-    {
-        ThunderHack.EVENT_BUS.subscribe(this);
-    }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPostTick(EventPostTick e) {
@@ -86,7 +80,7 @@ public class AsyncManager implements IManager {
 
                 try {
                     if (!Module.fullNullCheck()) {
-                        for (Module module : MANAGER.MODULE.modules) {
+                        for (Module module : ThunderHack.moduleManager.modules) {
                             if (module.isEnabled()) {
                                 module.onThread();
                             }

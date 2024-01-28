@@ -27,10 +27,10 @@ import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.entity.EventEntityRemoved;
-import thunder.hack.events.impl.world.EventPostSync;
-import thunder.hack.events.impl.world.EventSync;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.EventEntityRemoved;
+import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.*;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.system.Systems.MANAGER;
 
 public final class PistonAura extends Module {
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 1, 0, 25);
@@ -816,7 +815,7 @@ public final class PistonAura extends Module {
         synchronized (mc.world.getPlayers()) {
             List<PlayerEntity> playerList = new ArrayList<>();
             for (PlayerEntity player : mc.world.getPlayers()) {
-                if (mc.player != player && !MANAGER.FRIEND.isFriend(player) && mc.player.squaredDistanceTo(player) <= range * range) {
+                if (mc.player != player && !ThunderHack.friendManager.isFriend(player) && mc.player.squaredDistanceTo(player) <= range * range) {
                     playerList.add(player);
                 }
             }

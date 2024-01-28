@@ -1,9 +1,12 @@
 package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.entity.EntityStatuses;
+import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
-import thunder.hack.events.impl.entity.DeathEvent;
-import thunder.hack.events.impl.world.PacketEvent;
+import org.jetbrains.annotations.NotNull;
+import thunder.hack.events.impl.DeathEvent;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.combat.AutoCrystal;

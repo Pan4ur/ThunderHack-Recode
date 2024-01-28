@@ -5,7 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -14,7 +14,6 @@ import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.math.MathUtility;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.system.Systems.MANAGER;
 
 public class AutoTpAccept extends Module {
 
@@ -36,7 +35,7 @@ public class AutoTpAccept extends Module {
             final GameMessageS2CPacket packet = event.getPacket();
             if (packet.content().getString().contains("телепортироваться")) {
                 if (onlyFriends.getValue()) {
-                    if (MANAGER.FRIEND.isFriend(ThunderUtility.solveName(packet.content().getString()))) {
+                    if (ThunderHack.friendManager.isFriend(ThunderUtility.solveName(packet.content().getString()))) {
                         if (!duo.getValue()) acceptRequest(packet.content().getString());
                         else
                             tpTask = new TpTask(() -> acceptRequest(packet.content.getString()), System.currentTimeMillis());
@@ -62,7 +61,7 @@ public class AutoTpAccept extends Module {
             }
             for (PlayerEntity pl : mc.world.getPlayers()) {
                 if (pl == mc.player) continue;
-                if (MANAGER.FRIEND.isFriend(pl)) continue;
+                if (ThunderHack.friendManager.isFriend(pl)) continue;
                 tpTask.task.run();
                 tpTask = null;
                 break;

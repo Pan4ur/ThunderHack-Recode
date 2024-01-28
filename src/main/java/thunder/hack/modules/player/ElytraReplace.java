@@ -10,7 +10,6 @@ import thunder.hack.gui.notification.Notification;
 import thunder.hack.utility.player.InventoryUtility;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.system.Systems.MANAGER;
 
 public class ElytraReplace extends Module {
     public ElytraReplace() {
@@ -27,7 +26,7 @@ public class ElytraReplace extends Module {
                 clickSlot(6);
                 clickSlot(result);
                 mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                MANAGER.NOTIFICATION.publicity("ElytraReplace", isRu() ? "Меняем элитру на новую!" : "Swapping the old elytra for a new one!",2, Notification.Type.SUCCESS);
+                ThunderHack.notificationManager.publicity("ElytraReplace", isRu() ? "Меняем элитру на новую!" : "Swapping the old elytra for a new one!",2, Notification.Type.SUCCESS);
                 sendMessage(isRu() ? "Меняем элитру на новую!" : "Swapping the old elytra for a new one!");
             }
         }

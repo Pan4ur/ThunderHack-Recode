@@ -1,7 +1,7 @@
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
-import thunder.hack.events.impl.world.EventSync;
+import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import net.minecraft.item.Items;

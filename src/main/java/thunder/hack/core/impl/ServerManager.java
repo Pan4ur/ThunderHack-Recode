@@ -5,9 +5,8 @@ import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.IManager;
-import thunder.hack.events.impl.world.PacketEvent;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.client.FastLatency;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
@@ -22,10 +21,6 @@ public class ServerManager implements IManager {
     private long time;
     private long tickTime;
     private float tps;
-
-    {
-        ThunderHack.EVENT_BUS.subscribe(this);
-    }
 
     public float getTPS() {
         return round2(tps);

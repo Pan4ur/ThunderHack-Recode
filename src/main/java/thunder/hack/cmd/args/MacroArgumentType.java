@@ -16,10 +16,9 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.system.Systems.MANAGER;
 
 public class MacroArgumentType implements ArgumentType<MacroManager.Macro> {
-    private static final Collection<String> EXAMPLES = MANAGER.MACRO.getMacros().stream().map(MacroManager.Macro::name).limit(5).toList();
+    private static final Collection<String> EXAMPLES = ThunderHack.macroManager.getMacros().stream().map(MacroManager.Macro::name).limit(5).toList();
 
     public static MacroArgumentType create() {
         return new MacroArgumentType();
@@ -27,7 +26,7 @@ public class MacroArgumentType implements ArgumentType<MacroManager.Macro> {
 
     @Override
     public MacroManager.Macro parse(StringReader reader) throws CommandSyntaxException {
-        MacroManager.Macro macro = MANAGER.MACRO.getMacroByName(reader.readString());
+        MacroManager.Macro macro = ThunderHack.macroManager.getMacroByName(reader.readString());
 
         if (macro == null) throw new DynamicCommandExceptionType(
                 name -> Text.literal(isRu() ? "Макроса " + name.toString() + " не существует(" : "Macro with name " + name.toString() + " does not exists(")
@@ -38,7 +37,7 @@ public class MacroArgumentType implements ArgumentType<MacroManager.Macro> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(MANAGER.MACRO.getMacros().stream().map(MacroManager.Macro::name), builder);
+        return CommandSource.suggestMatching(ThunderHack.macroManager.getMacros().stream().map(MacroManager.Macro::name), builder);
     }
 
     @Override

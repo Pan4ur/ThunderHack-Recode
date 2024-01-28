@@ -7,8 +7,6 @@ import thunder.hack.core.impl.CombatManager;
 import thunder.hack.modules.base.TrapModule;
 import thunder.hack.setting.Setting;
 
-import static thunder.hack.system.Systems.MANAGER;
-
 public final class AutoTrap extends TrapModule {
     private final Setting<CombatManager.TargetBy> targetBy = new Setting<>("Target By", CombatManager.TargetBy.Distance);
 
@@ -33,6 +31,6 @@ public final class AutoTrap extends TrapModule {
 
     @Override
     protected @Nullable PlayerEntity getTarget() {
-        return MANAGER.COMBAT.getTarget(range.getValue(), targetBy.getValue());
+        return ThunderHack.combatManager.getTarget(range.getValue(), targetBy.getValue());
     }
 }

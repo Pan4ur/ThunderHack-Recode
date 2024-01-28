@@ -14,14 +14,15 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.entity.DeathEvent;
-import thunder.hack.events.impl.world.EventPostSync;
-import thunder.hack.events.impl.world.EventSync;
-import thunder.hack.events.impl.world.TotemPopEvent;
+import thunder.hack.events.impl.DeathEvent;
+import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -43,7 +44,6 @@ import java.util.*;
 import java.util.List;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
-import static thunder.hack.system.Systems.MANAGER;
 
 public final class AutoAnchor extends Module {
     private final Setting<Float> targetRange = new Setting<>("Target Range", 10f, 1f, 20f);
@@ -189,7 +189,7 @@ public final class AutoAnchor extends Module {
             if (!logicTimer.passedMs(logicDelay.getValue())) return;
 
             if (target == null) {
-                target = MANAGER.COMBAT.getNearestTarget(targetRange.getValue());
+                target = ThunderHack.combatManager.getNearestTarget(targetRange.getValue());
                 return;
             }
             if (target.getPos().squaredDistanceTo(mc.player.getEyePos()) > targetRange.getPow2Value()) {
@@ -258,7 +258,7 @@ public final class AutoAnchor extends Module {
     }
 
     private synchronized boolean isFriendsSafe(BlockPos blockPos) {
-        for (AbstractClientPlayerEntity player : MANAGER.FRIEND.getNearFriends()) {
+        for (AbstractClientPlayerEntity player : ThunderHack.friendManager.getNearFriends()) {
             if (ExplosionUtility.getAnchorExplosionDamage(blockPos, player) > maxFDamage.getValue()) {
                 return false;
             }
@@ -271,7 +271,7 @@ public final class AutoAnchor extends Module {
     }
 
     private boolean shouldFriendsPop(BlockPos pos) {
-        for (AbstractClientPlayerEntity player : MANAGER.FRIEND.getNearFriends()) {
+        for (AbstractClientPlayerEntity player : ThunderHack.friendManager.getNearFriends()) {
             if (mc.player.getHealth() + mc.player.getAbsorptionAmount() - ExplosionUtility.getAnchorExplosionDamage(pos, player) <= 0) {
                 return true;
             }
@@ -292,7 +292,7 @@ public final class AutoAnchor extends Module {
                 || target == null
                 || (rotate.getValue() && !rotated)
                 || mc.player.getHealth() + mc.player.getAbsorptionAmount() - ExplosionUtility.getSelfExplosionDamage(targetPos.toCenterPos(), predictTicks.getValue()) <= 0
-                || !MANAGER.FRIEND.getNearFriends().stream()
+                || !ThunderHack.friendManager.getNearFriends().stream()
                 .filter(friend -> friend.getHealth() + friend.getAbsorptionAmount() - ExplosionUtility.getAnchorExplosionDamage(targetPos, friend) <= 0)
                 .toList()
                 .isEmpty()
