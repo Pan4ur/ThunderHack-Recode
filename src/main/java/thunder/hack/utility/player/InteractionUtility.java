@@ -59,7 +59,7 @@ public final class InteractionUtility {
     }
 
     public static float @NotNull [] calculateAngle(Vec3d to) {
-        return calculateAngle(getEyesPos(mc.player), to);
+        return calculateAngle(getEyesPos(Objects.requireNonNull(mc.player)), to);
     }
 
     public static float @NotNull [] calculateAngle(@NotNull Vec3d from, @NotNull Vec3d to) {

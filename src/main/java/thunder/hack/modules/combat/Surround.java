@@ -25,12 +25,14 @@ import java.util.List;
 import java.util.Objects;
 
 import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.system.Systems.MANAGER;
 
 public final class Surround extends IndestructibleModule {
     private final Setting<PlaceTiming> placeTiming = new Setting<>("Place Timing", PlaceTiming.Default);
     private final Setting<Integer> blocksPerTick = new Setting<>("Blocks/Place", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10, v -> placeTiming.getValue() != PlaceTiming.Sequential);
     private final Setting<CenterMode> center = new Setting<>("Center", CenterMode.Disabled);
+    private final Setting<Boolean> thread = new Setting<>("Thread", false);
 
     private final Setting<Parent> autoDisable = new Setting<>("Auto Disable", new Parent(false, 0));
     private final Setting<Boolean> onYChange = new Setting<>("On Y Change", true).withParent(autoDisable);
@@ -109,6 +111,14 @@ public final class Surround extends IndestructibleModule {
         if (!getBlockResult().found())
             disable(isRu() ? "Нет блоков!" : "No blocks!");
 
+        if (thread.getValue()) {
+            MANAGER.ASYNC.run(this::logic);
+            return;
+        }
+        logic();
+    }
+
+    private void logic() {
         if (placeTiming.getValue() == PlaceTiming.Vanilla || placeTiming.getValue() == PlaceTiming.Sequential) {
             BlockPos targetBlock = getSequentialPos();
             if (targetBlock == null)
