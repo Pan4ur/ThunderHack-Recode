@@ -53,7 +53,7 @@ public abstract class TrapModule extends IndestructibleModule {
             return;
         }
 
-        if (placeTiming.getValue() == PlaceTiming.Vanilla && rotate.getValue()) {
+        if (placeTiming.getValue() == PlaceTiming.Vanilla && rotate.getValue() != RotateMode.Disabled) {
             BlockPos targetBlock = getBlockToPlace();
             if (targetBlock != null && mc.player != null) {
                 BlockHitResult result = InteractionUtility.getPlaceResult(targetBlock, interact.getValue(), false);
