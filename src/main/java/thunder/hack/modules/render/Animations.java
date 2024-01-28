@@ -38,7 +38,7 @@ public class Animations extends Module {
     public boolean flip;
 
     private enum Mode {
-        Default, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twelve, Thirteen
+        Default, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twelve, Thirteen, Disabled
     }
 
 
