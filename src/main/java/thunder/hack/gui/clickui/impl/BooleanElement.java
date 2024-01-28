@@ -1,7 +1,9 @@
 package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.gui.clickui.AbstractElement;
+import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.gui.font.FontRenderers;
@@ -11,6 +13,7 @@ import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 
+import static thunder.hack.modules.Module.mc;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class BooleanElement extends AbstractElement {
@@ -34,6 +37,12 @@ public class BooleanElement extends AbstractElement {
 
         if(setting.parent != null) {
             Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, 1f, 15, ClickGui.getInstance().getColor(1));
+        }
+
+        if(hovered) {
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(),
+                    GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
+            ClickUI.anyHovered = true;
         }
 
         if(!isSmall()) {

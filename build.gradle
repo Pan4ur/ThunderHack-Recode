@@ -56,7 +56,6 @@ dependencies {
 	modImpl("org.ladysnake:satin:${project.satin_version}")
 
 	libImpl("meteordevelopment:orbit:${project.orbit_version}")
-//	libImpl("se.michaelthelin.spotify:spotify-web-api-java:8.3.4");
 
 	configurations.libImpl.dependencies.each {
 		implementation(it)

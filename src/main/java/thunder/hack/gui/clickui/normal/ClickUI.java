@@ -37,6 +37,7 @@ public class ClickUI extends Screen {
     private boolean firstOpen;
     private float scrollY;
     private boolean setup = false;
+    public static boolean anyHovered = false;
 
     /*
       0 - lang
@@ -105,6 +106,8 @@ public class ClickUI extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        anyHovered = false;
+
         if (ThunderHack.isOutdated && (mc.player == null || (mc.player.age % 20) > 10)) {
             FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f + 1, mc.getWindow().getScaledHeight() - 39 - FontRenderers.thglitch.getFontHeight("New version is available!"), Color.BLACK.getRGB());
             FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() - 40 - FontRenderers.thglitch.getFontHeight("New version is available!"), -1);
@@ -246,6 +249,10 @@ public class ClickUI extends Screen {
             FontRenderers.sf_medium.drawString(context.getMatrices(), currentDescription, mouseX + 10, mouseY + 10, -1);
             currentDescription = "";
         }
+
+        if(!anyHovered)
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(),
+                    GLFW.glfwCreateStandardCursor(GLFW.GLFW_CURSOR_NORMAL));
     }
 
     @Override

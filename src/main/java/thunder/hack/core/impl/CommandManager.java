@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.impl.*;
 import thunder.hack.core.IManager;
@@ -49,7 +50,7 @@ public class CommandManager implements IManager {
         add(new GarbageCleanerCommand());
     }
 
-    private void add(Command command) {
+    private void add(@NotNull Command command) {
         command.register(dispatcher);
         commands.add(command);
     }
@@ -69,7 +70,7 @@ public class CommandManager implements IManager {
         return null;
     }
 
-    public static String getClientMessage() {
+    public static @NotNull String getClientMessage() {
         return Formatting.WHITE + "⌊" + Formatting.GOLD + "⚡" + Formatting.WHITE + "⌉" + Formatting.RESET;
     }
 

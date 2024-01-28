@@ -272,7 +272,7 @@ public class TargetHud extends HudElement {
                     drawPotionEffect(context.getMatrices(), ((PlayerEntity) target));
                 }
             } else if (Mode.getValue() == ModeEn.NurikZapen) {
-                float hurtPercent = (Render2DEngine.interpolateFloat(MathUtility.clamp(target.hurtTime + 1, 0, 10), target.hurtTime, mc.getTickDelta())) / 8f;
+                float hurtPercent = (Render2DEngine.interpolateFloat(MathUtility.clamp(target.hurtTime == 0 ? 0 : target.hurtTime + 1, 0, 10), target.hurtTime, mc.getTickDelta())) / 8f;
                 float health = Math.min(20, getHealth());
                 healthanimation.setValue(health);
                 health = (float) healthanimation.getAnimationD();

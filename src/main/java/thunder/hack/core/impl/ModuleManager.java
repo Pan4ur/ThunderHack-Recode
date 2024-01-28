@@ -2,12 +2,14 @@ package thunder.hack.core.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.IManager;
 import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.clickui.small.SmallClickUI;
 import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.gui.hud.HudElement;
 import thunder.hack.gui.hud.impl.*;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.*;
@@ -133,7 +135,7 @@ public class ModuleManager implements IManager {
     public static AutoArmor autoArmor = new AutoArmor();
     public static Cooldowns cooldowns = new Cooldowns();
     public static TapeMouse tapeMouse = new TapeMouse();
-    public static AutoMine autoMine = new AutoMine();
+    public static AutoGear autoGear = new AutoGear();
     public static ViewLock viewLock = new ViewLock();
     public static Velocity velocity = new Velocity();
     public static Tooltips tooltips = new Tooltips();
@@ -162,6 +164,7 @@ public class ModuleManager implements IManager {
     public static AntiVoid antiVoid = new AntiVoid();
     public static KillFeed killFeed = new KillFeed();
     public static AutoWalk autoWalk = new AutoWalk();
+    public static Breaker breaker = new Breaker();
     public static AutoEat autoEat = new AutoEat();
     public static AntiAFK antiAFK = new AntiAFK();
     public static AutoBuy autoBuy = new AutoBuy();
@@ -206,6 +209,7 @@ public class ModuleManager implements IManager {
     public static AutoEZ autoEZ = new AutoEZ();
     public static AimBot aimBot = new AimBot();
     public static Timer timer = new Timer();
+    public static Regen regen = new Regen();
     public static Speed speed = new Speed();
     public static Reach reach = new Reach();
     public static Radar radar = new Radar();
@@ -292,7 +296,10 @@ public class ModuleManager implements IManager {
     }
 
     public void onRender2D(DrawContext context) {
+        HudElement.anyHovered = false;
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender2D(context));
+        if(!HudElement.anyHovered && !ClickUI.anyHovered)
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_CURSOR_NORMAL));
         ThunderHack.core.onRender2D(context);
     }
 

@@ -67,7 +67,7 @@ public class EbatteSratte extends Module {
                 String chatPrefix = switch (server.getValue()) {
                     case FunnyGame -> "!";
                     case OldServer -> ">";
-                    case DirectMessage -> "/w ";
+                    case DirectMessage -> "/msg ";
                     case Local -> "";
                 };
 
@@ -84,7 +84,9 @@ public class EbatteSratte extends Module {
     public void loadEZ() {
         try {
             File file = new File("ThunderHackRecode/misc/EbatteSratte.txt");
-            if (!file.exists()) file.createNewFile();
+            if (!file.exists() && !file.createNewFile())
+                sendMessage("Error with creating file");
+
             new Thread(() -> {
                 try {
                     FileInputStream fis = new FileInputStream(file);

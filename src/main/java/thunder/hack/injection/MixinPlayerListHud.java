@@ -1,5 +1,6 @@
 package thunder.hack.injection;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.hud.PlayerListHud;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.scoreboard.Team;
@@ -9,6 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.modules.client.MainSettings;
 
@@ -25,7 +27,11 @@ public class MixinPlayerListHud {
 
     @Inject(method = "collectPlayerEntries", at = @At("HEAD"), cancellable = true)
     private void collectPlayerEntriesHook(CallbackInfoReturnable<List<PlayerListEntry>> cir) {
-        if (MainSettings.futureCompatibility.getValue()) return;
+        if (MainSettings.futureCompatibility.getValue())
+            return;
+
+        if (ThunderHack.isFuturePresent())
+            return;
 
         if (ModuleManager.extraTab.isEnabled())
             cir.setReturnValue(mc.player.networkHandler.getListedPlayerListEntries().stream().sorted(ENTRY_ORDERING).limit(1000).toList());

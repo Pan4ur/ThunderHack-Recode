@@ -47,6 +47,7 @@ public class Speed extends Module {
 
     public double baseSpeed;
     private int stage, ticks;
+    private float prevForward = 0;
     private thunder.hack.utility.Timer elytraDelay = new thunder.hack.utility.Timer();
     private thunder.hack.utility.Timer startDelay = new thunder.hack.utility.Timer();
 
@@ -172,18 +173,19 @@ public class Speed extends Module {
 
         if (MovementUtility.isMoving()) {
             ThunderHack.TICK_TIMER = useTimer.getValue() ? 1.088f : 1f;
+            float currentSpeed = mode.getValue() == Mode.NCP && mc.player.input.movementForward <= 0 && prevForward > 0 ? ThunderHack.playerManager.currentPlayerSpeed * 0.66f : ThunderHack.playerManager.currentPlayerSpeed;
             if (stage == 1 && mc.player.isOnGround()) {
                 mc.player.setVelocity(mc.player.getVelocity().x, MovementUtility.getJumpSpeed(), mc.player.getVelocity().z);
                 event.setY(MovementUtility.getJumpSpeed());
                 baseSpeed *= 2.149;
                 stage = 2;
             } else if (stage == 2) {
-                baseSpeed = ThunderHack.playerManager.currentPlayerSpeed - (0.66 * (ThunderHack.playerManager.currentPlayerSpeed - MovementUtility.getBaseMoveSpeed()));
+                baseSpeed = currentSpeed - (0.66 * (currentSpeed - MovementUtility.getBaseMoveSpeed()));
                 stage = 3;
             } else {
                 if ((mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, mc.player.getVelocity().getY(), 0.0)).iterator().hasNext() || mc.player.verticalCollision))
                     stage = 1;
-                baseSpeed = ThunderHack.playerManager.currentPlayerSpeed - ThunderHack.playerManager.currentPlayerSpeed / 159.0D;
+                baseSpeed = currentSpeed - currentSpeed / 159.0D;
             }
 
             baseSpeed = Math.max(baseSpeed, MovementUtility.getBaseMoveSpeed());
@@ -209,6 +211,7 @@ public class Speed extends Module {
                 ticks = 0;
 
             MovementUtility.modifyEventSpeed(event, baseSpeed);
+            prevForward = mc.player.input.movementForward;
         } else {
             ThunderHack.TICK_TIMER = 1f;
             event.setX(0);

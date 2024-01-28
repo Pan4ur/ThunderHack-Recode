@@ -43,6 +43,7 @@ public class AutoBuy extends Module {
     public final Setting<String> an = new Setting<>("An", "an235");
     public final Setting<Integer> minDelay = new Setting<>("MinUpdateDelay", 400, 50, 1000);
     public final Setting<Integer> maxDelay = new Setting<>("MaxUpdateDelay", 550, 100, 3000);
+    public final Setting<Integer> buyDelay = new Setting<>("BuyDelay", 800, 0, 3000);
 
     private final Timer updateTimer = new Timer();
     private final Timer reAhTimer = new Timer();
@@ -138,7 +139,7 @@ public class AutoBuy extends Module {
                             int finalSlot = slot;
                             new Thread(() -> {
                                 active = false;
-                                try {Thread.sleep((long) (800 + MathUtility.random(0, 50)));} catch (Exception ignored) {}
+                                try {Thread.sleep((long) (buyDelay.getValue() + MathUtility.random(0, 50)));} catch (Exception ignored) {}
                                 Buy(finalSlot);
                                 try {Thread.sleep(500);} catch (Exception ignored) {}
                                 active = true;
@@ -153,7 +154,7 @@ public class AutoBuy extends Module {
             } else if(mc.currentScreen.getTitle().getString().contains("Подозрительная цена")) {
                 new Thread(() -> {
                     active = false;
-                    try {Thread.sleep((long) (800 + MathUtility.random(0, 50)));} catch (Exception ignored) {}
+                    try {Thread.sleep((long) (buyDelay.getValue() + MathUtility.random(0, 50)));} catch (Exception ignored) {}
                     Buy(1);
                     try {Thread.sleep(500);} catch (Exception ignored) {}
                     active = true;
