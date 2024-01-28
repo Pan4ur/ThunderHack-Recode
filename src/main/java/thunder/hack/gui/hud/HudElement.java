@@ -4,7 +4,8 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.events.impl.EventMouse;
+import org.lwjgl.glfw.GLFW;
+import thunder.hack.events.impl.client.EventMouse;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
@@ -12,9 +13,11 @@ import thunder.hack.utility.render.Render3DEngine;
 
 public class HudElement extends Module {
     private final Setting<PositionSetting> pos = new Setting<>("Position", new PositionSetting(0.5f, 0.5f));
+
     private boolean mouseState = false, mouseButton = false;
     private float x, y, dragX, dragY;
     private int height, width;
+    public static boolean anyHovered = false;
 
     public HudElement(String name, int width, int height) {
         super(name, Category.HUD);
@@ -33,6 +36,7 @@ public class HudElement extends Module {
                 pos.getValue().setY((normaliseY() - dragY) / mc.getWindow().getScaledHeight());
             }
         }
+
         if (mouseButton) {
             if (!mouseState && isHovering()) {
                 dragX = (int) (normaliseX() - (pos.getValue().getX() * mc.getWindow().getScaledWidth()));
@@ -41,6 +45,11 @@ public class HudElement extends Module {
             }
         } else {
             mouseState = false;
+        }
+
+        if(isHovering()) {
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(), mouseState ? GLFW.glfwCreateStandardCursor(GLFW.GLFW_CROSSHAIR_CURSOR) : GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
+            anyHovered = true;
         }
     }
 
