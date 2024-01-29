@@ -54,6 +54,7 @@ public class ModuleManager implements IManager {
     public static EntityControl entityControl = new EntityControl();
     public static ElytraReplace elytraReplace = new ElytraReplace();
     public static ChorusExploit chorusExploit = new ChorusExploit();
+    public static MoreKnockback moreKnockback = new MoreKnockback();
     public static Trajectories trajectories = new Trajectories();
     public static TargetStrafe targetStrafe = new TargetStrafe();
     public static RadarRewrite radarRewrite = new RadarRewrite();
@@ -222,7 +223,6 @@ public class ModuleManager implements IManager {
     public static XRay xray = new XRay();
     public static Step step = new Step();
     public static Aura aura = new Aura();
-    public static WTap wTap = new WTap();
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
 
