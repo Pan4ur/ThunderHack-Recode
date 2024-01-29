@@ -142,7 +142,11 @@ public class TargetHud extends HudElement {
         if (target == null) return;
 
         context.getMatrices().push();
-        sizeAnimation(context.getMatrices(), getPosX() + 75 + animX.getValue(), getPosY() + 25 + animY.getValue(), animation.getAnimationd());
+        if (Mode.getValue() == ModeEn.NurikZapen && mini.getValue()) {
+            sizeAnimation(context.getMatrices(), getPosX() + 45 + animX.getValue(), getPosY() + 15 + animY.getValue(), animation.getAnimationd());
+        } else {
+            sizeAnimation(context.getMatrices(), getPosX() + 75 + animX.getValue(), getPosY() + 25 + animY.getValue(), animation.getAnimationd());
+        }
 
         if (animation.getAnimationd() > 0) {
 

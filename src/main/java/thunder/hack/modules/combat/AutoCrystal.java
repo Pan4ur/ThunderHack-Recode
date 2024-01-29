@@ -210,7 +210,6 @@ public class AutoCrystal extends Module {
             result.switchTo();
         }
 
-
         // CA Speed counter
         if (invTimer++ >= 20) {
             crystalSpeed = MathUtility.clamp(prevCrystalsAmount - InventoryUtility.getItemCount(Items.END_CRYSTAL), 0, 255);
@@ -614,7 +613,6 @@ public class AutoCrystal extends Module {
             bestPosition = null;
             return;
         }
-
         long currentTime = System.currentTimeMillis();
         List<PlaceData> list = getPossibleBlocks(target, center, range).stream().filter(data -> isSafe(data.damage, data.selfDamage, data.overrideDamage)).toList();
         bestPosition = list.isEmpty() ? null : filterPositions(list);
@@ -777,6 +775,8 @@ public class AutoCrystal extends Module {
     public @Nullable PlaceData getPlaceData(BlockPos bp, PlayerEntity target) {
         if (mc.player == null || mc.world == null) return null;
 
+        if(target.getPos().squaredDistanceTo(bp.toCenterPos().add(0,0.5,0)) > 144)
+            return null;
 
         Block base = mc.world.getBlockState(bp).getBlock();
 
@@ -794,6 +794,7 @@ public class AutoCrystal extends Module {
         Vec3d crystalVec = new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ());
 
         float damage = target == null ? 10f : ExplosionUtility.getAutoCrystalDamage(crystalVec, target);
+        if (damage < 1.5f) return null;
         float selfDamage = ExplosionUtility.getSelfExplosionDamage(crystalVec, selfPredictTicks.getValue());
         boolean overrideDamage = shouldOverrideDamage(damage, selfDamage);
 
@@ -808,7 +809,6 @@ public class AutoCrystal extends Module {
             }
         }
 
-        if (damage < 1.5f) return null;
         if (selfDamage > maxSelfDamage.getValue() && !overrideDamage) return null;
 
         BlockHitResult interactResult = getInteractResult(bp, crystalVec);
