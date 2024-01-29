@@ -115,6 +115,7 @@ public final class Aura extends Module {
     public final Setting<Boolean> Slimes = new Setting<>("Slimes", true).withParent(targets);
     public final Setting<Boolean> Projectiles = new Setting<>("Projectiles", true).withParent(targets);
     public final Setting<Boolean> ignoreInvisible = new Setting<>("IgnoreInvis", false).withParent(targets);
+    public final Setting<Boolean> ignoreTeam = new Setting<>("IgnoreTeam", false).withParent(targets);
     public final Setting<Boolean> ignoreCreative = new Setting<>("IgnoreCreative", true).withParent(targets);
     public final Setting<Boolean> ignoreShield = new Setting<>("IgnoreShield", true).withParent(targets);
     public final Setting<Boolean> onlyAngry = new Setting<>("OnlyAngryEntities", true).withParent(targets);
@@ -380,7 +381,7 @@ public final class Aura extends Module {
         if (!mc.options.jumpKey.isPressed() && mergeWithTargetStrafe && mergeWithSpeed && !onlySpace.getValue() && !autoJump.getValue())
             return true;
 
-        if (mc.player.isInLava())
+        if (mc.player.isInLava() || mc.player.isSubmergedInWater())
             return true;
 
         if (!mc.options.jumpKey.isPressed() && isAboveWater())
@@ -751,6 +752,8 @@ public final class Aura extends Module {
             if (player.isCreative() && ignoreCreative.getValue())
                 return true;
             if (player.isInvisible() && ignoreInvisible.getValue())
+                return true;
+            if(player.getTeamColorValue() == mc.player.getTeamColorValue() && ignoreTeam.getValue() && mc.player.getTeamColorValue() != 16777215)
                 return true;
         }
 
