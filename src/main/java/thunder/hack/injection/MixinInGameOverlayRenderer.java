@@ -15,19 +15,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinInGameOverlayRenderer {
     @Inject(method = "renderFireOverlay", at = @At("HEAD"), cancellable = true)
     private static void renderFireOverlayHook(MinecraftClient minecraftClient, MatrixStack matrixStack, CallbackInfo ci) {
-        if (ModuleManager.noRender.isEnabled() && NoRender.fireOverlay.getValue())
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.fireOverlay.getValue())
             ci.cancel();
     }
 
     @Inject(method = "renderUnderwaterOverlay", at = @At("HEAD"), cancellable = true)
     private static void renderUnderwaterOverlayHook(MinecraftClient minecraftClient, MatrixStack matrixStack, CallbackInfo ci) {
-        if (ModuleManager.noRender.isEnabled() && NoRender.waterOverlay.getValue() || ModuleManager.shaders.isEnabled())
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.waterOverlay.getValue() || ModuleManager.shaders.isEnabled())
             ci.cancel();
     }
 
     @Inject(method = "renderInWallOverlay", at = @At("HEAD"), cancellable = true)
     private static void renderInWallOverlayHook(Sprite sprite, MatrixStack matrices, CallbackInfo ci) {
-        if (ModuleManager.noRender.isEnabled() && NoRender.blockOverlay.getValue() || ModuleManager.shaders.isEnabled())
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.blockOverlay.getValue() || ModuleManager.shaders.isEnabled())
             ci.cancel();
     }
 }

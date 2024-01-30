@@ -2,9 +2,11 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IPlayerMoveC2SPacket;
@@ -26,7 +28,7 @@ public class NoFall extends Module {
     private thunder.hack.utility.Timer pearlCooldown = new thunder.hack.utility.Timer();
 
     private enum Mode {
-        Rubberband, Items, MatrixOffGround
+        Rubberband, Items, MatrixOffGround, Vanilla
     }
 
     private enum FallDistance {
@@ -63,7 +65,8 @@ public class NoFall extends Module {
                     doSnowDrop(snowResult, playerPos);
                 }
             }
-            if (mode.getValue() == Mode.MatrixOffGround) cancelGround = true;
+            if (mode.getValue() == Mode.MatrixOffGround || mode.getValue() == Mode.Vanilla)
+                cancelGround = true;
         }
     }
 

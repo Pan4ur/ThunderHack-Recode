@@ -37,6 +37,7 @@
     "MixinScreen",
     "MixinShaderEffect",
     "MixinShaderProgram",
+    "MixinSignBlockEntityRenderer",
     "MixinTextVisitFactory",
     "MixinTitleScreen",
     "MixinWorldRenderer",

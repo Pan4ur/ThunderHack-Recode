@@ -1,6 +1,8 @@
 package thunder.hack.modules.render;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.SignBlock;
+import net.minecraft.client.render.block.entity.SignBlockEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -9,6 +11,8 @@ import net.minecraft.entity.projectile.thrown.EggEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
+import net.minecraft.server.command.WeatherCommand;
+import net.minecraft.server.world.ServerWorld;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -27,47 +31,42 @@ public class NoRender extends Module {
         super("NoRender", Category.RENDER);
     }
 
-    public Setting<Boolean> auto = new Setting<>("Auto", false);
-    public Setting<Boolean> potions = new Setting<>("Potions", false);
-    public Setting<Boolean> xp = new Setting<>("XP", false);
-    public Setting<Boolean> arrows = new Setting<>("Arrows", false);
-    public Setting<Boolean> eggs = new Setting<>("Eggs", false);
-    public Setting<Boolean> elderGuardian = new Setting<>("Guardian", false);
-    public Setting<Boolean> vignette = new Setting<>("Vignette", true);
-    public Setting<Boolean> portal = new Setting<>("Portal", true);
-    public Setting<Boolean> explosions = new Setting<>("Explosions", false);
-    public Setting<Boolean> campFire = new Setting<>("CampFire", false);
-    public Setting<Boolean> fireworks = new Setting<>("Fireworks", false);
-    public static Setting<Boolean> armor = new Setting<>("Armor", false);
-    public static Setting<Boolean> bossbar = new Setting<>("Bossbar", false);
-    public static Setting<Boolean> fireOverlay = new Setting<>("FireOverlay", false);
-    public static Setting<Boolean> waterOverlay = new Setting<>("WaterOverlay", false);
-    public static Setting<Boolean> blockOverlay = new Setting<>("BlockOverlay", false);
-    public static Setting<Boolean> nausea = new Setting<>("Nausea", false);
-    public static Setting<Boolean> blindness = new Setting<>("Blindness", false);
-    public static Setting<Boolean> fog = new Setting<>("Fog", false);
-    public static Setting<Boolean> darkness = new Setting<>("Darkness", false);
-    public Setting<Boolean> items = new Setting<>("Items", false);
-    public Setting<Boolean> crystals = new Setting<>("Crystals", false);
-    public static Setting<Boolean> fireEntity = new Setting<>("FireEntity", true);
-    public Setting<Boolean> breakParticles = new Setting<>("BreakParticles", true);
-    public Setting<Boolean> antiTitle = new Setting<>("AntiTitle", false);
-    public Setting<Boolean> antiPlayerCollision = new Setting<>("AntiPlayerCollision", true);
-    public Setting<NoScoreBoard> noScoreBoard = new Setting<>("NoScoreBoard", NoScoreBoard.None);
-    public Setting<Float> sbX = new Setting<>("BoardX", 1.0f, 0.0f, 10.0f, v-> noScoreBoard.getValue() == NoScoreBoard.Position);
-    public Setting<Float> sbY = new Setting<>("BoardY", 1.0f, 0.0f, 10.0f, v-> noScoreBoard.getValue() == NoScoreBoard.Position);
+    public final Setting<Boolean> auto = new Setting<>("Auto", false);
+    public final Setting<Boolean> potions = new Setting<>("Potions", false);
+    public final Setting<Boolean> xp = new Setting<>("XP", false);
+    public final Setting<Boolean> arrows = new Setting<>("Arrows", false);
+    public final Setting<Boolean> eggs = new Setting<>("Eggs", false);
+    public final Setting<Boolean> elderGuardian = new Setting<>("Guardian", false);
+    public final Setting<Boolean> vignette = new Setting<>("Vignette", true);
+    public final Setting<Boolean> portal = new Setting<>("Portal", true);
+    public final Setting<Boolean> explosions = new Setting<>("Explosions", false);
+    public final Setting<Boolean> campFire = new Setting<>("CampFire", false);
+    public final Setting<Boolean> fireworks = new Setting<>("Fireworks", false);
+    public final Setting<Boolean> armor = new Setting<>("Armor", false);
+    public final Setting<Boolean> bossbar = new Setting<>("Bossbar", false);
+    public final Setting<Boolean> fireOverlay = new Setting<>("FireOverlay", false);
+    public final Setting<Boolean> waterOverlay = new Setting<>("WaterOverlay", false);
+    public final Setting<Boolean> blockOverlay = new Setting<>("BlockOverlay", false);
+    public final Setting<Boolean> nausea = new Setting<>("Nausea", false);
+    public final Setting<Boolean> blindness = new Setting<>("Blindness", false);
+    public final Setting<Boolean> fog = new Setting<>("Fog", false);
+    public final Setting<Boolean> darkness = new Setting<>("Darkness", false);
+    public final Setting<Boolean> items = new Setting<>("Items", false);
+    public final Setting<Boolean> crystals = new Setting<>("Crystals", false);
+    public final Setting<Boolean> fireEntity = new Setting<>("FireEntity", true);
+    public final Setting<Boolean> breakParticles = new Setting<>("BreakParticles", true);
+    public final Setting<Boolean> antiTitle = new Setting<>("AntiTitle", false);
+    public final Setting<Boolean> antiPlayerCollision = new Setting<>("AntiPlayerCollision", true);
+    public final Setting<Boolean> noScoreBoard = new Setting<>("NoScoreBoard", true);
+    public final Setting<Boolean> signText = new Setting<>("SignText", false);
+    public final Setting<Boolean> noWeather = new Setting<>("NoWeather", false);
 
-    public enum NoScoreBoard {
-        Off, Position, None
-    }
-
-    int potionCouter, xpCounter, arrowCounter, itemsCounter;
+    private int potionCouter, xpCounter, arrowCounter, itemsCounter;
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
-        if (e.getPacket() instanceof TitleS2CPacket && antiTitle.getValue()) {
+        if (e.getPacket() instanceof TitleS2CPacket && antiTitle.getValue())
             e.cancel();
-        }
     }
 
     @EventHandler

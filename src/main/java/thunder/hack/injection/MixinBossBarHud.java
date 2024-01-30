@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinBossBarHud {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void render(CallbackInfo ci) {
-        if (ModuleManager.noRender.isEnabled() && NoRender.bossbar.getValue()) {
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.bossbar.getValue()) {
             ci.cancel();
         }
     }

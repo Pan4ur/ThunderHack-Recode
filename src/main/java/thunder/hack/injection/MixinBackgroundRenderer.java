@@ -17,7 +17,7 @@ import thunder.hack.modules.render.WorldTweaks;
 public class MixinBackgroundRenderer {
     @Inject(method = "applyFog", at = @At("TAIL"))
     private static void onApplyFog(Camera camera, BackgroundRenderer.FogType fogType, float viewDistance, boolean thickFog, float tickDelta, CallbackInfo info) {
-        if (ModuleManager.noRender.isEnabled() && NoRender.fog.getValue()) {
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.fog.getValue()) {
             if (fogType == BackgroundRenderer.FogType.FOG_TERRAIN) {
                 RenderSystem.setShaderFogStart(viewDistance * 4);
                 RenderSystem.setShaderFogEnd(viewDistance * 4.25f);
@@ -33,6 +33,6 @@ public class MixinBackgroundRenderer {
 
     @Inject(method = "getFogModifier(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;", at = @At("HEAD"), cancellable = true)
     private static void onGetFogModifier(Entity entity, float tickDelta, CallbackInfoReturnable<Object> info) {
-        if (ModuleManager.noRender.isEnabled() && NoRender.blindness.getValue()) info.setReturnValue(null);
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.blindness.getValue()) info.setReturnValue(null);
     }
 }

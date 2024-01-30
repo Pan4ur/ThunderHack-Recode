@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DeadManager {
-    private final Map<EndCrystalEntity, Long> deadCrystals = new HashMap<>();
+    private final Map<EndCrystalEntity, Long> deadCrystals = new ConcurrentHashMap<>();
 
 
     public void reset() {
@@ -23,8 +23,9 @@ public class DeadManager {
         if(dangerous)
             removeFromWorld(delay);
 
-        if(!deadCrystals.isEmpty()) {
-            Map<EndCrystalEntity, Long> cache = new HashMap<>(deadCrystals);
+        Map<EndCrystalEntity, Long> cache = new ConcurrentHashMap<>(deadCrystals);
+
+        if(!cache.isEmpty()) {
             cache.forEach((crystal, deathTime) -> {
                 if (System.currentTimeMillis() - deathTime > ServerManager.getPing() * 3L) {
                     deadCrystals.remove(crystal);
@@ -42,7 +43,7 @@ public class DeadManager {
     }
 
     public void removeFromWorld(int removeDelay) {
-        Map<EndCrystalEntity, Long> cache = new HashMap<>(deadCrystals);
+        Map<EndCrystalEntity, Long> cache = new ConcurrentHashMap<>(deadCrystals);
         cache.forEach((c, time) -> {
             if (System.currentTimeMillis() - time >= removeDelay) {
                 c.kill();
