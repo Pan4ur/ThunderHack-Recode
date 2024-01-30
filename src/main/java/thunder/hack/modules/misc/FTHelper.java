@@ -1,9 +1,8 @@
 package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.PlayerEntityRenderer;
-import net.minecraft.entity.vehicle.BoatEntity;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
@@ -11,7 +10,6 @@ import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
-import org.apache.commons.lang3.StringUtils;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -19,7 +17,6 @@ import thunder.hack.gui.notification.Notification;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
-import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.PlayerUtility;
 
@@ -34,7 +31,7 @@ public class FTHelper extends Module {
     }
 
     public final Setting<Boolean> trueSight = new Setting<>("TrueSight", true);
-    public final Setting<Boolean> spek = new Setting<>("SpekNotification", true);
+    public final Setting<Boolean> spek = new Setting<>("SpecNotification", true);
     private final Setting<Bind> desorient = new Setting<>("Desorient", new Bind(-1, false, false));
     private final Setting<Bind> trap = new Setting<>("Trap", new Bind(-1, false, false));
 
@@ -61,8 +58,13 @@ public class FTHelper extends Module {
     public void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof GameMessageS2CPacket && spek.getValue()) {
             final GameMessageS2CPacket packet = event.getPacket();
+            ClientPlayerEntity player = MinecraftClient.getInstance().player;
+            String playerName = player.getName().toString();
+            int startIndex = playerName.indexOf("{") + 1;
+            int endIndex = playerName.indexOf("}");
             if (packet.content().getString().contains("спек")){
-                ThunderHack.notificationManager.publicity("SpekNotification", isRu() ?"Кто-то хочет чтобы за ним проследили" : "Someone wants to be followed", 3, Notification.Type.SUCCESS);
+                String nickname = playerName.substring(startIndex, endIndex);
+                ThunderHack.notificationManager.publicity("SpekNotification", isRu() ? nickname +  " хочет чтобы за ним проследили" : "Someone wants to be followed", 3, Notification.Type.WARNING);
             }
         }
     }
