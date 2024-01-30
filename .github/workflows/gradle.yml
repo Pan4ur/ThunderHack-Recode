@@ -31,10 +31,10 @@ jobs:
       - name: Remove *-sources.jar
         run: rm ./build/libs/*-sources.jar || true
 
-      - uses: "shxrklol/action-auto-releases-n20@v1.1"
+      - uses: "shxrklol/action-auto-releases-n20@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "v1.1"
+          automatic_release_tag: "latest"
           prerelease: true
           title: "Latest Build"
           files: |
