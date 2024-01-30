@@ -55,6 +55,7 @@ public class ModuleManager implements IManager {
     public static ElytraReplace elytraReplace = new ElytraReplace();
     public static ChorusExploit chorusExploit = new ChorusExploit();
     public static MoreKnockback moreKnockback = new MoreKnockback();
+    public static AntiServerAdd antiServerAdd = new AntiServerAdd();
     public static Trajectories trajectories = new Trajectories();
     public static TargetStrafe targetStrafe = new TargetStrafe();
     public static RadarRewrite radarRewrite = new RadarRewrite();

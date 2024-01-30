@@ -35,7 +35,6 @@ public class MainMenuScreen extends Screen {
     private final List<MainMenuButton> buttons = new ArrayList<>();
     public boolean confirm = false;
     public static int ticksActive;
-    private TextUtil animatedText = new TextUtil("THUNDERHACK", "HAPPY NEW YEAR!");
 
     protected MainMenuScreen() {
         super(Text.of("THMainMenuScreen"));
@@ -64,7 +63,6 @@ public class MainMenuScreen extends Screen {
     @Override
     public void tick() {
         ticksActive++;
-        animatedText.tick();
 
         if(ticksActive > 400) {
             ticksActive = 0;
@@ -96,7 +94,7 @@ public class MainMenuScreen extends Screen {
             // Smooth zone
             boolean hoveredLogo = Render2DEngine.isHovered(mouseX, mouseY, (int) (halfOfWidth - 120), (int) (halfOfHeight - 130), 210, 50);
 
-            FontRenderers.thglitchBig.drawCenteredString(context.getMatrices(), animatedText.toString(), (int) (halfOfWidth), (int) (halfOfHeight - 120), new Color(255, 255, 255, hoveredLogo ? 230 : 180).getRGB());
+            FontRenderers.thglitchBig.drawCenteredString(context.getMatrices(), "THUNDERHACK", (int) (halfOfWidth), (int) (halfOfHeight - 120), new Color(255, 255, 255, hoveredLogo ? 230 : 180).getRGB());
 
             buttons.forEach(b -> b.onRenderText(context, mouseX, mouseY));
 

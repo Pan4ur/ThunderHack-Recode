@@ -3,11 +3,15 @@ package thunder.hack.injection;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.Icons;
 import net.minecraft.client.util.MacWindowUtil;
 import net.minecraft.client.util.Window;
 import net.minecraft.resource.ResourcePack;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.system.MemoryStack;
@@ -15,6 +19,7 @@ import org.lwjgl.system.MemoryUtil;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -36,7 +41,19 @@ import java.util.List;
 import static thunder.hack.modules.Module.mc;
 
 @Mixin(MinecraftClient.class)
-public class MixinMinecraftClient {
+public abstract class MixinMinecraftClient {
+
+    @Unique
+    private String[] shittyServers = {
+            "mineblaze",
+            "musteryworld",
+            "dexland",
+            "masedworld",
+            "vimeworld",
+            "hypemc",
+            "vimemc"
+    };
+
     @Inject(method = "<init>", at = @At("TAIL"))
     void postWindowInit(RunArgs args, CallbackInfo ci) {
         try {
@@ -76,6 +93,8 @@ public class MixinMinecraftClient {
     @Shadow
     private static MinecraftClient instance;
 
+    @Shadow public abstract void setScreen(@Nullable Screen screen);
+
     @Inject(method = "onResolutionChanged", at = @At("TAIL"))
     private void captureResize(CallbackInfo ci) {
         WindowResizeCallback.EVENT.invoker().onResized((MinecraftClient) (Object) this, this.window);
@@ -85,6 +104,23 @@ public class MixinMinecraftClient {
     private void doItemPickHook(CallbackInfo ci) {
         if (ModuleManager.middleClick.isEnabled() && ModuleManager.middleClick.antiPickUp.getValue())
             ci.cancel();
+    }
+
+    @Inject(method = "setScreen", at = @At("RETURN"))
+    public void setScreenHook(Screen screen, CallbackInfo ci) {
+        if(screen instanceof MultiplayerScreen mScreen && ModuleManager.antiServerAdd.isEnabled() && mScreen.getServerList() != null) {
+            for (int i = 0; i < mScreen.getServerList().size(); i++) {
+                ServerInfo info = mScreen.getServerList().get(i);
+                for (String server : shittyServers) {
+                    if (info != null && info.address != null && info.address.toLowerCase().contains(server.toLowerCase())) {
+                        mScreen.getServerList().remove(info);
+                        mScreen.getServerList().saveFile();
+                        setScreen(screen);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/Window;setIcon(Lnet/minecraft/resource/ResourcePack;Lnet/minecraft/client/util/Icons;)V"))
