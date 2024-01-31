@@ -300,7 +300,7 @@ public class ModuleManager implements IManager {
         HudElement.anyHovered = false;
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender2D(context));
         if(!HudElement.anyHovered && !ClickUI.anyHovered)
-            GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_CURSOR_NORMAL));
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
         ThunderHack.core.onRender2D(context);
     }
 

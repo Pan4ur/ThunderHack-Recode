@@ -775,7 +775,7 @@ public class AutoCrystal extends Module {
     public @Nullable PlaceData getPlaceData(BlockPos bp, PlayerEntity target) {
         if (mc.player == null || mc.world == null) return null;
 
-        if(target.getPos().squaredDistanceTo(bp.toCenterPos().add(0,0.5,0)) > 144)
+        if(target != null && target.getPos().squaredDistanceTo(bp.toCenterPos().add(0,0.5,0)) > 144)
             return null;
 
         Block base = mc.world.getBlockState(bp).getBlock();
