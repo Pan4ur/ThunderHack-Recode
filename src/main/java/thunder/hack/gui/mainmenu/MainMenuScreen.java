@@ -15,12 +15,9 @@ import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.ThunderUtility;
-import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.MSAAFramebuffer;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.TextUtil;
 
 import java.awt.*;
 import java.net.URI;
@@ -31,7 +28,7 @@ import java.util.Locale;
 import static thunder.hack.modules.Module.mc;
 
 public class MainMenuScreen extends Screen {
-    private static final Identifier TH_LOGO = new Identifier("textures/th.png");
+    private static final Identifier TH_TEAM = new Identifier("textures/thteam.png");
     private final List<MainMenuButton> buttons = new ArrayList<>();
     public boolean confirm = false;
     public static int ticksActive;
@@ -64,7 +61,7 @@ public class MainMenuScreen extends Screen {
     public void tick() {
         ticksActive++;
 
-        if(ticksActive > 400) {
+        if (ticksActive > 400) {
             ticksActive = 0;
         }
     }
@@ -86,9 +83,8 @@ public class MainMenuScreen extends Screen {
 
         buttons.forEach(b -> b.onRender(context, mouseX, mouseY));
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.disableBlend();
+        Render2DEngine.drawHudBase(context.getMatrices(), mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40, 5, Render2DEngine.isHovered(mouseX, mouseY,mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40) ? 0.7f : 1f);
+
 
         MSAAFramebuffer.use(true, () -> {
             // Smooth zone
@@ -101,7 +97,11 @@ public class MainMenuScreen extends Screen {
             boolean hovered = Render2DEngine.isHovered(mouseX, mouseY, halfOfWidth - 50, halfOfHeight + 70, 100, 10);
 
             FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "<-- Back to default menu", halfOfWidth, halfOfHeight + 70, hovered ? -1 : Render2DEngine.applyOpacity(-1, 0.6f));
-            FontRenderers.sf_medium.drawString(context.getMatrices(), "By Pan4ur & 06ED", halfOfWidth * 2 - FontRenderers.sf_medium.getStringWidth("By Pan4ur & 06ED") - 5f, halfOfHeight * 2 - 10, Render2DEngine.applyOpacity(-1, 0.4f));
+          //  FontRenderers.sf_medium.drawString(context.getMatrices(), "By Pan4ur & 06ED", halfOfWidth * 2 - FontRenderers.sf_medium.getStringWidth("By Pan4ur & 06ED") - 5f, halfOfHeight * 2 - 10, Render2DEngine.applyOpacity(-1, 0.4f));
+
+            RenderSystem.setShaderColor(1f,1f,1f, Render2DEngine.isHovered(mouseX, mouseY,mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40) ? 0.7f : 1f);
+            context.drawTexture(TH_TEAM, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40, 0, 0, 40, 40, 40, 40);
+            RenderSystem.setShaderColor(1f,1f,1f,1f);
 
             int offsetY = 10;
             for (String change : ThunderUtility.changeLog) {
@@ -141,6 +141,9 @@ public class MainMenuScreen extends Screen {
             mc.setScreen(new TitleScreen());
             confirm = false;
         }
+
+        if(Render2DEngine.isHovered(mouseX, mouseY,mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40))
+            mc.setScreen(CreditsScreen.getInstance());
 
         if (Render2DEngine.isHovered(mouseX, mouseY, (int) (halfOfWidth - 157), (int) (halfOfHeight - 140), 300, 70))
             Util.getOperatingSystem().open(URI.create("https://thunderhack.onrender.com/"));
