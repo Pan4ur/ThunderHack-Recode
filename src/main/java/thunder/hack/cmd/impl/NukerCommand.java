@@ -8,23 +8,21 @@ import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.SearchArgumentType;
-import thunder.hack.modules.render.Search;
+import thunder.hack.modules.misc.Nuker;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
-public class SearchCommand extends Command {
-    public SearchCommand() {
-        super("search");
+public class NukerCommand extends Command {
+    public NukerCommand() {
+        super("nuker");
     }
 
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("reset").executes(context -> {
-            Search.defaultBlocks.clear();
-            sendMessage("Search got reset.");
-
-            mc.worldRenderer.reload();
+            Nuker.selectedBlocks.clear();
+            sendMessage("Nuker got reset.");
             return SINGLE_SUCCESS;
         }));
 
@@ -33,13 +31,11 @@ public class SearchCommand extends Command {
 
             Block result = getRegisteredBlock(blockName);
             if(result != null){
-                Search.defaultBlocks.add(result);
-                sendMessage(Formatting.GREEN + blockName + (isRu() ? " добавлен в Search" : " added to Search"));
+                Nuker.selectedBlocks.add(result);
+                sendMessage(Formatting.GREEN + blockName + (isRu() ? " добавлен в Nuker" : " added to Nuker"));
             } else {
                 sendMessage(Formatting.RED + (isRu() ? "Такого блока нет!" : "There is no such block!"));
             }
-
-            mc.worldRenderer.reload();
 
             return SINGLE_SUCCESS;
         })));
@@ -49,24 +45,22 @@ public class SearchCommand extends Command {
 
             Block result = getRegisteredBlock(blockName);
             if(result != null){
-                Search.defaultBlocks.remove(result);
-                sendMessage(Formatting.GREEN + blockName + (isRu() ? " удален из Search" : " removed from Search"));
+                Nuker.selectedBlocks.remove(result);
+                sendMessage(Formatting.GREEN + blockName + (isRu() ? " удален из Nuker" : " removed from Nuker"));
             } else {
                 sendMessage(Formatting.RED + (isRu() ? "Такого блока нет!" : "There is no such block!"));
             }
-
-            mc.worldRenderer.reload();
 
             return SINGLE_SUCCESS;
         })));
 
         builder.executes(context -> {
-            if (Search.defaultBlocks.isEmpty()) {
-                sendMessage("Search list empty");
+            if (Nuker.selectedBlocks.isEmpty()) {
+                sendMessage("Nuker list empty");
             } else {
-                StringBuilder f = new StringBuilder("Search list: ");
+                StringBuilder f = new StringBuilder("Nuker list: ");
 
-                for (Block name :  Search.defaultBlocks)
+                for (Block name :  Nuker.selectedBlocks)
                     try {
                         f.append(name.getTranslationKey().replace("block.minecraft.","")).append(", ");
                     } catch (Exception ignored) {

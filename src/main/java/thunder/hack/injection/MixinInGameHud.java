@@ -40,7 +40,7 @@ import static thunder.hack.modules.Module.mc;
 public abstract class MixinInGameHud {
 
     @Inject(at = @At(value = "HEAD"), method = "render")
-    public void render(DrawContext context, float tickDelta, CallbackInfo ci) {
+    public void renderHook(DrawContext context, float tickDelta, CallbackInfo ci) {
         ThunderHack.moduleManager.onRenderShaders(context);
         ThunderHack.notificationManager.onRenderShader(context);
 
