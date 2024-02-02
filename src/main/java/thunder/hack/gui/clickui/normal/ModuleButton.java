@@ -10,6 +10,7 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractButton;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.clickui.impl.*;
+import thunder.hack.gui.clickui.small.SmallClickUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.TargetHud;
 import thunder.hack.modules.Module;
@@ -73,6 +74,7 @@ public class ModuleButton extends AbstractButton {
             if (!prevHovered)
                 ModuleManager.soundFX.playScroll();
             ClickUI.currentDescription = I18n.translate(module.getDescription());
+            SmallClickUI.currentDescription = I18n.translate(module.getDescription());
         }
 
         prevHovered = hovered;

@@ -73,6 +73,7 @@ public class ModuleButton extends AbstractButton {
             if (!prevHovered)
                 ModuleManager.soundFX.playScroll();
             ClickUI.currentDescription = I18n.translate(module.getDescription());
+            SmallClickUI.currentDescription = I18n.translate(module.getDescription());
         }
 
         prevHovered = hovered;

@@ -5,6 +5,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.common.KeepAliveC2SPacket;
 import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -23,9 +24,12 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
+
 public class Blink extends Module {
     private final Setting<Boolean> pulse = new Setting<>("Pulse", false);
     private final Setting<Boolean> autoDisable = new Setting<>("AutoDisable", false);
+    private final Setting<Boolean> disableOnVelocity = new Setting<>("DisableOnVelocity", false);
     private final Setting<Integer> disablePackets = new Setting<>("DisablePackets", 17, 1, 1000, v-> autoDisable.getValue() );
     private final Setting<Integer> pulsePackets = new Setting<>("PulsePackets", 20, 1, 1000, v-> pulse.getValue());
     private final Setting<Boolean> render = new Setting<>("Render", true);
@@ -77,6 +81,12 @@ public class Blink extends Module {
     @Override
     public String getDisplayInfo() {
         return Integer.toString(storedPackets.size());
+    }
+
+    @EventHandler
+    public void onPacketReceive(PacketEvent.Receive event) {
+        if(event.getPacket() instanceof EntityVelocityUpdateS2CPacket vel && vel.getId() == mc.player.getId() && disableOnVelocity.getValue())
+            disable(isRu() ? "Выключенно из-за велосити!" : "Disabled due to velocity!");
     }
 
     @EventHandler

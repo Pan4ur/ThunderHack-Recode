@@ -14,7 +14,9 @@ public class NoSlow extends Module {
 
     public static final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
     private final Setting<Boolean> mainHand = new Setting<>("MainHand", true, v -> mode.getValue() == Mode.Grim || mode.getValue() == Mode.MusteryGrief);
-    private boolean returnSneak, skip;
+    private final Setting<Boolean> onlyFood = new Setting<>("OnlyFood", false);
+
+    private boolean returnSneak;
 
     @Override
     public void onUpdate() {
@@ -61,10 +63,13 @@ public class NoSlow extends Module {
                     else mc.player.setVelocity(mc.player.getVelocity().x * 0.95f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.95f);
                 }
             }
-        } else skip = false;
+        }
     }
 
     public boolean canNoSlow() {
+        if(onlyFood.getValue() && !mc.player.getActiveItem().isFood())
+            return false;
+
         if (mode.getValue() == Mode.MusteryGrief && mc.player.isOnGround() && !mc.options.jumpKey.isPressed())
             return false;
 
