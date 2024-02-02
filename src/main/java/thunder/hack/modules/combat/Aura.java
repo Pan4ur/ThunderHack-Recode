@@ -182,11 +182,11 @@ public final class Aura extends Module {
 
         if (!mc.options.jumpKey.isPressed() && mc.player.isOnGround() && autoJump.getValue())
             mc.player.jump();
-
-        calcRotations(autoCrit());
         
         boolean readyForAttack = autoCrit() && (lookingAtHitbox || skipRayTraceCheck());
 
+        calcRotations(autoCrit());
+        
         if (readyForAttack) {
             if (shieldBreaker(false))
                 return;
