@@ -94,7 +94,8 @@ public class NoSlow extends Module {
         if (!mainHand.getValue() && mc.player.getActiveHand() == Hand.MAIN_HAND)
             return false;
 
-        if (mc.player.getOffHandStack().isFood() && (mode.getValue() == Mode.FunTime || mode.getValue() == Mode.Grim) && mc.player.getActiveHand() == Hand.MAIN_HAND)
+        if ((mc.player.getOffHandStack().isFood() || mc.player.getOffHandStack().getItem() == Items.CROSSBOW || mc.player.getOffHandStack().getItem() == Items.BOW || mc.player.getOffHandStack().getItem() == Items.TRIDENT || mc.player.getOffHandStack().getItem() == Items.SHIELD)
+                && (mode.getValue() == Mode.FunTime || mode.getValue() == Mode.Grim) && mc.player.getActiveHand() == Hand.MAIN_HAND)
             return false;
 
         return true;

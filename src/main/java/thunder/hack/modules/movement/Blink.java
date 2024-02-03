@@ -3,6 +3,7 @@ package thunder.hack.modules.movement;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.network.packet.c2s.common.CommonPongC2SPacket;
 import net.minecraft.network.packet.c2s.common.KeepAliveC2SPacket;
 import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
@@ -48,8 +49,12 @@ public class Blink extends Module {
     }
 
     private PlayerEntityCopy blinkPlayer;
-    private Vec3d lastPos = new Vec3d(0, 0, 0);
+    private Vec3d lastPos = Vec3d.ZERO;
+    private Vec3d prevVelocity = Vec3d.ZERO;
+    private float prevYaw = 0;
+    private boolean prevSprinting = false;
     private final Queue<Packet<?>> storedPackets = new LinkedList<>();
+    private final Queue<Packet<?>> storedTransactions = new LinkedList<>();
     private final AtomicBoolean sending = new AtomicBoolean(false);
 
     public Blink() {
@@ -66,7 +71,11 @@ public class Blink extends Module {
             return;
         }
 
+        storedTransactions.clear();
         lastPos = mc.player.getPos();
+        prevVelocity = mc.player.getVelocity();
+        prevYaw = mc.player.getYaw();
+        prevSprinting = mc.player.isSprinting();
         mc.world.spawnEntity(new ClientPlayerEntity(mc, mc.world, mc.getNetworkHandler(), mc.player.getStatHandler(), mc.player.getRecipeBook(), mc.player.lastSprinting, mc.player.isSneaking()));
         sending.set(false);
         storedPackets.clear();
@@ -102,6 +111,10 @@ public class Blink extends Module {
             return;
         }
 
+        if(packet instanceof CommonPongC2SPacket) {
+            storedTransactions.add(packet);
+        }
+
         if (pulse.getValue()) {
             if (packet instanceof PlayerMoveC2SPacket) {
                 event.cancel();
@@ -120,6 +133,15 @@ public class Blink extends Module {
         if(isKeyPressed(cancel)) {
             storedPackets.clear();
             mc.player.setPos(lastPos.getX(), lastPos.getY(), lastPos.getZ());
+            mc.player.setVelocity(prevVelocity);
+            mc.player.setYaw(prevYaw);
+            mc.player.setSprinting(prevSprinting);
+            mc.player.setSneaking(false);
+            mc.options.sneakKey.setPressed(false);
+            sending.set(true);
+            while (!storedTransactions.isEmpty())
+                sendPacket(storedTransactions.poll());
+            sending.set(false);
             disable(isRu() ? "Отменяю.." : "Canceling..");
             return;
         }

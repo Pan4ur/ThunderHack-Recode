@@ -22,11 +22,11 @@ public class NoFall extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Rubberband);
     public final Setting<FallDistance> fallDistance = new Setting<>("FallDistance", FallDistance.Calc);
     public final Setting<Integer> fallDistanceValue = new Setting<>("FallDistanceVal", 10, 2, 100, v -> fallDistance.getValue() == FallDistance.Custom);
-    private final Setting<Boolean> powderSnowBucket = new Setting<>("POWDER_SNOW_BUCKET", true, v -> mode.getValue() == Mode.Items);
-    private final Setting<Boolean> waterBucket = new Setting<>("WaterBukkit", true, v -> mode.getValue() == Mode.Items);
+    private final Setting<Boolean> powderSnowBucket = new Setting<>("PowderSnowBucket", true, v -> mode.getValue() == Mode.Items);
+    private final Setting<Boolean> waterBucket = new Setting<>("WaterBucket", true, v -> mode.getValue() == Mode.Items);
     private final Setting<Boolean> enderPearl = new Setting<>("EnderPearl", true, v -> mode.getValue() == Mode.Items);
     private final Setting<Boolean> cobweb = new Setting<>("Cobweb", true, v -> mode.getValue() == Mode.Items);
-    private final Setting<Boolean> twistingVines = new Setting<>("TwistingWines", true, v -> mode.getValue() == Mode.Items);
+    private final Setting<Boolean> twistingVines = new Setting<>("TwistingVines", true, v -> mode.getValue() == Mode.Items);
 
     private thunder.hack.utility.Timer pearlCooldown = new thunder.hack.utility.Timer();
 
