@@ -6,10 +6,13 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.common.KeepAliveC2SPacket;
 import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.PlayerEntityCopy;
@@ -27,6 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class Blink extends Module {
+
     private final Setting<Boolean> pulse = new Setting<>("Pulse", false);
     private final Setting<Boolean> autoDisable = new Setting<>("AutoDisable", false);
     private final Setting<Boolean> disableOnVelocity = new Setting<>("DisableOnVelocity", false);
@@ -35,6 +39,7 @@ public class Blink extends Module {
     private final Setting<Boolean> render = new Setting<>("Render", true);
     private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Circle, value -> render.getValue());
     private final Setting<ColorSetting> circleColor = new Setting<>("Color", new ColorSetting(0xFFda6464, true), value -> render.getValue() && renderMode.getValue() == RenderMode.Circle || renderMode.getValue() == RenderMode.Both);
+    private final Setting<Bind> cancel = new Setting<>("Cancel", new Bind(GLFW.GLFW_KEY_LEFT_SHIFT, false, false));
 
     private enum RenderMode {
         Circle,
@@ -46,8 +51,6 @@ public class Blink extends Module {
     private Vec3d lastPos = new Vec3d(0, 0, 0);
     private final Queue<Packet<?>> storedPackets = new LinkedList<>();
     private final AtomicBoolean sending = new AtomicBoolean(false);
-
-    private Packet<?> lastPacket;
 
     public Blink() {
         super("Blink", Category.MOVEMENT);
@@ -113,6 +116,13 @@ public class Blink extends Module {
     @EventHandler
     public void onUpdate(EventTick event) {
         if (fullNullCheck()) return;
+
+        if(isKeyPressed(cancel)) {
+            storedPackets.clear();
+            mc.player.setPos(lastPos.getX(), lastPos.getY(), lastPos.getZ());
+            disable(isRu() ? "Отменяю.." : "Canceling..");
+            return;
+        }
 
         if (pulse.getValue()) {
             if (storedPackets.size() >= pulsePackets.getValue()) {

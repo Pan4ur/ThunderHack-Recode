@@ -68,6 +68,7 @@ public abstract class MixinMinecraftClient {
             FontRenderers.sf_medium_mini = FontRenderers.createDefault(12f, "sf_medium");
             FontRenderers.sf_medium_modules = FontRenderers.createDefault(14f, "sf_medium");
             FontRenderers.sf_bold_mini = FontRenderers.createDefault(14f, "sf_bold");
+            FontRenderers.sf_bold_micro = FontRenderers.createDefault(12f, "sf_bold");
             FontRenderers.icons = FontRenderers.createIcons(20);
             FontRenderers.mid_icons = FontRenderers.createIcons(46f);
             FontRenderers.big_icons = FontRenderers.createIcons(72f);

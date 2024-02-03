@@ -13,6 +13,7 @@ import thunder.hack.utility.render.animation.BetterAnimation;
 
 import java.awt.*;
 
+import static thunder.hack.gui.notification.NotificationManager.isDefault;
 import static thunder.hack.modules.Module.mc;
 
 public class Notification {
@@ -37,13 +38,13 @@ public class Notification {
             default -> icon = "H";
         }
 
-        width = ModuleManager.notifications.mode.getValue() == Notifications.Mode.Default ? FontRenderers.settings.getStringWidth(message) + 38f : FontRenderers.settings.getStringWidth(title + " " + message) + 22f;
-        height = ModuleManager.notifications.mode.getValue() == Notifications.Mode.Default ? 25 : 16;
+        width = isDefault() ? FontRenderers.sf_bold_mini.getStringWidth(message) + 38f : FontRenderers.sf_bold_micro.getStringWidth(title + " " + message) + 20f;
+        height = isDefault() ? 25 : 13;
 
-        animation = new BetterAnimation(ModuleManager.notifications.mode.getValue() == Notifications.Mode.Default ? 10 : 20);
+        animation = new BetterAnimation(isDefault() ? 10 : 20);
 
         animationX = width;
-        if (ModuleManager.notifications.mode.getValue() == Notifications.Mode.Default)
+        if (isDefault())
             y = mc.getWindow().getScaledHeight() - height;
         else y = mc.getWindow().getScaledHeight() / 2f + 10;
     }
@@ -52,7 +53,7 @@ public class Notification {
         int animatedAlpha = (int) MathUtility.clamp((1 - animation.getAnimationd()) * 255, 0, 255);
         Color color = new Color(170, 170, 170, animatedAlpha);
 
-        if (ModuleManager.notifications.mode.getValue() == Notifications.Mode.Default) {
+        if (isDefault()) {
             direction = isFinished();
             animationX = (float) (width * animation.getAnimationd());
 
@@ -70,10 +71,10 @@ public class Notification {
             animationX = (float) (width * animation.getAnimationd());
             y = animate(y, getY);
             float x = mc.getWindow().getScaledWidth() / 2f - width / 2f;
-            Render2DEngine.verticalGradient(matrix, x + 14, y + 1, x + 14.5f, y + 7, Render2DEngine.injectAlpha(color, 0), Render2DEngine.injectAlpha(color, animatedAlpha));
-            Render2DEngine.verticalGradient(matrix, x + 14, y + 7, x + 14.5f, y + 14, Render2DEngine.injectAlpha(color, animatedAlpha), Render2DEngine.injectAlpha(color, 0));
-            FontRenderers.sf_bold_mini.drawString(matrix, title + " " + message, x + 17, y + 6, color.getRGB());
-            FontRenderers.icons.drawString(matrix, icon, x + 4, y + 7, color.getRGB());
+            Render2DEngine.verticalGradient(matrix, x + 13, y + 1, x + 13.5f, y + 6, Render2DEngine.injectAlpha(color, 0), Render2DEngine.injectAlpha(color, animatedAlpha));
+            Render2DEngine.verticalGradient(matrix, x + 13, y + 6, x + 13.5f, y + 11, Render2DEngine.injectAlpha(color, animatedAlpha), Render2DEngine.injectAlpha(color, 0));
+            FontRenderers.sf_bold_micro.drawString(matrix, title + " " + message, x + 16, y + 5, color.getRGB());
+            FontRenderers.icons.drawString(matrix, icon, x + 3, y + 5.5f, color.getRGB());
         }
     }
 
@@ -85,8 +86,8 @@ public class Notification {
         direction = isFinished();
         animationX = (float) (width * animation.getAnimationd());
         y = animate(y, getY);
-        Render2DEngine.drawHudBase(matrix, ModuleManager.notifications.mode.getValue() == Notifications.Mode.Default ? mc.getWindow().getScaledWidth() - 6 - width + animationX : mc.getWindow().getScaledWidth() / 2f - width / 2f,
-                y, width, height, 5f, (float) MathUtility.clamp((1 - animation.getAnimationd()), 0f, 1f));
+        Render2DEngine.drawHudBase(matrix, isDefault() ? mc.getWindow().getScaledWidth() - 6 - width + animationX : mc.getWindow().getScaledWidth() / 2f - width / 2f,
+                y, width, height, isDefault() ? 5f : 3f, (float) MathUtility.clamp((1 - animation.getAnimationd()), 0f, 1f));
     }
 
     private boolean isFinished() {

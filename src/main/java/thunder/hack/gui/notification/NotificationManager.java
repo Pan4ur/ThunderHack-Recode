@@ -12,7 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static thunder.hack.modules.Module.mc;
 
 public class NotificationManager {
-    private final List<Notification> notifications = new CopyOnWriteArrayList<>();
+    public final List<Notification> notifications = new CopyOnWriteArrayList<>();
 
     public void publicity(String title, String content, int second, Notification.Type type) {
         if(ModuleManager.notifications.mode.getValue() == Notifications.Mode.Text)
@@ -26,13 +26,13 @@ public class NotificationManager {
         if (notifications.size() > 8)
             notifications.remove(0);
 
-        float startY = ModuleManager.notifications.mode.getValue() == Notifications.Mode.Default ? mc.getWindow().getScaledHeight() - 36f : mc.getWindow().getScaledHeight() / 2f + 15;
+        float startY = isDefault() ? mc.getWindow().getScaledHeight() - 36f : mc.getWindow().getScaledHeight() / 2f + 25;
 
         for (int i = 0; i < notifications.size(); i++) {
             Notification notification = notifications.get(i);
             notifications.removeIf(Notification::shouldDelete);
-            notification.render(event.getMatrices(), startY);
-            startY = (float) (ModuleManager.notifications.mode.getValue() == Notifications.Mode.Default ? startY - notification.getHeight() - 3: startY + notification.getHeight() + 3);
+            notification.render(event.getMatrices(), startY  + (isDefault() ? 0 : notifications.size() * 16));
+            startY = (float) (startY - notification.getHeight() - 3f);
         }
     }
 
@@ -44,11 +44,15 @@ public class NotificationManager {
     public void onRenderShader(DrawContext context) {
         if (!ModuleManager.notifications.isEnabled()) return;
 
-        float startY = ModuleManager.notifications.mode.getValue() == Notifications.Mode.Default ? mc.getWindow().getScaledHeight() - 36f : mc.getWindow().getScaledHeight() / 2f + 15;
+        float startY = isDefault() ? mc.getWindow().getScaledHeight() - 36f : mc.getWindow().getScaledHeight() / 2f + 25;
 
         for (Notification notification : notifications) {
-            notification.renderShaders(context.getMatrices(), startY);
-            startY = (float) (ModuleManager.notifications.mode.getValue() == Notifications.Mode.Default ? startY - notification.getHeight() - 3 : startY + notification.getHeight() + 3);
+            notification.renderShaders(context.getMatrices(), startY  + (isDefault() ? 0 : notifications.size() * 16));
+            startY = (float) (startY - notification.getHeight() - 3f);
         }
+    }
+
+    public static boolean isDefault() {
+        return ModuleManager.notifications.mode.getValue() == Notifications.Mode.Default;
     }
 }

@@ -19,6 +19,7 @@ public class FontRenderers {
     public static FontAdapter monsterrat;
     public static FontAdapter sf_bold;
     public static FontAdapter sf_bold_mini;
+    public static FontAdapter sf_bold_micro;
     public static FontAdapter sf_medium;
     public static FontAdapter sf_medium_mini;
     public static FontAdapter sf_medium_modules;

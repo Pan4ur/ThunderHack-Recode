@@ -1,10 +1,12 @@
 package thunder.hack.modules.movement;
 
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.player.PlayerUtility;
 
 public class NoSlow extends Module {
@@ -12,9 +14,17 @@ public class NoSlow extends Module {
         super("NoSlow", Category.MOVEMENT);
     }
 
-    public static final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
-    private final Setting<Boolean> mainHand = new Setting<>("MainHand", true, v -> mode.getValue() == Mode.Grim || mode.getValue() == Mode.MusteryGrief);
-    private final Setting<Boolean> onlyFood = new Setting<>("OnlyFood", false);
+    public final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
+    private final Setting<Boolean> mainHand = new Setting<>("MainHand", true);
+    private final Setting<Parent> selection = new Setting<>("Selection", new Parent(false, 0));
+    private final Setting<Boolean> food = new Setting<>("Food", true).withParent(selection);
+    private final Setting<Boolean> projectiles = new Setting<>("Projectiles", true).withParent(selection);
+    private final Setting<Boolean> shield = new Setting<>("Shield", true).withParent(selection);
+    public final Setting<Boolean> soulSand = new Setting<>("SoulSand", true).withParent(selection);
+    public final Setting<Boolean> honey = new Setting<>("Honey", true).withParent(selection);
+    public final Setting<Boolean> slime = new Setting<>("Slime", true).withParent(selection);
+    public final Setting<Boolean> ice = new Setting<>("Ice", true).withParent(selection);
+    public final Setting<Boolean> sweetBerryBush = new Setting<>("SweetBerryBush", true).withParent(selection);
 
     private boolean returnSneak;
 
@@ -60,23 +70,31 @@ public class NoSlow extends Module {
                     if (mc.player.isOnGround())
                         if (mc.player.age % 2 == 0)
                             mc.player.setVelocity(mc.player.getVelocity().x * 0.5f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.5f);
-                    else mc.player.setVelocity(mc.player.getVelocity().x * 0.95f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.95f);
+                        else
+                            mc.player.setVelocity(mc.player.getVelocity().x * 0.95f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.95f);
                 }
             }
         }
     }
 
     public boolean canNoSlow() {
-        if(onlyFood.getValue() && !mc.player.getActiveItem().isFood())
+        if (!food.getValue() && mc.player.getActiveItem().isFood())
+            return false;
+
+        if (!shield.getValue() && mc.player.getActiveItem().getItem() == Items.SHIELD)
+            return false;
+
+        if (!projectiles.getValue()
+                && (mc.player.getActiveItem().getItem() == Items.CROSSBOW || mc.player.getActiveItem().getItem() == Items.BOW || mc.player.getActiveItem().getItem() == Items.TRIDENT))
             return false;
 
         if (mode.getValue() == Mode.MusteryGrief && mc.player.isOnGround() && !mc.options.jumpKey.isPressed())
             return false;
 
         if (!mainHand.getValue() && mc.player.getActiveHand() == Hand.MAIN_HAND)
-            return mode.getValue() != Mode.MusteryGrief && mode.getValue() != Mode.Grim && mode.getValue() != Mode.FunTime;
+            return false;
 
-        if(mc.player.getOffHandStack().isFood() && mode.getValue() == Mode.FunTime && mc.player.getActiveHand() == Hand.MAIN_HAND)
+        if (mc.player.getOffHandStack().isFood() && (mode.getValue() == Mode.FunTime || mode.getValue() == Mode.Grim) && mc.player.getActiveHand() == Hand.MAIN_HAND)
             return false;
 
         return true;
