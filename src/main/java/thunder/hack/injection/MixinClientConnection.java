@@ -37,6 +37,7 @@ public class MixinClientConnection {
 
     @Inject(method = "send(Lnet/minecraft/network/packet/Packet;)V", at = @At("HEAD"),cancellable = true)
     private void onSendPacketPre(Packet<?> packet, CallbackInfo info) {
+        if(Module.fullNullCheck()) return;
         PacketEvent.Send event = new PacketEvent.Send(packet);
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) info.cancel();
@@ -44,6 +45,7 @@ public class MixinClientConnection {
 
     @Inject(method = "send(Lnet/minecraft/network/packet/Packet;)V", at = @At("RETURN"),cancellable = true)
     private void onSendPacketPost(Packet<?> packet, CallbackInfo info) {
+        if(Module.fullNullCheck()) return;
         PacketEvent.SendPost event = new PacketEvent.SendPost(packet);
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) info.cancel();

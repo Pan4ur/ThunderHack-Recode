@@ -8,6 +8,7 @@ import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.AbstractWindow;
+import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.clickui.normal.ModuleWindow;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
@@ -60,6 +61,8 @@ public class HudEditorGui extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        ClickUI.anyHovered = false;
+
         for (AbstractWindow window : windows) {
             if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 264)) {
                 window.setY(window.getY() + 2);

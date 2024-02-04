@@ -61,7 +61,7 @@ public class BooleanParentElement extends AbstractElement {
         Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 36), (float) (y + height / 2 - 4), 15, 8, 4, paddingX > 4 ? color : new Color(0xFFB2B1B1));
         Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 35 + paddingX), (float) (y + height / 2 - 3), 6, 6, 3, new Color(-1));
 
-        if(hovered) {
+        if(Render2DEngine.isHovered(mouseX, mouseY, (x + width - 36), (float) (y + height / 2 - 4), 15, 8)) {
             GLFW.glfwSetCursor(mc.getWindow().getHandle(),
                     GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
             ClickUI.anyHovered = true;

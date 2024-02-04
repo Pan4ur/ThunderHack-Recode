@@ -1,212 +1,362 @@
-// Merry Christmas! by @paulofalcao
 #version 150
+
+precision highp float;
 
 uniform vec2 uSize;
 uniform float Time;
-
 out vec4 fragColor;
 
-float PI=3.14159265;
+// "Dying Universe" by Martijn Steinrucken aka BigWings - 2015
+// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+// Email:countfrolic@gmail.com Twitter:@The_ArtOfCode
 
-vec2 ObjUnion(vec2 obj0,vec2 obj1){
-    if (obj0.x<obj1.x)
-    return obj0;
-    else
-    return obj1;
+vec4 COOLCOLOR = vec4(1.,.5,0.,0.);
+vec4 HOTCOLOR = vec4(0.,0.1,1.,1.);
+
+vec4 MIDCOLOR = vec4(0.5,0.3,0.,1.);
+float STARSIZE = 0.03;
+#define NUM_STARS 100
+#define NUM_BOUNCES 6
+#define FLOOR_REFLECT
+
+#define saturate(x) clamp(x,0.,1.)
+float DistSqr(vec3 a, vec3 b) { vec3 D=a-b; return dot(D, D); }
+float dist2(vec2 P0, vec2 P1) { vec2 D=P1-P0; return dot(D,D); }
+
+const vec3 up = vec3(0.,1.,0.);
+const float pi = 3.141592653589793238;
+const float twopi = 6.283185307179586;
+float time;
+
+struct ray {
+    vec3 o;
+    vec3 d;
+};
+ray e;				// the eye ray
+
+struct camera {
+    vec3 p;			// the position of the camera
+    vec3 forward;	// the camera forward vector
+    vec3 left;		// the camera left vector
+    vec3 up;		// the camera up vector
+
+    vec3 center;	// the center of the screen, in world coords
+    vec3 i;			// where the current ray intersects the screen, in world coords
+    ray ray;		// the current ray: from cam pos, through current uv projected on screen
+    vec3 lookAt;	// the lookat point
+    float zoom;		// the zoom factor
+};
+camera cam;
+
+void CameraSetup(vec2 uv, vec3 position, vec3 lookAt, float zoom) {
+
+    cam.p = position;
+    cam.lookAt = lookAt;
+    cam.forward = normalize(cam.lookAt-cam.p);
+    cam.left = cross(up, cam.forward);
+    cam.up = cross(cam.forward, cam.left);
+    cam.zoom = zoom;
+
+    cam.center = cam.p+cam.forward*cam.zoom;
+    cam.i = cam.center+cam.left*uv.x+cam.up*uv.y;
+
+    cam.ray.o = cam.p;						// ray origin = camera position
+    cam.ray.d = normalize(cam.i-cam.p);	// ray direction is the vector from the cam pos through the point on the imaginary screen
 }
 
-vec3 sim(vec3 p,float s){
-    vec3 ret=p;
-    ret=p+s/2.0;
-    ret=fract(ret/s)*s-s/2.0;
-    return ret;
+vec4 Noise401( vec4 x ) { return fract(sin(x)*5346.1764); }
+vec4 Noise4( vec4 x ) { return fract(sin(x)*5346.1764)*2. - 1.; }
+float Noise101( float x ) { return fract(sin(x)*5346.1764); }
+
+float hash( float n ) { return fract(sin(n)*753.5453123); }
+float noise( in vec3 x )
+{
+    vec3 p = floor(x);
+    vec3 f = fract(x);
+    f = f*f*(3.0-2.0*f);
+
+    float n = p.x + p.y*157.0 + 113.0*p.z;
+    return mix(mix(mix( hash(n+  0.0), hash(n+  1.0),f.x),
+    mix( hash(n+157.0), hash(n+158.0),f.x),f.y),
+    mix(mix( hash(n+113.0), hash(n+114.0),f.x),
+    mix( hash(n+270.0), hash(n+271.0),f.x),f.y),f.z);
+}
+const mat3 m = mat3( 0.00,  0.80,  0.60,
+-0.80,  0.36, -0.48,
+-0.60, -0.48,  0.64 );
+
+
+float PeriodicPulse(float x, float p) {
+    // pulses from 0 to 1 with a period of 2 pi
+    // increasing p makes the pulse sharper
+    return pow((cos(x+sin(x))+1.)/2., p);
 }
 
-vec2 rot(vec2 p,float r){
-    vec2 ret;
-    ret.x=p.x*cos(r)-p.y*sin(r);
-    ret.y=p.x*sin(r)+p.y*cos(r);
-    return ret;
+float SlantedCosine(float x) {
+    // its a cosine.. but skewed so that it rises slowly and drops quickly
+    // if anyone has a better function for this i'd love to hear about it
+    x -= 3.55;	// shift the phase so its in line with a cosine
+    return cos(x-cos(x)*0.5);
 }
 
-vec2 rotsim(vec2 p,float s){
-    vec2 ret=p;
-    ret=rot(p,-PI/(s*2.0));
-    ret=rot(p,floor(atan(ret.x,ret.y)/PI*s)*(PI/s));
-    return ret;
+vec3 ClosestPoint(ray r, vec3 p) {
+    // returns the closest point on ray r to point p
+    return r.o + max(0., dot(p-r.o, r.d))*r.d;
 }
 
-float rnd(vec2 v){
-    return sin((sin(((v.y-1453.0)/(v.x+1229.0))*23232.124))*16283.223)*0.5+0.5;
+
+
+float BounceFast(float t) {
+    // Precomputed bounced interpolation
+    // 2 bounces, decay of 0.3
+
+    t *= 2.695445115; // comment out if you don't need t normalized
+
+    float a1 = 1.-t*t;
+    t -= 1.5477225575; // 1 + sqrt(0.3)
+    float a2 = 0.3-t*t;
+    t -= 0.8477225575; // sqrt(0.3) + sqrt(0.09)
+    float a3 = 0.09-t*t;
+
+    return max(max(a1, a2), max(a3, 0.));
 }
 
-float noise(vec2 v){
-    vec2 v1=floor(v);
-    vec2 v2=smoothstep(0.0,1.0,fract(v));
-    float n00=rnd(v1);
-    float n01=rnd(v1+vec2(0,1));
-    float n10=rnd(v1+vec2(1,0));
-    float n11=rnd(v1+vec2(1,1));
-    return mix(mix(n00,n01,v2.y),mix(n10,n11,v2.y),v2.x);
-}
+#define NUM_ARCS NUM_BOUNCES+1
+float Bounce(float t, float decay) {
+    // Returns a bounced interpolation
+    // t = time
+    //     start of bounce is 0
+    //     end of bounce depends on number of bounces and decay param
+    // decay = how much lower each successive bounce is
+    //		0 = there is no bounce at all
+    //		0.5 = each successive bounce is half as high as the previous one
+    //		1 = there is no energy loss, it would bounce forever
 
-//Util End
 
+    float height = 1.;
+    float halfWidth=1.;
+    float previousHalf = 1.;
 
-//Scene Start
+    float y = 1.-t*t;
 
-//Floor
-vec2 obj0(in vec3 p){
-    if (p.y<0.4)
-    p.y+=sin(p.x)*0.4*cos(p.z)*0.4;
-    return vec2(p.y,0);
-}
-
-vec3 obj0_c(vec3 p){
-    float f=
-    noise(p.xz)*0.5+
-    noise(p.xz*2.0+13.45)*0.25+
-    noise(p.xz*4.0+23.45)*0.15;
-    float pc=min(max(1.0/length(p.xz),0.0),1.0)*0.5;
-    return vec3(f)*0.3+pc+0.5;
-}
-
-//Snow
-float makeshowflake(vec3 p){
-    return length(p)-0.03;
-}
-
-float makeShow(vec3 p,float tx,float ty,float tz){
-    p.y=p.y+Time*tx;
-    p.x=p.x+Time*ty;
-    p.z=p.z+Time*tz;
-    p=sim(p,4.0);
-    return makeshowflake(p);
-}
-
-vec2 obj1(vec3 p){
-    float f=makeShow(p,1.11, 1.03, 1.38);
-    f=min(f,makeShow(p,1.72, 0.74, 1.06));
-    f=min(f,makeShow(p,1.93, 0.75, 1.35));
-    f=min(f,makeShow(p,1.54, 0.94, 1.72));
-    f=min(f,makeShow(p,1.35, 1.33, 1.13));
-    f=min(f,makeShow(p,1.55, 0.23, 1.16));
-    f=min(f,makeShow(p,1.25, 0.41, 1.04));
-    f=min(f,makeShow(p,1.49, 0.29, 1.31));
-    f=min(f,makeShow(p,1.31, 1.31, 1.13));
-    return vec2(f,1.0);
-}
-
-vec3 obj1_c(vec3 p){
-    return vec3(1,1,1);
-}
-
-//Star
-vec2 obj2(vec3 p){
-    p.y=p.y-4.3;
-    p=p*4.0;
-    float l=length(p);
-    if (l<2.0){
-        p.xy=rotsim(p.xy,2.5);
-        p.y=p.y-2.0;
-        p.z=abs(p.z);
-        p.x=abs(p.x);
-        return vec2(dot(p,normalize(vec3(2.0,1,3.0)))/4.0,2);
-    } else return vec2((l-1.9)/4.0,2.0);
-}
-
-vec3 obj2_c(vec3 p){
-    return vec3(1.0,0.5,0.2);
-}
-
-//Objects union
-vec2 inObj(vec3 p){
-    return ObjUnion(ObjUnion(obj0(p),obj1(p)),obj2(p));
-}
-
-//Scene End
-
-void main() {
-    vec2 vPos=-1.0+2.0*gl_FragCoord.xy/uSize.xy;
-
-    float aboba=Time / 5.;
-
-    //Camera animation
-    vec3 vuv=normalize(vec3(sin(.1)*0.3, 1, 0));
-    vec3 vrp=vec3(0, cos(aboba*0.5)+2.5, 0);
-    vec3 prp=vec3(sin(aboba*0.5)*(sin(aboba*0.39)*2.0+3.5), sin(aboba*0.5)+3.5, cos(aboba*0.5)*(cos(aboba*0.45)*2.0+3.5));
-    float vpd=1.5;
-
-    //Camera setup
-    vec3 vpn=normalize(vrp-prp);
-    vec3 u=normalize(cross(vuv, vpn));
-    vec3 v=cross(vpn, u);
-    vec3 scrCoord=prp+vpn*vpd+vPos.x*u*uSize.x/uSize.y+vPos.y*v;
-    vec3 scp=normalize(scrCoord-prp);
-
-    //lights are 2d, no raymarching
-    mat4 cm=mat4(
-    u.x, u.y, u.z, -dot(u, prp),
-    v.x, v.y, v.z, -dot(v, prp),
-    vpn.x, vpn.y, vpn.z, -dot(vpn, prp),
-    0.0, 0.0, 0.0, 1.0);
-
-    vec4 pc=vec4(0, 0, 0, 0);
-    const float maxl=80.0;
-    for (float i=0.0;i<maxl;i++){
-        vec4 pt=vec4(
-        sin(i*PI*2.0*7.0/maxl)*2.0*(1.0-i/maxl),
-        i/maxl*4.0,
-        cos(i*PI*2.0*7.0/maxl)*2.0*(1.0-i/maxl),
-        1.0);
-        pt=pt*cm;
-        vec2 xy=(pt/(-pt.z/vpd)).xy+vPos*vec2(uSize.x/uSize.y, 1.0);
-        float c;
-        c=0.4/length(xy);
-        pc+=vec4(
-        (sin(i*5.0+Time*10.0)*0.5+0.5)*c * 0.7,
-        (cos(i*3.0+Time*8.0)*0.5+0.5)*c* 0.7,
-        (sin(i*6.0+Time*9.0)*0.5+0.5)*c* 0.7, 0.0);
-    }
-    pc=pc/maxl;
-
-    pc=smoothstep(0.0, 1.0, pc);
-
-    //Raymarching
-    const vec3 e=vec3(0.1, 0, 0);
-    const float maxd=15.0;//Max depth
-
-    vec2 s=vec2(0.1, 0.0);
-    vec3 c, p, n;
-
-    float f=1.0;
-    for (int i=0;i<64;i++){
-        if (abs(s.x)<.001||f>maxd) break;
-        f+=s.x;
-        p=prp+scp*f;
-        s=inObj(p);
+    height = 1.;
+    for(int i=1; i<NUM_BOUNCES; i++) {
+        height *= decay;
+        previousHalf = halfWidth;
+        halfWidth = sqrt(height);
+        t -= previousHalf + halfWidth;
+        y = max(y, height - t*t);
     }
 
-    if (f<maxd){
-        if (s.y==0.0)
-        c=obj0_c(p);
-        else if (s.y==1.0)
-        c=obj1_c(p);
-        else
-        c=obj2_c(p);
-        if (s.y<=1.0){
-            fragColor=vec4(c*max(1.0-f*.08, 0.0), 1.0)+pc;
-        } else {
-            //tetrahedron normal
-            const float n_er=0.01;
-            float v1=inObj(vec3(p.x+n_er, p.y-n_er, p.z-n_er)).x;
-            float v2=inObj(vec3(p.x-n_er, p.y-n_er, p.z+n_er)).x;
-            float v3=inObj(vec3(p.x-n_er, p.y+n_er, p.z-n_er)).x;
-            float v4=inObj(vec3(p.x+n_er, p.y+n_er, p.z+n_er)).x;
-            n=normalize(vec3(v4+v1-v3-v2, v3+v4-v1-v2, v2+v4-v3-v1));
+    return saturate( y );
+}
 
-            float b=max(dot(n, normalize(prp-p)), 0.0);
-            fragColor=vec4((b*c+pow(b, 8.0))*(1.0-f*.01), 1.0)+pc;
-        }
-    } else fragColor=vec4(0, 0, 0, 1.)+pc;//background color
+float BounceNorm(float t, float decay) {
+    // Returns a bounced interpolation
+    // Like Bounce but this one is time-normalized
+    // t = 0 is start of bounce
+    // t = 1 is end of bounce
+
+    float height = 1.;
+
+    float heights[NUM_ARCS]; heights[0] = 1.;
+    float halfDurations[NUM_ARCS]; halfDurations[0] = 1.;
+    float halfDuration = 0.5;
+    for(int i=1; i<NUM_ARCS; i++) {			// calculate the heights and durations of each bounc
+        height *= decay;
+        heights[i]= height;
+        halfDurations[i] = sqrt(height);
+        halfDuration += halfDurations[i];
+    }
+    t*=halfDuration*2.;						// normalize time
+
+    float y = 1.-t*t;
+
+    for(int i=1; i<NUM_ARCS; i++) {
+        t -=  halfDurations[i-1] + halfDurations[i];
+        y = max(y, heights[i] - t*t);
+    }
+
+    return saturate( y );
+}
+
+vec3 IntersectPlane(ray r, vec4 plane) {
+    // returns the intersection point between a ray and a plane
+    vec3 n = plane.xyz;
+    vec3 p0 = plane.xyz*plane.w;
+    float t = dot(p0-r.o, n)/dot(r.d, n);
+    return r.o+max(0.,t)*r.d;				// not quite sure what to return if there is no intersection
+    // right now it just returns the ray origin
+}
+vec3 IntersectPlane(ray r) {
+    // no plane param gives ground-plane intersection
+    return IntersectPlane(r, vec4(0.,1.,0.,0.));
+}
+
+float Circle(vec2 pos, vec2 uv, float radius) {
+    return smoothstep(radius, radius*0.9, length(uv-pos));
+}
+
+// -------------------------------------------------------------
+
+
+vec4 Star(ray r, float seed) {
+    vec4 noise = Noise4(vec4(seed, seed+1., seed+2., seed+3.));
+
+    float t = fract(time*0.1+seed)*2.;
+
+    float fade = smoothstep(2., 0.5, t);		// fade out;
+    vec4 col = mix(COOLCOLOR, HOTCOLOR, fade); // vary color with size
+    float size = STARSIZE+seed*0.03;					// random variation in size
+    size *= fade;
+
+    float b = BounceNorm(t, 0.4+seed*0.1)*7.;
+    b+=size;
+
+    vec3 sparkPos = vec3(noise.x*10., b, noise.y*10.);
+    vec3 closestPoint = ClosestPoint(r, sparkPos);
+
+    float dist = DistSqr(closestPoint, sparkPos)/(size*size);
+    float brightness = 1./dist;
+    col *= brightness;
+
+
+    return col;
+}
+
+vec3 stars[100];
+
+vec4 Star2(ray r, int i) {
+    vec3 sparkPos = stars[10];
+    vec3 closestPoint = ClosestPoint(r, sparkPos);
+
+    float dist = DistSqr(closestPoint, sparkPos)/(0.01);
+    float brightness = 1./dist;
+    vec4 col = vec4( brightness );
+
+
+    return col;
+}
+
+vec4 Stars(ray r) {
+    vec4 col = vec4( 0. );
+
+    float s = 0.;
+    for(int i=0; i<NUM_STARS; i++) {
+        s++;
+        col += Star(r, Noise101(s));
+    }
+
+    return col;
+}
+
+float Greasy(vec3 I) {
+    vec3 q = 8.0*I;
+    float f;
+    f  = 0.5000*noise( q ); q = m*q*2.01;
+    f += 0.2500*noise( q ); q = m*q*2.02;
+    f += 0.1250*noise( q ); q = m*q*2.03;
+    f += 0.0625*noise( q ); q = m*q*2.01;
+
+    return f;
+
+}
+
+vec4 CalcStarPos(int i) {
+    // returns the position in xyz and the fade value in w
+
+    float n = Noise101(float(i));
+
+    vec4 noise = Noise4(vec4(n, n+1., n+2., n+3.));
+
+    float t = fract(time*0.1+n)*2.;
+
+    float fade = smoothstep(2., 0.5, t);		// fade out;
+
+    float size = STARSIZE+n*0.03;					// random variation in size
+    size *= fade;
+
+    float b = BounceNorm(t, 0.4+n*0.1)*7.;
+    b+=size;
+
+    vec3 sparkPos = vec3(noise.x*10., b, noise.y*10.);
+
+    return vec4(sparkPos.xyz, fade);
+}
+
+vec4 Ground(ray r) {
+
+    vec4 ground = vec4(0.);
+
+    if(r.d.y>0.) return ground;
+
+    vec3 I = IntersectPlane(r);		// eye-ray ground intersection point
+
+    vec3 R = reflect(r.d, up);
+    ray ref = ray(I, R);
+
+    for(int i=0; i<NUM_STARS; i++) {
+        vec4 star = CalcStarPos(i);
+
+        vec3 L = star.xyz-I;
+        float dist = length(L);
+        L /= dist;
+
+        float lambert = saturate(dot(L, up));
+        float light = lambert/pow(dist,1.);
+
+
+        vec4 col = mix(COOLCOLOR, MIDCOLOR, star.w); // vary color with size
+        vec4 diffuseLight =  vec4(light)*0.1*col;
+
+        ground += diffuseLight*(sin(time)*0.5+0.6);
+}
+
+
+return ground;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = (fragCoord.xy / uSize.xy) - 0.5;
+    uv.y *= uSize.y/uSize.x;
+
+    time = Time*0.2;
+    fragColor = vec4(uv,0.5+0.5*sin(Time),1.0);
+
+
+    time *= 2.;
+
+    float t = time*pi*0.1;
+    float t2 = time*pi*0.03;
+
+    COOLCOLOR = vec4(sin(t), cos(t*0.23), cos(t*0.3453), 1.)*0.5+0.5;
+    HOTCOLOR = vec4(sin(t*2.), cos(t*2.*0.33), cos(t*0.3453), 1.)*0.5+0.5;
+
+    vec4 white = vec4(1.);
+    float whiteFade = sin(time*2.)*0.5+0.5;
+    HOTCOLOR = mix(HOTCOLOR, white, whiteFade);
+
+    MIDCOLOR = (HOTCOLOR+COOLCOLOR)*0.5;
+
+    float s = sin(t2);
+    float c = cos(t2);
+    mat3 rot = mat3(	  c,  0., s,
+    0., 1., 0.,
+    s,  0., -c);
+
+    float camHeight = mix(3.5, 0.1, PeriodicPulse(time*0.1, 2.));
+    vec3 pos = vec3(0., camHeight, -10.)*rot*(1.+sin(time)*0.3);
+
+    CameraSetup(uv, pos, vec3(0.), 0.5);
+
+    fragColor = Ground(cam.ray);
+    fragColor += Stars(cam.ray);
+    if(fragColor.a <= 1) {
+        fragColor.a = 1;
+    }
+}
+void main()
+{
+    mainImage(fragColor, gl_FragCoord.xy);
 }

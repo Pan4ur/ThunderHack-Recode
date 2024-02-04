@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.FluidBlock;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.Formatting;
@@ -26,14 +27,16 @@ import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
+import java.util.ArrayList;
 
-import static net.minecraft.block.Blocks.BEDROCK;
+import static net.minecraft.block.Blocks.*;
 import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class Nuker extends Module {
@@ -44,12 +47,14 @@ public class Nuker extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
     private final Setting<Integer> delay = new Setting<>("Delay", 25, 0, 1000);
     private final Setting<BlockSelection> blocks = new Setting<>("Blocks", BlockSelection.Select);
+    private final Setting<Boolean> ignoreWalls = new Setting<>("IgnoreWalls", false);
     private final Setting<Boolean> flatten = new Setting<>("Flatten", false);
     private final Setting<Boolean> creative = new Setting<>("Creative", false);
     private final Setting<Boolean> avoidLava = new Setting<>("AvoidLava", false);
     private final Setting<Float> range = new Setting<>("Range", 4.2f, 1.5f, 25f);
     private final Setting<ColorMode> colorMode = new Setting<>("ColorMode", ColorMode.Sync);
     public final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x2250b4b4), v -> colorMode.getValue() == ColorMode.Custom);
+    public static ArrayList<Block> selectedBlocks = new ArrayList<>();
 
     private Block targetBlockType;
     private BlockData blockData;
@@ -128,7 +133,7 @@ public class Nuker extends Module {
                 if (flatten.getValue() && b.getY() < mc.player.getY())
                     continue;
 
-                if(avoidLava.getValue() && checkLava(b))
+                if (avoidLava.getValue() && checkLava(b))
                     continue;
 
                 BlockState state = mc.world.getBlockState(b);
@@ -139,7 +144,8 @@ public class Nuker extends Module {
                             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, b, Direction.UP, PlayerUtility.getWorldActionId(mc.world)));
                             mc.interactionManager.breakBlock(b);
                             mc.player.swingHand(Hand.MAIN_HAND);
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
             }
@@ -189,16 +195,22 @@ public class Nuker extends Module {
             if (flatten.getValue() && b.getY() < mc.player.getY())
                 continue;
             if (PlayerUtility.squaredDistanceFromEyes(b.toCenterPos()) <= range.getPow2Value()) {
-                if(avoidLava.getValue() && checkLava(b))
+                if (avoidLava.getValue() && checkLava(b))
                     continue;
-                if (state.getBlock() == targetBlockType || (blocks.getValue().equals(BlockSelection.All) && state.getBlock() != BEDROCK)) {
-                    for (float x1 = 0f; x1 <= 1f; x1 += 0.2f) {
-                        for (float y1 = 0f; y1 <= 1; y1 += 0.2f) {
-                            for (float z1 = 0f; z1 <= 1; z1 += 0.2f) {
-                                Vec3d p = new Vec3d(b.getX() + x1, b.getY() + y1, b.getZ() + z1);
-                                BlockHitResult bhr = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), p, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
-                                if (bhr != null && bhr.getType() == HitResult.Type.BLOCK && bhr.getBlockPos().equals(b))
-                                    return new BlockData(b, p, bhr.getSide());
+                if (isAllowed(state.getBlock())) {
+                    if (ignoreWalls.getValue()) {
+                        BlockHitResult result = ExplosionUtility.rayCastBlock(new RaycastContext(InteractionUtility.getEyesPos(mc.player), b.toCenterPos(), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player), b);
+                        if(result != null)
+                            return new BlockData(b, result.getPos(), result.getSide());
+                    } else {
+                        for (float x1 = 0f; x1 <= 1f; x1 += 0.2f) {
+                            for (float y1 = 0f; y1 <= 1; y1 += 0.2f) {
+                                for (float z1 = 0f; z1 <= 1; z1 += 0.2f) {
+                                    Vec3d p = new Vec3d(b.getX() + x1, b.getY() + y1, b.getZ() + z1);
+                                    BlockHitResult bhr = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), p, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
+                                    if (bhr != null && bhr.getType() == HitResult.Type.BLOCK && bhr.getBlockPos().equals(b))
+                                        return new BlockData(b, p, bhr.getSide());
+                                }
                             }
                         }
                     }
@@ -209,8 +221,8 @@ public class Nuker extends Module {
     }
 
     private boolean checkLava(BlockPos base) {
-        for(Direction dir : Direction.values())
-            if(mc.world.getBlockState(base.offset(dir)).getBlock() == Blocks.LAVA)
+        for (Direction dir : Direction.values())
+            if (mc.world.getBlockState(base.offset(dir)).getBlock() == Blocks.LAVA)
                 return true;
         return false;
     }
@@ -224,7 +236,7 @@ public class Nuker extends Module {
                         while (ThunderHack.asyncManager.ticking.get()) {
                         }
 
-                        if ((targetBlockType != null || blocks.getValue().equals(BlockSelection.All)) && !mc.options.attackKey.isPressed() && blockData == null) {
+                        if ((targetBlockType != null || !blocks.getValue().equals(BlockSelection.Select)) && !mc.options.attackKey.isPressed() && blockData == null) {
                             blockData = getNukerBlockPos();
                         }
                     } else {
@@ -236,6 +248,15 @@ public class Nuker extends Module {
         }
     }
 
+    private boolean isAllowed(Block block) {
+        boolean allowed = selectedBlocks.contains(block);
+        return switch (blocks.getValue()) {
+            case All -> block != BEDROCK && block != AIR && block != CAVE_AIR && !(block instanceof FluidBlock) ;
+            case Select -> block == targetBlockType;
+            case WhiteList -> allowed;
+            default -> !allowed && block != BEDROCK && block != AIR && block != CAVE_AIR && !(block instanceof FluidBlock) ;
+        };
+    }
 
     private enum Mode {
         Default, Fast, FastAF
@@ -246,8 +267,9 @@ public class Nuker extends Module {
     }
 
     private enum BlockSelection {
-        Select, All
+        Select, All, BlackList, WhiteList
     }
 
-    public record BlockData(BlockPos bp, Vec3d vec3d, Direction dir) {}
+    public record BlockData(BlockPos bp, Vec3d vec3d, Direction dir) {
+    }
 }

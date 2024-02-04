@@ -79,13 +79,13 @@ public abstract class MixinEntity implements IEntity {
     public void isGlowingHook(CallbackInfoReturnable<Boolean> cir) {
         Shaders shaders = ModuleManager.shaders;
         if (shaders.isEnabled()) {
-          //  cir.setReturnValue(shaders.shouldRender((Entity) (Object) this));
+            cir.setReturnValue(shaders.shouldRender((Entity) (Object) this));
         }
     }
 
     @Inject(method = "isOnFire", at = @At("HEAD"), cancellable = true)
     public void isOnFireHook(CallbackInfoReturnable<Boolean> cir) {
-        if (ModuleManager.noRender.isEnabled() && NoRender.fireEntity.getValue()) {
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.fireEntity.getValue()) {
             cir.setReturnValue(false);
         }
     }

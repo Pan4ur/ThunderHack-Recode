@@ -39,7 +39,7 @@ public class BooleanElement extends AbstractElement {
             Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, 1f, 15, ClickGui.getInstance().getColor(1));
         }
 
-        if(hovered) {
+        if(Render2DEngine.isHovered(mouseX, mouseY, (x + width - 21), (float) (y + height / 2 - 4), 15, 8)) {
             GLFW.glfwSetCursor(mc.getWindow().getHandle(),
                     GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
             ClickUI.anyHovered = true;

@@ -54,6 +54,8 @@ public class ModuleManager implements IManager {
     public static EntityControl entityControl = new EntityControl();
     public static ElytraReplace elytraReplace = new ElytraReplace();
     public static ChorusExploit chorusExploit = new ChorusExploit();
+    public static MoreKnockback moreKnockback = new MoreKnockback();
+    public static AntiServerAdd antiServerAdd = new AntiServerAdd();
     public static Trajectories trajectories = new Trajectories();
     public static TargetStrafe targetStrafe = new TargetStrafe();
     public static RadarRewrite radarRewrite = new RadarRewrite();
@@ -85,6 +87,7 @@ public class ModuleManager implements IManager {
     public static AutoCrystal autoCrystal = new AutoCrystal();
     public static EntitySpeed entitySpeed = new EntitySpeed();
     public static AspectRatio aspectRatio = new AspectRatio();
+    public static ClientSpoof clientSpoof = new ClientSpoof();
     public static WaterSpeed waterSpeed = new WaterSpeed();
     public static TriggerBot triggerBot = new TriggerBot();
     public static TPSCounter tpsCounter = new TPSCounter();
@@ -222,7 +225,6 @@ public class ModuleManager implements IManager {
     public static XRay xray = new XRay();
     public static Step step = new Step();
     public static Aura aura = new Aura();
-    public static WTap wTap = new WTap();
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
 
@@ -299,7 +301,7 @@ public class ModuleManager implements IManager {
         HudElement.anyHovered = false;
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender2D(context));
         if(!HudElement.anyHovered && !ClickUI.anyHovered)
-            GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_CURSOR_NORMAL));
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
         ThunderHack.core.onRender2D(context);
     }
 

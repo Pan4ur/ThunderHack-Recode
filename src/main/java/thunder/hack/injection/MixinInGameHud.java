@@ -40,7 +40,7 @@ import static thunder.hack.modules.Module.mc;
 public abstract class MixinInGameHud {
 
     @Inject(at = @At(value = "HEAD"), method = "render")
-    public void render(DrawContext context, float tickDelta, CallbackInfo ci) {
+    public void renderHook(DrawContext context, float tickDelta, CallbackInfo ci) {
         ThunderHack.moduleManager.onRenderShaders(context);
         ThunderHack.notificationManager.onRenderShader(context);
 
@@ -80,10 +80,8 @@ public abstract class MixinInGameHud {
 
     @Inject(method = "renderScoreboardSidebar", at = @At(value = "HEAD"), cancellable = true)
     private void renderScoreboardSidebarHook(DrawContext context, ScoreboardObjective objective, CallbackInfo ci) {
-        if(ModuleManager.noRender.noScoreBoard.getValue() != NoRender.NoScoreBoard.None){
+        if(ModuleManager.noRender.noScoreBoard.getValue()){
             ci.cancel();
-            if(ModuleManager.noRender.noScoreBoard.getValue() == NoRender.NoScoreBoard.Position)
-                renderScoreboardSidebarCustom(context, objective);
         }
     }
 

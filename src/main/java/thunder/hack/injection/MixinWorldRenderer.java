@@ -1,18 +1,22 @@
 package thunder.hack.injection;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.gl.PostEffectProcessor;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.core.impl.ShaderManager;
+import thunder.hack.events.impl.EventSetBlockState;
 import thunder.hack.modules.render.Fullbright;
 
 import static thunder.hack.modules.Module.mc;
@@ -36,13 +40,20 @@ public abstract class MixinWorldRenderer {
 
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/PostEffectProcessor;render(F)V", ordinal = 0))
-    void replaceShaderHook(PostEffectProcessor instance, float tickDelta) {
+    private void replaceShaderHook(PostEffectProcessor instance, float tickDelta) {
         ShaderManager.Shader shaders = ModuleManager.shaders.mode.getValue();
         if (ModuleManager.shaders.isEnabled() && mc.world != null) {
             if (ThunderHack.shaderManager.fullNullCheck()) return;
             ThunderHack.shaderManager.setupShader(shaders, ThunderHack.shaderManager.getShaderOutline(shaders));
         } else {
             instance.render(tickDelta);
+        }
+    }
+
+    @Inject(method = "renderWeather", at = @At("HEAD"), cancellable = true)
+    private void renderWeatherHook(LightmapTextureManager manager, float tickDelta, double cameraX, double cameraY, double cameraZ, CallbackInfo ci) {
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.noWeather.getValue()) {
+            ci.cancel();
         }
     }
 }

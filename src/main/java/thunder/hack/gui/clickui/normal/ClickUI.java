@@ -251,8 +251,7 @@ public class ClickUI extends Screen {
         }
 
         if(!anyHovered)
-            GLFW.glfwSetCursor(mc.getWindow().getHandle(),
-                    GLFW.glfwCreateStandardCursor(GLFW.GLFW_CURSOR_NORMAL));
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
     }
 
     @Override

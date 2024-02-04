@@ -2,6 +2,7 @@ package thunder.hack.modules.player;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;

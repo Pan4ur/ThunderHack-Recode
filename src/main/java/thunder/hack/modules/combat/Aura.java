@@ -19,10 +19,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ShulkerBulletEntity;
-import net.minecraft.item.AxeItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.item.SwordItem;
+import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
@@ -82,7 +79,8 @@ public final class Aura extends Module {
     public final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 15).withParent(oldDelay);
     public final Setting<Integer> maxCPS = new Setting<>("MaxCPS", 12, 1, 15).withParent(oldDelay);
     public final Setting<ESP> esp = new Setting<>("ESP", ESP.ThunderHack);
-    public final Setting<Sort> sort = new Setting<>("Sort", Sort.Distance);
+    public final Setting<Sort> sort = new Setting<>("Sort", Sort.LowestDistance);
+    public final Setting<Boolean> lockTarget = new Setting<>("LockTarget", true);
 
     /*   ADVANCED   */
     public final Setting<Parent> advanced = new Setting<>("Advanced", new Parent(false, 0));
@@ -115,6 +113,7 @@ public final class Aura extends Module {
     public final Setting<Boolean> Slimes = new Setting<>("Slimes", true).withParent(targets);
     public final Setting<Boolean> Projectiles = new Setting<>("Projectiles", true).withParent(targets);
     public final Setting<Boolean> ignoreInvisible = new Setting<>("IgnoreInvis", false).withParent(targets);
+    public final Setting<Boolean> ignoreTeam = new Setting<>("IgnoreTeam", false).withParent(targets);
     public final Setting<Boolean> ignoreCreative = new Setting<>("IgnoreCreative", true).withParent(targets);
     public final Setting<Boolean> ignoreShield = new Setting<>("IgnoreShield", true).withParent(targets);
     public final Setting<Boolean> onlyAngry = new Setting<>("OnlyAngryEntities", true).withParent(targets);
@@ -167,7 +166,7 @@ public final class Aura extends Module {
     public void auraLogic() {
         Item handItem = mc.player.getMainHandStack().getItem();
 
-        if((switchMode.getValue() != Switch.Silent && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem))) {
+        if ((switchMode.getValue() != Switch.Silent && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem))) {
             target = null;
             return;
         }
@@ -182,9 +181,15 @@ public final class Aura extends Module {
         if (!mc.options.jumpKey.isPressed() && mc.player.isOnGround() && autoJump.getValue())
             mc.player.jump();
 
-        calcRotations(autoCrit());
-        
-        boolean readyForAttack = autoCrit() && (lookingAtHitbox || skipRayTraceCheck());
+        boolean readyForAttack;
+
+        if (rotationMode.getValue() == Rotation.SunRise) {
+            calcRotations(autoCrit());
+            readyForAttack = autoCrit() && (lookingAtHitbox || skipRayTraceCheck());
+        } else {
+            readyForAttack = autoCrit() && (lookingAtHitbox || skipRayTraceCheck());
+            calcRotations(autoCrit());
+        }
 
         if (readyForAttack) {
             if (shieldBreaker(false))
@@ -321,8 +326,8 @@ public final class Aura extends Module {
 
     @EventHandler
     public void onPacketSend(PacketEvent.@NotNull Send e) {
-        if(e.getPacket() instanceof  PlayerInteractEntityC2SPacket pie && Criticals.getInteractType(pie) != Criticals.InteractType.ATTACK)
-           e.cancel();
+        if (e.getPacket() instanceof PlayerInteractEntityC2SPacket pie && Criticals.getInteractType(pie) != Criticals.InteractType.ATTACK)
+            e.cancel();
     }
 
     @EventHandler
@@ -380,7 +385,7 @@ public final class Aura extends Module {
         if (!mc.options.jumpKey.isPressed() && mergeWithTargetStrafe && mergeWithSpeed && !onlySpace.getValue() && !autoJump.getValue())
             return true;
 
-        if (mc.player.isInLava())
+        if (mc.player.isInLava() || mc.player.isSubmergedInWater())
             return true;
 
         if (!mc.options.jumpKey.isPressed() && isAboveWater())
@@ -444,7 +449,7 @@ public final class Aura extends Module {
             return;
         }
 
-        if (sort.getValue() == Sort.FOV)
+        if (sort.getValue() == Sort.FOV || !lockTarget.getValue())
             target = candidat;
 
         if (candidat instanceof ProjectileEntity)
@@ -500,9 +505,6 @@ public final class Aura extends Module {
                 if (trackticks > 0 || mode.getValue() == Mode.Track) {
                     rotationYaw = (float) (newYaw - (newYaw - rotationYaw) % gcdFix);
                     rotationPitch = (float) (newPitch - (newPitch - rotationPitch) % gcdFix);
-                    if (MovementUtility.sprintIsLegit(rotationYaw) && hitTicks > 1) {
-                        //   mc.player.setVelocity(mc.player.getVelocity().getX() * 1.3, mc.player.getVelocity().getY(), mc.player.getVelocity().getZ() * 1.3);
-                    }
                 } else {
                     rotationYaw = mc.player.getYaw();
                     rotationPitch = mc.player.getPitch();
@@ -727,11 +729,39 @@ public final class Aura extends Module {
         }
 
         return switch (sort.getValue()) {
-            case Distance ->
+            case LowestDistance ->
                     first_stage.stream().min(Comparator.comparing(e -> (mc.player.squaredDistanceTo(e.getPos())))).orElse(null);
+
+            case HighestDistance ->
+                    first_stage.stream().max(Comparator.comparing(e -> (mc.player.squaredDistanceTo(e.getPos())))).orElse(null);
+
             case FOV -> first_stage.stream().min(Comparator.comparing(this::getFOVAngle)).orElse(null);
-            case Health ->
+
+            case LowestHealth ->
                     first_stage.stream().min(Comparator.comparing(e -> (e.getHealth() + e.getAbsorptionAmount()))).orElse(null);
+
+            case HighestHealth ->
+                    first_stage.stream().max(Comparator.comparing(e -> (e.getHealth() + e.getAbsorptionAmount()))).orElse(null);
+
+            case LowestDurability -> first_stage.stream().min(Comparator.comparing(e -> {
+                        float v = 0;
+                        for (ItemStack armor : target.getArmorItems())
+                            if (armor != null && !armor.getItem().equals(Items.AIR)) {
+                                v += ((armor.getMaxDamage() - armor.getDamage()) / (float) armor.getMaxDamage());
+                            }
+                        return v;
+                    }
+            )).orElse(null);
+
+            case HighestDurability -> first_stage.stream().max(Comparator.comparing(e -> {
+                        float v = 0;
+                        for (ItemStack armor : target.getArmorItems())
+                            if (armor != null && !armor.getItem().equals(Items.AIR)) {
+                                v += ((armor.getMaxDamage() - armor.getDamage()) / (float) armor.getMaxDamage());
+                            }
+                        return v;
+                    }
+            )).orElse(null);
         };
     }
 
@@ -751,6 +781,8 @@ public final class Aura extends Module {
             if (player.isCreative() && ignoreCreative.getValue())
                 return true;
             if (player.isInvisible() && ignoreInvisible.getValue())
+                return true;
+            if (player.getTeamColorValue() == mc.player.getTeamColorValue() && ignoreTeam.getValue() && mc.player.getTeamColorValue() != 16777215)
                 return true;
         }
 
@@ -793,7 +825,7 @@ public final class Aura extends Module {
     }
 
     public enum Sort {
-        Distance, Health, FOV
+        LowestDistance, HighestDistance, LowestHealth, HighestHealth, LowestDurability, HighestDurability, FOV
     }
 
     public enum Switch {

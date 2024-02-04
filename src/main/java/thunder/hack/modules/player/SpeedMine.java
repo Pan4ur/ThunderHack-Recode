@@ -307,7 +307,7 @@ public final class SpeedMine extends Module {
 
             BlockState currentState = mc.world.getBlockState(pos);
             mc.world.removeBlock(pos, false);
-            float dmg = ExplosionUtility.getExplosionDamage1(pos.toCenterPos(), player);
+            float dmg = ExplosionUtility.getExplosionDamage(pos.toCenterPos(), player);
             mc.world.setBlockState(pos, currentState);
 
             if (dmg > damage)

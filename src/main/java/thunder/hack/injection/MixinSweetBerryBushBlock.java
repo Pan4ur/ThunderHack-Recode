@@ -1,8 +1,7 @@
 package thunder.hack.injection;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.CobwebBlock;
-import net.minecraft.block.SoulSandBlock;
+import net.minecraft.block.SweetBerryBushBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -11,14 +10,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.movement.AntiWeb;
 
-@Mixin(CobwebBlock.class)
-public class MixinCobwebBlock {
+@Mixin(SweetBerryBushBlock.class)
+public class MixinSweetBerryBushBlock {
     @Inject(method = "onEntityCollision", at = @At("HEAD"), cancellable = true)
     public void onEntityCollisionHook(BlockState state, World world, BlockPos pos, Entity entity, CallbackInfo ci) {
-        if(ModuleManager.antiWeb.isEnabled() && AntiWeb.mode.getValue() == AntiWeb.Mode.Ignore){
+        if(ModuleManager.noSlow.isEnabled() && ModuleManager.noSlow.sweetBerryBush.getValue())
             ci.cancel();
-        }
     }
 }

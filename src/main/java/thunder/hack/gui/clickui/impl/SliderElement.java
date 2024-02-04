@@ -56,7 +56,7 @@ public class SliderElement extends AbstractElement {
 
         animation = MathUtility.clamp(animation, 0, 1);
 
-        if(hovered) {
+        if(Render2DEngine.isHovered(mouseX, mouseY, (x + 6), (float) (y + height - 7), (float) (width - 12), 3)) {
             GLFW.glfwSetCursor(mc.getWindow().getHandle(),
                     GLFW.glfwCreateStandardCursor(GLFW.GLFW_HRESIZE_CURSOR));
             ClickUI.anyHovered = true;

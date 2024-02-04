@@ -86,7 +86,7 @@ public abstract class MixinGameRenderer {
 
     @Redirect(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;lerp(FFF)F"))
     private float applyCameraTransformationsMathHelperLerpProxy(float delta, float first, float second) {
-        if (ModuleManager.noRender.isEnabled() && NoRender.nausea.getValue()) return 0;
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.nausea.getValue()) return 0;
         return MathHelper.lerp(delta, first, second);
     }
 

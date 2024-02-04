@@ -4,6 +4,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.ParticleTypes;
@@ -24,6 +25,7 @@ public class KillEffect extends Module {
     private final Setting<Integer> speed = new Setting<>("Y Speed", 0, -10, 10, value -> mode.getValue() == Mode.Orthodox);
     private final Setting<Boolean> playSound = new Setting<>("Play Sound", true, value -> mode.getValue() == Mode.Orthodox);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(new Color(255, 255, 0, 150)), value -> mode.getValue() == Mode.Orthodox);
+    private final Setting<Boolean> mobs = new Setting<>("Mobs", false);
 
     private final Map<Entity, Long> renderEntities = new ConcurrentHashMap<>();
     private final Map<Entity, Long> lightingEntities = new ConcurrentHashMap<>();
@@ -77,9 +79,11 @@ public class KillEffect extends Module {
     @Override
     public void onUpdate() {
         ThunderHack.asyncManager.getAsyncEntities().forEach(entity -> {
-            if (!(entity instanceof PlayerEntity)) return;
+            if (!(entity instanceof PlayerEntity) && !mobs.getValue()) return;
+            if (!(entity instanceof LivingEntity liv)) return;
+
             if (entity == mc.player || renderEntities.containsKey(entity) || lightingEntities.containsKey(entity)) return;
-            if (entity.isAlive() || ((PlayerEntity) entity).getHealth() != 0) return;
+            if (entity.isAlive() || liv.getHealth() != 0) return;
 
             if (playSound.getValue() && mode.getValue() == Mode.Orthodox)
                 mc.world.playSound(mc.player, entity.getBlockPos(), SoundUtility.ORTHODOX_SOUNDEVENT, SoundCategory.BLOCKS, 10f, 1f);

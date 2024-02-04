@@ -12,11 +12,10 @@ import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
-import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.CommandManager;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.gui.notification.Notification;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 
@@ -265,10 +264,17 @@ public abstract class Module {
     }
 
     public boolean isKeyPressed(int button) {
-        if(button == -1)
+        if (button == -1)
             return false;
-       return InputUtil.isKeyPressed(mc.getWindow().getHandle(), button);
+        return InputUtil.isKeyPressed(mc.getWindow().getHandle(), button);
     }
+
+    public boolean isKeyPressed(Setting<Bind> bind) {
+        if (bind.getValue().getKey() == -1)
+            return false;
+        return InputUtil.isKeyPressed(mc.getWindow().getHandle(), bind.getValue().getKey());
+    }
+
 
     public @Nullable Setting<?> getSettingByName(String name) {
         for (Setting<?> setting : getSettings()) {

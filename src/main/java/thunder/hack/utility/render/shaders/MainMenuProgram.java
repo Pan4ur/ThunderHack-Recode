@@ -32,7 +32,7 @@ public class MainMenuProgram extends GlProgram {
     }
 
     public static void increaseTime() {
-        time_ += 0.01f;
+        time_ += 0.025f;
     }
 
     @Override

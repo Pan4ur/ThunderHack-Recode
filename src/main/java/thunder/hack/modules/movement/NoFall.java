@@ -22,11 +22,16 @@ public class NoFall extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Rubberband);
     public final Setting<FallDistance> fallDistance = new Setting<>("FallDistance", FallDistance.Calc);
     public final Setting<Integer> fallDistanceValue = new Setting<>("FallDistanceVal", 10, 2, 100, v -> fallDistance.getValue() == FallDistance.Custom);
+    private final Setting<Boolean> powderSnowBucket = new Setting<>("PowderSnowBucket", true, v -> mode.getValue() == Mode.Items);
+    private final Setting<Boolean> waterBucket = new Setting<>("WaterBucket", true, v -> mode.getValue() == Mode.Items);
+    private final Setting<Boolean> enderPearl = new Setting<>("EnderPearl", true, v -> mode.getValue() == Mode.Items);
+    private final Setting<Boolean> cobweb = new Setting<>("Cobweb", true, v -> mode.getValue() == Mode.Items);
+    private final Setting<Boolean> twistingVines = new Setting<>("TwistingVines", true, v -> mode.getValue() == Mode.Items);
 
     private thunder.hack.utility.Timer pearlCooldown = new thunder.hack.utility.Timer();
 
     private enum Mode {
-        Rubberband, Items, MatrixOffGround
+        Rubberband, Items, MatrixOffGround, Vanilla
     }
 
     private enum FallDistance {
@@ -37,12 +42,11 @@ public class NoFall extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        if(fullNullCheck())
+        if (fullNullCheck())
             return;
         if (isFalling()) {
             if (mode.getValue() == Mode.Rubberband) sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
             if (mode.getValue() == Mode.Items) {
-                mc.player.setPitch(90);
                 BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
 
                 SearchInvResult snowResult = InventoryUtility.findItemInHotBar(Items.POWDER_SNOW_BUCKET);
@@ -51,19 +55,25 @@ public class NoFall extends Module {
                 SearchInvResult webResult = InventoryUtility.findItemInHotBar(Items.COBWEB);
                 SearchInvResult vinesResult = InventoryUtility.findItemInHotBar(Items.TWISTING_VINES);
 
-                if (waterResult.found()) {
+                if (waterResult.found() && waterBucket.getValue()) {
+                    mc.player.setPitch(90);
                     doWaterDrop(waterResult, playerPos);
-                } else if (pearlResult.found()) {
+                } else if (pearlResult.found() && enderPearl.getValue()) {
+                    mc.player.setPitch(90);
                     doPearlDrop(pearlResult);
-                } else if (webResult.found()) {
+                } else if (webResult.found() && cobweb.getValue()) {
+                    mc.player.setPitch(90);
                     doWebDrop(webResult, playerPos);
-                } else if (vinesResult.found()) {
+                } else if (vinesResult.found() && twistingVines.getValue()) {
+                    mc.player.setPitch(90);
                     doVinesDrop(vinesResult, playerPos);
-                } else if (snowResult.found()) {
+                } else if (snowResult.found() && powderSnowBucket.getValue()) {
+                    mc.player.setPitch(90);
                     doSnowDrop(snowResult, playerPos);
                 }
             }
-            if (mode.getValue() == Mode.MatrixOffGround) cancelGround = true;
+            if (mode.getValue() == Mode.MatrixOffGround || mode.getValue() == Mode.Vanilla)
+                cancelGround = true;
         }
     }
 
@@ -125,7 +135,7 @@ public class NoFall extends Module {
     }
 
     public boolean isFalling() {
-        if(mc.player.isFallFlying())
+        if (mc.player.isFallFlying())
             return false;
 
         switch (fallDistance.getValue()) {

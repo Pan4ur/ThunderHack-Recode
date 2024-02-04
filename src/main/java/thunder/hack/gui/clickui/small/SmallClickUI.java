@@ -11,6 +11,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ConfigManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractWindow;
+import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
@@ -101,6 +102,8 @@ public class SmallClickUI extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        ClickUI.anyHovered = false;
+
         if (ThunderHack.isOutdated && (mc.player == null || (mc.player.age % 20) > 10)) {
             FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f + 1, mc.getWindow().getScaledHeight() - 39 - FontRenderers.thglitch.getFontHeight("New version is available!"), Color.BLACK.getRGB());
             FontRenderers.thglitch.drawCenteredString(context.getMatrices(), "New version is available!", mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() - 40 - FontRenderers.thglitch.getFontHeight("New version is available!"), -1);

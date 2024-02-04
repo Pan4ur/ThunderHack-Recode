@@ -727,7 +727,15 @@ public class Render2DEngine {
 
     public static void drawHudBase(MatrixStack matrices, float x, float y, float width, float height, float radius) {
         preShaderDraw(matrices, x - 10, y - 10, width + 20, height + 20);
-        HUD_SHADER.setParameters(x, y, width, height, radius);
+        HUD_SHADER.setParameters(x, y, width, height, radius, 1f);
+        HUD_SHADER.use();
+        Tessellator.getInstance().draw();
+        RenderSystem.disableBlend();
+    }
+
+    public static void drawHudBase(MatrixStack matrices, float x, float y, float width, float height, float radius, float alpha) {
+        preShaderDraw(matrices, x - 10, y - 10, width + 20, height + 20);
+        HUD_SHADER.setParameters(x, y, width, height, radius, alpha);
         HUD_SHADER.use();
         Tessellator.getInstance().draw();
         RenderSystem.disableBlend();
