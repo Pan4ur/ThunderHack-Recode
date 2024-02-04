@@ -67,7 +67,7 @@ public final class TriggerBot extends Module {
         if (mc.player.fallDistance > 1 && mc.player.fallDistance < 1.14)
             return false;
 
-        if (Aura.getAttackCooldown() < 0.9f)
+        if ( ModuleManager.aura.getAttackCooldown() < 0.9f)
             return false;
 
         boolean mergeWithTargetStrafe = !ModuleManager.targetStrafe.isEnabled() || !ModuleManager.targetStrafe.jump.getValue();
@@ -79,7 +79,7 @@ public final class TriggerBot extends Module {
         if (mc.player.isInLava())
             return true;
 
-        if (!mc.options.jumpKey.isPressed() && Aura.isAboveWater())
+        if (!mc.options.jumpKey.isPressed() && ModuleManager.aura.isAboveWater())
             return true;
 
         if (!reasonForSkipCrit)

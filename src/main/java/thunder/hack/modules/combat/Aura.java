@@ -43,8 +43,8 @@ import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
-import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
@@ -64,14 +64,14 @@ import static thunder.hack.utility.math.MathUtility.random;
 
 public final class Aura extends Module {
     public final Setting<Float> attackRange = new Setting<>("Range", 3.1f, 2f, 6.0f);
+    public final Setting<Float> wallRange = new Setting<>("WallRange", 3.1f, 2f, 6.0f);
     public final Setting<Rotation> rotationMode = new Setting<>("Rotation", Rotation.Universal);
     public final Setting<Switch> switchMode = new Setting<>("Switch", Switch.None);
     public final Setting<Boolean> onlyWeapon = new Setting<>("OnlyWeapon", false, v -> switchMode.getValue() != Switch.Silent);
     public final Setting<BooleanParent> smartCrit = new Setting<>("SmartCrit", new BooleanParent(true));
     public final Setting<Boolean> onlySpace = new Setting<>("OnlySpace", false).withParent(smartCrit);
     public final Setting<Boolean> autoJump = new Setting<>("AutoJump", false).withParent(smartCrit);
-    public final Setting<BooleanParent> ignoreWalls = new Setting<>("IgnoreWalls", new BooleanParent(true));
-    public final Setting<Boolean> wallsBypass = new Setting<>("Bypass", false).withParent(ignoreWalls);
+    public final Setting<Boolean> wallsBypass = new Setting<>("WallsBypass", false, v -> wallRange.getValue() > 0);
     public final Setting<Boolean> shieldBreaker = new Setting<>("ShieldBreaker", true);
     public final Setting<Boolean> moveFix = new Setting<>("MoveFix", false);
     public final Setting<Boolean> clientLook = new Setting<>("ClientLook", false);
@@ -84,6 +84,9 @@ public final class Aura extends Module {
 
     /*   ADVANCED   */
     public final Setting<Parent> advanced = new Setting<>("Advanced", new Parent(false, 0));
+    public final Setting<Float> aimRange = new Setting<>("AimRange", 3.1f, 2f, 6.0f).withParent(advanced);
+    public final Setting<Boolean> uniqueHitPattern = new Setting<>("UniqueHitPattern", false).withParent(advanced);
+    public final Setting<Boolean> tpsSync = new Setting<>("TPSSync", false).withParent(advanced);
     public final Setting<Boolean> pauseWhileEating = new Setting<>("PauseWhileEating", false).withParent(advanced);
     public final Setting<Boolean> dropSprint = new Setting<>("DropSprint", true).withParent(advanced);
     public final Setting<Boolean> pauseInInventory = new Setting<>("PauseInInventory", true).withParent(advanced);
@@ -98,6 +101,7 @@ public final class Aura extends Module {
     public final Setting<AttackHand> attackHand = new Setting<>("AttackHand", AttackHand.MainHand).withParent(advanced);
     public final Setting<RayTraceAngle> rayTraceAngle = new Setting<>("TraceAngle", RayTraceAngle.Calculated).withParent(advanced);
     public final Setting<Resolver> resolver = new Setting<>("Resolver", Resolver.Advantage).withParent(advanced);
+    public final Setting<Boolean> accelerateOnHit = new Setting<>("AccelerateOnHit", false).withParent(advanced);
     public final Setting<Integer> minYawStep = new Setting<>("MinYawStep", 65, 1, 180).withParent(advanced);
     public final Setting<Integer> maxYawStep = new Setting<>("MaxYawStep", 75, 1, 180).withParent(advanced);
     public final Setting<Float> aimedPitchStep = new Setting<>("AimedPitchStep", 1f, 0f, 90f).withParent(advanced);
@@ -288,7 +292,7 @@ public final class Aura extends Module {
         if (mc.getCurrentServerEntry() != null && mc.getCurrentServerEntry().address.equals("ngrief.me") && mc.player.getMainHandStack().getItem() instanceof AxeItem) {
             return 21;
         }
-        return oldDelay.getValue().isEnabled() ? 1 + (int) (20f / random(minCPS.getValue(), maxCPS.getValue())) : 11;
+        return oldDelay.getValue().isEnabled() ? 1 + (int) (20f / random(minCPS.getValue(), maxCPS.getValue())) : (uniqueHitPattern.getValue() ? (int) MathUtility.random(11, 13) : 11);
     }
 
     @EventHandler
@@ -429,15 +433,15 @@ public final class Aura extends Module {
         }
     }
 
-    public static boolean isAboveWater() {
+    public boolean isAboveWater() {
         return mc.player.isSubmergedInWater() || mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos().add(0, -0.4, 0))).getBlock() == Blocks.WATER;
     }
 
-    public static float getAttackCooldownProgressPerTick() {
-        return (float) (1.0 / mc.player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_SPEED) * (20.0 * ThunderHack.TICK_TIMER));
+    public float getAttackCooldownProgressPerTick() {
+        return (float) (1.0 / mc.player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_SPEED) * (20.0 * ThunderHack.TICK_TIMER * (tpsSync.getValue() ? ThunderHack.serverManager.getTPSFactor() : 1f)));
     }
 
-    public static float getAttackCooldown() {
+    public float getAttackCooldown() {
         return MathHelper.clamp(((float) ((ILivingEntity) mc.player).getLastAttackedTicks() + 0.5f) / getAttackCooldownProgressPerTick(), 0.0F, 1.0F);
     }
 
@@ -490,6 +494,11 @@ public final class Aura extends Module {
                 float yawStep = mode.getValue() == Mode.Interact ? 360f : random(minYawStep.getValue(), maxYawStep.getValue());
                 float pitchStep = mode.getValue() == Mode.Interact ? 180f : pitchAcceleration + random(-1f, 1f);
 
+                if(accelerateOnHit.getValue() && ready) {
+                    yawStep = 180f;
+                    pitchStep = 90f;
+                }
+
                 if (delta_yaw > 180)
                     delta_yaw = delta_yaw - 180;
 
@@ -513,7 +522,7 @@ public final class Aura extends Module {
                 lookingAtHitbox = ThunderHack.playerManager.checkRtx(
                         rayTraceAngle.getValue() == RayTraceAngle.Calculated ? rotationYaw : prevYaw,
                         rayTraceAngle.getValue() == RayTraceAngle.Calculated ? rotationPitch : prevPitch,
-                        attackRange.getValue(), ignoreWalls.getValue().isEnabled(), rayTrace.getValue());
+                        attackRange.getValue(), wallRange.getValue(), rayTrace.getValue());
             }
             case SunRise -> {
                 Vec3d ent = getSunriseVector(target);
@@ -537,7 +546,7 @@ public final class Aura extends Module {
                 }
 
                 prevYaw = additionYaw;
-                lookingAtHitbox = ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), ignoreWalls.getValue().isEnabled(), rayTrace.getValue());
+                lookingAtHitbox = ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), wallRange.getValue(), rayTrace.getValue());
             }
         }
     }
@@ -583,7 +592,7 @@ public final class Aura extends Module {
 
     private float getSquaredRotateDistance() {
         float dst = attackRange.getValue();
-        dst += 2f;
+        dst += aimRange.getValue();
         if ((mc.player.isFallFlying() || ModuleManager.elytraPlus.isEnabled()) && target != null) dst += 4f;
         if (ModuleManager.strafe.isEnabled()) dst += 4f;
         if (mode.getValue() == Mode.Interact || rotationMode.getValue() == Rotation.None || rayTrace.getValue() == RayTrace.OFF)
@@ -653,12 +662,12 @@ public final class Aura extends Module {
         float[] rotation;
 
         // Если мы перестали смотреть на цель
-        if (!ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), ignoreWalls.getValue().isEnabled(), rayTrace.getValue())) {
+        if (!ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), wallRange.getValue(), rayTrace.getValue())) {
             float[] rotation1 = PlayerManager.calcAngle(target.getPos().add(0, target.getEyeHeight(target.getPose()) / 2f, 0));
 
             // Проверяем видимость центра игрока
             if (PlayerUtility.squaredDistanceFromEyes(target.getPos().add(0, target.getEyeHeight(target.getPose()) / 2f, 0)) <= attackRange.getPow2Value()
-                    && ThunderHack.playerManager.checkRtx(rotation1[0], rotation1[1], attackRange.getValue(), false, rayTrace.getValue())) {
+                    && ThunderHack.playerManager.checkRtx(rotation1[0], rotation1[1], attackRange.getValue(), 0, rayTrace.getValue())) {
                 // наводим на центр
                 rotationPoint = new Vec3d(random(-0.1f, 0.1f), target.getEyeHeight(target.getPose()) / (random(1.8f, 2.5f)), random(-0.1f, 0.1f));
             } else {
@@ -675,7 +684,7 @@ public final class Aura extends Module {
                             if (PlayerUtility.squaredDistanceFromEyes(v1) > attackRange.getPow2Value()) continue;
 
                             rotation = PlayerManager.calcAngle(v1);
-                            if (ThunderHack.playerManager.checkRtx(rotation[0], rotation[1], attackRange.getValue(), false, rayTrace.getValue())) {
+                            if (ThunderHack.playerManager.checkRtx(rotation[0], rotation[1], attackRange.getValue(), 0, rayTrace.getValue())) {
                                 // Наводимся, если видим эту точку
                                 rotationPoint = new Vec3d(x1, y1, z1);
                                 break;
@@ -705,7 +714,7 @@ public final class Aura extends Module {
                         continue;
 
                     rotation = PlayerManager.calcAngle(new Vec3d(target.getX() + x1, target.getY() + y1, target.getZ() + z1));
-                    if (ThunderHack.playerManager.checkRtx(rotation[0], rotation[1], (float) Math.sqrt(getSquaredRotateDistance()), ignoreWalls.getValue().isEnabled(), rayTrace.getValue())) {
+                    if (ThunderHack.playerManager.checkRtx(rotation[0], rotation[1], (float) Math.sqrt(getSquaredRotateDistance()), wallRange.getValue(), rayTrace.getValue())) {
                         return true;
                     }
                 }

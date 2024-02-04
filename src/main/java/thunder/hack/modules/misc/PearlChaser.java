@@ -82,27 +82,6 @@ public class PearlChaser extends Module {
         if (!delayTimer.passedMs(1000))
             return;
 
-        if(offaura.getValue() && ModuleManager.aura.isEnabled())
-            ModuleManager.aura.disable();
-
-        if(onlyOnGround.getValue() && !mc.player.isOnGround())
-            return;
-
-        if(noMove.getValue() && MovementUtility.isMoving())
-            return;
-
-        if(stopMotion.getValue().isEnabled()) {
-            if(!legitStop.getValue())
-                mc.player.setVelocity(0,0,0);
-            mc.options.forwardKey.setPressed(false);
-            mc.options.backKey.setPressed(false);
-            mc.options.leftKey.setPressed(false);
-            mc.options.rightKey.setPressed(false);
-            mc.player.input.movementForward = 0;
-            mc.player.input.movementSideways = 0;
-            return;
-        }
-
         for (Entity ent : mc.world.getEntities()) {
             if (!(ent instanceof EnderPearlEntity)) continue;
             if (ent.getId() == lastPearlId || ent.getId() == lastOurPearlId) continue;
@@ -130,6 +109,27 @@ public class PearlChaser extends Module {
 
         if (tracedBP == null || targetBlock.getSquaredDistance(tracedBP.toCenterPos()) > 36)
             return;
+
+        if(offaura.getValue() && ModuleManager.aura.isEnabled())
+            ModuleManager.aura.disable();
+
+        if(onlyOnGround.getValue() && !mc.player.isOnGround())
+            return;
+
+        if(noMove.getValue() && MovementUtility.isMoving())
+            return;
+
+        if(stopMotion.getValue().isEnabled()) {
+            if(!legitStop.getValue())
+                mc.player.setVelocity(0,0,0);
+            mc.options.forwardKey.setPressed(false);
+            mc.options.backKey.setPressed(false);
+            mc.options.leftKey.setPressed(false);
+            mc.options.rightKey.setPressed(false);
+            mc.player.input.movementForward = 0;
+            mc.player.input.movementSideways = 0;
+            return;
+        }
 
         sendMessage(isRu() ?
                 ("Догоняем перл! Позиция X:" + tracedBP.getX() + " Y:" + tracedBP.getY() + " Z:" + tracedBP.getZ() + " Углы Y:" + rotationYaw + " P:" + rotationPitch) :

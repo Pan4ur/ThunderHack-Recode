@@ -123,7 +123,7 @@ public class FakePlayer extends Module {
             if (mc.player.fallDistance > 0 || ModuleManager.criticals.isEnabled())
                 mc.world.playSound(mc.player, fakePlayer.getX(), fakePlayer.getY(), fakePlayer.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1f, 1f);
             fakePlayer.onDamaged(mc.world.getDamageSources().generic());
-            if (Aura.getAttackCooldown() >= 0.85)
+            if (ModuleManager.aura.getAttackCooldown() >= 0.85)
                 fakePlayer.setHealth(fakePlayer.getHealth() + fakePlayer.getAbsorptionAmount() - InventoryUtility.getHitDamage(mc.player.getMainHandStack(), fakePlayer));
             else fakePlayer.setHealth(fakePlayer.getHealth() + fakePlayer.getAbsorptionAmount() - 1f);
             if (fakePlayer.isDead()) {

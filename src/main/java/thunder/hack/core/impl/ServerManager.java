@@ -30,6 +30,10 @@ public class ServerManager implements IManager {
         return round2(20.0f * ((float) tickTime / 1000f));
     }
 
+    public float getTPSFactor() {
+        return (float) tickTime / 1000f;
+    }
+
     public static float round2(double value) {
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(2, RoundingMode.HALF_UP);

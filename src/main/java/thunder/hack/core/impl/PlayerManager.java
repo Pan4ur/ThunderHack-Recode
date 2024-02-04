@@ -116,24 +116,27 @@ public class PlayerManager implements IManager {
         return (deltaBodyYaw > 50f ? deltaBodyYaw * 0.2f : 0)  + ((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw() - deltaBodyYaw;
     }
 
-    public boolean checkRtx(float yaw, float pitch, float distance, boolean ignoreWalls, Aura.RayTrace rt) {
+    public boolean checkRtx(float yaw, float pitch, float distance, float wallDistance, Aura.RayTrace rt) {
         if (rt == Aura.RayTrace.OFF)
             return true;
 
         Entity targetedEntity;
-        HitResult result = ignoreWalls ? null : rayTrace(distance, yaw, pitch);
-        Vec3d vec3d = mc.player.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
+        HitResult result = rayTrace(distance, yaw, pitch);
+        Vec3d eyePos = mc.player.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
         double distancePow2 = Math.pow(distance, 2);
-        if (result != null) distancePow2 = result.getPos().squaredDistanceTo(vec3d);
+
+        if (result != null)
+            distancePow2 = eyePos.squaredDistanceTo(result.getPos());
+
         Vec3d vec3d2 = getRotationVector(pitch, yaw);
-        Vec3d vec3d3 = vec3d.add(vec3d2.x * distance, vec3d2.y * distance, vec3d2.z * distance);
+        Vec3d vec3d3 = eyePos.add(vec3d2.x * distance, vec3d2.y * distance, vec3d2.z * distance);
         Box box = mc.player.getBoundingBox().stretch(vec3d2.multiply(distance)).expand(1.0, 1.0, 1.0);
-        EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator() && entity.canHit(), distancePow2);
+        EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, eyePos, vec3d3, box, (entity) -> !entity.isSpectator() && entity.canHit(), Math.max(distancePow2, Math.pow(wallDistance, 2)));
         if (entityHitResult != null) {
             if (entityHitResult.getEntity() instanceof FireworkRocketEntity)
                 return false;
             Entity entity2 = entityHitResult.getEntity();
-            if (vec3d.squaredDistanceTo(entityHitResult.getPos()) < distancePow2 || result == null) {
+            if (eyePos.squaredDistanceTo(entityHitResult.getPos()) <= Math.pow(wallDistance, 2) || eyePos.squaredDistanceTo(entityHitResult.getPos()) < distancePow2 || result == null) {
                 targetedEntity = entity2;
                 return targetedEntity == Aura.target || Aura.target == null || rt != Aura.RayTrace.AllEntities;
             }
