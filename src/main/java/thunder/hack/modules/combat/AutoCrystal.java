@@ -228,10 +228,12 @@ public class AutoCrystal extends Module {
     @Override
     public String getDisplayInfo() {
         StringBuilder info = new StringBuilder();
-        if (bestPosition != null) {
+
+        Direction side = bestPosition == null ? null : bestPosition.getSide();
+        if (side != null) {
             if (targetName.getValue() && target != null) info.append(target.getName().getString()).append(" | ");
             if (speed.getValue()) info.append(crystalSpeed).append(" c/s").append(" | ");
-            if (currentSide.getValue()) info.append(bestPosition.getSide().toString().toUpperCase()).append(" | ");
+            if (currentSide.getValue()) info.append(side.toString().toUpperCase()).append(" | ");
             if (confirmInfo.getValue()) info.append("c: ").append(confirmTime).append(" | ");
             if (calcInfo.getValue()) info.append("calc: ").append(calcTime).append(" | ");
         }

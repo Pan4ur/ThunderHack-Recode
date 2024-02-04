@@ -18,14 +18,18 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.render.Trajectories;
+import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
@@ -41,6 +45,13 @@ public class PearlChaser extends Module {
     public PearlChaser() {
         super("PearlChaser", Category.MISC);
     }
+
+    private final Setting<BooleanParent> stopMotion = new Setting<>("StopMotion", new BooleanParent(false));
+    private final Setting<Boolean> legitStop = new Setting<>("LegitStop", false).withParent(stopMotion);
+    private final Setting<Boolean> offaura = new Setting<>("OffAura", false);
+    private final Setting<Boolean> onlyOnGround = new Setting<>("OnlyOnGround", false);
+    private final Setting<Boolean> noMove = new Setting<>("NoMove", false);
+
 
     private Runnable postSyncAction;
     private final Timer delayTimer = new Timer();
@@ -70,6 +81,27 @@ public class PearlChaser extends Module {
         // Антиспам
         if (!delayTimer.passedMs(1000))
             return;
+
+        if(offaura.getValue() && ModuleManager.aura.isEnabled())
+            ModuleManager.aura.disable();
+
+        if(onlyOnGround.getValue() && !mc.player.isOnGround())
+            return;
+
+        if(noMove.getValue() && MovementUtility.isMoving())
+            return;
+
+        if(stopMotion.getValue().isEnabled()) {
+            if(!legitStop.getValue())
+                mc.player.setVelocity(0,0,0);
+            mc.options.forwardKey.setPressed(false);
+            mc.options.backKey.setPressed(false);
+            mc.options.leftKey.setPressed(false);
+            mc.options.rightKey.setPressed(false);
+            mc.player.input.movementForward = 0;
+            mc.player.input.movementSideways = 0;
+            return;
+        }
 
         for (Entity ent : mc.world.getEntities()) {
             if (!(ent instanceof EnderPearlEntity)) continue;
@@ -118,6 +150,7 @@ public class PearlChaser extends Module {
                 sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
             }
         };
+
         targetBlock = null;
         delayTimer.reset();
     }
