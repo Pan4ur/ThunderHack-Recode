@@ -28,6 +28,7 @@ public class CommandManager implements IManager {
         add(new BindCommand());
         add(new DrawCommand());
         add(new HelpCommand());
+        add(new NukerCommand());
         add(new EClipCommand());
         add(new HClipCommand());
         add(new LoginCommand());

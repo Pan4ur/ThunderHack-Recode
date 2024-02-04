@@ -58,6 +58,7 @@ public final class Core {
     public void onTick(PlayerUpdateEvent event) {
         if (fullNullCheck()) return;
 
+        ThunderHack.notificationManager.onUpdate();
         ThunderHack.moduleManager.onUpdate();
         ThunderGui.getInstance().onTick();
 

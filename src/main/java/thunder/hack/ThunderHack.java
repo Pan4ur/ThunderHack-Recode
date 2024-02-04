@@ -9,8 +9,9 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.*;
-import thunder.hack.modules.client.RPC;
+import thunder.hack.gui.mainmenu.CreditsScreen;
 import thunder.hack.gui.notification.NotificationManager;
+import thunder.hack.modules.client.RPC;
 import thunder.hack.utility.SoundUtility;
 import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -20,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 
 public class ThunderHack implements ModInitializer {
@@ -34,6 +36,7 @@ public class ThunderHack implements ModInitializer {
     public static Color copy_color = new Color(-1);
     public static long initTime;
     public static KeyListening currentKeyListener;
+    public static String[] contributors = new String[16];
 
     /*-----------------    Managers  ---------------------*/
     public static NotificationManager notificationManager = new NotificationManager();
@@ -78,6 +81,8 @@ public class ThunderHack implements ModInitializer {
         configManager.loadChestStealer();
         configManager.loadInvCleaner();
         configManager.loadAutoBuy();
+        configManager.loadSearch();
+        configManager.loadNuker();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             FriendManager.saveFriends();
@@ -85,6 +90,8 @@ public class ThunderHack implements ModInitializer {
             wayPointManager.saveWayPoints();
             macroManager.saveMacro();
             configManager.saveChestStealer();
+            configManager.saveSearch();
+            configManager.saveNuker();
             configManager.saveInvCleaner();
             configManager.saveAutoBuy();
         }));
@@ -96,6 +103,7 @@ public class ThunderHack implements ModInitializer {
 
         SoundUtility.registerSounds();
         syncVersion();
+        syncContributors();
         ThunderUtility.parseChangeLog();
 
         if (isOnWindows())
@@ -122,6 +130,22 @@ public class ThunderHack implements ModInitializer {
             if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersion.txt").openStream())).readLine().equals(VERSION))
                 isOutdated = true;
         } catch (Exception ignored) {
+        }
+    }
+
+    public static void syncContributors() {
+        try {
+            URL list = new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/thTeam.txt");
+            BufferedReader in = new BufferedReader(new InputStreamReader(list.openStream(), StandardCharsets.UTF_8));
+            String inputLine;
+            int i = 0;
+            while ((inputLine = in.readLine()) != null) {
+                contributors[i] = inputLine.trim();
+                i++;
+            }
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

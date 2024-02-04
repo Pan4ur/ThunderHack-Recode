@@ -7,12 +7,14 @@ import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
+import thunder.hack.cmd.impl.NukerCommand;
 import thunder.hack.cmd.impl.SearchCommand;
 import thunder.hack.core.IManager;
 import thunder.hack.gui.autobuy.AutoBuyItem;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.AutoBuy;
 import thunder.hack.modules.client.MainSettings;
+import thunder.hack.modules.misc.Nuker;
 import thunder.hack.modules.render.Search;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.*;
@@ -53,16 +55,30 @@ public class ConfigManager implements IManager {
         if (!TEMP_FOLDER.exists()) TEMP_FOLDER.mkdirs();
         if (!MISC_FOLDER.exists()) MISC_FOLDER.mkdirs();
         if (!SOUNDS_FOLDER.exists()) SOUNDS_FOLDER.mkdirs();
-        loadSearch();
     }
 
     public void loadSearch() {
         try {
             File file = new File(CONFIG_FOLDER_NAME + "/misc/search.txt");
+
             if (file.exists())
                 try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                     while (reader.ready())
                         Search.defaultBlocks.add(SearchCommand.getRegisteredBlock(reader.readLine()));
+                }
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void loadNuker() {
+        try {
+            File file = new File(CONFIG_FOLDER_NAME + "/misc/nuker.txt");
+
+            if (file.exists())
+                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    while (reader.ready()) {
+                        Nuker.selectedBlocks.add(NukerCommand.getRegisteredBlock(reader.readLine()));
+                    }
                 }
         } catch (Exception ignored) {
         }
@@ -92,6 +108,22 @@ public class ConfigManager implements IManager {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (Block name : Search.defaultBlocks) {
+                writer.write(name.getTranslationKey() + "\n");
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void saveNuker() {
+        File file = new File(CONFIG_FOLDER_NAME + "/misc/nuker.txt");
+        try {
+            new File(CONFIG_FOLDER_NAME).mkdirs();
+            file.createNewFile();
+        } catch (Exception ignored) {
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (Block name : Nuker.selectedBlocks) {
                 writer.write(name.getTranslationKey() + "\n");
             }
         } catch (Exception ignored) {
@@ -236,7 +268,6 @@ public class ConfigManager implements IManager {
     }
 
     public void save(@NotNull File config) {
-        saveSearch();
         try {
             if (!config.exists()) {
                 config.createNewFile();
@@ -477,8 +508,8 @@ public class ConfigManager implements IManager {
         try {
             file.createNewFile();
         } catch (Exception ignored) {
-
         }
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (String item : ModuleManager.chestStealer.items) {
                 writer.write(item + "\n");
@@ -496,7 +527,6 @@ public class ConfigManager implements IManager {
                     while (reader.ready()) {
                         ModuleManager.inventoryCleaner.items.add(reader.readLine());
                     }
-
                 }
             }
         } catch (Exception ignored) {
@@ -510,6 +540,7 @@ public class ConfigManager implements IManager {
         } catch (Exception ignored) {
 
         }
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (String item : ModuleManager.inventoryCleaner.items) {
                 writer.write(item + "\n");
@@ -563,8 +594,8 @@ public class ConfigManager implements IManager {
                 file.createNewFile();
             }
         } catch (Exception ignored) {
-
         }
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             for (AutoBuyItem item : AutoBuy.items) {
                 writer.write(item.getItem().getTranslationKey().replace("block.minecraft.", "").replace("item.minecraft.", "") + ";" + item.getPrice() + ";" + item.getCount() + ";" + ArrayToString(item.getEnchantmentsToArray()) + ";" + ArrayToStringСomma(item.getAttributesToArray()) + ";" + item.checkForStar() + "\n");

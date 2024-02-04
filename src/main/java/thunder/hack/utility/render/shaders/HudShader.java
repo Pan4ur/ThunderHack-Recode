@@ -35,7 +35,7 @@ public class HudShader extends GlProgram {
         });
     }
 
-    public void setParameters(float x, float y, float width, float height, float r) {
+    public void setParameters(float x, float y, float width, float height, float r, float alpha1) {
         int i = mc.options.getGuiScale().getValue();
         radius.set(r * i);
         uLocation.set(x * i, -y * i + mc.getWindow().getScaledHeight() * i - height * i);
@@ -46,10 +46,10 @@ public class HudShader extends GlProgram {
         Color c3 =  HudEditor.getColor(180);
         Color c4 =  HudEditor.getColor(90);
 
-        color1.set(c1.getRed() / 255f, c1.getGreen() / 255f, c1.getBlue() / 255f, c1.getAlpha() / 255f);
-        color2.set(c2.getRed() / 255f, c2.getGreen() / 255f, c2.getBlue() / 255f, c2.getAlpha() / 255f);
-        color3.set(c3.getRed() / 255f, c3.getGreen() / 255f, c3.getBlue() / 255f, c3.getAlpha() / 255f);
-        color4.set(c4.getRed() / 255f, c4.getGreen() / 255f, c4.getBlue() / 255f, c4.getAlpha() / 255f);
+        color1.set(c1.getRed() / 255f, c1.getGreen() / 255f, c1.getBlue() / 255f, alpha1);
+        color2.set(c2.getRed() / 255f, c2.getGreen() / 255f, c2.getBlue() / 255f, alpha1);
+        color3.set(c3.getRed() / 255f, c3.getGreen() / 255f, c3.getBlue() / 255f, alpha1);
+        color4.set(c4.getRed() / 255f, c4.getGreen() / 255f, c4.getBlue() / 255f, alpha1);
         blend.set(HudEditor.blend.getValue());
         alpha.set(HudEditor.alpha.getValue());
     }

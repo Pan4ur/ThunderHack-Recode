@@ -30,6 +30,6 @@ public class BetterAnimation {
     }
 
     public double getAnimationd() {
-        return dropAnimation((this.prevTick + (this.tick - this.prevTick) * mc.getTickDelta()) / maxTick);
+        return dropAnimation((prevTick + (tick - prevTick) * mc.getTickDelta()) / maxTick);
     }
 }

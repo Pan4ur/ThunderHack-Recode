@@ -1,8 +1,10 @@
 package thunder.hack.modules.misc;
 
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -18,6 +20,32 @@ public class AutoSoup extends Module {
 
     @Override
     public void onUpdate() {
+        /*
+        if (mc.currentScreen instanceof InventoryScreen is) {
+            if (is.getScreenHandler().getSlot(0).getStack().getItem() == Items.FIREWORK_ROCKET) {
+                clickSlot(0, SlotActionType.QUICK_MOVE);
+            } else if (is.getScreenHandler().getSlot(1).getStack().getItem() != Items.PAPER) {
+                for(int i = 9; i < 44; i++) {
+                    if(is.getScreenHandler().getSlot(i).getStack().getItem() == Items.PAPER) {
+                        clickSlot(i);
+                        clickSlot(1);
+                        break;
+                    }
+                }
+                return;
+            } else if (is.getScreenHandler().getSlot(2).getStack().getItem() != Items.GUNPOWDER) {
+                for(int i = 9; i < 44; i++) {
+                    if(is.getScreenHandler().getSlot(i).getStack().getItem() == Items.GUNPOWDER) {
+                        clickSlot(i);
+                        clickSlot(2);
+                        break;
+                    }
+                }
+                return;
+            }
+        }
+       */
+
         if (mc.player.getHealth() <= health.getValue()) {
             int soupslot = InventoryUtility.findItemInHotBar(Items.MUSHROOM_STEW).slot();
             int currentslot = mc.player.getInventory().selectedSlot;

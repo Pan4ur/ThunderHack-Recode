@@ -110,6 +110,7 @@ public class HoleESP extends Module {
     private float easeOutExpo(float x){
         return x == 1f ? 1f : (float) (1f - Math.pow(2f, -10f * x));
     }
+
     public void renderOutline(@NotNull HoleESP.BoxWithColor boxWithColor) {
         Render3DEngine.OUTLINE_QUEUE.add(
                 new Render3DEngine.OutlineAction(boxWithColor.box, getColor(boxWithColor.box, boxWithColor.color(), boxWithColor.color.getAlpha()), lineWith.getValue())

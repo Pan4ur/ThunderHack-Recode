@@ -3,12 +3,17 @@ package thunder.hack.modules.movement;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.network.packet.c2s.common.CommonPongC2SPacket;
 import net.minecraft.network.packet.c2s.common.KeepAliveC2SPacket;
 import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.PlayerEntityCopy;
@@ -23,14 +28,19 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static thunder.hack.modules.client.MainSettings.isRu;
+
 public class Blink extends Module {
+
     private final Setting<Boolean> pulse = new Setting<>("Pulse", false);
     private final Setting<Boolean> autoDisable = new Setting<>("AutoDisable", false);
+    private final Setting<Boolean> disableOnVelocity = new Setting<>("DisableOnVelocity", false);
     private final Setting<Integer> disablePackets = new Setting<>("DisablePackets", 17, 1, 1000, v-> autoDisable.getValue() );
     private final Setting<Integer> pulsePackets = new Setting<>("PulsePackets", 20, 1, 1000, v-> pulse.getValue());
     private final Setting<Boolean> render = new Setting<>("Render", true);
     private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Circle, value -> render.getValue());
     private final Setting<ColorSetting> circleColor = new Setting<>("Color", new ColorSetting(0xFFda6464, true), value -> render.getValue() && renderMode.getValue() == RenderMode.Circle || renderMode.getValue() == RenderMode.Both);
+    private final Setting<Bind> cancel = new Setting<>("Cancel", new Bind(GLFW.GLFW_KEY_LEFT_SHIFT, false, false));
 
     private enum RenderMode {
         Circle,
@@ -39,11 +49,13 @@ public class Blink extends Module {
     }
 
     private PlayerEntityCopy blinkPlayer;
-    private Vec3d lastPos = new Vec3d(0, 0, 0);
+    private Vec3d lastPos = Vec3d.ZERO;
+    private Vec3d prevVelocity = Vec3d.ZERO;
+    private float prevYaw = 0;
+    private boolean prevSprinting = false;
     private final Queue<Packet<?>> storedPackets = new LinkedList<>();
+    private final Queue<Packet<?>> storedTransactions = new LinkedList<>();
     private final AtomicBoolean sending = new AtomicBoolean(false);
-
-    private Packet<?> lastPacket;
 
     public Blink() {
         super("Blink", Category.MOVEMENT);
@@ -59,7 +71,11 @@ public class Blink extends Module {
             return;
         }
 
+        storedTransactions.clear();
         lastPos = mc.player.getPos();
+        prevVelocity = mc.player.getVelocity();
+        prevYaw = mc.player.getYaw();
+        prevSprinting = mc.player.isSprinting();
         mc.world.spawnEntity(new ClientPlayerEntity(mc, mc.world, mc.getNetworkHandler(), mc.player.getStatHandler(), mc.player.getRecipeBook(), mc.player.lastSprinting, mc.player.isSneaking()));
         sending.set(false);
         storedPackets.clear();
@@ -80,6 +96,12 @@ public class Blink extends Module {
     }
 
     @EventHandler
+    public void onPacketReceive(PacketEvent.Receive event) {
+        if(event.getPacket() instanceof EntityVelocityUpdateS2CPacket vel && vel.getId() == mc.player.getId() && disableOnVelocity.getValue())
+            disable(isRu() ? "Выключенно из-за велосити!" : "Disabled due to velocity!");
+    }
+
+    @EventHandler
     public void onPacketSend(PacketEvent.Send event) {
         if (fullNullCheck()) return;
 
@@ -87,6 +109,10 @@ public class Blink extends Module {
 
         if (sending.get()) {
             return;
+        }
+
+        if(packet instanceof CommonPongC2SPacket) {
+            storedTransactions.add(packet);
         }
 
         if (pulse.getValue()) {
@@ -103,6 +129,22 @@ public class Blink extends Module {
     @EventHandler
     public void onUpdate(EventTick event) {
         if (fullNullCheck()) return;
+
+        if(isKeyPressed(cancel)) {
+            storedPackets.clear();
+            mc.player.setPos(lastPos.getX(), lastPos.getY(), lastPos.getZ());
+            mc.player.setVelocity(prevVelocity);
+            mc.player.setYaw(prevYaw);
+            mc.player.setSprinting(prevSprinting);
+            mc.player.setSneaking(false);
+            mc.options.sneakKey.setPressed(false);
+            sending.set(true);
+            while (!storedTransactions.isEmpty())
+                sendPacket(storedTransactions.poll());
+            sending.set(false);
+            disable(isRu() ? "Отменяю.." : "Canceling..");
+            return;
+        }
 
         if (pulse.getValue()) {
             if (storedPackets.size() >= pulsePackets.getValue()) {

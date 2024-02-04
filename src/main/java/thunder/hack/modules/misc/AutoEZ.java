@@ -78,7 +78,7 @@ public final class AutoEZ extends Module {
                         StringBuilder spamChunk = new StringBuilder();
                         for (String l : lines) {
                             if (l.equals("")) {
-                                if (spamChunk.length() > 0) {
+                                if (!spamChunk.isEmpty()) {
                                     spamList.add(spamChunk.toString());
                                     spamChunk = new StringBuilder();
                                 }

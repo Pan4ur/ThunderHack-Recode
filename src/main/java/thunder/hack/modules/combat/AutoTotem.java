@@ -55,7 +55,7 @@ public final class AutoTotem extends Module {
     private final Setting<Boolean> onAnchor = new Setting<>("OnAnchor", true).withParent(safety);
 
     private final Setting<Boolean> onTnt = new Setting<>("OnTNT", true).withParent(safety);
-    private final Setting<Boolean> rcGap = new Setting<>("RCGap", false);
+    public final Setting<Boolean> rcGap = new Setting<>("RCGap", false);
     private final Setting<Boolean> crappleSpoof = new Setting<>("CrappleSpoof", true, v -> offhand.getValue() == OffHand.GApple);
 
     private enum OffHand {Totem, Crystal, GApple, Shield}

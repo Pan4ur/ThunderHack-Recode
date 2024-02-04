@@ -4,7 +4,7 @@ public class Timer {
     private long time;
 
     public Timer() {
-        this.time = System.nanoTime();
+        reset();
     }
 
     public boolean passedS(double s) {

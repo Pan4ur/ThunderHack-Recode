@@ -131,7 +131,7 @@ public class RadarRewrite extends HudElement {
 
         float radius = CRadius.getValue() - margin;
 
-        for (i = start; i <= end; i += 10) {
+        for (i = start; i <= end; i += 6) {
             float stage = (i - start) / 360f;
             if (!Objects.equals(direction, ""))
                 switch (Mode2.getValue()) {
