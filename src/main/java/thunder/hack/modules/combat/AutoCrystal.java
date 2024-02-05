@@ -699,8 +699,10 @@ public class AutoCrystal extends Module {
     }
 
     public void getCrystalToExplode() {
-        if (target == null)
+        if (target == null) {
             bestCrystal = null;
+            return;
+        }
 
         List<CrystalData> list = getPossibleCrystals(target).stream().filter(data -> isSafe(data.damage, data.selfDamage, data.overrideDamage)).toList();
         bestCrystal = list.isEmpty() ? null : filterCrystals(list);

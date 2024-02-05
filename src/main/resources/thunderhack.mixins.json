@@ -17,6 +17,7 @@
     "MixinClientPlayerInteractionManager",
     "MixinClientPlayNetworkHandler",
     "MixinClientWorld",
+    "MixinEndCrystalEntityRenderer",
     "MixinEntityRenderer",
     "MixinGameRenderer",
     "MixinGenericContainerScreen",
