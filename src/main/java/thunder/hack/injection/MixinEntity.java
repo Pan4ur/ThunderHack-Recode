@@ -65,14 +65,14 @@ public abstract class MixinEntity implements IEntity {
         }
     }
 
-    @Redirect(method={"updateVelocity"}, at=@At(value="INVOKE", target="Lnet/minecraft/entity/Entity;movementInputToVelocity(Lnet/minecraft/util/math/Vec3d;FF)Lnet/minecraft/util/math/Vec3d;"))
-    public Vec3d hookVelocity(Vec3d movementInput, float speed, float yaw) {
+    @Inject(method = "updateVelocity", at = {@At("HEAD")}, cancellable = true)
+    public void updateVelocityHook(float speed, Vec3d movementInput, CallbackInfo ci) {
         if ((Object) this == mc.player) {
-            EvendFixVelocity event = new EvendFixVelocity(movementInput, speed, yaw, movementInputToVelocityC(movementInput, speed, yaw));
+            ci.cancel();
+            EvendFixVelocity event = new EvendFixVelocity(movementInput, speed, mc.player.getYaw(), movementInputToVelocityC(movementInput, speed, mc.player.getYaw()));
             ThunderHack.EVENT_BUS.post(event);
-            return event.getVelocity();
+            mc.player.setVelocity(mc.player.getVelocity().add(event.getVelocity()));
         }
-        return movementInputToVelocityC(movementInput, speed, yaw);
     }
 
     @Unique
