@@ -4,18 +4,20 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventEntityMoving;
+import thunder.hack.events.impl.EvendFixVelocity;
 import thunder.hack.modules.combat.HitBox;
-import thunder.hack.modules.render.NoRender;
 import thunder.hack.modules.render.Shaders;
 import thunder.hack.utility.interfaces.IEntity;
 import thunder.hack.modules.render.Trails;
@@ -61,6 +63,28 @@ public abstract class MixinEntity implements IEntity {
             args.set(1, 0.);
             args.set(2, 0.);
         }
+    }
+
+    @Redirect(method={"updateVelocity"}, at=@At(value="INVOKE", target="Lnet/minecraft/entity/Entity;movementInputToVelocity(Lnet/minecraft/util/math/Vec3d;FF)Lnet/minecraft/util/math/Vec3d;"))
+    public Vec3d hookVelocity(Vec3d movementInput, float speed, float yaw) {
+        if ((Object) this == mc.player) {
+            EvendFixVelocity event = new EvendFixVelocity(movementInput, speed, yaw, movementInputToVelocityC(movementInput, speed, yaw));
+            ThunderHack.EVENT_BUS.post(event);
+            return event.getVelocity();
+        }
+        return movementInputToVelocityC(movementInput, speed, yaw);
+    }
+
+    @Unique
+    private static Vec3d movementInputToVelocityC(Vec3d movementInput, float speed, float yaw) {
+        double d = movementInput.lengthSquared();
+        if (d < 1.0E-7) {
+            return Vec3d.ZERO;
+        }
+        Vec3d vec3d = (d > 1.0 ? movementInput.normalize() : movementInput).multiply(speed);
+        float f = MathHelper.sin(yaw * ((float)Math.PI / 180));
+        float g = MathHelper.cos(yaw * ((float)Math.PI / 180));
+        return new Vec3d(vec3d.x * (double)g - vec3d.z * (double)f, vec3d.y, vec3d.z * (double)g + vec3d.x * (double)f);
     }
 
     @Inject(method = "getBoundingBox", at = {@At("HEAD")}, cancellable = true)

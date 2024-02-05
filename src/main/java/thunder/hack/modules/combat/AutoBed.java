@@ -25,8 +25,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -72,6 +74,7 @@ public final class AutoBed extends Module {
 
     private PlayerEntity target;
     private BedData bestBed, bestPos;
+    private float rotationYaw, rotationPitch;
 
     private final Timer placeTimer = new Timer();
     private final Timer explodeTimer = new Timer();
@@ -85,6 +88,14 @@ public final class AutoBed extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
+        if (bestBed != null || bestPos != null) {
+            mc.player.setYaw(rotationYaw);
+            mc.player.setPitch(rotationPitch);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerUpdate(PlayerUpdateEvent e) {
         target = findTarget();
 
         if (mc.world.getDimension().bedWorks() && dimCheck.getValue()) {
@@ -103,8 +114,9 @@ public final class AutoBed extends Module {
 
             angle = InteractionUtility.calculateAngle(Objects.requireNonNullElseGet(bestPos, () -> bestBed).hitResult().getPos());
 
-            mc.player.setYaw(angle[0]);
-            mc.player.setPitch(angle[1]);
+            rotationYaw = (angle[0]);
+            rotationPitch = (angle[1]);
+            ModuleManager.rotations.fixRotation = rotationYaw;
         }
 
         if (autoCraft.getValue()) {

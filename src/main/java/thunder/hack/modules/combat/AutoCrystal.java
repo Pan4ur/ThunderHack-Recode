@@ -150,7 +150,7 @@ public class AutoCrystal extends Module {
 
     private final DeadManager deadManager = new DeadManager();
 
-    public float renderDamage, renderSelfDamage;
+    public float renderDamage, renderSelfDamage, rotationYaw, rotationPitch;
 
     private int prevCrystalsAmount, crystalSpeed, invTimer;
 
@@ -221,8 +221,13 @@ public class AutoCrystal extends Module {
         }
 
         // Rotate
-        if (rotate.getValue() && !shouldPause())
+        if (rotate.getValue() && !shouldPause() && bestPosition != null && mc.player != null)
             rotateMethod();
+    }
+
+    private void rotateMethod() {
+        mc.player.setYaw(rotationYaw);
+        mc.player.setPitch(rotationPitch);
     }
 
     @Override
@@ -310,7 +315,7 @@ public class AutoCrystal extends Module {
         tickBusy = false;
     }
 
-    public void rotateMethod() {
+    public void calcRotations() {
         if (bestPosition != null && mc.player != null) {
             float[] angle = InteractionUtility.calculateAngle(bestPosition.getPos());
             angle[1] = angle[1] + MathUtility.random(-1,1);
@@ -324,8 +329,9 @@ public class AutoCrystal extends Module {
             } else rotated = true;
 
             double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
-            mc.player.setYaw((float) (angle[0] - (angle[0] - ((IClientPlayerEntity) mc.player).getLastYaw()) % gcdFix));
-            mc.player.setPitch((float) (angle[1] - (angle[1] - ((IClientPlayerEntity) mc.player).getLastPitch()) % gcdFix));
+            rotationYaw = ((float) (angle[0] - (angle[0] - ((IClientPlayerEntity) mc.player).getLastYaw()) % gcdFix));
+            rotationPitch = ((float) (angle[1] - (angle[1] - ((IClientPlayerEntity) mc.player).getLastPitch()) % gcdFix));
+            ModuleManager.rotations.fixRotation = rotationYaw;
         }
     }
 
@@ -370,6 +376,12 @@ public class AutoCrystal extends Module {
                 renderBox(dmg, box);
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerUpdate(PlayerUpdateEvent event) {
+        if(rotate.getValue())
+            calcRotations();
     }
 
     private void renderBox(String dmg, Box box) {

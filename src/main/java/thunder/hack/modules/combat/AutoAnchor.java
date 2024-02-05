@@ -19,10 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.DeathEvent;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.TotemPopEvent;
+import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -90,6 +87,7 @@ public final class AutoAnchor extends Module {
     private PlayerEntity target;
     private BlockPos targetPos;
     private boolean rotated;
+    private float rotationYaw, rotationPitch;
 
     public AutoAnchor() {
         super("AutoAnchor", Category.COMBAT);
@@ -163,8 +161,16 @@ public final class AutoAnchor extends Module {
     }
 
     @EventHandler
+    public void onSync(EventSync e) {
+        if (rotate.getValue() && targetPos != null && mc.player != null) {
+            mc.player.setYaw(rotationYaw);
+            mc.player.setPitch(rotationPitch);
+        }
+    }
+
+    @EventHandler
     @SuppressWarnings("unused")
-    private void onSync(EventSync event) {
+    private void onCalcRotation(PlayerUpdateEvent event) {
         if (rotate.getValue() && targetPos != null && mc.player != null) {
             float[] angle = InteractionUtility.calculateAngle(targetPos.toCenterPos());
             if (yawStep.getValue() == YawStepMode.On) {
@@ -176,8 +182,9 @@ public final class AutoAnchor extends Module {
             } else rotated = true;
 
             double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
-            mc.player.setYaw((float) (angle[0] - (angle[0] - ((IClientPlayerEntity) mc.player).getLastYaw()) % gcdFix));
-            mc.player.setPitch((float) (angle[1] - (angle[1] - ((IClientPlayerEntity) mc.player).getLastPitch()) % gcdFix));
+            rotationYaw = ((float) (angle[0] - (angle[0] - ((IClientPlayerEntity) mc.player).getLastYaw()) % gcdFix));
+            rotationPitch = ((float) (angle[1] - (angle[1] - ((IClientPlayerEntity) mc.player).getLastPitch()) % gcdFix));
+            ModuleManager.rotations.fixRotation = rotationYaw;
         }
     }
 

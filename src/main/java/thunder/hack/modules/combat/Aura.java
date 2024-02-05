@@ -73,7 +73,6 @@ public final class Aura extends Module {
     public final Setting<Boolean> autoJump = new Setting<>("AutoJump", false).withParent(smartCrit);
     public final Setting<Boolean> wallsBypass = new Setting<>("WallsBypass", false, v -> wallRange.getValue() > 0);
     public final Setting<Boolean> shieldBreaker = new Setting<>("ShieldBreaker", true);
-    public final Setting<Boolean> moveFix = new Setting<>("MoveFix", false);
     public final Setting<Boolean> clientLook = new Setting<>("ClientLook", false);
     public final Setting<BooleanParent> oldDelay = new Setting<>("OldDelay", new BooleanParent(false));
     public final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 15).withParent(oldDelay);
@@ -124,7 +123,7 @@ public final class Aura extends Module {
 
     public static Entity target;
 
-    private float rotationYaw, rotationPitch, prevClientYaw, pitchAcceleration = 1f, prevYaw;
+    public float rotationYaw, rotationPitch, prevClientYaw, pitchAcceleration = 1f, prevYaw;
 
     private Vec3d rotationPoint = Vec3d.ZERO;
     private Vec3d rotationMotion = Vec3d.ZERO;
@@ -139,32 +138,6 @@ public final class Aura extends Module {
     public Aura() {
         super("Aura", Category.COMBAT);
         instance = this;
-    }
-
-    @EventHandler
-    public void modifyVelocity(EventPlayerTravel e) {
-        Item handItem = mc.player.getMainHandStack().getItem();
-        if (target == null || !moveFix.getValue() || (switchMode.getValue() != Switch.Silent && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem)))
-            return;
-
-        if (e.isPre()) {
-            prevClientYaw = mc.player.getYaw();
-            mc.player.setYaw(rotationYaw);
-        } else {
-            mc.player.setYaw(prevClientYaw);
-        }
-    }
-
-    @EventHandler
-    public void modifyJump(EventPlayerJump e) {
-        Item handItem = mc.player.getMainHandStack().getItem();
-        if (target == null || !moveFix.getValue() || (switchMode.getValue() != Switch.Silent && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem)))
-            return;
-
-        if (e.isPre()) {
-            prevClientYaw = mc.player.getYaw();
-            mc.player.setYaw(rotationYaw);
-        } else mc.player.setYaw(prevClientYaw);
     }
 
     public void auraLogic() {
@@ -519,6 +492,8 @@ public final class Aura extends Module {
                     rotationPitch = mc.player.getPitch();
                 }
 
+                ModuleManager.rotations.fixRotation = rotationYaw;
+
                 lookingAtHitbox = ThunderHack.playerManager.checkRtx(
                         rayTraceAngle.getValue() == RayTraceAngle.Calculated ? rotationYaw : prevYaw,
                         rayTraceAngle.getValue() == RayTraceAngle.Calculated ? rotationPitch : prevPitch,
@@ -547,6 +522,7 @@ public final class Aura extends Module {
 
                 prevYaw = additionYaw;
                 lookingAtHitbox = ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), wallRange.getValue(), rayTrace.getValue());
+                ModuleManager.rotations.fixRotation = rotationYaw;
             }
         }
     }

@@ -77,6 +77,28 @@ public class PlayerManager implements IManager {
 
         mc.player.setYaw(yaw);
         mc.player.setPitch(pitch);
+
+        ModuleManager.rotations.fixRotation = Float.NaN;
+    }
+
+    @EventHandler
+    public void onJump(EventPlayerJump e) {
+        ModuleManager.rotations.onJump(e);
+    }
+
+    @EventHandler
+    public void onPlayerMove(EvendFixVelocity e) {
+        ModuleManager.rotations.onPlayerMove(e);
+    }
+
+    @EventHandler
+    public void modifyVelocity(EventPlayerTravel e) {
+        ModuleManager.rotations.modifyVelocity(e);
+    }
+
+    @EventHandler
+    public void onKeyInput(EventKeyboardInput e) {
+        ModuleManager.rotations.onKeyInput(e);
     }
 
     @EventHandler
