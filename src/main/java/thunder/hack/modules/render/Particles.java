@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.ColorSetting;
@@ -99,10 +100,18 @@ public class Particles extends Module {
             RenderSystem.defaultBlendFunc();
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(false);
-            RenderSystem.setShader(() -> TEXTURE_COLOR_PROGRAM.backingProgram);
             BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-            fireFlies.forEach(p -> p.render(bufferBuilder));
+
+            if(MainSettings.amdCompatibility.getValue()) {
+                RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+                fireFlies.forEach(p -> p.render(bufferBuilder));
+            } else {
+                RenderSystem.setShader(() -> TEXTURE_COLOR_PROGRAM.backingProgram);
+                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+                fireFlies.forEach(p -> p.render(bufferBuilder));
+            }
+
             BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
             RenderSystem.depthMask(true);
             RenderSystem.disableDepthTest();
@@ -116,10 +125,18 @@ public class Particles extends Module {
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(false);
-            RenderSystem.setShader(() -> TEXTURE_COLOR_PROGRAM.backingProgram);
             BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-            particles.forEach(p -> p.render(bufferBuilder));
+
+            if(MainSettings.amdCompatibility.getValue()) {
+                RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+                particles.forEach(p -> p.render(bufferBuilder));
+            } else {
+                RenderSystem.setShader(() -> TEXTURE_COLOR_PROGRAM.backingProgram);
+                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+                particles.forEach(p -> p.render(bufferBuilder));
+            }
+
             BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
             RenderSystem.depthMask(true);
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);

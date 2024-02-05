@@ -7,7 +7,10 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.RotationAxis;
 import org.joml.Matrix4f;
+import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.utility.render.Render2DEngine;
 
 import static thunder.hack.modules.Module.mc;
@@ -42,19 +45,32 @@ public class CaptureMark {
         RenderSystem.setShaderTexture(0, Render2DEngine.capture);
         matrices.translate(-0.75, -0.75, -0.01);
         Matrix4f matrix = matrices.peek().getPositionMatrix();
-        RenderSystem.setShader(() -> TEXTURE_COLOR_PROGRAM.backingProgram);
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-        bufferBuilder.vertex(matrix,  0,  1.5f,  0).texture(0f, 1f).color(HudEditor.getColor(90).getRGB()).next();
-        bufferBuilder.vertex(matrix,  1.5f,  1.5f,  0).texture(1f, 1f).color(HudEditor.getColor(0).getRGB()).next();
-        bufferBuilder.vertex(matrix,  1.5f,  0,  0).texture(1f, 0).color(HudEditor.getColor(180).getRGB()).next();
-        bufferBuilder.vertex(matrix,  0,  0,  0).texture(0, 0).color(HudEditor.getColor(270).getRGB()).next();
+
+        if(MainSettings.amdCompatibility.getValue()) {
+            RenderSystem.setShaderColor(HudEditor.getColor(0).getRed() / 255f, HudEditor.getColor(0).getGreen() / 255f,HudEditor.getColor(0).getBlue() / 255f,HudEditor.getColor(0).getAlpha() / 255f);
+            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+            bufferBuilder.vertex(matrix, 0, 1.5f, 0).texture(0f, 1f).next();
+            bufferBuilder.vertex(matrix, 1.5f, 1.5f, 0).texture(1f, 1f).next();
+            bufferBuilder.vertex(matrix, 1.5f, 0, 0).texture(1f, 0).next();
+            bufferBuilder.vertex(matrix, 0, 0, 0).texture(0, 0).next();
+        } else {
+            RenderSystem.setShader(() -> TEXTURE_COLOR_PROGRAM.backingProgram);
+            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+            bufferBuilder.vertex(matrix, 0, 1.5f, 0).texture(0f, 1f).color(HudEditor.getColor(90).getRGB()).next();
+            bufferBuilder.vertex(matrix, 1.5f, 1.5f, 0).texture(1f, 1f).color(HudEditor.getColor(0).getRGB()).next();
+            bufferBuilder.vertex(matrix, 1.5f, 0, 0).texture(1f, 0).color(HudEditor.getColor(180).getRGB()).next();
+            bufferBuilder.vertex(matrix, 0, 0, 0).texture(0, 0).color(HudEditor.getColor(270).getRGB()).next();
+        }
+
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         immediate.draw();
         RenderSystem.enableCull();
         RenderSystem.disableDepthTest();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1f,1f,1f,1f);
     }
 
     public static void tick(){

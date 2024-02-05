@@ -58,7 +58,7 @@ public abstract class MixinEntity implements IEntity {
     public void pushAwayFromHook(Args args) {
 
         //Condition '...' is always 'false' is a lie!!! do not delete
-        if ((Object) this == MinecraftClient.getInstance().player && ModuleManager.velocity.isEnabled() && ModuleManager.velocity.players.getValue()) {
+        if ((Object) this == mc.player && ModuleManager.velocity.isEnabled() && ModuleManager.velocity.players.getValue()) {
             args.set(0, 0.);
             args.set(1, 0.);
             args.set(2, 0.);
