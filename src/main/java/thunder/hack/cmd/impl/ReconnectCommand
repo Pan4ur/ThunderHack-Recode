@@ -1,0 +1,30 @@
+package thunder.hack.cmd.impl;
+
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.network.ServerAddress;
+import net.minecraft.client.network.ServerInfo;
+import net.minecraft.command.CommandSource;
+import org.jetbrains.annotations.NotNull;
+import thunder.hack.cmd.Command;
+
+public class ReconnectCommand extends Command {
+    public ReconnectCommand() {
+        super("reconnect", "rec");
+    }
+
+    @Override
+    public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
+        builder.executes(context -> {
+            ServerInfo info = mc.isInSingleplayer() ? null : mc.getCurrentServerEntry();
+            if (info != null) {
+                mc.world.disconnect();
+                ConnectScreen.connect(new MultiplayerScreen(new TitleScreen()), mc, ServerAddress.parse(info.address), info, false);
+            }
+            return SINGLE_SUCCESS;
+        });
+    }
+}
