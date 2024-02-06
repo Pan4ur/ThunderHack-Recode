@@ -68,8 +68,8 @@ public class ServerManager implements IManager {
     public static int getPing() {
         if (mc.getNetworkHandler() == null || mc.player == null) return 0;
 
-        if (FastLatency.instance.isEnabled())
-            return FastLatency.instance.resolvedPing;
+        if (ModuleManager.fastLatency.isEnabled())
+            return ModuleManager.fastLatency.resolvedPing;
 
         PlayerListEntry playerListEntry = mc.getNetworkHandler().getPlayerListEntry(mc.player.getUuid());
         if (playerListEntry == null) return 0;

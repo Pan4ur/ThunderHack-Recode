@@ -48,7 +48,7 @@ public class PearlChaser extends Module {
 
     private final Setting<BooleanParent> stopMotion = new Setting<>("StopMotion", new BooleanParent(false));
     private final Setting<Boolean> legitStop = new Setting<>("LegitStop", false).withParent(stopMotion);
-    private final Setting<Boolean> offaura = new Setting<>("OffAura", false);
+    private final Setting<Boolean> pauseAura = new Setting<>("PauseAura", false);
     private final Setting<Boolean> onlyOnGround = new Setting<>("OnlyOnGround", false);
     private final Setting<Boolean> noMove = new Setting<>("NoMove", false);
 
@@ -110,8 +110,8 @@ public class PearlChaser extends Module {
         if (tracedBP == null || targetBlock.getSquaredDistance(tracedBP.toCenterPos()) > 36)
             return;
 
-        if(offaura.getValue() && ModuleManager.aura.isEnabled())
-            ModuleManager.aura.disable();
+        if(pauseAura.getValue() && ModuleManager.aura.isEnabled())
+            ModuleManager.aura.pause();
 
         if(onlyOnGround.getValue() && !mc.player.isOnGround())
             return;

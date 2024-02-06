@@ -16,8 +16,6 @@ public final class MainSettings extends Module {
     public static Setting<Language> language = new Setting<>("Language", Language.ENG);
     public static Setting<String> prefix = new Setting<>("Prefix", "@");
 
-    private static MainSettings instance;
-
     public enum Language {
         RU,
         ENG
@@ -25,14 +23,9 @@ public final class MainSettings extends Module {
 
     public MainSettings() {
         super("ClientSettings", Category.CLIENT);
-        instance = this;
     }
 
     public static boolean isRu() {
         return language.getValue() == Language.RU;
-    }
-
-    public static MainSettings getInstance() {
-        return instance;
     }
 }

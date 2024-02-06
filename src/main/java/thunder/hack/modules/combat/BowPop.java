@@ -1,16 +1,13 @@
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.network.packet.c2s.play.*;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 
 import java.util.Random;
@@ -42,6 +39,11 @@ public final class BowPop extends Module {
 
     @EventHandler
     private void onPacketSend(PacketEvent.Send event) {
+        if(event.getPacket() instanceof ClickSlotC2SPacket cs) {
+            sendMessage(cs.getSlot() + "");
+        }
+
+
         if (fullNullCheck() || !delayTimer.passedMs((long) (delay.getValue() * 1000))) return;
         if (event.getPacket() instanceof PlayerActionC2SPacket && ((PlayerActionC2SPacket) event.getPacket()).getAction() == PlayerActionC2SPacket.Action.RELEASE_USE_ITEM && (mc.player.getActiveItem().getItem() == Items.BOW && bow.getValue())
                 || event.getPacket() instanceof PlayerInteractItemC2SPacket && ((PlayerInteractItemC2SPacket) event.getPacket()).getHand() == Hand.MAIN_HAND && ((mc.player.getMainHandStack().getItem() == Items.ENDER_PEARL && pearls.getValue()) || (mc.player.getMainHandStack().getItem() == Items.EXPERIENCE_BOTTLE && xp.getValue()) || (mc.player.getMainHandStack().getItem() == Items.EGG && eggs.getValue()) || (mc.player.getMainHandStack().getItem() == Items.SPLASH_POTION && potions.getValue()) || (mc.player.getMainHandStack().getItem() == Items.SNOWBALL && snowballs.getValue()))) {

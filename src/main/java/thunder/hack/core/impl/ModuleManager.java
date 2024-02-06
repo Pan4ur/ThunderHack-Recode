@@ -56,7 +56,6 @@ public class ModuleManager implements IManager {
     public static ChorusExploit chorusExploit = new ChorusExploit();
     public static MoreKnockback moreKnockback = new MoreKnockback();
     public static AntiServerAdd antiServerAdd = new AntiServerAdd();
-    public static Rotations rotations = new Rotations();
     public static Trajectories trajectories = new Trajectories();
     public static TargetStrafe targetStrafe = new TargetStrafe();
     public static RadarRewrite radarRewrite = new RadarRewrite();
@@ -73,6 +72,7 @@ public class ModuleManager implements IManager {
     public static AntiServerRP antiServerRP = new AntiServerRP();
     public static TotemCounter totemCounter = new TotemCounter();
     public static PerfectDelay perfectDelay = new PerfectDelay();
+    public static FastLatency fastLatency = new FastLatency();
     public static PearlChaser pearlChaser = new PearlChaser();
     public static WorldTweaks worldTweaks = new WorldTweaks();
     public static VisualRange visualRange = new VisualRange();
@@ -139,6 +139,7 @@ public class ModuleManager implements IManager {
     public static AutoArmor autoArmor = new AutoArmor();
     public static Cooldowns cooldowns = new Cooldowns();
     public static TapeMouse tapeMouse = new TapeMouse();
+    public static Rotations rotations = new Rotations();
     public static AutoGear autoGear = new AutoGear();
     public static ViewLock viewLock = new ViewLock();
     public static Velocity velocity = new Velocity();
@@ -233,7 +234,6 @@ public class ModuleManager implements IManager {
     public ModuleManager() {
         modules.add(new AutoAnchor());
         modules.add(new Quiver());
-        modules.add(new FastLatency());
 
         if (ThunderHack.isOnWindows())
             modules.add(new RPC());
@@ -392,7 +392,7 @@ public class ModuleManager implements IManager {
             if (module.getName().toLowerCase().contains(string.toLowerCase()))
                 modulesCategory.add(module);
         });
-
+        Command.sendMessage(modulesCategory.toString());
         return modulesCategory;
     }
 }

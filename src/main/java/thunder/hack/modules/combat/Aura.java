@@ -123,7 +123,7 @@ public final class Aura extends Module {
 
     public static Entity target;
 
-    public float rotationYaw, rotationPitch, prevClientYaw, pitchAcceleration = 1f, prevYaw;
+    public float rotationYaw, rotationPitch, pitchAcceleration = 1f, prevYaw;
 
     private Vec3d rotationPoint = Vec3d.ZERO;
     private Vec3d rotationMotion = Vec3d.ZERO;
@@ -132,12 +132,11 @@ public final class Aura extends Module {
     private int trackticks;
     private boolean lookingAtHitbox;
 
-    private static Aura instance;
     private final Timer delayTimer = new Timer();
+    private final Timer pauseTimer = new Timer();
 
     public Aura() {
         super("Aura", Category.COMBAT);
-        instance = this;
     }
 
     public void auraLogic() {
@@ -270,6 +269,9 @@ public final class Aura extends Module {
 
     @EventHandler
     public void onUpdate(PlayerUpdateEvent e) {
+        if(!pauseTimer.passedMs(1000))
+            return;
+
         resolvePlayers();
         auraLogic();
         restorePlayers();
@@ -278,6 +280,9 @@ public final class Aura extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
+        if(!pauseTimer.passedMs(1000))
+            return;
+
         Item handItem = mc.player.getMainHandStack().getItem();
         if ((onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem)) && switchMode.getValue() != Switch.Silent)
             return;
@@ -797,8 +802,8 @@ public final class Aura extends Module {
         return Math.abs(yaw - MathHelper.wrapDegrees(mc.player.getYaw()));
     }
 
-    public static Aura getInstance() {
-        return instance;
+    public void pause() {
+        pauseTimer.reset();
     }
 
     public enum Rotation {

@@ -8,11 +8,9 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 
 public final class AntiServerRP extends Module {
-    private static AntiServerRP instance;
 
     public AntiServerRP() {
         super("AntiServerRP", Category.CLIENT);
-        instance = this;
     }
 
     @EventHandler
@@ -22,9 +20,5 @@ public final class AntiServerRP extends Module {
             sendPacket(new ResourcePackStatusC2SPacket(mc.player.getUuid(), ResourcePackStatusC2SPacket.Status.ACCEPTED));
             e.cancel();
         }
-    }
-
-    public static AntiServerRP getInstance() {
-        return instance;
     }
 }

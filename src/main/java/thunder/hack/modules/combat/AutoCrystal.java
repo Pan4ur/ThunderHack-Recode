@@ -144,6 +144,7 @@ public class AutoCrystal extends Module {
     private final Timer placeTimer = new Timer();
     private final Timer breakTimer = new Timer();
     private final Timer blockRecalcTimer = new Timer();
+    private final Timer pauseTimer = new Timer();
 
     // позиция и время постановки
     private final Map<BlockPos, Long> placedCrystals = new HashMap<>();
@@ -397,6 +398,9 @@ public class AutoCrystal extends Module {
 
         boolean offhand = mc.player.getOffHandStack().getItem() instanceof EndCrystalItem;
         boolean mainHand = mc.player.getMainHandStack().getItem() instanceof EndCrystalItem;
+
+        if(!pauseTimer.passedMs(1000))
+            return true;
 
         if (mc.interactionManager.isBreakingBlock() && !offhand && mining.getValue())
             return true;
@@ -1005,6 +1009,10 @@ public class AutoCrystal extends Module {
             calcPosition(placeRange.getValue(), mc.player.getPos());
             getCrystalToExplode();
         });
+    }
+
+    public void pause() {
+        pauseTimer.reset();
     }
 
     public record PlaceData(BlockHitResult bhr, float damage, float selfDamage, boolean overrideDamage) {

@@ -43,15 +43,9 @@ public final class Surround extends IndestructibleModule {
     private boolean wasTp = false;
     private int delay;
     private double prevY;
-    private static Surround instance;
 
     public Surround() {
         super("Surround", Category.COMBAT);
-        instance = this;
-    }
-
-    public static Surround getInstance() {
-        return instance;
     }
 
     @Override
