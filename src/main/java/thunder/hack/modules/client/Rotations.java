@@ -25,7 +25,7 @@ public class Rotations extends Module {
     private float prevRotation;
 
     public void onJump(EventPlayerJump e) {
-        if (Float.isNaN(fixRotation))
+        if (Float.isNaN(fixRotation) || moveFix.getValue() == MoveFix.Off)
             return;
 
         if (e.isPre()) {
