@@ -43,7 +43,7 @@ public class Rotations extends Module {
     }
 
     public void modifyVelocity(EventPlayerTravel e) {
-        if (moveFix.getValue() == MoveFix.Focused) {
+        if (moveFix.getValue() == MoveFix.Focused && !Float.isNaN(fixRotation)) {
             if (e.isPre()) {
                 prevRotation = mc.player.getYaw();
                 mc.player.setYaw(fixRotation);
