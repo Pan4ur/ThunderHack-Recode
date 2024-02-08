@@ -519,6 +519,7 @@ public class Render2DEngine {
         RenderSystem.setShaderTexture(0, arrow);
         RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
         RenderSystem.enableBlend();
+
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
         Matrix4f matrix = matrices.peek().getPositionMatrix();

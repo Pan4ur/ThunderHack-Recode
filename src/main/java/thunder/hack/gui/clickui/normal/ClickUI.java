@@ -250,7 +250,7 @@ public class ClickUI extends Screen {
             currentDescription = "";
         }
 
-        if(!anyHovered)
+        if (!anyHovered)
             GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
     }
 

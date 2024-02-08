@@ -64,7 +64,7 @@ import static thunder.hack.utility.math.MathUtility.random;
 
 public final class Aura extends Module {
     public final Setting<Float> attackRange = new Setting<>("Range", 3.1f, 2f, 6.0f);
-    public final Setting<Float> wallRange = new Setting<>("WallRange", 3.1f, 2f, 6.0f);
+    public final Setting<Float> wallRange = new Setting<>("WallRange", 3.1f, 0f, 6.0f);
     public final Setting<Rotation> rotationMode = new Setting<>("Rotation", Rotation.Universal);
     public final Setting<Switch> switchMode = new Setting<>("Switch", Switch.None);
     public final Setting<Boolean> onlyWeapon = new Setting<>("OnlyWeapon", false, v -> switchMode.getValue() != Switch.Silent);
