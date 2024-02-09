@@ -34,7 +34,9 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.core.impl.PlayerManager;
-import thunder.hack.events.impl.*;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
@@ -44,6 +46,7 @@ import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
@@ -65,6 +68,7 @@ import static thunder.hack.utility.math.MathUtility.random;
 public final class Aura extends Module {
     public final Setting<Float> attackRange = new Setting<>("Range", 3.1f, 2f, 6.0f);
     public final Setting<Float> wallRange = new Setting<>("WallRange", 3.1f, 0f, 6.0f);
+    public final Setting<Integer> fov = new Setting<>("FOV", 180, 1, 180);
     public final Setting<Rotation> rotationMode = new Setting<>("Rotation", Rotation.Universal);
     public final Setting<Switch> switchMode = new Setting<>("Switch", Switch.None);
     public final Setting<Boolean> onlyWeapon = new Setting<>("OnlyWeapon", false, v -> switchMode.getValue() != Switch.Silent);
@@ -269,7 +273,10 @@ public final class Aura extends Module {
 
     @EventHandler
     public void onUpdate(PlayerUpdateEvent e) {
-        if(!pauseTimer.passedMs(1000))
+        if (!pauseTimer.passedMs(1000))
+            return;
+
+        if (mc.player.isUsingItem() && pauseWhileEating.getValue())
             return;
 
         resolvePlayers();
@@ -280,7 +287,12 @@ public final class Aura extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        if(!pauseTimer.passedMs(1000))
+        CaptureMark.tick();
+
+        if (!pauseTimer.passedMs(1000))
+            return;
+
+        if (mc.player.isUsingItem() && pauseWhileEating.getValue())
             return;
 
         Item handItem = mc.player.getMainHandStack().getItem();
@@ -301,8 +313,6 @@ public final class Aura extends Module {
 
         if (target != null && pullDown.getValue())
             mc.player.addVelocity(0f, -pullValue.getValue() / 1000f, 0f);
-
-        CaptureMark.tick();
         Render3DEngine.updateTargetESP();
     }
 
@@ -346,10 +356,6 @@ public final class Aura extends Module {
 
         if (hitTicks > 0)
             return false;
-
-        if (mc.player.isUsingItem() && pauseWhileEating.getValue()
-                && (mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE))
-            return true;
 
         // я хз почему оно не критует когда фд больше 1.14
         if (mc.player.fallDistance > 1 && mc.player.fallDistance < 1.14)
@@ -472,7 +478,7 @@ public final class Aura extends Module {
                 float yawStep = mode.getValue() == Mode.Interact ? 360f : random(minYawStep.getValue(), maxYawStep.getValue());
                 float pitchStep = mode.getValue() == Mode.Interact ? 180f : pitchAcceleration + random(-1f, 1f);
 
-                if(accelerateOnHit.getValue() && ready) {
+                if (accelerateOnHit.getValue() && ready) {
                     yawStep = 180f;
                     pitchStep = 90f;
                 }
@@ -762,6 +768,7 @@ public final class Aura extends Module {
         if (entity instanceof ArmorStandEntity) return true;
         if (entity instanceof CatEntity) return true;
         if (skipNotSelected(entity)) return true;
+        if (!isInFOV(ent)) return true;
 
         if (entity instanceof PlayerEntity player) {
             if (ModuleManager.antiBot.isEnabled() && AntiBot.bots.contains(entity))
@@ -793,6 +800,16 @@ public final class Aura extends Module {
         if (entity instanceof VillagerEntity && !Villagers.getValue()) return true;
         if (entity instanceof MobEntity && !Mobs.getValue()) return true;
         return entity instanceof AnimalEntity && !Animals.getValue();
+    }
+
+    private boolean isInFOV(@NotNull LivingEntity e) {
+        double deltaX = e.getX() - mc.player.getX();
+        double deltaZ = e.getZ() - mc.player.getZ();
+        float yawDelta = MathHelper.wrapDegrees((float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(deltaZ, deltaX)) - 90.0) - MathHelper.wrapDegrees(mc.player.getYaw()));
+
+        if(e instanceof PlayerEntity && e != mc.player)
+             sendMessage(Math.abs(yawDelta) + "");
+        return Math.abs(yawDelta) <= fov.getValue();
     }
 
     private float getFOVAngle(@NotNull LivingEntity e) {
