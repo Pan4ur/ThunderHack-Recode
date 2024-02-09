@@ -7,26 +7,18 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.asm.mixin.Unique;
-import thunder.hack.ThunderHack;
-import thunder.hack.cmd.Command;
 import thunder.hack.core.IManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
@@ -36,7 +28,6 @@ import thunder.hack.modules.movement.NoSlow;
 import thunder.hack.utility.Timer;
 
 import static net.minecraft.util.math.MathHelper.clamp;
-import static thunder.hack.modules.Module.mc;
 
 public class PlayerManager implements IManager {
     public float yaw, pitch, lastYaw, lastPitch, currentPlayerSpeed;
@@ -133,9 +124,10 @@ public class PlayerManager implements IManager {
         double z = mc.player.getZ() - mc.player.prevZ;
         float offset = bodyYaw;
         if ((x * x + z * z) > 0.0025000002f) offset = (float) (MathHelper.atan2(z, x) * 57.295776f - 90.0f);
-        if (mc.player.handSwingProgress > 0.0f) offset = ((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw();
+        if (mc.player.handSwingProgress > 0.0f)
+            offset = ((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw();
         float deltaBodyYaw = clamp(MathHelper.wrapDegrees((((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw()) - (bodyYaw + MathHelper.wrapDegrees(offset - bodyYaw) * 0.3f)), -45.0f, 75.0f);
-        return (deltaBodyYaw > 50f ? deltaBodyYaw * 0.2f : 0)  + ((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw() - deltaBodyYaw;
+        return (deltaBodyYaw > 50f ? deltaBodyYaw * 0.2f : 0) + ((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw() - deltaBodyYaw;
     }
 
     public boolean checkRtx(float yaw, float pitch, float distance, float wallDistance, Aura.RayTrace rt) {
@@ -189,6 +181,23 @@ public class PlayerManager implements IManager {
             }
         }
         return targetedEntity;
+    }
+
+    public Vec3d getRtxPoint(float yaw, float pitch, float distance) {
+        Vec3d vec3d = mc.player.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
+        double distancePow2 = Math.pow(distance, 2);
+        Vec3d vec3d2 = getRotationVector(pitch, yaw);
+        Vec3d vec3d3 = vec3d.add(vec3d2.x * distance, vec3d2.y * distance, vec3d2.z * distance);
+        Box box = mc.player.getBoundingBox().stretch(vec3d2.multiply(distance)).expand(1.0, 1.0, 1.0);
+        EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator() && entity.canHit(), distancePow2);
+        if (entityHitResult != null) {
+            Entity entity2 = entityHitResult.getEntity();
+            Vec3d vec3d4 = entityHitResult.getPos();
+            if (entity2 instanceof LivingEntity) {
+                return vec3d4;
+            }
+        }
+        return null;
     }
 
     public HitResult rayTrace(double dst, float yaw, float pitch) {

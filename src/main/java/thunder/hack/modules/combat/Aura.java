@@ -88,7 +88,7 @@ public final class Aura extends Module {
     /*   ADVANCED   */
     public final Setting<Parent> advanced = new Setting<>("Advanced", new Parent(false, 0));
     public final Setting<Float> aimRange = new Setting<>("AimRange", 3.1f, 2f, 6.0f).withParent(advanced);
-    public final Setting<Boolean> uniqueHitPattern = new Setting<>("UniqueHitPattern", false).withParent(advanced);
+    public final Setting<RandomHitDelay> randomHitDelay = new Setting<>("RandomHitDelay", RandomHitDelay.Off).withParent(advanced);
     public final Setting<Boolean> tpsSync = new Setting<>("TPSSync", false).withParent(advanced);
     public final Setting<Boolean> pauseWhileEating = new Setting<>("PauseWhileEating", false).withParent(advanced);
     public final Setting<Boolean> dropSprint = new Setting<>("DropSprint", true).withParent(advanced);
@@ -268,7 +268,7 @@ public final class Aura extends Module {
         if (mc.getCurrentServerEntry() != null && mc.getCurrentServerEntry().address.equals("ngrief.me") && mc.player.getMainHandStack().getItem() instanceof AxeItem) {
             return 21;
         }
-        return oldDelay.getValue().isEnabled() ? 1 + (int) (20f / random(minCPS.getValue(), maxCPS.getValue())) : (uniqueHitPattern.getValue() ? (int) MathUtility.random(11, 13) : 11);
+        return oldDelay.getValue().isEnabled() ? 1 + (int) (20f / random(minCPS.getValue(), maxCPS.getValue())) : (randomHitDelay.getValue().equals(RandomHitDelay.Delay) ? (int) MathUtility.random(11, 13) : 11);
     }
 
     @EventHandler
@@ -380,7 +380,7 @@ public final class Aura extends Module {
             return true;
 
         if (!reasonForSkipCrit)
-            return !mc.player.isOnGround() && mc.player.fallDistance > 0.0f;
+            return !mc.player.isOnGround() && mc.player.fallDistance > (randomHitDelay.getValue().equals(RandomHitDelay.FallDistance) ? MathUtility.random(0f, 0.4f) : 0.0f);
         return true;
     }
 
@@ -854,5 +854,9 @@ public final class Aura extends Module {
 
     public enum ESP {
         Off, ThunderHack, NurikZapen, CelkaPasta
+    }
+
+    public enum RandomHitDelay {
+        Off, Delay, FallDistance
     }
 }
