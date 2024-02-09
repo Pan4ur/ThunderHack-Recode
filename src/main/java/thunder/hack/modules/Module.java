@@ -232,6 +232,8 @@ public abstract class Module {
             }
         }
 
+        settingList.forEach(s -> s.setModule(this));
+
         return settingList;
     }
 

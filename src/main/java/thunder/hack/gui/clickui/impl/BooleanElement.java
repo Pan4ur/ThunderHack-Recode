@@ -29,7 +29,6 @@ public class BooleanElement extends AbstractElement {
         animation = fast(animation, (boolean) setting.getValue() ? 1 : 0, 15f);
         double paddingX = 7 * animation;
 
-
         Render2DEngine.drawBlurredShadow(context.getMatrices(),(float) (x + width - 21), (float) (y + height / 2 - 4), 15, 8, 8, Render2DEngine.injectAlpha(new Color(0x000000), (int) (100 * (paddingX / 7f))));
 
         Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 21), (float) (y + height / 2 - 4), 15, 8, 4, paddingX > 4 ? ClickGui.getInstance().getColor(0) : new Color(0xFFB2B1B1));
@@ -46,9 +45,9 @@ public class BooleanElement extends AbstractElement {
         }
 
         if(!isSmall()) {
-            FontRenderers.settings.drawString(context.getMatrices(), setting.getName(), (setting.parent != null ? 2f : 0f) + (x + 6), (y + height / 2 - (6 / 2f)) + 2, new Color(-1).getRGB());
+            FontRenderers.settings.drawString(context.getMatrices(), setting.getName(), (setting.parent != null ? 2f : 0f) + (x + 6), (y + height / 2 - (6 / 2f)) + 2, ClickGui.getInstance().getTextColor(setting.getModule()));
         } else {
-            FontRenderers.sf_medium_mini.drawString(context.getMatrices(), setting.getName(), (setting.parent != null ? 2f : 0f) + (x + 6), (y + height / 2 - (6 / 2f)) + 2, new Color(-1).getRGB());
+            FontRenderers.sf_medium_mini.drawString(context.getMatrices(), setting.getName(), (setting.parent != null ? 2f : 0f) + (x + 6), (y + height / 2 - (6 / 2f)) + 2, ClickGui.getInstance().getTextColor(setting.getModule()));
         }
     }
 

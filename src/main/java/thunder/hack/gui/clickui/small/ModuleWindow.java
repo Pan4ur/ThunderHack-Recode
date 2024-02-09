@@ -95,7 +95,7 @@ public class ModuleWindow extends AbstractWindow {
 
         context.drawTexture(ICON, (int) (x + 7), (int) (y + (height - 18) / 2), 0, 0, 12, 12, 12, 12);
 
-        FontRenderers.categories.drawCenteredString(context.getMatrices(), getName(), ((int) x + 2 + (width - 4) / 2), (int) y + (int) height / 2f - 7, new Color(-1).getRGB());
+        FontRenderers.categories.drawCenteredString(context.getMatrices(), getName(), ((int) x + 2 + (width - 4) / 2), (int) y + (int) height / 2f - 7, ClickGui.getInstance().categoryText.getValue().getColor());
         context.getMatrices().pop();
         updatePosition();
     }

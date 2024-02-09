@@ -5,6 +5,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.modules.client.ClickGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.MathUtility;
@@ -48,7 +49,7 @@ public class ColorPickerElement extends AbstractElement {
         MatrixStack matrixStack = context.getMatrices();
 
         Render2DEngine.drawRound(matrixStack, (float) x + 5, (float) y + 2, (float) width - 10, (float) height - 4, 4, new Color(bgcolor));
-        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName(), x + 8, (int) y + 8, new Color(-1).getRGB());
+        FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName(), x + 8, (int) y + 8, ClickGui.getInstance().getTextColor(setting.getModule()));
 
         Render2DEngine.drawBlurredShadow(matrixStack, (float) (x + width - 25f), (float) (y + 5f), 14, 7, 10, getColorSetting().getColorObject());
         Render2DEngine.drawRound(matrixStack, (float) (x + width - 25), (float) (y + 5), 14, 7, 1, getColorSetting().getColorObject());

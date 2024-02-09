@@ -147,7 +147,7 @@ public class ModuleButton extends AbstractButton {
 
         if (!ClickGui.getInstance().showBinds.getValue()) {
             if (module.getSettings().size() > 3)
-                FontRenderers.sf_medium_modules.drawString(context.getMatrices(), isOpen() ? "-" : "+", x + width - 12, y + 7, -1);
+                FontRenderers.sf_medium_modules.drawString(context.getMatrices(), isOpen() ? "-" : "+", x + width - 12, y + 7, ClickGui.getInstance().getTextColor(module));
         } else {
             if (!module.getBind().getBind().equalsIgnoreCase("none")) {
                 String sbind = module.getBind().getBind();
@@ -170,22 +170,22 @@ public class ModuleButton extends AbstractButton {
                     sbind = "RAlt";
                 }
                 if (!binding)
-                    FontRenderers.sf_medium_modules.drawString(context.getMatrices(), sbind, x + width - 11 - FontRenderers.sf_medium_modules.getStringWidth(sbind), y + 6 + (hovered ? -1 : 0), new Color(-1).getRGB());
+                    FontRenderers.sf_medium_modules.drawString(context.getMatrices(), sbind, x + width - 11 - FontRenderers.sf_medium_modules.getStringWidth(sbind), y + 6 + (hovered ? -1 : 0), ClickGui.getInstance().getTextColor(module));
             }
             if (binding)
-                FontRenderers.sf_medium_modules.drawString(context.getMatrices(), holdbind ? (Formatting.GRAY + "Toggle / " + Formatting.RESET + "Hold") : (Formatting.RESET + "Toggle " + Formatting.GRAY + "/ Hold"), x + width - 11 - FontRenderers.sf_medium_modules.getStringWidth("Toggle/Hold"), iy + 2 + (hovered ? -1 : 0), new Color(-1).getRGB());
+                FontRenderers.sf_medium_modules.drawString(context.getMatrices(), holdbind ? (Formatting.GRAY + "Toggle / " + Formatting.RESET + "Hold") : (Formatting.RESET + "Toggle " + Formatting.GRAY + "/ Hold"), x + width - 11 - FontRenderers.sf_medium_modules.getStringWidth("Toggle/Hold"), iy + 2 + (hovered ? -1 : 0), ClickGui.getInstance().getTextColor(module));
         }
 
         if (hovered && InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT)) {
-            FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"), ix + 1f, iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+            FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"), ix + 1f, iy + 2 + (hovered ? -1 : 0), ClickGui.getInstance().getTextColor(module));
         } else {
             if (this.binding)
-                FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "PressKey", ix, iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+                FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "PressKey", ix, iy + 2 + (hovered ? -1 : 0), ClickGui.getInstance().getTextColor(module));
             else {
                 if (ClickGui.getInstance().textSide.getValue() == ClickGui.TextSide.Left)
-                    FontRenderers.sf_medium_modules.drawString(context.getMatrices(), module.getName(), ix + 2, iy + 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+                    FontRenderers.sf_medium_modules.drawString(context.getMatrices(), module.getName(), ix + 2, iy + 2 + (hovered ? -1 : 0), ClickGui.getInstance().getTextColor(module));
                 else
-                    FontRenderers.sf_medium_modules.drawCenteredString(context.getMatrices(), module.getName(), ix + 38, iy - 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
+                    FontRenderers.sf_medium_modules.drawCenteredString(context.getMatrices(), module.getName(), ix + 38, iy - 2 + (hovered ? -1 : 0), ClickGui.getInstance().getTextColor(module));
             }
         }
     }

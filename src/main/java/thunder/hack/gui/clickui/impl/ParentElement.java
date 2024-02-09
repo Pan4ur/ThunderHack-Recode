@@ -45,9 +45,9 @@ public class ParentElement extends AbstractElement {
         matrixStack.pop();
 
         if(!isSmall()) {
-            FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName(), (int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy())), (y + height / 2 - 1f), new Color(-1).getRGB());
+            FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName(), (int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy())), (y + height / 2 - 1f), ClickGui.getInstance().getTextColor(setting.getModule()));
         } else {
-            FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), (int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy())), (y + height / 2 - 1f), new Color(-1).getRGB());
+            FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), (int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy())), (y + height / 2 - 1f), ClickGui.getInstance().getTextColor(setting.getModule()));
         }
     }
 

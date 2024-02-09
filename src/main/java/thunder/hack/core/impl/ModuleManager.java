@@ -89,6 +89,7 @@ public class ModuleManager implements IManager {
     public static EntitySpeed entitySpeed = new EntitySpeed();
     public static AspectRatio aspectRatio = new AspectRatio();
     public static ClientSpoof clientSpoof = new ClientSpoof();
+    public static AutoAnchor autoAnchor = new AutoAnchor();
     public static WaterSpeed waterSpeed = new WaterSpeed();
     public static TriggerBot triggerBot = new TriggerBot();
     public static TPSCounter tpsCounter = new TPSCounter();
@@ -214,6 +215,7 @@ public class ModuleManager implements IManager {
     public static Burrow burrow = new Burrow();
     public static AutoEZ autoEZ = new AutoEZ();
     public static AimBot aimBot = new AimBot();
+    public static Quiver quiver = new Quiver();
     public static Timer timer = new Timer();
     public static Regen regen = new Regen();
     public static Speed speed = new Speed();
@@ -231,11 +233,7 @@ public class ModuleManager implements IManager {
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
 
-
     public ModuleManager() {
-        modules.add(new AutoAnchor());
-        modules.add(new Quiver());
-
         if (ThunderHack.isOnWindows())
             modules.add(new RPC());
 
