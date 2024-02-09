@@ -806,9 +806,6 @@ public final class Aura extends Module {
         double deltaX = e.getX() - mc.player.getX();
         double deltaZ = e.getZ() - mc.player.getZ();
         float yawDelta = MathHelper.wrapDegrees((float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(deltaZ, deltaX)) - 90.0) - MathHelper.wrapDegrees(mc.player.getYaw()));
-
-        if(e instanceof PlayerEntity && e != mc.player)
-             sendMessage(Math.abs(yawDelta) + "");
         return Math.abs(yawDelta) <= fov.getValue();
     }
 
