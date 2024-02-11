@@ -13,11 +13,10 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import thunder.hack.ThunderHack;
-import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.client.MainSettings;
+import thunder.hack.modules.client.ClientSettings;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ import java.util.List;
 
 import static com.mojang.blaze3d.systems.RenderSystem.disableBlend;
 import static thunder.hack.modules.Module.mc;
+import static thunder.hack.utility.render.Render2DEngine.*;
 
 public class Render3DEngine {
 
@@ -40,7 +40,6 @@ public class Render3DEngine {
 
     private static float prevCircleStep;
     private static float circleStep;
-    private float prevAdditionYaw;
 
     public static void onRender3D(MatrixStack stack) {
         if (!FILLED_QUEUE.isEmpty() || !FADE_QUEUE.isEmpty() || !FILLED_SIDE_QUEUE.isEmpty()) {
@@ -105,6 +104,47 @@ public class Render3DEngine {
         float maxX = (float) (box.maxX - mc.getEntityRenderDispatcher().camera.getPos().getX());
         float maxY = (float) (box.maxY - mc.getEntityRenderDispatcher().camera.getPos().getY());
         float maxZ = (float) (box.maxZ - mc.getEntityRenderDispatcher().camera.getPos().getZ());
+
+        bufferBuilder.vertex(m, minX, minY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, minY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, minY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, minY, maxZ).color(c.getRGB()).next();
+
+        bufferBuilder.vertex(m, minX, minY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, maxY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, maxY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, minY, minZ).color(c.getRGB()).next();
+
+        bufferBuilder.vertex(m, maxX, minY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, maxY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, maxY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, minY, maxZ).color(c.getRGB()).next();
+
+        bufferBuilder.vertex(m, minX, minY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, minY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, maxY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, maxY, maxZ).color(c.getRGB()).next();
+
+        bufferBuilder.vertex(m, minX, minY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, minY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, maxY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, maxY, minZ).color(c.getRGB()).next();
+
+        bufferBuilder.vertex(m, minX, maxY, minZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, minX, maxY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, maxY, maxZ).color(c.getRGB()).next();
+        bufferBuilder.vertex(m, maxX, maxY, minZ).color(c.getRGB()).next();
+    }
+
+    public static void setFilledBoxVertexes2(@NotNull BufferBuilder bufferBuilder, MatrixStack stack, @NotNull Box box, @NotNull Color c) {
+        float minX = (float) (box.minX);
+        float minY = (float) (box.minY);
+        float minZ = (float) (box.minZ);
+        float maxX = (float) (box.maxX);
+        float maxY = (float) (box.maxY);
+        float maxZ = (float) (box.maxZ);
+
+        Matrix4f m = stack.peek().getPositionMatrix();
 
         bufferBuilder.vertex(m, minX, minY, minZ).color(c.getRGB()).next();
         bufferBuilder.vertex(m, maxX, minY, minZ).color(c.getRGB()).next();
@@ -244,7 +284,7 @@ public class Render3DEngine {
     }
 
     public static double getScaleFactor() {
-        return MainSettings.scaleFactorFix.getValue() ? MainSettings.scaleFactorFixValue.getValue() : mc.getWindow().getScaleFactor();
+        return ClientSettings.scaleFactorFix.getValue() ? ClientSettings.scaleFactorFixValue.getValue() : mc.getWindow().getScaleFactor();
     }
 
 
@@ -562,6 +602,32 @@ public class Render3DEngine {
         stack.translate(-x, -y, -z);
         Render3DEngine.cleanup();
         stack.pop();
+    }
+
+    public static void renderDot(BufferBuilder bufferBuilder, float posX, float posY, float posZ) {
+        int age = 1;
+        int maxAge = 1;
+        float size = 0.3f;
+
+        RenderSystem.setShaderTexture(0, firefly);
+        Camera camera = mc.gameRenderer.getCamera();
+        Color color1 = HudEditor.getColor(age * 2);
+       //Vec3d pos = Render3DEngine.interpolatePos(prevposX, prevposY, prevposZ, posX, posY, posZ);
+        Vec3d pos = new Vec3d( posX, posY, posZ);
+
+        MatrixStack matrices = new MatrixStack();
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
+        matrices.translate(pos.x, pos.y, pos.z);
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+
+        Matrix4f matrix1 = matrices.peek().getPositionMatrix();
+
+        bufferBuilder.vertex(matrix1, 0, -size, 0).texture(0f, 1f).color(Render2DEngine.injectAlpha(color1, (int) (255 * ((float) age / (float) maxAge))).getRGB()).next();
+        bufferBuilder.vertex(matrix1, -size, -size, 0).texture(1f, 1f).color(Render2DEngine.injectAlpha(color1, (int) (255 * ((float) age / (float) maxAge))).getRGB()).next();
+        bufferBuilder.vertex(matrix1, -size, 0, 0).texture(1f, 0).color(Render2DEngine.injectAlpha(color1, (int) (255 * ((float) age / (float) maxAge))).getRGB()).next();
+        bufferBuilder.vertex(matrix1, 0, 0, 0).texture(0, 0).color(Render2DEngine.injectAlpha(color1, (int) (255 * ((float) age / (float) maxAge))).getRGB()).next();
     }
 
     public static void renderCrosses(@NotNull Box box, Color color, float lineWidth) {
