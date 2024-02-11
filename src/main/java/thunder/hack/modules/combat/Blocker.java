@@ -20,7 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public final class Blocker extends IndestructibleModule {
     private final Setting<Integer> actionShift = new Setting<>("Place Per Tick", 1, 1, 5);

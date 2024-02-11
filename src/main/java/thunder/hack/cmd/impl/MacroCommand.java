@@ -14,7 +14,7 @@ import thunder.hack.core.impl.MacroManager;
 import java.lang.reflect.Field;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class MacroCommand extends Command {
     public MacroCommand() {

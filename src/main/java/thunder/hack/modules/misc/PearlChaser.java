@@ -23,20 +23,16 @@ import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.render.Trajectories;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.PlayerUtility;
-import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.Comparator;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class PearlChaser extends Module {
 

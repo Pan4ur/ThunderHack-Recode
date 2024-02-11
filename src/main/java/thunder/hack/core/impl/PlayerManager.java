@@ -100,7 +100,7 @@ public class PlayerManager implements IManager {
         if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket slot) {
             if (serverSideSlot == slot.getSelectedSlot() && !(ModuleManager.noSlow.isEnabled() && ModuleManager.noSlow.mode.getValue() == NoSlow.Mode.StrictNCP)) {
                 event.cancel();
-                ModuleManager.mainSettings.debug("Double slot packet!");
+                ModuleManager.clientSettings.debug("Double slot packet!");
             }
 
             switchTimer.reset();

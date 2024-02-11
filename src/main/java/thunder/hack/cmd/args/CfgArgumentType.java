@@ -10,7 +10,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import thunder.hack.ThunderHack;
-import thunder.hack.modules.client.MainSettings;
+import thunder.hack.modules.client.ClientSettings;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -26,7 +26,7 @@ public class CfgArgumentType implements ArgumentType<String> {
     public String parse(StringReader reader) throws CommandSyntaxException {
         String config = reader.readString();
         if (!ThunderHack.configManager.getConfigList().contains(config)) throw new DynamicCommandExceptionType(
-                name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Конфига " + name.toString() + " не существует(" : "Config " + name.toString() + " does not exists(")
+                name -> Text.literal(ClientSettings.language.getValue().equals(ClientSettings.Language.RU) ? "Конфига " + name.toString() + " не существует(" : "Config " + name.toString() + " does not exists(")
         ).create(config);
 
         return config;

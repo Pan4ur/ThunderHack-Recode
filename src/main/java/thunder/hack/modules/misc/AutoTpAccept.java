@@ -13,7 +13,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.math.MathUtility;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class AutoTpAccept extends Module {
 

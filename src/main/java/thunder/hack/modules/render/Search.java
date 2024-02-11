@@ -1,6 +1,5 @@
 package thunder.hack.modules.render;
 
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.modules.Module;
@@ -20,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class Search extends Module {
 

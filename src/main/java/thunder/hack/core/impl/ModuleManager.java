@@ -62,7 +62,7 @@ public class ModuleManager implements IManager {
     public static PVPResources pvpResources = new PVPResources();
     public static NoServerSlot noServerSlot = new NoServerSlot();
     public static NoCameraClip noCameraClip = new NoCameraClip();
-    public static MainSettings mainSettings = new MainSettings();
+    public static ClientSettings clientSettings = new ClientSettings();
     public static ItemScroller itemScroller = new ItemScroller();
     public static HitParticles hitParticles = new HitParticles();
     public static ElytraRecast elytraRecast = new ElytraRecast();

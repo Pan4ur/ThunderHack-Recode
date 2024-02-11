@@ -1,15 +1,9 @@
 package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import thunder.hack.ThunderHack;
@@ -27,7 +21,7 @@ import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 import static thunder.hack.modules.movement.Timer.violation;
 import static thunder.hack.utility.player.MovementUtility.isMoving;
 

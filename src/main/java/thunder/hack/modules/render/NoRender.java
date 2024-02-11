@@ -1,8 +1,6 @@
 package thunder.hack.modules.render;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.SignBlock;
-import net.minecraft.client.render.block.entity.SignBlockEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -11,8 +9,6 @@ import net.minecraft.entity.projectile.thrown.EggEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
-import net.minecraft.server.command.WeatherCommand;
-import net.minecraft.server.world.ServerWorld;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -23,7 +19,7 @@ import thunder.hack.setting.Setting;
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class NoRender extends Module {
 

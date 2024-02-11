@@ -15,7 +15,7 @@ import thunder.hack.core.impl.MacroManager;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class MacroArgumentType implements ArgumentType<MacroManager.Macro> {
     private static final Collection<String> EXAMPLES = ThunderHack.macroManager.getMacros().stream().map(MacroManager.Macro::name).limit(5).toList();

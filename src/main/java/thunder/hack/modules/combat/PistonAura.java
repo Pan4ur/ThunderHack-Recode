@@ -48,7 +48,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public final class PistonAura extends Module {
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 1, 0, 25);

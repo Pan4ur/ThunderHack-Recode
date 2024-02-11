@@ -11,7 +11,7 @@ import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.util.Formatting;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public final class AutoAuth extends Module {
     private final Setting<Mode> passwordMode = new Setting<>("Password Mode", Mode.Custom);

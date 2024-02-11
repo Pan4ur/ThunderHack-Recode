@@ -7,11 +7,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.ColorSetting;
@@ -23,9 +21,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL13.GL_SUBTRACT;
-import static org.lwjgl.opengl.GL14.GL_FUNC_ADD;
-import static org.lwjgl.opengl.GL14.GL_MAX;
 import static thunder.hack.utility.render.Render2DEngine.*;
 
 public class Particles extends Module {
@@ -93,25 +88,17 @@ public class Particles extends Module {
 
     public void onPreRender3D(MatrixStack stack) {
 
-        if(FireFlies.getValue().isEnabled()) {
+        if (FireFlies.getValue().isEnabled()) {
             stack.push();
             RenderSystem.setShaderTexture(0, firefly);
             RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
+            RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(false);
             BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-
-            if(MainSettings.amdCompatibility.getValue()) {
-                RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-                fireFlies.forEach(p -> p.render(bufferBuilder));
-            } else {
-                RenderSystem.setShader(() -> TEXTURE_COLOR_PROGRAM.backingProgram);
-                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-                fireFlies.forEach(p -> p.render(bufferBuilder));
-            }
-
+            RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+            fireFlies.forEach(p -> p.render(bufferBuilder));
             BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
             RenderSystem.depthMask(true);
             RenderSystem.disableDepthTest();
@@ -119,24 +106,16 @@ public class Particles extends Module {
             stack.pop();
         }
 
-        if(mode.getValue() != Mode.Off) {
+        if (mode.getValue() != Mode.Off) {
             stack.push();
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(false);
             BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-
-            if(MainSettings.amdCompatibility.getValue()) {
-                RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-                particles.forEach(p -> p.render(bufferBuilder));
-            } else {
-                RenderSystem.setShader(() -> TEXTURE_COLOR_PROGRAM.backingProgram);
-                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-                particles.forEach(p -> p.render(bufferBuilder));
-            }
-
+            RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+            particles.forEach(p -> p.render(bufferBuilder));
             BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
             RenderSystem.depthMask(true);
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
@@ -243,7 +222,7 @@ public class Particles extends Module {
             posZ += motionZ;
 
             motionX *= 0.9f;
-            if(physics.getValue() == Physics.Fly)
+            if (physics.getValue() == Physics.Fly)
                 motionY *= 0.9f;
             motionZ *= 0.9f;
 
@@ -253,12 +232,12 @@ public class Particles extends Module {
         }
 
         public void render(BufferBuilder bufferBuilder) {
-            switch (mode.getValue()){
-                case Bloom ->  RenderSystem.setShaderTexture(0, firefly);
-                case SnowFlake ->  RenderSystem.setShaderTexture(0, snowflake);
-                case Dollars ->  RenderSystem.setShaderTexture(0, dollar);
-                case Hearts ->  RenderSystem.setShaderTexture(0, heart);
-                case Stars ->  RenderSystem.setShaderTexture(0, star);
+            switch (mode.getValue()) {
+                case Bloom -> RenderSystem.setShaderTexture(0, firefly);
+                case SnowFlake -> RenderSystem.setShaderTexture(0, snowflake);
+                case Dollars -> RenderSystem.setShaderTexture(0, dollar);
+                case Hearts -> RenderSystem.setShaderTexture(0, heart);
+                case Stars -> RenderSystem.setShaderTexture(0, star);
             }
 
             Camera camera = mc.gameRenderer.getCamera();

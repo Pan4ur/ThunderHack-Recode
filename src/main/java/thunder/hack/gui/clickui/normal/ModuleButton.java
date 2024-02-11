@@ -15,7 +15,7 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.TargetHud;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
-import thunder.hack.modules.client.MainSettings;
+import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.*;
 import thunder.hack.utility.render.Render2DEngine;
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class ModuleButton extends AbstractButton {
@@ -213,7 +213,7 @@ public class ModuleButton extends AbstractButton {
         if (hovered) {
             if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT) && button == 0) {
                 module.setDrawn(!module.isDrawn());
-                if (MainSettings.isRu()) {
+                if (ClientSettings.isRu()) {
                     Command.sendMessage("Модуль " + Formatting.GREEN + module.getName() + Formatting.WHITE + " теперь " + (module.isDrawn() ? "виден в ArrayList" : "не виден в ArrayList"));
                 } else {
                     Command.sendMessage(Formatting.GREEN + module.getName() + Formatting.WHITE + " is now " + (module.isDrawn() ? "visible in ArrayList" : "invisible in ArrayList"));

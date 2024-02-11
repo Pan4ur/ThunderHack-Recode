@@ -13,7 +13,7 @@ import thunder.hack.core.IManager;
 import thunder.hack.gui.autobuy.AutoBuyItem;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.AutoBuy;
-import thunder.hack.modules.client.MainSettings;
+import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.modules.misc.Nuker;
 import thunder.hack.modules.render.Search;
 import thunder.hack.setting.Setting;
@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class ConfigManager implements IManager {
@@ -86,14 +86,14 @@ public class ConfigManager implements IManager {
     }
 
     public void loadDefault(String name) {
-        MainSettings.Language prevLang = MainSettings.language.getValue();
+        ClientSettings.Language prevLang = ClientSettings.language.getValue();
         Path path = Paths.get(CONFIG_FOLDER_NAME + "/configs/" + name + ".th");
         try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("cfg/" + name + ".th");
              OutputStream out = Files.newOutputStream(path)) {
             if (in == null) return;
             IOUtils.copy(in, out);
             load(name);
-            MainSettings.language.setValue(prevLang);
+            ClientSettings.language.setValue(prevLang);
         } catch (IOException e) {
             e.printStackTrace();
         }

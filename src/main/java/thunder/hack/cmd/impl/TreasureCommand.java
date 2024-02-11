@@ -5,7 +5,7 @@ import net.minecraft.command.CommandSource;
 import thunder.hack.cmd.Command;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class TreasureCommand extends Command {
     public TreasureCommand() {

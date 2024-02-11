@@ -14,7 +14,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
@@ -40,7 +39,7 @@ import thunder.hack.utility.world.HoleUtility;
 import java.util.*;
 import java.util.List;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public final class AutoAnchor extends Module {
     private final Setting<Float> targetRange = new Setting<>("Target Range", 10f, 1f, 20f);

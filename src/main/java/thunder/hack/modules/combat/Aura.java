@@ -46,7 +46,6 @@ import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
 import thunder.hack.utility.math.MathUtility;
-import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
@@ -62,7 +61,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.minecraft.util.UseAction.BLOCK;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 import static thunder.hack.utility.math.MathUtility.random;
 
 public final class Aura extends Module {

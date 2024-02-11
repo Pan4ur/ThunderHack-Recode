@@ -14,7 +14,7 @@ import thunder.hack.utility.discord.DiscordRichPresence;
 import java.io.*;
 import java.util.Objects;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public final class RPC extends Module {
     private static final DiscordRPC rpc = DiscordRPC.INSTANCE;

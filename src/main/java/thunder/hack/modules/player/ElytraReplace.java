@@ -9,7 +9,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.utility.player.InventoryUtility;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class ElytraReplace extends Module {
     public ElytraReplace() {

@@ -3,7 +3,7 @@ package thunder.hack.modules.client;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
-public final class MainSettings extends Module {
+public final class ClientSettings extends Module {
     public static Setting<Boolean> futureCompatibility = new Setting<>("FutureCompatibility", false);
     public static Setting<Boolean> customMainMenu = new Setting<>("CustomMainMenu", true);
     public static Setting<Boolean> scaleFactorFix = new Setting<>("ScaleFactorFix", false);
@@ -12,7 +12,6 @@ public final class MainSettings extends Module {
     public static Setting<Boolean> skullEmoji = new Setting<>("SkullEmoji", true);
     public static Setting<Boolean> debug = new Setting<>("Debug", false);
     public static Setting<Boolean> customBob = new Setting<>("CustomBob", true);
-    public static Setting<Boolean> amdCompatibility = new Setting<>("AmdCompatibility", false);
     public static Setting<Language> language = new Setting<>("Language", Language.ENG);
     public static Setting<String> prefix = new Setting<>("Prefix", "@");
 
@@ -21,7 +20,7 @@ public final class MainSettings extends Module {
         ENG
     }
 
-    public MainSettings() {
+    public ClientSettings() {
         super("ClientSettings", Category.CLIENT);
     }
 

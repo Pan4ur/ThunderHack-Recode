@@ -1,7 +1,5 @@
 package thunder.hack.injection;
 
-import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
@@ -26,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
-import thunder.hack.modules.client.MainSettings;
+import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 
@@ -50,7 +48,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void onRenderPre(T livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
-        if (MinecraftClient.getInstance().player != null && livingEntity == MinecraftClient.getInstance().player && MainSettings.renderRotations.getValue() && !ThunderHack.isFuturePresent()) {
+        if (MinecraftClient.getInstance().player != null && livingEntity == MinecraftClient.getInstance().player && ClientSettings.renderRotations.getValue() && !ThunderHack.isFuturePresent()) {
             originalHeadYaw = livingEntity.headYaw;
             originalPrevHeadYaw = livingEntity.prevHeadYaw;
             originalPrevHeadPitch = livingEntity.prevPitch;
@@ -128,7 +126,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
 
     @Unique
     public void postRender(T livingEntity) {
-        if (MinecraftClient.getInstance().player != null && livingEntity == MinecraftClient.getInstance().player && MainSettings.renderRotations.getValue() && !ThunderHack.isFuturePresent()) {
+        if (MinecraftClient.getInstance().player != null && livingEntity == MinecraftClient.getInstance().player && ClientSettings.renderRotations.getValue() && !ThunderHack.isFuturePresent()) {
             livingEntity.prevPitch = originalPrevHeadPitch;
             livingEntity.setPitch(originalHeadPitch);
             livingEntity.headYaw = originalHeadYaw;

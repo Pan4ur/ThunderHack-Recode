@@ -19,7 +19,7 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class ElytraSwap extends Module {
     public ElytraSwap() {

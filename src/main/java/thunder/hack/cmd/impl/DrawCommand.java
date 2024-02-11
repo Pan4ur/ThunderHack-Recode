@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.ModuleArgumentType;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.MainSettings;
+import thunder.hack.modules.client.ClientSettings;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
@@ -23,7 +23,7 @@ public class DrawCommand extends Command {
 
             module.setDrawn(!module.isDrawn());
 
-            if(MainSettings.isRu()){
+            if(ClientSettings.isRu()){
                 sendMessage("Модуль " + Formatting.GREEN + module.getName() + Formatting.WHITE + " теперь " + (module.isDrawn() ? "виден в ArrayList" : "не виден в ArrayList"));
             } else {
                 sendMessage(Formatting.GREEN + module.getName() + Formatting.WHITE + " is now " + (module.isDrawn() ? "visible in ArrayList" : "invisible in ArrayList"));

@@ -17,7 +17,7 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.injection.accesors.IGameMessageS2CPacket;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.MainSettings;
+import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
@@ -109,7 +109,7 @@ public class ChatUtils extends Module {
 
         if (event.getPacket() instanceof GameMessageS2CPacket pac && mention.getValue()) {
             if (pac.content.getString().contains(mc.player.getName().getString()) && messageTimer.passedMs(1000)) {
-                ThunderHack.notificationManager.publicity("ChatUtils", MainSettings.language.getValue() == MainSettings.Language.RU ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
+                ThunderHack.notificationManager.publicity("ChatUtils", ClientSettings.language.getValue() == ClientSettings.Language.RU ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
                 mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 5f, 1f);
             }
         }
@@ -185,7 +185,7 @@ public class ChatUtils extends Module {
     public void onPacketSend(PacketEvent.@NotNull Send e) {
         if (e.getPacket() instanceof ChatMessageC2SPacket pac) {
             if (antiCoordLeak.getValue() && pac.chatMessage.replaceAll("\\D", "").length() >= 6) {
-                sendMessage("[ChatUtils] " + (MainSettings.language.getValue() == MainSettings.Language.RU ? "В сообщении содержатся координаты!" : "The message contains coordinates!"));
+                sendMessage("[ChatUtils] " + (ClientSettings.language.getValue() == ClientSettings.Language.RU ? "В сообщении содержатся координаты!" : "The message contains coordinates!"));
                 e.cancel();
             }
 

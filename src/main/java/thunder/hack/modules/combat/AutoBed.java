@@ -48,7 +48,7 @@ import thunder.hack.utility.render.Render3DEngine;
 import java.awt.*;
 import java.util.Objects;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public final class AutoBed extends Module {
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("InteractMode", InteractionUtility.Interact.Vanilla);

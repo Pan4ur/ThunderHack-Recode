@@ -19,7 +19,7 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 import java.text.DecimalFormat;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class LagNotifier extends Module {
     private final Setting<Boolean> rubberbandNotify = new Setting<>("Rubberband", true);

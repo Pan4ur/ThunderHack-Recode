@@ -38,7 +38,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 import static net.minecraft.block.Blocks.*;
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class Nuker extends Module {
     public Nuker() {

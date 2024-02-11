@@ -34,7 +34,7 @@ import thunder.hack.utility.render.BlockAnimationUtility;
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class AutoCrystalBase extends Module {
     private final Setting<TargetLogic> targetLogic = new Setting<>("TargetLogic", TargetLogic.Distance);

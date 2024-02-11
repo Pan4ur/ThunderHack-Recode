@@ -11,7 +11,7 @@ import thunder.hack.cmd.args.SearchArgumentType;
 import thunder.hack.modules.render.Search;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class SearchCommand extends Command {
     public SearchCommand() {

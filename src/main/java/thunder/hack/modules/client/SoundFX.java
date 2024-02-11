@@ -21,7 +21,7 @@ import javax.sound.sampled.FloatControl;
 import java.io.File;
 
 import static thunder.hack.core.impl.ConfigManager.SOUNDS_FOLDER;
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 
 public final class SoundFX extends Module {

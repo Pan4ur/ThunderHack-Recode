@@ -9,7 +9,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public final class AutoGApple extends Module {
     public final Setting<Integer> Delay = new Setting("UseDelay", 0, 0, 2000);

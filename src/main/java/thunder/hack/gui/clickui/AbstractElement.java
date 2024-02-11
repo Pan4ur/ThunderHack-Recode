@@ -4,13 +4,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.cmd.Command;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
-
-import static thunder.hack.modules.client.MainSettings.isRu;
 
 public abstract class AbstractElement {
     protected Setting setting;

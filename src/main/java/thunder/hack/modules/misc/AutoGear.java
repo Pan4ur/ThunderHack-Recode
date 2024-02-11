@@ -12,7 +12,7 @@ import thunder.hack.setting.Setting;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class AutoGear extends Module {
     public AutoGear() {

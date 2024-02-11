@@ -9,8 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.ModuleArgumentType;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.Bind;
 
@@ -18,7 +16,7 @@ import java.util.Objects;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static thunder.hack.gui.hud.impl.KeyBinds.getShortKeyName;
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class BindCommand extends Command {
     public BindCommand() {

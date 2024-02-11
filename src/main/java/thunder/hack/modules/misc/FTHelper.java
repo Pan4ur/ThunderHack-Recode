@@ -1,9 +1,6 @@
 package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.PlayerEntityRenderer;
-import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
@@ -11,7 +8,6 @@ import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
-import org.apache.commons.lang3.StringUtils;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -19,13 +15,10 @@ import thunder.hack.gui.notification.Notification;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
-import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.PlayerUtility;
 
-import java.util.Objects;
-
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class FTHelper extends Module {
 

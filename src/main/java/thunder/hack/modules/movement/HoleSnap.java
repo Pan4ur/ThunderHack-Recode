@@ -20,7 +20,7 @@ import thunder.hack.utility.world.HoleUtility;
 
 import java.util.ArrayList;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class HoleSnap extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Yaw);

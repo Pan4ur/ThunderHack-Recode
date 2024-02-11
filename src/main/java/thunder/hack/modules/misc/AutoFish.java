@@ -1,29 +1,23 @@
 package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.FishingRodItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import thunder.hack.ThunderHack;
-import thunder.hack.cmd.Command;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
-import thunder.hack.utility.player.PlayerUtility;
 
-import static thunder.hack.modules.client.MainSettings.isRu;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class AutoFish extends Module {
     public AutoFish() {
