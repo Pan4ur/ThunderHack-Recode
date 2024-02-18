@@ -233,6 +233,7 @@ public class ModuleManager implements IManager {
         modules.add(new AutoAnchor());
         modules.add(new Quiver());
         modules.add(new FastLatency());
+        modules.add(new UnHook());
 
         if (ThunderHack.isOnWindows())
             modules.add(new RPC());
