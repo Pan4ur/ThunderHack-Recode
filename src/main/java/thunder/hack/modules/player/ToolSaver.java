@@ -3,8 +3,9 @@ package thunder.hack.modules.player;
 import net.minecraft.item.*;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.player.InventoryUtility;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 import static thunder.hack.modules.combat.AutoTotem.findNearestCurrentItem;
 
 public class ToolSaver extends Module {

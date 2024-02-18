@@ -144,14 +144,13 @@ public class AutoCrystal extends Module {
     private final Timer placeTimer = new Timer();
     private final Timer breakTimer = new Timer();
     private final Timer blockRecalcTimer = new Timer();
-    private final Timer pauseTimer = new Timer();
 
     // позиция и время постановки
     private final Map<BlockPos, Long> placedCrystals = new HashMap<>();
 
     private final DeadManager deadManager = new DeadManager();
 
-    public float renderDamage, renderSelfDamage, rotationYaw, rotationPitch;
+    public float renderDamage, renderSelfDamage;
 
     private int prevCrystalsAmount, crystalSpeed, invTimer;
 
@@ -222,13 +221,8 @@ public class AutoCrystal extends Module {
         }
 
         // Rotate
-        if (rotate.getValue() && !shouldPause() && bestPosition != null && mc.player != null)
+        if (rotate.getValue() && !shouldPause())
             rotateMethod();
-    }
-
-    private void rotateMethod() {
-        mc.player.setYaw(rotationYaw);
-        mc.player.setPitch(rotationPitch);
     }
 
     @Override
@@ -316,7 +310,7 @@ public class AutoCrystal extends Module {
         tickBusy = false;
     }
 
-    public void calcRotations() {
+    public void rotateMethod() {
         if (bestPosition != null && mc.player != null) {
             float[] angle = InteractionUtility.calculateAngle(bestPosition.getPos());
             angle[1] = angle[1] + MathUtility.random(-1,1);
@@ -330,9 +324,8 @@ public class AutoCrystal extends Module {
             } else rotated = true;
 
             double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
-            rotationYaw = ((float) (angle[0] - (angle[0] - ((IClientPlayerEntity) mc.player).getLastYaw()) % gcdFix));
-            rotationPitch = ((float) (angle[1] - (angle[1] - ((IClientPlayerEntity) mc.player).getLastPitch()) % gcdFix));
-            ModuleManager.rotations.fixRotation = rotationYaw;
+            mc.player.setYaw((float) (angle[0] - (angle[0] - ((IClientPlayerEntity) mc.player).getLastYaw()) % gcdFix));
+            mc.player.setPitch((float) (angle[1] - (angle[1] - ((IClientPlayerEntity) mc.player).getLastPitch()) % gcdFix));
         }
     }
 
@@ -379,12 +372,6 @@ public class AutoCrystal extends Module {
         }
     }
 
-    @EventHandler
-    public void onPlayerUpdate(PlayerUpdateEvent event) {
-        if(rotate.getValue())
-            calcRotations();
-    }
-
     private void renderBox(String dmg, Box box) {
         Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(box, fillColor.getValue().getColorObject()));
         Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(box, lineColor.getValue().getColorObject(), lineWidth.getValue()));
@@ -398,9 +385,6 @@ public class AutoCrystal extends Module {
 
         boolean offhand = mc.player.getOffHandStack().getItem() instanceof EndCrystalItem;
         boolean mainHand = mc.player.getMainHandStack().getItem() instanceof EndCrystalItem;
-
-        if(!pauseTimer.passedMs(1000))
-            return true;
 
         if (mc.interactionManager.isBreakingBlock() && !offhand && mining.getValue())
             return true;
@@ -703,10 +687,8 @@ public class AutoCrystal extends Module {
     }
 
     public void getCrystalToExplode() {
-        if (target == null) {
+        if (target == null)
             bestCrystal = null;
-            return;
-        }
 
         List<CrystalData> list = getPossibleCrystals(target).stream().filter(data -> isSafe(data.damage, data.selfDamage, data.overrideDamage)).toList();
         bestCrystal = list.isEmpty() ? null : filterCrystals(list);
@@ -1009,10 +991,6 @@ public class AutoCrystal extends Module {
             calcPosition(placeRange.getValue(), mc.player.getPos());
             getCrystalToExplode();
         });
-    }
-
-    public void pause() {
-        pauseTimer.reset();
     }
 
     public record PlaceData(BlockHitResult bhr, float damage, float selfDamage, boolean overrideDamage) {

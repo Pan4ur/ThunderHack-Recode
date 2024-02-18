@@ -49,9 +49,9 @@ public class BooleanParentElement extends AbstractElement {
         matrixStack.pop();
 
         if(!isSmall()) {
-            FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName(), x + 6, y + height / 2 - 1f, ClickGui.getInstance().getTextColor(setting.getModule()));
+            FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName(), x + 6, y + height / 2 - 1f, new Color(-1).getRGB());
         } else {
-            FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), x + 6, y + height / 2 - 1f, ClickGui.getInstance().getTextColor(setting.getModule()));
+            FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), x + 6, y + height / 2 - 1f, new Color(-1).getRGB());
         }
 
         animation = fast(animation, getParentSetting().getValue().isEnabled() ? 1 : 0, 15f);

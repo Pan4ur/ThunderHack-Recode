@@ -7,11 +7,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.RotationAxis;
 import org.joml.Matrix4f;
-import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
 
 import static thunder.hack.modules.Module.mc;
+import static thunder.hack.utility.render.Render2DEngine.TEXTURE_COLOR_PROGRAM;
 
 
 public class CaptureMark {
@@ -42,27 +42,26 @@ public class CaptureMark {
         RenderSystem.setShaderTexture(0, Render2DEngine.capture);
         matrices.translate(-0.75, -0.75, -0.01);
         Matrix4f matrix = matrices.peek().getPositionMatrix();
+        RenderSystem.setShader(() -> TEXTURE_COLOR_PROGRAM.backingProgram);
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-        bufferBuilder.vertex(matrix, 0, 1.5f, 0).texture(0f, 1f).color(HudEditor.getColor(90).getRGB()).next();
-        bufferBuilder.vertex(matrix, 1.5f, 1.5f, 0).texture(1f, 1f).color(HudEditor.getColor(0).getRGB()).next();
-        bufferBuilder.vertex(matrix, 1.5f, 0, 0).texture(1f, 0).color(HudEditor.getColor(180).getRGB()).next();
-        bufferBuilder.vertex(matrix, 0, 0, 0).texture(0, 0).color(HudEditor.getColor(270).getRGB()).next();
+        bufferBuilder.vertex(matrix,  0,  1.5f,  0).texture(0f, 1f).color(HudEditor.getColor(90).getRGB()).next();
+        bufferBuilder.vertex(matrix,  1.5f,  1.5f,  0).texture(1f, 1f).color(HudEditor.getColor(0).getRGB()).next();
+        bufferBuilder.vertex(matrix,  1.5f,  0,  0).texture(1f, 0).color(HudEditor.getColor(180).getRGB()).next();
+        bufferBuilder.vertex(matrix,  0,  0,  0).texture(0, 0).color(HudEditor.getColor(270).getRGB()).next();
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         immediate.draw();
         RenderSystem.enableCull();
         RenderSystem.disableDepthTest();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.disableBlend();
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 
-    public static void tick() {
+    public static void tick(){
         prevEspValue = espValue;
         espValue += espSpeed;
-        if (espSpeed > 25) flipSpeed = true;
-        if (espSpeed < -25) flipSpeed = false;
-        espSpeed = flipSpeed ? espSpeed - 0.5f : espSpeed + 0.5f;
+        if(espSpeed > 25) flipSpeed = true;
+        if(espSpeed < -25) flipSpeed = false;
+        espSpeed = flipSpeed ? espSpeed-0.5f : espSpeed+0.5f;
     }
 }

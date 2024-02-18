@@ -1,14 +1,17 @@
 package thunder.hack.modules.combat;
 
+import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.*;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.events.impl.*;
@@ -22,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public final class Surround extends IndestructibleModule {
     private final Setting<PlaceTiming> placeTiming = new Setting<>("Place Timing", PlaceTiming.Default);
@@ -40,9 +43,15 @@ public final class Surround extends IndestructibleModule {
     private boolean wasTp = false;
     private int delay;
     private double prevY;
+    private static Surround instance;
 
     public Surround() {
         super("Surround", Category.COMBAT);
+        instance = this;
+    }
+
+    public static Surround getInstance() {
+        return instance;
     }
 
     @Override

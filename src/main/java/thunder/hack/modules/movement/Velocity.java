@@ -27,7 +27,6 @@ public class Velocity extends Module {
 
     public Setting<Boolean> onlyAura = new Setting<>("OnlyAura", false);
     public Setting<Boolean> pauseInWater = new Setting<>("PauseInFluids", false);
-    public Setting<Boolean> explosions = new Setting<>("Explosions", true);
     public Setting<Boolean> autoDisable = new Setting<>("DisableOnVerify", false);
     public Setting<Boolean> cc = new Setting<>("CC", false);
     public Setting<Boolean> fishingHook = new Setting<>("FishingHook", true);
@@ -136,7 +135,7 @@ public class Velocity extends Module {
         }
 
         // EXPLOSION
-        if (e.getPacket() instanceof ExplosionS2CPacket explosion && explosions.getValue()) {
+        if (e.getPacket() instanceof ExplosionS2CPacket explosion) {
             switch (mode.getValue()) {
                 case Cancel -> {
                     ((IExplosionS2CPacket) explosion).setMotionX(0);

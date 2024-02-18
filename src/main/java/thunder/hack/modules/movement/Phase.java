@@ -9,7 +9,6 @@ import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventBreakBlock;
 import thunder.hack.events.impl.EventCollision;
 import thunder.hack.events.impl.EventSync;
@@ -104,12 +103,8 @@ public class Phase extends Module {
                     mc.player.setYaw(angle[0]);
                     mc.player.setPitch(80f);
                     InventoryUtility.switchTo(epSlot);
-                   // sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
-                    mc.interactionManager.interactItem( mc.player, Hand.MAIN_HAND);
+                    sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
                     InventoryUtility.switchTo(prevItem);
-                    ModuleManager.autoCrystal.pause();
-                    ModuleManager.aura.pause();
-
                 }
                 clipTimer = 20;
                 afterPearlTime = afterPearl.getValue();

@@ -19,7 +19,7 @@ import thunder.hack.utility.world.HoleUtility;
 import java.util.List;
 import java.util.Objects;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public final class Quiver extends Module {
     private final Setting<Integer> shootCount = new Setting<>("Shoot Count", 1, 1, 10);

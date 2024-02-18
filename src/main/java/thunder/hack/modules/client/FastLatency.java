@@ -14,6 +14,7 @@ import thunder.hack.utility.math.MathUtility;
 public final class FastLatency extends Module {
     private final Setting<Integer> delay = new Setting<>("Delay", 80, 0, 1000);
 
+    public static FastLatency instance;
 
     private final Timer timer = new Timer();
     private final Timer limitTimer = new Timer();
@@ -22,6 +23,7 @@ public final class FastLatency extends Module {
 
     public FastLatency() {
         super("FastLatency", Category.CLIENT);
+        instance = this;
     }
 
     @Override
@@ -39,5 +41,9 @@ public final class FastLatency extends Module {
             resolvedPing = (int) MathUtility.clamp(System.currentTimeMillis() - ping, 0, 1000);
             timer.setMs(5000);
         }
+    }
+
+    public static FastLatency getInstance() {
+        return instance;
     }
 }

@@ -1,7 +1,10 @@
 package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.entity.EntityStatuses;
+import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.DeathEvent;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -16,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public final class AutoEZ extends Module {
     public static ArrayList<String> EZWORDS = new ArrayList<>();

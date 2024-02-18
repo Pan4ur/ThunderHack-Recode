@@ -8,7 +8,7 @@ import net.minecraft.util.Formatting;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
@@ -61,23 +61,23 @@ public class AutoLeave extends Module {
                 switch (players.getValue()) {
                     case Command -> {
                         if (autoDisable.getValue()) disable();
-                        sendMessage(ClientSettings.isRu() ? "Ливнул т.к. рядом появился игрок!" : "Logged out because there was a player!");
+                        sendMessage(MainSettings.isRu() ? "Ливнул т.к. рядом появился игрок!" : "Logged out because there was a player!");
                         mc.player.networkHandler.sendChatCommand(command.getValue());
                     }
                     case Leave ->
-                            leave(ClientSettings.isRu() ? "Ливнул т.к. рядом появился игрок" : "Logged out because there was a player");
+                            leave(MainSettings.isRu() ? "Ливнул т.к. рядом появился игрок" : "Logged out because there was a player");
                 }
             }
         }
 
         if (totems.getValue() && InventoryUtility.getItemCount(Items.TOTEM_OF_UNDYING) <= totemsCount.getValue())
-            leave(ClientSettings.isRu() ? "Ливнул т.к. кончились тотемы" : "Logged out because out of totems");
+            leave(MainSettings.isRu() ? "Ливнул т.к. кончились тотемы" : "Logged out because out of totems");
 
         if (mc.player.getHealth() < leaveHp.getValue() && low_hp.getValue())
-            leave(ClientSettings.isRu() ? "Ливнул т.к. мало хп" : "Logged out because ur hp is low");
+            leave(MainSettings.isRu() ? "Ливнул т.к. мало хп" : "Logged out because ur hp is low");
 
         if (staff.getValue() != LeaveMode.None && ModuleManager.staffBoard.isDisabled() && mc.player.age % 5 == 0)
-            sendMessage(ClientSettings.isRu() ? "Включи StaffBoard!" : "Turn on StaffBoard!");
+            sendMessage(MainSettings.isRu() ? "Включи StaffBoard!" : "Turn on StaffBoard!");
     }
 
     private void leave(String message) {
@@ -100,13 +100,13 @@ public class AutoLeave extends Module {
         if (hurtTimer.passedMs(30000) || !antiKTLeave.getValue()) {
             switch (staff.getValue()) {
                 case Command -> {
-                    sendMessage(ClientSettings.isRu() ? "Ливнул т.к. хелпер в спеке!" : "Logged out because helper in vanish!");
+                    sendMessage(MainSettings.isRu() ? "Ливнул т.к. хелпер в спеке!" : "Logged out because helper in vanish!");
                     mc.player.networkHandler.sendChatCommand(command.getValue());
                     if (autoDisable.getValue())
                         disable();
                 }
                 case Leave ->
-                        leave(ClientSettings.isRu() ? "Ливнул т.к. хелпер в спеке!" : "Logged out because helper in vanish!");
+                        leave(MainSettings.isRu() ? "Ливнул т.к. хелпер в спеке!" : "Logged out because helper in vanish!");
             }
         }
     }

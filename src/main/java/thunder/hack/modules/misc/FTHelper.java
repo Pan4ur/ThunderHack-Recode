@@ -1,6 +1,8 @@
 package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
@@ -18,7 +20,9 @@ import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.PlayerUtility;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import java.util.Objects;
+
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class FTHelper extends Module {
 
@@ -27,7 +31,7 @@ public class FTHelper extends Module {
     }
 
     public final Setting<Boolean> trueSight = new Setting<>("TrueSight", true);
-    public final Setting<Boolean> spek = new Setting<>("SpekNotification", true);
+    public final Setting<Boolean> spek = new Setting<>("SpecNotification", true);
     private final Setting<Bind> desorient = new Setting<>("Desorient", new Bind(-1, false, false));
     private final Setting<Bind> trap = new Setting<>("Trap", new Bind(-1, false, false));
 
@@ -54,8 +58,13 @@ public class FTHelper extends Module {
     public void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof GameMessageS2CPacket && spek.getValue()) {
             final GameMessageS2CPacket packet = event.getPacket();
+            ClientPlayerEntity player = MinecraftClient.getInstance().player;
+            String playerName = player.getName().toString();
+            int startIndex = playerName.indexOf("{") + 1;
+            int endIndex = playerName.indexOf("}");
             if (packet.content().getString().contains("спек")){
-                ThunderHack.notificationManager.publicity("SpekNotification", isRu() ?"Кто-то хочет чтобы за ним проследили" : "Someone wants to be followed", 3, Notification.Type.SUCCESS);
+                String nickname = playerName.substring(startIndex, endIndex);
+                ThunderHack.notificationManager.publicity("SpekNotification", isRu() ? nickname +  " хочет чтобы за ним проследили" : "Someone wants to be followed", 3, Notification.Type.WARNING);
             }
         }
     }

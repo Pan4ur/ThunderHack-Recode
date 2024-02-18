@@ -204,16 +204,12 @@ public final class InteractionUtility {
     public static @Nullable BlockPosWithFacing checkNearBlocks(@NotNull BlockPos blockPos) {
         if (mc.world.getBlockState(blockPos.add(0, -1, 0)).isSolid())
             return new BlockPosWithFacing(blockPos.add(0, -1, 0), Direction.UP);
-
         else if (mc.world.getBlockState(blockPos.add(-1, 0, 0)).isSolid())
             return new BlockPosWithFacing(blockPos.add(-1, 0, 0), Direction.EAST);
-
         else if (mc.world.getBlockState(blockPos.add(1, 0, 0)).isSolid())
             return new BlockPosWithFacing(blockPos.add(1, 0, 0), Direction.WEST);
-
         else if (mc.world.getBlockState(blockPos.add(0, 0, 1)).isSolid())
             return new BlockPosWithFacing(blockPos.add(0, 0, 1), Direction.NORTH);
-
         else if (mc.world.getBlockState(blockPos.add(0, 0, -1)).isSolid())
             return new BlockPosWithFacing(blockPos.add(0, 0, -1), Direction.SOUTH);
         return null;

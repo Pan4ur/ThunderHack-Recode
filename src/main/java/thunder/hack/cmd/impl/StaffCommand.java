@@ -37,15 +37,14 @@ public class StaffCommand extends Command {
             return SINGLE_SUCCESS;
         })));
 
-        builder.then(literal("del").then(arg("name", StringArgumentType.word()).executes(context -> {
+        builder.then(literal("del").then(arg("name", StringArgumentType.word())).executes(context -> {
             String name = context.getArgument("name", String.class);
 
             staffNames.remove(name);
             sendMessage(Formatting.GREEN + name + " removed from staff list");
 
             return SINGLE_SUCCESS;
-        })));
-
+        }));
 
         builder.executes(context -> {
             if (staffNames.isEmpty()) {

@@ -13,7 +13,7 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.modules.client.MainSettings;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +31,7 @@ public class ChestStealerArgumentType implements ArgumentType<String> {
     public String parse(@NotNull StringReader reader) throws CommandSyntaxException {
         String blockName = reader.readString();
         if (!getRegistered().contains(blockName)) throw new DynamicCommandExceptionType(
-                name -> Text.literal(ClientSettings.language.getValue().equals(ClientSettings.Language.RU) ? "Такого предмета нет!" : "There is no such item!")
+                name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Такого предмета нет!" : "There is no such item!")
         ).create(blockName);
         return blockName;
     }

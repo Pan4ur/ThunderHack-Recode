@@ -15,7 +15,7 @@ import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.MovementUtility;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class Timer extends Module {
     private static final Setting<Mode> mode = new Setting<>("Mode", Mode.NORMAL);

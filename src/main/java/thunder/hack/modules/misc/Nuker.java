@@ -21,7 +21,6 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventSetBlockState;
 import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.player.SpeedMine;
@@ -38,7 +37,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 import static net.minecraft.block.Blocks.*;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class Nuker extends Module {
     public Nuker() {
@@ -62,7 +61,6 @@ public class Nuker extends Module {
     private Timer breakTimer = new Timer();
 
     private NukerThread nukerThread = new NukerThread();
-    private float rotationYaw, rotationPitch;
 
     @Override
     public void onEnable() {
@@ -110,16 +108,6 @@ public class Nuker extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        if(rotationYaw != -999) {
-            mc.player.setYaw(rotationYaw);
-            mc.player.setPitch(rotationPitch);
-            rotationYaw = -999;
-        }
-    }
-
-
-    @EventHandler
-    public void onPlayerUpdate(PlayerUpdateEvent e) {
         if (blockData != null) {
             if ((mc.world.getBlockState(blockData.bp).getBlock() != targetBlockType && blocks.getValue().equals(BlockSelection.Select))
                     || PlayerUtility.squaredDistanceFromEyes(blockData.bp.toCenterPos()) > range.getPow2Value()
@@ -130,9 +118,8 @@ public class Nuker extends Module {
         if (blockData == null || mc.options.attackKey.isPressed()) return;
 
         float[] angle = InteractionUtility.calculateAngle(blockData.vec3d);
-        rotationYaw = (angle[0]);
-        rotationPitch = (angle[1]);
-        ModuleManager.rotations.fixRotation = rotationYaw;
+        mc.player.setYaw(angle[0]);
+        mc.player.setPitch(angle[1]);
 
         if (mode.getValue() == Mode.Default) {
             breakBlock();

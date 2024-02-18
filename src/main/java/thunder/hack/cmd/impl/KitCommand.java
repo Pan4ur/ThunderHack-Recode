@@ -16,7 +16,7 @@ import thunder.hack.core.impl.ModuleManager;
 import java.io.*;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class KitCommand extends Command {
 

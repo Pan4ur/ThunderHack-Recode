@@ -10,7 +10,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import thunder.hack.ThunderHack;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.modules.client.MainSettings;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,7 +27,7 @@ public class FriendArgumentType implements ArgumentType<String> {
     public String parse(StringReader reader) throws CommandSyntaxException {
         String friend = reader.readString();
         if (!ThunderHack.friendManager.isFriend(friend)) throw new DynamicCommandExceptionType(
-                name -> Text.literal(ClientSettings.language.getValue().equals(ClientSettings.Language.RU) ? "Друга с именем " + name.toString() + " не существует(" : "Friend with name " + name.toString() + " does not exists(")
+                name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Друга с именем " + name.toString() + " не существует(" : "Friend with name " + name.toString() + " does not exists(")
         ).create(friend);
 
         return friend;

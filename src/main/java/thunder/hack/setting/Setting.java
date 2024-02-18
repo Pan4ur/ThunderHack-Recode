@@ -4,7 +4,6 @@ package thunder.hack.setting;
 import com.google.gson.JsonPrimitive;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.SettingEvent;
-import thunder.hack.modules.Module;
 import thunder.hack.setting.impl.*;
 
 import java.util.function.Predicate;

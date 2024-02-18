@@ -17,9 +17,7 @@ import org.lwjgl.opengl.GL40C;
 import thunder.hack.gui.font.Texture;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.math.MathUtility;
-import thunder.hack.utility.render.shaders.HudShader;
-import thunder.hack.utility.render.shaders.MainMenuProgram;
-import thunder.hack.utility.render.shaders.TextureColorProgram;
+import thunder.hack.utility.render.shaders.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -44,7 +42,6 @@ public class Render2DEngine {
     public static final Identifier capture = new Identifier("textures/capture.png");
     public static final Identifier firefly = new Identifier("textures/firefly.png");
     public static final Identifier arrow = new Identifier("textures/triangle.png");
-    public static final Identifier bubble = new Identifier("textures/hitbubble.png");
 
     public static HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
     final static Stack<Rectangle> clipStack = new Stack<>();
@@ -292,12 +289,12 @@ public class Render2DEngine {
     }
 
     public static void renderGradientTexture(MatrixStack matrices, double x0, double y0, double width, double height, float u, float v, double regionWidth, double regionHeight, double textureWidth, double textureHeight,
-                                             Color c1, Color c2, Color c3, Color c4) {
+        Color c1, Color c2, Color c3, Color c4) {
         double x1 = x0 + width;
         double y1 = y0 + height;
         double z = 0;
         Matrix4f matrix = matrices.peek().getPositionMatrix();
-        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+        RenderSystem.setShader(() -> Render2DEngine.TEXTURE_COLOR_PROGRAM.backingProgram);
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
         bufferBuilder.vertex(matrix, (float) x0, (float) y1, (float) z).texture((u) / (float) textureWidth, (v + (float) regionHeight) / (float) textureHeight).color(c1.getRGB()).next();
@@ -522,7 +519,6 @@ public class Render2DEngine {
         RenderSystem.setShaderTexture(0, arrow);
         RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
         RenderSystem.enableBlend();
-        RenderSystem.disableDepthTest();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
         Matrix4f matrix = matrices.peek().getPositionMatrix();
@@ -530,14 +526,13 @@ public class Render2DEngine {
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
         bufferBuilder.vertex(matrix, x - (size / 2f), y + size, 0).texture(0f, 1f).next();
-        bufferBuilder.vertex(matrix, x + size / 2f, y + size, 0).texture(1f, 1f).next();
+        bufferBuilder.vertex(matrix,x + size / 2f,y + size, 0).texture(1f, 1f).next();
         bufferBuilder.vertex(matrix, x + size / 2f, y, 0).texture(1f, 0).next();
-        bufferBuilder.vertex(matrix, x - (size / 2f), y, 0).texture(0, 0).next();
+        bufferBuilder.vertex(matrix, x- (size / 2f), y, 0).texture(0, 0).next();
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         immediate.draw();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.enableDepthTest();
         RenderSystem.disableBlend();
     }
 
@@ -779,36 +774,20 @@ public class Render2DEngine {
 
     public static void drawStar(MatrixStack matrices, Color c, float scale) {
         RenderSystem.enableBlend();
-        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         RenderSystem.setShaderTexture(0, star);
         RenderSystem.setShaderColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f);
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(mc.player.age * 2));
-        Render2DEngine.renderGradientTexture(matrices, 0, 0, scale, scale, 0, 0, 128, 128, 128, 128,
-                HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+        Render2DEngine.renderTexture(matrices, 0, 0, scale, scale, 0, 0, 128, 128, 128, 128);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 
     public static void drawHeart(MatrixStack matrices, Color c, float scale) {
         RenderSystem.enableBlend();
-        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         RenderSystem.setShaderTexture(0, heart);
         RenderSystem.setShaderColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f);
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(mc.player.age * 2));
-        Render2DEngine.renderGradientTexture(matrices, 0, 0, scale, scale, 0, 0, 128, 128, 128, 128,
-                HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
-        RenderSystem.disableBlend();
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-    }
-
-    public static void drawBubble(MatrixStack matrices, float angle, float factor) {
-        RenderSystem.enableBlend();
-        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-        RenderSystem.setShaderTexture(0, bubble);
-        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(angle));
-        float scale = factor * 2f;
-        Render2DEngine.renderGradientTexture(matrices, -scale / 2, -scale / 2, scale, scale, 0, 0, 128, 128, 128, 128,
-                applyOpacity(HudEditor.getColor(270), 1f - factor),applyOpacity( HudEditor.getColor(0), 1f - factor), applyOpacity(HudEditor.getColor(180), 1f - factor), applyOpacity(HudEditor.getColor(90), 1f - factor));
+        Render2DEngine.renderTexture(matrices, 0, 0, scale, scale, 0, 0, 128, 128, 128, 128);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }

@@ -1,7 +1,6 @@
 package thunder.hack.modules.client;
 
 import meteordevelopment.orbit.EventHandler;
-import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.SettingEvent;
 import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.clickui.small.SmallClickUI;
@@ -13,6 +12,8 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 
 public class ClickGui extends Module {
+    private static ClickGui INSTANCE = new ClickGui();
+
     public Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
     public Setting<TextSide> textSide = new Setting<>("TextSide", TextSide.Left);
     public Setting<scrollModeEn> scrollMode = new Setting<>("ScrollMode", scrollModeEn.Old);
@@ -24,11 +25,6 @@ public class ClickGui extends Module {
     public final Setting<ColorSetting> plateColor = new Setting<>("Plate", new ColorSetting(-14474718));
     public final Setting<ColorSetting> disabled = new Setting<>("Disabled", new ColorSetting(new Color(24, 24, 27)));
     public final Setting<ColorSetting> catColor = new Setting<>("Category", new ColorSetting(-15395563));
-
-    public final Setting<ColorSetting> disabledText = new Setting<>("DisabledText", new ColorSetting(-1));
-    public final Setting<ColorSetting> enabledText = new Setting<>("EnabledText", new ColorSetting(-1));
-    public final Setting<ColorSetting> categoryText = new Setting<>("CategoryText", new ColorSetting(-1));
-
     public final Setting<Integer> colorSpeed = new Setting<>("ColorSpeed", 18, 2, 54);
     public final Setting<Boolean> showBinds = new Setting<>("ShowBinds", true);
     public final Setting<Boolean> outline = new Setting<>("Outline", false);
@@ -48,12 +44,15 @@ public class ClickGui extends Module {
 
     public ClickGui() {
         super("ClickGui", Module.Category.CLIENT);
+        this.setInstance();
     }
 
     public static ClickGui getInstance() {
-        return ModuleManager.clickGui;
+        if (INSTANCE == null) {
+            INSTANCE = new ClickGui();
+        }
+        return INSTANCE;
     }
-
 
     public Color getColor(int count) {
         return switch (colorMode.getValue()) {
@@ -77,15 +76,15 @@ public class ClickGui extends Module {
         else mc.setScreen(SmallClickUI.getClickGui());
     }
 
+    private void setInstance() {
+        INSTANCE = this;
+    }
+
     @EventHandler
     public void onSettingChange(SettingEvent e) {
         if(e.getSetting() == mode) {
              setGui();
         }
-    }
-
-    public int getTextColor(Module m) {
-        return m == null || m.isEnabled() ? enabledText.getValue().getColor() : disabledText.getValue().getColor();
     }
 
     @Override

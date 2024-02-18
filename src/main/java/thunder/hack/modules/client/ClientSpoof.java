@@ -11,10 +11,9 @@ public class ClientSpoof extends Module {
     }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Vanilla);
-    private final Setting<String> custom = new Setting<>("Client", "feather", v-> mode.getValue() == Mode.Custom);
 
     public enum Mode {
-        Vanilla, Lunar1_20_4, Lunar1_20_1, Custom, Null
+        Vanilla, Lunar, Null
     }
 
     public String getClientName() {
@@ -22,14 +21,8 @@ public class ClientSpoof extends Module {
             case Vanilla -> {
                 return "vanilla";
             }
-            case Lunar1_20_4 -> {
+            case Lunar -> {
                 return "lunarclient:1.20.4";
-            }
-            case Lunar1_20_1 -> {
-                return "lunarclient:1.20.1";
-            }
-            case Custom -> {
-                return (String) custom.getValue();
             }
             default ->
             {

@@ -54,9 +54,11 @@ public final class AimBot extends Module {
     private float rotationYaw, rotationPitch;
     private Box debug_box;
     private float assistAcceleration;
+    private static AimBot instance;
 
     public AimBot() {
         super("AimBot", Category.COMBAT);
+        instance = this;
     }
 
     @EventHandler
@@ -295,5 +297,9 @@ public final class AimBot extends Module {
 
     private enum Mode {
         CSAim, AimAssist, BowAim
+    }
+
+    public static AimBot getInstance() {
+        return instance;
     }
 }

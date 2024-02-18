@@ -14,8 +14,11 @@ public final class Media extends Module {
     public static final Setting<Boolean> skinProtect = new Setting<>("Skin Protect", true);
     public static final Setting<Boolean> nickProtect = new Setting<>("Nick Protect", true);
 
+    private static Media instance;
+
     public Media() {
         super("Media", Category.CLIENT);
+        instance = this;
     }
 
     @EventHandler
@@ -28,5 +31,9 @@ public final class Media extends Module {
                 }
             }
         }
+    }
+
+    public static Media getInstance() {
+        return instance;
     }
 }

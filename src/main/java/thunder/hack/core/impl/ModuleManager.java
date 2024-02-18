@@ -62,7 +62,7 @@ public class ModuleManager implements IManager {
     public static PVPResources pvpResources = new PVPResources();
     public static NoServerSlot noServerSlot = new NoServerSlot();
     public static NoCameraClip noCameraClip = new NoCameraClip();
-    public static ClientSettings clientSettings = new ClientSettings();
+    public static MainSettings mainSettings = new MainSettings();
     public static ItemScroller itemScroller = new ItemScroller();
     public static HitParticles hitParticles = new HitParticles();
     public static ElytraRecast elytraRecast = new ElytraRecast();
@@ -72,7 +72,6 @@ public class ModuleManager implements IManager {
     public static AntiServerRP antiServerRP = new AntiServerRP();
     public static TotemCounter totemCounter = new TotemCounter();
     public static PerfectDelay perfectDelay = new PerfectDelay();
-    public static FastLatency fastLatency = new FastLatency();
     public static PearlChaser pearlChaser = new PearlChaser();
     public static WorldTweaks worldTweaks = new WorldTweaks();
     public static VisualRange visualRange = new VisualRange();
@@ -89,7 +88,6 @@ public class ModuleManager implements IManager {
     public static EntitySpeed entitySpeed = new EntitySpeed();
     public static AspectRatio aspectRatio = new AspectRatio();
     public static ClientSpoof clientSpoof = new ClientSpoof();
-    public static AutoAnchor autoAnchor = new AutoAnchor();
     public static WaterSpeed waterSpeed = new WaterSpeed();
     public static TriggerBot triggerBot = new TriggerBot();
     public static TPSCounter tpsCounter = new TPSCounter();
@@ -115,7 +113,6 @@ public class ModuleManager implements IManager {
     public static DamageTint damageTint = new DamageTint();
     public static AntiAttack antiAttack = new AntiAttack();
     public static GapplesHud gapplesHud = new GapplesHud();
-    public static HitBubbles hitBubbles = new HitBubbles();
     public static Particles particles = new Particles();
     public static ToolSaver toolSaver = new ToolSaver();
     public static DamageFly damageFly = new DamageFly();
@@ -141,7 +138,6 @@ public class ModuleManager implements IManager {
     public static AutoArmor autoArmor = new AutoArmor();
     public static Cooldowns cooldowns = new Cooldowns();
     public static TapeMouse tapeMouse = new TapeMouse();
-    public static Rotations rotations = new Rotations();
     public static AutoGear autoGear = new AutoGear();
     public static ViewLock viewLock = new ViewLock();
     public static Velocity velocity = new Velocity();
@@ -215,7 +211,6 @@ public class ModuleManager implements IManager {
     public static Burrow burrow = new Burrow();
     public static AutoEZ autoEZ = new AutoEZ();
     public static AimBot aimBot = new AimBot();
-    public static Quiver quiver = new Quiver();
     public static Timer timer = new Timer();
     public static Regen regen = new Regen();
     public static Speed speed = new Speed();
@@ -233,7 +228,13 @@ public class ModuleManager implements IManager {
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
 
+
     public ModuleManager() {
+        modules.add(new AutoAnchor());
+        modules.add(new Quiver());
+        modules.add(new FastLatency());
+        modules.add(new UnHook());
+
         if (ThunderHack.isOnWindows())
             modules.add(new RPC());
 

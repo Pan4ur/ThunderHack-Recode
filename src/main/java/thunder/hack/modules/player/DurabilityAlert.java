@@ -9,12 +9,13 @@ import net.minecraft.util.Identifier;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 
 import java.awt.*;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class DurabilityAlert extends Module {
     public DurabilityAlert() {

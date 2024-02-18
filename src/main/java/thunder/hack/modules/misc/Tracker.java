@@ -11,6 +11,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -20,7 +21,7 @@ import thunder.hack.utility.math.MathUtility;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 //~pasted~ Ported from 3arthh4ack
 public class Tracker extends Module {

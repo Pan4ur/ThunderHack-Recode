@@ -15,7 +15,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CommandManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.notification.Notification;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public abstract class Module {
     private final Setting<Bind> bind = new Setting<>("Keybind", new Bind(-1, false, false));
@@ -232,8 +232,6 @@ public abstract class Module {
             }
         }
 
-        settingList.forEach(s -> s.setModule(this));
-
         return settingList;
     }
 
@@ -261,7 +259,7 @@ public abstract class Module {
     }
 
     public void debug(String message) {
-        if (fullNullCheck() || !ClientSettings.debug.getValue()) return;
+        if (fullNullCheck() || !MainSettings.debug.getValue()) return;
         mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] [\uD83D\uDD27] " + message));
     }
 

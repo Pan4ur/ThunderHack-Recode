@@ -32,7 +32,7 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.PlayerUtility;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 import static thunder.hack.modules.player.ElytraSwap.getChestPlateSlot;
 
 public class ElytraPlus extends Module {

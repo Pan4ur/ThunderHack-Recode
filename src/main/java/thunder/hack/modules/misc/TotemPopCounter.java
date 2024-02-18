@@ -11,7 +11,7 @@ import thunder.hack.modules.combat.AntiBot;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class TotemPopCounter extends Module {
     public TotemPopCounter() {

@@ -21,9 +21,11 @@ public final class HudEditor extends Module {
     public static final Setting<Float> alpha = new Setting<>("Alpha", 0.9f, 0f, 1f);
     public static final Setting<Float> blend = new Setting<>("Blend", 10f, 1f, 15f);
 
+    private static HudEditor instance;
 
     public HudEditor() {
         super("HudEditor", Module.Category.CLIENT);
+        instance = this;
     }
 
     public static Color getColor(int count) {
@@ -44,6 +46,10 @@ public final class HudEditor extends Module {
     public void onEnable() {
         mc.setScreen(HudEditorGui.getHudGui());
         disable();
+    }
+
+    public static HudEditor getInstance() {
+        return instance;
     }
 
     public enum ArrowsStyle {

@@ -11,7 +11,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.WayPointManager;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.modules.client.MainSettings;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -31,7 +31,7 @@ public class WayPointArgumentType implements ArgumentType<WayPointManager.WayPoi
         WayPointManager.WayPoint wp = ThunderHack.wayPointManager.getWayPointByName(reader.readString());
 
         if (wp == null) throw new DynamicCommandExceptionType(
-                name -> Text.literal(ClientSettings.language.getValue().equals(ClientSettings.Language.RU) ? "Вейпоинта " + name.toString() + " не существует(" : "Waypoint " + name.toString() + " does not exists(")
+                name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Вейпоинта " + name.toString() + " не существует(" : "Waypoint " + name.toString() + " does not exists(")
         ).create(reader.readString());
 
         return wp;

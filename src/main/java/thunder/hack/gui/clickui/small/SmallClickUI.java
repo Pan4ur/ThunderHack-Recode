@@ -16,7 +16,7 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.utility.render.MSAAFramebuffer;
 import thunder.hack.utility.render.Render2DEngine;
 
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class SmallClickUI extends Screen {
     public static List<AbstractWindow> windows;
@@ -190,8 +190,8 @@ public class SmallClickUI extends Screen {
                     Render2DEngine.drawRound(context.getMatrices(), hx - 90, hy - 50, 180, 20, 4, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70));
                 }
 
-                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), ClientSettings.language.getValue() == ClientSettings.Language.RU ? "Да" : "Yes", hx, hy - 45, -1);
-                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), ClientSettings.language.getValue() == ClientSettings.Language.RU ? "Нет, я про" : "Go fuck urself", hx, hy - 15, -1);
+                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), MainSettings.language.getValue() == MainSettings.Language.RU ? "Да" : "Yes", hx, hy - 45, -1);
+                FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), MainSettings.language.getValue() == MainSettings.Language.RU ? "Нет, я про" : "Go fuck urself", hx, hy - 15, -1);
                 FontRenderers.modules.drawCenteredString(context.getMatrices(), "ThunderHack v" + ThunderHack.VERSION, hx, hy + 90, Render2DEngine.injectAlpha(HudEditor.getColor(180), 70).getRGB());
                 context.drawTexture(pic1, (int) hx - 45, (int) hy + 10, 0, 0, 80, 75, 80, 75);
 
@@ -260,11 +260,11 @@ public class SmallClickUI extends Screen {
             float hy = mc.getWindow().getScaledHeight() / 2f;
             if (hstep == 0) {
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 50, 180, 20)) {
-                    ClientSettings.language.setValue(ClientSettings.Language.ENG);
+                    MainSettings.language.setValue(MainSettings.Language.ENG);
                     hstep = 1;
                 }
                 if (Render2DEngine.isHovered(mouseX, mouseY, hx - 90, hy - 20, 180, 20)) {
-                    ClientSettings.language.setValue(ClientSettings.Language.RU);
+                    MainSettings.language.setValue(MainSettings.Language.RU);
                     hstep = 1;
                 }
             } else if (hstep == 1) {

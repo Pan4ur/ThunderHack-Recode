@@ -11,7 +11,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.modules.client.MainSettings;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -27,7 +27,7 @@ public class ModuleArgumentType implements ArgumentType<Module> {
     public Module parse(StringReader reader) throws CommandSyntaxException {
         Module module = ThunderHack.moduleManager.get(reader.readString());
         if (module == null) throw new DynamicCommandExceptionType(
-                name -> Text.literal(ClientSettings.language.getValue().equals(ClientSettings.Language.RU) ? "Модуля " + name.toString() + " не существует(" : "Module " + name.toString() + " does not exists(")
+                name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Модуля " + name.toString() + " не существует(" : "Module " + name.toString() + " does not exists(")
         ).create(reader.readString());
 
         return module;

@@ -30,10 +30,6 @@ public class ServerManager implements IManager {
         return round2(20.0f * ((float) tickTime / 1000f));
     }
 
-    public float getTPSFactor() {
-        return (float) tickTime / 1000f;
-    }
-
     public static float round2(double value) {
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(2, RoundingMode.HALF_UP);
@@ -68,8 +64,8 @@ public class ServerManager implements IManager {
     public static int getPing() {
         if (mc.getNetworkHandler() == null || mc.player == null) return 0;
 
-        if (ModuleManager.fastLatency.isEnabled())
-            return ModuleManager.fastLatency.resolvedPing;
+        if (FastLatency.instance.isEnabled())
+            return FastLatency.instance.resolvedPing;
 
         PlayerListEntry playerListEntry = mc.getNetworkHandler().getPlayerListEntry(mc.player.getUuid());
         if (playerListEntry == null) return 0;

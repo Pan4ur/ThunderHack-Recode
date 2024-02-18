@@ -11,7 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.command.CommandSource;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.modules.client.MainSettings;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +29,7 @@ public class SearchArgumentType implements ArgumentType<String> {
     public String parse(StringReader reader) throws CommandSyntaxException {
         String blockName = reader.readString();
         if (!getRegisteredBlocks().contains(blockName)) throw new DynamicCommandExceptionType(
-                name -> Text.literal(ClientSettings.language.getValue().equals(ClientSettings.Language.RU) ? "Такого блока нет!" : "There is no such block!")
+                name -> Text.literal(MainSettings.language.getValue().equals(MainSettings.Language.RU) ? "Такого блока нет!" : "There is no such block!")
         ).create(blockName);
         return blockName;
     }

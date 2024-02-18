@@ -14,11 +14,15 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.*;
+import thunder.hack.events.impl.DeathEvent;
+import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -39,7 +43,7 @@ import thunder.hack.utility.world.HoleUtility;
 import java.util.*;
 import java.util.List;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public final class AutoAnchor extends Module {
     private final Setting<Float> targetRange = new Setting<>("Target Range", 10f, 1f, 20f);
@@ -86,7 +90,6 @@ public final class AutoAnchor extends Module {
     private PlayerEntity target;
     private BlockPos targetPos;
     private boolean rotated;
-    private float rotationYaw, rotationPitch;
 
     public AutoAnchor() {
         super("AutoAnchor", Category.COMBAT);
@@ -160,16 +163,8 @@ public final class AutoAnchor extends Module {
     }
 
     @EventHandler
-    public void onSync(EventSync e) {
-        if (rotate.getValue() && targetPos != null && mc.player != null) {
-            mc.player.setYaw(rotationYaw);
-            mc.player.setPitch(rotationPitch);
-        }
-    }
-
-    @EventHandler
     @SuppressWarnings("unused")
-    private void onCalcRotation(PlayerUpdateEvent event) {
+    private void onSync(EventSync event) {
         if (rotate.getValue() && targetPos != null && mc.player != null) {
             float[] angle = InteractionUtility.calculateAngle(targetPos.toCenterPos());
             if (yawStep.getValue() == YawStepMode.On) {
@@ -181,9 +176,8 @@ public final class AutoAnchor extends Module {
             } else rotated = true;
 
             double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
-            rotationYaw = ((float) (angle[0] - (angle[0] - ((IClientPlayerEntity) mc.player).getLastYaw()) % gcdFix));
-            rotationPitch = ((float) (angle[1] - (angle[1] - ((IClientPlayerEntity) mc.player).getLastPitch()) % gcdFix));
-            ModuleManager.rotations.fixRotation = rotationYaw;
+            mc.player.setYaw((float) (angle[0] - (angle[0] - ((IClientPlayerEntity) mc.player).getLastYaw()) % gcdFix));
+            mc.player.setPitch((float) (angle[1] - (angle[1] - ((IClientPlayerEntity) mc.player).getLastPitch()) % gcdFix));
         }
     }
 

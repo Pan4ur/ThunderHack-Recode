@@ -7,7 +7,6 @@ import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.modules.client.ClickGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 
@@ -29,9 +28,9 @@ public class StringElement extends AbstractElement {
         Render2DEngine.drawRect(context.getMatrices(), (float) getX() + 5,(float) getY() + 2, (float) (getWidth() - 11f), 10, new Color(0x94000000, true));
 
         if(!isSmall()) {
-            FontRenderers.getSettingsRenderer().drawString(context.getMatrices(), listening ? currentString + (mc.player == null || mc.player.age % 5 == 0 ? "_" : "") : (String) setting.getValue(), x + 6, y + height / 2, ClickGui.getInstance().getTextColor(setting.getModule()));
+            FontRenderers.getSettingsRenderer().drawString(context.getMatrices(), listening ? currentString + (mc.player == null || mc.player.age % 5 == 0 ? "_" : "") : (String) setting.getValue(), x + 6, y + height / 2, -1);
         } else {
-            FontRenderers.sf_medium_mini.drawString(context.getMatrices(), listening ? currentString + (mc.player == null || mc.player.age % 5 == 0 ? "_" : "") : (String) setting.getValue(), x + 6, y + height / 2, ClickGui.getInstance().getTextColor(setting.getModule()));
+            FontRenderers.sf_medium_mini.drawString(context.getMatrices(), listening ? currentString + (mc.player == null || mc.player.age % 5 == 0 ? "_" : "") : (String) setting.getValue(), x + 6, y + height / 2, -1);
         }
 
         if(Render2DEngine.isHovered(mouseX, mouseY, (float) getX() + 5,(float) getY() + 2, (float) (getWidth() - 11f), 10)) {

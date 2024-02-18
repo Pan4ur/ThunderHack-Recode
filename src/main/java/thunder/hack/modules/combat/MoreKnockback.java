@@ -10,7 +10,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 import static thunder.hack.modules.combat.Criticals.getEntity;
 import static thunder.hack.modules.combat.Criticals.getInteractType;
 

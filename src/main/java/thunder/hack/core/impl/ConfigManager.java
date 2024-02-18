@@ -13,7 +13,7 @@ import thunder.hack.core.IManager;
 import thunder.hack.gui.autobuy.AutoBuyItem;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.AutoBuy;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.modules.misc.Nuker;
 import thunder.hack.modules.render.Search;
 import thunder.hack.setting.Setting;
@@ -21,7 +21,6 @@ import thunder.hack.setting.impl.*;
 import thunder.hack.utility.player.InventoryUtility;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class ConfigManager implements IManager {
@@ -86,14 +85,14 @@ public class ConfigManager implements IManager {
     }
 
     public void loadDefault(String name) {
-        ClientSettings.Language prevLang = ClientSettings.language.getValue();
+        MainSettings.Language prevLang = MainSettings.language.getValue();
         Path path = Paths.get(CONFIG_FOLDER_NAME + "/configs/" + name + ".th");
         try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("cfg/" + name + ".th");
              OutputStream out = Files.newOutputStream(path)) {
             if (in == null) return;
             IOUtils.copy(in, out);
             load(name);
-            ClientSettings.language.setValue(prevLang);
+            MainSettings.language.setValue(prevLang);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -158,21 +157,6 @@ public class ConfigManager implements IManager {
         ThunderHack.moduleManager.onUnloadPost();
         load(file);
         ThunderHack.moduleManager.onLoad();
-    }
-
-    public void loadCloud(String name) {
-        Command.sendMessage(isRu() ? "Загружаю.." : "Downloading..");
-        try (BufferedInputStream in = new BufferedInputStream(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/configs/" + name + ".th").openStream());
-             FileOutputStream fileOutputStream = new FileOutputStream(new File(CONFIGS_FOLDER, name + ".th"))) {
-            byte dataBuffer[] = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1)
-                fileOutputStream.write(dataBuffer, 0, bytesRead);
-            Command.sendMessage(isRu() ? "Загрузил!" : "Downloaded!");
-            load(name);
-        } catch (Exception e) {
-            Command.sendMessage(isRu() ? "Произошла ошибка при загрузке! Может название неправильное?" : "There was an error downloading! Maybe the name is wrong?");
-        }
     }
 
     public void loadModuleOnly(String name, Module module) {
@@ -464,19 +448,6 @@ public class ConfigManager implements IManager {
             for (File file : Arrays.stream(Objects.requireNonNull(CONFIGS_FOLDER.listFiles())).filter(f -> f.getName().endsWith(".th")).collect(Collectors.toList())) {
                 list.add(file.getName().replace(".th", ""));
             }
-        }
-        return list;
-    }
-
-    public List<String> getCloudConfigs() {
-        List<String> list = new ArrayList<>();
-        try {
-            URL url = new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/cloudConfigs.txt");
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null)
-                list.add(inputLine.trim());
-        } catch (Exception ignored) {
         }
         return list;
     }

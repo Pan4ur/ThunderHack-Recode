@@ -27,10 +27,12 @@ import thunder.hack.core.impl.MacroManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.gui.hud.impl.RadarRewrite;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.gui.thundergui.ThunderGui;
+import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -40,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static thunder.hack.modules.Module.fullNullCheck;
 import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public final class Core {
     public static boolean lockSprint, serverSprint, hold_mouse0, showSkull;
@@ -70,8 +72,8 @@ public final class Core {
                 ThunderHack.EVENT_BUS.post(new DeathEvent(p));
         }
 
-        if (!Objects.equals(ThunderHack.commandManager.getPrefix(), ClientSettings.prefix.getValue().toString()))
-            ThunderHack.commandManager.setPrefix(ClientSettings.prefix.getValue());
+        if (!Objects.equals(ThunderHack.commandManager.getPrefix(), MainSettings.prefix.getValue().toString()))
+            ThunderHack.commandManager.setPrefix(MainSettings.prefix.getValue());
 
         new HashMap<>(InteractionUtility.awaiting).forEach((bp, time) -> {
             if (System.currentTimeMillis() - time > 300)
@@ -161,7 +163,7 @@ public final class Core {
     }
 
     public void drawSkull(DrawContext e) {
-        if (showSkull && !skullTimer.passedMs(3000) && ClientSettings.skullEmoji.getValue()) {
+        if (showSkull && !skullTimer.passedMs(3000) && MainSettings.skullEmoji.getValue()) {
             int xPos = (int) (mc.getWindow().getScaledWidth() / 2f - 150);
             int yPos = (int) (mc.getWindow().getScaledHeight() / 2f - 150);
             float alpha = (1 - (skullTimer.getPassedTimeMs() / 3000f));

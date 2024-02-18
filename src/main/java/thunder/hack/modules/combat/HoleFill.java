@@ -31,7 +31,7 @@ import thunder.hack.utility.world.HoleUtility;
 
 import java.util.*;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public final class HoleFill extends Module {
     private final Setting<Boolean> rotate = new Setting<>("Rotate", true);

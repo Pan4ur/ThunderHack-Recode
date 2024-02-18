@@ -3,7 +3,6 @@ package thunder.hack.cmd.impl;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
-import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
@@ -52,34 +51,15 @@ public class CfgCommand extends Command {
             return SINGLE_SUCCESS;
         })));
 
-        builder.then(literal("loadcloud").then(arg("name",  StringArgumentType.word()).executes(context -> {
-            ThunderHack.configManager.loadCloud(context.getArgument("name", String.class));
-            return SINGLE_SUCCESS;
-        })));
-
-        builder.then(literal("cloudlist").executes(context -> {
-            StringBuilder configs = new StringBuilder("Cloud Configs: \n");
-            for (String str : Objects.requireNonNull(ThunderHack.configManager.getCloudConfigs())) {
-                String[] split = str.split(";");
-                configs.append("\n- "+ Formatting.BOLD + split[0] + Formatting.RESET  + Formatting.GRAY + " author: " + Formatting.RESET + split[1] + Formatting.GRAY + " last updated: " + Formatting.RESET  + split[2]);
-            }
-            sendMessage(configs.toString());
-
-            return SINGLE_SUCCESS;
-        }));
-
-        builder.then(literal("cloud").then(arg("name",  StringArgumentType.word()).executes(context -> {
-            ThunderHack.configManager.loadCloud(context.getArgument("name", String.class));
-            return SINGLE_SUCCESS;
-        })));
-
         builder.then(literal("set")
                 .then(arg("name", CfgArgumentType.create())
                         .then(arg("module", ModuleArgumentType.create()).executes(context -> {
+                            sendMessage("228");
                             ThunderHack.configManager.loadModuleOnly(context.getArgument("name", String.class), context.getArgument("module", Module.class));
                             return SINGLE_SUCCESS;
                         }))
                         .executes(context -> {
+                            sendMessage("666");
                             ThunderHack.configManager.load(context.getArgument("name", String.class));
                             return SINGLE_SUCCESS;
                         })));

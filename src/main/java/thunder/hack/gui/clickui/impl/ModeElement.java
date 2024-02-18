@@ -51,11 +51,11 @@ public class ModeElement extends AbstractElement {
             Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, 1f, 17, ClickGui.getInstance().getColor(1));
 
         if(!isSmall()) {
-            FontRenderers.getSettingsRenderer().drawString(matrixStack, setting2.getName(), (setting.parent != null ? 2f : 0f) + (int) (x + 6), (int) (y + wheight / 2 - (6 / 2f)) + 3, ClickGui.getInstance().getTextColor(setting.getModule()));
-            FontRenderers.getSettingsRenderer().drawString(matrixStack, setting2.currentEnumName(), (int) (x + width - 18 - FontRenderers.getSettingsRenderer().getStringWidth(setting.currentEnumName())), 3 + (int) (y + wheight / 2 - 3f), ClickGui.getInstance().getTextColor(setting.getModule()));
+            FontRenderers.getSettingsRenderer().drawString(matrixStack, setting2.getName(), (setting.parent != null ? 2f : 0f) + (int) (x + 6), (int) (y + wheight / 2 - (6 / 2f)) + 3, new Color(-1).getRGB());
+            FontRenderers.getSettingsRenderer().drawString(matrixStack, setting2.currentEnumName(), (int) (x + width - 18 - FontRenderers.getSettingsRenderer().getStringWidth(setting.currentEnumName())), 3 + (int) (y + wheight / 2 - 3f), new Color(-1).getRGB());
         } else {
-            FontRenderers.sf_medium_mini.drawString(matrixStack, setting2.getName(), (setting.parent != null ? 2f : 0f) + (int) (x + 6), (int) (y + wheight / 2 - (6 / 2f)) + 3, ClickGui.getInstance().getTextColor(setting.getModule()));
-            FontRenderers.sf_medium_mini.drawString(matrixStack, setting2.currentEnumName(), (int) (x + width - 18 - FontRenderers.sf_medium_mini.getStringWidth(setting.currentEnumName())), 3 + (int) (y + wheight / 2 - 3f), ClickGui.getInstance().getTextColor(setting.getModule()));
+            FontRenderers.sf_medium_mini.drawString(matrixStack, setting2.getName(), (setting.parent != null ? 2f : 0f) + (int) (x + 6), (int) (y + wheight / 2 - (6 / 2f)) + 3, new Color(-1).getRGB());
+            FontRenderers.sf_medium_mini.drawString(matrixStack, setting2.currentEnumName(), (int) (x + width - 18 - FontRenderers.sf_medium_mini.getStringWidth(setting.currentEnumName())), 3 + (int) (y + wheight / 2 - 3f), new Color(-1).getRGB());
         }
 
 
@@ -64,9 +64,9 @@ public class ModeElement extends AbstractElement {
             double offsetY = 0;
             for (int i = 0; i <= setting2.getModes().length - 1; i++) {
                 if(!isSmall()) {
-                    FontRenderers.getSettingsRenderer().drawString(matrixStack, setting2.getModes()[i], (int) x + (int) width / 2f - (FontRenderers.getSettingsRenderer().getStringWidth(setting2.getModes()[i]) / 2f), (int) (y + wheight + 2 + offsetY), setting2.currentEnumName().equalsIgnoreCase(setting2.getModes()[i]) ? color.getRGB() : ClickGui.getInstance().getTextColor(setting.getModule()));
+                    FontRenderers.getSettingsRenderer().drawString(matrixStack, setting2.getModes()[i], (int) x + (int) width / 2f - (FontRenderers.getSettingsRenderer().getStringWidth(setting2.getModes()[i]) / 2f), (int) (y + wheight + 2 + offsetY), setting2.currentEnumName().equalsIgnoreCase(setting2.getModes()[i]) ? color.getRGB() : new Color(-1).getRGB());
                 } else {
-                    FontRenderers.sf_medium_mini.drawString(matrixStack, setting2.getModes()[i], (int) x + (int) width / 2f - (FontRenderers.sf_medium_mini.getStringWidth(setting2.getModes()[i]) / 2f), (int) (y + wheight + 2 + offsetY), setting2.currentEnumName().equalsIgnoreCase(setting2.getModes()[i]) ? color.getRGB() : ClickGui.getInstance().getTextColor(setting.getModule()));
+                    FontRenderers.sf_medium_mini.drawString(matrixStack, setting2.getModes()[i], (int) x + (int) width / 2f - (FontRenderers.sf_medium_mini.getStringWidth(setting2.getModes()[i]) / 2f), (int) (y + wheight + 2 + offsetY), setting2.currentEnumName().equalsIgnoreCase(setting2.getModes()[i]) ? color.getRGB() : new Color(-1).getRGB());
                 }
                 offsetY += 12;
             }

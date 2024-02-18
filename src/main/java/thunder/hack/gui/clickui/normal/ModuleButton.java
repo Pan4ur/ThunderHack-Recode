@@ -15,7 +15,7 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.TargetHud;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.modules.client.MainSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.*;
 import thunder.hack.utility.render.Render2DEngine;
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class ModuleButton extends AbstractButton {
@@ -124,8 +124,7 @@ public class ModuleButton extends AbstractButton {
             }
             context.getMatrices().pop();
 
-            if(module.isEnabled())
-                Render2DEngine.drawBlurredShadow(context.getMatrices(), (int) x + 3, (int) (y + height), (int) width - 6, 3, 13, new Color(0, 0, 0, 255));
+            Render2DEngine.drawBlurredShadow(context.getMatrices(), (int) x + 3, (int) (y + height), (int) width - 6, 3, 13, new Color(0, 0, 0, 255));
 
             Render2DEngine.popWindow();
         } else category_animation = fast(1, 0, 1f);
@@ -146,7 +145,7 @@ public class ModuleButton extends AbstractButton {
 
         if (!ClickGui.getInstance().showBinds.getValue()) {
             if (module.getSettings().size() > 3)
-                FontRenderers.sf_medium.drawString(context.getMatrices(), isOpen() ? "-" : "+", x + width - 12, y + 7, ClickGui.getInstance().getTextColor(module));
+                FontRenderers.sf_medium.drawString(context.getMatrices(), isOpen() ? "-" : "+", x + width - 12, y + 7, -1);
         } else {
             if (!module.getBind().getBind().equalsIgnoreCase("none")) {
                 String sbind = module.getBind().getBind();
@@ -169,24 +168,24 @@ public class ModuleButton extends AbstractButton {
                     sbind = "RAlt";
                 }
                 if (!binding) {
-                    FontRenderers.sf_medium.drawString(context.getMatrices(), sbind, (int) x + (int) width - 11 - (int) FontRenderers.sf_medium.getStringWidth(sbind), (int) y + 7 + (hovered ? -1 : 0), ClickGui.getInstance().getTextColor(module));
+                    FontRenderers.sf_medium.drawString(context.getMatrices(), sbind, (int) x + (int) width - 11 - (int) FontRenderers.sf_medium.getStringWidth(sbind), (int) y + 7 + (hovered ? -1 : 0), new Color(-1).getRGB());
                 }
             }
             if (binding) {
-                FontRenderers.sf_medium.drawString(context.getMatrices(), holdbind ? (Formatting.GRAY + "Toggle / " + Formatting.RESET + "Hold") : (Formatting.RESET + "Toggle " + Formatting.GRAY + "/ Hold"), (int) x + (int) width - 11 - (int) FontRenderers.sf_medium.getStringWidth("Toggle/Hold"), (int) y + 8 + (hovered ? -1 : 0), ClickGui.getInstance().getTextColor(module));
+                FontRenderers.sf_medium.drawString(context.getMatrices(), holdbind ? (Formatting.GRAY + "Toggle / " + Formatting.RESET + "Hold") : (Formatting.RESET + "Toggle " + Formatting.GRAY + "/ Hold"), (int) x + (int) width - 11 - (int) FontRenderers.sf_medium.getStringWidth("Toggle/Hold"), (int) y + 8 + (hovered ? -1 : 0), new Color(-1).getRGB());
             }
         }
 
         if (hovered && InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT)) {
-            FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"), ix + 1f, iy + 3 + (hovered ? -1 : 0), ClickGui.getInstance().getTextColor(module));
+            FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "Drawn " + (module.isDrawn() ? Formatting.GREEN + "TRUE" : Formatting.RED + "FALSE"), ix + 1f, iy + 3 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
         } else {
             if (this.binding) {
-                FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "PressKey", ix, iy + 3 + (hovered ? -1 : 0), ClickGui.getInstance().getTextColor(module));
+                FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "PressKey", ix, iy + 3 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
             } else {
                 if (ClickGui.getInstance().textSide.getValue() == ClickGui.TextSide.Left)
-                    FontRenderers.sf_medium.drawString(context.getMatrices(), module.getName(), ix + 2, iy + 1 + (hovered ? -1 : 0), ClickGui.getInstance().getTextColor(module));
+                    FontRenderers.sf_medium.drawString(context.getMatrices(), module.getName(), ix + 2, iy + 1 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
                 else
-                    FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), module.getName(), ix + 46, iy - 2 + (hovered ? -1 : 0), ClickGui.getInstance().getTextColor(module));
+                    FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), module.getName(), ix + 46, iy - 2 + (hovered ? -1 : 0), new Color(0xFFEAEAEA).getRGB());
             }
         }
     }
@@ -213,7 +212,7 @@ public class ModuleButton extends AbstractButton {
         if (hovered) {
             if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT) && button == 0) {
                 module.setDrawn(!module.isDrawn());
-                if (ClientSettings.isRu()) {
+                if (MainSettings.isRu()) {
                     Command.sendMessage("Модуль " + Formatting.GREEN + module.getName() + Formatting.WHITE + " теперь " + (module.isDrawn() ? "виден в ArrayList" : "не виден в ArrayList"));
                 } else {
                     Command.sendMessage(Formatting.GREEN + module.getName() + Formatting.WHITE + " is now " + (module.isDrawn() ? "visible in ArrayList" : "invisible in ArrayList"));

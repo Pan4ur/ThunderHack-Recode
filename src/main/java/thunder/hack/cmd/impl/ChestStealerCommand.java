@@ -12,7 +12,7 @@ import thunder.hack.cmd.args.ChestStealerArgumentType;
 import thunder.hack.core.impl.ModuleManager;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.modules.client.MainSettings.isRu;
 
 public class ChestStealerCommand extends Command {
     public ChestStealerCommand() {

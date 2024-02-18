@@ -25,9 +25,11 @@ public final class AntiBot extends Module {
     private int botsNumber = 0;
     private int ticks = 0;
 
+    private static AntiBot instance;
 
     public AntiBot() {
         super("AntiBot", Category.COMBAT);
+        instance = this;
     }
 
     @EventHandler
@@ -76,6 +78,10 @@ public final class AntiBot extends Module {
     @Override
     public String getDisplayInfo() {
         return String.valueOf(botsNumber);
+    }
+
+    public static AntiBot getInstance() {
+        return instance;
     }
 
     public enum Mode {

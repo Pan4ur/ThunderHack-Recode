@@ -43,11 +43,11 @@ public class SliderElement extends AbstractElement {
             Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, 1f, 18, ClickGui.getInstance().getColor(1));
 
         if(!isSmall()) {
-            FontRenderers.settings.drawString(matrixStack, setting.getName(), (setting.parent != null ? 2f : 0f) + x + 6, y + 4, ClickGui.getInstance().getTextColor(setting.getModule()));
-            FontRenderers.settings.drawString(matrixStack, listening ? (Objects.equals(Stringnumber, "") ? "..." : Stringnumber) : setting.getValue() + "", (int) (x + width - 6 - FontRenderers.getSettingsRenderer().getStringWidth(setting.getValue() + "")), y + 5, ClickGui.getInstance().getTextColor(setting.getModule()));
+            FontRenderers.settings.drawString(matrixStack, setting.getName(), (setting.parent != null ? 2f : 0f) + x + 6, y + 4, new Color(-1).getRGB());
+            FontRenderers.settings.drawString(matrixStack, listening ? (Objects.equals(Stringnumber, "") ? "..." : Stringnumber) : setting.getValue() + "", (int) (x + width - 6 - FontRenderers.getSettingsRenderer().getStringWidth(setting.getValue() + "")), y + 5, new Color(-1).getRGB());
         } else {
-            FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), (setting.parent != null ? 2f : 0f) + x + 6, y + 4, ClickGui.getInstance().getTextColor(setting.getModule()));
-            FontRenderers.sf_medium_mini.drawString(matrixStack, listening ? (Objects.equals(Stringnumber, "") ? "..." : Stringnumber) : setting.getValue() + "", (int) (x + width - 6 - FontRenderers.sf_medium_mini.getStringWidth(setting.getValue() + "")), y + 5, ClickGui.getInstance().getTextColor(setting.getModule()));
+            FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), (setting.parent != null ? 2f : 0f) + x + 6, y + 4, new Color(-1).getRGB());
+            FontRenderers.sf_medium_mini.drawString(matrixStack, listening ? (Objects.equals(Stringnumber, "") ? "..." : Stringnumber) : setting.getValue() + "", (int) (x + width - 6 - FontRenderers.sf_medium_mini.getStringWidth(setting.getValue() + "")), y + 5, new Color(-1).getRGB());
         }
 
         Render2DEngine.drawRound(matrixStack, (float) (x + 6), (float) (y + height - 6), (float) (width - 12), 1, 0.5f, new Color(0xff0E0E0E));
