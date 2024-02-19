@@ -232,6 +232,7 @@ public class ModuleManager implements IManager {
     public static Aura aura = new Aura();
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
+    public static UnHook unHook = new UnHook();
 
     public ModuleManager() {
         if (ThunderHack.isOnWindows())
