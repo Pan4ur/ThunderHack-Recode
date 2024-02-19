@@ -145,7 +145,7 @@ public final class Aura extends Module {
     public void auraLogic() {
         Item handItem = mc.player.getMainHandStack().getItem();
 
-        if ((switchMode.getValue() != Switch.Silent && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem))) {
+        if ((switchMode.getValue() != Switch.Silent && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem || handItem instanceof TridentItem))) {
             target = null;
             return;
         }
@@ -174,7 +174,7 @@ public final class Aura extends Module {
             if (shieldBreaker(false))
                 return;
 
-            if (switchMode.getValue() == Switch.None && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem))
+            if (switchMode.getValue() == Switch.None && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem || handItem instanceof TridentItem))
                 return;
 
             boolean[] playerState = preAttack();
@@ -295,7 +295,7 @@ public final class Aura extends Module {
             return;
 
         Item handItem = mc.player.getMainHandStack().getItem();
-        if ((onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem)) && switchMode.getValue() != Switch.Silent)
+        if ((onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem || handItem instanceof TridentItem)) && switchMode.getValue() != Switch.Silent)
             return;
 
         if (target != null && rotationMode.getValue() != Rotation.None) {
@@ -556,7 +556,7 @@ public final class Aura extends Module {
         if (target == null
                 || (switchMode.getValue() != Switch.Silent
                 && onlyWeapon.getValue()
-                && !(handItem instanceof SwordItem || handItem instanceof AxeItem)))
+                && !(handItem instanceof SwordItem || handItem instanceof AxeItem || handItem instanceof TridentItem)))
             return;
 
         switch (esp.getValue()) {
