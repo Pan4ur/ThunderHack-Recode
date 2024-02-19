@@ -33,6 +33,7 @@ public class Speed extends Module {
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
     public Setting<Boolean> useTimer = new Setting<>("Use Timer", false);
+    public Setting<Boolean> pauseInLiquids = new Setting<>("PauseInLiquids", false);
     public final Setting<Integer> hurttime = new Setting<>("HurtTime", 0, 0, 10, v -> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Float> boostFactor = new Setting<>("BoostFactor", 2f, 0f, 10f, v -> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Boolean> allowOffGround = new Setting<>("AllowOffGround", true, v -> mode.getValue() == Mode.MatrixDamage);
@@ -64,6 +65,7 @@ public class Speed extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
+        if(mc.player.isInFluid() && pauseInLiquids.getValue()){return;}
         if (mode.getValue() == Mode.MatrixJB) {
             boolean closeToGround = false;
 
@@ -118,6 +120,7 @@ public class Speed extends Module {
 
     @Override
     public void onUpdate() {
+        if(mc.player.isInFluid() && pauseInLiquids.getValue()){return;}
         if (mode.getValue() == Mode.ElytraLowHop) {
             if (mc.player.isOnGround()) {
                 mc.player.jump();
@@ -158,6 +161,8 @@ public class Speed extends Module {
 
     @EventHandler
     public void onMove(EventMove event) {
+        debug(String.valueOf(mc.player.isInFluid()));
+        if (mc.player.isInFluid() && pauseInLiquids.getValue()){return;}
         if (mode.getValue() != Mode.NCP && mode.getValue() != Mode.StrictStrafe) return;
         if (mc.player.getAbilities().flying) return;
         if (mc.player.isFallFlying()) return;
