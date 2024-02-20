@@ -1,7 +1,6 @@
 package thunder.hack.modules.misc;
 
 import thunder.hack.ThunderHack;
-import thunder.hack.gui.mainmenu.MainMenuScreen;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClientSettings;
 
@@ -11,7 +10,6 @@ public class UnHook extends Module {
     public UnHook() {
         super("UnHook", Category.MISC);
     }
-
     List<Module> list;
 
     @Override
@@ -23,7 +21,7 @@ public class UnHook extends Module {
             }
             module.disable();
         }
-        ClientSettings.customMainMenu.setValue(true);
+        ClientSettings.customMainMenu.setValue(false);
     }
 
     @Override
@@ -34,6 +32,6 @@ public class UnHook extends Module {
             }
             module.enable();
         }
-        ClientSettings.customMainMenu.setValue(false);
+        ClientSettings.customMainMenu.setValue(true);
     }
 }
