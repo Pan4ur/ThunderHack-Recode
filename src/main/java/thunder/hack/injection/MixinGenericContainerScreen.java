@@ -19,9 +19,12 @@ public abstract class MixinGenericContainerScreen extends HandledScreen<GenericC
 
     @Override
     protected void init() {
+        /*
         super.init();
         if (ModuleManager.autoBuy.isEnabled()) {
             addDrawableChild(ButtonWidget.builder(Text.literal("Включить AutoBuy"), b -> ModuleManager.autoBuy.toggleActive()).dimensions(x + backgroundWidth / 2 - 60, y - 30, 120, 20).build());
         }
+
+         */
     }
 }

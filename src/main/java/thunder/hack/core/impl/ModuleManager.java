@@ -174,7 +174,6 @@ public class ModuleManager implements IManager {
     public static Breaker breaker = new Breaker();
     public static AutoEat autoEat = new AutoEat();
     public static AntiAFK antiAFK = new AntiAFK();
-    public static AutoBuy autoBuy = new AutoBuy();
     public static SoundFX soundFX = new SoundFX();
     public static AutoBed autoBed = new AutoBed();
     public static TNTAura tntAura = new TNTAura();
