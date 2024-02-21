@@ -32,7 +32,7 @@ public class LongJump extends Module {
 
     @EventHandler
     public void onMove(EventMove e) {
-        if(mc.player.getPos().squaredDistanceTo(prevPosition) > maxDistance.getPow2Value())
+        if(prevPosition != null && mc.player.getPos().squaredDistanceTo(prevPosition) > maxDistance.getPow2Value())
             disable(isRu() ? "Прыжок выполнен! Отключаю.." : "Jump complete! Disabling..");
 
         if (MovementUtility.isMoving()) {
