@@ -135,6 +135,9 @@ public class NoFall extends Module {
     }
 
     public boolean isFalling() {
+        if(mc == null || mc.player == null || mc.world == null)
+            return false;
+        
         if (mc.player.isFallFlying())
             return false;
 
