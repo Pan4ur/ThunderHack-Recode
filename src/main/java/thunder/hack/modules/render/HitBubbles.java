@@ -1,5 +1,6 @@
 package thunder.hack.modules.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
@@ -30,6 +31,7 @@ public class HitBubbles extends Module {
     }
 
     public void onRender3D(MatrixStack matrixStack) {
+        RenderSystem.disableDepthTest();
         bubbles.forEach(b -> {
             matrixStack.push();
             matrixStack.translate(b.x - mc.getEntityRenderDispatcher().camera.getPos().getX(), b.y - mc.getEntityRenderDispatcher().camera.getPos().getY(), b.z - mc.getEntityRenderDispatcher().camera.getPos().getZ());
@@ -38,6 +40,7 @@ public class HitBubbles extends Module {
             drawBubble(matrixStack, -b.life.getPassedTimeMs() / 4f, b.life.getPassedTimeMs() / 1500f);
             matrixStack.pop();
         });
+        RenderSystem.enableDepthTest();
         bubbles.removeIf(b -> b.life.passedMs(1500));
     }
 

@@ -1,5 +1,6 @@
 package thunder.hack.gui.hud.impl;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -27,6 +28,7 @@ public class Particles {
 
     public void drawStar(MatrixStack matrices, float x, float y, Color c) {
         RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         RenderSystem.setShaderTexture(0, star);
         RenderSystem.setShaderColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, (float) (opacity / 255f));
         Render2DEngine.renderTexture(matrices, x + size / 2f, y + size / 2f, size, size, 0, 0, 256, 256, 256, 256);

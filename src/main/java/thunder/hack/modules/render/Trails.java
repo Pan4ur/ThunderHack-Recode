@@ -1,5 +1,6 @@
 package thunder.hack.modules.render;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.*;
@@ -37,19 +38,19 @@ public class Trails extends Module {
         super("Trails", Category.RENDER);
     }
 
-    private final Setting<Boolean> pearls = new Setting<>("Pearls", false);
     private final Setting<Boolean> xp = new Setting<>("Xp", false);
-    private final Setting<Boolean> arrows = new Setting<>("Arrows", false);
+    private final Setting<Particles> pearls = new Setting<>("Pearls", Particles.Particles);
+    private final Setting<Particles> arrows = new Setting<>("Arrows", Particles.Particles);
     private final Setting<Players> players = new Setting<>("Players", Players.Particles);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
     private final Setting<Float> down = new Setting<>("Down", 0.5F, 0.0F, 2.0F);
     private final Setting<Float> width = new Setting<>("Height", 1.3F, 0.1F, 2.0F);
-    private final Setting<Integer> speed = new Setting<>("Speed", 2, 1, 20, v-> players.getValue() == Players.Particles);
-    private final Setting<HitParticles.Mode> mode = new Setting<>("Mode", HitParticles.Mode.Stars, v-> players.getValue() == Players.Particles);
-    private final Setting<HitParticles.Physics> physics = new Setting<>("Physics", HitParticles.Physics.Fall, v-> players.getValue() == Players.Particles);
-    private final Setting<Integer> starsScale = new Setting<>("Scale", 3, 1, 10, v-> players.getValue() == Players.Particles);
-    private final Setting<Integer> amount = new Setting<>("Amount", 2, 1, 5, v-> players.getValue() == Players.Particles);
-    private final Setting<Integer> lifeTime = new Setting<>("LifeTime", 2, 1, 10, v-> players.getValue() == Players.Particles);
+    private final Setting<Integer> speed = new Setting<>("Speed", 2, 1, 20, v -> players.getValue() == Players.Particles);
+    private final Setting<HitParticles.Mode> mode = new Setting<>("Mode", HitParticles.Mode.Stars);
+    private final Setting<HitParticles.Physics> physics = new Setting<>("Physics", HitParticles.Physics.Fall, v -> players.getValue() == Players.Particles);
+    private final Setting<Integer> starsScale = new Setting<>("Scale", 3, 1, 10, v -> players.getValue() == Players.Particles);
+    private final Setting<Integer> amount = new Setting<>("Amount", 2, 1, 5, v -> players.getValue() == Players.Particles);
+    private final Setting<Integer> lifeTime = new Setting<>("LifeTime", 2, 1, 10, v -> players.getValue() == Players.Particles);
     private final Setting<Mode> lmode = new Setting<>("ColorMode", Mode.Sync);
     private final Setting<ColorSetting> lcolor = new Setting<>("Color2", new ColorSetting(0x2250b4b4), v -> lmode.getValue() == Mode.Custom);
 
@@ -57,10 +58,10 @@ public class Trails extends Module {
 
     public void onRender3D(MatrixStack stack) {
         for (Entity en : ThunderHack.asyncManager.getAsyncEntities()) {
-            if (en instanceof EnderPearlEntity && pearls.getValue())
+            if (en instanceof EnderPearlEntity && pearls.is(Particles.Trail))
                 calcTrajectory(en);
 
-            if (en instanceof ArrowEntity && arrows.getValue())
+            if (en instanceof ArrowEntity && pearls.is(Particles.Trail))
                 calcTrajectory(en);
 
             if (en instanceof ExperienceBottleEntity && xp.getValue())
@@ -99,12 +100,7 @@ public class Trails extends Module {
                     stack.pop();
                 }
             }
-        } else if (players.getValue() == Players.Particles) {
-            RenderSystem.enableDepthTest();
-            if (mc.player != null && mc.world != null)
-                particles.forEach(p -> p.render(stack));
-            RenderSystem.disableDepthTest();
-        } else if(players.getValue() == Players.Cute){
+        } else if (players.getValue() == Players.Cute) {
             for (PlayerEntity entity : mc.world.getPlayers()) {
                 float alpha = color.getValue().getAlpha() / 255f;
                 if (!((IEntity) entity).thunderHack_Recode$getTrails().isEmpty()) {
@@ -177,6 +173,30 @@ public class Trails extends Module {
                 }
             }
         }
+
+        if (!particles.isEmpty()) {
+            RenderSystem.disableDepthTest();
+            RenderSystem.enableBlend();
+            RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
+
+            switch (mode.getValue()) {
+                case Stars -> RenderSystem.setShaderTexture(0, star);
+                case Orbiz -> RenderSystem.setShaderTexture(0, firefly);
+                case Hearts -> RenderSystem.setShaderTexture(0, heart);
+            }
+
+            RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+            BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+
+            if (mc.player != null && mc.world != null)
+                particles.forEach(p -> p.render(stack, bufferBuilder));
+
+            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            RenderSystem.disableBlend();
+            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+            RenderSystem.enableDepthTest();
+        }
     }
 
     @Override
@@ -186,17 +206,30 @@ public class Trails extends Module {
         for (PlayerEntity player : mc.world.getPlayers()) {
             if (player.getPos().getZ() != player.prevZ || player.getPos().getX() != player.prevX) {
                 ((IEntity) player).thunderHack_Recode$getTrails().add(new Trail(new Vec3d(player.prevX, player.prevY, player.prevZ), player.getPos(), color.getValue().getColorObject()));
-                for (int i = 0; i < amount.getValue(); i++) {
-                    particles.add(new Particle(player.getX(), MathUtility.random((float) (player.getY() + player.getHeight()), (float) player.getY()), player.getZ(), c));
+                if (players.is(Players.Particles)) {
+                    for (int i = 0; i < amount.getValue(); i++) {
+                        particles.add(new Particle(player.getX(), MathUtility.random((float) (player.getY() + player.getHeight()), (float) player.getY()), player.getZ(), c));
+                    }
                 }
             }
             ((IEntity) player).thunderHack_Recode$getTrails().removeIf(Trail::update);
+
+        }
+
+        for (Entity en : ThunderHack.asyncManager.getAsyncEntities()) {
+            if (en instanceof ArrowEntity ae && (ae.prevY != ae.getY()) && arrows.is(Particles.Particles))
+                particles.add(new Particle(en.getX(), en.getY(), en.getZ(), HudEditor.getColor(mc.player.age)));
+
+            if (en instanceof EnderPearlEntity && pearls.is(Particles.Particles))
+                particles.add(new Particle(en.getX(), en.getY(), en.getZ(), HudEditor.getColor(mc.player.age)));
         }
 
         if (ThunderHack.playerManager.currentPlayerSpeed != 0) {
             ((IEntity) mc.player).thunderHack_Recode$getTrails().add(new Trail(new Vec3d(mc.player.prevX, mc.player.prevY, mc.player.prevZ), mc.player.getPos(), color.getValue().getColorObject()));
-            for (int i = 0; i < amount.getValue(); i++) {
-                particles.add(new Particle(mc.player.getX(), MathUtility.random((float) (mc.player.getY() + mc.player.getHeight()), (float) mc.player.getY()), mc.player.getZ(), c));
+            if (players.is(Players.Particles)) {
+                for (int i = 0; i < amount.getValue(); i++) {
+                    particles.add(new Particle(mc.player.getX(), MathUtility.random((float) (mc.player.getY() + mc.player.getHeight()), (float) mc.player.getY()), mc.player.getZ(), c));
+                }
             }
         }
         particles.removeIf(particle -> System.currentTimeMillis() - particle.time > 1000f * lifeTime.getValue());
@@ -275,7 +308,7 @@ public class Trails extends Module {
             if (y <= -65) break;
             if (e.getVelocity().x == 0 && e.getVelocity().y == 0 && e.getVelocity().z == 0) continue;
 
-            int alpha = (int) MathUtility.clamp((255f * (i / 8f)), 0 ,255);
+            int alpha = (int) MathUtility.clamp((255f * (i / 8f)), 0, 255);
 
             Render3DEngine.drawLine((float) lastPos.x, (float) lastPos.y, (float) lastPos.z, (float) x, (float) y, (float) z, lmode.getValue() == Mode.Sync ? Render2DEngine.injectAlpha(HudEditor.getColor(i * 5), alpha) : Render2DEngine.injectAlpha(lcolor.getValue().getColorObject(), alpha), 2);
         }
@@ -302,10 +335,6 @@ public class Trails extends Module {
             this.color = color;
         }
 
-        public long getTime() {
-            return time;
-        }
-
         public void update() {
             double sp = starsScale.getValue() / 10f;
             x += motionX;
@@ -315,7 +344,7 @@ public class Trails extends Module {
             if (posBlock(x, y - starsScale.getValue() / 10f, z)) {
                 motionY = -motionY / 1.1;
             } else {
-                if (    posBlock(x, y, z)
+                if (posBlock(x, y, z)
                         || posBlock(x - sp, y, z - sp)
                         || posBlock(x + sp, y, z + sp)
                         || posBlock(x + sp, y, z - sp)
@@ -336,31 +365,27 @@ public class Trails extends Module {
             motionY /= 1.005;
         }
 
-        public void render(MatrixStack matrixStack) {
+        public void render(MatrixStack matrixStack, BufferBuilder bufferBuilder) {
+            matrixStack.push();
             update();
-            float scale = 0.07f;
+            float scale = starsScale.getValue() / 10f;
             final double posX = x - mc.getEntityRenderDispatcher().camera.getPos().getX();
             final double posY = y - mc.getEntityRenderDispatcher().camera.getPos().getY();
             final double posZ = z - mc.getEntityRenderDispatcher().camera.getPos().getZ();
 
             matrixStack.push();
             matrixStack.translate(posX, posY, posZ);
-            matrixStack.scale(-scale, -scale, -scale);
 
             matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-mc.gameRenderer.getCamera().getYaw()));
             matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(mc.gameRenderer.getCamera().getPitch()));
+            Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 
-            switch (mode.getValue()) {
-                case Stars -> drawStar(matrixStack, color, starsScale.getValue());
-                case Orbiz ->  {
-                    drawOrbiz(matrixStack, 0.0f, 0.7, color);
-                    drawOrbiz(matrixStack, 0.1f, 1.4, color);
-                    drawOrbiz(matrixStack, 0.2f, 2.3, color);
-                }
-                default -> drawHeart(matrixStack, color, starsScale.getValue());
-            }
+            float colorAnim = (float) (System.currentTimeMillis() - time) / (1000f * lifeTime.getValue());
 
-            matrixStack.scale(0.8f, 0.8f, 0.8f);
+            bufferBuilder.vertex(matrix, 0, scale, 0).texture(0, 1).color(applyOpacity(HudEditor.getColor(270), 1f - colorAnim).getRGB()).next();
+            bufferBuilder.vertex(matrix, scale, scale, 0).texture(1, 1).color(applyOpacity(HudEditor.getColor(0), 1f - colorAnim).getRGB()).next();
+            bufferBuilder.vertex(matrix, scale, 0, 0).texture(1, 0).color(applyOpacity(HudEditor.getColor(180), 1f - colorAnim).getRGB()).next();
+            bufferBuilder.vertex(matrix, 0, 0, 0).texture(0, 0).color(applyOpacity(HudEditor.getColor(90), 1f - colorAnim).getRGB()).next();
             matrixStack.pop();
         }
 
@@ -375,5 +400,9 @@ public class Trails extends Module {
 
     private enum Players {
         Trail, Particles, Cute, None
+    }
+
+    private enum Particles {
+        Trail, Particles, None
     }
 }

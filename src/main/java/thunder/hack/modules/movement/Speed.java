@@ -161,7 +161,6 @@ public class Speed extends Module {
 
     @EventHandler
     public void onMove(EventMove event) {
-        debug(String.valueOf(mc.player.isInFluid()));
         if (mc.player.isInFluid() && pauseInLiquids.getValue()){return;}
         if (mode.getValue() != Mode.NCP && mode.getValue() != Mode.StrictStrafe) return;
         if (mc.player.getAbilities().flying) return;

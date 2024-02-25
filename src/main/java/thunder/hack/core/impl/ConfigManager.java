@@ -42,6 +42,7 @@ public class ConfigManager implements IManager {
     public static final File TEMP_FOLDER = new File(MAIN_FOLDER, "temp");
     public static final File MISC_FOLDER = new File(MAIN_FOLDER, "misc");
     public static final File SOUNDS_FOLDER = new File(MISC_FOLDER, "sounds");
+    public static final File IMAGES_FOLDER = new File(MISC_FOLDER, "images");
 
     public File currentConfig = null;
 
@@ -56,6 +57,7 @@ public class ConfigManager implements IManager {
         if (!TEMP_FOLDER.exists()) TEMP_FOLDER.mkdirs();
         if (!MISC_FOLDER.exists()) MISC_FOLDER.mkdirs();
         if (!SOUNDS_FOLDER.exists()) SOUNDS_FOLDER.mkdirs();
+        if (!IMAGES_FOLDER.exists()) IMAGES_FOLDER.mkdirs();
     }
 
     public void loadSearch() {

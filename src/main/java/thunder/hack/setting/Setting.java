@@ -244,5 +244,9 @@ public class Setting<T> {
         }
         return this.visibility.test(this.getValue());
     }
+
+    public boolean is(T colorMode) {
+        return value == colorMode;
+    }
 }
 

@@ -45,8 +45,10 @@ public class Render2DEngine {
     public static final Identifier firefly = new Identifier("textures/firefly.png");
     public static final Identifier arrow = new Identifier("textures/triangle.png");
     public static final Identifier bubble = new Identifier("textures/hitbubble.png");
+    public static final Identifier default_circle = new Identifier("textures/circle.png");
 
     public static HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
+    public static HashMap<Integer, BlurredShadow> shadowCache1 = new HashMap<>();
     final static Stack<Rectangle> clipStack = new Stack<>();
 
     public static void addWindow(MatrixStack stack, Rectangle r1) {
@@ -252,6 +254,46 @@ public class Render2DEngine {
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
+        renderGradientTexture(matrices, x, y, width, height, 0, 0, width, height, width, height, color1, color2, color3, color4);
+        RenderSystem.disableBlend();
+    }
+
+     public static void drawGradientBlurredShadow1(MatrixStack matrices, float x, float y, float width, float height, int blurRadius, Color color1, Color color2, Color color3, Color color4) {
+        if (!HudEditor.glow.getValue()) return;
+        width = width + blurRadius * 2;
+        height = height + blurRadius * 2;
+        x = x - blurRadius;
+        y = y - blurRadius;
+
+        int identifier = (int) (width * height + width * blurRadius);
+        if (shadowCache1.containsKey(identifier)) {
+            shadowCache1.get(identifier).bind();
+        } else {
+            BufferedImage original = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB);
+            Graphics g = original.getGraphics();
+            g.setColor(new Color(-1));
+            g.fillRect(blurRadius, blurRadius, (int) (width - blurRadius * 2), (int) (height - blurRadius * 2));
+            g.dispose();
+            BufferedImage blurred = new GaussianFilter(blurRadius).filter(original, null);
+
+            BufferedImage black =  new BufferedImage((int) width + blurRadius * 2, (int) height + blurRadius * 2, BufferedImage.TYPE_INT_ARGB);
+            Graphics g2 = black.getGraphics();
+            g2.setColor(new Color(0x000000));
+            g2.fillRect(0, 0, (int) width + blurRadius * 2, (int) height + blurRadius * 2);
+            g2.dispose();
+
+            BufferedImage combined = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB);
+            Graphics g1 = combined.getGraphics();
+            g1.drawImage(black, -blurRadius, -blurRadius, null);
+            g1.drawImage(blurred, 0, 0, null);
+            g1.dispose();
+
+            shadowCache1.put(identifier, new BlurredShadow(combined));
+            return;
+        }
+
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         renderGradientTexture(matrices, x, y, width, height, 0, 0, width, height, width, height, color1, color2, color3, color4);
         RenderSystem.disableBlend();
     }

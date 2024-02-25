@@ -29,6 +29,7 @@ import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.modules.misc.NameProtect;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -41,6 +42,7 @@ import java.util.List;
 
 public class TargetHud extends HudElement {
     private static final Identifier thudPic = new Identifier("textures/thud.png");
+    private static Identifier custom;
 
     public static BetterDynamicAnimation healthanimation = new BetterDynamicAnimation();
     public static BetterDynamicAnimation ebaloAnimation = new BetterDynamicAnimation();
@@ -67,6 +69,7 @@ public class TargetHud extends HudElement {
     public TargetHud() {
         super("TargetHud", 150, 50);
     }
+
 
     public static void sizeAnimation(MatrixStack matrixStack, double width, double height, double animation) {
         matrixStack.translate(width, height, 0);
@@ -159,17 +162,35 @@ public class TargetHud extends HudElement {
                 Render2DEngine.drawRound(context.getMatrices(), getPosX() + 50, getPosY(), 100, 50, 6, new Color(0, 0, 0, 255));
 
                 // Картинка
-                if (imageMode.getValue() == ImageModeEn.Anime) {
-                    context.getMatrices().push();
 
-                    RenderSystem.setShaderTexture(0, thudPic);
-                    RenderSystem.enableBlend();
-                    RenderSystem.defaultBlendFunc();
-                    Render2DEngine.drawRound(context.getMatrices(), getPosX() + 50, getPosY(), 100, 50, 12, new Color(0, 0, 0, 255));
-                    RenderSystem.disableBlend();
-                    RenderSystem.setShaderColor(0.3f, 0.3f, 0.3f, 1f);
-                    Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 50, getPosY(), 95, 50, 0, 0, 100, 50, 100, 50);
-                    context.getMatrices().pop();
+                imageRender:
+                {
+                    if (!imageMode.is(ImageModeEn.None)) {
+                        context.getMatrices().push();
+
+                        if (imageMode.is(ImageModeEn.Anime)) {
+                            RenderSystem.setShaderTexture(0, thudPic);
+                        } else {
+                            try {
+                                custom = ThunderUtility.getCustomImg("thud");
+                            } catch (Exception e) {
+                                sendMessage(".minecraft -> ThunderHackRecode -> misc -> images -> thud.png");
+                            }
+
+                            if(custom == null)
+                                break imageRender;
+
+                            RenderSystem.setShaderTexture(0, custom);
+                        }
+
+                        RenderSystem.enableBlend();
+                        RenderSystem.defaultBlendFunc();
+                        Render2DEngine.drawRound(context.getMatrices(), getPosX() + 50, getPosY(), 100, 50, 12, new Color(0, 0, 0, 255));
+                        RenderSystem.disableBlend();
+                        RenderSystem.setShaderColor(0.3f, 0.3f, 0.3f, 1f);
+                        Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 50, getPosY(), 95, 50, 0, 0, 100, 50, 100, 50);
+                        context.getMatrices().pop();
+                    }
                 }
 
                 //Партиклы
@@ -284,7 +305,7 @@ public class TargetHud extends HudElement {
 
                 if (mini.getValue()) {
                     // Основа
-                    Render2DEngine.drawGradientBlurredShadow(context.getMatrices(), getPosX() + 2, getPosY() + 2, 91, 31, 12, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+                    Render2DEngine.drawGradientBlurredShadow1(context.getMatrices(), getPosX() + 2, getPosY() + 2, 91, 31, 12, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
                     Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 95, 35, 7);
                     Render2DEngine.drawRound(context.getMatrices(), getPosX() + 0.5f, getPosY() + 0.5f, 94, 34, 7, Render2DEngine.injectAlpha(Color.BLACK, 220));
 
@@ -341,7 +362,7 @@ public class TargetHud extends HudElement {
                     }
                 } else {
                     // Основа
-                    Render2DEngine.drawGradientBlurredShadow(context.getMatrices(), getPosX() + 2, getPosY() + 2, 133, 44, 14, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+                    Render2DEngine.drawGradientBlurredShadow1(context.getMatrices(), getPosX() + 2, getPosY() + 2, 133, 44, 14, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
                     Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 137, 47.5f, 9);
                     Render2DEngine.drawRound(context.getMatrices(), getPosX() + 0.5f, getPosY() + 0.5f, 136f, 46, 9, Render2DEngine.injectAlpha(Color.BLACK, 220));
 

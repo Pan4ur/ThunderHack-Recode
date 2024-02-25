@@ -1,163 +1,121 @@
 package thunder.hack.modules.render;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Matrix4f;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.utility.ThunderUtility;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.Render3DEngine;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class JumpCircle extends Module {
-    public Setting<cmode> CMode = new Setting<>("ColorMode", cmode.Astolfo);
-    public Setting<Integer> lifetime = new Setting<>("live", 3, 1, 10);
-    public final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(3649978));
-    public final Setting<ColorSetting> color2 = new Setting<>("Color2", new ColorSetting(3646789));
-    public final Setting<Integer> colorOffset1 = new Setting<>("ColorOffset", 10, 1, 20);
+import static thunder.hack.utility.render.Render2DEngine.applyOpacity;
 
+public class JumpCircle extends Module {
     public JumpCircle() {
         super("JumpCircle", Category.RENDER);
     }
 
-    static List<Circle> circles = new ArrayList<>();
-    private List<PlayerEntity> cache = new CopyOnWriteArrayList<>();
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
+    private final Setting<Boolean> easeOut = new Setting<>("EaseOut", true);
+
+    private final List<Circle> circles = new ArrayList<>();
+    private final List<PlayerEntity> cache = new CopyOnWriteArrayList<>();
+    private Identifier custom;
+
+    @Override
+    public void onEnable() {
+        try {
+            custom = ThunderUtility.getCustomImg("circle");
+        } catch (Exception e) {
+            sendMessage(e.getMessage());
+        }
+    }
 
     @Override
     public void onUpdate() {
+        if (mode.is(Mode.Custom) && custom == null) {
+            try {
+                custom = ThunderUtility.getCustomImg("circle");
+            } catch (Exception e) {
+                sendMessage(".minecraft -> ThunderHackRecode -> misc -> images -> circle.png");
+            }
+        }
+
         for (PlayerEntity pl : mc.world.getPlayers())
             if (!cache.contains(pl) && pl.isOnGround())
                 cache.add(pl);
 
         cache.forEach(pl -> {
             if (pl != null && !pl.isOnGround()) {
-                circles.add(new Circle(new Vec3d(pl.getX(), pl.getY() - 0.3f, pl.getZ())));
+                circles.add(new Circle(new Vec3d(pl.getX(), (int) Math.floor(pl.getY()) + 0.001f, pl.getZ()), new Timer()));
                 cache.remove(pl);
             }
         });
 
-        for (Circle circle : circles) {
-            circle.update();
-        }
-        circles.removeIf(Circle::update);
+        circles.removeIf(c -> c.timer.passedMs(easeOut.getValue() ? 5000 : 6000));
     }
 
     public void onPreRender3D(MatrixStack stack) {
         Collections.reverse(circles);
-        try {
-            for (Circle c : circles) {
-                double x = c.position().x - mc.getEntityRenderDispatcher().camera.getPos().getX();
-                double y = c.position().y - mc.getEntityRenderDispatcher().camera.getPos().getY();
-                double z = c.position().z - mc.getEntityRenderDispatcher().camera.getPos().getZ();
-                float k = (float) c.timer.getPassedTimeMs() / (float) (lifetime.getValue() * 1000);
-                float start = k * 1.6f;
-                float middle = (start + k) / 2;
+        RenderSystem.disableDepthTest();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
 
-                stack.push();
-                stack.translate(x, y, z);
-                Tessellator tessellator = Tessellator.getInstance();
-                BufferBuilder bufferBuilder = tessellator.getBuffer();
-                Render3DEngine.setup();
-                RenderSystem.disableDepthTest();
-                RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-                bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
-                for (int i = 0; i <= 360; i += 5) {
-                    int clr = getColor(i);
-                    double v = Math.sin(Math.toRadians(i));
-                    double u = Math.cos(Math.toRadians(i));
-                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * start, (float) 0, (float) v * start).color(Render2DEngine.injectAlpha(new Color(clr), 0).getRGB()).next();
-                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(clr), (int) (150f * (1.0F - (float) c.timer.getPassedTimeMs() / (float) (lifetime.getValue() * 1000)))).getRGB()).next();
-                }
-                tessellator.draw();
-                RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-                bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
-                for (int i = 0; i <= 360; i += 5) {
-                    int clr = getColor(i);
-                    double v = Math.sin(Math.toRadians(i));
-                    double u = Math.cos(Math.toRadians(i));
-
-                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(clr), (int) (150 * (1.0F - (float) c.timer.getPassedTimeMs() / (float) (lifetime.getValue() * 1000)))).getRGB()).next();
-                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * k, (float) 0, (float) v * k).color(Render2DEngine.injectAlpha(new Color(clr), 0).getRGB()).next();
-                }
-                tessellator.draw();
-
-                RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-                bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
-                for (int i = 0; i <= 360; i += 5) {
-                    int clr = getColor(i);
-                    double v = Math.sin(Math.toRadians(i));
-                    double u = Math.cos(Math.toRadians(i));
-
-                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(clr), (int) (255f * (1.0F - (float) c.timer.getPassedTimeMs() / (float) (lifetime.getValue() * 1000)))).getRGB()).next();
-                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * (middle - 0.04f), (float) 0, (float) v * (middle - 0.04f)).color(Render2DEngine.injectAlpha(new Color(clr), 0).getRGB()).next();
-                }
-                tessellator.draw();
-
-                Render3DEngine.cleanup();
-                RenderSystem.enableDepthTest();
-                stack.translate(-x, -y, -z);
-                stack.pop();
-            }
-        } catch (Exception ignored) {
+        switch (mode.getValue()) {
+            case Portal -> RenderSystem.setShaderTexture(0, Render2DEngine.bubble);
+            case Default -> RenderSystem.setShaderTexture(0, Render2DEngine.default_circle);
+            case Custom ->
+                    RenderSystem.setShaderTexture(0, Objects.requireNonNullElse(custom, Render2DEngine.default_circle));
         }
+
+        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+
+        for (Circle c : circles) {
+            float colorAnim = (float) (c.timer.getPassedTimeMs()) / 6000f;
+            float sizeAnim = 1f - (float) Math.pow(1 - ((c.timer.getPassedTimeMs() * (easeOut.getValue() ? 2f : 1f)) / 5000f), 4);
+
+            stack.push();
+            stack.translate(c.pos().x - mc.getEntityRenderDispatcher().camera.getPos().getX(), c.pos().y - mc.getEntityRenderDispatcher().camera.getPos().getY(), c.pos().z - mc.getEntityRenderDispatcher().camera.getPos().getZ());
+            stack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
+            stack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(sizeAnim * 1000));
+            float scale = sizeAnim * 2f;
+            Matrix4f matrix = stack.peek().getPositionMatrix();
+
+            bufferBuilder.vertex(matrix, -sizeAnim, -sizeAnim + scale, 0).texture(0, 1).color(applyOpacity(HudEditor.getColor(270), 1f - colorAnim).getRGB()).next();
+            bufferBuilder.vertex(matrix, -sizeAnim + scale, -sizeAnim + scale, 0).texture(1, 1).color(applyOpacity(HudEditor.getColor(0), 1f - colorAnim).getRGB()).next();
+            bufferBuilder.vertex(matrix, -sizeAnim + scale, -sizeAnim, 0).texture(1, 0).color(applyOpacity(HudEditor.getColor(180), 1f - colorAnim).getRGB()).next();
+            bufferBuilder.vertex(matrix, -sizeAnim, -sizeAnim, 0).texture(0, 0).color(applyOpacity(HudEditor.getColor(90), 1f - colorAnim).getRGB()).next();
+
+            stack.pop();
+        }
+
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        RenderSystem.enableDepthTest();
         Collections.reverse(circles);
     }
 
-    public int getColor(int stage) {
-        switch (CMode.getValue()) {
-            case Rainbow -> {
-                return Render2DEngine.rainbow(stage, 1f, 1f).getRGB();
-            }
-            case Astolfo -> {
-                return Render2DEngine.astolfo(false, stage * 10).getRGB();
-            }
-            case Custom -> {
-                return color.getValue().getColorObject().getRGB();
-            }
-            default -> {
-                return Render2DEngine.TwoColoreffect(color.getValue().getColorObject(), color2.getValue().getColorObject(), 10, stage * colorOffset1.getValue()).getRGB();
-            }
-        }
+    public enum Mode {
+        Default, Portal, Custom
     }
 
-    private Color getColor2(Color color1, Color color2, int offset) {
-        return TwoColoreffect(color1, color2, Math.abs(System.currentTimeMillis() / 10) / 100.0 + offset * ((20f - colorOffset1.getValue()) / 200));
-    }
-
-    public static Color TwoColoreffect(Color cl1, Color cl2, double speed) {
-        double thing = speed / 4.0 % 1.0;
-        float val = MathHelper.clamp((float) Math.sin(Math.PI * 6 * thing) / 2.0f + 0.5f, 0.0f, 1.0f);
-        return new Color(Render2DEngine.interpolateFloat((float) cl1.getRed() / 255.0f, (float) cl2.getRed() / 255.0f, val), Render2DEngine.interpolateFloat((float) cl1.getGreen() / 255.0f, (float) cl2.getGreen() / 255.0f, val), Render2DEngine.interpolateFloat((float) cl1.getBlue() / 255.0f, (float) cl2.getBlue() / 255.0f, val));
-    }
-
-    public enum cmode {
-        Custom, Rainbow, TwoColor, Astolfo
-    }
-
-    class Circle {
-        private final Vec3d vec;
-        private final thunder.hack.utility.Timer timer = new thunder.hack.utility.Timer();
-
-        Circle(Vec3d vec) {
-            this.vec = vec;
-            timer.reset();
-        }
-
-        Vec3d position() {
-            return this.vec;
-        }
-
-        public boolean update() {
-            return timer.passedMs(lifetime.getValue() * 1000);
-        }
+    public record Circle(Vec3d pos, Timer timer) {
     }
 }
