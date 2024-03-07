@@ -5,6 +5,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Items;
+import net.minecraft.item.ShieldItem;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -22,6 +23,7 @@ public final class TriggerBot extends Module {
     public final Setting<Boolean> onlySpace = new Setting<>("OnlySpace", false).withParent(smartCrit);
     public final Setting<Boolean> autoJump = new Setting<>("AutoJump", false).withParent(smartCrit);
     public final Setting<Boolean> ignoreWalls = new Setting<>("IgnoreWalls", false);
+    public final Setting<Boolean> pauseEating = new Setting<>("PauseEating", false);
 
     private static TriggerBot instance;
     private int delay;
@@ -37,6 +39,9 @@ public final class TriggerBot extends Module {
 
     @EventHandler
     public void onAttack(PlayerUpdateEvent e) {
+        if(mc.player.isUsingItem() && pauseEating.getValue()){
+            return;
+        }
         if(!mc.options.jumpKey.isPressed() && mc.player.isOnGround() && autoJump.getValue())
             mc.player.jump();
 
