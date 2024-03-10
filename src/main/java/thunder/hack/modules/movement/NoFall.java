@@ -31,7 +31,7 @@ public class NoFall extends Module {
     private thunder.hack.utility.Timer pearlCooldown = new thunder.hack.utility.Timer();
 
     private enum Mode {
-        Rubberband, Items, MatrixOffGround, Vanilla
+        Rubberband, Items, MatrixOffGround, Vanilla, Grim2b2t
     }
 
     private enum FallDistance {
@@ -45,35 +45,47 @@ public class NoFall extends Module {
         if (fullNullCheck())
             return;
         if (isFalling()) {
-            if (mode.getValue() == Mode.Rubberband) sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
-            if (mode.getValue() == Mode.Items) {
-                BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
+            switch (mode.getValue()) {
+                case Rubberband -> {
+                    sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
+                }
 
-                SearchInvResult snowResult = InventoryUtility.findItemInHotBar(Items.POWDER_SNOW_BUCKET);
-                SearchInvResult waterResult = InventoryUtility.findItemInHotBar(Items.WATER_BUCKET);
-                SearchInvResult pearlResult = InventoryUtility.findItemInHotBar(Items.ENDER_PEARL);
-                SearchInvResult webResult = InventoryUtility.findItemInHotBar(Items.COBWEB);
-                SearchInvResult vinesResult = InventoryUtility.findItemInHotBar(Items.TWISTING_VINES);
+                case Items -> {
+                    BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
 
-                if (waterResult.found() && waterBucket.getValue()) {
-                    mc.player.setPitch(90);
-                    doWaterDrop(waterResult, playerPos);
-                } else if (pearlResult.found() && enderPearl.getValue()) {
-                    mc.player.setPitch(90);
-                    doPearlDrop(pearlResult);
-                } else if (webResult.found() && cobweb.getValue()) {
-                    mc.player.setPitch(90);
-                    doWebDrop(webResult, playerPos);
-                } else if (vinesResult.found() && twistingVines.getValue()) {
-                    mc.player.setPitch(90);
-                    doVinesDrop(vinesResult, playerPos);
-                } else if (snowResult.found() && powderSnowBucket.getValue()) {
-                    mc.player.setPitch(90);
-                    doSnowDrop(snowResult, playerPos);
+                    SearchInvResult snowResult = InventoryUtility.findItemInHotBar(Items.POWDER_SNOW_BUCKET);
+                    SearchInvResult waterResult = InventoryUtility.findItemInHotBar(Items.WATER_BUCKET);
+                    SearchInvResult pearlResult = InventoryUtility.findItemInHotBar(Items.ENDER_PEARL);
+                    SearchInvResult webResult = InventoryUtility.findItemInHotBar(Items.COBWEB);
+                    SearchInvResult vinesResult = InventoryUtility.findItemInHotBar(Items.TWISTING_VINES);
+
+                    if (waterResult.found() && waterBucket.getValue()) {
+                        mc.player.setPitch(90);
+                        doWaterDrop(waterResult, playerPos);
+                    } else if (pearlResult.found() && enderPearl.getValue()) {
+                        mc.player.setPitch(90);
+                        doPearlDrop(pearlResult);
+                    } else if (webResult.found() && cobweb.getValue()) {
+                        mc.player.setPitch(90);
+                        doWebDrop(webResult, playerPos);
+                    } else if (vinesResult.found() && twistingVines.getValue()) {
+                        mc.player.setPitch(90);
+                        doVinesDrop(vinesResult, playerPos);
+                    } else if (snowResult.found() && powderSnowBucket.getValue()) {
+                        mc.player.setPitch(90);
+                        doSnowDrop(snowResult, playerPos);
+                    }
+                }
+
+                case Grim2b2t -> {
+                    sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY() + 0.000000001, mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), false));
+                    mc.player.onLanding();
+                }
+
+                case MatrixOffGround, Vanilla -> {
+                    cancelGround = true;
                 }
             }
-            if (mode.getValue() == Mode.MatrixOffGround || mode.getValue() == Mode.Vanilla)
-                cancelGround = true;
         }
     }
 
@@ -137,7 +149,7 @@ public class NoFall extends Module {
     public boolean isFalling() {
         if(mc == null || mc.player == null || mc.world == null)
             return false;
-        
+
         if (mc.player.isFallFlying())
             return false;
 
