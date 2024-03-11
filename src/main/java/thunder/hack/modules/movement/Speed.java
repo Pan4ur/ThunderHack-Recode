@@ -38,7 +38,6 @@ public class Speed extends Module {
     public final Setting<Float> boostFactor = new Setting<>("BoostFactor", 2f, 0f, 10f, v -> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Boolean> allowOffGround = new Setting<>("AllowOffGround", true, v -> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Integer> shiftTicks = new Setting<>("ShiftTicks", 0, 0, 10, v -> mode.getValue() == Mode.MatrixDamage);
-    public final Setting<Boolean> withoutBot = new Setting<>("WithoutBot", false, v -> mode.getValue() == Mode.FunTime);
 
     public double baseSpeed;
     private int stage, ticks;
