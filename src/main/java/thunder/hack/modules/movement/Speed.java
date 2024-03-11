@@ -47,7 +47,7 @@ public class Speed extends Module {
     private thunder.hack.utility.Timer startDelay = new thunder.hack.utility.Timer();
 
     public enum Mode {
-        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, FunTime
+        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, GrimEntity
     }
 
     @Override
@@ -84,29 +84,15 @@ public class Speed extends Module {
                 mc.player.addVelocity(0f, -0.003f, 0f);
             }
         }
-
-        if (mode.getValue() == Mode.FunTime) {
-            if((ModuleManager.antiBot.isDisabled() || ModuleManager.antiBot.remove.getValue()) && mc.player.age % 8 == 0 && !withoutBot.getValue())
-                sendMessage(Formatting.GOLD + "Включи AntiBot и убери чек remove!");
-
-            if (ModuleManager.aura.isDisabled() || Aura.target == null) {
-                for (PlayerEntity ent : ThunderHack.asyncManager.getAsyncPlayers())
-                    if (ent != mc.player && mc.player.squaredDistanceTo(ent) < 49 && AntiBot.bots.contains(ent) && !withoutBot.getValue()) {
-                        mc.player.setPitch(95);
-                        mc.player.setYaw(mc.player.getYaw() + MathUtility.random(-0.5f,0.5f));
-                        break;
-                    }
-            }
-        }
     }
 
 
     // засекайте до обновы wild client (not paste)
     @EventHandler
     public void modifyVelocity(EventPlayerTravel e) {
-        if (mode.getValue() == Mode.FunTime && !e.isPre() && ThunderHack.core.getSetBackTime() > 1000) {
+        if (mode.getValue() == Mode.GrimEntity && !e.isPre() && ThunderHack.core.getSetBackTime() > 1000) {
             for(PlayerEntity ent : ThunderHack.asyncManager.getAsyncPlayers()) {
-                if(ent != mc.player && mc.player.squaredDistanceTo(ent) <= (AntiBot.bots.contains(ent) && !withoutBot.getValue() ? 9f : 2.25)) {
+                if(ent != mc.player && mc.player.squaredDistanceTo(ent) <= 2.25) {
                     float p = mc.world.getBlockState(((IEntity) mc.player).thunderHack_Recode$getVelocityBP()).getBlock().getSlipperiness();
                     float f = mc.player.isOnGround() ? p * 0.91f : 0.91f;
                     float f2 = mc.player.isOnGround() ? p : 0.99f;
