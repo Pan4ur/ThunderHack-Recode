@@ -58,7 +58,7 @@ public class NoSlow extends Module {
                     } else if (mc.player.fallDistance > 0.2f)
                         mc.player.setVelocity(mc.player.getVelocity().x * 0.95f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.95f);
                 }
-                case FunTime -> {
+                case GrimNew -> {
                     if (mc.player.getActiveHand() == Hand.OFF_HAND) {
                         sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot % 8 + 1));
                         sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
@@ -95,13 +95,13 @@ public class NoSlow extends Module {
             return false;
 
         if ((mc.player.getOffHandStack().isFood() || mc.player.getOffHandStack().getItem() == Items.SHIELD)
-                && (mode.getValue() == Mode.FunTime || mode.getValue() == Mode.Grim) && mc.player.getActiveHand() == Hand.MAIN_HAND)
+                && (mode.getValue() == Mode.GrimNew || mode.getValue() == Mode.Grim) && mc.player.getActiveHand() == Hand.MAIN_HAND)
             return false;
 
         return true;
     }
 
     public enum Mode {
-        NCP, StrictNCP, Matrix, Grim, MusteryGrief, FunTime, Matrix2
+        NCP, StrictNCP, Matrix, Grim, MusteryGrief, GrimNew, Matrix2
     }
 }
