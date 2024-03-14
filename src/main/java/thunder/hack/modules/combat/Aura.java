@@ -109,6 +109,9 @@ public final class Aura extends Module {
     public final Setting<Float> aimedPitchStep = new Setting<>("AimedPitchStep", 1f, 0f, 90f).withParent(advanced);
     public final Setting<Float> maxPitchStep = new Setting<>("MaxPitchStep", 8f, 1f, 90f).withParent(advanced);
     public final Setting<Float> pitchAccelerate = new Setting<>("PitchAccelerate", 1.65f, 1f, 10f).withParent(advanced);
+    public final Setting<Float> attackCooldown = new Setting<>("AttackCooldown", 0.9f, 0.5f, 1f).withParent(advanced);
+    public final Setting<Float> attackBaseTime = new Setting<>("AttackBaseTime", 0.5f, 0f, 2f).withParent(advanced);
+    public final Setting<Integer> attackTickLimit = new Setting<>("AttackTickLimit", 11, 0, 20).withParent(advanced);
 
     /*   TARGETS   */
     public final Setting<Parent> targets = new Setting<>("Targets", new Parent(false, 0));
@@ -263,11 +266,7 @@ public final class Aura extends Module {
     }
 
     private int getHitTicks() {
-        // Обоссаный плагин поставили чтоб нубики с читами в крит не попадали
-        if (mc.getCurrentServerEntry() != null && mc.getCurrentServerEntry().address.equals("ngrief.me") && mc.player.getMainHandStack().getItem() instanceof AxeItem) {
-            return 21;
-        }
-        return oldDelay.getValue().isEnabled() ? 1 + (int) (20f / random(minCPS.getValue(), maxCPS.getValue())) : (randomHitDelay.getValue().equals(RandomHitDelay.Delay) ? (int) MathUtility.random(11, 13) : 11);
+        return oldDelay.getValue().isEnabled() ? 1 + (int) (20f / random(minCPS.getValue(), maxCPS.getValue())) : (randomHitDelay.getValue().equals(RandomHitDelay.Delay) ? (int) MathUtility.random(11, 13) : attackTickLimit.getValue());
     }
 
     @EventHandler
@@ -363,7 +362,7 @@ public final class Aura extends Module {
         if (pauseInInventory.getValue() && ThunderHack.playerManager.inInventory)
             return false;
 
-        if (getAttackCooldown() < 0.9f && !oldDelay.getValue().isEnabled())
+        if (getAttackCooldown() < attackCooldown.getValue() && !oldDelay.getValue().isEnabled())
             return false;
 
         boolean mergeWithTargetStrafe = !ModuleManager.targetStrafe.isEnabled() || !ModuleManager.targetStrafe.jump.getValue();
