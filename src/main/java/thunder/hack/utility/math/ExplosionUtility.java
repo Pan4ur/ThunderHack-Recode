@@ -9,6 +9,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
@@ -19,6 +20,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.explosion.Explosion;
 import thunder.hack.cmd.Command;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.injection.accesors.IExplosion;
 import thunder.hack.modules.combat.AutoAnchor;
 import thunder.hack.modules.combat.AutoCrystal;
@@ -133,7 +135,7 @@ public final class ExplosionUtility {
             double distExposure = (float) target.squaredDistanceTo(explosionPos) / 144;
             if (distExposure <= 1.0) {
                 terrainIgnore = true;
-                double exposure = Explosion.getExposure(explosionPos, target);
+                double exposure = getExposure(explosionPos, target);
                 terrainIgnore = false;
                 double finalExposure = (1.0 - distExposure) * exposure;
 
@@ -191,7 +193,7 @@ public final class ExplosionUtility {
             double distExposure = MathHelper.sqrt((float) predict.squaredDistanceTo(explosionPos)) / 12d;
             if (distExposure <= 1.0) {
                 terrainIgnore = true;
-                double exposure = Explosion.getExposure(explosionPos, predict);
+                double exposure = getExposure(explosionPos, predict);
                 terrainIgnore = false;
                 double finalExposure = (1.0 - distExposure) * exposure;
 
@@ -349,6 +351,31 @@ public final class ExplosionUtility {
         return (float) i / (float) j;
     }
 
+    public static float getExposure(Vec3d source, Entity entity) {
+        if(!ModuleManager.autoCrystal.useOptimizedCalc.getValue())
+            return Explosion.getExposure(source, entity);
+
+        Box box = entity.getBoundingBox();
+
+        int miss = 0;
+        int hit = 0;
+
+        for(int k = 0; k <= 1; k += 1) {
+            for(int l = 0; l <= 1; l += 1) {
+                for(int m = 0; m <= 1; m += 1) {
+                    double n = MathHelper.lerp(k, box.minX, box.maxX);
+                    double o = MathHelper.lerp(l, box.minY, box.maxY);
+                    double p = MathHelper.lerp(m, box.minZ, box.maxZ);
+                    Vec3d vec3d = new Vec3d(n, o, p);
+                    if (raycast(vec3d, source) == HitResult.Type.MISS)
+                        ++miss;
+                    ++hit;
+                }
+            }
+        }
+        return (float)miss / (float)hit;
+    }
+
     private static BlockHitResult raycastGhost(RaycastContext context, BlockPos bPos) {
         return BlockView.raycast(context.getStart(), context.getEnd(), context, (innerContext, pos) -> {
             Vec3d vec3d = innerContext.getStart();
@@ -373,4 +400,13 @@ public final class ExplosionUtility {
         });
     }
 
+    private static HitResult.Type raycast(Vec3d start, Vec3d end) {
+        return BlockView.raycast(start, end, null, (_null, blockPos) -> {
+            BlockState blockState = mc.world.getBlockState(blockPos);
+            if (blockState.getBlock().getBlastResistance() < 600) return null;
+
+            BlockHitResult hitResult = blockState.getCollisionShape(mc.world, blockPos).raycast(start, end, blockPos);
+            return hitResult == null ? null : hitResult.getType();
+        }, (_null) -> HitResult.Type.MISS);
+    }
 }

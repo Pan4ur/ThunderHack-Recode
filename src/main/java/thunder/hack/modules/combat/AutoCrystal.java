@@ -7,8 +7,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -65,6 +67,7 @@ public class AutoCrystal extends Module {
     private final Setting<Float> targetRange = new Setting<>("TargetRange", 10.0f, 1.0f, 15f, v -> page.getValue() == Pages.Main);
     public static final Setting<Integer> selfPredictTicks = new Setting<>("SelfPredictTicks", 3, 0, 20, v -> page.getValue() == Pages.Main);
     private final Setting<OnBreakBlock> onBreakBlock = new Setting<>("OnBreakBlock", OnBreakBlock.Smart, v -> page.getValue() == Pages.Main);
+    public final Setting<Boolean> useOptimizedCalc = new Setting<>("UseOptimizedCalc", true, v -> page.getValue() == Pages.Main);
 
     /*   PLACE   */
     private final Setting<Interact> interact = new Setting<>("Interact", Interact.Default, v -> page.getValue() == Pages.Place);
@@ -195,6 +198,11 @@ public class AutoCrystal extends Module {
     @EventHandler
     public void onSync(EventSync e) {
         if (mc.player == null || mc.world == null) return;
+
+        if(target != null) {
+            //20 8
+          //  sendMessage(target.getArmor() + " " + (float) target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
+        }
 
         switch (targetLogic.getValue()) {
             case HP -> target = ThunderHack.combatManager.getTargetByHealth(targetRange.getValue());
