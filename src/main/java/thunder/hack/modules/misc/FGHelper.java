@@ -37,9 +37,7 @@ public class FGHelper extends Module {
 
     private final Setting<Mode> mode = new Setting("Server", Mode.Survival);
     private final Setting<Boolean> photomath = new Setting<>("PhotoMath", false, v -> mode.getValue() == Mode.Survival);
-    private final Setting<Boolean> cappuccino = new Setting<>("Cappuccino", true, v -> mode.getValue() == Mode.Survival);
     private final Setting<Integer> triggerhealth = new Setting<>("TriggerHealth", 10, 1, 36, v -> mode.getValue() == Mode.Survival && cappuccino.getValue());
-    private final Setting<Boolean> americano = new Setting<>("Americano", true, v -> mode.getValue() == Mode.Survival);
     private final Setting<Boolean> powder = new Setting<>("Powder", true, v -> mode.getValue() == Mode.Survival);
     private final Setting<Boolean> antiTpHere = new Setting<>("AntiTpHere", false, v -> mode.getValue() == Mode.Survival);
     private final Setting<Boolean> clanInvite = new Setting<>("ClanInvite", false, v -> mode.getValue() == Mode.Survival);
@@ -95,21 +93,6 @@ public class FGHelper extends Module {
     @Override
     public void onUpdate() {
         if (mode.getValue() == Mode.Survival) {
-            if (mc.player.getHealth() < triggerhealth.getValue() && timer.passedMs(200) && getCappuchinoAtHotbar() != -1 && cappuccino.getValue()) {
-                int hotbarslot = mc.player.getInventory().selectedSlot;
-                mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.AMBIENT, 150.0f, 1.0F);
-                sendPacket(new UpdateSelectedSlotC2SPacket(getCappuchinoAtHotbar()));
-                sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
-                sendPacket(new UpdateSelectedSlotC2SPacket(hotbarslot));
-                timer.reset();
-            }
-            if (timer.passedMs(200) && getAmericanoAtHotbar() != -1 && !mc.player.hasStatusEffect(StatusEffects.HASTE) && americano.getValue()) {
-                int hotbarslot = mc.player.getInventory().selectedSlot;
-                sendPacket(new UpdateSelectedSlotC2SPacket(getAmericanoAtHotbar()));
-                sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
-                sendPacket(new UpdateSelectedSlotC2SPacket(hotbarslot));
-                timer.reset();
-            }
             if (timer.passedMs(500) && getPowderAtHotbar() != -1 && !(mc.player.hasStatusEffect(StatusEffects.STRENGTH)) && mc.crosshairTarget != null && mc.crosshairTarget.getType() != HitResult.Type.BLOCK && powder.getValue()) {
                 int hotbarslot = mc.player.getInventory().selectedSlot;
                 sendPacket(new UpdateSelectedSlotC2SPacket(getPowderAtHotbar()));
@@ -173,26 +156,6 @@ public class FGHelper extends Module {
 
     private int getPowderAtHotbar() {
         for (int i = 0; i < 9; ++i) if (mc.player.getInventory().getStack(i).getItem() == Items.GUNPOWDER) return i;
-        return -1;
-    }
-
-    private int getAmericanoAtHotbar() {
-        for (int i = 0; i < 9; ++i) {
-            ItemStack itemStack = mc.player.getInventory().getStack(i);
-            if (!(itemStack.getItem() == Items.HONEY_BOTTLE)) continue;
-            if (!(itemStack.getName().getString().contains("Американо"))) continue;
-            return i;
-        }
-        return -1;
-    }
-
-    private int getCappuchinoAtHotbar() {
-        for (int i = 0; i < 9; ++i) {
-            ItemStack itemStack = mc.player.getInventory().getStack(i);
-            if (!(itemStack.getItem() == Items.HONEY_BOTTLE)) continue;
-            if (!(itemStack.getName().getString().contains("Каппучино"))) continue;
-            return i;
-        }
         return -1;
     }
 
