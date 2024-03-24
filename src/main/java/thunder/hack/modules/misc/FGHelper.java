@@ -37,7 +37,6 @@ public class FGHelper extends Module {
 
     private final Setting<Mode> mode = new Setting("Server", Mode.Survival);
     private final Setting<Boolean> photomath = new Setting<>("PhotoMath", false, v -> mode.getValue() == Mode.Survival);
-    private final Setting<Integer> triggerhealth = new Setting<>("TriggerHealth", 10, 1, 36, v -> mode.getValue() == Mode.Survival && cappuccino.getValue());
     private final Setting<Boolean> powder = new Setting<>("Powder", true, v -> mode.getValue() == Mode.Survival);
     private final Setting<Boolean> antiTpHere = new Setting<>("AntiTpHere", false, v -> mode.getValue() == Mode.Survival);
     private final Setting<Boolean> clanInvite = new Setting<>("ClanInvite", false, v -> mode.getValue() == Mode.Survival);
