@@ -26,11 +26,8 @@
 - [FabricApi 1.20.4](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/4933446)
 - [Java 17+](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 
-## Recommended to use
-- [Sodium](https://modrinth.com/mod/sodium/version/mc1.20.2-0.5.3) - For optimization
-- [ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus) - To play on all servers
-- [InGameAccountSwitcher](https://www.curseforge.com/minecraft/mc-mods/in-game-account-switcher) - To switch accounts in game
-- [NotEnoughCrashes](https://www.curseforge.com/minecraft/mc-mods/not-enough-crashes/files) - :^)
+## Recommended to read
+- [Performance guide for Minecraft 1.20.4+ Clients](https://gist.github.com/HexedHero/aab340a84db51913cb1106c2d85f4e4f)
 
 ## Credits
 - [Ai_24](https://www.youtube.com/@Ai_24) for showcase
