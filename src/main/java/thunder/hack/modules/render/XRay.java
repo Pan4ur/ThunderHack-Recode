@@ -147,27 +147,6 @@ public class XRay extends Module {
 
     public void onRender3D(MatrixStack stack) {
         // FABOS IDI NAHUI
-<<<<<<< Updated upstream
-
-        try {
-            for (BlockPos pos : ores) {
-                Block block = mc.world.getBlockState(pos).getBlock();
-                if ((block == Blocks.DIAMOND_ORE || block == Blocks.DEEPSLATE_DIAMOND_ORE) && diamond.getValue()) draw(pos, 0, 255, 255);
-               // TODO
-                if ((block == Blocks.GOLD_ORE || block == Blocks.DEEPSLATE_GOLD_ORE) && gold.getValue()) draw(pos, 255, 215, 0);
-                if (block == Blocks.NETHER_GOLD_ORE && gold.getValue()) draw(pos, 255, 215, 0);
-                if (block == Blocks.IRON_ORE && iron.getValue()) draw(pos, 213, 213, 213);
-                if (block == Blocks.EMERALD_ORE && emerald.getValue()) draw(pos, 0, 255, 77);
-                if ((block == Blocks.REDSTONE_ORE || block == Blocks.DEEPSLATE_REDSTONE_ORE) && redstone.getValue()) draw(pos, 255, 0, 0);
-                if (block == Blocks.COAL_ORE && coal.getValue()) draw(pos, 0, 0, 0);
-                if (block == Blocks.LAPIS_ORE && lapis.getValue()) draw(pos, 38, 97, 156);
-                if (block == Blocks.ANCIENT_DEBRIS && netherite.getValue()) draw(pos, 255, 255, 255);
-                if (block == Blocks.NETHER_QUARTZ_ORE && quartz.getValue()) draw(pos, 170, 170, 170);
-            }
-            if (displayBlock != null && (done != all))
-                draw(displayBlock, 255, 0, 60);
-        } catch (Exception ignored) {
-=======
         for (BlockPos pos : ores) {
             Block block = mc.world.getBlockState(pos).getBlock();
             if ((block == Blocks.DIAMOND_ORE || block == Blocks.DEEPSLATE_DIAMOND_ORE) && diamond.getValue())
@@ -186,7 +165,6 @@ public class XRay extends Module {
                 draw(pos, 38, 97, 156);
             if (block == Blocks.ANCIENT_DEBRIS && netherite.getValue()) draw(pos, 255, 255, 255);
             if (block == Blocks.NETHER_QUARTZ_ORE && quartz.getValue()) draw(pos, 170, 170, 170);
->>>>>>> Stashed changes
         }
 
         if (displayBlock != null && (done != all)) draw(displayBlock, 255, 0, 60);
