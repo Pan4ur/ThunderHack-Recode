@@ -29,7 +29,7 @@ public class Velocity extends Module {
     public Setting<Boolean> pauseInWater = new Setting<>("PauseInFluids", false);
     public Setting<Boolean> explosions = new Setting<>("Explosions", true);
     public Setting<Boolean> autoDisable = new Setting<>("DisableOnVerify", false);
-    public Setting<Boolean> cc = new Setting<>("CC", false);
+    public Setting<Boolean> cc = new Setting<>("PauseOnFlag", false);
     public Setting<Boolean> fishingHook = new Setting<>("FishingHook", true);
     public Setting<Boolean> fire = new Setting<>("PauseFire", false);
     public static Setting<Parent> antiPush = new Setting<>("AntiPush", new Parent(false, 0));
