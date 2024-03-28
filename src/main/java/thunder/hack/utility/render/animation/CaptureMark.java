@@ -28,7 +28,7 @@ public class CaptureMark {
         double tPosZ = Render2DEngine.interpolate(target.prevZ, target.getZ(), mc.getTickDelta()) - camera.getPos().z;
 
         MatrixStack matrices = new MatrixStack();
-        RenderSystem.enableDepthTest();
+        RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
@@ -52,7 +52,7 @@ public class CaptureMark {
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         immediate.draw();
         RenderSystem.enableCull();
-        RenderSystem.disableDepthTest();
+        RenderSystem.enableDepthTest();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);

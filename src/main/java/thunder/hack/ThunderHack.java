@@ -80,7 +80,6 @@ public class ThunderHack implements ModInitializer {
         moduleManager.onLoad();
         configManager.loadChestStealer();
         configManager.loadInvCleaner();
-        configManager.loadAutoBuy();
         configManager.loadSearch();
         configManager.loadNuker();
 
@@ -93,7 +92,6 @@ public class ThunderHack implements ModInitializer {
             configManager.saveSearch();
             configManager.saveNuker();
             configManager.saveInvCleaner();
-            configManager.saveAutoBuy();
         }));
 
         macroManager.onLoad();

@@ -31,7 +31,7 @@ public class JumpCircle extends Module {
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
     private final Setting<Boolean> easeOut = new Setting<>("EaseOut", true);
-
+    private final Setting<Boolean> onlySelf = new Setting<>("OnlySelf", false);
     private final List<Circle> circles = new ArrayList<>();
     private final List<PlayerEntity> cache = new CopyOnWriteArrayList<>();
     private Identifier custom;
@@ -56,7 +56,7 @@ public class JumpCircle extends Module {
         }
 
         for (PlayerEntity pl : mc.world.getPlayers())
-            if (!cache.contains(pl) && pl.isOnGround())
+            if (!cache.contains(pl) && pl.isOnGround() && (mc.player == pl || !onlySelf.getValue()))
                 cache.add(pl);
 
         cache.forEach(pl -> {

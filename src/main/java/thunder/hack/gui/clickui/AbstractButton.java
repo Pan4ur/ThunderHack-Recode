@@ -5,59 +5,49 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 
 public class AbstractButton {
-    public double x, y, width, height;
-    public double target_offset;
-    public double offsetY;
-    public boolean hiden;
-
-    public void setHiden(boolean hiden) {
-        this.hiden = hiden;
-    }
-
-    public boolean isHiden() {
-        return hiden;
-    }
-
+    public float x, y, width, height;
+    public float target_offset;
+    public float offsetY;
     public void init() {
     }
 
-    public double getX() {
+    public float getX() {
         return x;
     }
 
-    public void setX(double x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public double getY() {
+    public float getY() {
         return y;
     }
 
-    public void setY(double y) {
+    public void setY(float y) {
         this.y = y + offsetY;
     }
 
-    public double getWidth() {
+    public float getWidth() {
         return width;
     }
 
-    public void setWidth(double width) {
+    public void setWidth(float width) {
         this.width = width;
     }
 
-    public double getHeight() {
+    public float getHeight() {
         return height;
     }
 
-    public void setHeight(double height) {
+    public void setHeight(float height) {
         this.height = height;
     }
 
-    public void setOffsetY(double offsetY) {
+    public void setOffsetY(float offsetY) {
         this.target_offset = offsetY;
     }
 
-    public void render(DrawContext context, int mouseX, int mouseY, float delta, Color color) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
     }
 
     public void mouseReleased(int mouseX, int mouseY, int button) {
@@ -70,5 +60,8 @@ public class AbstractButton {
     }
 
     public void onGuiClosed() {
+    }
+
+    public void tick() {
     }
 }

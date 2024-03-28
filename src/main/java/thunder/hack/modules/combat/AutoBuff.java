@@ -1,11 +1,6 @@
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
-import thunder.hack.events.impl.EventAfterRotate;
-import thunder.hack.events.impl.EventPostSync;
-import thunder.hack.modules.Module;
-import thunder.hack.setting.Setting;
-import thunder.hack.utility.Timer;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -15,6 +10,11 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.util.Hand;
+import thunder.hack.events.impl.EventAfterRotate;
+import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.modules.Module;
+import thunder.hack.setting.Setting;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.PlayerUtility;
 
 public final class AutoBuff extends Module {
@@ -93,27 +93,25 @@ public final class AutoBuff extends Module {
             return;
         if (onDaGround.getValue() && !(mc.player.isOnGround()))
             return;
-        mc.executeTask(() -> {
-            if (mc.player.age > 80 && shouldThrow() && timer.passedMs(1000)) {
-                if (!mc.player.hasStatusEffect(StatusEffects.SPEED) && isPotionOnHotBar(Potions.SPEED) && speed.getValue()) {
-                    throwPotion(Potions.SPEED);
-                }
-                if (!mc.player.hasStatusEffect(StatusEffects.STRENGTH) && isPotionOnHotBar(Potions.STRENGTH) && strength.getValue()) {
-                    throwPotion(Potions.STRENGTH);
-                }
-                if (!mc.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE) && isPotionOnHotBar(Potions.FIRERES) && fire.getValue()) {
-                    throwPotion(Potions.FIRERES);
-                }
-                if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < health.getValue() && heal.getValue() && isPotionOnHotBar(Potions.HEAL)) {
-                    throwPotion(Potions.HEAL);
-                }
-                if (!mc.player.hasStatusEffect(StatusEffects.REGENERATION) && isPotionOnHotBar(Potions.REGEN) && regen.getValue()) {
-                    throwPotion(Potions.REGEN);
-                }
-                sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
-                timer.reset();
+        if (mc.player.age > 80 && shouldThrow() && timer.passedMs(1000)) {
+            if (!mc.player.hasStatusEffect(StatusEffects.SPEED) && isPotionOnHotBar(Potions.SPEED) && speed.getValue()) {
+                throwPotion(Potions.SPEED);
             }
-        });
+            if (!mc.player.hasStatusEffect(StatusEffects.STRENGTH) && isPotionOnHotBar(Potions.STRENGTH) && strength.getValue()) {
+                throwPotion(Potions.STRENGTH);
+            }
+            if (!mc.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE) && isPotionOnHotBar(Potions.FIRERES) && fire.getValue()) {
+                throwPotion(Potions.FIRERES);
+            }
+            if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < health.getValue() && heal.getValue() && isPotionOnHotBar(Potions.HEAL)) {
+                throwPotion(Potions.HEAL);
+            }
+            if (!mc.player.hasStatusEffect(StatusEffects.REGENERATION) && isPotionOnHotBar(Potions.REGEN) && regen.getValue()) {
+                throwPotion(Potions.REGEN);
+            }
+            sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+            timer.reset();
+        }
     }
 
     public void throwPotion(Potions potion) {

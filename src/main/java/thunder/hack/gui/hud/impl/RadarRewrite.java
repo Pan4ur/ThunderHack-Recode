@@ -11,27 +11,25 @@ import net.minecraft.util.math.RotationAxis;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.render.MSAAFramebuffer;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 import java.util.Objects;
 
 public class RadarRewrite extends HudElement {
-    public static Setting<Boolean> glow = new Setting<>("Glow", false);
+    private final Setting<Boolean> glow = new Setting<>("Glow", false);
     private final Setting<Float> width = new Setting<>("Height", 2.28f, 0.1f, 5f);
-    private static final Setting<Float> down = new Setting<>("Down", 3.63f, 0.1F, 20.0F);
-    private static final Setting<Float> tracerWidth = new Setting<>("Width", 0.44F, 0.0F, 8.0F);
+    private final Setting<Float> down = new Setting<>("Down", 3.63f, 0.1F, 20.0F);
+    private final Setting<Float> tracerWidth = new Setting<>("Width", 0.44F, 0.0F, 8.0F);
     private final Setting<Integer> xOffset = new Setting<>("TracerRadius", 68, 20, 100);
     private final Setting<Integer> pitchLock = new Setting<>("PitchLock", 42, 0, 90);
     private final Setting<triangleModeEn> triangleMode = new Setting<>("TracerCMode", triangleModeEn.Astolfo);
-    private final Setting<mode2> Mode2 = new Setting<>("CircleCMode", mode2.Astolfo);
     private final Setting<Float> CRadius = new Setting<>("CompassRadius", 47F, 0.1F, 70.0F);
-    public static final Setting<Integer> colorOffset1 = new Setting<>("ColorOffset", 10, 1, 20);
-    public static final Setting<ColorSetting> cColor2 = new Setting<>("Compass2", new ColorSetting(new Color(0x00CEEA)));
-    private final Setting<ColorSetting> cColor = new Setting<>("Compass", new ColorSetting(new Color(0x0000EA)));
     private final Setting<ColorSetting> ciColor = new Setting<>("Circle", new ColorSetting(new Color(0xFFFFFF)));
     private final Setting<ColorSetting> colorf = new Setting<>("Friend", new ColorSetting(new Color(0x00E800)));
     private final Setting<ColorSetting> colors = new Setting<>("Tracer", new ColorSetting(new Color(0xFFFF00)));
@@ -58,48 +56,50 @@ public class RadarRewrite extends HudElement {
         float middleW = mc.getWindow().getScaledWidth() * getX();
         float middleH = mc.getWindow().getScaledHeight() * getY();
 
-        context.getMatrices().push();
-        renderCompass(context.getMatrices(), middleW + CRadius.getValue(), middleH + CRadius.getValue());
-        context.getMatrices().pop();
+        MSAAFramebuffer.use(false, () -> {
+            context.getMatrices().push();
+            renderCompass(context.getMatrices(), middleW + CRadius.getValue(), middleH + CRadius.getValue());
+            context.getMatrices().pop();
 
-        int color = 0;
+            int color = 0;
 
-        context.getMatrices().push();
-        context.getMatrices().translate(middleW + CRadius.getValue(), middleH + CRadius.getValue(), 0);
-        context.getMatrices().multiply(RotationAxis.POSITIVE_X.rotationDegrees(90f / Math.abs(90f / MathUtility.clamp(mc.player.getPitch(), pitchLock.getValue(), 90f)) - 102));
-        context.getMatrices().translate(-(middleW + CRadius.getValue()), -(middleH + CRadius.getValue()), 0);
+            context.getMatrices().push();
+            context.getMatrices().translate(middleW + CRadius.getValue(), middleH + CRadius.getValue(), 0);
+            context.getMatrices().multiply(RotationAxis.POSITIVE_X.rotationDegrees(90f / Math.abs(90f / MathUtility.clamp(mc.player.getPitch(), pitchLock.getValue(), 90f)) - 102));
+            context.getMatrices().translate(-(middleW + CRadius.getValue()), -(middleH + CRadius.getValue()), 0);
 
-        for (PlayerEntity e : Lists.newArrayList(mc.world.getPlayers())) {
-            if (e != mc.player) {
-                context.getMatrices().push();
-                float yaw = getRotations(e) - mc.player.getYaw();
-                context.getMatrices().translate(middleW + CRadius.getValue(), middleH + CRadius.getValue(), 0.0F);
-                context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
-                context.getMatrices().translate(-(middleW + CRadius.getValue()), -(middleH + CRadius.getValue()), 0.0F);
+            for (PlayerEntity e : Lists.newArrayList(mc.world.getPlayers())) {
+                if (e != mc.player) {
+                    context.getMatrices().push();
+                    float yaw = getRotations(e) - mc.player.getYaw();
+                    context.getMatrices().translate(middleW + CRadius.getValue(), middleH + CRadius.getValue(), 0.0F);
+                    context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
+                    context.getMatrices().translate(-(middleW + CRadius.getValue()), -(middleH + CRadius.getValue()), 0.0F);
 
-                if (ThunderHack.friendManager.isFriend(e))
-                    color = colorf.getValue().getColor();
-                else color = switch (triangleMode.getValue()) {
-                    case Custom -> colors.getValue().getColor();
-                    case Astolfo -> Render2DEngine.astolfo(false, 1).getRGB();
-                };
+                    if (ThunderHack.friendManager.isFriend(e))
+                        color = colorf.getValue().getColor();
+                    else color = switch (triangleMode.getValue()) {
+                        case Custom -> colors.getValue().getColor();
+                        case Astolfo -> Render2DEngine.astolfo(false, 1).getRGB();
+                    };
 
-                Render2DEngine.drawTracerPointer(context.getMatrices(), middleW + CRadius.getValue(), middleH - xOffset.getValue() + CRadius.getValue(), width.getValue() * 5F, tracerWidth.getValue(), down.getValue(), true, glow.getValue(), color);
+                    Render2DEngine.drawTracerPointer(context.getMatrices(), middleW + CRadius.getValue(), middleH - xOffset.getValue() + CRadius.getValue(), width.getValue() * 5F, tracerWidth.getValue(), down.getValue(), true, glow.getValue(), color);
 
-                context.getMatrices().translate(middleW + CRadius.getValue(), middleH + CRadius.getValue(), 0.0F);
-                context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-yaw));
-                context.getMatrices().translate(-(middleW + CRadius.getValue()), -(middleH + CRadius.getValue()), 0.0F);
-                context.getMatrices().pop();
+                    context.getMatrices().translate(middleW + CRadius.getValue(), middleH + CRadius.getValue(), 0.0F);
+                    context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-yaw));
+                    context.getMatrices().translate(-(middleW + CRadius.getValue()), -(middleH + CRadius.getValue()), 0.0F);
+                    context.getMatrices().pop();
+                }
             }
-        }
-        context.getMatrices().pop();
+            context.getMatrices().pop();
+        });
         setBounds((int) (CRadius.getValue() * 2), (int) (CRadius.getValue() * 2));
     }
 
     public void renderCompass(MatrixStack matrices, float x, float y) {
         float pitchFactor = Math.abs(90f / MathUtility.clamp(mc.player.getPitch(), pitchLock.getValue(), 90f));
         drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, pitchFactor, 1f, -2f, 1f, ciColor.getValue().getColorObject(), false);
-        drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, pitchFactor, 1f, 0f, 3f, cColor.getValue().getColorObject(), true);
+        drawEllipsCompas(matrices, -(int) mc.player.getYaw(), x, y, pitchFactor, 1f, 0f, 3f, Color.WHITE, true);
     }
 
     public void drawEllipsCompas(MatrixStack matrices, int yaw, float x, float y, float x2, float y2, float margin, float width, Color color, boolean Dir) {
@@ -110,9 +110,10 @@ public class RadarRewrite extends HudElement {
     }
 
     public void drawElipse(MatrixStack matrices, float x, float y, float rx, float ry, float start, float end, float margin, float width, Color color, String direction) {
+
+
         float sin;
         float cos;
-        float i;
         float endOffset;
 
         if (start > end) {
@@ -131,14 +132,10 @@ public class RadarRewrite extends HudElement {
 
         float radius = CRadius.getValue() - margin;
 
-        for (i = start; i <= end; i += 6) {
+        for (float i = start; i <= end; i += 6) {
             float stage = (i - start) / 360f;
             if (!Objects.equals(direction, ""))
-                switch (Mode2.getValue()) {
-                    case Astolfo -> color = new Color(Render2DEngine.astolfo(false, (int) stage).getRGB());
-                    case TwoColor ->
-                            color = Render2DEngine.TwoColoreffect(cColor.getValue().getColorObject(), cColor2.getValue().getColorObject(), 10, stage * (colorOffset1.getValue() * 500));
-                }
+                color = HudEditor.getColor((int) (stage * 500f));
 
             cos = (float) Math.cos(i * Math.PI / 180);
             sin = (float) Math.sin(i * Math.PI / 180);

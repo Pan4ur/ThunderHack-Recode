@@ -13,7 +13,6 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ThunderHackGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.render.MSAAFramebuffer;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterAnimation;
 
@@ -165,9 +164,7 @@ public class ThunderGui extends Screen {
         mouse_x = mouseX;
         mouse_y = mouseY;
         if (open_animation.getAnimationd() > 0) {
-            MSAAFramebuffer.use(true, () -> {
-                renderGui(context, mouseX, mouseY, delta);
-            });
+            renderGui(context, mouseX, mouseY, delta);
         }
         if (open_animation.getAnimationd() <= 0.01 && !open_direction) {
             open_animation = new BetterAnimation();

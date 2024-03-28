@@ -54,7 +54,7 @@ public class EbatteSratte extends Module {
     @EventHandler
     @SuppressWarnings("unused")
     public void onAttackEntity(@NotNull EventAttack event) {
-        if (event.getEntity() instanceof PlayerEntity) {
+        if (event.getEntity() instanceof PlayerEntity && !event.isPre()) {
             if (timer.passedS(delay.getValue())) {
                 PlayerEntity entity = (PlayerEntity) event.getEntity();
                 if (entity == null) return;

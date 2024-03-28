@@ -28,8 +28,16 @@ public final class SoundUtility {
     public static SoundEvent SKEET_SOUNDEVENT = SoundEvent.of(SKEET_SOUND);
     public static final Identifier ORTHODOX_SOUND = new Identifier("thunderhack:orthodox");
     public static SoundEvent ORTHODOX_SOUNDEVENT = SoundEvent.of(ORTHODOX_SOUND);
-    public static final Identifier MAINMENU_SOUND = new Identifier("thunderhack:mainmenu");
-    public static SoundEvent MAINMENU_SOUNDEVENT = SoundEvent.of(MAINMENU_SOUND);
+    public static final Identifier BOOLEAN_SOUND = new Identifier("thunderhack:boolean");
+    public static SoundEvent BOOLEAN_SOUNDEVENT = SoundEvent.of(BOOLEAN_SOUND);
+    public static final Identifier SCROLL_SOUND = new Identifier("thunderhack:scroll");
+    public static SoundEvent SCROLL_SOUNDEVENT = SoundEvent.of(SCROLL_SOUND);
+    public static final Identifier SWIPEIN_SOUND = new Identifier("thunderhack:swipein");
+    public static SoundEvent SWIPEIN_SOUNDEVENT = SoundEvent.of(SWIPEIN_SOUND);
+    public static final Identifier SWIPEOUT_SOUND = new Identifier("thunderhack:swipeout");
+    public static SoundEvent SWIPEOUT_SOUNDEVENT = SoundEvent.of(SWIPEOUT_SOUND);
+    public static final Identifier ALERT_SOUND = new Identifier("thunderhack:alert");
+    public static SoundEvent ALERT_SOUNDEVENT = SoundEvent.of(ALERT_SOUND);
 
     public static void registerSounds() {
         Registry.register(Registries.SOUND_EVENT, SoundUtility.KEYPRESS_SOUND, SoundUtility.KEYPRESS_SOUNDEVENT);
@@ -43,6 +51,10 @@ public final class SoundUtility {
         Registry.register(Registries.SOUND_EVENT, SoundUtility.UWU_SOUND, SoundUtility.UWU_SOUNDEVENT);
         Registry.register(Registries.SOUND_EVENT, SoundUtility.SKEET_SOUND, SoundUtility.SKEET_SOUNDEVENT);
         Registry.register(Registries.SOUND_EVENT, SoundUtility.ORTHODOX_SOUND, SoundUtility.ORTHODOX_SOUNDEVENT);
-        Registry.register(Registries.SOUND_EVENT, SoundUtility.MAINMENU_SOUND, SoundUtility.MAINMENU_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtility.SCROLL_SOUND, SoundUtility.SCROLL_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtility.BOOLEAN_SOUND, SoundUtility.BOOLEAN_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtility.SWIPEIN_SOUND, SoundUtility.SWIPEIN_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtility.SWIPEOUT_SOUND, SoundUtility.SWIPEOUT_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, SoundUtility.ALERT_SOUND, SoundUtility.ALERT_SOUNDEVENT);
     }
 }

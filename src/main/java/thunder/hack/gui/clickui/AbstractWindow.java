@@ -5,20 +5,20 @@ import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 
-public abstract class AbstractWindow {
+public class AbstractWindow {
     private String name;
-    public double animationY;
-    protected double prevTargetX;
+    public float animationY;
+    protected float prevTargetX;
 
-    protected double x, y, width, height;
-    private double prevX, prevY;
+    protected float x, y, width, height;
+    private float prevX, prevY;
     protected boolean hovered;
     public boolean dragging;
     public float moduleOffset;
 
     private boolean open;
 
-    public AbstractWindow(String name, double x, double y, double width, double height) {
+    public AbstractWindow(String name, float x, float y, float width, float height) {
         this.name = name;
         this.x = x;
         this.y = y;
@@ -30,9 +30,9 @@ public abstract class AbstractWindow {
     public void init() {
     }
 
-    public void render(DrawContext context, int mouseX, int mouseY, float delta, Color color) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         hovered = Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height);
-        animationY = interpolate(y, animationY, 0.05);
+        animationY = (float) interpolate(y, animationY, 0.05);
         if (this.dragging) {
             prevTargetX = x;
             this.x = this.prevX + mouseX;
@@ -77,35 +77,35 @@ public abstract class AbstractWindow {
         return open;
     }
 
-    public double getX() {
+    public float getX() {
         return x;
     }
 
-    public void setX(double x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public double getY() {
+    public float getY() {
         return y;
     }
 
-    public void setY(double y) {
+    public void setY(float y) {
         this.y = y;
     }
 
-    public double getWidth() {
+    public float getWidth() {
         return width;
     }
 
-    public void setWidth(double width) {
+    public void setWidth(float width) {
         this.width = width;
     }
 
-    public double getHeight() {
+    public float getHeight() {
         return height;
     }
 
-    public void setHeight(double height) {
+    public void setHeight(float height) {
         this.height = height;
     }
 
@@ -113,5 +113,8 @@ public abstract class AbstractWindow {
         if (Render2DEngine.isHovered(mx, my, x, y, width, height + 1000)) {
             moduleOffset = moduleOffset + v;
         }
+    }
+
+    public void tick(){
     }
 }

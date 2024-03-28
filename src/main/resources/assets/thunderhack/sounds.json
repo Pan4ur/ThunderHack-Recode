@@ -14,11 +14,6 @@
       "thunderhack:uwu"
     ]
   },
-  "mainmenu": {
-    "sounds": [
-      "thunderhack:mainmenu"
-    ]
-  },
   "disable": {
     "sounds": [
       "thunderhack:disable"
@@ -57,6 +52,31 @@
   "orthodox": {
     "sounds": [
       "thunderhack:orthodox"
+    ]
+  },
+  "boolean": {
+    "sounds": [
+      "thunderhack:boolean"
+    ]
+  },
+  "scroll": {
+    "sounds": [
+      "thunderhack:scroll"
+    ]
+  },
+  "swipein": {
+    "sounds": [
+      "thunderhack:swipein"
+    ]
+  },
+  "swipeout": {
+    "sounds": [
+      "thunderhack:swipeout"
+    ]
+  },
+  "alert": {
+    "sounds": [
+      "thunderhack:alert"
     ]
   }
 }

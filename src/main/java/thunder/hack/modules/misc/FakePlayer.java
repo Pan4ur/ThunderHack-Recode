@@ -117,7 +117,7 @@ public class FakePlayer extends Module {
 
     @EventHandler
     public void onAttack(EventAttack e) {
-        if (fakePlayer != null && e.getEntity() == fakePlayer && fakePlayer.hurtTime == 0) {
+        if (fakePlayer != null && e.getEntity() == fakePlayer && fakePlayer.hurtTime == 0 && !e.isPre()) {
             mc.world.playSound(mc.player, fakePlayer.getX(), fakePlayer.getY(), fakePlayer.getZ(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1f, 1f);
 
             if (mc.player.fallDistance > 0 || ModuleManager.criticals.isEnabled())

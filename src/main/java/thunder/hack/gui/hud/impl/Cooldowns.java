@@ -38,10 +38,10 @@ public class Cooldowns extends HudElement {
                 getPosX() + 30.f, getPosY() + 30.f, 65, 5, 1.5f, HudEditor.getColor(90).darker().darker().darker(), HudEditor.getColor(180).darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker(), HudEditor.getColor(270).darker().darker().darker());
 
         Render2DEngine.drawGradientRound(context.getMatrices(),
-                getPosX() + 30.f, getPosY() + 20.f, (int) (65 * animation1), 5, 1.5f, HudEditor.getColor(90), HudEditor.getColor(180), HudEditor.getColor(0), HudEditor.getColor(270));
+                getPosX() + 30.f, getPosY() + 20.f, (65 * animation1), 5, 1.5f, HudEditor.getColor(90), HudEditor.getColor(180), HudEditor.getColor(0), HudEditor.getColor(270));
 
         Render2DEngine.drawGradientRound(context.getMatrices(),
-                getPosX() + 30.f, getPosY() + 30.f, (int) (65 * animation2), 5, 1.5f, HudEditor.getColor(90), HudEditor.getColor(180), HudEditor.getColor(0), HudEditor.getColor(270));
+                getPosX() + 30.f, getPosY() + 30.f, (65 * animation2), 5, 1.5f, HudEditor.getColor(90), HudEditor.getColor(180), HudEditor.getColor(0), HudEditor.getColor(270));
 
 
     }

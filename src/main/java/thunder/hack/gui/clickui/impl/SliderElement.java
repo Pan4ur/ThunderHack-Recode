@@ -5,24 +5,24 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
-import thunder.hack.cmd.Command;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractElement;
-import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.ClickGui;
+import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.client.SoundFX;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.SoundUtility;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 import java.util.Objects;
 
-import static thunder.hack.modules.Module.mc;
-
 public class SliderElement extends AbstractElement {
 
     private final float min, max;
-    private float animation;
+    private float animation, prevValue;
     private boolean dragging, listening;
     public String Stringnumber = "";
 
@@ -35,32 +35,30 @@ public class SliderElement extends AbstractElement {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        animation = Render2DEngine.scrollAnimate(animation, (((Number) setting.getValue()).floatValue() - min) / (max - min), 0.9f);
+        animation = Render2DEngine.scrollAnimate(animation, (((Number) setting.getValue()).floatValue() - min) / (max - min), 0.4f);
 
         MatrixStack matrixStack = context.getMatrices();
 
         if(setting.parent != null)
-            Render2DEngine.drawRect(context.getMatrices(), (float) x + 4, (float) y, 1f, 18, ClickGui.getInstance().getColor(1));
+            Render2DEngine.drawRect(context.getMatrices(), x + 4, y, 1f, 18, HudEditor.getColor(1));
 
-        if(!isSmall()) {
-            FontRenderers.settings.drawString(matrixStack, setting.getName(), (setting.parent != null ? 2f : 0f) + x + 6, y + 4, ClickGui.getInstance().getTextColor(setting.getModule()));
-            FontRenderers.settings.drawString(matrixStack, listening ? (Objects.equals(Stringnumber, "") ? "..." : Stringnumber) : setting.getValue() + "", (int) (x + width - 6 - FontRenderers.getSettingsRenderer().getStringWidth(setting.getValue() + "")), y + 5, ClickGui.getInstance().getTextColor(setting.getModule()));
+        if(!dragging) {
+            FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), (setting.parent != null ? 2f : 0f) + x + 6, y + 4, new Color(-1).getRGB());
+            FontRenderers.sf_medium_mini.drawString(matrixStack, listening ? (Objects.equals(Stringnumber, "") ? "..." : Stringnumber) : setting.getValue() + "", (int) (x + width - 6 - FontRenderers.sf_medium_mini.getStringWidth(setting.getValue() + "")), y + 5, new Color(-1).getRGB());
         } else {
-            FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), (setting.parent != null ? 2f : 0f) + x + 6, y + 4, ClickGui.getInstance().getTextColor(setting.getModule()));
-            FontRenderers.sf_medium_mini.drawString(matrixStack, listening ? (Objects.equals(Stringnumber, "") ? "..." : Stringnumber) : setting.getValue() + "", (int) (x + width - 6 - FontRenderers.sf_medium_mini.getStringWidth(setting.getValue() + "")), y + 5, ClickGui.getInstance().getTextColor(setting.getModule()));
+            if(animation > 0.2f)
+                FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getMin() + "", x + 6, y + 4, new Color(-1).getRGB());
+            if(animation < 0.8f)
+                FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getMax() + "", x + width - FontRenderers.sf_medium_mini.getStringWidth(setting.getMax() + "") - 6, y + 4, new Color(-1).getRGB());
+
+            FontRenderers.sf_medium_mini.drawString(matrixStack, listening ? (Objects.equals(Stringnumber, "") ? "..." : Stringnumber) : setting.getValue() + "", animation > 0.2f ? animation < 0.8f ? x + 6 + (width - 14) * animation - FontRenderers.sf_medium_mini.getStringWidth(setting.getValue() + "") / 2f : x + width - FontRenderers.sf_medium_mini.getStringWidth(setting.getMax() + "") - 6 : x + 6, y + 4, new Color(-1).getRGB());
         }
 
-        Render2DEngine.drawRound(matrixStack, (float) (x + 6), (float) (y + height - 6), (float) (width - 12), 1, 0.5f, new Color(0xff0E0E0E));
-        Render2DEngine.drawRound(matrixStack, (float) (x + 6), (float) (y + height - 6), (float) ((width - 12) * animation), 1, 0.5f, new Color(0xFFE1E1E1));
-        Render2DEngine.drawRound(matrixStack, (float) ((x + 6 + (width - 16) * animation)), (float) (y + height - 7.5f), 4, 4, 1.5f, new Color(0xFFE1E1E1));
+        Render2DEngine.drawRect(matrixStack, x + 6, y + height - 6, width - 12, 2, new Color(0x28FFFFFF, true));
+        Render2DEngine.draw2DGradientRect(matrixStack, x + 6, y + height - 6, x + 6 + (width - 12) * animation, y + height - 4, HudEditor.getColor(180),  HudEditor.getColor(180), HudEditor.getColor(0),  HudEditor.getColor(0));
+        Render2DEngine.drawRect(matrixStack, (x + 6 + (width - 14) * animation), y + height - 7.5f, 2, 5, new Color(0xFFE1E1E1));
 
         animation = MathUtility.clamp(animation, 0, 1);
-
-        if(Render2DEngine.isHovered(mouseX, mouseY, (x + 6), (float) (y + height - 7), (float) (width - 12), 3)) {
-            GLFW.glfwSetCursor(mc.getWindow().getHandle(),
-                    GLFW.glfwCreateStandardCursor(GLFW.GLFW_HRESIZE_CURSOR));
-            ClickUI.anyHovered = true;
-        }
 
         if (dragging)
             setValue(mouseX, x + 7, width - 14);
@@ -73,6 +71,12 @@ public class SliderElement extends AbstractElement {
         } else if (setting.getValue() instanceof Integer) {
             setting.setValue((int) value);
         }
+
+        if(value != prevValue)
+            ModuleManager.soundFX.playSlider();
+
+
+        prevValue = value;
     }
 
     @Override

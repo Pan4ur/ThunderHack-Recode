@@ -1,18 +1,15 @@
 package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractButton;
-import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
-import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -21,23 +18,16 @@ public class SearchBar extends AbstractButton {
     public static boolean listening;
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta, Color color) {
-        super.render(context, mouseX, mouseY, delta, color);
-
-        boolean isHovered = Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height);
-
-        float sc = ModuleManager.clickGui.mode.getValue() == ClickGui.Mode.Small ? 5f : 7f;
-
-        Render2DEngine.drawRoundDoubleColor(context.getMatrices(), x + 4, y + 1f, width - 8, height - 2, 3f, ClickGui.getInstance().getColor(200), ClickGui.getInstance().getColor(0));
-        Render2DEngine.drawRound(context.getMatrices(), (float) (x + 4.5f), (float) (y + 1.5f), (float) (width - 9), (float) (height - 3), 3f, Render2DEngine.injectAlpha(ClickGui.getInstance().plateColor.getValue().getColorObject(), isHovered ? 220 : 255));
-        if (!listening) FontRenderers.sf_medium.drawGradientString(context.getMatrices(), "Search...", (float) (x + 7f), (float) (y + sc), 2, false);
-        else FontRenderers.sf_medium.drawGradientString(context.getMatrices(), moduleName + (mc.player == null || ((mc.player.age / 10) % 2 == 0) ? " " : "_"), (float) (x + 7f), (float) (y + sc), 2, false);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+        Render2DEngine.drawGuiBase(context.getMatrices(), x + 4, y + 1f, width - 8, height - 2, 1f, Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height) ? 0.8f : 0f);
+        if (!listening) FontRenderers.sf_medium.drawGradientString(context.getMatrices(), "Search...", x + 7f, y + 5f, 2, true);
+        else FontRenderers.sf_medium.drawGradientString(context.getMatrices(), moduleName + (mc.player == null || ((mc.player.age / 10) % 2 == 0) ? " " : "_"), x + 7f, y + 5f, 2, true);
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
-
         boolean isHovered = Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height);
 
         if(isHovered) listening = true;
@@ -52,12 +42,6 @@ public class SearchBar extends AbstractButton {
     @Override
     public void keyTyped(int keyCode) {
         super.keyTyped(keyCode);
-
-        if (keyCode == GLFW.GLFW_KEY_F && (InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_CONTROL) || InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_CONTROL))) {
-            listening = !listening;
-            ThunderHack.currentKeyListener = ThunderHack.KeyListening.Search;
-            return;
-        }
 
         if(ThunderHack.currentKeyListener != ThunderHack.KeyListening.Search)
             return;

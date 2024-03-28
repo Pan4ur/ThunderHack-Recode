@@ -7,18 +7,14 @@ import org.lwjgl.glfw.GLFW;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 
-import java.awt.*;
-
 public abstract class AbstractElement {
     protected Setting setting;
 
-    protected double x, y, width, height;
-    protected double offsetY;
+    protected float x, y, width, height;
+    protected float offsetY;
 
     protected boolean hovered;
     protected boolean small;
-
-    protected int bgcolor = new Color(24, 24, 27).getRGB();
 
     public AbstractElement(Setting setting,boolean small) {
         this.setting = setting;
@@ -51,39 +47,39 @@ public abstract class AbstractElement {
         return setting;
     }
 
-    public double getX() {
+    public float getX() {
         return x;
     }
 
-    public double getY() {
+    public float getY() {
         return y;
     }
 
-    public double getWidth() {
+    public float getWidth() {
         return width;
     }
 
-    public double getHeight() {
+    public float getHeight() {
         return height;
     }
 
-    public void setX(double x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public void setY(double y) {
+    public void setY(float y) {
         this.y = y + offsetY;
     }
 
-    public void setWidth(double width) {
+    public void setWidth(float width) {
         this.width = width;
     }
 
-    public void setHeight(double height) {
+    public void setHeight(float height) {
         this.height = height;
     }
 
-    public void setOffsetY(double offsetY) {
+    public void setOffsetY(float offsetY) {
         this.offsetY = offsetY;
     }
 

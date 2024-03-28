@@ -152,7 +152,7 @@ public class Nuker extends Module {
                 BlockState state = mc.world.getBlockState(b);
 
                 if (PlayerUtility.squaredDistanceFromEyes(b.toCenterPos()) <= range.getPow2Value()) {
-                    if (state.getBlock() == targetBlockType || (blocks.getValue().equals(BlockSelection.All) && state.getBlock() != BEDROCK)) {
+                    if (isAllowed(state.getBlock())) {
                         try {
                             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, b, Direction.UP, PlayerUtility.getWorldActionId(mc.world)));
                             mc.interactionManager.breakBlock(b);

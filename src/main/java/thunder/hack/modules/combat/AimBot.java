@@ -136,12 +136,6 @@ public final class AimBot extends Module {
             if (Float.isNaN(rotationYaw)) return;
             double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
             rotationYaw = (float) (rotationYaw - (rotationYaw - mc.player.getYaw()) % gcdFix);
-
-            if (abs((mc.player.getYaw() - rotationYaw)) > 170) {
-                mc.player.setYaw(rotationYaw);
-                assistAcceleration = 1;
-                return;
-            }
             mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.getYaw(), rotationYaw, assistAcceleration));
             return;
         }

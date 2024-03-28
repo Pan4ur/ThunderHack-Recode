@@ -3,6 +3,7 @@ package thunder.hack.gui.thundergui.components;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.modules.client.ClickGui;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.client.util.math.MatrixStack;
@@ -66,7 +67,7 @@ public class ModeComponent extends SettingElement {
 
         double offsetY = 13;
         if (open) {
-            Color color = ClickGui.getInstance().getColor(0);
+            Color color = HudEditor.getColor(1);
             for (int i = 0; i <= setting.getModes().length - 1; i++) {
                 FontRenderers.settings.drawString(stack,setting.getModes()[i], (float) (x + 116), (float) ((y + 5) + offsetY), setting.currentEnumName().equalsIgnoreCase(setting.getModes()[i]) ? color.getRGB() : -1);
                 offsetY += 12;

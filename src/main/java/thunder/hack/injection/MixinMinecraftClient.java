@@ -10,6 +10,7 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.Icons;
 import net.minecraft.client.util.MacWindowUtil;
 import net.minecraft.client.util.Window;
+import net.minecraft.entity.Entity;
 import net.minecraft.resource.ResourcePack;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -24,8 +25,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.events.impl.EventAttack;
+import thunder.hack.events.impl.EventHandleBlockBreaking;
 import thunder.hack.events.impl.EventPostTick;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.gui.font.FontRenderers;
@@ -157,6 +161,24 @@ public abstract class MixinMinecraftClient {
             GLFW.glfwSetWindowIcon(mc.getWindow().getHandle(), buffer);
             buffers.forEach(MemoryUtil::memFree);
         } catch (IOException ignored) {
+        }
+    }
+
+    @Inject(method = "doAttack", at = @At("HEAD"), cancellable = true)
+    private void doAttackHook(CallbackInfoReturnable<Boolean> cir) {
+        final EventAttack event = new EventAttack(null, true);
+        ThunderHack.EVENT_BUS.post(event);
+        if (event.isCancelled()) {
+            cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "handleBlockBreaking", at = @At("HEAD"), cancellable = true)
+    private void handleBlockBreakingHook(boolean breaking, CallbackInfo ci) {
+        EventHandleBlockBreaking event = new EventHandleBlockBreaking();
+        ThunderHack.EVENT_BUS.post(event);
+        if (event.isCancelled()) {
+            ci.cancel();
         }
     }
 }

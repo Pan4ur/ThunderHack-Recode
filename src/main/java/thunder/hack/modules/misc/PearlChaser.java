@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -69,7 +70,6 @@ public class PearlChaser extends Module {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onSync(EventSync event) {
-
         // Анти селфкилл
         if (mc.player.getHealth() < 5)
             return;

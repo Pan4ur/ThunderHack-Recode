@@ -16,7 +16,8 @@ public final class HudEditor extends Module {
     public static final Setting<ColorSetting> hcolor1 = new Setting<>("Color", new ColorSetting(-6974059));
     public static final Setting<ColorSetting> acolor = new Setting<>("Color2", new ColorSetting(-8365735));
     public static final Setting<ColorSetting> plateColor = new Setting<>("PlateColor", new ColorSetting(new Color(0xE7000000, true).getRGB()));
-    public static final Setting<ColorSetting> textColor = new Setting<>("TextColorColor", new ColorSetting(new Color(0xFFFFFFFF, true).getRGB()));
+    public static final Setting<ColorSetting> textColor = new Setting<>("TextColor", new ColorSetting(new Color(0xFFFFFFFF, true).getRGB()));
+    public static final Setting<ColorSetting> textColor2 = new Setting<>("TextColor2", new ColorSetting(new Color(0xFFFFFFFF, true).getRGB()));
     public static final Setting<Float> hudRound = new Setting<>("HudRound", 6f, 1f, 10f);
     public static final Setting<Float> alpha = new Setting<>("Alpha", 0.9f, 0f, 1f);
     public static final Setting<Float> blend = new Setting<>("Blend", 10f, 1f, 15f);

@@ -41,6 +41,9 @@ public final class SoundFX extends Module {
     @EventHandler
     @SuppressWarnings("unused")
     public void onAttack(@NotNull EventAttack event) {
+        if(event.isPre())
+            return;
+
         if (!(event.getEntity() instanceof EndCrystalEntity)) {
             switch (hitSound.getValue()) {
                 case UWU -> playSound(SoundUtility.UWU_SOUNDEVENT);
@@ -63,11 +66,11 @@ public final class SoundFX extends Module {
     @EventHandler
     @SuppressWarnings("unused")
     public void onDeath(DeathEvent e) {
-        if (Aura.target != null && Aura.target == e.getPlayer()) {
+        if (Aura.target != null && Aura.target == e.getPlayer() && killSound.is(KillSound.Custom)) {
             playSound("kill");
             return;
         }
-        if (AutoCrystal.target != null && AutoCrystal.target == e.getPlayer()) {
+        if (AutoCrystal.target != null && AutoCrystal.target == e.getPlayer() && killSound.is(KillSound.Custom)) {
             playSound("kill");
         }
     }
@@ -114,6 +117,23 @@ public final class SoundFX extends Module {
             sendMessage(isRu() ? "Ошибка воспроизведения звука!" : "Error with playing sound!");
         }
     }
+
+    public void playSlider() {
+        playSound(SoundUtility.SCROLL_SOUNDEVENT);
+    }
+
+    public void playBoolean() {
+        playSound(SoundUtility.BOOLEAN_SOUNDEVENT);
+    }
+
+    public void playSwipeIn() {
+        playSound(SoundUtility.SWIPEIN_SOUNDEVENT);
+    }
+
+    public void playSwipeOut() {
+        playSound(SoundUtility.SWIPEOUT_SOUNDEVENT);
+    }
+
 
     private enum OnOffSound {
         Custom, Inertia, OFF

@@ -39,9 +39,9 @@ public class XRay extends Module {
         super("XRay", Category.MISC);
     }
 
+    private final Setting<Plugin> plugin = new Setting<>("Plugin", Plugin.New);
     public final Setting<Boolean> wallHack = new Setting<>("WallHack", false);
     private final Setting<Boolean> brutForce = new Setting<>("OreDeobf", false);
-    private final Setting<Boolean> funTimebypass = new Setting<>("FunTimeBypass", true);
     private final Setting<Boolean> fast = new Setting<>("Fast", false, v -> brutForce.getValue());
     private final Setting<Integer> delay = new Setting<>("Delay", 25, 1, 100, v -> brutForce.getValue());
     private final Setting<Integer> radius = new Setting<>("Radius", 5, 1, 64, v -> brutForce.getValue());
@@ -59,15 +59,17 @@ public class XRay extends Module {
     private static final Setting<Boolean> water = new Setting<>("Water", false);
     private static final Setting<Boolean> lava = new Setting<>("Lava", false);
 
-
     private final Timer delayTimer = new Timer();
     private final ArrayList<BlockPos> ores = new ArrayList<>();
     private final ArrayList<BlockPos> toCheck = new ArrayList<>();
     private final ArrayList<BlockMemory> checked = new ArrayList<>();
     private BlockPos displayBlock;
-    private int done;
-    private int all;
+    private int done, all;
     private Box area = new Box(BlockPos.ORIGIN);
+
+    private enum Plugin {
+        Old, New;
+    }
 
     @Override
     public void onEnable() {
@@ -92,8 +94,7 @@ public class XRay extends Module {
     public void onReceivePacket(PacketEvent.Receive e) {
         if (e.getPacket() instanceof BlockUpdateS2CPacket pac) {
             debug(((BlockUpdateS2CPacket) e.getPacket()).getState().getBlock().getName().getString() + " " + pac.getPos().toString());
-            if (isCheckableOre(pac.getState().getBlock()) && !ores.contains(pac.getPos()))
-                ores.add(pac.getPos());
+            if (isCheckableOre(pac.getState().getBlock()) && !ores.contains(pac.getPos())) ores.add(pac.getPos());
         }
     }
 
@@ -129,25 +130,24 @@ public class XRay extends Module {
 
     @NotNull
     private Box getArea() {
-        int radius_ = funTimebypass.getValue() ? Math.min(4, radius.getValue()) : radius.getValue();
-        int down_ = funTimebypass.getValue() ? Math.min(3, down.getValue()) : down.getValue();
-        int up_ = funTimebypass.getValue() ? Math.min(4, up.getValue()) : up.getValue();
-        return new Box(mc.player.getX() - radius_, mc.player.getY() - down_, mc.player.getZ() - radius_,
-                mc.player.getX() + radius_, mc.player.getY() + up_, mc.player.getZ() + radius_);
+        int radius_ = plugin.is(Plugin.New) ? Math.min(4, radius.getValue()) : radius.getValue();
+        int down_ = plugin.is(Plugin.New) ? Math.min(3, down.getValue()) : down.getValue();
+        int up_ = plugin.is(Plugin.New) ? Math.min(4, up.getValue()) : up.getValue();
+        return new Box(mc.player.getX() - radius_, mc.player.getY() - down_, mc.player.getZ() - radius_, mc.player.getX() + radius_, mc.player.getY() + up_, mc.player.getZ() + radius_);
     }
 
     @Override
     public void onUpdate() {
-        if (funTimebypass.getValue())
+        if (plugin.is(Plugin.New))
             checked.forEach(blockMemory -> {
-                if (blockMemory.isDelayed() && !ores.contains(blockMemory.bp)) {
+                if (blockMemory.isDelayed() && !ores.contains(blockMemory.bp))
                     ores.add(blockMemory.bp);
-                }
             });
     }
 
     public void onRender3D(MatrixStack stack) {
         // FABOS IDI NAHUI
+<<<<<<< Updated upstream
 
         try {
             for (BlockPos pos : ores) {
@@ -167,13 +167,33 @@ public class XRay extends Module {
             if (displayBlock != null && (done != all))
                 draw(displayBlock, 255, 0, 60);
         } catch (Exception ignored) {
+=======
+        for (BlockPos pos : ores) {
+            Block block = mc.world.getBlockState(pos).getBlock();
+            if ((block == Blocks.DIAMOND_ORE || block == Blocks.DEEPSLATE_DIAMOND_ORE) && diamond.getValue())
+                draw(pos, 0, 255, 255);
+            if ((block == Blocks.GOLD_ORE || block == Blocks.DEEPSLATE_GOLD_ORE) && gold.getValue())
+                draw(pos, 255, 215, 0);
+            if (block == Blocks.NETHER_GOLD_ORE && gold.getValue()) draw(pos, 255, 215, 0);
+            if ((block == Blocks.IRON_ORE || block == Blocks.DEEPSLATE_IRON_ORE) && iron.getValue())
+                draw(pos, 213, 213, 213);
+            if ((block == Blocks.EMERALD_ORE || block == Blocks.DEEPSLATE_EMERALD_ORE) && emerald.getValue())
+                draw(pos, 0, 255, 77);
+            if ((block == Blocks.REDSTONE_ORE || block == Blocks.DEEPSLATE_REDSTONE_ORE) && redstone.getValue())
+                draw(pos, 255, 0, 0);
+            if (block == Blocks.COAL_ORE && coal.getValue()) draw(pos, 0, 0, 0);
+            if ((block == Blocks.LAPIS_ORE || block == Blocks.DEEPSLATE_LAPIS_ORE) && lapis.getValue())
+                draw(pos, 38, 97, 156);
+            if (block == Blocks.ANCIENT_DEBRIS && netherite.getValue()) draw(pos, 255, 255, 255);
+            if (block == Blocks.NETHER_QUARTZ_ORE && quartz.getValue()) draw(pos, 170, 170, 170);
+>>>>>>> Stashed changes
         }
 
-        if (brutForce.getValue())
-            Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(area, HudEditor.getColor(1), 2));
+        if (displayBlock != null && (done != all)) draw(displayBlock, 255, 0, 60);
 
-        if (toCheck.isEmpty() || !brutForce.getValue())
-            return;
+        if (brutForce.getValue()) Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(area, HudEditor.getColor(1), 2));
+
+        if (toCheck.isEmpty() || !brutForce.getValue()) return;
 
         if (mc.isInSingleplayer()) {
             disable(isRu() ? "Братан, ты в синглплеере" : "Bro, you're in singleplayer");
@@ -181,8 +201,7 @@ public class XRay extends Module {
         }
 
         if (mc.player.getMainHandStack().getItem() instanceof PickaxeItem) {
-            if (mc.player.age % 8 == 0)
-                disable(isRu() ? "Убери кирку из руки!" : "Remove pickaxe from ur hand!");
+            if (mc.player.age % 8 == 0) disable(isRu() ? "Убери кирку из руки!" : "Remove pickaxe from ur hand!");
             return;
         }
 
@@ -207,20 +226,17 @@ public class XRay extends Module {
             float posX = mc.getWindow().getScaledWidth() / 2f - 68;
             float posY = mc.getWindow().getScaledHeight() / 2f + 68;
 
-            // Основа
             Render2DEngine.drawGradientBlurredShadow(context.getMatrices(), posX + 2, posY + 2, 133, 44, 14, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
             Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), posX, posY, 137, 47.5f, 9);
             Render2DEngine.drawRound(context.getMatrices(), posX + 0.5f, posY + 0.5f, 136f, 46, 9, Render2DEngine.injectAlpha(Color.BLACK, 220));
 
-            // Баллон
             Render2DEngine.drawGradientRound(context.getMatrices(), posX + 4, posY + 32, 129, 11, 4f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
 
-            Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270),
-                    posX + 4, posY + 32, (int) MathHelper.clamp((129 * ((float) done / Math.max((float) all, 1))), 8, 129), 11, 4f);
+            Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), posX + 4, posY + 32, (int) MathHelper.clamp((129 * ((float) done / Math.max((float) all, 1))), 8, 129), 11, 4f);
 
             FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), (int) ((float) done / (float) all * 100) + "%", posX + 68, posY + 33f, -1);
             FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "XRay", posX + 68, posY + 7, -1);
-            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), done + " / " + all + (isRu() ? " Осталось: " : " Estimated time: ") + MathUtility.round((all - done) * ((1000./ FrameRateCounter.INSTANCE.getFps() + delay.getValue()) / 1000f), 1) + "s", posX + 68, posY + 18, -1);
+            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), done + " / " + all + (isRu() ? " Осталось: " : " Estimated time: ") + MathUtility.round((all - done) * ((1000. / FrameRateCounter.INSTANCE.getFps() + delay.getValue()) / 1000f), 1) + "s", posX + 68, posY + 18, -1);
 
         }
     }
@@ -243,16 +259,16 @@ public class XRay extends Module {
     }
 
     private ArrayList<BlockPos> getBlocks() {
-        int radius_ = funTimebypass.getValue() ? Math.min(4, radius.getValue()) : radius.getValue();
-        int down_ = funTimebypass.getValue() ? Math.min(3, down.getValue()) : down.getValue();
-        int up_ = funTimebypass.getValue() ? Math.min(4, up.getValue()) : up.getValue();
+        int radius_ = plugin.is(Plugin.New) ? Math.min(4, radius.getValue()) : radius.getValue();
+        int down_ = plugin.is(Plugin.New) ? Math.min(3, down.getValue()) : down.getValue();
+        int up_ = plugin.is(Plugin.New) ? Math.min(4, up.getValue()) : up.getValue();
 
         ArrayList<BlockPos> positions = new ArrayList<>();
         for (int x = (int) (mc.player.getX() - radius_); x < mc.player.getX() + radius_; x++)
             for (int y = (int) (mc.player.getY() - down_); y < mc.player.getY() + up_; y++)
                 for (int z = (int) (mc.player.getZ() - radius_); z < mc.player.getZ() + radius_; z++) {
                     BlockPos pos = new BlockPos(x, y, z);
-                    if (mc.world.isAir(pos) || (fast.getValue() && !funTimebypass.getValue() && (x % 2 == 0 || y % 2 == 0 || z % 2 == 0)))
+                    if (mc.world.isAir(pos) || (fast.getValue() && plugin.is(Plugin.Old) && (x % 2 == 0 || y % 2 == 0 || z % 2 == 0)))
                         continue;
                     positions.add(pos);
                 }

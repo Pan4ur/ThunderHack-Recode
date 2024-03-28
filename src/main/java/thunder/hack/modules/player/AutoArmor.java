@@ -32,7 +32,7 @@ public class AutoArmor extends Module {
 
     private int tickDelay = 0;
     public final Setting<Boolean> noMove = new Setting<>("No Move", true);
-    public final Setting<Integer> delay = new Setting<>("Delay", 5, 1, 10);
+    public final Setting<Integer> delay = new Setting<>("Delay", 5, 0, 10);
 
 
     @EventHandler

@@ -33,8 +33,8 @@ public class GapplesHud extends HudElement {
         if (getItemCount(targetItem) == 0)
             return;
 
-        int xPos = (int) ModuleManager.crosshair.getAnimatedPosX();
-        int yPos = (int) ModuleManager.crosshair.getAnimatedPosY();
+        float xPos = ModuleManager.crosshair.getAnimatedPosX();
+        float yPos = ModuleManager.crosshair.getAnimatedPosY();
 
         float factor = angle > 0 ? angle / 15f : 0f;
         float factor2 = 1f - mc.player.getItemUseTime() / 40f;
@@ -51,9 +51,9 @@ public class GapplesHud extends HudElement {
 
 
         RenderSystem.setShaderColor(0.3f, 0.3f, 0.3f, 1f);
-        context.drawItem(targetItem.getDefaultStack(), xPos + 20, yPos - 9);
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-
+        context.getMatrices().translate(xPos + 20, yPos - 9, 0);
+        context.drawItem(targetItem.getDefaultStack(), 0, 0);
+        context.getMatrices().translate(-(xPos + 20), -(yPos - 9), 0);
         RenderSystem.setShaderColor(1f, 1f - factor, 1f - factor, 1f);
 
         context.getMatrices().translate((xPos + 28), (yPos - 1), 0);

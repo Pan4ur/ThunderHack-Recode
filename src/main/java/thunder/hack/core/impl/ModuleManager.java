@@ -6,8 +6,7 @@ import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.IManager;
-import thunder.hack.gui.clickui.normal.ClickUI;
-import thunder.hack.gui.clickui.small.SmallClickUI;
+import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.gui.hud.impl.*;
@@ -39,6 +38,7 @@ public class ModuleManager implements IManager {
     public static AutoCrystalBase autoCrystalBase = new AutoCrystalBase();
     public static CrosshairArrows crosshairArrows = new CrosshairArrows();
     public static PearlBlockThrow pearlBlockThrow = new PearlBlockThrow();
+    public static ClientSettings clientSettings = new ClientSettings();
     public static TimerIndicator timerIndicator = new TimerIndicator();
     public static ThunderHackGui thunderHackGui = new ThunderHackGui();
     public static NoServerRotate noServerRotate = new NoServerRotate();
@@ -56,13 +56,13 @@ public class ModuleManager implements IManager {
     public static ChorusExploit chorusExploit = new ChorusExploit();
     public static MoreKnockback moreKnockback = new MoreKnockback();
     public static AntiServerAdd antiServerAdd = new AntiServerAdd();
+    public static AntiLegitMiss antiLegitMiss = new AntiLegitMiss();
     public static Trajectories trajectories = new Trajectories();
     public static TargetStrafe targetStrafe = new TargetStrafe();
     public static RadarRewrite radarRewrite = new RadarRewrite();
     public static PVPResources pvpResources = new PVPResources();
     public static NoServerSlot noServerSlot = new NoServerSlot();
     public static NoCameraClip noCameraClip = new NoCameraClip();
-    public static ClientSettings clientSettings = new ClientSettings();
     public static ItemScroller itemScroller = new ItemScroller();
     public static HitParticles hitParticles = new HitParticles();
     public static ElytraRecast elytraRecast = new ElytraRecast();
@@ -300,8 +300,8 @@ public class ModuleManager implements IManager {
     public void onRender2D(DrawContext context) {
         HudElement.anyHovered = false;
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender2D(context));
-        if(!HudElement.anyHovered && !ClickUI.anyHovered)
-            GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
+      //  if(!HudElement.anyHovered && !ClickUI.anyHovered)
+      //      GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
         ThunderHack.core.onRender2D(context);
     }
 
@@ -345,7 +345,7 @@ public class ModuleManager implements IManager {
     }
 
     public void onKeyPressed(int eventKey) {
-        if (eventKey == -1 || eventKey == 0 || mc.currentScreen instanceof ClickUI || mc.currentScreen instanceof SmallClickUI) {
+        if (eventKey == -1 || eventKey == 0 || mc.currentScreen instanceof ClickGUI) {
             return;
         }
         modules.forEach(module -> {
@@ -355,7 +355,7 @@ public class ModuleManager implements IManager {
     }
 
     public void onKeyReleased(int eventKey) {
-        if (eventKey == -1 || eventKey == 0 || mc.currentScreen instanceof ClickUI || mc.currentScreen instanceof SmallClickUI)
+        if (eventKey == -1 || eventKey == 0 || mc.currentScreen instanceof ClickGUI)
             return;
 
         modules.forEach(module -> {
@@ -365,7 +365,7 @@ public class ModuleManager implements IManager {
     }
 
     public void onMoseKeyPressed(int eventKey) {
-        if (eventKey == -1 || mc.currentScreen instanceof ClickUI || mc.currentScreen instanceof SmallClickUI) {
+        if (eventKey == -1 || mc.currentScreen instanceof ClickGUI) {
             return;
         }
         modules.forEach(module -> {
@@ -376,7 +376,7 @@ public class ModuleManager implements IManager {
     }
 
     public void onMoseKeyReleased(int eventKey) {
-        if (eventKey == -1 || mc.currentScreen instanceof ClickUI || mc.currentScreen instanceof SmallClickUI)
+        if (eventKey == -1 || mc.currentScreen instanceof ClickGUI)
             return;
 
         modules.forEach(module -> {

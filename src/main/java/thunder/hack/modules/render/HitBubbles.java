@@ -26,7 +26,7 @@ public class HitBubbles extends Module {
     @EventHandler
     public void onHit(EventAttack e) {
         Vec3d point = ThunderHack.playerManager.getRtxPoint(((IClientPlayerEntity) mc.player).getLastYaw(), ((IClientPlayerEntity) mc.player).getLastPitch(), ModuleManager.aura.attackRange.getValue());
-        if (point != null)
+        if (point != null && !e.isPre())
             bubbles.add(new HitBubble((float) point.x, (float) point.y, (float) point.z, -((IClientPlayerEntity) mc.player).getLastYaw(), ((IClientPlayerEntity) mc.player).getLastPitch(), new Timer()));
     }
 

@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.utility.math.MathUtility;
-import thunder.hack.utility.render.MSAAFramebuffer;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
@@ -37,7 +36,7 @@ public class CreditsScreen extends Screen {
         super(Text.of("CreditsScreen"));
         INSTANCE = this;
         for (String line : ThunderHack.contributors) {
-            if(line == null)
+            if (line == null)
                 continue;
             String name = line.split(";")[0];
             String avatar = line.split(";")[1];
@@ -89,14 +88,10 @@ public class CreditsScreen extends Screen {
             offset += 150;
         }
         RenderSystem.disableBlend();
-
-
         Render2DEngine.drawHudBase(context.getMatrices(), mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40, 5, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40) ? 0.7f : 1f);
-        MSAAFramebuffer.use(true, () -> {
-            RenderSystem.setShaderColor(1f, 1f, 1f, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40) ? 0.7f : 1f);
-            context.drawTexture(TH_TEAM, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40, 0, 0, 40, 40, 40, 40);
-            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        });
+        RenderSystem.setShaderColor(1f, 1f, 1f, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40) ? 0.7f : 1f);
+        context.drawTexture(TH_TEAM, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40, 0, 0, 40, 40, 40, 40);
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 
 

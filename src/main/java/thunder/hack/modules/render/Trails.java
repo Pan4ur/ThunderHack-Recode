@@ -42,6 +42,7 @@ public class Trails extends Module {
     private final Setting<Particles> pearls = new Setting<>("Pearls", Particles.Particles);
     private final Setting<Particles> arrows = new Setting<>("Arrows", Particles.Particles);
     private final Setting<Players> players = new Setting<>("Players", Players.Particles);
+    private final Setting<Boolean> onlySelf = new Setting<>("OnlySelf", false, v -> players.getValue() != Players.None);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
     private final Setting<Float> down = new Setting<>("Down", 0.5F, 0.0F, 2.0F);
     private final Setting<Float> width = new Setting<>("Height", 1.3F, 0.1F, 2.0F);
@@ -72,6 +73,9 @@ public class Trails extends Module {
     public void onPreRender3D(MatrixStack stack) {
         if (players.getValue() == Players.Trail) {
             for (PlayerEntity entity : mc.world.getPlayers()) {
+                if(entity != mc.player && onlySelf.getValue())
+                    continue;
+
                 float alpha = color.getValue().getAlpha() / 255f;
                 if (!((IEntity) entity).thunderHack_Recode$getTrails().isEmpty()) {
                     stack.push();
@@ -102,6 +106,9 @@ public class Trails extends Module {
             }
         } else if (players.getValue() == Players.Cute) {
             for (PlayerEntity entity : mc.world.getPlayers()) {
+                if(entity != mc.player && onlySelf.getValue())
+                    continue;
+
                 float alpha = color.getValue().getAlpha() / 255f;
                 if (!((IEntity) entity).thunderHack_Recode$getTrails().isEmpty()) {
                     stack.push();
@@ -204,7 +211,7 @@ public class Trails extends Module {
         Color c = lmode.getValue() == Mode.Sync ? HudEditor.getColor((int) MathUtility.random(1, 228)) : lcolor.getValue().getColorObject();
 
         for (PlayerEntity player : mc.world.getPlayers()) {
-            if (player.getPos().getZ() != player.prevZ || player.getPos().getX() != player.prevX) {
+            if (player.getPos().getZ() != player.prevZ || player.getPos().getX() != player.prevX && (!onlySelf.getValue())) {
                 ((IEntity) player).thunderHack_Recode$getTrails().add(new Trail(new Vec3d(player.prevX, player.prevY, player.prevZ), player.getPos(), color.getValue().getColorObject()));
                 if (players.is(Players.Particles)) {
                     for (int i = 0; i < amount.getValue(); i++) {

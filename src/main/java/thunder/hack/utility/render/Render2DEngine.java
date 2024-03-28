@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GL40C;
 import thunder.hack.gui.font.Texture;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.render.shaders.ArcShader;
 import thunder.hack.utility.render.shaders.HudShader;
 import thunder.hack.utility.render.shaders.MainMenuProgram;
 import thunder.hack.utility.render.shaders.TextureColorProgram;
@@ -36,6 +37,8 @@ public class Render2DEngine {
     public static TextureColorProgram TEXTURE_COLOR_PROGRAM;
     public static HudShader HUD_SHADER;
     public static MainMenuProgram MAIN_MENU_PROGRAM;
+    public static ArcShader ARC_PROGRAM;
+
 
     public static final Identifier star = new Identifier("textures/star.png");
     public static final Identifier heart = new Identifier("textures/heart.png");
@@ -225,13 +228,15 @@ public class Render2DEngine {
         }
         RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
         RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         renderTexture(matrices, x, y, width, height, 0, 0, width, height, width, height);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 
     public static void drawGradientBlurredShadow(MatrixStack matrices, float x, float y, float width, float height, int blurRadius, Color color1, Color color2, Color color3, Color color4) {
-        if (!HudEditor.glow.getValue()) return;
+        if (!HudEditor.glow.getValue())
+            return;
         width = width + blurRadius * 2;
         height = height + blurRadius * 2;
         x = x - blurRadius;
@@ -258,7 +263,7 @@ public class Render2DEngine {
         RenderSystem.disableBlend();
     }
 
-     public static void drawGradientBlurredShadow1(MatrixStack matrices, float x, float y, float width, float height, int blurRadius, Color color1, Color color2, Color color3, Color color4) {
+    public static void drawGradientBlurredShadow1(MatrixStack matrices, float x, float y, float width, float height, int blurRadius, Color color1, Color color2, Color color3, Color color4) {
         if (!HudEditor.glow.getValue()) return;
         width = width + blurRadius * 2;
         height = height + blurRadius * 2;
@@ -276,7 +281,7 @@ public class Render2DEngine {
             g.dispose();
             BufferedImage blurred = new GaussianFilter(blurRadius).filter(original, null);
 
-            BufferedImage black =  new BufferedImage((int) width + blurRadius * 2, (int) height + blurRadius * 2, BufferedImage.TYPE_INT_ARGB);
+            BufferedImage black = new BufferedImage((int) width + blurRadius * 2, (int) height + blurRadius * 2, BufferedImage.TYPE_INT_ARGB);
             Graphics g2 = black.getGraphics();
             g2.setColor(new Color(0x000000));
             g2.fillRect(0, 0, (int) width + blurRadius * 2, (int) height + blurRadius * 2);
@@ -627,7 +632,7 @@ public class Render2DEngine {
         RenderSystem.disableBlend();
     }
 
-    public static void drawGradientRound(MatrixStack ms, float v, float v1, int i, int i1, float v2, Color darker, Color darker1, Color darker2, Color darker3) {
+    public static void drawGradientRound(MatrixStack ms, float v, float v1, float i, float i1, float v2, Color darker, Color darker1, Color darker2, Color darker3) {
         renderRoundedQuad2(ms, darker, darker1, darker2, darker3, v, v1, v + i, v1 + i1, v2);
     }
 
@@ -772,9 +777,18 @@ public class Render2DEngine {
         RenderSystem.disableBlend();
     }
 
+    public static void drawArc(MatrixStack matrices, float x, float y, float width, float height, float radius, float thickness, float start, float end) {
+        preShaderDraw(matrices, x - width/2f, y - height/2f, x + width/2f, y + height/2f);
+        ARC_PROGRAM.setParameters(x, y, width, height, radius, thickness, start, end);
+        ARC_PROGRAM.use();
+        Tessellator.getInstance().draw();
+        RenderSystem.disableBlend();
+    }
+
+
     public static void drawHudBase(MatrixStack matrices, float x, float y, float width, float height, float radius) {
         preShaderDraw(matrices, x - 10, y - 10, width + 20, height + 20);
-        HUD_SHADER.setParameters(x, y, width, height, radius, 1f);
+        HUD_SHADER.setParameters(x, y, width, height, radius, 1f, HudEditor.alpha.getValue());
         HUD_SHADER.use();
         Tessellator.getInstance().draw();
         RenderSystem.disableBlend();
@@ -782,11 +796,20 @@ public class Render2DEngine {
 
     public static void drawHudBase(MatrixStack matrices, float x, float y, float width, float height, float radius, float alpha) {
         preShaderDraw(matrices, x - 10, y - 10, width + 20, height + 20);
-        HUD_SHADER.setParameters(x, y, width, height, radius, alpha);
+        HUD_SHADER.setParameters(x, y, width, height, radius, alpha, HudEditor.alpha.getValue());
         HUD_SHADER.use();
         Tessellator.getInstance().draw();
         RenderSystem.disableBlend();
     }
+
+    public static void drawGuiBase(MatrixStack matrices, float x, float y, float width, float height, float radius, float opacity) {
+        preShaderDraw(matrices, x - 10, y - 10, width + 20, height + 20);
+        HUD_SHADER.setParameters(x, y, width, height, radius, 1f, 0);
+        HUD_SHADER.use();
+        Tessellator.getInstance().draw();
+        RenderSystem.disableBlend();
+    }
+
 
     public static void preShaderDraw(MatrixStack matrices, float x, float y, float width, float height) {
         RenderSystem.enableBlend();
@@ -850,7 +873,7 @@ public class Render2DEngine {
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(angle));
         float scale = factor * 2f;
         Render2DEngine.renderGradientTexture(matrices, -scale / 2, -scale / 2, scale, scale, 0, 0, 128, 128, 128, 128,
-                applyOpacity(HudEditor.getColor(270), 1f - factor),applyOpacity( HudEditor.getColor(0), 1f - factor), applyOpacity(HudEditor.getColor(180), 1f - factor), applyOpacity(HudEditor.getColor(90), 1f - factor));
+                applyOpacity(HudEditor.getColor(270), 1f - factor), applyOpacity(HudEditor.getColor(0), 1f - factor), applyOpacity(HudEditor.getColor(180), 1f - factor), applyOpacity(HudEditor.getColor(90), 1f - factor));
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
@@ -875,6 +898,7 @@ public class Render2DEngine {
         HUD_SHADER = new HudShader();
         MAIN_MENU_PROGRAM = new MainMenuProgram();
         TEXTURE_COLOR_PROGRAM = new TextureColorProgram();
+        ARC_PROGRAM = new ArcShader();
     }
 
     public static class BlurredShadow {

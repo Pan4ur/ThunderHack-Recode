@@ -240,7 +240,6 @@ public class FontRenderer implements Closeable {
             char c = chars[i];
 
             Color color = HudEditor.getColor(num * offset);
-            if (!hud) color = ClickGui.getInstance().getColor(num * offset);
 
             a = color.getAlpha() / 255f;
 

@@ -52,7 +52,7 @@ public class MixinPlayerEntity {
 
     @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
     private void attackAHook2(Entity target, CallbackInfo ci) {
-        final EventAttack event = new EventAttack(target);
+        final EventAttack event = new EventAttack(target, false);
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
             ci.cancel();

@@ -5,9 +5,7 @@ import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.AbstractElement;
-import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.modules.client.ClickGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 
@@ -26,18 +24,12 @@ public class StringElement extends AbstractElement {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        Render2DEngine.drawRect(context.getMatrices(), (float) getX() + 5,(float) getY() + 2, (float) (getWidth() - 11f), 10, new Color(0x94000000, true));
-
         if(!isSmall()) {
-            FontRenderers.getSettingsRenderer().drawString(context.getMatrices(), listening ? currentString + (mc.player == null || mc.player.age % 5 == 0 ? "_" : "") : (String) setting.getValue(), x + 6, y + height / 2, ClickGui.getInstance().getTextColor(setting.getModule()));
+            Render2DEngine.drawRect(context.getMatrices(), (float) getX() + 5,(float) getY() + 2, (float) (getWidth() - 11f), 10, new Color(0x94000000, true));
+            FontRenderers.getSettingsRenderer().drawString(context.getMatrices(), listening ? currentString + (mc.player == null || mc.player.age % 5 == 0 ? "_" : "") : (String) setting.getValue(), x + 6, y + height / 2, -1);
         } else {
-            FontRenderers.sf_medium_mini.drawString(context.getMatrices(), listening ? currentString + (mc.player == null || mc.player.age % 5 == 0 ? "_" : "") : (String) setting.getValue(), x + 6, y + height / 2, ClickGui.getInstance().getTextColor(setting.getModule()));
-        }
-
-        if(Render2DEngine.isHovered(mouseX, mouseY, (float) getX() + 5,(float) getY() + 2, (float) (getWidth() - 11f), 10)) {
-            GLFW.glfwSetCursor(mc.getWindow().getHandle(),
-                    GLFW.glfwCreateStandardCursor(GLFW.GLFW_IBEAM_CURSOR));
-            ClickUI.anyHovered = true;
+            Render2DEngine.drawRect(context.getMatrices(), (float) getX() + 5,(float) getY() + 2, (float) (getWidth() - 11f), 10, new Color(0x94000000, true));
+            FontRenderers.sf_medium_mini.drawString(context.getMatrices(), listening ? currentString + (mc.player == null || mc.player.age % 5 == 0 ? "_" : "") : (String) setting.getValue(), x + 6, y + height / 2, -1);
         }
     }
 

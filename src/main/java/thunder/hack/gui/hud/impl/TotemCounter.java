@@ -28,8 +28,8 @@ public class TotemCounter extends HudElement {
         if(getItemCount(Items.TOTEM_OF_UNDYING) == 0)
             return;
 
-        int xPos = (int) ModuleManager.crosshair.getAnimatedPosX();
-        int yPos = (int) ModuleManager.crosshair.getAnimatedPosY();
+        float xPos = ModuleManager.crosshair.getAnimatedPosX();
+        float yPos = ModuleManager.crosshair.getAnimatedPosY();
 
         float factor = Math.abs(angle < 0 ? angle / 15f : 0f);
 
@@ -39,7 +39,9 @@ public class TotemCounter extends HudElement {
         context.getMatrices().translate(-xPos, -yPos, 0);
 
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        context.drawItem(Items.TOTEM_OF_UNDYING.getDefaultStack(), xPos - 36, yPos - 9);
+        context.getMatrices().translate(xPos - 36, yPos - 9, 0);
+        context.drawItem(Items.TOTEM_OF_UNDYING.getDefaultStack(), 0, 0);
+        context.getMatrices().translate(-(xPos - 36), -(yPos - 9), 0);
         RenderSystem.setShaderColor(1f, 1f - factor, 1f - factor, 1f);
 
         if(factor > 0)

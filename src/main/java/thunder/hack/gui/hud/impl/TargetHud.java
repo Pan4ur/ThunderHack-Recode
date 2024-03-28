@@ -94,6 +94,15 @@ public class TargetHud extends HudElement {
         return "pon";
     }
 
+    @Override
+    public void onEnable() {
+        try {
+            custom = ThunderUtility.getCustomImg("thud");
+        } catch (Exception e) {
+            sendMessage(".minecraft -> ThunderHackRecode -> misc -> images -> thud.png");
+        }
+    }
+
     public static String getDurationString(StatusEffectInstance pe) {
         if (pe.isInfinite()) {
             return "*:*";
@@ -166,23 +175,15 @@ public class TargetHud extends HudElement {
                 imageRender:
                 {
                     if (!imageMode.is(ImageModeEn.None)) {
-                        context.getMatrices().push();
-
                         if (imageMode.is(ImageModeEn.Anime)) {
                             RenderSystem.setShaderTexture(0, thudPic);
                         } else {
-                            try {
-                                custom = ThunderUtility.getCustomImg("thud");
-                            } catch (Exception e) {
-                                sendMessage(".minecraft -> ThunderHackRecode -> misc -> images -> thud.png");
-                            }
-
                             if(custom == null)
                                 break imageRender;
 
                             RenderSystem.setShaderTexture(0, custom);
                         }
-
+                        context.getMatrices().push();
                         RenderSystem.enableBlend();
                         RenderSystem.defaultBlendFunc();
                         Render2DEngine.drawRound(context.getMatrices(), getPosX() + 50, getPosY(), 100, 50, 12, new Color(0, 0, 0, 255));

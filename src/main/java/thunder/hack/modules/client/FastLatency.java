@@ -14,7 +14,6 @@ import thunder.hack.utility.math.MathUtility;
 public final class FastLatency extends Module {
     private final Setting<Integer> delay = new Setting<>("Delay", 80, 0, 1000);
 
-
     private final Timer timer = new Timer();
     private final Timer limitTimer = new Timer();
     private long ping;

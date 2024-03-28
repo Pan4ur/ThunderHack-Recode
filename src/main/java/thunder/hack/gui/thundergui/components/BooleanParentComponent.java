@@ -4,6 +4,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.modules.client.ClickGui;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.utility.math.FrameRateCounter;
@@ -32,7 +33,7 @@ public class BooleanParentComponent extends SettingElement {
         FontRenderers.modules.drawString(stack,getSetting().getName(), (float) getX(), (float) getY() + 5, isHovered() ? -1 : new Color(0xB0FFFFFF, true).getRGB(), false);
         animation = fast(animation, getParentSetting().getValue().isEnabled() ? 1 : 0, 15f);
         double paddingX = 7 * animation;
-        Color color = ClickGui.getInstance().getColor(0);
+        Color color = HudEditor.getColor(1);
         Render2DEngine.drawRound(stack,(float) (x + width - 18), (float) (y + height / 2 - 4), 15, 8, 4, paddingX > 4 ? color : new Color(0xFFB2B1B1));
         Render2DEngine.drawRound(stack,(float) (x + width - 17 + paddingX), (float) (y + height / 2 - 3), 6, 6, 3, new Color(-1));
     }

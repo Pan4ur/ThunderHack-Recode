@@ -1,16 +1,29 @@
 package thunder.hack.injection;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.ShaderStage;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.item.PickaxeItem;
 import net.minecraft.item.SwordItem;
 import net.minecraft.resource.ResourceFactory;
-import com.mojang.datafixers.util.Pair;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
+import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import thunder.hack.ThunderHack;
@@ -19,22 +32,8 @@ import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.player.NoEntityTrace;
 import thunder.hack.utility.math.FrameRateCounter;
-import thunder.hack.utility.render.MSAAFramebuffer;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.PickaxeItem;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.MathHelper;
-import org.objectweb.asm.Opcodes;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.client.gl.ShaderStage;
-import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.render.BlockAnimationUtility;
+import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.render.shaders.GlProgram;
 
 import java.util.List;
@@ -70,11 +69,9 @@ public abstract class MixinGameRenderer {
         Render3DEngine.lastModMat.set(RenderSystem.getModelViewMatrix());
         Render3DEngine.lastWorldSpaceMatrix.set(matrix.peek().getPositionMatrix());
         ThunderHack.moduleManager.onPreRender3D(matrix);
-        MSAAFramebuffer.use(false, () -> {
-            ThunderHack.moduleManager.onRender3D(matrix);
-            BlockAnimationUtility.onRender(matrix);
-            Render3DEngine.onRender3D(matrix); // <- не двигать
-        });
+        ThunderHack.moduleManager.onRender3D(matrix);
+        BlockAnimationUtility.onRender(matrix);
+        Render3DEngine.onRender3D(matrix); // <- не двигать
     }
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V", shift = At.Shift.AFTER))
@@ -96,14 +93,14 @@ public abstract class MixinGameRenderer {
             mc.getProfiler().pop();
             info.cancel();
         }
-        if (ModuleManager.aura.isEnabled() && Aura.target != null && mc.player.distanceTo(Aura.target) <= ModuleManager.aura.attackRange.getValue() && ModuleManager.aura.rotationMode.getValue() != Aura.Rotation.None) {
+        if (ModuleManager.aura.isEnabled() && Aura.target != null && mc.player.distanceTo(Aura.target) <= ModuleManager.aura.attackRange.getValue() && ModuleManager.aura.rotationMode.getValue() != Aura.Mode.None) {
             mc.getProfiler().pop();
             info.cancel();
             //add vector from aura
             mc.crosshairTarget = new EntityHitResult(Aura.target);
         }
 
-        if(ModuleManager.freeCam.isEnabled())
+        if (ModuleManager.freeCam.isEnabled())
             mc.crosshairTarget = ThunderHack.playerManager.getRtxTarget(ModuleManager.freeCam.getFakeYaw(), ModuleManager.freeCam.getFakePitch(), ModuleManager.freeCam.getFakeX(), ModuleManager.freeCam.getFakeY(), ModuleManager.freeCam.getFakeZ());
     }
 
@@ -112,16 +109,16 @@ public abstract class MixinGameRenderer {
         GlProgram.forEachProgram(loader -> shadersToLoad.add(new Pair<>(loader.getLeft().apply(factory), loader.getRight())));
     }
 
-    @Inject(method = "getBasicProjectionMatrix",at = @At("TAIL"), cancellable = true)
+    @Inject(method = "getBasicProjectionMatrix", at = @At("TAIL"), cancellable = true)
     public void getBasicProjectionMatrixHook(double fov, CallbackInfoReturnable<Matrix4f> cir) {
-        if(ModuleManager.aspectRatio.isEnabled()) {
+        if (ModuleManager.aspectRatio.isEnabled()) {
             MatrixStack matrixStack = new MatrixStack();
             matrixStack.peek().getPositionMatrix().identity();
             if (zoom != 1.0f) {
                 matrixStack.translate(zoomX, -zoomY, 0.0f);
                 matrixStack.scale(zoom, zoom, 1.0f);
             }
-            matrixStack.peek().getPositionMatrix().mul(new Matrix4f().setPerspective((float)(fov * 0.01745329238474369), ModuleManager.aspectRatio.ratio.getValue(), 0.05f, viewDistance * 4.0f));
+            matrixStack.peek().getPositionMatrix().mul(new Matrix4f().setPerspective((float) (fov * 0.01745329238474369), ModuleManager.aspectRatio.ratio.getValue(), 0.05f, viewDistance * 4.0f));
             cir.setReturnValue(matrixStack.peek().getPositionMatrix());
         }
     }
@@ -144,7 +141,7 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
     private void bobViewHook(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        if(ClientSettings.customBob.getValue()) {
+        if (ClientSettings.customBob.getValue()) {
             ThunderHack.core.bobView(matrices, tickDelta);
             ci.cancel();
         }

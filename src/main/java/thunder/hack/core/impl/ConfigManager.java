@@ -10,9 +10,7 @@ import thunder.hack.cmd.Command;
 import thunder.hack.cmd.impl.NukerCommand;
 import thunder.hack.cmd.impl.SearchCommand;
 import thunder.hack.core.IManager;
-import thunder.hack.gui.autobuy.AutoBuyItem;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.AutoBuy;
 import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.modules.misc.Nuker;
 import thunder.hack.modules.render.Search;
@@ -38,7 +36,6 @@ public class ConfigManager implements IManager {
     public static final String CONFIG_FOLDER_NAME = "ThunderHackRecode";
     public static final File MAIN_FOLDER = new File(mc.runDirectory, CONFIG_FOLDER_NAME);
     public static final File CONFIGS_FOLDER = new File(MAIN_FOLDER, "configs");
-    public static final File AUTOBUY_FOLDER = new File(MAIN_FOLDER, "autobuy");
     public static final File TEMP_FOLDER = new File(MAIN_FOLDER, "temp");
     public static final File MISC_FOLDER = new File(MAIN_FOLDER, "misc");
     public static final File SOUNDS_FOLDER = new File(MISC_FOLDER, "sounds");
@@ -569,7 +566,6 @@ public class ConfigManager implements IManager {
         try {
             file.createNewFile();
         } catch (Exception ignored) {
-
         }
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -577,104 +573,6 @@ public class ConfigManager implements IManager {
                 writer.write(item + "\n");
             }
         } catch (Exception ignored) {
-        }
-    }
-
-    public void loadAutoBuy() {
-        try {
-            File file = new File(ConfigManager.CONFIG_FOLDER_NAME + "/misc/autobuy.txt");
-
-            if (file.exists()) {
-                try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
-                    while (reader.ready()) {
-                        String[] nameKey = reader.readLine().split(";");
-                        String name = nameKey[0];
-                        String price = nameKey[1];
-                        String count = nameKey[2];
-                        String enchantments = nameKey[3];
-                        String attributes = nameKey[4];
-                        String checkForStar = nameKey[5];
-
-                        ArrayList<Pair<String, Integer>> enchList = new ArrayList<>();
-                        for (String enc : enchantments.split(" ")) {
-                            Pair<String, Integer> ench = AutoBuy.parseEnchant(enc);
-                            if (ench != null)
-                                enchList.add(ench);
-                        }
-
-                        ArrayList<String> attribList = new ArrayList<>();
-                        for (String attr : attributes.split(",")) {
-                            if (!attr.isEmpty())
-                                attribList.add(attr);
-                        }
-
-                        AutoBuy.items.add(new AutoBuyItem(InventoryUtility.getItem(name), enchList, attribList, Integer.parseInt(price), Integer.parseInt(count), Boolean.parseBoolean(checkForStar)));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        } catch (Exception ignored) {
-        }
-    }
-
-    public void saveAutoBuy() {
-        File file = new File(ConfigManager.CONFIG_FOLDER_NAME + "/misc/autobuy.txt");
-        try {
-            if (new File(ConfigManager.CONFIG_FOLDER_NAME).mkdirs()) {
-                file.createNewFile();
-            }
-        } catch (Exception ignored) {
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
-            for (AutoBuyItem item : AutoBuy.items) {
-                writer.write(item.getItem().getTranslationKey().replace("block.minecraft.", "").replace("item.minecraft.", "") + ";" + item.getPrice() + ";" + item.getCount() + ";" + ArrayToString(item.getEnchantmentsToArray()) + ";" + ArrayToStringСomma(item.getAttributesToArray()) + ";" + item.checkForStar() + "\n");
-            }
-        } catch (Exception ignored) {
-        }
-    }
-
-    public List<String> getAutoBuyList() {
-        if (!MAIN_FOLDER.exists() || MAIN_FOLDER.listFiles() == null) return null;
-
-        List<String> list = new ArrayList<>();
-
-        if (AUTOBUY_FOLDER.listFiles() != null) {
-            for (File file : Arrays.stream(Objects.requireNonNull(AUTOBUY_FOLDER.listFiles())).filter(f -> f.getName().endsWith(".txt")).collect(Collectors.toList())) {
-                list.add(file.getName().replace(".txt", ""));
-            }
-        }
-        return list;
-    }
-
-    public static String ArrayToString(Object[] a) {
-        if (a == null)
-            return "null";
-        int iMax = a.length - 1;
-        if (iMax == -1)
-            return "";
-        StringBuilder b = new StringBuilder();
-        for (int i = 0; ; i++) {
-            b.append(String.valueOf(a[i]));
-            if (i == iMax)
-                return b.toString();
-            b.append(" ");
-        }
-    }
-
-    public static String ArrayToStringСomma(Object[] a) {
-        if (a == null)
-            return "null";
-        int iMax = a.length - 1;
-        if (iMax == -1)
-            return "";
-        StringBuilder b = new StringBuilder();
-        for (int i = 0; ; i++) {
-            b.append(String.valueOf(a[i]));
-            if (i == iMax)
-                return b.toString();
-            b.append(",");
         }
     }
 }

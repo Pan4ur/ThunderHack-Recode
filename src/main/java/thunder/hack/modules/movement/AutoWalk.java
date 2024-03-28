@@ -23,6 +23,7 @@ public class AutoWalk extends Module {
 
     @Override
     public void onEnable() {
+<<<<<<< Updated upstream
         if (mode.getValue() == Mode.Baritone) {
             String direction = mc.player.getHorizontalFacing().toString();
             if ("east" == direction) {
@@ -38,6 +39,10 @@ public class AutoWalk extends Module {
                 mc.player.networkHandler.sendChatMessage("#goto ~ ~ 30000000");
             }
         }
+=======
+        if (mode.getValue() == Mode.Baritone)
+            mc.player.networkHandler.sendChatMessage("#goto " + 3000000 * Math.cos(Math.toRadians(mc.player.getYaw() + 90f)) + " " + 3000000 * Math.sin(Math.toRadians(mc.player.getYaw() + 90f)));
+>>>>>>> Stashed changes
     }
 
     @Override
@@ -49,8 +54,13 @@ public class AutoWalk extends Module {
 
     @EventHandler
     public void onKey(EventKeyboardInput e) {
+<<<<<<< Updated upstream
         if (mode.getValue() == Mode.Simple) {
             mc.player.input.movementForward = 1f;
         }
+=======
+        if (mode.getValue() == Mode.Simple)
+            mc.player.input.movementForward = 1f;
+>>>>>>> Stashed changes
     }
 }

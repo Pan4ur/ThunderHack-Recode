@@ -8,11 +8,9 @@ import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.AbstractWindow;
-import thunder.hack.gui.clickui.normal.ClickUI;
-import thunder.hack.gui.clickui.normal.ModuleWindow;
+import thunder.hack.gui.clickui.ModuleWindow;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
-import thunder.hack.utility.render.MSAAFramebuffer;
 
 import java.util.List;
 
@@ -37,13 +35,13 @@ public class HudEditorGui extends Screen {
     @Override
     protected void init() {
         if (firstOpen) {
-            double x = 60, y = 20;
-            double offset = 0;
+            float x = 60, y = 20;
+            float offset = 0;
             int windowHeight = 18;
 
             for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
                 if (category != Module.Category.HUD) continue;
-                ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category), 0, x + offset, y, 108, windowHeight);
+                ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category), x + offset, y, 108, windowHeight);
                 window.setOpen(true);
                 windows.add(window);
                 offset += 110;
@@ -61,37 +59,29 @@ public class HudEditorGui extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        ClickUI.anyHovered = false;
+        ClickGui.anyHovered = false;
 
         for (AbstractWindow window : windows) {
-            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 264)) {
+            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_DOWN)) {
                 window.setY(window.getY() + 2);
             }
-            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 265)) {
+            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_UP)) {
                 window.setY(window.getY() - 2);
             }
-            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 262)) {
+            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_RIGHT)) {
                 window.setX(window.getX() + 2);
             }
-            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 263)) {
+            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT)) {
                 window.setX(window.getX() - 2);
             }
 
-            if (dWheel != 0) window.setY(window.getY() + dWheel);
+            if (dWheel != 0) window.setY((float) (window.getY() + dWheel));
         }
 
         dWheel = 0;
 
-        if (ClickGui.getInstance().msaa.getValue()) {
-            MSAAFramebuffer.use(true, () -> {
-                for (AbstractWindow window : windows) {
-                    window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().mainColor.getValue().getColorObject());
-                }
-            });
-        } else {
-            for (AbstractWindow window : windows) {
-                window.render(context, mouseX, mouseY, delta, ClickGui.getInstance().mainColor.getValue().getColorObject());
-            }
+        for (AbstractWindow window : windows) {
+            window.render(context, mouseX, mouseY, delta);
         }
     }
 

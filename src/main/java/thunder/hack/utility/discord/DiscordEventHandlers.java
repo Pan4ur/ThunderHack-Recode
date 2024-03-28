@@ -22,45 +22,5 @@ public class DiscordEventHandlers extends Structure {
         return Arrays.asList("ready", "disconnected", "errored", "joinGame", "spectateGame", "joinRequest");
     }
     
-    public static class Builder {
-        private final DiscordEventHandlers handlers;
-        
-        public Builder() {
-            this.handlers = new DiscordEventHandlers();
-        }
-        
-        public DiscordEventHandlers build() {
-            return this.handlers;
-        }
-        
-        public Builder disconnected(final DisconnectedCallback disconnected) {
-            this.handlers.disconnected = disconnected;
-            return this;
-        }
-        
-        public Builder errored(final ErroredCallback errored) {
-            this.handlers.errored = errored;
-            return this;
-        }
-        
-        public Builder ready(final ReadyCallback ready) {
-            this.handlers.ready = ready;
-            return this;
-        }
-        
-        public Builder joinRequest(final JoinRequestCallback joinRequest) {
-            this.handlers.joinRequest = joinRequest;
-            return this;
-        }
-        
-        public Builder joinGame(final JoinGameCallback joinGame) {
-            this.handlers.joinGame = joinGame;
-            return this;
-        }
-        
-        public Builder spectateGame(final SpectateGameCallback spectateGame) {
-            this.handlers.spectateGame = spectateGame;
-            return this;
-        }
-    }
+   
 }

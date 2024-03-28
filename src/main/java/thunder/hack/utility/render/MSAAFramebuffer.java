@@ -33,7 +33,7 @@ public class MSAAFramebuffer extends Framebuffer {
     }
 
     public static void use(boolean fancy, Runnable drawAction) {
-        use(Math.min(fancy ? 16 : ModuleManager.radarRewrite.isEnabled() ? 4 : 2, MAX_SAMPLES), MinecraftClient.getInstance().getFramebuffer(), drawAction);
+        use(Math.min(fancy ? 16 : 4, MAX_SAMPLES), MinecraftClient.getInstance().getFramebuffer(), drawAction);
     }
 
     public static void use(int samples, @NotNull Framebuffer mainBuffer, @NotNull Runnable drawAction) {

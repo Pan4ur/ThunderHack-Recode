@@ -1,25 +1,26 @@
 package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Formatting;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PostPlayerUpdateEvent;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.combat.AntiBot;
-import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.interfaces.IEntity;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
+
+import javax.swing.*;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 import static thunder.hack.modules.movement.Timer.violation;
@@ -46,7 +47,7 @@ public class Speed extends Module {
     private thunder.hack.utility.Timer startDelay = new thunder.hack.utility.Timer();
 
     public enum Mode {
-        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, GrimEntity
+        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, GrimEntity, GrimEntity2
     }
 
     @Override
@@ -64,7 +65,9 @@ public class Speed extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        if(mc.player.isInFluid() && pauseInLiquids.getValue()){return;}
+        if (mc.player.isInFluid() && pauseInLiquids.getValue()) {
+            return;
+        }
         if (mode.getValue() == Mode.MatrixJB) {
             boolean closeToGround = false;
 
@@ -86,12 +89,11 @@ public class Speed extends Module {
     }
 
 
-    // засекайте до обновы wild client (not paste)
     @EventHandler
     public void modifyVelocity(EventPlayerTravel e) {
         if (mode.getValue() == Mode.GrimEntity && !e.isPre() && ThunderHack.core.getSetBackTime() > 1000) {
-            for(PlayerEntity ent : ThunderHack.asyncManager.getAsyncPlayers()) {
-                if(ent != mc.player && mc.player.squaredDistanceTo(ent) <= 2.25) {
+            for (PlayerEntity ent : ThunderHack.asyncManager.getAsyncPlayers()) {
+                if (ent != mc.player && mc.player.squaredDistanceTo(ent) <= 2.25) {
                     float p = mc.world.getBlockState(((IEntity) mc.player).thunderHack_Recode$getVelocityBP()).getBlock().getSlipperiness();
                     float f = mc.player.isOnGround() ? p * 0.91f : 0.91f;
                     float f2 = mc.player.isOnGround() ? p : 0.99f;
@@ -100,12 +102,23 @@ public class Speed extends Module {
                 }
             }
         }
+        if (mode.getValue() == Mode.GrimEntity2 && !e.isPre() && ThunderHack.core.getSetBackTime() > 1000 && MovementUtility.isMoving()) {
+            int collisions = 0;
+            for (Entity ent : mc.world.getEntities())
+                if (ent != mc.player && ent instanceof LivingEntity && mc.player.getBoundingBox().expand(1.0).intersects(ent.getBoundingBox()))
+                    collisions++;
+
+            double[] motion = MovementUtility.forward(0.08 * collisions);
+            mc.player.addVelocity(motion[0], 0.0, motion[1]);
+        }
     }
 
 
     @Override
     public void onUpdate() {
-        if(mc.player.isInFluid() && pauseInLiquids.getValue()){return;}
+        if (mc.player.isInFluid() && pauseInLiquids.getValue()) {
+            return;
+        }
         if (mode.getValue() == Mode.ElytraLowHop) {
             if (mc.player.isOnGround()) {
                 mc.player.jump();
@@ -146,7 +159,9 @@ public class Speed extends Module {
 
     @EventHandler
     public void onMove(EventMove event) {
-        if (mc.player.isInFluid() && pauseInLiquids.getValue()){return;}
+        if (mc.player.isInFluid() && pauseInLiquids.getValue()) {
+            return;
+        }
         if (mode.getValue() != Mode.NCP && mode.getValue() != Mode.StrictStrafe) return;
         if (mc.player.getAbilities().flying) return;
         if (mc.player.isFallFlying()) return;

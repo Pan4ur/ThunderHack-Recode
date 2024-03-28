@@ -3,21 +3,17 @@ package thunder.hack.gui.clickui.impl;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
-import org.lwjgl.glfw.GLFW;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractElement;
-import thunder.hack.gui.clickui.normal.ClickUI;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.modules.client.ClickGui;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
-import thunder.hack.utility.math.FrameRateCounter;
-import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 
-import static thunder.hack.gui.clickui.normal.ClickUI.arrow;
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.gui.clickui.ClickGUI.arrow;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class BooleanParentElement extends AbstractElement {
@@ -32,12 +28,12 @@ public class BooleanParentElement extends AbstractElement {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context,mouseX,mouseY,delta);
+        super.render(context, mouseX, mouseY, delta);
 
         MatrixStack matrixStack = context.getMatrices();
 
-        float tx = (float) (x + width - 11);
-        float ty = (float) (y + 8.5f);
+        float tx = x + width - 11;
+        float ty = y + 8.5f;
 
         arrowAnimation = fast(arrowAnimation, getParentSetting().getValue().isExtended() ? 0 : 1, 15f);
 
@@ -47,32 +43,34 @@ public class BooleanParentElement extends AbstractElement {
         matrixStack.translate(-tx, -ty, 0);
         context.drawTexture(arrow, (int) (x + width - 14), (int) (y + 6), 0, 0, 6, 6, 6, 6);
         matrixStack.pop();
-
-        if(!isSmall()) {
-            FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName(), x + 6, y + height / 2 - 1f, ClickGui.getInstance().getTextColor(setting.getModule()));
-        } else {
-            FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), x + 6, y + height / 2 - 1f, ClickGui.getInstance().getTextColor(setting.getModule()));
-        }
-
+        FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), x + 6, y + height / 2 - 1f, new Color(-1).getRGB());
         animation = fast(animation, getParentSetting().getValue().isEnabled() ? 1 : 0, 15f);
+        float paddingX = 7f * animation;
+        Color color = HudEditor.getColor(0);
+        Render2DEngine.drawRound(context.getMatrices(), x + width - 36, y + height / 2 - 4, 15, 8, 1, paddingX > 4 ? color : new Color(0x28FFFFFF, true));
+        Render2DEngine.drawRound(context.getMatrices(), x + width - 35f + paddingX, y + height / 2 - 3, 6, 6, 1, new Color(-1));
 
-        double paddingX = 7 * animation;
-        Color color = ClickGui.getInstance().getColor(0);
-        Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 36), (float) (y + height / 2 - 4), 15, 8, 4, paddingX > 4 ? color : new Color(0xFFB2B1B1));
-        Render2DEngine.drawRound(context.getMatrices(),(float) (x + width - 35 + paddingX), (float) (y + height / 2 - 3), 6, 6, 3, new Color(-1));
-
-        if(Render2DEngine.isHovered(mouseX, mouseY, (x + width - 36), (float) (y + height / 2 - 4), 15, 8)) {
-            GLFW.glfwSetCursor(mc.getWindow().getHandle(),
-                    GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
-            ClickUI.anyHovered = true;
+        if (7f * animation > 4) {
+            FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "v", x + width - 33.5f, y + height / 2 - 1f, new Color(-1).getRGB());
+        } else {
+            FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "x", x + width - 26f, y + height / 2 - 1f, new Color(-1).getRGB());
         }
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (hovered) {
-            if(button == 0) getParentSetting().getValue().setEnabled(!getParentSetting().getValue().isEnabled());
-            else getParentSetting().getValue().setExtended(!getParentSetting().getValue().isExtended());
+            if (button == 0) {
+                getParentSetting().getValue().setEnabled(!getParentSetting().getValue().isEnabled());
+                ModuleManager.soundFX.playBoolean();
+            } else {
+                getParentSetting().getValue().setExtended(!getParentSetting().getValue().isExtended());
+                if (getParentSetting().getValue().isExtended()) {
+                    ModuleManager.soundFX.playSwipeIn();
+                } else {
+                    ModuleManager.soundFX.playSwipeOut();
+                }
+            }
         }
         super.mouseClicked(mouseX, mouseY, button);
     }

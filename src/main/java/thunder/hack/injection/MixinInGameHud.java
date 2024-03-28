@@ -1,40 +1,18 @@
 package thunder.hack.injection;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.mojang.datafixers.util.Pair;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.Entity;
-import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
-import net.minecraft.scoreboard.Team;
-import net.minecraft.scoreboard.number.NumberFormat;
-import net.minecraft.scoreboard.number.StyledNumberFormat;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Unique;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.hud.impl.Hotbar;
 import thunder.hack.modules.client.ClickGui;
-import thunder.hack.modules.render.NoRender;
-import thunder.hack.utility.render.MSAAFramebuffer;
 import net.minecraft.client.gui.hud.InGameHud;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import static thunder.hack.modules.Module.mc;
 
 @Mixin(InGameHud.class)
 public abstract class MixinInGameHud {
@@ -43,16 +21,8 @@ public abstract class MixinInGameHud {
     public void renderHook(DrawContext context, float tickDelta, CallbackInfo ci) {
         ThunderHack.moduleManager.onRenderShaders(context);
         ThunderHack.notificationManager.onRenderShader(context);
-
-        if (ClickGui.getInstance().msaa.getValue()) {
-            MSAAFramebuffer.use(false, () -> {
-                ThunderHack.moduleManager.onRender2D(context);
-                ThunderHack.notificationManager.onRender2D(context);
-            });
-        } else {
-            ThunderHack.moduleManager.onRender2D(context);
-            ThunderHack.notificationManager.onRender2D(context);
-        }
+        ThunderHack.moduleManager.onRender2D(context);
+        ThunderHack.notificationManager.onRender2D(context);
     }
 
     @Inject(at = @At(value = "HEAD"), method = "renderHotbar", cancellable = true)
