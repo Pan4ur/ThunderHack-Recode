@@ -1,19 +1,25 @@
 package thunder.hack.modules.render;
 
+import com.google.common.collect.Ordering;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.scoreboard.ReadableScoreboardScore;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
@@ -21,12 +27,17 @@ import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.number.StyledNumberFormat;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector4d;
+import org.lwjgl.opengl.GL11;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.gui.hud.impl.PotionHud;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -38,29 +49,31 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Objects;
+
+import static thunder.hack.utility.render.Render2DEngine.CONTAINER_BACKGROUND;
 
 public class NameTags extends Module {
     private final Setting<Float> scale = new Setting<>("Scale", 1f, 0.1f, 10f);
     private final Setting<Float> height = new Setting<>("Height", 2f, 0.1f, 10f);
-
     private final Setting<Boolean> gamemode = new Setting<>("Gamemode", false);
     private final Setting<Boolean> spawners = new Setting<>("SpawnerNameTag", false);
     private final Setting<Boolean> entityOwner = new Setting<>("EntityOwner", false);
-
     private final Setting<Boolean> ping = new Setting<>("Ping", false);
-    private final Setting<Boolean> health = new Setting<>("Health", true);
+    private final Setting<Boolean> hp = new Setting<>("HP", true);
     private final Setting<Boolean> distance = new Setting<>("Distance", true);
     private final Setting<Boolean> pops = new Setting<>("TotemPops", true);
     private final Setting<Boolean> outline = new Setting<>("Outline", true);
     private final Setting<Boolean> enchantss = new Setting<>("Enchants", true);
     private final Setting<Boolean> onlyHands = new Setting<>("OnlyHands", false, v -> enchantss.getValue());
     private final Setting<Boolean> funtimeHp = new Setting<>("FunTimeHp", false);
-
     private final Setting<Boolean> potions = new Setting<>("Potions", true);
-    //  private final Setting<Boolean> box = new Setting<>("Box", true);
+    private final Setting<Boolean> shulkers = new Setting<>("Shulkers", true);
     private final Setting<ColorSetting> fillColorA = new Setting<>("Color", new ColorSetting(0x80000000));
-
-    public static final Setting<Font> font = new Setting<>("FontMode", Font.Fancy);
+    private final Setting<Font> font = new Setting<>("FontMode", Font.Fancy);
+    private final Setting<Armor> armorMode = new Setting<>("ArmorMode", Armor.Full);
+    private final Setting<Health> health = new Setting<>("Health", Health.Number);
 
     public enum Font {
         Fancy, Fast
@@ -70,7 +83,10 @@ public class NameTags extends Module {
         None, Full, Durability
     }
 
-    private final Setting<Armor> armorMode = new Setting<>("ArmorMode", Armor.Full);
+    public enum Health {
+        Number, Hearts, Dots
+    }
+
 
     public NameTags() {
         super("NameTags", Category.RENDER);
@@ -102,7 +118,7 @@ public class NameTags extends Module {
 
             final_string += (ent.getDisplayName().getString()) + " ";
 
-            if (health.getValue()) {
+            if (hp.getValue() && health.is(Health.Number)) {
                 final_string += getHealthColor(getHealth(ent)) + round2(getHealth(ent)) + " ";
             }
 
@@ -114,6 +130,7 @@ public class NameTags extends Module {
                 double posX = position.x;
                 double posY = position.y;
                 double endPosX = position.z;
+                double maxEnchantY = 0;
 
                 float diff = (float) (endPosX - posX) / 2;
                 float textWidth;
@@ -145,7 +162,7 @@ public class NameTags extends Module {
                         if (!armorComponent.isEmpty()) {
                             if (armorMode.getValue() == Armor.Full) {
                                 context.getMatrices().push();
-                                context.getMatrices().translate(posX - 55 + item_offset, (float) (posY - 35f), 0);
+                                context.getMatrices().translate(posX - 55 + item_offset, (float) (posY - 33f), 0);
                                 context.getMatrices().scale(1.1f, 1.1f, 1.1f);
                                 DiffuseLighting.disableGuiDepthLighting();
                                 context.drawItem(armorComponent, 0, 0);
@@ -175,14 +192,15 @@ public class NameTags extends Module {
 
                             NbtList enchants = armorComponent.getEnchantments();
                             if (enchantss.getValue()) {
-                                if(!onlyHands.getValue() || (armorComponent == ent.getOffHandStack() || armorComponent == ent.getMainHandStack())) {
+                                if (!onlyHands.getValue() || (armorComponent == ent.getOffHandStack() || armorComponent == ent.getMainHandStack())) {
                                     for (int index = 0; index < enchants.size(); ++index) {
                                         String id = enchants.getCompound(index).getString("id");
                                         short level = enchants.getCompound(index).getShort("lvl");
                                         String encName = " ";
 
                                         switch (id) {
-                                            case "minecraft:blast_protection", "blast_protection" -> encName = "B" + level;
+                                            case "minecraft:blast_protection", "blast_protection" ->
+                                                    encName = "B" + level;
                                             case "minecraft:protection", "protection" -> encName = "P" + level;
                                             case "minecraft:thorns", "thorns" -> encName = "T" + level;
                                             case "minecraft:sharpness", "sharpness" -> encName = "S" + level;
@@ -203,6 +221,8 @@ public class NameTags extends Module {
                                             context.getMatrices().pop();
                                         }
                                         enchantmentY -= 8;
+                                        if(maxEnchantY > enchantmentY)
+                                            maxEnchantY = enchantmentY;
                                     }
                                 }
                             }
@@ -227,9 +247,24 @@ public class NameTags extends Module {
                     context.drawText(mc.textRenderer, final_string, 0, 0, -1, false);
                     context.getMatrices().pop();
                 }
-                context.getMatrices().pop();
 
-                //    if (box.getValue()) drawBox(ent, context);
+                if (!health.is(Health.Number)) {
+                    int i = MathHelper.ceil(ent.getHealth());
+                    float f = (float) ent.getAttributeValue(EntityAttributes.GENERIC_MAX_HEALTH);
+                    int p = MathHelper.ceil(ent.getAbsorptionAmount());
+                    context.getMatrices().push();
+                    context.getMatrices().translate(posX - 44, posY, 0);
+                    context.getMatrices().scale(1.1f, 1.1f, 1f);
+                    renderHealthBar(context, ent, f, i, p);
+                    context.getMatrices().pop();
+                }
+
+                if(potions.getValue())
+                    renderStatusEffectOverlay(context, (float) posX, (float) (posY + maxEnchantY - 60), ent);
+
+                if(shulkers.getValue())
+                    renderShulkerToolTip(context, (int) posX - 90, (int) posY - 120, ent.getMainHandStack());
+                context.getMatrices().pop();
             }
         }
 
@@ -327,43 +362,6 @@ public class NameTags extends Module {
         }
     }
 
-
-    public void drawPotions(MatrixStack matrices, @NotNull PlayerEntity entity, float posX, float posY) {
-        ArrayList<StatusEffectInstance> effects = new ArrayList<>(entity.getStatusEffects());
-
-        int y_offset1 = 0;
-
-        for (StatusEffectInstance potionEffect : effects) {
-            if (potionEffect.getDuration() != 0) {
-                StatusEffect potion = potionEffect.getEffectType();
-                String power = "";
-                switch (potionEffect.getAmplifier()) {
-                    case 0 -> power = "I";
-                    case 1 -> power = "II";
-                    case 2 -> power = "III";
-                    case 3 -> power = "IV";
-                    case 4 -> power = "V";
-                }
-                String s = potion.getName().getString() + " " + power;
-                String s2 = getDuration(potionEffect);
-
-                FontRenderers.sf_bold_mini.drawString(matrices, s + " " + s2, posX, posY + y_offset1, -1);
-                y_offset1 += 8;
-            }
-        }
-    }
-
-    public static @NotNull String getDuration(@NotNull StatusEffectInstance pe) {
-        if (pe.isInfinite()) return "*:*";
-        else {
-            int dur = pe.getDuration();
-            int mins = dur / 1200;
-            int sec = (dur % 1200) / 20;
-
-            return mins + ":" + sec;
-        }
-    }
-
     public static int getEntityPing(PlayerEntity entity) {
         if (mc.getNetworkHandler() == null) return 0;
         PlayerListEntry playerListEntry = mc.getNetworkHandler().getPlayerListEntry(entity.getUuid());
@@ -403,9 +401,76 @@ public class NameTags extends Module {
             float numValue = 0;
             try {
                 numValue = Float.parseFloat(resolvedHp);
-            } catch (NumberFormatException ignored) {}
+            } catch (NumberFormatException ignored) {
+            }
             return numValue;
         } else return ent.getHealth() + ent.getAbsorptionAmount();
+    }
+
+    private void renderHealthBar(DrawContext context, PlayerEntity player, float maxHealth, int lastHealth, int absorption) {
+        int i = MathHelper.ceil((double) maxHealth / 2.0);
+        int j = MathHelper.ceil((double) absorption / 2.0);
+        int k = i * 2;
+        int cont = 0;
+
+        for (int l = i + j - 1; l >= 0; --l) {
+            int n = l % 10;
+            int o = n * 8;
+
+            if (cont < 10) {
+                drawHeart(context, HeartType.CONTAINER, o, false, player);
+                cont++;
+            }
+
+            int q = l * 2;
+            if (q < lastHealth) {
+                drawHeart(context, HeartType.NORMAL, o, q + 1 == lastHealth, player);
+            }
+
+            if (l >= i) {
+                int r = q - k;
+                if (q - k < absorption) {
+                    context.getMatrices().push();
+                    context.getMatrices().translate(0, 0, 0.001f);
+                    drawHeart(context, HeartType.ABSORBING, o, r + 1 == absorption, player);
+                    context.getMatrices().pop();
+                }
+            }
+        }
+
+    }
+
+    private void drawHeart(DrawContext context, HeartType type, int x, boolean half, PlayerEntity player) {
+        if (health.is(Health.Dots)) {
+            if (type == HeartType.CONTAINER) {
+                Render2DEngine.drawRect(context.getMatrices(), x, 0, 7, 3, fillColorA.getValue().getColorObject());
+            } else if (type == HeartType.NORMAL) {
+                if (half) {
+                    Render2DEngine.drawRect(context.getMatrices(), x, 0, 3, 3, getHealthColor2(player.getHealth() + player.getAbsorptionAmount()));
+                    Render2DEngine.drawRect(context.getMatrices(), x + 3, 0, 4, 3, fillColorA.getValue().getColorObject());
+                } else {
+                    Render2DEngine.drawRect(context.getMatrices(), x, 0, 7, 3, getHealthColor2(player.getHealth() + player.getAbsorptionAmount()));
+                }
+            }
+        } else context.drawGuiTexture(type.getTexture(half), x, 0, 9, 9);
+    }
+
+    private enum HeartType {
+        CONTAINER(new Identifier("hud/heart/container"), new Identifier("hud/heart/container")),
+        NORMAL(new Identifier("hud/heart/full"), new Identifier("hud/heart/half")),
+        ABSORBING(new Identifier("hud/heart/absorbing_full"), new Identifier("hud/heart/absorbing_half"));
+
+        private final Identifier fullTexture;
+        private final Identifier halfTexture;
+
+        HeartType(Identifier fullTexture, Identifier halfTexture) {
+            this.fullTexture = fullTexture;
+            this.halfTexture = halfTexture;
+        }
+
+        public Identifier getTexture(boolean half) {
+            return half ? halfTexture : fullTexture;
+        }
     }
 
     private @NotNull String getHealthColor(float health) {
@@ -414,11 +479,104 @@ public class NameTags extends Module {
         return Formatting.RED + "";
     }
 
+    private @NotNull Color getHealthColor2(float health) {
+        if (health <= 15 && health > 7) return Color.YELLOW;
+        if (health > 15) return Color.GREEN;
+        return Color.RED;
+    }
+
     public static float round2(float value) {
         if (Float.isNaN(value) || Float.isInfinite(value))
             return 1f;
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(1, RoundingMode.HALF_UP);
         return bd.floatValue();
+    }
+
+    private void renderStatusEffectOverlay(DrawContext context, float x, float y, PlayerEntity player) {
+        Collection<StatusEffectInstance> effects = player.getStatusEffects();
+        if (effects.isEmpty())
+            return;
+        x += effects.size() * 12.5f;
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        for (StatusEffectInstance statusEffectInstance : Ordering.natural().reverse().sortedCopy(effects)) {
+            if (statusEffectInstance.shouldShowIcon()) {
+                x -= 25;
+                String power = "";
+                switch (statusEffectInstance.getAmplifier()) {
+                    case 0 -> power = "I";
+                    case 1 -> power = "II";
+                    case 2 -> power = "III";
+                    case 3 -> power = "IV";
+                    case 4 -> power = "V";
+                }
+
+                context.getMatrices().push();
+                context.getMatrices().translate(x, y, 0);
+                context.drawSprite(0, 0, 0, 18, 18, mc.getStatusEffectSpriteManager().getSprite(statusEffectInstance.getEffectType()));
+                FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), PotionHud.getDuration(statusEffectInstance), 9, -8, -1);
+                FontRenderers.categories.drawCenteredString(context.getMatrices(), power, 9, -16, -1);
+                context.getMatrices().pop();
+            }
+        }
+        RenderSystem.disableBlend();
+    }
+
+    public boolean renderShulkerToolTip(DrawContext context, int offsetX, int offsetY, ItemStack stack) {
+        try {
+            NbtCompound compoundTag = stack.getSubNbt("BlockEntityTag");
+            DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(27, ItemStack.EMPTY);
+            Inventories.readNbt(compoundTag, itemStacks);
+
+            float[] colors = new float[]{1F, 1F, 1F};
+            Item focusedItem = stack.getItem();
+            if (focusedItem instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
+                try {
+                    colors = Objects.requireNonNull(ShulkerBoxBlock.getColor(stack.getItem())).getColorComponents();
+                } catch (NullPointerException npe) {
+                    colors = new float[]{1F, 1F, 1F};
+                }
+            }
+            draw(context, itemStacks, offsetX, offsetY, colors);
+        } catch (Exception ignore) {
+            return false;
+        }
+        return true;
+    }
+
+    private void draw(DrawContext context, DefaultedList<ItemStack> itemStacks, int offsetX, int offsetY, float[] colors) {
+        RenderSystem.disableDepthTest();
+        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+
+        offsetX += 8;
+        offsetY -= 82;
+
+        drawBackground(context, offsetX, offsetY, colors);
+
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        DiffuseLighting.enableGuiDepthLighting();
+        int row = 0;
+        int i = 0;
+        for (ItemStack itemStack : itemStacks) {
+            context.drawItem(itemStack, offsetX + 8 + i * 18, offsetY + 7 + row * 18);
+            context.drawItemInSlot(mc.textRenderer, itemStack, offsetX + 8 + i * 18, offsetY + 7 + row * 18);
+            i++;
+            if (i >= 9) {
+                i = 0;
+                row++;
+            }
+        }
+        DiffuseLighting.disableGuiDepthLighting();
+        RenderSystem.enableDepthTest();
+    }
+
+    private void drawBackground(DrawContext context, int x, int y, float[] colors) {
+        RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(colors[0], colors[1], colors[2], 1F);
+        RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
+        context.drawTexture(CONTAINER_BACKGROUND, x, y, 0, 0, 176, 67, 176, 67);
+        RenderSystem.enableBlend();
     }
 }

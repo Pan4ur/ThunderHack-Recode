@@ -49,6 +49,7 @@ public class Render2DEngine {
     public static final Identifier arrow = new Identifier("textures/triangle.png");
     public static final Identifier bubble = new Identifier("textures/hitbubble.png");
     public static final Identifier default_circle = new Identifier("textures/circle.png");
+    public static final Identifier CONTAINER_BACKGROUND = new Identifier("textures/container.png");
 
     public static HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
     public static HashMap<Integer, BlurredShadow> shadowCache1 = new HashMap<>();

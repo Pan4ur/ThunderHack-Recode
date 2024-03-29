@@ -47,6 +47,7 @@ import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.render.Tooltips.hasItems;
+import static thunder.hack.utility.render.Render2DEngine.CONTAINER_BACKGROUND;
 
 @Mixin(value = {HandledScreen.class})
 public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen implements ScreenHandlerProvider<T> {
@@ -97,7 +98,6 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
     @Shadow
     protected int y;
 
-    private static final Identifier CONTAINER_BACKGROUND = new Identifier("textures/container.png");
     private static final Identifier MAP_BACKGROUND = new Identifier("textures/map_background.png");
     private static final ItemStack[] ITEMS = new ItemStack[27];
 
