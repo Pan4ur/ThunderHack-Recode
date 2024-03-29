@@ -86,8 +86,7 @@ public class Particles extends Module {
         }
     }
 
-    public void onPreRender3D(MatrixStack stack) {
-
+    public void onRender3D(MatrixStack stack) {
         if (FireFlies.getValue().isEnabled()) {
             stack.push();
             RenderSystem.setShaderTexture(0, firefly);

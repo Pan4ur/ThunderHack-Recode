@@ -47,7 +47,7 @@ public class HitParticles extends Module {
         particles.removeIf(particle -> System.currentTimeMillis() - particle.getTime() > lifeTime.getValue() * 1000);
     }
 
-    public void onPreRender3D(MatrixStack stack) {
+    public void onRender3D(MatrixStack stack) {
         RenderSystem.enableDepthTest();
         if (mc.player != null && mc.world != null) {
             for (Particle particle : particles) {

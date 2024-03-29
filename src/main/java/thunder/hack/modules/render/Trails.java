@@ -68,9 +68,6 @@ public class Trails extends Module {
             if (en instanceof ExperienceBottleEntity && xp.getValue())
                 calcTrajectory(en);
         }
-    }
-
-    public void onPreRender3D(MatrixStack stack) {
         if (players.getValue() == Players.Trail) {
             for (PlayerEntity entity : mc.world.getPlayers()) {
                 if(entity != mc.player && onlySelf.getValue())

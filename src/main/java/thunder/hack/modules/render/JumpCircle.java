@@ -69,7 +69,7 @@ public class JumpCircle extends Module {
         circles.removeIf(c -> c.timer.passedMs(easeOut.getValue() ? 5000 : 6000));
     }
 
-    public void onPreRender3D(MatrixStack stack) {
+    public void onRender3D(MatrixStack stack) {
         Collections.reverse(circles);
         RenderSystem.disableDepthTest();
         RenderSystem.enableBlend();

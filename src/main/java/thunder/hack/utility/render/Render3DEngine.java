@@ -46,6 +46,7 @@ public class Render3DEngine {
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder bufferBuilder = tessellator.getBuffer();
 
+            RenderSystem.disableDepthTest();
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -59,6 +60,7 @@ public class Render3DEngine {
 
             tessellator.draw();
             RenderSystem.disableBlend();
+            RenderSystem.enableDepthTest();
 
             FADE_QUEUE.clear();
             FILLED_SIDE_QUEUE.clear();
@@ -70,6 +72,7 @@ public class Render3DEngine {
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.getBuffer();
             RenderSystem.disableCull();
+            RenderSystem.disableDepthTest();
             RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
             buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
 
@@ -85,6 +88,7 @@ public class Render3DEngine {
 
             tessellator.draw();
             RenderSystem.enableCull();
+            RenderSystem.enableDepthTest();
             cleanup();
             OUTLINE_QUEUE.clear();
             OUTLINE_SIDE_QUEUE.clear();
@@ -245,7 +249,7 @@ public class Render3DEngine {
     public static void drawTextIn3D(String text, @NotNull Vec3d pos, double offX, double offY, double textOffset, @NotNull Color color) {
         MatrixStack matrices = new MatrixStack();
         Camera camera = mc.gameRenderer.getCamera();
-        RenderSystem.enableDepthTest();
+        RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
@@ -260,7 +264,7 @@ public class Render3DEngine {
         FontRenderers.modules.drawCenteredString(matrices, text, textOffset, 0f, color.getRGB());
         immediate.draw();
         RenderSystem.enableCull();
-        RenderSystem.disableDepthTest();
+        RenderSystem.enableDepthTest();
         RenderSystem.disableBlend();
     }
 
@@ -567,6 +571,8 @@ public class Render3DEngine {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableCull();
+        RenderSystem.disableDepthTest();
+
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
@@ -601,6 +607,7 @@ public class Render3DEngine {
         RenderSystem.enableCull();
         stack.translate(-x, -y, -z);
         Render3DEngine.cleanup();
+        RenderSystem.enableDepthTest();
         stack.pop();
     }
 
@@ -737,6 +744,7 @@ public class Render3DEngine {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableCull();
+        RenderSystem.disableDepthTest();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -752,6 +760,7 @@ public class Render3DEngine {
         tessellator.draw();
         RenderSystem.enableCull();
         RenderSystem.disableBlend();
+        RenderSystem.enableDepthTest();
         stack.pop();
     }
 

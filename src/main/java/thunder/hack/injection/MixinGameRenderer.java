@@ -68,7 +68,6 @@ public abstract class MixinGameRenderer {
         Render3DEngine.lastProjMat.set(RenderSystem.getProjectionMatrix());
         Render3DEngine.lastModMat.set(RenderSystem.getModelViewMatrix());
         Render3DEngine.lastWorldSpaceMatrix.set(matrix.peek().getPositionMatrix());
-        ThunderHack.moduleManager.onPreRender3D(matrix);
         ThunderHack.moduleManager.onRender3D(matrix);
         BlockAnimationUtility.onRender(matrix);
         Render3DEngine.onRender3D(matrix); // <- не двигать

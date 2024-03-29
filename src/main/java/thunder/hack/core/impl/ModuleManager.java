@@ -313,10 +313,6 @@ public class ModuleManager implements IManager {
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender3D(stack));
     }
 
-    public void onPreRender3D(MatrixStack stack) {
-        modules.stream().filter(Module::isEnabled).forEach(module -> module.onPreRender3D(stack));
-    }
-
     public void sortModules() {
         sortedModules = getEnabledModules().stream().filter(Module::isDrawn).sorted(Comparator.comparing(module -> FontRenderers.getModulesRenderer().getStringWidth(module.getFullArrayString()) * -1)).collect(Collectors.toList());
     }

@@ -15,6 +15,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
@@ -63,7 +64,8 @@ public class MiddleClick extends Module {
         if (fullNullCheck()) return;
 
         if (xp.getValue() && feetExp.getValue() && mc.options.pickItemKey.isPressed())
-            mc.player.setPitch(90);
+            if (!noWasteXp.getValue() || needXp())
+                mc.player.setPitch(90);
 
         if (friend.getValue() && mc.currentScreen == null && mc.options.pickItemKey.isPressed() && mc.targetedEntity != null && mc.targetedEntity instanceof PlayerEntity entity && timer.passedMs(800)) {
             if (ThunderHack.friendManager.isFriend(entity.getName().getString())) {
@@ -119,6 +121,33 @@ public class MiddleClick extends Module {
             timer.reset();
         }
 
+
+        if (healingPot.getValue() && mc.currentScreen == null && mc.options.pickItemKey.isPressed() && timer.every(200)) {
+            if (silentPearl.getValue()) {
+                if (getHpSlot() != -1) {
+                    int hpSlot = getHpSlot();
+                    int originalSlot = mc.player.getInventory().selectedSlot;
+                    if (hpSlot != -1) {
+                        mc.player.getInventory().selectedSlot = hpSlot;
+                        sendPacket(new UpdateSelectedSlotC2SPacket(hpSlot));
+                        sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                        mc.player.getInventory().selectedSlot = originalSlot;
+                        sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
+                    }
+                } else {
+                    int hpSlot = findHpInInventory();
+                    if (hpSlot != -1) {
+                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, hpSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+                        sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, hpSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPostSync(EventPostSync e) {
         if (xp.getValue()) {
             if (noWasteXp.getValue() && !needXp()) return;
             if (mc.options.pickItemKey.isPressed()) {
@@ -143,29 +172,6 @@ public class MiddleClick extends Module {
                 mc.player.getInventory().selectedSlot = lastSlot;
                 sendPacket(new UpdateSelectedSlotC2SPacket(lastSlot));
                 lastSlot = -1;
-            }
-        }
-
-        if (healingPot.getValue() && mc.currentScreen == null && mc.options.pickItemKey.isPressed() && timer.every(200)) {
-            if (silentPearl.getValue()) {
-                if (getHpSlot() != -1) {
-                    int hpSlot = getHpSlot();
-                    int originalSlot = mc.player.getInventory().selectedSlot;
-                    if (hpSlot != -1) {
-                        mc.player.getInventory().selectedSlot = hpSlot;
-                        sendPacket(new UpdateSelectedSlotC2SPacket(hpSlot));
-                        sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
-                        mc.player.getInventory().selectedSlot = originalSlot;
-                        sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
-                    }
-                } else {
-                    int hpSlot = findHpInInventory();
-                    if (hpSlot != -1) {
-                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, hpSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                        sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
-                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, hpSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                    }
-                }
             }
         }
     }

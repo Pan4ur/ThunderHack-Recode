@@ -67,9 +67,6 @@ public abstract class Module {
     public void onRender3D(MatrixStack event) {
     }
 
-    public void onPreRender3D(MatrixStack stack) {
-    }
-
     public void onUnload() {
     }
 
