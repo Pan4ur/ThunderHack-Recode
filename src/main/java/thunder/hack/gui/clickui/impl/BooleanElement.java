@@ -34,7 +34,7 @@ public class BooleanElement extends AbstractElement {
             FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "x", x + width - 11f, y + height / 2 - 1f, new Color(-1).getRGB());
         }
 
-        FontRenderers.sf_medium_mini.drawString(context.getMatrices(), setting.getName(), (setting.parent != null ? 2f : 0f) + (x + 6), (y + height / 2 - (6 / 2f)) + 2, new Color(-1).getRGB());
+        FontRenderers.sf_medium_mini.drawString(context.getMatrices(), setting.getName(), (setting.parent != null ? 2f : 0f) + (x + 6), (y + height / 2 - 3) + 2, new Color(-1).getRGB());
     }
 
     @Override

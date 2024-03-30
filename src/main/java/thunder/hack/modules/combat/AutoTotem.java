@@ -21,12 +21,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.Bind;
+import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.Parent;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.SearchInvResult;
@@ -34,10 +38,13 @@ import thunder.hack.utility.player.SearchInvResult;
 public final class AutoTotem extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Matrix);
     private final Setting<OffHand> offhand = new Setting<>("Item", OffHand.Totem);
+    private final Setting<BooleanParent> bindSwap = new Setting<>("BindSwap", new BooleanParent(false), v -> offhand.is(OffHand.Totem));
+    private final Setting<Bind> swapButton = new Setting<>("SwapButton", new Bind(GLFW.GLFW_KEY_CAPS_LOCK, false, false)).withParent(bindSwap);
+    private final Setting<Swap> swapMode = new Setting<>("Swap", Swap.GappleShield).withParent(bindSwap);
     private final Setting<Float> healthF = new Setting<>("HP", 16f, 0f, 36f);
     private final Setting<Float> healthS = new Setting<>("ShieldGappleHp", 16f, 0f, 20f, v -> offhand.getValue() == OffHand.Shield);
     private final Setting<Boolean> calcAbsorption = new Setting<>("CalcAbsorption", true);
-    private final Setting<Boolean> stopMotion = new Setting<>("stopMotion", false);
+    private final Setting<Boolean> stopMotion = new Setting<>("StopMotion", false);
     private final Setting<Boolean> resetAttackCooldown = new Setting<>("ResetAttackCooldown", false);
     private final Setting<Parent> safety = new Setting<>("Safety", new Parent(false, 0));
     private final Setting<Boolean> hotbarFallBack = new Setting<>("HotbarFallback", false).withParent(safety);
@@ -50,7 +57,6 @@ public final class AutoTotem extends Module {
     private final Setting<Boolean> onMinecartTnt = new Setting<>("OnMinecartTNT", true).withParent(safety);
     private final Setting<Boolean> onCreeper = new Setting<>("OnCreeper", true).withParent(safety);
     private final Setting<Boolean> onAnchor = new Setting<>("OnAnchor", true).withParent(safety);
-
     private final Setting<Boolean> onTnt = new Setting<>("OnTNT", true).withParent(safety);
     public final Setting<Boolean> rcGap = new Setting<>("RCGap", false);
     private final Setting<Boolean> crappleSpoof = new Setting<>("CrappleSpoof", true, v -> offhand.getValue() == OffHand.GApple);
@@ -59,15 +65,16 @@ public final class AutoTotem extends Module {
 
     private enum Mode {Default, Matrix, MatrixPick, NewVersion}
 
-    private static AutoTotem instance;
+    private enum Swap {GappleShield, BallShield, GappleBall}
 
     private int delay;
+
+    private Timer bindDelay = new Timer();
 
     private Item prevItem;
 
     public AutoTotem() {
         super("AutoTotem", Category.COMBAT);
-        instance = this;
     }
 
     @EventHandler
@@ -188,71 +195,92 @@ public final class AutoTotem extends Module {
         SearchInvResult gapple = InventoryUtility.findItemInInventory(Items.ENCHANTED_GOLDEN_APPLE);
         SearchInvResult crapple = InventoryUtility.findItemInInventory(Items.GOLDEN_APPLE);
         SearchInvResult shield = InventoryUtility.findItemInInventory(Items.SHIELD);
+        Item offHandItem = mc.player.getOffHandStack().getItem();
 
         int itemSlot = -1;
         Item item = null;
-
         switch (offhand.getValue()) {
             case Totem -> {
-                if (mc.player.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING && !mc.player.getOffHandStack().isEmpty())
-                    prevItem = mc.player.getOffHandStack().getItem();
+                if (offHandItem != Items.TOTEM_OF_UNDYING && !mc.player.getOffHandStack().isEmpty())
+                    prevItem = offHandItem;
+
                 item = prevItem;
+
+                if (bindSwap.getValue().isEnabled())
+                    if (isKeyPressed(swapButton) && bindDelay.every(250)) {
+                        switch (swapMode.getValue()) {
+                            case BallShield -> {
+                                if (mc.player.getOffHandStack().isEmpty() || offHandItem == Items.SHIELD)
+                                    item = Items.PLAYER_HEAD;
+                                else item = Items.SHIELD;
+                            }
+                            case GappleBall -> {
+                                if (mc.player.getOffHandStack().isEmpty() || offHandItem == Items.GOLDEN_APPLE)
+                                    item = Items.PLAYER_HEAD;
+                                else item = Items.GOLDEN_APPLE;
+                            }
+                            case GappleShield -> {
+                                if (mc.player.getOffHandStack().isEmpty() || offHandItem == Items.SHIELD)
+                                    item = Items.GOLDEN_APPLE;
+                                else item = Items.SHIELD;
+                            }
+                        }
+                        prevItem = item;
+                    }
             }
 
-            case Crystal -> {
-                item = Items.END_CRYSTAL;
-            }
+            case Crystal -> item = Items.END_CRYSTAL;
 
             case GApple -> {
                 if (crappleSpoof.getValue()) {
                     if (mc.player.hasStatusEffect(StatusEffects.ABSORPTION) && mc.player.getStatusEffect(StatusEffects.ABSORPTION).getAmplifier() > 2) {
-                        if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
+                        if (crapple.found() || offHandItem == Items.GOLDEN_APPLE)
                             item = Items.GOLDEN_APPLE;
-                        else if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+                        else if (gapple.found() || offHandItem == Items.ENCHANTED_GOLDEN_APPLE)
                             item = Items.ENCHANTED_GOLDEN_APPLE;
                     } else {
-                        if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+                        if (gapple.found() || offHandItem == Items.ENCHANTED_GOLDEN_APPLE)
                             item = Items.ENCHANTED_GOLDEN_APPLE;
-                        else if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
+                        else if (crapple.found() || offHandItem == Items.GOLDEN_APPLE)
                             item = Items.GOLDEN_APPLE;
                     }
                 } else {
-                    if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
+                    if (crapple.found() || offHandItem == Items.GOLDEN_APPLE)
                         item = Items.GOLDEN_APPLE;
-                    else if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+                    else if (gapple.found() || offHandItem == Items.ENCHANTED_GOLDEN_APPLE)
                         item = Items.ENCHANTED_GOLDEN_APPLE;
                 }
             }
 
             case Shield -> {
-                if (shield.found() || mc.player.getOffHandStack().getItem() == Items.SHIELD) {
+                if (shield.found() || offHandItem == Items.SHIELD) {
                     if (getTriggerHealth() <= healthS.getValue()) {
-                        if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
+                        if (crapple.found() || offHandItem == Items.GOLDEN_APPLE)
                             item = Items.GOLDEN_APPLE;
-                        else if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+                        else if (gapple.found() || offHandItem == Items.ENCHANTED_GOLDEN_APPLE)
                             item = Items.ENCHANTED_GOLDEN_APPLE;
                     } else {
                         if (!mc.player.getItemCooldownManager().isCoolingDown(Items.SHIELD)) item = Items.SHIELD;
                         else {
-                            if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
+                            if (crapple.found() || offHandItem == Items.GOLDEN_APPLE)
                                 item = Items.GOLDEN_APPLE;
-                            else if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+                            else if (gapple.found() || offHandItem == Items.ENCHANTED_GOLDEN_APPLE)
                                 item = Items.ENCHANTED_GOLDEN_APPLE;
                         }
                     }
-                } else if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
+                } else if (crapple.found() || offHandItem == Items.GOLDEN_APPLE)
                     item = Items.GOLDEN_APPLE;
             }
         }
 
 
-        if (getTriggerHealth() <= healthF.getValue() && (InventoryUtility.findItemInInventory(Items.TOTEM_OF_UNDYING).found() || mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING))
+        if (getTriggerHealth() <= healthF.getValue() && (InventoryUtility.findItemInInventory(Items.TOTEM_OF_UNDYING).found() || offHandItem == Items.TOTEM_OF_UNDYING))
             item = Items.TOTEM_OF_UNDYING;
 
-        if (rcGap.getValue() && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed() && !(mc.player.getOffHandStack().getItem() instanceof ShieldItem)) {
-            if (crapple.found() || mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE)
+        if (rcGap.getValue() && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed() && !(offHandItem instanceof ShieldItem)) {
+            if (crapple.found() || offHandItem == Items.GOLDEN_APPLE)
                 item = Items.GOLDEN_APPLE;
-            if (gapple.found() || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+            if (gapple.found() || offHandItem == Items.ENCHANTED_GOLDEN_APPLE)
                 item = Items.ENCHANTED_GOLDEN_APPLE;
         }
 
@@ -334,9 +362,5 @@ public final class AutoTotem extends Module {
         if (item == mc.player.getMainHandStack().getItem() && mc.options.useKey.isPressed()) return -1;
 
         return itemSlot;
-    }
-
-    public static AutoTotem getInstance() {
-        return instance;
     }
 }
