@@ -112,10 +112,18 @@ public class ClickGUI extends Screen {
         windows.forEach(w -> w.render(context, mouseX, mouseY, delta));
 
         if (!Objects.equals(currentDescription, "") && ModuleManager.clickGui.descriptions.getValue()) {
-            Render2DEngine.drawHudBase(context.getMatrices(), mouseX + 7, mouseY + 5, FontRenderers.sf_bold_mini.getStringWidth(currentDescription) + 6, 11, 1f);
-            FontRenderers.sf_bold_mini.drawString(context.getMatrices(), currentDescription, mouseX + 10, mouseY + 9, HudEditor.getColor(0).getRGB());
+            Render2DEngine.drawHudBase(context.getMatrices(), mouseX + 7, mouseY + 5, FontRenderers.sf_medium.getStringWidth(currentDescription) + 6, 11, 1f);
+            FontRenderers.sf_medium.drawString(context.getMatrices(), currentDescription, mouseX + 10, mouseY + 8, HudEditor.getColor(0).getRGB());
             currentDescription = "";
         }
+
+        FontRenderers.sf_medium.drawString(context.getMatrices(),
+                "Left Mouse Click to enable module" +
+                "\nRight Mouse Click to open module settings\nMiddle Mouse Click to bind module" +
+                "\nCtrl + F to start searching\nDrag n Drop config there to load" +
+                "\nShift + Left Mouse Click to change module visibility in array list" +
+                "\nMiddle Mouse Click on slider to enter value from keyboard" +
+                "\nDelete + Left Mouse Click on module to reset", 5, mc.getWindow().getScaledHeight() - 80, HudEditor.getColor(0).getRGB());
     }
 
     @Override

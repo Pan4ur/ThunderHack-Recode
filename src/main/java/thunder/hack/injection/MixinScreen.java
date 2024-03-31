@@ -3,14 +3,23 @@ package thunder.hack.injection;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Style;
+import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CommandManager;
+import thunder.hack.gui.misc.DialogScreen;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
+
+import static thunder.hack.modules.Module.mc;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 @Mixin(Screen.class)
 public abstract class MixinScreen {
@@ -38,5 +47,25 @@ public abstract class MixinScreen {
                 cir.setReturnValue(true);
             } catch (CommandSyntaxException ignored) {
             }
+    }
+
+    @Inject(method = "filesDragged", at = @At("HEAD"), cancellable = true)
+    public void filesDragged(List<Path> paths, CallbackInfo ci) {
+        //  Command.sendMessage(paths.get(0).toString());
+        String configPath = paths.get(0).toString();
+        File cfgFile = new File(configPath);
+        String configName = cfgFile.getName();
+        if(!configName.contains(".th"))
+            return;
+
+        DialogScreen dialogScreen = new DialogScreen(isRu() ? "Обнаружен конфиг!" : "Config detected!",
+                isRu() ? "Ты действительно хочешь загрузить " + configName + "?" : "Are you sure you want to load " + configName + "?",
+                isRu() ? "Да ебать" : "Do it, piece of shit!", isRu() ? "Не, че за хуйня?" : "Nooo fuck ur ass nigga!",
+                () -> {
+                    ThunderHack.configManager.load(cfgFile);
+                    mc.setScreen(null);
+                }, () -> mc.setScreen(null));
+
+        mc.setScreen(dialogScreen);
     }
 }

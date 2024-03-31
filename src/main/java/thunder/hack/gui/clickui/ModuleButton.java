@@ -11,11 +11,13 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
+import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.impl.*;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.TargetHud;
+import thunder.hack.gui.misc.DialogScreen;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
@@ -266,6 +268,20 @@ public class ModuleButton extends AbstractButton {
             if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT) && button == 0) {
                 module.setDrawn(!module.isDrawn());
                 return;
+            }
+
+            if(InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_DELETE) && button == 0) {
+                DialogScreen dialogScreen = new DialogScreen(isRu() ? "Сброс модуля" : "Reset module",
+                        isRu() ? "Ты действительно хочешь сбросить " + module.getName() + "?" : "Are you sure you want to reset " + module.getName() + "?",
+                        isRu() ? "Да ебать" : "Do it, piece of shit!", isRu() ? "Не, че за хуйня?" : "Nooo fuck ur ass nigga!",
+                        () -> {
+                            if(module.isEnabled())
+                                module.disable("reseting");
+                            for (Setting s : module.getSettings())
+                                s.setValue(s.getDefaultValue());
+                            mc.setScreen(null);
+                        }, () -> mc.setScreen(null));
+                mc.setScreen(dialogScreen);
             }
 
             if (button == 0) {

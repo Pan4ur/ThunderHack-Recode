@@ -1,6 +1,7 @@
 package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
@@ -43,17 +44,20 @@ public class SearchBar extends AbstractButton {
     public void keyTyped(int keyCode) {
         super.keyTyped(keyCode);
 
+        if (keyCode == GLFW.GLFW_KEY_F && (InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_CONTROL) || InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_CONTROL))) {
+            listening = !listening;
+            ThunderHack.currentKeyListener = ThunderHack.KeyListening.Search;
+            return;
+        }
+
         if(ThunderHack.currentKeyListener != ThunderHack.KeyListening.Search)
             return;
 
         if (listening) {
             switch (keyCode) {
-                case GLFW.GLFW_KEY_ESCAPE -> {
+                case GLFW.GLFW_KEY_ESCAPE, GLFW.GLFW_KEY_ENTER -> {
                     listening = false;
                     moduleName = "";
-                    return;
-                }
-                case GLFW.GLFW_KEY_ENTER -> {
                     return;
                 }
                 case GLFW.GLFW_KEY_BACKSPACE -> {
