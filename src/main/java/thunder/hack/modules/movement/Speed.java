@@ -35,6 +35,7 @@ public class Speed extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
     public Setting<Boolean> useTimer = new Setting<>("Use Timer", false);
     public Setting<Boolean> pauseInLiquids = new Setting<>("PauseInLiquids", false);
+    public Setting<Boolean> pauseWhileSneaking = new Setting<>("PauseWhileSneaking", false);
     public final Setting<Integer> hurttime = new Setting<>("HurtTime", 0, 0, 10, v -> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Float> boostFactor = new Setting<>("BoostFactor", 2f, 0f, 10f, v -> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Boolean> allowOffGround = new Setting<>("AllowOffGround", true, v -> mode.getValue() == Mode.MatrixDamage);
@@ -65,7 +66,7 @@ public class Speed extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        if (mc.player.isInFluid() && pauseInLiquids.getValue()) {
+        if (mc.player.isInFluid() && pauseInLiquids.getValue() || mc.player.isSneaking() && pauseWhileSneaking.getValue()) {
             return;
         }
         if (mode.getValue() == Mode.MatrixJB) {
@@ -116,7 +117,7 @@ public class Speed extends Module {
 
     @Override
     public void onUpdate() {
-        if (mc.player.isInFluid() && pauseInLiquids.getValue()) {
+        if (mc.player.isInFluid() && pauseInLiquids.getValue() || mc.player.isSneaking() && pauseWhileSneaking.getValue()) {
             return;
         }
         if (mode.getValue() == Mode.ElytraLowHop) {
@@ -159,7 +160,7 @@ public class Speed extends Module {
 
     @EventHandler
     public void onMove(EventMove event) {
-        if (mc.player.isInFluid() && pauseInLiquids.getValue()) {
+        if (mc.player.isInFluid() && pauseInLiquids.getValue() || mc.player.isSneaking() && pauseWhileSneaking.getValue()) {
             return;
         }
         if (mode.getValue() != Mode.NCP && mode.getValue() != Mode.StrictStrafe) return;
