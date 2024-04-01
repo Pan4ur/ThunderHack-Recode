@@ -71,7 +71,7 @@ public class CreditsScreen extends Screen {
             float cX = halfOfWidth + offset - globalOffset + scroll;
             float cY = halfOfHeight - 120;
             Render2DEngine.drawHudBase(context.getMatrices(), cX, cY, 140, 240, 20);
-            FontRenderers.sf_medium.drawGradientString(context.getMatrices(), contributor.name, (cX + 70) - FontRenderers.sf_medium.getStringWidth(contributor.name) / 2f, halfOfHeight - 57, 30, true);
+            FontRenderers.sf_medium.drawGradientString(context.getMatrices(), contributor.name, (cX + 70) - FontRenderers.sf_medium.getStringWidth(contributor.name) / 2f, halfOfHeight - 57, 30);
             FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), contributor.role, cX + 70, halfOfHeight - 50, new Color(0x818181).getRGB());
 
             Render2DEngine.horizontalGradient(context.getMatrices(), cX + 2, cY + 90, cX + 70, cY + 91, Render2DEngine.injectAlpha(new Color(-1), 0), new Color(-1));

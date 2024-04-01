@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.RaycastContext;
@@ -279,7 +280,17 @@ public final class HoleFill extends Module {
             for (int j = centerPos.getY() - h; j < centerPos.getY() + h; j++) {
                 for (int k = centerPos.getZ() - r; k < centerPos.getZ() + r; k++) {
                     BlockPos pos = new BlockPos(i, j, k);
+                    boolean foundEntity = false;
                     if (isHole(pos) && !isFillingNow(pos)) {
+                        for(PlayerEntity pe : ThunderHack.asyncManager.getAsyncPlayers()) {
+                            if(new Box(pos).offset(-1,0,-1).expand(2,-0.3,2).intersects(pe.getBoundingBox())) {
+                                foundEntity = true;
+                                break;
+                            }
+                        }
+                        if(foundEntity)
+                            continue;
+
                         BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), pos.toCenterPos().offset(Direction.UP, 0.5f), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
                         if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != pos)
                             if (InteractionUtility.squaredDistanceFromEyes(pos.toCenterPos()) > placeWallRange.getPow2Value())

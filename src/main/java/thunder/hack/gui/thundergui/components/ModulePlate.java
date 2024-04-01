@@ -74,11 +74,6 @@ public class ModulePlate {
             Render2DEngine.drawBlurredShadow(stack, MouseX - 20, MouseY - 20, 40, 40, 60, Render2DEngine.applyOpacity(new Color(0xC3555A7E, true), getFadeFactor()));
         }
 
-
-        // GL11.glPushMatrix();
-        //  Stencil.write(false);
-        //  Particles.roundedRect(posX - 0.5, posY - 0.5, 91, 31, 8, Render2DEngine.applyOpacity(new Color(0, 0, 0, 255), getFadeFactor()));
-        // Stencil.erase(true);
         if (ThunderGui.selected_plate != this)
             FontRenderers.icons.drawString(stack, "H", (int) (posX + 80f), (int) (posY + 22f), Render2DEngine.applyOpacity(new Color(0xFFECECEC, true).getRGB(), getFadeFactor()));
         else {
@@ -95,11 +90,11 @@ public class ModulePlate {
         }
 
         if (!listening_bind) {
-            FontRenderers.sf_medium.drawString(stack, module.getName(), posX + 5, posY + 5, Render2DEngine.applyOpacity(-1, getFadeFactor()), false);
+            FontRenderers.sf_medium.drawString(stack, module.getName(), posX + 5, posY + 5, Render2DEngine.applyOpacity(-1, getFadeFactor()));
         }
 
         if (listening_bind) {
-            FontRenderers.modules.drawString(stack, "PressKey", posX + 85 - FontRenderers.modules.getStringWidth("PressKey"), posY + 5, Render2DEngine.applyOpacity(new Color(0xB0B0B0), getFadeFactor()).getRGB(), false);
+            FontRenderers.modules.drawString(stack, "PressKey", posX + 85 - FontRenderers.modules.getStringWidth("PressKey"), posY + 5, Render2DEngine.applyOpacity(new Color(0xB0B0B0), getFadeFactor()).getRGB());
         } else if (!Objects.equals(module.getBind().getBind(), "None")) {
 
             String sbind = module.getBind().getBind();
@@ -122,7 +117,7 @@ public class ModulePlate {
                 sbind = "RAlt";
             }
 
-            FontRenderers.modules.drawString(stack, sbind, posX + 86 - FontRenderers.modules.getStringWidth(sbind), posY + 6, Render2DEngine.applyOpacity(new Color(0xB0B0B0), getFadeFactor()).getRGB(), false);
+            FontRenderers.modules.drawString(stack, sbind, posX + 86 - FontRenderers.modules.getStringWidth(sbind), posY + 6, Render2DEngine.applyOpacity(new Color(0xB0B0B0), getFadeFactor()).getRGB());
         }
 
         if (!listening_bind && module.getDescription() != null) {
@@ -136,7 +131,7 @@ public class ModulePlate {
                     step++;
                 }
             }
-            FontRenderers.sf_medium_mini.drawString(stack, firstString.toString(), posX + 5, posY + 14, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
+            FontRenderers.sf_medium_mini.drawString(stack, firstString.toString(), posX + 5, posY + 14, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()));
         }
 
         if (listening_bind) {

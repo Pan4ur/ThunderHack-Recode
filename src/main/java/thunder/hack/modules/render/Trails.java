@@ -62,7 +62,7 @@ public class Trails extends Module {
             if (en instanceof EnderPearlEntity && pearls.is(Particles.Trail))
                 calcTrajectory(en);
 
-            if (en instanceof ArrowEntity && pearls.is(Particles.Trail))
+            if (en instanceof ArrowEntity && arrows.is(Particles.Trail))
                 calcTrajectory(en);
 
             if (en instanceof ExperienceBottleEntity && xp.getValue())
@@ -179,7 +179,6 @@ public class Trails extends Module {
         }
 
         if (!particles.isEmpty()) {
-            RenderSystem.disableDepthTest();
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
 
@@ -199,7 +198,6 @@ public class Trails extends Module {
             BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
             RenderSystem.disableBlend();
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-            RenderSystem.enableDepthTest();
         }
     }
 
@@ -314,7 +312,7 @@ public class Trails extends Module {
 
             int alpha = (int) MathUtility.clamp((255f * (i / 8f)), 0, 255);
 
-            Render3DEngine.drawLine((float) lastPos.x, (float) lastPos.y, (float) lastPos.z, (float) x, (float) y, (float) z, lmode.getValue() == Mode.Sync ? Render2DEngine.injectAlpha(HudEditor.getColor(i * 5), alpha) : Render2DEngine.injectAlpha(lcolor.getValue().getColorObject(), alpha), 2);
+            Render3DEngine.drawLine(lastPos, pos, lmode.getValue() == Mode.Sync ? Render2DEngine.injectAlpha(HudEditor.getColor(i * 5), alpha) : Render2DEngine.injectAlpha(lcolor.getValue().getColorObject(), alpha));
         }
     }
 

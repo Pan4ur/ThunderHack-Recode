@@ -14,6 +14,6 @@ public class FpsCounter extends HudElement {
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "FPS " + Formatting.WHITE + FrameRateCounter.INSTANCE.getFps(), getPosX(), getPosY(), HudEditor.getColor(1).getRGB(), false);
+        FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "FPS " + Formatting.WHITE + FrameRateCounter.INSTANCE.getFps(), getPosX(), getPosY(), HudEditor.getColor(1).getRGB());
     }
 }

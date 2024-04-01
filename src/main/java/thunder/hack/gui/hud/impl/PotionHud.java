@@ -96,7 +96,7 @@ public class PotionHud extends HudElement {
             }
         }
 
-        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "Potions", getPosX() + max_width / 2, getPosY() + 2, HudEditor.textColor.getValue().getColor());
+        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "Potions", getPosX() + max_width / 2, getPosY() + 4, HudEditor.textColor.getValue().getColor());
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation / 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2, getPosY() + 13.7f, getPosX() + hAnimation - 2, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
 
@@ -115,7 +115,7 @@ public class PotionHud extends HudElement {
             String s = potion.getName().getString() + " " + power;
             String s2 = getDuration(potionEffect) + "";
 
-            FontRenderers.sf_bold_mini.drawString(context.getMatrices(), s + "  " + s2, getPosX() + 5, getPosY() + 20 + y_offset, HudEditor.textColor.getValue().getColor(), false);
+            FontRenderers.sf_bold_mini.drawString(context.getMatrices(), s + "  " + s2, getPosX() + 5, getPosY() + 20 + y_offset, HudEditor.textColor.getValue().getColor());
             y_offset += 10;
         }
         Render2DEngine.popWindow();

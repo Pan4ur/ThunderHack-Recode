@@ -1,19 +1,19 @@
 package thunder.hack.modules.render;
 
-import net.minecraft.client.util.math.MatrixStack;
-import org.jetbrains.annotations.NotNull;
-import thunder.hack.modules.Module;
-import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.setting.Setting;
-import thunder.hack.utility.math.FrameRateCounter;
-import thunder.hack.utility.render.Render3DEngine;
 import net.minecraft.block.BarrierBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CommandBlock;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.NotNull;
+import thunder.hack.modules.Module;
+import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.utility.math.FrameRateCounter;
+import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -96,7 +96,7 @@ public class Search extends Module {
                         .rotateY(-(float) Math.toRadians(mc.gameRenderer.getCamera().getYaw()))
                         .add(mc.cameraEntity.getEyePos());
 
-                Render3DEngine.drawLineDebug(vec2.x, vec2.y, vec2.z, vec.x + 0.5f, vec.y + 0.5f, vec.z + 0.5f, color.getValue().getColorObject(), 1f);
+                Render3DEngine.drawLineDebug(vec2, vec.getVector(), color.getValue().getColorObject());
             }
         }
     }
@@ -112,7 +112,8 @@ public class Search extends Module {
             return true;
         }
 
-        if (illegals.getValue()) return isIllegal(mc.world.getBlockState(new BlockPos((int) vec.x, (int) vec.y, (int) vec.z)).getBlock(), new BlockPos((int) vec.x, (int) vec.y, (int) vec.z));
+        if (illegals.getValue())
+            return isIllegal(mc.world.getBlockState(new BlockPos((int) vec.x, (int) vec.y, (int) vec.z)).getBlock(), new BlockPos((int) vec.x, (int) vec.y, (int) vec.z));
 
         return false;
     }
@@ -142,6 +143,10 @@ public class Search extends Module {
             double dz = z - v.z;
 
             return Math.sqrt(dx * dx + dy * dy + dz * dz);
+        }
+
+        public Vec3d getVector() {
+            return new Vec3d(x + 0.5f, y + 0.5f, z + 0.5f);
         }
     }
 

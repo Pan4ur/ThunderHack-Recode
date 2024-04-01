@@ -35,14 +35,14 @@ public class KillFeed extends HudElement {
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KillFeed", getPosX() + hAnimation / 2, getPosY() + 2, -1);
+        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KillFeed", getPosX() + hAnimation / 2, getPosY() + 4, -1);
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
 
         Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
         int y_offset = 3;
         for (String player : Lists.newArrayList(players)) {
-            FontRenderers.modules.drawString(context.getMatrices(), player, getPosX() + 5, getPosY() + 18 + y_offset, -1, false);
+            FontRenderers.modules.drawString(context.getMatrices(), player, getPosX() + 5, getPosY() + 18 + y_offset, -1);
             y_offset += 10;
         }
         Render2DEngine.popWindow();

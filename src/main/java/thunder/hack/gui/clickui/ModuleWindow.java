@@ -119,7 +119,7 @@ public class ModuleWindow extends AbstractWindow {
         Render2DEngine.drawBlurredShadow(context.getMatrices(),
                 ((int) x + (width - 4) / 2) - FontRenderers.categories.getStringWidth(getName()) / 2f, (int) y + (int) height / 2f - 10, FontRenderers.categories.getStringWidth(getName()) + 6, 13, 20, Render2DEngine.injectAlpha(Color.black, 170));
 
-        FontRenderers.categories.drawCenteredString(context.getMatrices(), getName(), ((int) x + 2 + (width - 4) / 2), (int) y + (int) height / 2f - 10, new Color(-1).getRGB());
+        FontRenderers.categories.drawCenteredString(context.getMatrices(), getName(), ((int) x + 2 + (width - 4) / 2), (int) y + (int) height / 2f - 7, new Color(-1).getRGB());
         context.getMatrices().pop();
         updatePosition();
     }

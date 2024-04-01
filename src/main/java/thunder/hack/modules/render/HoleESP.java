@@ -30,7 +30,7 @@ public class HoleESP extends Module {
 
     private final Setting<Float> height = new Setting<>("Height", 1f, 0.01f, 5f);
     private final Setting<Float> lineWith = new Setting<>("Line Width", 0.5f, 0.01f, 5f);
-    public final Setting<Boolean> culling = new Setting<>("Culling", true, v-> mode.getValue() == Mode.Fade || mode.getValue() == Mode.Fade2);
+    public final Setting<Boolean> culling = new Setting<>("Culling", true, v -> mode.getValue() == Mode.Fade || mode.getValue() == Mode.Fade2);
 
     private enum Mode {
         Fade,
@@ -107,7 +107,7 @@ public class HoleESP extends Module {
         return Render2DEngine.injectAlpha(color, (int) (factor * alpha));
     }
 
-    private float easeOutExpo(float x){
+    private float easeOutExpo(float x) {
         return x == 1f ? 1f : (float) (1f - Math.pow(2f, -10f * x));
     }
 

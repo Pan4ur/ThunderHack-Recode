@@ -1,6 +1,7 @@
 package thunder.hack.gui.mainmenu;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
@@ -52,7 +53,7 @@ public class MainMenuButton {
         Render2DEngine.drawGradientRound(context.getMatrices(), halfOfWidth + posX, halfOfHeight + posY, (int) width,(int) height, 10, c1, c2, c3, c4);
         Render2DEngine.drawRound(context.getMatrices(), halfOfWidth + posX + 1, halfOfHeight + posY + 1, width - 2, height - 2, 10, HudEditor.plateColor.getValue().getColorObject());
 
-        FontRenderers.monsterrat.drawCenteredString(context.getMatrices(), name,halfOfWidth +  posX + width / 2f, halfOfHeight + posY + height / 2f - 5f, hovered ? -1 : Render2DEngine.applyOpacity(-1, 0.7f));
+        FontRenderers.monsterrat.drawCenteredString(context.getMatrices(), name,halfOfWidth +  posX + width / 2f, halfOfHeight + posY + height / 2f - 3f, hovered ? -1 : Render2DEngine.applyOpacity(-1, 0.7f));
     }
 
     public void onClick(int mouseX, int mouseY) {

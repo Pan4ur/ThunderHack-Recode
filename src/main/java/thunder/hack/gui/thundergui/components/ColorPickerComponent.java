@@ -47,7 +47,7 @@ public class ColorPickerComponent extends SettingElement {
         if ((getY() > ThunderGui.getInstance().main_posY + ThunderGui.getInstance().height) || getY() < ThunderGui.getInstance().main_posY) {
             return;
         }
-        FontRenderers.modules.drawString(stack,getSetting().getName(), (float) getX(), (float) getY() + 5, isHovered() ? -1 : new Color(0xB0FFFFFF, true).getRGB(), false);
+        FontRenderers.modules.drawString(stack,getSetting().getName(), (float) getX(), (float) getY() + 5, isHovered() ? -1 : new Color(0xB0FFFFFF, true).getRGB());
         Render2DEngine.drawBlurredShadow(stack,(int) (x + width - 20), (int) (y + 5), 14, 6, 10, getColorSetting().getColorObject());
         Render2DEngine.drawRound(stack,(float) (x + width - 20), (float) (y + 5), 14, 6, 1, getColorSetting().getColorObject());
         if (open)

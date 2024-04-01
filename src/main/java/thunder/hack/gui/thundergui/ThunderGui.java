@@ -350,7 +350,7 @@ public class ThunderGui extends Screen {
         } else {
             Render2DEngine.drawRound(context.getMatrices(), main_posX + 105, main_posY + 14, 11, 11, 3f, new Color(52, 38, 58, 250));
         }
-        FontRenderers.modules.drawString(context.getMatrices(), "current cfg: " + ThunderHack.configManager.currentConfig.getName(), main_posX + 120, main_posY + 18, new Color(0xCDFFFFFF, true).getRGB(), false);
+        FontRenderers.modules.drawString(context.getMatrices(), "current cfg: " + ThunderHack.configManager.currentConfig.getName(), main_posX + 120, main_posY + 18, new Color(0xCDFFFFFF, true).getRGB());
         FontRenderers.icons.drawString(context.getMatrices(), "t", main_posX + 106, main_posY + 17, new Color(0xC2FFFFFF, true).getRGB());
 
         // Поиск
@@ -372,14 +372,14 @@ public class ThunderGui extends Screen {
         }
 
         if (currentMode == CurrentMode.Modules)
-            FontRenderers.modules.drawString(context.getMatrices(), search_string, main_posX + 252, main_posY + 19, searching ? new Color(0xCBFFFFFF, true).getRGB() : new Color(0x83FFFFFF, true).getRGB(), false);
+            FontRenderers.modules.drawString(context.getMatrices(), search_string, main_posX + 252, main_posY + 19, searching ? new Color(0xCBFFFFFF, true).getRGB() : new Color(0x83FFFFFF, true).getRGB());
         if (currentMode == CurrentMode.CfgManager) {
-            FontRenderers.modules.drawString(context.getMatrices(), config_string, main_posX + 252, main_posY + 19, listening_config ? new Color(0xCBFFFFFF, true).getRGB() : new Color(0x83FFFFFF, true).getRGB(), false);
+            FontRenderers.modules.drawString(context.getMatrices(), config_string, main_posX + 252, main_posY + 19, listening_config ? new Color(0xCBFFFFFF, true).getRGB() : new Color(0x83FFFFFF, true).getRGB());
             Render2DEngine.drawRound(context.getMatrices(), main_posX + 368, main_posY + 17, 20, 6, 1f, isHoveringItem(main_posX + 368, main_posY + 17, 20, 6, mouseX, mouseY) ? new Color(59, 42, 63, 194) : new Color(33, 23, 35, 194));
             FontRenderers.modules.drawCenteredString(context.getMatrices(), "+", main_posX + 378, main_posY + 16, ThunderHackGui.getColorByTheme(2).getRGB());
         }
         if (currentMode == CurrentMode.FriendManager) {
-            FontRenderers.modules.drawString(context.getMatrices(), friend_string, main_posX + 252, main_posY + 19, listening_friend ? new Color(0xCBFFFFFF, true).getRGB() : new Color(0x83FFFFFF, true).getRGB(), false);
+            FontRenderers.modules.drawString(context.getMatrices(), friend_string, main_posX + 252, main_posY + 19, listening_friend ? new Color(0xCBFFFFFF, true).getRGB() : new Color(0x83FFFFFF, true).getRGB());
             Render2DEngine.drawRound(context.getMatrices(), main_posX + 368, main_posY + 17, 20, 6, 1f, isHoveringItem(main_posX + 368, main_posY + 17, 20, 6, mouseX, mouseY) ? new Color(59, 42, 63, 194) : new Color(33, 23, 35, 194));
             FontRenderers.modules.drawCenteredString(context.getMatrices(), "+", main_posX + 378, main_posY + 16, ThunderHackGui.getColorByTheme(2).getRGB());
         }

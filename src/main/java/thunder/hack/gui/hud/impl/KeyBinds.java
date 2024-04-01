@@ -29,7 +29,7 @@ public class KeyBinds extends HudElement {
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
 
-        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KeyBinds", getPosX() + hAnimation / 2, getPosY() + 2, HudEditor.textColor.getValue().getColor());
+        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KeyBinds", getPosX() + hAnimation / 2, getPosY() + 4, HudEditor.textColor.getValue().getColor());
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
 
@@ -39,7 +39,7 @@ public class KeyBinds extends HudElement {
             if (feature.isDisabled() && onlyEnabled.getValue())
                 continue;
             if (!Objects.equals(feature.getBind().getBind(), "None") && feature != ModuleManager.clickGui && feature != ModuleManager.thunderHackGui) {
-                FontRenderers.sf_bold_mini.drawString(context.getMatrices(), "[" + getShortKeyName(feature) + "]  " + feature.getName(), getPosX() + 5, getPosY() + 18 + y_offset, feature.isOn() ? oncolor.getValue().getColor() : offcolor.getValue().getColor(), false);
+                FontRenderers.sf_bold_mini.drawString(context.getMatrices(), "[" + getShortKeyName(feature) + "]  " + feature.getName(), getPosX() + 5, getPosY() + 18 + y_offset, feature.isOn() ? oncolor.getValue().getColor() : offcolor.getValue().getColor());
                 y_offset += 10;
             }
         }

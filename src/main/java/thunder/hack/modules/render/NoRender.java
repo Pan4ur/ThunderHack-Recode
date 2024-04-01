@@ -56,6 +56,7 @@ public class NoRender extends Module {
     public final Setting<Boolean> noScoreBoard = new Setting<>("NoScoreBoard", true);
     public final Setting<Boolean> signText = new Setting<>("SignText", false);
     public final Setting<Boolean> noWeather = new Setting<>("NoWeather", false);
+    public final Setting<Boolean> noArmorStands = new Setting<>("NoArmorStands", false);
 
     private int potionCouter, xpCounter, arrowCounter, itemsCounter;
 

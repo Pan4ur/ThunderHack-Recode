@@ -272,10 +272,10 @@ public class TargetHud extends HudElement {
                 Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 55, getPosY() + 35 - 14, (int) MathUtility.clamp((90 * (health / 20)), 3, 90), 10, 2f);
 
 
-                FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : ((Math.round(10.0 * health) / 10.0) / 20f) * 100 + "%", getPosX() + 102, getPosY() + 20.5f, -1);
+                FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : ((Math.round(10.0 * health) / 10.0) / 20f) * 100 + "%", getPosX() + 102, getPosY() + 24f, -1);
 
                 //Имя ебыря
-                FontRenderers.sf_bold.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : ModuleManager.nameProtect.isEnabled() && target == mc.player ? NameProtect.newName.getValue() : target.getName().getString(), getPosX() + 55, getPosY() + 5, -1, false);
+                FontRenderers.sf_bold.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : ModuleManager.nameProtect.isEnabled() && target == mc.player ? NameProtect.newName.getValue() : target.getName().getString(), getPosX() + 55, getPosY() + 5, -1);
 
                 if (target instanceof PlayerEntity) {
                     //Броня
@@ -339,11 +339,11 @@ public class TargetHud extends HudElement {
                     Render2DEngine.drawGradientRound(context.getMatrices(), getPosX() + 38, getPosY() + 25, 52, 7, 2f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
                     Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 38, getPosY() + 25, (int) MathUtility.clamp((52 * (health / 20)), 8, 52), 7, 2f);
 
-                    FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (((Math.round(10.0 * getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 65, getPosY() + 24f, -1);
+                    FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (((Math.round(10.0 * getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 65, getPosY() + 27f, -1);
                     //
 
                     //Имя
-                    FontRenderers.sf_bold_mini.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : ModuleManager.nameProtect.isEnabled() && target == mc.player ? NameProtect.newName.getValue() : target.getName().getString(), getPosX() + 38, getPosY() + 5, -1, false);
+                    FontRenderers.sf_bold_mini.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : ModuleManager.nameProtect.isEnabled() && target == mc.player ? NameProtect.newName.getValue() : target.getName().getString(), getPosX() + 38, getPosY() + 5, -1);
 
                     if (target instanceof PlayerEntity) {
                         //Броня
@@ -396,11 +396,11 @@ public class TargetHud extends HudElement {
                     Render2DEngine.drawGradientRound(context.getMatrices(), getPosX() + 48, getPosY() + 32, 85, 11, 4f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
                     Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 48, getPosY() + 32, (int) MathUtility.clamp((85 * (health / 20)), 8, 85), 11, 4f);
 
-                    FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (((Math.round(10.0 * getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 92f, getPosY() + 32.5f, -1);
+                    FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (((Math.round(10.0 * getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 92f, getPosY() + 35.5f, -1);
                     //
 
                     //Имя
-                    FontRenderers.sf_bold.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : ModuleManager.nameProtect.isEnabled() && target == mc.player ? NameProtect.newName.getValue() : target.getName().getString(), getPosX() + 48, getPosY() + 7, -1, false);
+                    FontRenderers.sf_bold.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : ModuleManager.nameProtect.isEnabled() && target == mc.player ? NameProtect.newName.getValue() : target.getName().getString(), getPosX() + 48, getPosY() + 7, -1);
 
                     if (target instanceof PlayerEntity) {
                         //Броня
@@ -446,8 +446,8 @@ public class TargetHud extends HudElement {
                 Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 3.5f + hurtPercent, getPosY() + 3.5f + hurtPercent, 40 - hurtPercent * 2, 40 - hurtPercent * 2, 40, 8, 8, 8, 64, 64);
                 RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
-                FontRenderers.modules.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : ModuleManager.nameProtect.isEnabled() && target == mc.player ? NameProtect.newName.getValue() : target.getName().getString(), getPosX() + 50, getPosY() + 7, -1, false);
-                FontRenderers.modules.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (((Math.round(10.0 * getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 81f, getPosY() + 31f, -1);
+                FontRenderers.modules.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : ModuleManager.nameProtect.isEnabled() && target == mc.player ? NameProtect.newName.getValue() : target.getName().getString(), getPosX() + 50, getPosY() + 7, -1);
+                FontRenderers.modules.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (((Math.round(10.0 * getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 81f, getPosY() + 34f, -1);
 
 
                 if (target instanceof PlayerEntity) {
@@ -518,7 +518,7 @@ public class TargetHud extends HudElement {
             if (!entity.hasStatusEffect(potion) || !potRanOut) continue;
             finalString.append(getPotionName(potion)).append(potionEffect.getAmplifier() < 1 ? "" : potionEffect.getAmplifier() + 1).append(" ").append(getDurationString(potionEffect)).append(" ");
         }
-        FontRenderers.settings.drawString(ms, finalString.toString(), getPosX() + 55, getPosY() + 15, new Color(0x8D8D8D).getRGB(), false);
+        FontRenderers.settings.drawString(ms, finalString.toString(), getPosX() + 55, getPosY() + 15, new Color(0x8D8D8D).getRGB());
     }
 
     public float getHealth() {

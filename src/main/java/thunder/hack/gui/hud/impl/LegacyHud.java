@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Formatting;
 import thunder.hack.ThunderHack;
-import thunder.hack.gui.font.FontAdapter;
+import thunder.hack.gui.font.FontRenderer;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -198,7 +198,7 @@ public class LegacyHud extends Module {
 
     private void drawText(DrawContext context, String str, int x, int y, int color) {
         if (!customFont.getValue().equals(Font.Minecraft)) {
-            FontAdapter adapter;
+            FontRenderer adapter;
             switch (customFont.getValue()) {
                 case Monsterrat -> {
                     adapter = FontRenderers.monsterrat;
@@ -219,7 +219,7 @@ public class LegacyHud extends Module {
 
     private void drawText(DrawContext context, String str, int x, int y) {
         if (!customFont.getValue().equals(Font.Minecraft)) {
-            FontAdapter adapter;
+            FontRenderer adapter;
             switch (customFont.getValue()) {
                 case Monsterrat -> {
                     adapter = FontRenderers.monsterrat;

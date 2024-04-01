@@ -25,7 +25,7 @@ public class BooleanComponent extends SettingElement {
         if ((getY() > ThunderGui.getInstance().main_posY + ThunderGui.getInstance().height) || getY() < ThunderGui.getInstance().main_posY) {
             return;
         }
-        FontRenderers.modules.drawString(stack, getSetting().getName(), getX(), getY() + 5, isHovered() ? -1 : new Color(0xB0FFFFFF, true).getRGB(), false);
+        FontRenderers.modules.drawString(stack, getSetting().getName(), getX(), getY() + 5, isHovered() ? -1 : new Color(0xB0FFFFFF, true).getRGB());
         animation = fast(animation, (boolean) setting.getValue() ? 1 : 0, 15f);
         double paddingX = 7 * animation;
         Color color = HudEditor.getColor(1);

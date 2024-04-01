@@ -8,35 +8,40 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class FontRenderers {
-    public static FontAdapter settings;
-    public static FontAdapter modules;
-    public static FontAdapter categories;
-    public static FontAdapter icons;
-    public static FontAdapter mid_icons;
-    public static FontAdapter big_icons;
-    public static FontAdapter thglitch;
-    public static FontAdapter thglitchBig;
-    public static FontAdapter monsterrat;
-    public static FontAdapter sf_bold;
-    public static FontAdapter sf_bold_mini;
-    public static FontAdapter sf_bold_micro;
-    public static FontAdapter sf_medium;
-    public static FontAdapter sf_medium_mini;
-    public static FontAdapter sf_medium_modules;
+    public static FontRenderer settings;
+    public static FontRenderer modules;
+    public static FontRenderer categories;
+    public static FontRenderer icons;
+    public static FontRenderer mid_icons;
+    public static FontRenderer big_icons;
+    public static FontRenderer thglitch;
+    public static FontRenderer thglitchBig;
+    public static FontRenderer monsterrat;
+    public static FontRenderer sf_bold;
+    public static FontRenderer sf_bold_mini;
+    public static FontRenderer sf_bold_micro;
+    public static FontRenderer sf_medium;
+    public static FontRenderer sf_medium_mini;
+    public static FontRenderer sf_medium_modules;
 
-    public static FontAdapter getSettingsRenderer() {
+    public static FontRenderer getSettingsRenderer() {
         return settings;
     }
 
-    public static FontAdapter getModulesRenderer() {
+    public static FontRenderer getModulesRenderer() {
         return modules;
     }
+
+    //Font fn = Font.decode("FreeSerif");
+    //			fr = new FontRenderer(new Font[]{fn}, 64, 256, 2, "123");
     
-    public static @NotNull RendererFontAdapter createDefault(float size, String name) throws IOException, FontFormatException {
-        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("assets/thunderhack/fonts/" + name + ".ttf"))).deriveFont(Font.PLAIN, size / 2f), size / 2f);
+    public static @NotNull FontRenderer createDefault(float size, String name) throws IOException, FontFormatException {
+
+        Font fn = Font.decode("FreeSerif");
+        return new FontRenderer(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("assets/thunderhack/fonts/" + name + ".ttf"))).deriveFont(Font.PLAIN, size / 2f), size / 2f);
     }
     
-    public static @NotNull RendererFontAdapter createIcons(float size) throws IOException, FontFormatException {
-        return new RendererFontAdapter(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("assets/thunderhack/fonts/icons.ttf"))).deriveFont(Font.PLAIN, size / 2f), size / 2f);
+    public static @NotNull FontRenderer createIcons(float size) throws IOException, FontFormatException {
+        return new FontRenderer(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("assets/thunderhack/fonts/icons.ttf"))).deriveFont(Font.PLAIN, size / 2f), size / 2f);
     }
 }

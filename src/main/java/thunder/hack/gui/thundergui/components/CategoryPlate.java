@@ -30,7 +30,7 @@ public class CategoryPlate {
             Render2DEngine.drawRound(matrixStack, posX, posY, 84, 15, 2f, new Color(25, 20, 30, (int) MathUtility.clamp(65 * category_animation, 0, 255)));
             Render2DEngine.drawBlurredShadow(matrixStack, MouseX - 20, MouseY - 20, 40, 40, 60, new Color(0xC3555A7E, true));
         }
-        FontRenderers.modules.drawString(matrixStack, cat.getName(), posX + 5, posY + 6, -1, false);
+        FontRenderers.modules.drawString(matrixStack, cat.getName(), posX + 5, posY + 6, -1);
         Render2DEngine.popWindow();
     }
 

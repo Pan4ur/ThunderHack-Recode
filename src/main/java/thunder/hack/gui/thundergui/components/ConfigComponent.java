@@ -81,8 +81,8 @@ public class ConfigComponent {
 
 
         FontRenderers.mid_icons.drawString(context.getMatrices(),"u", posX + 7, posY + 5, Render2DEngine.applyOpacity(-1, getFadeFactor()));
-        FontRenderers.modules.drawString(context.getMatrices(),name, posX + 37, posY + 6, Render2DEngine.applyOpacity(-1, getFadeFactor()), false);
-        FontRenderers.settings.drawString(context.getMatrices(),"updated on: " + date, posX + 37, posY + 17, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()), false);
+        FontRenderers.modules.drawString(context.getMatrices(),name, posX + 37, posY + 6, Render2DEngine.applyOpacity(-1, getFadeFactor()));
+        FontRenderers.settings.drawString(context.getMatrices(),"updated on: " + date, posX + 37, posY + 17, Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()));
     }
 
     private float getFadeFactor() {

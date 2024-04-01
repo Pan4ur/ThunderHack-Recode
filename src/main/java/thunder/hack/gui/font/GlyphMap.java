@@ -1,40 +1,42 @@
 package thunder.hack.gui.font;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.chars.Char2ObjectArrayMap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
-import org.lwjgl.BufferUtils;
+import org.lwjgl.system.MemoryUtil;
+import thunder.hack.injection.accesors.INativeImage;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.WritableRaster;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.modules.Module.mc;
-
 class GlyphMap {
-    private static final int PADDING = 5;
-    char fromIncl, toExcl;
-    Font[] font;
-    Identifier bindToTexture;
+    final char fromIncl, toExcl;
+    final Font font;
+    final Identifier bindToTexture;
+    final int pixelPadding;
     private final Char2ObjectArrayMap<Glyph> glyphs = new Char2ObjectArrayMap<>();
     int width, height;
 
     boolean generated = false;
 
-    public GlyphMap(char from, char to, Font[] fonts, Identifier identifier) {
-        fromIncl = from;
-        toExcl = to;
-        font = fonts;
-        bindToTexture = identifier;
+    public GlyphMap(char from, char to, Font font, Identifier identifier, int padding) {
+        this.fromIncl = from;
+        this.toExcl = to;
+        this.font = font;
+        this.bindToTexture = identifier;
+        this.pixelPadding = padding;
     }
 
     public Glyph getGlyph(char c) {
@@ -57,12 +59,10 @@ class GlyphMap {
     }
 
     private Font getFontForGlyph(char c) {
-        for (Font font1 : this.font) {
-            if (font1.canDisplay(c)) {
-                return font1;
-            }
+        if (font.canDisplay(c)) {
+            return font;
         }
-        return this.font[0];
+        return this.font; // no font can display it, so it doesn't matter which one we pick; it'll always be missing
     }
 
     public void generate() {
@@ -70,7 +70,7 @@ class GlyphMap {
             return;
         }
         int range = toExcl - fromIncl - 1;
-        int charsVert = (int) (Math.ceil(Math.sqrt(range)) * 1.5);
+        int charsVert = (int) (Math.ceil(Math.sqrt(range)) * 1.5);  // double as many chars wide as high
         glyphs.clear();
         int generatedChars = 0;
         int charNX = 0;
@@ -79,7 +79,7 @@ class GlyphMap {
         int currentRowMaxY = 0;
         List<Glyph> glyphs1 = new ArrayList<>();
         AffineTransform af = new AffineTransform();
-        FontRenderContext frc = new FontRenderContext(af, true, true);
+        FontRenderContext frc = new FontRenderContext(af, true, false);
         while (generatedChars <= range) {
             char currentChar = (char) (fromIncl + generatedChars);
             Font font = getFontForGlyph(currentChar);
@@ -92,16 +92,16 @@ class GlyphMap {
             maxY = Math.max(maxY, currentY + height);
             if (charNX >= charsVert) {
                 currentX = 0;
-                currentY += currentRowMaxY + PADDING;
+                currentY += currentRowMaxY + pixelPadding; // add height of highest glyph, and reset
                 charNX = 0;
                 currentRowMaxY = 0;
             }
-            currentRowMaxY = Math.max(currentRowMaxY, height);
+            currentRowMaxY = Math.max(currentRowMaxY, height); // calculate the highest glyph in this row
             glyphs1.add(new Glyph(currentX, currentY, width, height, currentChar, this));
-            currentX += width + PADDING;
+            currentX += width + pixelPadding;
             charNX++;
         }
-        BufferedImage bi = new BufferedImage(Math.max(maxX + PADDING, 1), Math.max(maxY + PADDING, 1),
+        BufferedImage bi = new BufferedImage(Math.max(maxX + pixelPadding, 1), Math.max(maxY + pixelPadding, 1),
                 BufferedImage.TYPE_INT_ARGB);
         width = bi.getWidth();
         height = bi.getHeight();
@@ -110,7 +110,7 @@ class GlyphMap {
         g2d.fillRect(0, 0, width, height);
         g2d.setColor(Color.WHITE);
 
-        g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
@@ -126,15 +126,49 @@ class GlyphMap {
 
     public static void registerBufferedImageTexture(Identifier i, BufferedImage bi) {
         try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ImageIO.write(bi, "png", out);
-            byte[] bytes = out.toByteArray();
+            // argb from BufferedImage is little endian, alpha is actually where the `a` is in the label
+            // rgba from NativeImage (and by extension opengl) is big endian, alpha is on the other side (abgr)
+            // thank you opengl
+            int ow = bi.getWidth();
+            int oh = bi.getHeight();
+            NativeImage image = new NativeImage(NativeImage.Format.RGBA, ow, oh, false);
+            @SuppressWarnings("DataFlowIssue") long ptr = ((INativeImage) (Object) image).getPointer();
+            IntBuffer backingBuffer = MemoryUtil.memIntBuffer(ptr, image.getWidth() * image.getHeight());
+            int off = 0;
+            Object _d;
+            WritableRaster _ra = bi.getRaster();
+            ColorModel _cm = bi.getColorModel();
+            int nbands = _ra.getNumBands();
+            int dataType = _ra.getDataBuffer().getDataType();
+            _d = switch (dataType) {
+                case DataBuffer.TYPE_BYTE -> new byte[nbands];
+                case DataBuffer.TYPE_USHORT -> new short[nbands];
+                case DataBuffer.TYPE_INT -> new int[nbands];
+                case DataBuffer.TYPE_FLOAT -> new float[nbands];
+                case DataBuffer.TYPE_DOUBLE -> new double[nbands];
+                default -> throw new IllegalArgumentException("Unknown data buffer type: " +
+                        dataType);
+            };
 
-            ByteBuffer data = BufferUtils.createByteBuffer(bytes.length).put(bytes);
-            data.flip();
-            NativeImageBackedTexture tex = new NativeImageBackedTexture(NativeImage.read(data));
-            mc.execute(() -> mc.getTextureManager().registerTexture(i, tex));
-        } catch (Exception e) {
+            for (int y = 0; y < oh; y++) {
+                for (int x = 0; x < ow; x++) {
+                    _ra.getDataElements(x, y, _d);
+                    int a = _cm.getAlpha(_d);
+                    int r = _cm.getRed(_d);
+                    int g = _cm.getGreen(_d);
+                    int b = _cm.getBlue(_d);
+                    int abgr = a << 24 | b << 16 | g << 8 | r;
+                    backingBuffer.put(abgr);
+                }
+            }
+            NativeImageBackedTexture tex = new NativeImageBackedTexture(image);
+            tex.upload();
+            if (RenderSystem.isOnRenderThread()) {
+                MinecraftClient.getInstance().getTextureManager().registerTexture(i, tex);
+            } else {
+                RenderSystem.recordRenderCall(() -> MinecraftClient.getInstance().getTextureManager().registerTexture(i, tex));
+            }
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }

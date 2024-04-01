@@ -196,7 +196,7 @@ public class Blink extends Module {
                 }
 
                 for (int j = 0; j < vecs.size() - 1; ++j) {
-                    Render3DEngine.drawLine(vecs.get(j).x, vecs.get(j).y, vecs.get(j).z, vecs.get(j + 1).x, vecs.get(j + 1).y, vecs.get(j + 1).z, new Color(rgb), 2f);
+                    Render3DEngine.drawLine(vecs.get(j), vecs.get(j + 1), new Color(rgb));
                     hue += (1F / 360F);
                     rgb = Color.getHSBColor(hue, hsb[1], hsb[2]).getRGB();
                 }

@@ -17,6 +17,6 @@ public class PingHud extends HudElement {
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "Ping " + Formatting.WHITE + getPing(), getPosX(), getPosY(), HudEditor.getColor(1).getRGB(), false);
+        FontRenderers.getModulesRenderer().drawString(context.getMatrices(), "Ping " + Formatting.WHITE + getPing(), getPosX(), getPosY(), HudEditor.getColor(1).getRGB());
     }
 }

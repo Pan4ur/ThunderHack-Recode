@@ -67,7 +67,7 @@ public class ModuleList extends HudElement {
 
             Render2DEngine.drawRect(context.getMatrices(), reverse ? reversedX - stringWidth : getPosX(), getPosY() + offset, stringWidth + 1.0f, 9.0f, mode.getValue() == Mode.ColorRect ? color1 : color3.getValue().getColorObject());
             Render2DEngine.drawRect(context.getMatrices(), reverse ? reversedX + 1f : getPosX() - 2.0f, getPosY() + offset, 2.0f, 9f, mode.getValue() == Mode.ColorRect ? color4.getValue().getColorObject() : color1);
-            FontRenderers.modules.drawString(context.getMatrices(), module.getDisplayName() + Formatting.GRAY + (module.getDisplayInfo() != null ? " [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]" : ""), reverse ? reversedX - stringWidth + 2.0f : getPosX() + 3.0f, getPosY() + 3.0f + offset, mode.getValue() == Mode.ColorRect ? -1 : color1.getRGB(), false);
+            FontRenderers.modules.drawString(context.getMatrices(), module.getDisplayName() + Formatting.GRAY + (module.getDisplayInfo() != null ? " [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]" : ""), reverse ? reversedX - stringWidth + 2.0f : getPosX() + 3.0f, getPosY() + 3.0f + offset, mode.getValue() == Mode.ColorRect ? -1 : color1.getRGB());
 
             offset += 9;
         }

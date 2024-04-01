@@ -25,6 +25,13 @@ public abstract class MixinInGameHud {
         ThunderHack.notificationManager.onRender2D(context);
     }
 
+    @Inject(at = @At(value = "HEAD"), method = "renderStatusBars", cancellable = true)
+    private void renderStatusBarsHook(DrawContext context, CallbackInfo ci) {
+        if (ModuleManager.hotbar.isEnabled()) {
+   //         ci.cancel();
+        }
+    }
+
     @Inject(at = @At(value = "HEAD"), method = "renderHotbar", cancellable = true)
     public void renderHotbarCustom(float tickDelta, DrawContext context, CallbackInfo ci) {
         if (ModuleManager.hotbar.isEnabled()) {
@@ -50,7 +57,7 @@ public abstract class MixinInGameHud {
 
     @Inject(method = "renderScoreboardSidebar", at = @At(value = "HEAD"), cancellable = true)
     private void renderScoreboardSidebarHook(DrawContext context, ScoreboardObjective objective, CallbackInfo ci) {
-        if(ModuleManager.noRender.noScoreBoard.getValue()){
+        if(ModuleManager.noRender.noScoreBoard.getValue() && ModuleManager.noRender.isEnabled()){
             ci.cancel();
         }
     }

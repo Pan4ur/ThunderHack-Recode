@@ -579,7 +579,10 @@ public class AutoCrystal extends Module {
                     continue;
                 if (ent instanceof EndCrystalEntity cr && deadManager.isDead(cr))
                     continue;
-
+                if(breakTimer.passedMs(breakDelay.getValue()) && ent instanceof EndCrystalEntity cr && ExplosionUtility.getSelfExplosionDamage(cr.getPos(), selfPredictTicks.getValue()) < maxSelfDamage.getValue()) {
+                    attackCrystal(cr);
+                    return false;
+                }
                 return true;
             }
         }

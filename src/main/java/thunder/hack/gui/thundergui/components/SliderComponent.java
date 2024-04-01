@@ -45,7 +45,7 @@ public class SliderComponent extends SettingElement {
             return;
         }
 
-        FontRenderers.modules.drawString(stack,getSetting().getName(), (float) getX(), (float) getY() + 5, isHovered() ? -1 : new Color(0xB0FFFFFF, true).getRGB(), false);
+        FontRenderers.modules.drawString(stack,getSetting().getName(), (float) getX(), (float) getY() + 5, isHovered() ? -1 : new Color(0xB0FFFFFF, true).getRGB());
 
         double currentPos = (((Number) setting.getValue()).floatValue() - min) / (max - min);
         stranimation = stranimation + (((Number) setting.getValue()).floatValue() * 100 / 100 - stranimation) / 2.0D;
@@ -64,14 +64,14 @@ public class SliderComponent extends SettingElement {
 
         if (!listening) {
             if (setting.getValue() instanceof Float)
-                FontRenderers.modules.drawString(stack,String.valueOf(MathUtility.round((Float) setting.getValue(), 2)), (float) (x + 156), (float) (y + height - 9), new Color(0xBAFFFFFF, true).getRGB(), false);
+                FontRenderers.modules.drawString(stack,String.valueOf(MathUtility.round((Float) setting.getValue(), 2)), (float) (x + 156), (float) (y + height - 9), new Color(0xBAFFFFFF, true).getRGB());
             if (setting.getValue() instanceof Integer)
-                FontRenderers.modules.drawString(stack,String.valueOf(setting.getValue()), (float) (x + 156), (float) (y + height - 9), new Color(0xBAFFFFFF, true).getRGB(), false);
+                FontRenderers.modules.drawString(stack,String.valueOf(setting.getValue()), (float) (x + 156), (float) (y + height - 9), new Color(0xBAFFFFFF, true).getRGB());
         } else {
             if (Objects.equals(Stringnumber, "")) {
-                FontRenderers.modules.drawString(stack,"...", (float) (x + 156), (float) (y + height - 9), new Color(0xBAFFFFFF, true).getRGB(), false);
+                FontRenderers.modules.drawString(stack,"...", (float) (x + 156), (float) (y + height - 9), new Color(0xBAFFFFFF, true).getRGB());
             } else {
-                FontRenderers.modules.drawString(stack,Stringnumber, (float) (x + 156), (float) (y + height - 9), new Color(0xBAFFFFFF, true).getRGB(), false);
+                FontRenderers.modules.drawString(stack,Stringnumber, (float) (x + 156), (float) (y + height - 9), new Color(0xBAFFFFFF, true).getRGB());
             }
         }
 
