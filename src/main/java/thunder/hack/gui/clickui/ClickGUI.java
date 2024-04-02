@@ -145,7 +145,7 @@ public class ClickGUI extends Screen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (!setup && ConfigManager.firstLaunch) return false;
+         //   if (!setup && ConfigManager.firstLaunch) return false;
         windows.forEach(w -> w.mouseReleased((int) mouseX, (int) mouseY, button));
         return super.mouseReleased(mouseX, mouseY, button);
     }

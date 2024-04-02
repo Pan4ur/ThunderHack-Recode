@@ -75,7 +75,6 @@ public class SliderElement extends AbstractElement {
         if(value != prevValue)
             ModuleManager.soundFX.playSlider();
 
-
         prevValue = value;
     }
 

@@ -202,7 +202,7 @@ public class Speed extends Module {
 
     @EventHandler
     public void onMove(EventMove event) {
-        if (mc.player.isInFluid() && pauseInLiquids.getValue()) {
+        if (mc.player.isInFluid() && pauseInLiquids.getValue() || mc.player.isSneaking() && pauseWhileSneaking.getValue()) {
             return;
         }
         if (mode.getValue() != Mode.NCP && mode.getValue() != Mode.StrictStrafe) return;

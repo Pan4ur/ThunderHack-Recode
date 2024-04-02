@@ -387,7 +387,6 @@ public class ModuleManager implements IManager {
             if (module.getName().toLowerCase().contains(string.toLowerCase()))
                 modulesCategory.add(module);
         });
-        Command.sendMessage(modulesCategory.toString());
         return modulesCategory;
     }
 }
