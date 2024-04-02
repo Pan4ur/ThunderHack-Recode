@@ -47,7 +47,7 @@ public class TotemCounter extends HudElement {
         if(factor > 0)
             Render2DEngine.drawBlurredShadow(context.getMatrices(), xPos - 34, yPos - 6, 11, 11, 8, Render2DEngine.injectAlpha(new Color(0xFF0000), (int) (255 * factor)));
 
-        FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), getItemCount(Items.TOTEM_OF_UNDYING) + "",xPos - 28, yPos + 6, -1);
+        FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), getItemCount(Items.TOTEM_OF_UNDYING) + "",xPos - 28, yPos + 8, -1);
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         context.getMatrices().pop();
     }

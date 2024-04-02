@@ -221,7 +221,7 @@ public class NameTags extends Module {
                                             context.getMatrices().pop();
                                         }
                                         enchantmentY -= 8;
-                                        if(maxEnchantY > enchantmentY)
+                                        if (maxEnchantY > enchantmentY)
                                             maxEnchantY = enchantmentY;
                                     }
                                 }
@@ -259,10 +259,10 @@ public class NameTags extends Module {
                     context.getMatrices().pop();
                 }
 
-                if(potions.getValue())
+                if (potions.getValue())
                     renderStatusEffectOverlay(context, (float) posX, (float) (posY + maxEnchantY - 60), ent);
 
-                if(shulkers.getValue())
+                if (shulkers.getValue())
                     renderShulkerToolTip(context, (int) posX - 90, (int) posY - 120, ent.getMainHandStack());
                 context.getMatrices().pop();
             }
@@ -494,31 +494,30 @@ public class NameTags extends Module {
     }
 
     private void renderStatusEffectOverlay(DrawContext context, float x, float y, PlayerEntity player) {
-        Collection<StatusEffectInstance> effects = player.getStatusEffects();
+        ArrayList<StatusEffectInstance> effects = new ArrayList<>(player.getStatusEffects());
         if (effects.isEmpty())
             return;
         x += effects.size() * 12.5f;
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         for (StatusEffectInstance statusEffectInstance : Ordering.natural().reverse().sortedCopy(effects)) {
-            if (statusEffectInstance.shouldShowIcon()) {
-                x -= 25;
-                String power = "";
-                switch (statusEffectInstance.getAmplifier()) {
-                    case 0 -> power = "I";
-                    case 1 -> power = "II";
-                    case 2 -> power = "III";
-                    case 3 -> power = "IV";
-                    case 4 -> power = "V";
-                }
-
-                context.getMatrices().push();
-                context.getMatrices().translate(x, y, 0);
-                context.drawSprite(0, 0, 0, 18, 18, mc.getStatusEffectSpriteManager().getSprite(statusEffectInstance.getEffectType()));
-                FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), PotionHud.getDuration(statusEffectInstance), 9, -8, -1);
-                FontRenderers.categories.drawCenteredString(context.getMatrices(), power, 9, -16, -1);
-                context.getMatrices().pop();
+            x -= 25;
+            String power = "";
+            switch (statusEffectInstance.getAmplifier()) {
+                case 0 -> power = "I";
+                case 1 -> power = "II";
+                case 2 -> power = "III";
+                case 3 -> power = "IV";
+                case 4 -> power = "V";
             }
+
+            context.getMatrices().push();
+            context.getMatrices().translate(x, y, 0);
+            context.drawSprite(0, 0, 0, 18, 18, mc.getStatusEffectSpriteManager().getSprite(statusEffectInstance.getEffectType()));
+            FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), PotionHud.getDuration(statusEffectInstance), 9, -8, -1);
+            FontRenderers.categories.drawCenteredString(context.getMatrices(), power, 9, -16, -1);
+            context.getMatrices().pop();
+
         }
         RenderSystem.disableBlend();
     }
@@ -537,6 +536,8 @@ public class NameTags extends Module {
                 } catch (NullPointerException npe) {
                     colors = new float[]{1F, 1F, 1F};
                 }
+            } else {
+                return false;
             }
             draw(context, itemStacks, offsetX, offsetY, colors);
         } catch (Exception ignore) {

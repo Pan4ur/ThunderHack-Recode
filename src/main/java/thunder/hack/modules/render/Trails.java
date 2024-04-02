@@ -101,6 +101,57 @@ public class Trails extends Module {
                     stack.pop();
                 }
             }
+        } else if (players.getValue() == Players.Tail) {
+            for (PlayerEntity entity : mc.world.getPlayers()) {
+                if(entity != mc.player && onlySelf.getValue())
+                    continue;
+                float alpha = color.getValue().getAlpha();
+                Camera camera = mc.gameRenderer.getCamera();
+                stack.push();
+                RenderSystem.setShaderTexture(0, firefly);
+                RenderSystem.enableBlend();
+                RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
+                RenderSystem.enableDepthTest();
+                RenderSystem.depthMask(false);
+                RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+                BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+                int size = ((IEntity) entity).thunderHack_Recode$getTrails().size();
+                if (!((IEntity) entity).thunderHack_Recode$getTrails().isEmpty()) {
+                    for (int i = 0; i < size; i++) {
+                        Trail ctx = ((IEntity) entity).thunderHack_Recode$getTrails().get(i);
+                        MatrixStack matrices = new MatrixStack();
+                        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+                        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
+
+                        Vec3d pos = ctx.interpolate(mc.getTickDelta());
+                        matrices.translate(pos.x, pos.y + 0.9f, pos.z);
+
+                        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
+                        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+                        Matrix4f matrix = matrices.peek().getPositionMatrix();
+
+                        Color col = ctx.color();
+
+                        float sc = 0.6f;
+
+                        float colorFactor = (float) i / (float) size;
+                        col = Render2DEngine.interpolateColorC(col, Color.WHITE, (float) Math.pow(1f - colorFactor, 2f));
+                        float animPow = (float) ctx.animation(mc.getTickDelta());
+                        int animatedAlpha = (int) (alpha * animPow);
+
+                        bufferBuilder.vertex(matrix, -sc, sc, 0).texture(0f, 1f).color(Render2DEngine.injectAlpha(col, animatedAlpha).getRGB()).next();
+                        bufferBuilder.vertex(matrix, sc, sc, 0).texture(1f, 1f).color(Render2DEngine.injectAlpha(col, animatedAlpha).getRGB()).next();
+                        bufferBuilder.vertex(matrix, sc, -sc, 0).texture(1f, 0).color(Render2DEngine.injectAlpha(col, animatedAlpha).getRGB()).next();
+                        bufferBuilder.vertex(matrix, -sc, -sc, 0).texture(0, 0).color(Render2DEngine.injectAlpha(col, animatedAlpha).getRGB()).next();
+                    }
+                }
+                BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+                RenderSystem.depthMask(true);
+                RenderSystem.disableDepthTest();
+                RenderSystem.disableBlend();
+                stack.pop();
+            }
         } else if (players.getValue() == Players.Cute) {
             for (PlayerEntity entity : mc.world.getPlayers()) {
                 if(entity != mc.player && onlySelf.getValue())
@@ -203,11 +254,11 @@ public class Trails extends Module {
 
     @Override
     public void onUpdate() {
-        Color c = lmode.getValue() == Mode.Sync ? HudEditor.getColor((int) MathUtility.random(1, 228)) : lcolor.getValue().getColorObject();
+        Color c = lmode.getValue() == Mode.Sync ? HudEditor.getColor(mc.player.age % 360) : lcolor.getValue().getColorObject();
 
         for (PlayerEntity player : mc.world.getPlayers()) {
             if (player.getPos().getZ() != player.prevZ || player.getPos().getX() != player.prevX && (!onlySelf.getValue())) {
-                ((IEntity) player).thunderHack_Recode$getTrails().add(new Trail(new Vec3d(player.prevX, player.prevY, player.prevZ), player.getPos(), color.getValue().getColorObject()));
+                ((IEntity) player).thunderHack_Recode$getTrails().add(new Trail(new Vec3d(player.prevX, player.prevY, player.prevZ), player.getPos(), c));
                 if (players.is(Players.Particles)) {
                     for (int i = 0; i < amount.getValue(); i++) {
                         particles.add(new Particle(player.getX(), MathUtility.random((float) (player.getY() + player.getHeight()), (float) player.getY()), player.getZ(), c));
@@ -227,7 +278,7 @@ public class Trails extends Module {
         }
 
         if (ThunderHack.playerManager.currentPlayerSpeed != 0) {
-            ((IEntity) mc.player).thunderHack_Recode$getTrails().add(new Trail(new Vec3d(mc.player.prevX, mc.player.prevY, mc.player.prevZ), mc.player.getPos(), color.getValue().getColorObject()));
+            ((IEntity) mc.player).thunderHack_Recode$getTrails().add(new Trail(new Vec3d(mc.player.prevX, mc.player.prevY, mc.player.prevZ), mc.player.getPos(), c));
             if (players.is(Players.Particles)) {
                 for (int i = 0; i < amount.getValue(); i++) {
                     particles.add(new Particle(mc.player.getX(), MathUtility.random((float) (mc.player.getY() + mc.player.getHeight()), (float) mc.player.getY()), mc.player.getZ(), c));
@@ -401,7 +452,7 @@ public class Trails extends Module {
     }
 
     private enum Players {
-        Trail, Particles, Cute, None
+        Trail, Particles, Cute, Tail, None
     }
 
     private enum Particles {

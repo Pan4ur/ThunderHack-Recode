@@ -16,6 +16,7 @@ public class Setting<T> {
     private T plannedValue;
     private T min;
     private T max;
+    private String unit;
     public Setting<?> parent = null;
 
     private boolean hasRestriction;
@@ -29,7 +30,6 @@ public class Setting<T> {
         this.plannedValue = defaultValue;
     }
 
-
     public Setting(String name, T defaultValue, T min, T max) {
         this.name = name;
         this.defaultValue = defaultValue;
@@ -39,7 +39,6 @@ public class Setting<T> {
         this.plannedValue = defaultValue;
         this.hasRestriction = true;
     }
-
 
     public Setting(String name, T defaultValue, T min, T max, Predicate<T> visibility) {
         this.name = name;

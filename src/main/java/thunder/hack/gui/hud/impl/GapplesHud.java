@@ -67,7 +67,7 @@ public class GapplesHud extends HudElement {
         if (factor > 0)
             Render2DEngine.drawBlurredShadow(context.getMatrices(), xPos + 22, yPos - 6, 11, 11, 8, Render2DEngine.injectAlpha(new Color(0xFF1500), (int) (255 * factor)));
 
-        FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), getItemCount(targetItem) + "", xPos + 28.5f, yPos + 5, -1);
+        FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), getItemCount(targetItem) + "", xPos + 28.5f, yPos + 8, -1);
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         context.getMatrices().pop();
     }

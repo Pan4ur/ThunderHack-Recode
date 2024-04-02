@@ -5,6 +5,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -40,6 +46,8 @@ public class Speed extends Module {
     public final Setting<Float> boostFactor = new Setting<>("BoostFactor", 2f, 0f, 10f, v -> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Boolean> allowOffGround = new Setting<>("AllowOffGround", true, v -> mode.getValue() == Mode.MatrixDamage);
     public final Setting<Integer> shiftTicks = new Setting<>("ShiftTicks", 0, 0, 10, v -> mode.getValue() == Mode.MatrixDamage);
+    public final Setting<Integer> fireWorkSlot = new Setting<>("FireSlot", 1, 1, 9, v -> mode.getValue() == Mode.FireWork);
+    public final Setting<Integer> delay = new Setting<>("Delay", 8, 1, 20, v -> mode.getValue() == Mode.FireWork);
 
     public double baseSpeed;
     private int stage, ticks;
@@ -48,7 +56,7 @@ public class Speed extends Module {
     private thunder.hack.utility.Timer startDelay = new thunder.hack.utility.Timer();
 
     public enum Mode {
-        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, GrimEntity, GrimEntity2
+        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, GrimEntity, GrimEntity2, FireWork
     }
 
     @Override
@@ -120,6 +128,42 @@ public class Speed extends Module {
         if (mc.player.isInFluid() && pauseInLiquids.getValue() || mc.player.isSneaking() && pauseWhileSneaking.getValue()) {
             return;
         }
+
+        if (mode.getValue() == Mode.FireWork) {
+            ticks--;
+            int ellySlot = InventoryUtility.getElytra();
+            int fireSlot = InventoryUtility.findItemInHotBar(Items.FIREWORK_ROCKET).slot();
+            boolean inOffHand = mc.player.getOffHandStack().getItem() == Items.FIREWORK_ROCKET;
+            if(fireSlot == -1) {
+                int fireInInv = InventoryUtility.findItemInInventory(Items.FIREWORK_ROCKET).slot();
+                if(fireInInv != -1)
+                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, fireInInv, fireWorkSlot.getValue() - 1, SlotActionType.SWAP, mc.player);
+            }
+
+            if (ellySlot != -1 && (fireSlot != -1 || inOffHand) && !mc.player.isOnGround() && mc.player.fallDistance > 0) {
+                if (ticks <= 0) {
+                    if (ellySlot != -2) {
+                        mc.interactionManager.clickSlot(0, ellySlot, 1, SlotActionType.PICKUP, mc.player);
+                        mc.interactionManager.clickSlot(0, 6, 1, SlotActionType.PICKUP, mc.player);
+                    }
+                    mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+                    int prevSlot = mc.player.getInventory().selectedSlot;
+                    if (prevSlot != fireSlot && !inOffHand)
+                        sendPacket(new UpdateSelectedSlotC2SPacket(fireSlot));
+                    mc.interactionManager.interactItem(mc.player, inOffHand ? Hand.OFF_HAND : Hand.MAIN_HAND);
+                    if (prevSlot != fireSlot && !inOffHand)
+                        sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
+
+                    if (ellySlot != -2) {
+                        mc.interactionManager.clickSlot(0, 6, 1, SlotActionType.PICKUP, mc.player);
+                        mc.interactionManager.clickSlot(0, ellySlot, 1, SlotActionType.PICKUP, mc.player);
+                    }
+                    mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                    ticks = delay.getValue();
+                }
+            }
+        }
+
         if (mode.getValue() == Mode.ElytraLowHop) {
             if (mc.player.isOnGround()) {
                 mc.player.jump();
@@ -160,7 +204,7 @@ public class Speed extends Module {
 
     @EventHandler
     public void onMove(EventMove event) {
-        if (mc.player.isInFluid() && pauseInLiquids.getValue() || mc.player.isSneaking() && pauseWhileSneaking.getValue()) {
+        if (mc.player.isInFluid() && pauseInLiquids.getValue()) {
             return;
         }
         if (mode.getValue() != Mode.NCP && mode.getValue() != Mode.StrictStrafe) return;

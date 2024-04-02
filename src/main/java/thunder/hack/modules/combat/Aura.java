@@ -83,12 +83,13 @@ public final class Aura extends Module {
     public final Setting<Sort> sort = new Setting<>("Sort", Sort.LowestDistance);
     public final Setting<Boolean> lockTarget = new Setting<>("LockTarget", true);
     public final Setting<Boolean> grimRayTrace = new Setting<>("GrimRayTrace", true);
+    public final Setting<Boolean> tpsSync = new Setting<>("TPSSync", false);
+
 
     /*   ADVANCED   */
     public final Setting<Parent> advanced = new Setting<>("Advanced", new Parent(false, 0));
     public final Setting<Float> aimRange = new Setting<>("AimRange", 3.1f, 2f, 6.0f).withParent(advanced);
     public final Setting<RandomHitDelay> randomHitDelay = new Setting<>("RandomHitTiming", RandomHitDelay.Off).withParent(advanced);
-    public final Setting<Boolean> tpsSync = new Setting<>("TPSSync", false).withParent(advanced);
     public final Setting<Boolean> pauseWhileEating = new Setting<>("PauseWhileEating", false).withParent(advanced);
     public final Setting<Boolean> pauseInInventory = new Setting<>("PauseInInventory", true).withParent(advanced);
     public final Setting<RayTrace> rayTrace = new Setting<>("RayTrace", RayTrace.OnlyTarget).withParent(advanced);
@@ -185,7 +186,8 @@ public final class Aura extends Module {
     }
 
     private boolean skipRayTraceCheck() {
-        return rotationMode.getValue() == Mode.None || rayTrace.getValue() == RayTrace.OFF || (rotationMode.getValue() == Mode.Interact && interactTicks.getValue() <= 1);
+        return rotationMode.getValue() == Mode.None || rayTrace.getValue() == RayTrace.OFF || (rotationMode.getValue() == Mode.Interact && (interactTicks.getValue() <= 1
+                || mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.25, 0.0, -0.25).offset(0.0, 1, 0.0)).iterator().hasNext()));
     }
 
     public void attack() {
@@ -443,7 +445,7 @@ public final class Aura extends Module {
 
     private void calcRotations(boolean ready) {
         if (ready) {
-            trackticks = interactTicks.getValue();
+            trackticks = (mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.25, 0.0, -0.25).offset(0.0, 1, 0.0)).iterator().hasNext() ? 1 : interactTicks.getValue());
         } else if (trackticks > 0) {
             trackticks--;
         }

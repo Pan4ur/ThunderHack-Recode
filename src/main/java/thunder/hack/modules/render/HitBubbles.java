@@ -10,6 +10,7 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventAttack;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
+import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ public class HitBubbles extends Module {
     public HitBubbles() {
         super("HitBubbles", Category.RENDER);
     }
+
+    public final Setting<Integer> lifeTime = new Setting<>("LifeTime", 30, 1, 150);
 
     private final ArrayList<HitBubble> bubbles = new ArrayList<>();
 
@@ -41,7 +44,7 @@ public class HitBubbles extends Module {
             matrixStack.pop();
         });
         RenderSystem.enableDepthTest();
-        bubbles.removeIf(b -> b.life.passedMs(1500));
+        bubbles.removeIf(b -> b.life.passedMs(lifeTime.getValue() * 50));
     }
 
     public record HitBubble(float x, float y, float z, float yaw, float pitch, Timer life) {
