@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.CfgArgumentType;
+import thunder.hack.cmd.args.CfgModeType;
 import thunder.hack.cmd.args.ModuleArgumentType;
 import thunder.hack.modules.Module;
 
@@ -47,12 +48,19 @@ public class CfgCommand extends Command {
             return SINGLE_SUCCESS;
         })));
 
-        builder.then(literal("load").then(arg("name", CfgArgumentType.create()).executes(context -> {
+        builder.then(literal("load")
+                .then(arg("mode", CfgModeType.create()))
+                .then(arg("name", CfgModeType.create()).executes(context -> {
+                    String name = context.getArgument("name", String.class);
+                    String cat = context.getArgument("mode", String.class);
+                    ThunderHack.configManager.load(name, cat);
+                    return SINGLE_SUCCESS;
+                }))).executes(context -> {
             ThunderHack.configManager.load(context.getArgument("name", String.class));
             return SINGLE_SUCCESS;
-        })));
+        });
 
-        builder.then(literal("loadcloud").then(arg("name",  StringArgumentType.word()).executes(context -> {
+        builder.then(literal("loadcloud").then(arg("name", StringArgumentType.word()).executes(context -> {
             ThunderHack.configManager.loadCloud(context.getArgument("name", String.class));
             return SINGLE_SUCCESS;
         })));
@@ -61,22 +69,33 @@ public class CfgCommand extends Command {
             StringBuilder configs = new StringBuilder("Cloud Configs: \n");
             for (String str : Objects.requireNonNull(ThunderHack.configManager.getCloudConfigs())) {
                 String[] split = str.split(";");
-                configs.append("\n- "+ Formatting.BOLD + split[0] + Formatting.RESET  + Formatting.GRAY + " author: " + Formatting.RESET + split[1] + Formatting.GRAY + " last updated: " + Formatting.RESET  + split[2]);
+                configs.append("\n- " + Formatting.BOLD + split[0] + Formatting.RESET + Formatting.GRAY + " author: " + Formatting.RESET + split[1] + Formatting.GRAY + " last updated: " + Formatting.RESET + split[2]);
             }
             sendMessage(configs.toString());
 
             return SINGLE_SUCCESS;
         }));
 
-        builder.then(literal("cloud").then(arg("name",  StringArgumentType.word()).executes(context -> {
+        builder.then(literal("cloud").then(arg("name", StringArgumentType.word()).executes(context -> {
             ThunderHack.configManager.loadCloud(context.getArgument("name", String.class));
             return SINGLE_SUCCESS;
         })));
 
         builder.then(literal("set")
-                .then(arg("name", CfgArgumentType.create())
+                .then(arg("name", CfgModeType.create())
                         .then(arg("module", ModuleArgumentType.create()).executes(context -> {
                             ThunderHack.configManager.loadModuleOnly(context.getArgument("name", String.class), context.getArgument("module", Module.class));
+                            return SINGLE_SUCCESS;
+                        }))
+                        .executes(context -> {
+                            ThunderHack.configManager.load(context.getArgument("name", String.class));
+                            return SINGLE_SUCCESS;
+                        })));
+
+        builder.then(literal("load")
+                .then(arg("mode", CfgModeType.create())
+                        .then(arg("name", CfgArgumentType.create()).executes(context -> {
+                            ThunderHack.configManager.load(context.getArgument("name", String.class), context.getArgument("mode", String.class));
                             return SINGLE_SUCCESS;
                         }))
                         .executes(context -> {

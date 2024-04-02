@@ -3,6 +3,7 @@ package thunder.hack.modules.movement;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
@@ -11,7 +12,6 @@ import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import thunder.hack.ThunderHack;
@@ -26,8 +26,6 @@ import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
 
-import javax.swing.*;
-
 import static thunder.hack.modules.client.ClientSettings.isRu;
 import static thunder.hack.modules.movement.Timer.violation;
 import static thunder.hack.utility.player.MovementUtility.isMoving;
@@ -38,14 +36,14 @@ public class Speed extends Module {
         super("Speed", Category.MOVEMENT);
     }
 
-    private final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
+    public final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
     public Setting<Boolean> useTimer = new Setting<>("Use Timer", false);
     public Setting<Boolean> pauseInLiquids = new Setting<>("PauseInLiquids", false);
     public Setting<Boolean> pauseWhileSneaking = new Setting<>("PauseWhileSneaking", false);
-    public final Setting<Integer> hurttime = new Setting<>("HurtTime", 0, 0, 10, v -> mode.getValue() == Mode.MatrixDamage);
-    public final Setting<Float> boostFactor = new Setting<>("BoostFactor", 2f, 0f, 10f, v -> mode.getValue() == Mode.MatrixDamage);
-    public final Setting<Boolean> allowOffGround = new Setting<>("AllowOffGround", true, v -> mode.getValue() == Mode.MatrixDamage);
-    public final Setting<Integer> shiftTicks = new Setting<>("ShiftTicks", 0, 0, 10, v -> mode.getValue() == Mode.MatrixDamage);
+    public final Setting<Integer> hurttime = new Setting<>("HurtTime", 0, 0, 10, v -> mode.is(Mode.MatrixDamage));
+    public final Setting<Float> boostFactor = new Setting<>("BoostFactor", 2f, 0f, 10f, v -> mode.is(Mode.MatrixDamage) || mode.is(Mode.Vanilla));
+    public final Setting<Boolean> allowOffGround = new Setting<>("AllowOffGround", true, v -> mode.is(Mode.MatrixDamage));
+    public final Setting<Integer> shiftTicks = new Setting<>("ShiftTicks", 0, 0, 10, v -> mode.is(Mode.MatrixDamage));
     public final Setting<Integer> fireWorkSlot = new Setting<>("FireSlot", 1, 1, 9, v -> mode.getValue() == Mode.FireWork);
     public final Setting<Integer> delay = new Setting<>("Delay", 8, 1, 20, v -> mode.getValue() == Mode.FireWork);
 
@@ -56,7 +54,7 @@ public class Speed extends Module {
     private thunder.hack.utility.Timer startDelay = new thunder.hack.utility.Timer();
 
     public enum Mode {
-        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, GrimEntity, GrimEntity2, FireWork
+        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, GrimEntity, GrimEntity2, FireWork, Vanilla
     }
 
     @Override
@@ -134,9 +132,9 @@ public class Speed extends Module {
             int ellySlot = InventoryUtility.getElytra();
             int fireSlot = InventoryUtility.findItemInHotBar(Items.FIREWORK_ROCKET).slot();
             boolean inOffHand = mc.player.getOffHandStack().getItem() == Items.FIREWORK_ROCKET;
-            if(fireSlot == -1) {
+            if (fireSlot == -1) {
                 int fireInInv = InventoryUtility.findItemInInventory(Items.FIREWORK_ROCKET).slot();
-                if(fireInInv != -1)
+                if (fireInInv != -1)
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, fireInInv, fireWorkSlot.getValue() - 1, SlotActionType.SWAP, mc.player);
             }
 

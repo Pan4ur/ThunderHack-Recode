@@ -2,6 +2,7 @@ package thunder.hack.injection;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -22,6 +23,7 @@ import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.modules.client.Media;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.movement.AutoSprint;
+import thunder.hack.modules.movement.Speed;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -47,6 +49,13 @@ public class MixinPlayerEntity {
             final float multiplier = 0.6f + 0.4f * AutoSprint.motion.getValue();
             mc.player.setVelocity(mc.player.getVelocity().x / 0.6 * multiplier, mc.player.getVelocity().y, mc.player.getVelocity().z / 0.6 * multiplier);
             mc.player.setSprinting(true);
+        }
+    }
+
+    @Inject(method = "getMovementSpeed", at = @At("HEAD"), cancellable = true)
+    public void getMovementSpeedHook(CallbackInfoReturnable<Float> cir) {
+        if (ModuleManager.speed.isEnabled() && ModuleManager.speed.mode.is(Speed.Mode.Vanilla)) {
+            cir.setReturnValue(ModuleManager.speed.boostFactor.getValue());
         }
     }
 

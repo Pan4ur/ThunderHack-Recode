@@ -141,6 +141,24 @@ public class ConfigManager implements IManager {
         return obj.format(sol);
     }
 
+    public void load(String name, String category) {
+        File file = new File(CONFIGS_FOLDER, name + ".th");
+        if (!file.exists()) {
+            if (isRu()) Command.sendMessage("Конфига " + name + " не существует!");
+            else Command.sendMessage("Config " + name + " does not exist!");
+
+            return;
+        }
+
+        if (currentConfig != null)
+            save(currentConfig);
+
+        ThunderHack.moduleManager.onUnload();
+        ThunderHack.moduleManager.onUnloadPost();
+        load(file);
+        ThunderHack.moduleManager.onLoad();
+    }
+
     public void load(String name) {
         File file = new File(CONFIGS_FOLDER, name + ".th");
         if (!file.exists()) {
@@ -212,7 +230,45 @@ public class ConfigManager implements IManager {
             if (modules != null) {
                 modules.forEach(m -> {
                     try {
-                        parseModule(m.getAsJsonObject());
+                        parseModule(m.getAsJsonObject(), "none");
+                    } catch (NullPointerException e) {
+                        System.err.println(e.getMessage());
+                    }
+                });
+            }
+
+            if (isRu()) Command.sendMessage("Загружен конфиг " + config.getName());
+            else Command.sendMessage("Loaded " + config.getName());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        currentConfig = config;
+        saveCurrentConfig();
+    }
+
+    public void load(@NotNull File config, String category) {
+        if (!config.exists()) save(config);
+        try {
+            FileReader reader = new FileReader(config, StandardCharsets.UTF_8);
+            JsonParser parser = new JsonParser();
+
+            JsonArray array = null;
+            try {
+                array = (JsonArray) parser.parse(reader);
+            } catch (ClassCastException e) {
+                save(config);
+            }
+
+            JsonArray modules = null;
+            try {
+                JsonObject modulesObject = (JsonObject) array.get(0);
+                modules = modulesObject.getAsJsonArray("Modules");
+            } catch (Exception ignored) {
+            }
+            if (modules != null) {
+                modules.forEach(m -> {
+                    try {
+                        parseModule(m.getAsJsonObject(), category);
                     } catch (NullPointerException e) {
                         System.err.println(e.getMessage());
                     }
@@ -257,7 +313,7 @@ public class ConfigManager implements IManager {
 
                     if (Objects.equals(module.getName(), module1.getName())) {
                         try {
-                            parseModule(m.getAsJsonObject());
+                            parseModule(m.getAsJsonObject(), "none");
                         } catch (NullPointerException e) {
                             System.err.println(e.getMessage());
                         }
@@ -303,11 +359,14 @@ public class ConfigManager implements IManager {
         }
     }
 
-    private void parseModule(JsonObject object) throws NullPointerException {
+    private void parseModule(JsonObject object, String category) throws NullPointerException {
         Module module = ThunderHack.moduleManager.modules.stream()
                 .filter(m -> object.getAsJsonObject(m.getName()) != null)
                 .findFirst()
                 .orElse(null);
+
+        if(!Objects.equals(category, "none") && !module.getCategory().getName().toLowerCase().equals(category))
+            return;
 
         if (module != null) {
             JsonObject mobject = object.getAsJsonObject(module.getName());

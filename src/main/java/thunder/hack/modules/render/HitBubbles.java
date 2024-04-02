@@ -1,5 +1,6 @@
 package thunder.hack.modules.render;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.util.math.MatrixStack;
@@ -14,6 +15,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static thunder.hack.utility.render.Render2DEngine.drawBubble;
 
@@ -35,7 +37,8 @@ public class HitBubbles extends Module {
 
     public void onRender3D(MatrixStack matrixStack) {
         RenderSystem.disableDepthTest();
-        bubbles.forEach(b -> {
+        ArrayList<HitBubble> bubblesCopy = Lists.newArrayList(bubbles);
+        bubblesCopy.forEach(b -> {
             matrixStack.push();
             matrixStack.translate(b.x - mc.getEntityRenderDispatcher().camera.getPos().getX(), b.y - mc.getEntityRenderDispatcher().camera.getPos().getY(), b.z - mc.getEntityRenderDispatcher().camera.getPos().getZ());
             matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(b.yaw));

@@ -220,7 +220,7 @@ public class ModuleButton extends AbstractButton {
                 if (ClickGui.getInstance().textSide.getValue() == ClickGui.TextSide.Left)
                     FontRenderers.sf_medium_modules.drawString(context.getMatrices(), module.getName(), ix + 2, iy + 2, module.isEnabled() ? HudEditor.textColor2.getValue().getColor() : HudEditor.textColor.getValue().getColor());
                 else
-                    FontRenderers.sf_medium_modules.drawCenteredString(context.getMatrices(), module.getName(), ix + 44, iy - 1, module.isEnabled() ? HudEditor.textColor2.getValue().getColor() : HudEditor.textColor.getValue().getColor());
+                    FontRenderers.sf_medium_modules.drawCenteredString(context.getMatrices(), module.getName(), ix + 44, iy + 1, module.isEnabled() ? HudEditor.textColor2.getValue().getColor() : HudEditor.textColor.getValue().getColor());
             }
         }
     }
