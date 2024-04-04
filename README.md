@@ -37,4 +37,4 @@
 - [@0x3C50](https://github.com/0x3C50/Renderer) for Renderer
 
 ## ScreenShots
-![image](https://media.discordapp.net/attachments/934396624111824900/1176572202066378822/2023-11-21_20.16.11.png?ex=656f5b40&is=655ce640&hm=4ce030e0849e75f8b266b5fda2a5f2e0cecd8c36b629da995ee5a14952a280cd&=&width=1585&height=848)
+![image](https://cdn.discordapp.com/attachments/1003219031635001414/1223181472383635496/2024-03-29_11.03.55.png?ex=6618eb84&is=66067684&hm=58ffd22b02a4f98f34e77ffb78c03977d80d3a705879a0d4911e02e2d9f6d54d&)
