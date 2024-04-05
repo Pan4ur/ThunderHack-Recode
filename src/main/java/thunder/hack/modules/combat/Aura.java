@@ -64,14 +64,14 @@ import static thunder.hack.utility.math.MathUtility.random;
 
 public final class Aura extends Module {
     public final Setting<Float> attackRange = new Setting<>("Range", 3.1f, 2f, 6.0f);
-    public final Setting<Float> wallRange = new Setting<>("WallRange", 3.1f, 0f, 6.0f);
+    public final Setting<Float> wallRange = new Setting<>("ThroughWallsRange", 3.1f, 0f, 6.0f);
     public final Setting<Integer> fov = new Setting<>("FOV", 180, 1, 180);
     public final Setting<Mode> rotationMode = new Setting<>("RotationMode", Mode.Track);
     public final Setting<Integer> interactTicks = new Setting<>("InteractTicks", 3, 1, 10, v -> rotationMode.getValue() == Mode.Interact);
-    public final Setting<Switch> switchMode = new Setting<>("Switch", Switch.None);
+    public final Setting<Switch> switchMode = new Setting<>("AutoWeapon", Switch.None);
     public final Setting<Boolean> onlyWeapon = new Setting<>("OnlyWeapon", false, v -> switchMode.getValue() != Switch.Silent);
     public final Setting<BooleanParent> smartCrit = new Setting<>("SmartCrit", new BooleanParent(true));
-    public final Setting<Boolean> onlySpace = new Setting<>("OnlySpace", false).withParent(smartCrit);
+    public final Setting<Boolean> onlySpace = new Setting<>("OnlyCrit", false).withParent(smartCrit);
     public final Setting<Boolean> autoJump = new Setting<>("AutoJump", false).withParent(smartCrit);
     public final Setting<Boolean> wallsBypass = new Setting<>("WallsBypass", false, v -> wallRange.getValue() > 0);
     public final Setting<Boolean> shieldBreaker = new Setting<>("ShieldBreaker", true);
@@ -94,9 +94,9 @@ public final class Aura extends Module {
     public final Setting<Boolean> pauseInInventory = new Setting<>("PauseInInventory", true).withParent(advanced);
     public final Setting<RayTrace> rayTrace = new Setting<>("RayTrace", RayTrace.OnlyTarget).withParent(advanced);
     public final Setting<Boolean> unpressShield = new Setting<>("UnpressShield", true).withParent(advanced);
-    public final Setting<Boolean> deathDisable = new Setting<>("DeathDisable", true).withParent(advanced);
+    public final Setting<Boolean> deathDisable = new Setting<>("DisableOnDeath", true).withParent(advanced);
     public final Setting<Boolean> tpDisable = new Setting<>("TPDisable", false).withParent(advanced);
-    public final Setting<Boolean> pullDown = new Setting<>("PullDown", false).withParent(advanced);
+    public final Setting<Boolean> pullDown = new Setting<>("FastFall", false).withParent(advanced);
     public final Setting<Float> pullValue = new Setting<>("PullValue", 3f, 0f, 20f, v -> pullDown.getValue()).withParent(advanced);
     public final Setting<AttackHand> attackHand = new Setting<>("AttackHand", AttackHand.MainHand).withParent(advanced);
     public final Setting<Resolver> resolver = new Setting<>("Resolver", Resolver.Advantage).withParent(advanced);
@@ -118,10 +118,10 @@ public final class Aura extends Module {
     public final Setting<Boolean> Villagers = new Setting<>("Villagers", true).withParent(targets);
     public final Setting<Boolean> Slimes = new Setting<>("Slimes", true).withParent(targets);
     public final Setting<Boolean> Projectiles = new Setting<>("Projectiles", true).withParent(targets);
-    public final Setting<Boolean> ignoreInvisible = new Setting<>("IgnoreInvis", false).withParent(targets);
+    public final Setting<Boolean> ignoreInvisible = new Setting<>("IgnoreInvisibleEntities", false).withParent(targets);
     public final Setting<Boolean> ignoreTeam = new Setting<>("IgnoreTeam", false).withParent(targets);
     public final Setting<Boolean> ignoreCreative = new Setting<>("IgnoreCreative", true).withParent(targets);
-    public final Setting<Boolean> ignoreShield = new Setting<>("IgnoreShield", true).withParent(targets);
+    public final Setting<Boolean> ignoreShield = new Setting<>("AttackShieldingEntities", true).withParent(targets);
     public final Setting<Boolean> onlyAngry = new Setting<>("OnlyAngryEntities", true).withParent(targets);
 
     public static Entity target;
