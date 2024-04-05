@@ -26,7 +26,7 @@ public class Velocity extends Module {
      */
 
     public Setting<Boolean> onlyAura = new Setting<>("OnlyDuringAura", false);
-    public Setting<Boolean> pauseInWater = new Setting<>("PauseInFluids", false);
+    public Setting<Boolean> pauseInWater = new Setting<>("PauseInLiquids", false);
     public Setting<Boolean> explosions = new Setting<>("Explosions", true);
     public Setting<Boolean> autoDisable = new Setting<>("DisableOnStaff", false);
     public Setting<Boolean> cc = new Setting<>("PauseOnFlag", false);
@@ -35,7 +35,7 @@ public class Velocity extends Module {
     public static Setting<Parent> antiPush = new Setting<>("AntiPush", new Parent(false, 0));
     public Setting<Boolean> blocks = new Setting<>("Blocks", true).withParent(antiPush);
     public Setting<Boolean> players = new Setting<>("Players", true).withParent(antiPush);
-    public Setting<Boolean> water = new Setting<>("Water", true).withParent(antiPush);
+    public Setting<Boolean> water = new Setting<>("Liquids", true).withParent(antiPush);
     private final Setting<modeEn> mode = new Setting<>("Mode", modeEn.Matrix);
     public Setting<Float> vertical = new Setting<>("Vertical", 0.0f, 0.0f, 100.0f, v -> mode.getValue() == modeEn.Custom);
     private final Setting<jumpModeEn> jumpMode = new Setting<>("JumpMode", jumpModeEn.Jump, v -> mode.getValue() == modeEn.Jump);
