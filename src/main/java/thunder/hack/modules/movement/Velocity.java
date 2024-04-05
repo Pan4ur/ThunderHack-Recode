@@ -25,13 +25,13 @@ public class Velocity extends Module {
     https://github.com/SkidderMC/FDPClient/blob/main/src/main/java/net/ccbluex/liquidbounce/features/module/modules/combat/velocitys/vanilla/JumpVelocity.kt
      */
 
-    public Setting<Boolean> onlyAura = new Setting<>("OnlyAura", false);
+    public Setting<Boolean> onlyAura = new Setting<>("OnlyDuringAura", false);
     public Setting<Boolean> pauseInWater = new Setting<>("PauseInFluids", false);
     public Setting<Boolean> explosions = new Setting<>("Explosions", true);
-    public Setting<Boolean> autoDisable = new Setting<>("DisableOnVerify", false);
+    public Setting<Boolean> autoDisable = new Setting<>("DisableOnStaff", false);
     public Setting<Boolean> cc = new Setting<>("PauseOnFlag", false);
     public Setting<Boolean> fishingHook = new Setting<>("FishingHook", true);
-    public Setting<Boolean> fire = new Setting<>("PauseFire", false);
+    public Setting<Boolean> fire = new Setting<>("PauseOnFire", false);
     public static Setting<Parent> antiPush = new Setting<>("AntiPush", new Parent(false, 0));
     public Setting<Boolean> blocks = new Setting<>("Blocks", true).withParent(antiPush);
     public Setting<Boolean> players = new Setting<>("Players", true).withParent(antiPush);
