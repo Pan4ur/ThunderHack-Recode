@@ -20,10 +20,10 @@ import thunder.hack.setting.impl.BooleanParent;
 public final class TriggerBot extends Module {
     public final Setting<Float> attackRange = new Setting<>("Range", 3f, 1f, 7.0f);
     public final Setting<BooleanParent> smartCrit = new Setting<>("SmartCrit", new BooleanParent(true));
-    public final Setting<Boolean> onlySpace = new Setting<>("OnlySpace", false).withParent(smartCrit);
+    public final Setting<Boolean> onlySpace = new Setting<>("OnlyCrit", false).withParent(smartCrit);
     public final Setting<Boolean> autoJump = new Setting<>("AutoJump", false).withParent(smartCrit);
     public final Setting<Boolean> ignoreWalls = new Setting<>("IgnoreWalls", false);
-    public final Setting<Boolean> pauseEating = new Setting<>("PauseEating", false);
+    public final Setting<Boolean> pauseEating = new Setting<>("PauseWhileEating", false);
 
     private static TriggerBot instance;
     private int delay;
