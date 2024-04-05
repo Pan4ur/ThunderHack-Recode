@@ -16,8 +16,8 @@ import thunder.hack.utility.render.animation.AnimationUtility;
 import java.util.Objects;
 
 public class KeyBinds extends HudElement {
-    public final Setting<ColorSetting> oncolor = new Setting<>("OnColor", new ColorSetting(0xBEBEBE));
-    public final Setting<ColorSetting> offcolor = new Setting<>("OffColor", new ColorSetting(0x646464));
+    public final Setting<ColorSetting> oncolor = new Setting<>("OnColor", new ColorSetting(-1));
+    public final Setting<ColorSetting> offcolor = new Setting<>("OffColor", new ColorSetting(1));
     public final Setting<Boolean> onlyEnabled = new Setting<>("OnlyEnabled", false);
 
     public KeyBinds() {
