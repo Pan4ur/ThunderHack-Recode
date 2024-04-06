@@ -7,10 +7,13 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Pair;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderer;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.FrameRateCounter;
@@ -50,8 +53,11 @@ public class LegacyHud extends Module {
     private final Setting<Boolean> offhandDurability = new Setting<>("OffhandDurability", false);
     private final Setting<Boolean> mainhandDurability = new Setting<>("MainhandDurability", false);
     private final Setting<Boolean> fps = new Setting<>("FPS", false);
-    public Setting<Integer> waterMarkY = new Setting<>("WatermarkPosY", 2, 0, 20, v -> waterMark.getValue());
+    private final Setting<Boolean> chests = new Setting<>("Chests", false);
     public Setting<Boolean> time = new Setting<>("Time", false);
+
+
+    public Setting<Integer> waterMarkY = new Setting<>("WatermarkPosY", 2, 0, 20, v -> waterMark.getValue());
     private int color;
 
     private enum Font {
@@ -141,6 +147,12 @@ public class LegacyHud extends Module {
 
         if (speed.getValue()) {
             String str = "Speed " + Formatting.WHITE + MathUtility.round(ThunderHack.playerManager.currentPlayerSpeed * (bps.getValue() ? 20f : 72f) * ThunderHack.TICK_TIMER) + (bps.getValue() ? " b/s" : " km/h");
+            drawText(context, str, (width - getStringWidth(str) - 2), renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
+        }
+
+        if (chests.getValue()) {
+            Pair<Integer, Integer> chests = ModuleManager.chestCounter.getChestCount();
+            String str = "Chests: " + Formatting.WHITE + "S:" + chests.getLeft() + " D:" + chests.getRight();
             drawText(context, str, (width - getStringWidth(str) - 2), renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
         }
 

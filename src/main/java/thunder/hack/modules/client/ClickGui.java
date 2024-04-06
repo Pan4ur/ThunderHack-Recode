@@ -7,7 +7,6 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 
 public class ClickGui extends Module {
-    public static boolean anyHovered;
     public Setting<Gradient> gradientMode = new Setting<>("Gradient", Gradient.LeftToRight);
     public Setting<TextSide> textSide = new Setting<>("TextSide", TextSide.Left);
     public Setting<scrollModeEn> scrollMode = new Setting<>("ScrollMode", scrollModeEn.Old);

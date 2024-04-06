@@ -8,6 +8,7 @@ import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.AbstractWindow;
+import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.ModuleWindow;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
@@ -35,32 +36,17 @@ public class HudEditorGui extends Screen {
     @Override
     protected void init() {
         if (firstOpen) {
-            float x = 60, y = 20;
-            float offset = 0;
-            int windowHeight = 18;
-
-            for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
-                if (category != Module.Category.HUD) continue;
-                ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category), x + offset, y, 108, windowHeight);
-                window.setOpen(true);
-                windows.add(window);
-                offset += 110;
-
-                if (offset > mc.getWindow().getScaledWidth()) {
-                    offset = 0;
-                }
-            }
-
+            ModuleWindow window = new ModuleWindow(Module.Category.HUD, ThunderHack.moduleManager.getModulesByCategory(Module.Category.HUD), 20f, 20f, 100f, 18f);
+            window.setOpen(true);
+            windows.add(window);
             firstOpen = false;
         }
-
         windows.forEach(AbstractWindow::init);
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        ClickGui.anyHovered = false;
-
+        ClickGUI.anyHovered = false;
         for (AbstractWindow window : windows) {
             if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_DOWN)) {
                 window.setY(window.getY() + 2);

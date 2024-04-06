@@ -117,12 +117,13 @@ public final class Aura extends Module {
     public final Setting<Boolean> Animals = new Setting<>("Animals", true).withParent(targets);
     public final Setting<Boolean> Villagers = new Setting<>("Villagers", true).withParent(targets);
     public final Setting<Boolean> Slimes = new Setting<>("Slimes", true).withParent(targets);
+    public final Setting<Boolean> hostiles = new Setting<>("Hostiles", true).withParent(targets);
+    public final Setting<Boolean> onlyAngry = new Setting<>("OnlyAngryHostiles", true, v -> hostiles.getValue()).withParent(targets);
     public final Setting<Boolean> Projectiles = new Setting<>("Projectiles", true).withParent(targets);
     public final Setting<Boolean> ignoreInvisible = new Setting<>("IgnoreInvisibleEntities", false).withParent(targets);
     public final Setting<Boolean> ignoreTeam = new Setting<>("IgnoreTeam", false).withParent(targets);
     public final Setting<Boolean> ignoreCreative = new Setting<>("IgnoreCreative", true).withParent(targets);
     public final Setting<Boolean> ignoreShield = new Setting<>("AttackShieldingEntities", true).withParent(targets);
-    public final Setting<Boolean> onlyAngry = new Setting<>("OnlyAngryEntities", true).withParent(targets);
 
     public static Entity target;
 
@@ -743,7 +744,14 @@ public final class Aura extends Module {
 
     private boolean skipNotSelected(Entity entity) {
         if (entity instanceof SlimeEntity && !Slimes.getValue()) return true;
-        if (entity instanceof HostileEntity he && !he.isAngryAt(mc.player) && onlyAngry.getValue()) return true;
+        if (entity instanceof HostileEntity he) {
+            if(!hostiles.getValue())
+                return true;
+
+            if (onlyAngry.getValue())
+                return !he.isAngryAt(mc.player);
+        }
+
         if (entity instanceof PlayerEntity && !Players.getValue()) return true;
         if (entity instanceof VillagerEntity && !Villagers.getValue()) return true;
         if (entity instanceof MobEntity && !Mobs.getValue()) return true;

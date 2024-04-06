@@ -24,6 +24,7 @@ import static thunder.hack.modules.Module.mc;
 
 public class ClickGUI extends Screen {
     public static List<AbstractWindow> windows;
+    public static boolean anyHovered;
 
     private boolean firstOpen;
     private float scrollY;
@@ -63,7 +64,7 @@ public class ClickGUI extends Screen {
             int windowHeight = 18;
 
             for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
-                if (category.getName().contains("HUD")) continue;
+                if (category == Module.Category.HUD) continue;
                 ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category), 20f + offset, 20, 100, windowHeight);
                 window.setOpen(true);
                 windows.add(window);
@@ -88,6 +89,8 @@ public class ClickGUI extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        anyHovered = false;
+
         if (Module.fullNullCheck())
             Render2DEngine.drawMainMenuShader(context.getMatrices(), 0, 0, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
 

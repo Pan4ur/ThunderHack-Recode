@@ -7,6 +7,7 @@ import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractElement;
+import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
@@ -18,6 +19,8 @@ import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 import java.util.Objects;
+
+import static thunder.hack.core.IManager.mc;
 
 public class SliderElement extends AbstractElement {
 
@@ -62,6 +65,12 @@ public class SliderElement extends AbstractElement {
 
         if (dragging)
             setValue(mouseX, x + 7, width - 14);
+
+        if(Render2DEngine.isHovered(mouseX, mouseY, (x + 6), (float) (y + height - 7), (float) (width - 12), 3)) {
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(),
+                    GLFW.glfwCreateStandardCursor(GLFW.GLFW_HRESIZE_CURSOR));
+            ClickGUI.anyHovered = true;
+        }
     }
 
     private void setValue(int mouseX, double x, double width) {

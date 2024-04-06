@@ -3,8 +3,10 @@ package thunder.hack.gui.clickui.impl;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractElement;
+import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -13,6 +15,7 @@ import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 
+import static thunder.hack.core.IManager.mc;
 import static thunder.hack.gui.clickui.ClickGUI.arrow;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
@@ -54,6 +57,12 @@ public class BooleanParentElement extends AbstractElement {
             FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "v", x + width - 33.5f, y + height / 2 - 1f, new Color(-1).getRGB());
         } else {
             FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "x", x + width - 26f, y + height / 2 - 1f, new Color(-1).getRGB());
+        }
+
+        if(Render2DEngine.isHovered(mouseX, mouseY, x + width - 36, y + height / 2 - 4, 15, 8)) {
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(),
+                    GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
+            ClickGUI.anyHovered = true;
         }
     }
 

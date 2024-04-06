@@ -6,6 +6,7 @@ import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractButton;
+import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.render.Render2DEngine;
@@ -24,6 +25,12 @@ public class SearchBar extends AbstractButton {
         Render2DEngine.drawGuiBase(context.getMatrices(), x + 4, y + 1f, width - 8, height - 2, 1f, Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height) ? 0.8f : 0f);
         if (!listening) FontRenderers.sf_medium.drawGradientString(context.getMatrices(), "Search...", x + 7f, y + 5f, 2);
         else FontRenderers.sf_medium.drawGradientString(context.getMatrices(), moduleName + (mc.player == null || ((mc.player.age / 10) % 2 == 0) ? " " : "_"), x + 7f, y + 5f, 2);
+
+        if(Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height)) {
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(),
+                    GLFW.glfwCreateStandardCursor(GLFW.GLFW_IBEAM_CURSOR));
+            ClickGUI.anyHovered = true;
+        }
     }
 
     @Override

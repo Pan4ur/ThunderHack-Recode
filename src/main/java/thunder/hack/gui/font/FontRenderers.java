@@ -23,6 +23,7 @@ public class FontRenderers {
     public static FontRenderer sf_medium;
     public static FontRenderer sf_medium_mini;
     public static FontRenderer sf_medium_modules;
+    public static FontRenderer minecraft;
 
     public static FontRenderer getSettingsRenderer() {
         return settings;
@@ -31,17 +32,8 @@ public class FontRenderers {
     public static FontRenderer getModulesRenderer() {
         return modules;
     }
-
-    //Font fn = Font.decode("FreeSerif");
-    //			fr = new FontRenderer(new Font[]{fn}, 64, 256, 2, "123");
     
-    public static @NotNull FontRenderer createDefault(float size, String name) throws IOException, FontFormatException {
-
-        Font fn = Font.decode("FreeSerif");
+    public static @NotNull FontRenderer create(float size, String name) throws IOException, FontFormatException {
         return new FontRenderer(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("assets/thunderhack/fonts/" + name + ".ttf"))).deriveFont(Font.PLAIN, size / 2f), size / 2f);
-    }
-    
-    public static @NotNull FontRenderer createIcons(float size) throws IOException, FontFormatException {
-        return new FontRenderer(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("assets/thunderhack/fonts/icons.ttf"))).deriveFont(Font.PLAIN, size / 2f), size / 2f);
     }
 }

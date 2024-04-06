@@ -72,6 +72,7 @@ public class ModuleManager implements IManager {
     public static AntiServerRP antiServerRP = new AntiServerRP();
     public static TotemCounter totemCounter = new TotemCounter();
     public static PerfectDelay perfectDelay = new PerfectDelay();
+    public static ChestCounter chestCounter = new ChestCounter();
     public static FastLatency fastLatency = new FastLatency();
     public static PearlChaser pearlChaser = new PearlChaser();
     public static WorldTweaks worldTweaks = new WorldTweaks();
@@ -300,8 +301,8 @@ public class ModuleManager implements IManager {
     public void onRender2D(DrawContext context) {
         HudElement.anyHovered = false;
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender2D(context));
-      //  if(!HudElement.anyHovered && !ClickUI.anyHovered)
-      //      GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
+        if(!HudElement.anyHovered && !ClickGUI.anyHovered)
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
         ThunderHack.core.onRender2D(context);
     }
 
