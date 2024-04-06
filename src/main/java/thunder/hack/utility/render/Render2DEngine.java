@@ -39,7 +39,6 @@ public class Render2DEngine {
     public static MainMenuProgram MAIN_MENU_PROGRAM;
     public static ArcShader ARC_PROGRAM;
 
-
     public static final Identifier star = new Identifier("textures/star.png");
     public static final Identifier heart = new Identifier("textures/heart.png");
     public static final Identifier dollar = new Identifier("textures/dollar.png");

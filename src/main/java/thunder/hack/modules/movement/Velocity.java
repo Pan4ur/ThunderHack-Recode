@@ -2,12 +2,14 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.projectile.FishingBobberEntity;
+import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.explosion.Explosion;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -28,7 +30,6 @@ public class Velocity extends Module {
     public Setting<Boolean> onlyAura = new Setting<>("OnlyDuringAura", false);
     public Setting<Boolean> pauseInWater = new Setting<>("PauseInLiquids", false);
     public Setting<Boolean> explosions = new Setting<>("Explosions", true);
-    public Setting<Boolean> autoDisable = new Setting<>("DisableOnStaff", false);
     public Setting<Boolean> cc = new Setting<>("PauseOnFlag", false);
     public Setting<Boolean> fishingHook = new Setting<>("FishingHook", true);
     public Setting<Boolean> fire = new Setting<>("PauseOnFire", false);
@@ -66,11 +67,6 @@ public class Velocity extends Module {
         if (ccCooldown > 0) {
             ccCooldown--;
             return;
-        }
-
-        if (e.getPacket() instanceof GameMessageS2CPacket && autoDisable.getValue()) {
-            String text = ((GameMessageS2CPacket) e.getPacket()).content().getString();
-            if (text.contains("Тебя проверяют на чит АКБ, ник хелпера - ")) disable(":^)");
         }
 
         if (e.getPacket() instanceof EntityStatusS2CPacket pac
@@ -149,7 +145,9 @@ public class Velocity extends Module {
                     ((IExplosionS2CPacket) explosion).setMotionY(((IExplosionS2CPacket) explosion).getMotionY() * vertical.getValue() / 100f);
                 }
                 case GrimNew -> {
-                    e.cancel();
+                    ((IExplosionS2CPacket) explosion).setMotionX(0);
+                    ((IExplosionS2CPacket) explosion).setMotionY(0);
+                    ((IExplosionS2CPacket) explosion).setMotionZ(0);
                     flag = true;
                 }
             }

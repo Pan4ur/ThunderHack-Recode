@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
@@ -12,6 +13,7 @@ import net.minecraft.util.math.Direction;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventBreakBlock;
 import thunder.hack.events.impl.EventCollision;
+import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -51,6 +53,12 @@ public class Phase extends Module {
             if (!e.getPos().equals(playerPos.down()) || mc.options.sneakKey.isPressed())
                 e.setState(Blocks.AIR.getDefaultState());
         }
+    }
+    
+    @Override
+    public void onEnable() {
+        afterPearlTime = 0;
+        clipTimer = 0;
     }
 
     @EventHandler
@@ -98,18 +106,32 @@ public class Phase extends Module {
 
                 float[] angle = InteractionUtility.calculateAngle(block.toCenterPos());
                 int epSlot = findEPSlot();
+
+                if (epSlot != -1) {
+                    ModuleManager.autoCrystal.pause();
+                    ModuleManager.aura.pause();
+                    mc.player.setYaw(angle[0]);
+                    mc.player.setPitch(80f);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPostSync(EventPostSync e) {
+        if (mode.getValue() == Mode.Pearl) {
+            if(mc.player.horizontalCollision && !playerInsideBlock() && clipTimer <= 0 && mc.player.age > 60){
+                if(mc.options.sneakKey.isPressed())
+                    return;
+
+                int epSlot = findEPSlot();
                 int prevItem = mc.player.getInventory().selectedSlot;
 
                 if (epSlot != -1) {
-                    mc.player.setYaw(angle[0]);
-                    mc.player.setPitch(80f);
                     InventoryUtility.switchTo(epSlot);
-                   // sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
-                    mc.interactionManager.interactItem( mc.player, Hand.MAIN_HAND);
+                    sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                    sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                     InventoryUtility.switchTo(prevItem);
-                    ModuleManager.autoCrystal.pause();
-                    ModuleManager.aura.pause();
-
                 }
                 clipTimer = 20;
                 afterPearlTime = afterPearl.getValue();

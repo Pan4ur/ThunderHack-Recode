@@ -146,7 +146,7 @@ public final class Aura extends Module {
     public void auraLogic() {
         Item handItem = mc.player.getMainHandStack().getItem();
 
-        if ((switchMode.getValue() != Switch.Silent && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem || handItem instanceof TridentItem))) {
+        if ((!haveWeapon() && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem || handItem instanceof TridentItem))) {
             target = null;
             return;
         }
@@ -184,6 +184,10 @@ public final class Aura extends Module {
 
             postAttack(playerState[0], playerState[1]);
         }
+    }
+
+    private boolean haveWeapon() {
+        return InventoryUtility.getSwordHotBar().found() || InventoryUtility.getAxeHotBar().found();
     }
 
     private boolean skipRayTraceCheck() {

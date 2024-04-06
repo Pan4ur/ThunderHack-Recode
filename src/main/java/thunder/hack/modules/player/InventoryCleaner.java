@@ -23,16 +23,9 @@ public class InventoryCleaner extends Module {
         super("InventoryCleaner", Category.PLAYER);
     }
 
-    public final Setting<Mode> mode = new Setting<>("Mode", Mode.NexusGrief);
     private final Setting<DropWhen> dropWhen = new Setting<>("DropWhen", DropWhen.NotInInventory);
     private final Setting<Integer> delay = new Setting<>("Delay", 50, 0, 500);
     private final Setting<Boolean> cleanChests = new Setting<>("CleanChests", false);
-
-    private static final List<Item> nexusShit = Arrays.asList(
-            Items.PAPER, Items.OAK_SAPLING, Items.PLAYER_HEAD, Items.WOODEN_AXE,
-            Items.KNOWLEDGE_BOOK, Items.BIRCH_SAPLING, Items.STONE_SHOVEL, Items.SPRUCE_SAPLING,
-            Items.WHEAT_SEEDS, Items.TORCH, Items.BUCKET, Items.FLINT_AND_STEEL, Items.STICK
-    );
 
     public List<String> items = new ArrayList<>();
     private final Timer delayTimer = new Timer();
@@ -56,13 +49,7 @@ public class InventoryCleaner extends Module {
 
         for (int slot = 0; slot < 36; slot++) {
             ItemStack itemFromslot = mc.player.getInventory().getStack(slot);
-            if (nexusShit.contains(itemFromslot.getItem()) && mode.getValue() == Mode.NexusGrief) {
-                // Порой бывает что деревянный топорик - твое единственное оружие...
-                if (itemFromslot.getItem() == Items.WOODEN_AXE && InventoryUtility.getItemCount(Items.WOODEN_AXE) == 1)
-                    continue;
-                drop(slot);
-            }
-            if (mode.getValue() == Mode.BlackList && dropThisShit(itemFromslot))
+            if (dropThisShit(itemFromslot))
                 drop(slot);
         }
 
@@ -86,9 +73,5 @@ public class InventoryCleaner extends Module {
 
     public enum DropWhen {
         Inventory, Always, NotInInventory
-    }
-
-    public enum Mode {
-        NexusGrief, BlackList
     }
 }

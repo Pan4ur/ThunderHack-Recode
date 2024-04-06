@@ -49,7 +49,6 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Objects;
 
 import static thunder.hack.utility.render.Render2DEngine.CONTAINER_BACKGROUND;
@@ -68,6 +67,7 @@ public class NameTags extends Module {
     private final Setting<Boolean> enchantss = new Setting<>("Enchants", true);
     private final Setting<Boolean> onlyHands = new Setting<>("OnlyHands", false, v -> enchantss.getValue());
     private final Setting<Boolean> funtimeHp = new Setting<>("FunTimeHp", false);
+    private final Setting<Boolean> bots = new Setting<>("Bots", false);
     private final Setting<Boolean> potions = new Setting<>("Potions", true);
     private final Setting<Boolean> shulkers = new Setting<>("Shulkers", true);
     private final Setting<ColorSetting> fillColorA = new Setting<>("Color", new ColorSetting(0x80000000));
@@ -95,6 +95,7 @@ public class NameTags extends Module {
     public void onRender2D(DrawContext context) {
         for (PlayerEntity ent : mc.world.getPlayers()) {
             if (ent == mc.player && mc.options.getPerspective().isFirstPerson()) continue;
+            if (getEntityPing(ent) <= 0 && !bots.getValue()) continue;
 
             double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
             double y = ent.prevY + (ent.getY() - ent.prevY) * mc.getTickDelta();

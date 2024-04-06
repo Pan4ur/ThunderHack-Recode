@@ -57,7 +57,7 @@ public abstract class MixinMinecraftClient {
             "hypemc",
             "vimemc"
     };
-    
+
     @Inject(method = "<init>", at = @At("TAIL"))
     void postWindowInit(RunArgs args, CallbackInfo ci) {
         try {

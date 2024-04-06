@@ -140,32 +140,10 @@ public final class RPC extends Module {
             result = isRu() ? "Выбирает сервер" : "Picks a server";
         } else if (mc.getCurrentServerEntry() != null) {
             result = isRu() ? (showIP.getValue() ? "Играет на " + mc.getCurrentServerEntry().address : "Играет на сервере") : (showIP.getValue() ? "Playing on " + mc.getCurrentServerEntry().address : "Playing on server");
-            if (mc.getCurrentServerEntry().address.equals("ngrief.me"))
-                result = mc.getCurrentServerEntry().address + " " + getNexusDetails();
         } else if (mc.isInSingleplayer()) {
             result = isRu() ? "Читерит в одиночке" : "SinglePlayer hacker";
         }
         return result;
-    }
-
-    private String getNexusDetails() {
-        if (isOn(-150, -3, -146, 1))
-            return "(фармит на плите)";
-        else if (isOn(-120, 10, -82, 46))
-            return "(у прудика)";
-        else if (isOn(-92, -74, -26, -64))
-            return "(на warp pvp)";
-        else if (isOn(0, -27, 20, -10))
-            return "(у аукциона)";
-        else if (isOn(-210, -160, -126, 131))
-            return "(на warp exit)";
-        else if (isOn(-124, -92, 42, 85))
-            return "(на спавне)";
-        else return "(на ртп)";
-    }
-
-    private boolean isOn(int x, int z, int x1, int z1) {
-        return mc.player.getX() > x && mc.player.getX() < x1 && mc.player.getZ() > z && mc.player.getZ() < z1;
     }
 
     public enum Mode {Custom, MegaCute, Recode}
