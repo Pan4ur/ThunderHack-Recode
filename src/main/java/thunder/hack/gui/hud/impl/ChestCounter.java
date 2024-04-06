@@ -15,9 +15,6 @@ import thunder.hack.setting.Setting;
 import static thunder.hack.modules.render.StorageEsp.getBlockEntities;
 
 public class ChestCounter extends HudElement {
-    public float speed = 0f;
-    private final Setting<Boolean> bps = new Setting<>("BPS", false);
-
     public ChestCounter() {
         super("ChestCounter", 50, 10);
     }
