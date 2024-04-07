@@ -339,7 +339,7 @@ public class Render3DEngine {
             RenderSystem.disableCull();
     }
 
-    public static void drawLine(@NotNull Vec3d start, @NotNull Vec3d end,@NotNull Color color) {
+    public static void drawLine(@NotNull Vec3d start, @NotNull Vec3d end, @NotNull Color color) {
         LINE_QUEUE.add(new LineAction(start, end, color));
     }
 

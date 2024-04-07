@@ -298,7 +298,8 @@ public class FontRenderer implements Closeable {
                 continue;
             }
             Glyph glyph = locateGlyph1(c1);
-            currentLine += glyph.width() / (float) this.scaleMul;
+            float w = glyph == null ? 0 : glyph.width();
+            currentLine += w / (float) this.scaleMul;
         }
         return Math.max(currentLine, maxPreviousLines);
     }
@@ -320,7 +321,8 @@ public class FontRenderer implements Closeable {
                 continue;
             }
             Glyph glyph = locateGlyph1(c1);
-            currentLine = Math.max(glyph.height() / (float) this.scaleMul, currentLine);
+            float h = glyph == null ? 0 : glyph.height();
+            currentLine = Math.max(h / (float) this.scaleMul, currentLine);
         }
         return currentLine + previous;
     }

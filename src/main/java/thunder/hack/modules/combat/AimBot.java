@@ -1,3 +1,4 @@
+
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
@@ -18,6 +19,7 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.math.PredictUtility;
 import thunder.hack.utility.player.PlayerUtility;
@@ -28,18 +30,19 @@ import java.awt.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static java.lang.Math.abs;
 import static net.minecraft.util.hit.HitResult.Type.ENTITY;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
-import static thunder.hack.core.impl.PlayerManager.calcAngleVec;
 
 public final class AimBot extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.BowAim);
     private final Setting<Rotation> rotation = new Setting<>("Rotation", Rotation.Silent, v -> mode.getValue() != Mode.AimAssist);
     public final Setting<Float> aimRange = new Setting<>("Range", 20f, 1f, 30f, v -> mode.getValue() != Mode.AimAssist);
     public final Setting<Integer> aimStrength = new Setting<>("AimStrength", 30, 1, 100, v -> mode.getValue() == Mode.AimAssist);
-    public final Setting<Boolean> ignoreWalls = new Setting<>("Ignore Walls", true, v -> mode.getValue() == Mode.CSAim);
-    public final Setting<Boolean> ignoreInvisible = new Setting<>("IgnoreInvis", false);
+    public final Setting<Integer> aimSmooth = new Setting<>("AimSmooth", 45, 1, 180, v -> mode.getValue() == Mode.AimAssist);
+    public final Setting<Integer> aimtime = new Setting<>("AimTime", 2, 1, 10, v -> mode.getValue() == Mode.AimAssist);
+    public final Setting<Boolean> ignoreWalls = new Setting<>("Ignore Walls", true, v -> mode.getValue() == Mode.CSAim || mode.is(Mode.AimAssist));
+    public final Setting<Integer> reactionTime = new Setting<>("ReactionTime", 80, 1, 500, v -> mode.getValue() == Mode.AimAssist && !ignoreWalls.getValue());
+    public final Setting<Boolean> ignoreInvisible = new Setting<>("IgnoreInvis", false, v -> mode.is(Mode.AimAssist));
     public Setting<Float> rotYawRandom = new Setting<>("Yaw Random", 0f, 0f, 3f, v -> mode.getValue() == Mode.CSAim);
     public Setting<Float> rotPitchRandom = new Setting<>("Pitch Random", 0f, 0f, 3f, v -> mode.getValue() == Mode.CSAim);
     public Setting<Float> predict = new Setting<>("Aim Predict", 0.5f, 0.5f, 2f, v -> mode.getValue() == Mode.CSAim);
@@ -54,6 +57,9 @@ public final class AimBot extends Module {
     private float rotationYaw, rotationPitch;
     private Box debug_box;
     private float assistAcceleration;
+
+    private int aimTicks = 0;
+    private Timer visibleTime = new Timer();
 
     public AimBot() {
         super("AimBot", Category.COMBAT);
@@ -93,18 +99,42 @@ public final class AimBot extends Module {
                 if (mc.player.age % delay.getValue() == 0)
                     sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
         } else {
-            if (mc.crosshairTarget.getType() == ENTITY) {
+            if (mc.crosshairTarget.getType() == ENTITY)
+                aimTicks++;
+            else
+                aimTicks = 0;
+
+            if (aimTicks >= aimtime.getValue()) {
                 assistAcceleration = 0;
                 return;
             }
-            rotationYaw = Float.NaN;
+
             PlayerEntity nearestTarget = ThunderHack.combatManager.getNearestTarget(5);
             assistAcceleration += aimStrength.getValue() / 10000f;
 
             if (nearestTarget != null) {
-                rotationYaw = calcAngleVec(ModuleManager.aura.getLegitLook(nearestTarget)).x;
-                return;
-            }
+                if (!mc.player.canSee(nearestTarget)) {
+                    if (!ignoreWalls.getValue())
+                        visibleTime.reset();
+                }
+
+                if (!visibleTime.passedMs(reactionTime.getValue())) {
+                    rotationYaw = Float.NaN;
+                    return;
+                }
+
+                if (Float.isNaN(rotationYaw))
+                    rotationYaw = mc.player.getYaw();
+
+                float delta_yaw = wrapDegrees((float) wrapDegrees(Math.toDegrees(Math.atan2(nearestTarget.getEyePos().z - mc.player.getZ(), (nearestTarget.getEyePos().x - mc.player.getX()))) - 90) - rotationYaw);
+                if (delta_yaw > 180)
+                    delta_yaw = delta_yaw - 180;
+                float deltaYaw = MathHelper.clamp(MathHelper.abs(delta_yaw), -aimSmooth.getValue(), aimSmooth.getValue());
+                float newYaw = rotationYaw + (delta_yaw > 0 ? deltaYaw : -deltaYaw);
+                double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
+                rotationYaw = (float) (newYaw - (newYaw - rotationYaw) % gcdFix);
+            } else rotationYaw = Float.NaN;
+            return;
         }
 
         if (target != null || (mode.getValue() == Mode.BowAim && mc.player.getActiveItem().getItem() instanceof BowItem)) {
@@ -134,8 +164,6 @@ public final class AimBot extends Module {
 
         if (mode.getValue() == Mode.AimAssist) {
             if (Float.isNaN(rotationYaw)) return;
-            double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
-            rotationYaw = (float) (rotationYaw - (rotationYaw - mc.player.getYaw()) % gcdFix);
             mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.getYaw(), rotationYaw, assistAcceleration));
             return;
         }

@@ -85,7 +85,6 @@ public final class Aura extends Module {
     public final Setting<Boolean> grimRayTrace = new Setting<>("GrimRayTrace", true);
     public final Setting<Boolean> tpsSync = new Setting<>("TPSSync", false);
 
-
     /*   ADVANCED   */
     public final Setting<Parent> advanced = new Setting<>("Advanced", new Parent(false, 0));
     public final Setting<Float> aimRange = new Setting<>("AimRange", 3.1f, 2f, 6.0f).withParent(advanced);
@@ -144,9 +143,7 @@ public final class Aura extends Module {
     }
 
     public void auraLogic() {
-        Item handItem = mc.player.getMainHandStack().getItem();
-
-        if ((!haveWeapon() && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem || handItem instanceof TridentItem))) {
+        if (!haveWeapon()) {
             target = null;
             return;
         }
@@ -175,9 +172,6 @@ public final class Aura extends Module {
             if (shieldBreaker(false))
                 return;
 
-            if (switchMode.getValue() == Switch.None && onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem || handItem instanceof TridentItem))
-                return;
-
             boolean[] playerState = preAttack();
             if (!(target instanceof PlayerEntity pl) || !(pl.isUsingItem() && pl.getOffHandStack().getItem() == Items.SHIELD) || ignoreShield.getValue())
                 attack();
@@ -187,7 +181,15 @@ public final class Aura extends Module {
     }
 
     private boolean haveWeapon() {
-        return InventoryUtility.getSwordHotBar().found() || InventoryUtility.getAxeHotBar().found();
+        Item handItem = mc.player.getMainHandStack().getItem();
+        if(onlyWeapon.getValue()) {
+            if(switchMode.getValue() == Switch.None) {
+                return handItem instanceof SwordItem || handItem instanceof AxeItem || handItem instanceof TridentItem;
+            } else {
+                return (InventoryUtility.getSwordHotBar().found() || InventoryUtility.getAxeHotBar().found());
+            }
+        }
+        return true;
     }
 
     private boolean skipRayTraceCheck() {
@@ -296,8 +298,7 @@ public final class Aura extends Module {
         if (mc.player.isUsingItem() && pauseWhileEating.getValue())
             return;
 
-        Item handItem = mc.player.getMainHandStack().getItem();
-        if ((onlyWeapon.getValue() && !(handItem instanceof SwordItem || handItem instanceof AxeItem || handItem instanceof TridentItem)) && switchMode.getValue() != Switch.Silent)
+        if (!haveWeapon())
             return;
 
         if (target != null && rotationMode.getValue() != Mode.None) {
@@ -506,11 +507,7 @@ public final class Aura extends Module {
     }
 
     public void onRender3D(MatrixStack stack) {
-        Item handItem = mc.player.getMainHandStack().getItem();
-        if (target == null
-                || (switchMode.getValue() != Switch.Silent
-                && onlyWeapon.getValue()
-                && !(handItem instanceof SwordItem || handItem instanceof AxeItem || handItem instanceof TridentItem)))
+        if (!haveWeapon() || target == null)
             return;
 
         switch (esp.getValue()) {
@@ -749,7 +746,7 @@ public final class Aura extends Module {
     private boolean skipNotSelected(Entity entity) {
         if (entity instanceof SlimeEntity && !Slimes.getValue()) return true;
         if (entity instanceof HostileEntity he) {
-            if(!hostiles.getValue())
+            if (!hostiles.getValue())
                 return true;
 
             if (onlyAngry.getValue())
