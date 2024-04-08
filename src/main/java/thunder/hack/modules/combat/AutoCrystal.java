@@ -506,19 +506,24 @@ public class AutoCrystal extends Module {
         }
     }
 
-    private int switchTo(SearchInvResult result, SearchInvResult resultInv, @NotNull Setting<Switch> antiWeakness) {
+    private int switchTo(SearchInvResult result, SearchInvResult resultInv, @NotNull Setting<Switch> switchMode) {
         if (mc.player == null || mc.world == null || mc.interactionManager == null) return -1;
 
         int prevSlot = mc.player.getInventory().selectedSlot;
 
-        if (antiWeakness.getValue() != Switch.INVENTORY) {
-            result.switchTo();
-        } else if (resultInv.found()) {
-            prevSlot = resultInv.slot();
-            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-            sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+        switch (switchMode.getValue()) {
+            case INVENTORY -> {
+                if (resultInv.found()) {
+                    prevSlot = resultInv.slot();
+                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                }
+            }
+            case NORMAL -> result.switchTo();
+            case SILENT -> result.switchToSilent();
+            case NONE -> {
+            }
         }
-
         return prevSlot;
     }
 
@@ -546,7 +551,7 @@ public class AutoCrystal extends Module {
         if (autoSwitch.getValue() != Switch.NONE && !holdingCrystal)
             prevSlot = switchTo(crystalResult, crystalResultInv, autoSwitch);
 
-        if (!(mc.player.getMainHandStack().getItem() instanceof EndCrystalItem || offhand))
+        if (!(mc.player.getMainHandStack().getItem() instanceof EndCrystalItem || offhand || autoSwitch.getValue() == Switch.SILENT))
             return;
 
         sendPacket(new PlayerInteractBlockC2SPacket(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));

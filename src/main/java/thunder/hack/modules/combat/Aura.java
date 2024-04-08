@@ -90,6 +90,7 @@ public final class Aura extends Module {
     public final Setting<Float> aimRange = new Setting<>("AimRange", 3.1f, 0f, 6.0f).withParent(advanced);
     public final Setting<RandomHitDelay> randomHitDelay = new Setting<>("RandomHitTiming", RandomHitDelay.Off).withParent(advanced);
     public final Setting<Boolean> pauseInInventory = new Setting<>("PauseInInventory", true).withParent(advanced);
+    public final Setting<Boolean> dropSprint = new Setting<>("DropSprint", true).withParent(advanced);
     public final Setting<RayTrace> rayTrace = new Setting<>("RayTrace", RayTrace.OnlyTarget).withParent(advanced);
     public final Setting<Boolean> grimRayTrace = new Setting<>("GrimRayTrace", true).withParent(advanced);
     public final Setting<Boolean> unpressShield = new Setting<>("UnpressShield", true).withParent(advanced);
@@ -215,13 +216,13 @@ public final class Aura extends Module {
             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
 
         boolean sprint = Core.serverSprint;
-        if (sprint)
+        if (sprint && dropSprint.getValue())
             disableSprint();
         return new boolean[]{blocking, sprint};
     }
 
     public void postAttack(boolean block, boolean sprint) {
-        if (sprint)
+        if (sprint && dropSprint.getValue())
             enableSprint();
         if (block && unpressShield.getValue())
             sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
