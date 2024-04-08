@@ -417,7 +417,7 @@ public class AutoCrystal extends Module {
         if(!offhand && !mainHand && autoSwitch.is(Switch.NONE))
             return true;
 
-        if (mc.player.isUsingItem() && eating.getValue() && !offhand)
+        if (mc.player.isUsingItem() && eating.getValue())
             return true;
 
         if (rotationMarkedDirty())

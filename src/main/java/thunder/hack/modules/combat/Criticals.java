@@ -31,7 +31,7 @@ public final class Criticals extends Module {
 
     @EventHandler
     public void onPacketSend(PacketEvent.@NotNull Send event) {
-        if (event.getPacket() instanceof PlayerInteractEntityC2SPacket && getInteractType(event.getPacket()) == InteractType.ATTACK && !(getEntity(event.getPacket()) instanceof EndCrystalEntity)) {
+        if (event.getPacket() instanceof PlayerInteractEntityC2SPacket && getInteractType(event.getPacket()) == InteractType.ATTACK) {
             if (cancelCrit || getEntity(event.getPacket()) instanceof EndCrystalEntity) return;
             doCrit();
         }
