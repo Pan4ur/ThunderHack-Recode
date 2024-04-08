@@ -691,7 +691,7 @@ public final class Aura extends Module {
 
             case LowestDurability -> first_stage.stream().min(Comparator.comparing(e -> {
                         float v = 0;
-                        for (ItemStack armor : target.getArmorItems())
+                        for (ItemStack armor : e.getArmorItems())
                             if (armor != null && !armor.getItem().equals(Items.AIR)) {
                                 v += ((armor.getMaxDamage() - armor.getDamage()) / (float) armor.getMaxDamage());
                             }
@@ -701,7 +701,7 @@ public final class Aura extends Module {
 
             case HighestDurability -> first_stage.stream().max(Comparator.comparing(e -> {
                         float v = 0;
-                        for (ItemStack armor : target.getArmorItems())
+                        for (ItemStack armor : e.getArmorItems())
                             if (armor != null && !armor.getItem().equals(Items.AIR)) {
                                 v += ((armor.getMaxDamage() - armor.getDamage()) / (float) armor.getMaxDamage());
                             }
