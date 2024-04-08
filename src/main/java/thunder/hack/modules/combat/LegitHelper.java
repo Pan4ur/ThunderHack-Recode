@@ -77,6 +77,8 @@ public class LegitHelper extends Module {
                 && pl.getActiveItem().getItem() == Items.SHIELD && timer.every(500)) {
 
             int axeSlot = InventoryUtility.getAxeHotBar().slot();
+            if (axeSlot == -1)
+                return;
             new ShieldBreaker(axeSlot, mc.player.getInventory().selectedSlot, swapDelay.getValue()).start();
         }
     }
