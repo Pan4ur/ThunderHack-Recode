@@ -65,6 +65,7 @@ import static thunder.hack.utility.math.MathUtility.random;
 public final class Aura extends Module {
     public final Setting<Float> attackRange = new Setting<>("Range", 3.1f, 2f, 6.0f);
     public final Setting<Float> wallRange = new Setting<>("ThroughWallsRange", 3.1f, 0f, 6.0f);
+    public final Setting<Boolean> wallsBypass = new Setting<>("WallsBypass", false, v -> wallRange.getValue() > 0);
     public final Setting<Integer> fov = new Setting<>("FOV", 180, 1, 180);
     public final Setting<Mode> rotationMode = new Setting<>("RotationMode", Mode.Track);
     public final Setting<Integer> interactTicks = new Setting<>("InteractTicks", 3, 1, 10, v -> rotationMode.getValue() == Mode.Interact);
@@ -73,8 +74,9 @@ public final class Aura extends Module {
     public final Setting<BooleanParent> smartCrit = new Setting<>("SmartCrit", new BooleanParent(true));
     public final Setting<Boolean> onlySpace = new Setting<>("OnlyCrit", false).withParent(smartCrit);
     public final Setting<Boolean> autoJump = new Setting<>("AutoJump", false).withParent(smartCrit);
-    public final Setting<Boolean> wallsBypass = new Setting<>("WallsBypass", false, v -> wallRange.getValue() > 0);
     public final Setting<Boolean> shieldBreaker = new Setting<>("ShieldBreaker", true);
+    public final Setting<Boolean> pauseWhileEating = new Setting<>("PauseWhileEating", false); 
+    public final Setting<Boolean> tpsSync = new Setting<>("TPSSync", false);
     public final Setting<Boolean> clientLook = new Setting<>("ClientLook", false);
     public final Setting<BooleanParent> oldDelay = new Setting<>("OldDelay", new BooleanParent(false));
     public final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 15).withParent(oldDelay);
@@ -82,16 +84,14 @@ public final class Aura extends Module {
     public final Setting<ESP> esp = new Setting<>("ESP", ESP.ThunderHack);
     public final Setting<Sort> sort = new Setting<>("Sort", Sort.LowestDistance);
     public final Setting<Boolean> lockTarget = new Setting<>("LockTarget", true);
-    public final Setting<Boolean> grimRayTrace = new Setting<>("GrimRayTrace", true);
-    public final Setting<Boolean> tpsSync = new Setting<>("TPSSync", false);
 
     /*   ADVANCED   */
     public final Setting<Parent> advanced = new Setting<>("Advanced", new Parent(false, 0));
-    public final Setting<Float> aimRange = new Setting<>("AimRange", 3.1f, 2f, 6.0f).withParent(advanced);
+    public final Setting<Float> aimRange = new Setting<>("AimRange", 3.1f, 0f, 6.0f).withParent(advanced);
     public final Setting<RandomHitDelay> randomHitDelay = new Setting<>("RandomHitTiming", RandomHitDelay.Off).withParent(advanced);
-    public final Setting<Boolean> pauseWhileEating = new Setting<>("PauseWhileEating", false).withParent(advanced);
     public final Setting<Boolean> pauseInInventory = new Setting<>("PauseInInventory", true).withParent(advanced);
     public final Setting<RayTrace> rayTrace = new Setting<>("RayTrace", RayTrace.OnlyTarget).withParent(advanced);
+    public final Setting<Boolean> grimRayTrace = new Setting<>("GrimRayTrace", true).withParent(advanced);
     public final Setting<Boolean> unpressShield = new Setting<>("UnpressShield", true).withParent(advanced);
     public final Setting<Boolean> deathDisable = new Setting<>("DisableOnDeath", true).withParent(advanced);
     public final Setting<Boolean> tpDisable = new Setting<>("TPDisable", false).withParent(advanced);
