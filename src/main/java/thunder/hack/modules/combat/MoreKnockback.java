@@ -30,11 +30,6 @@ public class MoreKnockback extends Module {
     public Setting<Integer> hurtTime = new Setting<>("HurtTime", 10, 0, 10);
     public Setting<Integer> chance = new Setting<>("Chance", 100, 0, 100);
 
-    @Override
-    public void onEnable() {
-        sendMessage(Formatting.RED + (isRu() ? "Внимание! С этим модулем не будут проходить криты" : "Attention! With this module your hits will not be critical"));
-    }
-
     @EventHandler
     public void onSendPacket(PacketEvent.Send event) {
         if ((!MovementUtility.isMoving() || inMove.getValue())
@@ -68,6 +63,9 @@ public class MoreKnockback extends Module {
 
         if (mc.player.getAttackCooldownProgress(0.5f) < 0.9f)
             return false;
+
+        if (ModuleManager.criticals.isEnabled())
+            return true;
 
         if (!reasonForSkipCrit)
             return !mc.player.isOnGround() && mc.player.fallDistance > 0f;

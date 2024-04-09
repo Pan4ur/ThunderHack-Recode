@@ -31,4 +31,9 @@ public record SearchInvResult(int slot, boolean found, ItemStack stack) {
         if (found && isInHotBar())
             InventoryUtility.switchTo(slot);
     }
+
+    public void switchToSilent() {
+        if (found && isInHotBar())
+            InventoryUtility.switchToSilent(slot);
+    }
 }

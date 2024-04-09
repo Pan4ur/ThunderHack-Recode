@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DeadManager {
     private final Map<EndCrystalEntity, Long> deadCrystals = new ConcurrentHashMap<>();
 
-
     public void reset() {
         deadCrystals.clear();
     }

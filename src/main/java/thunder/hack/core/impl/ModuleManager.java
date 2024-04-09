@@ -4,7 +4,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
-import thunder.hack.cmd.Command;
 import thunder.hack.core.IManager;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
@@ -90,6 +89,7 @@ public class ModuleManager implements IManager {
     public static EntitySpeed entitySpeed = new EntitySpeed();
     public static AspectRatio aspectRatio = new AspectRatio();
     public static ClientSpoof clientSpoof = new ClientSpoof();
+    public static LegitHelper legitHelper = new LegitHelper();
     public static AutoAnchor autoAnchor = new AutoAnchor();
     public static WaterSpeed waterSpeed = new WaterSpeed();
     public static TriggerBot triggerBot = new TriggerBot();

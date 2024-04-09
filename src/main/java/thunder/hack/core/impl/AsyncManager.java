@@ -33,6 +33,13 @@ public class AsyncManager implements IManager {
     private volatile List<AbstractClientPlayerEntity> threadSafePlayersList = Collections.emptyList();
     public final AtomicBoolean ticking = new AtomicBoolean(false);
 
+    public static void sleep(int delay) {
+        try {
+            Thread.sleep(delay);
+        } catch (Exception ignored) {
+        }
+    }
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPostTick(EventPostTick e) {
         if (mc.world == null) return;

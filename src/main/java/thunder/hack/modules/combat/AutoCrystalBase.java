@@ -39,6 +39,7 @@ import static thunder.hack.modules.client.ClientSettings.isRu;
 public class AutoCrystalBase extends Module {
     private final Setting<TargetLogic> targetLogic = new Setting<>("TargetLogic", TargetLogic.Distance);
     private final Setting<Integer> range = new Setting<>("Range", 5, 1, 7);
+    private final Setting<Float> minDamageDelta = new Setting<>("MinDamageDelta", 5f, 1f, 20f);
     private final Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 300, 0, 3000);
     private final Setting<Integer> calcDelay = new Setting<>("CalcDelay", 150, 0, 3000);
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
@@ -128,7 +129,7 @@ public class AutoCrystalBase extends Module {
         return ModuleManager.autoCrystal.isEnabled()
                 && bestData != null
                 && ModuleManager.autoCrystal.renderDamage > 2
-                && ModuleManager.autoCrystal.renderDamage < bestData.damage;
+                && (ModuleManager.autoCrystal.renderDamage + minDamageDelta.getValue()) < bestData.damage;
     }
 
     public void calcPosition(float range, Vec3d center) {

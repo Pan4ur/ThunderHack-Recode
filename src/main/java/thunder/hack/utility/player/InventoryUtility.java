@@ -351,6 +351,11 @@ public final class InventoryUtility {
         mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
     }
 
+    public static void switchToSilent(int slot) {
+        if (mc.player == null || mc.getNetworkHandler() == null) return;
+        mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
+    }
+
     public static SearchInvResult getAntiWeaknessItem() {
         if (mc.player == null) return SearchInvResult.notFound();
 
