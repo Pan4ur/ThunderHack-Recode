@@ -13,6 +13,7 @@ public class AntiCrash extends Module { //https://github.com/Bram1903/MinecraftP
     public final Setting<Boolean> debug = new Setting<>("Debug",false);
     final double d = Double.MAX_VALUE / 2;
     final float f = Float.MAX_VALUE / 2;
+    final int i = Integer.MAX_VALUE / 2;
     public AntiCrash() {
         super("AntiCrash", Category.CLIENT);
     }
@@ -22,7 +23,8 @@ public class AntiCrash extends Module { //https://github.com/Bram1903/MinecraftP
             if(
                     exp.getX() == d ||
                     exp.getY() == d ||
-                    exp.getZ() == d
+                    exp.getZ() == d ||
+                    exp.getRadius() == f
             ){
                 if(debug.getValue()){
                     sendMessage("ExplosionS2CPacket canceled");
@@ -35,7 +37,11 @@ public class AntiCrash extends Module { //https://github.com/Bram1903/MinecraftP
             if(
                     p.getX() == d ||
                     p.getY() == d ||
-                    p.getZ() == d
+                    p.getZ() == d ||
+                    p.getSpeed() == f ||
+                    p.getOffsetX() == f ||
+                    p.getOffsetY() == f ||
+                    p.getOffsetZ() == f
             ){
                 if(debug.getValue()){
                     sendMessage("ParticleS2CPacket canceled");
@@ -48,7 +54,10 @@ public class AntiCrash extends Module { //https://github.com/Bram1903/MinecraftP
             if(
                     pos.getX() == d ||
                     pos.getY() == d ||
-                    pos.getZ() == d
+                    pos.getZ() == d ||
+                    pos.getYaw() == f ||
+                    pos.getPitch() == f ||
+                    pos.getTeleportId() == i
             )
             {
                 if(debug.getValue()){
