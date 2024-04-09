@@ -9,12 +9,14 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.PickaxeItem;
 import net.minecraft.item.SwordItem;
 import net.minecraft.resource.ResourceFactory;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.objectweb.asm.Opcodes;
@@ -31,6 +33,7 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.player.NoEntityTrace;
+import thunder.hack.modules.render.NoBob;
 import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.render.BlockAnimationUtility;
 import thunder.hack.utility.render.Render3DEngine;
@@ -140,6 +143,11 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
     private void bobViewHook(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+        if(ModuleManager.noBob.isEnabled()) {
+            ModuleManager.noBob.bobView(matrices, tickDelta);
+            ci.cancel();
+            return;
+        }
         if (ClientSettings.customBob.getValue()) {
             ThunderHack.core.bobView(matrices, tickDelta);
             ci.cancel();
