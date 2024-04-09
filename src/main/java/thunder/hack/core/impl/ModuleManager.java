@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class ModuleManager implements IManager {
     public ArrayList<Module> modules = new ArrayList<>();
     public List<Module> sortedModules = new ArrayList<>();
-
+    public static AntiCrash antiCrash = new AntiCrash();
     public static LevitationControl levitationControl = new LevitationControl();
     public static InventoryCleaner inventoryCleaner = new InventoryCleaner();
     public static NoCommentExploit noCommentExploit = new NoCommentExploit();
