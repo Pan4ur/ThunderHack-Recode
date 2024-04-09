@@ -2,6 +2,7 @@ package thunder.hack.modules.misc;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import net.minecraft.client.MinecraftClient;
 import org.apache.commons.io.IOUtils;
 import thunder.hack.ThunderHack;
 import thunder.hack.modules.Module;
@@ -13,6 +14,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Random;
+import net.minecraft.server.PlayerManager;
+import net.minecraft.server.integrated.IntegratedPlayerManager;
 
 public class Spammer extends Module {
     public static ArrayList<String> SpamList = new ArrayList<>();
@@ -39,8 +42,19 @@ public class Spammer extends Module {
                     }
                     case Joke: {
                         URL response = new URL("https://v2.jokeapi.dev/joke/Any?format=txt&type=single");
-                        this.message = new BufferedReader(new InputStreamReader(response.openStream())).readLine();
+                        this.message = new String(response.openStream().readAllBytes());
+                        break;
                     }
+                    case Activities:{
+                        String jsonResponse = IOUtils.toString(new URL("http://www.boredapi.com/api/activity"), StandardCharsets.UTF_8);
+                        JsonObject jsonObject = new JsonParser().parse(jsonResponse).getAsJsonObject();
+                        this.message = jsonObject.get("activity").getAsString();
+                        break;
+                    }
+                }
+                if(this.message.length() > 256){
+                    message = null;
+                    changeMessage();
                 }
             }catch (IOException e){
                 disable(ClientSettings.isRu() ? "Не удалось загрузить факт,может ты включишь интернет?" : "Failed to load the fact, can you turn on the Internet?");
@@ -50,7 +64,6 @@ public class Spammer extends Module {
     public static void loadSpammer() {
         try {
             File file = new File("ThunderHackRecode/misc/spammer.txt");
-
             if (!file.exists()) file.createNewFile();
             new Thread(() -> {
                 try {
@@ -102,6 +115,7 @@ public class Spammer extends Module {
     public void onEnable() {
         loadSpammer();
         changeMessage();
+
     }
 
     @Override
@@ -130,5 +144,5 @@ public class Spammer extends Module {
 
 
     private enum Mode {File, Api}
-    private enum Apis {Cat,Joke}
+    private enum Apis {Cat,Joke,Activities}
 }
