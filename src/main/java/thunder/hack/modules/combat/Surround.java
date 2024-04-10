@@ -5,13 +5,14 @@ import meteordevelopment.orbit.EventPriority;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import thunder.hack.events.impl.*;
+import thunder.hack.events.impl.EventEntitySpawn;
+import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.base.IndestructibleModule;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
@@ -25,17 +26,13 @@ import java.util.Objects;
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public final class Surround extends IndestructibleModule {
-    private final Setting<PlaceTiming> placeTiming = new Setting<>("Place Timing", PlaceTiming.Default);
-    private final Setting<Integer> blocksPerTick = new Setting<>("Blocks/Place", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
-    private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10, v -> placeTiming.getValue() != PlaceTiming.Sequential);
+    private final Setting<Integer> blocksPerTick = new Setting<>("Blocks/Place", 8, 1, 12);
+    private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10);
     private final Setting<CenterMode> center = new Setting<>("Center", CenterMode.Disabled);
-
     private final Setting<Parent> autoDisable = new Setting<>("Auto Disable", new Parent(false, 0));
     private final Setting<Boolean> onYChange = new Setting<>("On Y Change", true).withParent(autoDisable);
     private final Setting<OnTpAction> onTp = new Setting<>("On Tp", OnTpAction.None).withParent(autoDisable);
     private final Setting<Boolean> onDeath = new Setting<>("On Death", false).withParent(autoDisable);
-
-    private final List<BlockPos> sequentialBlocks = new ArrayList<>();
 
     private boolean wasTp = false;
     private int delay;
@@ -73,18 +70,14 @@ public final class Surround extends IndestructibleModule {
             disable(isRu() ? "Отключён из-за изменения Y!" : "Disabled due to Y change!");
             return;
         }
+
         if (wasTp && mc.player.isOnGround()) wasTp = false;
         prevY = mc.player.getY();
 
-        Vec3d centerVec = new Vec3d(
-                MathHelper.floor(mc.player.getX()) + 0.5,
-                mc.player.getY(),
-                MathHelper.floor(mc.player.getZ()) + 0.5
-        );
-        Box centerBox = new Box(
-                centerVec.getX() - 0.2, centerVec.getY() - 0.1, centerVec.getZ() - 0.2,
-                centerVec.getX() + 0.2, centerVec.getY() + 0.1, centerVec.getZ() + 0.2
-        );
+        Vec3d centerVec = new Vec3d(MathHelper.floor(mc.player.getX()) + 0.5, mc.player.getY(), MathHelper.floor(mc.player.getZ()) + 0.5);
+
+        Box centerBox = new Box(centerVec.getX() - 0.2, centerVec.getY() - 0.1, centerVec.getZ() - 0.2, centerVec.getX() + 0.2, centerVec.getY() + 0.1, centerVec.getZ() + 0.2);
+
         if (center.getValue() == CenterMode.Motion && !centerBox.contains(mc.player.getPos())) {
             mc.player.move(MovementType.SELF, new Vec3d((centerVec.getX() - mc.player.getX()) / 2, 0, (centerVec.getZ() - mc.player.getZ()) / 2));
             return;
@@ -101,42 +94,30 @@ public final class Surround extends IndestructibleModule {
         if (!getBlockResult().found())
             disable(isRu() ? "Нет блоков!" : "No blocks!");
 
-        if (placeTiming.getValue() == PlaceTiming.Vanilla || placeTiming.getValue() == PlaceTiming.Sequential) {
+
+        int placed = 0;
+        if (delay > 0) return;
+        while (placed < blocksPerTick.getValue()) {
+            if (!getBlockResult().found()) disable(isRu() ? "Нет блоков!" : "No blocks!");
+
             BlockPos targetBlock = getSequentialPos();
             if (targetBlock == null)
-                return;
+                break;
+
             if (placeBlock(targetBlock, true)) {
-                sequentialBlocks.add(targetBlock);
+                placed++;
                 delay = placeDelay.getValue();
                 inactivityTimer.reset();
-            }
-        } else {
-            int placed = 0;
-            if (delay > 0) return;
-            while (placed < blocksPerTick.getValue()) {
-                if (!getBlockResult().found()) disable(isRu() ? "Нет блоков!" : "No blocks!");
-
-                BlockPos targetBlock = getSequentialPos();
-                if (targetBlock == null)
-                    break;
-
-                if (placeBlock(targetBlock, true)) {
-                    placed++;
-                    delay = placeDelay.getValue();
-                    inactivityTimer.reset();
-                } else break;
-            }
+            } else break;
         }
+
     }
 
     @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onEntitySpawn(@NotNull EventEntitySpawn event) {
-        if (event.getEntity() instanceof EndCrystalEntity && crystalBreaker.getValue().isEnabled()) {
-            if (event.getEntity().squaredDistanceTo(mc.player) <= remove.getPow2Value()) {
-                breakCrystal((EndCrystalEntity) event.getEntity());
-            }
-        }
+        if (event.getEntity() instanceof EndCrystalEntity cr && crystalBreaker.getValue().isEnabled() && cr.squaredDistanceTo(mc.player) <= remove.getPow2Value())
+            handlePacket();
     }
 
     @SuppressWarnings("unused")
@@ -144,20 +125,8 @@ public final class Surround extends IndestructibleModule {
     private void onPacketReceive(PacketEvent.@NotNull Receive event) {
         if (!getBlockResult().found()) disable(isRu() ? "Нет блоков!" : "No blocks!");
 
-        if (event.getPacket() instanceof BlockUpdateS2CPacket pac && mc.player != null) {
-            if (placeTiming.getValue() == PlaceTiming.Sequential && !sequentialBlocks.isEmpty()) {
-                handleSequential(pac.getPos());
-            }
-            if (mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value() && pac.getState().isReplaceable()) {
-                handleSurroundBreak();
-            }
-        }
-        if (event.getPacket() instanceof BlockBreakingProgressS2CPacket pac && mc.player != null) {
-            if (placeTiming.getValue() == PlaceTiming.Sequential && !sequentialBlocks.isEmpty())
-                handleSequential(pac.getPos());
-            if (mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value())
-                handleSurroundBreak();
-        }
+        if (event.getPacket() instanceof BlockUpdateS2CPacket pac && mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value() && pac.getState().isReplaceable())
+            handlePacket();
 
         if (event.getPacket() instanceof PlayerPositionLookS2CPacket)
             switch (onTp.getValue()) {
@@ -166,7 +135,7 @@ public final class Surround extends IndestructibleModule {
             }
     }
 
-    private void handleSurroundBreak() {
+    private void handlePacket() {
         BlockPos bp = getSequentialPos();
         if (bp != null) {
             if (placeBlock(bp))
@@ -174,30 +143,13 @@ public final class Surround extends IndestructibleModule {
         }
     }
 
-    public void handleSequential(BlockPos pos) {
-        if (sequentialBlocks.contains(pos)) {
-            BlockPos bp = getSequentialPos();
-            if (bp != null) {
-                if (placeBlock(bp)) {
-                    sequentialBlocks.add(bp);
-                    sequentialBlocks.remove(pos);
-                    inactivityTimer.reset();
-                }
-            }
-        }
-    }
-
     private @Nullable BlockPos getSequentialPos() {
-        if (mc.player == null || mc.world == null) return null;
-
         for (BlockPos bp : getBlocks()) {
             if (new Box(bp).intersects(mc.player.getBoundingBox()))
                 continue;
-            if (InteractionUtility.canPlaceBlock(bp, interact.getValue(), true) && mc.world.getBlockState(bp).isReplaceable()) {
+            if (InteractionUtility.canPlaceBlock(bp, interact.getValue(), true) && mc.world.getBlockState(bp).isReplaceable())
                 return bp;
-            }
         }
-
         return null;
     }
 
@@ -254,8 +206,6 @@ public final class Surround extends IndestructibleModule {
     }
 
     private boolean getDown(BlockPos pos) {
-        if (mc.world == null) return false;
-
         for (Direction dir : Direction.values())
             if (!mc.world.getBlockState(pos.add(dir.getVector())).isReplaceable())
                 return false;
@@ -286,27 +236,14 @@ public final class Surround extends IndestructibleModule {
     }
 
     private @NotNull BlockPos getPlayerPos() {
-        return BlockPos.ofFloored(mc.player.getX(),
-                mc.player.getY() - Math.floor(mc.player.getY()) > 0.8 ? Math.floor(mc.player.getY()) + 1.0 : Math.floor(mc.player.getY()),
-                mc.player.getZ()
-        );
-    }
-
-    private enum PlaceTiming {
-        Default,
-        Vanilla,
-        Sequential
+        return BlockPos.ofFloored(mc.player.getX(), mc.player.getY() - Math.floor(mc.player.getY()) > 0.8 ? Math.floor(mc.player.getY()) + 1.0 : Math.floor(mc.player.getY()), mc.player.getZ());
     }
 
     private enum CenterMode {
-        Teleport,
-        Motion,
-        Disabled
+        Teleport, Motion, Disabled
     }
 
     private enum OnTpAction {
-        Disable,
-        Stay,
-        None
+        Disable, Stay, None
     }
 }

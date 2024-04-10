@@ -9,10 +9,8 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.*;
-import thunder.hack.gui.mainmenu.CreditsScreen;
 import thunder.hack.gui.notification.NotificationManager;
 import thunder.hack.modules.client.RPC;
-import thunder.hack.utility.SoundUtility;
 import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.render.Render2DEngine;
 
@@ -51,6 +49,7 @@ public class ThunderHack implements ModInitializer {
     public static AsyncManager asyncManager = new AsyncManager();
     public static MacroManager macroManager = new MacroManager();
     public static CommandManager commandManager = new CommandManager();
+    public static SoundManager soundManager = new SoundManager();
     public static Core core = new Core();
     /*--------------------------------------------------------*/
 
@@ -99,7 +98,7 @@ public class ThunderHack implements ModInitializer {
 
         Render2DEngine.initShaders();
 
-        SoundUtility.registerSounds();
+        soundManager.registerSounds();
         syncVersion();
         syncContributors();
         ThunderUtility.parseChangeLog();

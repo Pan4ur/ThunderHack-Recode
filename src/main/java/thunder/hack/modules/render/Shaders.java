@@ -18,7 +18,6 @@ public class Shaders extends Module {
 
     //Thanks to @0x3C50 for Shader rendering example
 
-
     private final Setting<Parent> select = new Setting<>("Select", new Parent(false, 0));
     private final Setting<Boolean> hands = new Setting<>("Hands", true).withParent(select);
     private final Setting<Boolean> players = new Setting<>("Players", true).withParent(select);

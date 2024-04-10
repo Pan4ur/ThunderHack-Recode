@@ -7,6 +7,7 @@ import net.minecraft.client.gl.SimpleFramebuffer;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL30;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.render.WindowResizeCallback;
 
 import static thunder.hack.modules.Module.mc;
@@ -15,6 +16,7 @@ public class MainMenuProgram extends GlProgram {
 
     private GlUniform Time;
     private GlUniform uSize;
+    private GlUniform color;
     private Framebuffer input;
     public static float time_ = 0f;
 
@@ -29,10 +31,11 @@ public class MainMenuProgram extends GlProgram {
     public void setParameters(float x, float y, float width, float height) {
         this.uSize.set(width * mc.options.getGuiScale().getValue(), height * mc.options.getGuiScale().getValue());
         this.Time.set((float) time_);
+        this.color.set(HudEditor.getColor(0).getRed() / 255f, HudEditor.getColor(0).getGreen() / 255f, HudEditor.getColor(0).getBlue() / 255f, HudEditor.getColor(0).getAlpha() / 255f);
     }
 
     public static void increaseTime() {
-        time_ += 0.025f;
+        time_ += 0.0025f;
     }
 
     @Override
@@ -49,6 +52,7 @@ public class MainMenuProgram extends GlProgram {
     protected void setup() {
         this.uSize = this.findUniform("uSize");
         this.Time = this.findUniform("Time");
+        this.color = this.findUniform("color");
         var window = MinecraftClient.getInstance().getWindow();
         this.input = new SimpleFramebuffer(window.getFramebufferWidth(), window.getFramebufferHeight(), false, MinecraftClient.IS_SYSTEM_MAC);
     }

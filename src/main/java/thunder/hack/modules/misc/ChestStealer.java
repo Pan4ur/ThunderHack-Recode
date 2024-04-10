@@ -52,7 +52,7 @@ public class ChestStealer extends Module {
                 }
             }
             if (isContainerEmpty(chest) && close.getValue())
-                mc.player.closeScreen();
+                mc.player.closeHandledScreen();
         }
     }
 

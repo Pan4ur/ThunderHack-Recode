@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class ModuleManager implements IManager {
     public ArrayList<Module> modules = new ArrayList<>();
     public List<Module> sortedModules = new ArrayList<>();
-    public static AntiCrash antiCrash = new AntiCrash();
+
     public static LevitationControl levitationControl = new LevitationControl();
     public static InventoryCleaner inventoryCleaner = new InventoryCleaner();
     public static NoCommentExploit noCommentExploit = new NoCommentExploit();
@@ -117,6 +117,7 @@ public class ModuleManager implements IManager {
     public static AntiAttack antiAttack = new AntiAttack();
     public static GapplesHud gapplesHud = new GapplesHud();
     public static HitBubbles hitBubbles = new HitBubbles();
+    public static AntiCrash antiCrash = new AntiCrash();
     public static Particles particles = new Particles();
     public static ToolSaver toolSaver = new ToolSaver();
     public static DamageFly damageFly = new DamageFly();
@@ -227,6 +228,7 @@ public class ModuleManager implements IManager {
     public static Chams chams = new Chams();
     public static Blink blink = new Blink();
     public static Phase phase = new Phase();
+    public static NoBob noBob = new NoBob();
     public static XRay xray = new XRay();
     public static Step step = new Step();
     public static Aura aura = new Aura();

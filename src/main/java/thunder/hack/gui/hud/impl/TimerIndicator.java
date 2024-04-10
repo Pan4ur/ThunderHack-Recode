@@ -27,21 +27,16 @@ public class TimerIndicator extends HudElement {
 
     @Override
     public void onRenderShaders(@NotNull DrawContext context) {
-        Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), 61, 12, 3);
-
-        int status;
-        float timerStatus;
-
         float f4 = 100 / Timer.speed.getValue();
         float f5 = Math.min(Timer.violation, f4);
         timerAnimation.setValue(((f4 - f5) / f4) * 58);
-        timerStatus = (float) timerAnimation.getAnimationD();
-        status = (int) (((f4 - f5) / f4) * 100);
+        int status = (int) (((f4 - f5) / f4) * 100);
         status = MathUtility.clamp(status, 0, 100);
-        timerStatus = MathUtility.clamp(timerStatus, 5, 58);
-
-        Render2DEngine.drawGradientRound(context.getMatrices(), getPosX() + 1.5f, getPosY() + 1f, (int) timerStatus, 9, HudEditor.hudRound.getValue() - 4, HudEditor.getColor(90), HudEditor.getColor(180), HudEditor.getColor(0), HudEditor.getColor(270));
-        FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), status >= 99 ? "100%" : status + "%", getPosX() + 31, getPosY() + 2, new Color(200, 200, 200, 255).getRGB());
+        Render2DEngine.drawGradientBlurredShadow(context.getMatrices(), getPosX() - 1, getPosY() - 1, 62, 12,6, HudEditor.getColor(90), HudEditor.getColor(180), HudEditor.getColor(0), HudEditor.getColor(270));
+        Render2DEngine.drawRect(context.getMatrices(), getPosX(), getPosY(), 60, 10, new Color(0x9E000000, true));
+        Render2DEngine.draw2DGradientRect(context.getMatrices(), getPosX(), getPosY(), getPosX() + 60 * ((float) status / 100f), getPosY() + 10, HudEditor.getColor(90), HudEditor.getColor(180), HudEditor.getColor(0), HudEditor.getColor(270));
+        Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX() + 20, getPosY(), 22, 10,6, new Color(0x47000000, true));
+        FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), status >= 99 ? "100%" : status + "%", getPosX() + 31, getPosY() + 3.5f, new Color(200, 200, 200, 255).getRGB());
     }
 
     @Override

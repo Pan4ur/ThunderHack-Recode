@@ -3,14 +3,15 @@ package thunder.hack.injection;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
+import net.minecraft.client.gui.screen.Overlay;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.SplashOverlay;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.Icons;
 import net.minecraft.client.util.MacWindowUtil;
 import net.minecraft.client.util.Window;
-import net.minecraft.entity.Entity;
 import net.minecraft.resource.ResourcePack;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -98,7 +99,8 @@ public abstract class MixinMinecraftClient {
     @Shadow
     private static MinecraftClient instance;
 
-    @Shadow public abstract void setScreen(@Nullable Screen screen);
+    @Shadow
+    public abstract void setScreen(@Nullable Screen screen);
 
     @Inject(method = "onResolutionChanged", at = @At("TAIL"))
     private void captureResize(CallbackInfo ci) {
@@ -111,9 +113,15 @@ public abstract class MixinMinecraftClient {
             ci.cancel();
     }
 
+    @Inject(method = "setOverlay", at = @At("HEAD"))
+    public void setOverlay(Overlay overlay, CallbackInfo ci) {
+     //   if (overlay instanceof SplashOverlay)
+          //  ThunderHack.shaderManager.reloadShaders();
+    }
+
     @Inject(method = "setScreen", at = @At("RETURN"))
     public void setScreenHook(Screen screen, CallbackInfo ci) {
-        if(screen instanceof MultiplayerScreen mScreen && ModuleManager.antiServerAdd.isEnabled() && mScreen.getServerList() != null) {
+        if (screen instanceof MultiplayerScreen mScreen && ModuleManager.antiServerAdd.isEnabled() && mScreen.getServerList() != null) {
             for (int i = 0; i < mScreen.getServerList().size(); i++) {
                 ServerInfo info = mScreen.getServerList().get(i);
                 for (String server : shittyServers) {

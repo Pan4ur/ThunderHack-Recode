@@ -3,6 +3,7 @@ package thunder.hack.gui.clickui.impl;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
@@ -53,9 +54,9 @@ public class ParentElement extends AbstractElement {
         if (hovered) {
             getParentSetting().getValue().setExtended(!getParentSetting().getValue().isExtended());
             if(getParentSetting().getValue().isExtended()) {
-                ModuleManager.soundFX.playSwipeIn();
+                ThunderHack.soundManager.playSwipeIn();
             } else {
-                ModuleManager.soundFX.playSwipeOut();
+                ThunderHack.soundManager.playSwipeOut();
             }
         }
         super.mouseClicked(mouseX, mouseY, button);

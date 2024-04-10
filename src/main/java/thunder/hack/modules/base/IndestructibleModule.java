@@ -144,7 +144,11 @@ public abstract class IndestructibleModule extends Module {
         sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         attackTimer.reset();
 
-        if (remove.getValue()) mc.world.removeEntity(entity.getId(), Entity.RemovalReason.KILLED);
+        if (remove.getValue()) {
+            entity.kill();
+            entity.setRemoved(Entity.RemovalReason.KILLED);
+            entity.onRemoved();
+        }
 
         if (antiWeakness.getValue() && mc.player.hasStatusEffect(StatusEffects.WEAKNESS))
             InventoryUtility.switchTo(preSlot);

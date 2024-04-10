@@ -5,13 +5,14 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.SoundManager;
 import thunder.hack.events.impl.DeathEvent;
 import thunder.hack.events.impl.EventAttack;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.SoundUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 
@@ -29,113 +30,33 @@ public final class SoundFX extends Module {
         super("SoundFX", Category.CLIENT);
     }
 
-    private final Setting<Integer> volume = new Setting<>("Volume", 100, 0, 100);
-    private final Setting<OnOffSound> enableMode = new Setting<>("EnableMode", OnOffSound.Inertia);
-    private final Setting<OnOffSound> disableMode = new Setting<>("DisableMode", OnOffSound.Inertia);
-    private final Setting<HitSound> hitSound = new Setting<>("HitSound", HitSound.OFF);
-    private final Setting<KillSound> killSound = new Setting<>("KillSound", KillSound.OFF);
-    private final Setting<ScrollSound> scrollSound = new Setting<>("ScrollSound", ScrollSound.KeyBoard);
-
-    private final Timer scrollTimer = new Timer();
+    public final Setting<Integer> volume = new Setting<>("Volume", 100, 0, 100);
+    public final Setting<OnOffSound> enableMode = new Setting<>("EnableMode", OnOffSound.Inertia);
+    public final Setting<OnOffSound> disableMode = new Setting<>("DisableMode", OnOffSound.Inertia);
+    public final Setting<HitSound> hitSound = new Setting<>("HitSound", HitSound.OFF);
+    public final Setting<KillSound> killSound = new Setting<>("KillSound", KillSound.OFF);
+    public final Setting<ScrollSound> scrollSound = new Setting<>("ScrollSound", ScrollSound.KeyBoard);
 
     @EventHandler
     @SuppressWarnings("unused")
     public void onAttack(@NotNull EventAttack event) {
-        if(event.isPre())
-            return;
-
-        if (!(event.getEntity() instanceof EndCrystalEntity)) {
-            switch (hitSound.getValue()) {
-                case UWU -> playSound(SoundUtility.UWU_SOUNDEVENT);
-                case SKEET -> playSound(SoundUtility.SKEET_SOUNDEVENT);
-                case KEYBOARD -> playSound(SoundUtility.KEYPRESS_SOUNDEVENT);
-                case MOAN -> {
-                    SoundEvent sound = switch ((int) (MathUtility.random(0, 3))) {
-                        case 0 -> SoundUtility.MOAN1_SOUNDEVENT;
-                        case 1 -> SoundUtility.MOAN2_SOUNDEVENT;
-                        case 2 -> SoundUtility.MOAN3_SOUNDEVENT;
-                        default -> SoundUtility.MOAN4_SOUNDEVENT;
-                    };
-                    playSound(sound);
-                }
-                case CUSTOM -> playSound("hit");
-            }
-        }
+        if (!(event.getEntity() instanceof EndCrystalEntity) && !event.isPre())
+            ThunderHack.soundManager.playHitSound(hitSound.getValue());
     }
 
     @EventHandler
     @SuppressWarnings("unused")
     public void onDeath(DeathEvent e) {
         if (Aura.target != null && Aura.target == e.getPlayer() && killSound.is(KillSound.Custom)) {
-            playSound("kill");
+            ThunderHack.soundManager.playSound("kill");
             return;
         }
         if (AutoCrystal.target != null && AutoCrystal.target == e.getPlayer() && killSound.is(KillSound.Custom)) {
-            playSound("kill");
+            ThunderHack.soundManager.playSound("kill");
         }
     }
 
-    public void playEnable() {
-        if (enableMode.getValue() == OnOffSound.Inertia) {
-            playSound(SoundUtility.ENABLE_SOUNDEVENT);
-        } else if (enableMode.getValue() == OnOffSound.Custom) {
-            playSound("enable");
-        }
-    }
-
-    public void playDisable() {
-        if (disableMode.getValue() == OnOffSound.Inertia) {
-            playSound(SoundUtility.DISABLE_SOUNDEVENT);
-        } else if (disableMode.getValue() == OnOffSound.Custom) {
-            playSound("disable");
-        }
-    }
-
-    public void playScroll() {
-        if (scrollTimer.every(50)) {
-            if (scrollSound.getValue() == ScrollSound.KeyBoard) {
-                playSound(SoundUtility.KEYPRESS_SOUNDEVENT);
-            } else if (scrollSound.getValue() == ScrollSound.Custom) {
-                playSound("scroll");
-            }
-        }
-    }
-
-    public void playSound(SoundEvent sound) {
-        if (mc.player != null && mc.world != null)
-            mc.world.playSound(mc.player, mc.player.getBlockPos(), sound, SoundCategory.BLOCKS, (float) volume.getValue() / 100f, 1f);
-    }
-
-    public void playSound(String name) {
-        try {
-            Clip clip = AudioSystem.getClip();
-            clip.open(AudioSystem.getAudioInputStream(new File(SOUNDS_FOLDER, name + ".wav").getAbsoluteFile()));
-            FloatControl floatControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            floatControl.setValue((floatControl.getMaximum() - floatControl.getMinimum() * ((float) volume.getValue() / 100f)) + floatControl.getMinimum());
-            clip.start();
-        } catch (Exception e) {
-            sendMessage(isRu() ? "Ошибка воспроизведения звука!" : "Error with playing sound!");
-        }
-    }
-
-    public void playSlider() {
-        playSound(SoundUtility.SCROLL_SOUNDEVENT);
-    }
-
-    public void playBoolean() {
-        playSound(SoundUtility.BOOLEAN_SOUNDEVENT);
-    }
-
-    public void playSwipeIn() {
-        playSound(SoundUtility.SWIPEIN_SOUNDEVENT);
-    }
-
-    public void playSwipeOut() {
-        playSound(SoundUtility.SWIPEOUT_SOUNDEVENT);
-    }
-
-
-    private enum OnOffSound {
+    public enum OnOffSound {
         Custom, Inertia, OFF
     }
 
@@ -143,11 +64,11 @@ public final class SoundFX extends Module {
         UWU, MOAN, SKEET, KEYBOARD, CUSTOM, OFF
     }
 
-    private enum KillSound {
+    public enum KillSound {
         Custom, OFF
     }
 
-    private enum ScrollSound {
+    public enum ScrollSound {
         Custom, OFF, KeyBoard
     }
 }

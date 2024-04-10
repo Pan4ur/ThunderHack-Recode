@@ -22,9 +22,9 @@ public class AntiCrash extends Module { //https://github.com/Bram1903/MinecraftP
         if(receive.getPacket() instanceof ExplosionS2CPacket exp){
             if(
                     exp.getX() > 1E9 ||
-                    exp.getY() > 1E9 ||
-                    exp.getZ() > 1E9 ||
-                    exp.getRadius() > 1E9
+                            exp.getY() > 1E9 ||
+                            exp.getZ() > 1E9 ||
+                            exp.getRadius() > 1E9
             ){
                 if(debug.getValue()){
                     sendMessage("ExplosionS2CPacket canceled");
@@ -36,12 +36,12 @@ public class AntiCrash extends Module { //https://github.com/Bram1903/MinecraftP
 
             if(
                     p.getX() > 1E9 ||
-                    p.getY() > 1E9 ||
-                    p.getZ() > 1E9 ||
-                    p.getSpeed() > 1E9 ||
-                    p.getOffsetX() > 1E9 ||
-                    p.getOffsetY() > 1E9 ||
-                    p.getOffsetZ() > 1E9
+                            p.getY() > 1E9 ||
+                            p.getZ() > 1E9 ||
+                            p.getSpeed() > 1E9 ||
+                            p.getOffsetX() > 1E9 ||
+                            p.getOffsetY() > 1E9 ||
+                            p.getOffsetZ() > 1E9
             ){
                 if(debug.getValue()){
                     sendMessage("ParticleS2CPacket canceled");
@@ -53,11 +53,11 @@ public class AntiCrash extends Module { //https://github.com/Bram1903/MinecraftP
 
             if(
                     pos.getX() > 1E9 ||
-                    pos.getY() > 1E9 ||
-                    pos.getZ() > 1E9 ||
-                    pos.getYaw() > 1E9 ||
-                    pos.getPitch() > 1E9 ||
-                    pos.getTeleportId() > 1E9
+                            pos.getY() > 1E9 ||
+                            pos.getZ() > 1E9 ||
+                            pos.getYaw() > 1E9 ||
+                            pos.getPitch() > 1E9 ||
+                            pos.getTeleportId() > 1E9
             )
             {
                 if(debug.getValue()){

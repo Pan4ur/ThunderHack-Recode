@@ -44,6 +44,9 @@ public class ShaderManager implements IManager {
             reloadShaders();
         }
 
+        if(shaderBuffer == null)
+            return;
+
         tasks.forEach(t -> applyShader(t.task(), t.shader()));
         tasks.clear();
     }

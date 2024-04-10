@@ -107,7 +107,7 @@ public abstract class Module {
 
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
             ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль включен!" : "Was Enabled!", 2, Notification.Type.ENABLED);
-            ModuleManager.soundFX.playEnable();
+            ThunderHack.soundManager.playEnable();
         }
     }
 
@@ -134,7 +134,7 @@ public abstract class Module {
 
         if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
             ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль выключен!" : "Was Disabled!", 2, Notification.Type.DISABLED);
-            ModuleManager.soundFX.playDisable();
+            ThunderHack.soundManager.playDisable();
         }
     }
 
@@ -250,6 +250,11 @@ public abstract class Module {
     public static void clickSlot(int id, SlotActionType type) {
         if (id == -1 || mc.interactionManager == null || mc.player == null) return;
         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, id, 0, type, mc.player);
+    }
+
+    public static void clickSlot(int id, int button, SlotActionType type) {
+        if (id == -1 || mc.interactionManager == null || mc.player == null) return;
+        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, id, button, type, mc.player);
     }
 
     public void sendMessage(String message) {

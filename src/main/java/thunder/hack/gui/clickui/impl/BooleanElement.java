@@ -2,6 +2,7 @@ package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.clickui.ClickGUI;
@@ -50,7 +51,7 @@ public class BooleanElement extends AbstractElement {
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (hovered && button == 0) {
             setting.setValue(!((Boolean) setting.getValue()));
-            ModuleManager.soundFX.playBoolean();
+            ThunderHack.soundManager.playBoolean();
         }
 
         super.mouseClicked(mouseX, mouseY, button);

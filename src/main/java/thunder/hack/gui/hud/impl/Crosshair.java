@@ -97,7 +97,7 @@ public class Crosshair extends Module {
             }
             case Dot -> {
                 context.getMatrices().push();
-                context.getMatrices().translate(xAnim, yAnim, 0);
+                context.getMatrices().translate(xAnim + 4, yAnim + 4, 0);
                 RenderSystem.setShaderTexture(0, firefly);
                 RenderSystem.enableBlend();
                 RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
@@ -109,9 +109,9 @@ public class Crosshair extends Module {
                 RenderSystem.setShaderTexture(0, firefly);
                 Color color1 = colorMode.getValue() == ColorMode.Sync ? HudEditor.getColor(1) : color.getValue().getColorObject();
                 Matrix4f posMatrix = context.getMatrices().peek().getPositionMatrix();
-                bufferBuilder.vertex(posMatrix, 0, -9f, 0).texture(0f, 1f).color(color1.getRGB()).next();
-                bufferBuilder.vertex(posMatrix, -9f, -9f, 0).texture(1f, 1f).color(color1.getRGB()).next();
-                bufferBuilder.vertex(posMatrix, -9f, 0, 0).texture(1f, 0).color(color1.getRGB()).next();
+                bufferBuilder.vertex(posMatrix, 0, -8f, 0).texture(0f, 1f).color(color1.getRGB()).next();
+                bufferBuilder.vertex(posMatrix, -8f, -8f, 0).texture(1f, 1f).color(color1.getRGB()).next();
+                bufferBuilder.vertex(posMatrix, -8f, 0, 0).texture(1f, 0).color(color1.getRGB()).next();
                 bufferBuilder.vertex(posMatrix, 0, 0, 0).texture(0, 0).color(color1.getRGB()).next();
                 BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
                 RenderSystem.depthMask(true);

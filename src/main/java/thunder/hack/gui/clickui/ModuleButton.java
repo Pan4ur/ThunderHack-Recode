@@ -83,7 +83,7 @@ public class ModuleButton extends AbstractButton {
 
         if (hovered) {
             if (!prevHovered)
-                ModuleManager.soundFX.playScroll();
+                ThunderHack.soundManager.playScroll();
             ClickGUI.currentDescription = I18n.translate(module.getDescription());
         }
 
@@ -289,8 +289,8 @@ public class ModuleButton extends AbstractButton {
             } else if (button == 1 && (module.getSettings().size() > 3)) {
                 setOpen(!isOpen());
 
-                if(open) ModuleManager.soundFX.playSwipeIn();
-                else ModuleManager.soundFX.playSwipeOut();
+                if(open) ThunderHack.soundManager.playSwipeIn();
+                else ThunderHack.soundManager.playSwipeOut();
 
                 animation = 0.5f;
             } else if (button == 2)
