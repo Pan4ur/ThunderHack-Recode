@@ -24,6 +24,7 @@ public class Spammer extends Module {
     public static ArrayList<String> SpamList = new ArrayList<>();
     public Setting<Mode> mode = new Setting<>("mode",Mode.Simple);
     public Setting<Messages> messages = new Setting<>("messages",Messages.File);
+    public Setting<WhisperMode> whisper = new Setting<>("prefix",WhisperMode.W);
     public Setting<Boolean> global = new Setting<>("global", true,v -> mode.getValue() == Mode.Simple);
     public Setting<Integer> delay = new Setting<>("delay", 5, 1, 30);
     private final Timer timer_delay = new Timer();
@@ -130,7 +131,8 @@ public class Spammer extends Module {
                 } else mc.player.networkHandler.sendChatMessage(global.getValue() ? "!" + c : c);
             }else{
                 try{
-                    mc.player.networkHandler.sendCommand("w " + getPlayerName() + " " + c);
+                    String prefix = whisper.getValue() == WhisperMode.W ? "w " : "msg ";
+                    mc.player.networkHandler.sendCommand(prefix + getPlayerName() + " " + c);
                 }catch (NullPointerException e){}
             }
 
@@ -139,4 +141,5 @@ public class Spammer extends Module {
     }
     private enum Messages{File,CatFacts}
     private enum Mode{Simple,Whispers}
+    private enum WhisperMode{W,Msg}
 }
