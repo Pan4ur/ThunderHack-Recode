@@ -11,9 +11,6 @@ import thunder.hack.setting.Setting;
 
 public class AntiCrash extends Module { //https://github.com/Bram1903/MinecraftPlayerCrasher
     public final Setting<Boolean> debug = new Setting<>("Debug",false);
-    final double d = Double.MAX_VALUE / 2;
-    final float f = Float.MAX_VALUE / 2;
-    final int i = Integer.MAX_VALUE / 2;
     public AntiCrash() {
         super("AntiCrash", Category.CLIENT);
     }
@@ -33,7 +30,6 @@ public class AntiCrash extends Module { //https://github.com/Bram1903/MinecraftP
             }
         }
         if(receive.getPacket() instanceof ParticleS2CPacket p){
-
             if(
                     p.getX() > 1E9 ||
                             p.getY() > 1E9 ||
@@ -49,15 +45,13 @@ public class AntiCrash extends Module { //https://github.com/Bram1903/MinecraftP
                 receive.cancel();
             }
         }
-        if(receive.getPacket() instanceof PlayerPositionLookS2CPacket pos){
-
+        else if(receive.getPacket() instanceof PlayerPositionLookS2CPacket pos){
             if(
                     pos.getX() > 1E9 ||
                             pos.getY() > 1E9 ||
                             pos.getZ() > 1E9 ||
                             pos.getYaw() > 1E9 ||
-                            pos.getPitch() > 1E9 ||
-                            pos.getTeleportId() > 1E9
+                            pos.getPitch() > 1E9
             )
             {
                 if(debug.getValue()){
