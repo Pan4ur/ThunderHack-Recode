@@ -2,8 +2,6 @@ package thunder.hack.modules.misc;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.authlib.GameProfile;
-import net.minecraft.client.network.PlayerListEntry;
 import org.apache.commons.io.IOUtils;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.hud.impl.StaffBoard;
@@ -18,13 +16,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class Spammer extends Module {
     public static ArrayList<String> SpamList = new ArrayList<>();
     public Setting<Mode> mode = new Setting<>("mode",Mode.Simple);
     public Setting<Messages> messages = new Setting<>("messages",Messages.File);
-    public Setting<WhisperMode> whisper = new Setting<>("prefix",WhisperMode.W);
+    public Setting<WhisperPrefix> whisper_prefix = new Setting<>("prefix", WhisperPrefix.W);
     public Setting<Boolean> global = new Setting<>("global", true,v -> mode.getValue() == Mode.Simple);
     public Setting<Integer> delay = new Setting<>("delay", 5, 1, 30);
     private final Timer timer_delay = new Timer();
@@ -131,7 +128,7 @@ public class Spammer extends Module {
                 } else mc.player.networkHandler.sendChatMessage(global.getValue() ? "!" + c : c);
             }else{
                 try{
-                    String prefix = whisper.getValue() == WhisperMode.W ? "w " : "msg ";
+                    String prefix = whisper_prefix.getValue() == WhisperPrefix.W ? "w " : "msg ";
                     mc.player.networkHandler.sendCommand(prefix + getPlayerName() + " " + c);
                 }catch (NullPointerException e){}
             }
@@ -141,5 +138,5 @@ public class Spammer extends Module {
     }
     private enum Messages{File,CatFacts}
     private enum Mode{Simple,Whispers}
-    private enum WhisperMode{W,Msg}
+    private enum WhisperPrefix {W,Msg}
 }
