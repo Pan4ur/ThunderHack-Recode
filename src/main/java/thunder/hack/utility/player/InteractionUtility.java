@@ -156,20 +156,21 @@ public final class InteractionUtility {
         ArrayList<BlockPosWithFacing> supports = getSupportBlocks(bp);
         for (BlockPosWithFacing support : supports) {
             if (interact != Interact.Vanilla) {
-                if (getStrictDirections(bp).isEmpty())
+                @NotNull List<Direction> dirs = getStrictDirections(bp);
+                if (dirs.isEmpty())
                     return null;
-                if (!getStrictDirections(bp).contains(support.facing))
+
+                if (!dirs.contains(support.facing))
                     continue;
             }
             BlockHitResult result = null;
-            if (interact != Interact.Legit) {
+            if (interact == Interact.Legit) {
+                Vec3d p = getVisibleDirectionPoint(support.facing, support.position);
+                if (p != null)
+                    return new BlockHitResult(p, support.facing, support.position, false);
+           } else {
                 Vec3d directionVec = new Vec3d(support.position.getX() + 0.5 + support.facing.getVector().getX() * 0.5, support.position.getY() + 0.5 + support.facing.getVector().getY() * 0.5, support.position.getZ() + 0.5 + support.facing.getVector().getZ() * 0.5);
                 result = new BlockHitResult(directionVec, support.facing, support.position, false);
-            } else {
-                Vec3d p = getVisibleDirectionPoint(support.facing, support.position);
-                if (p != null) {
-                    return new BlockHitResult(p, support.facing, support.position, false);
-                }
             }
             return result;
         }
@@ -237,22 +238,26 @@ public final class InteractionUtility {
         double upDelta = getEyesPos(mc.player).y - (positionVector.add(0, 0.5, 0).y);
         double downDelta = getEyesPos(mc.player).y - (positionVector.add(0, -0.5, 0).y);
 
-        if (westDelta > 0 && !mc.world.getBlockState(bp.west()).isReplaceable()) visibleSides.add(Direction.EAST);
-        if (westDelta < 0 && !mc.world.getBlockState(bp.east()).isReplaceable()) visibleSides.add(Direction.WEST);
-        if (eastDelta < 0 && !mc.world.getBlockState(bp.east()).isReplaceable()) visibleSides.add(Direction.WEST);
-        if (eastDelta > 0 && !mc.world.getBlockState(bp.west()).isReplaceable()) visibleSides.add(Direction.EAST);
+        if (westDelta > 0 && !isReplaceable(bp.west())) visibleSides.add(Direction.EAST);
+        if (westDelta < 0 && !isReplaceable(bp.east())) visibleSides.add(Direction.WEST);
+        if (eastDelta < 0 && !isReplaceable(bp.east())) visibleSides.add(Direction.WEST);
+        if (eastDelta > 0 && !isReplaceable(bp.west())) visibleSides.add(Direction.EAST);
 
-        if (northDelta > 0 && !mc.world.getBlockState(bp.north()).isReplaceable()) visibleSides.add(Direction.SOUTH);
-        if (northDelta < 0 && !mc.world.getBlockState(bp.south()).isReplaceable()) visibleSides.add(Direction.NORTH);
-        if (southDelta < 0 && !mc.world.getBlockState(bp.south()).isReplaceable()) visibleSides.add(Direction.NORTH);
-        if (southDelta > 0 && !mc.world.getBlockState(bp.north()).isReplaceable()) visibleSides.add(Direction.SOUTH);
+        if (northDelta > 0 && !isReplaceable(bp.north())) visibleSides.add(Direction.SOUTH);
+        if (northDelta < 0 && !isReplaceable(bp.south())) visibleSides.add(Direction.NORTH);
+        if (southDelta < 0 && !isReplaceable(bp.south())) visibleSides.add(Direction.NORTH);
+        if (southDelta > 0 && !isReplaceable(bp.north())) visibleSides.add(Direction.SOUTH);
 
-        if (upDelta > 0 && !mc.world.getBlockState(bp.down()).isReplaceable()) visibleSides.add(Direction.UP);
-        if (upDelta < 0 && !mc.world.getBlockState(bp.up()).isReplaceable()) visibleSides.add(Direction.DOWN);
-        if (downDelta < 0 && !mc.world.getBlockState(bp.up()).isReplaceable()) visibleSides.add(Direction.DOWN);
-        if (downDelta > 0 && !mc.world.getBlockState(bp.down()).isReplaceable()) visibleSides.add(Direction.UP);
+        if (upDelta > 0 && !isReplaceable(bp.down())) visibleSides.add(Direction.UP);
+        if (upDelta < 0 && isReplaceable(bp.up())) visibleSides.add(Direction.DOWN);
+        if (downDelta < 0 && isReplaceable(bp.up())) visibleSides.add(Direction.DOWN);
+        if (downDelta > 0 && isReplaceable(bp.down())) visibleSides.add(Direction.UP);
 
         return visibleSides;
+    }
+
+    public static boolean isReplaceable(BlockPos bp) {
+        return mc.world.getBlockState(bp).isReplaceable() || awaiting.containsKey(bp);
     }
 
     public static @NotNull List<Direction> getStrictBlockDirections(@NotNull BlockPos bp) {
@@ -387,6 +392,14 @@ public final class InteractionUtility {
 
     public static boolean needSneak(Block in) {
         return SHIFT_BLOCKS.contains(in);
+    }
+
+    public static void lookAt(BlockPos bp) {
+        if(bp != null) {
+            float[] angle = calculateAngle(bp.toCenterPos());
+            mc.player.setYaw(angle[0]);
+            mc.player.setPitch(angle[1]);
+        }
     }
 
     public record BlockPosWithFacing(BlockPos position, Direction facing) {

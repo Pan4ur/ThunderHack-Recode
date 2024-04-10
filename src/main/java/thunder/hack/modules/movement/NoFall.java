@@ -24,11 +24,14 @@ public class NoFall extends Module {
     public final Setting<Integer> fallDistanceValue = new Setting<>("FallDistanceVal", 10, 2, 100, v -> fallDistance.getValue() == FallDistance.Custom);
     private final Setting<Boolean> powderSnowBucket = new Setting<>("PowderSnowBucket", true, v -> mode.getValue() == Mode.Items);
     private final Setting<Boolean> waterBucket = new Setting<>("WaterBucket", true, v -> mode.getValue() == Mode.Items);
+    private final Setting<Boolean> retrieve = new Setting<>("Retrieve", true, v -> mode.getValue() == Mode.Items && waterBucket.getValue());
     private final Setting<Boolean> enderPearl = new Setting<>("EnderPearl", true, v -> mode.getValue() == Mode.Items);
     private final Setting<Boolean> cobweb = new Setting<>("Cobweb", true, v -> mode.getValue() == Mode.Items);
     private final Setting<Boolean> twistingVines = new Setting<>("TwistingVines", true, v -> mode.getValue() == Mode.Items);
 
     private thunder.hack.utility.Timer pearlCooldown = new thunder.hack.utility.Timer();
+
+    private boolean retrieveFlag;
 
     private enum Mode {
         Rubberband, Items, MatrixOffGround, Vanilla, Grim2b2t
@@ -44,6 +47,7 @@ public class NoFall extends Module {
     public void onSync(EventSync e) {
         if (fullNullCheck())
             return;
+
         if (isFalling()) {
             switch (mode.getValue()) {
                 case Rubberband -> {
@@ -54,10 +58,10 @@ public class NoFall extends Module {
                     BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
 
                     SearchInvResult snowResult = InventoryUtility.findItemInHotBar(Items.POWDER_SNOW_BUCKET);
-                    SearchInvResult waterResult = InventoryUtility.findItemInHotBar(Items.WATER_BUCKET);
                     SearchInvResult pearlResult = InventoryUtility.findItemInHotBar(Items.ENDER_PEARL);
                     SearchInvResult webResult = InventoryUtility.findItemInHotBar(Items.COBWEB);
                     SearchInvResult vinesResult = InventoryUtility.findItemInHotBar(Items.TWISTING_VINES);
+                    SearchInvResult waterResult = InventoryUtility.findItemInHotBar(Items.WATER_BUCKET);
 
                     if (waterResult.found() && waterBucket.getValue()) {
                         mc.player.setPitch(90);
@@ -86,6 +90,15 @@ public class NoFall extends Module {
                     cancelGround = true;
                 }
             }
+        } else if (retrieveFlag) {
+            InventoryUtility.saveSlot();
+            SearchInvResult waterResult = InventoryUtility.findItemInHotBar(Items.WATER_BUCKET);
+            waterResult.switchTo();
+            mc.player.setPitch(90);
+            mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
+            mc.player.swingHand(Hand.MAIN_HAND);
+            InventoryUtility.returnSlot();
+            retrieveFlag = false;
         }
     }
 
@@ -96,6 +109,7 @@ public class NoFall extends Module {
             mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
             mc.player.swingHand(Hand.MAIN_HAND);
             InventoryUtility.returnSlot();
+            retrieveFlag = retrieve.getValue();
         }
     }
 
@@ -147,7 +161,7 @@ public class NoFall extends Module {
     }
 
     public boolean isFalling() {
-        if(mc == null || mc.player == null || mc.world == null)
+        if (mc == null || mc.player == null || mc.world == null)
             return false;
 
         if (mc.player.isFallFlying())
