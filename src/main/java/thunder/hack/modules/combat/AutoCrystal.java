@@ -414,7 +414,13 @@ public class AutoCrystal extends Module {
         if (mc.interactionManager.isBreakingBlock() && !offhand && mining.getValue())
             return true;
 
-        if(!offhand && !mainHand && autoSwitch.is(Switch.NONE))
+        if(autoSwitch.is(Switch.NONE) && !offhand && !mainHand)
+            return true;
+
+        if(autoSwitch.is(Switch.SILENT) && !InventoryUtility.getCrystal().found())
+            return true;
+
+        if(autoSwitch.is(Switch.INVENTORY) && !InventoryUtility.findItemInInventory(Items.END_CRYSTAL).found())
             return true;
 
         if (mc.player.isUsingItem() && eating.getValue())

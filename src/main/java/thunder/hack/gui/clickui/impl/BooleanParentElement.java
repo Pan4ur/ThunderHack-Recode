@@ -4,6 +4,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
 import org.lwjgl.glfw.GLFW;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.clickui.ClickGUI;
@@ -71,13 +72,13 @@ public class BooleanParentElement extends AbstractElement {
         if (hovered) {
             if (button == 0) {
                 getParentSetting().getValue().setEnabled(!getParentSetting().getValue().isEnabled());
-                ModuleManager.soundFX.playBoolean();
+                ThunderHack.soundManager.playBoolean();
             } else {
                 getParentSetting().getValue().setExtended(!getParentSetting().getValue().isExtended());
                 if (getParentSetting().getValue().isExtended()) {
-                    ModuleManager.soundFX.playSwipeIn();
+                    ThunderHack.soundManager.playSwipeIn();
                 } else {
-                    ModuleManager.soundFX.playSwipeOut();
+                    ThunderHack.soundManager.playSwipeOut();
                 }
             }
         }

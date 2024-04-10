@@ -10,10 +10,10 @@ import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.SoundManager;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.utility.SoundUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
@@ -86,7 +86,7 @@ public class KillEffect extends Module {
             if (entity.isAlive() || liv.getHealth() != 0) return;
 
             if (playSound.getValue() && mode.getValue() == Mode.Orthodox)
-                mc.world.playSound(mc.player, entity.getBlockPos(), SoundUtility.ORTHODOX_SOUNDEVENT, SoundCategory.BLOCKS, 10f, 1f);
+                mc.world.playSound(mc.player, entity.getBlockPos(), ThunderHack.soundManager.ORTHODOX_SOUNDEVENT, SoundCategory.BLOCKS, 10f, 1f);
             renderEntities.put(entity, System.currentTimeMillis());
         });
 

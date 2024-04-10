@@ -3,6 +3,7 @@ package thunder.hack.gui.clickui.impl;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
@@ -74,13 +75,13 @@ public class ModeElement extends AbstractElement {
         if (Render2DEngine.isHovered(mouseX, mouseY, x, y, width, wheight)) {
             if (button == 0) {
                 setting2.increaseEnum();
-                ModuleManager.soundFX.playBoolean();
+                ThunderHack.soundManager.playBoolean();
             } else {
                 open = !open;
                 if(open) {
-                    ModuleManager.soundFX.playSwipeIn();
+                    ThunderHack.soundManager.playSwipeIn();
                 } else {
-                    ModuleManager.soundFX.playSwipeOut();
+                    ThunderHack.soundManager.playSwipeOut();
                 }
             }
         }
@@ -90,7 +91,7 @@ public class ModeElement extends AbstractElement {
             for (int i = 0; i <= setting2.getModes().length - 1; i++) {
                 if (Render2DEngine.isHovered(mouseX, mouseY, x, y + wheight + offsetY, width, 12) && button == 0) {
                     setting2.setEnumByNumber(i);
-                    ModuleManager.soundFX.playBoolean();
+                    ThunderHack.soundManager.playBoolean();
                 }
                 offsetY += 12;
             }

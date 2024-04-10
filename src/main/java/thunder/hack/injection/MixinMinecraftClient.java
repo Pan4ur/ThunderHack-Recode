@@ -115,8 +115,8 @@ public abstract class MixinMinecraftClient {
 
     @Inject(method = "setOverlay", at = @At("HEAD"))
     public void setOverlay(Overlay overlay, CallbackInfo ci) {
-        if (overlay instanceof SplashOverlay)
-            ThunderHack.shaderManager.reloadShaders();
+     //   if (overlay instanceof SplashOverlay)
+          //  ThunderHack.shaderManager.reloadShaders();
     }
 
     @Inject(method = "setScreen", at = @At("RETURN"))
