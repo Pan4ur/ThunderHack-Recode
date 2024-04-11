@@ -120,7 +120,7 @@ public class Spammer extends Module {
             }else{
                 if(fact == null){return;}
                 c = fact;
-                changeFact();3
+                changeFact();
             }
             if(mode.getValue() == Mode.Chat){
                 if (c.charAt(0) == '/') {
