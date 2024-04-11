@@ -19,10 +19,10 @@ import java.util.Random;
 
 public class Spammer extends Module {
     public static ArrayList<String> SpamList = new ArrayList<>();
-    public Setting<Mode> mode = new Setting<>("mode",Mode.Simple);
+    public Setting<Mode> mode = new Setting<>("mode",Mode.Chat);
     public Setting<Messages> messages = new Setting<>("messages",Messages.File);
-    public Setting<WhisperPrefix> whisper_prefix = new Setting<>("prefix", WhisperPrefix.W);
-    public Setting<Boolean> global = new Setting<>("global", true,v -> mode.getValue() == Mode.Simple);
+    public Setting<WhisperPrefix> whisper_prefix = new Setting<>("prefix", WhisperPrefix.W, v -> mode.getValue() == Mode.Whispers);
+    public Setting<Boolean> global = new Setting<>("global", true,v -> mode.getValue() == Mode.Chat);
     public Setting<Integer> delay = new Setting<>("delay", 5, 1, 30);
     private final Timer timer_delay = new Timer();
     private final Random random = new Random();
@@ -120,8 +120,9 @@ public class Spammer extends Module {
             }else{
                 if(fact == null){return;}
                 c = fact;
+                changeFact();3
             }
-            if(mode.getValue() == Mode.Simple){
+            if(mode.getValue() == Mode.Chat){
                 if (c.charAt(0) == '/') {
                     c = c.replace("/", "");
                     mc.player.networkHandler.sendCommand(c);
@@ -137,6 +138,6 @@ public class Spammer extends Module {
         }
     }
     private enum Messages{File,CatFacts}
-    private enum Mode{Simple,Whispers}
+    private enum Mode{Chat,Whispers}
     private enum WhisperPrefix {W,Msg}
 }
