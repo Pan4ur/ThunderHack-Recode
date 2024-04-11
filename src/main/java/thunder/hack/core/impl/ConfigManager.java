@@ -155,7 +155,7 @@ public class ConfigManager implements IManager {
 
         ThunderHack.moduleManager.onUnload();
         ThunderHack.moduleManager.onUnloadPost();
-        load(file);
+        load(file, category);
         ThunderHack.moduleManager.onLoad();
     }
 
@@ -203,7 +203,6 @@ public class ConfigManager implements IManager {
 
         ThunderHack.moduleManager.onUnload();
         ThunderHack.moduleManager.onUnloadPost();
-
         loadModuleOnly(file, module);
         ThunderHack.moduleManager.onLoad();
     }
@@ -376,9 +375,10 @@ public class ConfigManager implements IManager {
                     switch (setting2.getType()) {
                         case "Parent":
                             continue;
-                        case "Boolean":
+                        case "Boolean": {
                             setting2.setValue(mobject.getAsJsonPrimitive(setting2.getName()).getAsBoolean());
                             continue;
+                        }
                         case "Double":
                             setting2.setValue(mobject.getAsJsonPrimitive(setting2.getName()).getAsDouble());
                             continue;

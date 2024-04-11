@@ -97,10 +97,10 @@ public abstract class IndestructibleModule extends Module {
                     .ifPresent(this::breakCrystal);
         }
 
-        if (placeMode.getValue() == InteractMode.Packet || placeMode.getValue() == InteractMode.All) {
+        if (placeMode.getValue() == InteractMode.Packet) {
             validInteraction = InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), InteractionUtility.PlaceMode.Packet, result.slot(), true, ignoreEntities);
         }
-        if (placeMode.getValue() == InteractMode.Normal || placeMode.getValue() == InteractMode.All) {
+        if (placeMode.getValue() == InteractMode.Normal) {
             validInteraction = InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), InteractionUtility.PlaceMode.Normal, result.slot(), true, ignoreEntities);
         }
 
@@ -135,10 +135,10 @@ public abstract class IndestructibleModule extends Module {
             result.switchTo();
         }
 
-        if (breakCrystalMode.getValue() == InteractMode.Packet || breakCrystalMode.getValue() == InteractMode.All)
+        if (breakCrystalMode.getValue() == InteractMode.Packet)
             sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
 
-        if (breakCrystalMode.getValue() == InteractMode.Normal || breakCrystalMode.getValue() == InteractMode.All)
+        if (breakCrystalMode.getValue() == InteractMode.Normal)
             mc.interactionManager.attackEntity(mc.player, entity);
 
         sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -192,7 +192,6 @@ public abstract class IndestructibleModule extends Module {
 
     protected enum InteractMode {
         Packet,
-        Normal,
-        All
+        Normal
     }
 }

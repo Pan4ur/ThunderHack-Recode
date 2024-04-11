@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.base.IndestructibleModule;
 import thunder.hack.setting.Setting;
@@ -65,7 +66,7 @@ public final class Surround extends IndestructibleModule {
 
     @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.HIGHEST)
-    private void onPostSync(EventPostSync event) {
+    private void onTick(EventTick event) {
         if (prevY != mc.player.getY() && onYChange.getValue() && !wasTp) {
             disable(isRu() ? "Отключён из-за изменения Y!" : "Disabled due to Y change!");
             return;

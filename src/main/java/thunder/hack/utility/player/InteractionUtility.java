@@ -249,9 +249,9 @@ public final class InteractionUtility {
         if (southDelta > 0 && !isReplaceable(bp.north())) visibleSides.add(Direction.SOUTH);
 
         if (upDelta > 0 && !isReplaceable(bp.down())) visibleSides.add(Direction.UP);
-        if (upDelta < 0 && !isReplaceable(bp.up())) visibleSides.add(Direction.DOWN);
-        if (downDelta < 0 && !isReplaceable(bp.up())) visibleSides.add(Direction.DOWN);
-        if (downDelta > 0 && !isReplaceable(bp.down())) visibleSides.add(Direction.UP);
+        if (upDelta < 0 && isReplaceable(bp.up())) visibleSides.add(Direction.DOWN);
+        if (downDelta < 0 && isReplaceable(bp.up())) visibleSides.add(Direction.DOWN);
+        if (downDelta > 0 && isReplaceable(bp.down())) visibleSides.add(Direction.UP);
 
         return visibleSides;
     }
