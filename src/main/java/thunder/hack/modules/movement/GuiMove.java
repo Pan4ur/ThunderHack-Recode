@@ -2,10 +2,12 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -16,6 +18,7 @@ public class GuiMove extends Module {
 
     public Setting<Boolean> rotateOnArrows = new Setting<>("RotateOnArrows", true);
     public Setting<Boolean> clickBypass = new Setting<>("strict", false);
+    public Setting<Boolean> grim995Bypass = new Setting<>("grim995", false);
     public Setting<Boolean> sneak = new Setting<>("sneak", false);
 
     public GuiMove() {
@@ -66,6 +69,8 @@ public class GuiMove extends Module {
 
                 sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 0.0656, mc.player.getZ(), false));
             }
+
+            if (grim995Bypass.getValue() && mc.currentScreen instanceof InventoryScreen) sendPacket(new CloseHandledScreenC2SPacket(0));
         }
     }
 
