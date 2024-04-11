@@ -13,6 +13,7 @@ import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
+import java.awt.*;
 import java.util.Objects;
 
 public class KeyBinds extends HudElement {
@@ -28,6 +29,15 @@ public class KeyBinds extends HudElement {
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
+
+        TEMP:
+        {
+            if (offcolor.getValue().getAlpha() < 5)
+                offcolor.getValue().setColor(Color.GRAY.getRGB());
+
+            if (oncolor.getValue().getAlpha() < 5)
+                oncolor.getValue().setColor(Color.WHITE.getRGB());
+        }
 
         FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KeyBinds", getPosX() + hAnimation / 2, getPosY() + 4, HudEditor.textColor.getValue().getColor());
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());

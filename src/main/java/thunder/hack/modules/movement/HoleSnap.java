@@ -25,6 +25,7 @@ import static thunder.hack.modules.client.ClientSettings.isRu;
 public class HoleSnap extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Yaw);
     private final Setting<Integer> searchRange = new Setting<>("Search Range", 5, 1, 20);
+    private final Setting<Integer> searchFOV = new Setting<>("Search FOV", 360, 1, 360);
     private final Setting<Boolean> useTimer = new Setting<>("Use Timer", false);
     private final Setting<Float> timerValue = new Setting<>("Timer Value", 1f, 0f, 20f);
 
@@ -142,8 +143,8 @@ public class HoleSnap extends Module {
         for (int i = centerPos.getX() - searchRange.getValue(); i < centerPos.getX() + searchRange.getValue(); i++) {
             for (int j = centerPos.getY() - 4; j < centerPos.getY() + 2; j++) {
                 for (int k = centerPos.getZ() - searchRange.getValue(); k < centerPos.getZ() + searchRange.getValue(); k++) {
-                    BlockPos pos = new BlockPos(i, j, k);
-                    if (HoleUtility.isSingleHole(pos)) {
+                    BlockPos pos = new BlockPos(i, j, k);;
+                    if (HoleUtility.isSingleHole(pos) && InteractionUtility.isVecInFOV(pos.toCenterPos(), searchFOV.getValue() / 2)) {
                         blocks.add(new BlockPos(pos));
                     }
                 }

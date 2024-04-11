@@ -5,6 +5,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
@@ -400,6 +401,13 @@ public final class InteractionUtility {
             mc.player.setYaw(angle[0]);
             mc.player.setPitch(angle[1]);
         }
+    }
+
+    public static boolean isVecInFOV(Vec3d pos, Integer fov) {
+        double deltaX = pos.getX() - mc.player.getX();
+        double deltaZ = pos.getZ() - mc.player.getZ();
+        float yawDelta = MathHelper.wrapDegrees((float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(deltaZ, deltaX)) - 90.0) - MathHelper.wrapDegrees(mc.player.getYaw()));
+        return Math.abs(yawDelta) <= fov;
     }
 
     public record BlockPosWithFacing(BlockPos position, Direction facing) {

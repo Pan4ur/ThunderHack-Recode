@@ -160,6 +160,8 @@ public class ElytraSwap extends Module {
                 } catch (Exception ignored) {}
                 clickSlot(result.slot());
                 sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                if(startFireWork.getValue() && mc.player.fallDistance > 0)
+                    sendPacket(new ClientCommandC2SPacket( mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
                 swapping = false;
             }).start();
             else {
@@ -167,6 +169,8 @@ public class ElytraSwap extends Module {
                 clickSlot(6);
                 clickSlot(result.slot());
                 sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                if(startFireWork.getValue() && mc.player.fallDistance > 0)
+                    sendPacket(new ClientCommandC2SPacket( mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
             }
         } else {
             if (disable) disable(isRu() ? "У тебя нет элитры!" : "You don't have an elytra!");

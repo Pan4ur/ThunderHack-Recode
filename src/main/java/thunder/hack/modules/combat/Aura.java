@@ -46,6 +46,7 @@ import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.interfaces.IOtherClientPlayerEntity;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
@@ -719,7 +720,7 @@ public final class Aura extends Module {
         if (entity instanceof ArmorStandEntity) return true;
         if (entity instanceof CatEntity) return true;
         if (skipNotSelected(entity)) return true;
-        if (!isInFOV(ent)) return true;
+        if (!InteractionUtility.isVecInFOV(ent.getPos(), fov.getValue())) return true;
 
         if (entity instanceof PlayerEntity player) {
             if (ModuleManager.antiBot.isEnabled() && AntiBot.bots.contains(entity))
@@ -758,13 +759,6 @@ public final class Aura extends Module {
         if (entity instanceof VillagerEntity && !Villagers.getValue()) return true;
         if (entity instanceof MobEntity && !Mobs.getValue()) return true;
         return entity instanceof AnimalEntity && !Animals.getValue();
-    }
-
-    private boolean isInFOV(@NotNull LivingEntity e) {
-        double deltaX = e.getX() - mc.player.getX();
-        double deltaZ = e.getZ() - mc.player.getZ();
-        float yawDelta = MathHelper.wrapDegrees((float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(deltaZ, deltaX)) - 90.0) - MathHelper.wrapDegrees(mc.player.getYaw()));
-        return Math.abs(yawDelta) <= fov.getValue();
     }
 
     private float getFOVAngle(@NotNull LivingEntity e) {

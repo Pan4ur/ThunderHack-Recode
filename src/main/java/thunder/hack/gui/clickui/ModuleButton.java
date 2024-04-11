@@ -264,6 +264,7 @@ public class ModuleButton extends AbstractButton {
             module.setBind(button, true, holdbind);
             binding = false;
         }
+
         if (hovered) {
             if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT) && button == 0) {
                 module.setDrawn(!module.isDrawn());

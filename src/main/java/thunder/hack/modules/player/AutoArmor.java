@@ -2,6 +2,7 @@ package thunder.hack.modules.player;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.model.ModelUtil;
+import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.PlayerUpdateEvent;
@@ -18,10 +19,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.ProtectionEnchantment;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ElytraItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 
@@ -61,7 +58,7 @@ public class AutoArmor extends Module {
             int prot = getProtection(stack);
             if (prot > 0) {
                 for (Entry<EquipmentSlot, int[]> e: armorMap.entrySet()) {
-                    if (e.getKey() == (stack.getItem() instanceof ElytraItem ? EquipmentSlot.CHEST : ((ArmorItem) stack.getItem()).getSlotType())) {
+                    if (e.getKey() == (stack.getItem() instanceof ElytraItem || stack.getItem() instanceof AirBlockItem ? EquipmentSlot.CHEST : ((ArmorItem) stack.getItem()).getSlotType())) {
                         if (prot > e.getValue()[1] && prot > e.getValue()[3]) {
                             e.getValue()[2] = i;
                             e.getValue()[3] = prot;
