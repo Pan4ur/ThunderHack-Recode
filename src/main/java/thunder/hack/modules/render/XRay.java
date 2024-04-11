@@ -212,9 +212,14 @@ public class XRay extends Module {
 
             Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), posX + 4, posY + 32, (int) MathHelper.clamp((129 * ((float) done / Math.max((float) all, 1))), 8, 129), 11, 4f);
 
-            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), (int) ((float) done / (float) all * 100) + "%", posX + 68, posY + 33f, -1);
+            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), (int) ((float) done / (float) all * 100) + "%", posX + 68, posY + 35f, -1);
             FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "XRay", posX + 68, posY + 7, -1);
-            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), done + " / " + all + (isRu() ? " Осталось: " : " Estimated time: ") + MathUtility.round((all - done) * ((1000. / FrameRateCounter.INSTANCE.getFps() + delay.getValue()) / 1000f), 1) + "s", posX + 68, posY + 18, -1);
+            double time = 0;
+            try {
+                time = MathUtility.round((all - done) * ((1000. / FrameRateCounter.INSTANCE.getFps() + delay.getValue()) / 1000f), 1);
+            } catch (NumberFormatException e) {
+            }
+            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), done + " / " + all + (isRu() ? " Осталось: " : " Estimated time: ") + time + "s", posX + 68, posY + 18, -1);
 
         }
     }
