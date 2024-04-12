@@ -310,7 +310,7 @@ public final class AutoTotem extends Module {
 
             if (onCrystal.getValue()) {
                 if (entity instanceof EndCrystalEntity) {
-                    if ((getTriggerHealth()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos(), AutoCrystal.selfPredictTicks.getValue()) < 0.5) {
+                    if ((getTriggerHealth()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos(), 0) < 0.5) {
                         item = Items.TOTEM_OF_UNDYING;
                         break;
                     }

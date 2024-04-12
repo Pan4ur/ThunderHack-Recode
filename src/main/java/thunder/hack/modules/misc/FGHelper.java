@@ -95,7 +95,7 @@ public class FGHelper extends Module {
             if (timer.passedMs(500) && getPowderAtHotbar() != -1 && !(mc.player.hasStatusEffect(StatusEffects.STRENGTH)) && mc.crosshairTarget != null && mc.crosshairTarget.getType() != HitResult.Type.BLOCK && powder.getValue()) {
                 int hotbarslot = mc.player.getInventory().selectedSlot;
                 sendPacket(new UpdateSelectedSlotC2SPacket(getPowderAtHotbar()));
-                sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
                 sendPacket(new UpdateSelectedSlotC2SPacket(hotbarslot));
                 timer.reset();
             }

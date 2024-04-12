@@ -2,6 +2,8 @@ package thunder.hack.utility.player;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.network.PendingUpdateManager;
+import net.minecraft.client.network.SequencedPacketCreator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
@@ -18,6 +20,7 @@ import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.cmd.Command;
+import thunder.hack.injection.accesors.IClientWorldMixin;
 import thunder.hack.utility.math.ExplosionUtility;
 
 import java.util.*;
@@ -115,7 +118,7 @@ public final class InteractionUtility {
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
 
         if (mode == PlaceMode.Packet)
-            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
+            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, id));
 
         awaiting.put(bp, System.currentTimeMillis());
 
@@ -137,6 +140,14 @@ public final class InteractionUtility {
         BlockHitResult result = getPlaceResult(bp, interact, ignoreEntities);
         if (result != null) return calculateAngle(result.getPos());
         return null;
+    }
+
+    public static void sendSequencedPacket(SequencedPacketCreator packetCreator) {
+        if (mc.getNetworkHandler() == null || mc.world == null) return;
+        try (PendingUpdateManager pendingUpdateManager = ((IClientWorldMixin) mc.world).getPendingUpdateManager().incrementSequence();){
+            int i = pendingUpdateManager.getSequence();
+            mc.getNetworkHandler().sendPacket(packetCreator.predict(i));
+        }
     }
 
     @Nullable

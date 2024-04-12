@@ -3,6 +3,7 @@ package thunder.hack.modules.misc;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
@@ -65,12 +66,12 @@ public class FTHelper extends Module {
             int originalSlot = mc.player.getInventory().selectedSlot;
             mc.player.getInventory().selectedSlot = slot;
             sendPacket(new UpdateSelectedSlotC2SPacket(slot));
-            sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+            sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
             mc.player.getInventory().selectedSlot = originalSlot;
             sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
         } else if (islot != -1) {
             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, islot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-            sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+            sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, islot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
         }
         disorientTimer.reset();

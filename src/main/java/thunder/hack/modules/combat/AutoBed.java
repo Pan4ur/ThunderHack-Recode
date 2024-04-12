@@ -11,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BedItem;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.screen.CraftingScreenHandler;
@@ -147,7 +148,7 @@ public final class AutoBed extends Module {
         }
 
         if (bestBed != null && explodeTimer.passedMs(explodeDelay.getValue())) {
-            sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bestBed.hitResult(), PlayerUtility.getWorldActionId(mc.world)));
+            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bestBed.hitResult(), id));
             mc.player.swingHand(Hand.MAIN_HAND);
             explodeTimer.reset();
         }
@@ -162,7 +163,7 @@ public final class AutoBed extends Module {
             mc.player.setYaw(angle2);
             mc.player.prevYaw = angle2;
             ((IClientPlayerEntity) mc.player).setLastYaw(angle2);
-            sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bestPos.hitResult(), PlayerUtility.getWorldActionId(mc.world)));
+            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bestPos.hitResult(), id));
             mc.player.swingHand(Hand.MAIN_HAND);
             placeTimer.reset();
             mc.player.setYaw(prevYaw);
@@ -315,13 +316,10 @@ public final class AutoBed extends Module {
                             }
                         }
                     } else {
-                        float[] angle;
-
-                        angle = InteractionUtility.calculateAngle(result.getPos());
+                        float[] angle = InteractionUtility.calculateAngle(result.getPos());
                         mc.player.setYaw(angle[0]);
                         mc.player.setPitch(angle[1]);
-
-                        sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
+                        sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, id));
                     }
                 }
             }

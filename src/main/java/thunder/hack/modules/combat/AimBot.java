@@ -97,7 +97,7 @@ public final class AimBot extends Module {
             calcThread();
             if (target != null && (mc.player.canSee(target) || ignoreWalls.getValue()))
                 if (mc.player.age % delay.getValue() == 0)
-                    sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                    sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
         } else {
             if (mc.crosshairTarget.getType() == ENTITY)
                 aimTicks++;

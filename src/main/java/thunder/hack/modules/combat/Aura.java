@@ -226,7 +226,7 @@ public final class Aura extends Module {
         if (sprint && dropSprint.getValue())
             enableSprint();
         if (block && unpressShield.getValue())
-            sendPacket(new PlayerInteractItemC2SPacket(Hand.OFF_HAND, PlayerUtility.getWorldActionId(mc.world)));
+            sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id));
     }
 
     private void disableSprint() {

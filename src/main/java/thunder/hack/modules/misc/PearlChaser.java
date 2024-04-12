@@ -140,7 +140,7 @@ public class PearlChaser extends Module {
             if (epSlot != -1) {
                 mc.player.getInventory().selectedSlot = epSlot;
                 sendPacket(new UpdateSelectedSlotC2SPacket(epSlot));
-                sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
                 sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                 mc.player.getInventory().selectedSlot = originalSlot;
                 sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));

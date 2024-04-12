@@ -90,7 +90,7 @@ public class MiddleClick extends Module {
                     if (epSlot != -1) {
                         mc.player.getInventory().selectedSlot = epSlot;
                         sendPacket(new UpdateSelectedSlotC2SPacket(epSlot));
-                        sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
                         mc.player.getInventory().selectedSlot = originalSlot;
                         sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
                     }
@@ -98,7 +98,7 @@ public class MiddleClick extends Module {
                     int epSlot = InventoryUtility.findItemInInventory(Items.ENDER_PEARL).slot();
                     if (epSlot != -1) {
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, epSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                        sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, epSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
                     }
                 }
@@ -130,7 +130,7 @@ public class MiddleClick extends Module {
                     if (hpSlot != -1) {
                         mc.player.getInventory().selectedSlot = hpSlot;
                         sendPacket(new UpdateSelectedSlotC2SPacket(hpSlot));
-                        sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
                         mc.player.getInventory().selectedSlot = originalSlot;
                         sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
                     }
@@ -138,7 +138,7 @@ public class MiddleClick extends Module {
                     int hpSlot = findHpInInventory();
                     if (hpSlot != -1) {
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, hpSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                        sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+                        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, hpSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
                     }
                 }
@@ -156,9 +156,7 @@ public class MiddleClick extends Module {
                     int lastSlot = mc.player.getInventory().selectedSlot;
                     mc.player.getInventory().selectedSlot = slot;
                     sendPacket(new UpdateSelectedSlotC2SPacket(slot));
-
-                    sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
-
+                    sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
                     if (silent.getValue()) {
                         mc.player.getInventory().selectedSlot = lastSlot;
                         sendPacket(new UpdateSelectedSlotC2SPacket(lastSlot));
@@ -268,7 +266,8 @@ public class MiddleClick extends Module {
                     sleep(delay);
                 } catch (Exception ignore) {
                 }
-                sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+
+                sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
 
                 try {
                     sleep(delay);
@@ -276,7 +275,6 @@ public class MiddleClick extends Module {
                 }
                 mc.player.getInventory().selectedSlot = originalSlot;
                 sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
-                super.run();
             } else {
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, epSlot, originalSlot, SlotActionType.SWAP, mc.player);
 
@@ -286,16 +284,14 @@ public class MiddleClick extends Module {
                 }
                 if (ModuleManager.aura.isEnabled() && Aura.target != null)
                     sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
-                sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
-
+                sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
                 try {
                     sleep(delay);
                 } catch (Exception ignore) {
                 }
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, epSlot, originalSlot, SlotActionType.SWAP, mc.player);
-
-                super.run();
             }
+            super.run();
         }
     }
 }

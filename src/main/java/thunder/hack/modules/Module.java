@@ -3,8 +3,11 @@ package thunder.hack.modules;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.network.PendingUpdateManager;
+import net.minecraft.client.network.SequencedPacketCreator;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
@@ -15,6 +18,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CommandManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.notification.Notification;
+import thunder.hack.injection.accesors.IClientWorldMixin;
 import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
@@ -74,6 +78,14 @@ public abstract class Module {
         if (mc.getNetworkHandler() == null) return;
 
         mc.getNetworkHandler().sendPacket(packet);
+    }
+
+    protected void sendSequencedPacket(SequencedPacketCreator packetCreator) {
+        if (mc.getNetworkHandler() == null || mc.world == null) return;
+        try (PendingUpdateManager pendingUpdateManager = ((IClientWorldMixin) mc.world).getPendingUpdateManager().incrementSequence();){
+            int i = pendingUpdateManager.getSequence();
+            mc.getNetworkHandler().sendPacket(packetCreator.predict(i));
+        }
     }
 
     public String getDisplayInfo() {

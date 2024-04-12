@@ -619,7 +619,7 @@ public class ElytraPlus extends Module {
         slotWithFireWorks = n2;
         boolean bl3 = mc.player.getOffHandStack().getItem() == Items.FIREWORK_ROCKET;
         if (!bl3) sendPacket(new UpdateSelectedSlotC2SPacket(n2));
-        sendPacket(new PlayerInteractItemC2SPacket(bl3 ? Hand.OFF_HAND : Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(bl3 ? Hand.OFF_HAND : Hand.MAIN_HAND, id));
         if (!bl3) sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
         ++ticksInAir;
         flying = true;

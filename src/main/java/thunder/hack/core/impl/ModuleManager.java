@@ -217,6 +217,7 @@ public class ModuleManager implements IManager {
     public static AutoEZ autoEZ = new AutoEZ();
     public static AimBot aimBot = new AimBot();
     public static Quiver quiver = new Quiver();
+    public static NoPush noPush = new NoPush();
     public static Timer timer = new Timer();
     public static Regen regen = new Regen();
     public static Speed speed = new Speed();

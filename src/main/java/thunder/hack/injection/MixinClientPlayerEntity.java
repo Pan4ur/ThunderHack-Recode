@@ -116,7 +116,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "pushOutOfBlocks", at = @At("HEAD"), cancellable = true)
     private void onPushOutOfBlocksHook(double x, double d, CallbackInfo info) {
-        if (ModuleManager.velocity.isEnabled() && ModuleManager.velocity.blocks.getValue()) {
+        if (ModuleManager.noPush.isEnabled() && ModuleManager.noPush.blocks.getValue()) {
             info.cancel();
         }
     }

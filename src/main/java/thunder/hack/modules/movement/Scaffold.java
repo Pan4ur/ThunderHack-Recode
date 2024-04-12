@@ -279,7 +279,7 @@ public class Scaffold extends Module {
             }
 
             if(placeMode.getValue() == InteractionUtility.PlaceMode.Packet)
-                sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
+                sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bhr, id));
             else
                 mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, bhr);
 

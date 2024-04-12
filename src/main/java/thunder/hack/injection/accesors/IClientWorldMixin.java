@@ -8,5 +8,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(ClientWorld.class)
 public interface IClientWorldMixin {
     @Accessor("pendingUpdateManager")
-    PendingUpdateManager acquirePendingUpdateManager();
+    PendingUpdateManager getPendingUpdateManager();
 }

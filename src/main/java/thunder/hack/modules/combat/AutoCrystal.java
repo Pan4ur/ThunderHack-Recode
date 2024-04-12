@@ -560,7 +560,8 @@ public class AutoCrystal extends Module {
         if (!(mc.player.getMainHandStack().getItem() instanceof EndCrystalItem || offhand || autoSwitch.getValue() == Switch.SILENT))
             return;
 
-        sendPacket(new PlayerInteractBlockC2SPacket(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND, bhr, PlayerUtility.getWorldActionId(mc.world)));
+        sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND, bhr, id));
+
         mc.player.swingHand(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND);
         placeTimer.reset();
 

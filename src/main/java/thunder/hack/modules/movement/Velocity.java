@@ -33,10 +33,6 @@ public class Velocity extends Module {
     public Setting<Boolean> cc = new Setting<>("PauseOnFlag", false);
     public Setting<Boolean> fishingHook = new Setting<>("FishingHook", true);
     public Setting<Boolean> fire = new Setting<>("PauseOnFire", false);
-    public static Setting<Parent> antiPush = new Setting<>("AntiPush", new Parent(false, 0));
-    public Setting<Boolean> blocks = new Setting<>("Blocks", true).withParent(antiPush);
-    public Setting<Boolean> players = new Setting<>("Players", true).withParent(antiPush);
-    public Setting<Boolean> water = new Setting<>("Liquids", true).withParent(antiPush);
     private final Setting<modeEn> mode = new Setting<>("Mode", modeEn.Matrix);
     public Setting<Float> vertical = new Setting<>("Vertical", 0.0f, 0.0f, 100.0f, v -> mode.getValue() == modeEn.Custom);
     private final Setting<jumpModeEn> jumpMode = new Setting<>("JumpMode", jumpModeEn.Jump, v -> mode.getValue() == modeEn.Jump);

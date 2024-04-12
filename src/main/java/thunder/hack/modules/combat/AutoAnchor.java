@@ -417,7 +417,7 @@ public final class AutoAnchor extends Module {
     }
 
     private void interact(BlockHitResult result, Hand hand) {
-        sendPacket(new PlayerInteractBlockC2SPacket(hand, result, PlayerUtility.getWorldActionId(mc.world)));
+        sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
         if (swing.getValue()) mc.player.swingHand(hand);
         else sendPacket(new HandSwingC2SPacket(hand));
     }

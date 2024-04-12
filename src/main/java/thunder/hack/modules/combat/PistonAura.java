@@ -261,7 +261,8 @@ public final class PistonAura extends Module {
                     sendPacket(new UpdateSelectedSlotC2SPacket(crystal_slot));
                 }
             }
-            sendPacket(new PlayerInteractBlockC2SPacket(offHand ? Hand.OFF_HAND : Hand.MAIN_HAND, result, PlayerUtility.getWorldActionId(mc.world)));
+
+            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(offHand ? Hand.OFF_HAND : Hand.MAIN_HAND, result, id));
             sendPacket(new HandSwingC2SPacket(offHand ? Hand.OFF_HAND : Hand.MAIN_HAND));
 
             if (!offHand) {

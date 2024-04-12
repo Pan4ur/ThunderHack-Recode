@@ -117,7 +117,7 @@ public final class AutoBuff extends Module {
     public void throwPotion(Potions potion) {
         int slot = getPotionSlot(potion);
         sendPacket(new UpdateSelectedSlotC2SPacket(slot));
-        sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, PlayerUtility.getWorldActionId(mc.world)));
+        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
     }
 
     public enum Potions {

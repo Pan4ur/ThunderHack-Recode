@@ -15,6 +15,7 @@ import net.minecraft.item.PickaxeItem;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -431,8 +432,7 @@ public final class CevBreaker extends Module {
         if (pData != null) {
             if (mc.player.getOffHandStack().getItem().equals(Items.END_CRYSTAL)) {
                 mc.interactionManager.interactBlock(mc.player, Hand.OFF_HAND, pData);
-                sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, pData, PlayerUtility.getWorldActionId(mc.world)));
-
+                sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, pData, id));
                 if (swing.getValue()) mc.player.swingHand(Hand.OFF_HAND);
                 return;
             }
@@ -443,7 +443,7 @@ public final class CevBreaker extends Module {
                 crystalResult.switchTo();
             }
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, pData);
-            sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, pData, PlayerUtility.getWorldActionId(mc.world)));
+            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, pData, id));
             InventoryUtility.switchTo(preSlot);
             if (swing.getValue()) mc.player.swingHand(Hand.MAIN_HAND);
         }

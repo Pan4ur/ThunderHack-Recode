@@ -24,7 +24,7 @@ public abstract class MixinFlowableFluid {
 
     @Inject(method = "getVelocity", at = @At(value = "HEAD"), cancellable = true)
     private void getVelocityHook(BlockView world, BlockPos pos, FluidState state, CallbackInfoReturnable<Vec3d> cir) {
-        if (ModuleManager.velocity.isEnabled() && ModuleManager.velocity.water.getValue()) {
+        if (ModuleManager.noPush.isEnabled() && ModuleManager.noPush.water.getValue()) {
             double d = 0.0;
             double e = 0.0;
             BlockPos.Mutable mutable = new BlockPos.Mutable();

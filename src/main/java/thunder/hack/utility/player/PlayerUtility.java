@@ -46,20 +46,9 @@ public final class PlayerUtility {
         return mc.player;
     }
 
-    public static int getWorldActionId(ClientWorld world) {
-        PendingUpdateManager pum = getUpdateManager(world);
-        int p = pum.getSequence();
-        pum.close();
-        return p;
-    }
-
     public static float calculatePercentage(@NotNull ItemStack stack) {
         float durability = stack.getMaxDamage() - stack.getDamage();
         return (durability / (float) stack.getMaxDamage()) * 100F;
-    }
-
-    private static PendingUpdateManager getUpdateManager(ClientWorld world) {
-        return ((IClientWorldMixin) world).acquirePendingUpdateManager();
     }
 
     public static float fixAngle(float angle) {
