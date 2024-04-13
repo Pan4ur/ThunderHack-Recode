@@ -64,7 +64,7 @@ public class LegacyHud extends Module {
         Minecraft, Comfortaa, Monsterrat, SF
     }
 
-    public void onRenderShaders(DrawContext context) {
+    public void onRender2D(DrawContext context) {
         if (fullNullCheck())
             return;
 

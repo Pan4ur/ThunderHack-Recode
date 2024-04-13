@@ -8,9 +8,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ConfigManager;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.gui.clickui.AbstractWindow;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
@@ -120,13 +118,14 @@ public class ClickGUI extends Screen {
             currentDescription = "";
         }
 
-        FontRenderers.sf_medium.drawString(context.getMatrices(),
-                "Left Mouse Click to enable module" +
-                "\nRight Mouse Click to open module settings\nMiddle Mouse Click to bind module" +
-                "\nCtrl + F to start searching\nDrag n Drop config there to load" +
-                "\nShift + Left Mouse Click to change module visibility in array list" +
-                "\nMiddle Mouse Click on slider to enter value from keyboard" +
-                "\nDelete + Left Mouse Click on module to reset", 5, mc.getWindow().getScaledHeight() - 80, HudEditor.getColor(0).getRGB());
+        if (ModuleManager.clickGui.tips.getValue())
+            FontRenderers.sf_medium.drawString(context.getMatrices(),
+                    "Left Mouse Click to enable module" +
+                            "\nRight Mouse Click to open module settings\nMiddle Mouse Click to bind module" +
+                            "\nCtrl + F to start searching\nDrag n Drop config there to load" +
+                            "\nShift + Left Mouse Click to change module visibility in array list" +
+                            "\nMiddle Mouse Click on slider to enter value from keyboard" +
+                            "\nDelete + Left Mouse Click on module to reset", 5, mc.getWindow().getScaledHeight() - 80, HudEditor.getColor(0).getRGB());
     }
 
     @Override
@@ -148,7 +147,7 @@ public class ClickGUI extends Screen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-         //   if (!setup && ConfigManager.firstLaunch) return false;
+        //   if (!setup && ConfigManager.firstLaunch) return false;
         windows.forEach(w -> w.mouseReleased((int) mouseX, (int) mouseY, button));
         return super.mouseReleased(mouseX, mouseY, button);
     }

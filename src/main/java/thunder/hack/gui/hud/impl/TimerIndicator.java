@@ -22,11 +22,6 @@ public class TimerIndicator extends HudElement {
     @Override
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-
-    }
-
-    @Override
-    public void onRenderShaders(@NotNull DrawContext context) {
         float f4 = 100 / Timer.speed.getValue();
         float f5 = Math.min(Timer.violation, f4);
         timerAnimation.setValue(((f4 - f5) / f4) * 58);

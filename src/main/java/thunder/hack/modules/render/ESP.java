@@ -22,10 +22,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector4d;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.gui.hud.impl.RadarRewrite;
 import thunder.hack.injection.accesors.IBeaconBlockEntity;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -101,7 +99,7 @@ public class ESP extends Module {
 
                     Tessellator tessellator = Tessellator.getInstance();
                     BufferBuilder bufferBuilder = tessellator.getBuffer();
-                    Render3DEngine.setup();
+                    Render3DEngine.setupRender();
                     RenderSystem.disableDepthTest();
                     RenderSystem.setShader(GameRenderer::getPositionColorProgram);
                     bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
@@ -123,7 +121,7 @@ public class ESP extends Module {
                     }
                     tessellator.draw();
 
-                    Render3DEngine.cleanup();
+                    Render3DEngine.endRender();
                     RenderSystem.enableDepthTest();
                     stack.translate(-x, -y, -z);
                     stack.pop();
@@ -163,7 +161,7 @@ public class ESP extends Module {
 
                 Tessellator tessellator = Tessellator.getInstance();
                 BufferBuilder bufferBuilder = tessellator.getBuffer();
-                Render3DEngine.setup();
+                Render3DEngine.setupRender();
                 RenderSystem.disableDepthTest();
                 RenderSystem.setShader(GameRenderer::getPositionColorProgram);
                 bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
@@ -185,7 +183,7 @@ public class ESP extends Module {
                 }
                 tessellator.draw();
 
-                Render3DEngine.cleanup();
+                Render3DEngine.endRender();
                 RenderSystem.enableDepthTest();
                 stack.translate(-x, -y, -z);
                 stack.pop();

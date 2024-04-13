@@ -39,7 +39,7 @@ public class BreadCrumbs extends Module {
     }
 
     public void drawLine(float width, boolean white) {
-        Render3DEngine.setup();
+        Render3DEngine.setupRender();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         RenderSystem.disableDepthTest();
@@ -68,7 +68,7 @@ public class BreadCrumbs extends Module {
         tessellator.draw();
         RenderSystem.enableCull();
         RenderSystem.enableDepthTest();
-        Render3DEngine.cleanup();
+        Render3DEngine.endRender();
     }
 
     @EventHandler

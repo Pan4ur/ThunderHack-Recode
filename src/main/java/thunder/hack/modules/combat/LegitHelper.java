@@ -14,6 +14,7 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.AsyncManager;
 import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.PacketEvent;
@@ -21,6 +22,7 @@ import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
+import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
@@ -34,30 +36,59 @@ public class LegitHelper extends Module {
         super("LegitHelper", Category.COMBAT);
     }
 
-    private final Setting<Integer> swapDelay = new Setting<>("SwapDelay", 50, 10, 250);
-    private final Setting<Bind> anchorBind = new Setting<>("AnchorBind", new Bind(GLFW.GLFW_KEY_Y, false, false));
-    private final Setting<Bind> crystalBind = new Setting<>("CrystalBind", new Bind(GLFW.GLFW_KEY_U, false, false));
-    private final Setting<Boolean> changePitch = new Setting<>("ChangePitch", false);
-    private final Setting<Boolean> crystalOptimizer = new Setting<>("CrystalOptimizer", false);
-    private final Setting<Boolean> shieldBreaker = new Setting<>("ShieldBreaker", false);
+
+    private final Setting<BooleanParent> anchors = new Setting<>("Anchors", new BooleanParent(true));
+    private final Setting<Integer> anchorDelay = new Setting<>("AnchorDelay", 50, 5, 250).withParent(anchors);
+    private final Setting<Bind> anchorBind = new Setting<>("AnchorBind", new Bind(GLFW.GLFW_KEY_Y, false, false)).withParent(anchors);
+
+    private final Setting<BooleanParent> crystals = new Setting<>("Crystals", new BooleanParent(true));
+    private final Setting<Integer> crystalDelay = new Setting<>("CrystalDelay", 50, 5, 250).withParent(crystals);
+    private final Setting<Bind> crystalBind = new Setting<>("CrystalBind", new Bind(GLFW.GLFW_KEY_U, false, false)).withParent(crystals);
+    private final Setting<Boolean> changePitch = new Setting<>("ChangePitch", false).withParent(crystals);
+    private final Setting<Boolean> crystalOptimizer = new Setting<>("CrystalOptimizer", false).withParent(crystals);
+    private final Setting<Boolean> switchBack = new Setting<>("SwitchBack", false).withParent(crystals);
+
+    private final Setting<BooleanParent> shieldBreaker = new Setting<>("ShieldBreaker", new BooleanParent(false));
+    private final Setting<Integer> breakerDelay = new Setting<>("BreakerDelay", 50, 5, 250).withParent(shieldBreaker);
+    private final Setting<Boolean> swapBack = new Setting<>("SwapBack", true).withParent(shieldBreaker);
+
 
     private Timer timer = new Timer();
     private Vec3d lastCrystalVec = Vec3d.ZERO;
 
     @Override
     public void onUpdate() {
-        if (isKeyPressed(anchorBind) && timer.every(swapDelay.getValue() * 5L + 100)) {
+        if (isKeyPressed(anchorBind) && timer.every(anchorDelay.getValue() * 5L + 100)) {
             int glowSlot = InventoryUtility.getGlowStone().slot();
             int anchorSlot = InventoryUtility.getAnchor().slot();
             if (glowSlot == -1 || anchorSlot == -1) return;
-            new AnchorThread(glowSlot, mc.player.getInventory().selectedSlot, anchorSlot, swapDelay.getValue()).start();
+
+            int prevSlot = mc.player.getInventory().selectedSlot;
+
+            ThunderHack.asyncManager.run(() -> {
+                mc.player.getInventory().selectedSlot = anchorSlot;
+                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(anchorSlot));
+                AsyncManager.sleep(anchorDelay.getValue());
+                ((IMinecraftClient) mc).idoItemUse();
+                AsyncManager.sleep(anchorDelay.getValue());
+                mc.player.getInventory().selectedSlot = glowSlot;
+                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(glowSlot));
+                AsyncManager.sleep(anchorDelay.getValue());
+                ((IMinecraftClient) mc).idoItemUse();
+                AsyncManager.sleep(anchorDelay.getValue());
+                mc.player.getInventory().selectedSlot = prevSlot;
+                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
+                AsyncManager.sleep(anchorDelay.getValue());
+                ((IMinecraftClient) mc).idoItemUse();
+            });
+
             return;
         }
 
         boolean crystalAtCrosshair = mc.crosshairTarget instanceof EntityHitResult ehr && ehr.getEntity() instanceof EndCrystalEntity;
         boolean obbyAtCrosshair = mc.crosshairTarget instanceof BlockHitResult bhr && mc.world.getBlockState(bhr.getBlockPos()).getBlock() == Blocks.OBSIDIAN;
 
-        if (isKeyPressed(crystalBind) && timer.every(swapDelay.getValue() * (crystalAtCrosshair ? 1L : obbyAtCrosshair ? 2L : 4L))) {
+        if (isKeyPressed(crystalBind) && timer.every(crystalDelay.getValue() * (crystalAtCrosshair ? 1L : obbyAtCrosshair ? 2L : 4L))) {
             int crystalSlot = InventoryUtility.findItemInHotBar(Items.END_CRYSTAL).slot();
             int obbySlot = InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN).slot();
             if (obbySlot == -1 || crystalSlot == -1 || crystalSlot >= 9 || obbySlot >= 9) return;
@@ -67,10 +98,32 @@ public class LegitHelper extends Module {
                 mc.player.swingHand(Hand.MAIN_HAND);
                 return;
             }
-            new CrystalThread(crystalSlot, obbySlot, mc.player.getInventory().selectedSlot, swapDelay.getValue(), obbyAtCrosshair).start();
+
+            int prevSlot = mc.player.getInventory().selectedSlot;
+
+            ThunderHack.asyncManager.run(() -> {
+                if (!obbyAtCrosshair) {
+                    mc.player.getInventory().selectedSlot = obbySlot;
+                    mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(obbySlot));
+                    AsyncManager.sleep(crystalDelay.getValue());
+                    ((IMinecraftClient) mc).idoItemUse();
+                    AsyncManager.sleep(crystalDelay.getValue());
+                }
+                mc.player.getInventory().selectedSlot = crystalSlot;
+                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(crystalSlot));
+                AsyncManager.sleep(crystalDelay.getValue());
+                ((IMinecraftClient) mc).idoItemUse();
+                lastCrystalVec = mc.crosshairTarget.getPos();
+                if (switchBack.getValue()) {
+                    AsyncManager.sleep(crystalDelay.getValue());
+                    mc.player.getInventory().selectedSlot = prevSlot;
+                    mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
+                }
+            });
         }
 
-        if (shieldBreaker.getValue()
+
+        if (shieldBreaker.getValue().isEnabled()
                 && mc.crosshairTarget instanceof EntityHitResult ehr
                 && ehr.getEntity() instanceof PlayerEntity pl
                 && (pl.getOffHandStack().getItem() == Items.SHIELD || pl.getMainHandStack().getItem() == Items.SHIELD)
@@ -79,7 +132,23 @@ public class LegitHelper extends Module {
             int axeSlot = InventoryUtility.getAxeHotBar().slot();
             if (axeSlot == -1)
                 return;
-            new ShieldBreaker(axeSlot, mc.player.getInventory().selectedSlot, swapDelay.getValue()).start();
+
+            int prevSlot = mc.player.getInventory().selectedSlot;
+            ThunderHack.asyncManager.run(() -> {
+                AsyncManager.sleep(breakerDelay.getValue());
+                mc.player.getInventory().selectedSlot = axeSlot;
+                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(axeSlot));
+                AsyncManager.sleep(breakerDelay.getValue());
+                if (mc.crosshairTarget instanceof EntityHitResult ehr2)
+                    mc.interactionManager.attackEntity(mc.player, ehr2.getEntity());
+                mc.player.swingHand(Hand.MAIN_HAND);
+
+                if (swapBack.getValue()) {
+                    AsyncManager.sleep(breakerDelay.getValue());
+                    mc.player.getInventory().selectedSlot = prevSlot;
+                    mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
+                }
+            });
         }
     }
 
@@ -105,94 +174,6 @@ public class LegitHelper extends Module {
             c.kill();
             c.setRemoved(Entity.RemovalReason.KILLED);
             c.onRemoved();
-        }
-    }
-
-    public class CrystalThread extends Thread {
-        int crystalSlot, obbySlot, originalSlot, delay;
-        boolean onBlock;
-
-        public CrystalThread(int crystalSlot, int obbySlot, int originalSlot, int delay, boolean onBlock) {
-            this.crystalSlot = crystalSlot;
-            this.obbySlot = obbySlot;
-            this.originalSlot = originalSlot;
-            this.delay = delay;
-            this.onBlock = onBlock;
-        }
-
-        @Override
-        public void run() {
-            if (!onBlock) {
-                mc.player.getInventory().selectedSlot = obbySlot;
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(obbySlot));
-                AsyncManager.sleep(delay);
-                ((IMinecraftClient) mc).idoItemUse();
-                AsyncManager.sleep(delay);
-            }
-            mc.player.getInventory().selectedSlot = crystalSlot;
-            mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(crystalSlot));
-            AsyncManager.sleep(delay);
-            ((IMinecraftClient) mc).idoItemUse();
-            lastCrystalVec = mc.crosshairTarget.getPos();
-            AsyncManager.sleep(delay);
-            mc.player.getInventory().selectedSlot = originalSlot;
-            mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
-            super.run();
-        }
-    }
-
-    public class AnchorThread extends Thread {
-        int anchorSlot, glowSlot, originalSlot, delay;
-
-        public AnchorThread(int glowSlot, int originalSlot, int anchorSlot, int delay) {
-            this.glowSlot = glowSlot;
-            this.originalSlot = originalSlot;
-            this.delay = delay;
-            this.anchorSlot = anchorSlot;
-        }
-
-        @Override
-        public void run() {
-            mc.player.getInventory().selectedSlot = anchorSlot;
-            mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(anchorSlot));
-            AsyncManager.sleep(delay);
-            ((IMinecraftClient) mc).idoItemUse();
-            AsyncManager.sleep(delay);
-            mc.player.getInventory().selectedSlot = glowSlot;
-            mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(glowSlot));
-            AsyncManager.sleep(delay);
-            ((IMinecraftClient) mc).idoItemUse();
-            AsyncManager.sleep(delay);
-            mc.player.getInventory().selectedSlot = originalSlot;
-            mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
-            AsyncManager.sleep(delay);
-            ((IMinecraftClient) mc).idoItemUse();
-            super.run();
-        }
-    }
-
-    public class ShieldBreaker extends Thread {
-        int axeslot, originalSlot, delay;
-
-        public ShieldBreaker(int axeslot, int originalSlot, int delay) {
-            this.axeslot = axeslot;
-            this.originalSlot = originalSlot;
-            this.delay = delay;
-        }
-
-        @Override
-        public void run() {
-            AsyncManager.sleep(delay);
-            mc.player.getInventory().selectedSlot = axeslot;
-            mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(axeslot));
-            AsyncManager.sleep(delay);
-            if (mc.crosshairTarget instanceof EntityHitResult ehr)
-                mc.interactionManager.attackEntity(mc.player, ehr.getEntity());
-            mc.player.swingHand(Hand.MAIN_HAND);
-            AsyncManager.sleep(delay);
-            mc.player.getInventory().selectedSlot = originalSlot;
-            mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));
-            super.run();
         }
     }
 }

@@ -102,6 +102,25 @@ public class StaffBoard extends HudElement {
         all.addAll(players);
         all.addAll(notSpec);
 
+        int y_offset1 = 5;
+        float scale_x = 35;
+
+        for (String player : all) {
+            if (player != null) {
+                String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "SPEC" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "SPEC " + Formatting.YELLOW + "(GM3)" : Formatting.GREEN + "Z");
+                if (FontRenderers.sf_bold_mini.getStringWidth(a) > scale_x) {
+                    scale_x = FontRenderers.sf_bold_mini.getStringWidth(a);
+                }
+            }
+            y_offset1 += 11;
+        }
+
+        vAnimation = AnimationUtility.fast(vAnimation, 20 + y_offset1, 15);
+        hAnimation = AnimationUtility.fast(hAnimation, scale_x + 15, 15);
+
+        Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue());
+        setBounds((int) (scale_x + 20), 20 + y_offset1);
+
 
         FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "StaffBoard", getPosX() + hAnimation / 2f, getPosY() + 4, HudEditor.textColor.getValue().getColor());
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + hAnimation / 2f, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
@@ -121,29 +140,6 @@ public class StaffBoard extends HudElement {
         Render2DEngine.popWindow();
     }
 
-    public void onRenderShaders(DrawContext context) {
-        int y_offset1 = 5;
-        float scale_x = 35;
-        List<String> all = new java.util.ArrayList<>();
-        all.addAll(players);
-        all.addAll(notSpec);
-
-        for (String player : all) {
-            if (player != null) {
-                String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "SPEC" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "SPEC " + Formatting.YELLOW + "(GM3)" : Formatting.GREEN + "Z");
-                if (FontRenderers.sf_bold_mini.getStringWidth(a) > scale_x) {
-                    scale_x = FontRenderers.sf_bold_mini.getStringWidth(a);
-                }
-            }
-            y_offset1 += 11;
-        }
-
-        vAnimation = AnimationUtility.fast(vAnimation, 20 + y_offset1, 15);
-        hAnimation = AnimationUtility.fast(hAnimation, scale_x + 15, 15);
-
-        Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue());
-        setBounds((int) (scale_x + 20), 20 + y_offset1);
-    }
 
     @Override
     public void onUpdate() {

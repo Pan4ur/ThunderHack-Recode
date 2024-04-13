@@ -47,7 +47,7 @@ public class Crosshair extends Module {
 
     private float xAnim, yAnim, prevPitch, prevProgress;
 
-    public void onRenderShaders(DrawContext context) {
+    public void onRender2D(DrawContext context) {
         if (!mc.options.getPerspective().isFirstPerson()) return;
 
         float midX = mc.getWindow().getScaledWidth() / 2f;

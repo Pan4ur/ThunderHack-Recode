@@ -12,6 +12,8 @@ public class ClickGui extends Module {
     public Setting<scrollModeEn> scrollMode = new Setting<>("ScrollMode", scrollModeEn.Old);
     public Setting<Integer> catHeight = new Setting<>("CategoryHeight", 300, 100, 720);
     public final Setting<Boolean> descriptions = new Setting<>("Descriptions", true);
+    public final Setting<Boolean> tips = new Setting<>("Tips", true);
+
 
     public ClickGui() {
         super("ClickGui", Module.Category.CLIENT);

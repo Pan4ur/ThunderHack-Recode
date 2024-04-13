@@ -95,7 +95,7 @@ public class Trails extends Module {
                     }
 
                     tessellator.draw();
-                    Render3DEngine.cleanup();
+                    Render3DEngine.endRender();
                     RenderSystem.enableCull();
                     RenderSystem.disableDepthTest();
                     stack.pop();
@@ -221,7 +221,7 @@ public class Trails extends Module {
                     }
                     tessellator.draw();
 
-                    Render3DEngine.cleanup();
+                    Render3DEngine.endRender();
                     RenderSystem.enableCull();
                     RenderSystem.disableDepthTest();
                     stack.pop();

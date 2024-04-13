@@ -32,27 +32,9 @@ public class Radar extends HudElement {
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        if (mode.getValue() == Mode.Text) {
-            float offset_y = 0;
-            for (PlayerEntity entityPlayer : players) {
-                if (entityPlayer == mc.player)
-                    continue;
 
-                String str = entityPlayer.getName().getString() + " " + String.format("%.1f", (entityPlayer.getHealth() + entityPlayer.getAbsorptionAmount())) + " " + String.format("%.1f", mc.player.distanceTo(entityPlayer)) + " m";
-                if (colorMode.getValue() == ColorMode.Sync) {
-                    FontRenderers.sf_bold.drawString(context.getMatrices(), str, getPosX(), getPosY() + offset_y, HudEditor.getColor((int) (offset_y * 2f)).getRGB());
-                } else {
-                    FontRenderers.sf_bold.drawString(context.getMatrices(), str, getPosX(), getPosY() + offset_y, color2.getValue().getColor());
-                }
-                offset_y += FontRenderers.sf_bold.getFontHeight(str);
-            }
-        }
-    }
-
-    public void onRenderShaders(DrawContext context) {
         if (mode.getValue() == Mode.Rect) {
             Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), size.getValue(), size.getValue(), HudEditor.hudRound.getValue());
-
 
             Render2DEngine.drawRectDumbWay(context.getMatrices(),
                     (float) (getPosX() + (size.getValue() / 2F - 0.5)),
@@ -70,8 +52,6 @@ public class Radar extends HudElement {
                     getPosY() + (size.getValue() / 2F + 0.5f),
                     color2.getValue().getColorObject(), color2.getValue().getColorObject(), color2.getValue().getColorObject(), color2.getValue().getColorObject()
             );
-
-            setBounds(size.getValue(), size.getValue());
 
             for (PlayerEntity entityPlayer : players) {
                 if (entityPlayer == mc.player)
@@ -97,8 +77,25 @@ public class Radar extends HudElement {
                 Render2DEngine.drawRound(context.getMatrices(), (getPosX() + size.getValue() / 2F + rotX) - 2, (getPosY() + size.getValue() / 2F + rotY) - 2, 4, 4, 2f, color3.getValue().getColorObject());
             }
         }
-    }
 
+        if (mode.getValue() == Mode.Text) {
+            float offset_y = 0;
+            for (PlayerEntity entityPlayer : players) {
+                if (entityPlayer == mc.player)
+                    continue;
+
+                String str = entityPlayer.getName().getString() + " " + String.format("%.1f", (entityPlayer.getHealth() + entityPlayer.getAbsorptionAmount())) + " " + String.format("%.1f", mc.player.distanceTo(entityPlayer)) + " m";
+                if (colorMode.getValue() == ColorMode.Sync) {
+                    FontRenderers.sf_bold.drawString(context.getMatrices(), str, getPosX(), getPosY() + offset_y, HudEditor.getColor((int) (offset_y * 2f)).getRGB());
+                } else {
+                    FontRenderers.sf_bold.drawString(context.getMatrices(), str, getPosX(), getPosY() + offset_y, color2.getValue().getColor());
+                }
+                offset_y += FontRenderers.sf_bold.getFontHeight(str);
+            }
+        }
+
+        setBounds(size.getValue(), size.getValue());
+    }
 
     private enum Mode {
         Rect, Text

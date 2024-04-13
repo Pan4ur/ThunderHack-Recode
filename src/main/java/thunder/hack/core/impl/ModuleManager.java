@@ -37,6 +37,7 @@ public class ModuleManager implements IManager {
     public static AutoCrystalBase autoCrystalBase = new AutoCrystalBase();
     public static CrosshairArrows crosshairArrows = new CrosshairArrows();
     public static PearlBlockThrow pearlBlockThrow = new PearlBlockThrow();
+    public static ChatTranslator chatTranslator = new ChatTranslator();
     public static ClientSettings clientSettings = new ClientSettings();
     public static TimerIndicator timerIndicator = new TimerIndicator();
     public static ThunderHackGui thunderHackGui = new ThunderHackGui();
@@ -307,10 +308,6 @@ public class ModuleManager implements IManager {
         if(!HudElement.anyHovered && !ClickGUI.anyHovered)
             GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
         ThunderHack.core.onRender2D(context);
-    }
-
-    public void onRenderShaders(DrawContext context) {
-        modules.stream().filter(Module::isEnabled).forEach(module -> module.onRenderShaders(context));
     }
 
     public void onRender3D(MatrixStack stack) {

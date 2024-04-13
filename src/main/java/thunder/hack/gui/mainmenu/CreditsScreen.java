@@ -89,8 +89,8 @@ public class CreditsScreen extends Screen {
         }
         RenderSystem.disableBlend();
         Render2DEngine.drawHudBase(context.getMatrices(), mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40, 5, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40) ? 0.7f : 1f);
-        RenderSystem.setShaderColor(1f, 1f, 1f, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40) ? 0.7f : 1f);
-        context.drawTexture(TH_TEAM, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40, 0, 0, 40, 40, 40, 40);
+        RenderSystem.setShaderColor(1f, 1f, 1f, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 30, 30) ? 0.7f : 1f);
+        context.drawTexture(TH_TEAM, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 30, 30, 0, 0, 30, 30, 30, 30);
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 

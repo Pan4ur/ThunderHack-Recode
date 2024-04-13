@@ -80,16 +80,14 @@ public class MainMenuScreen extends Screen {
 
         Render2DEngine.drawHudBase(context.getMatrices(), mainX, mainY, mainWidth, mainHeight, 20);
 
-        buttons.forEach(b -> b.onRender(context, mouseX, mouseY));
 
         Render2DEngine.drawHudBase(context.getMatrices(), mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40, 5, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40) ? 0.7f : 1f);
+        buttons.forEach(b -> b.onRender(context, mouseX, mouseY));
 
 
         boolean hoveredLogo = Render2DEngine.isHovered(mouseX, mouseY, (int) (halfOfWidth - 120), (int) (halfOfHeight - 130), 210, 50);
 
         FontRenderers.thglitchBig.drawCenteredString(context.getMatrices(), "THUNDERHACK", (int) (halfOfWidth), (int) (halfOfHeight - 120), new Color(255, 255, 255, hoveredLogo ? 230 : 180).getRGB());
-
-        buttons.forEach(b -> b.onRenderText(context, mouseX, mouseY));
 
         boolean hovered = Render2DEngine.isHovered(mouseX, mouseY, halfOfWidth - 50, halfOfHeight + 70, 100, 10);
 

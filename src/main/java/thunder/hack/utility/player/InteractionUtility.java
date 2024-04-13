@@ -112,7 +112,7 @@ public final class InteractionUtility {
 
         float[] angle = calculateAngle(result.getPos());
         if (rotate)
-            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
+            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), angle[0], angle[1], mc.player.isOnGround()));
 
         if (mode == PlaceMode.Normal)
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);

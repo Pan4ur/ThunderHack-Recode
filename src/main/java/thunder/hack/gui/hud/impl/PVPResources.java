@@ -20,9 +20,6 @@ public class PVPResources extends HudElement {
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-    }
-
-    public void onRenderShaders(DrawContext context) {
         Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), 50, 50, HudEditor.hudRound.getValue());
 
         Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 24.5f, getPosX() + 26, getPosY() + 25, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());

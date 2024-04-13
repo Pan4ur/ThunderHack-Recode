@@ -62,9 +62,6 @@ public abstract class Module {
     public void onUpdate() {
     }
 
-    public void onRenderShaders(DrawContext context) {
-    }
-
     public void onRender2D(DrawContext event) {
     }
 

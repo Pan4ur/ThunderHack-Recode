@@ -39,24 +39,6 @@ public class KeyBinds extends HudElement {
                 oncolor.getValue().setColor(Color.WHITE.getRGB());
         }
 
-        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KeyBinds", getPosX() + hAnimation / 2, getPosY() + 4, HudEditor.textColor.getValue().getColor());
-        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
-        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
-
-        Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
-        int y_offset = 2;
-        for (Module feature : ThunderHack.moduleManager.modules) {
-            if (feature.isDisabled() && onlyEnabled.getValue())
-                continue;
-            if (!Objects.equals(feature.getBind().getBind(), "None") && feature != ModuleManager.clickGui && feature != ModuleManager.thunderHackGui) {
-                FontRenderers.sf_bold_mini.drawString(context.getMatrices(), "[" + getShortKeyName(feature) + "]  " + feature.getName(), getPosX() + 5, getPosY() + 18 + y_offset, feature.isOn() ? oncolor.getValue().getColor() : offcolor.getValue().getColor());
-                y_offset += 10;
-            }
-        }
-        Render2DEngine.popWindow();
-    }
-
-    public void onRenderShaders(DrawContext context) {
         int y_offset1 = 0;
         float max_width = 50;
         for (Module feature : ThunderHack.moduleManager.modules) {
@@ -73,7 +55,24 @@ public class KeyBinds extends HudElement {
         hAnimation = AnimationUtility.fast(hAnimation, max_width, 15);
 
         Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue());
+
+        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KeyBinds", getPosX() + hAnimation / 2, getPosY() + 4, HudEditor.textColor.getValue().getColor());
+        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
+        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+
+        Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
+        int y_offset = 2;
+        for (Module feature : ThunderHack.moduleManager.modules) {
+            if (feature.isDisabled() && onlyEnabled.getValue())
+                continue;
+            if (!Objects.equals(feature.getBind().getBind(), "None") && feature != ModuleManager.clickGui && feature != ModuleManager.thunderHackGui) {
+                FontRenderers.sf_bold_mini.drawString(context.getMatrices(), "[" + getShortKeyName(feature) + "]  " + feature.getName(), getPosX() + 5, getPosY() + 18 + y_offset, feature.isOn() ? oncolor.getValue().getColor() : offcolor.getValue().getColor());
+                y_offset += 10;
+            }
+        }
+        Render2DEngine.popWindow();
         setBounds((int) max_width, 20 + y_offset1);
+
     }
 
     @NotNull

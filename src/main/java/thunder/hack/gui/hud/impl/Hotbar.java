@@ -23,7 +23,29 @@ public class Hotbar extends HudElement {
         Merged, Separately
     }
 
-    public static void renderCustomHotbar(float tickDelta, DrawContext context) {
+    public void onRender2D(DrawContext context) {
+        PlayerEntity playerEntity = mc.player;
+        if (playerEntity != null) {
+            MatrixStack matrices = context.getMatrices();
+            int i = mc.getWindow().getScaledWidth() / 2;
+
+            if (mc.player.getOffHandStack().isEmpty()) {
+                Render2DEngine.drawHudBase(matrices, i - 90, mc.getWindow().getScaledHeight() - 25, 180, 20, HudEditor.hudRound.getValue());
+            } else if (lmode.getValue() == Mode.Merged) {
+                Render2DEngine.drawHudBase(matrices, i - 111, mc.getWindow().getScaledHeight() - 25, 201, 20, HudEditor.hudRound.getValue());
+                Render2DEngine.verticalGradient(matrices, i - 109 + 18, mc.getWindow().getScaledHeight() - 22 + 1 - 4, i - 108 + 18 - 0.5f, mc.getWindow().getScaledHeight() - 11 + 1 - 4, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
+                Render2DEngine.verticalGradient(matrices, i - 109 + 18, mc.getWindow().getScaledHeight() - 11 - 4, i - 108 + 18 - 0.5f, mc.getWindow().getScaledHeight() - 5, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+            } else {
+                Render2DEngine.drawHudBase(matrices,i - 90, mc.getWindow().getScaledHeight() - 25, 180, 20, HudEditor.hudRound.getValue());
+                Render2DEngine.drawHudBase(matrices, i - 112.5f, mc.getWindow().getScaledHeight() - 25, 20, 20, HudEditor.hudRound.getValue());
+            }
+
+            Render2DEngine.drawRound(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, mc.getWindow().getScaledHeight() - 24, 17, 17, 5f, new Color(0x7C313131, true));
+        }
+    }
+
+    // Bake only items
+    public static void renderHotBarItems(float tickDelta, DrawContext context) {
         PlayerEntity playerEntity = mc.player;
         if (playerEntity != null) {
 
@@ -32,19 +54,11 @@ public class Hotbar extends HudElement {
             int o = mc.getWindow().getScaledHeight() - 16 - 3;
 
             if (mc.player.getOffHandStack().isEmpty()) {
-                Render2DEngine.drawHudBase(matrices, i - 90, mc.getWindow().getScaledHeight() - 25, 180, 20, HudEditor.hudRound.getValue());
             } else if (lmode.getValue() == Mode.Merged) {
-                Render2DEngine.drawHudBase(matrices, i - 111, mc.getWindow().getScaledHeight() - 25, 201, 20, HudEditor.hudRound.getValue());
                 renderHotbarItem(context, i - 109, o - 5, playerEntity.getOffHandStack());
-                Render2DEngine.verticalGradient(matrices, i - 109 + 18, mc.getWindow().getScaledHeight() - 22 + 1 - 4, i - 108 + 18 - 0.5f, mc.getWindow().getScaledHeight() - 11 + 1 - 4, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
-                Render2DEngine.verticalGradient(matrices, i - 109 + 18, mc.getWindow().getScaledHeight() - 11 - 4, i - 108 + 18 - 0.5f, mc.getWindow().getScaledHeight() - 5, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
             } else {
-                Render2DEngine.drawHudBase(matrices,i - 90, mc.getWindow().getScaledHeight() - 25, 180, 20, HudEditor.hudRound.getValue());
-                Render2DEngine.drawHudBase(matrices, i - 112.5f, mc.getWindow().getScaledHeight() - 25, 20, 20, HudEditor.hudRound.getValue());
                 renderHotbarItem(context, i - 111, o - 5, playerEntity.getOffHandStack());
             }
-
-            Render2DEngine.drawRound(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, mc.getWindow().getScaledHeight() - 24, 17, 17, 5f, new Color(0x7C313131, true));
 
             for (int m = 0; m < 9; ++m) {
                 int n = i - 90 + m * 20 + 2;

@@ -20,28 +20,7 @@ public class NotificationManager {
         else notifications.add(new Notification(title, content, type, second * 1000));
     }
 
-    public void onRender2D(DrawContext event) {
-        if (!ModuleManager.notifications.isEnabled()) return;
-
-        if (notifications.size() > 8)
-            notifications.remove(0);
-
-        float startY = isDefault() ? mc.getWindow().getScaledHeight() - 36f : mc.getWindow().getScaledHeight() / 2f + 25;
-
-        for (int i = 0; i < notifications.size(); i++) {
-            Notification notification = notifications.get(i);
-            notifications.removeIf(Notification::shouldDelete);
-            notification.render(event.getMatrices(), startY  + (isDefault() ? 0 : notifications.size() * 16));
-            startY = (float) (startY - notification.getHeight() - 3f);
-        }
-    }
-
-    public void onUpdate() {
-        if (!ModuleManager.notifications.isEnabled()) return;
-        notifications.forEach(Notification::onUpdate);
-    }
-
-    public void onRenderShader(DrawContext context) {
+    public void onRender2D(DrawContext context) {
         if (!ModuleManager.notifications.isEnabled()) return;
 
         float startY = isDefault() ? mc.getWindow().getScaledHeight() - 36f : mc.getWindow().getScaledHeight() / 2f + 25;
@@ -50,6 +29,23 @@ public class NotificationManager {
             notification.renderShaders(context.getMatrices(), startY  + (isDefault() ? 0 : notifications.size() * 16));
             startY = (float) (startY - notification.getHeight() - 3f);
         }
+
+        if (notifications.size() > 8)
+            notifications.remove(0);
+
+        float startY1 = isDefault() ? mc.getWindow().getScaledHeight() - 36f : mc.getWindow().getScaledHeight() / 2f + 25;
+
+        for (int i = 0; i < notifications.size(); i++) {
+            Notification notification = notifications.get(i);
+            notifications.removeIf(Notification::shouldDelete);
+            notification.render(context.getMatrices(), startY1  + (isDefault() ? 0 : notifications.size() * 16));
+            startY1 = (float) (startY1 - notification.getHeight() - 3f);
+        }
+    }
+
+    public void onUpdate() {
+        if (!ModuleManager.notifications.isEnabled()) return;
+        notifications.forEach(Notification::onUpdate);
     }
 
     public static boolean isDefault() {

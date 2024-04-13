@@ -19,8 +19,6 @@ public abstract class MixinInGameHud {
 
     @Inject(at = @At(value = "HEAD"), method = "render")
     public void renderHook(DrawContext context, float tickDelta, CallbackInfo ci) {
-        ThunderHack.moduleManager.onRenderShaders(context);
-        ThunderHack.notificationManager.onRenderShader(context);
         ThunderHack.moduleManager.onRender2D(context);
         ThunderHack.notificationManager.onRender2D(context);
     }
@@ -36,7 +34,7 @@ public abstract class MixinInGameHud {
     public void renderHotbarCustom(float tickDelta, DrawContext context, CallbackInfo ci) {
         if (ModuleManager.hotbar.isEnabled()) {
             ci.cancel();
-            Hotbar.renderCustomHotbar(tickDelta, context);
+            Hotbar.renderHotBarItems(tickDelta, context);
         }
     }
 
@@ -60,54 +58,6 @@ public abstract class MixinInGameHud {
         if(ModuleManager.noRender.noScoreBoard.getValue() && ModuleManager.noRender.isEnabled()){
             ci.cancel();
         }
-    }
-
-    @Unique
-    private void renderScoreboardSidebarCustom(DrawContext context, ScoreboardObjective objective) {
-        /*
-
-        !!!! FIND ANOTHER WAY !!!!
-
-        int i;
-        Scoreboard scoreboard = objective.getScoreboard();
-        Collection<ScoreboardPlayerScore> collection = scoreboard.getScore(objective);
-        List list = collection.stream().filter(score -> score.getPlayerName() != null && !score.getPlayerName().startsWith("#")).collect(Collectors.toList());
-        collection = list.size() > 15 ? Lists.newArrayList(Iterables.skip(list, collection.size() - 15)) : list;
-        ArrayList<Pair<ScoreboardPlayerScore, MutableText>> list2 = Lists.newArrayListWithCapacity(collection.size());
-        Text text = objective.getDisplayName();
-        int j = i = mc.textRenderer.getWidth(text);
-        int k = mc.textRenderer.getWidth(": ");
-        for (ScoreboardPlayerScore scoreboardPlayerScore : collection) {
-            Team team = scoreboard.getPlayerTeam(scoreboardPlayerScore.getPlayerName());
-            MutableText text2 = Team.decorateName(team, Text.literal(scoreboardPlayerScore.getPlayerName()));
-            list2.add(Pair.of(scoreboardPlayerScore, text2));
-            j = Math.max(j, mc.textRenderer.getWidth(text2) + k + mc.textRenderer.getWidth(Integer.toString(scoreboardPlayerScore.getScore())));
-        }
-        int l = collection.size() * mc.textRenderer.fontHeight;
-
-        int m = (int) (mc.getWindow().getScaledHeight() * (ModuleManager.noRender.sbY.getValue() / 10f)) + l / 3;
-        int o = (int) (mc.getWindow().getWidth() * (ModuleManager.noRender.sbX.getValue() / 10f)) - j - 3;
-
-        int p = 0;
-        int q = mc.options.getTextBackgroundColor(0.3f);
-        int r = mc.options.getTextBackgroundColor(0.4f);
-        for (Pair pair : list2) {
-            ScoreboardPlayerScore scoreboardPlayerScore2 = (ScoreboardPlayerScore)pair.getFirst();
-            Text text3 = (Text)pair.getSecond();
-            String string = "" + Formatting.RED + scoreboardPlayerScore2.getScore();
-            int s = o;
-            int t = m - ++p * mc.textRenderer.fontHeight;
-            int u = (int) (mc.getWindow().getWidth() * (ModuleManager.noRender.sbX.getValue() / 10f)) - 3 + 2;
-            context.fill(s - 2, t, u, t + mc.textRenderer.fontHeight, q);
-            context.drawText(mc.textRenderer, text3, s, t, -1, false);
-            context.drawText(mc.textRenderer, string, u - mc.textRenderer.getWidth(string), t, -1, false);
-            if (p != collection.size()) continue;
-            context.fill(s - 2, t - mc.textRenderer.fontHeight - 1, u, t - 1, r);
-            context.fill(s - 2, t - 1, u, t, q);
-            context.drawText(mc.textRenderer, text, s + j / 2 - i / 2, t - mc.textRenderer.fontHeight, -1, false);
-        }
-
-         */
     }
 
     @Inject(method = "renderVignetteOverlay", at = @At(value = "HEAD"), cancellable = true)
