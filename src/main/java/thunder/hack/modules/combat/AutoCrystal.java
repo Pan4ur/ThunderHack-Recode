@@ -473,9 +473,6 @@ public class AutoCrystal extends Module {
         if (shouldPause() || target == null)
             return;
 
-        if (crystalAge.getValue() != 0 && crystal.age < crystalAge.getValue())
-            return;
-
         StatusEffectInstance weaknessEffect = mc.player.getStatusEffect(StatusEffects.WEAKNESS);
         StatusEffectInstance strengthEffect = mc.player.getStatusEffect(StatusEffects.STRENGTH);
 
@@ -510,6 +507,41 @@ public class AutoCrystal extends Module {
                 sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
             }
         }
+    }
+
+    private boolean canAttackCrystal(EndCrystalEntity cr) {
+        if (crystalAge.getValue() != 0 && cr.age < crystalAge.getValue())
+            return false;
+
+        if (deadManager.isDead(cr))
+            return false;
+
+        if (PlayerUtility.squaredDistanceFromEyes(cr.getPos()) > explodeRange.getPow2Value())
+            return false;
+
+        if (!InteractionUtility.canSee(cr) && PlayerUtility.squaredDistanceFromEyes(cr.getPos()) > explodeWallRange.getPow2Value())
+            return false;
+
+        if (!cr.isAlive())
+            return false;
+
+        float damage = ExplosionUtility.getAutoCrystalDamage(cr.getPos(), target);
+        float selfDamage = ExplosionUtility.getSelfExplosionDamage(cr.getPos(), selfPredictTicks.getValue());
+
+        boolean overrideDamage = shouldOverrideDamage(damage, selfDamage);
+
+        if (protectFriends.getValue()) {
+            List<PlayerEntity> players = Lists.newArrayList(mc.world.getPlayers());
+            for (PlayerEntity pl : players) {
+                if (!ThunderHack.friendManager.isFriend(pl)) continue;
+                float fdamage = ExplosionUtility.getAutoCrystalDamage(cr.getPos(), pl);
+                if (fdamage > selfDamage) {
+                    selfDamage = fdamage;
+                }
+            }
+        }
+
+        return !(selfDamage > maxSelfDamage.getValue()) || overrideDamage;
     }
 
     private int switchTo(SearchInvResult result, SearchInvResult resultInv, @NotNull Setting<Switch> switchMode) {
@@ -577,28 +609,6 @@ public class AutoCrystal extends Module {
         tickBusy = true;
 
         postPlaceSwitch(prevSlot);
-    }
-
-    private boolean checkOtherEntities(Box posBoundingBox) {
-        if (mc.player == null || mc.world == null) return false;
-
-        Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
-
-        for (Entity ent : entities) {
-            if (ent == null) continue;
-            if (ent.getBoundingBox().intersects(posBoundingBox)) {
-                if (ent instanceof ExperienceOrbEntity)
-                    continue;
-                if (ent instanceof EndCrystalEntity cr && deadManager.isDead(cr))
-                    continue;
-                if(breakTimer.passedMs(breakDelay.getValue()) && ent instanceof EndCrystalEntity cr && ExplosionUtility.getSelfExplosionDamage(cr.getPos(), selfPredictTicks.getValue()) < maxSelfDamage.getValue()) {
-                    attackCrystal(cr);
-                    return false;
-                }
-                return true;
-            }
-        }
-        return false;
     }
 
     private void postPlaceSwitch(int slot) {
@@ -692,6 +702,9 @@ public class AutoCrystal extends Module {
         Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
         for (Entity ent : entities) {
             if (!(ent instanceof EndCrystalEntity cr))
+                continue;
+
+            if (crystalAge.getValue() != 0 && cr.age < crystalAge.getValue())
                 continue;
 
             if (deadManager.isDead(cr))
@@ -895,6 +908,32 @@ public class AutoCrystal extends Module {
                     continue;
                 if (ent instanceof EndCrystalEntity) {
                     continue;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkOtherEntities(Box posBoundingBox) {
+        if (mc.player == null || mc.world == null) return false;
+
+        Iterable<Entity> entities = Lists.newArrayList(mc.world.getEntities());
+
+        for (Entity ent : entities) {
+            if (ent == null) continue;
+            if (ent.getBoundingBox().intersects(posBoundingBox)) {
+                if (ent instanceof ExperienceOrbEntity)
+                    continue;
+
+                if (ent instanceof EndCrystalEntity cr && deadManager.isDead(cr))
+                    continue;
+
+                if(breakTimer.passedMs(breakDelay.getValue()) && ent instanceof EndCrystalEntity cr
+                        && canAttackCrystal(cr)) {
+                    attackCrystal(cr);
+                    debug("attack stuck crystal");
+                    return false;
                 }
                 return true;
             }

@@ -1,31 +1,27 @@
 package thunder.hack.injection;
 
-import net.minecraft.entity.MovementType;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.EventEntityMoving;
 import thunder.hack.events.impl.EvendFixVelocity;
 import thunder.hack.modules.combat.HitBox;
 import thunder.hack.modules.render.Shaders;
-import thunder.hack.utility.interfaces.IEntity;
 import thunder.hack.modules.render.Trails;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import thunder.hack.utility.interfaces.IEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +38,7 @@ public abstract class MixinEntity implements IEntity {
     private Box boundingBox;
 
     @Override
-    public List<Trails.Trail> thunderHack_Recode$getTrails() {
+    public List<Trails.Trail> getTrails() {
         return trails;
     }
 
@@ -82,9 +78,9 @@ public abstract class MixinEntity implements IEntity {
             return Vec3d.ZERO;
         }
         Vec3d vec3d = (d > 1.0 ? movementInput.normalize() : movementInput).multiply(speed);
-        float f = MathHelper.sin(yaw * ((float)Math.PI / 180));
-        float g = MathHelper.cos(yaw * ((float)Math.PI / 180));
-        return new Vec3d(vec3d.x * (double)g - vec3d.z * (double)f, vec3d.y, vec3d.z * (double)g + vec3d.x * (double)f);
+        float f = MathHelper.sin(yaw * ((float) Math.PI / 180));
+        float g = MathHelper.cos(yaw * ((float) Math.PI / 180));
+        return new Vec3d(vec3d.x * (double) g - vec3d.z * (double) f, vec3d.y, vec3d.z * (double) g + vec3d.x * (double) f);
     }
 
     @Inject(method = "getBoundingBox", at = {@At("HEAD")}, cancellable = true)
@@ -92,11 +88,6 @@ public abstract class MixinEntity implements IEntity {
         if (ModuleManager.hitBox.isEnabled() && mc != null && mc.player != null && ((Entity) (Object) this).getId() != mc.player.getId() && (ModuleManager.aura.isDisabled() || HitBox.affectToAura.getValue())) {
             cir.setReturnValue(new Box(this.boundingBox.minX - HitBox.XZExpand.getValue() / 2f, this.boundingBox.minY - HitBox.YExpand.getValue() / 2f, this.boundingBox.minZ - HitBox.XZExpand.getValue() / 2f, this.boundingBox.maxX + HitBox.XZExpand.getValue() / 2f, this.boundingBox.maxY + HitBox.YExpand.getValue() / 2f, this.boundingBox.maxZ + HitBox.XZExpand.getValue() / 2f));
         }
-    }
-
-    @Inject(method = "move", at = @At("HEAD"))
-    public void onMove(MovementType movementType, Vec3d movement, CallbackInfo ci) {
-        ThunderHack.EVENT_BUS.post(new EventEntityMoving((Entity) (Object) this, movementType, movement));
     }
 
     @Inject(method = "isGlowing", at = @At("HEAD"), cancellable = true)

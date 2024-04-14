@@ -21,14 +21,13 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
+import net.minecraft.network.packet.s2c.common.KeepAliveS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
@@ -40,6 +39,7 @@ import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.Parent;
@@ -76,7 +76,7 @@ public final class Aura extends Module {
     public final Setting<Boolean> onlySpace = new Setting<>("OnlyCrit", false).withParent(smartCrit);
     public final Setting<Boolean> autoJump = new Setting<>("AutoJump", false).withParent(smartCrit);
     public final Setting<Boolean> shieldBreaker = new Setting<>("ShieldBreaker", true);
-    public final Setting<Boolean> pauseWhileEating = new Setting<>("PauseWhileEating", false); 
+    public final Setting<Boolean> pauseWhileEating = new Setting<>("PauseWhileEating", false);
     public final Setting<Boolean> tpsSync = new Setting<>("TPSSync", false);
     public final Setting<Boolean> clientLook = new Setting<>("ClientLook", false);
     public final Setting<BooleanParent> oldDelay = new Setting<>("OldDelay", new BooleanParent(false));
@@ -101,6 +101,7 @@ public final class Aura extends Module {
     public final Setting<Float> pullValue = new Setting<>("PullValue", 3f, 0f, 20f, v -> pullDown.getValue()).withParent(advanced);
     public final Setting<AttackHand> attackHand = new Setting<>("AttackHand", AttackHand.MainHand).withParent(advanced);
     public final Setting<Resolver> resolver = new Setting<>("Resolver", Resolver.Advantage).withParent(advanced);
+    public final Setting<Integer> backTicks = new Setting<>("BackTicks", 20, 1, 100, v -> resolver.is(Resolver.BackTrack)).withParent(advanced);
     public final Setting<Boolean> accelerateOnHit = new Setting<>("AccelerateOnHit", false).withParent(advanced);
     public final Setting<Integer> minYawStep = new Setting<>("MinYawStep", 65, 1, 180).withParent(advanced);
     public final Setting<Integer> maxYawStep = new Setting<>("MaxYawStep", 75, 1, 180).withParent(advanced);
@@ -124,7 +125,9 @@ public final class Aura extends Module {
     public final Setting<Boolean> ignoreInvisible = new Setting<>("IgnoreInvisibleEntities", false).withParent(targets);
     public final Setting<Boolean> ignoreTeam = new Setting<>("IgnoreTeam", false).withParent(targets);
     public final Setting<Boolean> ignoreCreative = new Setting<>("IgnoreCreative", true).withParent(targets);
+    public final Setting<Boolean> ignoreNaked = new Setting<>("IgnoreNaked", false).withParent(targets);
     public final Setting<Boolean> ignoreShield = new Setting<>("AttackShieldingEntities", true).withParent(targets);
+
 
     public static Entity target;
 
@@ -139,6 +142,8 @@ public final class Aura extends Module {
 
     private final Timer delayTimer = new Timer();
     private final Timer pauseTimer = new Timer();
+
+    public Box resolvedBox;
 
     public Aura() {
         super("Aura", Category.COMBAT);
@@ -184,8 +189,8 @@ public final class Aura extends Module {
 
     private boolean haveWeapon() {
         Item handItem = mc.player.getMainHandStack().getItem();
-        if(onlyWeapon.getValue()) {
-            if(switchMode.getValue() == Switch.None) {
+        if (onlyWeapon.getValue()) {
+            if (switchMode.getValue() == Switch.None) {
                 return handItem instanceof SwordItem || handItem instanceof AxeItem || handItem instanceof TridentItem;
             } else {
                 return (InventoryUtility.getSwordHotBar().found() || InventoryUtility.getAxeHotBar().found());
@@ -337,6 +342,36 @@ public final class Aura extends Module {
 
         if (e.getPacket() instanceof EntityStatusS2CPacket pac && pac.getStatus() == 3 && pac.getEntity(mc.world) == mc.player && deathDisable.getValue())
             disable(isRu() ? "Отключаю из-за смерти!" : "Disabling due to death!");
+
+        if(true )
+            return;
+        if (resolver.is(Resolver.BackTrack) && e.getPacket() instanceof CommonPingS2CPacket ping && target != null) {
+            ThunderHack.asyncManager.run(() -> {
+                        mc.executeSync(() -> {
+                            try {
+                                ping.apply(mc.getNetworkHandler());
+                            } catch (Exception ea) {
+                                ea.printStackTrace();
+                            }
+                        });
+                    }
+                    , backTicks.getValue() * 25L);
+            e.cancel();
+        }
+
+        if (resolver.is(Resolver.BackTrack) && e.getPacket() instanceof KeepAliveS2CPacket ping && target != null) {
+            ThunderHack.asyncManager.run(() -> {
+                        mc.executeSync(() -> {
+                            try {
+                                ping.apply(mc.getNetworkHandler());
+                            } catch (Exception ea) {
+                                ea.printStackTrace();
+                            }
+                        });
+                    }
+                    , backTicks.getValue() * 25L);
+            e.cancel();
+        }
     }
 
     @Override
@@ -511,6 +546,9 @@ public final class Aura extends Module {
     public void onRender3D(MatrixStack stack) {
         if (!haveWeapon() || target == null)
             return;
+
+        if (resolver.is(Resolver.BackTrack) && resolvedBox != null)
+            Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(resolvedBox, HudEditor.getColor(0), 1));
 
         switch (esp.getValue()) {
             case CelkaPasta -> Render3DEngine.drawOldTargetEsp(stack, target);
@@ -729,6 +767,8 @@ public final class Aura extends Module {
                 return true;
             if (player.isCreative() && ignoreCreative.getValue())
                 return true;
+            if (player.getArmor() == 0 && ignoreNaked.getValue())
+                return true;
             if (player.isInvisible() && ignoreInvisible.getValue())
                 return true;
             if (player.getTeamColorValue() == mc.player.getTeamColorValue() && ignoreTeam.getValue() && mc.player.getTeamColorValue() != 16777215)
@@ -772,6 +812,34 @@ public final class Aura extends Module {
         pauseTimer.reset();
     }
 
+    public static class Position {
+        private double x, y, z;
+        private int ticks;
+
+        public Position(double x, double y, double z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+        public boolean shouldRemove() {
+            return ticks++ > ModuleManager.aura.backTicks.getValue();
+        }
+
+        public double getX() {
+            return x;
+        }
+
+        public double getY() {
+            return y;
+        }
+
+        public double getZ() {
+            return z;
+
+        }
+    }
+
     public enum RayTrace {
         OFF, OnlyTarget, AllEntities
     }
@@ -785,7 +853,7 @@ public final class Aura extends Module {
     }
 
     public enum Resolver {
-        Off, Advantage, Predictive
+        Off, Advantage, Predictive, BackTrack
     }
 
     public enum Mode {

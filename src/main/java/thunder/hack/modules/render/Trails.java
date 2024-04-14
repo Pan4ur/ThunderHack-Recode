@@ -74,7 +74,7 @@ public class Trails extends Module {
                     continue;
 
                 float alpha = color.getValue().getAlpha() / 255f;
-                if (!((IEntity) entity).thunderHack_Recode$getTrails().isEmpty()) {
+                if (!((IEntity) entity).getTrails().isEmpty()) {
                     stack.push();
                     RenderSystem.disableCull();
                     Tessellator tessellator = Tessellator.getInstance();
@@ -87,11 +87,11 @@ public class Trails extends Module {
 
                     RenderSystem.setShader(GameRenderer::getPositionColorProgram);
                     bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
-                    for (int i = 0; i < ((IEntity) entity).thunderHack_Recode$getTrails().size(); i++) {
-                        Trail ctx = ((IEntity) entity).thunderHack_Recode$getTrails().get(i);
+                    for (int i = 0; i < ((IEntity) entity).getTrails().size(); i++) {
+                        Trail ctx = ((IEntity) entity).getTrails().get(i);
                         Vec3d pos = ctx.interpolate(mc.getTickDelta());
-                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + down.getValue(), (float) pos.z).color(Render2DEngine.injectAlpha(((IEntity) entity).thunderHack_Recode$getTrails().get(i).color(), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
-                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + width.getValue() + down.getValue(), (float) pos.z).color(Render2DEngine.injectAlpha(((IEntity) entity).thunderHack_Recode$getTrails().get(i).color(), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + down.getValue(), (float) pos.z).color(Render2DEngine.injectAlpha(((IEntity) entity).getTrails().get(i).color(), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + width.getValue() + down.getValue(), (float) pos.z).color(Render2DEngine.injectAlpha(((IEntity) entity).getTrails().get(i).color(), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
                     }
 
                     tessellator.draw();
@@ -116,10 +116,10 @@ public class Trails extends Module {
                 RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
                 BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
                 bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-                int size = ((IEntity) entity).thunderHack_Recode$getTrails().size();
-                if (!((IEntity) entity).thunderHack_Recode$getTrails().isEmpty()) {
+                int size = ((IEntity) entity).getTrails().size();
+                if (!((IEntity) entity).getTrails().isEmpty()) {
                     for (int i = 0; i < size; i++) {
-                        Trail ctx = ((IEntity) entity).thunderHack_Recode$getTrails().get(i);
+                        Trail ctx = ((IEntity) entity).getTrails().get(i);
                         MatrixStack matrices = new MatrixStack();
                         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
                         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
@@ -158,7 +158,7 @@ public class Trails extends Module {
                     continue;
 
                 float alpha = color.getValue().getAlpha() / 255f;
-                if (!((IEntity) entity).thunderHack_Recode$getTrails().isEmpty()) {
+                if (!((IEntity) entity).getTrails().isEmpty()) {
                     stack.push();
                     RenderSystem.disableCull();
                     Tessellator tessellator = Tessellator.getInstance();
@@ -173,8 +173,8 @@ public class Trails extends Module {
 
                     RenderSystem.setShader(GameRenderer::getPositionColorProgram);
                     bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
-                    for (int i = 0; i < ((IEntity) entity).thunderHack_Recode$getTrails().size(); i++) {
-                        Trail ctx = ((IEntity) entity).thunderHack_Recode$getTrails().get(i);
+                    for (int i = 0; i < ((IEntity) entity).getTrails().size(); i++) {
+                        Trail ctx = ((IEntity) entity).getTrails().get(i);
                         Vec3d pos = ctx.interpolate(mc.getTickDelta());
                         bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(69, 221, 255), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
                         bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(69, 221, 255), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
@@ -183,8 +183,8 @@ public class Trails extends Module {
 
                     RenderSystem.setShader(GameRenderer::getPositionColorProgram);
                     bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
-                    for (int i = 0; i < ((IEntity) entity).thunderHack_Recode$getTrails().size(); i++) {
-                        Trail ctx = ((IEntity) entity).thunderHack_Recode$getTrails().get(i);
+                    for (int i = 0; i < ((IEntity) entity).getTrails().size(); i++) {
+                        Trail ctx = ((IEntity) entity).getTrails().get(i);
                         Vec3d pos = ctx.interpolate(mc.getTickDelta());
                         bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(248, 139, 160), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
                         bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step * 2, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(248, 139, 160), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
@@ -193,8 +193,8 @@ public class Trails extends Module {
 
                     RenderSystem.setShader(GameRenderer::getPositionColorProgram);
                     bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
-                    for (int i = 0; i < ((IEntity) entity).thunderHack_Recode$getTrails().size(); i++) {
-                        Trail ctx = ((IEntity) entity).thunderHack_Recode$getTrails().get(i);
+                    for (int i = 0; i < ((IEntity) entity).getTrails().size(); i++) {
+                        Trail ctx = ((IEntity) entity).getTrails().get(i);
                         Vec3d pos = ctx.interpolate(mc.getTickDelta());
                         bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step * 2, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(255, 255, 255), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
                         bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step * 3, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(255, 255, 255), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
@@ -203,8 +203,8 @@ public class Trails extends Module {
 
                     RenderSystem.setShader(GameRenderer::getPositionColorProgram);
                     bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
-                    for (int i = 0; i < ((IEntity) entity).thunderHack_Recode$getTrails().size(); i++) {
-                        Trail ctx = ((IEntity) entity).thunderHack_Recode$getTrails().get(i);
+                    for (int i = 0; i < ((IEntity) entity).getTrails().size(); i++) {
+                        Trail ctx = ((IEntity) entity).getTrails().get(i);
                         Vec3d pos = ctx.interpolate(mc.getTickDelta());
                         bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step * 3, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(248, 139, 160), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
                         bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step * 4, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(248, 139, 160), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
@@ -213,8 +213,8 @@ public class Trails extends Module {
 
                     RenderSystem.setShader(GameRenderer::getPositionColorProgram);
                     bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
-                    for (int i = 0; i < ((IEntity) entity).thunderHack_Recode$getTrails().size(); i++) {
-                        Trail ctx = ((IEntity) entity).thunderHack_Recode$getTrails().get(i);
+                    for (int i = 0; i < ((IEntity) entity).getTrails().size(); i++) {
+                        Trail ctx = ((IEntity) entity).getTrails().get(i);
                         Vec3d pos = ctx.interpolate(mc.getTickDelta());
                         bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step * 4, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(69, 221, 255), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
                         bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + step * 5, (float) pos.z).color(Render2DEngine.injectAlpha(new Color(69, 221, 255), (int) ((alpha * ctx.animation(mc.getTickDelta())) * 255)).getRGB()).next();
@@ -258,14 +258,14 @@ public class Trails extends Module {
 
         for (PlayerEntity player : mc.world.getPlayers()) {
             if (player.getPos().getZ() != player.prevZ || player.getPos().getX() != player.prevX && (!onlySelf.getValue())) {
-                ((IEntity) player).thunderHack_Recode$getTrails().add(new Trail(new Vec3d(player.prevX, player.prevY, player.prevZ), player.getPos(), c));
+                ((IEntity) player).getTrails().add(new Trail(new Vec3d(player.prevX, player.prevY, player.prevZ), player.getPos(), c));
                 if (players.is(Players.Particles)) {
                     for (int i = 0; i < amount.getValue(); i++) {
                         particles.add(new Particle(player.getX(), MathUtility.random((float) (player.getY() + player.getHeight()), (float) player.getY()), player.getZ(), c));
                     }
                 }
             }
-            ((IEntity) player).thunderHack_Recode$getTrails().removeIf(Trail::update);
+            ((IEntity) player).getTrails().removeIf(Trail::update);
 
         }
 
@@ -278,7 +278,7 @@ public class Trails extends Module {
         }
 
         if (ThunderHack.playerManager.currentPlayerSpeed != 0) {
-            ((IEntity) mc.player).thunderHack_Recode$getTrails().add(new Trail(new Vec3d(mc.player.prevX, mc.player.prevY, mc.player.prevZ), mc.player.getPos(), c));
+            ((IEntity) mc.player).getTrails().add(new Trail(new Vec3d(mc.player.prevX, mc.player.prevY, mc.player.prevZ), mc.player.getPos(), c));
             if (players.is(Players.Particles)) {
                 for (int i = 0; i < amount.getValue(); i++) {
                     particles.add(new Particle(mc.player.getX(), MathUtility.random((float) (mc.player.getY() + mc.player.getHeight()), (float) mc.player.getY()), mc.player.getZ(), c));

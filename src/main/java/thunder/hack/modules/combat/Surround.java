@@ -11,10 +11,9 @@ import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.events.impl.EventEntitySpawn;
-import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.modules.base.IndestructibleModule;
+import thunder.hack.modules.base.PlaceModule;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.player.InteractionUtility;
@@ -26,7 +25,7 @@ import java.util.Objects;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
-public final class Surround extends IndestructibleModule {
+public final class Surround extends PlaceModule {
     private final Setting<Integer> blocksPerTick = new Setting<>("Blocks/Place", 8, 1, 12);
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10);
     private final Setting<CenterMode> center = new Setting<>("Center", CenterMode.Disabled);

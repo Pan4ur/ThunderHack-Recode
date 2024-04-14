@@ -15,8 +15,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventTravel;
+import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.render.Animations;
 import thunder.hack.utility.interfaces.IEntityLiving;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -26,19 +30,30 @@ public class MixinEntityLiving implements IEntityLiving {
     @Shadow protected double serverY;
     @Shadow protected double serverZ;
 
+    @Unique
+    double prevServerX, prevServerY, prevServerZ;
+
+    @Unique
+    public List<Aura.Position> positonHistory = new ArrayList<>();
+
+    @Override
+    public List<Aura.Position> getPositionHistory() {
+        return positonHistory;
+    }
+
     @Inject(method = {"getHandSwingDuration"}, at = {@At("HEAD")}, cancellable = true)
     private void getArmSwingAnimationEnd(final CallbackInfoReturnable<Integer> info) {
         if (ModuleManager.animations.isEnabled() && Animations.slowAnimation.getValue())
             info.setReturnValue(Animations.slowAnimationVal.getValue());
     }
 
-    double prevServerX, prevServerY, prevServerZ;
-
     @Inject(method = {"updateTrackedPositionAndAngles"}, at = {@At("HEAD")})
     private void updateTrackedPositionAndAnglesHook(double x, double y, double z, float yaw, float pitch, int interpolationSteps, CallbackInfo ci) {
         prevServerX = serverX;
         prevServerY = serverY;
         prevServerZ = serverZ;
+        positonHistory.add(new Aura.Position(serverX, serverY, serverZ));
+        positonHistory.removeIf(Aura.Position::shouldRemove);
     }
 
     @Override

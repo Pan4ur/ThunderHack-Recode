@@ -10,7 +10,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.*;
-import thunder.hack.modules.base.IndestructibleModule;
+import thunder.hack.modules.base.PlaceModule;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.player.InteractionUtility;
@@ -22,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
-public final class Blocker extends IndestructibleModule {
+public final class Blocker extends PlaceModule {
     private final Setting<Integer> actionShift = new Setting<>("Place Per Tick", 1, 1, 5);
     private final Setting<Integer> actionInterval = new Setting<>("Delay", 0, 0, 5);
 

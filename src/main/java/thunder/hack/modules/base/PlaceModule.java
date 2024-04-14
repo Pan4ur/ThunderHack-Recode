@@ -31,7 +31,7 @@ import thunder.hack.utility.render.BlockAnimationUtility;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class IndestructibleModule extends Module {
+public abstract class PlaceModule extends Module {
     protected final Setting<Float> range = new Setting<>("Range", 5f, 0f, 7f);
     protected final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
     protected final Setting<InteractMode> placeMode = new Setting<>("Place Mode", InteractMode.Normal);
@@ -65,15 +65,16 @@ public abstract class IndestructibleModule extends Module {
     protected final Setting<Integer> renderLineWidth = new Setting<>("Line Width", 2, 1, 5).withParent(render);
 
     public static final Timer inactivityTimer = new Timer();
+    public static final Timer pauseTimer = new Timer();
     protected final Timer attackTimer = new Timer();
 
-    public IndestructibleModule(@NotNull String name, @NotNull Category category) {
+    public PlaceModule(@NotNull String name, @NotNull Category category) {
         super(name, category);
     }
 
     protected boolean shouldPause() {
         return (eatPause.getValue() && PlayerUtility.isEating())
-                || (breakPause.getValue() && PlayerUtility.isMining());
+                || (breakPause.getValue() && PlayerUtility.isMining()) ;
     }
 
     protected boolean placeBlock(BlockPos pos) {
@@ -188,6 +189,10 @@ public abstract class IndestructibleModule extends Module {
         }
 
         return InventoryUtility.findBlockInHotBar(canUseBlocks);
+    }
+
+    public void pause() {
+        pauseTimer.reset();
     }
 
     protected enum InteractMode {

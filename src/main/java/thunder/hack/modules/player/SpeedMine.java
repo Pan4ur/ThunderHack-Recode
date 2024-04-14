@@ -352,10 +352,10 @@ public final class SpeedMine extends Module {
 
     public boolean checkWorth(float damage, BlockPos pos) {
         if (isDisabled()
-                || mode.getValue() != Mode.Packet
+                || mode.getValue() == Mode.Damage
                 || pos == null
                 || mc.world == null
-                || progress < 0.95
+                || progress < (mode.is(Mode.Packet) ? 0.95 : 0)
                 || mc.world.getBlockState(pos).getBlock() != Blocks.OBSIDIAN)
             return false;
 

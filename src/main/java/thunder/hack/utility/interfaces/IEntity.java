@@ -7,9 +7,7 @@ import thunder.hack.modules.render.Trails;
 import java.util.List;
 
 public interface IEntity {
-    List<Trails.Trail> thunderHack_Recode$getTrails();
-
-    List<Vec3d> getPrevPositions();
+    List<Trails.Trail> getTrails();
 
     BlockPos thunderHack_Recode$getVelocityBP();
 }
