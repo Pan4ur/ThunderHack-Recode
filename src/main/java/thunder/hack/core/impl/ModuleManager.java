@@ -109,7 +109,6 @@ public class ModuleManager implements IManager {
     public static FakePlayer fakePlayer = new FakePlayer();
     public static ElytraSwap elytraSwap = new ElytraSwap();
     public static ElytraPlus elytraPlus = new ElytraPlus();
-    public static CevBreaker cevBreaker = new CevBreaker();
     public static AutoSprint autoSprint = new AutoSprint();
     public static AutoGApple autoGApple = new AutoGApple();
     public static AntiHunger antiHunger = new AntiHunger();
