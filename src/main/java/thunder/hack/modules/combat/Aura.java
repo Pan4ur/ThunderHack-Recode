@@ -111,6 +111,7 @@ public final class Aura extends Module {
     public final Setting<Float> attackCooldown = new Setting<>("AttackCooldown", 0.9f, 0.5f, 1f).withParent(advanced);
     public final Setting<Float> attackBaseTime = new Setting<>("AttackBaseTime", 0.5f, 0f, 2f).withParent(advanced);
     public final Setting<Integer> attackTickLimit = new Setting<>("AttackTickLimit", 11, 0, 20).withParent(advanced);
+    public final Setting<Boolean> lfcraft = new Setting<>("LFCraft", false).withParent(advanced); // bypass vulcan, alice and prob hw
 
     /*   TARGETS   */
     public final Setting<Parent> targets = new Setting<>("Targets", new Parent(false, 0));
@@ -136,6 +137,7 @@ public final class Aura extends Module {
     private Vec3d rotationPoint = Vec3d.ZERO;
     private Vec3d rotationMotion = Vec3d.ZERO;
 
+    private int lfcraft_hitTicks;
     private int hitTicks;
     private int trackticks;
     private boolean lookingAtHitbox;
@@ -211,6 +213,7 @@ public final class Aura extends Module {
         mc.interactionManager.attackEntity(mc.player, target);
         Criticals.cancelCrit = false;
         swingHand();
+        lfcraft_hitTicks = 0;
         hitTicks = getHitTicks();
         if (prevSlot != -1)
             InventoryUtility.switchTo(prevSlot);
@@ -329,6 +332,11 @@ public final class Aura extends Module {
     public void onPacketSend(PacketEvent.@NotNull Send e) {
         if (e.getPacket() instanceof PlayerInteractEntityC2SPacket pie && Criticals.getInteractType(pie) != Criticals.InteractType.ATTACK)
             e.cancel();
+
+        if (e.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround rot && lfcraft.getValue() && lfcraft_hitTicks++ < 3) {
+            e.cancel();
+            sendPacket(new PlayerMoveC2SPacket.Full(rot.getX(mc.player.getX()), rot.getY(mc.player.getY()), rot.getZ(mc.player.getZ()), rot.getYaw(mc.player.getYaw()), rot.getPitch(mc.player.getPitch()), mc.player.isOnGround()));
+        }
     }
 
     @EventHandler
