@@ -22,12 +22,14 @@ import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.core.impl.PlayerManager;
 import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IInteractionManager;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.Rotations;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.ColorSetting;
@@ -45,14 +47,14 @@ import java.util.Objects;
 public final class SpeedMine extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
     private final Setting<StartMode> startMode = new Setting<>("StartMode", StartMode.StartAbort, v -> mode.getValue() == Mode.Packet);
-    private final Setting<SwitchMode> switchMode = new Setting<>("SwitchMode", SwitchMode.Alternative, v -> mode.getValue() == Mode.Packet);
-    private final Setting<Integer> swapDelay = new Setting<>("SwapDelay", 50, 0, 1000, v -> switchMode.getValue() == SwitchMode.Alternative && mode.getValue() == Mode.Packet);
-    private final Setting<Float> factor = new Setting<>("Factor", 1f, 0.5f, 2f, v -> mode.getValue() == Mode.Packet);
-    private final Setting<Float> startDmg = new Setting<>("StartDmg", 0f, 0f, 1f, v -> mode.getValue() == Mode.Damage);
-    private final Setting<Float> finishDmg = new Setting<>("FinishDmg", 1f, 0f, 1f, v -> mode.getValue() == Mode.Damage);
-    private final Setting<Float> range = new Setting<>("Range", 4.2f, 3.0f, 10.0f, v -> mode.getValue() == Mode.Packet);
-    private final Setting<Boolean> rotate = new Setting<>("Rotate", false, v -> mode.getValue() == Mode.Packet);
-    private final Setting<Boolean> resetOnSwitch = new Setting<>("ResetOnSwitch", true, v -> mode.getValue() == Mode.Packet);
+    private final Setting<SwitchMode> switchMode = new Setting<>("SwitchMode", SwitchMode.Alternative, v -> mode.getValue() != Mode.Damage);
+    private final Setting<Integer> swapDelay = new Setting<>("SwapDelay", 50, 0, 1000, v -> switchMode.getValue() == SwitchMode.Alternative && mode.getValue() != Mode.Damage);
+    private final Setting<Float> factor = new Setting<>("Factor", 1f, 0.5f, 2f, v -> mode.getValue() != Mode.Damage);
+    private final Setting<Float> rebreakfactor = new Setting<>("RebreakFactor", 7f, 0.5f, 20f, v -> mode.getValue() == Mode.GrimInstant);
+    private final Setting<Float> speed = new Setting<>("Speed", 0.5f, 0f, 1f, v -> mode.getValue() == Mode.Damage);
+    private final Setting<Float> range = new Setting<>("Range", 4.2f, 3.0f, 10.0f, v -> mode.getValue() != Mode.Damage);
+    private final Setting<Boolean> rotate = new Setting<>("Rotate", false, v -> mode.getValue() != Mode.Damage);
+    private final Setting<Boolean> resetOnSwitch = new Setting<>("ResetOnSwitch", true, v -> mode.getValue() != Mode.Damage);
     private final Setting<Integer> breakAttempts = new Setting<>("BreakAttempts", 10, 1, 50, v -> mode.getValue() == Mode.Packet);
 
     private final Setting<Parent> packets = new Setting<>("Packets", new Parent(false, 0), v -> mode.getValue() == Mode.Packet);
@@ -61,14 +63,14 @@ public final class SpeedMine extends Module {
     private final Setting<Boolean> start = new Setting<>("Start", true, v -> mode.getValue() == Mode.Packet).withParent(packets);
     private final Setting<Boolean> stop2 = new Setting<>("Stop2", true, v -> mode.getValue() == Mode.Packet).withParent(packets);
 
-    private final Setting<BooleanParent> render = new Setting<>("Render", new BooleanParent(false), v -> mode.getValue() == Mode.Packet);
-    private final Setting<Boolean> smooth = new Setting<>("Smooth", true, v -> mode.getValue() == Mode.Packet).withParent(render);
-    private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Shrink, v -> mode.getValue() == Mode.Packet).withParent(render);
-    private final Setting<ColorSetting> startLineColor = new Setting<>("Start Line Color", new ColorSetting(new Color(255, 0, 0, 200)), v -> mode.getValue() == Mode.Packet).withParent(render);
-    private final Setting<ColorSetting> endLineColor = new Setting<>("End Line Color", new ColorSetting(new Color(47, 255, 0, 200)), v -> mode.getValue() == Mode.Packet).withParent(render);
-    private final Setting<Integer> lineWidth = new Setting<>("Line Width", 2, 1, 10, v -> mode.getValue() == Mode.Packet).withParent(render);
-    private final Setting<ColorSetting> startFillColor = new Setting<>("Start Fill Color", new ColorSetting(new Color(255, 0, 0, 120)), v -> mode.getValue() == Mode.Packet).withParent(render);
-    private final Setting<ColorSetting> endFillColor = new Setting<>("End Fill Color", new ColorSetting(new Color(47, 255, 0, 120)), v -> mode.getValue() == Mode.Packet).withParent(render);
+    private final Setting<BooleanParent> render = new Setting<>("Render", new BooleanParent(false), v -> mode.getValue() != Mode.Damage);
+    private final Setting<Boolean> smooth = new Setting<>("Smooth", true, v -> mode.getValue() != Mode.Damage).withParent(render);
+    private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Shrink, v -> mode.getValue() != Mode.Damage).withParent(render);
+    private final Setting<ColorSetting> startLineColor = new Setting<>("Start Line Color", new ColorSetting(new Color(255, 0, 0, 200)), v -> mode.getValue() != Mode.Damage).withParent(render);
+    private final Setting<ColorSetting> endLineColor = new Setting<>("End Line Color", new ColorSetting(new Color(47, 255, 0, 200)), v -> mode.getValue() != Mode.Damage).withParent(render);
+    private final Setting<Integer> lineWidth = new Setting<>("Line Width", 2, 1, 10, v -> mode.getValue() != Mode.Damage).withParent(render);
+    private final Setting<ColorSetting> startFillColor = new Setting<>("Start Fill Color", new ColorSetting(new Color(255, 0, 0, 120)), v -> mode.getValue() != Mode.Damage).withParent(render);
+    private final Setting<ColorSetting> endFillColor = new Setting<>("End Fill Color", new ColorSetting(new Color(47, 255, 0, 120)), v -> mode.getValue() != Mode.Damage).withParent(render);
 
     private static SpeedMine instance;
     public static BlockPos minePosition;
@@ -102,10 +104,8 @@ public final class SpeedMine extends Module {
                 || mc.player.getAbilities().creativeMode) return;
 
         if (mode.getValue() == Mode.Damage) {
-            if (((IInteractionManager) mc.interactionManager).getCurBlockDamageMP() < startDmg.getValue())
-                ((IInteractionManager) mc.interactionManager).setCurBlockDamageMP(startDmg.getValue());
-            if (((IInteractionManager) mc.interactionManager).getCurBlockDamageMP() >= finishDmg.getValue())
-                ((IInteractionManager) mc.interactionManager).setCurBlockDamageMP(1f);
+            if (((IInteractionManager) mc.interactionManager).getCurBlockDamageMP() < speed.getValue())
+                ((IInteractionManager) mc.interactionManager).setCurBlockDamageMP(speed.getValue());
 
         } else if (mode.getValue() == Mode.Packet) {
             if (minePosition != null) {
@@ -169,6 +169,66 @@ public final class SpeedMine extends Module {
                 progress = 0;
                 prevProgress = 0;
             }
+
+            if(!mode.getValue().equals(Mode.Damage)) {
+                if (rotate.getValue() && progress > 0.95 && minePosition != null && mc.player != null) {
+                    float[] angle = PlayerManager.calcAngle(mc.player.getEyePos(), minePosition.toCenterPos());
+                    ModuleManager.rotations.fixRotation = angle[0];
+                }
+            }
+        } else if (mode.getValue() == Mode.GrimInstant) {
+            if (minePosition != null) {
+                if (mc.player.squaredDistanceTo(minePosition.toCenterPos()) > range.getPow2Value()) {
+                    reset();
+                    return;
+                }
+            }
+
+            if (minePosition != null) {
+                if(mc.world.isAir(minePosition))
+                    return;
+
+                int invPickSlot = getTool(minePosition);
+                int hotBarPickSlot = InventoryUtility.getPickAxeHotbar().slot();
+                int prevSlot = -1;
+
+                if (invPickSlot == -1 && switchMode.getValue() == SwitchMode.Alternative) return;
+                if (hotBarPickSlot == -1 && switchMode.getValue() != SwitchMode.Alternative) return;
+
+                if (progress >= 1) {
+                    if (switchMode.getValue() == SwitchMode.Alternative) {
+                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, invPickSlot < 9 ? invPickSlot + 36 : invPickSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+                        closeScreen();
+                    } else if (switchMode.getValue() == SwitchMode.Normal || switchMode.getValue() == SwitchMode.Silent) {
+                        prevSlot = mc.player.getInventory().selectedSlot;
+                        InventoryUtility.getPickAxeHotbar().switchTo();
+                    }
+
+                    sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, minePosition, mineFacing));
+
+                    if (switchMode.getValue() == SwitchMode.Alternative) {
+                        if (swapDelay.getValue() != 0) {
+                            ThunderHack.asyncManager.run(() -> {
+                                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, invPickSlot < 9 ? invPickSlot + 36 : invPickSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+                                closeScreen();
+                            }, swapDelay.getValue());
+                        } else {
+                            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, invPickSlot < 9 ? invPickSlot + 36 : invPickSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+                            closeScreen();
+                        }
+                    } else if (switchMode.getValue() == SwitchMode.Silent) {
+                        InventoryUtility.switchTo(prevSlot);
+                    }
+
+                    progress = 0;
+                    mineBreaks++;
+                }
+                prevProgress = progress;
+                progress += getBlockStrength(mc.world.getBlockState(minePosition), minePosition) * (mineBreaks >= 1 ? rebreakfactor.getValue() : 1);
+            } else {
+                progress = 0;
+                prevProgress = 0;
+            }
         }
     }
 
@@ -176,7 +236,7 @@ public final class SpeedMine extends Module {
     public void onRender3D(MatrixStack stack) {
         worth = checkWorth();
 
-        if (mode.getValue() != Mode.Packet
+        if (mode.getValue() == Mode.Damage
                 || mc.world == null
                 || minePosition == null
                 || mc.world.isAir(minePosition))
@@ -247,7 +307,7 @@ public final class SpeedMine extends Module {
         if (mc.player != null
                 && canBreak(event.getBlockPos())
                 && !mc.player.getAbilities().creativeMode
-                && mode.getValue() == Mode.Packet
+                && (mode.getValue() == Mode.Packet || mode.getValue() == Mode.GrimInstant)
                 && !event.getBlockPos().equals(minePosition)) {
             addBlockToMine(event.getBlockPos(), event.getEnumFacing(), true);
         }
@@ -267,7 +327,7 @@ public final class SpeedMine extends Module {
     @EventHandler
     @SuppressWarnings("unused")
     private void onPacketSend(PacketEvent.@NotNull SendPost e) {
-        if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket && resetOnSwitch.getValue()) {
+        if (e.getPacket() instanceof UpdateSelectedSlotC2SPacket && resetOnSwitch.getValue() && !switchMode.is(SwitchMode.Silent) && !mode.is(Mode.GrimInstant)) {
             addBlockToMine(minePosition, mineFacing, true);
         }
     }
@@ -318,6 +378,10 @@ public final class SpeedMine extends Module {
     }
 
     private float getBlockStrength(@NotNull BlockState state, BlockPos position) {
+        if(state == Blocks.AIR.getDefaultState()) {
+            return 0.02f;
+        }
+
         float hardness = state.getHardness(mc.world, position);
 
         if (hardness < 0)
@@ -449,6 +513,7 @@ public final class SpeedMine extends Module {
 
     public enum Mode {
         Packet,
+        GrimInstant,
         Damage
     }
 
@@ -461,7 +526,6 @@ public final class SpeedMine extends Module {
     public enum SwitchMode {
         Silent,
         Normal,
-        None,
         Alternative
     }
 
