@@ -417,10 +417,10 @@ public class AutoCrystal extends Module {
         if(autoSwitch.is(Switch.NONE) && !offhand && !mainHand)
             return true;
 
-        if(autoSwitch.is(Switch.SILENT) && !InventoryUtility.getCrystal().found())
+        if(autoSwitch.is(Switch.SILENT) && !InventoryUtility.getCrystal().found() && !offhand)
             return true;
 
-        if(autoSwitch.is(Switch.INVENTORY) && !InventoryUtility.findItemInInventory(Items.END_CRYSTAL).found())
+        if(autoSwitch.is(Switch.INVENTORY) && !InventoryUtility.findItemInInventory(Items.END_CRYSTAL).found() && !offhand)
             return true;
 
         if (mc.player.isUsingItem() && eating.getValue())

@@ -34,8 +34,10 @@ public class Phase extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Vanilla);
     private final Setting<Boolean> silent = new Setting<>("Silent", false, v -> mode.getValue() == Mode.Sunrise);
     private final Setting<Boolean> waitBreak = new Setting<>("WaitBreak", true, v -> mode.getValue() == Mode.Sunrise);
+
     private final Setting<Integer> afterBreak = new Setting<>("BreakTimeout", 4, 1, 20, v -> mode.getValue() == Mode.Sunrise && waitBreak.getValue());
     private final Setting<Integer> afterPearl = new Setting<>("PearlTimeout", 0, 0, 60, v -> mode.getValue() == Mode.Pearl);
+    private final Setting<Float> pitch = new Setting<>("Pitch", 80f, 0f, 90f, v -> mode.getValue() == Mode.Pearl);
 
     public int clipTimer;
     public int afterPearlTime;
@@ -112,7 +114,7 @@ public class Phase extends Module {
                     ModuleManager.autoCrystal.pause();
                     ModuleManager.aura.pause();
                     mc.player.setYaw(angle[0]);
-                    mc.player.setPitch(80f);
+                    mc.player.setPitch(pitch.getValue());
                 }
             }
         }

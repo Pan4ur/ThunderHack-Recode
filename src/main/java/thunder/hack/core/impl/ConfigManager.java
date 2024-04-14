@@ -84,20 +84,6 @@ public class ConfigManager implements IManager {
         }
     }
 
-    public void loadDefault(String name) {
-        ClientSettings.Language prevLang = ClientSettings.language.getValue();
-        Path path = Paths.get(CONFIG_FOLDER_NAME + "/configs/" + name + ".th");
-        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("cfg/" + name + ".th");
-             OutputStream out = Files.newOutputStream(path)) {
-            if (in == null) return;
-            IOUtils.copy(in, out);
-            load(name);
-            ClientSettings.language.setValue(prevLang);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void saveSearch() {
         File file = new File(CONFIG_FOLDER_NAME + "/misc/search.txt");
         try {
