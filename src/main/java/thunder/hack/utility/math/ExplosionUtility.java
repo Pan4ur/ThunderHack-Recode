@@ -178,6 +178,9 @@ public final class ExplosionUtility {
         if (mc.world.getDifficulty() == Difficulty.PEACEFUL)
             return 0f;
 
+        if(target == null || predict == null)
+            return 0f;
+
         if (explosion == null)
             explosion = new Explosion(mc.world, mc.player, 1f, 33f, 7f, 6f, false, Explosion.DestructionType.DESTROY);
 

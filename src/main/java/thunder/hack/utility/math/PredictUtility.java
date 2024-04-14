@@ -12,6 +12,9 @@ import static thunder.hack.modules.Module.mc;
 
 public class PredictUtility {
     public static PlayerEntity predictPlayer(PlayerEntity entity, int ticks) {
+        if(entity == null)
+            return null;
+
         Vec3d posVec = new Vec3d(entity.getX(), entity.getY(), entity.getZ());
         double motionX = entity.getX() - entity.prevX;
         double motionY = entity.getY() - entity.prevY;

@@ -30,6 +30,7 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IInteractionManager;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.Rotations;
+import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.ColorSetting;
@@ -196,6 +197,10 @@ public final class SpeedMine extends Module {
                 if (hotBarPickSlot == -1 && switchMode.getValue() != SwitchMode.Alternative) return;
 
                 if (progress >= 1) {
+                    AutoCrystal.PlaceData placeCrystalData = ModuleManager.autoCrystal.getPlaceData(SpeedMine.minePosition, null);
+                    if(placeCrystalData != null)
+                        ModuleManager.autoCrystal.placeCrystal(placeCrystalData.bhr());
+
                     if (switchMode.getValue() == SwitchMode.Alternative) {
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, invPickSlot < 9 ? invPickSlot + 36 : invPickSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
                         closeScreen();
@@ -355,7 +360,7 @@ public final class SpeedMine extends Module {
                 || mode.getValue() == Mode.Damage
                 || pos == null
                 || mc.world == null
-                || progress < (mode.is(Mode.Packet) ? 0.95 : 0)
+                || progress < 0.95
                 || mc.world.getBlockState(pos).getBlock() != Blocks.OBSIDIAN)
             return false;
 
