@@ -126,6 +126,7 @@ public class LegitHelper extends Module {
         if (shieldBreaker.getValue().isEnabled()
                 && mc.crosshairTarget instanceof EntityHitResult ehr
                 && ehr.getEntity() instanceof PlayerEntity pl
+                && !ThunderHack.friendManager.isFriend(pl)
                 && (pl.getOffHandStack().getItem() == Items.SHIELD || pl.getMainHandStack().getItem() == Items.SHIELD)
                 && pl.getActiveItem().getItem() == Items.SHIELD && timer.every(500)) {
 

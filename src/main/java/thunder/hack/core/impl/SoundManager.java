@@ -7,6 +7,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import thunder.hack.ThunderHack;
 import thunder.hack.modules.client.SoundFX;
+import thunder.hack.modules.misc.ChatUtils;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 
@@ -53,6 +54,8 @@ public final class SoundManager {
     public SoundEvent SWIPEOUT_SOUNDEVENT = SoundEvent.of(SWIPEOUT_SOUND);
     public final Identifier ALERT_SOUND = new Identifier("thunderhack:alert");
     public SoundEvent ALERT_SOUNDEVENT = SoundEvent.of(ALERT_SOUND);
+    public final Identifier PM_SOUND = new Identifier("thunderhack:pmsound");
+    public SoundEvent PM_SOUNDEVENT = SoundEvent.of(PM_SOUND);
 
     private final Timer scrollTimer = new Timer();
 
@@ -73,6 +76,7 @@ public final class SoundManager {
         Registry.register(Registries.SOUND_EVENT, SWIPEIN_SOUND, SWIPEIN_SOUNDEVENT);
         Registry.register(Registries.SOUND_EVENT, SWIPEOUT_SOUND, SWIPEOUT_SOUNDEVENT);
         Registry.register(Registries.SOUND_EVENT, ALERT_SOUND, ALERT_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, PM_SOUND, PM_SOUNDEVENT);
     }
 
     public void playHitSound(SoundFX.HitSound value) {
@@ -132,7 +136,7 @@ public final class SoundManager {
             floatControl.setValue((floatControl.getMaximum() - floatControl.getMinimum() * ((float) ModuleManager.soundFX.volume.getValue() / 100f)) + floatControl.getMinimum());
             clip.start();
         } catch (Exception e) {
-            sendMessage(isRu() ? "Ошибка воспроизведения звука!" : "Error with playing sound!");
+            sendMessage((isRu() ? "Ошибка воспроизведения звука! Проверь " : "Error with playing sound! Check ") + new File(SOUNDS_FOLDER, name + ".wav").getAbsolutePath());
         }
     }
 
@@ -150,5 +154,10 @@ public final class SoundManager {
 
     public void playSwipeOut() {
         playSound(SWIPEOUT_SOUNDEVENT);
+    }
+
+    public void playPmSound(ChatUtils.PMSound sound) {
+        if(sound == ChatUtils.PMSound.Custom) playSound(PM_SOUNDEVENT);
+        else ThunderHack.soundManager.playSound("pmsound");
     }
 }

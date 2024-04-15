@@ -34,6 +34,7 @@ public class ChatUtils extends Module {
     private final Setting<Boolean> totems = new Setting<>("Totems", false);
     private final Setting<Boolean> time = new Setting<>("Time", false);
     private final Setting<Boolean> mention = new Setting<>("Mention", false);
+    private final Setting<PMSound> pmSound = new Setting<>("PMSound", PMSound.Default);
     private final Setting<Boolean> zov = new Setting<>("ZOV", false);
     private final Setting<Boolean> antiCoordLeak = new Setting<>("AntiCoordLeak", false);
 
@@ -101,16 +102,22 @@ public class ChatUtils extends Module {
                 }
             }
         }
+        if (event.getPacket() instanceof GameMessageS2CPacket pac) {
+            if (time.getValue()) {
+                IGameMessageS2CPacket pac2 = event.getPacket();
+                pac2.setContent(Text.of("[" + Formatting.GRAY + new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime()) + Formatting.RESET + "] ").copy().append(pac.content));
+            }
 
-        if (event.getPacket() instanceof GameMessageS2CPacket pac && time.getValue()) {
-            IGameMessageS2CPacket pac2 = event.getPacket();
-            pac2.setContent(Text.of("[" + Formatting.GRAY + new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime()) + Formatting.RESET + "] ").copy().append(pac.content));
-        }
+            if (mention.getValue()) {
+                if (pac.content.getString().contains(mc.player.getName().getString()) && messageTimer.passedMs(1000)) {
+                    ThunderHack.notificationManager.publicity("ChatUtils", ClientSettings.language.getValue() == ClientSettings.Language.RU ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
+                    mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 5f, 1f);
+                }
+            }
 
-        if (event.getPacket() instanceof GameMessageS2CPacket pac && mention.getValue()) {
-            if (pac.content.getString().contains(mc.player.getName().getString()) && messageTimer.passedMs(1000)) {
-                ThunderHack.notificationManager.publicity("ChatUtils", ClientSettings.language.getValue() == ClientSettings.Language.RU ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
-                mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 5f, 1f);
+            String content = pac.content.getString().toLowerCase();
+            if(!pmSound.is(PMSound.Off) && (content.contains("whisper") || content.contains("-> я") || content.contains("-> me") || content.contains(" says:"))) {
+                ThunderHack.soundManager.playPmSound(pmSound.getValue());
             }
         }
     }
@@ -227,5 +234,9 @@ public class ChatUtils extends Module {
 
     private enum Prefix {
         Green, Global, None
+    }
+
+    public enum PMSound {
+        Off, Default, Custom
     }
 }

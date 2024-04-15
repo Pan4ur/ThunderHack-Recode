@@ -42,7 +42,6 @@ public abstract class PlaceModule extends Module {
     protected final Setting<Integer> breakDelay = new Setting<>("Break Delay", 100, 1, 1000).withParent(crystalBreaker);
     protected final Setting<Boolean> remove = new Setting<>("Remove", false).withParent(crystalBreaker);
     protected final Setting<InteractMode> breakCrystalMode = new Setting<>("Break Mode", InteractMode.Normal).withParent(crystalBreaker);
-    protected final Setting<Boolean> antiSelfPop = new Setting<>("Anti Self Pop", true).withParent(crystalBreaker);
     protected final Setting<Boolean> antiWeakness = new Setting<>("Anti Weakness", false).withParent(crystalBreaker);
 
     protected final Setting<Parent> blocks = new Setting<>("Blocks", new Parent(false, 0));
@@ -78,7 +77,7 @@ public abstract class PlaceModule extends Module {
     }
 
     protected boolean placeBlock(BlockPos pos) {
-        return placeBlock(pos, false);
+        return placeBlock(pos, crystalBreaker.getValue().isEnabled());
     }
 
     protected boolean placeBlock(BlockPos pos, boolean ignoreEntities) {
@@ -122,9 +121,6 @@ public abstract class PlaceModule extends Module {
                 || !attackTimer.passedMs(breakDelay.getValue())
                 || mc.player.squaredDistanceTo(entity) > range.getPow2Value()
                 || !crystalBreaker.getValue().isEnabled())
-            return;
-
-        if (antiSelfPop.getValue() && mc.player.getHealth() + mc.player.getAbsorptionAmount() - ExplosionUtility.getSelfExplosionDamage(entity.getPos(), AutoCrystal.selfPredictTicks.getValue()) <= 2)
             return;
 
         int preSlot = mc.player.getInventory().selectedSlot;

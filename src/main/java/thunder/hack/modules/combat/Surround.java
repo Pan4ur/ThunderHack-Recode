@@ -6,7 +6,11 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -126,6 +130,16 @@ public final class Surround extends PlaceModule {
         if (!getBlockResult().found()) disable(isRu() ? "Нет блоков!" : "No blocks!");
 
         if (event.getPacket() instanceof BlockUpdateS2CPacket pac && mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value() && pac.getState().isReplaceable())
+            handlePacket();
+
+        if (event.getPacket() instanceof ExplosionS2CPacket p
+                && mc.player.squaredDistanceTo(p.getX(), p.getY(), p.getZ()) < range.getPow2Value())
+            handlePacket();
+
+        if (event.getPacket() instanceof PlaySoundS2CPacket p
+                && p.getCategory().equals(SoundCategory.BLOCKS)
+                && p.getSound().value().equals(SoundEvents.ENTITY_GENERIC_EXPLODE)
+                && mc.player.squaredDistanceTo(p.getX(), p.getY(), p.getZ()) < range.getPow2Value())
             handlePacket();
 
         if (event.getPacket() instanceof PlayerPositionLookS2CPacket)
