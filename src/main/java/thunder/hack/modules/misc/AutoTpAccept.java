@@ -33,14 +33,15 @@ public class AutoTpAccept extends Module {
         if (fullNullCheck()) return;
         if (event.getPacket() instanceof GameMessageS2CPacket) {
             final GameMessageS2CPacket packet = event.getPacket();
-            if (packet.content().getString().contains("телепортироваться")) {
+            if (packet.content().getString().contains("телепортироваться") || packet.content().getString().contains("tpaccept")) {
                 if (onlyFriends.getValue()) {
                     if (ThunderHack.friendManager.isFriend(ThunderUtility.solveName(packet.content().getString()))) {
                         if (!duo.getValue()) acceptRequest(packet.content().getString());
                         else
                             tpTask = new TpTask(() -> acceptRequest(packet.content.getString()), System.currentTimeMillis());
                     }
-                } else acceptRequest(packet.content().getString());
+                } else
+                    acceptRequest(packet.content().getString());
             }
         }
     }
