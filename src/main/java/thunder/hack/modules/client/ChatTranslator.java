@@ -9,6 +9,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -49,7 +50,7 @@ public class ChatTranslator extends Module {
 
             ThunderHack.asyncManager.run(() -> {
                 try {
-                    sendMessage(Formatting.WHITE + translate(message, "auto", urLang.getValue().name()));
+                    sendMessage(Formatting.WHITE + translate(message, urLang.getValue().name()));
                 } catch (Exception exc) {
                     exc.printStackTrace();
                 }
@@ -70,7 +71,7 @@ public class ChatTranslator extends Module {
 
             ThunderHack.asyncManager.run(() -> {
                 try {
-                    String outMessage = translate(pac.chatMessage(), "auto", outMessages.getValue().name());
+                    String outMessage = translate(pac.chatMessage(), outMessages.getValue().name());
                     skip = outMessage;
                     mc.player.networkHandler.sendChatMessage(outMessage);
                 } catch (Exception exc) {
@@ -81,10 +82,10 @@ public class ChatTranslator extends Module {
         }
     }
 
-    public String translate(String text, String from, String to) throws UnsupportedEncodingException, MalformedURLException {
+    public String translate(String text, String to) throws UnsupportedEncodingException, MalformedURLException {
         StringBuilder response = new StringBuilder();
 
-        URL url = new URL(String.format("https://translate.google.com/m?hl=en&sl=%s&tl=%s&ie=UTF-8&prev=_m&q=%s", from, to, URLEncoder.encode(text.trim(), "UTF-8")));
+        URL url = new URL(String.format("https://translate.google.com/m?hl=en&sl=auto&tl=%s&ie=UTF-8&prev=_m&q=%s", to, URLEncoder.encode(text.trim(), "UTF-8")));
         try {
             try (BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"))) {
                 String line;

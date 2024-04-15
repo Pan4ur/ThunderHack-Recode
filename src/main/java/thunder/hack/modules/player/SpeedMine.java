@@ -25,11 +25,11 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.core.impl.PlayerManager;
 import thunder.hack.events.impl.EventAttackBlock;
+import thunder.hack.events.impl.EventSetBlockState;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IInteractionManager;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.Rotations;
 import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
@@ -55,6 +55,7 @@ public final class SpeedMine extends Module {
     private final Setting<Float> speed = new Setting<>("Speed", 0.5f, 0f, 1f, v -> mode.getValue() == Mode.Damage);
     private final Setting<Float> range = new Setting<>("Range", 4.2f, 3.0f, 10.0f, v -> mode.getValue() != Mode.Damage);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false, v -> mode.getValue() != Mode.Damage);
+    private final Setting<Boolean> placeCrystal = new Setting<>("PlaceCrystal", true, v -> mode.getValue() == Mode.GrimInstant);
     private final Setting<Boolean> resetOnSwitch = new Setting<>("ResetOnSwitch", true, v -> mode.getValue() != Mode.Damage);
     private final Setting<Integer> breakAttempts = new Setting<>("BreakAttempts", 10, 1, 50, v -> mode.getValue() == Mode.Packet);
 
@@ -171,7 +172,7 @@ public final class SpeedMine extends Module {
                 prevProgress = 0;
             }
 
-            if(!mode.getValue().equals(Mode.Damage)) {
+            if (!mode.getValue().equals(Mode.Damage)) {
                 if (rotate.getValue() && progress > 0.95 && minePosition != null && mc.player != null) {
                     float[] angle = PlayerManager.calcAngle(mc.player.getEyePos(), minePosition.toCenterPos());
                     ModuleManager.rotations.fixRotation = angle[0];
@@ -186,7 +187,7 @@ public final class SpeedMine extends Module {
             }
 
             if (minePosition != null) {
-                if(mc.world.isAir(minePosition))
+                if (mc.world.isAir(minePosition))
                     return;
 
                 int invPickSlot = getTool(minePosition);
@@ -197,9 +198,15 @@ public final class SpeedMine extends Module {
                 if (hotBarPickSlot == -1 && switchMode.getValue() != SwitchMode.Alternative) return;
 
                 if (progress >= 1) {
-                    AutoCrystal.PlaceData placeCrystalData = ModuleManager.autoCrystal.getPlaceData(SpeedMine.minePosition, null);
-                    if(placeCrystalData != null)
-                        ModuleManager.autoCrystal.placeCrystal(placeCrystalData.bhr());
+                    if (placeCrystal.getValue()) {
+                        AutoCrystal.PlaceData placeCrystalData = ModuleManager.autoCrystal.getPlaceData(SpeedMine.minePosition, null);
+                        if (placeCrystalData != null) {
+                            ModuleManager.autoCrystal.placeCrystal(placeCrystalData.bhr(), true);
+                            debug("placing..");
+                        } else
+                            debug("placeCrystalData is null");
+                        ModuleManager.autoTrap.pause();
+                    }
 
                     if (switchMode.getValue() == SwitchMode.Alternative) {
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, invPickSlot < 9 ? invPickSlot + 36 : invPickSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
@@ -383,7 +390,7 @@ public final class SpeedMine extends Module {
     }
 
     private float getBlockStrength(@NotNull BlockState state, BlockPos position) {
-        if(state == Blocks.AIR.getDefaultState()) {
+        if (state == Blocks.AIR.getDefaultState()) {
             return 0.02f;
         }
 

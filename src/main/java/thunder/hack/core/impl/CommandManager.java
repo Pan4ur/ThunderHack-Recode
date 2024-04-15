@@ -44,6 +44,7 @@ public class CommandManager implements IManager {
         add(new DropAllCommand());
         add(new TreasureCommand());
         add(new WayPointCommand());
+        add(new TabParseCommand());
         add(new OpenFolderCommand());
         add(new ResetBindsCommand());
         add(new InvCleanerCommand());

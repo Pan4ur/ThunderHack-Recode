@@ -64,8 +64,8 @@ public abstract class PlaceModule extends Module {
     protected final Setting<ColorSetting> renderLineColor = new Setting<>("Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(render);
     protected final Setting<Integer> renderLineWidth = new Setting<>("Line Width", 2, 1, 5).withParent(render);
 
-    public static final Timer inactivityTimer = new Timer();
-    public static final Timer pauseTimer = new Timer();
+    public final Timer inactivityTimer = new Timer();
+    public final Timer pauseTimer = new Timer();
     protected final Timer attackTimer = new Timer();
 
     public PlaceModule(@NotNull String name, @NotNull Category category) {
@@ -74,7 +74,7 @@ public abstract class PlaceModule extends Module {
 
     protected boolean shouldPause() {
         return (eatPause.getValue() && PlayerUtility.isEating())
-                || (breakPause.getValue() && PlayerUtility.isMining()) ;
+                || (breakPause.getValue() && PlayerUtility.isMining()) || !pauseTimer.passedMs(350) ;
     }
 
     protected boolean placeBlock(BlockPos pos) {
