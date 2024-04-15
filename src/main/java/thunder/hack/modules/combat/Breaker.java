@@ -3,6 +3,7 @@ package thunder.hack.modules.combat;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -26,6 +27,7 @@ public final class Breaker extends Module {
     private final Setting<Float> minDamage = new Setting<>("MinDamage", 7f, 0f, 36f);
     private final Setting<Float> maxSelfDamage = new Setting<>("MaxSelfDamage", 4f, 0f, 36f);
     private final Setting<Boolean> cevPriority = new Setting<>("CevPriority", true);
+    private final Setting<Boolean> antiShulker = new Setting<>("AntiShulker", true);
 
     private BlockPos blockPos;
 
@@ -77,6 +79,12 @@ public final class Breaker extends Module {
                     if (y > 1 && (x == -2 || z == -2 || x == 2 || z == 2))
                         continue;
                     BlockPos bp = BlockPos.ofFloored(target.getX() + x, target.getY() + y, target.getZ() + z);
+
+                    if(mc.world.getBlockState(bp).getBlock() instanceof ShulkerBoxBlock && antiShulker.getValue()) {
+                        blockPos = bp;
+                        return;
+                    }
+                    
                     if (mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN && mc.world.isAir(bp.up()) && !bp.equals(BlockPos.ofFloored(target.getPos()).down())) {
                         if(ModuleManager.autoCrystal.getInteractResult(bp, new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ())) == null) continue;
                         BlockState currentState = mc.world.getBlockState(bp);
