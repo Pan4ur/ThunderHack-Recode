@@ -109,7 +109,7 @@ public class AutoCrystal extends Module {
     private final Setting<Float> lethalMultiplier = new Setting<>("LethalMultiplier", 1.0f, 0.0f, 5f, v -> page.getValue() == Pages.Damages);
     private final Setting<BooleanParent> armorBreaker = new Setting<>("ArmorBreaker", new BooleanParent(true), v -> page.getValue() == Pages.Damages);
     private final Setting<Float> armorScale = new Setting<>("Armor %", 5.0f, 0.0f, 40f, v -> page.getValue() == Pages.Damages).withParent(armorBreaker);
-    private final Setting<Float> facePlaceHp = new Setting<>("FacePlaceHp", 5.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
+    private final Setting<Float> facePlaceHp = new Setting<>("FacePlaceHp", 5.0f, 0.0f, 20f, v -> page.getValue() == Pages.Damages);
     private final Setting<Bind> facePlaceButton = new Setting<>("FacePlaceBtn", new Bind(GLFW.GLFW_KEY_LEFT_SHIFT, false, false), v -> page.getValue() == Pages.Damages);
 
     /*   SWITCH   */
@@ -229,7 +229,7 @@ public class AutoCrystal extends Module {
         }
 
         // Rotate
-        if (rotate.getValue() && !shouldPause() && bestPosition != null && mc.player != null)
+        if (rotate.getValue() && !shouldPause() && (bestPosition != null || bestCrystal != null) && mc.player != null)
             rotateMethod();
     }
 
@@ -324,8 +324,9 @@ public class AutoCrystal extends Module {
     }
 
     public void calcRotations() {
-        if (bestPosition != null && mc.player != null) {
-            float[] angle = InteractionUtility.calculateAngle(bestPosition.getPos());
+        if ((bestPosition != null || bestCrystal != null) && mc.player != null) {
+            Vec3d vec = bestPosition == null ? bestCrystal.getPos() : bestPosition.getPos();
+            float[] angle = InteractionUtility.calculateAngle(vec);
             angle[1] = angle[1] + MathUtility.random(-1, 1);
             angle[0] = (float) (angle[0] + Render2DEngine.interpolate(-2, 2, Math.sin(mc.player.age % 80)) + MathUtility.random(-2, 2));
             if (yawStep.getValue().isEnabled()) {
@@ -494,7 +495,6 @@ public class AutoCrystal extends Module {
 
         if (remove.getValue() != Remove.OFF)
             deadManager.setDead(crystal, System.currentTimeMillis());
-
         if (prevSlot != -1) {
             if (antiWeakness.getValue() == Switch.SILENT) {
                 mc.player.getInventory().selectedSlot = prevSlot;

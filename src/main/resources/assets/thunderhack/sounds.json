@@ -78,5 +78,10 @@
     "sounds": [
       "thunderhack:alert"
     ]
+  },
+  "pmsound": {
+    "sounds": [
+      "thunderhack:pmsound"
+    ]
   }
 }
