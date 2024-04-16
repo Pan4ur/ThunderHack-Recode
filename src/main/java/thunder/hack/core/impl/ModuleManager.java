@@ -47,6 +47,7 @@ public class ModuleManager implements IManager {
     public static AntiBadEffects antiBadEffects = new AntiBadEffects();
     public static MouseElytraFix mouseElytraFix = new MouseElytraFix();
     public static PortalGodMode portalGodMode = new PortalGodMode();
+    public static MBGodMode mbGodMode = new MBGodMode();
     public static OptifineCapes optifineCapes = new OptifineCapes();
     public static Notifications notifications = new Notifications();
     public static NoEntityTrace noEntityTrace = new NoEntityTrace();

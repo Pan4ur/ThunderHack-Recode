@@ -1,17 +1,14 @@
 package thunder.hack.modules.movement;
 
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
 import thunder.hack.modules.Module;
 import net.minecraft.util.math.Direction;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.player.PlayerUtility;
 
 public class NoSlow extends Module {
     public NoSlow() {
@@ -78,12 +75,12 @@ public class NoSlow extends Module {
                             mc.player.setVelocity(mc.player.getVelocity().x * 0.95f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.95f);
                 }
                 case LFCraft -> {
-                	sendSequencedPacket(id -> new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, mc.player.getBlockPos().up(), Direction.NORTH, id));
+                    if (mc.player.getItemUseTime() <= 3)
+                        sendSequencedPacket(id -> new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, mc.player.getBlockPos().up(), Direction.NORTH, id));
                 }
             }
         }
     }
-
 
     public boolean canNoSlow() {
         if (!food.getValue() && mc.player.getActiveItem().isFood())
