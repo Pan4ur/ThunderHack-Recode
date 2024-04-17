@@ -72,6 +72,8 @@ public class ChatTranslator extends Module {
             ThunderHack.asyncManager.run(() -> {
                 try {
                     String outMessage = translate(pac.chatMessage(), outMessages.getValue().name());
+                    if (Objects.equals(pac.chatMessage(), outMessage))
+                        return;
                     skip = outMessage;
                     mc.player.networkHandler.sendChatMessage(outMessage);
                 } catch (Exception exc) {
