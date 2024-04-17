@@ -22,7 +22,6 @@ import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
-import net.minecraft.network.packet.s2c.common.KeepAliveS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
@@ -54,6 +53,7 @@ import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.render.animation.CaptureMark;
 
+import javax.sound.midi.Track;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -102,6 +102,7 @@ public final class Aura extends Module {
     public final Setting<AttackHand> attackHand = new Setting<>("AttackHand", AttackHand.MainHand).withParent(advanced);
     public final Setting<Resolver> resolver = new Setting<>("Resolver", Resolver.Advantage).withParent(advanced);
     public final Setting<Integer> backTicks = new Setting<>("BackTicks", 20, 1, 100, v -> resolver.is(Resolver.BackTrack)).withParent(advanced);
+    public final Setting<Boolean> resolverVisualisation = new Setting<>("ResolverVisualisation", false, v -> !resolver.is(Resolver.Off)).withParent(advanced);
     public final Setting<Boolean> accelerateOnHit = new Setting<>("AccelerateOnHit", false).withParent(advanced);
     public final Setting<Integer> minYawStep = new Setting<>("MinYawStep", 65, 1, 180).withParent(advanced);
     public final Setting<Integer> maxYawStep = new Setting<>("MaxYawStep", 75, 1, 180).withParent(advanced);
@@ -200,7 +201,9 @@ public final class Aura extends Module {
     }
 
     private boolean skipRayTraceCheck() {
-        return rotationMode.getValue() == Mode.None || rayTrace.getValue() == RayTrace.OFF || (rotationMode.getValue() == Mode.Interact && (interactTicks.getValue() <= 1
+        return rotationMode.getValue() == Mode.None || rayTrace.getValue() == RayTrace.OFF
+                || rotationMode.is(Mode.Grim)
+                || (rotationMode.getValue() == Mode.Interact && (interactTicks.getValue() <= 1
                 || mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.25, 0.0, -0.25).offset(0.0, 1, 0.0)).iterator().hasNext()));
     }
 
@@ -224,14 +227,22 @@ public final class Aura extends Module {
         boolean sprint = Core.serverSprint;
         if (sprint && dropSprint.getValue())
             disableSprint();
+
+        if(rotationMode.is(Mode.Grim))
+            sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), rotationYaw, rotationPitch, mc.player.isOnGround()));
+
         return new boolean[]{blocking, sprint};
     }
 
     public void postAttack(boolean block, boolean sprint) {
         if (sprint && dropSprint.getValue())
             enableSprint();
+
         if (block && unpressShield.getValue())
             sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id));
+
+        if(rotationMode.is(Mode.Grim))
+            sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
     }
 
     private void disableSprint() {
@@ -308,7 +319,7 @@ public final class Aura extends Module {
         if (!haveWeapon())
             return;
 
-        if (target != null && rotationMode.getValue() != Mode.None) {
+        if (target != null && rotationMode.getValue() != Mode.None && rotationMode.getValue() != Mode.Grim) {
             mc.player.setYaw(rotationYaw);
             mc.player.setPitch(rotationPitch);
         } else {
@@ -343,35 +354,12 @@ public final class Aura extends Module {
         if (e.getPacket() instanceof EntityStatusS2CPacket pac && pac.getStatus() == 3 && pac.getEntity(mc.world) == mc.player && deathDisable.getValue())
             disable(isRu() ? "Отключаю из-за смерти!" : "Disabling due to death!");
 
-        if(true )
-            return;
+        /*
         if (resolver.is(Resolver.BackTrack) && e.getPacket() instanceof CommonPingS2CPacket ping && target != null) {
-            ThunderHack.asyncManager.run(() -> {
-                        mc.executeSync(() -> {
-                            try {
-                                ping.apply(mc.getNetworkHandler());
-                            } catch (Exception ea) {
-                                ea.printStackTrace();
-                            }
-                        });
-                    }
-                    , backTicks.getValue() * 25L);
+            ThunderHack.asyncManager.run(() -> mc.executeSync(() -> ping.apply(mc.getNetworkHandler())), backTicks.getValue() * 25L);
             e.cancel();
         }
-
-        if (resolver.is(Resolver.BackTrack) && e.getPacket() instanceof KeepAliveS2CPacket ping && target != null) {
-            ThunderHack.asyncManager.run(() -> {
-                        mc.executeSync(() -> {
-                            try {
-                                ping.apply(mc.getNetworkHandler());
-                            } catch (Exception ea) {
-                                ea.printStackTrace();
-                            }
-                        });
-                    }
-                    , backTicks.getValue() * 25L);
-            e.cancel();
-        }
+         */
     }
 
     @Override
@@ -511,8 +499,8 @@ public final class Aura extends Module {
         float delta_yaw = wrapDegrees((float) wrapDegrees(Math.toDegrees(Math.atan2(targetVec.z - mc.player.getZ(), (targetVec.x - mc.player.getX()))) - 90) - rotationYaw);
         float delta_pitch = ((float) (-Math.toDegrees(Math.atan2(targetVec.y - (mc.player.getPos().y + mc.player.getEyeHeight(mc.player.getPose())), Math.sqrt(Math.pow((targetVec.x - mc.player.getX()), 2) + Math.pow(targetVec.z - mc.player.getZ(), 2))))) - rotationPitch);
 
-        float yawStep = rotationMode.getValue() == Mode.Interact ? 360f : random(minYawStep.getValue(), maxYawStep.getValue());
-        float pitchStep = rotationMode.getValue() == Mode.Interact ? 180f : pitchAcceleration + random(-1f, 1f);
+        float yawStep = rotationMode.getValue() != Mode.Track ? 360f : random(minYawStep.getValue(), maxYawStep.getValue());
+        float pitchStep = rotationMode.getValue() != Mode.Track ? 180f : pitchAcceleration + random(-1f, 1f);
 
         if (accelerateOnHit.getValue() && ready) {
             yawStep = 180f;
@@ -539,7 +527,8 @@ public final class Aura extends Module {
             rotationPitch = mc.player.getPitch();
         }
 
-        ModuleManager.rotations.fixRotation = rotationYaw;
+        if(!rotationMode.is(Mode.Grim))
+            ModuleManager.rotations.fixRotation = rotationYaw;
         lookingAtHitbox = ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), wallRange.getValue(), rayTrace.getValue());
     }
 
@@ -547,7 +536,7 @@ public final class Aura extends Module {
         if (!haveWeapon() || target == null)
             return;
 
-        if (resolver.is(Resolver.BackTrack) && resolvedBox != null)
+        if ((resolver.is(Resolver.BackTrack) || resolverVisualisation.getValue()) && resolvedBox != null)
             Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(resolvedBox, HudEditor.getColor(0), 1));
 
         switch (esp.getValue()) {
@@ -572,7 +561,7 @@ public final class Aura extends Module {
         dst += aimRange.getValue();
         if ((mc.player.isFallFlying() || ModuleManager.elytraPlus.isEnabled()) && target != null) dst += 4f;
         if (ModuleManager.strafe.isEnabled()) dst += 4f;
-        if (rotationMode.getValue() == Mode.Interact || rotationMode.getValue() == Mode.None || rayTrace.getValue() == RayTrace.OFF)
+        if (rotationMode.getValue() != Mode.Track || rayTrace.getValue() == RayTrace.OFF)
             dst = attackRange.getValue();
 
         return dst * dst;
@@ -857,7 +846,7 @@ public final class Aura extends Module {
     }
 
     public enum Mode {
-        Interact, Track, None
+        Interact, Track, Grim, None
     }
 
     public enum AttackHand {

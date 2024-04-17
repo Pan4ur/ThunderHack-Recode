@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.CombatManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
@@ -61,7 +62,7 @@ public class AutoCrystal extends Module {
     private final Setting<Boolean> rotate = new Setting<>("Rotate", true, v -> page.getValue() == Pages.Main);
     private final Setting<BooleanParent> yawStep = new Setting<>("YawStep", new BooleanParent(false), v -> rotate.getValue() && page.getValue() == Pages.Main);
     private final Setting<Float> yawAngle = new Setting<>("YawAngle", 180.0f, 1.0f, 180.0f, v -> rotate.getValue() && page.getValue() == Pages.Main).withParent(yawStep);
-    private final Setting<TargetLogic> targetLogic = new Setting<>("TargetLogic", TargetLogic.Distance, v -> page.getValue() == Pages.Main);
+    private final Setting<CombatManager.TargetBy> targetLogic = new Setting<>("TargetLogic", CombatManager.TargetBy.Distance, v -> page.getValue() == Pages.Main);
     private final Setting<Float> targetRange = new Setting<>("TargetRange", 10.0f, 1.0f, 15f, v -> page.getValue() == Pages.Main);
     public static final Setting<Integer> selfPredictTicks = new Setting<>("SelfPredictTicks", 3, 0, 20, v -> page.getValue() == Pages.Main);
     private final Setting<OnBreakBlock> onBreakBlock = new Setting<>("OnBreakBlock", OnBreakBlock.Smart, v -> page.getValue() == Pages.Main);
@@ -148,7 +149,6 @@ public class AutoCrystal extends Module {
     private final Timer blockRecalcTimer = new Timer();
     private final Timer pauseTimer = new Timer();
 
-    // позиция и время постановки
     private final Map<BlockPos, Long> placedCrystals = new HashMap<>();
 
     private final DeadManager deadManager = new DeadManager();
@@ -171,10 +171,22 @@ public class AutoCrystal extends Module {
 
     @Override
     public void onEnable() {
+        resetVars();
+    }
+
+    @Override
+    public void onDisable() {
+        resetVars();
+    }
+
+    private void resetVars() {
         facePlacing = false;
         rotated = false;
         renderDamage = 0;
         renderSelfDamage = 0;
+        renderMultiplier = 0;
+        confirmTime = 0;
+        renderPositions.clear();
         placedCrystals.clear();
         deadManager.reset();
         breakTimer.reset();
@@ -184,30 +196,13 @@ public class AutoCrystal extends Module {
         renderPos = null;
         prevRenderPos = null;
         target = null;
-        renderMultiplier = 0;
-        confirmTime = 0;
-        renderPositions.clear();
-    }
-
-    @Override
-    public void onDisable() {
-        target = null;
     }
 
     @EventHandler
     public void onSync(EventSync e) {
         if (mc.player == null || mc.world == null) return;
 
-        if (target != null) {
-            //20 8
-            //  sendMessage(target.getArmor() + " " + (float) target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
-        }
-
-        switch (targetLogic.getValue()) {
-            case HP -> target = ThunderHack.combatManager.getTargetByHealth(targetRange.getValue());
-            case Distance -> target = ThunderHack.combatManager.getNearestTarget(targetRange.getValue());
-            case FOV -> target = ThunderHack.combatManager.getTargetByFOV(targetRange.getValue());
-        }
+        target = ThunderHack.combatManager.getTarget(targetRange.getValue(), targetLogic.getValue());
 
         if (target != null && (target.isDead() || target.getHealth() < 0)) {
             target = null;
@@ -217,8 +212,7 @@ public class AutoCrystal extends Module {
         // Right click gapple
         if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL && autoGapple.getValue()
                 && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() == Items.END_CRYSTAL) {
-            SearchInvResult result = InventoryUtility.findItemInHotBar(Items.ENCHANTED_GOLDEN_APPLE);
-            result.switchTo();
+            InventoryUtility.findItemInHotBar(Items.ENCHANTED_GOLDEN_APPLE).switchTo();
         }
 
         // CA Speed counter
@@ -229,13 +223,10 @@ public class AutoCrystal extends Module {
         }
 
         // Rotate
-        if (rotate.getValue() && !shouldPause() && (bestPosition != null || bestCrystal != null) && mc.player != null)
-            rotateMethod();
-    }
-
-    private void rotateMethod() {
-        mc.player.setYaw(rotationYaw);
-        mc.player.setPitch(rotationPitch);
+        if (rotate.getValue() && !shouldPause() && (bestPosition != null || bestCrystal != null) && mc.player != null) {
+            mc.player.setYaw(rotationYaw);
+            mc.player.setPitch(rotationPitch);
+        }
     }
 
     @Override
@@ -1105,10 +1096,6 @@ public class AutoCrystal extends Module {
 
     private enum Interact {
         Default, Strict, Legit
-    }
-
-    private enum TargetLogic {
-        Distance, HP, FOV
     }
 
     public enum Safety {

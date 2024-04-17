@@ -47,7 +47,6 @@ public class ModuleManager implements IManager {
     public static AntiBadEffects antiBadEffects = new AntiBadEffects();
     public static MouseElytraFix mouseElytraFix = new MouseElytraFix();
     public static PortalGodMode portalGodMode = new PortalGodMode();
-    public static MBGodMode mbGodMode = new MBGodMode();
     public static OptifineCapes optifineCapes = new OptifineCapes();
     public static Notifications notifications = new Notifications();
     public static NoEntityTrace noEntityTrace = new NoEntityTrace();
@@ -164,6 +163,7 @@ public class ModuleManager implements IManager {
     public static ClickGui clickGui = new ClickGui();
     public static AutoTrap autoTrap = new AutoTrap();
     public static AutoTool autoTool = new AutoTool();
+    public static SoundESP soundESP = new SoundESP();
     public static AutoSoup autoSoup = new AutoSoup();
     public static AutoFish autoFish = new AutoFish();
     public static AutoBuff autoBuff = new AutoBuff();

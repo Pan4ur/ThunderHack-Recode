@@ -104,7 +104,7 @@ public class NameTags extends Module {
 
             Vector4d position = null;
 
-            vector = Render3DEngine.worldSpaceToScreenSpace(new Vec3d(vector.x, vector.y, vector.z));
+            vector = Render3DEngine.worldSpaceToScreenSpace(vector);
             if (vector.z > 0 && vector.z < 1) {
                 position = new Vector4d(vector.x, vector.y, vector.z, 0);
                 position.x = Math.min(vector.x, position.x);

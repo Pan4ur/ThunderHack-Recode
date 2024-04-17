@@ -18,6 +18,7 @@ public class AntiWeb extends Module {
     }
 
     public static final Setting<Mode> mode = new Setting<>("Mode", Mode.Solid);
+    public static final Setting<Boolean> grim = new Setting<>("Grim", false, v-> mode.is(Mode.Ignore));
     public static final Setting<Float> timer = new Setting<>("Timer", 20f, 1f, 50f, v -> mode.getValue() == Mode.Timer);
     public Setting<Float> speed = new Setting<>("Speed", 0.3f, 0.0f, 10.0f, v -> mode.getValue() == Mode.Fly);
 

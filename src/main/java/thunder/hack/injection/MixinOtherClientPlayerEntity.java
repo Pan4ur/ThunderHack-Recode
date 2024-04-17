@@ -64,6 +64,8 @@ public class MixinOtherClientPlayerEntity extends AbstractClientPlayerEntity imp
         } else {
             setPosition(to.x, to.y, to.z);
         }
+        if(Aura.target == this)
+            ModuleManager.aura.resolvedBox = getBoundingBox();
     }
 
     public void releaseResolver() {
