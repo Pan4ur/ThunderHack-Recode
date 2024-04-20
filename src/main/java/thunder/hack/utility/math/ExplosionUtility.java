@@ -327,6 +327,14 @@ public final class ExplosionUtility {
         return 0f;
     }
 
+    public float calculateDamage(Explosion explosion, Entity entity) {
+        float f = explosion.getPower() * 2.0f;
+        Vec3d vec3d = explosion.getPosition();
+        double d = Math.sqrt(entity.squaredDistanceTo(vec3d)) / (double)f;
+        double e = (1.0 - d) * (double)Explosion.getExposure(vec3d, entity);
+        return (float)((e * e + e) / 2.0 * 7.0 * (double)f + 1.0);
+    }
+
     private static float getExposureGhost(Vec3d source, Entity entity, BlockPos pos) {
         Box box = entity.getBoundingBox();
         double d = 1.0 / ((box.maxX - box.minX) * 2.0 + 1.0);

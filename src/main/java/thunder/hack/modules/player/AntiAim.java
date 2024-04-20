@@ -1,7 +1,8 @@
 package thunder.hack.modules.player;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
@@ -27,7 +28,7 @@ public class AntiAim extends Module {
 
     private float rotationYaw, rotationPitch, pitch_sinus_step, yaw_sinus_step;
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onSync(EventSync e) {
         if(allowInteract.getValue() && (mc.options.attackKey.isPressed() || mc.options.attackKey.isPressed())) return;
         double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
@@ -40,7 +41,7 @@ public class AntiAim extends Module {
             mc.player.setPitch((float) (rotationPitch - (rotationPitch - mc.player.getPitch()) % gcdFix));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onCalc(PlayerUpdateEvent e) {
         if (pitchMode.getValue() == Mode.RandomAngle)
             if (mc.player.age % Speed.getValue() == 0)
@@ -88,5 +89,6 @@ public class AntiAim extends Module {
         if (yawMode.getValue() == Mode.Static)
             rotationYaw =  mc.player.getYaw() % 360 + yawDelta.getValue();
 
+        ModuleManager.rotations.fixRotation = rotationYaw;
     }
 }

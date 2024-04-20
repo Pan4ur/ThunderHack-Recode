@@ -21,6 +21,7 @@ public class Shaders extends Module {
     private final Setting<Parent> select = new Setting<>("Select", new Parent(false, 0));
     private final Setting<Boolean> hands = new Setting<>("Hands", true).withParent(select);
     private final Setting<Boolean> players = new Setting<>("Players", true).withParent(select);
+    private final Setting<Boolean> self = new Setting<>("Self", true,v -> players.getValue()).withParent(select);
     private final Setting<Boolean> friends = new Setting<>("Friends", true).withParent(select);
     private final Setting<Boolean> crystals = new Setting<>("Crystals", true).withParent(select);
     private final Setting<Boolean> creatures = new Setting<>("Creatures", false).withParent(select);
@@ -61,7 +62,7 @@ public class Shaders extends Module {
             return false;
 
         if (entity instanceof PlayerEntity) {
-            if (entity == mc.player)
+            if (entity == mc.player && !self.getValue())
                 return false;
             if (ThunderHack.friendManager.isFriend((PlayerEntity) entity))
                 return friends.getValue();

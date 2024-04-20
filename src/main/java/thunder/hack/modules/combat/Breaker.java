@@ -39,7 +39,6 @@ public final class Breaker extends Module {
     @SuppressWarnings("unused")
     private void onSync(EventSync event) {
         PlayerEntity target = ThunderHack.combatManager.getTarget(range.getValue(), targetBy.getValue());
-
         if (target == null) return;
 
         if (blockPos != null) {
@@ -54,7 +53,7 @@ public final class Breaker extends Module {
         ArrayList<BreakData> list = new ArrayList<>();
 
         if (cevPriority.getValue()) {
-            for (int y = 0; y <= 3; y++) {
+            for (int y = 2; y <= 3; y++) {
                 BlockPos bp = BlockPos.ofFloored(target.getX(), target.getY() + y, target.getZ());
                 if (mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN && mc.world.isAir(bp.up()) && !bp.equals(BlockPos.ofFloored(target.getPos()).down())) {
                     if(ModuleManager.autoCrystal.getInteractResult(bp, new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ())) == null) continue;
@@ -85,8 +84,10 @@ public final class Breaker extends Module {
                         return;
                     }
                     
-                    if (mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN && mc.world.isAir(bp.up()) && !bp.equals(BlockPos.ofFloored(target.getPos()).down())) {
-                        if(ModuleManager.autoCrystal.getInteractResult(bp, new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ())) == null) continue;
+                    if ((mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN || mc.world.getBlockState(bp).getBlock() == Blocks.ENDER_CHEST)
+                            && mc.world.isAir(bp.up()) && !bp.equals(BlockPos.ofFloored(target.getPos()).down())) {
+                        if(ModuleManager.autoCrystal.getInteractResult(bp, new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ())) == null)
+                            continue;
                         BlockState currentState = mc.world.getBlockState(bp);
                         mc.world.removeBlock(bp, false);
                         float damage = ExplosionUtility.getExplosionDamage(bp.toCenterPos(), target);

@@ -28,6 +28,8 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     boolean pre_sprint_state = false;
     @Unique
     private boolean updateLock = false;
+    @Unique
+    private Runnable postAction;
 
     @Shadow
     public abstract float getPitch(float tickDelta);
@@ -67,6 +69,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         if (fullNullCheck()) return;
         EventSync event = new EventSync(getYaw(), getPitch());
         ThunderHack.EVENT_BUS.post(event);
+        postAction = event.getPostAction();
         EventSprint e = new EventSprint(isSprinting());
         ThunderHack.EVENT_BUS.post(e);
         ThunderHack.EVENT_BUS.post(new EventAfterRotate());
@@ -91,7 +94,12 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         Core.lockSprint = false;
         EventPostSync event = new EventPostSync();
         ThunderHack.EVENT_BUS.post(event);
-        if (event.isCancelled()) info.cancel();
+        if(postAction != null) {
+            postAction.run();
+            postAction = null;
+        }
+        if (event.isCancelled())
+            info.cancel();
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendMovementPackets()V", ordinal = 0, shift = At.Shift.AFTER), cancellable = true)

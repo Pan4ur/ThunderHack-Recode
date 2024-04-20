@@ -3,8 +3,6 @@ package thunder.hack.modules.movement;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CobwebBlock;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventCollision;
 import thunder.hack.events.impl.PlayerUpdateEvent;
@@ -18,9 +16,11 @@ public class AntiWeb extends Module {
     }
 
     public static final Setting<Mode> mode = new Setting<>("Mode", Mode.Solid);
-    public static final Setting<Boolean> grim = new Setting<>("Grim", false, v-> mode.is(Mode.Ignore));
+    public static final Setting<Boolean> grim = new Setting<>("Grim", false, v -> mode.is(Mode.Ignore));
     public static final Setting<Float> timer = new Setting<>("Timer", 20f, 1f, 50f, v -> mode.getValue() == Mode.Timer);
     public Setting<Float> speed = new Setting<>("Speed", 0.3f, 0.0f, 10.0f, v -> mode.getValue() == Mode.Fly);
+
+    private boolean timerEnabled = false;
 
     public enum Mode {
         Timer, Solid, Ignore, Fly
@@ -30,8 +30,12 @@ public class AntiWeb extends Module {
     public void onPlayerUpdate(PlayerUpdateEvent e) {
         if (ThunderHack.playerManager.isInWeb()) {
             if (mode.getValue() == Mode.Timer) {
-                if (mc.player.isOnGround()) ThunderHack.TICK_TIMER = 1f;
-                else ThunderHack.TICK_TIMER = timer.getValue();
+                if (mc.player.isOnGround()) {
+                    ThunderHack.TICK_TIMER = 1f;
+                } else {
+                    ThunderHack.TICK_TIMER = timer.getValue();
+                    timerEnabled = true;
+                }
             }
             if (mode.getValue() == Mode.Fly) {
                 final double[] dir = MovementUtility.forward(speed.getValue());
@@ -41,6 +45,9 @@ public class AntiWeb extends Module {
                 if (mc.options.sneakKey.isPressed())
                     mc.player.setVelocity(mc.player.getVelocity().add(0, -speed.getValue(), 0));
             }
+        } else if (timerEnabled) {
+            timerEnabled = false;
+            ThunderHack.TICK_TIMER = 1f;
         }
     }
 

@@ -170,7 +170,7 @@ public final class Core {
         if (showSkull && !skullTimer.passedMs(3000) && ClientSettings.skullEmoji.getValue()) {
             int xPos = (int) (mc.getWindow().getScaledWidth() / 2f - 150);
             int yPos = (int) (mc.getWindow().getScaledHeight() / 2f - 150);
-            float alpha = (1 - (skullTimer.getPassedTimeMs() / 3000f));
+            float alpha = (1f - (skullTimer.getPassedTimeMs() / 3000f));
             RenderSystem.setShaderColor(1f, 1f, 1f, alpha);
             e.drawTexture(SKULL, xPos, yPos, 0, 0, 300, 300, 300, 300);
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);

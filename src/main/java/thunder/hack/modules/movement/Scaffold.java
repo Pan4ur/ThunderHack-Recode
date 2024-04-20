@@ -5,12 +5,11 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventPostSync;
@@ -34,6 +33,8 @@ public class Scaffold extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("PlaceMode", InteractionUtility.PlaceMode.Normal, v -> !mode.is(Mode.Grim));
     private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
+    private final Setting<Boolean> lockY = new Setting<>("LockY", false);
+    private final Setting<Boolean> autoJump = new Setting<>("AutoJump", false);
     private final Setting<Boolean> allowShift = new Setting<>("AllowShift", false);
     private final Setting<Boolean> autoswap = new Setting<>("AutoSwap", true);
     private final Setting<Boolean> tower = new Setting<>("Tower", true, v -> !mode.is(Mode.Grim));
@@ -54,156 +55,68 @@ public class Scaffold extends Module {
     private final Timer timer = new Timer();
     private BlockPosWithFacing currentblock;
     float[] rotation = new float[2];
+    int prevY;
 
     public Scaffold() {
         super("Scaffold", Category.MOVEMENT);
     }
 
-    private int findBlockToPlace() {
-        if (mc.player.getMainHandStack().getItem() instanceof BlockItem) {
-            if (((BlockItem) mc.player.getMainHandStack().getItem()).getBlock().getDefaultState().isSolid())
-                return mc.player.getInventory().selectedSlot;
-        }
-        for (int i = 0; i < 9; i++) {
-            if (mc.player.getInventory().getStack(i).getCount() != 0) {
-                if (mc.player.getInventory().getStack(i).getItem() instanceof BlockItem) {
-                    if (!echestholding.getValue() || (echestholding.getValue() && !mc.player.getInventory().getStack(i).getItem().equals(Item.fromBlock(Blocks.ENDER_CHEST)))) {
-                        if (((BlockItem) mc.player.getInventory().getStack(i).getItem()).getBlock().getDefaultState().isSolid())
-                            return i;
-                    }
-                }
-            }
-        }
-        return -1;
-    }
-
     @Override
     public void onEnable() {
         rotation = new float[]{mc.player.getYaw(), mc.player.getPitch()};
-    }
-
-    private BlockPosWithFacing checkNearBlocksExtended(BlockPos blockPos) {
-        BlockPosWithFacing ret = null;
-        //:skull:
-        ret = checkNearBlocks(blockPos);
-        if (ret != null) return ret;
-
-        ret = checkNearBlocks(blockPos.add(-1, 0, 0));
-        if (ret != null) return ret;
-
-        ret = checkNearBlocks(blockPos.add(1, 0, 0));
-        if (ret != null) return ret;
-
-        ret = checkNearBlocks(blockPos.add(0, 0, 1));
-        if (ret != null) return ret;
-
-        ret = checkNearBlocks(blockPos.add(0, 0, -1));
-        if (ret != null) return ret;
-
-        ret = checkNearBlocks(blockPos.add(-2, 0, 0));
-        if (ret != null) return ret;
-
-        ret = checkNearBlocks(blockPos.add(2, 0, 0));
-        if (ret != null) return ret;
-
-        ret = checkNearBlocks(blockPos.add(0, 0, 2));
-        if (ret != null) return ret;
-
-        ret = checkNearBlocks(blockPos.add(0, 0, -2));
-        if (ret != null) return ret;
-
-        ret = checkNearBlocks(blockPos.add(0, -1, 0));
-        BlockPos blockPos2 = blockPos.add(0, -1, 0);
-
-        if (ret != null) return ret;
-
-        ret = checkNearBlocks(blockPos2.add(1, 0, 0));
-        if (ret != null) return ret;
-
-        ret = checkNearBlocks(blockPos2.add(-1, 0, 0));
-        if (ret != null) return ret;
-
-        ret = checkNearBlocks(blockPos2.add(0, 0, 1));
-        if (ret != null) return ret;
-
-        return checkNearBlocks(blockPos2.add(0, 0, -1));
-    }
-
-    private int countValidBlocks() {
-        int n = 36;
-        int n2 = 0;
-
-        while (n < 45) {
-            if (!mc.player.getInventory().getStack(n >= 36 ? n - 36 : n).isEmpty()) {
-                ItemStack itemStack = mc.player.getInventory().getStack(n >= 36 ? n - 36 : n);
-                if (itemStack.getItem() instanceof BlockItem) {
-                    if (((BlockItem) itemStack.getItem()).getBlock().getDefaultState().isSolid())
-                        n2 += itemStack.getCount();
-                }
-            }
-            n++;
-        }
-
-        return n2;
-    }
-
-    private void doSafeWalk(EventMove event) {
-        double x = event.getX();
-        double y = event.getY();
-        double z = event.getZ();
-
-        if (mc.player.isOnGround() && !mc.player.noClip) {
-            double increment;
-            for (increment = 0.05D; x != 0.0D && isOffsetBBEmpty(x, 0.0D); ) {
-                if (x < increment && x >= -increment) {
-                    x = 0.0D;
-                } else if (x > 0.0D) {
-                    x -= increment;
-                } else {
-                    x += increment;
-                }
-            }
-            while (z != 0.0D && isOffsetBBEmpty(0.0D, z)) {
-                if (z < increment && z >= -increment) {
-                    z = 0.0D;
-                } else if (z > 0.0D) {
-                    z -= increment;
-                } else {
-                    z += increment;
-                }
-            }
-            while (x != 0.0D && z != 0.0D && isOffsetBBEmpty(x, z)) {
-                if (x < increment && x >= -increment) {
-                    x = 0.0D;
-                } else if (x > 0.0D) {
-                    x -= increment;
-                } else {
-                    x += increment;
-                }
-                if (z < increment && z >= -increment) {
-                    z = 0.0D;
-                } else if (z > 0.0D) {
-                    z -= increment;
-                } else {
-                    z += increment;
-                }
-            }
-        }
-        event.setX(x);
-        event.setY(y);
-        event.setZ(z);
-        event.cancel();
+        prevY = -999;
     }
 
     @EventHandler
     public void onMove(EventMove event) {
         if (fullNullCheck()) return;
-        if (safewalk.getValue() && !mode.is(Mode.Grim))
-            doSafeWalk(event);
-    }
+        if (safewalk.getValue() && !mode.is(Mode.Grim)) {
+            double x = event.getX();
+            double y = event.getY();
+            double z = event.getZ();
 
-    private boolean isOffsetBBEmpty(double x, double z) {
-        return !mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.1, 0, -0.1).offset(x, -2, z)).iterator().hasNext();
+            if (mc.player.isOnGround() && !mc.player.noClip) {
+                double increment;
+                for (increment = 0.05D; x != 0.0D && isOffsetBBEmpty(x, 0.0D); ) {
+                    if (x < increment && x >= -increment) {
+                        x = 0.0D;
+                    } else if (x > 0.0D) {
+                        x -= increment;
+                    } else {
+                        x += increment;
+                    }
+                }
+                while (z != 0.0D && isOffsetBBEmpty(0.0D, z)) {
+                    if (z < increment && z >= -increment) {
+                        z = 0.0D;
+                    } else if (z > 0.0D) {
+                        z -= increment;
+                    } else {
+                        z += increment;
+                    }
+                }
+                while (x != 0.0D && z != 0.0D && isOffsetBBEmpty(x, z)) {
+                    if (x < increment && x >= -increment) {
+                        x = 0.0D;
+                    } else if (x > 0.0D) {
+                        x -= increment;
+                    } else {
+                        x += increment;
+                    }
+                    if (z < increment && z >= -increment) {
+                        z = 0.0D;
+                    } else if (z > 0.0D) {
+                        z -= increment;
+                    } else {
+                        z += increment;
+                    }
+                }
+            }
+            event.setX(x);
+            event.setY(y);
+            event.setZ(z);
+            event.cancel();
+        }
     }
 
     @EventHandler
@@ -235,7 +148,16 @@ public class Scaffold extends Module {
 
         Item item = mc.player.getInventory().getStack(n2).getItem();
         if (!(item instanceof BlockItem)) return;
-        BlockPos blockPos2 = new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY()) - 0.01), (int) Math.floor(mc.player.getZ()));
+
+        if(mc.player.input.jumping && !MovementUtility.isMoving())
+            prevY = (int) (Math.floor(mc.player.getY()) - 0.01);
+
+        if(!mc.player.input.jumping && MovementUtility.isMoving() && mc.player.isOnGround() && autoJump.getValue())
+            mc.player.jump();
+
+        BlockPos blockPos2 = lockY.getValue() && prevY != -999 ?
+                BlockPos.ofFloored(mc.player.getX(), prevY, mc.player.getZ())
+                : new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY()) - 0.01), (int) Math.floor(mc.player.getZ()));
 
         if (!mc.world.getBlockState(blockPos2).isReplaceable()) return;
 
@@ -305,6 +227,8 @@ public class Scaffold extends Module {
 
             mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
+            prevY = currentblock.position().getY();
+
             if (mode.is(Mode.Grim))
                 sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
 
@@ -314,5 +238,90 @@ public class Scaffold extends Module {
             if (!mode.is(Mode.StrictNCP))
                 InventoryUtility.switchTo(prev_item);
         }
+    }
+
+    private BlockPosWithFacing checkNearBlocksExtended(BlockPos blockPos) {
+        BlockPosWithFacing ret = null;
+
+        ret = checkNearBlocks(blockPos);
+        if (ret != null) return ret;
+
+        ret = checkNearBlocks(blockPos.add(-1, 0, 0));
+        if (ret != null) return ret;
+
+        ret = checkNearBlocks(blockPos.add(1, 0, 0));
+        if (ret != null) return ret;
+
+        ret = checkNearBlocks(blockPos.add(0, 0, 1));
+        if (ret != null) return ret;
+
+        ret = checkNearBlocks(blockPos.add(0, 0, -1));
+        if (ret != null) return ret;
+
+        ret = checkNearBlocks(blockPos.add(-2, 0, 0));
+        if (ret != null) return ret;
+
+        ret = checkNearBlocks(blockPos.add(2, 0, 0));
+        if (ret != null) return ret;
+
+        ret = checkNearBlocks(blockPos.add(0, 0, 2));
+        if (ret != null) return ret;
+
+        ret = checkNearBlocks(blockPos.add(0, 0, -2));
+        if (ret != null) return ret;
+
+        ret = checkNearBlocks(blockPos.add(0, -1, 0));
+        if (ret != null) return ret;
+
+        ret = checkNearBlocks(blockPos.add(1, -1, 0));
+        if (ret != null) return ret;
+
+        ret = checkNearBlocks(blockPos.add(-1, -1, 0));
+        if (ret != null) return ret;
+
+        ret = checkNearBlocks(blockPos.add(0, -1, 1));
+        if (ret != null) return ret;
+
+        return checkNearBlocks(blockPos.add(0, -1, -1));
+    }
+
+    private int countValidBlocks() {
+        int n = 36;
+        int n2 = 0;
+
+        while (n < 45) {
+            if (!mc.player.getInventory().getStack(n >= 36 ? n - 36 : n).isEmpty()) {
+                ItemStack itemStack = mc.player.getInventory().getStack(n >= 36 ? n - 36 : n);
+                if (itemStack.getItem() instanceof BlockItem) {
+                    if (((BlockItem) itemStack.getItem()).getBlock().getDefaultState().isSolid())
+                        n2 += itemStack.getCount();
+                }
+            }
+            n++;
+        }
+
+        return n2;
+    }
+
+    private int findBlockToPlace() {
+        if (mc.player.getMainHandStack().getItem() instanceof BlockItem) {
+            if (((BlockItem) mc.player.getMainHandStack().getItem()).getBlock().getDefaultState().isSolid())
+                return mc.player.getInventory().selectedSlot;
+        }
+        for (int i = 0; i < 9; i++) {
+            if (mc.player.getInventory().getStack(i).getCount() != 0) {
+                if (mc.player.getInventory().getStack(i).getItem() instanceof BlockItem) {
+                    if (!echestholding.getValue() || (echestholding.getValue() && !mc.player.getInventory().getStack(i).getItem().equals(Item.fromBlock(Blocks.ENDER_CHEST)))) {
+                        if (((BlockItem) mc.player.getInventory().getStack(i).getItem()).getBlock().getDefaultState().isSolid())
+                            return i;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+    private boolean isOffsetBBEmpty(double x, double z) {
+        return !mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.1, 0, -0.1).offset(x, -2, z)).iterator().hasNext();
     }
 }

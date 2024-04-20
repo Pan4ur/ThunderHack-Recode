@@ -13,6 +13,7 @@ import net.minecraft.registry.Registries;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.injection.accesors.IInteractionManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -346,9 +347,10 @@ public final class InventoryUtility {
 
     public static void switchTo(int slot) {
         if (mc.player == null || mc.getNetworkHandler() == null) return;
-        if (mc.player.getInventory().selectedSlot == slot && ThunderHack.playerManager.serverSideSlot == slot) return;
+        if (mc.player.getInventory().selectedSlot == slot && ThunderHack.playerManager.serverSideSlot == slot)
+            return;
         mc.player.getInventory().selectedSlot = slot;
-        mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
+        ((IInteractionManager)mc.interactionManager).syncSlot();
     }
 
     public static void switchToSilent(int slot) {

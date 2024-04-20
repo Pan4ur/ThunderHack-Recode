@@ -98,11 +98,8 @@ public class CombatManager implements IManager {
     }
 
     private float getFOVAngle(@NotNull LivingEntity e) {
-        double difX = e.getX() - mc.player.getPos().x;
-        double difZ = e.getZ() - mc.player.getPos().z;
-        float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0);
-        double plYaw = MathHelper.wrapDegrees(mc.player.getYaw());
-        return (float) Math.abs(yaw - plYaw);
+        float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(e.getZ() - mc.player.getZ(), e.getX() - mc.player.getX())) - 90.0);
+        return Math.abs(yaw - MathHelper.wrapDegrees(mc.player.getYaw()));
     }
 
     public enum TargetBy {

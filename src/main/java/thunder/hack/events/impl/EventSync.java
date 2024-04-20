@@ -10,6 +10,7 @@ public class EventSync extends Event {
 
     float yaw;
     float pitch;
+    Runnable postAction;
 
     public float getYaw() {
         return yaw;
@@ -17,5 +18,13 @@ public class EventSync extends Event {
 
     public float getPitch() {
         return pitch;
+    }
+
+    public void addPostAction(Runnable r) {
+        postAction = r;
+    }
+
+    public Runnable getPostAction() {
+        return postAction;
     }
 }

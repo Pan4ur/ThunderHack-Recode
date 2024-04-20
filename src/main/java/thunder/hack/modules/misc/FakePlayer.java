@@ -41,15 +41,15 @@ public class FakePlayer extends Module {
     private Setting<Boolean> record = new Setting<>("Record", false);
     private Setting<Boolean> play = new Setting<>("Play", false);
     private Setting<Boolean> autoTotem = new Setting<>("AutoTotem", false);
-
+    private Setting<String> name = new Setting<>("Name", "Hell_Raider");
+    
     private final List<PlayerState> positions = new ArrayList<>();
 
     int movementTick, deathTime;
 
-
     @Override
     public void onEnable() {
-        fakePlayer = new OtherClientPlayerEntity(mc.world, new GameProfile(UUID.fromString("66123666-6666-6666-6666-666666666600"), "Hell_Raider"));
+        fakePlayer = new OtherClientPlayerEntity(mc.world, new GameProfile(UUID.fromString("66123666-6666-6666-6666-666666666600"), name.getValue()));
         fakePlayer.copyPositionAndRotation(mc.player);
 
         if (copyInventory.getValue()) {

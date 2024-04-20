@@ -28,6 +28,7 @@ public final class AutoBuff extends Module {
     private final Setting<Boolean> onDaGround = new Setting<>("Only while on ground", true);
     public Timer timer = new Timer();
     private static AutoBuff instance;
+    private boolean spoofed = false;
 
     public AutoBuff() {
         super("AutoBuff", Category.COMBAT);
@@ -77,7 +78,10 @@ public final class AutoBuff extends Module {
     public void onPostRotationSet(EventAfterRotate event) {
         if (Aura.target != null && mc.player.getAttackCooldownProgress(1) > 0.5f)
             return;
-        if (mc.player.age > 80 && shouldThrow()) mc.player.setPitch(90);
+        if (mc.player.age > 80 && shouldThrow()) {
+            mc.player.setPitch(90);
+            spoofed = true;
+        }
     }
 
     private boolean shouldThrow() {
@@ -91,32 +95,34 @@ public final class AutoBuff extends Module {
     public void onPostSync(EventPostSync e) {
         if (Aura.target != null && mc.player.getAttackCooldownProgress(1) > 0.5f)
             return;
-        if (onDaGround.getValue() && !(mc.player.isOnGround()))
+
+        if (onDaGround.getValue() && !mc.player.isOnGround())
             return;
-        if (mc.player.age > 80 && shouldThrow() && timer.passedMs(1000)) {
-            if (!mc.player.hasStatusEffect(StatusEffects.SPEED) && isPotionOnHotBar(Potions.SPEED) && speed.getValue()) {
+
+        if (mc.player.age > 80 && shouldThrow() && timer.passedMs(1000) && spoofed) {
+            if (!mc.player.hasStatusEffect(StatusEffects.SPEED) && isPotionOnHotBar(Potions.SPEED) && speed.getValue())
                 throwPotion(Potions.SPEED);
-            }
-            if (!mc.player.hasStatusEffect(StatusEffects.STRENGTH) && isPotionOnHotBar(Potions.STRENGTH) && strength.getValue()) {
+
+            if (!mc.player.hasStatusEffect(StatusEffects.STRENGTH) && isPotionOnHotBar(Potions.STRENGTH) && strength.getValue())
                 throwPotion(Potions.STRENGTH);
-            }
-            if (!mc.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE) && isPotionOnHotBar(Potions.FIRERES) && fire.getValue()) {
+
+            if (!mc.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE) && isPotionOnHotBar(Potions.FIRERES) && fire.getValue())
                 throwPotion(Potions.FIRERES);
-            }
-            if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < health.getValue() && heal.getValue() && isPotionOnHotBar(Potions.HEAL)) {
+
+            if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < health.getValue() && heal.getValue() && isPotionOnHotBar(Potions.HEAL))
                 throwPotion(Potions.HEAL);
-            }
-            if (!mc.player.hasStatusEffect(StatusEffects.REGENERATION) && isPotionOnHotBar(Potions.REGEN) && regen.getValue()) {
+
+            if (!mc.player.hasStatusEffect(StatusEffects.REGENERATION) && isPotionOnHotBar(Potions.REGEN) && regen.getValue())
                 throwPotion(Potions.REGEN);
-            }
+
             sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
             timer.reset();
+            spoofed = false;
         }
     }
 
     public void throwPotion(Potions potion) {
-        int slot = getPotionSlot(potion);
-        sendPacket(new UpdateSelectedSlotC2SPacket(slot));
+        sendPacket(new UpdateSelectedSlotC2SPacket(getPotionSlot(potion)));
         sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
     }
 
