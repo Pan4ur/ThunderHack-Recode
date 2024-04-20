@@ -27,6 +27,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
+import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
@@ -45,6 +46,8 @@ public class ElytraPlus extends Module {
     private final Setting<Float> xzSpeed = new Setting<>("XZSpeed", 1.55f, 0.1f, 10f, v -> mode.getValue() != Mode.Boost && mode.getValue() != Mode.Pitch40Infinite);
     private final Setting<Float> ySpeed = new Setting<>("YSpeed", 0.47f, 0f, 2f, v -> mode.getValue() == Mode.FireWork || mode.getValue() == Mode.SunriseOld);
     private final Setting<Integer> fireSlot = new Setting<>("FireSlot", 1, 1, 9, v -> mode.getValue() == Mode.FireWork);
+    private final Setting<BooleanParent> accelerate = new Setting<>("Acceleration", new BooleanParent(false), v -> mode.getValue() == Mode.Control);
+    private final Setting<Float> accelerateFactor = new Setting<>("AccelerateFactor", 9f, 0f, 100f, v -> mode.getValue() == Mode.Control).withParent(accelerate);
     private final Setting<Float> fireDelay = new Setting<>("FireDelay", 1.5f, 0f, 1.5f, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> stayMad = new Setting<>("GroundSafe", false, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> keepFlying = new Setting<>("KeepFlying", false, v -> mode.getValue() == Mode.FireWork);
@@ -56,7 +59,7 @@ public class ElytraPlus extends Module {
     private final Setting<Boolean> cruiseControl = new Setting<>("CruiseControl", false, v -> mode.getValue() == Mode.Boost);
     private final Setting<Float> factor = new Setting<>("Factor", 1.5f, 0.1f, 50.0f, v -> mode.getValue() == Mode.Boost);
     private final Setting<Float> upFactor = new Setting<>("UpFactor", 1.0f, 0.0f, 10.0f, v -> (mode.getValue() == Mode.Boost || mode.getValue() == Mode.Control));
-    private final Setting<Float> downFactor = new Setting<>("DownFactor", 1.0f, 0.0f, 10.0f, v -> (mode.getValue() == Mode.Boost || mode.getValue() == Mode.Control));
+    private final Setting<Float> downFactor = new Setting<>("Glide", 1.0f, 0.0f, 10.0f, v -> (mode.getValue() == Mode.Boost || mode.getValue() == Mode.Control));
     private final Setting<Boolean> stopMotion = new Setting<>("StopMotion", true, v -> mode.getValue() == Mode.Boost);
     private final Setting<Float> minUpSpeed = new Setting<>("MinUpSpeed", 0.5f, 0.1f, 5.0f, v -> mode.getValue() == Mode.Boost && cruiseControl.getValue());
     private final Setting<Boolean> forceHeight = new Setting<>("ForceHeight", false, v -> (mode.getValue() == Mode.Boost && cruiseControl.getValue()));
@@ -64,7 +67,6 @@ public class ElytraPlus extends Module {
     private final Setting<Float> sneakDownSpeed = new Setting<>("DownSpeed", 1.0F, 0.1F, 10.0F, v -> mode.getValue() == Mode.Control);
     private final Setting<Boolean> speedLimit = new Setting<>("SpeedLimit", true, v -> (mode.getValue() == Mode.Boost || mode.getValue() == Mode.Control));
     private final Setting<Float> maxSpeed = new Setting<>("MaxSpeed", 2.5f, 0.1f, 10.0f, v -> (mode.getValue() == Mode.Boost || mode.getValue() == Mode.Control));
-    private final Setting<Boolean> noDrag = new Setting<>("NoDrag", false, v -> (mode.getValue() == Mode.Boost || mode.getValue() == Mode.Control));
     private final Setting<Float> packetDelay = new Setting<>("Limit", 1F, 0.1F, 5F, v -> mode.getValue() == Mode.Boost);
     private final Setting<Float> staticDelay = new Setting<>("Delay", 5F, 0.1F, 20F, v -> mode.getValue() == Mode.Boost);
     private final Setting<Float> timeout = new Setting<>("Timeout", 0.5F, 0.1F, 1F, v -> mode.getValue() == Mode.Boost);
@@ -296,7 +298,8 @@ public class ElytraPlus extends Module {
             } else hasElytra = false;
         }
 
-        if (strictTimer.passedMs(1500) && !strictTimer.passedMs(2000)) ThunderHack.TICK_TIMER = 1.0f;
+        if (strictTimer.passedMs(1500) && !strictTimer.passedMs(2000))
+            ThunderHack.TICK_TIMER = 1.0f;
 
         if (!mc.player.isFallFlying()) {
             if (hasTouchedGround && !mc.player.isOnGround() && mc.player.fallDistance > 0 && instantFly.getValue())
@@ -377,8 +380,7 @@ public class ElytraPlus extends Module {
 
                 double adjustment = (pDist - pitch) * heightDiffPct;
 
-                mc.player.setPitch((float) pitch);
-                mc.player.setPitch(mc.player.getPitch() + (float) adjustment);
+                mc.player.setPitch((float) pitch + (float) adjustment);
                 mc.player.prevPitch = mc.player.getPitch();
             } else {
                 mc.player.setPitch(0.25F);
@@ -421,13 +423,6 @@ public class ElytraPlus extends Module {
             mc.player.setVelocity(e.getX(), e.getY(), e.getZ());
         }
 
-        if (!noDrag.getValue()) {
-            e.setY(e.getY() * 0.9900000095367432D);
-            e.setX(e.getX() * 0.9800000190734863D);
-            e.setZ(e.getZ() * 0.9900000095367432D);
-            mc.player.setVelocity(e.getX(), e.getY(), e.getZ());
-        }
-
         float yaw = mc.player.getYaw() * 0.017453292F;
 
         if (f > 0F && e.getY() < 0D) {
@@ -456,43 +451,28 @@ public class ElytraPlus extends Module {
     }
 
     private void doControl(EventMove e) {
-        Vec3d lookVec = mc.player.getRotationVec(mc.getTickDelta());
-
-        double lookDist = Math.sqrt(lookVec.x * lookVec.x + lookVec.z * lookVec.z);
-        double motionDist = Math.sqrt(e.getX() * e.getX() + e.getZ() * e.getZ());
-
-        if (mc.options.sneakKey.isPressed()) {
+        if(mc.options.jumpKey.isPressed()) {
+            e.setY(upFactor.getValue());
+        } else if (mc.options.sneakKey.isPressed()) {
             e.setY(-sneakDownSpeed.getValue());
         } else if (!mc.options.jumpKey.isPressed()) {
-            e.setY(-0.00000000000003D * downFactor.getValue());
-        }
-
-        if (mc.options.jumpKey.isPressed()) {
-            e.setY(upFactor.getValue());
-        }
-
-        if (lookDist > 0.0D) {
-            e.setX(e.getX() + (lookVec.x / lookDist * motionDist - e.getX()) * 0.1D);
-            e.setZ(e.getZ() + (lookVec.z / lookDist * motionDist - e.getZ()) * 0.1D);
+            e.setY(-0.08D * downFactor.getValue());
         }
 
         if (!mc.options.jumpKey.isPressed()) {
-            double[] dir = MovementUtility.forward(xzSpeed.getValue());
+            double[] dir = MovementUtility.forward(xzSpeed.getValue() * (accelerate.getValue().isEnabled() ? Math.min((acceleration += accelerateFactor.getValue()) / 100.0f, 1.0f) : 1f));
             e.setX(dir[0]);
             e.setZ(dir[1]);
         }
 
-        if (!noDrag.getValue()) {
-            e.setY(e.getY() * 0.9900000095367432D);
-            e.setX(e.getX() * 0.9800000190734863D);
-            e.setZ(e.getZ() * 0.9900000095367432D);
-        }
+        if(!MovementUtility.isMoving())
+            acceleration = 0;
 
-        double finalDist = Math.sqrt(e.getX() * e.getX() + e.getZ() * e.getZ());
+        double speed = Math.hypot(e.getX(), e.getZ());
 
-        if (speedLimit.getValue() && finalDist > maxSpeed.getValue()) {
-            e.setX(e.getX() * maxSpeed.getValue() / finalDist);
-            e.setZ(e.getZ() * maxSpeed.getValue() / finalDist);
+        if (speedLimit.getValue() && speed > maxSpeed.getValue()) {
+            e.setX(e.getX() * maxSpeed.getValue() / speed);
+            e.setZ(e.getZ() * maxSpeed.getValue() / speed);
         }
     }
 

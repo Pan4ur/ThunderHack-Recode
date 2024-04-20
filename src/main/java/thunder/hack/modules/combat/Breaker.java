@@ -39,11 +39,12 @@ public final class Breaker extends Module {
     @SuppressWarnings("unused")
     private void onSync(EventSync event) {
         PlayerEntity target = ThunderHack.combatManager.getTarget(range.getValue(), targetBy.getValue());
-        if (target == null) return;
+        if (target == null)
+            return;
 
         if (blockPos != null) {
             if (ModuleManager.speedMine.isEnabled()) {
-                if (SpeedMine.minePosition == blockPos || SpeedMine.progress != 0)
+                if (SpeedMine.minePosition == blockPos || (SpeedMine.minePosition != null && !mc.world.isAir(SpeedMine.minePosition)))
                     return;
                 mc.interactionManager.attackBlock(blockPos, Direction.UP);
             } else mc.interactionManager.updateBlockBreakingProgress(blockPos, Direction.UP);

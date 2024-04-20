@@ -69,7 +69,7 @@ public class CombatManager implements IManager {
                 .filter(entityPlayer -> !ThunderHack.friendManager.isFriend(entityPlayer.getName().getString()))
                 .filter(entityPlayer -> entityPlayer != mc.player)
                 .filter(entityPlayer -> mc.player.squaredDistanceTo(entityPlayer) < range * range)
-                .sorted(Comparator.comparing(e -> mc.player.distanceTo(e)))
+                .sorted(Comparator.comparing(e -> mc.player.squaredDistanceTo(e)))
                 .collect(Collectors.toList());
     }
 
