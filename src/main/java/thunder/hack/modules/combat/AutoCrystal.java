@@ -198,6 +198,22 @@ public class AutoCrystal extends Module {
         target = null;
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onTick(EventTick e) {
+        if (mc.player == null || mc.world == null) return;
+
+        ThunderHack.asyncManager.run(() -> {
+            calcPosition(placeRange.getValue(), mc.player.getPos());
+            getCrystalToExplode();
+        });
+    }
+
+    @EventHandler
+    public void onPlayerUpdate(PlayerUpdateEvent event) {
+        if (rotate.getValue())
+            calcRotations();
+    }
+
     @EventHandler
     public void onSync(EventSync e) {
         if (mc.player == null || mc.world == null) return;
@@ -229,6 +245,16 @@ public class AutoCrystal extends Module {
         }
     }
 
+    @EventHandler
+    public void onPostSync(EventPostSync e) {
+        if (bestPosition != null && placeTimer.passedMs(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()))
+            placeCrystal(bestPosition, false);
+
+        if (bestCrystal != null && breakTimer.passedMs(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
+            attackCrystal(bestCrystal);
+        tickBusy = false;
+    }
+
     @Override
     public String getDisplayInfo() {
         StringBuilder info = new StringBuilder();
@@ -254,24 +280,6 @@ public class AutoCrystal extends Module {
                     placedCrystals.remove(bp);
                     ThunderHack.asyncManager.run(() -> handleSpawn(crystal));
                 }
-        }
-    }
-
-    private void handleSpawn(EndCrystalEntity crystal) {
-        if (mc.player == null || mc.world == null) return;
-
-        getCrystalToExplode();
-        if (bestCrystal == crystal) {
-            attackCrystal(crystal);
-            debug("end sequence");
-            if (instantPlace.getValue().isEnabled() && placeTimer.passedMs(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue())) {
-                debug("placing after attack");
-                if (recalculate.getValue() != Recalc.OFF)
-                    calcPosition(recalculate.getValue() == Recalc.FAST ? 2f : placeRange.getValue(), recalculate.getValue() == Recalc.FAST ? crystal.getPos() : mc.player.getPos());
-
-                if (bestPosition != null)
-                    placeCrystal(bestPosition, false);
-            }
         }
     }
 
@@ -303,15 +311,22 @@ public class AutoCrystal extends Module {
         }
     }
 
+    private void handleSpawn(EndCrystalEntity crystal) {
+        if (mc.player == null || mc.world == null) return;
 
-    @EventHandler
-    public void onPostSync(EventPostSync e) {
-        if (bestPosition != null && placeTimer.passedMs(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()))
-            placeCrystal(bestPosition, false);
+        getCrystalToExplode();
+        if (bestCrystal == crystal) {
+            attackCrystal(crystal);
+            debug("end sequence");
+            if (instantPlace.getValue().isEnabled() && placeTimer.passedMs(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue())) {
+                debug("placing after attack");
+                if (recalculate.getValue() != Recalc.OFF)
+                    calcPosition(recalculate.getValue() == Recalc.FAST ? 2f : placeRange.getValue(), recalculate.getValue() == Recalc.FAST ? crystal.getPos() : mc.player.getPos());
 
-        if (bestCrystal != null && breakTimer.passedMs(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
-            attackCrystal(bestCrystal);
-        tickBusy = false;
+                if (bestPosition != null)
+                    placeCrystal(bestPosition, false);
+            }
+        }
     }
 
     public void calcRotations() {
@@ -376,12 +391,6 @@ public class AutoCrystal extends Module {
                 renderBox(dmg, box);
             }
         }
-    }
-
-    @EventHandler
-    public void onPlayerUpdate(PlayerUpdateEvent event) {
-        if (rotate.getValue())
-            calcRotations();
     }
 
     private void renderBox(String dmg, Box box) {
@@ -621,6 +630,7 @@ public class AutoCrystal extends Module {
 
     public void calcPosition(float range, Vec3d center) {
         if (mc.player == null || mc.world == null) return;
+        long currentTime = System.currentTimeMillis();
 
         if (ModuleManager.speedMine.isWorth()) {
             if (onBreakBlock.getValue() == OnBreakBlock.Smart) {
@@ -658,14 +668,13 @@ public class AutoCrystal extends Module {
             }
         }
 
-
         if (target == null) {
             renderPos = null;
             prevRenderPos = null;
             bestPosition = null;
             return;
         }
-        long currentTime = System.currentTimeMillis();
+
         List<PlaceData> list = getPossibleBlocks(target, center, range).stream().filter(data -> isSafe(data.damage, data.selfDamage, data.overrideDamage)).toList();
         bestPosition = list.isEmpty() ? null : filterPositions(list);
         calcTime = System.currentTimeMillis() - currentTime;
@@ -1060,16 +1069,6 @@ public class AutoCrystal extends Module {
             }
         }
         return bestResult;
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onTick(EventTick e) {
-        if (mc.player == null || mc.world == null) return;
-
-        ThunderHack.asyncManager.run(() -> {
-            calcPosition(placeRange.getValue(), mc.player.getPos());
-            getCrystalToExplode();
-        });
     }
 
     public void pause() {

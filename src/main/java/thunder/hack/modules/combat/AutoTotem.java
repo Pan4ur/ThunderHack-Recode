@@ -65,7 +65,7 @@ public final class AutoTotem extends Module {
 
     private enum Mode {Default, Matrix, MatrixPick, NewVersion}
 
-    private enum Swap {GappleShield, BallShield, GappleBall}
+    private enum Swap {GappleShield, BallShield, GappleBall, BallTotem}
 
     private int delay;
 
@@ -223,6 +223,11 @@ public final class AutoTotem extends Module {
                                 if (mc.player.getOffHandStack().isEmpty() || offHandItem == Items.SHIELD)
                                     item = Items.GOLDEN_APPLE;
                                 else item = Items.SHIELD;
+                            }
+                            case BallTotem -> {
+                                if (mc.player.getOffHandStack().isEmpty() || offHandItem == Items.TOTEM_OF_UNDYING)
+                                    item = Items.PLAYER_HEAD;
+                                else item = Items.TOTEM_OF_UNDYING;
                             }
                         }
                         prevItem = item;

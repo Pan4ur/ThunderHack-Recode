@@ -142,8 +142,8 @@ public class ModuleButton extends AbstractButton {
                 element.setWidth(width);
                 element.setHeight(13);
 
-                if (element instanceof ColorPickerElement)
-                    element.setHeight(66);
+                if (element instanceof ColorPickerElement picker)
+                    element.setHeight(picker.getHeight());
 
                 else if (element instanceof SliderElement)
                     element.setHeight(18);

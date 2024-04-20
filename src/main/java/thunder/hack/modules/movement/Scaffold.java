@@ -34,8 +34,9 @@ public class Scaffold extends Module {
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("PlaceMode", InteractionUtility.PlaceMode.Normal, v -> !mode.is(Mode.Grim));
     private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
     private final Setting<Boolean> lockY = new Setting<>("LockY", false);
+    private final Setting<Boolean> onlyNotHoldingSpace = new Setting<>("OnlyNotHoldingSpace", false, v-> lockY.getValue());
     private final Setting<Boolean> autoJump = new Setting<>("AutoJump", false);
-    private final Setting<Boolean> allowShift = new Setting<>("AllowShift", false);
+    private final Setting<Boolean> allowShift = new Setting<>("WorkWhileSneaking", false);
     private final Setting<Boolean> autoswap = new Setting<>("AutoSwap", true);
     private final Setting<Boolean> tower = new Setting<>("Tower", true, v -> !mode.is(Mode.Grim));
     private final Setting<Boolean> safewalk = new Setting<>("SafeWalk", true, v -> !mode.is(Mode.Grim));
@@ -142,22 +143,27 @@ public class Scaffold extends Module {
 
         if (mc.player.isSneaking() && !allowShift.getValue()) return;
 
-
         int n2 = findBlockToPlace();
         if (n2 == -1) return;
 
         Item item = mc.player.getInventory().getStack(n2).getItem();
         if (!(item instanceof BlockItem)) return;
 
-        if(mc.player.input.jumping && !MovementUtility.isMoving())
-            prevY = (int) (Math.floor(mc.player.getY()) - 0.01);
+        if(mc.options.jumpKey.isPressed() && !MovementUtility.isMoving())
+            prevY = (int) (Math.floor(mc.player.getY() - 1));
 
-        if(!mc.player.input.jumping && MovementUtility.isMoving() && mc.player.isOnGround() && autoJump.getValue())
-            mc.player.jump();
+        if(MovementUtility.isMoving() && autoJump.getValue()) {
+            if(mc.options.jumpKey.isPressed()) {
+                if(onlyNotHoldingSpace.getValue())
+                    prevY = (int) (Math.floor(mc.player.getY() - 1));
+            } else if(mc.player.isOnGround()) {
+                mc.player.jump();
+            }
+        }
 
         BlockPos blockPos2 = lockY.getValue() && prevY != -999 ?
                 BlockPos.ofFloored(mc.player.getX(), prevY, mc.player.getZ())
-                : new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY()) - 0.01), (int) Math.floor(mc.player.getZ()));
+                : new BlockPos((int) Math.floor(mc.player.getX()), (int) (Math.floor(mc.player.getY() - 1)), (int) Math.floor(mc.player.getZ()));
 
         if (!mc.world.getBlockState(blockPos2).isReplaceable()) return;
 
@@ -166,12 +172,8 @@ public class Scaffold extends Module {
             if (rotate.getValue() && !mode.is(Mode.Grim)) {
                 Vec3d hitVec = new Vec3d(currentblock.position().getX() + 0.5, currentblock.position().getY() + 0.5, currentblock.position().getZ() + 0.5).add(new Vec3d(currentblock.facing().getUnitVector()).multiply(0.5));
                 float[] rotations = InteractionUtility.calculateAngle(hitVec);
-                if (mode.is(Mode.StrictNCP)) {
-                    rotation = rotations;
-                } else {
-                    mc.player.setYaw(rotations[0]);
-                    mc.player.setPitch(rotations[1]);
-                }
+                mc.player.setYaw(rotations[0]);
+                mc.player.setPitch(rotations[1]);
             }
         }
     }
@@ -217,6 +219,11 @@ public class Scaffold extends Module {
 
             float[] rotations = InteractionUtility.calculateAngle(bhr.getPos());
 
+            boolean sneak = InteractionUtility.needSneak(mc.world.getBlockState(bhr.getBlockPos()).getBlock()) && !mc.player.isSneaking();
+
+            if (sneak)
+                mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
+
             if (mode.is(Mode.Grim))
                 sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), rotations[0], rotations[1], mc.player.isOnGround()));
 
@@ -228,6 +235,9 @@ public class Scaffold extends Module {
             mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
             prevY = currentblock.position().getY();
+
+            if (sneak)
+                mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
 
             if (mode.is(Mode.Grim))
                 sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));

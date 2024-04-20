@@ -42,7 +42,7 @@ public class FakePlayer extends Module {
     private Setting<Boolean> play = new Setting<>("Play", false);
     private Setting<Boolean> autoTotem = new Setting<>("AutoTotem", false);
     private Setting<String> name = new Setting<>("Name", "Hell_Raider");
-    
+
     private final List<PlayerState> positions = new ArrayList<>();
 
     int movementTick, deathTime;

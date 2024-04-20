@@ -39,7 +39,7 @@ public class ArcShader extends GlProgram {
     public void setParameters(float x, float y, float width, float height, float r, float thickness, float start, float end) {
         if(mc.player == null)
             return;
-        int i = mc.options.getGuiScale().getValue();
+        float i = (float) mc.getWindow().getScaleFactor();
         radius.set(r * i);
         uLocation.set(x * i, -y * i + mc.getWindow().getScaledHeight() * i - height * i);
         uSize.set(width * i, height * i);

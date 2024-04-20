@@ -29,7 +29,8 @@ public class MainMenuProgram extends GlProgram {
     }
 
     public void setParameters(float x, float y, float width, float height) {
-        this.uSize.set(width * mc.options.getGuiScale().getValue(), height * mc.options.getGuiScale().getValue());
+        float i = (float) mc.getWindow().getScaleFactor();
+        this.uSize.set(width * i, height * i);
         this.Time.set((float) time_);
         this.color.set(HudEditor.getColor(0).getRed() / 255f, HudEditor.getColor(0).getGreen() / 255f, HudEditor.getColor(0).getBlue() / 255f, HudEditor.getColor(0).getAlpha() / 255f);
     }

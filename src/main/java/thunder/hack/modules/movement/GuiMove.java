@@ -31,7 +31,7 @@ public class GuiMove extends Module {
     public void onUpdate() {
         if (mc.currentScreen != null) {
             if (!(mc.currentScreen instanceof ChatScreen)) {
-                mc.player.setSprinting(true);
+               // mc.player.setSprinting(true);
 
                 for (KeyBinding k : new KeyBinding[]{mc.options.forwardKey, mc.options.backKey, mc.options.leftKey, mc.options.rightKey, mc.options.jumpKey, mc.options.sprintKey}) {
                     k.setPressed(InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.fromTranslationKey(k.getBoundKeyTranslationKey()).getCode()));
@@ -59,25 +59,25 @@ public class GuiMove extends Module {
 
     @EventHandler
     public void onPacketSend(PacketEvent.Send e) {
-        if (pause) {
-            pause = false;
-            return;
-        }
         if (e.getPacket() instanceof ClickSlotC2SPacket) {
+            mc.player.setSprinting(false);
+            mc.player.input.movementForward = 0f;
+            mc.options.forwardKey.setPressed(false);
             if (clickBypass.getValue() && mc.player.isOnGround() && MovementUtility.isMoving() && !mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, 0.0656, 0.0)).iterator().hasNext()) {
                 if (mc.player.isSprinting()) sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
-
                 sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 0.0656, mc.player.getZ(), false));
             }
 
-            if (grim995Bypass.getValue() && mc.currentScreen instanceof InventoryScreen) sendPacket(new CloseHandledScreenC2SPacket(0));
+            if (grim995Bypass.getValue() && mc.currentScreen instanceof InventoryScreen)
+                sendPacket(new CloseHandledScreenC2SPacket(0));
         }
     }
 
     @EventHandler
     public void onPacketSendPost(PacketEvent.SendPost e) {
         if (e.getPacket() instanceof ClickSlotC2SPacket) {
-            if (mc.player.isSprinting()) sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+            if (mc.player.isSprinting() && clickBypass.getValue())
+                sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
         }
     }
 }

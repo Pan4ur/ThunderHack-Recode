@@ -338,7 +338,7 @@ public final class Aura extends Module {
 
     @EventHandler
     public void onPacketSend(PacketEvent.@NotNull Send e) {
-        if (e.getPacket() instanceof PlayerInteractEntityC2SPacket pie && Criticals.getInteractType(pie) != Criticals.InteractType.ATTACK)
+        if (e.getPacket() instanceof PlayerInteractEntityC2SPacket pie && Criticals.getInteractType(pie) != Criticals.InteractType.ATTACK && target != null)
             e.cancel();
     }
 
