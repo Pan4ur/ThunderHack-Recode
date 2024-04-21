@@ -106,7 +106,7 @@ public final class RPC extends Module {
                     }
 
                     presence.button_label_1 = "Download";
-                    presence.button_url_1 = "https://thunderhack.onrender.com/";
+                    presence.button_url_1 = "https://github.com/Pan4ur/ThunderHack-Recode/";
 
                     switch (mode.getValue()) {
                         case Recode -> presence.largeImageKey = "https://i.imgur.com/yY0z2Uq.gif";
