@@ -19,13 +19,13 @@ import thunder.hack.utility.player.PlayerUtility;
 
 public final class AutoBuff extends Module {
     private final Setting<Boolean> strength = new Setting<>("Strength", true);
-    private final Setting<Boolean> speed = new Setting<>("SpeedPot", true);
-    private final Setting<Boolean> fire = new Setting<>("FireRes", true);
-    private final Setting<Boolean> heal = new Setting<>("Heal", true);
+    private final Setting<Boolean> speed = new Setting<>("Speed", true);
+    private final Setting<Boolean> fire = new Setting<>("FireResistance", true);
+    private final Setting<Boolean> heal = new Setting<>("InstantHealing", true);
     private final Setting<Boolean> regen = new Setting<>("Regeneration", true);
 
     public Setting<Integer> health = new Setting<>("Health", 8, 0, 20);
-    private final Setting<Boolean> onDaGround = new Setting<>("Only while on ground", true);
+    private final Setting<Boolean> onDaGround = new Setting<>("OnlyOnGround", true);
     public Timer timer = new Timer();
     private static AutoBuff instance;
     private boolean spoofed = false;
