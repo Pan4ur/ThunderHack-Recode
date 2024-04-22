@@ -98,12 +98,13 @@ public final class Aura extends Module {
     public final Setting<Boolean> deathDisable = new Setting<>("DisableOnDeath", true).withParent(advanced);
     public final Setting<Boolean> tpDisable = new Setting<>("TPDisable", false).withParent(advanced);
     public final Setting<Boolean> pullDown = new Setting<>("FastFall", false).withParent(advanced);
+    public final Setting<Boolean> onlyJumpBoost = new Setting<>("OnlyJumpBoost", false, v-> pullDown.getValue()).withParent(advanced);
     public final Setting<Float> pullValue = new Setting<>("PullValue", 3f, 0f, 20f, v -> pullDown.getValue()).withParent(advanced);
     public final Setting<AttackHand> attackHand = new Setting<>("AttackHand", AttackHand.MainHand).withParent(advanced);
     public final Setting<Resolver> resolver = new Setting<>("Resolver", Resolver.Advantage).withParent(advanced);
     public final Setting<Integer> backTicks = new Setting<>("BackTicks", 20, 1, 100, v -> resolver.is(Resolver.BackTrack)).withParent(advanced);
     public final Setting<Boolean> resolverVisualisation = new Setting<>("ResolverVisualisation", false, v -> !resolver.is(Resolver.Off)).withParent(advanced);
-    public final Setting<Boolean> accelerateOnHit = new Setting<>("AccelerateOnHit", false).withParent(advanced);
+    public final Setting<AccelerateOnHit> accelerateOnHit = new Setting<>("AccelerateOnHit", AccelerateOnHit.Off).withParent(advanced);
     public final Setting<Integer> minYawStep = new Setting<>("MinYawStep", 65, 1, 180).withParent(advanced);
     public final Setting<Integer> maxYawStep = new Setting<>("MaxYawStep", 75, 1, 180).withParent(advanced);
     public final Setting<Float> aimedPitchStep = new Setting<>("AimedPitchStep", 1f, 0f, 90f).withParent(advanced);
@@ -112,6 +113,8 @@ public final class Aura extends Module {
     public final Setting<Float> attackCooldown = new Setting<>("AttackCooldown", 0.9f, 0.5f, 1f).withParent(advanced);
     public final Setting<Float> attackBaseTime = new Setting<>("AttackBaseTime", 0.5f, 0f, 2f).withParent(advanced);
     public final Setting<Integer> attackTickLimit = new Setting<>("AttackTickLimit", 11, 0, 20).withParent(advanced);
+    public final Setting<Float> critFallDistance = new Setting<>("CritFallDistance", 0f, 0f, 1f).withParent(advanced);
+
 
     /*   TARGETS   */
     public final Setting<Parent> targets = new Setting<>("Targets", new Parent(false, 0));
@@ -331,7 +334,7 @@ public final class Aura extends Module {
             if (minCPS.getValue() > maxCPS.getValue())
                 minCPS.setValue(maxCPS.getValue());
 
-        if (target != null && pullDown.getValue())
+        if (target != null && pullDown.getValue() && (mc.player.hasStatusEffect(StatusEffects.JUMP_BOOST) || !onlyJumpBoost.getValue()))
             mc.player.addVelocity(0f, -pullValue.getValue() / 1000f, 0f);
         Render3DEngine.updateTargetESP();
     }
@@ -407,7 +410,7 @@ public final class Aura extends Module {
             return true;
 
         if (!reasonForSkipCrit)
-            return !mc.player.isOnGround() && mc.player.fallDistance > (randomHitDelay.getValue().equals(RandomHitDelay.FallDistance) ? MathUtility.random(0f, 0.4f) : 0.0f);
+            return !mc.player.isOnGround() && mc.player.fallDistance > (randomHitDelay.getValue().equals(RandomHitDelay.FallDistance) ? MathUtility.random(0f, 0.4f) : critFallDistance.getValue());
         return true;
     }
 
@@ -502,10 +505,21 @@ public final class Aura extends Module {
         float yawStep = rotationMode.getValue() != Mode.Track ? 360f : random(minYawStep.getValue(), maxYawStep.getValue());
         float pitchStep = rotationMode.getValue() != Mode.Track ? 180f : pitchAcceleration + random(-1f, 1f);
 
-        if (accelerateOnHit.getValue() && ready) {
-            yawStep = 180f;
-            pitchStep = 90f;
-        }
+        if (ready)
+            switch(accelerateOnHit.getValue()) {
+                case Off -> {
+                }
+                case Yaw -> {
+                    yawStep = 180f;
+                }
+                case Pitch -> {
+                    pitchStep = 90f;
+                }
+                case Both -> {
+                    yawStep = 180f;
+                    pitchStep = 90f;
+                }
+            }
 
         if (delta_yaw > 180)
             delta_yaw = delta_yaw - 180;
@@ -859,5 +873,9 @@ public final class Aura extends Module {
 
     public enum RandomHitDelay {
         Off, Delay, FallDistance
+    }
+
+    public enum AccelerateOnHit {
+        Off, Yaw, Pitch, Both
     }
 }

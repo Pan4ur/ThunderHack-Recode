@@ -44,7 +44,6 @@ public class MainMenuButton {
         float halfOfWidth = mc.getWindow().getScaledWidth() / 2f;
         float halfOfHeight = mc.getWindow().getScaledHeight() / 2f;
         boolean hovered = Render2DEngine.isHovered(mouseX, mouseY,halfOfWidth +  posX, halfOfHeight +  posY, width, height);
-
         if (hovered) action.run();
     }
 }

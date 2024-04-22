@@ -21,6 +21,8 @@ public final class HudEditor extends Module {
     public static final Setting<Float> hudRound = new Setting<>("HudRound", 6f, 1f, 10f);
     public static final Setting<Float> alpha = new Setting<>("Alpha", 0.9f, 0f, 1f);
     public static final Setting<Float> blend = new Setting<>("Blend", 10f, 1f, 15f);
+    public static final Setting<Float> outline = new Setting<>("Outline", 0.5f, 0f, 2.5f);
+    public static final Setting<Float> glow1 = new Setting<>("Glow", 0.5f, 0f, 1f);
 
 
     public HudEditor() {

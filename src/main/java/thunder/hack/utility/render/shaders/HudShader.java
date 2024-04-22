@@ -21,6 +21,8 @@ public class HudShader extends GlProgram {
     private GlUniform radius;
     private GlUniform blend;
     private GlUniform alpha;
+    private GlUniform outline;
+    private GlUniform glow;
     private GlUniform color1;
     private GlUniform color2;
     private GlUniform color3;
@@ -51,6 +53,8 @@ public class HudShader extends GlProgram {
         color3.set(c3.getRed() / 255f, c3.getGreen() / 255f, c3.getBlue() / 255f, externalAlpha);
         color4.set(c4.getRed() / 255f, c4.getGreen() / 255f, c4.getBlue() / 255f, externalAlpha);
         blend.set(HudEditor.blend.getValue());
+        outline.set(HudEditor.outline.getValue());
+        glow.set(HudEditor.glow1.getValue());
         alpha.set(internalAlpha);
     }
 
@@ -75,6 +79,8 @@ public class HudShader extends GlProgram {
         color2 = findUniform("color2");
         color3 = findUniform("color3");
         color4 = findUniform("color4");
+        outline = findUniform("outline");
+        glow = findUniform("glow");
         var window = MinecraftClient.getInstance().getWindow();
         input = new SimpleFramebuffer(window.getFramebufferWidth(), window.getFramebufferHeight(), false, MinecraftClient.IS_SYSTEM_MAC);
     }

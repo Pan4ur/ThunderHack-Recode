@@ -19,25 +19,24 @@ public class CandleHud extends HudElement {
     }
 
     private final Identifier CANDLE = new Identifier("textures/candle.png");
-    private Setting<Integer> scale = new Setting<>("Scale", 25, 0, 100);
+    private Setting<Integer> scale = new Setting<>("Scale", 25, 15, 100);
     private Setting<For> mode = new Setting<>("For", For.Win);
 
     private float xAnim, yAnim, prevPitch;
 
-
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
 
-        float midX = 10f;
-        float midY = 10f;
-        float yawDelta = mc.player.prevHeadYaw - mc.player.getHeadYaw();
-        float pitchDelta = prevPitch - mc.player.getPitch();
-        if (yawDelta > 0) xAnim = AnimationUtility.fast(xAnim, midX - 25, 10);
-        else if (yawDelta < 0) xAnim = AnimationUtility.fast(xAnim, midX + 25, 10);
-        else xAnim = AnimationUtility.fast(xAnim, midX, 10);
-        if (pitchDelta > 0) yAnim = AnimationUtility.fast(yAnim, midY - 25, 10);
-        else if (pitchDelta < 0) yAnim = AnimationUtility.fast(yAnim, midY + 25, 10);
-        else yAnim = AnimationUtility.fast(yAnim, midY, 10);
+        float yDelta = mc.player.prevHeadYaw - mc.player.getHeadYaw();
+        if (yDelta > 0) xAnim = AnimationUtility.fast(xAnim, -15, 10);
+        else if (yDelta < 0) xAnim = AnimationUtility.fast(xAnim, 35, 10);
+        else xAnim = AnimationUtility.fast(xAnim, 10, 10);
+
+        float pDelta = prevPitch - mc.player.getPitch();
+        if (pDelta > 0) yAnim = AnimationUtility.fast(yAnim, -15, 10);
+        else if (pDelta < 0) yAnim = AnimationUtility.fast(yAnim, 35, 10);
+        else yAnim = AnimationUtility.fast(yAnim, 10, 10);
+
         prevPitch = mc.player.getPitch();
 
         context.getMatrices().push();

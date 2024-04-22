@@ -97,6 +97,12 @@ public class CombatManager implements IManager {
         return getTargets(range).stream().min(Comparator.comparing(this::getFOVAngle)).orElse(null);
     }
 
+    public PlayerEntity getTargetByFOV(float range, float fov) {
+        return getTargets(range).stream()
+                .filter(entityPlayer -> getFOVAngle(entityPlayer) < fov)
+                .min(Comparator.comparing(this::getFOVAngle)).orElse(null);
+    }
+
     private float getFOVAngle(@NotNull LivingEntity e) {
         float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(e.getZ() - mc.player.getZ(), e.getX() - mc.player.getX())) - 90.0);
         return Math.abs(yaw - MathHelper.wrapDegrees(mc.player.getYaw()));
