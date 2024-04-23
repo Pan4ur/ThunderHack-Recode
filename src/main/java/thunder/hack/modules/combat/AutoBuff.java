@@ -23,23 +23,14 @@ import javax.lang.model.element.ModuleElement;
 
 public final class AutoBuff extends Module {
     private final Setting<Boolean> strength = new Setting<>("Strength", true);
-<<<<<<< Updated upstream
     private final Setting<Boolean> speed = new Setting<>("Speed", true);
     private final Setting<Boolean> fire = new Setting<>("FireResistance", true);
-    private final Setting<Boolean> heal = new Setting<>("InstantHealing", true);
-    private final Setting<Boolean> regen = new Setting<>("Regeneration", true);
-
-    public Setting<Integer> health = new Setting<>("Health", 8, 0, 20);
-    private final Setting<Boolean> onDaGround = new Setting<>("OnlyOnGround", true);
-=======
-    private final Setting<Boolean> speed = new Setting<>("SpeedPot", true);
-    private final Setting<Boolean> fire = new Setting<>("FireRes", true);
-    private final Setting<BooleanParent> heal = new Setting<>("Heal", new BooleanParent(true));
+    private final Setting<BooleanParent> heal = new Setting<>("InstantHealing", new BooleanParent(true));
     private final Setting<Integer> healthH = new Setting<>("Health", 8, 0, 20).withParent(heal);
     private final Setting<BooleanParent> regen = new Setting<>("Regeneration", new BooleanParent(true));
     private final Setting<TriggerOn> triggerOn = new Setting<>("TriggerOn", TriggerOn.LackOfRegen).withParent(regen);
     private final Setting<Integer> healthR = new Setting<>("HP", 8, 0, 20, v-> triggerOn.is(TriggerOn.Health)).withParent(regen);
-    private final Setting<Boolean> onDaGround = new Setting<>("Only while on ground", true);
+    private final Setting<Boolean> onDaGround = new Setting<>("OnlyOnGround", true);
     private final Setting<Boolean> pauseAura = new Setting<>("PauseAura", false);
 
 >>>>>>> Stashed changes
