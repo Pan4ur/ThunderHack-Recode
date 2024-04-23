@@ -152,12 +152,8 @@ public final class AutoBuff extends Module {
     public enum Potions {
         STRENGTH, SPEED, FIRERES, HEAL, REGEN
     }
-<<<<<<< Updated upstream
-}
-=======
 
     public enum TriggerOn {
         LackOfRegen, Health
     }
 }
->>>>>>> Stashed changes
