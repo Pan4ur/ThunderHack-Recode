@@ -33,7 +33,6 @@ public final class AutoBuff extends Module {
     private final Setting<Boolean> onDaGround = new Setting<>("OnlyOnGround", true);
     private final Setting<Boolean> pauseAura = new Setting<>("PauseAura", false);
 
->>>>>>> Stashed changes
     public Timer timer = new Timer();
     private static AutoBuff instance;
     private boolean spoofed = false;
