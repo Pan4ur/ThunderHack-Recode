@@ -26,9 +26,9 @@ public final class AutoBuff extends Module {
     private final Setting<Boolean> speed = new Setting<>("Speed", true);
     private final Setting<Boolean> fire = new Setting<>("FireResistance", true);
     private final Setting<BooleanParent> heal = new Setting<>("InstantHealing", new BooleanParent(true));
-    private final Setting<Integer> healthH = new Setting<>("Health", 8, 0, 20).withParent(heal);
+    private final Setting<Integer> healthH = new Setting<>("HP", 8, 0, 20).withParent(heal);
     private final Setting<BooleanParent> regen = new Setting<>("Regeneration", new BooleanParent(true));
-    private final Setting<TriggerOn> triggerOn = new Setting<>("TriggerOn", TriggerOn.LackOfRegen).withParent(regen);
+    private final Setting<TriggerOn> triggerOn = new Setting<>("Trigger", TriggerOn.LackOfRegen).withParent(regen);
     private final Setting<Integer> healthR = new Setting<>("HP", 8, 0, 20, v-> triggerOn.is(TriggerOn.Health)).withParent(regen);
     private final Setting<Boolean> onDaGround = new Setting<>("OnlyOnGround", true);
     private final Setting<Boolean> pauseAura = new Setting<>("PauseAura", false);
