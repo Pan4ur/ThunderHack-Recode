@@ -42,7 +42,7 @@ public class WaterMark extends HudElement {
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        String username = ((ModuleManager.media.isEnabled() && Media.nickProtect.getValue()) || ModuleManager.nameProtect.isEnabled()) ? (ModuleManager.nameProtect.isEnabled() ? NameProtect.newName.getValue() : "Protected") : mc.getSession().getUsername();
+        String username = ((ModuleManager.media.isEnabled() && Media.nickProtect.getValue()) || ModuleManager.nameProtect.isEnabled()) ? (ModuleManager.nameProtect.isEnabled() ? NameProtect.getCustomName() : "Protected") : mc.getSession().getUsername();
 
         if (mode.getValue() == Mode.Big) {
             Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), 106, 30, HudEditor.hudRound.getValue());

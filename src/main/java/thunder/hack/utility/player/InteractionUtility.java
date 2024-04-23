@@ -46,6 +46,8 @@ public final class InteractionUtility {
         return canSee(entityEyes, entityPos);
     }
 
+    // 1.5 - 3.2
+
     public static boolean canSee(Vec3d entityEyes, Vec3d entityPos) {
         if (mc.player == null || mc.world == null) return false;
 

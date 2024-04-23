@@ -21,7 +21,7 @@ public class MixinTextVisitFactory {
             return string;
         String me = mc.getSession().getUsername();
         if (string.contains(me))
-            return string.replace(me, NameProtect.newName.getValue());
+            return string.replace(me, NameProtect.getCustomName());
 
         return string;
     }

@@ -15,6 +15,6 @@ public class MixinScoreboardPlayerScore {
     @Inject(method = "owner", at = @At("HEAD"), cancellable = true)
     private void getPlayerName(CallbackInfoReturnable<String> ci) {
         if (ModuleManager.nameProtect.isEnabled() && ci.getReturnValue() != null && mc.getSession().getUsername().contains(ci.getReturnValue()))
-            ci.setReturnValue(NameProtect.newName.getValue());
+            ci.setReturnValue(NameProtect.getCustomName());
     }
 }

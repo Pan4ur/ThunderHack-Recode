@@ -10,15 +10,20 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.util.Hand;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventAfterRotate;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.PlayerUtility;
 
+import javax.lang.model.element.ModuleElement;
+
 public final class AutoBuff extends Module {
     private final Setting<Boolean> strength = new Setting<>("Strength", true);
+<<<<<<< Updated upstream
     private final Setting<Boolean> speed = new Setting<>("Speed", true);
     private final Setting<Boolean> fire = new Setting<>("FireResistance", true);
     private final Setting<Boolean> heal = new Setting<>("InstantHealing", true);
@@ -26,6 +31,18 @@ public final class AutoBuff extends Module {
 
     public Setting<Integer> health = new Setting<>("Health", 8, 0, 20);
     private final Setting<Boolean> onDaGround = new Setting<>("OnlyOnGround", true);
+=======
+    private final Setting<Boolean> speed = new Setting<>("SpeedPot", true);
+    private final Setting<Boolean> fire = new Setting<>("FireRes", true);
+    private final Setting<BooleanParent> heal = new Setting<>("Heal", new BooleanParent(true));
+    private final Setting<Integer> healthH = new Setting<>("Health", 8, 0, 20).withParent(heal);
+    private final Setting<BooleanParent> regen = new Setting<>("Regeneration", new BooleanParent(true));
+    private final Setting<TriggerOn> triggerOn = new Setting<>("TriggerOn", TriggerOn.LackOfRegen).withParent(regen);
+    private final Setting<Integer> healthR = new Setting<>("HP", 8, 0, 20, v-> triggerOn.is(TriggerOn.Health)).withParent(regen);
+    private final Setting<Boolean> onDaGround = new Setting<>("Only while on ground", true);
+    private final Setting<Boolean> pauseAura = new Setting<>("PauseAura", false);
+
+>>>>>>> Stashed changes
     public Timer timer = new Timer();
     private static AutoBuff instance;
     private boolean spoofed = false;
@@ -88,7 +105,9 @@ public final class AutoBuff extends Module {
         return (!mc.player.hasStatusEffect(StatusEffects.SPEED) && isPotionOnHotBar(Potions.SPEED) && speed.getValue())
                 || (!mc.player.hasStatusEffect(StatusEffects.STRENGTH) && isPotionOnHotBar(Potions.STRENGTH) && strength.getValue())
                 || (!mc.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE) && isPotionOnHotBar(Potions.FIRERES) && fire.getValue())
-                || (mc.player.getHealth() + mc.player.getAbsorptionAmount() < health.getValue() && isPotionOnHotBar(Potions.HEAL) && heal.getValue());
+                || (mc.player.getHealth() + mc.player.getAbsorptionAmount() < healthH.getValue() && isPotionOnHotBar(Potions.HEAL) && heal.getValue().isEnabled())
+                || ((!mc.player.hasStatusEffect(StatusEffects.REGENERATION) && triggerOn.is(TriggerOn.LackOfRegen)) || (mc.player.getHealth() + mc.player.getAbsorptionAmount() < healthR.getValue() && triggerOn.is(TriggerOn.Health))
+                && isPotionOnHotBar(Potions.FIRERES) && regen.getValue().isEnabled());
     }
 
     @EventHandler
@@ -109,10 +128,12 @@ public final class AutoBuff extends Module {
             if (!mc.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE) && isPotionOnHotBar(Potions.FIRERES) && fire.getValue())
                 throwPotion(Potions.FIRERES);
 
-            if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < health.getValue() && heal.getValue() && isPotionOnHotBar(Potions.HEAL))
+            if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < healthH.getValue() && heal.getValue().isEnabled() && isPotionOnHotBar(Potions.HEAL))
                 throwPotion(Potions.HEAL);
 
-            if (!mc.player.hasStatusEffect(StatusEffects.REGENERATION) && isPotionOnHotBar(Potions.REGEN) && regen.getValue())
+            if (((!mc.player.hasStatusEffect(StatusEffects.REGENERATION) && triggerOn.is(TriggerOn.LackOfRegen)) ||
+                    (mc.player.getHealth() + mc.player.getAbsorptionAmount() < healthR.getValue() && triggerOn.is(TriggerOn.Health)))
+                    && isPotionOnHotBar(Potions.REGEN) && regen.getValue().isEnabled())
                 throwPotion(Potions.REGEN);
 
             sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
@@ -122,6 +143,8 @@ public final class AutoBuff extends Module {
     }
 
     public void throwPotion(Potions potion) {
+        if(pauseAura.getValue())
+            ModuleManager.aura.pause();
         sendPacket(new UpdateSelectedSlotC2SPacket(getPotionSlot(potion)));
         sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
     }
@@ -129,4 +152,12 @@ public final class AutoBuff extends Module {
     public enum Potions {
         STRENGTH, SPEED, FIRERES, HEAL, REGEN
     }
+<<<<<<< Updated upstream
 }
+=======
+
+    public enum TriggerOn {
+        LackOfRegen, Health
+    }
+}
+>>>>>>> Stashed changes

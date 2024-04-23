@@ -23,15 +23,18 @@ import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.movement.Blink;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.Parent;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.ExplosionUtility;
+import thunder.hack.utility.math.PredictUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.SearchInvResult;
 
@@ -63,7 +66,7 @@ public final class AutoTotem extends Module {
 
     private enum OffHand {Totem, Crystal, GApple, Shield}
 
-    private enum Mode {Default, Matrix, MatrixPick, NewVersion}
+    private enum Mode {Default, Alternative, Matrix, MatrixPick, NewVersion}
 
     private enum Swap {GappleShield, BallShield, GappleBall, BallTotem}
 
@@ -87,8 +90,8 @@ public final class AutoTotem extends Module {
     public void onPacketReceive(PacketEvent.@NotNull Receive e) {
         if (e.getPacket() instanceof EntitySpawnS2CPacket spawn && hotbarFallBack.getValue()) {
             if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
-                if (mc.player.squaredDistanceTo(spawn.getX(), spawn.getY(), spawn.getZ()) < 36) {
-                    if (fallBackCalc.getValue() && ExplosionUtility.getSelfExplosionDamage(new Vec3d(spawn.getX(), spawn.getY(), spawn.getZ()), AutoCrystal.selfPredictTicks.getValue()) < getTriggerHealth() + 4f)
+                if (getPlayerPos().squaredDistanceTo(spawn.getX(), spawn.getY(), spawn.getZ()) < 36) {
+                    if (fallBackCalc.getValue() && ExplosionUtility.getExplosionDamageWPredict(new Vec3d(spawn.getX(), spawn.getY(), spawn.getZ()), mc.player, PredictUtility.movePlayer(mc.player, getPlayerPos())) < getTriggerHealth() + 4f)
                         return;
                     runInstant();
                 }
@@ -96,7 +99,7 @@ public final class AutoTotem extends Module {
         }
         if (e.getPacket() instanceof BlockUpdateS2CPacket blockUpdate) {
             if (blockUpdate.getState().getBlock() == Blocks.OBSIDIAN && onObsidianPlace.getValue()) {
-                if (mc.player.squaredDistanceTo(blockUpdate.getPos().toCenterPos()) < 36 && delay <= 0) {
+                if (getPlayerPos().squaredDistanceTo(blockUpdate.getPos().toCenterPos()) < 36 && delay <= 0) {
                     runInstant();
                 }
             }
@@ -127,7 +130,7 @@ public final class AutoTotem extends Module {
 
             if (stopMotion.getValue()) mc.player.setVelocity(0, mc.player.getVelocity().getY(), 0);
 
-            int nearest_slot = findNearestCurrentItem();
+            int nearestSlot = findNearestCurrentItem();
             int prevCurrentItem = mc.player.getInventory().selectedSlot;
             if (slot >= 9) {
                 switch (mode.getValue()) {
@@ -138,19 +141,26 @@ public final class AutoTotem extends Module {
                         clickSlot(slot);
                         sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                     }
+                    case Alternative -> {
+                        sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+                        clickSlot(slot, nearestSlot, SlotActionType.SWAP);
+                        clickSlot(45, nearestSlot, SlotActionType.SWAP);
+                        clickSlot(slot, nearestSlot, SlotActionType.SWAP);
+                        sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                    }
                     case Matrix -> {
                         sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
-                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
-                        debug(slot + " " + nearest_slot);
-                        sendPacket(new UpdateSelectedSlotC2SPacket(nearest_slot));
-                        mc.player.getInventory().selectedSlot = nearest_slot;
+                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearestSlot, SlotActionType.SWAP, mc.player);
+                        debug(slot + " " + nearestSlot);
+                        sendPacket(new UpdateSelectedSlotC2SPacket(nearestSlot));
+                        mc.player.getInventory().selectedSlot = nearestSlot;
                         ItemStack itemstack = mc.player.getOffHandStack();
                         mc.player.setStackInHand(Hand.OFF_HAND, mc.player.getMainHandStack());
                         mc.player.setStackInHand(Hand.MAIN_HAND, itemstack);
                         sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
                         sendPacket(new UpdateSelectedSlotC2SPacket(prevCurrentItem));
                         mc.player.getInventory().selectedSlot = prevCurrentItem;
-                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearest_slot, SlotActionType.SWAP, mc.player);
+                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearestSlot, SlotActionType.SWAP, mc.player);
                         sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                         if (resetAttackCooldown.getValue())
                             mc.player.resetLastAttackedTicks();
@@ -299,7 +309,7 @@ public final class AutoTotem extends Module {
             for (PlayerEntity pl : ThunderHack.asyncManager.getAsyncPlayers()) {
                 if (ThunderHack.friendManager.isFriend(pl)) continue;
                 if (pl == mc.player) continue;
-                if (mc.player.squaredDistanceTo(pl) < 36) {
+                if (getPlayerPos().squaredDistanceTo(pl.getPos()) < 36) {
                     if (pl.getMainHandStack().getItem() == Items.OBSIDIAN
                             || pl.getMainHandStack().getItem() == Items.END_CRYSTAL
                             || pl.getOffHandStack().getItem() == Items.OBSIDIAN
@@ -311,11 +321,11 @@ public final class AutoTotem extends Module {
 
         for (Entity entity : mc.world.getEntities()) {
             if (entity == null || !entity.isAlive()) continue;
-            if (mc.player.squaredDistanceTo(entity) > 36) continue;
+            if (getPlayerPos().squaredDistanceTo(entity.getPos()) > 36) continue;
 
             if (onCrystal.getValue()) {
                 if (entity instanceof EndCrystalEntity) {
-                    if ((getTriggerHealth()) - ExplosionUtility.getSelfExplosionDamage(entity.getPos(), 0) < 0.5) {
+                    if (getTriggerHealth() - ExplosionUtility.getExplosionDamageWPredict(entity.getPos(), mc.player, PredictUtility.movePlayer(mc.player, getPlayerPos())) < 0.5) {
                         item = Items.TOTEM_OF_UNDYING;
                         break;
                     }
@@ -367,5 +377,9 @@ public final class AutoTotem extends Module {
         if (item == mc.player.getMainHandStack().getItem() && mc.options.useKey.isPressed()) return -1;
 
         return itemSlot;
+    }
+
+    private Vec3d getPlayerPos() {
+        return ModuleManager.blink.isEnabled() ? Blink.lastPos : mc.player.getPos();
     }
 }

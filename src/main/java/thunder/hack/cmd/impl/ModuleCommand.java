@@ -21,6 +21,7 @@ import thunder.hack.setting.impl.PositionSetting;
 import java.util.Objects;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class ModuleCommand extends Command {
     public ModuleCommand() {
@@ -63,7 +64,7 @@ public class ModuleCommand extends Command {
                             JsonParser jp = new JsonParser();
                             if (setting.getType().equalsIgnoreCase("String")) {
                                 setting.setValue(settingValue);
-                                sendMessage(Formatting.DARK_GRAY + module.getName() + " " + setting.getName() + " has been set to " + settingValue + ".");
+                                sendMessage(Formatting.DARK_GRAY + module.getName() + " " + setting.getName() + (isRu() ? " был выставлен " : " has been set to ") + settingValue);
                                 return SINGLE_SUCCESS;
                             }
                             try {
@@ -77,10 +78,15 @@ public class ModuleCommand extends Command {
                                 }
                                 setCommandValue(module, setting, jp.parse(settingValue));
                             } catch (Exception e) {
-                                sendMessage("Bad Value! This setting requires a: " + setting.getType() + " value.");
+                                sendMessage((isRu() ? "Неверное значение! Эта настройка требует тип: " : "Bad Value! This setting requires a: ") + setting.getType());
                                 return SINGLE_SUCCESS;
                             }
-                            sendMessage(Formatting.GRAY + module.getName() + " " + setting.getName() + " has been set to " + settingValue + ".");
+
+                            if(settingValue.contains("toggle"))
+                                sendMessage(Formatting.GRAY + module.getName() + " " + setting.getName() + (isRu() ? " был переключен" : " has been toggled"));
+                            else
+                                sendMessage(Formatting.GRAY + module.getName() + " " + setting.getName() + (isRu() ? " был выставлен " : " has been set to ") + settingValue);
+
                             return SINGLE_SUCCESS;
                         }))));
 
@@ -110,6 +116,10 @@ public class ModuleCommand extends Command {
                         return;
                     }
                     case "Boolean" -> {
+                        if(element.getAsString().equals("toggle")) {
+                            checkSetting.setValue(!(boolean) checkSetting.getValue());
+                            return;
+                        }
                         checkSetting.setValue(Boolean.valueOf(element.getAsBoolean()));
                         return;
                     }

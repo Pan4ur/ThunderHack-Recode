@@ -9,4 +9,8 @@ public class NameProtect extends Module {
     }
 
     public static Setting<String> newName = new Setting<>("name", "Hell_Raider");
+
+    public static String getCustomName() {
+        return newName.getValue().replaceAll("&", "\u00a7");
+    }
 }

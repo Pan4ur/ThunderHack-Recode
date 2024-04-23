@@ -46,7 +46,7 @@ public class Blink extends Module {
     }
 
     private PlayerEntityCopy blinkPlayer;
-    private Vec3d lastPos = Vec3d.ZERO;
+    public static Vec3d lastPos = Vec3d.ZERO;
     private Vec3d prevVelocity = Vec3d.ZERO;
     private float prevYaw = 0;
     private boolean prevSprinting = false;
@@ -81,7 +81,9 @@ public class Blink extends Module {
     @Override
     public void onDisable() {
         if (mc.world == null || mc.player == null) return;
-        while (!storedPackets.isEmpty()) sendPacket(storedPackets.poll());
+
+        while (!storedPackets.isEmpty())
+            sendPacket(storedPackets.poll());
 
         if (blinkPlayer != null) blinkPlayer.deSpawn();
         blinkPlayer = null;

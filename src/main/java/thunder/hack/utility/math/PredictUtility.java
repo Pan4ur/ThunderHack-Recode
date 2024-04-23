@@ -11,6 +11,12 @@ import java.util.UUID;
 import static thunder.hack.modules.Module.mc;
 
 public class PredictUtility {
+    public static PlayerEntity movePlayer(PlayerEntity entity, Vec3d newPos) {
+        if(entity == null || newPos == null)
+            return null;
+        return equipAndReturn(entity, newPos);
+    }
+
     public static PlayerEntity predictPlayer(PlayerEntity entity, int ticks) {
         if(entity == null)
             return null;

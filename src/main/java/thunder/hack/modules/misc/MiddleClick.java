@@ -67,14 +67,14 @@ public class MiddleClick extends Module {
             if (mc.player.isFallFlying()) {
                 if(mc.options.pickItemKey.isPressed())
                     onFlying.getValue().doAction(event);
-                state = "Elytra";
+                state = onFlying.getValue().toString();
                 return;
             }
 
             if (target instanceof EntityHitResult ehr && ehr.getEntity() instanceof PlayerEntity) {
                 if(mc.options.pickItemKey.isPressed())
                     onEntity.getValue().doAction(event);
-                state = "Entity";
+                state = onEntity.getValue().toString();
                 return;
             }
 
@@ -82,17 +82,17 @@ public class MiddleClick extends Module {
                 if (mc.world.isAir(bhr.getBlockPos())) {
                     if(mc.options.pickItemKey.isPressed())
                         onAir.getValue().doAction(event);
-                    state = "Air";
+                    state = onAir.getValue().toString();
                 } else {
                     if(mc.options.pickItemKey.isPressed())
                         onBlock.getValue().doAction(event);
-                    state = "Block";
+                    state = onBlock.getValue().toString();
                 }
                 return;
             }
             if(mc.options.pickItemKey.isPressed())
                 onAir.getValue().doAction(event);
-            state = "Air";
+            state = onAir.getValue().toString();
         }
     }
 
