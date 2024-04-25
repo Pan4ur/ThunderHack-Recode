@@ -70,7 +70,8 @@ public class NameTags extends Module {
     private final Setting<Boolean> bots = new Setting<>("Bots", false);
     private final Setting<Boolean> potions = new Setting<>("Potions", true);
     private final Setting<Boolean> shulkers = new Setting<>("Shulkers", true);
-    private final Setting<ColorSetting> fillColorA = new Setting<>("Color", new ColorSetting(0x80000000));
+    private final Setting<ColorSetting> fillColorA = new Setting<>("Fill", new ColorSetting(0x80000000));
+    private final Setting<ColorSetting> fillColorF = new Setting<>("FriendFill", new ColorSetting(0x80000000));
     private final Setting<Font> font = new Setting<>("FontMode", Font.Fancy);
     private final Setting<Armor> armorMode = new Setting<>("ArmorMode", Armor.Full);
     private final Setting<Health> health = new Setting<>("Health", Health.Number);
@@ -231,7 +232,9 @@ public class NameTags extends Module {
                         item_offset += 18f;
                     }
 
-                Render2DEngine.drawRect(context.getMatrices(), tagX - 2, (float) (posY - 13f), textWidth + 4, 11, fillColorA.getValue().getColorObject());
+                Color color = ThunderHack.friendManager.isFriend(ent) ? fillColorF.getValue().getColorObject() : fillColorA.getValue().getColorObject();
+
+                Render2DEngine.drawRect(context.getMatrices(), tagX - 2, (float) (posY - 13f), textWidth + 4, 11, color);
 
                 if (outline.getValue()) {
                     Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1, HudEditor.getColor(270));
@@ -443,12 +446,14 @@ public class NameTags extends Module {
 
     private void drawHeart(DrawContext context, HeartType type, int x, boolean half, PlayerEntity player) {
         if (health.is(Health.Dots)) {
+
+            Color color = ThunderHack.friendManager.isFriend(player) ? fillColorF.getValue().getColorObject() : fillColorA.getValue().getColorObject();
             if (type == HeartType.CONTAINER) {
-                Render2DEngine.drawRect(context.getMatrices(), x, 0, 7, 3, fillColorA.getValue().getColorObject());
+                Render2DEngine.drawRect(context.getMatrices(), x, 0, 7, 3, color);
             } else if (type == HeartType.NORMAL) {
                 if (half) {
                     Render2DEngine.drawRect(context.getMatrices(), x, 0, 3, 3, getHealthColor2(player.getHealth() + player.getAbsorptionAmount()));
-                    Render2DEngine.drawRect(context.getMatrices(), x + 3, 0, 4, 3, fillColorA.getValue().getColorObject());
+                    Render2DEngine.drawRect(context.getMatrices(), x + 3, 0, 4, 3, color);
                 } else {
                     Render2DEngine.drawRect(context.getMatrices(), x, 0, 7, 3, getHealthColor2(player.getHealth() + player.getAbsorptionAmount()));
                 }

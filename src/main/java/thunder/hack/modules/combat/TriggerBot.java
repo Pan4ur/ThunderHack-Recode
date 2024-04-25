@@ -4,15 +4,11 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.Items;
-import net.minecraft.item.ShieldItem;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.PlayerUpdateEvent;
-import thunder.hack.injection.accesors.ILivingEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
@@ -39,13 +35,13 @@ public final class TriggerBot extends Module {
 
     @EventHandler
     public void onAttack(PlayerUpdateEvent e) {
-        if(mc.player.isUsingItem() && pauseEating.getValue()){
+        if (mc.player.isUsingItem() && pauseEating.getValue()) {
             return;
         }
-        if(!mc.options.jumpKey.isPressed() && mc.player.isOnGround() && autoJump.getValue())
+        if (!mc.options.jumpKey.isPressed() && mc.player.isOnGround() && autoJump.getValue())
             mc.player.jump();
 
-        if(delay > 0) {
+        if (delay > 0) {
             delay--;
             return;
         }
@@ -72,7 +68,7 @@ public final class TriggerBot extends Module {
         if (mc.player.fallDistance > 1 && mc.player.fallDistance < 1.14)
             return false;
 
-        if ( ModuleManager.aura.getAttackCooldown() < 0.9f)
+        if (ModuleManager.aura.getAttackCooldown() < (mc.player.isOnGround() ? 1f : 0.9f))
             return false;
 
         boolean mergeWithTargetStrafe = !ModuleManager.targetStrafe.isEnabled() || !ModuleManager.targetStrafe.jump.getValue();
