@@ -14,6 +14,7 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
+import java.lang.IllegalArgumentException;
 
 public class ModuleList extends HudElement {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.ColorText);
@@ -37,7 +38,13 @@ public class ModuleList extends HudElement {
         float maxWidth = 0;
         float reversedX = getPosX() + 50;
 
-        List<Module> list = ThunderHack.moduleManager.getEnabledModules().stream().sorted(Comparator.comparing(module -> FontRenderers.modules.getStringWidth(module.getFullArrayString()) * -1)).toList();
+        List<Module> list = null;
+        
+        try {
+            list = ThunderHack.moduleManager.getEnabledModules().stream().sorted(Comparator.comparing(module -> FontRenderers.modules.getStringWidth(module.getFullArrayString()) * -1)).toList();
+        } catch (IllegalArgumentException ex) {
+            return;
+        }
 
         for (Module module : list) {
             if (!shouldRender(module))
