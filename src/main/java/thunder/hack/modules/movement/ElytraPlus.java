@@ -55,7 +55,7 @@ public class ElytraPlus extends Module {
     }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.FireWork);
-    private final Setting<AntiKick> antiKick = new Setting<>("Mode", AntiKick.Jitter, v -> mode.getValue() == Mode.FireWork);
+    private final Setting<AntiKick> antiKick = new Setting<>("AntiKick", AntiKick.Jitter, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Float> xzSpeed = new Setting<>("XZSpeed", 1.55f, 0.1f, 10f, v -> mode.getValue() != Mode.Boost && mode.getValue() != Mode.Pitch40Infinite);
     private final Setting<Float> ySpeed = new Setting<>("YSpeed", 0.47f, 0f, 2f, v -> mode.getValue() == Mode.FireWork || mode.getValue() == Mode.SunriseOld);
     private final Setting<Integer> fireSlot = new Setting<>("FireSlot", 1, 1, 9, v -> mode.getValue() == Mode.FireWork);
