@@ -12,7 +12,7 @@ public final class HudEditor extends Module {
     public static final Setting<ArrowsStyle> arrowsStyle = new Setting<>("ArrowsStyle", ArrowsStyle.Default);
     public static final Setting<ClickGui.colorModeEn> colorMode = new Setting<>("ColorMode", ClickGui.colorModeEn.Static);
     public static final Setting<Integer> colorSpeed = new Setting<>("ColorSpeed", 18, 2, 54);
-    public static final Setting<Boolean> glow = new Setting<>("Glow", true);
+    public static final Setting<Boolean> glow = new Setting<>("Light", true);
     public static final Setting<ColorSetting> hcolor1 = new Setting<>("Color", new ColorSetting(-6974059));
     public static final Setting<ColorSetting> acolor = new Setting<>("Color2", new ColorSetting(-8365735));
     public static final Setting<ColorSetting> plateColor = new Setting<>("PlateColor", new ColorSetting(new Color(0xE7000000, true).getRGB()));

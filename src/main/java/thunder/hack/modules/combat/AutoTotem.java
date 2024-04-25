@@ -13,6 +13,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.TntMinecartEntity;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
@@ -61,7 +62,7 @@ public final class AutoTotem extends Module {
     private final Setting<Boolean> onCreeper = new Setting<>("OnCreeper", true).withParent(safety);
     private final Setting<Boolean> onAnchor = new Setting<>("OnAnchor", true).withParent(safety);
     private final Setting<Boolean> onTnt = new Setting<>("OnTNT", true).withParent(safety);
-    public final Setting<Boolean> rcGap = new Setting<>("RCGap", false);
+    public final Setting<RCGap> rcGap = new Setting<>("RightClickGapple", RCGap.Off);
     private final Setting<Boolean> crappleSpoof = new Setting<>("CrappleSpoof", true, v -> offhand.getValue() == OffHand.GApple);
 
     private enum OffHand {Totem, Crystal, GApple, Shield}
@@ -69,6 +70,9 @@ public final class AutoTotem extends Module {
     private enum Mode {Default, Alternative, Matrix, MatrixPick, NewVersion}
 
     private enum Swap {GappleShield, BallShield, GappleBall, BallTotem}
+
+    public enum RCGap {Off, Always, OnlySafe}
+
 
     private int delay;
 
@@ -292,11 +296,13 @@ public final class AutoTotem extends Module {
         if (getTriggerHealth() <= healthF.getValue() && (InventoryUtility.findItemInInventory(Items.TOTEM_OF_UNDYING).found() || offHandItem == Items.TOTEM_OF_UNDYING))
             item = Items.TOTEM_OF_UNDYING;
 
-        if (rcGap.getValue() && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed() && !(offHandItem instanceof ShieldItem)) {
-            if (crapple.found() || offHandItem == Items.GOLDEN_APPLE)
-                item = Items.GOLDEN_APPLE;
-            if (gapple.found() || offHandItem == Items.ENCHANTED_GOLDEN_APPLE)
-                item = Items.ENCHANTED_GOLDEN_APPLE;
+        if (!rcGap.is(RCGap.Off) && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed() && !(offHandItem instanceof ShieldItem)) {
+            if(rcGap.is(RCGap.Always) || (rcGap.is(RCGap.OnlySafe) && getTriggerHealth() > healthF.getValue())) {
+                if (crapple.found() || offHandItem == Items.GOLDEN_APPLE)
+                    item = Items.GOLDEN_APPLE;
+                if (gapple.found() || offHandItem == Items.ENCHANTED_GOLDEN_APPLE)
+                    item = Items.ENCHANTED_GOLDEN_APPLE;
+            }
         }
 
         if (onFall.getValue() && (getTriggerHealth()) - (((mc.player.fallDistance - 3) / 2F) + 3.5F) < 0.5)

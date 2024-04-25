@@ -1,14 +1,17 @@
 package thunder.hack.modules.movement;
 
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
-import thunder.hack.modules.Module;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Direction;
+import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
+import thunder.hack.utility.player.PlayerUtility;
 
 public class NoSlow extends Module {
     public NoSlow() {
@@ -33,6 +36,7 @@ public class NoSlow extends Module {
     public void onUpdate() {
         if (returnSneak) {
             mc.options.sneakKey.setPressed(false);
+            mc.player.setSprinting(true);
             returnSneak = false;
         }
 

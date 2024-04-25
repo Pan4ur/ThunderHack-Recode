@@ -10,6 +10,7 @@ public class UnHook extends Module {
     public UnHook() {
         super("UnHook", Category.MISC);
     }
+
     List<Module> list;
 
     @Override

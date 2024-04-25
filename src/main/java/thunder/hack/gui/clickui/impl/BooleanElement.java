@@ -23,14 +23,18 @@ public class BooleanElement extends AbstractElement {
     }
 
     float animation = 0f;
+    float animation2 = 0f;
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        animation = fast(animation, (boolean) setting.getValue() ? 1 : 0, 15f);
 
         Render2DEngine.drawRound(context.getMatrices(), x + width - 21, y + height / 2 - 4, 15, 8, 1, 7f * animation > 4 ? HudEditor.getColor(0) : new Color(0x28FFFFFF, true));
+
+        animation = fast(animation, (boolean) setting.getValue() ? 1 : 0, 20f);
+        animation2 = fast(animation2, (boolean) setting.getValue() ? 1 : 0, 8f);
         Render2DEngine.drawRound(context.getMatrices(), x + width - 20 + 7f * animation, y + height / 2 - 3, 6, 6, 1, new Color(-1));
+        Render2DEngine.drawRound(context.getMatrices(), x + width - 20 + 7f * animation2, y + height / 2 - 3, 6, 6, 1, new Color(-1));
 
         if (7f * animation > 4) {
             FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "v", x + width - 18.5f, y + height / 2 - 1f, new Color(-1).getRGB());

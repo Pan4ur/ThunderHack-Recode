@@ -119,7 +119,7 @@ public class StaffBoard extends HudElement {
         hAnimation = AnimationUtility.fast(hAnimation, scale_x + 15, 15);
 
         Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue());
-        setBounds((int) (scale_x + 20), 20 + y_offset1);
+        setBounds((int) (scale_x + 15), 20 + y_offset1);
 
 
         FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "StaffBoard", getPosX() + hAnimation / 2f, getPosY() + 4, HudEditor.textColor.getValue().getColor());

@@ -9,7 +9,11 @@ import thunder.hack.events.impl.EventMouse;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
+import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+
+import java.awt.*;
 
 public class HudElement extends Module {
     private final Setting<PositionSetting> pos = new Setting<>("Position", new PositionSetting(0.5f, 0.5f));
@@ -31,8 +35,10 @@ public class HudElement extends Module {
 
         if (mc.currentScreen instanceof ChatScreen || mc.currentScreen instanceof HudEditorGui) {
             if (mouseButton && mouseState) {
-                pos.getValue().setX((normaliseX() - dragX) / mc.getWindow().getScaledWidth());
-                pos.getValue().setY((normaliseY() - dragY) / mc.getWindow().getScaledHeight());
+                pos.getValue().setX(MathUtility.clamp(Render2DEngine.scrollAnimate((normaliseX() - dragX) / mc.getWindow().getScaledWidth(), pos.getValue().getX(), .1f),
+                        0, 1f - ((float) width / mc.getWindow().getScaledWidth())));
+                pos.getValue().setY(MathUtility.clamp(Render2DEngine.scrollAnimate((normaliseY() - dragY) / mc.getWindow().getScaledHeight(), pos.getValue().getY(), .1f),
+                        0, 1f - ((float) height / mc.getWindow().getScaledHeight())));
             }
         }
 
@@ -46,10 +52,12 @@ public class HudElement extends Module {
             mouseState = false;
         }
 
-        if(isHovering() && (mc.currentScreen instanceof ChatScreen || mc.currentScreen instanceof HudEditorGui)) {
+        if (isHovering() && (mc.currentScreen instanceof ChatScreen || mc.currentScreen instanceof HudEditorGui)) {
             GLFW.glfwSetCursor(mc.getWindow().getHandle(), mouseState ? GLFW.glfwCreateStandardCursor(GLFW.GLFW_CROSSHAIR_CURSOR) : GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
             anyHovered = true;
         }
+
+       // Render2DEngine.drawRect(context.getMatrices(),getPosX(), getPosY(), width, height, Color.RED);
     }
 
     @EventHandler
@@ -74,18 +82,18 @@ public class HudElement extends Module {
     }
 
     public boolean isHovering() {
-        return normaliseX() > x && normaliseX() < x + width && normaliseY() > y && normaliseY() < y + height;
+        return normaliseX() > Math.min(x, x + width) && normaliseX() < Math.max(x, x + width) && normaliseY() > Math.min(y, y + height) && normaliseY() < Math.max(y, y + height);
     }
 
-    public void setWidth(int width){
+    public void setWidth(int width) {
         this.width = width;
     }
 
-    public void setHeight(int height){
+    public void setHeight(int height) {
         this.height = height;
     }
 
-    public void setBounds(int w, int h){
+    public void setBounds(int w, int h) {
         setWidth(w);
         setHeight(h);
     }

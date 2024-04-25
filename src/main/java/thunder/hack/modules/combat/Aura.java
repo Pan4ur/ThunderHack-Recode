@@ -64,7 +64,7 @@ import static thunder.hack.modules.client.ClientSettings.isRu;
 import static thunder.hack.utility.math.MathUtility.random;
 
 public final class Aura extends Module {
-    public final Setting<Float> attackRange = new Setting<>("Range", 3.1f, 1f, 6.0f);
+    public final Setting<Float> attackRange = new Setting<>("Range", 3.1f, 2f, 6.0f);
     public final Setting<Float> wallRange = new Setting<>("ThroughWallsRange", 3.1f, 0f, 6.0f);
     public final Setting<Boolean> wallsBypass = new Setting<>("WallsBypass", false, v -> wallRange.getValue() > 0);
     public final Setting<Integer> fov = new Setting<>("FOV", 180, 1, 180);
@@ -80,8 +80,8 @@ public final class Aura extends Module {
     public final Setting<Boolean> tpsSync = new Setting<>("TPSSync", false);
     public final Setting<Boolean> clientLook = new Setting<>("ClientLook", false);
     public final Setting<BooleanParent> oldDelay = new Setting<>("OldDelay", new BooleanParent(false));
-    public final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 20).withParent(oldDelay);
-    public final Setting<Integer> maxCPS = new Setting<>("MaxCPS", 12, 1, 20).withParent(oldDelay);
+    public final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 15).withParent(oldDelay);
+    public final Setting<Integer> maxCPS = new Setting<>("MaxCPS", 12, 1, 15).withParent(oldDelay);
     public final Setting<ESP> esp = new Setting<>("ESP", ESP.ThunderHack);
     public final Setting<Sort> sort = new Setting<>("Sort", Sort.LowestDistance);
     public final Setting<Boolean> lockTarget = new Setting<>("LockTarget", true);
@@ -92,6 +92,7 @@ public final class Aura extends Module {
     public final Setting<RandomHitDelay> randomHitDelay = new Setting<>("RandomHitTiming", RandomHitDelay.Off).withParent(advanced);
     public final Setting<Boolean> pauseInInventory = new Setting<>("PauseInInventory", true).withParent(advanced);
     public final Setting<Boolean> dropSprint = new Setting<>("DropSprint", true).withParent(advanced);
+    public final Setting<Boolean> returnSprint = new Setting<>("ReturnSprint", true, v-> dropSprint.getValue()).withParent(advanced);
     public final Setting<RayTrace> rayTrace = new Setting<>("RayTrace", RayTrace.OnlyTarget).withParent(advanced);
     public final Setting<Boolean> grimRayTrace = new Setting<>("GrimRayTrace", true).withParent(advanced);
     public final Setting<Boolean> unpressShield = new Setting<>("UnpressShield", true).withParent(advanced);
@@ -238,7 +239,7 @@ public final class Aura extends Module {
     }
 
     public void postAttack(boolean block, boolean sprint) {
-        if (sprint && dropSprint.getValue())
+        if (sprint && returnSprint.getValue() && dropSprint.getValue())
             enableSprint();
 
         if (block && unpressShield.getValue())
@@ -387,15 +388,14 @@ public final class Aura extends Module {
         if (hitTicks > 0)
             return false;
 
-        // я хз почему оно не критует когда фд больше 1.14
-        if (mc.player.fallDistance > 1 && mc.player.fallDistance < 1.14)
-            return false;
-
         if (pauseInInventory.getValue() && ThunderHack.playerManager.inInventory)
             return false;
 
         if (getAttackCooldown() < attackCooldown.getValue() && !oldDelay.getValue().isEnabled())
             return false;
+
+        if(ModuleManager.criticals.isEnabled() && ModuleManager.criticals.mode.is(Criticals.Mode.Grim))
+            return true;
 
         boolean mergeWithTargetStrafe = !ModuleManager.targetStrafe.isEnabled() || !ModuleManager.targetStrafe.jump.getValue();
         boolean mergeWithSpeed = !ModuleManager.speed.isEnabled() || mc.player.isOnGround();
@@ -408,6 +408,10 @@ public final class Aura extends Module {
 
         if (!mc.options.jumpKey.isPressed() && isAboveWater())
             return true;
+
+        // я хз почему оно не критует когда фд больше 1.14
+        if (mc.player.fallDistance > 1 && mc.player.fallDistance < 1.14)
+            return false;
 
         if (!reasonForSkipCrit)
             return !mc.player.isOnGround() && mc.player.fallDistance > (randomHitDelay.getValue().equals(RandomHitDelay.FallDistance) ? MathUtility.random(0f, 0.4f) : critFallDistance.getValue());

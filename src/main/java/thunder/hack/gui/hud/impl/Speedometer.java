@@ -25,7 +25,7 @@ public class Speedometer extends HudElement {
         } else {
             str += MathUtility.round(getSpeedMpS() * ThunderHack.TICK_TIMER) + " b/s";
         }
-        FontRenderers.getModulesRenderer().drawString(context.getMatrices(), str, getPosX(), getPosY(), HudEditor.getColor(1).getRGB());
+        FontRenderers.getModulesRenderer().drawString(context.getMatrices(), str, getPosX(), getPosY() + 3, HudEditor.getColor(1).getRGB());
     }
 
     public float getSpeedKpH() {

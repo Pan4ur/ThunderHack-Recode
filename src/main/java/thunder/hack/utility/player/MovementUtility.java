@@ -73,6 +73,40 @@ public final class MovementUtility {
         }
     }
 
+    public static float getMoveDirection() {
+        double forward = mc.player.input.movementForward;
+        double strafe = mc.player.input.movementSideways;
+
+        if (strafe > 0) {
+            strafe = 1;
+        } else if (strafe < 0) {
+            strafe = -1;
+        }
+
+        float yaw = mc.player.getYaw();
+        if (forward == 0 && strafe == 0) {
+            return yaw;
+        } else {
+            if (forward != 0) {
+                if (strafe > 0)
+                    yaw += forward > 0 ? -45f : -135f;
+                else if (strafe < 0)
+                    yaw += forward > 0 ? 45f : 135f;
+                else if (forward < 0) {
+                    yaw += 180f;
+                }
+            }
+            if (forward == 0) {
+                if (strafe > 0)
+                    yaw -= 90f;
+                else if (strafe < 0)
+                    yaw += 90f;
+            }
+        }
+
+        return yaw;
+    }
+
     public static double getJumpSpeed() {
         double jumpSpeed = 0.3999999463558197;
         if (mc.player.hasStatusEffect(StatusEffects.JUMP_BOOST)) {

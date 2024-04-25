@@ -1,30 +1,29 @@
 package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.EventMove;
-import thunder.hack.events.impl.EventPlayerTravel;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PostPlayerUpdateEvent;
+import thunder.hack.events.impl.*;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.interfaces.IEntity;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
+import thunder.hack.utility.player.SearchInvResult;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 import static thunder.hack.modules.movement.Timer.violation;
@@ -54,7 +53,7 @@ public class Speed extends Module {
     private thunder.hack.utility.Timer startDelay = new thunder.hack.utility.Timer();
 
     public enum Mode {
-        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, GrimEntity, GrimEntity2, FireWork, Vanilla
+        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, GrimEntity, GrimEntity2, FireWork, Vanilla, GrimIce
     }
 
     @Override
@@ -75,6 +74,7 @@ public class Speed extends Module {
         if (mc.player.isInFluid() && pauseInLiquids.getValue() || mc.player.isSneaking() && pauseWhileSneaking.getValue()) {
             return;
         }
+
         if (mode.getValue() == Mode.MatrixJB) {
             boolean closeToGround = false;
 
@@ -95,7 +95,6 @@ public class Speed extends Module {
         }
     }
 
-
     @EventHandler
     public void modifyVelocity(EventPlayerTravel e) {
         if (mode.getValue() == Mode.GrimEntity && !e.isPre() && ThunderHack.core.getSetBackTime() > 1000) {
@@ -109,6 +108,7 @@ public class Speed extends Module {
                 }
             }
         }
+
         if (mode.getValue() == Mode.GrimEntity2 && !e.isPre() && ThunderHack.core.getSetBackTime() > 1000 && MovementUtility.isMoving()) {
             int collisions = 0;
             for (Entity ent : mc.world.getEntities())
@@ -120,6 +120,23 @@ public class Speed extends Module {
         }
     }
 
+    @EventHandler
+    public void onTick(EventTick e) {
+        if (mode.is(Speed.Mode.GrimIce) && mc.player.isOnGround()) {
+            BlockPos pos = ((IEntity) mc.player).thunderHack_Recode$getVelocityBP();
+            SearchInvResult result = InventoryUtility.findBlockInHotBar(Blocks.ICE, Blocks.PACKED_ICE, Blocks.BLUE_ICE);
+            if(mc.world.isAir(pos) || !result.found() || !mc.options.jumpKey.isPressed())
+                return;
+
+            InventoryUtility.saveSlot();
+            result.switchTo();
+            sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), 90, mc.player.isOnGround()));
+            sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, pos, Direction.UP));
+            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(pos.toCenterPos().add(0, 0.5, 0), Direction.UP, pos, false), id));
+            mc.world.setBlockState(pos, Blocks.ICE.getDefaultState());
+            InventoryUtility.returnSlot();
+        }
+    }
 
     @Override
     public void onUpdate() {

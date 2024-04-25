@@ -31,6 +31,7 @@ public class ModuleManager implements IManager {
     public static LevitationControl levitationControl = new LevitationControl();
     public static InventoryCleaner inventoryCleaner = new InventoryCleaner();
     public static NoCommentExploit noCommentExploit = new NoCommentExploit();
+    public static NoWaterCollision noWaterCollision = new NoWaterCollision();
     public static TotemPopCounter totemPopCounter = new TotemPopCounter();
     public static HotbarReplenish hotbarReplenish = new HotbarReplenish();
     public static DurabilityAlert durabilityAlert = new DurabilityAlert();
@@ -220,6 +221,7 @@ public class ModuleManager implements IManager {
     public static AimBot aimBot = new AimBot();
     public static Quiver quiver = new Quiver();
     public static NoPush noPush = new NoPush();
+    public static UnHook unHook = new UnHook();
     public static Timer timer = new Timer();
     public static Regen regen = new Regen();
     public static Speed speed = new Speed();
@@ -232,12 +234,12 @@ public class ModuleManager implements IManager {
     public static Blink blink = new Blink();
     public static Phase phase = new Phase();
     public static NoBob noBob = new NoBob();
+    public static Jesus jesus = new Jesus();
     public static XRay xray = new XRay();
     public static Step step = new Step();
     public static Aura aura = new Aura();
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
-    public static UnHook unHook = new UnHook();
 
     public ModuleManager() {
         if (ThunderHack.isOnWindows())

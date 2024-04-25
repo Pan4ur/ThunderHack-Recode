@@ -92,6 +92,14 @@ public class GuiMove extends Module {
                     }
                 }
 
+                case StrictNCP2 -> {
+                    if (mc.player.isOnGround() && !mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(0.0, 0.000000271875, 0.0)).iterator().hasNext()) {
+                        if (mc.player.isSprinting())
+                            sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+                        sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + 0.000000271875, mc.player.getZ(), false));
+                    }
+                }
+
                 case MatrixNcp -> {
                     sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
                     mc.options.forwardKey.setPressed(false);
@@ -125,6 +133,6 @@ public class GuiMove extends Module {
     }
 
     private enum Bypass {
-        DisableClicks, None, StrictNCP, GrimSwap, MatrixNcp, Delay
+        DisableClicks, None, StrictNCP, GrimSwap, MatrixNcp, Delay, StrictNCP2
     }
 }

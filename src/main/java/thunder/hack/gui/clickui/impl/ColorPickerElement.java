@@ -66,7 +66,6 @@ public class ColorPickerElement extends AbstractElement {
         boolean dark = Render2DEngine.isDark(ThunderHack.copy_color);
         boolean dark2 = Render2DEngine.isDark(getColorSetting().getColorObject());
 
-
         Render2DEngine.drawRect(matrixStack, x + 9f, y + 54f, 24, 7, new Color(0x424242));
         FontRenderers.sf_medium_mini.drawString(matrixStack, "Сopy", x + 13, y + 56.5f, copyHovered ? new Color(0xA3FFFFFF, true).getRGB() : Color.WHITE.getRGB());
 

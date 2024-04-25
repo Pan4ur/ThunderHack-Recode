@@ -2,7 +2,6 @@ package thunder.hack.modules.combat;
 
 import io.netty.buffer.Unpooled;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.network.PacketByteBuf;
@@ -10,11 +9,12 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
 public final class Criticals extends Module {
-    private final Setting<Mode> mode = new Setting<>("Mode", Mode.UpdatedNCP);
+    public final Setting<Mode> mode = new Setting<>("Mode", Mode.UpdatedNCP);
 
     private static Criticals instance;
 
@@ -40,7 +40,7 @@ public final class Criticals extends Module {
     public void doCrit() {
         if (isDisabled() || mc.player == null || mc.world == null)
             return;
-        if ((mc.player.isOnGround() || mc.player.getAbilities().flying) && !mc.player.isInLava() && !mc.player.isSubmergedInWater()) {
+        if ((mc.player.isOnGround() || mc.player.getAbilities().flying || mode.is(Mode.Grim)) && !mc.player.isInLava() && !mc.player.isSubmergedInWater()) {
             switch (mode.getValue()) {
                 case OldNCP -> {
                     critPacket(0.00001058293536, false);
@@ -61,12 +61,19 @@ public final class Criticals extends Module {
                     critPacket(0., false);
                     critPacket(0., false);
                 }
+                case Grim -> {
+                    if (!mc.player.isOnGround())
+                        critPacket(-0.000001, false);
+                }
             }
         }
     }
 
-    private void critPacket(double yDelta, boolean ground) {
-        sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + yDelta, mc.player.getZ(), ground));
+    private void critPacket(double yDelta, boolean full) {
+        if (full)
+            sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + yDelta, mc.player.getZ(), false));
+        else
+            sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY() + yDelta, mc.player.getZ(), ((IClientPlayerEntity) mc.player).getLastYaw(), ((IClientPlayerEntity) mc.player).getLastPitch(), false));
     }
 
     public static Entity getEntity(@NotNull PlayerInteractEntityC2SPacket packet) {
@@ -89,6 +96,6 @@ public final class Criticals extends Module {
     }
 
     public enum Mode {
-        Ncp, Strict, OldNCP, UpdatedNCP
+        Ncp, Strict, OldNCP, UpdatedNCP, Grim
     }
 }

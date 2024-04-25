@@ -495,6 +495,7 @@ public class AutoCrystal extends Module {
 
         if (remove.getValue() != Remove.OFF)
             deadManager.setDead(crystal, System.currentTimeMillis());
+
         if (prevSlot != -1) {
             if (antiWeakness.getValue() == Switch.SILENT) {
                 mc.player.getInventory().selectedSlot = prevSlot;

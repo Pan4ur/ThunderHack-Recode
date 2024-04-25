@@ -10,4 +10,8 @@ public interface IPlayerMoveC2SPacket {
     @Mutable
     @Accessor("onGround")
     void setOnGround(boolean onGround);
+
+    @Mutable
+    @Accessor("y")
+    void setY(double y);
 }

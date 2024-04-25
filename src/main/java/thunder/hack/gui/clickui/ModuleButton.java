@@ -99,7 +99,7 @@ public class ModuleButton extends AbstractButton {
 
         if (isOpen()) {
             Render2DEngine.drawGuiBase(context.getMatrices(), x + 4, y + height - 12f, width - 8, height + (float) getElementsHeight(), 1f, 0);
-            Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle(x, y + height - 15, width + x + 2, (float) (height + y + 1f + getElementsHeight())));
+            Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle(x + 1, y + height - 15, width + x - 2, (float) (height + y + 1f + getElementsHeight())));
 
             if (mc.player != null) {
                 Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle(x, y + height + 1, (width) + x + 6, (float) ((height) + y + 1f + getElementsHeight())));
@@ -167,7 +167,7 @@ public class ModuleButton extends AbstractButton {
         } else {
             category_animation = fast(1, 0, 1f);
             if (hovered) {
-                Render2DEngine.addWindow(context.getMatrices(), x, y, x + width, y + height, 1.);
+                Render2DEngine.addWindow(context.getMatrices(), x + 1, y, x + width - 2, y + height, 1.);
                 Render2DEngine.drawBlurredShadow(context.getMatrices(), mouseX - 10, mouseY - 10, 20, 20, 35, HudEditor.getColor(270));
                 Render2DEngine.popWindow();
             }

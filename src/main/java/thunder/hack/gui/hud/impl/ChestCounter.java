@@ -23,7 +23,7 @@ public class ChestCounter extends HudElement {
         super.onRender2D(context);
         Pair<Integer, Integer> chests = getChestCount();
         String str = "Chests: " + Formatting.WHITE + "S:" + chests.getLeft() + " D:" + chests.getRight();
-        FontRenderers.getModulesRenderer().drawString(context.getMatrices(), str, getPosX(), getPosY(), HudEditor.getColor(1).getRGB());
+        FontRenderers.getModulesRenderer().drawString(context.getMatrices(), str, getPosX(), getPosY() + 3, HudEditor.getColor(1).getRGB());
     }
 
     public Pair<Integer, Integer> getChestCount() {

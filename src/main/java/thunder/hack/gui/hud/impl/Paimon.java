@@ -57,7 +57,6 @@ public class Paimon extends HudElement {
         context.getMatrices().translate((int) getPosX() + 100, (int) getPosY() + 100, 0);
         context.getMatrices().scale((float) scale.getValue() / 100f, (float) scale.getValue() / 100f, 1);
         context.getMatrices().translate(-((int) getPosX() + 100), -((int) getPosY() + 100), 0);
-
         context.drawTexture(PAIMON, (int) getPosX(), (int) getPosY(), 0, currentFrame * 200, 200, 200, 200, 10600);
         context.getMatrices().pop();
 

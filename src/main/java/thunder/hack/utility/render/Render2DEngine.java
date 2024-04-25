@@ -483,7 +483,7 @@ public class Render2DEngine {
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         immediate.draw();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
+        RenderSystem.defaultBlendFunc();
         RenderSystem.enableDepthTest();
         endRender();
     }

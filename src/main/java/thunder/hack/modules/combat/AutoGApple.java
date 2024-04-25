@@ -46,7 +46,7 @@ public final class AutoGApple extends Module {
 
     private boolean GapInOffHand() {
         if(autoTotemIntegration.getValue() && ModuleManager.autoTotem.isEnabled()) {
-            if(ModuleManager.autoTotem.rcGap.getValue())
+            if(!ModuleManager.autoTotem.rcGap.is(AutoTotem.RCGap.Off))
                 return true;
             else
                 sendMessage(Formatting.RED + (isRu() ? "Включи RcGap в AutoTotem!" : "Enable RcGap in AutoTotem"));

@@ -129,6 +129,7 @@ public class Velocity extends Module {
 
         // EXPLOSION
         if (e.getPacket() instanceof ExplosionS2CPacket explosion && explosions.getValue()) {
+
             switch (mode.getValue()) {
                 case Cancel -> {
                     ((IExplosionS2CPacket) explosion).setMotionX(0);

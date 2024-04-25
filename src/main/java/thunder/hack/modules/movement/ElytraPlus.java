@@ -1,17 +1,24 @@
 package thunder.hack.modules.movement;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.FluidBlock;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.EntityInteraction;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
@@ -23,8 +30,12 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.*;
-import thunder.hack.modules.Module;
+import thunder.hack.gui.font.FontRenderer;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.notification.Notification;
+import thunder.hack.modules.Module;
+import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.combat.Criticals;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.BooleanParent;
@@ -32,6 +43,8 @@ import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.PlayerUtility;
+import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 import static thunder.hack.modules.player.ElytraSwap.getChestPlateSlot;
@@ -42,13 +55,14 @@ public class ElytraPlus extends Module {
     }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.FireWork);
-    private final Setting<AntiKick> antiKick = new Setting<>("Mode", AntiKick.Jitter, v-> mode.getValue() == Mode.FireWork);
+    private final Setting<AntiKick> antiKick = new Setting<>("Mode", AntiKick.Jitter, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Float> xzSpeed = new Setting<>("XZSpeed", 1.55f, 0.1f, 10f, v -> mode.getValue() != Mode.Boost && mode.getValue() != Mode.Pitch40Infinite);
     private final Setting<Float> ySpeed = new Setting<>("YSpeed", 0.47f, 0f, 2f, v -> mode.getValue() == Mode.FireWork || mode.getValue() == Mode.SunriseOld);
     private final Setting<Integer> fireSlot = new Setting<>("FireSlot", 1, 1, 9, v -> mode.getValue() == Mode.FireWork);
     private final Setting<BooleanParent> accelerate = new Setting<>("Acceleration", new BooleanParent(false), v -> mode.getValue() == Mode.Control);
     private final Setting<Float> accelerateFactor = new Setting<>("AccelerateFactor", 9f, 0f, 100f, v -> mode.getValue() == Mode.Control).withParent(accelerate);
     private final Setting<Float> fireDelay = new Setting<>("FireDelay", 1.5f, 0f, 1.5f, v -> mode.getValue() == Mode.FireWork);
+    private final Setting<Boolean> grim = new Setting<>("Grim", false, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> stayMad = new Setting<>("GroundSafe", false, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> keepFlying = new Setting<>("KeepFlying", false, v -> mode.getValue() == Mode.FireWork);
     private final Setting<Boolean> disableOnFlag = new Setting<>("DisableOnFlag", false, v -> mode.getValue() == Mode.FireWork);
@@ -81,6 +95,7 @@ public class ElytraPlus extends Module {
     private final thunder.hack.utility.Timer instantFlyTimer = new thunder.hack.utility.Timer();
     private final thunder.hack.utility.Timer staticTimer = new thunder.hack.utility.Timer();
     private final thunder.hack.utility.Timer strictTimer = new thunder.hack.utility.Timer();
+    private final thunder.hack.utility.Timer pingTimer = new thunder.hack.utility.Timer();
 
     private boolean hasElytra, infiniteFlag, hasTouchedGround, elytraEquiped, flying, startFallFlying;
     private float acceleration, accelerationY, height, prevClientPitch, infinitePitch, lastInfinitePitch;
@@ -89,10 +104,11 @@ public class ElytraPlus extends Module {
     private ItemStack prevArmorItemCopy, getStackInSlotCopy;
     private Item prevArmorItem = Items.AIR;
     private Item prevItemInHand = Items.AIR;
+    private Vec3d flightZonePos;
     private int prevElytraSlot = -1;
     private int slotWithFireWorks = -1;
     private long lastFireworkTime;
-    private int  ticksInAir;
+    private int ticksInAir;
 
     @Override
     public void onEnable() {
@@ -104,6 +120,9 @@ public class ElytraPlus extends Module {
             );
         }
 
+        flying = false;
+        reset();
+
         infiniteFlag = false;
         acceleration = 0;
         accelerationY = 0;
@@ -114,6 +133,7 @@ public class ElytraPlus extends Module {
             mc.player.getAbilities().flying = false;
         }
         hasElytra = false;
+        pingTimer.reset();
 
         if (mode.getValue() == Mode.FireWork) fireworkOnEnable();
     }
@@ -187,7 +207,7 @@ public class ElytraPlus extends Module {
             return;
         }
 
-        if(mc.player.fallDistance <= 0)
+        if (mc.player.fallDistance <= 0)
             return;
 
         if (mc.options.jumpKey.isPressed() || mc.options.sneakKey.isPressed()) {
@@ -234,8 +254,8 @@ public class ElytraPlus extends Module {
                 infiniteFlag = false;
         } else infiniteFlag = true;
 
-        if (infiniteFlag) infinitePitch+=3;
-        else infinitePitch-=3;
+        if (infiniteFlag) infinitePitch += 3;
+        else infinitePitch -= 3;
 
         infinitePitch = MathUtility.clamp(infinitePitch, -40, 40);
         return infinitePitch;
@@ -264,15 +284,11 @@ public class ElytraPlus extends Module {
         if (event.getPacket() instanceof ClientCommandC2SPacket command && mode.getValue() == Mode.FireWork)
             if (command.getMode() == ClientCommandC2SPacket.Mode.START_FALL_FLYING)
                 doFireWork(false);
-    }
 
-    @EventHandler
-    public void onPlayerUpdate(PlayerUpdateEvent e) {
-        if (mode.getValue() == Mode.FireWork) {
-            fireWorkOnPlayerUpdate();
-        }
-        if (mode.getValue() == Mode.Pitch40Infinite) {
-            lastInfinitePitch = PlayerUtility.fixAngle(getInfinitePitch());
+        if(event.getPacket() instanceof PlayerInteractEntityC2SPacket p) {
+            if (mode.is(Mode.FireWork) && grim.getValue() && flying && flightZonePos != null && Criticals.getEntity(p).age < (pingTimer.getPassedTimeMs() / 50f)) {
+                sendMessage(Formatting.RED + (isRu() ? "В этом режиме нельзя бить сущностей которые появились после включения модуля!" : "In this mode, you cannot hit entities that spawned after the module was turned on!"));
+            }
         }
     }
 
@@ -283,6 +299,23 @@ public class ElytraPlus extends Module {
             accelerationY = 0;
             if (disableOnFlag.getValue() && mode.getValue() == Mode.FireWork)
                 disable(isRu() ? "Выключен из-за флага!" : "Disabled due to flag!");
+            pingTimer.reset();
+        }
+        if (e.getPacket() instanceof CommonPingS2CPacket && mode.is(Mode.FireWork) && grim.getValue() && flying) {
+            if (!pingTimer.passedMs(50000)) {
+                if (pingTimer.passedMs(1000) && mc.player.squaredDistanceTo(flightZonePos) < 7000)
+                    e.cancel();
+            } else pingTimer.reset();
+        }
+    }
+
+    @EventHandler
+    public void onPlayerUpdate(PlayerUpdateEvent e) {
+        if (mode.getValue() == Mode.FireWork) {
+            fireWorkOnPlayerUpdate();
+        }
+        if (mode.getValue() == Mode.Pitch40Infinite) {
+            lastInfinitePitch = PlayerUtility.fixAngle(getInfinitePitch());
         }
     }
 
@@ -311,6 +344,43 @@ public class ElytraPlus extends Module {
                 mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
                 hasTouchedGround = false;
                 strictTimer.reset();
+            }
+        }
+    }
+
+    public void onRender3D(MatrixStack stack) {
+        if (mode.is(Mode.FireWork) && grim.getValue() && flying && flightZonePos != null) {
+            stack.push();
+            Render3DEngine.setupRender();
+            RenderSystem.disableCull();
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder bufferBuilder = tessellator.getBuffer();
+            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+            bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+            float cos;
+            float sin;
+            for (int i = 0; i <= 30; i++) {
+                cos = (float) ((flightZonePos.getX() - mc.getEntityRenderDispatcher().camera.getPos().getX()) + Math.cos(i * (Math.PI * 2f) / 30f) * 95);
+                sin = (float) ((flightZonePos.getZ() - mc.getEntityRenderDispatcher().camera.getPos().getZ()) + Math.sin(i * (Math.PI * 2f) / 30f) * 95);
+                bufferBuilder.vertex(stack.peek().getPositionMatrix(), cos, (float) ((float) -mc.getEntityRenderDispatcher().camera.getPos().getY()), sin).color(Render2DEngine.injectAlpha(HudEditor.getColor(i), 255).getRGB()).next();
+                bufferBuilder.vertex(stack.peek().getPositionMatrix(), cos, (float) ((float) 128 - mc.getEntityRenderDispatcher().camera.getPos().getY()), sin).color(Render2DEngine.injectAlpha(HudEditor.getColor(i), 0).getRGB()).next();
+            }
+            tessellator.draw();
+            RenderSystem.enableCull();
+            Render3DEngine.endRender();
+            stack.pop();
+        }
+    }
+
+    public void onRender2D(DrawContext context) {
+        if (mode.is(Mode.FireWork) && grim.getValue() && flying) {
+            if (!pingTimer.passedMs(50000)) {
+                if (pingTimer.passedMs(1000)) {
+                    int timeS = (int) MathUtility.round2(((float) (50000 - pingTimer.getPassedTimeMs()) / 1000f));
+                    int dist = (int) (83f - Math.sqrt(mc.player.squaredDistanceTo(flightZonePos)));
+                    FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), isRu() ? ("Осталось " + timeS + " секунд и " + dist + " метров") : (timeS + " seconds and " + dist + " meters left"),
+                            mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() / 2f + 30f, -1);
+                }
             }
         }
     }
@@ -451,7 +521,7 @@ public class ElytraPlus extends Module {
     }
 
     private void doControl(EventMove e) {
-        if(mc.options.jumpKey.isPressed()) {
+        if (mc.options.jumpKey.isPressed()) {
             e.setY(upFactor.getValue());
         } else if (mc.options.sneakKey.isPressed()) {
             e.setY(-sneakDownSpeed.getValue());
@@ -465,7 +535,7 @@ public class ElytraPlus extends Module {
             e.setZ(dir[1]);
         }
 
-        if(!MovementUtility.isMoving())
+        if (!MovementUtility.isMoving())
             acceleration = 0;
 
         double speed = Math.hypot(e.getX(), e.getZ());
@@ -585,9 +655,12 @@ public class ElytraPlus extends Module {
     }
 
     private void doFireWork(boolean started) {
-        if (started && (float) (System.currentTimeMillis() - lastFireworkTime) < fireDelay.getValue() * 1000.0f) {
+        if (started && (float) (System.currentTimeMillis() - lastFireworkTime) < fireDelay.getValue() * 1000.0f)
             return;
-        }
+
+        if (grim.getValue() && started && pingTimer.passedMs(200) && flightZonePos != null && mc.player.squaredDistanceTo(flightZonePos) < 7000)
+            return;
+
         if (started && !mc.player.isFallFlying()) return;
         if (!started && ticksInAir > 1) return;
 
@@ -597,13 +670,15 @@ public class ElytraPlus extends Module {
             return;
         }
         slotWithFireWorks = n2;
-        boolean bl3 = mc.player.getOffHandStack().getItem() == Items.FIREWORK_ROCKET;
-        if (!bl3) sendPacket(new UpdateSelectedSlotC2SPacket(n2));
-        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(bl3 ? Hand.OFF_HAND : Hand.MAIN_HAND, id));
-        if (!bl3) sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+        boolean inOffhand = mc.player.getOffHandStack().getItem() == Items.FIREWORK_ROCKET;
+        if (!inOffhand) sendPacket(new UpdateSelectedSlotC2SPacket(n2));
+        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(inOffhand ? Hand.OFF_HAND : Hand.MAIN_HAND, id));
+        if (!inOffhand) sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
         ++ticksInAir;
         flying = true;
         lastFireworkTime = System.currentTimeMillis();
+        pingTimer.reset();
+        flightZonePos = mc.player.getPos();
     }
 
     private void pickPrevElytraSlot() {
@@ -695,6 +770,16 @@ public class ElytraPlus extends Module {
     }
 
     public void fireworkOnSync() {
+        if (grim.getValue()) {
+            if (mc.options.jumpKey.isPressed() && mc.player.isFallFlying() && flying)
+                mc.player.setPitch(-45f);
+
+            if (mc.options.sneakKey.isPressed() && mc.player.isFallFlying() && flying)
+                mc.player.setPitch(45f);
+
+            mc.player.setYaw(MovementUtility.getMoveDirection());
+        }
+
         if (!MovementUtility.isMoving() && mc.options.jumpKey.isPressed() && mc.player.isFallFlying() && flying)
             mc.player.setPitch(-90f);
 
@@ -704,7 +789,7 @@ public class ElytraPlus extends Module {
 
     public void fireworkOnMove(EventMove e) {
         if (mc.player.isFallFlying() && flying) {
-            if(mc.player.horizontalCollision || mc.player.verticalCollision) {
+            if (mc.player.horizontalCollision || mc.player.verticalCollision) {
                 acceleration = 0;
                 accelerationY = 0;
             }
@@ -720,24 +805,24 @@ public class ElytraPlus extends Module {
             } else if (mc.options.sneakKey.isPressed()) {
                 e.setY(-ySpeed.getValue() * Math.min((accelerationY += 9) / 100.0f, 1.0f));
             } else if (bowBomb.getValue() && checkGround(2.0f)) {
-                e.setY(mc.player.age % 2 == 0 ?  0.42f :  -0.42f);
+                e.setY(mc.player.age % 2 == 0 ? 0.42f : -0.42f);
             } else {
                 switch (antiKick.getValue()) {
-                    case Jitter ->  e.setY(mc.player.age % 2 == 0 ? 0.08f : -0.08f);
+                    case Jitter -> e.setY(mc.player.age % 2 == 0 ? 0.08f : -0.08f);
                     case Glide -> e.setY(-0.08f);
                     case Off -> e.setY(0f);
                 }
             }
 
-            if(!MovementUtility.isMoving())
+            if (!MovementUtility.isMoving())
                 acceleration = 0;
 
-            if(mc.player.input.movementSideways > 0) {
+            if (mc.player.input.movementSideways > 0) {
                 mc.player.input.movementSideways = 1;
-            } else if(mc.player.input.movementSideways < 0) {
+            } else if (mc.player.input.movementSideways < 0) {
                 mc.player.input.movementSideways = -1;
             }
-            
+
             MovementUtility.modifyEventSpeed(e, xzSpeed.getValue() * Math.min((acceleration += 9) / 100.0f, 1.0f));
             if (stayMad.getValue() && !checkGround(3.0f) && ThunderHack.playerManager.ticksElytraFlying > 10)
                 e.setY(0.42f);
@@ -772,7 +857,7 @@ public class ElytraPlus extends Module {
     public void fireworkOnDisable() {
         startFallFlying = false;
         if (keepFlying.getValue()) return;
-        mc.player.setVelocity(0, mc.player.getVelocity().getY(),0);
+        mc.player.setVelocity(0, mc.player.getVelocity().getY(), 0);
         new Thread(() -> {
             sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
             ThunderHack.TICK_TIMER = 0.1f;

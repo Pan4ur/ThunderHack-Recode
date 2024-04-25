@@ -92,7 +92,7 @@ public class NoFall extends Module {
             }
         } else if (retrieveFlag) {
             InventoryUtility.saveSlot();
-            SearchInvResult waterResult = InventoryUtility.findItemInHotBar(Items.WATER_BUCKET);
+            SearchInvResult waterResult = InventoryUtility.findItemInHotBar(Items.BUCKET);
             waterResult.switchTo();
             mc.player.setPitch(90);
             mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
