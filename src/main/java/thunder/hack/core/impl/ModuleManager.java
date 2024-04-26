@@ -222,6 +222,7 @@ public class ModuleManager implements IManager {
     public static Quiver quiver = new Quiver();
     public static NoPush noPush = new NoPush();
     public static UnHook unHook = new UnHook();
+    public static Avoid avoid = new Avoid();
     public static Timer timer = new Timer();
     public static Regen regen = new Regen();
     public static Speed speed = new Speed();

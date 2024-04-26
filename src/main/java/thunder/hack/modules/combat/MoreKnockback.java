@@ -64,7 +64,10 @@ public class MoreKnockback extends Module {
         if (mc.player.getAttackCooldownProgress(0.5f) < 0.9f)
             return false;
 
-        if (ModuleManager.criticals.isEnabled())
+        if (ModuleManager.criticals.isEnabled() && !ModuleManager.criticals.mode.is(Criticals.Mode.Grim))
+            return true;
+
+        if (ModuleManager.criticals.isEnabled() && ModuleManager.criticals.mode.is(Criticals.Mode.Grim) && !mc.player.isOnGround())
             return true;
 
         if (!reasonForSkipCrit)

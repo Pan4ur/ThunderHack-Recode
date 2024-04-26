@@ -6,6 +6,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.screen.slot.SlotActionType;
@@ -17,10 +18,12 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.*;
+import thunder.hack.injection.accesors.IInteractionManager;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.interfaces.IEntity;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.SearchInvResult;
@@ -47,7 +50,7 @@ public class Speed extends Module {
     public final Setting<Integer> delay = new Setting<>("Delay", 8, 1, 20, v -> mode.getValue() == Mode.FireWork);
 
     public double baseSpeed;
-    private int stage, ticks;
+    private int stage, ticks, prevSlot;
     private float prevForward = 0;
     private thunder.hack.utility.Timer elytraDelay = new thunder.hack.utility.Timer();
     private thunder.hack.utility.Timer startDelay = new thunder.hack.utility.Timer();
@@ -67,6 +70,7 @@ public class Speed extends Module {
         ticks = 0;
         baseSpeed = 0.2873D;
         startDelay.reset();
+        prevSlot = -1;
     }
 
     @EventHandler
@@ -112,7 +116,7 @@ public class Speed extends Module {
         if (mode.getValue() == Mode.GrimEntity2 && !e.isPre() && ThunderHack.core.getSetBackTime() > 1000 && MovementUtility.isMoving()) {
             int collisions = 0;
             for (Entity ent : mc.world.getEntities())
-                if (ent != mc.player && ent instanceof LivingEntity && mc.player.getBoundingBox().expand(1.0).intersects(ent.getBoundingBox()))
+                if (ent != mc.player && (ent instanceof LivingEntity || ent instanceof BoatEntity) && mc.player.getBoundingBox().expand(1.0).intersects(ent.getBoundingBox()))
                     collisions++;
 
             double[] motion = MovementUtility.forward(0.08 * collisions);
@@ -128,13 +132,21 @@ public class Speed extends Module {
             if(mc.world.isAir(pos) || !result.found() || !mc.options.jumpKey.isPressed())
                 return;
 
-            InventoryUtility.saveSlot();
+            prevSlot = mc.player.getInventory().selectedSlot;
             result.switchTo();
             sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), 90, mc.player.isOnGround()));
             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, pos, Direction.UP));
-            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(pos.toCenterPos().add(0, 0.5, 0), Direction.UP, pos, false), id));
+            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(pos.down().toCenterPos().add(0, 0.5, 0), Direction.UP, pos.down(), false), id));
             mc.world.setBlockState(pos, Blocks.ICE.getDefaultState());
-            InventoryUtility.returnSlot();
+        }
+    }
+
+    @EventHandler
+    public void onPostTick(EventPostTick e) {
+        if (mode.is(Speed.Mode.GrimIce) && prevSlot != -1) {
+            mc.player.getInventory().selectedSlot = prevSlot;
+            ((IInteractionManager) mc.interactionManager).syncSlot();
+            prevSlot = -1;
         }
     }
 

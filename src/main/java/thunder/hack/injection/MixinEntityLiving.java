@@ -1,16 +1,21 @@
 package thunder.hack.injection;
 
+import net.minecraft.block.Blocks;
+import net.minecraft.block.FluidBlock;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
+import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventTravel;
 import thunder.hack.modules.combat.Aura;
@@ -21,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static thunder.hack.modules.Module.mc;
+import static thunder.hack.modules.movement.WaterSpeed.Mode.CancelResurface;
 
 @Mixin(LivingEntity.class)
 public class MixinEntityLiving implements IEntityLiving {
@@ -106,5 +112,14 @@ public class MixinEntityLiving implements IEntityLiving {
             mc.player.move(MovementType.SELF, mc.player.getVelocity());
             ci.cancel();
         }
+    }
+
+    @ModifyVariable(method = "setSprinting", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    private boolean setSprintingHook(boolean sprinting) {
+        if (mc.player != null && mc.world != null && ModuleManager.waterSpeed.isEnabled() && ModuleManager.waterSpeed.mode.is(CancelResurface)) {
+            if (mc.player.isTouchingWater() || mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos().add(0,-0.5,0))).getBlock() instanceof FluidBlock)
+                return true;
+        }
+        return sprinting;
     }
 }
