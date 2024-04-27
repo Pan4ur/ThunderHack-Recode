@@ -22,6 +22,7 @@ import java.util.*;
 
 public class LogoutSpots extends Module {
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
+    private final Setting<Boolean> notifications = new Setting<>("Notifications", true);
 
     private final Map<UUID, PlayerEntity> playerCache = Maps.newConcurrentMap();
     private final Map<UUID, PlayerEntity> logoutCache = Maps.newConcurrentMap();
@@ -38,7 +39,7 @@ public class LogoutSpots extends Module {
                     for (UUID uuid : logoutCache.keySet()) {
                         if (!uuid.equals(ple.profile().getId())) continue;
                         PlayerEntity pl = logoutCache.get(uuid);
-                        sendMessage(pl.getName().getString() + " logged back at  X: " + (int) pl.getX() + " Y: " + (int) pl.getY() + " Z: " + (int) pl.getZ());
+                        if(notifications.getValue()) sendMessage(pl.getName().getString() + " logged back at  X: " + (int) pl.getX() + " Y: " + (int) pl.getY() + " Z: " + (int) pl.getZ());
                         logoutCache.remove(uuid);
                     }
                 }
@@ -52,7 +53,7 @@ public class LogoutSpots extends Module {
                     if (!uuid.equals(uuid2)) continue;
                     final PlayerEntity pl = playerCache.get(uuid);
                     if(pl != null) {
-                        sendMessage(pl.getName().getString() + " logged out at  X: " + (int) pl.getX() + " Y: " + (int) pl.getY() + " Z: " + (int) pl.getZ());
+                        if(notifications.getValue()) sendMessage(pl.getName().getString() + " logged out at  X: " + (int) pl.getX() + " Y: " + (int) pl.getY() + " Z: " + (int) pl.getZ());
                         if (!logoutCache.containsKey(uuid))
                             logoutCache.put(uuid, pl);
                     }
