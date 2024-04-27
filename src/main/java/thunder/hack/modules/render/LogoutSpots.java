@@ -3,6 +3,8 @@ package thunder.hack.modules.render;
 import com.google.common.collect.Maps;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.network.OtherClientPlayerEntity;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
@@ -12,17 +14,20 @@ import org.joml.Vector4d;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.misc.FakePlayer;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class LogoutSpots extends Module {
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
     private final Setting<Boolean> notifications = new Setting<>("Notifications", true);
+    private final Setting<Boolean> ignoreBots = new Setting<>("IgnoreBots", true);
 
     private final Map<UUID, PlayerEntity> playerCache = Maps.newConcurrentMap();
     private final Map<UUID, PlayerEntity> logoutCache = Maps.newConcurrentMap();
@@ -39,6 +44,7 @@ public class LogoutSpots extends Module {
                     for (UUID uuid : logoutCache.keySet()) {
                         if (!uuid.equals(ple.profile().getId())) continue;
                         PlayerEntity pl = logoutCache.get(uuid);
+                        if(ignoreBots.getValue() && isABot(pl)) continue;
                         if(notifications.getValue()) sendMessage(pl.getName().getString() + " logged back at  X: " + (int) pl.getX() + " Y: " + (int) pl.getY() + " Z: " + (int) pl.getZ());
                         logoutCache.remove(uuid);
                     }
@@ -52,6 +58,7 @@ public class LogoutSpots extends Module {
                 for (UUID uuid : playerCache.keySet()) {
                     if (!uuid.equals(uuid2)) continue;
                     final PlayerEntity pl = playerCache.get(uuid);
+                    if(ignoreBots.getValue() && isABot(pl)) continue;
                     if(pl != null) {
                         if(notifications.getValue()) sendMessage(pl.getName().getString() + " logged out at  X: " + (int) pl.getX() + " Y: " + (int) pl.getY() + " Z: " + (int) pl.getZ());
                         if (!logoutCache.containsKey(uuid))
@@ -113,5 +120,12 @@ public class LogoutSpots extends Module {
                 }
             }
         }
+    }
+    private boolean isABot(PlayerEntity entity){
+        if (mc.getNetworkHandler() == null) return true;
+        PlayerListEntry playerListEntry = mc.getNetworkHandler().getPlayerListEntry(entity.getUuid());
+        if (playerListEntry == null) return true;
+        if (playerListEntry.getLatency()<=0) return true;
+        else return false;
     }
 }
