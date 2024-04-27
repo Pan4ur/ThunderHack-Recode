@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.OtherClientPlayerEntity;
-import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
@@ -121,11 +120,12 @@ public class LogoutSpots extends Module {
             }
         }
     }
-    private boolean isABot(PlayerEntity entity){
-        if (mc.getNetworkHandler() == null) return true;
-        PlayerListEntry playerListEntry = mc.getNetworkHandler().getPlayerListEntry(entity.getUuid());
-        if (playerListEntry == null) return true;
-        if (playerListEntry.getLatency()<=0) return true;
-        else return false;
+    private boolean isABot(PlayerEntity ent){
+        if (!ent.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + ent.getName().getString()).getBytes(StandardCharsets.UTF_8))) && ent instanceof OtherClientPlayerEntity
+                && (FakePlayer.fakePlayer == null || ent.getId() != FakePlayer.fakePlayer.getId())
+                && !ent.getName().getString().contains("-")) {
+            return  true;
+        }
+        else {return false;}
     }
 }
