@@ -12,12 +12,13 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.EvendFixVelocity;
+import thunder.hack.events.impl.EventFixVelocity;
 import thunder.hack.modules.combat.HitBox;
 import thunder.hack.modules.render.Shaders;
 import thunder.hack.modules.render.Trails;
@@ -65,7 +66,7 @@ public abstract class MixinEntity implements IEntity {
     public void updateVelocityHook(float speed, Vec3d movementInput, CallbackInfo ci) {
         if ((Object) this == mc.player) {
             ci.cancel();
-            EvendFixVelocity event = new EvendFixVelocity(movementInput, speed, mc.player.getYaw(), movementInputToVelocityC(movementInput, speed, mc.player.getYaw()));
+            EventFixVelocity event = new EventFixVelocity(movementInput, speed, mc.player.getYaw(), movementInputToVelocityC(movementInput, speed, mc.player.getYaw()));
             ThunderHack.EVENT_BUS.post(event);
             mc.player.setVelocity(mc.player.getVelocity().add(event.getVelocity()));
         }
@@ -128,5 +129,19 @@ public abstract class MixinEntity implements IEntity {
     public void setSwimmingHook(boolean swimming, CallbackInfo ci) {
         if((ModuleManager.jesus.isEnabled() || ModuleManager.noWaterCollision.isEnabled()) && swimming && mc.player != null && ((Entity) (Object) this).getId() == mc.player.getId())
             ci.cancel();
+    }
+
+    @ModifyVariable(method = "changeLookDirection", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    private double changeLookDirectionHook0(double value) {
+        if(ModuleManager.viewLock.isEnabled() && ModuleManager.viewLock.yaw.getValue())
+            return 0d;
+        return value;
+    }
+
+    @ModifyVariable(method = "changeLookDirection", at = @At("HEAD"), ordinal = 1, argsOnly = true)
+    private double changeLookDirectionHook1(double value) {
+        if(ModuleManager.viewLock.isEnabled() && ModuleManager.viewLock.pitch.getValue())
+            return 0d;
+        return value;
     }
 }

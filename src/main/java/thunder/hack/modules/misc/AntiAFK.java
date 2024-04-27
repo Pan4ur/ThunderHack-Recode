@@ -2,7 +2,7 @@ package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.SettingEvent;
+import thunder.hack.events.impl.EventSetting;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
@@ -39,7 +39,7 @@ public class AntiAFK extends Module {
     }
 
     @EventHandler
-    public void onSettingChange(SettingEvent e) {
+    public void onSettingChange(EventSetting e) {
         if(e.getSetting() == mode)
             step = 0;
     }

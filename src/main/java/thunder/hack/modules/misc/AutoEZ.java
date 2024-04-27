@@ -2,7 +2,7 @@ package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
-import thunder.hack.events.impl.DeathEvent;
+import thunder.hack.events.impl.EventDeath;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
@@ -130,7 +130,7 @@ public final class AutoEZ extends Module {
     }
 
     @EventHandler
-    public void onDeath(DeathEvent e) {
+    public void onDeath(EventDeath e) {
         if (server.getValue() != ServerMode.Universal) return;
         if (Aura.target != null && Aura.target == e.getPlayer()) {
             sayEZ(e.getPlayer().getName().getString());

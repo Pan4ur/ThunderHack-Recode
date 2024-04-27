@@ -1,5 +1,6 @@
 package thunder.hack.gui.clickui.impl;
 
+import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
@@ -52,6 +53,13 @@ public class StringElement extends AbstractElement {
     }
 
     @Override
+    public void charTyped(char key, int keyCode) {
+        if (SharedConstants.isValidChar(key)) {
+            currentString = currentString + key;
+        }
+    }
+
+    @Override
     public void keyTyped(int keyCode) {
         if (ThunderHack.currentKeyListener != ThunderHack.KeyListening.Strings)
             return;
@@ -59,29 +67,19 @@ public class StringElement extends AbstractElement {
         if (listening) {
             switch (keyCode) {
                 case GLFW.GLFW_KEY_ESCAPE -> {
-                    return;
                 }
                 case GLFW.GLFW_KEY_ENTER -> {
                     setting.setValue(currentString == null || currentString.isEmpty() ? setting.getDefaultValue() : currentString);
                     currentString = "";
                     listening = !listening;
-                    return;
                 }
                 case GLFW.GLFW_KEY_BACKSPACE -> {
                     currentString = SliderElement.removeLastChar(currentString);
-                    return;
                 }
                 case GLFW.GLFW_KEY_SPACE -> {
                     currentString = currentString + " ";
-                    return;
                 }
             }
-            if (GLFW.glfwGetKeyName(keyCode, 0) == null)
-                return;
-
-            currentString = currentString + (
-                    (InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_LEFT_SHIFT ) || InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_RIGHT_SHIFT)) && GLFW.glfwGetKeyName(keyCode, 0) != null ?
-                    GLFW.glfwGetKeyName(keyCode, 0).toUpperCase() : GLFW.glfwGetKeyName(keyCode, 0));
         }
     }
 }

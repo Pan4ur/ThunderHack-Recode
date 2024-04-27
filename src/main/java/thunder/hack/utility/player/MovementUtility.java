@@ -1,14 +1,9 @@
 package thunder.hack.utility.player;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.MathHelper;
 import thunder.hack.ThunderHack;
-import thunder.hack.cmd.Command;
-import thunder.hack.core.impl.PlayerManager;
 import thunder.hack.events.impl.EventMove;
-import thunder.hack.events.impl.EventTravel;
-import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 
 import static thunder.hack.modules.Module.mc;
@@ -26,7 +21,7 @@ public final class MovementUtility {
     public static double[] forward(final double d) {
         float f = mc.player.input.movementForward;
         float f2 = mc.player.input.movementSideways;
-        float f3 =  mc.player.getYaw();
+        float f3 = mc.player.getYaw();
         if (f != 0.0f) {
             if (f2 > 0.0f) {
                 f3 += ((f > 0.0f) ? -45 : 45);
@@ -52,7 +47,7 @@ public final class MovementUtility {
         double strafe = mc.player.input.movementSideways;
         float yaw = mc.player.getYaw();
         if (forward == 0 && strafe == 0) {
-            mc.player.setVelocity(0, mc.player.getVelocity().y,0);
+            mc.player.setVelocity(0, mc.player.getVelocity().y, 0);
         } else {
             if (forward != 0) {
                 if (strafe > 0) {
@@ -69,7 +64,7 @@ public final class MovementUtility {
             }
             double sin = MathHelper.sin((float) Math.toRadians(yaw + 90));
             double cos = MathHelper.cos((float) Math.toRadians(yaw + 90));
-            mc.player.setVelocity(forward * speed * cos + strafe * speed * sin, mc.player.getVelocity().y,forward * speed * sin - strafe * speed * cos);
+            mc.player.setVelocity(forward * speed * cos + strafe * speed * sin, mc.player.getVelocity().y, forward * speed * sin - strafe * speed * cos);
         }
     }
 

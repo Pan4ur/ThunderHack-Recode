@@ -1,5 +1,6 @@
 package thunder.hack.gui.clickui.impl;
 
+import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
@@ -48,6 +49,13 @@ public class SearchBar extends AbstractButton {
     }
 
     @Override
+    public void charTyped(char key, int keyCode) {
+        if (SharedConstants.isValidChar(key)) {
+            moduleName = moduleName + key;
+        }
+    }
+
+    @Override
     public void keyTyped(int keyCode) {
         super.keyTyped(keyCode);
 
@@ -65,19 +73,14 @@ public class SearchBar extends AbstractButton {
                 case GLFW.GLFW_KEY_ESCAPE, GLFW.GLFW_KEY_ENTER -> {
                     listening = false;
                     moduleName = "";
-                    return;
                 }
                 case GLFW.GLFW_KEY_BACKSPACE -> {
                     moduleName = SliderElement.removeLastChar(moduleName);
-                    return;
                 }
                 case GLFW.GLFW_KEY_SPACE -> {
                     moduleName = moduleName + " ";
-                    return;
                 }
             }
-            if(GLFW.glfwGetKeyName(keyCode, 0) == null) return;
-            moduleName = moduleName + GLFW.glfwGetKeyName(keyCode, 0);
         }
     }
 }

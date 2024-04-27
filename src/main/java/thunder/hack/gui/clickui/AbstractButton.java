@@ -64,4 +64,7 @@ public class AbstractButton {
 
     public void tick() {
     }
+
+    public void charTyped(char key, int keyCode) {
+    }
 }

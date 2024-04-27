@@ -470,8 +470,11 @@ public class ConfigManager implements IManager {
                 continue;
             }
             if (setting.isStringSetting()) {
-                String str = (String) setting.getValue();
-                attribs.add(setting.getName(), jp.parse(str.replace(" ", "_")));
+                try {
+                    String str = (String) setting.getValue();
+                    attribs.add(setting.getName(), jp.parse(str.replace(" ", "_")));
+                } catch (Exception ignored) {
+                }
                 continue;
             }
             if (setting.isEnumSetting()) {

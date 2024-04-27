@@ -2,7 +2,7 @@ package thunder.hack.modules.client;
 
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import thunder.hack.events.impl.EvendFixVelocity;
+import thunder.hack.events.impl.EventFixVelocity;
 import thunder.hack.events.impl.EventKeyboardInput;
 import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
@@ -34,7 +34,7 @@ public class Rotations extends Module {
         } else mc.player.setYaw(prevRotation);
     }
 
-    public void onPlayerMove(EvendFixVelocity event) {
+    public void onPlayerMove(EventFixVelocity event) {
         if (moveFix.getValue() == MoveFix.Free) {
             if (Float.isNaN(fixRotation))
                 return;

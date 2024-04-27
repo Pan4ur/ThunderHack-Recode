@@ -90,4 +90,7 @@ public abstract class AbstractElement {
     public boolean isSmall() {
         return small;
     }
+
+    public void charTyped(char key, int keyCode) {
+    }
 }

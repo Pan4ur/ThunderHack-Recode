@@ -15,7 +15,7 @@ import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.events.impl.SettingEvent;
+import thunder.hack.events.impl.EventSetting;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -99,7 +99,7 @@ public class XRay extends Module {
     }
 
     @EventHandler
-    public void onSettingChange(SettingEvent e) {
+    public void onSettingChange(EventSetting e) {
         if (e.getSetting() == wallHack) {
             mc.worldRenderer.reload();
         }

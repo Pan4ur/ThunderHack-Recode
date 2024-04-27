@@ -3,13 +3,13 @@ package thunder.hack.events.impl;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.events.Event;
 
-public class EvendFixVelocity extends Event {
+public class EventFixVelocity extends Event {
     Vec3d movementInput;
     float speed;
     float yaw;
     Vec3d velocity;
 
-    public EvendFixVelocity(Vec3d movementInput, float speed, float yaw, Vec3d velocity) {
+    public EventFixVelocity(Vec3d movementInput, float speed, float yaw, Vec3d velocity) {
         this.movementInput = movementInput;
         this.speed = speed;
         this.yaw = yaw;

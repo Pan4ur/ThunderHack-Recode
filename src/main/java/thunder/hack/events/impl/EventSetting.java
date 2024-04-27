@@ -3,10 +3,10 @@ package thunder.hack.events.impl;
 import thunder.hack.events.Event;
 import thunder.hack.setting.Setting;
 
-public class SettingEvent extends Event {
+public class EventSetting extends Event {
     final Setting<?> setting;
 
-    public SettingEvent(Setting<?> setting){
+    public EventSetting(Setting<?> setting){
         this.setting = setting;
     }
 

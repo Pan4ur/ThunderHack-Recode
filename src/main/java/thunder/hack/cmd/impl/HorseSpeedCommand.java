@@ -12,7 +12,7 @@ import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class HorseSpeedCommand extends Command {
     public HorseSpeedCommand() {
-        super("gethorsespeed");
+        super("gethorsespeed", "horsespeed");
     }
 
     @Override
@@ -36,9 +36,6 @@ public class HorseSpeedCommand extends Command {
 
                 if (ratio > 0.3 && ratio < 0.6)
                     verbose = isRu() ? "У тебя нормальная лошадь" : "Your horse is normal";
-
-                if (ratio > 0.6)
-                    verbose = isRu() ? "У тебя пиздатая лошадь :)" : "Your horse is good :)";
 
                 if (ratio > 0.6)
                     verbose = isRu() ? "У тебя пиздатая лошадь :)" : "Your horse is good :)";

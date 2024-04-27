@@ -5,7 +5,6 @@ import net.minecraft.util.math.Vec3d;
 
 public class EventPlayerTravel extends Event {
     private Vec3d mVec;
-
     private boolean pre;
 
     public EventPlayerTravel(Vec3d mVec,boolean pre) {

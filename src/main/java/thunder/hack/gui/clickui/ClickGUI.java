@@ -153,6 +153,12 @@ public class ClickGUI extends Screen {
     }
 
     @Override
+    public boolean charTyped(char key, int modifier) {
+        windows.forEach(w -> w.charTyped(key, modifier));
+        return true;
+    }
+
+    @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         windows.forEach(w -> w.keyTyped(keyCode));
 

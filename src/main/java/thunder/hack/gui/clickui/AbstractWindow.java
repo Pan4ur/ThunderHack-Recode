@@ -62,6 +62,9 @@ public class AbstractWindow {
         return true;
     }
 
+    public void charTyped(char key, int modifier) {
+    }
+
     public void onClose() {
     }
 

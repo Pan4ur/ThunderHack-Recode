@@ -5,15 +5,12 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -73,7 +70,7 @@ public final class Core {
 
         for (PlayerEntity p : mc.world.getPlayers()) {
             if (p.isDead() || p.getHealth() == 0)
-                ThunderHack.EVENT_BUS.post(new DeathEvent(p));
+                ThunderHack.EVENT_BUS.post(new EventDeath(p));
         }
 
         if (!Objects.equals(ThunderHack.commandManager.getPrefix(), ClientSettings.prefix.getValue().toString()))

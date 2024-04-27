@@ -2,27 +2,14 @@ package thunder.hack.modules.client;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.SoundManager;
-import thunder.hack.events.impl.DeathEvent;
+import thunder.hack.events.impl.EventDeath;
 import thunder.hack.events.impl.EventAttack;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.MathUtility;
-
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
-import java.io.File;
-
-import static thunder.hack.core.impl.ConfigManager.SOUNDS_FOLDER;
-import static thunder.hack.modules.client.ClientSettings.isRu;
 
 
 public final class SoundFX extends Module {
@@ -46,7 +33,7 @@ public final class SoundFX extends Module {
 
     @EventHandler
     @SuppressWarnings("unused")
-    public void onDeath(DeathEvent e) {
+    public void onDeath(EventDeath e) {
         if (Aura.target != null && Aura.target == e.getPlayer() && killSound.is(KillSound.Custom)) {
             ThunderHack.soundManager.playSound("kill");
             return;

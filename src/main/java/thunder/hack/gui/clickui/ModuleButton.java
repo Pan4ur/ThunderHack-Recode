@@ -1,5 +1,6 @@
 package thunder.hack.gui.clickui;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.resource.language.I18n;
@@ -7,13 +8,10 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
-import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.impl.*;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.TargetHud;
@@ -111,7 +109,7 @@ public class ModuleButton extends AbstractButton {
                 context.getMatrices().translate(-px, -py, 0.0F);
                 RenderSystem.setShaderTexture(0, Gear);
                 RenderSystem.enableBlend();
-                RenderSystem.defaultBlendFunc();
+                RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
                 Render2DEngine.renderGradientTexture(context.getMatrices(), px - 30, py - 30, 60, 60, 0, 0, 60, 60, 60, 60,
                         Render2DEngine.injectAlpha(HudEditor.getColor(270).darker(), 110),
                         Render2DEngine.injectAlpha(HudEditor.getColor(0).darker(), 110),
@@ -271,12 +269,12 @@ public class ModuleButton extends AbstractButton {
                 return;
             }
 
-            if(InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_DELETE) && button == 0) {
+            if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_DELETE) && button == 0) {
                 DialogScreen dialogScreen = new DialogScreen(isRu() ? "Сброс модуля" : "Reset module",
                         isRu() ? "Ты действительно хочешь сбросить " + module.getName() + "?" : "Are you sure you want to reset " + module.getName() + "?",
                         isRu() ? "Да ебать" : "Do it, piece of shit!", isRu() ? "Не, че за хуйня?" : "Nooo fuck ur ass nigga!",
                         () -> {
-                            if(module.isEnabled())
+                            if (module.isEnabled())
                                 module.disable("reseting");
                             for (Setting s : module.getSettings())
                                 s.setValue(s.getDefaultValue());
@@ -290,7 +288,7 @@ public class ModuleButton extends AbstractButton {
             } else if (button == 1 && (module.getSettings().size() > 3)) {
                 setOpen(!isOpen());
 
-                if(open) ThunderHack.soundManager.playSwipeIn();
+                if (open) ThunderHack.soundManager.playSwipeIn();
                 else ThunderHack.soundManager.playSwipeOut();
 
                 animation = 0.5f;
@@ -308,6 +306,13 @@ public class ModuleButton extends AbstractButton {
     public void mouseReleased(int mouseX, int mouseY, int button) {
         if (isOpen())
             elements.forEach(element -> element.mouseReleased(mouseX, mouseY, button));
+    }
+
+    public void charTyped(char key, int keyCode) {
+        if (isOpen()) {
+            for (AbstractElement element : elements)
+                element.charTyped(key, keyCode);
+        }
     }
 
     public void keyTyped(int keyCode) {

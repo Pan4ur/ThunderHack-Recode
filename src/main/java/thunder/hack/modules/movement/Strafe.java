@@ -26,6 +26,9 @@ import thunder.hack.utility.player.MovementUtility;
 import static thunder.hack.utility.player.MovementUtility.isMoving;
 
 public class Strafe extends Module {
+
+    // Outdated
+
     private final Setting<Boost> boost = new Setting<>("Boost", Boost.None);
     public Setting<Float> setSpeed = new Setting<>("speed", 1.3F, 0.0F, 2f, v -> boost.getValue() == Boost.Elytra);
     private final Setting<Float> velReduction = new Setting<>("Reduction", 6.0f, 0.1f, 10f, v -> boost.getValue() == Boost.Damage);

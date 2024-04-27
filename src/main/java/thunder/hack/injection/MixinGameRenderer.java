@@ -102,9 +102,13 @@ public abstract class MixinGameRenderer {
             mc.crosshairTarget = new EntityHitResult(Aura.target);
         }
 
-        if (ModuleManager.freeCam.isEnabled())
+        if (ModuleManager.freeCam.isEnabled()) {
+            mc.getProfiler().pop();
+            info.cancel();
             mc.crosshairTarget = ThunderHack.playerManager.getRtxTarget(ModuleManager.freeCam.getFakeYaw(), ModuleManager.freeCam.getFakePitch(), ModuleManager.freeCam.getFakeX(), ModuleManager.freeCam.getFakeY(), ModuleManager.freeCam.getFakeZ());
+        }
     }
+
 
     @Inject(method = "loadPrograms", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
     void loadAllTheShaders(ResourceFactory factory, CallbackInfo ci, List<ShaderStage> stages, List<Pair<ShaderProgram, Consumer<ShaderProgram>>> shadersToLoad) {

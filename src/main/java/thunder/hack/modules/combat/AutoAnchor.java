@@ -146,7 +146,7 @@ public final class AutoAnchor extends Module {
 
     @EventHandler
     @SuppressWarnings("unused")
-    private void onDeath(@NotNull DeathEvent event) {
+    private void onDeath(@NotNull EventDeath event) {
         if (!event.getPlayer().equals(target) || !render.getValue().isEnabled() || !death.getValue()) return;
 
         BlockAnimationUtility.renderBlock(

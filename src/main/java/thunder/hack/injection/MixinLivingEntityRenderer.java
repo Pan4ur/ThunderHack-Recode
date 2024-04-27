@@ -61,6 +61,12 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
             livingEntity.prevHeadYaw = ThunderHack.playerManager.lastYaw;
             livingEntity.prevBodyYaw = Render2DEngine.interpolateFloat(ThunderHack.playerManager.prevBodyYaw, ThunderHack.playerManager.bodyYaw, mc.getTickDelta());
         }
+
+        if (livingEntity != mc.player && ModuleManager.freeCam.isEnabled() && ModuleManager.freeCam.track.getValue() && ModuleManager.freeCam.trackEntity != null && ModuleManager.freeCam.trackEntity == livingEntity) {
+            ci.cancel();
+            return;
+        }
+
         lastEntity = livingEntity;
 
         if (livingEntity instanceof PlayerEntity pe && ModuleManager.chams.isEnabled() && ModuleManager.chams.players.getValue()) {
@@ -143,6 +149,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
     private void renderHook(Args args) {
         if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.antiPlayerCollision.getValue() && lastEntity != mc.player && lastEntity instanceof PlayerEntity pl && !pl.isInvisible())
             args.set(7, MathUtility.clamp((float) (mc.player.squaredDistanceTo(lastEntity.getPos()) / 3f) + 0.2f, 0f, 1f));
+
         if (lastEntity != mc.player && lastEntity instanceof PlayerEntity pl && pl.isInvisible() && ModuleManager.fTHelper.isEnabled() && ModuleManager.fTHelper.trueSight.getValue())
             args.set(7, 0.3f);
     }
