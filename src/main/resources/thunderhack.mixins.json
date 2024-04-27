@@ -51,6 +51,7 @@
     "accesors.INativeImage",
     "accesors.IPostProcessShader",
     "accesors.IRenderPhaseMixin",
+    "accesors.ISignEditScreen",
     "accesors.IWorldRenderer",
     "accesors.ShaderProgramAccessor"
   ],

@@ -77,6 +77,12 @@ public abstract class Module {
         mc.getNetworkHandler().sendPacket(packet);
     }
 
+    protected void sendPacketSilent(Packet<?> packet) {
+        if (mc.getNetworkHandler() == null) return;
+        ThunderHack.core.silentPackets.add(packet);
+        mc.getNetworkHandler().sendPacket(packet);
+    }
+
     protected void sendSequencedPacket(SequencedPacketCreator packetCreator) {
         if (mc.getNetworkHandler() == null || mc.world == null) return;
         try (PendingUpdateManager pendingUpdateManager = ((IClientWorldMixin) mc.world).getPendingUpdateManager().incrementSequence();){

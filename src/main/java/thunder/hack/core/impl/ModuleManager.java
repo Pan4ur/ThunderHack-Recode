@@ -176,6 +176,7 @@ public class ModuleManager implements IManager {
     public static AntiVoid antiVoid = new AntiVoid();
     public static KillFeed killFeed = new KillFeed();
     public static AutoWalk autoWalk = new AutoWalk();
+    public static AutoSign autoSign = new AutoSign();
     public static Breaker breaker = new Breaker();
     public static AutoEat autoEat = new AutoEat();
     public static AntiAFK antiAFK = new AntiAFK();

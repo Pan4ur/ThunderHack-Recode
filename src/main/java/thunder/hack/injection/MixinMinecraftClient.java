@@ -5,7 +5,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
 import net.minecraft.client.gui.screen.Overlay;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.SplashOverlay;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.texture.NativeImage;
@@ -29,10 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.EventAttack;
-import thunder.hack.events.impl.EventHandleBlockBreaking;
-import thunder.hack.events.impl.EventPostTick;
-import thunder.hack.events.impl.EventTick;
+import thunder.hack.events.impl.*;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.utility.render.WindowResizeCallback;
@@ -119,8 +115,15 @@ public abstract class MixinMinecraftClient {
           //  ThunderHack.shaderManager.reloadShaders();
     }
 
+    @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
+    public void setScreenHookPre(Screen screen, CallbackInfo ci) {
+        EventScreen event = new EventScreen(screen);
+        ThunderHack.EVENT_BUS.post(event);
+        if (event.isCancelled()) ci.cancel();
+    }
+
     @Inject(method = "setScreen", at = @At("RETURN"))
-    public void setScreenHook(Screen screen, CallbackInfo ci) {
+    public void setScreenHookPost(Screen screen, CallbackInfo ci) {
         if (screen instanceof MultiplayerScreen mScreen && ModuleManager.antiServerAdd.isEnabled() && mScreen.getServerList() != null) {
             for (int i = 0; i < mScreen.getServerList().size(); i++) {
                 ServerInfo info = mScreen.getServerList().get(i);

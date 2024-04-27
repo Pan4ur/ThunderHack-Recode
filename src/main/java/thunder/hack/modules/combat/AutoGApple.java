@@ -5,6 +5,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Formatting;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.PostPlayerUpdateEvent;
+import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
@@ -33,7 +34,10 @@ public final class AutoGApple extends Module {
         if (GapInOffHand()) {
             if (mc.player.getHealth() + (absorption.getValue() ? mc.player.getAbsorptionAmount() : 0) <= health.getValue() && useDelay.passedMs(Delay.getValue())) {
                 isActive = true;
-                mc.options.useKey.setPressed(true);
+                if (mc.currentScreen != null && !mc.player.isUsingItem())
+                    ((IMinecraftClient) mc).idoItemUse();
+                else
+                    mc.options.useKey.setPressed(true);
             } else if (isActive) {
                 isActive = false;
                 mc.options.useKey.setPressed(false);
@@ -45,8 +49,8 @@ public final class AutoGApple extends Module {
     }
 
     private boolean GapInOffHand() {
-        if(autoTotemIntegration.getValue() && ModuleManager.autoTotem.isEnabled()) {
-            if(!ModuleManager.autoTotem.rcGap.is(AutoTotem.RCGap.Off))
+        if (autoTotemIntegration.getValue() && ModuleManager.autoTotem.isEnabled()) {
+            if (!ModuleManager.autoTotem.rcGap.is(AutoTotem.RCGap.Off))
                 return true;
             else
                 sendMessage(Formatting.RED + (isRu() ? "Включи RcGap в AutoTotem!" : "Enable RcGap in AutoTotem"));

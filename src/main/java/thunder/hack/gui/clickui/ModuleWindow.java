@@ -101,7 +101,8 @@ public class ModuleWindow extends AbstractWindow {
         {
             RenderSystem.setShaderTexture(0, ICON);
             RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
+           // RenderSystem.defaultBlendFunc();
+            RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
             Render2DEngine.addWindow(context.getMatrices(), x + 2, y - 4, x + 2 + width - 4, y - 5 + height, 1);
             Render2DEngine.renderGradientTexture(context.getMatrices(), x + 85, (y + (height - 24) / 2), 12, 12, 0, 0, 12, 12, 12, 12, m1.darker(), m2.darker(), m3.darker(), m4.darker());
             Render2DEngine.renderGradientTexture(context.getMatrices(), x + 75, (y + (height - 34) / 2), 16, 16, 0, 0, 16, 16, 16, 16, m1, m2, m3, m4);

@@ -12,7 +12,7 @@ import thunder.hack.ThunderHack;
 @Mixin(ClientPlayNetworkHandler.class)
 public class MixinClientPlayNetworkHandler {
     @Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
-    private void onSendChatMessage(@NotNull String message, CallbackInfo ci) {
+    private void sendChatMessageHook(@NotNull String message, CallbackInfo ci) {
         if (message.startsWith(ThunderHack.commandManager.getPrefix())) {
             try {
                 ThunderHack.commandManager.getDispatcher().execute(

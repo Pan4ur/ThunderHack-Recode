@@ -8,6 +8,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FishingBobberEntity;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
@@ -49,6 +50,7 @@ import static thunder.hack.modules.client.ClientSettings.isRu;
 public final class Core {
     public static boolean lockSprint, serverSprint, hold_mouse0, showSkull;
     public static final Map<String, Identifier> HEADS = new ConcurrentHashMap<>();
+    public ArrayList<Packet<?>> silentPackets = new ArrayList<>();
     private final Identifier SKULL = new Identifier("textures/skull.png");
     private final Timer skullTimer = new Timer();
     private final Timer lastPacket = new Timer();

@@ -6,6 +6,7 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
@@ -51,7 +52,12 @@ public class AutoEat extends Module {
             }
 
             eating = true;
-            mc.options.useKey.setPressed(true);
+
+            if (mc.currentScreen != null && !mc.player.isUsingItem())
+                ((IMinecraftClient) mc).idoItemUse();
+            else
+                mc.options.useKey.setPressed(true);
+
         } else if (eating) {
             eating = false;
             mc.options.useKey.setPressed(false);

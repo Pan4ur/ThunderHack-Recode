@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinEntityRenderer<T extends Entity> {
     @Inject(method = "renderLabelIfPresent", at = @At("HEAD"), cancellable = true)
     private void renderLabelIfPresent(T entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo info) {
-        if(entity instanceof ArmorStandEntity && ModuleManager.noRender.noArmorStands.getValue())
+        if(entity instanceof ArmorStandEntity && ModuleManager.noRender.isEnabled() && ModuleManager.noRender.noArmorStands.getValue())
             info.cancel();
 
         if (entity instanceof PlayerEntity && ModuleManager.nameTags.isEnabled())
