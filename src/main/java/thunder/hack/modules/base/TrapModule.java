@@ -61,7 +61,6 @@ public abstract class TrapModule extends PlaceModule {
                     float[] angle = InteractionUtility.calculateAngle(result.getPos());
                     mc.player.setYaw(angle[0]);
                     mc.player.setPitch(angle[1]);
-
                 }
             }
         }
@@ -85,7 +84,8 @@ public abstract class TrapModule extends PlaceModule {
                     placed++;
                     delay = placeDelay.getValue();
                     inactivityTimer.reset();
-                } else break;
+                } else
+                    break;
             }
         } else if (placeTiming.getValue() == PlaceTiming.Vanilla || placeTiming.getValue() == PlaceTiming.Sequential) {
             BlockPos targetBlock = getBlockToPlace();
@@ -139,22 +139,26 @@ public abstract class TrapModule extends PlaceModule {
                 offsets.addAll(holePoses.stream()
                         .map(BlockPos::down)
                         .toList());
+
                 if (interact.getValue() != InteractionUtility.Interact.AirPlace)
                     offsets.addAll(addHelpOffsets(surroundPoses));
+
                 offsets.addAll(surroundPoses);
                 offsets.addAll(surroundPoses.stream()
                         .map(BlockPos::up)
                         .toList());
+
                 if (interact.getValue() != InteractionUtility.Interact.AirPlace) {
                     surroundPoses.stream()
                             .map(pos -> pos.up(2))
                             .filter(pos -> pos.getSquaredDistance(mc.player.getPos()) < range.getPow2Value())
-                            .max(Comparator.comparing(pos -> player.squaredDistanceTo(pos.toCenterPos())))
+                            .max(Comparator.comparing(pos -> mc.player.squaredDistanceTo(pos.toCenterPos())))
                             .ifPresent(pos -> {
                                 offsets.add(pos);
                                 offsets.add(pos.down());
                             });
                 }
+
                 offsets.addAll(holePoses.stream()
                         .map(pos -> pos.up(2))
                         .toList());

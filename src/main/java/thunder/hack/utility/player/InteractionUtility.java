@@ -7,7 +7,6 @@ import net.minecraft.client.network.SequencedPacketCreator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
@@ -40,13 +39,15 @@ public final class InteractionUtility {
 
     public static Map<BlockPos, Long> awaiting = new HashMap<>();
 
+    public static boolean canSee(Vec3d vec) {
+        return canSee(vec, vec);
+    }
+
     public static boolean canSee(Entity entity) {
         Vec3d entityEyes = getEyesPos(entity);
         Vec3d entityPos = entity.getPos();
         return canSee(entityEyes, entityPos);
     }
-
-    // 1.5 - 3.2
 
     public static boolean canSee(Vec3d entityEyes, Vec3d entityPos) {
         if (mc.player == null || mc.world == null) return false;
@@ -159,13 +160,11 @@ public final class InteractionUtility {
                 if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity))
                     return null;
 
-        if (!mc.world.getBlockState(bp).isReplaceable()) {
+        if (!mc.world.getBlockState(bp).isReplaceable())
             return null;
-        }
 
-        if(interact == Interact.AirPlace) {
+        if(interact == Interact.AirPlace)
             return ExplosionUtility.rayCastBlock(new RaycastContext(InteractionUtility.getEyesPos(mc.player), bp.toCenterPos(), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player), bp);
-        }
 
         ArrayList<BlockPosWithFacing> supports = getSupportBlocks(bp);
         for (BlockPosWithFacing support : supports) {
@@ -193,6 +192,7 @@ public final class InteractionUtility {
 
 
     public static @NotNull ArrayList<BlockPosWithFacing> getSupportBlocks(@NotNull BlockPos bp) {
+
         ArrayList<BlockPosWithFacing> list = new ArrayList<>();
 
         if (mc.world.getBlockState(bp.add(0, -1, 0)).isSolid() || awaiting.containsKey(bp.add(0, -1, 0)))
@@ -252,26 +252,38 @@ public final class InteractionUtility {
         double upDelta = getEyesPos(mc.player).y - (positionVector.add(0, 0.5, 0).y);
         double downDelta = getEyesPos(mc.player).y - (positionVector.add(0, -0.5, 0).y);
 
-        if (westDelta > 0 && !isReplaceable(bp.west())) visibleSides.add(Direction.EAST);
-        if (westDelta < 0 && !isReplaceable(bp.east())) visibleSides.add(Direction.WEST);
-        if (eastDelta < 0 && !isReplaceable(bp.east())) visibleSides.add(Direction.WEST);
-        if (eastDelta > 0 && !isReplaceable(bp.west())) visibleSides.add(Direction.EAST);
+        if (westDelta > 0 && isSolid(bp.west()))
+            visibleSides.add(Direction.EAST);
+        if (westDelta < 0 && isSolid(bp.east()))
+            visibleSides.add(Direction.WEST);
+        if (eastDelta < 0 && isSolid(bp.east()))
+            visibleSides.add(Direction.WEST);
+        if (eastDelta > 0 && isSolid(bp.west()))
+            visibleSides.add(Direction.EAST);
 
-        if (northDelta > 0 && !isReplaceable(bp.north())) visibleSides.add(Direction.SOUTH);
-        if (northDelta < 0 && !isReplaceable(bp.south())) visibleSides.add(Direction.NORTH);
-        if (southDelta < 0 && !isReplaceable(bp.south())) visibleSides.add(Direction.NORTH);
-        if (southDelta > 0 && !isReplaceable(bp.north())) visibleSides.add(Direction.SOUTH);
+        if (northDelta > 0 && isSolid(bp.north()))
+            visibleSides.add(Direction.SOUTH);
+        if (northDelta < 0 && isSolid(bp.south()))
+            visibleSides.add(Direction.NORTH);
+        if (southDelta < 0 && isSolid(bp.south()))
+            visibleSides.add(Direction.NORTH);
+        if (southDelta > 0 && isSolid(bp.north()))
+            visibleSides.add(Direction.SOUTH);
 
-        if (upDelta > 0 && !isReplaceable(bp.down())) visibleSides.add(Direction.UP);
-        if (upDelta < 0 && isReplaceable(bp.up())) visibleSides.add(Direction.DOWN);
-        if (downDelta < 0 && isReplaceable(bp.up())) visibleSides.add(Direction.DOWN);
-        if (downDelta > 0 && isReplaceable(bp.down())) visibleSides.add(Direction.UP);
+        if (upDelta > 0 && isSolid(bp.down()))
+            visibleSides.add(Direction.UP);
+        if (upDelta < 0 && isSolid(bp.up()))
+            visibleSides.add(Direction.DOWN);
+        if (downDelta < 0 && isSolid(bp.up()))
+            visibleSides.add(Direction.DOWN);
+        if (downDelta > 0 && isSolid(bp.down()))
+            visibleSides.add(Direction.UP);
 
         return visibleSides;
     }
 
-    public static boolean isReplaceable(BlockPos bp) {
-        return mc.world.getBlockState(bp).isReplaceable() || awaiting.containsKey(bp);
+    public static boolean isSolid(BlockPos bp) {
+        return mc.world.getBlockState(bp).isSolid() || awaiting.containsKey(bp);
     }
 
     public static @NotNull List<Direction> getStrictBlockDirections(@NotNull BlockPos bp) {

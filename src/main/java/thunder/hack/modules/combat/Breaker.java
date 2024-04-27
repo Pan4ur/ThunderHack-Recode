@@ -16,6 +16,7 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.ExplosionUtility;
 
 import java.util.ArrayList;
@@ -31,6 +32,8 @@ public final class Breaker extends Module {
 
     private BlockPos blockPos;
 
+    private Timer pause = new Timer();
+
     public Breaker() {
         super("Breaker", Category.COMBAT);
     }
@@ -40,6 +43,9 @@ public final class Breaker extends Module {
     private void onSync(EventSync event) {
         PlayerEntity target = ThunderHack.combatManager.getTarget(range.getValue(), targetBy.getValue());
         if (target == null)
+            return;
+
+        if(!pause.passedMs(600))
             return;
 
         if (blockPos != null) {
@@ -102,6 +108,10 @@ public final class Breaker extends Module {
 
         BreakData best = list.stream().max(Comparator.comparing(BreakData::damage)).orElse(null);
         blockPos = best == null ? null : best.blockPos();
+    }
+
+    public void pause() {
+        pause.reset();
     }
 
     private record BreakData(BlockPos blockPos, float damage) {

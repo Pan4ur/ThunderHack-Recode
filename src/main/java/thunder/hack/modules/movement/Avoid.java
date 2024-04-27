@@ -27,7 +27,7 @@ public class Avoid extends Module {
     private final Setting<Boolean> lava = new Setting<>("Lava", true);
     private final Setting<Boolean> plate = new Setting<>("Plate", true);
     private final Setting<Boolean> trapString = new Setting<>("Tripwire", true);
-    
+
     @EventHandler
     public void onCollide(EventCollision e) {
         if (fullNullCheck())

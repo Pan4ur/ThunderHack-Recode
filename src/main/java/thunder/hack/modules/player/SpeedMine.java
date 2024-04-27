@@ -206,6 +206,7 @@ public final class SpeedMine extends Module {
                         } else
                             debug("placeCrystalData is null");
                         ModuleManager.autoTrap.pause();
+                        ModuleManager.breaker.pause();
                     }
 
                     if (switchMode.getValue() == SwitchMode.Alternative) {

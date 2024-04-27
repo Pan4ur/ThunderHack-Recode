@@ -150,7 +150,7 @@ public final class Burrow extends Module {
             return;
         }
 
-        if (timer.passedMs(1000)) {
+        if (timer.passedMs(250)) {
             if (rotate.getValue()) sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), 90, onGround.getValue()));
 
             InventoryUtility.saveSlot();
@@ -171,7 +171,7 @@ public final class Burrow extends Module {
             return;
         }
 
-        if (timer.passedMs(1000)) {
+        if (timer.passedMs(250)) {
             if (rotate.getValue()) sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), 90, onGround.getValue()));
             InventoryUtility.saveSlot();
             InteractionUtility.placeBlock(pos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, skullResult.slot(), false, true);
