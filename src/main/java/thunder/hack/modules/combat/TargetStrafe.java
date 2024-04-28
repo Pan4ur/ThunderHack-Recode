@@ -103,7 +103,7 @@ public class TargetStrafe extends Module {
         if (mc.player.isOnGround()) {
             n8 = speedAttributes * n7;
             if (move.getY() > 0) {
-                n8 += boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && disabled ? 0.65 : 0.2f;
+                n8 += boost.getValue() == Boost.Elytra && InventoryUtility.getElytra() != -1 && disabled ? 0.65f : 0.2f;
             }
             disabled = false;
         } else {
@@ -272,11 +272,5 @@ public class TargetStrafe extends Module {
 
     private enum Boost {
         None, Elytra, Damage
-    }
-
-    private static float getFrictionFactor() {
-        BlockPos.Mutable bp = new BlockPos.Mutable();
-        bp.set(mc.player.prevX, mc.player.getBoundingBox().minY - 0.8D, mc.player.prevZ);
-        return mc.world.getBlockState(bp).getBlock().getSlipperiness() * 0.91F;
     }
 }

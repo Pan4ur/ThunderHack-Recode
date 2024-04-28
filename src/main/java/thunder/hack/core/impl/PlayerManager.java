@@ -134,27 +134,37 @@ public class PlayerManager implements IManager {
         if (rt == Aura.RayTrace.OFF)
             return true;
 
-        Entity targetedEntity;
         HitResult result = rayTrace(distance, yaw, pitch);
-        Vec3d eyePos = mc.player.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
+        Vec3d startPoint = mc.player.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
         double distancePow2 = Math.pow(distance, 2);
 
         if (result != null)
-            distancePow2 = eyePos.squaredDistanceTo(result.getPos());
+            distancePow2 = startPoint.squaredDistanceTo(result.getPos());
 
-        Vec3d vec3d2 = getRotationVector(pitch, yaw);
-        Vec3d vec3d3 = eyePos.add(vec3d2.x * distance, vec3d2.y * distance, vec3d2.z * distance);
-        Box box = mc.player.getBoundingBox().stretch(vec3d2.multiply(distance)).expand(1.0, 1.0, 1.0);
-        EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, eyePos, vec3d3, box, (entity) -> !entity.isSpectator() && entity.canHit(), Math.max(distancePow2, Math.pow(wallDistance, 2)));
-        if (entityHitResult != null) {
-            if (entityHitResult.getEntity() instanceof FireworkRocketEntity)
-                return false;
-            Entity entity2 = entityHitResult.getEntity();
-            if (eyePos.squaredDistanceTo(entityHitResult.getPos()) <= Math.pow(wallDistance, 2) || eyePos.squaredDistanceTo(entityHitResult.getPos()) < distancePow2 || result == null) {
-                targetedEntity = entity2;
-                return targetedEntity == Aura.target || Aura.target == null || rt != Aura.RayTrace.AllEntities;
-            }
+        Vec3d rotationVector = getRotationVector(pitch, yaw).multiply(distance);
+        Vec3d endPoint = startPoint.add(rotationVector);
+        
+        Box entityArea = mc.player.getBoundingBox().stretch(rotationVector).expand(1.0, 1.0, 1.0);
+        
+        EntityHitResult ehr;
+
+        double maxDistance = Math.max(distancePow2, Math.pow(wallDistance, 2));
+
+        if (rt == Aura.RayTrace.OnlyTarget && Aura.target != null)
+            ehr = ProjectileUtil.raycast(mc.player, startPoint, endPoint, entityArea, e -> !e.isSpectator() && e.canHit() && e == Aura.target, maxDistance);
+        else
+            ehr = ProjectileUtil.raycast(mc.player, startPoint, endPoint, entityArea, e -> !e.isSpectator() && e.canHit(), maxDistance);
+
+        if (ehr != null) {
+            boolean allowedWallDistance = startPoint.squaredDistanceTo(ehr.getPos()) <= Math.pow(wallDistance, 2);
+            boolean wallMissing = result == null;
+            boolean wallBehindEntity = startPoint.squaredDistanceTo(ehr.getPos()) < distancePow2;
+            boolean allowWallHit = wallMissing || allowedWallDistance || wallBehindEntity;
+
+            if (allowWallHit && startPoint.squaredDistanceTo(ehr.getPos()) <= Math.pow(distance, 2))
+                return ehr.getEntity() == Aura.target || Aura.target == null || rt == Aura.RayTrace.OnlyTarget;
         }
+
         return false;
     }
 
