@@ -18,7 +18,10 @@ public class MixinRenderTickCounter {
     @Final @Shadow private float tickTime;
 
     @Inject(method = "beginRenderTick", at = @At("HEAD"), cancellable = true)
-    private void beginRenderTick(long timeMillis, CallbackInfoReturnable<Integer> cir) {
+    private void beginRenderTickHook(long timeMillis, CallbackInfoReturnable<Integer> cir) {
+        if(ThunderHack.TICK_TIMER == 1)
+            return;
+
         this.lastFrameDuration = ((timeMillis - this.prevTimeMillis) / this.tickTime) * ThunderHack.TICK_TIMER;
         this.prevTimeMillis = timeMillis;
         this.tickDelta += this.lastFrameDuration;
