@@ -51,17 +51,18 @@ public class ElytraRecast extends Module {
 
     @EventHandler
     public void modifyVelocity(EventTravel e) {
-        if (e.isPre()) {
-            prevClientPitch = mc.player.getPitch();
-            prevClientYaw = mc.player.getYaw();
-            mc.player.setPitch(pitchValue.getValue());
-            if (exploit.getValue() == Exploit.Strict)
-                mc.player.setYaw(mc.player.getYaw() + (20 * MathUtility.sin((System.currentTimeMillis() - ThunderHack.initTime) / 50f)));
-        } else {
-            mc.player.setPitch(prevClientPitch);
-            if (exploit.getValue() == Exploit.Strict)
-                mc.player.setYaw(prevClientYaw);
-        }
+        if (changePitch.getValue())
+            if (e.isPre()) {
+                prevClientPitch = mc.player.getPitch();
+                prevClientYaw = mc.player.getYaw();
+                mc.player.setPitch(pitchValue.getValue());
+                if (exploit.getValue() == Exploit.Strict)
+                    mc.player.setYaw(mc.player.getYaw() + (20 * MathUtility.sin((System.currentTimeMillis() - ThunderHack.initTime) / 50f)));
+            } else {
+                mc.player.setPitch(prevClientPitch);
+                if (exploit.getValue() == Exploit.Strict)
+                    mc.player.setYaw(prevClientYaw);
+            }
     }
 
     @Override
