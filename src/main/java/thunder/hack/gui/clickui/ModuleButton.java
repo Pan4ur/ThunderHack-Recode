@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.impl.*;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.TargetHud;
@@ -96,13 +97,14 @@ public class ModuleButton extends AbstractButton {
         } else offset_animation = 1f;
 
         if (isOpen()) {
-            Render2DEngine.drawGuiBase(context.getMatrices(), x + 4, y + height - 12f, width - 8, height + (float) getElementsHeight(), 1f, 0);
+            Render2DEngine.drawGuiBase(context.getMatrices(), x + 4, y + 2f, width - 8, height + (float) getElementsHeight(), 1f, 0);
             Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle(x + 1, y + height - 15, width + x - 2, (float) (height + y + 1f + getElementsHeight())));
 
-            if (mc.player != null) {
+            if (mc.player != null && ModuleManager.clickGui.gear.getValue().isEnabled()) {
                 Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle(x, y + height + 1, (width) + x + 6, (float) ((height) + y + 1f + getElementsHeight())));
                 float px = x + 4 + (width - 8) / 2f;
                 float py = y + 12f + (height + (float) getElementsHeight()) / 2f;
+                int gScale = ModuleManager.clickGui.gearScale.getValue();
                 context.getMatrices().push();
                 context.getMatrices().translate(px, py, 0.0F);
                 context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(gearAnimation.getValue()));
@@ -110,7 +112,7 @@ public class ModuleButton extends AbstractButton {
                 RenderSystem.setShaderTexture(0, Gear);
                 RenderSystem.enableBlend();
                 RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-                Render2DEngine.renderGradientTexture(context.getMatrices(), px - 30, py - 30, 60, 60, 0, 0, 60, 60, 60, 60,
+                Render2DEngine.renderGradientTexture(context.getMatrices(), px - gScale / 2f, py - gScale / 2f, gScale, gScale, 0, 0, gScale, gScale, gScale, gScale,
                         Render2DEngine.injectAlpha(HudEditor.getColor(270).darker(), 110),
                         Render2DEngine.injectAlpha(HudEditor.getColor(0).darker(), 110),
                         Render2DEngine.injectAlpha(HudEditor.getColor(180).darker(), 110),
@@ -218,7 +220,7 @@ public class ModuleButton extends AbstractButton {
                 if (ClickGui.getInstance().textSide.getValue() == ClickGui.TextSide.Left)
                     FontRenderers.sf_medium_modules.drawString(context.getMatrices(), module.getName(), ix + 2, iy + 2, module.isEnabled() ? HudEditor.textColor2.getValue().getColor() : HudEditor.textColor.getValue().getColor());
                 else
-                    FontRenderers.sf_medium_modules.drawCenteredString(context.getMatrices(), module.getName(), ix + 44, iy + 2, module.isEnabled() ? HudEditor.textColor2.getValue().getColor() : HudEditor.textColor.getValue().getColor());
+                    FontRenderers.sf_medium_modules.drawCenteredString(context.getMatrices(), module.getName(), ix + getWidth() / 2 - 4, iy + 2, module.isEnabled() ? HudEditor.textColor2.getValue().getColor() : HudEditor.textColor.getValue().getColor());
             }
         }
     }

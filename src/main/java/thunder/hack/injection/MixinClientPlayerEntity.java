@@ -128,4 +128,10 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             info.cancel();
         }
     }
+
+    @Inject(method = "updateNausea", at = @At("HEAD"), cancellable = true)
+    private void updateNauseaHook(CallbackInfo ci) {
+        if(ModuleManager.portalInventory.isEnabled())
+            ci.cancel();
+    }
 }

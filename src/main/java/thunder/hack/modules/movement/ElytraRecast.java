@@ -34,19 +34,24 @@ public class ElytraRecast extends Module {
     public Setting<Boolean> autoJump = new Setting<>("AutoJump", true);
     public Setting<Boolean> allowBroken = new Setting<>("AllowBroken", true);
 
-    private float prevClientPitch, prevClientYaw;
+    private float prevClientPitch, prevClientYaw, jitter;
 
 
     private enum Exploit {
-        None, Strict
+        None, Strict, Strong
     }
 
     @EventHandler
     public void onSync(EventSync e) {
         if (changePitch.getValue())
             mc.player.setPitch(pitchValue.getValue());
-        if (exploit.getValue() == Exploit.Strict)
-            mc.player.setYaw(mc.player.getYaw() + (20 * MathUtility.sin((System.currentTimeMillis() - ThunderHack.initTime) / 50f)));
+
+        switch (exploit.getValue()) {
+            case None -> {
+            }
+            case Strict -> mc.player.setYaw(mc.player.getYaw() + jitter);
+            case Strong -> mc.player.setPitch(pitchValue.getValue() - Math.abs(jitter / 2f));
+        }
     }
 
     @EventHandler
@@ -56,8 +61,13 @@ public class ElytraRecast extends Module {
                 prevClientPitch = mc.player.getPitch();
                 prevClientYaw = mc.player.getYaw();
                 mc.player.setPitch(pitchValue.getValue());
-                if (exploit.getValue() == Exploit.Strict)
-                    mc.player.setYaw(mc.player.getYaw() + (20 * MathUtility.sin((System.currentTimeMillis() - ThunderHack.initTime) / 50f)));
+
+                switch (exploit.getValue()) {
+                    case None -> {
+                    }
+                    case Strict -> mc.player.setYaw(mc.player.getYaw() + jitter);
+                    case Strong -> mc.player.setPitch(pitchValue.getValue() - Math.abs(jitter / 2f));
+                }
             } else {
                 mc.player.setPitch(prevClientPitch);
                 if (exploit.getValue() == Exploit.Strict)
@@ -80,6 +90,8 @@ public class ElytraRecast extends Module {
 
         if (!mc.player.isFallFlying() && mc.player.fallDistance > 0 && checkElytra() && !mc.player.isFallFlying())
             castElytra();
+
+        jitter = (20 * MathUtility.sin((System.currentTimeMillis() - ThunderHack.initTime) / 50f));
 
         ((ILivingEntity) mc.player).setLastJumpCooldown(0);
     }

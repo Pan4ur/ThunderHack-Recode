@@ -5,6 +5,7 @@ import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSignC2SPacket;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Direction;
@@ -17,6 +18,8 @@ import thunder.hack.utility.player.SearchInvResult;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class AutoSign extends Module {
     public AutoSign() {
@@ -53,6 +56,14 @@ public class AutoSign extends Module {
     }
 
     public String format(String s) {
-        return s.replace("<player>", mc.getSession().getUsername()).replace("<date>", new SimpleDateFormat(dateFormat.getValue()).format(new Date()));
+        String format = "dd/MM/yyyy";
+
+        try {
+            format = new SimpleDateFormat(dateFormat.getValue()).format(new Date());
+        } catch (Exception e) {
+            sendMessage(Formatting.RED + (isRu() ? "У тебя не правильный формат даты!" : "Your date format is wrong!"));
+        }
+
+        return s.replace("<player>", mc.getSession().getUsername()).replace("<date>", format);
     }
 }

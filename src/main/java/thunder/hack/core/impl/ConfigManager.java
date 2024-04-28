@@ -1,6 +1,7 @@
 package thunder.hack.core.impl;
 
 import com.google.gson.*;
+import com.mojang.logging.LogUtils;
 import net.minecraft.block.Block;
 import net.minecraft.util.Pair;
 import org.apache.commons.io.IOUtils;
@@ -378,7 +379,7 @@ public class ConfigManager implements IManager {
                             setting2.setValue(mobject.getAsJsonPrimitive(setting2.getName()).getAsInt());
                             continue;
                         case "String":
-                            setting2.setValue(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().replace("_", " "));
+                            setting2.setValue(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().replace("_", " ").replace("++", "/"));
                             continue;
                         case "Bind":
                             try {
@@ -470,10 +471,13 @@ public class ConfigManager implements IManager {
                 continue;
             }
             if (setting.isStringSetting()) {
+                String str = (String) setting.getValue();
+
                 try {
-                    String str = (String) setting.getValue();
-                    attribs.add(setting.getName(), jp.parse(str.replace(" ", "_")));
-                } catch (Exception ignored) {
+                    attribs.add(setting.getName(), jp.parse(str.replace(" ", "_").replace("/", "++")));
+                } catch (Exception exception) {
+                    LogUtils.getLogger().info(m.getName() + " " + setting.getName() + " " + str);
+                    exception.printStackTrace();
                 }
                 continue;
             }

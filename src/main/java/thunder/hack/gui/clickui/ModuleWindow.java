@@ -43,6 +43,8 @@ public class ModuleWindow extends AbstractWindow {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
+        setWidth(ModuleManager.clickGui.moduleWidth.getValue());
+
         scrollHover = Render2DEngine.isHovered(mouseX, mouseY, x, y + height, width, 4000);
 
         context.getMatrices().push();
@@ -88,7 +90,7 @@ public class ModuleWindow extends AbstractWindow {
                 }
                 button.setX(x + 2);
                 button.setWidth(width - 4);
-                button.setHeight(14);
+                button.setHeight(ModuleManager.clickGui.moduleHeight.getValue());
                 button.render(context, mouseX, mouseY, delta);
             }
         }

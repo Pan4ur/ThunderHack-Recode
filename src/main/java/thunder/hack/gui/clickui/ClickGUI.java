@@ -60,7 +60,6 @@ public class ClickGUI extends Screen {
         if (firstOpen) {
             float offset = 0;
             int windowHeight = 18;
-
             for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
                 if (category == Module.Category.HUD) continue;
                 ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category), 20f + offset, 20, 100, windowHeight);

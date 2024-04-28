@@ -216,7 +216,7 @@ public class PlayerManager implements IManager {
         Vec3d vec3d2 = getRotationVector(pitch, yaw);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * 5, vec3d2.y * 5, vec3d2.z * 5);
         Box box = new Box(x - .3, y, z - .3, x + .3, y + 1.8, z + .3).stretch(vec3d2.multiply(5)).expand(1.0, 1.0, 1.0);
-        EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator(), distancePow2);
+        EntityHitResult entityHitResult = ProjectileUtil.raycast(mc.player, vec3d, vec3d3, box, (entity) -> !entity.isSpectator() && entity.canHit(), distancePow2);
         if (entityHitResult != null) {
             Entity entity2 = entityHitResult.getEntity();
             Vec3d vec3d4 = entityHitResult.getPos();
