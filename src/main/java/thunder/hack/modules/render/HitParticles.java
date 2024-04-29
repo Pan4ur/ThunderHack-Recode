@@ -1,50 +1,81 @@
 package thunder.hack.modules.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.block.AirBlock;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static thunder.hack.utility.render.Render2DEngine.*;
 
 public class HitParticles extends Module {
+
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Stars);
     private final Setting<Physics> physics = new Setting<>("Physics", Physics.Fall);
-    public final Setting<ColorSetting> colorrr = new Setting<>("Color", new ColorSetting(0x8800FF00));
-    public Setting<Boolean> selfp = new Setting<>("Self", false);
-    public Setting<Integer> amount = new Setting<>("Amount", 2, 1, 5);
-    public Setting<Integer> lifeTime = new Setting<>("LifeTime", 2, 1, 10);
-    public Setting<Integer> speed = new Setting<>("Speed", 2, 1, 20);
-    CopyOnWriteArrayList<Particle> particles = new CopyOnWriteArrayList<>();
-    public Setting<Integer> starsScale = new Setting<>("Scale", 3, 1, 10, v -> mode.getValue() != Mode.Orbiz);
-    private final Setting<ColorMode> colorMode = new Setting("ColorMode", ColorMode.Sync);
+    private final Setting<ColorSetting> colorrr = new Setting<>("Color", new ColorSetting(0x8800FF00));
+    private final Setting<Boolean> selfp = new Setting<>("Self", false);
+    private final Setting<Integer> amount = new Setting<>("Amount", 2, 1, 5);
+    private final Setting<Integer> lifeTime = new Setting<>("LifeTime", 2, 1, 10);
+    private final Setting<Integer> speed = new Setting<>("Speed", 2, 1, 20);
+    private final Setting<Float> starsScale = new Setting<>("Scale", 3f, 1f, 10f, v -> mode.getValue() != Mode.Orbiz);
+    private final Setting<ColorMode> colorMode = new Setting<>("ColorMode", ColorMode.Sync);
+    private final Setting<ColorSetting> colorH = new Setting<>("HealColor", new ColorSetting(3142544), v -> mode.is(Mode.Text));
+    private final Setting<ColorSetting> colorD = new Setting<>("DamageColor", new ColorSetting(15811379), v -> mode.is(Mode.Text));
 
     public HitParticles() {
         super("HitParticles", Category.RENDER);
     }
 
+    private final HashMap<Integer, Float> healthMap = new HashMap<>();
+    private final CopyOnWriteArrayList<Particle> particles = new CopyOnWriteArrayList<>();
+
     @Override
     public void onUpdate() {
+        particles.removeIf(particle -> System.currentTimeMillis() - particle.getTime() > lifeTime.getValue() * 1000);
+
+        if (mode.is(Mode.Text)) {
+            for (Entity entity : mc.world.getEntities()) {
+                if (entity == null || mc.player.squaredDistanceTo(entity) > 256f || !entity.isAlive() || !(entity instanceof LivingEntity lent))
+                    continue;
+
+                Color c = colorMode.getValue() == ColorMode.Sync ? HudEditor.getColor((int) MathUtility.random(1, 228)) : colorrr.getValue().getColorObject();
+                float health = lent.getHealth() + lent.getAbsorptionAmount();
+                float lastHealth = healthMap.getOrDefault(entity.getId(), health);
+                healthMap.put(entity.getId(), health);
+                if (lastHealth == health)
+                    continue;
+
+                particles.add(new Particle((float) lent.getX(), MathUtility.random((float) (lent.getY() + lent.getHeight()), (float) lent.getY()), (float) lent.getZ(), c,
+                        MathUtility.random(0, 180), MathUtility.random(10f, 60f), health - lastHealth));
+            }
+            return;
+        }
+
         for (PlayerEntity player : mc.world.getPlayers()) {
             if (!selfp.getValue() && player == mc.player) continue;
             if (player.hurtTime > 0) {
                 Color c = colorMode.getValue() == ColorMode.Sync ? HudEditor.getColor((int) MathUtility.random(1, 228)) : colorrr.getValue().getColorObject();
                 for (int i = 0; i < amount.getValue(); i++) {
-                    particles.add(new Particle(player.getX(), MathUtility.random((float) (player.getY() + player.getHeight()), (float) player.getY()), player.getZ(), c));
+                    particles.add(new Particle((float) player.getX(), MathUtility.random((float) (player.getY() + player.getHeight()), (float) player.getY()), (float) player.getZ(), c, MathUtility.random(0, 180), MathUtility.random(10f, 60f), 0));
                 }
             }
         }
-        particles.removeIf(particle -> System.currentTimeMillis() - particle.getTime() > lifeTime.getValue() * 1000);
     }
 
     public void onRender3D(MatrixStack stack) {
@@ -58,16 +89,21 @@ public class HitParticles extends Module {
     }
 
     public class Particle {
-        double x;
-        double y;
-        double z;
-        double motionX;
-        double motionY;
-        double motionZ;
+        float x;
+        float y;
+        float z;
+        float motionX;
+        float motionY;
+        float motionZ;
+
+        float rotationAngle;
+        float rotationSpeed;
+        float health;
+
         long time;
         Color color;
 
-        public Particle(double x, double y, double z, Color color) {
+        public Particle(float x, float y, float z, Color color, float rotationAngle, float rotationSpeed, float health) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -76,6 +112,9 @@ public class HitParticles extends Module {
             motionZ = MathUtility.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
             time = System.currentTimeMillis();
             this.color = color;
+            this.rotationAngle = rotationAngle;
+            this.rotationSpeed = rotationSpeed;
+            this.health = health;
         }
 
         public long getTime() {
@@ -89,7 +128,7 @@ public class HitParticles extends Module {
             z += motionZ;
 
             if (posBlock(x, y - starsScale.getValue() / 10f, z)) {
-                motionY = -motionY / 1.1;
+                motionY = -motionY / 1.1f;
             } else {
                 if (posBlock(x - sp, y, z - sp)
                         || posBlock(x + sp, y, z + sp)
@@ -103,27 +142,40 @@ public class HitParticles extends Module {
                     motionX = -motionX;
                     motionZ = -motionZ;
                 }
+                motionY = 0;
             }
 
             if (physics.getValue() == Physics.Fall) motionY -= 0.0005f;
-            motionX /= 1.005;
-            motionZ /= 1.005;
-            motionY /= 1.005;
+            motionX /= 1.005f;
+            motionZ /= 1.005f;
+            motionY /= 1.005f;
         }
 
         public void render(MatrixStack matrixStack) {
             update();
-            float scale = 0.07f;
+
+            float size = starsScale.getValue();
+            float scale = mode.is(Mode.Text) ? 0.025f * size : 0.07f;
+
             final double posX = x - mc.getEntityRenderDispatcher().camera.getPos().getX();
-            final double posY = y - mc.getEntityRenderDispatcher().camera.getPos().getY();
+            final double posY = y + 0.1 - mc.getEntityRenderDispatcher().camera.getPos().getY();
             final double posZ = z - mc.getEntityRenderDispatcher().camera.getPos().getZ();
 
             matrixStack.push();
             matrixStack.translate(posX, posY, posZ);
-            matrixStack.scale(-scale, -scale, -scale);
 
+            matrixStack.scale(scale, scale, scale);
+
+            matrixStack.translate(size / 2, size / 2, size / 2);
             matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-mc.gameRenderer.getCamera().getYaw()));
             matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(mc.gameRenderer.getCamera().getPitch()));
+
+            if (mode.is(Mode.Text))
+                matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180));
+            else
+                matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotationAngle += (float) (AnimationUtility.deltaTime() * rotationSpeed)));
+
+            matrixStack.translate(-size / 2, -size / 2, -size / 2);
 
             switch (mode.getValue()) {
                 case Orbiz -> {
@@ -131,8 +183,10 @@ public class HitParticles extends Module {
                     drawOrbiz(matrixStack, 0.1f, 1.4, color);
                     drawOrbiz(matrixStack, 0.2f, 2.3, color);
                 }
-                case Stars -> drawStar(matrixStack, color, starsScale.getValue());
-                case Hearts -> drawHeart(matrixStack, color, starsScale.getValue());
+                case Stars -> drawStar(matrixStack, color, size);
+                case Hearts -> drawHeart(matrixStack, color, size);
+                case Text ->
+                        FontRenderers.sf_medium.drawCenteredString(matrixStack, MathUtility.round2(health) + " ", 0, 0, (health > 0 ? colorH.getValue() : colorD.getValue()).getColorObject());
             }
 
             matrixStack.scale(0.8f, 0.8f, 0.8f);
@@ -140,7 +194,8 @@ public class HitParticles extends Module {
         }
 
         private boolean posBlock(double x, double y, double z) {
-            return (mc.world.getBlockState(new BlockPos((int) x, (int) y, (int) z)).getBlock() != Blocks.AIR && mc.world.getBlockState(new BlockPos((int) x, (int) y, (int) z)).getBlock() != Blocks.WATER && mc.world.getBlockState(new BlockPos((int) x, (int) y, (int) z)).getBlock() != Blocks.LAVA);
+            Block b = mc.world.getBlockState(BlockPos.ofFloored(x, y, z)).getBlock();
+            return (!(b instanceof AirBlock) && b != Blocks.WATER && b != Blocks.LAVA);
         }
     }
 
@@ -149,7 +204,7 @@ public class HitParticles extends Module {
     }
 
     public enum Mode {
-        Orbiz, Stars, Hearts
+        Orbiz, Stars, Hearts, Text
     }
 
     public enum ColorMode {

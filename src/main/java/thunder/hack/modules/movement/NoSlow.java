@@ -1,5 +1,6 @@
 package thunder.hack.modules.movement;
 
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
@@ -8,6 +9,7 @@ import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Direction;
+import thunder.hack.events.impl.EventKeyboardInput;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Parent;
@@ -86,7 +88,35 @@ public class NoSlow extends Module {
         }
     }
 
+    @EventHandler
+    public void onKeyboardInput(EventKeyboardInput e) {
+        if(mode.getValue() == Mode.Matrix3 && mc.player.isUsingItem() && !mc.player.isFallFlying()) {
+            mc.player.input.movementForward /= 0.2f;
+            mc.player.input.movementSideways /= 0.2f;
+            if (mc.player.isOnGround()) {
+                if(mc.player.input.movementForward != 0 && mc.player.input.movementSideways != 0) {
+                    mc.player.input.movementForward *= 0.35f;
+                    mc.player.input.movementSideways *= 0.35f;
+                } else {
+                    mc.player.input.movementForward *= 0.5f;
+                    mc.player.input.movementSideways *= 0.5f;
+                }
+            } else {
+                if(mc.player.input.movementForward != 0 && mc.player.input.movementSideways != 0) {
+                    mc.player.input.movementForward *= 0.47f;
+                    mc.player.input.movementSideways *= 0.47f;
+                } else {
+                    mc.player.input.movementForward *= 0.67f;
+                    mc.player.input.movementSideways *= 0.67f;
+                }
+            }
+        }
+    }
+
     public boolean canNoSlow() {
+        if (mode.getValue() == Mode.Matrix3)
+            return false;
+
         if (!food.getValue() && mc.player.getActiveItem().isFood())
             return false;
 
@@ -111,6 +141,6 @@ public class NoSlow extends Module {
     }
 
     public enum Mode {
-        NCP, StrictNCP, Matrix, Grim, MusteryGrief, GrimNew, Matrix2, LFCraft
+        NCP, StrictNCP, Matrix, Grim, MusteryGrief, GrimNew, Matrix2, LFCraft, Matrix3
     }
 }

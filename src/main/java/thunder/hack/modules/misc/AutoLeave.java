@@ -57,15 +57,18 @@ public class AutoLeave extends Module {
             }
 
 
-            if (pl != mc.player && !ThunderHack.friendManager.isFriend(pl) && players.getValue() != LeaveMode.None && mc.player.squaredDistanceTo(pl.getPos()) <= distance.getValue() * distance.getValue()) {
+            if (pl != mc.player && !ThunderHack.friendManager.isFriend(pl) && players.getValue() != LeaveMode.None && mc.player.squaredDistanceTo(pl.getPos()) <= distance.getPow2Value()) {
                 switch (players.getValue()) {
                     case Command -> {
                         if (autoDisable.getValue()) disable();
                         sendMessage(ClientSettings.isRu() ? "Ливнул т.к. рядом появился игрок!" : "Logged out because there was a player!");
                         mc.player.networkHandler.sendChatCommand(command.getValue());
+                        return;
                     }
-                    case Leave ->
-                            leave(ClientSettings.isRu() ? "Ливнул т.к. рядом появился игрок" : "Logged out because there was a player");
+                    case Leave -> {
+                        leave(ClientSettings.isRu() ? "Ливнул т.к. рядом появился игрок" : "Logged out because there was a player");
+                        return;
+                    }
                 }
             }
         }

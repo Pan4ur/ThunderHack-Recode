@@ -33,25 +33,24 @@ import java.lang.reflect.Field;
 public final class Burrow extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
     private final Setting<OffsetMode> offsetMode = new Setting<>("Mode", OffsetMode.Smart, v -> mode.getValue() == Mode.Default);
-    public Setting<Float> vClip = new Setting<>("V-Clip", -9.0F, -256.0F, 256.0F, v -> offsetMode.getValue() == OffsetMode.Constant && mode.getValue() == Mode.Default);
-    public Setting<Integer> delay = new Setting<>("Delay", 100, 0, 1000, v -> mode.getValue() == Mode.Default);
-    public Setting<Boolean> scaleDown = new Setting<>("Scale-Down", false, v -> mode.getValue() == Mode.Default);
-    public Setting<Boolean> scaleVelocity = new Setting<>("Scale-Velocity", false, v -> mode.getValue() == Mode.Default);
-    public Setting<Boolean> scaleExplosion = new Setting<>("Scale-Explosion", false, v -> mode.getValue() == Mode.Default);
-    public Setting<Float> scaleFactor = new Setting<>("Scale-Factor", 1.0F, 0.1F, 10.0F, v -> mode.getValue() == Mode.Default);
-    public Setting<Integer> scaleDelay = new Setting<>("Scale-Delay", 250, 0, 1000, v -> mode.getValue() == Mode.Default);
-    public Setting<Boolean> attack = new Setting<>("Attack", true, v -> mode.getValue() == Mode.Default);
-    public Setting<Boolean> placeDisable = new Setting<>("PlaceDisable", false, v -> mode.getValue() == Mode.Default);
-    public Setting<Boolean> wait = new Setting<>("Wait", true);
-    public Setting<Boolean> evade = new Setting<>("Evade", false, v -> offsetMode.getValue() == OffsetMode.Constant && mode.getValue() == Mode.Default);
-    public Setting<Boolean> noVoid = new Setting<>("NoVoid", false, v -> offsetMode.getValue() == OffsetMode.Smart && mode.getValue() == Mode.Default);
-    public Setting<Boolean> onGround = new Setting<>("OnGround", true, v -> mode.getValue() == Mode.Default);
-    public Setting<Boolean> allowUp = new Setting<>("IgnoreHeadBlock", false, v -> mode.getValue() == Mode.Default);
-    public Setting<Boolean> rotate = new Setting<>("Rotate", true);
-    public Setting<Boolean> discrete = new Setting<>("Discrete", true, v -> offsetMode.getValue() == OffsetMode.Smart && mode.getValue() == Mode.Default);
-    public Setting<Boolean> air = new Setting<>("Air", false, v -> offsetMode.getValue() == OffsetMode.Smart && mode.getValue() == Mode.Default);
-    public Setting<Boolean> fallback = new Setting<>("Fallback", true, v -> offsetMode.getValue() == OffsetMode.Smart && mode.getValue() == Mode.Default);
-    public Setting<Boolean> skipZero = new Setting<>("SkipZero", true, v -> offsetMode.getValue() == OffsetMode.Smart && mode.getValue() == Mode.Default);
+    private final Setting<Float> vClip = new Setting<>("VClip", -9.0F, -256.0F, 256.0F, v -> offsetMode.getValue() == OffsetMode.Constant && mode.getValue() == Mode.Default);
+    private final Setting<Boolean> scaleDown = new Setting<>("ScaleDown", false, v -> mode.getValue() == Mode.Default);
+    private final Setting<Boolean> scaleVelocity = new Setting<>("ScaleVelocity", false, v -> mode.getValue() == Mode.Default);
+    private final Setting<Boolean> scaleExplosion = new Setting<>("Scale-xplosion", false, v -> mode.getValue() == Mode.Default);
+    private final Setting<Float> scaleFactor = new Setting<>("ScaleFactor", 1.0F, 0.1F, 10.0F, v -> mode.getValue() == Mode.Default);
+    private final Setting<Integer> scaleDelay = new Setting<>("ScaleDelay", 250, 0, 1000, v -> mode.getValue() == Mode.Default);
+    private final Setting<Boolean> attack = new Setting<>("Attack", true, v -> mode.getValue() == Mode.Default);
+    private final Setting<Boolean> placeDisable = new Setting<>("PlaceDisable", false, v -> mode.getValue() == Mode.Default);
+    private final Setting<Boolean> wait = new Setting<>("Wait", true);
+    private final Setting<Boolean> evade = new Setting<>("Evade", false, v -> offsetMode.getValue() == OffsetMode.Constant && mode.getValue() == Mode.Default);
+    private final Setting<Boolean> noVoid = new Setting<>("NoVoid", false, v -> offsetMode.getValue() == OffsetMode.Smart && mode.getValue() == Mode.Default);
+    private final Setting<Boolean> onGround = new Setting<>("OnGround", true, v -> mode.getValue() == Mode.Default);
+    private final Setting<Boolean> allowUp = new Setting<>("IgnoreHeadBlock", false, v -> mode.getValue() == Mode.Default);
+    private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
+    private final Setting<Boolean> discrete = new Setting<>("Discrete", true, v -> offsetMode.getValue() == OffsetMode.Smart && mode.getValue() == Mode.Default);
+    private final Setting<Boolean> air = new Setting<>("Air", false, v -> offsetMode.getValue() == OffsetMode.Smart && mode.getValue() == Mode.Default);
+    private final Setting<Boolean> fallback = new Setting<>("Fallback", true, v -> offsetMode.getValue() == OffsetMode.Smart && mode.getValue() == Mode.Default);
+    private final Setting<Boolean> skipZero = new Setting<>("SkipZero", true, v -> offsetMode.getValue() == OffsetMode.Smart && mode.getValue() == Mode.Default);
 
     private double motionY;
     private BlockPos startPos;
@@ -60,11 +59,9 @@ public final class Burrow extends Module {
     private volatile double last_z;
     private final Timer scaleTimer = new Timer();
     private final Timer timer = new Timer();
-    private static Burrow instance;
 
     public Burrow() {
         super("Burrow", Category.COMBAT);
-        instance  = this;
     }
 
     @Override
@@ -266,7 +263,6 @@ public final class Burrow extends Module {
             if (evade.getValue() && Math.abs(y) < 1) {
                 y = -1;
             }
-
             return y;
         }
 
@@ -347,11 +343,7 @@ public final class Burrow extends Module {
     }
 
     public static BlockPos getPlayerPos() {
-        return Math.abs(mc.player.getVelocity().y) > 0.1 ? BlockPos.ofFloored(mc.player.getPos()) : getPosition(mc.player);
-    }
-
-    public static Burrow getInstance() {
-        return instance;
+        return Math.abs(mc.player.getVelocity().getY()) > 0.1 ? BlockPos.ofFloored(mc.player.getPos()) : getPosition(mc.player);
     }
 
     public enum OffsetMode {

@@ -147,6 +147,7 @@ public class ModuleManager implements IManager {
     public static Cooldowns cooldowns = new Cooldowns();
     public static TapeMouse tapeMouse = new TapeMouse();
     public static Rotations rotations = new Rotations();
+    public static MemoryHud memoryHud = new MemoryHud();
     public static AutoGear autoGear = new AutoGear();
     public static ViewLock viewLock = new ViewLock();
     public static Velocity velocity = new Velocity();
