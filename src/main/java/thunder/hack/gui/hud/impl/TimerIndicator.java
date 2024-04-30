@@ -2,6 +2,8 @@ package thunder.hack.gui.hud.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
@@ -22,7 +24,7 @@ public class TimerIndicator extends HudElement {
     @Override
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        float f4 = 100 / Timer.speed.getValue();
+        float f4 = 100f / ModuleManager.timer.speed.getValue();
         float f5 = Math.min(Timer.violation, f4);
         timerAnimation.setValue(((f4 - f5) / f4) * 58);
         int status = (int) (((f4 - f5) / f4) * 100);

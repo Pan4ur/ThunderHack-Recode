@@ -18,11 +18,11 @@ import thunder.hack.utility.player.MovementUtility;
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class Timer extends Module {
-    private static final Setting<Mode> mode = new Setting<>("Mode", Mode.NORMAL);
-    public static final Setting<Float> speed = new Setting<>("Speed", 2.0f, 0.1f, 10.0f, v -> mode.getValue() != Mode.TICKSHIFT);
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.NORMAL);
+    public final Setting<Float> speed = new Setting<>("Speed", 2.0f, 0.1f, 10.0f, v -> mode.getValue() != Mode.TICKSHIFT);
     private final Setting<Integer> shiftTicks = new Setting<>("ShiftTicks", 10, 1, 40, v -> mode.getValue() == Mode.TICKSHIFT);
-    private static final Setting<Float> addOnTheMove = new Setting<>("addOnTheMove", 0.0f, 0.0f, 1.0f, v -> mode.getValue() == Mode.SMART);
-    private static final Setting<Float> decreaseRate = new Setting<>("decreaseRate", 1.0f, 0.5f, 3.0f, v -> mode.getValue() == Mode.SMART);
+    private final Setting<Float> addOnTheMove = new Setting<>("addOnTheMove", 0.0f, 0.0f, 1.0f, v -> mode.getValue() == Mode.SMART);
+    private final Setting<Float> decreaseRate = new Setting<>("decreaseRate", 1.0f, 0.5f, 3.0f, v -> mode.getValue() == Mode.SMART);
     private final Setting<Bind> boostKey = new Setting<>("BoostKey", new Bind(-1, false, false), v -> mode.getValue() == Mode.GrimFunnyGame);
 
     public static float violation = 0.0f;
@@ -76,7 +76,7 @@ public class Timer extends Module {
         } else if (mode.getValue() == Mode.NORMAL) {
             ThunderHack.TICK_TIMER = speed.getValue();
         } else {
-            if ( violation > 39f || !InputUtil.isKeyPressed(mc.getWindow().getHandle(), boostKey.getValue().getKey())) {
+            if (violation > 39f || !InputUtil.isKeyPressed(mc.getWindow().getHandle(), boostKey.getValue().getKey())) {
                 ThunderHack.TICK_TIMER = 1f;
                 return;
             }
@@ -126,7 +126,7 @@ public class Timer extends Module {
         }
     }
 
-    public static void onEntitySync(EventSync e) {
+    public void onEntitySync(EventSync e) {
         if (mode.getValue() == Mode.GrimFunnyGame) return;
         violation = notMoving() ? (float) (violation - (decreaseRate.getValue() + 0.4)) : violation - (addOnTheMove.getValue() / 10.0f);
         violation = (float) MathHelper.clamp(violation, 0.0, Math.floor(100f / ThunderHack.TICK_TIMER));

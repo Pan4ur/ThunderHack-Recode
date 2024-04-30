@@ -16,12 +16,13 @@ public class TickShift extends Module {
         super("TickShift", Category.MOVEMENT);
     }
 
-    public Setting<Float> timer = new Setting<>("Timer", 2.0f, 0.1f, 100.0f);
-    public Setting<Integer> packets = new Setting<>("Packets", 20, 0, 1000);
-    public Setting<Integer> lagTime = new Setting<>("LagTime", 1000, 0, 10000);
-    public Setting<Boolean> sneaking = new Setting<>("Sneaking", false);
-    public Setting<Boolean> cancelGround = new Setting<>("CancelGround", false);
-    public Setting<Boolean> cancelRotations = new Setting<>("CancelRotation", false);
+    private final Setting<Float> timer = new Setting<>("Timer", 2.0f, 0.1f, 100.0f);
+    private final Setting<Integer> packets = new Setting<>("Packets", 20, 0, 1000);
+    private final Setting<Integer> lagTime = new Setting<>("LagTime", 1000, 0, 10000);
+    private final Setting<Boolean> sneaking = new Setting<>("Sneaking", false);
+    private final Setting<Boolean> cancelGround = new Setting<>("CancelGround", false);
+    private final Setting<Boolean> cancelRotations = new Setting<>("CancelRotation", false);
+
     private static double prevPosX, prevPosY, prevPosZ;
     private Timer lagTimer = new Timer();
     private static float yaw, pitch;

@@ -11,11 +11,11 @@ import thunder.hack.setting.Setting;
 public class Step extends Module {
 
     private final thunder.hack.utility.Timer stepTimer = new thunder.hack.utility.Timer();
-    public Setting<Boolean> strict = new Setting<>("Strict", false);
-    public Setting<Float> height = new Setting("Height", 2.0F, 1F, 2.5F, v -> !strict.getValue());
-    public Setting<Boolean> useTimer = new Setting<>("Timer", true);
-    public Setting<Boolean> pauseIfShift = new Setting<>("PauseIfShift", false);
-    public Setting<Integer> stepDelay = new Setting("StepDelay", 200, 0, 1000);
+    private final Setting<Boolean> strict = new Setting<>("Strict", false);
+    private final Setting<Float> height = new Setting("Height", 2.0F, 1F, 2.5F, v -> !strict.getValue());
+    private final Setting<Boolean> useTimer = new Setting<>("Timer", true);
+    private final Setting<Boolean> pauseIfShift = new Setting<>("PauseIfShift", false);
+    private final Setting<Integer> stepDelay = new Setting("StepDelay", 200, 0, 1000);
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
     private boolean timer;
 

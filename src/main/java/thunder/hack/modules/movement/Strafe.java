@@ -30,7 +30,7 @@ public class Strafe extends Module {
     // Outdated
 
     private final Setting<Boost> boost = new Setting<>("Boost", Boost.None);
-    public Setting<Float> setSpeed = new Setting<>("speed", 1.3F, 0.0F, 2f, v -> boost.getValue() == Boost.Elytra);
+    private final Setting<Float> setSpeed = new Setting<>("speed", 1.3F, 0.0F, 2f, v -> boost.getValue() == Boost.Elytra);
     private final Setting<Float> velReduction = new Setting<>("Reduction", 6.0f, 0.1f, 10f, v -> boost.getValue() == Boost.Damage);
     private final Setting<Float> maxVelocitySpeed = new Setting<>("MaxVelocity", 0.8f, 0.1f, 2f, v -> boost.getValue() == Boost.Damage);
     private final Setting<Boolean> sunrise = new Setting<>("Sunrise", true, v -> boost.getValue() == Boost.Elytra);

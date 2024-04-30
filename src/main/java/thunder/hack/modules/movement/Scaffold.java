@@ -55,8 +55,7 @@ public class Scaffold extends Module {
 
     private final Timer timer = new Timer();
     private BlockPosWithFacing currentblock;
-    float[] rotation = new float[2];
-    int prevY;
+    private int prevY;
 
     public Scaffold() {
         super("Scaffold", Category.MOVEMENT);
@@ -64,7 +63,6 @@ public class Scaffold extends Module {
 
     @Override
     public void onEnable() {
-        rotation = new float[]{mc.player.getYaw(), mc.player.getPitch()};
         prevY = -999;
     }
 

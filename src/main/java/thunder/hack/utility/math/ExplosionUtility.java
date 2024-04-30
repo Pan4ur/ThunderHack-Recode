@@ -117,7 +117,7 @@ public final class ExplosionUtility {
      * @return damage value in Float format
      */
     public static float getExplosionDamage(Vec3d explosionPos, PlayerEntity target) {
-        if (mc.world.getDifficulty() == Difficulty.PEACEFUL)
+        if (mc.world.getDifficulty() == Difficulty.PEACEFUL || target == null)
             return 0f;
 
         if (explosion == null)
