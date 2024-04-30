@@ -27,7 +27,7 @@ public class AutoSex extends Module {
     };
     private static final String[] ACTIVE_MESSAGES = {
             "Oh, I'm cumming!",
-            "Oh, ur pussy is so nice!",
+            "Oh, ur bussy is so nice!",
             "Yeah, yeah",
             "I feel u!",
             "Oh, im inside u"
