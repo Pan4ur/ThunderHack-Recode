@@ -152,7 +152,7 @@ public final class Surround extends PlaceModule {
     private void handlePacket() {
         BlockPos bp = getSequentialPos();
         if (bp != null) {
-            if (placeBlock(bp))
+            if (placeBlock(bp, InteractMode.Packet))
                 inactivityTimer.reset();
         }
     }

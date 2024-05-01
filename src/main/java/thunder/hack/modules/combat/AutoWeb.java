@@ -16,6 +16,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.RaycastContext;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
@@ -40,10 +41,10 @@ public final class AutoWeb extends Module {
     private final Setting<Integer> placeWallRange = new Setting<>("WallRange", 5, 1, 7);
     private final Setting<PlaceTiming> placeTiming = new Setting<>("PlaceTiming", PlaceTiming.Default);
     private final Setting<Integer> blocksPerTick = new Setting<>("Block/Tick", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
-    private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10, v -> placeTiming.getValue() != PlaceTiming.Sequential);
+    private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10);
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("PlaceMode", InteractionUtility.PlaceMode.Normal);
-    private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
+    private final Setting<InteractionUtility.Rotate> rotate = new Setting<>("Rotate", InteractionUtility.Rotate.None);
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
     private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Fade).withParent(renderCategory);
     private final Setting<ColorSetting> renderFillColor = new Setting<>("Render Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
@@ -93,7 +94,7 @@ public final class AutoWeb extends Module {
     }
 
     @EventHandler
-    public void onPostSync(EventPostSync e) {
+    public void onTick(EventTick e) {
         BlockPos targetBlock1 = getSequentialPos();
         if (targetBlock1 == null) return;
 
@@ -115,7 +116,7 @@ public final class AutoWeb extends Module {
                     inactivityTimer.reset();
                 }
             }
-        } else if (placeTiming.getValue() == PlaceTiming.Vanilla || placeTiming.getValue() == PlaceTiming.Sequential) {
+        } else if (placeTiming.getValue() == PlaceTiming.Vanilla) {
             BlockPos targetBlock = getSequentialPos();
             if (targetBlock == null) return;
 
@@ -127,28 +128,6 @@ public final class AutoWeb extends Module {
             }
         }
         InventoryUtility.returnSlot();
-    }
-
-    @EventHandler
-    public void onPacketReceive(PacketEvent.Receive e) {
-        if (e.getPacket() instanceof BlockUpdateS2CPacket pac) {
-            if (placeTiming.getValue() == PlaceTiming.Sequential && !sequentialBlocks.isEmpty()) {
-                if (sequentialBlocks.contains(pac.getPos())) {
-                    BlockPos bp = getSequentialPos();
-                    if (bp != null) {
-                        InventoryUtility.saveSlot();
-                        if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
-                            sequentialBlocks.add(bp);
-                            sequentialBlocks.remove(pac.getPos());
-                            InventoryUtility.returnSlot();
-                            inactivityTimer.reset();
-                            return;
-                        }
-                        InventoryUtility.returnSlot();
-                    }
-                }
-            }
-        }
     }
 
     private BlockPos getSequentialPos() {
@@ -210,7 +189,7 @@ public final class AutoWeb extends Module {
     }
 
     private enum PlaceTiming {
-        Default, Vanilla, Sequential
+        Default, Vanilla
     }
 
     private enum RenderMode {

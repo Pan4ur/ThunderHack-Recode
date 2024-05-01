@@ -151,7 +151,7 @@ public final class Burrow extends Module {
             if (rotate.getValue()) sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), 90, onGround.getValue()));
 
             InventoryUtility.saveSlot();
-            InteractionUtility.placeBlock(pos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Packet, webResult.slot(), false, true);
+            InteractionUtility.placeBlock(pos, InteractionUtility.Rotate.None, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Packet, webResult.slot(), false, true);
             mc.player.swingHand(Hand.MAIN_HAND);
             timer.reset();
             InventoryUtility.returnSlot();
@@ -171,7 +171,7 @@ public final class Burrow extends Module {
         if (timer.passedMs(250)) {
             if (rotate.getValue()) sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), 90, onGround.getValue()));
             InventoryUtility.saveSlot();
-            InteractionUtility.placeBlock(pos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, skullResult.slot(), false, true);
+            InteractionUtility.placeBlock(pos, InteractionUtility.Rotate.None, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, skullResult.slot(), false, true);
             mc.player.swingHand(Hand.MAIN_HAND);
             timer.reset();
             InventoryUtility.returnSlot();
@@ -237,7 +237,7 @@ public final class Burrow extends Module {
             sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(rEntity.getX(), rEntity.getY() + 1.16, rEntity.getZ(), onGround.getValue()));
 
             InventoryUtility.saveSlot();
-            InteractionUtility.placeBlock(pos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Packet, slot, false, true);
+            InteractionUtility.placeBlock(pos, InteractionUtility.Rotate.None, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Packet, slot, false, true);
             mc.player.swingHand(Hand.MAIN_HAND);
             sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(rEntity.getX(), y, rEntity.getZ(), false));
             timer.reset();

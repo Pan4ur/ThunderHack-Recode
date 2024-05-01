@@ -52,6 +52,7 @@ public final class AutoAnchor extends Module {
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
     private final Setting<Integer> actionDelay = new Setting<>("Action Delay", 500, 1, 2000);
     private final Setting<Integer> logicDelay = new Setting<>("Logic Delay", 30, 1, 2000);
+  //  private final Setting<InteractionUtility.Rotate> rotate = new Setting<>("Rotate", InteractionUtility.Rotate.None);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
     private final Setting<YawStepMode> yawStep = new Setting<>("Yaw Step", YawStepMode.Off);
     private final Setting<Integer> yawAngle = new Setting<>("Yaw Angle", 54, 5, 180, v -> yawStep.getValue() != YawStepMode.Off);
@@ -307,7 +308,7 @@ public final class AutoAnchor extends Module {
         if (HoleUtility.isHole(target.getBlockPos())) {
             if (InteractionUtility.canPlaceBlock(targetPos, interactMode.getValue(), false)) {
                 InteractionUtility.placeBlock(targetPos,
-                        rotate.getValue(),
+                        InteractionUtility.Rotate.None,
                         interactMode.getValue(),
                         InteractionUtility.PlaceMode.Packet,
                         InventoryUtility.getAnchor(),
@@ -321,7 +322,7 @@ public final class AutoAnchor extends Module {
                         check = check.up(i);
                         if (InteractionUtility.canPlaceBlock(check, interactMode.getValue(), false)) {
                             InteractionUtility.placeBlock(check,
-                                    rotate.getValue(),
+                                    InteractionUtility.Rotate.None,
                                     interactMode.getValue(),
                                     InteractionUtility.PlaceMode.Packet,
                                     InventoryUtility.getAnchor(),
@@ -342,7 +343,7 @@ public final class AutoAnchor extends Module {
             }
         } else if (placeTimer.passedMs(actionDelay.getValue())) {
             InteractionUtility.placeBlock(targetPos,
-                    rotate.getValue(),
+                    InteractionUtility.Rotate.None,
                     interactMode.getValue(),
                     InteractionUtility.PlaceMode.Packet,
                     InventoryUtility.getAnchor(),

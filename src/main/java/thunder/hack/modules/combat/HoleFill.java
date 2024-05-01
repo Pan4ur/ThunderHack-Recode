@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.EventTick;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -35,7 +36,7 @@ import java.util.*;
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public final class HoleFill extends Module {
-    private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
+    private final Setting<InteractionUtility.Rotate> rotate = new Setting<>("Rotate", InteractionUtility.Rotate.None);
     private final Setting<InteractionUtility.Interact> interactMode = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
     private final Setting<Float> placeRange = new Setting<>("Range", 5f, 1f, 6f);
     private final Setting<Float> placeWallRange = new Setting<>("WallRange", 5f, 1f, 6f);
@@ -105,7 +106,7 @@ public final class HoleFill extends Module {
     }
 
     @EventHandler
-    public void onSync(EventSync event) {
+    public void onTick(EventTick event) {
         if (fullNullCheck()) return;
         if (jumpDisable.getValue() && mc.player.prevY < mc.player.getY())
             disable(isRu() ? "Вы прыгнули! Выключаю..." : "You jumped! Disabling...");
@@ -126,8 +127,9 @@ public final class HoleFill extends Module {
                 .min(Comparator.comparing(e -> mc.player.squaredDistanceTo(e)))
                 .orElse(null);
 
-        if (mode.getValue() == Mode.Target && target == null) return;
-        if(target == null) return;
+        if (mode.getValue() == Mode.Target && target == null)
+            return;
+
         final PlayerEntity predicted = PredictUtility.predictPlayer(target, 3);
 
         int blocksPlaced = 0;

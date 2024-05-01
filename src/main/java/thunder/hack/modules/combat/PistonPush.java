@@ -155,7 +155,7 @@ public final class PistonPush extends Module {
 
         placeRunnable = () -> {
             int prevSlot = mc.player.getInventory().selectedSlot;
-            InteractionUtility.placeBlock(chargePos, false, interact.getValue(), placeMode.getValue(), getChargeSlot(), true, false);
+            InteractionUtility.placeBlock(chargePos, InteractionUtility.Rotate.None, interact.getValue(), placeMode.getValue(), getChargeSlot(), true, false);
             sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
             mc.player.getInventory().selectedSlot = prevSlot;
             firstPlace = true;
@@ -192,7 +192,7 @@ public final class PistonPush extends Module {
             mc.player.prevYaw = angle;
             ((IClientPlayerEntity) mc.player).setLastYaw(angle);
             int prevSlot = mc.player.getInventory().selectedSlot;
-            InteractionUtility.placeBlock(pistonPos, false, interact.getValue(), placeMode.getValue(), getPistonSlot(), true, false);
+            InteractionUtility.placeBlock(pistonPos, InteractionUtility.Rotate.None, interact.getValue(), placeMode.getValue(), getPistonSlot(), true, false);
             sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
             mc.player.getInventory().selectedSlot = prevSlot;
             mc.player.setYaw(prevYaw);

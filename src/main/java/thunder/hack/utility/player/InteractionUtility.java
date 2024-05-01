@@ -81,7 +81,7 @@ public final class InteractionUtility {
         return new float[]{yD, pD};
     }
 
-    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, int slot, boolean returnSlot, boolean ignoreEntities) {
+    public static boolean placeBlock(BlockPos bp, Rotate rotate, Interact interact, PlaceMode mode, int slot, boolean returnSlot, boolean ignoreEntities) {
         int prevItem = mc.player.getInventory().selectedSlot;
         if (slot != -1) InventoryUtility.switchTo(slot);
         else return false;
@@ -92,7 +92,7 @@ public final class InteractionUtility {
         return result;
     }
 
-    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, @NotNull SearchInvResult invResult, boolean returnSlot, boolean ignoreEntities) {
+    public static boolean placeBlock(BlockPos bp, Rotate rotate, Interact interact, PlaceMode mode, @NotNull SearchInvResult invResult, boolean returnSlot, boolean ignoreEntities) {
         int prevItem = mc.player.getInventory().selectedSlot;
         invResult.switchTo();
         boolean result = placeBlock(bp, rotate, interact, mode, ignoreEntities);
@@ -101,7 +101,7 @@ public final class InteractionUtility {
         return result;
     }
 
-    public static boolean placeBlock(BlockPos bp, boolean rotate, Interact interact, PlaceMode mode, boolean ignoreEntities) {
+    public static boolean placeBlock(BlockPos bp, Rotate rotate, Interact interact, PlaceMode mode, boolean ignoreEntities) {
         BlockHitResult result = getPlaceResult(bp, interact, ignoreEntities);
         if (result == null || mc.world == null || mc.interactionManager == null || mc.player == null) return false;
 
@@ -114,8 +114,18 @@ public final class InteractionUtility {
             mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
 
         float[] angle = calculateAngle(result.getPos());
-        if (rotate)
-            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), angle[0], angle[1], mc.player.isOnGround()));
+
+        switch (rotate) {
+            case None -> {
+                
+            }
+            case Default -> {
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
+            }
+            case Grim -> {
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), angle[0], angle[1], mc.player.isOnGround()));
+            }
+        }
 
         if (mode == PlaceMode.Normal)
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
@@ -125,8 +135,12 @@ public final class InteractionUtility {
 
         awaiting.put(bp, System.currentTimeMillis());
 
+        if(rotate == Rotate.Grim)
+            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
+
         if (sneak)
             mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
+
         if (sprint)
             mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
 
@@ -444,6 +458,12 @@ public final class InteractionUtility {
     public enum PlaceMode {
         Packet,
         Normal
+    }
+
+    public enum Rotate {
+        None,
+        Default,
+        Grim
     }
 
     public enum Interact {

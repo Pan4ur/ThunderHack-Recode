@@ -128,9 +128,9 @@ public class NoFall extends Module {
         if (mc.world.getBlockState(playerPos.down()).isSolid() || mc.world.getBlockState(playerPos.down().down()).isSolid()) {
             InventoryUtility.saveSlot();
             if (mc.world.getBlockState(playerPos.down()).isSolid())
-                InteractionUtility.placeBlock(playerPos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, webResult.slot(), false, true);
+                InteractionUtility.placeBlock(playerPos, InteractionUtility.Rotate.None, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, webResult.slot(), false, true);
             else
-                InteractionUtility.placeBlock(playerPos.down(), false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, webResult.slot(), false, true);
+                InteractionUtility.placeBlock(playerPos.down(), InteractionUtility.Rotate.None, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, webResult.slot(), false, true);
             mc.player.swingHand(Hand.MAIN_HAND);
             InventoryUtility.returnSlot();
         }
@@ -140,9 +140,9 @@ public class NoFall extends Module {
         if (mc.world.getBlockState(playerPos.down()).isSolid() || mc.world.getBlockState(playerPos.down().down()).isSolid()) {
             InventoryUtility.saveSlot();
             if (mc.world.getBlockState(playerPos.down()).isSolid())
-                InteractionUtility.placeBlock(playerPos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, vinesResult.slot(), false, true);
+                InteractionUtility.placeBlock(playerPos, InteractionUtility.Rotate.None, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, vinesResult.slot(), false, true);
             else
-                InteractionUtility.placeBlock(playerPos.down(), false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, vinesResult.slot(), false, true);
+                InteractionUtility.placeBlock(playerPos.down(), InteractionUtility.Rotate.None, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, vinesResult.slot(), false, true);
             mc.player.swingHand(Hand.MAIN_HAND);
             InventoryUtility.returnSlot();
         }
@@ -152,9 +152,9 @@ public class NoFall extends Module {
         if (mc.world.getBlockState(playerPos.down()).isSolid() || mc.world.getBlockState(playerPos.down().down()).isSolid()) {
             InventoryUtility.saveSlot();
             if (mc.world.getBlockState(playerPos.down()).isSolid())
-                InteractionUtility.placeBlock(playerPos, false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, snowResult.slot(), false, true);
+                InteractionUtility.placeBlock(playerPos, InteractionUtility.Rotate.None, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, snowResult.slot(), false, true);
             else
-                InteractionUtility.placeBlock(playerPos.down(), false, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, snowResult.slot(), false, true);
+                InteractionUtility.placeBlock(playerPos.down(), InteractionUtility.Rotate.None, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, snowResult.slot(), false, true);
             mc.player.swingHand(Hand.MAIN_HAND);
             InventoryUtility.returnSlot();
         }

@@ -35,7 +35,7 @@ public abstract class PlaceModule extends Module {
     protected final Setting<Float> range = new Setting<>("Range", 5f, 0f, 7f);
     protected final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
     protected final Setting<InteractMode> placeMode = new Setting<>("Place Mode", InteractMode.Normal);
-    protected final Setting<Boolean> rotate = new Setting<>("Rotate", true);
+    protected final Setting<InteractionUtility.Rotate> rotate = new Setting<>("Rotate", InteractionUtility.Rotate.None);
     protected final Setting<Boolean> swing = new Setting<>("Swing", false);
 
     protected final Setting<BooleanParent> crystalBreaker = new Setting<>("Crystal Breaker", new BooleanParent(false));
@@ -77,10 +77,22 @@ public abstract class PlaceModule extends Module {
     }
 
     protected boolean placeBlock(BlockPos pos) {
-        return placeBlock(pos, crystalBreaker.getValue().isEnabled());
+        return placeBlock(pos, crystalBreaker.getValue().isEnabled(), placeMode.getValue(), rotate.getValue());
     }
 
     protected boolean placeBlock(BlockPos pos, boolean ignoreEntities) {
+        return placeBlock(pos, ignoreEntities, placeMode.getValue(), rotate.getValue());
+    }
+
+    protected boolean placeBlock(BlockPos pos, InteractionUtility.Rotate rotate) {
+        return placeBlock(pos, crystalBreaker.getValue().isEnabled(), placeMode.getValue(), rotate);
+    }
+
+    protected boolean placeBlock(BlockPos pos, InteractMode mode) {
+        return placeBlock(pos, crystalBreaker.getValue().isEnabled(), mode, rotate.getValue());
+    }
+
+    protected boolean placeBlock(BlockPos pos, boolean ignoreEntities, InteractMode mode, InteractionUtility.Rotate rotate) {
         if (shouldPause()) return false;
         boolean validInteraction = false;
         SearchInvResult result = getBlockResult();
@@ -97,11 +109,11 @@ public abstract class PlaceModule extends Module {
                     .ifPresent(this::breakCrystal);
         }
 
-        if (placeMode.getValue() == InteractMode.Packet) {
-            validInteraction = InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), InteractionUtility.PlaceMode.Packet, result.slot(), true, ignoreEntities);
+        if (mode == InteractMode.Packet) {
+            validInteraction = InteractionUtility.placeBlock(pos, rotate, interact.getValue(), InteractionUtility.PlaceMode.Packet, result.slot(), true, ignoreEntities);
         }
-        if (placeMode.getValue() == InteractMode.Normal) {
-            validInteraction = InteractionUtility.placeBlock(pos, rotate.getValue(), interact.getValue(), InteractionUtility.PlaceMode.Normal, result.slot(), true, ignoreEntities);
+        if (mode == InteractMode.Normal) {
+            validInteraction = InteractionUtility.placeBlock(pos, rotate, interact.getValue(), InteractionUtility.PlaceMode.Normal, result.slot(), true, ignoreEntities);
         }
 
         if (validInteraction && mc.player != null) {

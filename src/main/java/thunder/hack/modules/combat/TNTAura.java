@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventPostSync;
+import thunder.hack.events.impl.EventTick;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -45,7 +46,7 @@ public class TNTAura extends Module {
     private final Setting<Integer> blocksPerTick = new Setting<>("Block/Tick", 8, 1, 12);
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10);
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("PlaceMode", InteractionUtility.PlaceMode.Normal);
-    private final Setting<Boolean> rotate = new Setting<>("Rotate", false);
+    private final Setting<InteractionUtility.Rotate> rotate = new Setting<>("Rotate", InteractionUtility.Rotate.None);
     private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
     private final Setting<RenderMode> renderMode = new Setting<>("RenderMode", RenderMode.Fade).withParent(renderCategory);
     private final Setting<ColorSetting> renderFillColor = new Setting<>("Fill", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
@@ -80,7 +81,7 @@ public class TNTAura extends Module {
     }
 
     @EventHandler
-    public void onPostSync(EventPostSync e) {
+    public void onTick(EventTick e) {
         if (getTntSlot() == -1) {
             disable(isRu() ? "Нет динамита!" : "No tnt");
             return;

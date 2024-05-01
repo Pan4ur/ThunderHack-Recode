@@ -63,6 +63,7 @@ public final class PistonAura extends Module {
     private final Setting<Float> wallRange = new Setting<>("WallRange", 4.0f, 1.0f, 7.0f);
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Normal);
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
+    private final Setting<InteractionUtility.Rotate> rotate = new Setting<>("Rotate", InteractionUtility.Rotate.None);
 
     public PlayerEntity target;
     private BlockPos targetPos, pistonPos, crystalPos, redStonePos, firePos, pistonHeadPos;
@@ -201,7 +202,7 @@ public final class PistonAura extends Module {
         }
 
         if (mc.world.getBlockState(redStonePos.down()).isReplaceable() && supportPlace.getValue()) {
-            InteractionUtility.placeBlock(redStonePos.down(), true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
+            InteractionUtility.placeBlock(redStonePos.down(), rotate.getValue(), interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
         }
 
         final float[] angle = InteractionUtility.getPlaceAngle(redStonePos, interact.getValue(), false);
@@ -224,7 +225,7 @@ public final class PistonAura extends Module {
                 else redstone_slot = redTorchResult.slot();
             } else redstone_slot = redBlockResult.slot();
 
-            InteractionUtility.placeBlock(redStonePos, false, interact.getValue(), placeMode.getValue(), redstone_slot, false, false);
+            InteractionUtility.placeBlock(redStonePos, InteractionUtility.Rotate.None, interact.getValue(), placeMode.getValue(), redstone_slot, false, false);
             stage = Stage.Break;
         };
     }
@@ -236,7 +237,7 @@ public final class PistonAura extends Module {
         }
 
         if (mc.world.getBlockState(crystalPos).isReplaceable() && supportPlace.getValue()) {
-            InteractionUtility.placeBlock(crystalPos, true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
+            InteractionUtility.placeBlock(crystalPos, rotate.getValue(), interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
             return;
         }
 
@@ -283,7 +284,7 @@ public final class PistonAura extends Module {
         if (mc.world.getBlockState(firePos).getBlock() instanceof FireBlock) stage = Stage.Crystal;
 
         if (mc.world.getBlockState(firePos.down()).isReplaceable() && supportPlace.getValue()) {
-            InteractionUtility.placeBlock(firePos.down(), true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
+            InteractionUtility.placeBlock(firePos.down(), rotate.getValue(), interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
             return;
         }
 
@@ -296,7 +297,7 @@ public final class PistonAura extends Module {
             mc.player.setPitch(angle[1]);
         }
         postAction = () -> {
-            InteractionUtility.placeBlock(firePos, false, interact.getValue(), placeMode.getValue(), InventoryUtility.findItemInHotBar(Items.FLINT_AND_STEEL).slot(), false, false);
+            InteractionUtility.placeBlock(firePos, InteractionUtility.Rotate.None, interact.getValue(), placeMode.getValue(), InventoryUtility.findItemInHotBar(Items.FLINT_AND_STEEL).slot(), false, false);
             stage = Stage.Crystal;
         };
     }
@@ -322,7 +323,7 @@ public final class PistonAura extends Module {
 
             InventoryUtility.saveSlot();
             for (BlockPos bp : trapPos) {
-                if (InteractionUtility.placeBlock(bp, true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false)) {
+                if (InteractionUtility.placeBlock(bp, rotate.getValue(), interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false)) {
                     if (bp == targetPos.add(0, 2, 0)) {
                         builtTrap = true;
                         stage = Stage.Piston;
@@ -350,7 +351,7 @@ public final class PistonAura extends Module {
         }
 
         if (mc.world.getBlockState(pistonPos.down()).isReplaceable() && supportPlace.getValue()) {
-            InteractionUtility.placeBlock(pistonPos.down(), true, interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
+            InteractionUtility.placeBlock(pistonPos.down(), rotate.getValue(), interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
             return;
         }
 
@@ -386,7 +387,7 @@ public final class PistonAura extends Module {
             mc.player.prevYaw = angle2;
             ((IClientPlayerEntity) mc.player).setLastYaw(angle2);
             int prevSlot = mc.player.getInventory().selectedSlot;
-            InteractionUtility.placeBlock(pistonPos, false, interact.getValue(), placeMode.getValue(), piston_slot, false, false);
+            InteractionUtility.placeBlock(pistonPos, InteractionUtility.Rotate.None, interact.getValue(), placeMode.getValue(), piston_slot, false, false);
             sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
             mc.player.getInventory().selectedSlot = prevSlot;
             mc.player.setYaw(prevYaw);
