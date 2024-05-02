@@ -16,6 +16,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
@@ -47,7 +48,7 @@ public class HitParticles extends Module {
 
     @Override
     public void onUpdate() {
-        particles.removeIf(particle -> System.currentTimeMillis() - particle.getTime() > lifeTime.getValue() * 1000);
+        particles.removeIf(Particle::update);
 
         if (mode.is(Mode.Text)) {
             for (Entity entity : mc.world.getEntities()) {
@@ -92,6 +93,11 @@ public class HitParticles extends Module {
         float x;
         float y;
         float z;
+
+        float px;
+        float py;
+        float pz;
+
         float motionX;
         float motionY;
         float motionZ;
@@ -107,6 +113,9 @@ public class HitParticles extends Module {
             this.x = x;
             this.y = y;
             this.z = z;
+            px = x;
+            py = y;
+            pz = z;
             motionX = MathUtility.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
             motionY = MathUtility.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
             motionZ = MathUtility.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
@@ -121,14 +130,20 @@ public class HitParticles extends Module {
             return time;
         }
 
-        public void update() {
+        public boolean update() {
             double sp = Math.sqrt(motionX * motionX + motionZ * motionZ);
+            px = x;
+            py = y;
+            pz = z;
+
             x += motionX;
             y += motionY;
             z += motionZ;
 
             if (posBlock(x, y - starsScale.getValue() / 10f, z)) {
                 motionY = -motionY / 1.1f;
+                motionX = motionX / 1.1f;
+                motionZ = motionZ / 1.1f;
             } else {
                 if (posBlock(x - sp, y, z - sp)
                         || posBlock(x + sp, y, z + sp)
@@ -142,24 +157,25 @@ public class HitParticles extends Module {
                     motionX = -motionX;
                     motionZ = -motionZ;
                 }
-                motionY = 0;
             }
 
-            if (physics.getValue() == Physics.Fall) motionY -= 0.0005f;
+            if (physics.getValue() == Physics.Fall)
+                motionY -= 0.035f;
+
             motionX /= 1.005f;
             motionZ /= 1.005f;
             motionY /= 1.005f;
+
+            return System.currentTimeMillis() - getTime() > lifeTime.getValue() * 1000;
         }
 
         public void render(MatrixStack matrixStack) {
-            update();
-
             float size = starsScale.getValue();
             float scale = mode.is(Mode.Text) ? 0.025f * size : 0.07f;
 
-            final double posX = x - mc.getEntityRenderDispatcher().camera.getPos().getX();
-            final double posY = y + 0.1 - mc.getEntityRenderDispatcher().camera.getPos().getY();
-            final double posZ = z - mc.getEntityRenderDispatcher().camera.getPos().getZ();
+            final double posX = Render2DEngine.interpolate(px, x, mc.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getX();
+            final double posY = Render2DEngine.interpolate(py, y, mc.getTickDelta()) + 0.1 - mc.getEntityRenderDispatcher().camera.getPos().getY();
+            final double posZ = Render2DEngine.interpolate(pz, z, mc.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getZ();
 
             matrixStack.push();
             matrixStack.translate(posX, posY, posZ);
@@ -179,12 +195,13 @@ public class HitParticles extends Module {
 
             switch (mode.getValue()) {
                 case Orbiz -> {
-                    drawOrbiz(matrixStack, 0.0f, 0.7, color);
-                    drawOrbiz(matrixStack, 0.1f, 1.4, color);
-                    drawOrbiz(matrixStack, 0.2f, 2.3, color);
+                    drawOrbiz(matrixStack, 0.0f, 0.5, color);
+                    drawOrbiz(matrixStack, -0.1f, 1.1, color);
+                    drawOrbiz(matrixStack, -0.2f, 1.5, color);
                 }
                 case Stars -> drawStar(matrixStack, color, size);
                 case Hearts -> drawHeart(matrixStack, color, size);
+                case Bloom -> drawBloom(matrixStack, color, size);
                 case Text ->
                         FontRenderers.sf_medium.drawCenteredString(matrixStack, MathUtility.round2(health) + " ", 0, 0, (health > 0 ? colorH.getValue() : colorD.getValue()).getColorObject());
             }
@@ -204,7 +221,7 @@ public class HitParticles extends Module {
     }
 
     public enum Mode {
-        Orbiz, Stars, Hearts, Text
+        Orbiz, Stars, Hearts, Bloom, Text
     }
 
     public enum ColorMode {

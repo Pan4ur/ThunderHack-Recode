@@ -28,7 +28,7 @@ public class AntiAim extends Module {
 
     private float rotationYaw, rotationPitch, pitch_sinus_step, yaw_sinus_step;
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = 99)
     public void onSync(EventSync e) {
         if(allowInteract.getValue() && (mc.options.attackKey.isPressed() || mc.options.attackKey.isPressed())) return;
         double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
