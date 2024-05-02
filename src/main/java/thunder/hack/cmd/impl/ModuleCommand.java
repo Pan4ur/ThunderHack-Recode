@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.ModuleArgumentType;
+import thunder.hack.cmd.args.SettingArgumentType;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -50,11 +51,17 @@ public class ModuleCommand extends Command {
                     }
 
                     return SINGLE_SUCCESS;
-                })).then(arg("setting", StringArgumentType.word())
+                })).then(arg("setting", SettingArgumentType.create())
                         .then(arg("settingValue", StringArgumentType.greedyString()).executes(context -> {
                             Module module = context.getArgument("module", Module.class);
-                            Setting setting = module.getSettingByName(context.getArgument("setting", String.class));
+                            String settingName = context.getArgument("setting", String.class);
                             String settingValue = context.getArgument("settingValue", String.class);
+                            Setting setting = null;
+
+                            for(Setting set : module.getSettings()) {
+                                if(Objects.equals(set.getName(), settingName))
+                                    setting = set;
+                            }
 
                             if (setting == null) {
                                 sendMessage("No such setting");

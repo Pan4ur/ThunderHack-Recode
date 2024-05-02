@@ -55,9 +55,9 @@ public class BooleanParentElement extends AbstractElement {
         Render2DEngine.drawRound(context.getMatrices(), x + width - 35f + paddingX, y + height / 2 - 3, 6, 6, 1, new Color(-1));
 
         if (7f * animation > 4) {
-            FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "v", x + width - 33.5f, y + height / 2 - 1f, new Color(-1).getRGB());
+            FontRenderers.sf_bold_mini.drawString(context.getMatrices(), "v", x + width - 34f, y + height / 2 - 2f, new Color(-1).getRGB());
         } else {
-            FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "x", x + width - 26f, y + height / 2 - 1f, new Color(-1).getRGB());
+            FontRenderers.sf_bold_mini.drawString(context.getMatrices(), "x", x + width - 27f, y + height / 2 - 2f, new Color(-1).getRGB());
         }
 
         if(Render2DEngine.isHovered(mouseX, mouseY, x + width - 36, y + height / 2 - 4, 15, 8)) {

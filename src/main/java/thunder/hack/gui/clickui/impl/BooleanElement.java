@@ -37,9 +37,9 @@ public class BooleanElement extends AbstractElement {
         Render2DEngine.drawRound(context.getMatrices(), x + width - 20 + 7f * animation2, y + height / 2 - 3, 6, 6, 1, new Color(-1));
 
         if (7f * animation > 4) {
-            FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "v", x + width - 18.5f, y + height / 2 - 1f, new Color(-1).getRGB());
+            FontRenderers.sf_bold_mini.drawString(context.getMatrices(), "v", x + width - 19f, y + height / 2 - 2f, new Color(-1).getRGB());
         } else {
-            FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "x", x + width - 11f, y + height / 2 - 1f, new Color(-1).getRGB());
+            FontRenderers.sf_bold_mini.drawString(context.getMatrices(), "x", x + width - 12f, y + height / 2 - 2f, new Color(-1).getRGB());
         }
 
         if(Render2DEngine.isHovered(mouseX, mouseY, x + width - 21, y + height / 2 - 4, 15, 8)) {

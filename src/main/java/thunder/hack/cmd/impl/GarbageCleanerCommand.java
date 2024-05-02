@@ -12,7 +12,7 @@ import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
 public class GarbageCleanerCommand extends Command {
     public GarbageCleanerCommand() {
-        super("gc", "garbagecleaner");
+        super("gc", "garbagecleaner", "clearram");
     }
 
     @Override

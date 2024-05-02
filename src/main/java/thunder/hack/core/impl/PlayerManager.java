@@ -66,8 +66,10 @@ public class PlayerManager implements IManager {
         prevBodyYaw = bodyYaw;
         bodyYaw = getBodyYaw();
 
-        mc.player.setYaw(yaw);
-        mc.player.setPitch(pitch);
+        if(!ModuleManager.rotations.clientLook.getValue()) {
+            mc.player.setYaw(yaw);
+            mc.player.setPitch(pitch);
+        }
 
         ModuleManager.rotations.fixRotation = Float.NaN;
     }

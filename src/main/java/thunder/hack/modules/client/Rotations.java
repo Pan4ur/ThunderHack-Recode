@@ -16,6 +16,7 @@ public class Rotations extends Module {
     }
 
     private final Setting<MoveFix> moveFix = new Setting<>("MoveFix", MoveFix.Free);
+    public final Setting<Boolean> clientLook = new Setting<>("ClientLook", false);
 
     private enum MoveFix {
         Off, Focused, Free;

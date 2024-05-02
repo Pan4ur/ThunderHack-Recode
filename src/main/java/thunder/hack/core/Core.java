@@ -65,6 +65,7 @@ public final class Core {
 
         if (ModuleManager.clickGui.getBind().getKey() == -1) {
             Command.sendMessage(Formatting.RED + "Default clickgui keybind --> P");
+            Command.sendMessage(Formatting.RED + "You can get pre built config using command -> @cfg cloudlist");
             ModuleManager.clickGui.setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(), false, false);
         }
 

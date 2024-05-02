@@ -19,7 +19,7 @@ public class PerfectDelay extends Module {
         super("PerfectDelay", Category.PLAYER);
     }
 
-    private final Setting<Boolean> horse = new Setting<>("Horse", true);
+    private final Setting<HorseJump> horse = new Setting<>("Horse", HorseJump.Legit);
     private final Setting<Boolean> bow = new Setting<>("Bow", true);
     private final Setting<Boolean> crossbow = new Setting<>("Crossbow", true);
     private final Setting<Boolean> trident = new Setting<>("Trident", true);
@@ -50,8 +50,16 @@ public class PerfectDelay extends Module {
                 mc.interactionManager.stopUsingItem(mc.player);
         }
 
-        if (mc.player.getControllingVehicle() != null && mc.player.getControllingVehicle() instanceof HorseEntity && horse.getValue()) {
+        if (mc.player.getControllingVehicle() != null && mc.player.getControllingVehicle() instanceof HorseEntity && horse.is(HorseJump.Rage)) {
             ((IClientPlayerEntity) mc.player).setMountJumpStrength(1f);
         }
+
+        if (mc.player.getControllingVehicle() != null && mc.player.getControllingVehicle() instanceof HorseEntity && horse.is(HorseJump.Legit) && mc.player.getMountJumpStrength() >= 1) {
+            mc.options.jumpKey.setPressed(false);
+        }
+    }
+
+    private enum HorseJump {
+        Legit, Rage, Off
     }
 }
