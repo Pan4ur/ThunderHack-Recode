@@ -11,7 +11,6 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
@@ -22,6 +21,7 @@ import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.modules.client.Media;
 import thunder.hack.modules.combat.Aura;
+import thunder.hack.modules.combat.Reach;
 import thunder.hack.modules.movement.AutoSprint;
 import thunder.hack.modules.movement.Speed;
 
@@ -70,7 +70,7 @@ public class MixinPlayerEntity {
 
     @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
     private void onTravelhookPre(Vec3d movementInput, CallbackInfo ci) {
-        if(mc.player == null)
+        if (mc.player == null)
             return;
 
         final EventPlayerTravel event = new EventPlayerTravel(movementInput, true);
@@ -84,7 +84,7 @@ public class MixinPlayerEntity {
 
     @Inject(method = "travel", at = @At("RETURN"), cancellable = true)
     private void onTravelhookPost(Vec3d movementInput, CallbackInfo ci) {
-        if(mc.player == null)
+        if (mc.player == null)
             return;
         final EventPlayerTravel event = new EventPlayerTravel(movementInput, false);
         ThunderHack.EVENT_BUS.post(event);
@@ -111,7 +111,21 @@ public class MixinPlayerEntity {
 
     @Inject(method = "shouldDismount", at = @At("HEAD"), cancellable = true)
     protected void shouldDismountHook(CallbackInfoReturnable<Boolean> cir) {
-          if(ModuleManager.boatFly.isEnabled() && ModuleManager.boatFly.allowShift.getValue())
+        if (ModuleManager.boatFly.isEnabled() && ModuleManager.boatFly.allowShift.getValue())
             cir.setReturnValue(false);
+    }
+
+    @Inject(method = "getBlockInteractionRange", at = @At("HEAD"), cancellable = true)
+    public void getBlockInteractionRangeHook(CallbackInfoReturnable<Double> cir) {
+        if (ModuleManager.reach.isEnabled()) {
+            cir.setReturnValue((double) ModuleManager.reach.blocksRange.getValue());
+        }
+    }
+
+    @Inject(method = "getEntityInteractionRange", at = @At("HEAD"), cancellable = true)
+    public void getEntityInteractionRangeHook(CallbackInfoReturnable<Double> cir) {
+        if (ModuleManager.reach.isEnabled()) {
+            cir.setReturnValue((double) ModuleManager.reach.entityRange.getValue());
+        }
     }
 }

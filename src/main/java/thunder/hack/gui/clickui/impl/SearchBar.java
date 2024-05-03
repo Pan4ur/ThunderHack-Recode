@@ -3,6 +3,7 @@ package thunder.hack.gui.clickui.impl;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
@@ -50,7 +51,7 @@ public class SearchBar extends AbstractButton {
 
     @Override
     public void charTyped(char key, int keyCode) {
-        if (SharedConstants.isValidChar(key) && listening) {
+        if (StringHelper.isValidChar(key) && listening) {
             moduleName = moduleName + key;
         }
     }

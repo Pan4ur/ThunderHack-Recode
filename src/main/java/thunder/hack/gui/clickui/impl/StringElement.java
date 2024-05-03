@@ -3,6 +3,7 @@ package thunder.hack.gui.clickui.impl;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.AbstractElement;
@@ -54,7 +55,7 @@ public class StringElement extends AbstractElement {
 
     @Override
     public void charTyped(char key, int keyCode) {
-        if (SharedConstants.isValidChar(key)) {
+        if (StringHelper.isValidChar(key)) {
             currentString = currentString + key;
         }
     }

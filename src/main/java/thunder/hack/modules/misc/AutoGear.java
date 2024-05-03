@@ -1,8 +1,8 @@
 package thunder.hack.modules.misc;
 
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PotionItem;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.Formatting;
 import thunder.hack.cmd.impl.KitCommand;
@@ -88,14 +88,14 @@ public class AutoGear extends Module {
         ItemStack cursorStack = handler.getCursorStack();
 
         if ((cursorStack.getItem() instanceof PotionItem ?
-                cursorStack.getItem().getTranslationKey() + PotionUtil.getColor(cursorStack)
+                cursorStack.getItem().getTranslationKey() + cursorStack.getItem().getComponents().get(DataComponentTypes.POTION_CONTENTS).getColor()
                 : cursorStack.getItem().getTranslationKey()).equals(name))
             return -2;
 
         for (int i = 0; i < (lower ? 26 : 53); i++) {
             ItemStack stack = handler.getSlot(i).getStack();
             if ((stack.getItem() instanceof PotionItem ?
-                    stack.getItem().getTranslationKey() + PotionUtil.getColor(stack)
+                    stack.getItem().getTranslationKey() + stack.getItem().getComponents().get(DataComponentTypes.POTION_CONTENTS).getColor()
                     : stack.getItem().getTranslationKey()).equals(name))
                 return i;
         }
@@ -111,7 +111,7 @@ public class AutoGear extends Module {
             ItemStack itemInslot = handler.slots.get((handler.slots.size() == 63 ? lower : upper)).getStack();
 
             if((itemInslot.getItem() instanceof PotionItem ?
-                    itemInslot.getItem().getTranslationKey() + PotionUtil.getColor(itemInslot)
+                    itemInslot.getItem().getTranslationKey() + itemInslot.getItem().getComponents().get(DataComponentTypes.POTION_CONTENTS).getColor()
                     : itemInslot.getItem().getTranslationKey()).equals(expectedInv.get(s)))
                 continue;
 

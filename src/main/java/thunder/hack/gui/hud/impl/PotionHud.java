@@ -6,9 +6,11 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public class PotionHud extends HudElement {
@@ -17,6 +19,8 @@ public class PotionHud extends HudElement {
     }
 
     private float vAnimation, hAnimation;
+
+    private final Setting<Boolean> colored = new Setting<>("Colored", false);
 
     public static String getDuration(StatusEffectInstance pe) {
         if (pe.isInfinite()) {
@@ -44,7 +48,7 @@ public class PotionHud extends HudElement {
                 effects.add(potionEffect);
 
                 y_offset1 += 10;
-                StatusEffect potion = potionEffect.getEffectType();
+                StatusEffect potion = potionEffect.getEffectType().value();
                 String power = "";
                 switch (potionEffect.getAmplifier()) {
                     case 0 -> power = "I";
@@ -78,7 +82,7 @@ public class PotionHud extends HudElement {
 
         Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
         for (StatusEffectInstance potionEffect : effects) {
-            StatusEffect potion = potionEffect.getEffectType();
+            StatusEffect potion = potionEffect.getEffectType().value();
             String power = "";
             switch (potionEffect.getAmplifier()) {
                 case 0 -> power = "I";
@@ -91,7 +95,8 @@ public class PotionHud extends HudElement {
             String s = potion.getName().getString() + " " + power;
             String s2 = getDuration(potionEffect) + "";
 
-            FontRenderers.sf_bold_mini.drawString(context.getMatrices(), s + "  " + s2, getPosX() + 5, getPosY() + 20 + y_offset, HudEditor.textColor.getValue().getColor());
+            Color c = new Color(potionEffect.getEffectType().value().getColor());
+            FontRenderers.sf_bold_mini.drawString(context.getMatrices(), s + "  " + s2, getPosX() + 5, getPosY() + 20 + y_offset, colored.getValue() ? c.getRGB() : HudEditor.textColor.getValue().getColor());
             y_offset += 10;
         }
         Render2DEngine.popWindow();

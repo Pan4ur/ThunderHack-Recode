@@ -114,7 +114,7 @@ public class LegacyHud extends Module {
         if (potions.getValue()) {
             List<StatusEffectInstance> effects = new ArrayList<>(mc.player.getStatusEffects());
             for (StatusEffectInstance potionEffect : effects) {
-                StatusEffect potion = potionEffect.getEffectType();
+                StatusEffect potion = potionEffect.getEffectType().value();
                 String power = "";
                 switch (potionEffect.getAmplifier()) {
                     case 0 -> power = "I";
@@ -125,12 +125,13 @@ public class LegacyHud extends Module {
                 }
                 String s = potion.getName().getString() + " " + power;
                 String s2 = getDuration(potionEffect) + "";
+                Color c = new Color(potionEffect.getEffectType().value().getColor());
 
                 if (renderingUp.getValue()) {
                     i += offset;
-                    drawText(context, s + " " + s2, (width - getStringWidth(s + " " + s2) - 2), (height - 2 - i), potionEffect.getEffectType().getColor());
+                    drawText(context, s + " " + s2, (width - getStringWidth(s + " " + s2) - 2), (height - 2 - i), c.getRGB());
                 } else {
-                    drawText(context, s + " " + s2, (width - getStringWidth(s + " " + s2) - 2), (2 + i++ * offset), potionEffect.getEffectType().getColor());
+                    drawText(context, s + " " + s2, (width - getStringWidth(s + " " + s2) - 2), (2 + i++ * offset), c.getRGB());
                 }
             }
         }

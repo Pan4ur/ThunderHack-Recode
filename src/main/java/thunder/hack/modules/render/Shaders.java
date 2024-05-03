@@ -6,6 +6,7 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ShaderManager;
+import thunder.hack.injection.accesors.IGameRenderer;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -21,7 +22,7 @@ public class Shaders extends Module {
     private final Setting<Parent> select = new Setting<>("Select", new Parent(false, 0));
     private final Setting<Boolean> hands = new Setting<>("Hands", true).withParent(select);
     private final Setting<Boolean> players = new Setting<>("Players", true).withParent(select);
-    private final Setting<Boolean> self = new Setting<>("Self", true,v -> players.getValue()).withParent(select);
+    private final Setting<Boolean> self = new Setting<>("Self", true, v -> players.getValue()).withParent(select);
     private final Setting<Boolean> friends = new Setting<>("Friends", true).withParent(select);
     private final Setting<Boolean> crystals = new Setting<>("Crystals", true).withParent(select);
     private final Setting<Boolean> creatures = new Setting<>("Creatures", false).withParent(select);
@@ -82,7 +83,7 @@ public class Shaders extends Module {
 
     public void onRender3D(MatrixStack matrices) {
         if (hands.getValue())
-            ThunderHack.shaderManager.renderShader(()-> mc.gameRenderer.renderHand(matrices, mc.gameRenderer.getCamera(), mc.getTickDelta()), handsMode.getValue());
+            ThunderHack.shaderManager.renderShader(() -> ((IGameRenderer) mc.gameRenderer).irenderHand(mc.gameRenderer.getCamera(), mc.getTickDelta(), matrices.peek().getPositionMatrix()), handsMode.getValue());
     }
 
     @Override

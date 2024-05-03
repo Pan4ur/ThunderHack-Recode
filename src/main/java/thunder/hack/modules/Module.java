@@ -244,6 +244,21 @@ public abstract class Module {
             }
         }
 
+        try {
+            for (Field field : getClass().getSuperclass().getSuperclass().getSuperclass().getDeclaredFields()) {
+                if (Setting.class.isAssignableFrom(field.getType())) {
+                    field.setAccessible(true);
+
+                    try {
+                        settingList.add((Setting<?>) field.get(this));
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
         settingList.forEach(s -> s.setModule(this));
 
         return settingList;

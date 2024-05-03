@@ -46,7 +46,7 @@ public final class ThunderUtility {
 
     public static void parseChangeLog() {
         try {
-            URL url = new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/changeLog.txt");
+            URL url = new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/changeLogBeta.txt");
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
             String inputLine;
             while ((inputLine = in.readLine()) != null)

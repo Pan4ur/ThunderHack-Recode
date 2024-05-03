@@ -33,7 +33,7 @@ public class MixinPlayerListEntry {
     @Unique
     private Identifier customCapeTexture;
 
-    @Inject(method = "Lnet/minecraft/client/network/PlayerListEntry;<init>(Lcom/mojang/authlib/GameProfile;Z)V", at = @At("TAIL"))
+    @Inject(method = "<init>(Lcom/mojang/authlib/GameProfile;Z)V", at = @At("TAIL"))
     private void initHook(GameProfile profile, boolean secureChatEnforced, CallbackInfo ci) {
         getTexture(profile);
     }

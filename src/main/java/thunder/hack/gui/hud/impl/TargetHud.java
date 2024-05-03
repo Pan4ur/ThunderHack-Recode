@@ -517,12 +517,12 @@ public class TargetHud extends HudElement {
     private void drawPotionEffect(MatrixStack ms, PlayerEntity entity) {
         StringBuilder finalString = new StringBuilder();
         for (StatusEffectInstance potionEffect : entity.getStatusEffects()) {
-            StatusEffect potion = potionEffect.getEffectType();
-            if ((potion != StatusEffects.REGENERATION) && (potion != StatusEffects.SPEED) && (potion != StatusEffects.STRENGTH) && (potion != StatusEffects.WEAKNESS)) {
+            StatusEffect potion = (StatusEffect) potionEffect.getEffectType();
+            if ((potion != StatusEffects.REGENERATION.value()) && (potion != StatusEffects.SPEED.value()) && (potion != StatusEffects.STRENGTH.value()) && (potion != StatusEffects.WEAKNESS.value())) {
                 continue;
             }
             boolean potRanOut = (double) potionEffect.getDuration() != 0.0;
-            if (!entity.hasStatusEffect(potion) || !potRanOut) continue;
+            if (!entity.hasStatusEffect(potionEffect.getEffectType()) || !potRanOut) continue;
             finalString.append(getPotionName(potion)).append(potionEffect.getAmplifier() < 1 ? "" : potionEffect.getAmplifier() + 1).append(" ").append(getDurationString(potionEffect)).append(" ");
         }
         FontRenderers.settings.drawString(ms, finalString.toString(), getPosX() + 55, getPosY() + 15, new Color(0x8D8D8D).getRGB());

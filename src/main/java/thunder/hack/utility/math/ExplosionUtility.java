@@ -2,14 +2,12 @@ package thunder.hack.utility.math;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
@@ -19,15 +17,12 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.explosion.Explosion;
-import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.injection.accesors.IExplosion;
 import thunder.hack.modules.combat.AutoAnchor;
 import thunder.hack.modules.combat.AutoCrystal;
 
 import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -80,7 +75,7 @@ public final class ExplosionUtility {
      * Calculate target damage based on anchor position and target. Uses AutoAnchor settings so use only in AutoAnchor
      *
      * @param obsidianPos the position of the anchor whose damage is to be calculated
-     * @param target    the damage will be calculated on this entity
+     * @param target      the damage will be calculated on this entity
      * @return damage value in Float format
      */
     public static float getExplosionDamageWithRemove(BlockPos obsidianPos, PlayerEntity target) {
@@ -146,7 +141,7 @@ public final class ExplosionUtility {
                 if (mc.world.getDifficulty() == Difficulty.EASY) toDamage = Math.min(toDamage / 2f + 1f, toDamage);
                 else if (mc.world.getDifficulty() == Difficulty.HARD) toDamage = toDamage * 3f / 2f;
 
-                toDamage = DamageUtil.getDamageLeft(toDamage, target.getArmor(), (float) target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
+                toDamage = DamageUtil.getDamageLeft(toDamage, ((IExplosion) explosion).getDamageSource(), target.getArmor(), (float) target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
 
                 if (target.hasStatusEffect(StatusEffects.RESISTANCE)) {
                     int resistance = 25 - (target.getStatusEffect(StatusEffects.RESISTANCE).getAmplifier() + 1) * 5;
@@ -178,7 +173,7 @@ public final class ExplosionUtility {
         if (mc.world.getDifficulty() == Difficulty.PEACEFUL)
             return 0f;
 
-        if(target == null || predict == null)
+        if (target == null || predict == null)
             return 0f;
 
         if (explosion == null)
@@ -207,7 +202,7 @@ public final class ExplosionUtility {
                 if (mc.world.getDifficulty() == Difficulty.EASY) toDamage = Math.min(toDamage / 2f + 1f, toDamage);
                 else if (mc.world.getDifficulty() == Difficulty.HARD) toDamage = toDamage * 3f / 2f;
 
-                toDamage = DamageUtil.getDamageLeft(toDamage, target.getArmor(), (float) Objects.requireNonNull(target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS)).getValue());
+                toDamage = DamageUtil.getDamageLeft(toDamage, ((IExplosion) explosion).getDamageSource(), target.getArmor(), (float) Objects.requireNonNull(target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS)).getValue());
 
                 if (target.hasStatusEffect(StatusEffects.RESISTANCE)) {
                     int resistance = 25 - (Objects.requireNonNull(target.getStatusEffect(StatusEffects.RESISTANCE)).getAmplifier() + 1) * 5;
@@ -306,7 +301,7 @@ public final class ExplosionUtility {
                     toDamage = toDamage * 3f / 2f;
                 }
 
-                toDamage = DamageUtil.getDamageLeft(toDamage, target.getArmor(), (float) target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
+                toDamage = DamageUtil.getDamageLeft(toDamage, ((IExplosion) explosion).getDamageSource(), target.getArmor(), (float) target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
 
                 if (target.hasStatusEffect(StatusEffects.RESISTANCE)) {
                     int resistance = 25 - (target.getStatusEffect(StatusEffects.RESISTANCE).getAmplifier() + 1) * 5;
@@ -330,9 +325,9 @@ public final class ExplosionUtility {
     public float calculateDamage(Explosion explosion, Entity entity) {
         float f = explosion.getPower() * 2.0f;
         Vec3d vec3d = explosion.getPosition();
-        double d = Math.sqrt(entity.squaredDistanceTo(vec3d)) / (double)f;
-        double e = (1.0 - d) * (double)Explosion.getExposure(vec3d, entity);
-        return (float)((e * e + e) / 2.0 * 7.0 * (double)f + 1.0);
+        double d = Math.sqrt(entity.squaredDistanceTo(vec3d)) / (double) f;
+        double e = (1.0 - d) * (double) Explosion.getExposure(vec3d, entity);
+        return (float) ((e * e + e) / 2.0 * 7.0 * (double) f + 1.0);
     }
 
     private static float getExposureGhost(Vec3d source, Entity entity, BlockPos pos) {
@@ -365,7 +360,7 @@ public final class ExplosionUtility {
     }
 
     public static float getExposure(Vec3d source, Entity entity) {
-        if(!ModuleManager.autoCrystal.useOptimizedCalc.getValue())
+        if (!ModuleManager.autoCrystal.useOptimizedCalc.getValue())
             return Explosion.getExposure(source, entity);
 
         Box box = entity.getBoundingBox();
@@ -373,9 +368,9 @@ public final class ExplosionUtility {
         int miss = 0;
         int hit = 0;
 
-        for(int k = 0; k <= 1; k += 1) {
-            for(int l = 0; l <= 1; l += 1) {
-                for(int m = 0; m <= 1; m += 1) {
+        for (int k = 0; k <= 1; k += 1) {
+            for (int l = 0; l <= 1; l += 1) {
+                for (int m = 0; m <= 1; m += 1) {
                     double n = MathHelper.lerp(k, box.minX, box.maxX);
                     double o = MathHelper.lerp(l, box.minY, box.maxY);
                     double p = MathHelper.lerp(m, box.minZ, box.maxZ);
@@ -386,7 +381,7 @@ public final class ExplosionUtility {
                 }
             }
         }
-        return (float)miss / (float)hit;
+        return (float) miss / (float) hit;
     }
 
     private static BlockHitResult raycastGhost(RaycastContext context, BlockPos bPos) {

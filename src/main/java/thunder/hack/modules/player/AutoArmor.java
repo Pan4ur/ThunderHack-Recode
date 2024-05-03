@@ -1,9 +1,14 @@
 package thunder.hack.modules.player;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.model.ModelUtil;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
@@ -104,13 +109,16 @@ public class AutoArmor extends Module {
                     prot = 999;
                 }
             }
+
             if (is.hasEnchantments()) {
-                for (Entry<Enchantment, Integer> e: EnchantmentHelper.get(is).entrySet()) {
-                    if (e.getKey() instanceof ProtectionEnchantment)
-                        prot += e.getValue();
+                ItemEnchantmentsComponent enchants = EnchantmentHelper.getEnchantments(is);
+                if (enchants.getEnchantments().contains(Registries.ENCHANTMENT.getEntry(Enchantments.PROTECTION))) {
+                    prot += enchants.getLevel(Enchantments.PROTECTION);
                 }
             }
-            return (is.getItem() instanceof ArmorItem ? ((ArmorItem) is.getItem()).getProtection() : 0) + prot;
+
+
+            return (is.getItem() instanceof ArmorItem ? ((ArmorItem) is.getItem()).getProtection() + (int) Math.ceil(((ArmorItem) is.getItem()).getToughness()) : 0) + prot;
         } else if (!is.isEmpty()) {
             return 0;
         }

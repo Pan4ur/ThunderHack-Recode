@@ -58,7 +58,7 @@ public class LegitHelper extends Module {
 
     @Override
     public void onUpdate() {
-        if (isKeyPressed(anchorBind) && timer.every(anchorDelay.getValue() * 5L + 100)) {
+        if (anchors.getValue().isEnabled() && isKeyPressed(anchorBind) && timer.every(anchorDelay.getValue() * 5L + 100)) {
             int glowSlot = InventoryUtility.getGlowStone().slot();
             int anchorSlot = InventoryUtility.getAnchor().slot();
             if (glowSlot == -1 || anchorSlot == -1) return;
@@ -88,7 +88,7 @@ public class LegitHelper extends Module {
         boolean crystalAtCrosshair = mc.crosshairTarget instanceof EntityHitResult ehr && ehr.getEntity() instanceof EndCrystalEntity;
         boolean obbyAtCrosshair = mc.crosshairTarget instanceof BlockHitResult bhr && mc.world.getBlockState(bhr.getBlockPos()).getBlock() == Blocks.OBSIDIAN;
 
-        if (isKeyPressed(crystalBind) && timer.every(crystalDelay.getValue() * (crystalAtCrosshair ? 1L : obbyAtCrosshair ? 2L : 4L))) {
+        if (crystals.getValue().isEnabled() && isKeyPressed(crystalBind) && timer.every(crystalDelay.getValue() * (crystalAtCrosshair ? 1L : obbyAtCrosshair ? 2L : 4L))) {
             int crystalSlot = InventoryUtility.findItemInHotBar(Items.END_CRYSTAL).slot();
             int obbySlot = InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN).slot();
             if (obbySlot == -1 || crystalSlot == -1 || crystalSlot >= 9 || obbySlot >= 9) return;

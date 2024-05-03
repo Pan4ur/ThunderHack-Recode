@@ -16,7 +16,8 @@ public class GetNbtCommand extends Command {
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            sendMessage(mc.player.getMainHandStack().hasNbt() ? mc.player.getMainHandStack().getNbt().toString() : isRu() ? "У этого предмета нет nbt тегов!" : "This item don't contains nbt tags!");
+
+            sendMessage(mc.player.getMainHandStack().getComponents() != null ? mc.player.getMainHandStack().getComponents().toString() : isRu() ? "У этого предмета нет nbt тегов!" : "This item don't contains nbt tags!");
             return SINGLE_SUCCESS;
         });
     }

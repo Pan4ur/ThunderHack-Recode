@@ -10,12 +10,17 @@ import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ContainerComponent;
+import net.minecraft.component.type.MapIdComponent;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.*;
 import net.minecraft.item.map.MapState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ShulkerBoxScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -40,10 +45,7 @@ import thunder.hack.modules.render.Tooltips;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render2DEngine;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.render.Tooltips.hasItems;
@@ -158,9 +160,9 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
     public boolean renderShulkerToolTip(DrawContext context, int offsetX, int offsetY, int mouseX, int mouseY, ItemStack stack) {
         try {
-            NbtCompound compoundTag = stack.getSubNbt("BlockEntityTag");
-            DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(27, ItemStack.EMPTY);
-            Inventories.readNbt(compoundTag, itemStacks);
+            ContainerComponent compoundTag = stack.get(DataComponentTypes.CONTAINER);
+            if(compoundTag == null)
+                return false;
 
             float[] colors = new float[]{1F, 1F, 1F};
             Item focusedItem = stack.getItem();
@@ -171,7 +173,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
                     colors = new float[]{1F, 1F, 1F};
                 }
             }
-            draw(context, itemStacks, offsetX, offsetY, mouseX, mouseY, colors);
+            draw(context, compoundTag.stream().toList(), offsetX, offsetY, mouseX, mouseY, colors);
         } catch (Exception ignore) {
             return false;
         }
@@ -186,7 +188,8 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
         }
     }
 
-    private void draw(DrawContext context, DefaultedList<ItemStack> itemStacks, int offsetX, int offsetY, int mouseX, int mouseY, float[] colors) {
+    @Unique
+    private void draw(DrawContext context, List<ItemStack> itemStacks, int offsetX, int offsetY, int mouseX, int mouseY, float[] colors) {
         RenderSystem.disableDepthTest();
         GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
 
@@ -250,7 +253,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
             context.getMatrices().translate(x1, y1, z);
             context.getMatrices().scale((float) scale, (float) scale, 0);
             VertexConsumerProvider.Immediate consumer = client.getBufferBuilders().getEntityVertexConsumers();
-            client.gameRenderer.getMapRenderer().draw(context.getMatrices(), consumer, FilledMapItem.getMapId(stack), mapState, false, 0xF000F0);
+            client.gameRenderer.getMapRenderer().draw(context.getMatrices(), consumer, (MapIdComponent) stack.get(DataComponentTypes.MAP_ID), mapState, false, 0xF000F0);
         }
         context.getMatrices().pop();
     }
@@ -263,16 +266,12 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
             if (hasItems(itemStack) && Tooltips.middleClickOpen.getValue()) {
 
                 Arrays.fill(ITEMS, ItemStack.EMPTY);
-                NbtCompound nbt = itemStack.getNbt();
+                ContainerComponent nbt = itemStack.get(DataComponentTypes.CONTAINER);
 
-                if (nbt != null && nbt.contains("BlockEntityTag")) {
-                    NbtCompound nbt2 = nbt.getCompound("BlockEntityTag");
-                    if (nbt2 != null && nbt2.contains("Items")) {
-                        NbtList nbt3 = nbt2.getList("Items", 10);
-                        for (int i = 0; i < nbt3.size(); i++) {
-                            ITEMS[nbt3.getCompound(i).getByte("Slot")] = ItemStack.fromNbt(nbt3.getCompound(i));
-                        }
-                    }
+                if (nbt != null) {
+                    List<ItemStack> list = nbt.stream().toList();
+                    for (int i = 0; i < list.size(); i++)
+                        ITEMS[i] = list.get(i);
                 }
 
                 client.setScreen(new PeekScreen(new ShulkerBoxScreenHandler(0, client.player.getInventory(), new SimpleInventory(ITEMS)), client.player.getInventory(), focusedSlot.getStack().getName(), ((BlockItem) focusedSlot.getStack().getItem()).getBlock()));

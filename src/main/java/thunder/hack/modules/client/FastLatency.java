@@ -34,7 +34,7 @@ public final class FastLatency extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.@NotNull Receive e) {
-        if (e.getPacket() instanceof CommandSuggestionsS2CPacket c && c.getCompletionId() == 1337) {
+        if (e.getPacket() instanceof CommandSuggestionsS2CPacket c && c.id() == 1337) {
             resolvedPing = (int) MathUtility.clamp(System.currentTimeMillis() - ping, 0, 1000);
             timer.setMs(5000);
         }

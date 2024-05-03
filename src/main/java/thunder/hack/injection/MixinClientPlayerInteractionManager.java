@@ -3,6 +3,7 @@ package thunder.hack.injection;
 import net.minecraft.block.*;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.ActionResult;
@@ -24,7 +25,6 @@ import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventBreakBlock;
 import thunder.hack.events.impl.EventClickSlot;
 import thunder.hack.modules.player.NoInteract;
-import thunder.hack.modules.player.Reach;
 import thunder.hack.modules.player.SpeedMine;
 
 import static thunder.hack.modules.Module.mc;
@@ -78,6 +78,7 @@ public class MixinClientPlayerInteractionManager {
             cir.setReturnValue(false);
     }
 
+    /*
     @Inject(method = "getReachDistance", at = @At("HEAD"), cancellable = true)
     private void getReachDistanceHook(CallbackInfoReturnable<Float> cir) {
         if (ModuleManager.reach.isEnabled()) {
@@ -91,6 +92,7 @@ public class MixinClientPlayerInteractionManager {
             cir.setReturnValue(true);
         }
     }
+     */
 
     @Inject(method = "breakBlock", at = @At("HEAD"), cancellable = true)
     public void breakBlockHook(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {

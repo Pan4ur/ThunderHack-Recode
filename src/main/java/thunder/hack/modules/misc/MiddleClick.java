@@ -2,6 +2,8 @@ package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -10,7 +12,6 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -122,10 +123,12 @@ public class MiddleClick extends Module {
         if (stack == null)
             return false;
 
-        if (stack.getItem() == Items.SPLASH_POTION)
-            for (StatusEffectInstance effect : PotionUtil.getPotion(stack).getEffects())
-                if (effect.getEffectType() == StatusEffects.INSTANT_HEALTH)
+        if (stack.getItem() == Items.SPLASH_POTION) {
+            PotionContentsComponent potionContentsComponent = stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
+            for (StatusEffectInstance effect : potionContentsComponent.getEffects())
+                if (effect.getEffectType().value() == StatusEffects.INSTANT_HEALTH.value())
                     return true;
+        }
         return false;
     }
 

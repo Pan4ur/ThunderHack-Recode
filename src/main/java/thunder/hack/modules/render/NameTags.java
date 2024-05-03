@@ -8,6 +8,13 @@ import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ContainerComponent;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.component.type.NbtComponent;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -21,6 +28,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registries;
 import net.minecraft.scoreboard.ReadableScoreboardScore;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import net.minecraft.scoreboard.ScoreboardObjective;
@@ -48,8 +57,8 @@ import thunder.hack.utility.render.Render3DEngine;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.*;
+import java.util.List;
 
 import static thunder.hack.utility.render.Render2DEngine.CONTAINER_BACKGROUND;
 
@@ -76,6 +85,8 @@ public class NameTags extends Module {
     private final Setting<Armor> armorMode = new Setting<>("ArmorMode", Armor.Full);
     private final Setting<Health> health = new Setting<>("Health", Health.Number);
 
+    Map<Enchantment, String> encMap = new HashMap<>();
+
     public enum Font {
         Fancy, Fast
     }
@@ -91,6 +102,13 @@ public class NameTags extends Module {
 
     public NameTags() {
         super("NameTags", Category.RENDER);
+        encMap.put(Enchantments.BLAST_PROTECTION, "B");
+        encMap.put(Enchantments.PROTECTION, "P");
+        encMap.put(Enchantments.SHARPNESS, "S");
+        encMap.put(Enchantments.EFFICIENCY, "E");
+        encMap.put(Enchantments.UNBREAKING, "U");
+        encMap.put(Enchantments.POWER, "PO");
+        encMap.put(Enchantments.THORNS, "T");
     }
 
     public void onRender2D(DrawContext context) {
@@ -192,39 +210,30 @@ public class NameTags extends Module {
 
                             float enchantmentY = 0;
 
-                            NbtList enchants = armorComponent.getEnchantments();
+                            ItemEnchantmentsComponent enchants = EnchantmentHelper.getEnchantments(armorComponent);
+
+
                             if (enchantss.getValue()) {
                                 if (!onlyHands.getValue() || (armorComponent == ent.getOffHandStack() || armorComponent == ent.getMainHandStack())) {
-                                    for (int index = 0; index < enchants.size(); ++index) {
-                                        String id = enchants.getCompound(index).getString("id");
-                                        short level = enchants.getCompound(index).getShort("lvl");
-                                        String encName = " ";
 
-                                        switch (id) {
-                                            case "minecraft:blast_protection", "blast_protection" ->
-                                                    encName = "B" + level;
-                                            case "minecraft:protection", "protection" -> encName = "P" + level;
-                                            case "minecraft:thorns", "thorns" -> encName = "T" + level;
-                                            case "minecraft:sharpness", "sharpness" -> encName = "S" + level;
-                                            case "minecraft:efficiency", "efficiency" -> encName = "E" + level;
-                                            case "minecraft:unbreaking", "unbreaking" -> encName = "U" + level;
-                                            case "minecraft:power", "power" -> encName = "PO" + level;
-                                            default -> {
-                                                continue;
+                                    for (Enchantment enchantment : encMap.keySet()) {
+                                        if (enchants.getEnchantments().contains(Registries.ENCHANTMENT.getEntry(enchantment))) {
+                                            String id = encMap.get(enchantment);
+                                            int level = enchants.getLevel(enchantment);
+                                            String encName = id + level;
+
+                                            if (font.getValue() == Font.Fancy) {
+                                                FontRenderers.sf_bold.drawString(context.getMatrices(), encName, posX - 50 + item_offset, (float) posY - 45 + enchantmentY, -1);
+                                            } else {
+                                                context.getMatrices().push();
+                                                context.getMatrices().translate((posX - 50f + item_offset), (posY - 45f + enchantmentY), 0);
+                                                context.drawText(mc.textRenderer, encName, 0, 0, -1, false);
+                                                context.getMatrices().pop();
                                             }
+                                            enchantmentY -= 8;
+                                            if (maxEnchantY > enchantmentY)
+                                                maxEnchantY = enchantmentY;
                                         }
-
-                                        if (font.getValue() == Font.Fancy) {
-                                            FontRenderers.sf_bold.drawString(context.getMatrices(), encName, posX - 50 + item_offset, (float) posY - 45 + enchantmentY, -1);
-                                        } else {
-                                            context.getMatrices().push();
-                                            context.getMatrices().translate((posX - 50f + item_offset), (posY - 45f + enchantmentY), 0);
-                                            context.drawText(mc.textRenderer, encName, 0, 0, -1, false);
-                                            context.getMatrices().pop();
-                                        }
-                                        enchantmentY -= 8;
-                                        if (maxEnchantY > enchantmentY)
-                                            maxEnchantY = enchantmentY;
                                     }
                                 }
                             }
@@ -266,8 +275,10 @@ public class NameTags extends Module {
                 if (potions.getValue())
                     renderStatusEffectOverlay(context, (float) posX, (float) (posY + maxEnchantY - 60), ent);
 
+                Item handItem = ent.getMainHandStack().getItem();
+
                 if (shulkers.getValue())
-                    renderShulkerToolTip(context, (int) posX - 90, (int) posY - 120, ent.getMainHandStack());
+                    renderShulkerToolTip(context, (int) posX - 90, (int) posY - 120, (handItem instanceof BlockItem bi) && (bi.getBlock() instanceof ShulkerBoxBlock) ?  ent.getMainHandStack() : ent.getOffHandStack());
                 context.getMatrices().pop();
             }
         }
@@ -530,9 +541,9 @@ public class NameTags extends Module {
 
     public boolean renderShulkerToolTip(DrawContext context, int offsetX, int offsetY, ItemStack stack) {
         try {
-            NbtCompound compoundTag = stack.getSubNbt("BlockEntityTag");
-            DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(27, ItemStack.EMPTY);
-            Inventories.readNbt(compoundTag, itemStacks);
+            ContainerComponent compoundTag = stack.get(DataComponentTypes.CONTAINER);
+            if(compoundTag == null)
+                return false;
 
             float[] colors = new float[]{1F, 1F, 1F};
             Item focusedItem = stack.getItem();
@@ -545,14 +556,14 @@ public class NameTags extends Module {
             } else {
                 return false;
             }
-            draw(context, itemStacks, offsetX, offsetY, colors);
+            draw(context, compoundTag.stream().toList(), offsetX, offsetY, colors);
         } catch (Exception ignore) {
             return false;
         }
         return true;
     }
 
-    private void draw(DrawContext context, DefaultedList<ItemStack> itemStacks, int offsetX, int offsetY, float[] colors) {
+    private void draw(DrawContext context, List<ItemStack> itemStacks, int offsetX, int offsetY, float[] colors) {
         RenderSystem.disableDepthTest();
         GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
 

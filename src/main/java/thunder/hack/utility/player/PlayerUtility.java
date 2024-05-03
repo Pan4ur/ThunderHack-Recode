@@ -3,6 +3,7 @@ package thunder.hack.utility.player;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PendingUpdateManager;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +16,7 @@ public final class PlayerUtility {
     public static boolean isEating() {
         if (mc.player == null) return false;
 
-        return (mc.player.getMainHandStack().isFood() || mc.player.getOffHandStack().isFood())
+        return (mc.player.getMainHandStack().getComponents().contains(DataComponentTypes.FOOD) || mc.player.getOffHandStack().getComponents().contains(DataComponentTypes.FOOD))
                 && mc.player.isUsingItem();
     }
 

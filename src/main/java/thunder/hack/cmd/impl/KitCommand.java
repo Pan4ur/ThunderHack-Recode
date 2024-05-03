@@ -5,9 +5,9 @@ import com.google.gson.JsonParser;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PotionItem;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
@@ -132,7 +132,7 @@ public class KitCommand extends Command {
         StringBuilder jsonInventory = new StringBuilder();
 
         for (ItemStack item : mc.player.getInventory().main)
-            jsonInventory.append(item.getItem() instanceof PotionItem ? item.getItem().getTranslationKey() + PotionUtil.getColor(item) : item.getItem().getTranslationKey()).append(" ");
+            jsonInventory.append(item.getItem() instanceof PotionItem ? item.getItem().getTranslationKey() + item.getItem().getComponents().get(DataComponentTypes.POTION_CONTENTS).getColor() : item.getItem().getTranslationKey()).append(" ");
 
         json.addProperty(name, jsonInventory.toString());
         saveFile(json, name, isRu() ? "сохранен" : "saved");

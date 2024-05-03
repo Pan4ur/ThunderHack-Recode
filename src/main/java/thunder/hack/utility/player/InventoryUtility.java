@@ -1,6 +1,7 @@
 package thunder.hack.utility.player;
 
 import net.minecraft.block.Block;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.DamageUtil;
@@ -89,7 +90,7 @@ public final class InventoryUtility {
         for (int b1 = 9; b1 < 45; b1++) {
             ItemStack itemStack = mc.player.getInventory().getStack(b1 >= 36 ? b1 - 36 : b1);
             if (itemStack != null && itemStack.getItem() instanceof AxeItem axe) {
-                float f1 = axe.getMaxDamage();
+                float f1 = axe.getComponents().get(DataComponentTypes.MAX_DAMAGE);
                 f1 += EnchantmentHelper.getLevel(Enchantments.SHARPNESS, itemStack);
                 if (f1 > f) {
                     f = f1;
@@ -194,7 +195,7 @@ public final class InventoryUtility {
         for (int b1 = 9; b1 < 45; b1++) {
             ItemStack itemStack = mc.player.getInventory().getStack(b1);
             if (itemStack != null && itemStack.getItem() instanceof SwordItem sword) {
-                float f1 = sword.getMaxDamage();
+                float f1 = sword.getComponents().get(DataComponentTypes.MAX_DAMAGE);
                 f1 += EnchantmentHelper.getLevel(Enchantments.SHARPNESS, itemStack);
                 if (f1 > f) {
                     f = f1;
@@ -215,7 +216,7 @@ public final class InventoryUtility {
         for (int b1 = 0; b1 < 9; b1++) {
             ItemStack itemStack = mc.player.getInventory().getStack(b1);
             if (itemStack != null && itemStack.getItem() instanceof SwordItem sword) {
-                float f1 = sword.getMaxDamage();
+                float f1 = sword.getComponents().get(DataComponentTypes.MAX_DAMAGE);
                 f1 += EnchantmentHelper.getLevel(Enchantments.SHARPNESS, itemStack);
                 if (f1 > f) {
                     f = f1;
@@ -236,7 +237,7 @@ public final class InventoryUtility {
         for (int b1 = 0; b1 < 9; b1++) {
             ItemStack itemStack = mc.player.getInventory().getStack(b1);
             if (itemStack != null && itemStack.getItem() instanceof AxeItem axe) {
-                float f1 = axe.getMaxDamage();
+                float f1 = axe.getComponents().get(DataComponentTypes.MAX_DAMAGE);
                 f1 += EnchantmentHelper.getLevel(Enchantments.SHARPNESS, itemStack);
                 if (f1 > f) {
                     f = f1;
@@ -248,7 +249,6 @@ public final class InventoryUtility {
         if (slot == -1) return SearchInvResult.notFound();
         return new SearchInvResult(slot, true, mc.player.getInventory().getStack(slot));
     }
-
 
 
     // Needs rewrite
@@ -350,7 +350,7 @@ public final class InventoryUtility {
         if (mc.player.getInventory().selectedSlot == slot && ThunderHack.playerManager.serverSideSlot == slot)
             return;
         mc.player.getInventory().selectedSlot = slot;
-        ((IInteractionManager)mc.interactionManager).syncSlot();
+        ((IInteractionManager) mc.interactionManager).syncSlot();
     }
 
     public static void switchToSilent(int slot) {
@@ -382,10 +382,10 @@ public final class InventoryUtility {
         float baseDamage = 1f;
 
         if (weapon.getItem() instanceof SwordItem swordItem)
-            baseDamage = swordItem.getAttackDamage();
+            baseDamage = 7;
 
         if (weapon.getItem() instanceof AxeItem axeItem)
-            baseDamage = axeItem.getAttackDamage();
+            baseDamage = 9;
 
         if (mc.player.fallDistance > 0 || ModuleManager.criticals.isEnabled())
             baseDamage += baseDamage / 2f;
@@ -398,8 +398,7 @@ public final class InventoryUtility {
         }
 
         // Reduce by armour
-        baseDamage = DamageUtil.getDamageLeft(baseDamage, ent.getArmor(), (float) ent.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
-
+        baseDamage = DamageUtil.getDamageLeft(baseDamage, mc.world.getDamageSources().generic(), ent.getArmor(), (float) ent.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
         return baseDamage;
     }
 
@@ -424,12 +423,12 @@ public final class InventoryUtility {
     }
 
     public static Item getItem(String Name) {
-        if(Name == null) return Items.AIR;
+        if (Name == null) return Items.AIR;
         for (Block block : Registries.BLOCK)
-            if (block.getTranslationKey().replace("block.minecraft.","").equals(Name.toLowerCase()))
+            if (block.getTranslationKey().replace("block.minecraft.", "").equals(Name.toLowerCase()))
                 return Item.fromBlock(block);
         for (Item item : Registries.ITEM)
-            if (item.getTranslationKey().replace("item.minecraft.","").equals(Name.toLowerCase()))
+            if (item.getTranslationKey().replace("item.minecraft.", "").equals(Name.toLowerCase()))
                 return item;
         return Items.DIRT;
     }

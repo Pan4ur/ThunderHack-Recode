@@ -1,5 +1,11 @@
 package thunder.hack.modules.render;
 
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ContainerComponent;
+import net.minecraft.component.type.NbtComponent;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.util.collection.DefaultedList;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import net.minecraft.item.ItemStack;
@@ -17,7 +23,7 @@ public class Tooltips extends Module {
     public final Setting<Boolean> shulkerRegearShiftMode = new Setting<>("RegearShift", true);
 
     public static boolean hasItems(ItemStack itemStack) {
-        NbtCompound compoundTag = itemStack.getSubNbt("BlockEntityTag");
-        return compoundTag != null && compoundTag.contains("Items", 9);
+        ContainerComponent compoundTag = itemStack.get(DataComponentTypes.CONTAINER);
+        return compoundTag != null && !compoundTag.stream().toList().isEmpty();
     }
 }

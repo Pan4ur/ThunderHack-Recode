@@ -8,17 +8,18 @@ import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.PickaxeItem;
 import net.minecraft.item.SwordItem;
 import net.minecraft.resource.ResourceFactory;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
-import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,7 +34,6 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.player.NoEntityTrace;
-import thunder.hack.modules.render.NoBob;
 import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.render.BlockAnimationUtility;
 import thunder.hack.utility.render.Render3DEngine;
@@ -67,17 +67,31 @@ public abstract class MixinGameRenderer {
     }
 
     @Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z", opcode = Opcodes.GETFIELD, ordinal = 0), method = "renderWorld")
-    void render3dHook(float tickDelta, long limitTime, @NotNull MatrixStack matrix, CallbackInfo ci) {
+    void render3dHook(float tickDelta, long limitTime, CallbackInfo ci) {
+        if(mc.player == null)
+            return;
+
+        Camera camera = mc.gameRenderer.getCamera();
+        MatrixStack matrixStack = new MatrixStack();
+        RenderSystem.getModelViewStack().pushMatrix().mul(matrixStack.peek().getPositionMatrix());
+        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0f));
+        RenderSystem.applyModelViewMatrix();
+
         Render3DEngine.lastProjMat.set(RenderSystem.getProjectionMatrix());
         Render3DEngine.lastModMat.set(RenderSystem.getModelViewMatrix());
-        Render3DEngine.lastWorldSpaceMatrix.set(matrix.peek().getPositionMatrix());
-        ThunderHack.moduleManager.onRender3D(matrix);
-        BlockAnimationUtility.onRender(matrix);
-        Render3DEngine.onRender3D(matrix); // <- не двигать
+        Render3DEngine.lastWorldSpaceMatrix.set(matrixStack.peek().getPositionMatrix());
+
+        ThunderHack.moduleManager.onRender3D(matrixStack);
+        BlockAnimationUtility.onRender(matrixStack);
+        Render3DEngine.onRender3D(matrixStack); // <- не двигать
+
+        RenderSystem.getModelViewStack().popMatrix();
+        RenderSystem.applyModelViewMatrix();
     }
 
-    @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V", shift = At.Shift.AFTER))
-    public void postRender3dHook(float tickDelta, long limitTime, MatrixStack matrix, CallbackInfo ci) {
+    @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/render/Camera;FLorg/joml/Matrix4f;)V", shift = At.Shift.AFTER))
+    public void postRender3dHook(float tickDelta, long limitTime, CallbackInfo ci) {
         ThunderHack.shaderManager.renderShaders();
     }
 
@@ -87,7 +101,7 @@ public abstract class MixinGameRenderer {
         return MathHelper.lerp(delta, first, second);
     }
 
-    @Inject(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/ProjectileUtil;raycast(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Ljava/util/function/Predicate;D)Lnet/minecraft/util/hit/EntityHitResult;"), cancellable = true)
+    @Inject(method = "updateCrosshairTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;findCrosshairTarget(Lnet/minecraft/entity/Entity;DDF)Lnet/minecraft/util/hit/HitResult;"), cancellable = true)
     private void onUpdateTargetedEntity(float tickDelta, CallbackInfo info) {
         if (ModuleManager.noEntityTrace.isEnabled() && (mc.player.getMainHandStack().getItem() instanceof PickaxeItem || !NoEntityTrace.ponly.getValue())) {
             if (mc.cameraEntity instanceof EndCrystalEntity && NoEntityTrace.ignoreCrystals.getValue()) return;
@@ -147,7 +161,7 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
     private void bobViewHook(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        if(ModuleManager.noBob.isEnabled()) {
+        if (ModuleManager.noBob.isEnabled()) {
             ModuleManager.noBob.bobView(matrices, tickDelta);
             ci.cancel();
             return;

@@ -1,6 +1,8 @@
 package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FoodComponent;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
@@ -117,7 +119,7 @@ public class NoSlow extends Module {
         if (mode.getValue() == Mode.Matrix3)
             return false;
 
-        if (!food.getValue() && mc.player.getActiveItem().isFood())
+        if (!food.getValue() && mc.player.getActiveItem().getComponents().contains(DataComponentTypes.FOOD))
             return false;
 
         if (!shield.getValue() && mc.player.getActiveItem().getItem() == Items.SHIELD)
@@ -133,7 +135,7 @@ public class NoSlow extends Module {
         if (!mainHand.getValue() && mc.player.getActiveHand() == Hand.MAIN_HAND)
             return false;
 
-        if ((mc.player.getOffHandStack().isFood() || mc.player.getOffHandStack().getItem() == Items.SHIELD)
+        if ((mc.player.getOffHandStack().getComponents().contains(DataComponentTypes.FOOD) || mc.player.getOffHandStack().getItem() == Items.SHIELD)
                 && (mode.getValue() == Mode.GrimNew || mode.getValue() == Mode.Grim) && mc.player.getActiveHand() == Hand.MAIN_HAND)
             return false;
 

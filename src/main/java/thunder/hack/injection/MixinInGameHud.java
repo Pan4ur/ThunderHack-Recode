@@ -31,7 +31,7 @@ public abstract class MixinInGameHud {
     }
 
     @Inject(at = @At(value = "HEAD"), method = "renderHotbar", cancellable = true)
-    public void renderHotbarCustom(float tickDelta, DrawContext context, CallbackInfo ci) {
+    public void renderHotbarCustom(DrawContext context, float tickDelta, CallbackInfo ci) {
         if (ModuleManager.hotbar.isEnabled()) {
             ci.cancel();
             Hotbar.renderHotBarItems(tickDelta, context);
@@ -39,7 +39,7 @@ public abstract class MixinInGameHud {
     }
 
     @Inject(at = @At(value = "HEAD"), method = "renderStatusEffectOverlay", cancellable = true)
-    public void renderStatusEffectOverlayHook(DrawContext context, CallbackInfo ci) {
+    public void renderStatusEffectOverlayHook(DrawContext context, float tickDelta, CallbackInfo ci) {
         if (ModuleManager.potionHud.isEnabled() || (ModuleManager.legacyHud.isEnabled() && ModuleManager.legacyHud.potions.getValue())) {
             ci.cancel();
         }
@@ -53,7 +53,7 @@ public abstract class MixinInGameHud {
         }
     }
 
-    @Inject(method = "renderScoreboardSidebar", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "HEAD"), cancellable = true)
     private void renderScoreboardSidebarHook(DrawContext context, ScoreboardObjective objective, CallbackInfo ci) {
         if(ModuleManager.noRender.noScoreBoard.getValue() && ModuleManager.noRender.isEnabled()){
             ci.cancel();
@@ -73,7 +73,7 @@ public abstract class MixinInGameHud {
     }
 
     @Inject(method = "renderCrosshair", at = @At(value = "HEAD"), cancellable = true)
-    public void renderCrosshair(DrawContext context, CallbackInfo ci) {
+    public void renderCrosshair(DrawContext context, float tickDelta, CallbackInfo ci) {
         if (ModuleManager.crosshair.isEnabled()) {
             ci.cancel();
         }

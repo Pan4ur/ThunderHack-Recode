@@ -34,7 +34,7 @@ public class MixinTitleScreen extends Screen {
         if (ThunderHack.isOutdated && !FabricLoader.getInstance().isDevelopmentEnvironment()) {
             mc.setScreen(new ConfirmScreen(
                     confirm -> {
-                        if (confirm) Util.getOperatingSystem().open(URI.create("https://github.com/Pan4ur/ThunderHack-Recode/releases/download/latest/thunderhack-1.4.jar/"));
+                        if (confirm) Util.getOperatingSystem().open(URI.create("https://github.com/Pan4ur/ThunderHack-Recode/releases/download/latest/thunderhack-1.6.jar/"));
                         else mc.stop();
                     },
                     Text.of(Formatting.RED + "You are using an outdated version of ThunderHack Recode"), Text.of("Please update to the latest release"), Text.of("Download"), Text.of("Quit Game")));

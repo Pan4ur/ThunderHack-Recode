@@ -11,7 +11,7 @@ import static thunder.hack.modules.Module.mc;
 public final class MovementUtility {
 
     public static boolean isMoving() {
-        return mc.player.input.movementForward != 0.0 || mc.player.input.movementSideways != 0.0;
+        return mc.player != null && mc.world != null && mc.player.input != null && (mc.player.input.movementForward != 0.0 || mc.player.input.movementSideways != 0.0);
     }
 
     public static double getSpeed() {

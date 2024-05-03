@@ -10,6 +10,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
+import thunder.hack.injection.accesors.IPlayerInteractEntityC2SPacket;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
@@ -79,14 +80,12 @@ public final class Criticals extends Module {
     public static Entity getEntity(@NotNull PlayerInteractEntityC2SPacket packet) {
         PacketByteBuf packetBuf = new PacketByteBuf(Unpooled.buffer());
         packet.write(packetBuf);
-
         return mc.world.getEntityById(packetBuf.readVarInt());
     }
 
     public static InteractType getInteractType(@NotNull PlayerInteractEntityC2SPacket packet) {
         PacketByteBuf packetBuf = new PacketByteBuf(Unpooled.buffer());
         packet.write(packetBuf);
-
         packetBuf.readVarInt();
         return packetBuf.readEnumConstant(InteractType.class);
     }
