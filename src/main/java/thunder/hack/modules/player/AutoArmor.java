@@ -1,96 +1,104 @@
 package thunder.hack.modules.player;
 
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.model.ModelUtil;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.*;
-import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.PlayerUpdateEvent;
-import thunder.hack.modules.Module;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Stack;
-
-import thunder.hack.setting.Setting;
-import thunder.hack.utility.player.MovementUtility;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.ProtectionEnchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.ElytraItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.Hand;
+import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.gui.clickui.ClickGUI;
+import thunder.hack.gui.hud.HudEditorGui;
+import thunder.hack.modules.Module;
+import thunder.hack.setting.Setting;
+import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.MovementUtility;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class AutoArmor extends Module {
     public AutoArmor() {
         super("AutoArmor", Category.PLAYER);
     }
 
+    private final Setting<EnchantPriority> head = new Setting<>("Head", EnchantPriority.Protection);
+    private final Setting<EnchantPriority> body = new Setting<>("Body", EnchantPriority.Protection);
+    private final Setting<EnchantPriority> tights = new Setting<>("Tights", EnchantPriority.Protection);
+    private final Setting<EnchantPriority> feet = new Setting<>("Feet", EnchantPriority.Protection);
+    private final Setting<ElytraPriority> elytraPriority = new Setting<>("ElytraPriority", ElytraPriority.Ignore);
+    private final Setting<Integer> delay = new Setting<>("Delay", 5, 0, 10);
+    private final Setting<Boolean> oldVersion = new Setting<>("OldVersion", false);
+    private final Setting<Boolean> pauseInventory = new Setting<>("PauseInventory", false);
+    private final Setting<Boolean> noMove = new Setting<>("NoMove", false);
+    private final Setting<Boolean> ignoreCurse = new Setting<>("IgnoreCurse", true);
+    private final Setting<Boolean> strict = new Setting<>("Strict", false);
+
     private int tickDelay = 0;
-    public final Setting<Boolean> noMove = new Setting<>("No Move", true);
-    public final Setting<Integer> delay = new Setting<>("Delay", 5, 0, 10);
 
+    List<ArmorData> armorList = Arrays.asList(
+            new ArmorData(EquipmentSlot.FEET, 36, -1, -1, -1),
+            new ArmorData(EquipmentSlot.LEGS, 37, -1, -1, -1),
+            new ArmorData(EquipmentSlot.CHEST, 38, -1, -1, -1),
+            new ArmorData(EquipmentSlot.HEAD, 39, -1, -1, -1)
+    );
 
-    @EventHandler
-    public void onTick(PlayerUpdateEvent event) {
-        if (mc.player.playerScreenHandler != mc.player.currentScreenHandler)
+    @Override
+    public void onUpdate() {
+        if (mc.currentScreen != null && pauseInventory.getValue() && !(mc.currentScreen instanceof ChatScreen) && !(mc.currentScreen instanceof ClickGUI) && !(mc.currentScreen instanceof HudEditorGui))
             return;
 
-        if(MovementUtility.isMoving() && noMove.getValue()) return;
-        if(ModuleManager.elytraPlus.isEnabled()) return;
-
-        if (tickDelay > 0) {
-            tickDelay--;
+        if (tickDelay-- > 0)
             return;
-        }
 
-        tickDelay = delay.getValue();
-
-        Map<EquipmentSlot, int[]> armorMap = new HashMap<>(4);
-        armorMap.put(EquipmentSlot.FEET, new int[] { 36, getProtection(mc.player.getInventory().getStack(36)), -1, -1 });
-        armorMap.put(EquipmentSlot.LEGS, new int[] { 37, getProtection(mc.player.getInventory().getStack(37)), -1, -1 });
-        armorMap.put(EquipmentSlot.CHEST, new int[] { 38, getProtection(mc.player.getInventory().getStack(38)), -1, -1 });
-        armorMap.put(EquipmentSlot.HEAD, new int[] { 39, getProtection(mc.player.getInventory().getStack(39)), -1, -1 });
+        armorList.forEach(ArmorData::reset);
 
         for (int i = 0; i < 36; i++) {
             ItemStack stack = mc.player.getInventory().getStack(i);
             int prot = getProtection(stack);
-            if (prot > 0) {
-                for (Entry<EquipmentSlot, int[]> e: armorMap.entrySet()) {
-                    if (e.getKey() == (stack.getItem() instanceof ElytraItem || stack.getItem() instanceof AirBlockItem ? EquipmentSlot.CHEST : ((ArmorItem) stack.getItem()).getSlotType())) {
-                        if (prot > e.getValue()[1] && prot > e.getValue()[3]) {
-                            e.getValue()[2] = i;
-                            e.getValue()[3] = prot;
+            if (prot > 0)
+                for (ArmorData e : armorList) {
+                    if (e.getEquipmentSlot() == (stack.getItem() instanceof ArmorItem ai ? ai.getSlotType() : EquipmentSlot.CHEST))
+                        if (prot > e.getPrevProt() && prot > e.getNewProtection()) {
+                            e.setNewSlot(i);
+                            e.setNewProtection(prot);
                         }
-                    }
                 }
-            }
         }
 
-        for (Entry<EquipmentSlot, int[]> e: armorMap.entrySet()) {
-            if (e.getValue()[2] != -1) {
-                if (e.getValue()[1] == -1 && e.getValue()[2] < 9) {
-                    if (e.getValue()[2] != mc.player.getInventory().selectedSlot) {
-                        mc.player.getInventory().selectedSlot = e.getValue()[2];
-                        mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(e.getValue()[2]));
-                    }
-                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 36 + e.getValue()[2], 1, SlotActionType.QUICK_MOVE, mc.player);
-                    mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                } else if (mc.player.playerScreenHandler == mc.player.currentScreenHandler) {
-                    int armorSlot = (e.getValue()[0] - 34) + (39 - e.getValue()[0]) * 2;
-                    int newArmorslot = e.getValue()[2] < 9 ? 36 + e.getValue()[2] : e.getValue()[2];
-                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, newArmorslot, 0, SlotActionType.PICKUP, mc.player);
-                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, armorSlot, 0, SlotActionType.PICKUP, mc.player);
-                    if (e.getValue()[1] != -1)
-                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, newArmorslot, 0, SlotActionType.PICKUP, mc.player);
-                    mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+        for (ArmorData armorPiece : armorList) {
+            int slot = armorPiece.getNewSlot();
+            if (slot != -1) {
+                if ((armorPiece.getPrevProt() == -1 || !oldVersion.getValue()) && slot < 9) {
+                    InventoryUtility.saveAndSwitchTo(slot);
+                    sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+                    InventoryUtility.returnSlot();
+                } else {
+                    if (MovementUtility.isMoving() && noMove.getValue())
+                        return;
+
+                    int newArmorSlot = slot < 9 ? 36 + slot : slot;
+
+                    if(strict.getValue())
+                        sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+
+                    clickSlot(newArmorSlot);
+                    clickSlot((armorPiece.getArmorSlot() - 34) + (39 - armorPiece.getArmorSlot()) * 2);
+                    if (armorPiece.getPrevProt() != -1)
+                        clickSlot(newArmorSlot);
+
+                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                 }
+
+                tickDelay = delay.getValue();
                 return;
             }
         }
@@ -100,29 +108,116 @@ public class AutoArmor extends Module {
         if (is.getItem() instanceof ArmorItem || is.getItem() instanceof ElytraItem) {
             int prot = 0;
 
+            EquipmentSlot slot = is.getItem() instanceof ArmorItem ai ? ai.getSlotType() : EquipmentSlot.BODY;
+
+
             if (is.getItem() instanceof ElytraItem) {
                 if (!ElytraItem.isUsable(is))
                     return 0;
-                prot = 1;
-                if(ModuleManager.elytraRecast.isEnabled() || ModuleManager.elytraPlus.isEnabled()
-                        || (ModuleManager.elytraSwap.isEnabled() && mc.player.getInventory().getStack(38).getItem() instanceof ElytraItem)){
+
+                boolean ePlus = elytraPriority.is(ElytraPriority.ElytraPlus) && (ModuleManager.elytraRecast.isEnabled() || ModuleManager.elytraPlus.isEnabled());
+                boolean ignore = elytraPriority.is(ElytraPriority.Ignore) && mc.player.getInventory().getStack(38).getItem() instanceof ElytraItem;
+
+                if (ePlus || ignore || elytraPriority.is(ElytraPriority.Always))
                     prot = 999;
+            }
+
+            int blastMultiplier = 1;
+            int protectionMultiplier = 1;
+
+            switch (slot) {
+                case HEAD -> {
+                    if(head.is(EnchantPriority.Protection)) protectionMultiplier *= 2;
+                    else blastMultiplier *= 2;
+                }
+                case BODY -> {
+                    if(body.is(EnchantPriority.Protection)) protectionMultiplier *= 2;
+                    else blastMultiplier *= 2;
+                }
+                case LEGS -> {
+                    if(tights.is(EnchantPriority.Protection)) protectionMultiplier *= 2;
+                    else blastMultiplier *= 2;
+                }
+                case FEET -> {
+                    if(feet.is(EnchantPriority.Protection)) protectionMultiplier *= 2;
+                    else blastMultiplier *= 2;
                 }
             }
 
             if (is.hasEnchantments()) {
                 ItemEnchantmentsComponent enchants = EnchantmentHelper.getEnchantments(is);
-                if (enchants.getEnchantments().contains(Registries.ENCHANTMENT.getEntry(Enchantments.PROTECTION))) {
-                    prot += enchants.getLevel(Enchantments.PROTECTION);
-                }
+
+                if (enchants.getEnchantments().contains(Registries.ENCHANTMENT.getEntry(Enchantments.PROTECTION)))
+                    prot += enchants.getLevel(Enchantments.PROTECTION) * protectionMultiplier;
+
+                if (enchants.getEnchantments().contains(Registries.ENCHANTMENT.getEntry(Enchantments.BLAST_PROTECTION)))
+                    prot += enchants.getLevel(Enchantments.BLAST_PROTECTION) * blastMultiplier;
+
+                if (enchants.getEnchantments().contains(Registries.ENCHANTMENT.getEntry(Enchantments.BINDING_CURSE)) && ignoreCurse.getValue())
+                    prot = -999;
             }
 
+            return (is.getItem() instanceof ArmorItem armorItem ? (armorItem.getProtection() + (int) Math.ceil(armorItem.getToughness())) * 10 : 0) + prot;
+        } else if (!is.isEmpty()) return 0;
+        return -1;
+    }
 
-            return (is.getItem() instanceof ArmorItem ? ((ArmorItem) is.getItem()).getProtection() + (int) Math.ceil(((ArmorItem) is.getItem()).getToughness()) : 0) + prot;
-        } else if (!is.isEmpty()) {
-            return 0;
+    public class ArmorData {
+        private EquipmentSlot equipmentSlot;
+        private int armorSlot, prevProtection, newSlot, newProtection;
+
+        public ArmorData(EquipmentSlot equipmentSlot, int armorSlot, int prevProtection, int newSlot, int newProtection) {
+            this.equipmentSlot = equipmentSlot;
+            this.armorSlot = armorSlot;
+            this.prevProtection = prevProtection;
+            this.newSlot = newSlot;
+            this.newProtection = newProtection;
         }
 
-        return -1;
+        public int getArmorSlot() {
+            return armorSlot;
+        }
+
+        public int getPrevProt() {
+            return prevProtection;
+        }
+
+        public void setPrevProt(int prevProtection) {
+            this.prevProtection = prevProtection;
+        }
+
+        public int getNewSlot() {
+            return newSlot;
+        }
+
+        public void setNewSlot(int newSlot) {
+            this.newSlot = newSlot;
+        }
+
+        public int getNewProtection() {
+            return newProtection;
+        }
+
+        public void setNewProtection(int newProtection) {
+            this.newProtection = newProtection;
+        }
+
+        public EquipmentSlot getEquipmentSlot() {
+            return equipmentSlot;
+        }
+
+        public void reset() {
+            setPrevProt(getProtection(mc.player.getInventory().getStack(getArmorSlot())));
+            setNewSlot(-1);
+            setNewProtection(-1);
+        }
+    }
+
+    private enum ElytraPriority {
+        None, Always, ElytraPlus, Ignore
+    }
+
+    private enum EnchantPriority {
+        Blast, Protection
     }
 }

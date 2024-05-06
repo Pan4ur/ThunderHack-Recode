@@ -293,7 +293,7 @@ public class LegacyHud extends Module {
             int x = i - 189 + 180 + 2;
             context.drawItem(totem, x, y);
             context.drawItemInSlot(mc.textRenderer, totem, x, y);
-            drawText(context, totems + "", x + 8 + getStringWidth(totems + "") / 2, (y - 7), 16777215);
+            drawText(context, totems + "", 8 + (int) (x - (float) getStringWidth(totems + "") / 2f), (y - 7), 16777215);
         }
     }
 

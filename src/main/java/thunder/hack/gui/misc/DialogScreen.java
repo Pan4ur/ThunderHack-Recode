@@ -50,10 +50,10 @@ public class DialogScreen extends Screen {
         FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), description, mainX + (mainWidth / 2f), mainY + 12, new Color(0xABFFFFFF, true).getRGB());
 
         Render2DEngine.drawHudBase(context.getMatrices(), mainX + 5, mainY + 95, 110, 40, 15);
-        FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), yesText, mainX + 60, mainY + 110, yesHovered(mouseX, mouseY) ? -1 : new Color(0xABFFFFFF, true).getRGB());
+        FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), yesText, mainX + 60, mainY + 112, yesHovered(mouseX, mouseY) ? -1 : new Color(0xABFFFFFF, true).getRGB());
 
         Render2DEngine.drawHudBase(context.getMatrices(), mainX + 125, mainY + 95, 110, 40, 15);
-        FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), noText, mainX + 180f, mainY + 110, noHovered(mouseX, mouseY) ? -1 : new Color(0xABFFFFFF, true).getRGB());
+        FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), noText, mainX + 180f, mainY + 112, noHovered(mouseX, mouseY) ? -1 : new Color(0xABFFFFFF, true).getRGB());
 
         context.drawTexture(questionPic, (int) (mainX + (mainWidth / 2f) - 35), (int) mainY + 25, 0, 0, 70, 65, 70, 65);
     }

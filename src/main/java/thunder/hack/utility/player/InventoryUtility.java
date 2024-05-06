@@ -345,6 +345,15 @@ public final class InventoryUtility {
         cachedSlot = -1;
     }
 
+    public static void saveAndSwitchTo(int slot) {
+        saveSlot();
+        if (mc.player == null || mc.getNetworkHandler() == null) return;
+        if (mc.player.getInventory().selectedSlot == slot && ThunderHack.playerManager.serverSideSlot == slot)
+            return;
+        mc.player.getInventory().selectedSlot = slot;
+        ((IInteractionManager) mc.interactionManager).syncSlot();
+    }
+
     public static void switchTo(int slot) {
         if (mc.player == null || mc.getNetworkHandler() == null) return;
         if (mc.player.getInventory().selectedSlot == slot && ThunderHack.playerManager.serverSideSlot == slot)

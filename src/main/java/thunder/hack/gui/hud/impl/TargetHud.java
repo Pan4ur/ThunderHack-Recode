@@ -78,17 +78,17 @@ public class TargetHud extends HudElement {
     }
 
     public static String getPotionName(StatusEffect potion) {
-        if (potion == StatusEffects.REGENERATION) {
+        if (potion == StatusEffects.REGENERATION.value()) {
             return "Reg";
-        } else if (potion == StatusEffects.STRENGTH) {
+        } else if (potion == StatusEffects.STRENGTH.value()) {
             return "Str";
-        } else if (potion == StatusEffects.SPEED) {
+        } else if (potion == StatusEffects.SPEED.value()) {
             return "Spd";
-        } else if (potion == StatusEffects.HASTE) {
+        } else if (potion == StatusEffects.HASTE.value()) {
             return "H";
-        } else if (potion == StatusEffects.WEAKNESS) {
+        } else if (potion == StatusEffects.WEAKNESS.value()) {
             return "W";
-        } else if (potion == StatusEffects.RESISTANCE) {
+        } else if (potion == StatusEffects.RESISTANCE.value()) {
             return "Res";
         }
         return "pon";
@@ -517,7 +517,7 @@ public class TargetHud extends HudElement {
     private void drawPotionEffect(MatrixStack ms, PlayerEntity entity) {
         StringBuilder finalString = new StringBuilder();
         for (StatusEffectInstance potionEffect : entity.getStatusEffects()) {
-            StatusEffect potion = (StatusEffect) potionEffect.getEffectType();
+            StatusEffect potion = potionEffect.getEffectType().value();
             if ((potion != StatusEffects.REGENERATION.value()) && (potion != StatusEffects.SPEED.value()) && (potion != StatusEffects.STRENGTH.value()) && (potion != StatusEffects.WEAKNESS.value())) {
                 continue;
             }

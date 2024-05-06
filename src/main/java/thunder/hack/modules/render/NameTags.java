@@ -11,7 +11,6 @@ import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -22,13 +21,9 @@ import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.inventory.Inventories;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.scoreboard.ReadableScoreboardScore;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
@@ -37,7 +32,6 @@ import net.minecraft.scoreboard.number.StyledNumberFormat;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
@@ -57,8 +51,8 @@ import thunder.hack.utility.render.Render3DEngine;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static thunder.hack.utility.render.Render2DEngine.CONTAINER_BACKGROUND;
 
@@ -72,11 +66,14 @@ public class NameTags extends Module {
     private final Setting<Boolean> hp = new Setting<>("HP", true);
     private final Setting<Boolean> distance = new Setting<>("Distance", true);
     private final Setting<Boolean> pops = new Setting<>("TotemPops", true);
-    private final Setting<Boolean> outline = new Setting<>("Outline", true);
+    private final Setting<OutlineColor> outline = new Setting<>("Outline", OutlineColor.None);
+    private final Setting<OutlineColor> friendOutline = new Setting<>("FriendOutline", OutlineColor.None);
+    private final Setting<ColorSetting> outlineColor = new Setting<>("OutlineColor", new ColorSetting(0x80000000));
+    private final Setting<ColorSetting> friendOutlineColor = new Setting<>("FriendOutlineColor", new ColorSetting(0x80000000));
     private final Setting<Boolean> enchantss = new Setting<>("Enchants", true);
     private final Setting<Boolean> onlyHands = new Setting<>("OnlyHands", false, v -> enchantss.getValue());
     private final Setting<Boolean> funtimeHp = new Setting<>("FunTimeHp", false);
-    private final Setting<Boolean> bots = new Setting<>("Bots", false);
+    private final Setting<Boolean> ignoreBots = new Setting<>("IgnoreBots", false);
     private final Setting<Boolean> potions = new Setting<>("Potions", true);
     private final Setting<Boolean> shulkers = new Setting<>("Shulkers", true);
     private final Setting<ColorSetting> fillColorA = new Setting<>("Fill", new ColorSetting(0x80000000));
@@ -85,7 +82,7 @@ public class NameTags extends Module {
     private final Setting<Armor> armorMode = new Setting<>("ArmorMode", Armor.Full);
     private final Setting<Health> health = new Setting<>("Health", Health.Number);
 
-    Map<Enchantment, String> encMap = new HashMap<>();
+    private final Map<Enchantment, String> encMap = new HashMap<>();
 
     public enum Font {
         Fancy, Fast
@@ -99,6 +96,9 @@ public class NameTags extends Module {
         Number, Hearts, Dots
     }
 
+    private enum OutlineColor {
+        Sync, Custom, None
+    }
 
     public NameTags() {
         super("NameTags", Category.RENDER);
@@ -114,7 +114,7 @@ public class NameTags extends Module {
     public void onRender2D(DrawContext context) {
         for (PlayerEntity ent : mc.world.getPlayers()) {
             if (ent == mc.player && mc.options.getPerspective().isFirstPerson()) continue;
-            if (getEntityPing(ent) <= 0 && !bots.getValue()) continue;
+            if (getEntityPing(ent) <= 0 && ignoreBots.getValue()) continue;
 
             double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
             double y = ent.prevY + (ent.getY() - ent.prevY) * mc.getTickDelta();
@@ -245,11 +245,29 @@ public class NameTags extends Module {
 
                 Render2DEngine.drawRect(context.getMatrices(), tagX - 2, (float) (posY - 13f), textWidth + 4, 11, color);
 
-                if (outline.getValue()) {
-                    Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1, HudEditor.getColor(270));
-                    Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 3f), textWidth + 6, 1, HudEditor.getColor(0));
-                    Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), 1, 11, HudEditor.getColor(180));
-                    Render2DEngine.drawRect(context.getMatrices(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11, HudEditor.getColor(90));
+
+                OutlineColor cl = ThunderHack.friendManager.isFriend(ent) ? friendOutline.getValue() : outline.getValue();
+
+                switch (cl) {
+                    case None -> {
+
+                    }
+                    case Sync -> {
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1, HudEditor.getColor(270));
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 3f), textWidth + 6, 1, HudEditor.getColor(0));
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), 1, 11, HudEditor.getColor(180));
+                        Render2DEngine.drawRect(context.getMatrices(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11, HudEditor.getColor(90));
+                    }
+                    case Custom -> {
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1,
+                                ThunderHack.friendManager.isFriend(ent) ?  friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 3f), textWidth + 6, 1,
+                                ThunderHack.friendManager.isFriend(ent) ?  friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), 1, 11,
+                                ThunderHack.friendManager.isFriend(ent) ?  friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
+                        Render2DEngine.drawRect(context.getMatrices(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11,
+                                ThunderHack.friendManager.isFriend(ent) ?  friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
+                    }
                 }
 
                 if (font.getValue() == Font.Fancy) {
@@ -278,7 +296,7 @@ public class NameTags extends Module {
                 Item handItem = ent.getMainHandStack().getItem();
 
                 if (shulkers.getValue())
-                    renderShulkerToolTip(context, (int) posX - 90, (int) posY - 120, (handItem instanceof BlockItem bi) && (bi.getBlock() instanceof ShulkerBoxBlock) ?  ent.getMainHandStack() : ent.getOffHandStack());
+                    renderShulkerToolTip(context, (int) posX - 90, (int) posY - 120, (handItem instanceof BlockItem bi) && (bi.getBlock() instanceof ShulkerBoxBlock) ? ent.getMainHandStack() : ent.getOffHandStack());
                 context.getMatrices().pop();
             }
         }
@@ -318,12 +336,25 @@ public class NameTags extends Module {
 
                     Render2DEngine.drawRect(context.getMatrices(), tagX - 2, (float) (posY - 13f), textWidth + 4, 11, fillColorA.getValue().getColorObject());
 
-                    if (outline.getValue()) {
-                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1, HudEditor.getColor(270));
-                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 3f), textWidth + 6, 1, HudEditor.getColor(0));
-                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), 1, 11, HudEditor.getColor(180));
-                        Render2DEngine.drawRect(context.getMatrices(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11, HudEditor.getColor(90));
+                    switch (outline.getValue()) {
+                        case None -> {
+
+                        }
+                        case Sync -> {
+                            Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1, HudEditor.getColor(270));
+                            Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 3f), textWidth + 6, 1, HudEditor.getColor(0));
+                            Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), 1, 11, HudEditor.getColor(180));
+                            Render2DEngine.drawRect(context.getMatrices(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11, HudEditor.getColor(90));
+                        }
+                        case Custom -> {
+                            Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1, outlineColor.getValue().getColorObject());
+                            Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 3f), textWidth + 6, 1, outlineColor.getValue().getColorObject());
+                            Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), 1, 11, outlineColor.getValue().getColorObject());
+                            Render2DEngine.drawRect(context.getMatrices(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11, outlineColor.getValue().getColorObject());
+                        }
                     }
+
+
                     FontRenderers.sf_bold.drawString(context.getMatrices(), final_string, tagX, (float) posY - 10, -1);
                 }
             }
@@ -366,11 +397,22 @@ public class NameTags extends Module {
 
                 Render2DEngine.drawRect(context.getMatrices(), tagX - 2, (float) (posY - 13f), textWidth + 4, 11, fillColorA.getValue().getColorObject());
 
-                if (outline.getValue()) {
-                    Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1, HudEditor.getColor(270));
-                    Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 3f), textWidth + 6, 1, HudEditor.getColor(0));
-                    Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), 1, 11, HudEditor.getColor(180));
-                    Render2DEngine.drawRect(context.getMatrices(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11, HudEditor.getColor(90));
+                switch (outline.getValue()) {
+                    case None -> {
+
+                    }
+                    case Sync -> {
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1, HudEditor.getColor(270));
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 3f), textWidth + 6, 1, HudEditor.getColor(0));
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), 1, 11, HudEditor.getColor(180));
+                        Render2DEngine.drawRect(context.getMatrices(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11, HudEditor.getColor(90));
+                    }
+                    case Custom -> {
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1, outlineColor.getValue().getColorObject());
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 3f), textWidth + 6, 1, outlineColor.getValue().getColorObject());
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), 1, 11, outlineColor.getValue().getColorObject());
+                        Render2DEngine.drawRect(context.getMatrices(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11, outlineColor.getValue().getColorObject());
+                    }
                 }
                 FontRenderers.sf_bold.drawString(context.getMatrices(), final_string, tagX, (float) posY - 10, -1);
             }
@@ -422,7 +464,8 @@ public class NameTags extends Module {
         } else return ent.getHealth() + ent.getAbsorptionAmount();
     }
 
-    private void renderHealthBar(DrawContext context, PlayerEntity player, float maxHealth, int lastHealth, int absorption) {
+    private void renderHealthBar(DrawContext context, PlayerEntity player, float maxHealth, int lastHealth,
+                                 int absorption) {
         int i = MathHelper.ceil((double) maxHealth / 2.0);
         int j = MathHelper.ceil((double) absorption / 2.0);
         int k = i * 2;
@@ -542,7 +585,7 @@ public class NameTags extends Module {
     public boolean renderShulkerToolTip(DrawContext context, int offsetX, int offsetY, ItemStack stack) {
         try {
             ContainerComponent compoundTag = stack.get(DataComponentTypes.CONTAINER);
-            if(compoundTag == null)
+            if (compoundTag == null)
                 return false;
 
             float[] colors = new float[]{1F, 1F, 1F};

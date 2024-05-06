@@ -33,6 +33,8 @@ public class NoSlow extends Module {
     public final Setting<Boolean> slime = new Setting<>("Slime", true).withParent(selection);
     public final Setting<Boolean> ice = new Setting<>("Ice", true).withParent(selection);
     public final Setting<Boolean> sweetBerryBush = new Setting<>("SweetBerryBush", true).withParent(selection);
+    public final Setting<Boolean> sneak = new Setting<>("Sneak", false).withParent(selection);
+    public final Setting<Boolean> crawl = new Setting<>("Crawl", false).withParent(selection);
 
     private boolean returnSneak;
 

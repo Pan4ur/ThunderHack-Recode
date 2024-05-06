@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.ModuleManager;
@@ -52,6 +53,19 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         if (ModuleManager.noSlow.isEnabled() && ModuleManager.noSlow.canNoSlow())
             return false;
         return player.isUsingItem();
+    }
+
+    @Inject(method = "shouldSlowDown", at = @At("HEAD"), cancellable = true)
+    public void shouldSlowDownHook(CallbackInfoReturnable<Boolean> cir) {
+        if(ModuleManager.noSlow.isEnabled()) {
+            if (isCrawling()) {
+                if (ModuleManager.noSlow.crawl.getValue())
+                    cir.setReturnValue(false);
+            } else {
+                if (ModuleManager.noSlow.sneak.getValue())
+                    cir.setReturnValue(false);
+            }
+        }
     }
 
     @Inject(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"), cancellable = true)

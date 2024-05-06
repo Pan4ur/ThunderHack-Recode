@@ -23,7 +23,7 @@ public class AutoSprint extends Module {
                 mc.player.getHungerManager().getFoodLevel() > 6
                         && !mc.player.horizontalCollision
                         && !(mc.player.input.movementForward < 0)
-                        && !mc.player.isSneaking()
+                        && (!mc.player.isSneaking() || (ModuleManager.noSlow.isEnabled() && ModuleManager.noSlow.sneak.getValue()))
                         && (!mc.player.isUsingItem() || !stopWhileUsing.getValue())
                         && MovementUtility.isMoving()
                         && (!ModuleManager.aura.isEnabled() || Aura.target == null || !pauseWhileAura.getValue())

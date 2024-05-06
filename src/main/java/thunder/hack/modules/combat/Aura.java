@@ -103,7 +103,7 @@ public final class Aura extends Module {
     public final Setting<Float> pullValue = new Setting<>("PullValue", 3f, 0f, 20f, v -> pullDown.getValue()).withParent(advanced);
     public final Setting<AttackHand> attackHand = new Setting<>("AttackHand", AttackHand.MainHand).withParent(advanced);
     public final Setting<Resolver> resolver = new Setting<>("Resolver", Resolver.Advantage).withParent(advanced);
-    public final Setting<Integer> backTicks = new Setting<>("BackTicks", 20, 1, 100, v -> resolver.is(Resolver.BackTrack)).withParent(advanced);
+    public final Setting<Integer> backTicks = new Setting<>("BackTicks", 4, 1, 20, v -> resolver.is(Resolver.BackTrack)).withParent(advanced);
     public final Setting<Boolean> resolverVisualisation = new Setting<>("ResolverVisualisation", false, v -> !resolver.is(Resolver.Off)).withParent(advanced);
     public final Setting<AccelerateOnHit> accelerateOnHit = new Setting<>("AccelerateOnHit", AccelerateOnHit.Off).withParent(advanced);
     public final Setting<Integer> minYawStep = new Setting<>("MinYawStep", 65, 1, 180).withParent(advanced);
