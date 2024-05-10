@@ -1,38 +1,64 @@
 package thunder.hack.gui.hud.impl;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.render.Render2DEngine;
+
+import java.awt.*;
 
 public class Speedometer extends HudElement {
     public float speed = 0f;
     private final Setting<Boolean> bps = new Setting<>("BPS", false);
+    private final Setting<Boolean> average = new Setting<>("Average", false);
 
     public Speedometer() {
         super("Speedometer", 50, 10);
     }
 
+    private Identifier icon = new Identifier("thunderhack", "textures/hud/icons/speedometer.png");
+
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
+
         String str = "Speed " + Formatting.WHITE;
         if (!bps.getValue()) {
             str += MathUtility.round(getSpeedKpH() * ThunderHack.TICK_TIMER) + " km/h";
         } else {
             str += MathUtility.round(getSpeedMpS() * ThunderHack.TICK_TIMER) + " b/s";
         }
-        FontRenderers.getModulesRenderer().drawString(context.getMatrices(), str, getPosX(), getPosY() + 3, HudEditor.getColor(1).getRGB());
+
+        float pX = getPosX() > mc.getWindow().getScaledWidth() / 2f ? getPosX() - FontRenderers.getModulesRenderer().getStringWidth(str) : getPosX();
+
+        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+            Render2DEngine.drawRoundedBlur(context.getMatrices(), pX - 18, getPosY() - 2, FontRenderers.getModulesRenderer().getStringWidth(str) + 21, 13f, 3, HudEditor.blurColor.getValue().getColorObject());
+            Render2DEngine.drawRect(context.getMatrices(), pX - 4, getPosY(), 0.5f, 8, new Color(0x44FFFFFF, true));
+
+            Render2DEngine.setupRender();
+            RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
+            RenderSystem.setShaderTexture(0, icon);
+            Render2DEngine.renderGradientTexture(context.getMatrices(), pX - 16, getPosY() - 1, 10, 10, 0, 0, 512, 512, 512, 512,
+                    HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+            Render2DEngine.endRender();
+        }
+
+        FontRenderers.getModulesRenderer().drawString(context.getMatrices(), str, pX, getPosY() + 3, HudEditor.getColor(1).getRGB());
+        setBounds(pX - 18, getPosY() - 2, FontRenderers.getModulesRenderer().getStringWidth(str) + 21, 13f);
     }
 
     public float getSpeedKpH() {
-        return (float) (ThunderHack.playerManager.currentPlayerSpeed * 72f);
+        return (average.getValue() ? ThunderHack.playerManager.averagePlayerSpeed : ThunderHack.playerManager.currentPlayerSpeed) * 72f;
     }
 
     public float getSpeedMpS() {
-        return (float) (ThunderHack.playerManager.currentPlayerSpeed * 20f);
+        return (average.getValue() ? ThunderHack.playerManager.averagePlayerSpeed : ThunderHack.playerManager.currentPlayerSpeed) * 20f;
     }
 }

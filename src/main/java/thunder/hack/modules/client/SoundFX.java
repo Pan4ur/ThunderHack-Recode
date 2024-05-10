@@ -27,7 +27,7 @@ public final class SoundFX extends Module {
     @EventHandler
     @SuppressWarnings("unused")
     public void onAttack(@NotNull EventAttack event) {
-        if (!(event.getEntity() instanceof EndCrystalEntity) && !event.isPre())
+        if (!event.isPre())
             ThunderHack.soundManager.playHitSound(hitSound.getValue());
     }
 

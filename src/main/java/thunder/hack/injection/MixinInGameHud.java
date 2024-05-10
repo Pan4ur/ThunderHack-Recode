@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.Unique;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.hud.impl.Hotbar;
+import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
 import net.minecraft.client.gui.hud.InGameHud;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,6 +20,7 @@ public abstract class MixinInGameHud {
 
     @Inject(at = @At(value = "HEAD"), method = "render")
     public void renderHook(DrawContext context, float tickDelta, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         ThunderHack.moduleManager.onRender2D(context);
         ThunderHack.notificationManager.onRender2D(context);
     }

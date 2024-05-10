@@ -55,13 +55,11 @@ public final class AutoWeb extends Module {
     public static Timer inactivityTimer = new Timer();
 
     private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
-    private static AutoWeb instance;
 
     private int delay = 0;
 
     public AutoWeb() {
         super("AutoWeb", Category.COMBAT);
-        instance = this;
     }
 
     public void onRender3D(MatrixStack stack) {
@@ -182,10 +180,6 @@ public final class AutoWeb extends Module {
             }
         }
         return slot;
-    }
-
-    public static AutoWeb getInstance() {
-        return instance;
     }
 
     private enum PlaceTiming {

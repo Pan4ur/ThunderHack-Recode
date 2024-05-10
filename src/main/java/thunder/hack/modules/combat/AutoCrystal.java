@@ -247,7 +247,7 @@ public class AutoCrystal extends Module {
 
     @EventHandler
     public void onPostSync(EventPostSync e) {
-        if (bestPosition != null && placeTimer.passedMs(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()))
+        if (bestPosition != null && placeTimer.passedMs(facePlacing ? lowPlaceDelay.getValue() : (placeDelay.getValue())))
             placeCrystal(bestPosition, false);
 
         if (bestCrystal != null && breakTimer.passedMs(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
@@ -330,7 +330,7 @@ public class AutoCrystal extends Module {
     }
 
     public void calcRotations() {
-        if ((bestPosition != null || bestCrystal != null) && mc.player != null) {
+        if (rotate.getValue() && !shouldPause() && (bestPosition != null || bestCrystal != null) && mc.player != null) {
             Vec3d vec = bestPosition == null ? bestCrystal.getPos() : bestPosition.getPos();
             float[] angle = InteractionUtility.calculateAngle(vec);
             angle[1] = angle[1] + MathUtility.random(-1, 1);

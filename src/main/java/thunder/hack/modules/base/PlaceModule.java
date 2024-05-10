@@ -180,7 +180,6 @@ public abstract class PlaceModule extends Module {
     protected SearchInvResult getBlockResult() {
         final List<Block> canUseBlocks = new ArrayList<>();
         if (mc.player == null) return SearchInvResult.notFound();
-
         if (obsidian.getValue()) canUseBlocks.add(Blocks.OBSIDIAN);
         if (enderChest.getValue()) canUseBlocks.add(Blocks.ENDER_CHEST);
         if (cryingObsidian.getValue()) canUseBlocks.add(Blocks.CRYING_OBSIDIAN);

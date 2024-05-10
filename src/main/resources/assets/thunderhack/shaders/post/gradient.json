@@ -6,7 +6,7 @@
   ],
   "passes": [
     {
-      "name": "snow",
+      "name": "thunderhack:gradient",
       "intarget": "bufIn",
       "outtarget": "swap",
       "uniforms": []

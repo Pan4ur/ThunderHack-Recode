@@ -17,7 +17,7 @@ public class MultiTask extends Module {
             mc.player.swingHand(Hand.MAIN_HAND);
         }
 
-        if (mc.crosshairTarget instanceof EntityHitResult ehr && ehr.getEntity() != null && mc.options.attackKey.isPressed() && mc.player.getAttackCooldownProgress(0.5f) > 0.6f) {
+        if (mc.crosshairTarget instanceof EntityHitResult ehr && ehr.getEntity() != null && mc.options.attackKey.isPressed() && mc.player.getAttackCooldownProgress(0.5f) > 0.9f) {
             mc.interactionManager.attackEntity(mc.player, ehr.getEntity());
             mc.player.swingHand(Hand.MAIN_HAND);
         }

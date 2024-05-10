@@ -13,7 +13,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.utility.render.Render3DEngine;
 
 public final class WayPoints extends Module {
-    private static final Identifier ICON = new Identifier("textures/waypoint.png");
+    private static final Identifier ICON = new Identifier("thunderhack", "textures/hud/elements/waypoint.png");
 
     public WayPoints() {
         super("WayPoints", Category.CLIENT);

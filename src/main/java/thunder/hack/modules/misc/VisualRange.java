@@ -58,11 +58,12 @@ public class VisualRange extends Module {
         if (enter) message += Formatting.GREEN + " was found!";
         else message += Formatting.RED + " left to X:" + (int)entity.getX() + " Z:" + (int) entity.getZ();
 
-        if (mode.getValue() == Mode.Chat)
+        if (mode.is(Mode.Chat) || mode.is(Mode.Both))
             sendMessage(message);
 
-        if (mode.getValue() == Mode.Notification)
+        if (mode.is(Mode.Notification) || mode.is(Mode.Both))
             ThunderHack.notificationManager.publicity("VisualRange", message, 2, Notification.Type.WARNING);
+
 
         if (soundpl.getValue()) {
             try {
@@ -81,6 +82,6 @@ public class VisualRange extends Module {
     }
 
     public enum Mode {
-        Chat, Notification
+        Chat, Notification, Both
     }
 }

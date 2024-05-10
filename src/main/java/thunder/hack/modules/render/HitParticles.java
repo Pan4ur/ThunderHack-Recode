@@ -80,13 +80,13 @@ public class HitParticles extends Module {
     }
 
     public void onRender3D(MatrixStack stack) {
-        RenderSystem.enableDepthTest();
+        RenderSystem.disableDepthTest();
         if (mc.player != null && mc.world != null) {
             for (Particle particle : particles) {
                 particle.render(stack);
             }
         }
-        RenderSystem.disableDepthTest();
+        RenderSystem.enableDepthTest();
     }
 
     public class Particle {
@@ -116,9 +116,9 @@ public class HitParticles extends Module {
             px = x;
             py = y;
             pz = z;
-            motionX = MathUtility.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
-            motionY = MathUtility.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
-            motionZ = MathUtility.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
+            motionX = MathUtility.random(-(float) speed.getValue() / 50f, (float) speed.getValue() / 50f);
+            motionY = MathUtility.random(-(float) speed.getValue() / 50f, (float) speed.getValue() / 50f);
+            motionZ = MathUtility.random(-(float) speed.getValue() / 50f, (float) speed.getValue() / 50f);
             time = System.currentTimeMillis();
             this.color = color;
             this.rotationAngle = rotationAngle;
@@ -195,9 +195,9 @@ public class HitParticles extends Module {
 
             switch (mode.getValue()) {
                 case Orbiz -> {
-                    drawOrbiz(matrixStack, 0.0f, 0.5, color);
-                    drawOrbiz(matrixStack, -0.1f, 1.1, color);
-                    drawOrbiz(matrixStack, -0.2f, 1.5, color);
+                    drawOrbiz(matrixStack, 0.0f, 0.3, color);
+                    drawOrbiz(matrixStack, -0.1f, 0.5, color);
+                    drawOrbiz(matrixStack, -0.2f, 0.7, color);
                 }
                 case Stars -> drawStar(matrixStack, color, size);
                 case Hearts -> drawHeart(matrixStack, color, size);

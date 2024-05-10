@@ -18,6 +18,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventTravel;
+import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.render.Animations;
 import thunder.hack.utility.interfaces.IEntityLiving;
@@ -56,6 +57,7 @@ public class MixinEntityLiving implements IEntityLiving {
 
     @Inject(method = {"updateTrackedPositionAndAngles"}, at = {@At("HEAD")})
     private void updateTrackedPositionAndAnglesHook(double x, double y, double z, float yaw, float pitch, int interpolationSteps, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         prevServerX = serverX;
         prevServerY = serverY;
         prevServerZ = serverZ;
@@ -94,6 +96,7 @@ public class MixinEntityLiving implements IEntityLiving {
 
     @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
     public void travelHook(Vec3d movementInput, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         if ((LivingEntity) (Object) this != mc.player) return;
         final EventTravel event = new EventTravel(mc.player.getVelocity(), true);
         ThunderHack.EVENT_BUS.post(event);
@@ -105,6 +108,7 @@ public class MixinEntityLiving implements IEntityLiving {
 
     @Inject(method = "travel", at = @At("RETURN"), cancellable = true)
     public void travelPostHook(Vec3d movementInput, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         if ((LivingEntity) (Object) this != mc.player) return;
         final EventTravel event = new EventTravel(movementInput, false);
         ThunderHack.EVENT_BUS.post(event);

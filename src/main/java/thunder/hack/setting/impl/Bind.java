@@ -22,7 +22,8 @@ public class Bind {
     public String getBind() {
         if (mouse) return "M" + key;
 
-        String kn = this.key > 0 ? GLFW.glfwGetKeyName(this.key, GLFW.glfwGetKeyScancode(this.key)) : "None";
+        String kn = this.key > 0 ? GLFW.glfwGetKeyName(this.key, 0) : "None";
+
         if (kn == null) {
             try {
                 for (Field declaredField : GLFW.class.getDeclaredFields()) {

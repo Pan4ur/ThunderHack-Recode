@@ -28,7 +28,7 @@ public class ModuleWindow extends AbstractWindow {
     public ModuleWindow(Module.Category category, ArrayList<Module> features, float x, float y, float width, float height) {
         super(category.getName(), x, y, width, height);
         buttons = new ArrayList<>();
-        ICON = new Identifier("textures/" + category.getName().toLowerCase() + ".png");
+        ICON = new Identifier("thunderhack", "textures/gui/headers/" + category.getName().toLowerCase() + ".png");
         if (category.getName().equals("Client"))
             buttons.add(new SearchBar());
         features.forEach(feature -> buttons.add(new ModuleButton(feature)));
@@ -68,7 +68,7 @@ public class ModuleWindow extends AbstractWindow {
         Color m4 = HudEditor.getColor(90);
 
         if (isOpen()) {
-            Render2DEngine.drawHudBase(context.getMatrices(), x + 3, y + height - 6, width - 6, height1, 1);
+            Render2DEngine.drawHudBase(context.getMatrices(), x + 3, y + height - 6, width - 6, height1, 1, false);
 
             if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old || (getButtonsHeight() + 8) < ModuleManager.clickGui.catHeight.getValue()) {
 
@@ -98,7 +98,7 @@ public class ModuleWindow extends AbstractWindow {
         if (popStack)
             Render2DEngine.popWindow();
 
-        Render2DEngine.drawHudBase(context.getMatrices(), x + 2, y - 5, width - 4, height, 1);
+        Render2DEngine.drawHudBase(context.getMatrices(), x + 2, y - 5, width - 4, height, 1, false);
 
         {
             RenderSystem.setShaderTexture(0, ICON);
@@ -194,6 +194,14 @@ public class ModuleWindow extends AbstractWindow {
                 }
             }
             offsetY += button.getHeight() + openY;
+        }
+    }
+
+    @Override
+    public void hudClicked(Module module) {
+        for (AbstractButton button : buttons) {
+            if (button instanceof ModuleButton mbutton && mbutton.module == module)
+                mbutton.setOpen(true);
         }
     }
 

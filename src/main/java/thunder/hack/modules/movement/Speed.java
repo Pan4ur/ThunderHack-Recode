@@ -48,7 +48,7 @@ public class Speed extends Module {
     public final Setting<Integer> shiftTicks = new Setting<>("ShiftTicks", 0, 0, 10, v -> mode.is(Mode.MatrixDamage));
     public final Setting<Integer> fireWorkSlot = new Setting<>("FireSlot", 1, 1, 9, v -> mode.getValue() == Mode.FireWork);
     public final Setting<Integer> delay = new Setting<>("Delay", 8, 1, 20, v -> mode.getValue() == Mode.FireWork);
-    public final Setting<Boolean> strict = new Setting<>("Strict", false, v -> mode.is(Mode.GrimIce) || mode.is(Mode.GrimCombo));
+    public final Setting<Boolean> strict = new Setting<>("Strict", false, v -> mode.is(Mode.GrimIce));
 
     public double baseSpeed;
     private int stage, ticks, prevSlot;
@@ -131,7 +131,7 @@ public class Speed extends Module {
         if ((mode.is(Mode.GrimIce) || mode.is(Mode.GrimCombo)) && mc.player.isOnGround()) {
             BlockPos pos = ((IEntity) mc.player).thunderHack_Recode$getVelocityBP();
             SearchInvResult result = InventoryUtility.findBlockInHotBar(Blocks.ICE, Blocks.PACKED_ICE, Blocks.BLUE_ICE);
-            if (mc.world.isAir(pos) || !result.found() || !mc.options.jumpKey.isPressed())
+            if(mc.world.isAir(pos) || !result.found() || !mc.options.jumpKey.isPressed())
                 return;
 
             prevSlot = mc.player.getInventory().selectedSlot;

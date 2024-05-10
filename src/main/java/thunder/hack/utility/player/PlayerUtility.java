@@ -67,4 +67,10 @@ public final class PlayerUtility {
         double f = mc.player.getZ() - z;
         return (float) (d * d + f * f);
     }
+
+    public static float getSquaredDistance2D(Vec3d vec) {
+        double d0 = mc.player.getX() - vec.getX();
+        double d2 = mc.player.getZ() - vec.getZ();
+        return (float) (d0 * d0 + d2 * d2);
+    }
 }

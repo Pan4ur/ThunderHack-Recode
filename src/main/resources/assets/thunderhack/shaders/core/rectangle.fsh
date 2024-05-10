@@ -23,13 +23,6 @@ vec3 createGradient(vec2 coords, vec3 color1, vec3 color2, vec3 color3, vec3 col
 
 void main() {
     float distance = roundedBoxSDF(gl_FragCoord.xy - uLocation - (uSize / 2.0), uSize / 2.0, radius);
-    float smoothedAlpha = (1.0 - smoothstep(-10, 10, distance)) * color1.a;
-    float smoothedAlpha2 = (1.0 - smoothstep(-1., 1., distance)) * color1.a;
-
-    if (smoothedAlpha2 < 0.5) {
-    } else {
-        float distance1 = roundedBoxSDF(gl_FragCoord.xy - uLocation - (uSize / 2.), (uSize / 2.) + (1. *.5) - .5, radius);
-        float blendAmount = smoothstep(0., 2., abs(distance1) - .5);
-        fragColor = vec4(createGradient((gl_FragCoord.xy - uLocation) / uSize, color1.rgb, color2.rgb, color3.rgb, color4.rgb), 1.);
-    }
+    float smoothedAlpha = (1.0 - smoothstep(-1.0, 1.0, distance)) * color1.a;
+    fragColor = vec4(createGradient((gl_FragCoord.xy - uLocation) / uSize, color1.rgb, color2.rgb, color3.rgb, color4.rgb), smoothedAlpha);
 }

@@ -14,6 +14,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL40C;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.Texture;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.math.MathUtility;
@@ -36,17 +37,19 @@ public class Render2DEngine {
     public static RectangleShader RECTANGLE_SHADER;
     public static MainMenuProgram MAIN_MENU_PROGRAM;
     public static ArcShader ARC_PROGRAM;
+    public static BlurProgram BLUR_PROGRAM;
 
-    public static final Identifier star = new Identifier("textures/star.png");
-    public static final Identifier heart = new Identifier("textures/heart.png");
-    public static final Identifier dollar = new Identifier("textures/dollar.png");
-    public static final Identifier snowflake = new Identifier("textures/snowflake.png");
-    public static final Identifier capture = new Identifier("textures/capture.png");
-    public static final Identifier firefly = new Identifier("textures/firefly.png");
-    public static final Identifier arrow = new Identifier("textures/triangle.png");
-    public static final Identifier bubble = new Identifier("textures/hitbubble.png");
-    public static final Identifier default_circle = new Identifier("textures/circle.png");
-    public static final Identifier CONTAINER_BACKGROUND = new Identifier("textures/container.png");
+    public static final Identifier star = new Identifier("thunderhack", "textures/particles/star.png");
+    public static final Identifier heart = new Identifier("thunderhack", "textures/particles/heart.png");
+    public static final Identifier dollar = new Identifier("thunderhack", "textures/particles/dollar.png");
+    public static final Identifier snowflake = new Identifier("thunderhack", "textures/particles/snowflake.png");
+    public static final Identifier firefly = new Identifier("thunderhack", "textures/particles/firefly.png");
+    public static final Identifier arrow = new Identifier("thunderhack", "textures/hud/elements/triangle.png");
+    public static final Identifier capture = new Identifier("thunderhack", "textures/hud/elements/capture.png");
+    public static final Identifier bubble = new Identifier("thunderhack", "textures/particles/hitbubble.png");
+
+    public static final Identifier default_circle = new Identifier("thunderhack", "textures/particles/circle.png");
+    public static final Identifier CONTAINER_BACKGROUND = new Identifier("thunderhack", "textures/hud/elements/container.png");
 
     public static HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
     public static HashMap<Integer, BlurredShadow> shadowCache1 = new HashMap<>();
@@ -689,9 +692,45 @@ public class Render2DEngine {
     }
 
     public static void drawHudBase(MatrixStack matrices, float x, float y, float width, float height, float radius) {
+        if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+            drawRoundedBlur(matrices, x, y, width, height, radius, HudEditor.blurColor.getValue().getColorObject());
+        } else {
+            preShaderDraw(matrices, x - 10, y - 10, width + 20, height + 20);
+            HUD_SHADER.setParameters(x, y, width, height, radius, HudEditor.alpha.getValue(), HudEditor.alpha.getValue());
+            HUD_SHADER.use();
+            Tessellator.getInstance().draw();
+            endRender();
+        }
+    }
+
+    public static void drawHudBase2(MatrixStack matrices, float x, float y, float width, float height, float radius, float blurStrenth, float blurOpacity) {
+        if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+            drawRoundedBlur(matrices, x, y, width, height, radius, HudEditor.blurColor.getValue().getColorObject(), blurStrenth, blurOpacity);
+        } else {
+            preShaderDraw(matrices, x - 10, y - 10, width + 20, height + 20);
+            HUD_SHADER.setParameters(x, y, width, height, radius, HudEditor.alpha.getValue(), HudEditor.alpha.getValue());
+            HUD_SHADER.use();
+            Tessellator.getInstance().draw();
+            endRender();
+        }
+    }
+
+    public static void drawHudBase(MatrixStack matrices, float x, float y, float width, float height, float radius, boolean hud) {
         preShaderDraw(matrices, x - 10, y - 10, width + 20, height + 20);
-        HUD_SHADER.setParameters(x, y, width, height, radius, 1f, HudEditor.alpha.getValue());
+        HUD_SHADER.setParameters(x, y, width, height, radius, HudEditor.alpha.getValue(), HudEditor.alpha.getValue());
         HUD_SHADER.use();
+        Tessellator.getInstance().draw();
+        endRender();
+    }
+
+    public static void drawRoundedBlur(MatrixStack matrices, float x, float y, float width, float height, float radius, Color c1) {
+        drawRoundedBlur(matrices, x, y, width, height, radius, c1, HudEditor.blurStrength.getValue(), HudEditor.blurOpacity.getValue());
+    }
+
+    public static void drawRoundedBlur(MatrixStack matrices, float x, float y, float width, float height, float radius, Color c1, float blurStrenth, float blurOpacity) {
+        preShaderDraw(matrices, x - 10, y - 10, width + 20, height + 20);
+        BLUR_PROGRAM.setParameters(x, y, width, height, radius, c1, blurStrenth, blurOpacity);
+        BLUR_PROGRAM.use();
         Tessellator.getInstance().draw();
         endRender();
     }
@@ -748,7 +787,7 @@ public class Render2DEngine {
         RenderSystem.setShaderTexture(0, star);
         RenderSystem.setShaderColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f);
         Render2DEngine.renderGradientTexture(matrices, 0, 0, scale, scale, 0, 0, 128, 128, 128, 128,
-                HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+                c, c, c, c);
         endRender();
     }
 
@@ -758,7 +797,7 @@ public class Render2DEngine {
         RenderSystem.setShaderTexture(0, heart);
         RenderSystem.setShaderColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f);
         Render2DEngine.renderGradientTexture(matrices, 0, 0, scale, scale, 0, 0, 128, 128, 128, 128,
-                HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+                c, c, c, c);
         endRender();
     }
 
@@ -768,7 +807,7 @@ public class Render2DEngine {
         RenderSystem.setShaderTexture(0, firefly);
         RenderSystem.setShaderColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f);
         Render2DEngine.renderGradientTexture(matrices, 0, 0, scale, scale, 0, 0, 128, 128, 128, 128,
-                HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+                c, c, c, c);
         endRender();
     }
 
@@ -805,6 +844,7 @@ public class Render2DEngine {
         TEXTURE_COLOR_PROGRAM = new TextureColorProgram();
         ARC_PROGRAM = new ArcShader();
         RECTANGLE_SHADER = new RectangleShader();
+        BLUR_PROGRAM = new BlurProgram();
     }
 
     public static class BlurredShadow {

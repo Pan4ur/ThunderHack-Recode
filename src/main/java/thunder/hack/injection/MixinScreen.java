@@ -1,7 +1,11 @@
 package thunder.hack.injection;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.multiplayer.AddServerScreen;
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.text.Style;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,8 +15,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CommandManager;
+import thunder.hack.gui.clickui.ClickGUI;
+import thunder.hack.gui.mainmenu.CreditsScreen;
+import thunder.hack.gui.mainmenu.MainMenuScreen;
 import thunder.hack.gui.misc.DialogScreen;
+import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.utility.ClientClickEvent;
+import thunder.hack.utility.render.Render2DEngine;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -71,5 +80,14 @@ public abstract class MixinScreen {
                 }, () -> mc.setScreen(null));
 
         mc.setScreen(dialogScreen);
+    }
+
+    @SuppressWarnings("all")
+    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
+    public void renderBackgroundHook(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if(ClientSettings.customMainMenu.getValue() && mc.world == null) {
+            ci.cancel();
+            Render2DEngine.drawMainMenuShader(context.getMatrices(), 0, 0, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
+        }
     }
 }

@@ -38,7 +38,6 @@ public class MixinClientConnection {
     @Inject(method = "send(Lnet/minecraft/network/packet/Packet;)V", at = @At("HEAD"),cancellable = true)
     private void onSendPacketPre(Packet<?> packet, CallbackInfo info) {
         if(Module.fullNullCheck()) return;
-
         if(ThunderHack.core.silentPackets.contains(packet)) {
             ThunderHack.core.silentPackets.remove(packet);
             return;

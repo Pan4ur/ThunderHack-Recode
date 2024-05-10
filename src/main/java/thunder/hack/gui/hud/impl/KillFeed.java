@@ -18,6 +18,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,9 +49,19 @@ public class KillFeed extends HudElement {
         hAnimation = AnimationUtility.fast(hAnimation, scale_x + 20, 15);
 
         Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue());
-        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KillFeed", getPosX() + hAnimation / 2, getPosY() + 4, HudEditor.textColor.getValue().getColorObject());
-        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
-        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+
+        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Glowing)) {
+            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KillFeed", getPosX() + hAnimation / 2, getPosY() + 4, HudEditor.textColor.getValue().getColorObject());
+        } else {
+            FontRenderers.sf_bold.drawGradientCenteredString(context.getMatrices(), "KillFeed", getPosX() + hAnimation / 2, getPosY() + 4, 10);
+        }
+
+        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+            Render2DEngine.verticalGradient(context.getMatrices(), getPosX() , getPosY() + 13, getPosX() + hAnimation, getPosY() + 18, new Color(0x7B000000, true), new Color(0x0000000, true));
+        } else {
+            Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
+            Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+        }
 
         Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
         int y_offset = 3;
@@ -59,7 +70,7 @@ public class KillFeed extends HudElement {
             y_offset += 10;
         }
         Render2DEngine.popWindow();
-        setBounds((int) (scale_x + 20), 20 + y_offset1);
+        setBounds(getPosX(), getPosY(), hAnimation, vAnimation);
     }
 
     @EventHandler

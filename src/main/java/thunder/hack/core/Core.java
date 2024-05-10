@@ -48,7 +48,7 @@ public final class Core {
     public static boolean lockSprint, serverSprint, hold_mouse0, showSkull;
     public static final Map<String, Identifier> HEADS = new ConcurrentHashMap<>();
     public ArrayList<Packet<?>> silentPackets = new ArrayList<>();
-    private final Identifier SKULL = new Identifier("textures/skull.png");
+    private final Identifier SKULL = new Identifier("thunderhack", "textures/hud/elements/skull.png");
     private final Timer skullTimer = new Timer();
     private final Timer lastPacket = new Timer();
     private final Timer autoSave = new Timer();

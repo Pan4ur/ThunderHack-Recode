@@ -37,7 +37,7 @@ public class HudEditorGui extends Screen {
     @Override
     protected void init() {
         if (firstOpen) {
-            ModuleWindow window = new ModuleWindow(Module.Category.HUD, ThunderHack.moduleManager.getModulesByCategory(Module.Category.HUD), 20f, 20f, 100f, 18f);
+            ModuleWindow window = new ModuleWindow(Module.Category.HUD, ThunderHack.moduleManager.getModulesByCategory(Module.Category.HUD), mc.getWindow().getScaledWidth() / 2f - 50, 20f, 100f, 18f);
             window.setOpen(true);
             windows.add(window);
             firstOpen = false;
@@ -114,6 +114,12 @@ public class HudEditorGui extends Screen {
     @Override
     public void removed() {
         ThunderHack.EVENT_BUS.unsubscribe(this);
+    }
+
+    public void hudClicked(Module module) {
+        for (AbstractWindow window : windows) {
+            window.hudClicked(module);
+        }
     }
 
     public static HudEditorGui getInstance() {

@@ -71,13 +71,18 @@ public class ModuleList extends HudElement {
             stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
             Color color1 = HudEditor.getColor(offset);
 
-            Render2DEngine.drawRect(context.getMatrices(), reverse ? reversedX - stringWidth : getPosX(), getPosY() + offset, stringWidth + 1.0f, 9.0f, mode.getValue() == Mode.ColorRect ? color1 : color3.getValue().getColorObject());
-            Render2DEngine.drawRect(context.getMatrices(), reverse ? reversedX + 1f : getPosX() - 2.0f, getPosY() + offset, 2.0f, 9f, mode.getValue() == Mode.ColorRect ? color4.getValue().getColorObject() : color1);
+            if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+                Render2DEngine.drawRoundedBlur(context.getMatrices(), reverse ? reversedX - stringWidth : getPosX(), getPosY() + offset, stringWidth + 1.0f, 9.0f, 2, HudEditor.blurColor.getValue().getColorObject());
+            } else {
+                Render2DEngine.drawRect(context.getMatrices(), reverse ? reversedX - stringWidth : getPosX(), getPosY() + offset, stringWidth + 1.0f, 9.0f, mode.getValue() == Mode.ColorRect ? color1 : color3.getValue().getColorObject());
+                Render2DEngine.drawRect(context.getMatrices(), reverse ? reversedX + 1f : getPosX() - 2.0f, getPosY() + offset, 2.0f, 9f, mode.getValue() == Mode.ColorRect ? color4.getValue().getColorObject() : color1);
+            }
+
             FontRenderers.modules.drawString(context.getMatrices(), module.getDisplayName() + Formatting.GRAY + (module.getDisplayInfo() != null ? " [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]" : ""), reverse ? reversedX - stringWidth + 2.0f : getPosX() + 3.0f, getPosY() + 3.0f + offset, mode.getValue() == Mode.ColorRect ? -1 : color1.getRGB());
 
             offset += 9;
         }
-        setBounds((int) maxWidth * (reverse ? -1 : 1), offset);
+        setBounds(getPosX(), getPosY(),(int) maxWidth * (reverse ? -1 : 1), offset);
     }
 
     private boolean shouldRender(Module m) {

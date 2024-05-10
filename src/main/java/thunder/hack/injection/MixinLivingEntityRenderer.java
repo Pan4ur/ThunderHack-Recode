@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
+import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -48,6 +49,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void onRenderPre(T livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         if (MinecraftClient.getInstance().player != null && livingEntity == MinecraftClient.getInstance().player && ClientSettings.renderRotations.getValue() && !ThunderHack.isFuturePresent()) {
             originalHeadYaw = livingEntity.headYaw;
             originalPrevHeadYaw = livingEntity.prevHeadYaw;
@@ -132,6 +134,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
 
     @Unique
     public void postRender(T livingEntity) {
+        if(Module.fullNullCheck()) return;
         if (MinecraftClient.getInstance().player != null && livingEntity == MinecraftClient.getInstance().player && ClientSettings.renderRotations.getValue() && !ThunderHack.isFuturePresent()) {
             livingEntity.prevPitch = originalPrevHeadPitch;
             livingEntity.setPitch(originalHeadPitch);
@@ -142,11 +145,14 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
 
     @Inject(method = "render", at = @At("TAIL"))
     public void onRenderPost(T livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         postRender(livingEntity);
     }
 
     @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/EntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;IIFFFF)V"))
     private void renderHook(Args args) {
+        if(Module.fullNullCheck()) return;
+
         if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.antiPlayerCollision.getValue() && lastEntity != mc.player && lastEntity instanceof PlayerEntity pl && !pl.isInvisible())
             args.set(7, MathUtility.clamp((float) (mc.player.squaredDistanceTo(lastEntity.getPos()) / 3f) + 0.2f, 0f, 1f));
 

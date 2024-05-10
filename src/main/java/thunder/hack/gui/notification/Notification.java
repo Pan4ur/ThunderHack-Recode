@@ -2,10 +2,8 @@ package thunder.hack.gui.notification;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Formatting;
-import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.client.Notifications;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -13,7 +11,7 @@ import thunder.hack.utility.render.animation.BetterAnimation;
 
 import java.awt.*;
 
-import static thunder.hack.gui.notification.NotificationManager.isDefault;
+import static thunder.hack.core.impl.NotificationManager.isDefault;
 import static thunder.hack.modules.Module.mc;
 
 public class Notification {
@@ -71,8 +69,12 @@ public class Notification {
             animationX = (float) (width * animation.getAnimationd());
             y = animate(y, getY);
             float x = mc.getWindow().getScaledWidth() / 2f - width / 2f;
-            Render2DEngine.verticalGradient(matrix, x + 13, y + 1, x + 13.5f, y + 6, Render2DEngine.injectAlpha(color, 0), Render2DEngine.injectAlpha(color, animatedAlpha));
-            Render2DEngine.verticalGradient(matrix, x + 13, y + 6, x + 13.5f, y + 11, Render2DEngine.injectAlpha(color, animatedAlpha), Render2DEngine.injectAlpha(color, 0));
+            if(HudEditor.hudStyle.is(HudEditor.HudStyle.Glowing)) {
+                Render2DEngine.verticalGradient(matrix, x + 13, y + 1, x + 13.5f, y + 6, Render2DEngine.injectAlpha(color, 0), Render2DEngine.injectAlpha(color, animatedAlpha));
+                Render2DEngine.verticalGradient(matrix, x + 13, y + 6, x + 13.5f, y + 11, Render2DEngine.injectAlpha(color, animatedAlpha), Render2DEngine.injectAlpha(color, 0));
+            } else {
+                Render2DEngine.drawRect(matrix, x + 13, y + 1, 0.5f, 10, Render2DEngine.injectAlpha(new Color(0x44FFFFFF, true), (int) (animatedAlpha * 0.1f)));
+            }
             FontRenderers.sf_bold_micro.drawString(matrix, title + " " + message, x + 16, y + 5, color.getRGB());
             FontRenderers.icons.drawString(matrix, icon, x + 3, y + 5.5f, color.getRGB());
         }
@@ -86,8 +88,14 @@ public class Notification {
         direction = isFinished();
         animationX = (float) (width * animation.getAnimationd());
         y = animate(y, getY);
-        Render2DEngine.drawHudBase(matrix, isDefault() ? mc.getWindow().getScaledWidth() - 6 - width + animationX : mc.getWindow().getScaledWidth() / 2f - width / 2f,
-                y, width, height, isDefault() ? 5f : 3f, (float) MathUtility.clamp((1 - animation.getAnimationd()), 0f, 1f));
+        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+            Render2DEngine.drawHudBase2(matrix, isDefault() ? mc.getWindow().getScaledWidth() - 6 - width + animationX : mc.getWindow().getScaledWidth() / 2f - width / 2f,
+                    y, width, height, isDefault() ? 5f : 3f, (float) MathUtility.clamp((1 - animation.getAnimationd()), 0f, 1f) * HudEditor.blurStrength.getValue(),
+                    (float) Render2DEngine.interpolate(0.85f, HudEditor.blurOpacity.getValue(), MathUtility.clamp((1 - animation.getAnimationd()), 0f, 1f)));
+        } else {
+            Render2DEngine.drawHudBase(matrix, isDefault() ? mc.getWindow().getScaledWidth() - 6 - width + animationX : mc.getWindow().getScaledWidth() / 2f - width / 2f,
+                    y, width, height, isDefault() ? 5f : 3f, (float) MathUtility.clamp((1 - animation.getAnimationd()), 0f, 1f));
+        }
     }
 
     private boolean isFinished() {

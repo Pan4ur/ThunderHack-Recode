@@ -29,10 +29,6 @@ public class ClickGui extends Module {
         super("ClickGui", Module.Category.CLIENT);
     }
 
-    public static ClickGui getInstance() {
-        return ModuleManager.clickGui;
-    }
-
     @Override
     public void onEnable() {
         setGui();

@@ -31,9 +31,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.player.NoEntityTrace;
+import thunder.hack.modules.render.Shaders;
 import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.render.BlockAnimationUtility;
 import thunder.hack.utility.render.Render3DEngine;
@@ -61,6 +63,7 @@ public abstract class MixinGameRenderer {
     @Shadow
     private float viewDistance;
 
+    @SuppressWarnings("all")
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", shift = At.Shift.BEFORE), method = "render")
     void postHudRenderHook(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
         FrameRateCounter.INSTANCE.recordFrame();
@@ -68,8 +71,7 @@ public abstract class MixinGameRenderer {
 
     @Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z", opcode = Opcodes.GETFIELD, ordinal = 0), method = "renderWorld")
     void render3dHook(float tickDelta, long limitTime, CallbackInfo ci) {
-        if(mc.player == null)
-            return;
+        if(Module.fullNullCheck()) return;
 
         Camera camera = mc.gameRenderer.getCamera();
         MatrixStack matrixStack = new MatrixStack();
@@ -92,6 +94,7 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/render/Camera;FLorg/joml/Matrix4f;)V", shift = At.Shift.AFTER))
     public void postRender3dHook(float tickDelta, long limitTime, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         ThunderHack.shaderManager.renderShaders();
     }
 
@@ -103,6 +106,8 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "updateCrosshairTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;findCrosshairTarget(Lnet/minecraft/entity/Entity;DDF)Lnet/minecraft/util/hit/HitResult;"), cancellable = true)
     private void onUpdateTargetedEntity(float tickDelta, CallbackInfo info) {
+        if(Module.fullNullCheck()) return;
+
         if (ModuleManager.noEntityTrace.isEnabled() && (mc.player.getMainHandStack().getItem() instanceof PickaxeItem || !NoEntityTrace.ponly.getValue())) {
             if (mc.cameraEntity instanceof EndCrystalEntity && NoEntityTrace.ignoreCrystals.getValue()) return;
             if (mc.player.getMainHandStack().getItem() instanceof SwordItem && NoEntityTrace.noSword.getValue()) return;
@@ -146,21 +151,24 @@ public abstract class MixinGameRenderer {
     @Inject(method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D", at = @At("TAIL"), cancellable = true)
     public void getFov(Camera camera, float tickDelta, boolean changingFov, CallbackInfoReturnable<Double> cb) {
         if (ModuleManager.fov.isEnabled()) {
-            if (cb.getReturnValue() == 70
-                    && !ModuleManager.fov.itemFov.getValue()
-                    && mc.options.getPerspective() != Perspective.FIRST_PERSON) return;
+            if (cb.getReturnValue() == 70 && !ModuleManager.fov.itemFov.getValue() && mc.options.getPerspective() != Perspective.FIRST_PERSON)
+                return;
+
             else if (ModuleManager.fov.itemFov.getValue() && cb.getReturnValue() == 70) {
                 cb.setReturnValue(ModuleManager.fov.itemFovModifier.getValue().doubleValue());
                 return;
             }
 
-            if (mc.player.isSubmergedInWater()) return;
+            if (mc.player.isSubmergedInWater())
+                return;
+
             cb.setReturnValue(ModuleManager.fov.fovModifier.getValue().doubleValue());
         }
     }
 
     @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
     private void bobViewHook(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         if (ModuleManager.noBob.isEnabled()) {
             ModuleManager.noBob.bobView(matrices, tickDelta);
             ci.cancel();

@@ -18,7 +18,7 @@ public class CandleHud extends HudElement {
         super("Candle", 10, 100);
     }
 
-    private final Identifier CANDLE = new Identifier("textures/candle.png");
+    private final Identifier CANDLE = new Identifier("thunderhack", "textures/hud/elements/candle.png");
     private Setting<Integer> scale = new Setting<>("Scale", 25, 15, 100);
     private Setting<For> mode = new Setting<>("For", For.Win);
 
@@ -57,7 +57,7 @@ public class CandleHud extends HudElement {
         drawFire(context.getMatrices(), getPosX() + (40 + 4f - xAnim / 4f) * scalefactor, getPosY() + (43 - yAnim / 4f) * scalefactor, 15 * scalefactor, 15 * scalefactor,
                 Render2DEngine.applyOpacity(new Color(0x6690F6), (float) Math.sin((mc.player.age + 40) / 15f) + 1.8f));
 
-        setBounds((int) (102 * scalefactor), (int) (529 * scalefactor));
+        setBounds(getPosX(), getPosY(), (int) (102 * scalefactor), (int) (529 * scalefactor));
     }
 
     private void drawFire(MatrixStack matrices, float x, float y, float width, float height, Color color) {

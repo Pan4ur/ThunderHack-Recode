@@ -6,7 +6,7 @@
   ],
   "passes": [
     {
-      "name": "gradient",
+      "name": "thunderhack:outline",
       "intarget": "bufIn",
       "outtarget": "swap",
       "uniforms": []

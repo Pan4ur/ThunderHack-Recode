@@ -26,13 +26,18 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.movement.NoSlow;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.math.MathUtility;
+
+import java.util.ArrayDeque;
 
 import static net.minecraft.util.math.MathHelper.clamp;
 
 public class PlayerManager implements IManager {
-    public float yaw, pitch, lastYaw, lastPitch, currentPlayerSpeed;
+    public float yaw, pitch, lastYaw, lastPitch, currentPlayerSpeed, averagePlayerSpeed;
     public int ticksElytraFlying, serverSideSlot;
     public final Timer switchTimer = new Timer();
+
+    private final ArrayDeque<Float> speedResult = new ArrayDeque<>(20);
 
     public float bodyYaw, prevBodyYaw;
 
@@ -57,6 +62,17 @@ public class PlayerManager implements IManager {
     @EventHandler
     public void onTick(EventTick e) {
         currentPlayerSpeed = (float) Math.hypot(mc.player.getX() - mc.player.prevX, mc.player.getZ() - mc.player.prevZ);
+
+        if (speedResult.size() > 20)
+            speedResult.poll();
+
+        speedResult.add(currentPlayerSpeed);
+
+        float average = 0.0f;
+
+        for (Float value : speedResult) average += MathUtility.clamp(value, 0f, 20f);
+
+        averagePlayerSpeed = average / (float) speedResult.size();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

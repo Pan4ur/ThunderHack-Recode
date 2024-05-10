@@ -92,11 +92,9 @@ public final class HoleFill extends Module {
     public static final Timer inactivityTimer = new Timer();
     private int tickCounter = 0;
     private boolean selfFillNeed = false;
-    private static HoleFill instance;
 
     public HoleFill() {
         super("HoleFill", Category.COMBAT);
-        instance = this;
     }
 
     @Override
@@ -353,9 +351,5 @@ public final class HoleFill extends Module {
         return ((HoleUtility.validTwoBlockIndestructible(pos) || HoleUtility.validTwoBlockBedrock(pos)) && fillDouble.getValue())
                 || ((HoleUtility.validQuadBedrock(pos) || HoleUtility.validQuadIndestructible(pos)) && fillQuad.getValue())
                 || ((HoleUtility.validBedrock(pos) || HoleUtility.validIndestructible(pos)) && fillSingle.getValue());
-    }
-
-    public static HoleFill getInstance() {
-        return instance;
     }
 }

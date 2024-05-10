@@ -26,6 +26,10 @@ public class PredictUtility {
         double motionY = entity.getY() - entity.prevY;
         double motionZ = entity.getZ() - entity.prevZ;
 
+        // Можно въебать себя при спрыгивании с блока
+        if(entity == mc.player)
+            motionY = 0;
+
         for (int i = 0; i < ticks; i++) {
             if (!mc.world.isAir(BlockPos.ofFloored(posVec.add(0, motionY, 0)))) {
                 motionY = 0;

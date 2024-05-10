@@ -10,6 +10,7 @@ import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
@@ -29,7 +30,7 @@ public class ClickGUI extends Screen {
     private boolean setup = false;
 
     public static String currentDescription = "";
-    public static final Identifier arrow = new Identifier("textures/arrow.png");
+    public static final Identifier arrow = new Identifier("thunderhack", "textures/gui/elements/arrow.png");
 
     public ClickGUI() {
         super(Text.of("NewClickGUI"));
@@ -60,12 +61,16 @@ public class ClickGUI extends Screen {
         if (firstOpen) {
             float offset = 0;
             int windowHeight = 18;
+
+            int halfWidth = mc.getWindow().getScaledWidth() / 2;
+            int halfWidthCats = (int) (3 * (ModuleManager.clickGui.moduleWidth.getValue() + 4f));
+
             for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
                 if (category == Module.Category.HUD) continue;
-                ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category), 20f + offset, 20, 100, windowHeight);
+                ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category), (halfWidth - halfWidthCats) + offset, 20, 100, windowHeight);
                 window.setOpen(true);
                 windows.add(window);
-                offset += 102f;
+                offset += ModuleManager.clickGui.moduleWidth.getValue() + 2;
                 if (offset > mc.getWindow().getScaledWidth())
                     offset = 0;
             }
@@ -89,11 +94,11 @@ public class ClickGUI extends Screen {
         if (ModuleManager.clickGui.blur.getValue())
             applyBlur(delta);
 
-
         anyHovered = false;
 
         if (Module.fullNullCheck())
-            Render2DEngine.drawMainMenuShader(context.getMatrices(), 0, 0, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
+            renderBackground(context, mouseX, mouseY, delta);
+        //   Render2DEngine.drawMainMenuShader(context.getMatrices(), 0, 0, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
 
         if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old) {
             for (AbstractWindow window : windows) {
@@ -116,7 +121,7 @@ public class ClickGUI extends Screen {
         windows.forEach(w -> w.render(context, mouseX, mouseY, delta));
 
         if (!Objects.equals(currentDescription, "") && ModuleManager.clickGui.descriptions.getValue()) {
-            Render2DEngine.drawHudBase(context.getMatrices(), mouseX + 7, mouseY + 5, FontRenderers.sf_medium.getStringWidth(currentDescription) + 6, 11, 1f);
+            Render2DEngine.drawHudBase(context.getMatrices(), mouseX + 7, mouseY + 5, FontRenderers.sf_medium.getStringWidth(currentDescription) + 6, 11, 1f, false);
             FontRenderers.sf_medium.drawString(context.getMatrices(), currentDescription, mouseX + 10, mouseY + 8, HudEditor.getColor(0).getRGB());
             currentDescription = "";
         }
@@ -129,6 +134,9 @@ public class ClickGUI extends Screen {
                             "\nShift + Left Mouse Click to change module visibility in array list" +
                             "\nMiddle Mouse Click on slider to enter value from keyboard" +
                             "\nDelete + Left Mouse Click on module to reset", 5, mc.getWindow().getScaledHeight() - 80, HudEditor.getColor(0).getRGB());
+
+        if(!HudElement.anyHovered && !ClickGUI.anyHovered)
+            GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
     }
 
     @Override

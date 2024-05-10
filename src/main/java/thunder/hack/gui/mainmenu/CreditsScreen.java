@@ -26,7 +26,7 @@ import java.util.Objects;
 import static thunder.hack.modules.Module.mc;
 
 public class CreditsScreen extends Screen {
-    private static final Identifier TH_TEAM = new Identifier("textures/thteam.png");
+    private static final Identifier TH_TEAM = new Identifier("thunderhack", "textures/gui/elements/thteam.png");
 
     public ArrayList<Contributor> contributors = new ArrayList<>();
 
@@ -63,14 +63,16 @@ public class CreditsScreen extends Screen {
         float halfOfHeight = mc.getWindow().getScaledHeight() / 2f;
         float globalOffset = (contributors.size() * 150) / 2f;
 
-        Render2DEngine.drawMainMenuShader(context.getMatrices(), 0, 0, halfOfWidth * 2f, halfOfHeight * 2);
+      //  Render2DEngine.drawMainMenuShader(context.getMatrices(), 0, 0, halfOfWidth * 2f, halfOfHeight * 2);
+        renderBackground(context, mouseX, mouseY, delta);
+
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         int offset = 0;
         for (Contributor contributor : contributors) {
             float cX = halfOfWidth + offset - globalOffset + scroll;
             float cY = halfOfHeight - 120;
-            Render2DEngine.drawHudBase(context.getMatrices(), cX, cY, 140, 240, 20);
+            Render2DEngine.drawHudBase(context.getMatrices(), cX, cY, 140, 240, 20, false);
             FontRenderers.sf_medium.drawGradientString(context.getMatrices(), contributor.name, (cX + 70) - FontRenderers.sf_medium.getStringWidth(contributor.name) / 2f, halfOfHeight - 57, 30);
             FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), contributor.role, cX + 70, halfOfHeight - 50, new Color(0x818181).getRGB());
 
@@ -88,9 +90,9 @@ public class CreditsScreen extends Screen {
             offset += 150;
         }
         RenderSystem.disableBlend();
-        Render2DEngine.drawHudBase(context.getMatrices(), mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40, 5, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40) ? 0.7f : 1f);
-        RenderSystem.setShaderColor(1f, 1f, 1f, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 30, 30) ? 0.7f : 1f);
-        context.drawTexture(TH_TEAM, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 30, 30, 0, 0, 30, 30, 30, 30);
+        Render2DEngine.drawHudBase(context.getMatrices(), mc.getWindow().getScaledWidth() - 40, mc.getWindow().getScaledHeight() - 40, 30, 30, 5, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40) ? 0.7f : 1f);
+        RenderSystem.setShaderColor(1f, 1f, 1f, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 40, mc.getWindow().getScaledHeight() - 40, 30, 30) ? 0.7f : 1f);
+        context.drawTexture(TH_TEAM, mc.getWindow().getScaledWidth() - 40, mc.getWindow().getScaledHeight() - 40, 30, 30, 0, 0, 30, 30, 30, 30);
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 
@@ -109,7 +111,7 @@ public class CreditsScreen extends Screen {
             offset += 150;
         }
 
-        if (Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40))
+        if (Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 40, mc.getWindow().getScaledHeight() - 40, 40, 40))
             mc.setScreen(MainMenuScreen.getInstance());
 
         return super.mouseClicked(mouseX, mouseY, button);

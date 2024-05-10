@@ -2,15 +2,11 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventBreakBlock;
 import thunder.hack.events.impl.EventCollision;
@@ -21,7 +17,6 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
-import thunder.hack.utility.player.PlayerUtility;
 
 import static thunder.hack.modules.player.AutoTool.getTool;
 
@@ -34,6 +29,7 @@ public class Phase extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Vanilla);
     private final Setting<Boolean> silent = new Setting<>("Silent", false, v -> mode.getValue() == Mode.Sunrise);
     private final Setting<Boolean> waitBreak = new Setting<>("WaitBreak", true, v -> mode.getValue() == Mode.Sunrise);
+    private final Setting<Boolean> autoDisable = new Setting<>("AutoDisable", false, v -> mode.getValue() == Mode.Pearl);
 
     private final Setting<Integer> afterBreak = new Setting<>("BreakTimeout", 4, 1, 20, v -> mode.getValue() == Mode.Sunrise && waitBreak.getValue());
     private final Setting<Integer> afterPearl = new Setting<>("PearlTimeout", 0, 0, 60, v -> mode.getValue() == Mode.Pearl);
@@ -48,7 +44,7 @@ public class Phase extends Module {
 
     @EventHandler
     public void onCollide(EventCollision e) {
-        if(fullNullCheck())
+        if (fullNullCheck())
             return;
         BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
 
@@ -57,7 +53,7 @@ public class Phase extends Module {
                 e.setState(Blocks.AIR.getDefaultState());
         }
     }
-    
+
     @Override
     public void onEnable() {
         afterPearlTime = 0;
@@ -66,7 +62,7 @@ public class Phase extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        if(fullNullCheck()) return;
+        if (fullNullCheck()) return;
         if (clipTimer > 0) clipTimer--;
         if (afterPearlTime > 0) afterPearlTime--;
 
@@ -100,11 +96,11 @@ public class Phase extends Module {
         }
 
         if (mode.getValue() == Mode.Pearl) {
-            if(mc.player.horizontalCollision && !playerInsideBlock() && clipTimer <= 0 && mc.player.age > 60){
+            if (mc.player.horizontalCollision && !playerInsideBlock() && clipTimer <= 0 && mc.player.age > 60) {
                 double[] dir = MovementUtility.forward(0.5);
                 BlockPos block = BlockPos.ofFloored(mc.player.getX() + dir[0], mc.player.getY(), mc.player.getZ() + dir[1]);
 
-                if(mc.options.sneakKey.isPressed())
+                if (mc.options.sneakKey.isPressed())
                     return;
 
                 float[] angle = InteractionUtility.calculateAngle(block.toCenterPos());
@@ -123,8 +119,8 @@ public class Phase extends Module {
     @EventHandler
     public void onPostSync(EventPostSync e) {
         if (mode.getValue() == Mode.Pearl) {
-            if(mc.player.horizontalCollision && !playerInsideBlock() && clipTimer <= 0 && mc.player.age > 60){
-                if(mc.options.sneakKey.isPressed())
+            if (mc.player.horizontalCollision && !playerInsideBlock() && clipTimer <= 0 && mc.player.age > 60) {
+                if (mc.options.sneakKey.isPressed())
                     return;
 
                 int epSlot = findEPSlot();
@@ -135,6 +131,8 @@ public class Phase extends Module {
                     sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
                     sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                     InventoryUtility.switchTo(prevItem);
+                    if (autoDisable.getValue())
+                        disable();
                 }
                 clipTimer = 20;
                 afterPearlTime = afterPearl.getValue();
@@ -159,7 +157,7 @@ public class Phase extends Module {
     }
 
     public boolean canNoClip() {
-        if (mode.getValue() == Mode.Vanilla) return true;
+        if (mode.is(Mode.Vanilla)) return true;
         if (!waitBreak.getValue()) return true;
         return clipTimer != 0;
     }

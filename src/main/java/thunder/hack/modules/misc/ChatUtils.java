@@ -116,7 +116,7 @@ public class ChatUtils extends Module {
             }
 
             String content = pac.content.getString().toLowerCase();
-            if(!pmSound.is(PMSound.Off) && (content.contains("whisper") || content.contains("-> я") || content.contains("-> me") || content.contains(" says:"))) {
+            if(!pmSound.is(PMSound.Off) && (content.contains("whisper") || content.contains("-> я") || content.contains("-> " + NameProtect.getCustomName()) || content.contains("-> me") || content.contains(" says:"))) {
                 ThunderHack.soundManager.playPmSound(pmSound.getValue());
             }
         }
@@ -133,9 +133,11 @@ public class ChatUtils extends Module {
     }
 
     private @NotNull String getPrefix() {
-        if (prefix.getValue() == Prefix.Green) return ">";
-        if (prefix.getValue() == Prefix.Global) return "!";
-        return "";
+        return switch (prefix.getValue()){
+            case Green -> ">";
+            case Global -> "!";
+            case None -> "";
+        };
     }
 
     public boolean antiBot(@NotNull String s) {

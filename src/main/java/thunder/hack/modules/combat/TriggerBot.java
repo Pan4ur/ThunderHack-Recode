@@ -21,16 +21,10 @@ public final class TriggerBot extends Module {
     public final Setting<Boolean> ignoreWalls = new Setting<>("IgnoreWalls", false);
     public final Setting<Boolean> pauseEating = new Setting<>("PauseWhileEating", false);
 
-    private static TriggerBot instance;
     private int delay;
 
     public TriggerBot() {
         super("TriggerBot", Category.COMBAT);
-        instance = this;
-    }
-
-    public static TriggerBot getInstance() {
-        return instance;
     }
 
     @EventHandler

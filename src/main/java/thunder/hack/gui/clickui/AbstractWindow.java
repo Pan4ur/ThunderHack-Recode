@@ -1,6 +1,7 @@
 package thunder.hack.gui.clickui;
 
 import net.minecraft.client.gui.DrawContext;
+import thunder.hack.modules.Module;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
@@ -119,5 +120,8 @@ public class AbstractWindow {
     }
 
     public void tick(){
+    }
+
+    public void hudClicked(Module module) {
     }
 }

@@ -5,8 +5,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
@@ -17,17 +16,10 @@ import thunder.hack.setting.Setting;
 public final class Criticals extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.UpdatedNCP);
 
-    private static Criticals instance;
-
     public static boolean cancelCrit;
 
     public Criticals() {
         super("Criticals", Category.COMBAT);
-        instance = this;
-    }
-
-    public static Criticals getInstance() {
-        return instance;
     }
 
     @EventHandler
@@ -65,6 +57,7 @@ public final class Criticals extends Module {
                 case Grim -> {
                     if (!mc.player.isOnGround())
                         critPacket(-0.000001, false);
+
                 }
             }
         }

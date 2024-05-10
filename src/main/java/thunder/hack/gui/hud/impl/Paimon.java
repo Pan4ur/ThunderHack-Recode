@@ -25,7 +25,7 @@ public class Paimon extends HudElement {
         super("Paimon", 50, 10);
     }
 
-    private final Identifier PAIMON = new Identifier("textures/paimon.png");
+    private final Identifier PAIMON = new Identifier("thunderhack", "textures/hud/elements/paimon.png");
 
     public Setting<Integer> scale = new Setting<>("Scale", 50, 0, 100);
 
@@ -77,8 +77,7 @@ public class Paimon extends HudElement {
                 currentFrame = 0;
         }
 
-
-        setBounds((int) (scale.getValue() * 3f), (int) (scale.getValue() * 3f));
+        setBounds(getPosX(), getPosY(), (scale.getValue() * 3f), (scale.getValue() * 3f));
     }
 
 

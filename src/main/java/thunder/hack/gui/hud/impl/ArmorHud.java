@@ -18,5 +18,6 @@ public class ArmorHud extends HudElement {
             context.drawItemInSlot(mc.textRenderer,itemStack,  (int) xItemOffset, (int) getPosY());
             xItemOffset += 20;
         }
+        setBounds(getPosX(), getPosY(), 60, 25);
     }
 }

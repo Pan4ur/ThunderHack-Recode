@@ -21,11 +21,9 @@ public final class AutoGApple extends Module {
     private boolean isActive;
     private final Timer useDelay = new Timer();
 
-    private static AutoGApple instance;
 
     public AutoGApple() {
         super("AutoGApple", Category.COMBAT);
-        instance = this;
     }
 
     @EventHandler
@@ -57,9 +55,5 @@ public final class AutoGApple extends Module {
         }
 
         return !mc.player.getOffHandStack().isEmpty() && (mc.player.getOffHandStack().getItem() == Items.GOLDEN_APPLE || mc.player.getOffHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE);
-    }
-
-    public static AutoGApple getInstance() {
-        return instance;
     }
 }

@@ -1,23 +1,18 @@
 package thunder.hack.injection;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.client.gl.PostEffectProcessor;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.core.impl.ShaderManager;
-import thunder.hack.events.impl.EventSetBlockState;
 import thunder.hack.modules.render.Fullbright;
+import thunder.hack.modules.render.Shaders;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -37,7 +32,6 @@ public abstract class MixinWorldRenderer {
     private boolean renderSetupTerrainModifyArg(boolean spectator) {
         return ModuleManager.freeCam.isEnabled() || spectator;
     }
-
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/PostEffectProcessor;render(F)V", ordinal = 0))
     private void replaceShaderHook(PostEffectProcessor instance, float tickDelta) {

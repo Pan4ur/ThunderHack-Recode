@@ -15,11 +15,8 @@ import thunder.hack.utility.player.PlayerUtility;
 public class BowSpam extends Module {
     private final Setting<Integer> ticks = new Setting<>("Delay", 3, 0, 20);
 
-    private static BowSpam instance;
-
     public BowSpam() {
         super("BowSpam", Category.COMBAT);
-        instance = this;
     }
 
     @EventHandler
@@ -31,9 +28,5 @@ public class BowSpam extends Module {
                 mc.player.stopUsingItem();
             }
         }
-    }
-
-    public static BowSpam getInstance() {
-        return instance;
     }
 }

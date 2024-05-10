@@ -149,12 +149,12 @@ public class ShaderManager implements IManager {
     }
 
     public void reloadShaders() {
-        DEFAULT = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/outline.json"));
-        SMOKE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/smoke.json"));
-        GRADIENT = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/gradient.json"));
-        SNOW = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/snow.json"));
+        DEFAULT = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/outline.json"));
+        SMOKE = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/smoke.json"));
+        GRADIENT = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/gradient.json"));
+        SNOW = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/snow.json"));
 
-        DEFAULT_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/outline.json"), managedShaderEffect -> {
+        DEFAULT_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/outline.json"), managedShaderEffect -> {
             PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
             if (effect == null) return;
 
@@ -162,7 +162,7 @@ public class ShaderManager implements IManager {
             ((IShaderEffect) effect).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
         });
 
-        SMOKE_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/smoke.json"), managedShaderEffect -> {
+        SMOKE_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/smoke.json"), managedShaderEffect -> {
             PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
             if (effect == null) return;
 
@@ -170,7 +170,7 @@ public class ShaderManager implements IManager {
             ((IShaderEffect) effect).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
         });
 
-        GRADIENT_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/gradient.json"), managedShaderEffect -> {
+        GRADIENT_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/gradient.json"), managedShaderEffect -> {
             PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
             if (effect == null) return;
 
@@ -178,7 +178,7 @@ public class ShaderManager implements IManager {
             ((IShaderEffect) effect).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
         });
 
-        SNOW_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("minecraft", "shaders/post/snow.json"), managedShaderEffect -> {
+        SNOW_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/snow.json"), managedShaderEffect -> {
             PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
             if (effect == null) return;
 

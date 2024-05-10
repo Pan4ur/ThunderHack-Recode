@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import thunder.hack.ThunderHack;
+import thunder.hack.modules.Module;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -28,7 +29,8 @@ public abstract class MixinChatInputSuggestor {
     @Shadow protected abstract void showCommandSuggestions();
 
     @Inject(method = "refresh", at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/StringReader;canRead()Z", remap = false), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
-    public void onRefresh(CallbackInfo ci, String string, StringReader reader) {
+    public void refreshHook(CallbackInfo ci, String string, StringReader reader) {
+        if(Module.fullNullCheck()) return;
         if (reader.canRead(ThunderHack.commandManager.getPrefix().length()) && reader.getString().startsWith(ThunderHack.commandManager.getPrefix(), reader.getCursor())) {
             reader.setCursor(reader.getCursor() + 1);
 

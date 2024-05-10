@@ -78,15 +78,8 @@ public final class PistonAura extends Module {
     private EndCrystalEntity lastCrystal;
     private Vec3d rotations;
 
-    private static PistonAura instance;
-
     public PistonAura() {
         super("PistonAura", Category.COMBAT);
-        instance = this;
-    }
-
-    public static PistonAura getInstance() {
-        return instance;
     }
 
     public void reset() {

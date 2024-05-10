@@ -27,11 +27,9 @@ public final class RPC extends Module {
     public static boolean started;
     static String String1 = "none";
     private static Thread thread;
-    private static RPC instance;
 
     public RPC() {
         super("DiscordRPC", Category.CLIENT);
-        instance = this;
     }
 
     public static void readFile() {
@@ -149,8 +147,4 @@ public final class RPC extends Module {
     public enum Mode {Custom, MegaCute, Recode}
 
     public enum sMode {Custom, Stats, Version}
-
-    public static RPC getInstance() {
-        return instance;
-    }
 }

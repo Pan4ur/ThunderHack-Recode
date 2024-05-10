@@ -93,7 +93,7 @@ public class RadarRewrite extends HudElement {
             }
             context.getMatrices().pop();
         });
-        setBounds((int) (CRadius.getValue() * 2), (int) (CRadius.getValue() * 2));
+        setBounds(getPosX(), getPosY(),(int) (CRadius.getValue() * 2), (int) (CRadius.getValue() * 2));
     }
 
     public void renderCompass(MatrixStack matrices, float x, float y) {

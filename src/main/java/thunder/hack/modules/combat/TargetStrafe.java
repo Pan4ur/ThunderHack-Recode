@@ -2,7 +2,10 @@ package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
@@ -10,6 +13,8 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
@@ -17,6 +22,10 @@ import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.MovementUtility;
+import thunder.hack.utility.render.Render3DEngine;
+
+import java.awt.*;
 
 import static thunder.hack.utility.player.MovementUtility.isMoving;
 

@@ -80,11 +80,8 @@ public final class AutoBed extends Module {
     private final Timer placeTimer = new Timer();
     private final Timer explodeTimer = new Timer();
 
-    private static AutoBed instance;
-
     public AutoBed() {
         super("AutoBed", Category.COMBAT);
-        instance = this;
     }
 
     @EventHandler
@@ -382,8 +379,5 @@ public final class AutoBed extends Module {
     private record BedData(BlockHitResult hitResult, float damage, float selfDamage, Direction dir) {
     }
 
-    public static AutoBed getInstance() {
-        return instance;
-    }
 }
 

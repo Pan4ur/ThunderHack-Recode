@@ -10,15 +10,8 @@ import thunder.hack.setting.Setting;
 public final class AutoTrap extends TrapModule {
     private final Setting<CombatManager.TargetBy> targetBy = new Setting<>("Target By", CombatManager.TargetBy.Distance);
 
-    private static AutoTrap instance;
-
     public AutoTrap() {
         super("AutoTrap", Category.COMBAT);
-        instance = this;
-    }
-
-    public static AutoTrap getInstance() {
-        return instance;
     }
 
     @Override

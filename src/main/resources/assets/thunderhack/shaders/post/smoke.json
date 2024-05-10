@@ -6,7 +6,7 @@
   ],
   "passes": [
     {
-      "name": "outline",
+      "name": "thunderhack:smoke",
       "intarget": "bufIn",
       "outtarget": "swap",
       "uniforms": []

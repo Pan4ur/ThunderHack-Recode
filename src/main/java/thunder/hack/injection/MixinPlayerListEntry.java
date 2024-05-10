@@ -1,28 +1,23 @@
 package thunder.hack.injection;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import thunder.hack.cmd.Command;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.utility.OptifineCapes;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 @Mixin(PlayerListEntry.class)
 public class MixinPlayerListEntry {
@@ -62,15 +57,16 @@ public class MixinPlayerListEntry {
                     String name = colune.split(":")[0];
                     String cape = colune.split(":")[1];
                     if (Objects.equals(profile.getName(), name)) {
-                        customCapeTexture = new Identifier("textures/" + cape + ".png");
+                        customCapeTexture = new Identifier("thunderhack", "textures/capes/" + cape + ".png");
                         return;
                     }
                 }
             } catch (Exception ignored) {
             }
-            OptifineCapes.loadPlayerCape(profile, id -> {
-                customCapeTexture = id;
-            });
+            if (ModuleManager.optifineCapes.isEnabled())
+                OptifineCapes.loadPlayerCape(profile, id -> {
+                    customCapeTexture = id;
+                });
         });
     }
 }

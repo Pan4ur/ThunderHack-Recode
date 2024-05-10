@@ -76,7 +76,7 @@ public class FakePlayer extends Module {
             if (fakePlayer.isDead()) {
                 if (fakePlayer.tryUseTotem(mc.world.getDamageSources().generic())) {
                     fakePlayer.setHealth(10f);
-                    new EntityStatusS2CPacket(fakePlayer, EntityStatuses.USE_TOTEM_OF_UNDYING).apply(mc.player.networkHandler);
+              //      new EntityStatusS2CPacket(fakePlayer, EntityStatuses.USE_TOTEM_OF_UNDYING).apply(mc.player.networkHandler);
                 }
             }
         }

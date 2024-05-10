@@ -1,10 +1,6 @@
 package thunder.hack.gui.misc;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
-import net.minecraft.block.EnderChestBlock;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
@@ -14,24 +10,17 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ShulkerBoxScreenHandler;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.cmd.Command;
 import thunder.hack.modules.render.Tooltips;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class PeekScreen extends ShulkerBoxScreen {
-    private static final Identifier TEXTURE = new Identifier("textures/container.png");
-
     private static final ItemStack[] ITEMS = new ItemStack[27];
-
-    private final Block block;
 
     public PeekScreen(ShulkerBoxScreenHandler handler, PlayerInventory inventory, Text title, Block block) {
         super(handler, inventory, title);
-        this.block = block;
     }
 
     @Override

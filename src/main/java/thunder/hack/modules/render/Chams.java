@@ -53,7 +53,7 @@ public class Chams extends Module {
     }
 
     private final Identifier crystalTexture = new Identifier("textures/entity/end_crystal/end_crystal.png");
-    private final Identifier crystalTexture2 = new Identifier("textures/end_crystal2.png");
+    private final Identifier crystalTexture2 = new Identifier("thunderhack","textures/misc/end_crystal2.png");
 
     private static final float SINE_45_DEGREES = (float) Math.sin(0.7853981633974483);
 

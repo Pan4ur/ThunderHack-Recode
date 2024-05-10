@@ -117,6 +117,7 @@ public abstract class MixinMinecraftClient {
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     public void setScreenHookPre(Screen screen, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         EventScreen event = new EventScreen(screen);
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) ci.cancel();
@@ -124,6 +125,7 @@ public abstract class MixinMinecraftClient {
 
     @Inject(method = "setScreen", at = @At("RETURN"))
     public void setScreenHookPost(Screen screen, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         if (screen instanceof MultiplayerScreen mScreen && ModuleManager.antiServerAdd.isEnabled() && mScreen.getServerList() != null) {
             for (int i = 0; i < mScreen.getServerList().size(); i++) {
                 ServerInfo info = mScreen.getServerList().get(i);

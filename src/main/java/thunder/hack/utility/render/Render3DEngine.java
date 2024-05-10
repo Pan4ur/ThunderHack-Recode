@@ -460,12 +460,12 @@ public class Render3DEngine {
 
     public static void vertexLine(@NotNull MatrixStack matrices, @NotNull VertexConsumer buffer, float x1, float y1, float z1, float x2, float y2, float z2, @NotNull Color lineColor) {
         Matrix4f model = matrices.peek().getPositionMatrix();
-        Matrix3f normal = matrices.peek().getNormalMatrix();
+        MatrixStack.Entry entry = matrices.peek();
         Vector3f normalVec = getNormal(x1, y1, z1, x2, y2, z2);
 
         //TODO Test
-        buffer.vertex(model, x1, y1, z1).color(lineColor.getRed(), lineColor.getGreen(), lineColor.getBlue(), lineColor.getAlpha()).normal(normalVec.x(), normalVec.y(), normalVec.z()).next();
-        buffer.vertex(model, x2, y2, z2).color(lineColor.getRed(), lineColor.getGreen(), lineColor.getBlue(), lineColor.getAlpha()).normal(normalVec.x(), normalVec.y(), normalVec.z()).next();
+        buffer.vertex(model, x1, y1, z1).color(lineColor.getRed(), lineColor.getGreen(), lineColor.getBlue(), lineColor.getAlpha()).normal(entry, normalVec.x(), normalVec.y(), normalVec.z()).next();
+        buffer.vertex(model, x2, y2, z2).color(lineColor.getRed(), lineColor.getGreen(), lineColor.getBlue(), lineColor.getAlpha()).normal(entry,normalVec.x(), normalVec.y(), normalVec.z()).next();
     }
 
     public static @NotNull Vector3f getNormal(float x1, float y1, float z1, float x2, float y2, float z2) {

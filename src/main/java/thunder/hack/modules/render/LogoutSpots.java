@@ -121,11 +121,8 @@ public class LogoutSpots extends Module {
         }
     }
     private boolean isABot(PlayerEntity ent){
-        if (!ent.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + ent.getName().getString()).getBytes(StandardCharsets.UTF_8))) && ent instanceof OtherClientPlayerEntity
+        return !ent.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + ent.getName().getString()).getBytes(StandardCharsets.UTF_8))) && ent instanceof OtherClientPlayerEntity
                 && (FakePlayer.fakePlayer == null || ent.getId() != FakePlayer.fakePlayer.getId())
-                && !ent.getName().getString().contains("-")) {
-            return  true;
-        }
-        else {return false;}
+                && !ent.getName().getString().contains("-");
     }
 }

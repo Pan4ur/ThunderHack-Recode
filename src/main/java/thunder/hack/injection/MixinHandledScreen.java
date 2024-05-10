@@ -41,6 +41,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.misc.PeekScreen;
+import thunder.hack.modules.Module;
 import thunder.hack.modules.render.Tooltips;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render2DEngine;
@@ -72,6 +73,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
     @Inject(method = "render", at = @At("HEAD"))
     private void drawScreenHook(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         for (int i1 = 0; i1 < mc.player.currentScreenHandler.slots.size(); ++i1) {
             Slot slot = mc.player.currentScreenHandler.slots.get(i1);
             if (isPointOverSlot(slot, mouseX, mouseY) && slot.isEnabled()) {
@@ -91,7 +93,6 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
         return Core.hold_mouse0;
     }
 
-
     @Shadow
     @Nullable
     protected Slot focusedSlot;
@@ -100,13 +101,13 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
     @Shadow
     protected int y;
 
-    private static final Identifier MAP_BACKGROUND = new Identifier("textures/map_background.png");
     private static final ItemStack[] ITEMS = new ItemStack[27];
 
     private Map<Render2DEngine.Rectangle, Integer> clickableRects = new HashMap<>();
 
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         if (focusedSlot != null && !focusedSlot.getStack().isEmpty() && client.player.playerScreenHandler.getCursorStack().isEmpty()) {
             if (hasItems(focusedSlot.getStack()) && Tooltips.storage.getValue()) {
                 renderShulkerToolTip(context, mouseX, mouseY, 0, 0, focusedSlot.getStack());
@@ -183,6 +184,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
     @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"), cancellable = true)
     private void onDrawMouseoverTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         if (focusedSlot != null && !focusedSlot.getStack().isEmpty() && client.player.playerScreenHandler.getCursorStack().isEmpty()) {
             if (focusedSlot.getStack().getItem() == Items.FILLED_MAP && Tooltips.maps.getValue()) ci.cancel();
         }
@@ -234,12 +236,8 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         int y1 = y - 12;
-        int y2 = y1 + 100;
         int x1 = x + 8;
-        int x2 = x1 + 100;
         int z = 300;
-
-        context.drawTexture(MAP_BACKGROUND, x1, y1, x2, y2, 0, 0);
 
         MapState mapState = FilledMapItem.getMapState(stack, client.world);
 
@@ -260,6 +258,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+        if(Module.fullNullCheck()) return;
         if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE && focusedSlot != null && !focusedSlot.getStack().isEmpty() && client.player.playerScreenHandler.getCursorStack().isEmpty()) {
             ItemStack itemStack = focusedSlot.getStack();
 

@@ -12,8 +12,6 @@ public class Particles {
     public double x, y, deltaX, deltaY, size, opacity;
     public Color color;
 
-    private final Identifier star = new Identifier("textures/star.png");
-
     public static Color mixColors(final Color color1, final Color color2, final double percent) {
         final double inverse_percent = 1.0 - percent;
         final int redPart = (int) (color1.getRed() * percent + color2.getRed() * inverse_percent);
@@ -29,7 +27,7 @@ public class Particles {
     public void drawStar(MatrixStack matrices, float x, float y, Color c) {
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-        RenderSystem.setShaderTexture(0, star);
+        RenderSystem.setShaderTexture(0, Render2DEngine.star);
         RenderSystem.setShaderColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, (float) (opacity / 255f));
         Render2DEngine.renderTexture(matrices, x + size / 2f, y + size / 2f, size, size, 0, 0, 256, 256, 256, 256);
         RenderSystem.disableBlend();

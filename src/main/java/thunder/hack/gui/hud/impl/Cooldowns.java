@@ -7,6 +7,8 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
+import java.awt.*;
+
 public class Cooldowns extends HudElement {
     public Cooldowns() {
         super("Cooldowns", 100, 100);
@@ -26,18 +28,28 @@ public class Cooldowns extends HudElement {
         Render2DEngine.drawGradientRound(context.getMatrices(),
                 getPosX() + 30.f, getPosY() + 30.f, 65, 5, 1.5f, HudEditor.getColor(90).darker().darker().darker(), HudEditor.getColor(180).darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker(), HudEditor.getColor(270).darker().darker().darker());
 
-        Render2DEngine.drawGradientRound(context.getMatrices(),
-                getPosX() + 30.f, getPosY() + 20.f, (65 * animation1), 5, 1.5f, HudEditor.getColor(90), HudEditor.getColor(180), HudEditor.getColor(0), HudEditor.getColor(270));
+        Render2DEngine.drawRect(context.getMatrices(),
+                getPosX() + 30.f, getPosY() + 20.f, (65 * animation1), 5, 1.5f,1f);
 
-        Render2DEngine.drawGradientRound(context.getMatrices(),
-                getPosX() + 30.f, getPosY() + 30.f, (65 * animation2), 5, 1.5f, HudEditor.getColor(90), HudEditor.getColor(180), HudEditor.getColor(0), HudEditor.getColor(270));
+        Render2DEngine.drawRect(context.getMatrices(),
+                getPosX() + 30.f, getPosY() + 30.f, (65 * animation2), 5, 1.5f,1f);
 
-        FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "Cooldowns", getPosX() + 100 / 2, getPosY() + 4, HudEditor.textColor.getValue().getColor());
-        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + 100 / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
-        Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + 100 / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + 100 - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Glowing)) {
+            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "Cooldowns", getPosX() + 50, getPosY() + 4, HudEditor.textColor.getValue().getColorObject());
+        } else {
+            FontRenderers.sf_bold.drawGradientCenteredString(context.getMatrices(), "Cooldowns", getPosX() + 50, getPosY() + 4, 10);
+        }
+
+        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+            Render2DEngine.verticalGradient(context.getMatrices(), getPosX() , getPosY() + 13, getPosX() + 100, getPosY() + 18, new Color(0x7B000000, true), new Color(0x0000000, true));
+        } else {
+            Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + 100 / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
+            Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + 100 / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + 100 - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+        }
 
         FontRenderers.sf_bold_mini.drawString(context.getMatrices(), "Attack", getPosX() + 5, getPosY() + 20, HudEditor.textColor.getValue().getColor());
         FontRenderers.sf_bold_mini.drawString(context.getMatrices(), "Hurt", getPosX() + 5, getPosY() + 30, HudEditor.textColor.getValue().getColor());
 
+        setBounds(getPosX(), getPosY(), 100, 40);
     }
 }

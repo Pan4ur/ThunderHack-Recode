@@ -24,6 +24,7 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventBreakBlock;
 import thunder.hack.events.impl.EventClickSlot;
+import thunder.hack.modules.Module;
 import thunder.hack.modules.player.NoInteract;
 import thunder.hack.modules.player.SpeedMine;
 
@@ -72,6 +73,7 @@ public class MixinClientPlayerInteractionManager {
 
     @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
     private void attackBlockHook(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        if(Module.fullNullCheck()) return;
         EventAttackBlock event = new EventAttackBlock(pos, direction);
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled())
@@ -96,6 +98,7 @@ public class MixinClientPlayerInteractionManager {
 
     @Inject(method = "breakBlock", at = @At("HEAD"), cancellable = true)
     public void breakBlockHook(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        if(Module.fullNullCheck()) return;
         EventBreakBlock event = new EventBreakBlock(pos);
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled())
@@ -104,6 +107,7 @@ public class MixinClientPlayerInteractionManager {
 
     @Inject(method = "clickSlot", at = @At("HEAD"), cancellable = true)
     public void clickSlotHook(int syncId, int slotId, int button, SlotActionType actionType, PlayerEntity player, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         EventClickSlot event = new EventClickSlot(actionType, slotId, button, syncId);
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled())

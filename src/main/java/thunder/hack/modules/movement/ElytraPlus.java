@@ -660,7 +660,7 @@ public class ElytraPlus extends Module {
         if (started && (float) (System.currentTimeMillis() - lastFireworkTime) < fireDelay.getValue() * 1000.0f)
             return;
 
-        if (grim.getValue() && started && pingTimer.passedMs(200) && flightZonePos != null && mc.player.squaredDistanceTo(flightZonePos) < 7000)
+        if (grim.getValue() && started && pingTimer.passedMs(200) && flightZonePos != null && PlayerUtility.getSquaredDistance2D(flightZonePos) < 7000)
             return;
 
         if (started && !mc.player.isFallFlying()) return;

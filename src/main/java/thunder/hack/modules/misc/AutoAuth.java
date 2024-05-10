@@ -18,12 +18,10 @@ public final class AutoAuth extends Module {
     private final Setting<String> cpass = new Setting<>("Password", "babidjon777", v -> passwordMode.getValue() == Mode.Custom);
     private final Setting<Boolean> showPasswordInChat = new Setting<>("Show Pass In Chat", true);
 
-    private static AutoAuth instance;
     private String password;
 
     public AutoAuth() {
         super("AutoAuth", Category.MISC);
-        instance = this;
     }
 
     private enum Mode {
@@ -69,9 +67,5 @@ public final class AutoAuth extends Module {
                 ThunderHack.notificationManager.publicity("AutoAuth", "Выполнен вход!", 4, Notification.Type.SUCCESS);
             }
         }
-    }
-
-    public static AutoAuth getInstance() {
-        return instance;
     }
 }

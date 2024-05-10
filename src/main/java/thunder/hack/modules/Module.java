@@ -20,6 +20,7 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.injection.accesors.IClientWorldMixin;
 import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.modules.misc.UnHook;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 
@@ -64,6 +65,7 @@ public abstract class Module {
 
     public void onRender2D(DrawContext event) {
     }
+
 
     public void onRender3D(MatrixStack event) {
     }
@@ -111,9 +113,10 @@ public abstract class Module {
     }
 
     public void enable() {
-        enabled.setValue(true);
+        if(!(this instanceof UnHook))
+            enabled.setValue(true);
 
-        if (!fullNullCheck()) onEnable();
+        if (!fullNullCheck() || (this instanceof UnHook) ) onEnable();
         if (isOn()) ThunderHack.EVENT_BUS.subscribe(this);
         if (fullNullCheck()) return;
 
@@ -199,7 +202,7 @@ public abstract class Module {
     }
 
     public static boolean fullNullCheck() {
-        return mc.player == null || mc.world == null;
+        return mc.player == null || mc.world == null || ModuleManager.unHook.isEnabled();
     }
 
     public String getName() {
@@ -288,7 +291,7 @@ public abstract class Module {
     }
 
     public void sendMessage(String message) {
-        if (fullNullCheck()) return;
+        if (fullNullCheck() || !ClientSettings.clientMessages.getValue() || ModuleManager.unHook.isEnabled()) return;
         mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + message));
     }
 
@@ -298,13 +301,13 @@ public abstract class Module {
     }
 
     public boolean isKeyPressed(int button) {
-        if (button == -1)
+        if (button == -1 || ModuleManager.unHook.isEnabled())
             return false;
         return InputUtil.isKeyPressed(mc.getWindow().getHandle(), button);
     }
 
     public boolean isKeyPressed(Setting<Bind> bind) {
-        if (bind.getValue().getKey() == -1)
+        if (bind.getValue().getKey() == -1 || ModuleManager.unHook.isEnabled())
             return false;
         return InputUtil.isKeyPressed(mc.getWindow().getHandle(), bind.getValue().getKey());
     }

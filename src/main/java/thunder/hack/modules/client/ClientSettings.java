@@ -10,6 +10,7 @@ public final class ClientSettings extends Module {
     public static Setting<Float> scaleFactorFixValue = new Setting<>("ScaleFactorFixValue", 2f, 0f, 4f);
     public static Setting<Boolean> renderRotations = new Setting<>("RenderRotations", true);
     public static Setting<Boolean> skullEmoji = new Setting<>("SkullEmoji", true);
+    public static Setting<Boolean> clientMessages = new Setting<>("ClientMessages", true);
     public static Setting<Boolean> debug = new Setting<>("Debug", false);
     public static Setting<Boolean> customBob = new Setting<>("CustomBob", true);
     public static Setting<Language> language = new Setting<>("Language", Language.ENG);
@@ -25,6 +26,6 @@ public final class ClientSettings extends Module {
     }
 
     public static boolean isRu() {
-        return language.getValue() == Language.RU;
+        return language.is(Language.RU);
     }
 }

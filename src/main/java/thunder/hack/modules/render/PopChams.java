@@ -32,11 +32,9 @@ public final class PopChams extends Module {
     private final Setting<Integer> aSpeed = new Setting<>("Alpha Speed", 5, 1, 100);
 
     private final CopyOnWriteArrayList<Person> popList = new CopyOnWriteArrayList<>();
-    private static PopChams instance;
 
     public PopChams() {
         super("PopChams", Category.RENDER);
-        instance = this;
     }
 
     @Override
@@ -151,9 +149,5 @@ public final class PopChams extends Module {
         public int getAlpha() {
             return MathUtility.clamp(alpha, 0, 255);
         }
-    }
-
-    public static PopChams getInstance() {
-        return instance;
     }
 }

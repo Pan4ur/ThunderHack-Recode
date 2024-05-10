@@ -9,7 +9,7 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.*;
-import thunder.hack.gui.notification.NotificationManager;
+import thunder.hack.core.impl.NotificationManager;
 import thunder.hack.modules.client.RPC;
 import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -83,6 +83,8 @@ public class ThunderHack implements ModInitializer {
         configManager.loadNuker();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if(ModuleManager.unHook.isEnabled())
+                ModuleManager.unHook.disable();
             FriendManager.saveFriends();
             configManager.save(configManager.getCurrentConfig());
             wayPointManager.saveWayPoints();
@@ -102,9 +104,7 @@ public class ThunderHack implements ModInitializer {
         syncVersion();
         syncContributors();
         ThunderUtility.parseChangeLog();
-
-        if (isOnWindows())
-            RPC.getInstance().startRpc();
+        ModuleManager.rpc.startRpc();
 
         LogUtils.getLogger().info("""
                 \n /$$$$$$$$ /$$                                 /$$                     /$$   /$$                     /$$     \s
@@ -144,10 +144,6 @@ public class ThunderHack implements ModInitializer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static boolean isOnWindows() {
-        return System.getProperty("os.name").startsWith("Windows");
     }
 
     public static boolean isFuturePresent() {

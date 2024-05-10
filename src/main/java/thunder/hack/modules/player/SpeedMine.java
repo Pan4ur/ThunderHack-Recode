@@ -74,7 +74,6 @@ public final class SpeedMine extends Module {
     private final Setting<ColorSetting> startFillColor = new Setting<>("Start Fill Color", new ColorSetting(new Color(255, 0, 0, 120)), v -> mode.getValue() != Mode.Damage).withParent(render);
     private final Setting<ColorSetting> endFillColor = new Setting<>("End Fill Color", new ColorSetting(new Color(47, 255, 0, 120)), v -> mode.getValue() != Mode.Damage).withParent(render);
 
-    private static SpeedMine instance;
     public static BlockPos minePosition;
     private Direction mineFacing;
     private int mineBreaks;
@@ -85,7 +84,6 @@ public final class SpeedMine extends Module {
 
     public SpeedMine() {
         super("SpeedMine", Category.PLAYER);
-        instance = this;
     }
 
     @Override
@@ -518,10 +516,6 @@ public final class SpeedMine extends Module {
             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos, mineFacing));
             sendPacket(new PlayerActionC2SPacket(startMode.getValue() == StartMode.StartAbort ? PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK : PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, minePosition, mineFacing));
         }
-    }
-
-    public static SpeedMine getInstance() {
-        return instance;
     }
 
     public enum Mode {

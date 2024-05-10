@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventHeldItemRenderer;
+import thunder.hack.modules.Module;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -31,6 +32,7 @@ public abstract class MixinHeldItemRenderer {
 
     @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/HeldItemRenderer;renderItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"), cancellable = true)
     private void onRenderItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         EventHeldItemRenderer event = new EventHeldItemRenderer(hand, item, equipProgress, matrices);
         ThunderHack.EVENT_BUS.post(event);
     }

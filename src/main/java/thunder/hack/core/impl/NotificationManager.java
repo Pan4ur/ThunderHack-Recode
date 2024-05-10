@@ -1,9 +1,10 @@
-package thunder.hack.gui.notification;
+package thunder.hack.core.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.gui.notification.Notification;
 import thunder.hack.modules.client.Notifications;
 
 import java.util.List;

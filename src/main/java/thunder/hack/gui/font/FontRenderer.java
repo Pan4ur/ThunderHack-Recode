@@ -371,7 +371,11 @@ public class FontRenderer implements Closeable {
     }
 
     public void drawGradientString(MatrixStack stack, String s, float x, float y, int offset) {
-        drawString(stack, s, x, y, 255, 255, 255, 255, true, offset);
+        drawString(stack, s, x, y, 1f, 1f, 1f, 1f, true, offset);
+    }
+
+    public void drawGradientCenteredString(MatrixStack stack, String s, double x, double y, int offset) {
+        drawString(stack, s, (float) (x - getStringWidth(s) / 2f), (float) y, 1f, 1f, 1f, 1f,true, offset);
     }
 
     record DrawEntry(float atX, float atY, float r, float g, float b, Glyph toDraw) {

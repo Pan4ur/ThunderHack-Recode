@@ -19,6 +19,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
+import thunder.hack.modules.Module;
 
 import static thunder.hack.modules.Module.fullNullCheck;
 import static thunder.hack.modules.Module.mc;
@@ -43,9 +44,8 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "tick", at = @At("HEAD"))
     public void tickHook(CallbackInfo info) {
-        if (mc.player != null && mc.world != null) {
-            ThunderHack.EVENT_BUS.post(new PlayerUpdateEvent());
-        }
+        if(Module.fullNullCheck()) return;
+        ThunderHack.EVENT_BUS.post(new PlayerUpdateEvent());
     }
 
     @Redirect(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"), require = 0)
@@ -70,6 +70,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"), cancellable = true)
     public void onMoveHook(MovementType movementType, Vec3d movement, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         EventMove event = new EventMove(movement.x, movement.y, movement.z);
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) {
@@ -118,6 +119,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendMovementPackets()V", ordinal = 0, shift = At.Shift.AFTER), cancellable = true)
     private void PostUpdateHook(CallbackInfo info) {
+        if(Module.fullNullCheck()) return;
         if (updateLock) {
             return;
         }

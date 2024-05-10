@@ -39,12 +39,10 @@ public final class Blocker extends PlaceModule {
     private final Setting<Boolean> onBreak = new Setting<>("On Break", true).withParent(detect);
 
     private final List<BlockPos> placePositions = new CopyOnWriteArrayList<>();
-    private static Blocker instance;
     private int tickCounter = 0;
 
     public Blocker() {
         super("Blocker", Category.COMBAT);
-        instance = this;
     }
 
     @Override
@@ -122,10 +120,6 @@ public final class Blocker extends PlaceModule {
                 && antiAutoAnchor.getValue()) {
             placePositions.add(event.getBlockPos());
         }
-    }
-
-    public static Blocker getInstance() {
-        return instance;
     }
 
     private void doLogic(BlockPos pos) {

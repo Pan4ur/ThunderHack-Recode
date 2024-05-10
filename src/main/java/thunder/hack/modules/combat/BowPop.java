@@ -29,12 +29,10 @@ public final class BowPop extends Module {
     public final Setting<Boolean> snowballs = new Setting<>("Snowballs", true).withParent(selection);
 
     public static Timer delayTimer = new Timer();
-    private static BowPop instance;
     private final Random rnd = new Random();
 
     public BowPop() {
         super("BowPop", Category.COMBAT);
-        instance = this;
     }
 
     @EventHandler
@@ -103,10 +101,6 @@ public final class BowPop extends Module {
         int n = rnd.nextInt(29000000);
         if (rnd.nextBoolean()) return n;
         return -n;
-    }
-
-    public static BowPop getInstance() {
-        return instance;
     }
 
     private enum exploitEn {

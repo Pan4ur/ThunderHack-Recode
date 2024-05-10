@@ -40,9 +40,8 @@ public class ModuleButton extends AbstractButton {
     private boolean hovered, prevHovered;
     private float animation, animation2;
 
-    private Identifier Gear = new Identifier("textures/client.png");
-    private GearAnimation gearAnimation = new GearAnimation();
-
+    private final Identifier Gear = new Identifier("thunderhack", "textures/gui/headers/client.png");
+    private final GearAnimation gearAnimation = new GearAnimation();
 
     private boolean binding = false;
     private boolean holdbind = false;
@@ -178,7 +177,7 @@ public class ModuleButton extends AbstractButton {
             Render2DEngine.drawRect(context.getMatrices(), x + 4f, y + 1f, width - 8, height - 2, Render2DEngine.applyOpacity(HudEditor.plateColor.getValue().getColorObject().darker(), 0.15f));
         else {
 
-            switch (ClickGui.getInstance().gradientMode.getValue()) {
+            switch (ModuleManager.clickGui.gradientMode.getValue()) {
                 case both -> {
                     Render2DEngine.draw2DGradientRect(context.getMatrices(), x + 4, y + 1f, x + 4 + width - 8, y + 1f + height - 2,
                             Render2DEngine.applyOpacity(HudEditor.getColor(270), animation * 2f),
@@ -218,7 +217,7 @@ public class ModuleButton extends AbstractButton {
             if (binding)
                 FontRenderers.sf_medium_modules.drawString(context.getMatrices(), "PressKey", ix, iy + 2, module.isEnabled() ? Render2DEngine.applyOpacity(HudEditor.textColor2.getValue().getColor(), animation2) : Render2DEngine.applyOpacity(HudEditor.textColor.getValue().getColor(), animation2));
             else {
-                if (ClickGui.getInstance().textSide.getValue() == ClickGui.TextSide.Left)
+                if (ModuleManager.clickGui.textSide.getValue() == ClickGui.TextSide.Left)
                     FontRenderers.sf_medium_modules.drawString(context.getMatrices(), module.getName(), ix + 2, iy + 2, module.isEnabled() ? HudEditor.textColor2.getValue().getColor() : HudEditor.textColor.getValue().getColor());
                 else
                     FontRenderers.sf_medium_modules.drawCenteredString(context.getMatrices(), module.getName(), ix + getWidth() / 2 - 4, iy + 2, module.isEnabled() ? HudEditor.textColor2.getValue().getColor() : HudEditor.textColor.getValue().getColor());

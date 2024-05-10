@@ -36,12 +36,10 @@ public final class AutoBuff extends Module {
     private final Setting<Boolean> pauseAura = new Setting<>("PauseAura", false);
 
     public Timer timer = new Timer();
-    private static AutoBuff instance;
     private boolean spoofed = false;
 
     public AutoBuff() {
         super("AutoBuff", Category.COMBAT);
-        instance = this;
     }
 
     public static int getPotionSlot(Potions potion) {
@@ -78,10 +76,6 @@ public final class AutoBuff extends Module {
             }
         }
         return false;
-    }
-
-    public static AutoBuff getInstance() {
-        return instance;
     }
 
     @EventHandler

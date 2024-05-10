@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventFixVelocity;
+import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.HitBox;
 import thunder.hack.modules.render.Shaders;
 import thunder.hack.modules.render.Trails;
@@ -64,6 +65,7 @@ public abstract class MixinEntity implements IEntity {
 
     @Inject(method = "updateVelocity", at = {@At("HEAD")}, cancellable = true)
     public void updateVelocityHook(float speed, Vec3d movementInput, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
         if ((Object) this == mc.player) {
             ci.cancel();
             EventFixVelocity event = new EventFixVelocity(movementInput, speed, mc.player.getYaw(), movementInputToVelocityC(movementInput, speed, mc.player.getYaw()));

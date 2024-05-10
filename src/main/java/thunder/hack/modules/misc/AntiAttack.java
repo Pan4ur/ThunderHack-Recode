@@ -16,11 +16,8 @@ public final class AntiAttack extends Module {
     private final Setting<Boolean> friend = new Setting<>("Friend", true);
     private final Setting<Boolean> zoglin = new Setting<>("Zoglin", true);
 
-    private static AntiAttack instance;
-
     public AntiAttack() {
         super("AntiAttack", Category.PLAYER);
-        instance = this;
     }
 
     @EventHandler
@@ -34,9 +31,5 @@ public final class AntiAttack extends Module {
             if (entity instanceof ZombifiedPiglinEntity && zoglin.getValue())
                 e.cancel();
         }
-    }
-
-    public static AntiAttack getInstance() {
-        return instance;
     }
 }

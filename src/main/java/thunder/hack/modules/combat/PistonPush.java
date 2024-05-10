@@ -53,15 +53,8 @@ public final class PistonPush extends Module {
 
     private final ConcurrentHashMap<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
 
-    private static PistonPush instance;
-
     public PistonPush() {
         super("PistonPush", Category.COMBAT);
-        instance = this;
-    }
-
-    public static PistonPush getInstance() {
-        return instance;
     }
 
     @Override

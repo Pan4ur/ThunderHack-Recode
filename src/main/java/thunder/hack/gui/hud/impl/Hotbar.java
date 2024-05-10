@@ -33,8 +33,13 @@ public class Hotbar extends HudElement {
                 Render2DEngine.drawHudBase(matrices, i - 90, mc.getWindow().getScaledHeight() - 25, 180, 20, HudEditor.hudRound.getValue());
             } else if (lmode.getValue() == Mode.Merged) {
                 Render2DEngine.drawHudBase(matrices, i - 111, mc.getWindow().getScaledHeight() - 25, 201, 20, HudEditor.hudRound.getValue());
-                Render2DEngine.verticalGradient(matrices, i - 109 + 18, mc.getWindow().getScaledHeight() - 22 + 1 - 4, i - 108 + 18 - 0.5f, mc.getWindow().getScaledHeight() - 11 + 1 - 4, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
-                Render2DEngine.verticalGradient(matrices, i - 109 + 18, mc.getWindow().getScaledHeight() - 11 - 4, i - 108 + 18 - 0.5f, mc.getWindow().getScaledHeight() - 5, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+
+                if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+                    Render2DEngine.drawRect(context.getMatrices(), i - 109 + 18, mc.getWindow().getScaledHeight() - 23, 0.5f, 15, new Color(0x44FFFFFF, true));
+                } else {
+                    Render2DEngine.verticalGradient(matrices, i - 109 + 18, mc.getWindow().getScaledHeight() - 22 + 1 - 4, i - 108 + 18 - 0.5f, mc.getWindow().getScaledHeight() - 11 + 1 - 4, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
+                    Render2DEngine.verticalGradient(matrices, i - 109 + 18, mc.getWindow().getScaledHeight() - 11 - 4, i - 108 + 18 - 0.5f, mc.getWindow().getScaledHeight() - 5, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+                }
             } else {
                 Render2DEngine.drawHudBase(matrices,i - 90, mc.getWindow().getScaledHeight() - 25, 180, 20, HudEditor.hudRound.getValue());
                 Render2DEngine.drawHudBase(matrices, i - 112.5f, mc.getWindow().getScaledHeight() - 25, 20, 20, HudEditor.hudRound.getValue());
