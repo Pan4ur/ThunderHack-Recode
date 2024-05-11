@@ -1,15 +1,12 @@
 package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.EventPostSync;
@@ -24,6 +21,7 @@ import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
+import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.BlockAnimationUtility;
 
 import static thunder.hack.utility.player.InteractionUtility.BlockPosWithFacing;
@@ -32,12 +30,12 @@ import static thunder.hack.utility.player.InteractionUtility.checkNearBlocks;
 public class Scaffold extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("PlaceMode", InteractionUtility.PlaceMode.Normal, v -> !mode.is(Mode.Grim));
+    private final Setting<Switch> autoSwitch = new Setting<>("Switch", Switch.Silent);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", true);
     private final Setting<Boolean> lockY = new Setting<>("LockY", false);
-    private final Setting<Boolean> onlyNotHoldingSpace = new Setting<>("OnlyNotHoldingSpace", false, v-> lockY.getValue());
+    private final Setting<Boolean> onlyNotHoldingSpace = new Setting<>("OnlyNotHoldingSpace", false, v -> lockY.getValue());
     private final Setting<Boolean> autoJump = new Setting<>("AutoJump", false);
     private final Setting<Boolean> allowShift = new Setting<>("WorkWhileSneaking", false);
-    private final Setting<Boolean> autoswap = new Setting<>("AutoSwap", true);
     private final Setting<Boolean> tower = new Setting<>("Tower", true, v -> !mode.is(Mode.Grim));
     private final Setting<Boolean> safewalk = new Setting<>("SafeWalk", true, v -> !mode.is(Mode.Grim));
     private final Setting<Boolean> echestholding = new Setting<>("EchestHolding", false);
@@ -51,6 +49,10 @@ public class Scaffold extends Module {
 
     private enum Mode {
         NCP, StrictNCP, Grim
+    }
+
+    private enum Switch {
+        Normal, Silent, Inventory, None
     }
 
     private final Timer timer = new Timer();
@@ -133,30 +135,21 @@ public class Scaffold extends Module {
     }
 
     public void preAction() {
-        if (countValidBlocks() <= 0) {
-            currentblock = null;
-            return;
-        }
         currentblock = null;
 
         if (mc.player.isSneaking() && !allowShift.getValue()) return;
 
-        int n2 = findBlockToPlace();
-        if (n2 == -1) return;
+        if (prePlace(false) == -1) return;
 
-        Item item = mc.player.getInventory().getStack(n2).getItem();
-        if (!(item instanceof BlockItem)) return;
-
-        if(mc.options.jumpKey.isPressed() && !MovementUtility.isMoving())
+        if (mc.options.jumpKey.isPressed() && !MovementUtility.isMoving())
             prevY = (int) (Math.floor(mc.player.getY() - 1));
 
-        if(MovementUtility.isMoving() && autoJump.getValue()) {
-            if(mc.options.jumpKey.isPressed()) {
-                if(onlyNotHoldingSpace.getValue())
+        if (MovementUtility.isMoving() && autoJump.getValue()) {
+            if (mc.options.jumpKey.isPressed()) {
+                if (onlyNotHoldingSpace.getValue())
                     prevY = (int) (Math.floor(mc.player.getY() - 1));
-            } else if(mc.player.isOnGround()) {
+            } else if (mc.player.isOnGround())
                 mc.player.jump();
-            }
         }
 
         BlockPos blockPos2 = lockY.getValue() && prevY != -999 ?
@@ -189,17 +182,10 @@ public class Scaffold extends Module {
             return;
 
         if (currentblock == null) return;
-        int prev_item = mc.player.getInventory().selectedSlot;
 
-        if (!(mc.player.getMainHandStack().getItem() instanceof BlockItem)) {
-            if (autoswap.getValue()) {
-                int blockSlot = findBlockToPlace();
-                if (blockSlot != -1)
-                    InventoryUtility.switchTo(blockSlot);
-            }
-        }
+        int prevItem = prePlace(true);
 
-        if (mc.player.getMainHandStack().getItem() instanceof BlockItem block && block.getBlock().getDefaultState().isSolid()) {
+        if (prevItem != -1) {
             if (mc.player.input.jumping && !MovementUtility.isMoving() && tower.getValue() && !mode.is(Mode.Grim)) {
                 mc.player.setVelocity(0.0, 0.42, 0.0);
                 if (timer.passedMs(1500)) {
@@ -225,12 +211,13 @@ public class Scaffold extends Module {
             if (mode.is(Mode.Grim))
                 sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), rotations[0], rotations[1], mc.player.isOnGround()));
 
-            if (placeMode.getValue() == InteractionUtility.PlaceMode.Packet && !mode.is(Mode.Grim))
-                sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, bhr, id));
-            else
-                mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, bhr);
+            if (placeMode.getValue() == InteractionUtility.PlaceMode.Packet && !mode.is(Mode.Grim)) {
+                boolean finalIsOffhand = prevItem == -2;
+                sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(finalIsOffhand ? Hand.OFF_HAND : Hand.MAIN_HAND, bhr, id));
+            } else
+                mc.interactionManager.interactBlock(mc.player, prevItem == -2 ? Hand.OFF_HAND : Hand.MAIN_HAND, bhr);
 
-            mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+            mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(prevItem == -2 ? Hand.OFF_HAND : Hand.MAIN_HAND));
 
             prevY = currentblock.position().getY();
 
@@ -243,8 +230,7 @@ public class Scaffold extends Module {
             if (render.getValue())
                 BlockAnimationUtility.renderBlock(currentblock.position(), renderLineColor.getValue().getColorObject(), renderLineWidth.getValue(), renderFillColor.getValue().getColorObject(), animationMode.getValue(), renderMode.getValue());
 
-            if (!mode.is(Mode.StrictNCP))
-                InventoryUtility.switchTo(prev_item);
+            postPlace(prevItem);
         }
     }
 
@@ -293,40 +279,45 @@ public class Scaffold extends Module {
         return checkNearBlocks(blockPos.add(0, -1, -1));
     }
 
-    private int countValidBlocks() {
-        int n = 36;
-        int n2 = 0;
+    private int prePlace(boolean swap) {
+        if (mc.player == null || mc.world == null || mc.interactionManager == null)
+            return -1;
 
-        while (n < 45) {
-            if (!mc.player.getInventory().getStack(n >= 36 ? n - 36 : n).isEmpty()) {
-                ItemStack itemStack = mc.player.getInventory().getStack(n >= 36 ? n - 36 : n);
-                if (itemStack.getItem() instanceof BlockItem) {
-                    if (((BlockItem) itemStack.getItem()).getBlock().getDefaultState().isSolid())
-                        n2 += itemStack.getCount();
-                }
-            }
-            n++;
-        }
+        if (mc.player.getOffHandStack().getItem() instanceof BlockItem bi && !bi.getBlock().getDefaultState().isReplaceable())
+            return -2;
 
-        return n2;
-    }
+        int prevSlot = mc.player.getInventory().selectedSlot;
 
-    private int findBlockToPlace() {
-        if (mc.player.getMainHandStack().getItem() instanceof BlockItem) {
-            if (((BlockItem) mc.player.getMainHandStack().getItem()).getBlock().getDefaultState().isSolid())
-                return mc.player.getInventory().selectedSlot;
-        }
-        for (int i = 0; i < 9; i++) {
-            if (mc.player.getInventory().getStack(i).getCount() != 0) {
-                if (mc.player.getInventory().getStack(i).getItem() instanceof BlockItem) {
-                    if (!echestholding.getValue() || (echestholding.getValue() && !mc.player.getInventory().getStack(i).getItem().equals(Item.fromBlock(Blocks.ENDER_CHEST)))) {
-                        if (((BlockItem) mc.player.getInventory().getStack(i).getItem()).getBlock().getDefaultState().isSolid())
-                            return i;
+        SearchInvResult hotbarResult = InventoryUtility.findInHotBar(i -> i.getItem() instanceof BlockItem bi && !bi.getBlock().getDefaultState().isReplaceable());
+        SearchInvResult invResult = InventoryUtility.findInInventory(i -> i.getItem() instanceof BlockItem bi && !bi.getBlock().getDefaultState().isReplaceable());
+
+        if (swap)
+            switch (autoSwitch.getValue()) {
+                case Inventory -> {
+                    if (invResult.found()) {
+                        prevSlot = invResult.slot();
+                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+                        sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                     }
                 }
+                case Normal -> hotbarResult.switchTo();
+                case Silent -> hotbarResult.switchToSilent();
             }
+
+        return prevSlot;
+    }
+
+    private void postPlace(int prevSlot) {
+        if (prevSlot == -1 || prevSlot == -2)
+            return;
+
+        switch (autoSwitch.getValue()) {
+            case Inventory -> {
+                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
+                sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+            }
+            case Silent -> InventoryUtility.switchToSilent(prevSlot);
         }
-        return -1;
     }
 
     private boolean isOffsetBBEmpty(double x, double z) {
