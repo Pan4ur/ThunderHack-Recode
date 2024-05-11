@@ -33,12 +33,12 @@ vec4 blur() {
         }
     }
 
-    Color /= 80;
+    Color /= 80.0;
     return (Color + color1) * Brightness;
 }
 
 void main() {
     vec2 halfSize = uSize / 2.0;
-    float smoothedAlpha =  (1.0 - smoothstep(0.0, 1.0, roundedBoxSDF(gl_FragCoord.xy - uLocation - halfSize, halfSize, radius))) * 1f;
+    float smoothedAlpha =  (1.0 - smoothstep(0.0, 1.0, roundedBoxSDF(gl_FragCoord.xy - uLocation - halfSize, halfSize, radius)));
     fragColor = vec4(blur().rgb, smoothedAlpha);
 }
