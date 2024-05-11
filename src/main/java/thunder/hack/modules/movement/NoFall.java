@@ -6,6 +6,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.events.impl.EventSync;
+import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IPlayerMoveC2SPacket;
 import thunder.hack.modules.Module;
@@ -81,11 +82,6 @@ public class NoFall extends Module {
                     }
                 }
 
-                case Grim2b2t -> {
-                    sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY() + 0.000000001, mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), false));
-                    mc.player.onLanding();
-                }
-
                 case MatrixOffGround, Vanilla -> {
                     cancelGround = true;
                 }
@@ -99,6 +95,14 @@ public class NoFall extends Module {
             mc.player.swingHand(Hand.MAIN_HAND);
             InventoryUtility.returnSlot();
             retrieveFlag = false;
+        }
+    }
+
+    @EventHandler
+    public void onTick(EventTick e) {
+        if (mode.is(Mode.Grim2b2t) && isFalling()) {
+            sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY() + 0.000000001, mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), false));
+            mc.player.onLanding();
         }
     }
 
@@ -166,6 +170,9 @@ public class NoFall extends Module {
 
         if (mc.player.isFallFlying())
             return false;
+
+        if(mode.is(Mode.Grim2b2t))
+            return mc.player.fallDistance > 3f;
 
         switch (fallDistance.getValue()) {
             case Custom -> {

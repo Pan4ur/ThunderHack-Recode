@@ -31,7 +31,6 @@ public class Velocity extends Module {
     public Setting<Boolean> pauseInWater = new Setting<>("PauseInLiquids", false);
     public Setting<Boolean> explosions = new Setting<>("Explosions", true);
     public Setting<Boolean> cc = new Setting<>("PauseOnFlag", false);
-    public Setting<Boolean> fishingHook = new Setting<>("FishingHook", true);
     public Setting<Boolean> fire = new Setting<>("PauseOnFire", false);
     private final Setting<modeEn> mode = new Setting<>("Mode", modeEn.Matrix);
     public Setting<Float> vertical = new Setting<>("Vertical", 0.0f, 0.0f, 100.0f, v -> mode.getValue() == modeEn.Custom);
@@ -63,16 +62,6 @@ public class Velocity extends Module {
         if (ccCooldown > 0) {
             ccCooldown--;
             return;
-        }
-
-        if (e.getPacket() instanceof EntityStatusS2CPacket pac
-                && pac.getStatus() == 31
-                && pac.getEntity(mc.world) instanceof FishingBobberEntity
-                && fishingHook.getValue()) {
-            FishingBobberEntity fishHook = (FishingBobberEntity) pac.getEntity(mc.world);
-            if (fishHook.getHookedEntity() == mc.player) {
-                e.cancel();
-            }
         }
 
         // MAIN VELOCITY
