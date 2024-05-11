@@ -58,14 +58,11 @@ public class Notification {
             y = animate(y, getY);
             float x = mc.getWindow().getScaledWidth() - 6 - width + animationX;
 
-            Render2DEngine.verticalGradient(matrix, x + 25, y + 1, x + 25.5f, y + 12, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
-            Render2DEngine.verticalGradient(matrix, x + 25, y + 11, x + 25.5f, y + 22, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
-
             if(HudEditor.hudStyle.is(HudEditor.HudStyle.Glowing)) {
                 Render2DEngine.verticalGradient(matrix, x + 25, y + 1, x + 25.5f, y + 12, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
                 Render2DEngine.verticalGradient(matrix, x + 25, y + 11, x + 25.5f, y + 22, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
             } else {
-                Render2DEngine.drawRect(matrix, x + 25, y + 1, 0.5f, 11, Render2DEngine.injectAlpha(new Color(0x44FFFFFF, true), (int) (animatedAlpha * 0.1f)));
+                Render2DEngine.drawRect(matrix, x + 25, y + 2, 0.5f, 20, Render2DEngine.injectAlpha(new Color(0x44FFFFFF, true), (int) (animatedAlpha * 0.1f)));
             }
 
             FontRenderers.sf_bold_mini.drawString(matrix, title, x + 30, y + 6, HudEditor.textColor.getValue().getColor());
