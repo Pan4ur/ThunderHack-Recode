@@ -3,6 +3,7 @@ package thunder.hack.injection;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.FireBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -23,6 +24,8 @@ public abstract class MixinBlock {
     private static void shouldDrawSideHook(BlockState state, BlockView world, BlockPos pos, Direction side, BlockPos blockPos, CallbackInfoReturnable<Boolean> cir) {
         if (ModuleManager.xray.isEnabled() && ModuleManager.xray.wallHack.getValue())
             cir.setReturnValue(XRay.isCheckableOre(state.getBlock()));
+        if(ModuleManager.autoAnchor.isEnabled() && state.getBlock() instanceof FireBlock)
+            cir.setReturnValue(false);
     }
 
     /*

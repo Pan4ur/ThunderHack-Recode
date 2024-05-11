@@ -19,11 +19,6 @@ import static thunder.hack.modules.Module.mc;
 public abstract class MixinWorld {
     @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)
     public void blockStateHook(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
-        if ((ExplosionUtility.anchorIgnore != null && ExplosionUtility.anchorIgnore == pos)) {
-            cir.setReturnValue(Blocks.AIR.getDefaultState());
-            return;
-        }
-
         if (ExplosionUtility.terrainIgnore && mc.world != null && !mc.world.isInBuildLimit(pos)) {
             WorldChunk worldChunk = mc.world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
 

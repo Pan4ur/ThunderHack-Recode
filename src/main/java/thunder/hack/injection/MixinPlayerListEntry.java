@@ -11,8 +11,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.utility.OptifineCapes;
+import thunder.hack.utility.ThunderUtility;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -63,6 +65,12 @@ public class MixinPlayerListEntry {
                 }
             } catch (Exception ignored) {
             }
+
+            for(String str : ThunderUtility.starGazer) {
+                if(profile.getName().toLowerCase().equals(str.toLowerCase()))
+                    customCapeTexture = new Identifier("thunderhack", "textures/capes/starcape.png");
+            }
+
             if (ModuleManager.optifineCapes.isEnabled())
                 OptifineCapes.loadPlayerCape(profile, id -> {
                     customCapeTexture = id;

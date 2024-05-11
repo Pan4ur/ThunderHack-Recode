@@ -26,6 +26,7 @@ import thunder.hack.gui.hud.HudEditorGui;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.combat.Aura;
+import thunder.hack.modules.combat.AutoAnchor;
 import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.modules.misc.NameProtect;
 import thunder.hack.setting.Setting;
@@ -145,7 +146,14 @@ public class TargetHud extends HudElement {
                 target = null;
                 direction = false;
             }
-        } else if (mc.currentScreen instanceof ChatScreen || mc.currentScreen instanceof HudEditorGui) {
+        } else if (AutoAnchor.target != null) {
+            target = AutoAnchor.target;
+            direction = true;
+            if (AutoAnchor.target.isDead()) {
+                AutoAnchor.target = null;
+                return;
+            }
+        }else if (mc.currentScreen instanceof ChatScreen || mc.currentScreen instanceof HudEditorGui) {
             target = mc.player;
             direction = true;
         } else {

@@ -72,7 +72,7 @@ public class FakePlayer extends Module {
     public void onPacketReceive(PacketEvent.Receive e) {
         if (e.getPacket() instanceof ExplosionS2CPacket explosion && fakePlayer != null && fakePlayer.hurtTime == 0) {
             fakePlayer.onDamaged(mc.world.getDamageSources().generic());
-            fakePlayer.setHealth(fakePlayer.getHealth() + fakePlayer.getAbsorptionAmount() - ExplosionUtility.getAutoCrystalDamage(new Vec3d(explosion.getX(), explosion.getY(), explosion.getZ()), fakePlayer));
+            fakePlayer.setHealth(fakePlayer.getHealth() + fakePlayer.getAbsorptionAmount() - ExplosionUtility.getAutoCrystalDamage(new Vec3d(explosion.getX(), explosion.getY(), explosion.getZ()), fakePlayer, 0, false));
             if (fakePlayer.isDead()) {
                 if (fakePlayer.tryUseTotem(mc.world.getDamageSources().generic())) {
                     fakePlayer.setHealth(10f);

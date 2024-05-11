@@ -17,10 +17,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.explosion.Explosion;
-import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.injection.accesors.IExplosion;
-import thunder.hack.modules.combat.AutoAnchor;
-import thunder.hack.modules.combat.AutoCrystal;
 
 import java.util.Objects;
 
@@ -28,66 +25,20 @@ import static thunder.hack.modules.Module.mc;
 
 public final class ExplosionUtility {
 
-
     public static boolean terrainIgnore = false;
-    public static BlockPos anchorIgnore = null;
-    public static BlockPos setToAir = null;
-
     public static Explosion explosion;
-
 
     /**
      * Calculate target damage based on crystal position and target. Uses AutoCrystal settings so use only in AutoCrystal
      *
      * @param crystalPos the position of the crystal whose damage is to be calculated
      * @param target     the damage will be calculated on this entity
+     * @param optimized    use light calculate
      * @return damage value in Float format
      */
-    public static float getAutoCrystalDamage(Vec3d crystalPos, PlayerEntity target) {
-        if (AutoCrystal.predictTicks.getValue() == 0) return getExplosionDamage(crystalPos, target);
-        return getExplosionDamageWPredict(crystalPos, target, PredictUtility.predictPlayer(target, AutoCrystal.predictTicks.getValue()));
-    }
-
-
-    /**
-     * Calculate target damage based on anchor position and target. Uses AutoAnchor settings so use only in AutoAnchor
-     *
-     * @param anchorPos the position of the anchor whose damage is to be calculated
-     * @param target    the damage will be calculated on this entity
-     * @return damage value in Float format
-     */
-    public static float getAnchorExplosionDamage(BlockPos anchorPos, PlayerEntity target) {
-        float final_result;
-        anchorIgnore = anchorPos;
-        terrainIgnore = true;
-
-        if (AutoAnchor.predictTicks.getValue() == 0)
-            final_result = getExplosionDamage(anchorPos.up().toCenterPos(), target);
-        else
-            final_result = getExplosionDamageWPredict(anchorPos.toCenterPos(), target, PredictUtility.predictPlayer(target, AutoAnchor.predictTicks.getValue()));
-
-        anchorIgnore = null;
-        terrainIgnore = false;
-        return final_result;
-    }
-
-    /**
-     * Calculate target damage based on anchor position and target. Uses AutoAnchor settings so use only in AutoAnchor
-     *
-     * @param obsidianPos the position of the anchor whose damage is to be calculated
-     * @param target      the damage will be calculated on this entity
-     * @return damage value in Float format
-     */
-    public static float getExplosionDamageWithRemove(BlockPos obsidianPos, PlayerEntity target) {
-        float final_result;
-        setToAir = obsidianPos;
-        terrainIgnore = true;
-
-        final_result = getExplosionDamage(obsidianPos.toCenterPos().add(0, 0.5, 0), target);
-
-        setToAir = null;
-        terrainIgnore = false;
-        return final_result;
+    public static float getAutoCrystalDamage(Vec3d crystalPos, PlayerEntity target, int predictTicks, boolean optimized) {
+        if (predictTicks == 0) return getExplosionDamage(crystalPos, target, optimized);
+        return getExplosionDamageWPredict(crystalPos, target, PredictUtility.predictPlayer(target, predictTicks), optimized);
     }
 
     /**
@@ -95,13 +46,14 @@ public final class ExplosionUtility {
      *
      * @param explosionPos the position of the explosion whose damage is to be calculated
      * @param predictTicks the number of game ticks for which the player's position should be predicted
+     * @param optimized    use light calculate
      * @return damage value in Float format
      */
-    public static float getSelfExplosionDamage(Vec3d explosionPos, int predictTicks) {
+    public static float getSelfExplosionDamage(Vec3d explosionPos, int predictTicks, boolean optimized) {
         if (predictTicks == 0)
-            return getExplosionDamage(explosionPos, mc.player);
+            return getExplosionDamage(explosionPos, mc.player, optimized);
         else
-            return getExplosionDamageWPredict(explosionPos, mc.player, PredictUtility.predictPlayer(mc.player, predictTicks));
+            return getExplosionDamageWPredict(explosionPos, mc.player, PredictUtility.predictPlayer(mc.player, predictTicks), optimized);
     }
 
     /**
@@ -109,9 +61,10 @@ public final class ExplosionUtility {
      *
      * @param explosionPos the position of the explosion whose damage is to be calculated
      * @param target       the damage will be calculated on this entity
+     * @param optimized    use light calculate
      * @return damage value in Float format
      */
-    public static float getExplosionDamage(Vec3d explosionPos, PlayerEntity target) {
+    public static float getExplosionDamage(Vec3d explosionPos, PlayerEntity target, boolean optimized) {
         if (mc.world.getDifficulty() == Difficulty.PEACEFUL || target == null)
             return 0f;
 
@@ -132,7 +85,7 @@ public final class ExplosionUtility {
             double distExposure = (float) target.squaredDistanceTo(explosionPos) / 144;
             if (distExposure <= 1.0) {
                 terrainIgnore = true;
-                double exposure = getExposure(explosionPos, target);
+                double exposure = getExposure(explosionPos, target, optimized);
                 terrainIgnore = false;
                 double finalExposure = (1.0 - distExposure) * exposure;
 
@@ -169,7 +122,7 @@ public final class ExplosionUtility {
      * @param predict      predicted copy of target
      * @return damage value in Float format
      */
-    public static float getExplosionDamageWPredict(Vec3d explosionPos, PlayerEntity target, PlayerEntity predict) {
+    public static float getExplosionDamageWPredict(Vec3d explosionPos, PlayerEntity target, PlayerEntity predict, boolean optimized) {
         if (mc.world.getDifficulty() == Difficulty.PEACEFUL)
             return 0f;
 
@@ -193,7 +146,7 @@ public final class ExplosionUtility {
             double distExposure = MathHelper.sqrt((float) predict.squaredDistanceTo(explosionPos)) / 12d;
             if (distExposure <= 1.0) {
                 terrainIgnore = true;
-                double exposure = getExposure(explosionPos, predict);
+                double exposure = getExposure(explosionPos, predict, optimized);
                 terrainIgnore = false;
                 double finalExposure = (1.0 - distExposure) * exposure;
 
@@ -322,14 +275,6 @@ public final class ExplosionUtility {
         return 0f;
     }
 
-    public float calculateDamage(Explosion explosion, Entity entity) {
-        float f = explosion.getPower() * 2.0f;
-        Vec3d vec3d = explosion.getPosition();
-        double d = Math.sqrt(entity.squaredDistanceTo(vec3d)) / (double) f;
-        double e = (1.0 - d) * (double) Explosion.getExposure(vec3d, entity);
-        return (float) ((e * e + e) / 2.0 * 7.0 * (double) f + 1.0);
-    }
-
     private static float getExposureGhost(Vec3d source, Entity entity, BlockPos pos) {
         Box box = entity.getBoundingBox();
         double d = 1.0 / ((box.maxX - box.minX) * 2.0 + 1.0);
@@ -359,8 +304,8 @@ public final class ExplosionUtility {
         return (float) i / (float) j;
     }
 
-    public static float getExposure(Vec3d source, Entity entity) {
-        if (!ModuleManager.autoCrystal.useOptimizedCalc.getValue())
+    public static float getExposure(Vec3d source, Entity entity, boolean optimized) {
+        if (!optimized)
             return Explosion.getExposure(source, entity);
 
         Box box = entity.getBoundingBox();

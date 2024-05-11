@@ -202,8 +202,8 @@ public final class AutoBed extends Module {
                     BlockHitResult bhr = getInteractResult(b);
 
                     mc.world.removeBlock(b, false);
-                    float damage = ExplosionUtility.getExplosionDamage(b.toCenterPos().add(0, -0.5, 0), target);
-                    float selfDamage = ExplosionUtility.getExplosionDamage(b.toCenterPos().add(0, -0.5, 0), mc.player);
+                    float damage = ExplosionUtility.getExplosionDamage(b.toCenterPos().add(0, -0.5, 0), target, false);
+                    float selfDamage = ExplosionUtility.getExplosionDamage(b.toCenterPos().add(0, -0.5, 0), mc.player, false);
                     mc.world.setBlockState(b, state);
 
                     if (damage < minDamage.getValue())
@@ -248,8 +248,8 @@ public final class AutoBed extends Module {
                         if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != b)
                             continue;
 
-                        float damage = ExplosionUtility.getExplosionDamage(b.up().toCenterPos().add(0, -0.5, 0), target);
-                        float selfDamage = ExplosionUtility.getExplosionDamage(b.up().toCenterPos().add(0, -0.5, 0), mc.player);
+                        float damage = ExplosionUtility.getExplosionDamage(b.up().toCenterPos().add(0, -0.5, 0), target, false);
+                        float selfDamage = ExplosionUtility.getExplosionDamage(b.up().toCenterPos().add(0, -0.5, 0), mc.player, false);
 
                         if (damage < minDamage.getValue())
                             continue;
@@ -274,8 +274,8 @@ public final class AutoBed extends Module {
                             if(!mc.world.getBlockState(offset).isReplaceable())
                                 continue;
 
-                            float dirdamage = ExplosionUtility.getExplosionDamage(offset.toCenterPos().add(0, -0.5, 0), target);
-                            float dirSelfDamage = ExplosionUtility.getExplosionDamage(offset.toCenterPos().add(0, -0.5, 0), mc.player);
+                            float dirdamage = ExplosionUtility.getExplosionDamage(offset.toCenterPos().add(0, -0.5, 0), target, false);
+                            float dirSelfDamage = ExplosionUtility.getExplosionDamage(offset.toCenterPos().add(0, -0.5, 0), mc.player, false);
                             if (dirdamage > bestDirdmg && dirSelfDamage <= maxSelfDamage.getValue()) {
                                 bestDir = dir;
                                 bestDirdmg = dirdamage;

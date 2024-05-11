@@ -95,7 +95,7 @@ public final class AutoTotem extends Module {
         if (e.getPacket() instanceof EntitySpawnS2CPacket spawn && hotbarFallBack.getValue()) {
             if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
                 if (getPlayerPos().squaredDistanceTo(spawn.getX(), spawn.getY(), spawn.getZ()) < 36) {
-                    if (fallBackCalc.getValue() && ExplosionUtility.getExplosionDamageWPredict(new Vec3d(spawn.getX(), spawn.getY(), spawn.getZ()), mc.player, PredictUtility.movePlayer(mc.player, getPlayerPos())) < getTriggerHealth() + 4f)
+                    if (fallBackCalc.getValue() && ExplosionUtility.getExplosionDamageWPredict(new Vec3d(spawn.getX(), spawn.getY(), spawn.getZ()), mc.player, PredictUtility.movePlayer(mc.player, getPlayerPos()), false) < getTriggerHealth() + 4f)
                         return;
                     runInstant();
                 }
@@ -331,7 +331,7 @@ public final class AutoTotem extends Module {
 
             if (onCrystal.getValue()) {
                 if (entity instanceof EndCrystalEntity) {
-                    if (getTriggerHealth() - ExplosionUtility.getExplosionDamageWPredict(entity.getPos(), mc.player, PredictUtility.movePlayer(mc.player, getPlayerPos())) < 0.5) {
+                    if (getTriggerHealth() - ExplosionUtility.getExplosionDamageWPredict(entity.getPos(), mc.player, PredictUtility.movePlayer(mc.player, getPlayerPos()), false) < 0.5) {
                         item = Items.TOTEM_OF_UNDYING;
                         break;
                     }

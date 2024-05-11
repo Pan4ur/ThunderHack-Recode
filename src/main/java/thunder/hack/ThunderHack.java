@@ -104,6 +104,7 @@ public class ThunderHack implements ModInitializer {
         syncVersion();
         syncContributors();
         ThunderUtility.parseChangeLog();
+        ThunderUtility.parseStarGazer();
         ModuleManager.rpc.startRpc();
 
         LogUtils.getLogger().info("""
