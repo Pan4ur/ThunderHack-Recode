@@ -73,6 +73,7 @@ public class AutoCrystal extends Module {
 
     /*   PLACE   */
     private final Setting<Interact> interact = new Setting<>("Interact", Interact.Default, v -> page.getValue() == Pages.Place);
+    private final Setting<Boolean> rayTraceBypass = new Setting<>("RayTraceBypass", false, v -> page.getValue() == Pages.Place);
     private final Setting<Boolean> strictCenter = new Setting<>("StrictCenter", true, v -> page.getValue() == Pages.Place && interact.getValue() == Interact.Strict);
     private final Setting<Boolean> oldVer = new Setting<>("1.12", false, v -> page.getValue() == Pages.Place);
     private final Setting<Boolean> ccPlace = new Setting<>("CC", true, v -> page.getValue() == Pages.Place);
@@ -251,8 +252,9 @@ public class AutoCrystal extends Module {
 
         // Rotate
         if (rotate.getValue() && mc.player != null && rotationYaw != mc.player.getYaw() && rotationPitch != mc.player.getPitch()) {
+            if(mc.player.age % 5 == 0 && rayTraceBypass.getValue()) mc.player.setPitch(-90);
+            else mc.player.setPitch(rotationPitch);
             mc.player.setYaw(rotationYaw);
-            mc.player.setPitch(rotationPitch);
         }
     }
 
