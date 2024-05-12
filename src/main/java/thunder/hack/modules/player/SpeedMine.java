@@ -324,7 +324,7 @@ public final class SpeedMine extends Module {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     @SuppressWarnings("unused")
     private void onSync(EventSync event) {
         if (rotate.getValue() && progress > 0.95 && minePosition != null && mc.player != null) {
