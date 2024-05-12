@@ -39,49 +39,6 @@ public final class InventoryUtility {
         return counter;
     }
 
-    public static SearchInvResult getCrystal() {
-        if (mc.player == null) return SearchInvResult.notFound();
-
-        if (mc.player.getMainHandStack().getItem() == Items.END_CRYSTAL) {
-            return new SearchInvResult(mc.player.getInventory().selectedSlot, true, mc.player.getMainHandStack());
-        }
-
-        return findItemInHotBar(Items.END_CRYSTAL);
-    }
-
-    public static SearchInvResult getXp() {
-        if (mc.player == null) return SearchInvResult.notFound();
-
-        ItemStack stack = mc.player.getMainHandStack();
-        if (!stack.isEmpty() && stack.getItem() instanceof ExperienceBottleItem) {
-            return new SearchInvResult(mc.player.getInventory().selectedSlot, true, stack);
-        }
-
-        return findItemInHotBar(Items.EXPERIENCE_BOTTLE);
-    }
-
-    public static SearchInvResult getAnchor() {
-        if (mc.player == null) return SearchInvResult.notFound();
-
-        ItemStack stack = mc.player.getMainHandStack();
-        if (!stack.isEmpty() && stack.getItem().equals(Items.RESPAWN_ANCHOR)) {
-            return new SearchInvResult(mc.player.getInventory().selectedSlot, true, stack);
-        }
-
-        return findItemInHotBar(Items.RESPAWN_ANCHOR);
-    }
-
-    public static SearchInvResult getGlowStone() {
-        if (mc.player == null) return SearchInvResult.notFound();
-
-        ItemStack stack = mc.player.getMainHandStack();
-        if (!stack.isEmpty() && stack.getItem().equals(Items.GLOWSTONE)) {
-            return new SearchInvResult(mc.player.getInventory().selectedSlot, true, stack);
-        }
-
-        return findItemInHotBar(Items.GLOWSTONE);
-    }
-
     public static SearchInvResult getAxe() {
         if (mc.player == null) return SearchInvResult.notFound();
         int slot = -1;
@@ -251,14 +208,10 @@ public final class InventoryUtility {
     }
 
 
-    // Needs rewrite
-    @Deprecated
     public static int getElytra() {
-        for (ItemStack stack : mc.player.getInventory().armor) {
-            if (stack.getItem() == Items.ELYTRA && stack.getDamage() < 430) {
+        for (ItemStack stack : mc.player.getInventory().armor)
+            if (stack.getItem() == Items.ELYTRA && stack.getDamage() < 430)
                 return -2;
-            }
-        }
 
         int slot = -1;
         for (int i = 0; i < 36; i++) {
@@ -269,9 +222,8 @@ public final class InventoryUtility {
             }
         }
 
-        if (slot < 9 && slot != -1) {
+        if (slot < 9 && slot != -1)
             slot = slot + 36;
-        }
 
         return slot;
     }

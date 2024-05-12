@@ -169,6 +169,9 @@ public class Trajectories extends Module {
                 Render3DEngine.FILLED_SIDE_QUEUE.add(new Render3DEngine.FillSideAction(
                         new Box(bhr.getBlockPos()), lmode.getValue() == Mode.Sync ? Render2DEngine.injectAlpha(HudEditor.getColor(i * 10), 100) : lcolor.getValue().getColorObject(), bhr.getSide()
                 ));
+
+
+
                 break;
             }
 

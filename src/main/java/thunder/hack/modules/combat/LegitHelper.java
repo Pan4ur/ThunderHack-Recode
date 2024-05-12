@@ -59,8 +59,8 @@ public class LegitHelper extends Module {
     @Override
     public void onUpdate() {
         if (anchors.getValue().isEnabled() && isKeyPressed(anchorBind) && timer.every(anchorDelay.getValue() * 5L + 100)) {
-            int glowSlot = InventoryUtility.getGlowStone().slot();
-            int anchorSlot = InventoryUtility.getAnchor().slot();
+            int glowSlot = InventoryUtility.findItemInHotBar(Items.GLOWSTONE).slot();
+            int anchorSlot = InventoryUtility.findItemInHotBar(Items.RESPAWN_ANCHOR).slot();
             if (glowSlot == -1 || anchorSlot == -1) return;
 
             int prevSlot = mc.player.getInventory().selectedSlot;

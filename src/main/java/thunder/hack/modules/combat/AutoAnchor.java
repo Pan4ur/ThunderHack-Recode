@@ -371,7 +371,7 @@ public final class AutoAnchor extends Module {
         if (autoSwitch.is(Switch.NONE) && !offhand && !mainHand)
             return true;
 
-        if ((autoSwitch.is(Switch.SILENT) || autoSwitch.is(Switch.NORMAL)) && !InventoryUtility.getAnchor().found() && !offhand)
+        if ((autoSwitch.is(Switch.SILENT) || autoSwitch.is(Switch.NORMAL)) && !InventoryUtility.findItemInHotBar(Items.RESPAWN_ANCHOR).found() && !offhand)
             return true;
 
         if (autoSwitch.is(Switch.INVENTORY) && !InventoryUtility.findItemInInventory(Items.RESPAWN_ANCHOR).found() && !offhand)
@@ -380,7 +380,7 @@ public final class AutoAnchor extends Module {
         if (autoSwitch.is(Switch.NONE) && !offhandGlow && !mainHandGlow)
             return true;
 
-        if ((autoSwitch.is(Switch.SILENT) || autoSwitch.is(Switch.NORMAL)) && !InventoryUtility.getGlowStone().found() && !offhandGlow)
+        if ((autoSwitch.is(Switch.SILENT) || autoSwitch.is(Switch.NORMAL)) && !InventoryUtility.findItemInHotBar(Items.GLOWSTONE).found() && !offhandGlow)
             return true;
 
         if (autoSwitch.is(Switch.INVENTORY) && !InventoryUtility.findItemInInventory(Items.GLOWSTONE).found() && !offhandGlow)

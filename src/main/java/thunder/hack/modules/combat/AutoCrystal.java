@@ -445,7 +445,7 @@ public class AutoCrystal extends Module {
         if (autoSwitch.is(Switch.NONE) && !offhand && !mainHand)
             return true;
 
-        if ((autoSwitch.is(Switch.SILENT) || autoSwitch.is(Switch.NORMAL)) && !InventoryUtility.getCrystal().found() && !offhand)
+        if ((autoSwitch.is(Switch.SILENT) || autoSwitch.is(Switch.NORMAL)) && !InventoryUtility.findItemInHotBar(Items.END_CRYSTAL).found() && !offhand)
             return true;
 
         if (autoSwitch.is(Switch.INVENTORY) && !InventoryUtility.findItemInInventory(Items.END_CRYSTAL).found() && !offhand)

@@ -33,7 +33,7 @@ vec4 blur() {
         }
     }
 
-    Color /= 80.0;
+    Color /= 80;
     return (Color + color1) * Brightness;
 }
 

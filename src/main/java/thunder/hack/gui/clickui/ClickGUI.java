@@ -16,6 +16,7 @@ import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 
@@ -91,6 +92,7 @@ public class ClickGUI extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+
         if (ModuleManager.clickGui.blur.getValue())
             applyBlur(delta);
 

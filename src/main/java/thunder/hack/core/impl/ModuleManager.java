@@ -18,10 +18,15 @@ import thunder.hack.modules.movement.*;
 import thunder.hack.modules.player.*;
 import thunder.hack.modules.render.Particles;
 import thunder.hack.modules.render.*;
+import thunder.hack.utility.render.Render2DEngine;
 
+import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
+
+import static thunder.hack.modules.Module.mc;
 
 @SuppressWarnings("unused")
 public class ModuleManager implements IManager {
