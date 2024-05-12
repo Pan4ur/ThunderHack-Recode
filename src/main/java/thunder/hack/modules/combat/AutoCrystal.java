@@ -7,8 +7,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -22,6 +25,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
+import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -29,7 +33,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CombatManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
-import thunder.hack.injection.accesors.IClientPlayerEntity;
+import thunder.hack.injection.accesors.IExplosion;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.player.SpeedMine;
@@ -56,7 +60,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
-import static thunder.hack.utility.math.MathUtility.random;
 
 public class AutoCrystal extends Module {
     /*   MAIN   */
@@ -105,6 +108,7 @@ public class AutoCrystal extends Module {
 
     /*   DAMAGES   */
     public final Setting<Sort> sort = new Setting<>("Sort", Sort.DAMAGE, v -> page.getValue() == Pages.Damages);
+    public final Setting<Boolean> assumeBestArmor = new Setting<>("AssumeBestArmor", false, v -> page.getValue() == Pages.Damages);
     public final Setting<Float> minDamage = new Setting<>("MinDamage", 6.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
     public final Setting<Float> maxSelfDamage = new Setting<>("MaxSelfDamage", 10.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
     private final Setting<Safety> safety = new Setting<>("Safety", Safety.NONE, v -> page.getValue() == Pages.Damages);
@@ -211,7 +215,7 @@ public class AutoCrystal extends Module {
             getCrystalToExplode();
         });
 
-        if(timing.is(Timing.NORMAL)) {
+        if (timing.is(Timing.NORMAL)) {
             if (bestPosition != null && placeTimer.passedMs(facePlacing ? lowPlaceDelay.getValue() : (placeDelay.getValue())))
                 placeCrystal(bestPosition, false);
 
@@ -252,7 +256,7 @@ public class AutoCrystal extends Module {
 
         // Rotate
         if (rotate.getValue() && mc.player != null && rotationYaw != mc.player.getYaw() && rotationPitch != mc.player.getPitch()) {
-            if(mc.player.age % 5 == 0 && rayTraceBypass.getValue()) mc.player.setPitch(-90);
+            if (mc.player.age % 5 == 0 && rayTraceBypass.getValue()) mc.player.setPitch(-90);
             else mc.player.setPitch(rotationPitch);
             mc.player.setYaw(rotationYaw);
         }
@@ -260,7 +264,7 @@ public class AutoCrystal extends Module {
 
     @EventHandler
     public void onPostSync(EventPostSync e) {
-        if(timing.is(Timing.SEQUENTIAL)) {
+        if (timing.is(Timing.SEQUENTIAL)) {
             if (bestPosition != null && placeTimer.passedMs(facePlacing ? lowPlaceDelay.getValue() : (placeDelay.getValue())))
                 placeCrystal(bestPosition, false);
 
@@ -358,7 +362,7 @@ public class AutoCrystal extends Module {
 
             float yawStepVal = 180f;
 
-            if(yawStep.getValue().isEnabled())
+            if (yawStep.getValue().isEnabled())
                 yawStepVal = yawAngle.getValue();
 
             float clampedYawDelta = MathHelper.clamp(MathHelper.abs(yawDelta), -yawStepVal, yawStepVal);

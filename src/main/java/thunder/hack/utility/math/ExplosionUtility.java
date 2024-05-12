@@ -17,7 +17,9 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.explosion.Explosion;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.injection.accesors.IExplosion;
+import thunder.hack.modules.combat.AutoCrystal;
 
 import java.util.Objects;
 
@@ -104,7 +106,7 @@ public final class ExplosionUtility {
 
                 if (toDamage <= 0f) toDamage = 0f;
                 else {
-                    int protAmount = EnchantmentHelper.getProtectionAmount(target.getArmorItems(), mc.world.getDamageSources().explosion(explosion));
+                    int protAmount = ModuleManager.autoCrystal.assumeBestArmor.getValue() ? 32 : EnchantmentHelper.getProtectionAmount(target.getArmorItems(), mc.world.getDamageSources().explosion(explosion));
                     if (protAmount > 0)
                         toDamage = DamageUtil.getInflictedDamage(toDamage, protAmount);
                 }
@@ -166,7 +168,7 @@ public final class ExplosionUtility {
                 if (toDamage <= 0f)
                     toDamage = 0f;
                 else {
-                    int protAmount = EnchantmentHelper.getProtectionAmount(target.getArmorItems(), mc.world.getDamageSources().explosion(explosion));
+                    int protAmount = ModuleManager.autoCrystal.assumeBestArmor.getValue() ? 32 : EnchantmentHelper.getProtectionAmount(target.getArmorItems(), mc.world.getDamageSources().explosion(explosion));
                     if (protAmount > 0)
                         toDamage = DamageUtil.getInflictedDamage(toDamage, protAmount);
                 }
@@ -264,10 +266,9 @@ public final class ExplosionUtility {
 
                 if (toDamage <= 0f) toDamage = 0f;
                 else {
-                    int protAmount = EnchantmentHelper.getProtectionAmount(target.getArmorItems(), mc.world.getDamageSources().explosion(explosion));
-                    if (protAmount > 0) {
+                    int protAmount = ModuleManager.autoCrystal.assumeBestArmor.getValue() ? 32 : EnchantmentHelper.getProtectionAmount(target.getArmorItems(), mc.world.getDamageSources().explosion(explosion));
+                    if (protAmount > 0)
                         toDamage = DamageUtil.getInflictedDamage(toDamage, protAmount);
-                    }
                 }
                 return toDamage;
             }
