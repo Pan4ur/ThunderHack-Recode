@@ -380,9 +380,12 @@ public final class SpeedMine extends Module {
             BlockState currentState = mc.world.getBlockState(pos);
             mc.world.removeBlock(pos, false);
             float dmg = ExplosionUtility.getExplosionDamage(pos.toCenterPos(), player, false);
+            float selfDamage = ExplosionUtility.getExplosionDamage(pos.toCenterPos(), mc.player, false);
             mc.world.setBlockState(pos, currentState);
 
-            if (dmg > damage)
+            boolean overrideDamage = ModuleManager.autoCrystal.shouldOverrideDamage(damage, selfDamage);
+
+            if (dmg > damage && ModuleManager.autoCrystal.isSafe(dmg, selfDamage, overrideDamage))
                 return true;
         }
 
