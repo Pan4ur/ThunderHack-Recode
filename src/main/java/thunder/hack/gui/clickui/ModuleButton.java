@@ -23,6 +23,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.*;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.animation.AnimationUtility;
 import thunder.hack.utility.render.animation.GearAnimation;
 
 import java.awt.*;
@@ -39,6 +40,7 @@ public class ModuleButton extends AbstractButton {
     private boolean open;
     private boolean hovered, prevHovered;
     private float animation, animation2;
+    float category_animation = 0f;
 
     private final Identifier Gear = new Identifier("thunderhack", "textures/gui/headers/client.png");
     private final GearAnimation gearAnimation = new GearAnimation();
@@ -91,14 +93,14 @@ public class ModuleButton extends AbstractButton {
         float ix = x + 5;
         float iy = y + height / 2f - 3f;
 
-        offset_animation = fast(1f, 0f, 15f);
-        if (target_offset != offsetY) {
-            offsetY = (float) interp(offsetY, target_offset, offset_animation);
-        } else offset_animation = 1f;
+        if (target_offset > offsetY)
+            offsetY += (float) (((target_offset - offsetY) / 8f) * (AnimationUtility.deltaTime() * 90));
+        else if (target_offset < offsetY)
+            offsetY -= (float) (((offsetY - target_offset) / 8f) * (AnimationUtility.deltaTime() * 90));
 
         if (isOpen()) {
             Render2DEngine.drawGuiBase(context.getMatrices(), x + 4, y + 2f, width - 8, height + (float) getElementsHeight(), 1f, 0);
-            Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle(x + 1, y + height - 15, width + x - 2, (float) (height + y + 1f + getElementsHeight())));
+            Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle(x + 1, y + height, width + x - 2, (float) (height + y + 1f + getElementsHeight())));
 
             if (mc.player != null && ModuleManager.clickGui.gear.getValue().isEnabled()) {
                 Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle(x, y + height + 1, (width) + x + 6, (float) ((height) + y + 1f + getElementsHeight())));
@@ -130,7 +132,7 @@ public class ModuleButton extends AbstractButton {
             }
 
             context.getMatrices().push();
-            TargetHud.sizeAnimation(context.getMatrices(), x + width / 2 + 6, y + height / 2 - 12, 1f - category_animation);
+            TargetHud.sizeAnimation(context.getMatrices(), x + width / 2 + 6, y + height / 2 - 12, 1f - Math.clamp(category_animation * 1.5f, 0f, 1f));
             float offsetY = 0;
             for (AbstractElement element : elements) {
                 if (!element.isVisible())
@@ -353,14 +355,11 @@ public class ModuleButton extends AbstractButton {
                 if (element.isVisible())
                     offsetY += element.getHeight();
             }
-            category_animation = fast(category_animation, 0, 8f);
+            category_animation = fast(category_animation, 0, 2f);
             offsetY1 = (float) interp(offsetY1, offsetY, category_animation);
         }
         return offsetY1;
     }
-
-    float category_animation = 0f;
-    float offset_animation = 0f;
 
     public double interp(double d, double d2, float d3) {
         return d2 + (d - d2) * d3;

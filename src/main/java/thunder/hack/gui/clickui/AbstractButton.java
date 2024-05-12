@@ -2,8 +2,6 @@ package thunder.hack.gui.clickui;
 
 import net.minecraft.client.gui.DrawContext;
 
-import java.awt.*;
-
 public class AbstractButton {
     public float x, y, width, height;
     public float target_offset;
@@ -43,8 +41,12 @@ public class AbstractButton {
         this.height = height;
     }
 
-    public void setOffsetY(float offsetY) {
+    public void setTargetOffset(float offsetY) {
         this.target_offset = offsetY;
+    }
+
+    public void setOffset(float offsetY) {
+        this.offsetY = offsetY;
     }
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {

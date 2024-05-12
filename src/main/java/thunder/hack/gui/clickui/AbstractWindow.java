@@ -11,7 +11,7 @@ public class AbstractWindow {
     public float animationY;
     protected float prevTargetX;
 
-    protected float x, y, width, height;
+    protected float x, y, width, height, sx, sy;
     private float prevX, prevY;
     protected boolean hovered;
     public boolean dragging;
@@ -123,5 +123,15 @@ public class AbstractWindow {
     }
 
     public void hudClicked(Module module) {
+    }
+
+    public void savePos() {
+        sx = x;
+        sy = y;
+    }
+
+    public void restorePos() {
+        x = sx;
+        y = sy;
     }
 }

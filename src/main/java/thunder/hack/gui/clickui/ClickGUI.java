@@ -15,8 +15,8 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.animation.AnimationUtility;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,8 +27,8 @@ public class ClickGUI extends Screen {
     public static boolean anyHovered;
 
     private boolean firstOpen;
-    private float scrollY;
-    private boolean setup = false;
+    private float scrollY, closeAnimation, prevYaw, prevPitch, closeDirectionX, closeDirectionY;
+    public static boolean close = false;
 
     public static String currentDescription = "";
     public static final Identifier arrow = new Identifier("thunderhack", "textures/gui/elements/arrow.png");
@@ -50,6 +50,7 @@ public class ClickGUI extends Screen {
     }
 
     public static ClickGUI getClickGui() {
+        windows.forEach(AbstractWindow::init);
         return ClickGUI.getInstance();
     }
 
@@ -88,6 +89,32 @@ public class ClickGUI extends Screen {
     @Override
     public void tick() {
         windows.forEach(AbstractWindow::tick);
+
+        if (close) {
+            if (mc.player != null) {
+                if (mc.player.getPitch() > prevPitch)
+                    closeDirectionY = (prevPitch - mc.player.getPitch()) * 150;
+
+                if (mc.player.getPitch() < prevPitch)
+                    closeDirectionY = (prevPitch - mc.player.getPitch()) * 150;
+
+                if (mc.player.getYaw() > prevYaw)
+                    closeDirectionX = (prevYaw - mc.player.getYaw()) * 150;
+
+                if (mc.player.getYaw() < prevYaw)
+                    closeDirectionX = (prevYaw - mc.player.getYaw()) * 150;
+            }
+
+            if(closeDirectionX < 1 && closeDirectionY < 1 && closeAnimation > 2)
+                closeDirectionY = -3000;
+
+            closeAnimation++;
+            if (closeAnimation > 10) {
+                close = false;
+                windows.forEach(AbstractWindow::restorePos);
+                close();
+            }
+        }
     }
 
     @Override
@@ -97,6 +124,14 @@ public class ClickGUI extends Screen {
             applyBlur(delta);
 
         anyHovered = false;
+
+
+        if(closeAnimation <= 10) {
+            windows.forEach(w -> {
+                w.setX((float) (w.getX() + closeDirectionX * AnimationUtility.deltaTime()));
+                w.setY((float) (w.getY() + closeDirectionY * AnimationUtility.deltaTime()));
+            });
+        }
 
         if (Module.fullNullCheck())
             renderBackground(context, mouseX, mouseY, delta);
@@ -137,7 +172,7 @@ public class ClickGUI extends Screen {
                             "\nMiddle Mouse Click on slider to enter value from keyboard" +
                             "\nDelete + Left Mouse Click on module to reset", 5, mc.getWindow().getScaledHeight() - 80, HudEditor.getColor(0).getRGB());
 
-        if(!HudElement.anyHovered && !ClickGUI.anyHovered)
+        if (!HudElement.anyHovered && !ClickGUI.anyHovered)
             GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
     }
 
@@ -176,9 +211,27 @@ public class ClickGUI extends Screen {
         windows.forEach(w -> w.keyTyped(keyCode));
 
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            super.keyPressed(keyCode, scanCode, modifiers);
+            if(mc.player == null) {
+                super.keyPressed(keyCode, scanCode, modifiers);
+                return true;
+            }
+
+            windows.forEach(AbstractWindow::savePos);
+
+            closeDirectionX = 0;
+            closeDirectionY = 0;
+
+            close = true;
+            mc.mouse.lockCursor();
+
+            closeAnimation = 0;
+            if (mc.player != null) {
+                prevYaw = mc.player.getYaw();
+                prevPitch = mc.player.getPitch();
+            }
             return true;
         }
+
         return false;
     }
 }

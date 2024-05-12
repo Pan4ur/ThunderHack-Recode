@@ -11,11 +11,11 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ModuleWindow extends AbstractWindow {
     private final Identifier ICON;
@@ -23,7 +23,7 @@ public class ModuleWindow extends AbstractWindow {
     private boolean scrollHover;
     private final List<AbstractButton> buttons;
 
-    public static float minX, minY;
+    public float catHeight;
 
     public ModuleWindow(Module.Category category, ArrayList<Module> features, float x, float y, float width, float height) {
         super(category.getName(), x, y, width, height);
@@ -37,6 +37,12 @@ public class ModuleWindow extends AbstractWindow {
     @Override
     public void init() {
         buttons.forEach(AbstractButton::init);
+        catHeight = 20;
+        buttons.forEach(b -> {
+            b.setY(0);
+            b.setOffset(0);
+            b.setTargetOffset(0);
+        });
     }
 
     @Override
@@ -45,21 +51,22 @@ public class ModuleWindow extends AbstractWindow {
 
         setWidth(ModuleManager.clickGui.moduleWidth.getValue());
 
-        scrollHover = Render2DEngine.isHovered(mouseX, mouseY, x, y + height, width, 4000);
+        scrollHover = Render2DEngine.isHovered(mouseX, mouseY, getX(), getY() + height, width, 4000);
 
         context.getMatrices().push();
 
         boolean popStack = false;
 
         float height1;
-        if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old || (getButtonsHeight() + 8) < ModuleManager.clickGui.catHeight.getValue())
-            height1 = (float) ((getButtonsHeight() + 8));
+        if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old || getButtonsHeight() < ModuleManager.clickGui.catHeight.getValue())
+            height1 = (float) getButtonsHeight();
         else
             height1 = (float) ((ModuleManager.clickGui.catHeight.getValue()));
 
-        if (Objects.equals(getName(), "Combat")) {
-            minX = x;
-            minY = y;
+        if(height1 > catHeight) {
+            catHeight += (float) (((height1 - catHeight) / 8f) * (AnimationUtility.deltaTime() * 90));
+        } else if(height1 < catHeight) {
+            catHeight -= (float) (((catHeight - height1) / 8f) * (AnimationUtility.deltaTime() * 90));
         }
 
         Color m1 = HudEditor.getColor(270);
@@ -68,27 +75,27 @@ public class ModuleWindow extends AbstractWindow {
         Color m4 = HudEditor.getColor(90);
 
         if (isOpen()) {
-            Render2DEngine.drawHudBase(context.getMatrices(), x + 3, y + height - 6, width - 6, height1, 1, false);
+            Render2DEngine.drawHudBase(context.getMatrices(), getX() + 3, getY() + height - 6, width - 6, catHeight, 1, false);
 
-            if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old || (getButtonsHeight() + 8) < ModuleManager.clickGui.catHeight.getValue()) {
+            if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old || getButtonsHeight() < ModuleManager.clickGui.catHeight.getValue()) {
 
             } else {
-                Render2DEngine.addWindow(context.getMatrices(), x + 3, y + height - 6, x + 3 + width - 6, (y + height - 6) + (float) ((ModuleManager.clickGui.catHeight.getValue())), 1f);
+                Render2DEngine.addWindow(context.getMatrices(), getX() + 3, getY() + height - 6, getX() + 3 + width - 6, (getY() + height - 6) + (float) ((ModuleManager.clickGui.catHeight.getValue())), 1f);
                 popStack = true;
             }
 
-            Render2DEngine.drawBlurredShadow(context.getMatrices(), (int) x + 4, (int) (y + height - 6), (int) width - 8, 8, 7, new Color(0, 0, 0, 180));
+            Render2DEngine.drawBlurredShadow(context.getMatrices(), (int) getX() + 4, (int) (getY() + height - 6), (int) width - 8, 8, 7, new Color(0, 0, 0, 180));
             for (AbstractButton button : buttons) {
                 if (button instanceof ModuleButton mb && SearchBar.listening && !mb.module.getName().toLowerCase().contains(SearchBar.moduleName))
                     continue;
 
-                if (popStack && buttons.get(0).getY() + moduleOffset < y + height) {
-                    button.setY(y + height + moduleOffset);
+                if (popStack && buttons.get(0).getY() + moduleOffset < getY() + height) {
+                    button.setY(getY() + height + moduleOffset);
                 } else {
-                    button.setY(y + height);
+                    button.setY(getY() + height);
                     moduleOffset = 0f;
                 }
-                button.setX(x + 2);
+                button.setX(getX() + 2);
                 button.setWidth(width - 4);
                 button.setHeight(ModuleManager.clickGui.moduleHeight.getValue());
                 button.render(context, mouseX, mouseY, delta);
@@ -98,31 +105,31 @@ public class ModuleWindow extends AbstractWindow {
         if (popStack)
             Render2DEngine.popWindow();
 
-        Render2DEngine.drawHudBase(context.getMatrices(), x + 2, y - 5, width - 4, height, 1, false);
+        Render2DEngine.drawHudBase(context.getMatrices(), getX() + 2, getY() - 5, width - 4, height, 1, false);
 
         {
             RenderSystem.setShaderTexture(0, ICON);
             RenderSystem.enableBlend();
             // RenderSystem.defaultBlendFunc();
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-            Render2DEngine.addWindow(context.getMatrices(), x + 2, y - 4, x + 2 + width - 4, y - 5 + height, 1);
-            Render2DEngine.renderGradientTexture(context.getMatrices(), x + 85, (y + (height - 24) / 2), 12, 12, 0, 0, 12, 12, 12, 12, m1.darker(), m2.darker(), m3.darker(), m4.darker());
-            Render2DEngine.renderGradientTexture(context.getMatrices(), x + 75, (y + (height - 34) / 2), 16, 16, 0, 0, 16, 16, 16, 16, m1, m2, m3, m4);
-            Render2DEngine.renderGradientTexture(context.getMatrices(), x + 65, (y + (height - 20) / 2), 12, 12, 0, 0, 12, 12, 12, 12, m1.darker().darker(), m2.darker().darker(), m3.darker().darker(), m4.darker().darker());
-            Render2DEngine.renderGradientTexture(context.getMatrices(), x + 55, (y + (height - 28) / 2), 6, 6, 0, 0, 6, 6, 6, 6, m1, m2, m3, m4);
-            Render2DEngine.renderGradientTexture(context.getMatrices(), x + 45, (y + (height - 17) / 2), 17, 17, 0, 0, 17, 17, 17, 17, m1, m2, m3, m4);
-            Render2DEngine.renderGradientTexture(context.getMatrices(), x + 35, (y + (height - 30) / 2), 15, 15, 0, 0, 15, 15, 15, 15, m1.darker().darker().darker(), m2.darker().darker().darker(), m3.darker().darker().darker(), m4.darker().darker().darker());
-            Render2DEngine.renderGradientTexture(context.getMatrices(), x + 25, (y + (height - 21) / 2), 8, 8, 0, 0, 8, 8, 8, 8, m1, m2, m3, m4);
-            Render2DEngine.renderGradientTexture(context.getMatrices(), x + 15, (y + (height - 22) / 2), 12, 12, 0, 0, 12, 12, 12, 12, m1.darker().darker().darker(), m2.darker().darker().darker(), m3.darker().darker().darker(), m4.darker().darker().darker());
-            Render2DEngine.renderGradientTexture(context.getMatrices(), x + 5, (y + (height - 28) / 2), 20, 20, 0, 0, 20, 20, 20, 20, m1, m2, m3, m4);
+            Render2DEngine.addWindow(context.getMatrices(), getX() + 2, getY() - 4, getX() + 2 + width - 4, getY() - 5 + height, 1);
+            Render2DEngine.renderGradientTexture(context.getMatrices(), getX() + 85, (getY() + (height - 24) / 2), 12, 12, 0, 0, 12, 12, 12, 12, m1.darker(), m2.darker(), m3.darker(), m4.darker());
+            Render2DEngine.renderGradientTexture(context.getMatrices(), getX() + 75, (getY() + (height - 34) / 2), 16, 16, 0, 0, 16, 16, 16, 16, m1, m2, m3, m4);
+            Render2DEngine.renderGradientTexture(context.getMatrices(), getX() + 65, (getY() + (height - 20) / 2), 12, 12, 0, 0, 12, 12, 12, 12, m1.darker().darker(), m2.darker().darker(), m3.darker().darker(), m4.darker().darker());
+            Render2DEngine.renderGradientTexture(context.getMatrices(), getX() + 55, (getY() + (height - 28) / 2), 6, 6, 0, 0, 6, 6, 6, 6, m1, m2, m3, m4);
+            Render2DEngine.renderGradientTexture(context.getMatrices(), getX() + 45, (getY() + (height - 17) / 2), 17, 17, 0, 0, 17, 17, 17, 17, m1, m2, m3, m4);
+            Render2DEngine.renderGradientTexture(context.getMatrices(), getX() + 35, (getY() + (height - 30) / 2), 15, 15, 0, 0, 15, 15, 15, 15, m1.darker().darker().darker(), m2.darker().darker().darker(), m3.darker().darker().darker(), m4.darker().darker().darker());
+            Render2DEngine.renderGradientTexture(context.getMatrices(), getX() + 25, (getY() + (height - 21) / 2), 8, 8, 0, 0, 8, 8, 8, 8, m1, m2, m3, m4);
+            Render2DEngine.renderGradientTexture(context.getMatrices(), getX() + 15, (getY() + (height - 22) / 2), 12, 12, 0, 0, 12, 12, 12, 12, m1.darker().darker().darker(), m2.darker().darker().darker(), m3.darker().darker().darker(), m4.darker().darker().darker());
+            Render2DEngine.renderGradientTexture(context.getMatrices(), getX() + 5, (getY() + (height - 28) / 2), 20, 20, 0, 0, 20, 20, 20, 20, m1, m2, m3, m4);
             RenderSystem.disableBlend();
             Render2DEngine.popWindow();
         }
 
         Render2DEngine.drawBlurredShadow(context.getMatrices(),
-                ((int) x + (width - 4) / 2) - FontRenderers.categories.getStringWidth(getName()) / 2f, (int) y + (int) height / 2f - 10, FontRenderers.categories.getStringWidth(getName()) + 6, 13, 20, Render2DEngine.injectAlpha(Color.black, 170));
+                ((int) getX() + (width - 4) / 2) - FontRenderers.categories.getStringWidth(getName()) / 2f, (int) getY() + (int) height / 2f - 10, FontRenderers.categories.getStringWidth(getName()) + 6, 13, 20, Render2DEngine.injectAlpha(Color.black, 170));
 
-        FontRenderers.categories.drawCenteredString(context.getMatrices(), getName(), ((int) x + 2 + (width - 4) / 2), (int) y + (int) height / 2f - 7, new Color(-1).getRGB());
+        FontRenderers.categories.drawCenteredString(context.getMatrices(), getName(), ((int) getX() + 2 + (width - 4) / 2), (int) getY() + (int) height / 2f - 7, new Color(-1).getRGB());
         context.getMatrices().pop();
         updatePosition();
     }
@@ -183,7 +190,7 @@ public class ModuleWindow extends AbstractWindow {
             if (button instanceof ModuleButton mb && SearchBar.listening && !mb.module.getName().toLowerCase().contains(SearchBar.moduleName)) {
                 continue;
             }
-            button.setOffsetY(offsetY);
+            button.setTargetOffset(offsetY);
             if (button instanceof ModuleButton mbutton) {
                 if (mbutton.isOpen()) {
                     for (AbstractElement element : mbutton.getElements()) {
@@ -206,14 +213,17 @@ public class ModuleWindow extends AbstractWindow {
     }
 
     public double getButtonsHeight() {
-        double height = 0;
+        double height = 8;
         for (AbstractButton button : buttons) {
-            if (button instanceof ModuleButton mb && SearchBar.listening && !mb.module.getName().toLowerCase().contains(SearchBar.moduleName)) {
+            if (button instanceof ModuleButton mb && SearchBar.listening && !mb.module.getName().toLowerCase().contains(SearchBar.moduleName))
                 continue;
-            }
+
             if (button instanceof ModuleButton mbutton) {
+                if(mbutton.isOpen())
+                    height += 2f;
                 height += mbutton.getElementsHeight();
             }
+
             height += button.getHeight();
         }
         return height;

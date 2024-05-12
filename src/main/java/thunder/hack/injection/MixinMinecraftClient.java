@@ -29,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
+import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.utility.render.WindowResizeCallback;
@@ -111,21 +112,21 @@ public abstract class MixinMinecraftClient {
 
     @Inject(method = "setOverlay", at = @At("HEAD"))
     public void setOverlay(Overlay overlay, CallbackInfo ci) {
-     //   if (overlay instanceof SplashOverlay)
-          //  ThunderHack.shaderManager.reloadShaders();
+        //   if (overlay instanceof SplashOverlay)
+        //  ThunderHack.shaderManager.reloadShaders();
     }
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     public void setScreenHookPre(Screen screen, CallbackInfo ci) {
-        if(Module.fullNullCheck()) return;
+        if (Module.fullNullCheck()) return;
         EventScreen event = new EventScreen(screen);
         ThunderHack.EVENT_BUS.post(event);
-        if (event.isCancelled()) ci.cancel();
+        if (event.isCancelled() || (ClickGUI.close && screen == null)) ci.cancel();
     }
 
     @Inject(method = "setScreen", at = @At("RETURN"))
     public void setScreenHookPost(Screen screen, CallbackInfo ci) {
-        if(Module.fullNullCheck()) return;
+        if (Module.fullNullCheck()) return;
         if (screen instanceof MultiplayerScreen mScreen && ModuleManager.antiServerAdd.isEnabled() && mScreen.getServerList() != null) {
             for (int i = 0; i < mScreen.getServerList().size(); i++) {
                 ServerInfo info = mScreen.getServerList().get(i);
