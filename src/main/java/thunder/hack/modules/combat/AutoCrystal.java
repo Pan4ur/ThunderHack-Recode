@@ -260,7 +260,7 @@ public class AutoCrystal extends Module {
             boolean hitVisible = bestCrystal == null || PlayerUtility.canSee(bestCrystal.getPos());
             boolean placeVisible = bestPosition == null || PlayerUtility.canSee(bestPosition.getPos());
 
-            debug("hit:"hitVisible + ", place:" + placeVisible);
+            debug("hit:" + hitVisible + ", place:" + placeVisible);
 
             if (mc.player.age % 5 == 0 && rayTraceBypass.getValue() && (!hitVisible || !placeVisible)) mc.player.setPitch(-90);
             else mc.player.setPitch(rotationPitch);
