@@ -47,7 +47,7 @@ public class DurabilityAlert extends Module {
 
         boolean flag = false;
         for (ItemStack stack : mc.player.getInventory().armor) {
-            if (stack.isEmpty()) continue;
+            if (stack.isEmpty() || !(stack.getItem() instanceof ArmorItem)) continue;
             if (getDurability(stack) < percent.getValue()) {
                 need_alert = true;
                 flag = true;

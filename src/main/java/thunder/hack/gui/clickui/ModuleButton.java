@@ -75,6 +75,7 @@ public class ModuleButton extends AbstractButton {
 
     public void init() {
         elements.forEach(AbstractElement::init);
+        category_animation = 0;
     }
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
@@ -94,9 +95,9 @@ public class ModuleButton extends AbstractButton {
         float iy = y + height / 2f - 3f;
 
         if (target_offset > offsetY)
-            offsetY += (float) (((target_offset - offsetY) / 8f) * (AnimationUtility.deltaTime() * 90));
+            offsetY += (float) (((target_offset - offsetY) / 4f) * (AnimationUtility.deltaTime() * 90));
         else if (target_offset < offsetY)
-            offsetY -= (float) (((offsetY - target_offset) / 8f) * (AnimationUtility.deltaTime() * 90));
+            offsetY -= (float) (((offsetY - target_offset) / 4f) * (AnimationUtility.deltaTime() * 90));
 
         if (isOpen()) {
             Render2DEngine.drawGuiBase(context.getMatrices(), x + 4, y + 2f, width - 8, height + (float) getElementsHeight(), 1f, 0);

@@ -286,6 +286,9 @@ public class Scaffold extends Module {
         if (mc.player.getOffHandStack().getItem() instanceof BlockItem bi && !bi.getBlock().getDefaultState().isReplaceable())
             return -2;
 
+        if (mc.player.getMainHandStack().getItem() instanceof BlockItem bi && !bi.getBlock().getDefaultState().isReplaceable())
+            return mc.player.getInventory().selectedSlot;
+
         int prevSlot = mc.player.getInventory().selectedSlot;
 
         SearchInvResult hotbarResult = InventoryUtility.findInHotBar(i -> i.getItem() instanceof BlockItem bi && !bi.getBlock().getDefaultState().isReplaceable());

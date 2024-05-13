@@ -26,7 +26,7 @@ public class Rotations extends Module {
     private float prevRotation;
 
     public void onJump(EventPlayerJump e) {
-        if (Float.isNaN(fixRotation) || moveFix.getValue() == MoveFix.Off)
+        if (Float.isNaN(fixRotation) || moveFix.getValue() == MoveFix.Off || mc.player.isRiding())
             return;
 
         if (e.isPre()) {
@@ -37,14 +37,14 @@ public class Rotations extends Module {
 
     public void onPlayerMove(EventFixVelocity event) {
         if (moveFix.getValue() == MoveFix.Free) {
-            if (Float.isNaN(fixRotation))
+            if (Float.isNaN(fixRotation) || mc.player.isRiding())
                 return;
             event.setVelocity(fix(fixRotation, event.getMovementInput(), event.getSpeed()));
         }
     }
 
     public void modifyVelocity(EventPlayerTravel e) {
-        if (moveFix.getValue() == MoveFix.Focused && !Float.isNaN(fixRotation)) {
+        if (moveFix.getValue() == MoveFix.Focused && !Float.isNaN(fixRotation) && !mc.player.isRiding()) {
             if (e.isPre()) {
                 prevRotation = mc.player.getYaw();
                 mc.player.setYaw(fixRotation);
@@ -56,7 +56,7 @@ public class Rotations extends Module {
 
     public void onKeyInput(EventKeyboardInput e) {
         if (moveFix.getValue() == MoveFix.Free) {
-            if (Float.isNaN(fixRotation))
+            if (Float.isNaN(fixRotation) || mc.player.isRiding())
                 return;
 
             float mF = mc.player.input.movementForward;

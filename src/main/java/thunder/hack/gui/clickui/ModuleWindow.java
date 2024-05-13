@@ -64,9 +64,9 @@ public class ModuleWindow extends AbstractWindow {
             height1 = (float) ((ModuleManager.clickGui.catHeight.getValue()));
 
         if(height1 > catHeight) {
-            catHeight += (float) (((height1 - catHeight) / 8f) * (AnimationUtility.deltaTime() * 90));
+            catHeight += (float) (((height1 - catHeight) / 2f) * (AnimationUtility.deltaTime() * 90));
         } else if(height1 < catHeight) {
-            catHeight -= (float) (((catHeight - height1) / 8f) * (AnimationUtility.deltaTime() * 90));
+            catHeight -= (float) (((catHeight - height1) / 2f) * (AnimationUtility.deltaTime() * 90));
         }
 
         Color m1 = HudEditor.getColor(270);

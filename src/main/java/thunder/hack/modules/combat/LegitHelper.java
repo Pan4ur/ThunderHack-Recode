@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.AsyncManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IMinecraftClient;
@@ -171,7 +172,8 @@ public class LegitHelper extends Module {
     @EventHandler
     public void onPacketSend(PacketEvent.@NotNull Send event) {
         if (crystalOptimizer.getValue() && event.getPacket() instanceof PlayerInteractEntityC2SPacket
-                && getInteractType(event.getPacket()) == Criticals.InteractType.ATTACK && getEntity(event.getPacket()) instanceof EndCrystalEntity c) {
+                && getInteractType(event.getPacket()) == Criticals.InteractType.ATTACK && getEntity(event.getPacket()) instanceof EndCrystalEntity c
+                && !ModuleManager.autoCrystal.isEnabled()) {
             c.kill();
             c.setRemoved(Entity.RemovalReason.KILLED);
             c.onRemoved();
