@@ -8,6 +8,7 @@ import net.minecraft.util.Identifier;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
@@ -18,20 +19,30 @@ public class Coords extends HudElement {
         super("Coords", 100, 10);
     }
 
-    private Identifier icon = new Identifier("thunderhack", "textures/hud/icons/coords.png");
+    private final Identifier icon = new Identifier("thunderhack", "textures/hud/icons/coords.png");
+    private final Setting<NetherCoords> netherCoords = new Setting<>("NetherCoords", NetherCoords.On);
+
+    private enum NetherCoords {
+        Off, On, OnlyNether
+    }
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
         int posX = (int) mc.player.getX();
         int posY = (int) mc.player.getY();
         int posZ = (int) mc.player.getZ();
+
         float nether = !isHell() ? 0.125F : 8.0F;
+
         int hposX = (int) (mc.player.getX() * nether);
         int hposZ = (int) (mc.player.getZ() * nether);
-        String coordinates = "XYZ " + Formatting.WHITE + (isHell() ? (posX + " " + posY + " " + posZ + Formatting.WHITE + " [" + Formatting.RESET + hposX + " " + hposZ + Formatting.WHITE + "]" + Formatting.RESET) : (posX + " " + posY + " " + posZ + Formatting.WHITE + " [" + Formatting.RESET + hposX + " " + hposZ + Formatting.WHITE + "]"));
+
+        String coordinates = "XYZ " + Formatting.WHITE +
+                (posX + " " + posY + " " + posZ + Formatting.WHITE + (netherCoords.is(NetherCoords.On) || (netherCoords.is(NetherCoords.OnlyNether) && isHell()) ? " [" + Formatting.RESET + hposX + " " + hposZ + Formatting.WHITE + "]" : ""));
+
         float pX = getPosX() > mc.getWindow().getScaledWidth() / 2f ? getPosX() - FontRenderers.getModulesRenderer().getStringWidth(coordinates) : getPosX();
 
-        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+        if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
             Render2DEngine.drawRoundedBlur(context.getMatrices(), pX - 18, getPosY() - 2, FontRenderers.getModulesRenderer().getStringWidth(coordinates) + 21, 13f, 3, HudEditor.blurColor.getValue().getColorObject());
             Render2DEngine.drawRect(context.getMatrices(), pX - 4, getPosY(), 0.5f, 8, new Color(0x44FFFFFF, true));
 

@@ -1,14 +1,13 @@
 package thunder.hack.utility.player;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.PendingUpdateManager;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.*;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.injection.accesors.IClientWorldMixin;
-import thunder.hack.utility.math.MathUtility;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -72,5 +71,13 @@ public final class PlayerUtility {
         double d0 = mc.player.getX() - vec.getX();
         double d2 = mc.player.getZ() - vec.getZ();
         return (float) (d0 * d0 + d2 * d2);
+    }
+
+    public static boolean canSee(Vec3d pos) {
+        Vec3d vec3d = new Vec3d(mc.player.getX(), mc.player.getEyeY(), mc.player.getZ());
+        if (pos.distanceTo(vec3d) > 128.0)
+            return false;
+        else
+            return mc.world.raycast(new RaycastContext(vec3d, pos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.MISS;
     }
 }

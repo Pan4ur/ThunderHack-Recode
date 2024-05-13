@@ -256,7 +256,13 @@ public class AutoCrystal extends Module {
 
         // Rotate
         if (rotate.getValue() && mc.player != null && rotationYaw != mc.player.getYaw() && rotationPitch != mc.player.getPitch()) {
-            if (mc.player.age % 5 == 0 && rayTraceBypass.getValue()) mc.player.setPitch(-90);
+
+            boolean hitVisible = bestCrystal == null || PlayerUtility.canSee(bestCrystal.getPos());
+            boolean placeVisible = bestPosition == null || PlayerUtility.canSee(bestPosition.getPos());
+
+            sendMessage(hitVisible + " " + placeVisible);
+
+            if (mc.player.age % 5 == 0 && rayTraceBypass.getValue() && (!hitVisible || !placeVisible)) mc.player.setPitch(-90);
             else mc.player.setPitch(rotationPitch);
             mc.player.setYaw(rotationYaw);
         }
