@@ -37,12 +37,6 @@ public class ModuleWindow extends AbstractWindow {
     @Override
     public void init() {
         buttons.forEach(AbstractButton::init);
-        catHeight = 20;
-        buttons.forEach(b -> {
-            b.setY(0);
-            b.setOffset(0);
-            b.setTargetOffset(0);
-        });
     }
 
     @Override

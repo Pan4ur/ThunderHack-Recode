@@ -16,7 +16,6 @@ import java.math.RoundingMode;
 import java.util.ArrayDeque;
 
 public class ServerManager implements IManager {
-    private final Timer timeDelay = new Timer();
     private final ArrayDeque<Float> tpsResult = new ArrayDeque<>(20);
     private long time;
     private long tickTime;
@@ -42,9 +41,6 @@ public class ServerManager implements IManager {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.@NotNull Receive event) {
-        if (!(event.getPacket() instanceof ChatMessageS2CPacket)) {
-            timeDelay.reset();
-        }
         if (event.getPacket() instanceof WorldTimeUpdateS2CPacket) {
             if (time != 0L) {
                 tickTime = System.currentTimeMillis() - time;

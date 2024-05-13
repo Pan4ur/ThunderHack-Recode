@@ -179,7 +179,7 @@ public class ClickGUI extends Screen {
             currentDescription = "";
         }
 
-        if (ModuleManager.clickGui.tips.getValue())
+        if (ModuleManager.clickGui.tips.getValue() && !close)
             FontRenderers.sf_medium.drawString(context.getMatrices(),
                     "Left Mouse Click to enable module" +
                             "\nRight Mouse Click to open module settings\nMiddle Mouse Click to bind module" +

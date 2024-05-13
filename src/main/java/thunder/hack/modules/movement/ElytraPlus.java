@@ -18,7 +18,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -52,13 +52,17 @@ public class ElytraPlus extends Module {
         super("Elytra+", Category.MOVEMENT);
     }
 
-    private final Setting<Mode> mode = new Setting<>("Mode", Mode.FireWork);
+    public final Setting<Mode> mode = new Setting<>("Mode", Mode.FireWork);
+    private final Setting<Boolean> stopOnGround = new Setting<>("StopOnGround", false, v -> mode.is(Mode.Packet));
+    private final Setting<Boolean> infDurability = new Setting<>("InfDurability", true, v -> mode.is(Mode.Packet));
+    private final Setting<Boolean> vertical = new Setting<>("Vertical", false, v -> mode.is(Mode.Packet));
+    private final Setting<NCPStrict> ncpStrict = new Setting<>("NCPStrict", NCPStrict.Off, v -> mode.is(Mode.Packet));
     private final Setting<AntiKick> antiKick = new Setting<>("AntiKick", AntiKick.Jitter, v -> mode.is(Mode.FireWork));
     private final Setting<Float> xzSpeed = new Setting<>("XZSpeed", 1.55f, 0.1f, 10f, v -> !mode.is(Mode.Boost) && mode.getValue() != Mode.Pitch40Infinite);
-    private final Setting<Float> ySpeed = new Setting<>("YSpeed", 0.47f, 0f, 2f, v -> mode.is(Mode.FireWork) || mode.getValue() == Mode.SunriseOld);
+    private final Setting<Float> ySpeed = new Setting<>("YSpeed", 0.47f, 0f, 2f, v -> mode.is(Mode.FireWork) || mode.getValue() == Mode.SunriseOld || (mode.is(Mode.Packet) && vertical.getValue()));
     private final Setting<Integer> fireSlot = new Setting<>("FireSlot", 1, 1, 9, v -> mode.is(Mode.FireWork));
-    private final Setting<BooleanParent> accelerate = new Setting<>("Acceleration", new BooleanParent(false), v -> mode.is(Mode.Control));
-    private final Setting<Float> accelerateFactor = new Setting<>("AccelerateFactor", 9f, 0f, 100f, v -> mode.is(Mode.Control)).withParent(accelerate);
+    private final Setting<BooleanParent> accelerate = new Setting<>("Acceleration", new BooleanParent(false), v -> mode.is(Mode.Control) || mode.is(Mode.Packet));
+    private final Setting<Float> accelerateFactor = new Setting<>("AccelerateFactor", 9f, 0f, 100f, v -> mode.is(Mode.Control) || mode.is(Mode.Packet)).withParent(accelerate);
     private final Setting<Float> fireDelay = new Setting<>("FireDelay", 1.5f, 0f, 1.5f, v -> mode.is(Mode.FireWork));
     private final Setting<Boolean> grim = new Setting<>("Grim", false, v -> mode.is(Mode.FireWork));
     private final Setting<Boolean> stayMad = new Setting<>("GroundSafe", false, v -> mode.is(Mode.FireWork));
@@ -86,9 +90,11 @@ public class ElytraPlus extends Module {
     private final Setting<Float> infiniteMinSpeed = new Setting<>("InfiniteMinSpeed", 25f, 10f, 70f, v -> mode.getValue() == Mode.Pitch40Infinite);
     private final Setting<Integer> infiniteMaxHeight = new Setting<>("InfiniteMaxHeight", 200, 50, 360, v -> mode.getValue() == Mode.Pitch40Infinite);
 
-    public enum Mode {FireWork, SunriseOld, Boost, Control, Pitch40Infinite, SunriseNew}
+    public enum Mode {FireWork, SunriseOld, Boost, Control, Pitch40Infinite, SunriseNew, Packet}
 
     public enum AntiKick {Off, Jitter, Glide}
+
+    public enum NCPStrict {Off, Old, New, Motion}
 
     private final thunder.hack.utility.Timer startTimer = new thunder.hack.utility.Timer();
     private final thunder.hack.utility.Timer redeployTimer = new thunder.hack.utility.Timer();
@@ -171,6 +177,17 @@ public class ElytraPlus extends Module {
             case Boost, Control -> doPreLegacy();
             case FireWork -> fireworkOnSync();
             case Pitch40Infinite -> doPitch40Infinite();
+            case Packet -> doPacket(e);
+        }
+    }
+
+    private void doPacket(EventSync e) {
+        if ((!mc.player.isOnGround() || !stopOnGround.getValue()) && mc.player.getInventory().getStack(38).getItem() == Items.ELYTRA) {
+            if (infDurability.getValue() || !mc.player.isFallFlying())
+                sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+
+            if (mc.player.age % 3 != 0 && ncpStrict.is(NCPStrict.Motion))
+                e.cancel();
         }
     }
 
@@ -257,6 +274,8 @@ public class ElytraPlus extends Module {
     @Override
     public void onDisable() {
         ThunderHack.TICK_TIMER = 1.0f;
+        mc.player.getAbilities().flying = false;
+        mc.player.getAbilities().setFlySpeed(0.05F);
         if (mode.is(Mode.FireWork))
             fireworkOnDisable();
     }
@@ -267,6 +286,7 @@ public class ElytraPlus extends Module {
             case Boost -> doBoost(e);
             case Control -> doControl(e);
             case FireWork -> fireworkOnMove(e);
+            case Packet -> doMotionPacket(e);
         }
     }
 
@@ -284,6 +304,10 @@ public class ElytraPlus extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
+
+        if (e.getPacket() instanceof EntityTrackerUpdateS2CPacket pac && pac.id() == mc.player.getId() && mode.is(Mode.Packet))
+            e.cancel();
+
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             acceleration = 0;
             accelerationY = 0;
@@ -305,6 +329,50 @@ public class ElytraPlus extends Module {
         switch (mode.getValue()) {
             case FireWork -> fireWorkOnPlayerUpdate();
             case Pitch40Infinite -> lastInfinitePitch = PlayerUtility.fixAngle(getInfinitePitch());
+        }
+    }
+
+    private void doMotionPacket(EventMove e) {
+        mc.player.getAbilities().flying = false;
+        mc.player.getAbilities().setFlySpeed(0.05F);
+
+        if ((!mc.player.isOnGround() && stopOnGround.getValue()) || mc.player.getInventory().getStack(38).getItem() != Items.ELYTRA)
+            return;
+
+        mc.player.getAbilities().flying = true;
+        mc.player.getAbilities().setFlySpeed((xzSpeed.getValue() / 15f) * (accelerate.getValue().isEnabled() ? Math.min((acceleration += accelerateFactor.getValue()) / 100.0f, 1.0f) : 1f));
+        e.cancel();
+
+        if (mc.player.age % 3 == 0 && ncpStrict.is(NCPStrict.Motion)) {
+            e.setY(0);
+            e.setX(0);
+            e.setZ(0);
+            return;
+        }
+
+        if (Math.abs(e.getX()) < 0.05)
+            e.setX(0);
+
+        if (Math.abs(e.getZ()) < 0.05)
+            e.setZ(0);
+
+        e.setY(vertical.getValue() ? mc.options.jumpKey.isPressed() ? ySpeed.getValue() : mc.options.sneakKey.isPressed() ? -ySpeed.getValue() : 0 : 0);
+
+        switch (ncpStrict.getValue()) {
+            case New -> e.setY(-1.000088900582341E-12);
+            case Motion -> e.setY(-4.000355602329364E-12);
+            case Old -> e.setY(0.0002 - (mc.player.age % 2 == 0 ? 0 : 0.000001) + MathUtility.random(0, 0.0000009));
+        }
+
+        if (stopOnGround.getValue() && (ncpStrict.is(NCPStrict.New) || ncpStrict.is(NCPStrict.Motion)) && mc.player.age % 2 == 0)
+            e.setY(-0.07840000152587923);
+
+        if ((infDurability.getValue() || ncpStrict.is(NCPStrict.Motion))) {
+            if (!MovementUtility.isMoving()) {
+                float angleToRad = (float) Math.toRadians(4.5 * (mc.player.age % 80));
+                e.setX(Math.sin(angleToRad) * 0.1488);
+                e.setZ(Math.cos(angleToRad) * 0.1488);
+            }
         }
     }
 
@@ -489,7 +557,7 @@ public class ElytraPlus extends Module {
 
         if (!MovementUtility.isMoving())
             acceleration = 0;
-        
+
         mc.player.setVelocity(e.getX(), e.getY(), e.getZ());
         e.cancel();
     }

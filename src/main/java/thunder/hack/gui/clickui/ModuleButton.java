@@ -203,13 +203,10 @@ public class ModuleButton extends AbstractButton {
                             Render2DEngine.applyOpacity(HudEditor.getColor(0), animation));
                 }
             }
-
-
         }
-        if (!module.getBind().getBind().equalsIgnoreCase("none") && !binding) {
-            String sbind = getSbind();
-            FontRenderers.sf_medium_modules.drawString(context.getMatrices(), getSbind(), x + width - 11 - FontRenderers.sf_medium_modules.getStringWidth(sbind), y + 6, module.isEnabled() ? HudEditor.textColor2.getValue().getColor() : HudEditor.textColor.getValue().getColor());
-        }
+
+        if (!module.getBind().getBind().equalsIgnoreCase("none") && !binding)
+            FontRenderers.sf_medium_modules.drawString(context.getMatrices(), getSbind(), x + width - 11 - FontRenderers.sf_medium_modules.getStringWidth(getSbind()), y + 6, module.isEnabled() ? HudEditor.textColor2.getValue().getColor() : HudEditor.textColor.getValue().getColor());
 
         if (binding)
             FontRenderers.sf_medium_modules.drawString(context.getMatrices(), holdbind ? (Formatting.GRAY + "Toggle / " + Formatting.RESET + "Hold") : (Formatting.RESET + "Toggle " + Formatting.GRAY + "/ Hold"), x + width - 11 - FontRenderers.sf_medium_modules.getStringWidth("Toggle/Hold"), iy + 2, Render2DEngine.applyOpacity(Color.WHITE.getRGB(), animation2));
