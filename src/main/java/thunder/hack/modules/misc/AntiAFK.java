@@ -1,11 +1,15 @@
 package thunder.hack.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import thunder.hack.ThunderHack;
+import thunder.hack.events.impl.EventKeyboardInput;
 import thunder.hack.events.impl.EventSetting;
+import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.player.MovementUtility;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -16,6 +20,8 @@ public class AntiAFK extends Module {
     }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Simple);
+    public final Setting<Boolean> onlyWhenAfk = new Setting<>("OnlyWhenAFK", false);
+    public final Setting<Boolean> move = new Setting<>("Move", false, v -> mode.getValue() == Mode.Simple);
     private final Setting<Boolean> spin = new Setting<>("Spin", false, v -> mode.getValue() == Mode.Simple);
     private final Setting<Float> speed = new Setting<>("Speed", 5f, 1f, 7f, v -> mode.getValue() == Mode.Simple);
     private final Setting<Boolean> jump = new Setting<>("Jump", false, v -> mode.getValue() == Mode.Simple);
@@ -40,13 +46,35 @@ public class AntiAFK extends Module {
 
     @EventHandler
     public void onSettingChange(EventSetting e) {
-        if(e.getSetting() == mode)
+        if (e.getSetting() == mode)
             step = 0;
     }
 
-    @Override
-    public void onUpdate() {
-        if(mode.getValue() == Mode.Simple) {
+    @EventHandler
+    @SuppressWarnings("unused")
+    public void onKeyboardInput(EventKeyboardInput e) {
+        if (mc.player != null && mode.is(Mode.Simple) && !MovementUtility.isMoving() && move.getValue() && isAfk()) {
+            float angleToRad = (float) Math.toRadians(9 * (mc.player.age % 40));
+
+            float sin = (float) Math.clamp(Math.sin(angleToRad), -1, 1);
+            float cos = (float) Math.clamp(Math.cos(angleToRad), -1, 1);
+
+            mc.player.input.movementForward = Math.round(sin);
+            mc.player.input.movementSideways = Math.round(cos);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onUpdate(PlayerUpdateEvent e) {
+        if (mode.is(Mode.Simple) ? isActive() : ThunderHack.playerManager.currentPlayerSpeed > 0.07)
+            inactiveTime.reset();
+
+        if (mode.getValue() == Mode.Simple) {
+            if(!isAfk()) return;
+
+            if(move.getValue())
+                mc.player.setSprinting(false);
+
             if (spin.getValue()) {
                 double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
                 float newYaw = mc.player.getYaw() + speed.getValue();
@@ -59,34 +87,31 @@ public class AntiAFK extends Module {
             if (swing.getValue() && ThreadLocalRandom.current().nextInt(99) == 0)
                 mc.player.swingHand(mc.player.getActiveHand());
         } else {
-           if(inactiveTime.every(5000)) {
-               if(step > 3)
-                   step = 0;
+            if (inactiveTime.every(5000)) {
+                if (step > 3)
+                    step = 0;
 
-               switch (step) {
-                   case 0: {
-                       mc.player.networkHandler.sendChatMessage("#goto ~ ~" + radius.getValue());
-                       break;
-                   }
-                   case 1: {
-                       mc.player.networkHandler.sendChatMessage("#goto ~" + radius.getValue() + " ~");
-                       break;
-                   }
-                   case 2: {
-                       mc.player.networkHandler.sendChatMessage("#goto ~ ~-" + radius.getValue());
-                       break;
-                   }
-                   case 3: {
-                       mc.player.networkHandler.sendChatMessage("#goto ~-" + radius.getValue() + " ~");
-                       break;
-                   }
-               }
-               step++;
-           }
+                switch (step) {
+                    case 0: {
+                        mc.player.networkHandler.sendChatMessage("#goto ~ ~" + radius.getValue());
+                        break;
+                    }
+                    case 1: {
+                        mc.player.networkHandler.sendChatMessage("#goto ~" + radius.getValue() + " ~");
+                        break;
+                    }
+                    case 2: {
+                        mc.player.networkHandler.sendChatMessage("#goto ~ ~-" + radius.getValue());
+                        break;
+                    }
+                    case 3: {
+                        mc.player.networkHandler.sendChatMessage("#goto ~-" + radius.getValue() + " ~");
+                        break;
+                    }
+                }
+                step++;
+            }
         }
-
-        if(ThunderHack.playerManager.currentPlayerSpeed > 0.07)
-            inactiveTime.reset();
     }
 
     @Override
@@ -94,7 +119,15 @@ public class AntiAFK extends Module {
         if (alwayssneak.getValue())
             mc.options.sneakKey.setPressed(false);
 
-        if(mode.getValue() == Mode.Baritone)
+        if (mode.getValue() == Mode.Baritone)
             mc.player.networkHandler.sendChatMessage("#stop");
+    }
+
+    private boolean isAfk() {
+        return !onlyWhenAfk.getValue() || inactiveTime.passedS(10);
+    }
+
+    private boolean isActive() {
+        return mc.options.forwardKey.isPressed() || mc.options.leftKey.isPressed() || mc.options.rightKey.isPressed() || mc.options.backKey.isPressed();
     }
 }

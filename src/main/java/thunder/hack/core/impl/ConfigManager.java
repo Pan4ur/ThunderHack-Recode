@@ -415,9 +415,9 @@ public class ConfigManager implements IManager {
                             }
                     }
                 } catch (Exception e) {
-                    System.out.println(module.getName());
-                    System.out.println(setting2);
-                    e.printStackTrace();
+                 //   System.out.println(module.getName() + " [ThunderHack]");
+                 //   System.out.println(setting2);
+                 //   e.printStackTrace();
                 }
             }
         }
