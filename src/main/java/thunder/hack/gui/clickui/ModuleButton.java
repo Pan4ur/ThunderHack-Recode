@@ -80,7 +80,7 @@ public class ModuleButton extends AbstractButton {
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         hovered = Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height);
-        animation = fast(animation, module.isEnabled() ? 1 : 0, 15f);
+        animation = fast(animation, module.isEnabled() ? 1 : 0, 8f);
         animation2 = fast(animation2, 1f, 10f);
 
         if (hovered) {
@@ -94,14 +94,13 @@ public class ModuleButton extends AbstractButton {
         float ix = x + 5;
         float iy = y + height / 2f - 3f;
 
-        if (target_offset > offsetY)
-            offsetY += (float) (((target_offset - offsetY) / 4f) * (AnimationUtility.deltaTime() * 90));
-        else if (target_offset < offsetY)
-            offsetY -= (float) (((offsetY - target_offset) / 4f) * (AnimationUtility.deltaTime() * 90));
+        offsetY = AnimationUtility.fast(offsetY, target_offset, 20f);
+
+        float offsetY = 0;
 
         if (isOpen()) {
             Render2DEngine.drawGuiBase(context.getMatrices(), x + 4, y + 2f, width - 8, height + (float) getElementsHeight(), 1f, 0);
-            Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle(x + 1, y + height, width + x - 2, (float) (height + y + 1f + getElementsHeight())));
+            Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle(x + 1, y + height - 2, width + x - 2, (float) (height + y + 1f + getElementsHeight())));
 
             if (mc.player != null && ModuleManager.clickGui.gear.getValue().isEnabled()) {
                 Render2DEngine.addWindow(context.getMatrices(), new Render2DEngine.Rectangle(x, y + height + 1, (width) + x + 6, (float) ((height) + y + 1f + getElementsHeight())));
@@ -132,9 +131,6 @@ public class ModuleButton extends AbstractButton {
                 Render2DEngine.drawBlurredShadow(context.getMatrices(), mouseX - 10, mouseY - 10, 20, 20, 40, HudEditor.getColor(270));
             }
 
-            context.getMatrices().push();
-            TargetHud.sizeAnimation(context.getMatrices(), x + width / 2 + 6, y + height / 2 - 12, 1f - Math.clamp(category_animation * 1.5f, 0f, 1f));
-            float offsetY = 0;
             for (AbstractElement element : elements) {
                 if (!element.isVisible())
                     continue;
@@ -157,24 +153,30 @@ public class ModuleButton extends AbstractButton {
                         element.setHeight(13 + (combobox.getSetting().getModes().length * 12));
                     } else element.setHeight(13);
                 }
-
-                element.render(context, mouseX, mouseY, delta);
-
                 offsetY += element.getHeight();
             }
+
+            context.getMatrices().push();
+            TargetHud.sizeAnimation(context.getMatrices(), x + width / 2f + 6, y + height / 2f - 12, Math.clamp(category_animation / offsetY, 0f, 1f));
+            elements.forEach(e -> {
+                if (e.isVisible())
+                    e.render(context, mouseX, mouseY, delta);
+            });
             context.getMatrices().pop();
 
             Render2DEngine.drawBlurredShadow(context.getMatrices(), x + 3, y + height, width - 6, 3, 13, HudEditor.getColor(1));
-            Render2DEngine.draw2DGradientRect(context.getMatrices(), x + 4, y + height - 1f, x + 3f + width - 7f, 3f + y + height, Render2DEngine.applyOpacity(HudEditor.getColor(0), 0), HudEditor.getColor(0), Render2DEngine.applyOpacity(HudEditor.getColor(90), 0), HudEditor.getColor(90));
+            if (!module.isEnabled())
+                Render2DEngine.draw2DGradientRect(context.getMatrices(), x + 4, y + height - 1f, x + 3f + width - 7f, 3f + y + height, Render2DEngine.applyOpacity(HudEditor.getColor(0), 0), HudEditor.getColor(0), Render2DEngine.applyOpacity(HudEditor.getColor(90), 0), HudEditor.getColor(90));
             Render2DEngine.popWindow();
         } else {
-            category_animation = fast(1, 0, 1f);
             if (hovered) {
                 Render2DEngine.addWindow(context.getMatrices(), x + 1, y, x + width - 2, y + height, 1.);
                 Render2DEngine.drawBlurredShadow(context.getMatrices(), mouseX - 10, mouseY - 10, 20, 20, 35, HudEditor.getColor(270));
                 Render2DEngine.popWindow();
             }
         }
+
+        category_animation = fast(category_animation, offsetY, 20);
 
         if (animation < 0.05)
             Render2DEngine.drawRect(context.getMatrices(), x + 4f, y + 1f, width - 8, height - 2, Render2DEngine.applyOpacity(HudEditor.plateColor.getValue().getColorObject().darker(), 0.15f));
@@ -346,17 +348,7 @@ public class ModuleButton extends AbstractButton {
     }
 
     public double getElementsHeight() {
-        float offsetY = 0;
-        float offsetY1 = 0;
-        if (isOpen()) {
-            for (AbstractElement element : getElements()) {
-                if (element.isVisible())
-                    offsetY += element.getHeight();
-            }
-            category_animation = fast(category_animation, 0, 2f);
-            offsetY1 = (float) interp(offsetY1, offsetY, category_animation);
-        }
-        return offsetY1;
+        return category_animation;
     }
 
     public double interp(double d, double d2, float d3) {

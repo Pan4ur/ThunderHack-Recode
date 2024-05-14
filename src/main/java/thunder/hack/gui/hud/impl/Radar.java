@@ -43,7 +43,7 @@ public class Radar extends HudElement {
                 Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + (size.getValue() / 2F - 2), getPosY(), getPosX() + (size.getValue() / 2F), getPosY() + size.getValue(),  new Color(0x0000000, true), new Color(0x7B000000, true));
                 Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + (size.getValue() / 2F), getPosY(), getPosX() + (size.getValue() / 2F + 2), getPosY() + size.getValue(), new Color(0x7B000000, true), new Color(0x0000000, true));
             } else {
-                Render2DEngine.drawRectDumbWay(context.getMatrices(),
+                Render2DEngine.draw2DGradientRect(context.getMatrices(),
                         (float) (getPosX() + (size.getValue() / 2F - 0.5)),
                         (float) (getPosY() + 3.5),
                         (float) (getPosX() + (size.getValue() / 2F + 0.2)),
@@ -51,7 +51,7 @@ public class Radar extends HudElement {
                         color2.getValue().getColorObject(), color2.getValue().getColorObject(), color2.getValue().getColorObject(), color2.getValue().getColorObject()
                 );
 
-                Render2DEngine.drawRectDumbWay(
+                Render2DEngine.draw2DGradientRect(
                         context.getMatrices(),
                         getPosX() + 3.5f,
                         getPosY() + (size.getValue() / 2F - 0.2f),

@@ -10,10 +10,10 @@ public class FrameRateCounter {
     public void recordFrame() {
         long c = System.currentTimeMillis();
         records.add(c);
+        records.removeIf(aLong -> aLong + 1000 < System.currentTimeMillis());
     }
 
     public int getFps() {
-        records.removeIf(aLong -> aLong + 1000 < System.currentTimeMillis());
         return records.size() / 2;
     }
 }

@@ -6,7 +6,7 @@ import thunder.hack.utility.math.MathUtility;
 
 public class AnimationUtility {
     public static double deltaTime() {
-        return MinecraftClient.getInstance().getCurrentFps() > 0 ? (1f / (float) MinecraftClient.getInstance().getCurrentFps()) : 1;
+        return MinecraftClient.getInstance().getCurrentFps() > 0 ? (1f / FrameRateCounter.INSTANCE.getFps()) : 0.016;
     }
 
     public static float fast(float end, float start, float multiple) {
