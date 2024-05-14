@@ -182,7 +182,7 @@ public class ElytraPlus extends Module {
     }
 
     private void doPacket(EventSync e) {
-        if ((!mc.player.isOnGround() || !stopOnGround.getValue()) && mc.player.getInventory().getStack(38).getItem() == Items.ELYTRA) {
+        if ((!isBoxCollidingGround() || !stopOnGround.getValue()) && mc.player.getInventory().getStack(38).getItem() == Items.ELYTRA) {
             if (infDurability.getValue() || !mc.player.isFallFlying())
                 sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
 
@@ -336,7 +336,7 @@ public class ElytraPlus extends Module {
         mc.player.getAbilities().flying = false;
         mc.player.getAbilities().setFlySpeed(0.05F);
 
-        if ((!mc.player.isOnGround() && stopOnGround.getValue()) || mc.player.getInventory().getStack(38).getItem() != Items.ELYTRA)
+        if ((isBoxCollidingGround() && stopOnGround.getValue()) || mc.player.getInventory().getStack(38).getItem() != Items.ELYTRA)
             return;
 
         mc.player.getAbilities().flying = true;
@@ -364,14 +364,14 @@ public class ElytraPlus extends Module {
             case Old -> e.setY(0.0002 - (mc.player.age % 2 == 0 ? 0 : 0.000001) + MathUtility.random(0, 0.0000009));
         }
 
-        if (stopOnGround.getValue() && (ncpStrict.is(NCPStrict.New) || ncpStrict.is(NCPStrict.Motion)) && mc.player.age % 2 == 0)
+        if (mc.player.horizontalCollision && (ncpStrict.is(NCPStrict.New) || ncpStrict.is(NCPStrict.Motion)) && mc.player.age % 2 == 0)
             e.setY(-0.07840000152587923);
 
         if ((infDurability.getValue() || ncpStrict.is(NCPStrict.Motion))) {
-            if (!MovementUtility.isMoving()) {
+            if (!MovementUtility.isMoving() && Math.abs(e.getX()) < 0.121 && Math.abs(e.getX()) < 0.121) {
                 float angleToRad = (float) Math.toRadians(4.5 * (mc.player.age % 80));
-                e.setX(Math.sin(angleToRad) * 0.1488);
-                e.setZ(Math.cos(angleToRad) * 0.1488);
+                e.setX(Math.sin(angleToRad) * 0.12);
+                e.setZ(Math.cos(angleToRad) * 0.12);
             }
         }
     }
@@ -881,5 +881,9 @@ public class ElytraPlus extends Module {
             resetPrevItems();
             ThunderHack.TICK_TIMER = 1f;
         }).start();
+    }
+
+    private boolean isBoxCollidingGround() {
+        return mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.25, 0.0, -0.25).offset(0.0, -0.3, 0.0)).iterator().hasNext();
     }
 }
