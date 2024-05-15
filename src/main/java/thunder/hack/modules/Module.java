@@ -312,7 +312,6 @@ public abstract class Module {
         return InputUtil.isKeyPressed(mc.getWindow().getHandle(), bind.getValue().getKey());
     }
 
-
     public @Nullable Setting<?> getSettingByName(String name) {
         for (Setting<?> setting : getSettings()) {
             if (!setting.getName().equalsIgnoreCase(name)) continue;
