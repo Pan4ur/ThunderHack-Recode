@@ -75,7 +75,6 @@ public class ModuleButton extends AbstractButton {
 
     public void init() {
         elements.forEach(AbstractElement::init);
-        category_animation = 0;
     }
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {

@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.Window;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
@@ -79,13 +78,13 @@ public class ClickGUI extends Screen {
             }
             firstOpen = false;
         } else {
-            if(windows.getFirst().getX() < 0 || windows.getFirst().getY() < 0) {
+            if (windows.getFirst().getX() < 0 || windows.getFirst().getY() < 0) {
                 float offset = 0;
 
                 int halfWidth = mc.getWindow().getScaledWidth() / 2;
                 int halfWidthCats = (int) (3 * (ModuleManager.clickGui.moduleWidth.getValue() + 4f));
 
-                for(AbstractWindow w : windows) {
+                for (AbstractWindow w : windows) {
                     w.setX((halfWidth - halfWidthCats) + offset);
                     w.setY(20);
                     offset += ModuleManager.clickGui.moduleWidth.getValue() + 2;
@@ -142,7 +141,7 @@ public class ClickGUI extends Screen {
         anyHovered = false;
 
 
-        if(closeAnimation <= 10) {
+        if (closeAnimation <= 10) {
             windows.forEach(w -> {
                 w.setX((float) (w.getX() + closeDirectionX * AnimationUtility.deltaTime()));
                 w.setY((float) (w.getY() + closeDirectionY * AnimationUtility.deltaTime()));
@@ -227,10 +226,13 @@ public class ClickGUI extends Screen {
         windows.forEach(w -> w.keyTyped(keyCode));
 
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            if(mc.player == null) {
+            if (mc.player == null) {
                 super.keyPressed(keyCode, scanCode, modifiers);
                 return true;
             }
+
+            if(close)
+                return true;
 
             windows.forEach(AbstractWindow::savePos);
 

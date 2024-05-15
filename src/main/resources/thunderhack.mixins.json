@@ -68,6 +68,7 @@
     "MixinBoatEntity",
     "MixinBoatEntityRenderer",
     "MixinCobwebBlock",
+    "MixinEndCrystal",
     "MixinEntity",
     "MixinEntityLiving",
     "MixinFlowableFluid",

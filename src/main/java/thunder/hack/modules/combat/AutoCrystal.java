@@ -7,11 +7,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -25,7 +22,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
-import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -33,7 +29,6 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CombatManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
-import thunder.hack.injection.accesors.IExplosion;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.player.SpeedMine;
@@ -260,9 +255,8 @@ public class AutoCrystal extends Module {
             boolean hitVisible = bestCrystal == null || PlayerUtility.canSee(bestCrystal.getPos());
             boolean placeVisible = bestPosition == null || PlayerUtility.canSee(bestPosition.getPos());
 
-            debug("hit:" + hitVisible + ", place:" + placeVisible);
-
-            if (mc.player.age % 5 == 0 && rayTraceBypass.getValue() && (!hitVisible || !placeVisible)) mc.player.setPitch(-90);
+            if (mc.player.age % 5 == 0 && rayTraceBypass.getValue() && (!hitVisible || !placeVisible))
+                mc.player.setPitch(-90);
             else mc.player.setPitch(rotationPitch);
             mc.player.setYaw(rotationYaw);
         }
@@ -316,7 +310,6 @@ public class AutoCrystal extends Module {
                 if (ent instanceof EndCrystalEntity crystal
                         && crystal.squaredDistanceTo(explosion.getX(), explosion.getY(), explosion.getZ()) <= 144
                         && !deadManager.isDead(crystal)) {
-                    debug("Removed " + crystal.getPos().toString() + " (due to explosion)");
                     deadManager.setDead(crystal, System.currentTimeMillis());
                 }
             }
@@ -330,7 +323,6 @@ public class AutoCrystal extends Module {
         if (e.getPrevState() == null || e.getState() == null)
             return;
         if (target != null && target.squaredDistanceTo(e.getPos().toCenterPos()) <= 4 && e.getState().isAir() && !e.getPrevState().isAir() && blockRecalcTimer.every(200)) {
-            debug("Detected change of state " + e.getPos() + ", recalculating...");
             ThunderHack.asyncManager.run(() -> calcPosition(recalculate.getValue() == Recalc.FAST ? 2f : placeRange.getValue(), recalculate.getValue() == Recalc.FAST ? e.getPos().toCenterPos() : mc.player.getPos()));
         }
     }
@@ -341,9 +333,7 @@ public class AutoCrystal extends Module {
         getCrystalToExplode();
         if (bestCrystal == crystal) {
             attackCrystal(crystal);
-            debug("end sequence");
             if (instantPlace.getValue().isEnabled() && placeTimer.passedMs(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue())) {
-                debug("placing after attack");
                 if (recalculate.getValue() != Recalc.OFF)
                     calcPosition(recalculate.getValue() == Recalc.FAST ? 2f : placeRange.getValue(), recalculate.getValue() == Recalc.FAST ? crystal.getPos() : mc.player.getPos());
 
@@ -361,7 +351,7 @@ public class AutoCrystal extends Module {
             float pitchDelta = ((float) (-Math.toDegrees(Math.atan2(vec.y - (mc.player.getPos().y + mc.player.getEyeHeight(mc.player.getPose())), Math.sqrt(Math.pow((vec.x - mc.player.getX()), 2) + Math.pow(vec.z - mc.player.getZ(), 2))))) - rotationPitch);
 
             yawDelta = (float) (yawDelta + Render2DEngine.interpolate(-1.2f, 1.2f, Math.sin(mc.player.age % 80)) + MathUtility.random(-1.2f, 1.2f));
-            pitchDelta = pitchDelta + MathUtility.random(-0.8f, 0.8f);
+            pitchDelta = pitchDelta + MathUtility.random(-2.8f, 0.1f);
 
             if (yawDelta > 180)
                 yawDelta = yawDelta - 180;
@@ -545,11 +535,11 @@ public class AutoCrystal extends Module {
         }
     }
 
-    private boolean canAttackCrystal(EndCrystalEntity cr) {
+    private boolean canAttackCrystal(EndCrystalEntity cr, boolean deadCheck) {
         if (crystalAge.getValue() != 0 && cr.age < crystalAge.getValue())
             return false;
 
-        if (deadManager.isDead(cr))
+        if (deadManager.isDead(cr) && deadCheck)
             return false;
 
         if (PlayerUtility.squaredDistanceFromEyes(cr.getPos()) > explodeRange.getPow2Value())
@@ -946,7 +936,7 @@ public class AutoCrystal extends Module {
             if (ent.getBoundingBox().intersects(posBoundingBox)) {
                 if (ent instanceof ExperienceOrbEntity)
                     continue;
-                if (ent instanceof EndCrystalEntity) {
+                if (ent instanceof EndCrystalEntity cr && canAttackCrystal(cr, false)) {
                     continue;
                 }
                 return true;
@@ -970,7 +960,7 @@ public class AutoCrystal extends Module {
                     continue;
 
                 if (breakTimer.passedMs(breakDelay.getValue()) && ent instanceof EndCrystalEntity cr
-                        && canAttackCrystal(cr)) {
+                        && canAttackCrystal(cr, true)) {
                     attackCrystal(cr);
                     debug("attack stuck crystal");
                     return false;
@@ -1046,7 +1036,7 @@ public class AutoCrystal extends Module {
                 if (dir == Direction.UP || dir == Direction.DOWN)
                     continue;
 
-                Vec3d directionVec = new Vec3d(bp.getX() + 0.5 + dir.getVector().getX() * 0.5, bp.getY() + 0.9, bp.getZ() + 0.5 + dir.getVector().getZ() * 0.5);
+                Vec3d directionVec = new Vec3d(bp.getX() + 0.5 + dir.getVector().getX() * 0.5, bp.getY() + 0.99, bp.getZ() + 0.5 + dir.getVector().getZ() * 0.5);
 
                 if (!mc.world.isAir(bp.offset(dir)))
                     continue;
