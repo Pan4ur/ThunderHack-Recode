@@ -126,6 +126,7 @@ public class AutoCrystal extends Module {
     private final Setting<Integer> removeDelay = new Setting<>("RemoveDelay", 0, 0, 200, v -> page.getValue() == Pages.Remove);
 
     /*   RENDER   */
+    private final Setting<Swing> swingMode = new Setting<>("Swing", Swing.Place, v -> page.getValue() == Pages.Render);
     private final Setting<Boolean> render = new Setting<>("Render", true, v -> page.getValue() == Pages.Render);
     private final Setting<Render> renderMode = new Setting<>("RenderMode", Render.Fade, v -> page.getValue() == Pages.Render);
     private final Setting<Boolean> rselfDamage = new Setting<>("SelfDamage", true, v -> page.getValue() == Pages.Render);
@@ -516,7 +517,7 @@ public class AutoCrystal extends Module {
                 prevSlot = switchTo(antiWeaknessResult, antiWeaknessResultInv, antiWeakness);
 
         sendPacket(PlayerInteractEntityC2SPacket.attack(crystal, mc.player.isSneaking()));
-        sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+        swingHand(false, true);
 
         breakTimer.reset();
 
@@ -624,8 +625,8 @@ public class AutoCrystal extends Module {
             return;
 
         sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND, bhr, id));
+        swingHand(offhand, false);
 
-        mc.player.swingHand(offhand ? Hand.OFF_HAND : Hand.MAIN_HAND);
         placeTimer.reset();
 
         if (!bhr.getBlockPos().equals(renderPos)) {
@@ -1097,6 +1098,25 @@ public class AutoCrystal extends Module {
         return bestResult;
     }
 
+    private void swingHand(boolean offHand, boolean attack) {
+        switch (swingMode.getValue()) {
+            case Both -> mc.player.swingHand(offHand ? Hand.OFF_HAND : Hand.MAIN_HAND);
+            case Break -> {
+                if(attack)
+                    mc.player.swingHand(Hand.MAIN_HAND);
+                else
+                    sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+
+            }
+            case Place -> {
+                if(!attack)
+                    mc.player.swingHand(offHand ? Hand.OFF_HAND : Hand.MAIN_HAND);
+                else
+                    sendPacket(new HandSwingC2SPacket(offHand ? Hand.OFF_HAND : Hand.MAIN_HAND));
+            }
+        }
+    }
+
     public void pause() {
         pauseTimer.reset();
     }
@@ -1145,5 +1165,9 @@ public class AutoCrystal extends Module {
 
     public enum Recalc {
         OFF, FAST, SLOW
+    }
+
+    public enum Swing {
+        Both, Place, Break, ServerSide
     }
 }
