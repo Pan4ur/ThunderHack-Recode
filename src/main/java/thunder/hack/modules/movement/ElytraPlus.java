@@ -53,6 +53,8 @@ public class ElytraPlus extends Module {
     }
 
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.FireWork);
+    private final Setting<Boolean> twoBee = new Setting<>("2b2t", false, v -> mode.is(Mode.Boost));
+    private final Setting<Boolean> onlySpace = new Setting<>("OnlySpace", true, v -> mode.is(Mode.Boost) && twoBee.getValue());
     private final Setting<Boolean> stopOnGround = new Setting<>("StopOnGround", false, v -> mode.is(Mode.Packet));
     private final Setting<Boolean> infDurability = new Setting<>("InfDurability", true, v -> mode.is(Mode.Packet));
     private final Setting<Boolean> vertical = new Setting<>("Vertical", false, v -> mode.is(Mode.Packet));
@@ -71,21 +73,21 @@ public class ElytraPlus extends Module {
     private final Setting<Boolean> allowFireSwap = new Setting<>("AllowFireSwap", false, v -> mode.is(Mode.FireWork));
     private final Setting<Boolean> bowBomb = new Setting<>("BowBomb", false, v -> mode.is(Mode.FireWork) || mode.getValue() == Mode.SunriseOld);
     private final Setting<Bind> bombKey = new Setting<>("BombKey", new Bind(-1, false, false), v -> mode.getValue() == Mode.SunriseOld);
-    private final Setting<Boolean> instantFly = new Setting<>("InstantFly", true, v -> (mode.is(Mode.Boost) || mode.is(Mode.Control)));
-    private final Setting<Boolean> cruiseControl = new Setting<>("CruiseControl", false, v -> mode.is(Mode.Boost));
+    private final Setting<Boolean> instantFly = new Setting<>("InstantFly", true, v -> ((mode.is(Mode.Boost) && !twoBee.getValue()) || mode.is(Mode.Control)));
+    private final Setting<Boolean> cruiseControl = new Setting<>("CruiseControl", false, v -> mode.is(Mode.Boost) && !twoBee.getValue());
     private final Setting<Float> factor = new Setting<>("Factor", 1.5f, 0.1f, 50.0f, v -> mode.is(Mode.Boost));
-    private final Setting<Float> upSpeed = new Setting<>("UpSpeed", 1.0f, 0.01f, 5.0f, v -> (mode.is(Mode.Boost) || mode.is(Mode.Control)));
-    private final Setting<Float> downFactor = new Setting<>("Glide", 1.0f, 0.0f, 2.0f, v -> (mode.is(Mode.Boost) || mode.is(Mode.Control)));
-    private final Setting<Boolean> stopMotion = new Setting<>("StopMotion", true, v -> mode.is(Mode.Boost));
-    private final Setting<Float> minUpSpeed = new Setting<>("MinUpSpeed", 0.5f, 0.1f, 5.0f, v -> mode.is(Mode.Boost) && cruiseControl.getValue());
-    private final Setting<Boolean> forceHeight = new Setting<>("ForceHeight", false, v -> (mode.is(Mode.Boost) && cruiseControl.getValue()));
-    private final Setting<Integer> manualHeight = new Setting<>("Height", 121, 1, 256, v -> mode.is(Mode.Boost) && cruiseControl.getValue() && forceHeight.getValue());
+    private final Setting<Float> upSpeed = new Setting<>("UpSpeed", 1.0f, 0.01f, 5.0f, v -> ((mode.is(Mode.Boost) && !twoBee.getValue()) || mode.is(Mode.Control)));
+    private final Setting<Float> downFactor = new Setting<>("Glide", 1.0f, 0.0f, 2.0f, v -> ((mode.is(Mode.Boost) && !twoBee.getValue()) || mode.is(Mode.Control)));
+    private final Setting<Boolean> stopMotion = new Setting<>("StopMotion", true, v -> mode.is(Mode.Boost) && !twoBee.getValue());
+    private final Setting<Float> minUpSpeed = new Setting<>("MinUpSpeed", 0.5f, 0.1f, 5.0f, v -> mode.is(Mode.Boost) && cruiseControl.getValue() && !twoBee.getValue());
+    private final Setting<Boolean> forceHeight = new Setting<>("ForceHeight", false, v -> (mode.is(Mode.Boost) && cruiseControl.getValue() && !twoBee.getValue()));
+    private final Setting<Integer> manualHeight = new Setting<>("Height", 121, 1, 256, v -> mode.is(Mode.Boost)&& !twoBee.getValue() && cruiseControl.getValue() && forceHeight.getValue());
     private final Setting<Float> sneakDownSpeed = new Setting<>("DownSpeed", 1.0f, 0.01f, 5.0f, v -> mode.is(Mode.Control));
     private final Setting<Boolean> speedLimit = new Setting<>("SpeedLimit", true, v -> mode.is(Mode.Boost));
     private final Setting<Float> maxSpeed = new Setting<>("MaxSpeed", 2.5f, 0.1f, 10.0f, v -> mode.is(Mode.Boost));
-    private final Setting<Float> redeployInterval = new Setting<>("RedeployInterval", 1F, 0.1F, 5F, v -> mode.is(Mode.Boost));
-    private final Setting<Float> redeployTimeOut = new Setting<>("RedeployTimeout", 5f, 0.1f, 20f, v -> mode.is(Mode.Boost));
-    private final Setting<Float> redeployDelay = new Setting<>("RedeployDelay", 0.5F, 0.1F, 1F, v -> mode.is(Mode.Boost));
+    private final Setting<Float> redeployInterval = new Setting<>("RedeployInterval", 1F, 0.1F, 5F, v -> mode.is(Mode.Boost) && !twoBee.getValue());
+    private final Setting<Float> redeployTimeOut = new Setting<>("RedeployTimeout", 5f, 0.1f, 20f, v -> mode.is(Mode.Boost) && !twoBee.getValue());
+    private final Setting<Float> redeployDelay = new Setting<>("RedeployDelay", 0.5F, 0.1F, 1F, v -> mode.is(Mode.Boost) && !twoBee.getValue());
     private final Setting<Float> infiniteMaxSpeed = new Setting<>("InfiniteMaxSpeed", 150f, 50f, 170f, v -> mode.getValue() == Mode.Pitch40Infinite);
     private final Setting<Float> infiniteMinSpeed = new Setting<>("InfiniteMinSpeed", 25f, 10f, 70f, v -> mode.getValue() == Mode.Pitch40Infinite);
     private final Setting<Integer> infiniteMaxHeight = new Setting<>("InfiniteMaxHeight", 200, 50, 360, v -> mode.getValue() == Mode.Pitch40Infinite);
@@ -305,8 +307,6 @@ public class ElytraPlus extends Module {
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
 
-        if (e.getPacket() instanceof EntityTrackerUpdateS2CPacket pac && pac.id() == mc.player.getId() && mode.is(Mode.Packet))
-            e.cancel();
 
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             acceleration = 0;
@@ -468,70 +468,79 @@ public class ElytraPlus extends Module {
     }
 
     private void doBoost(EventMove e) {
-        if (mc.player.getInventory().getStack(38).getItem() != Items.ELYTRA || !mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava() || !mc.player.isFallFlying())
-            return;
-
-        float moveForward = mc.player.input.movementForward;
-
-        if (cruiseControl.getValue()) {
-            if (mc.options.jumpKey.isPressed()) height++;
-            else if (mc.options.sneakKey.isPressed()) height--;
-
-            if (forceHeight.getValue()) height = manualHeight.getValue();
-
-            double heightPct = 1 - Math.sqrt(MathHelper.clamp(ThunderHack.playerManager.currentPlayerSpeed / 1.7, 0.0, 1.0));
-
-            if (ThunderHack.playerManager.currentPlayerSpeed >= minUpSpeed.getValue() && startTimer.passedMs((long) (2000 * redeployInterval.getValue()))) {
-                double pitch = -(44.4 * heightPct + 0.6);
-                double diff = (height + 1 - mc.player.getY()) * 2;
-                double pDist = -Math.toDegrees(Math.atan2(Math.abs(diff), ThunderHack.playerManager.currentPlayerSpeed * 30.0)) * Math.signum(diff);
-                mc.player.setPitch((float) (pitch + (pDist - pitch) * MathHelper.clamp(Math.abs(diff), 0.0, 1.0)));
-            } else {
-                mc.player.setPitch(0.25F);
-                moveForward = 1;
+        if(twoBee.getValue()) {
+            if (mc.options.jumpKey.isPressed() && mc.player.isFallFlying()) {
+                double[] m = MovementUtility.forward((factor.getValue() / 10f));
+                e.setX(e.getX() + m[0]);
+                e.setZ(e.getZ() + m[1]);
             }
-        }
+        } else {
 
-        Vec3d rotationVec = mc.player.getRotationVec(mc.getTickDelta());
+            if (mc.player.getInventory().getStack(38).getItem() != Items.ELYTRA || !mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava() || !mc.player.isFallFlying())
+                return;
 
-        double d6 = Math.hypot(rotationVec.x, rotationVec.z);
-        double currentSpeed = Math.hypot(e.getX(), e.getZ());
+            float moveForward = mc.player.input.movementForward;
 
-        float f4 = (float) (Math.pow(Math.cos(Math.toRadians(mc.player.getPitch())), 2) * Math.min(1, rotationVec.length() / 0.4));
+            if (cruiseControl.getValue()) {
+                if (mc.options.jumpKey.isPressed()) height++;
+                else if (mc.options.sneakKey.isPressed()) height--;
 
-        e.setY(e.getY() + (-0.08D + (double) f4 * 0.06));
+                if (forceHeight.getValue()) height = manualHeight.getValue();
 
-        if (e.getY() < 0 && d6 > 0) {
-            double ySpeed = e.getY() * -0.1 * (double) f4;
-            e.setY(e.getY() + ySpeed);
-            e.setX(e.getX() + rotationVec.x * ySpeed / d6);
-            e.setZ(e.getZ() + rotationVec.z * ySpeed / d6);
-        }
+                double heightPct = 1 - Math.sqrt(MathHelper.clamp(ThunderHack.playerManager.currentPlayerSpeed / 1.7, 0.0, 1.0));
 
-        if (mc.player.getPitch() < 0) {
-            double ySpeed = currentSpeed * -Math.sin(Math.toRadians(mc.player.getPitch())) * 0.04;
-            e.setY(e.getY() + ySpeed * 3.2);
-            e.setX(e.getX() - rotationVec.x * ySpeed / d6);
-            e.setZ(e.getZ() - rotationVec.z * ySpeed / d6);
-        }
-
-        if (d6 > 0) {
-            e.setX(e.getX() + (rotationVec.x / d6 * currentSpeed - e.getX()) * 0.1D);
-            e.setZ(e.getZ() + (rotationVec.z / d6 * currentSpeed - e.getZ()) * 0.1D);
-        }
-
-        if (mc.player.getPitch() > 0 && e.getY() < 0) {
-            if (moveForward != 0 && startTimer.passedMs((long) (2000 * redeployInterval.getValue())) && redeployTimer.passedMs((long) (1000 * redeployTimeOut.getValue()))) {
-                if (stopMotion.getValue()) {
-                    e.setX(0);
-                    e.setZ(0);
+                if (ThunderHack.playerManager.currentPlayerSpeed >= minUpSpeed.getValue() && startTimer.passedMs((long) (2000 * redeployInterval.getValue()))) {
+                    double pitch = -(44.4 * heightPct + 0.6);
+                    double diff = (height + 1 - mc.player.getY()) * 2;
+                    double pDist = -Math.toDegrees(Math.atan2(Math.abs(diff), ThunderHack.playerManager.currentPlayerSpeed * 30.0)) * Math.signum(diff);
+                    mc.player.setPitch((float) (pitch + (pDist - pitch) * MathHelper.clamp(Math.abs(diff), 0.0, 1.0)));
+                } else {
+                    mc.player.setPitch(0.25F);
+                    moveForward = 1;
                 }
-                startTimer.reset();
-                sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
-            } else if (!startTimer.passedMs((long) (2000 * redeployInterval.getValue()))) {
-                e.setX(e.getX() - moveForward * Math.sin(Math.toRadians(mc.player.getYaw())) * factor.getValue() / 20F);
-                e.setZ(e.getZ() + moveForward * Math.cos(Math.toRadians(mc.player.getYaw())) * factor.getValue() / 20F);
-                redeployTimer.reset();
+            }
+
+            Vec3d rotationVec = mc.player.getRotationVec(mc.getTickDelta());
+
+            double d6 = Math.hypot(rotationVec.x, rotationVec.z);
+            double currentSpeed = Math.hypot(e.getX(), e.getZ());
+
+            float f4 = (float) (Math.pow(Math.cos(Math.toRadians(mc.player.getPitch())), 2) * Math.min(1, rotationVec.length() / 0.4));
+
+            e.setY(e.getY() + (-0.08D + (double) f4 * 0.06));
+
+            if (e.getY() < 0 && d6 > 0) {
+                double ySpeed = e.getY() * -0.1 * (double) f4;
+                e.setY(e.getY() + ySpeed);
+                e.setX(e.getX() + rotationVec.x * ySpeed / d6);
+                e.setZ(e.getZ() + rotationVec.z * ySpeed / d6);
+            }
+
+            if (mc.player.getPitch() < 0) {
+                double ySpeed = currentSpeed * -Math.sin(Math.toRadians(mc.player.getPitch())) * 0.04;
+                e.setY(e.getY() + ySpeed * 3.2);
+                e.setX(e.getX() - rotationVec.x * ySpeed / d6);
+                e.setZ(e.getZ() - rotationVec.z * ySpeed / d6);
+            }
+
+            if (d6 > 0) {
+                e.setX(e.getX() + (rotationVec.x / d6 * currentSpeed - e.getX()) * 0.1D);
+                e.setZ(e.getZ() + (rotationVec.z / d6 * currentSpeed - e.getZ()) * 0.1D);
+            }
+
+            if (mc.player.getPitch() > 0 && e.getY() < 0) {
+                if (moveForward != 0 && startTimer.passedMs((long) (2000 * redeployInterval.getValue())) && redeployTimer.passedMs((long) (1000 * redeployTimeOut.getValue()))) {
+                    if (stopMotion.getValue()) {
+                        e.setX(0);
+                        e.setZ(0);
+                    }
+                    startTimer.reset();
+                    sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+                } else if (!startTimer.passedMs((long) (2000 * redeployInterval.getValue()))) {
+                    e.setX(e.getX() - moveForward * Math.sin(Math.toRadians(mc.player.getYaw())) * factor.getValue() / 20F);
+                    e.setZ(e.getZ() + moveForward * Math.cos(Math.toRadians(mc.player.getYaw())) * factor.getValue() / 20F);
+                    redeployTimer.reset();
+                }
             }
         }
 

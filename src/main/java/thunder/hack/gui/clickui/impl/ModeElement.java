@@ -59,20 +59,20 @@ public class ModeElement extends AbstractElement {
             Render2DEngine.drawRect(context.getMatrices(), x + 4, y, 1f, 17, HudEditor.getColor(1));
 
 
-        FontRenderers.sf_medium_mini.drawString(matrixStack, setting2.getName(), (setting.parent != null ? 2f : 0f) + (int) (x + 6), (int) (y + wheight / 2 - (6 / 2f)) + 3, new Color(-1).getRGB());
+        FontRenderers.sf_medium_mini.drawString(matrixStack, setting2.getName(), (setting.parent != null ? 2f : 0f) + (x + 6),  (y + wheight / 2 - (6 / 2f)) + 3, new Color(-1).getRGB());
 
         if(animation2 < 0.99 && !Objects.equals(setting2.currentEnumName(), prevMode)) {
-            FontRenderers.sf_medium_mini.drawString(matrixStack, prevMode, (int) (x + width - 18 - FontRenderers.sf_medium_mini.getStringWidth(prevMode)), 3 + (int) (y + wheight / 2 - 3f) - animation2 * 5, Render2DEngine.applyOpacity(new Color(-1), animation2));
-            FontRenderers.sf_medium_mini.drawString(matrixStack, setting2.currentEnumName(), (int) (x + width - 18 - FontRenderers.sf_medium_mini.getStringWidth(setting2.currentEnumName())), 3 + (int) (y + wheight / 2 - 3f) - animation2 * 5 + 5, Render2DEngine.applyOpacity(new Color(-1), 1f - animation2));
+            FontRenderers.sf_medium_mini.drawString(matrixStack, prevMode, (int) (x + width - 18 - FontRenderers.sf_medium_mini.getStringWidth(prevMode)), 3 + (y + wheight / 2 - 3f) - animation2 * 5, Render2DEngine.applyOpacity(new Color(-1), animation2));
+            FontRenderers.sf_medium_mini.drawString(matrixStack, setting2.currentEnumName(), (x + width - 18 - FontRenderers.sf_medium_mini.getStringWidth(setting2.currentEnumName())), 3 + (y + wheight / 2 - 3f) - animation2 * 5 + 5, Render2DEngine.applyOpacity(new Color(-1), 1f - animation2));
         } else
-             FontRenderers.sf_medium_mini.drawString(matrixStack, setting2.currentEnumName(), (int) (x + width - 18 - FontRenderers.sf_medium_mini.getStringWidth(setting.currentEnumName())), 3 + (int) (y + wheight / 2 - 3f), new Color(-1).getRGB());
+             FontRenderers.sf_medium_mini.drawString(matrixStack, setting2.currentEnumName(), (x + width - 18 - FontRenderers.sf_medium_mini.getStringWidth(setting.currentEnumName())), 3 + (y + wheight / 2 - 3f), new Color(-1).getRGB());
 
 
         if (open) {
             Color color = HudEditor.getColor(0);
             double offsetY = 0;
             for (int i = 0; i <= setting2.getModes().length - 1; i++) {
-                FontRenderers.sf_medium_mini.drawString(matrixStack, setting2.getModes()[i], (int) x + (int) width / 2f - (FontRenderers.sf_medium_mini.getStringWidth(setting2.getModes()[i]) / 2f), (int) (y + wheight + 2 + offsetY), setting2.currentEnumName().equalsIgnoreCase(setting2.getModes()[i]) ? color.getRGB() : new Color(-1).getRGB());
+                FontRenderers.sf_medium_mini.drawString(matrixStack, setting2.getModes()[i], x +  width / 2f - (FontRenderers.sf_medium_mini.getStringWidth(setting2.getModes()[i]) / 2f),  (y + wheight + 2 + offsetY), setting2.currentEnumName().equalsIgnoreCase(setting2.getModes()[i]) ? color.getRGB() : new Color(-1).getRGB());
                 offsetY += 12;
             }
         }
