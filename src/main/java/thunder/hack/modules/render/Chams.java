@@ -62,6 +62,7 @@ public class Chams extends Module {
         if(alternativeBlending.getValue()) RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         else RenderSystem.defaultBlendFunc();
         RenderSystem.disableCull();
+        RenderSystem.disableDepthTest();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
 
@@ -103,6 +104,7 @@ public class Chams extends Module {
         tessellator.draw();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.disableBlend();
+        RenderSystem.enableDepthTest();
         RenderSystem.enableCull();
     }
 
@@ -111,6 +113,7 @@ public class Chams extends Module {
         if(alternativeBlending.getValue()) RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         else RenderSystem.defaultBlendFunc();
         RenderSystem.enableCull();
+        RenderSystem.disableDepthTest();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
 
@@ -188,6 +191,7 @@ public class Chams extends Module {
         RenderSystem.disableCull();
         matrixStack.pop();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        RenderSystem.enableDepthTest();
         if (!playerTexture.getValue()) {
             ci.cancel();
             post.run();
