@@ -108,7 +108,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
                     matrixStack.translate((float) (-direction.getOffsetX()) * n, 0.0f, (float) (-direction.getOffsetZ()) * n);
                 }
                 float l = pe.age + g;
-                ModuleManager.chams.setupTransforms(pe, matrixStack, l, h, g);
+                ModuleManager.chams.setupTransforms1(pe, matrixStack, l, h, g);
                 matrixStack.scale(-1.0f, -1.0f, 1.0f);
                 matrixStack.scale(0.9375f, 0.9375f, 0.9375f);
                 matrixStack.translate(0.0f, -1.501f, 0.0f);

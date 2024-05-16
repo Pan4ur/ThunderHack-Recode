@@ -8,6 +8,7 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
+import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -15,10 +16,12 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3d;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.events.impl.EventHeldItemRenderer;
@@ -164,7 +167,7 @@ public class Chams extends Module {
             matrixStack.translate((float) (-direction.getOffsetX()) * n, 0.0f, (float) (-direction.getOffsetZ()) * n);
         }
         float l = pe.age + g;
-        this.setupTransforms(pe, matrixStack, l, h, g);
+        setupTransforms1(pe, matrixStack, l, h, g);
         matrixStack.scale(-1.0f, -1.0f, 1.0f);
         matrixStack.scale(0.9375f, 0.9375f, 0.9375f);
         matrixStack.translate(0.0f, -1.501f, 0.0f);
@@ -198,31 +201,63 @@ public class Chams extends Module {
         }
     }
 
-    public void setupTransforms(PlayerEntity entity, MatrixStack matrices, float animationProgress, float bodyYaw, float tickDelta) {
-        if (entity.isFrozen()) {
-            bodyYaw += (float) (Math.cos((double) entity.age * 3.25) * Math.PI * (double) 0.4f);
-        }
-        if (!entity.isInPose(EntityPose.SLEEPING)) {
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f - bodyYaw));
-        }
-        if (entity.deathTime > 0) {
-            float f = ((float) entity.deathTime + tickDelta - 1.0f) / 20.0f * 1.6f;
-            if ((f = MathHelper.sqrt(f)) > 1.0f) {
-                f = 1.0f;
+    public void setupTransforms1(PlayerEntity abstractClientPlayerEntity, MatrixStack matrixStack, float f, float g, float h) {
+        float j = abstractClientPlayerEntity.getLeaningPitch(h);
+        float k = abstractClientPlayerEntity.getPitch(h);
+        float l;
+        float m;
+        if (abstractClientPlayerEntity.isFallFlying()) {
+            setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
+            l = (float)abstractClientPlayerEntity.getFallFlyingTicks() + h;
+            m = MathHelper.clamp(l * l / 100.0F, 0.0F, 1.0F);
+            if (!abstractClientPlayerEntity.isUsingRiptide()) {
+                matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(m * (-90.0F - k)));
             }
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(f * 90));
+
+            Vec3d vec3d = abstractClientPlayerEntity.getRotationVec(h);
+            Vec3d vec3d2 = abstractClientPlayerEntity.getVelocity();
+            double d = vec3d2.horizontalLengthSquared();
+            double e = vec3d.horizontalLengthSquared();
+            if (d > 0.0 && e > 0.0) {
+                double n = (vec3d2.x * vec3d.x + vec3d2.z * vec3d.z) / Math.sqrt(d * e);
+                double o = vec3d2.x * vec3d.z - vec3d2.z * vec3d.x;
+                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotation((float)(Math.signum(o) * Math.acos(n))));
+            }
+        } else if (j > 0.0F) {
+            setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
+            l = abstractClientPlayerEntity.isTouchingWater() ? -90.0F - k : -90.0F;
+            m = MathHelper.lerp(j, 0.0F, l);
+            matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(m));
+            if (abstractClientPlayerEntity.isInSwimmingPose()) {
+                matrixStack.translate(0.0F, -1.0F, 0.3F);
+            }
+        } else {
+            setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
+        }
+    }
+
+    private void setupTransforms(PlayerEntity entity, MatrixStack matrices, float animationProgress, float bodyYaw, float tickDelta) {
+        if (!entity.isInPose(EntityPose.SLEEPING)) {
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F - bodyYaw));
+        }
+
+        if (entity.deathTime > 0) {
+            float f = ((float)entity.deathTime + tickDelta - 1.0F) / 20.0F * 1.6F;
+            f = MathHelper.sqrt(f);
+            if (f > 1.0F) {
+                f = 1.0F;
+            }
+
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(f * 90.0F));
         } else if (entity.isUsingRiptide()) {
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0f - entity.getPitch()));
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(((float) entity.age + tickDelta) * -75.0f));
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0F - entity.getPitch()));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(((float)entity.age + tickDelta) * -75.0F));
         } else if (entity.isInPose(EntityPose.SLEEPING)) {
             Direction direction = entity.getSleepingDirection();
             float g = direction != null ? getYaw(direction) : bodyYaw;
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(g));
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(90));
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(270.0f));
-        } else if (LivingEntityRenderer.shouldFlipUpsideDown(entity)) {
-            matrices.translate(0.0f, entity.getHeight() + 0.1f, 0.0f);
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(90.0F));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(270.0F));
         }
     }
 

@@ -294,7 +294,7 @@ public class AutoCrystal extends Module {
         if (e.getEntity() instanceof EndCrystalEntity crystal && !placedCrystals.isEmpty()) {
             HashMap<BlockPos, Long> cache = new HashMap<>(placedCrystals);
             for (BlockPos bp : cache.keySet())
-                if (crystal.squaredDistanceTo(bp.toCenterPos()) < 0.3 && timing.getValue() == Timing.NORMAL && breakTimer.passedMs(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue())) {
+                if (crystal.squaredDistanceTo(bp.toCenterPos()) < 0.3 && breakTimer.passedMs(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue())) {
                     confirmTime = System.currentTimeMillis() - cache.get(bp);
                     placedCrystals.remove(bp);
                     ThunderHack.asyncManager.run(() -> handleSpawn(crystal));
