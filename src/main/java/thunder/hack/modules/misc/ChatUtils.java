@@ -36,6 +36,7 @@ public class ChatUtils extends Module {
     private final Setting<Boolean> mention = new Setting<>("Mention", false);
     private final Setting<PMSound> pmSound = new Setting<>("PMSound", PMSound.Default);
     private final Setting<Boolean> zov = new Setting<>("ZOV", false);
+    private final Setting<Boolean> wavy = new Setting<>("wAvY",false);
     private final Setting<Boolean> antiCoordLeak = new Setting<>("AntiCoordLeak", false);
 
     private final Timer timer = new Timer();
@@ -202,7 +203,7 @@ public class ChatUtils extends Module {
         }
 
         if (fullNullCheck()) return;
-        if (e.getPacket() instanceof ChatMessageC2SPacket pac && zov.getValue()) {
+        if (e.getPacket() instanceof ChatMessageC2SPacket pac && (zov.getValue() || wavy.getValue())) {
 
             if (Objects.equals(pac.chatMessage(), skip)) {
                 return;
@@ -214,17 +215,35 @@ public class ChatUtils extends Module {
             if (pac.chatMessage().startsWith("/") || pac.chatMessage().startsWith(ThunderHack.commandManager.getPrefix()))
                 return;
 
-            StringBuilder newString = new StringBuilder();
-            for (char Z : pac.chatMessage().toCharArray()) {
-                if ('З' == Z || 'з' == Z) {
-                    newString.append("Z");
-                } else if ('В' == Z || 'в' == Z) {
-                    newString.append("V");
-                } else {
-                    newString.append(Z);
+            String message = pac.chatMessage();
+            if(zov.getValue()){
+                StringBuilder builder = new StringBuilder();
+                for(char Z:message.toCharArray()){
+                    if ('З' == Z || 'з' == Z) {
+                        builder.append("Z");
+                    } else if ('В' == Z || 'в' == Z) {
+                        builder.append("V");
+                    } else {
+                        builder.append(Z);
+                    }
                 }
+                message = builder.toString();
             }
-            skip = newString.toString();
+            if(wavy.getValue()){
+                StringBuilder builder = new StringBuilder();
+                boolean up = false;
+                for(char C : message.toCharArray()){
+                    if(up){
+                        builder.append(Character.toUpperCase(C));
+                    }
+                    else{
+                        builder.append(Character.toLowerCase(C));
+                    }
+                    up = !up;
+                }
+                message = builder.toString();
+            }
+            skip = message;
             mc.player.networkHandler.sendChatMessage(skip);
             e.cancel();
         }
