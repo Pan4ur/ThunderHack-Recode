@@ -102,6 +102,13 @@ public final class MovementUtility {
         return yaw;
     }
 
+    public static double[] forwardWithoutStrafe(final double d) {
+        float f3 = mc.player.getYaw();
+        final double d4 = d * Math.cos(Math.toRadians(f3 + 90.0f));
+        final double d5 = d * Math.sin(Math.toRadians(f3 + 90.0f));
+        return new double[]{d4, d5};
+    }
+
     public static double getJumpSpeed() {
         double jumpSpeed = 0.3999999463558197;
         if (mc.player.hasStatusEffect(StatusEffects.JUMP_BOOST)) {
