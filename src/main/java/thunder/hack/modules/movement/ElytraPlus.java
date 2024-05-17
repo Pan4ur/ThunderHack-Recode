@@ -322,7 +322,7 @@ public class ElytraPlus extends Module {
 
         if (e.getPacket() instanceof CommonPingS2CPacket && mode.is(Mode.FireWork) && grim.getValue() && flying)
             if (!pingTimer.passedMs(50000)) {
-                if (pingTimer.passedMs(1000) && mc.player.squaredDistanceTo(flightZonePos) < 7000)
+                if (pingTimer.passedMs(1000) && PlayerUtility.getSquaredDistance2D(flightZonePos) < 7000)
                     e.cancel();
             } else pingTimer.reset();
     }
@@ -429,7 +429,7 @@ public class ElytraPlus extends Module {
             if (!pingTimer.passedMs(50000)) {
                 if (pingTimer.passedMs(1000)) {
                     int timeS = (int) MathUtility.round2(((float) (50000 - pingTimer.getPassedTimeMs()) / 1000f));
-                    int dist = (int) (83f - Math.sqrt(mc.player.squaredDistanceTo(flightZonePos)));
+                    int dist = (int) (83f - Math.sqrt(PlayerUtility.getSquaredDistance2D(flightZonePos)));
                     FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), isRu() ? ("Осталось " + timeS + " секунд и " + dist + " метров") : (timeS + " seconds and " + dist + " meters left"),
                             mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() / 2f + 30f, -1);
                 }

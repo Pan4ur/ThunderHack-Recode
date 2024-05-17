@@ -40,6 +40,7 @@ import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
@@ -110,7 +111,7 @@ public final class SpeedMine extends Module {
 
         } else if (mode.getValue() == Mode.Packet) {
             if (minePosition != null) {
-                if (mineBreaks >= breakAttempts.getValue() || mc.player.squaredDistanceTo(minePosition.toCenterPos()) > range.getPow2Value()) {
+                if (mineBreaks >= breakAttempts.getValue() || PlayerUtility.squaredDistanceFromEyes(minePosition.toCenterPos()) > range.getPow2Value()) {
                     reset();
                     return;
                 }
@@ -179,7 +180,7 @@ public final class SpeedMine extends Module {
             }
         } else if (mode.getValue() == Mode.GrimInstant) {
             if (minePosition != null) {
-                if (mc.player.squaredDistanceTo(minePosition.toCenterPos()) > range.getPow2Value()) {
+                if (PlayerUtility.squaredDistanceFromEyes(minePosition.toCenterPos()) > range.getPow2Value()) {
                     reset();
                     return;
                 }
