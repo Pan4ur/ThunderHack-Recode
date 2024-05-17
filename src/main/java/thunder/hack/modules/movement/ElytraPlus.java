@@ -38,6 +38,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.PlayerUtility;
@@ -81,7 +82,7 @@ public class ElytraPlus extends Module {
     private final Setting<Boolean> stopMotion = new Setting<>("StopMotion", true, v -> mode.is(Mode.Boost) && !twoBee.getValue());
     private final Setting<Float> minUpSpeed = new Setting<>("MinUpSpeed", 0.5f, 0.1f, 5.0f, v -> mode.is(Mode.Boost) && cruiseControl.getValue());
     private final Setting<Boolean> forceHeight = new Setting<>("ForceHeight", false, v -> (mode.is(Mode.Boost) && cruiseControl.getValue()));
-    private final Setting<Integer> manualHeight = new Setting<>("Height", 121, 1, 256, v -> mode.is(Mode.Boost)&& !twoBee.getValue() && forceHeight.getValue());
+    private final Setting<Integer> manualHeight = new Setting<>("Height", 121, 1, 256, v -> mode.is(Mode.Boost) && forceHeight.getValue());
     private final Setting<Float> sneakDownSpeed = new Setting<>("DownSpeed", 1.0f, 0.01f, 5.0f, v -> mode.is(Mode.Control));
     private final Setting<Boolean> speedLimit = new Setting<>("SpeedLimit", true, v -> mode.is(Mode.Boost));
     private final Setting<Float> maxSpeed = new Setting<>("MaxSpeed", 2.5f, 0.1f, 10.0f, v -> mode.is(Mode.Boost));
@@ -476,24 +477,29 @@ public class ElytraPlus extends Module {
         if (cruiseControl.getValue()) {
             if (mc.options.jumpKey.isPressed()) height++;
             else if (mc.options.sneakKey.isPressed()) height--;
-
             if (forceHeight.getValue()) height = manualHeight.getValue();
 
-            double heightPct = 1 - Math.sqrt(MathHelper.clamp(ThunderHack.playerManager.currentPlayerSpeed / 1.7, 0.0, 1.0));
-
-            if (ThunderHack.playerManager.currentPlayerSpeed >= minUpSpeed.getValue() && startTimer.passedMs((long) (2000 * redeployInterval.getValue()))) {
-                double pitch = -(44.4 * heightPct + 0.6);
-                double diff = (height + 1 - mc.player.getY()) * 2;
-                double pDist = -Math.toDegrees(Math.atan2(Math.abs(diff), ThunderHack.playerManager.currentPlayerSpeed * 30.0)) * Math.signum(diff);
-                mc.player.setPitch((float) (pitch + (pDist - pitch) * MathHelper.clamp(Math.abs(diff), 0.0, 1.0)));
+            if(twoBee.getValue()) {
+                if (ThunderHack.playerManager.currentPlayerSpeed >= minUpSpeed.getValue())
+                    mc.player.setPitch((float) MathHelper.clamp(MathHelper.wrapDegrees(Math.toDegrees(Math.atan2((height - mc.player.getY()) * -1.0, 10))), -50, 50));
+                else
+                    mc.player.setPitch(0.25F);
             } else {
-                mc.player.setPitch(0.25F);
-                moveForward = 1;
+                double heightPct = 1 - Math.sqrt(MathHelper.clamp(ThunderHack.playerManager.currentPlayerSpeed / 1.7, 0.0, 1.0));
+                if (ThunderHack.playerManager.currentPlayerSpeed >= minUpSpeed.getValue() && startTimer.passedMs((long) (2000 * redeployInterval.getValue()))) {
+                    double pitch = -(44.4 * heightPct + 0.6);
+                    double diff = (height + 1 - mc.player.getY()) * 2;
+                    double pDist = -Math.toDegrees(Math.atan2(Math.abs(diff), ThunderHack.playerManager.currentPlayerSpeed * 30.0)) * Math.signum(diff);
+                    mc.player.setPitch((float) (pitch + (pDist - pitch) * MathHelper.clamp(Math.abs(diff), 0.0, 1.0)));
+                } else {
+                    mc.player.setPitch(0.25F);
+                    moveForward = 1;
+                }
             }
         }
 
         if(twoBee.getValue()) {
-            if ((mc.options.jumpKey.isPressed() || !onlySpace.getValue())) {
+            if ((mc.options.jumpKey.isPressed() || !onlySpace.getValue() || cruiseControl.getValue())) {
                 double[] m = MovementUtility.forwardWithoutStrafe((factor.getValue() / 10f));
                 e.setX(e.getX() + m[0]);
                 e.setZ(e.getZ() + m[1]);
