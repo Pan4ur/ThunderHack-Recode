@@ -13,7 +13,7 @@ public class Baritone extends Module {
     public final Setting<Boolean> pauseInGUI = new Setting<>("PauseInGUI", false);
     public final Setting<Boolean> allowBreak = new Setting<>("allowBreak", true);
     public final Setting<Boolean> allowPlace = new Setting<>("allowPlace", true);
-    public final Setting<Boolean> allowSprint = new Setting<>("allowPlace", true);
+    public final Setting<Boolean> allowSprint = new Setting<>("allowSprint", true);
 
     @EventHandler
     public void onSettingChange(EventSetting e) {
