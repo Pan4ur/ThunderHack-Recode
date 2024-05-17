@@ -296,6 +296,7 @@ public class ElytraPlus extends Module {
     @EventHandler
     public void onPacketSend(PacketEvent.SendPost event) {
         if (fullNullCheck()) return;
+
         if (event.getPacket() instanceof ClientCommandC2SPacket command && mode.is(Mode.FireWork))
             if (command.getMode() == ClientCommandC2SPacket.Mode.START_FALL_FLYING)
                 doFireWork(false);
@@ -307,7 +308,8 @@ public class ElytraPlus extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
-
+        if (e.getPacket() instanceof EntityTrackerUpdateS2CPacket pac && pac.id() == mc.player.getId() && mode.is(Mode.Packet))
+            e.cancel();
 
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             acceleration = 0;
