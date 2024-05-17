@@ -469,7 +469,7 @@ public class ElytraPlus extends Module {
 
     private void doBoost(EventMove e) {
         if(twoBee.getValue()) {
-            if (mc.options.jumpKey.isPressed() && mc.player.isFallFlying()) {
+            if ((mc.options.jumpKey.isPressed() || !onlySpace.getValue()) && mc.player.isFallFlying()) {
                 double[] m = MovementUtility.forward((factor.getValue() / 10f));
                 e.setX(e.getX() + m[0]);
                 e.setZ(e.getZ() + m[1]);
