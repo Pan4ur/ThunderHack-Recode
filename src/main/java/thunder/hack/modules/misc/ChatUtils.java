@@ -239,7 +239,7 @@ public class ChatUtils extends Module {
                     else{
                         builder.append(Character.toLowerCase(C));
                     }
-                    up = !up;
+                    up = Character.isLetter(C) != up;
                 }
                 message = builder.toString();
             }
