@@ -253,6 +253,7 @@ public class ModuleManager implements IManager {
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
     public static RPC rpc = new RPC();
+    public static KillStats kills = new KillStats();
 
     public ModuleManager() {
         for (Field field : getClass().getDeclaredFields()) {
