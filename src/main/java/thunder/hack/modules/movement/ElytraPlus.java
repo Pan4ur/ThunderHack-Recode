@@ -38,6 +38,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.PlayerUtility;
@@ -74,14 +75,14 @@ public class ElytraPlus extends Module {
     private final Setting<Boolean> bowBomb = new Setting<>("BowBomb", false, v -> mode.is(Mode.FireWork) || mode.getValue() == Mode.SunriseOld);
     private final Setting<Bind> bombKey = new Setting<>("BombKey", new Bind(-1, false, false), v -> mode.getValue() == Mode.SunriseOld);
     private final Setting<Boolean> instantFly = new Setting<>("InstantFly", true, v -> ((mode.is(Mode.Boost) && !twoBee.getValue()) || mode.is(Mode.Control)));
-    private final Setting<Boolean> cruiseControl = new Setting<>("CruiseControl", false, v -> mode.is(Mode.Boost) && !twoBee.getValue());
+    private final Setting<Boolean> cruiseControl = new Setting<>("CruiseControl", false, v -> mode.is(Mode.Boost));
     private final Setting<Float> factor = new Setting<>("Factor", 1.5f, 0.1f, 50.0f, v -> mode.is(Mode.Boost));
     private final Setting<Float> upSpeed = new Setting<>("UpSpeed", 1.0f, 0.01f, 5.0f, v -> ((mode.is(Mode.Boost) && !twoBee.getValue()) || mode.is(Mode.Control)));
     private final Setting<Float> downFactor = new Setting<>("Glide", 1.0f, 0.0f, 2.0f, v -> ((mode.is(Mode.Boost) && !twoBee.getValue()) || mode.is(Mode.Control)));
     private final Setting<Boolean> stopMotion = new Setting<>("StopMotion", true, v -> mode.is(Mode.Boost) && !twoBee.getValue());
-    private final Setting<Float> minUpSpeed = new Setting<>("MinUpSpeed", 0.5f, 0.1f, 5.0f, v -> mode.is(Mode.Boost) && cruiseControl.getValue() && !twoBee.getValue());
-    private final Setting<Boolean> forceHeight = new Setting<>("ForceHeight", false, v -> (mode.is(Mode.Boost) && cruiseControl.getValue() && !twoBee.getValue()));
-    private final Setting<Integer> manualHeight = new Setting<>("Height", 121, 1, 256, v -> mode.is(Mode.Boost)&& !twoBee.getValue() && cruiseControl.getValue() && forceHeight.getValue());
+    private final Setting<Float> minUpSpeed = new Setting<>("MinUpSpeed", 0.5f, 0.1f, 5.0f, v -> mode.is(Mode.Boost) && cruiseControl.getValue());
+    private final Setting<Boolean> forceHeight = new Setting<>("ForceHeight", false, v -> (mode.is(Mode.Boost) && cruiseControl.getValue()));
+    private final Setting<Integer> manualHeight = new Setting<>("Height", 121, 1, 256, v -> mode.is(Mode.Boost) && forceHeight.getValue());
     private final Setting<Float> sneakDownSpeed = new Setting<>("DownSpeed", 1.0f, 0.01f, 5.0f, v -> mode.is(Mode.Control));
     private final Setting<Boolean> speedLimit = new Setting<>("SpeedLimit", true, v -> mode.is(Mode.Boost));
     private final Setting<Float> maxSpeed = new Setting<>("MaxSpeed", 2.5f, 0.1f, 10.0f, v -> mode.is(Mode.Boost));
@@ -295,6 +296,7 @@ public class ElytraPlus extends Module {
     @EventHandler
     public void onPacketSend(PacketEvent.SendPost event) {
         if (fullNullCheck()) return;
+
         if (event.getPacket() instanceof ClientCommandC2SPacket command && mode.is(Mode.FireWork))
             if (command.getMode() == ClientCommandC2SPacket.Mode.START_FALL_FLYING)
                 doFireWork(false);
@@ -306,7 +308,8 @@ public class ElytraPlus extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
-
+        if (e.getPacket() instanceof EntityTrackerUpdateS2CPacket pac && pac.id() == mc.player.getId() && mode.is(Mode.Packet))
+            e.cancel();
 
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             acceleration = 0;
@@ -319,7 +322,7 @@ public class ElytraPlus extends Module {
 
         if (e.getPacket() instanceof CommonPingS2CPacket && mode.is(Mode.FireWork) && grim.getValue() && flying)
             if (!pingTimer.passedMs(50000)) {
-                if (pingTimer.passedMs(1000) && mc.player.squaredDistanceTo(flightZonePos) < 7000)
+                if (pingTimer.passedMs(1000) && PlayerUtility.getSquaredDistance2D(flightZonePos) < 7000)
                     e.cancel();
             } else pingTimer.reset();
     }
@@ -426,7 +429,7 @@ public class ElytraPlus extends Module {
             if (!pingTimer.passedMs(50000)) {
                 if (pingTimer.passedMs(1000)) {
                     int timeS = (int) MathUtility.round2(((float) (50000 - pingTimer.getPassedTimeMs()) / 1000f));
-                    int dist = (int) (83f - Math.sqrt(mc.player.squaredDistanceTo(flightZonePos)));
+                    int dist = (int) (83f - Math.sqrt(PlayerUtility.getSquaredDistance2D(flightZonePos)));
                     FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), isRu() ? ("Осталось " + timeS + " секунд и " + dist + " метров") : (timeS + " seconds and " + dist + " meters left"),
                             mc.getWindow().getScaledWidth() / 2f, mc.getWindow().getScaledHeight() / 2f + 30f, -1);
                 }
@@ -468,27 +471,23 @@ public class ElytraPlus extends Module {
     }
 
     private void doBoost(EventMove e) {
-        if(twoBee.getValue()) {
-            if (mc.options.jumpKey.isPressed() && mc.player.isFallFlying()) {
-                double[] m = MovementUtility.forward((factor.getValue() / 10f));
-                e.setX(e.getX() + m[0]);
-                e.setZ(e.getZ() + m[1]);
-            }
-        } else {
+        if (mc.player.getInventory().getStack(38).getItem() != Items.ELYTRA || !mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava() || !mc.player.isFallFlying())
+            return;
 
-            if (mc.player.getInventory().getStack(38).getItem() != Items.ELYTRA || !mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava() || !mc.player.isFallFlying())
-                return;
+        float moveForward = mc.player.input.movementForward;
 
-            float moveForward = mc.player.input.movementForward;
+        if (cruiseControl.getValue()) {
+            if (mc.options.jumpKey.isPressed()) height++;
+            else if (mc.options.sneakKey.isPressed()) height--;
+            if (forceHeight.getValue()) height = manualHeight.getValue();
 
-            if (cruiseControl.getValue()) {
-                if (mc.options.jumpKey.isPressed()) height++;
-                else if (mc.options.sneakKey.isPressed()) height--;
-
-                if (forceHeight.getValue()) height = manualHeight.getValue();
-
+            if(twoBee.getValue()) {
+                if (ThunderHack.playerManager.currentPlayerSpeed >= minUpSpeed.getValue())
+                    mc.player.setPitch((float) MathHelper.clamp(MathHelper.wrapDegrees(Math.toDegrees(Math.atan2((height - mc.player.getY()) * -1.0, 10))), -50, 50));
+                else
+                    mc.player.setPitch(0.25F);
+            } else {
                 double heightPct = 1 - Math.sqrt(MathHelper.clamp(ThunderHack.playerManager.currentPlayerSpeed / 1.7, 0.0, 1.0));
-
                 if (ThunderHack.playerManager.currentPlayerSpeed >= minUpSpeed.getValue() && startTimer.passedMs((long) (2000 * redeployInterval.getValue()))) {
                     double pitch = -(44.4 * heightPct + 0.6);
                     double diff = (height + 1 - mc.player.getY()) * 2;
@@ -499,7 +498,15 @@ public class ElytraPlus extends Module {
                     moveForward = 1;
                 }
             }
+        }
 
+        if(twoBee.getValue()) {
+            if ((mc.options.jumpKey.isPressed() || !onlySpace.getValue() || cruiseControl.getValue())) {
+                double[] m = MovementUtility.forwardWithoutStrafe((factor.getValue() / 10f));
+                e.setX(e.getX() + m[0]);
+                e.setZ(e.getZ() + m[1]);
+            }
+        } else {
             Vec3d rotationVec = mc.player.getRotationVec(mc.getTickDelta());
 
             double d6 = Math.hypot(rotationVec.x, rotationVec.z);

@@ -42,6 +42,7 @@ public class ConfigManager implements IManager {
     public static final File SOUNDS_FOLDER = new File(MISC_FOLDER, "sounds");
     public static final File IMAGES_FOLDER = new File(MISC_FOLDER, "images");
     public static final File TABPARSER_FOLDER = new File(MISC_FOLDER, "tabparser");
+    public static final File STASHLOGGER_FOLDER = new File(MISC_FOLDER, "stashlogger");
 
 
     public File currentConfig = null;
@@ -59,6 +60,7 @@ public class ConfigManager implements IManager {
         if (!SOUNDS_FOLDER.exists()) SOUNDS_FOLDER.mkdirs();
         if (!IMAGES_FOLDER.exists()) IMAGES_FOLDER.mkdirs();
         if (!TABPARSER_FOLDER.exists()) TABPARSER_FOLDER.mkdirs();
+        if (!STASHLOGGER_FOLDER.exists()) STASHLOGGER_FOLDER.mkdirs();
     }
 
     public void loadSearch() {
