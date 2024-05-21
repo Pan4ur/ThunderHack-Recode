@@ -57,7 +57,7 @@ public class KillStats extends HudElement {
         if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
             Render2DEngine.drawRoundedBlur(context.getMatrices(), pX - 18, getPosY() - 2, FontRenderers.getModulesRenderer().getStringWidth(streak) + FontRenderers.getModulesRenderer().getStringWidth(kd) + 21, 13f, 3, HudEditor.blurColor.getValue().getColorObject());
             Render2DEngine.drawRect(context.getMatrices(), pX - 4, getPosY(), 0.5f, 8, new Color(0x44FFFFFF, true));
-
+            Render2DEngine.setupRender();
             RenderSystem.setShaderTexture(0, icon);
             Render2DEngine.renderGradientTexture(context.getMatrices(), pX - 16, getPosY() - 1, 10, 10, 0, 0, 16, 16, 16, 16,
                     HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
