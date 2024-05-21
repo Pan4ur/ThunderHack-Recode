@@ -57,6 +57,7 @@ import java.util.*;
 import static thunder.hack.utility.render.Render2DEngine.CONTAINER_BACKGROUND;
 
 public class NameTags extends Module {
+    private final Setting<Boolean> self = new Setting<>("Self",false);
     private final Setting<Float> scale = new Setting<>("Scale", 1f, 0.1f, 10f);
     private final Setting<Float> height = new Setting<>("Height", 2f, 0.1f, 10f);
     private final Setting<Boolean> gamemode = new Setting<>("Gamemode", false);
@@ -113,7 +114,7 @@ public class NameTags extends Module {
 
     public void onRender2D(DrawContext context) {
         for (PlayerEntity ent : mc.world.getPlayers()) {
-            if (ent == mc.player && mc.options.getPerspective().isFirstPerson()) continue;
+            if (ent == mc.player && (mc.options.getPerspective().isFirstPerson() || !self.getValue())) continue;
             if (getEntityPing(ent) <= 0 && ignoreBots.getValue()) continue;
 
             double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
