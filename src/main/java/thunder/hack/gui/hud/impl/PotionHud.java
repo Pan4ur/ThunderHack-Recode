@@ -28,8 +28,7 @@ public class PotionHud extends HudElement {
         } else {
             int var1 = pe.getDuration();
             int mins = var1 / 1200;
-            int sec = (var1 % 1200) / 20;
-
+            String sec = String.format("%02d", (var1 % 1200) / 20);
             return mins + ":" + sec;
         }
     }
