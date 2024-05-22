@@ -3,6 +3,7 @@ package thunder.hack.modules.render;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.thrown.EggEntity;
@@ -90,6 +91,9 @@ public class NoRender extends Module {
             if (ent instanceof ItemEntity) {
                 itemsCounter++;
                 if (items.getValue()) mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
+            }
+            if (ent instanceof ArmorStandEntity){
+                if(noArmorStands.getValue()) mc.world.removeEntity(ent.getId(), Entity.RemovalReason.KILLED);
             }
         }
 
