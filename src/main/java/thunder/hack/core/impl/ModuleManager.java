@@ -125,6 +125,7 @@ public class ModuleManager implements IManager {
     public static AntiAttack antiAttack = new AntiAttack();
     public static GapplesHud gapplesHud = new GapplesHud();
     public static HitBubbles hitBubbles = new HitBubbles();
+    public static KillStats killStats = new KillStats();
     public static AutoAnvil autoAnvil = new AutoAnvil();
     public static CandleHud candleHud = new CandleHud();
     public static AntiCrash antiCrash = new AntiCrash();
@@ -253,7 +254,6 @@ public class ModuleManager implements IManager {
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
     public static RPC rpc = new RPC();
-    public static KillStats kills = new KillStats();
 
     public ModuleManager() {
         for (Field field : getClass().getDeclaredFields()) {
