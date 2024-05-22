@@ -36,6 +36,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.utility.TickTimer;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.autoCrystal.DeadManager;
 import thunder.hack.utility.math.ExplosionUtility;
@@ -77,15 +78,15 @@ public class AutoCrystal extends Module {
     private final Setting<Boolean> ccPlace = new Setting<>("CC", true, v -> page.getValue() == Pages.Place);
     private final Setting<BooleanParent> instantPlace = new Setting<>("InstantPlace", new BooleanParent(true), v -> page.getValue() == Pages.Place);
     private final Setting<Recalc> recalculate = new Setting<>("Recalc", Recalc.FAST, v -> page.getValue() == Pages.Place).withParent(instantPlace);
-    private final Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 0, 0, 1000, v -> page.getValue() == Pages.Place);
-    private final Setting<Integer> lowPlaceDelay = new Setting<>("LowPlaceDelay", 550, 0, 1000, v -> page.getValue() == Pages.Place);
+    private final Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 0, 0, 20, v -> page.getValue() == Pages.Place);
+    private final Setting<Integer> lowPlaceDelay = new Setting<>("LowPlaceDelay", 11, 0, 20, v -> page.getValue() == Pages.Place);
     private final Setting<Float> placeRange = new Setting<>("PlaceRange", 5f, 1.0f, 6f, v -> page.getValue() == Pages.Place);
     private final Setting<Float> placeWallRange = new Setting<>("PlaceWallRange", 3.5f, 1.0f, 6f, v -> page.getValue() == Pages.Place);
     public static final Setting<Integer> predictTicks = new Setting<>("PredictTicks", 3, 0, 20, v -> page.getValue() == Pages.Place);
 
     /*   BREAK   */
-    private final Setting<Integer> breakDelay = new Setting<>("BreakDelay", 0, 0, 1000, v -> page.getValue() == Pages.Break);
-    private final Setting<Integer> lowBreakDelay = new Setting<>("LowBreakDelay", 550, 0, 1000, v -> page.getValue() == Pages.Break);
+    private final Setting<Integer> breakDelay = new Setting<>("BreakDelay", 0, 0, 20, v -> page.getValue() == Pages.Break);
+    private final Setting<Integer> lowBreakDelay = new Setting<>("LowBreakDelay", 11, 0, 20, v -> page.getValue() == Pages.Break);
     private final Setting<Float> explodeRange = new Setting<>("BreakRange", 5.0f, 1.0f, 6f, v -> page.getValue() == Pages.Break);
     private final Setting<Float> explodeWallRange = new Setting<>("BreakWallRange", 3.5f, 1.0f, 6f, v -> page.getValue() == Pages.Break);
     private final Setting<Integer> crystalAge = new Setting<>("CrystalAge", 0, 0, 20, v -> page.getValue() == Pages.Break);
@@ -148,8 +149,9 @@ public class AutoCrystal extends Module {
     private BlockHitResult bestPosition;
     private EndCrystalEntity bestCrystal;
 
-    private final Timer placeTimer = new Timer();
-    private final Timer breakTimer = new Timer();
+    private final TickTimer placeTimer = new TickTimer();
+    private final TickTimer breakTimer = new TickTimer();
+
     private final Timer blockRecalcTimer = new Timer();
     private final Timer pauseTimer = new Timer();
 
@@ -161,7 +163,7 @@ public class AutoCrystal extends Module {
 
     private int prevCrystalsAmount, crystalSpeed, invTimer;
 
-    private boolean rotated, facePlacing;
+    private boolean rotated, facePlacing, placedOnSpawn;
 
     private long confirmTime, calcTime;
 
@@ -212,11 +214,13 @@ public class AutoCrystal extends Module {
         });
 
         if (timing.is(Timing.NORMAL)) {
-            if (bestPosition != null && placeTimer.passedMs(facePlacing ? lowPlaceDelay.getValue() : (placeDelay.getValue())))
-                placeCrystal(bestPosition, false);
+            if (bestPosition != null && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : (placeDelay.getValue())) && !placedOnSpawn)
+                placeCrystal(bestPosition, false, false);
 
-            if (bestCrystal != null && breakTimer.passedMs(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
+            if (bestCrystal != null && breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
                 attackCrystal(bestCrystal);
+
+            placedOnSpawn = false;
         }
     }
 
@@ -266,11 +270,13 @@ public class AutoCrystal extends Module {
     @EventHandler
     public void onPostSync(EventPostSync e) {
         if (timing.is(Timing.SEQUENTIAL)) {
-            if (bestPosition != null && placeTimer.passedMs(facePlacing ? lowPlaceDelay.getValue() : (placeDelay.getValue())))
-                placeCrystal(bestPosition, false);
+            if (bestPosition != null && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()) && !placedOnSpawn)
+                placeCrystal(bestPosition, false, false);
 
-            if (bestCrystal != null && breakTimer.passedMs(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
+            if (bestCrystal != null && breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
                 attackCrystal(bestCrystal);
+
+            placedOnSpawn = false;
         }
     }
 
@@ -291,10 +297,10 @@ public class AutoCrystal extends Module {
 
     @EventHandler
     public void onCrystalSpawn(@NotNull EventEntitySpawn e) {
-        if (e.getEntity() instanceof EndCrystalEntity crystal && !placedCrystals.isEmpty()) {
+        if (e.getEntity() instanceof EndCrystalEntity crystal) {
             HashMap<BlockPos, Long> cache = new HashMap<>(placedCrystals);
             for (BlockPos bp : cache.keySet())
-                if (crystal.squaredDistanceTo(bp.toCenterPos()) < 0.3 && breakTimer.passedMs(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue())) {
+                if (crystal.squaredDistanceTo(bp.toCenterPos()) < 0.3 && breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue())) {
                     confirmTime = System.currentTimeMillis() - cache.get(bp);
                     placedCrystals.remove(bp);
                     ThunderHack.asyncManager.run(() -> handleSpawn(crystal));
@@ -310,8 +316,8 @@ public class AutoCrystal extends Module {
             for (Entity ent : Lists.newArrayList(mc.world.getEntities())) {
                 if (ent instanceof EndCrystalEntity crystal
                         && crystal.squaredDistanceTo(explosion.getX(), explosion.getY(), explosion.getZ()) <= 144
-                        && !deadManager.isDead(crystal)) {
-                    deadManager.setDead(crystal, System.currentTimeMillis());
+                        && !deadManager.isDead(crystal.getId())) {
+                    deadManager.setDead(crystal.getId(), System.currentTimeMillis());
                 }
             }
         }
@@ -334,12 +340,12 @@ public class AutoCrystal extends Module {
         getCrystalToExplode();
         if (bestCrystal == crystal) {
             attackCrystal(crystal);
-            if (instantPlace.getValue().isEnabled() && placeTimer.passedMs(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue())) {
+            if (instantPlace.getValue().isEnabled() && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue())) {
                 if (recalculate.getValue() != Recalc.OFF)
                     calcPosition(recalculate.getValue() == Recalc.FAST ? 2f : placeRange.getValue(), recalculate.getValue() == Recalc.FAST ? crystal.getPos() : mc.player.getPos());
 
                 if (bestPosition != null)
-                    placeCrystal(bestPosition, false);
+                    placeCrystal(bestPosition, false, true);
             }
         }
     }
@@ -522,7 +528,7 @@ public class AutoCrystal extends Module {
         breakTimer.reset();
 
         if (remove.getValue() != Remove.OFF)
-            deadManager.setDead(crystal, System.currentTimeMillis());
+            deadManager.setDead(crystal.getId(), System.currentTimeMillis());
 
         if (prevSlot != -1) {
             if (antiWeakness.getValue() == Switch.SILENT) {
@@ -540,7 +546,7 @@ public class AutoCrystal extends Module {
         if (crystalAge.getValue() != 0 && cr.age < crystalAge.getValue())
             return false;
 
-        if (deadManager.isDead(cr) && deadCheck)
+        if (deadManager.isDead(cr.getId()) && deadCheck)
             return false;
 
         if (PlayerUtility.squaredDistanceFromEyes(cr.getPos()) > explodeRange.getPow2Value())
@@ -592,7 +598,7 @@ public class AutoCrystal extends Module {
         return prevSlot;
     }
 
-    public void placeCrystal(BlockHitResult bhr, boolean instant) {
+    public void placeCrystal(BlockHitResult bhr, boolean instant, boolean onSpawn) {
         if (shouldPause() || mc.player == null) return;
         int prevSlot = -1;
 
@@ -639,6 +645,9 @@ public class AutoCrystal extends Module {
             placedCrystals.put(bhr.getBlockPos(), System.currentTimeMillis());
         renderPositions.put(bhr.getBlockPos(), System.currentTimeMillis());
         postPlaceSwitch(prevSlot);
+
+        if(onSpawn)
+            placedOnSpawn = true;
     }
 
     private void postPlaceSwitch(int slot) {
@@ -737,7 +746,7 @@ public class AutoCrystal extends Module {
             if (crystalAge.getValue() != 0 && cr.age < crystalAge.getValue())
                 continue;
 
-            if (deadManager.isDead(cr))
+            if (deadManager.isDead(cr.getId()))
                 continue;
 
             if (PlayerUtility.squaredDistanceFromEyes(ent.getPos()) > explodeRange.getPow2Value())
@@ -957,10 +966,10 @@ public class AutoCrystal extends Module {
                 if (ent instanceof ExperienceOrbEntity)
                     continue;
 
-                if (ent instanceof EndCrystalEntity cr && deadManager.isDead(cr))
+                if (ent instanceof EndCrystalEntity cr && deadManager.isDead(cr.getId()))
                     continue;
 
-                if (breakTimer.passedMs(breakDelay.getValue()) && ent instanceof EndCrystalEntity cr
+                if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()) && ent instanceof EndCrystalEntity cr
                         && canAttackCrystal(cr, true)) {
                     attackCrystal(cr);
                     debug("attack stuck crystal");

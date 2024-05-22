@@ -11,8 +11,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static thunder.hack.core.IManager.mc;
+
 public class DeadManager {
-    private final Map<EndCrystalEntity, Long> deadCrystals = new ConcurrentHashMap<>();
+    private final Map<Integer, Long> deadCrystals = new ConcurrentHashMap<>();
 
     public void reset() {
         deadCrystals.clear();
@@ -22,7 +24,7 @@ public class DeadManager {
         if(dangerous)
             removeFromWorld(delay);
 
-        Map<EndCrystalEntity, Long> cache = new ConcurrentHashMap<>(deadCrystals);
+        Map<Integer, Long> cache = new ConcurrentHashMap<>(deadCrystals);
 
         if(!cache.isEmpty()) {
             cache.forEach((crystal, deathTime) -> {
@@ -33,22 +35,25 @@ public class DeadManager {
         }
     }
 
-    public boolean isDead(EndCrystalEntity crystal) {
-        return deadCrystals.containsKey(crystal);
+    public boolean isDead(Integer id) {
+        return deadCrystals.containsKey(id);
     }
 
-    public void setDead(EndCrystalEntity crystal, long deathTime) {
-        deadCrystals.put(crystal, deathTime);
+    public void setDead(Integer id, long deathTime) {
+        deadCrystals.put(id, deathTime);
     }
 
     public void removeFromWorld(int removeDelay) {
-        Map<EndCrystalEntity, Long> cache = new ConcurrentHashMap<>(deadCrystals);
-        cache.forEach((c, time) -> {
+        Map<Integer, Long> cache = new ConcurrentHashMap<>(deadCrystals);
+        cache.forEach((id, time) -> {
             if (System.currentTimeMillis() - time >= removeDelay) {
-                c.kill();
-                c.setRemoved(Entity.RemovalReason.KILLED);
-                c.onRemoved();
-                deadCrystals.remove(c);
+                Entity e = mc.world.getEntityById(id);
+                if(e instanceof EndCrystalEntity c) {
+                    c.kill();
+                    c.setRemoved(Entity.RemovalReason.KILLED);
+                    c.onRemoved();
+                }
+                deadCrystals.remove(id);
             }
         });
     }

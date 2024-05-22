@@ -24,6 +24,7 @@ public class ClickGui extends Module {
     public final Setting<Integer> modulesFontScale = new Setting<>("ModulesFontScale", 14, 6, 24);
     public final Setting<BooleanParent> gear = new Setting<>("Gear", new BooleanParent(true));
     public final Setting<Integer> gearScale = new Setting<>("GearScale", 60, 6, 300).withParent(gear);
+    public final Setting<Boolean> closeAnimation = new Setting<>("CloseAnimation", true);
 
     public ClickGui() {
         super("ClickGui", Module.Category.CLIENT);

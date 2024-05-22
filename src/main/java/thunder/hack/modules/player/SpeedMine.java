@@ -201,7 +201,7 @@ public final class SpeedMine extends Module {
                     if (placeCrystal.getValue()) {
                         AutoCrystal.PlaceData placeCrystalData = ModuleManager.autoCrystal.getPlaceData(SpeedMine.minePosition, null);
                         if (placeCrystalData != null) {
-                            ModuleManager.autoCrystal.placeCrystal(placeCrystalData.bhr(), true);
+                            ModuleManager.autoCrystal.placeCrystal(placeCrystalData.bhr(), true, false);
                             debug("placing..");
                         } else
                             debug("placeCrystalData is null");

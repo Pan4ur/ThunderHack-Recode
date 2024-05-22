@@ -108,23 +108,23 @@ public class ClickGUI extends Screen {
         if (close) {
             if (mc.player != null) {
                 if (mc.player.getPitch() > prevPitch)
-                    closeDirectionY = (prevPitch - mc.player.getPitch()) * 150;
+                    closeDirectionY = (prevPitch - mc.player.getPitch()) * 300;
 
                 if (mc.player.getPitch() < prevPitch)
-                    closeDirectionY = (prevPitch - mc.player.getPitch()) * 150;
+                    closeDirectionY = (prevPitch - mc.player.getPitch()) * 300;
 
                 if (mc.player.getYaw() > prevYaw)
-                    closeDirectionX = (prevYaw - mc.player.getYaw()) * 150;
+                    closeDirectionX = (prevYaw - mc.player.getYaw()) * 300;
 
                 if (mc.player.getYaw() < prevYaw)
-                    closeDirectionX = (prevYaw - mc.player.getYaw()) * 150;
+                    closeDirectionX = (prevYaw - mc.player.getYaw()) * 300;
             }
 
             if(closeDirectionX < 1 && closeDirectionY < 1 && closeAnimation > 2)
                 closeDirectionY = -3000;
 
             closeAnimation++;
-            if (closeAnimation > 10) {
+            if (closeAnimation > 6) {
                 close = false;
                 windows.forEach(AbstractWindow::restorePos);
                 close();
@@ -141,7 +141,7 @@ public class ClickGUI extends Screen {
         anyHovered = false;
 
 
-        if (closeAnimation <= 10) {
+        if (closeAnimation <= 6) {
             windows.forEach(w -> {
                 w.setX((float) (w.getX() + closeDirectionX * AnimationUtility.deltaTime()));
                 w.setY((float) (w.getY() + closeDirectionY * AnimationUtility.deltaTime()));
@@ -226,7 +226,7 @@ public class ClickGUI extends Screen {
         windows.forEach(w -> w.keyTyped(keyCode));
 
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            if (mc.player == null) {
+            if (mc.player == null || !ModuleManager.clickGui.closeAnimation.getValue()) {
                 super.keyPressed(keyCode, scanCode, modifiers);
                 return true;
             }
