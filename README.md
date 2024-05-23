@@ -37,4 +37,4 @@
 - [@0x3C50](https://github.com/0x3C50/Renderer) for the renderer
 
 ## Screenshots
-![image](https://media.discordapp.net/attachments/909158122990469150/1223198203906887721/2024-03-29_11.png?ex=6618fb19&is=66068619&hm=6e9f83c686a851f3f1f3bd89f3c828cad0920fbf1cce8bc5842af7bb20edf428&=&format=webp&quality=lossless)
+![image](https://github.com/Pan4ur/ThunderHack-Recode/assets/82473048/1e56338f-58a1-4759-8234-858878bdde3f)
