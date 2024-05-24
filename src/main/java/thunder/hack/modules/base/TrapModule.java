@@ -25,6 +25,7 @@ public abstract class TrapModule extends PlaceModule {
     protected final Setting<Integer> blocksPerTick = new Setting<>("Block/Tick", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
     protected final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10);
     protected final Setting<TrapMode> trapMode = new Setting<>("Trap Mode", TrapMode.Full);
+    protected final Setting<Boolean> inHole = new Setting<>("Only in hole",false);
 
     private int delay;
     protected PlayerEntity target;
@@ -103,7 +104,7 @@ public abstract class TrapModule extends PlaceModule {
     }
 
     protected @Nullable BlockPos getBlockToPlace() {
-        if (target == null || mc.player == null) return null;
+        if (target == null || (target != null && !HoleUtility.isHole(target.getBlockPos()) && inHole.getValue()) || mc.player == null) return null;
         return getBlocks(target).stream()
                 .filter(pos -> pos.getSquaredDistance(mc.player.getPos()) < range.getPow2Value())
                 .filter(pos -> InteractionUtility.canPlaceBlock(pos, interact.getValue(), true))
