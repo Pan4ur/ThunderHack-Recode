@@ -125,6 +125,7 @@ public class ModuleManager implements IManager {
     public static AntiAttack antiAttack = new AntiAttack();
     public static GapplesHud gapplesHud = new GapplesHud();
     public static HitBubbles hitBubbles = new HitBubbles();
+    public static AutoTrader autoTrader = new AutoTrader();
     public static KillStats killStats = new KillStats();
     public static AutoAnvil autoAnvil = new AutoAnvil();
     public static CandleHud candleHud = new CandleHud();

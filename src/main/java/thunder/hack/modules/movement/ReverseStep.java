@@ -16,10 +16,10 @@ public class ReverseStep extends Module {
     }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Motion);
-    public Setting<Float> timer = new Setting<>("Timer", 3.0F, 1F, 10.0F, v -> mode.getValue() == Mode.Timer);
-    public Setting<Float> motion = new Setting<>("Motion", 1.0F, 0.1F, 10.0F, v -> mode.getValue() == Mode.Motion);
-    public Setting<Boolean> anyblock = new Setting<>("AnyBlock", false);
-    public Setting<Boolean> pauseIfShift = new Setting<>("PauseIfShift", false);
+    private final Setting<Float> timer = new Setting<>("Timer", 3.0F, 1F, 10.0F, v -> mode.getValue() == Mode.Timer);
+    private final Setting<Float> motion = new Setting<>("Motion", 1.0F, 0.1F, 10.0F, v -> mode.getValue() == Mode.Motion);
+    private final Setting<Boolean> anyblock = new Setting<>("AnyBlock", false);
+    private final Setting<Boolean> pauseIfShift = new Setting<>("PauseIfShift", false);
 
     private boolean disableTimer = true;
     private boolean prevGround = false;
@@ -50,7 +50,7 @@ public class ReverseStep extends Module {
 
         prevGround = mc.player.isOnGround();
     }
-
+    
     private void disableTimer() {
         if (disableTimer)
             ThunderHack.TICK_TIMER = 1f;
@@ -66,9 +66,8 @@ public class ReverseStep extends Module {
             disableTimer = true;
         }
 
-        if (mc.player.isOnGround() && mode.getValue() == Mode.Motion) {
+        if (mc.player.isOnGround() && mode.getValue() == Mode.Motion)
             mc.player.setVelocity(mc.player.getVelocity().add(0, -motion.getValue(), 0));
-        }
     }
 
     public enum Mode {

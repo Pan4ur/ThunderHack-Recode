@@ -157,7 +157,7 @@ public final class SoundManager {
     }
 
     public void playPmSound(ChatUtils.PMSound sound) {
-        if(sound == ChatUtils.PMSound.Custom) playSound(PM_SOUNDEVENT);
+        if(sound == ChatUtils.PMSound.Default) playSound(PM_SOUNDEVENT);
         else ThunderHack.soundManager.playSound("pmsound");
     }
 }
