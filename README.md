@@ -28,6 +28,7 @@
 
 ## Recommended to read:
 - [Performance guide for Minecraft 1.20.4+ Clients](https://gist.github.com/HexedHero/aab340a84db51913cb1106c2d85f4e4f)
+- [Setup guide by @DevilishRak](https://thunderguidemc.vercel.app/)
 
 ## Credits
 - [Ai_24](https://www.youtube.com/@Ai_24) for cool showcase
