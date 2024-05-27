@@ -34,8 +34,8 @@ public class ColorPickerElement extends AbstractElement {
         return (ColorSetting) colorSetting.getValue();
     }
 
-    public ColorPickerElement(Setting setting, boolean small) {
-        super(setting, small);
+    public ColorPickerElement(Setting setting) {
+        super(setting);
         this.colorSetting = setting;
         prevColor = getColorSetting().getColorObject();
         updatePos();

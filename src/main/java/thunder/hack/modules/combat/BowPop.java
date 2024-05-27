@@ -5,7 +5,7 @@ import net.minecraft.network.packet.c2s.play.*;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.Timer;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
@@ -20,7 +20,7 @@ public final class BowPop extends Module {
     public Setting<Float> scale = new Setting<>("Scale", 0.01f, 0.01f, 0.4f);
     public Setting<Boolean> minimize = new Setting<>("Minimize", false);
     public Setting<Float> delay = new Setting<>("Delay", 5f, 0f, 10f);
-    public final Setting<Parent> selection = new Setting<>("Selection", new Parent(false, 0));
+    public final Setting<SettingGroup> selection = new Setting<>("Selection", new SettingGroup(false, 0));
     public final Setting<Boolean> bow = new Setting<>("Bows", true).withParent(selection);
     public final Setting<Boolean> pearls = new Setting<>("EPearls", true).withParent(selection);
     public final Setting<Boolean> xp = new Setting<>("XP", true).withParent(selection);

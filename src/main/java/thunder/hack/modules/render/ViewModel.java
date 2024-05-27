@@ -4,10 +4,9 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.RotationAxis;
 import thunder.hack.events.impl.EventHeldItemRenderer;
-import thunder.hack.injection.accesors.IHeldItemRenderer;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
 
 public class ViewModel extends Module {
     public ViewModel() {
@@ -19,28 +18,28 @@ public class ViewModel extends Module {
     public final Setting<Float> positionMainY = new Setting<>("positionMainY", 0f, -3.0f, 3f);
     public final Setting<Float> positionMainZ = new Setting<>("positionMainZ", 0f, -3.0f, 3f);
 
-    public final Setting<Parent> mainHand = new Setting<>("MainHand", new Parent(false, 0));
-    public final Setting<Parent> rotationMain = new Setting<>("Rotation", new Parent(false, 1)).withParent(mainHand);
+    public final Setting<SettingGroup> mainHand = new Setting<>("MainHand", new SettingGroup(false, 0));
+    public final Setting<SettingGroup> rotationMain = new Setting<>("Rotation", new SettingGroup(false, 1)).withParent(mainHand);
     public final Setting<Float> rotationMainX = new Setting<>("rotationMainX", 0f, -180.0f, 180f).withParent(rotationMain);
     public final Setting<Float> rotationMainY = new Setting<>("rotationMainY", 0f, -180.0f, 180f).withParent(rotationMain);
     public final Setting<Float> rotationMainZ = new Setting<>("rotationMainZ", 0f, -180.0f, 180f).withParent(rotationMain);
-    public final Setting<Parent> animateMain = new Setting<>("Animate", new Parent(false, 1)).withParent(mainHand);
+    public final Setting<SettingGroup> animateMain = new Setting<>("Animate", new SettingGroup(false, 1)).withParent(mainHand);
     public Setting<Boolean> animateMainX = new Setting<>("animateMainX", false).withParent(animateMain);
     public Setting<Boolean> animateMainY = new Setting<>("animateMainY", false).withParent(animateMain);
     public Setting<Boolean> animateMainZ = new Setting<>("animateMainZ", false).withParent(animateMain);
     public final Setting<Float> speedAnimateMain = new Setting<>("speedAnimateMain", 1f, 1f, 5f).withParent(rotationMain);
 
-    public final Setting<Parent> offHand = new Setting<>("OffHand", new Parent(false, 0));
-    public final Setting<Parent> rotationOff = new Setting<>("RotationOff", new Parent(false, 1)).withParent(offHand);
+    public final Setting<SettingGroup> offHand = new Setting<>("OffHand", new SettingGroup(false, 0));
+    public final Setting<SettingGroup> rotationOff = new Setting<>("RotationOff", new SettingGroup(false, 1)).withParent(offHand);
     public final Setting<Float> rotationOffX = new Setting<>("rotationOffX", 0f, -180.0f, 180f).withParent(rotationOff);
     public final Setting<Float> rotationOffY = new Setting<>("rotationOffY", 0f, -180.0f, 180f).withParent(rotationOff);
     public final Setting<Float> rotationOffZ = new Setting<>("rotationOffZ", 0f, -180.0f, 180f).withParent(rotationOff);
-    public final Setting<Parent> animateOff = new Setting<>("AnimateOff", new Parent(false, 1)).withParent(offHand);
+    public final Setting<SettingGroup> animateOff = new Setting<>("AnimateOff", new SettingGroup(false, 1)).withParent(offHand);
     public Setting<Boolean> animateOffX = new Setting<>("animateOffX", false).withParent(animateOff);
     public Setting<Boolean> animateOffY = new Setting<>("animateOffY", false).withParent(animateOff);
     public Setting<Boolean> animateOffZ = new Setting<>("animateOffZ", false).withParent(animateOff);
     public final Setting<Float> speedAnimateOff = new Setting<>("speedAnimateOff", 1f, 1f, 5f).withParent(rotationOff);
-    public final Setting<Parent> eatMod = new Setting<>("Eat", new Parent(false, 0));
+    public final Setting<SettingGroup> eatMod = new Setting<>("Eat", new SettingGroup(false, 0));
     public final Setting<Float> eatX = new Setting<>("EatX", 1f, -1f, 2f).withParent(eatMod);
     public final Setting<Float> eatY = new Setting<>("EatY", 1f, -1f, 2f).withParent(eatMod);
 

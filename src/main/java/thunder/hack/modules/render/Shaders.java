@@ -1,19 +1,16 @@
 package thunder.hack.modules.render;
 
-import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import org.lwjgl.opengl.EXTFramebufferObject;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ShaderManager;
 import thunder.hack.injection.accesors.IGameRenderer;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.ClickGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
 
 public class Shaders extends Module {
     public Shaders() {
@@ -22,7 +19,7 @@ public class Shaders extends Module {
 
     //Thanks to @0x3C50 for Shader rendering example
 
-    private final Setting<Parent> select = new Setting<>("Select", new Parent(false, 0));
+    private final Setting<SettingGroup> select = new Setting<>("Select", new SettingGroup(false, 0));
     private final Setting<Boolean> hands = new Setting<>("Hands", true).withParent(select);
     private final Setting<Boolean> players = new Setting<>("Players", true).withParent(select);
     private final Setting<Boolean> self = new Setting<>("Self", true, v -> players.getValue()).withParent(select);
@@ -46,7 +43,7 @@ public class Shaders extends Module {
     public final Setting<Integer> fillAlpha = new Setting<>("FillAlpha", 170, 0, 255);
     public final Setting<Boolean> glow = new Setting<>("SmokeGlow", true);
 
-    private final Setting<Parent> colors = new Setting<>("Colors", new Parent(false, 0));
+    private final Setting<SettingGroup> colors = new Setting<>("Colors", new SettingGroup(false, 0));
     public final Setting<ColorSetting> outlineColor = new Setting<>("Outline", new ColorSetting(0x8800FF00)).withParent(colors);
     public final Setting<ColorSetting> outlineColor1 = new Setting<>("SmokeOutline", new ColorSetting(0x8800FF00), v -> mode.is(ShaderManager.Shader.Smoke) || handsMode.is(ShaderManager.Shader.Smoke)).withParent(colors);
     public final Setting<ColorSetting> outlineColor2 = new Setting<>("SmokeOutline2", new ColorSetting(0x8800FF00), v -> mode.is(ShaderManager.Shader.Smoke) || handsMode.is(ShaderManager.Shader.Smoke)).withParent(colors);

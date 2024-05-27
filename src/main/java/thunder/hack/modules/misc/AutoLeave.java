@@ -10,7 +10,7 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InventoryUtility;
 
@@ -24,7 +24,7 @@ public class AutoLeave extends Module {
     private final Setting<Boolean> autoDisable = new Setting<>("AutoDisable", true);
     private final Setting<Boolean> fastLeave = new Setting<>("InstantLeave", true);
     public static Setting<String> command = new Setting<>("Command", "hub");
-    private final Setting<Parent> leaveIf = new Setting<>("Leave if", new Parent(false, 0));
+    private final Setting<SettingGroup> leaveIf = new Setting<>("Leave if", new SettingGroup(false, 0));
     private final Setting<Boolean> low_hp = new Setting<>("LowHp", false).withParent(leaveIf);
     private final Setting<Boolean> totems = new Setting<>("Totems", false).withParent(leaveIf);
     private final Setting<Integer> totemsCount = new Setting("TotemsCount", 2, 0, 10, v -> totems.getValue());

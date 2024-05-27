@@ -1,10 +1,10 @@
 package thunder.hack.setting.impl;
 
-public class Parent {
+public class SettingGroup {
     private boolean extended;
     private final int hierarchy;
 
-    public Parent(boolean extended, int hierarchy) {
+    public SettingGroup(boolean extended, int hierarchy) {
         this.extended = extended;
         this.hierarchy = hierarchy;
     }

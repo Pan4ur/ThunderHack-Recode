@@ -8,9 +8,9 @@ import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.gui.clickui.AbstractWindow;
+import thunder.hack.gui.clickui.AbstractCategory;
+import thunder.hack.gui.clickui.Category;
 import thunder.hack.gui.clickui.ClickGUI;
-import thunder.hack.gui.clickui.ModuleWindow;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
 
@@ -20,7 +20,7 @@ import static thunder.hack.modules.Module.mc;
 
 public class HudEditorGui extends Screen {
     public static HudElement currentlyDragging;
-    private final List<AbstractWindow> windows;
+    private final List<AbstractCategory> windows;
     private static HudEditorGui instance = new HudEditorGui();
 
     private boolean firstOpen;
@@ -37,12 +37,12 @@ public class HudEditorGui extends Screen {
     @Override
     protected void init() {
         if (firstOpen) {
-            ModuleWindow window = new ModuleWindow(Module.Category.HUD, ThunderHack.moduleManager.getModulesByCategory(Module.Category.HUD), mc.getWindow().getScaledWidth() / 2f - 50, 20f, 100f, 18f);
+            Category window = new Category(Module.Category.HUD, ThunderHack.moduleManager.getModulesByCategory(Module.Category.HUD), mc.getWindow().getScaledWidth() / 2f - 50, 20f, 100f, 18f);
             window.setOpen(true);
             windows.add(window);
             firstOpen = false;
         }
-        windows.forEach(AbstractWindow::init);
+        windows.forEach(AbstractCategory::init);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class HudEditorGui extends Screen {
         ClickGUI.anyHovered = false;
 
         if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old) {
-            for (AbstractWindow window : windows) {
+            for (AbstractCategory window : windows) {
                 if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 264))
                     window.setY(window.getY() + 2);
                 if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 265))
@@ -67,13 +67,13 @@ public class HudEditorGui extends Screen {
                 if (dWheel != 0)
                     window.setY((float) (window.getY() + dWheel));
             }
-        } else for (AbstractWindow window : windows)
+        } else for (AbstractCategory window : windows)
             if (dWheel != 0)
                 window.setModuleOffset((float) dWheel, mouseX, mouseY);
 
         dWheel = 0;
 
-        for (AbstractWindow window : windows) {
+        for (AbstractCategory window : windows) {
             window.render(context, mouseX, mouseY, delta);
         }
     }
@@ -122,7 +122,7 @@ public class HudEditorGui extends Screen {
     }
 
     public void hudClicked(Module module) {
-        for (AbstractWindow window : windows) {
+        for (AbstractCategory window : windows) {
             window.hudClicked(module);
         }
     }

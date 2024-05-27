@@ -22,7 +22,7 @@ public class ChestStealerCommand extends Command {
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("reset").executes(context -> {
-            ModuleManager.chestStealer.items.clear();
+            ModuleManager.chestStealer.items.getValue().getItemsById().clear();
             sendMessage("ChestStealer got reset.");
             return SINGLE_SUCCESS;
         }));
@@ -32,7 +32,7 @@ public class ChestStealerCommand extends Command {
 
             String result = getRegistered(blockName);
             if(result != null){
-                ModuleManager.chestStealer.items.add(result);
+                ModuleManager.chestStealer.items.getValue().getItemsById().add(result);
                 sendMessage(Formatting.GREEN + blockName + (isRu() ? " добавлен в ChestStealer" : " added to ChestStealer"));
             } else {
                 sendMessage(Formatting.RED + (isRu() ? "Такого предмета нет!" : "There is no such item!"));
@@ -45,7 +45,7 @@ public class ChestStealerCommand extends Command {
 
             String result = getRegistered(blockName);
             if(result != null){
-                ModuleManager.chestStealer.items.remove(result);
+                ModuleManager.chestStealer.items.getValue().getItemsById().remove(result);
                 sendMessage(Formatting.GREEN + blockName + (isRu() ? " удален из ChestStealer" : " removed from ChestStealer"));
             } else {
                 sendMessage(Formatting.RED + (isRu() ? "Такого предмета нет!" : "There is no such item!"));
@@ -54,12 +54,12 @@ public class ChestStealerCommand extends Command {
         })));
 
         builder.executes(context -> {
-            if (ModuleManager.chestStealer.items.isEmpty()) {
+            if (ModuleManager.chestStealer.items.getValue().getItemsById().isEmpty()) {
                 sendMessage("ChestStealer list empty");
             } else {
                 StringBuilder f = new StringBuilder("ChestStealer list: ");
 
-                for (String name :  ModuleManager.chestStealer.items)
+                for (String name :  ModuleManager.chestStealer.items.getValue().getItemsById())
                     try {
                         f.append(name).append(", ");
                     } catch (Exception ignored) {

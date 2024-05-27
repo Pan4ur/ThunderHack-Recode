@@ -54,21 +54,23 @@ public class ModuleButton extends AbstractButton {
 
         for (Setting setting : module.getSettings()) {
             if (setting.getValue() instanceof Boolean && !setting.getName().equals("Enabled") && !setting.getName().equals("Drawn")) {
-                elements.add(new BooleanElement(setting, true));
+                elements.add(new BooleanElement(setting));
             } else if (setting.getValue() instanceof ColorSetting) {
-                elements.add(new ColorPickerElement(setting, true));
+                elements.add(new ColorPickerElement(setting));
             } else if (setting.getValue() instanceof BooleanParent) {
-                elements.add(new BooleanParentElement(setting, true));
+                elements.add(new BooleanParentElement(setting));
             } else if (setting.isNumberSetting() && setting.hasRestriction()) {
-                elements.add(new SliderElement(setting, true));
-            } else if (setting.isEnumSetting() && !(setting.getValue() instanceof Parent) && !(setting.getValue() instanceof PositionSetting)) {
-                elements.add(new ModeElement(setting, true));
+                elements.add(new SliderElement(setting));
+            } else if (setting.getValue() instanceof ItemSelectSetting) {
+                elements.add(new ItemSelectElement(setting));
+            } else if (setting.getValue() instanceof SettingGroup) {
+                elements.add(new ParentElement(setting));
+            } else if (setting.isEnumSetting() && !(setting.getValue() instanceof PositionSetting)) {
+                elements.add(new ModeElement(setting));
             } else if (setting.getValue() instanceof Bind && !setting.getName().equals("Keybind")) {
-                elements.add(new BindElement(setting, true));
+                elements.add(new BindElement(setting));
             } else if ((setting.getValue() instanceof String || setting.getValue() instanceof Character) && !setting.getName().equalsIgnoreCase("displayName")) {
-                elements.add(new StringElement(setting, true));
-            } else if (setting.getValue() instanceof Parent) {
-                elements.add(new ParentElement(setting, true));
+                elements.add(new StringElement(setting));
             }
         }
     }

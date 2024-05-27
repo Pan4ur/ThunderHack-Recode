@@ -23,7 +23,7 @@ import java.util.Objects;
 import static thunder.hack.modules.Module.mc;
 
 public class ClickGUI extends Screen {
-    public static List<AbstractWindow> windows;
+    public static List<AbstractCategory> windows;
     public static boolean anyHovered;
 
     private boolean firstOpen;
@@ -50,7 +50,7 @@ public class ClickGUI extends Screen {
     }
 
     public static ClickGUI getClickGui() {
-        windows.forEach(AbstractWindow::init);
+        windows.forEach(AbstractCategory::init);
         return ClickGUI.getInstance();
     }
 
@@ -69,7 +69,7 @@ public class ClickGUI extends Screen {
 
             for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
                 if (category == Module.Category.HUD) continue;
-                ModuleWindow window = new ModuleWindow(category, ThunderHack.moduleManager.getModulesByCategory(category), (halfWidth - halfWidthCats) + offset, 20, 100, windowHeight);
+                Category window = new Category(category, ThunderHack.moduleManager.getModulesByCategory(category), (halfWidth - halfWidthCats) + offset, 20, 100, windowHeight);
                 window.setOpen(true);
                 windows.add(window);
                 offset += ModuleManager.clickGui.moduleWidth.getValue() + 2;
@@ -84,7 +84,7 @@ public class ClickGUI extends Screen {
                 int halfWidth = mc.getWindow().getScaledWidth() / 2;
                 int halfWidthCats = (int) (3 * (ModuleManager.clickGui.moduleWidth.getValue() + 4f));
 
-                for (AbstractWindow w : windows) {
+                for (AbstractCategory w : windows) {
                     w.setX((halfWidth - halfWidthCats) + offset);
                     w.setY(20);
                     offset += ModuleManager.clickGui.moduleWidth.getValue() + 2;
@@ -93,7 +93,7 @@ public class ClickGUI extends Screen {
                 }
             }
         }
-        windows.forEach(AbstractWindow::init);
+        windows.forEach(AbstractCategory::init);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class ClickGUI extends Screen {
 
     @Override
     public void tick() {
-        windows.forEach(AbstractWindow::tick);
+        windows.forEach(AbstractCategory::tick);
 
         if (close) {
             if (mc.player != null) {
@@ -126,7 +126,7 @@ public class ClickGUI extends Screen {
             closeAnimation++;
             if (closeAnimation > 6) {
                 close = false;
-                windows.forEach(AbstractWindow::restorePos);
+                windows.forEach(AbstractCategory::restorePos);
                 close();
             }
         }
@@ -153,7 +153,7 @@ public class ClickGUI extends Screen {
         //   Render2DEngine.drawMainMenuShader(context.getMatrices(), 0, 0, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
 
         if (ModuleManager.clickGui.scrollMode.getValue() == ClickGui.scrollModeEn.Old) {
-            for (AbstractWindow window : windows) {
+            for (AbstractCategory window : windows) {
                 if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 264))
                     window.setY(window.getY() + 2);
                 if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), 265))
@@ -165,7 +165,7 @@ public class ClickGUI extends Screen {
                 if (scrollY != 0)
                     window.setY(window.getY() + scrollY);
             }
-        } else for (AbstractWindow window : windows)
+        } else for (AbstractCategory window : windows)
             if (scrollY != 0)
                 window.setModuleOffset(scrollY, mouseX, mouseY);
 
@@ -234,7 +234,7 @@ public class ClickGUI extends Screen {
             if(close)
                 return true;
 
-            windows.forEach(AbstractWindow::savePos);
+            windows.forEach(AbstractCategory::savePos);
 
             closeDirectionX = 0;
             closeDirectionY = 0;

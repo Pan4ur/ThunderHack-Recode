@@ -16,7 +16,6 @@ public class Setting<T> {
     private T plannedValue;
     private T min;
     private T max;
-    private String unit;
     public Setting<?> parent = null;
 
     private boolean hasRestriction;
@@ -45,7 +44,7 @@ public class Setting<T> {
         this.defaultValue = defaultValue;
         this.value = defaultValue;
         this.min = min;
-        this.max = max;
+        this. max = max;
         this.plannedValue = defaultValue;
         this.visibility = visibility;
         this.hasRestriction = true;
@@ -70,43 +69,43 @@ public class Setting<T> {
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public T getValue() {
-        return this.value;
+        return value;
     }
 
     public void setValue(T value) {
-        this.setPlannedValue(value);
-        if (this.hasRestriction) {
-            if (((Number) this.min).floatValue() > ((Number) value).floatValue()) {
-                this.setPlannedValue(this.min);
+        setPlannedValue(value);
+        if (hasRestriction) {
+            if (((Number) min).floatValue() > ((Number) value).floatValue()) {
+                setPlannedValue(min);
             }
-            if (((Number) this.max).floatValue() < ((Number) value).floatValue()) {
-                this.setPlannedValue(this.max);
+            if (((Number) max).floatValue() < ((Number) value).floatValue()) {
+                setPlannedValue(max);
             }
         }
-        this.value = this.plannedValue;
+        this.value = plannedValue;
         ThunderHack.EVENT_BUS.post(new EventSetting(this));
     }
 
     public float getPow2Value() {
-        if (value instanceof Float) {
+        if (value instanceof Float)
             return (float) value * (float) value;
-        }
-        if (value instanceof Integer) {
+
+        if (value instanceof Integer)
             return (int) value * (int) value;
-        }
+
         return 0;
     }
 
     public void setPlannedValue(T value) {
-        this.plannedValue = value;
+        plannedValue = value;
     }
 
     public T getMin() {
-        return this.min;
+        return min;
     }
 
     public void setMin(T min) {
@@ -114,7 +113,7 @@ public class Setting<T> {
     }
 
     public T getMax() {
-        return this.max;
+        return max;
     }
 
     public void setMax(T max) {
@@ -122,7 +121,7 @@ public class Setting<T> {
     }
 
     public Module getModule() {
-        return this.module;
+        return module;
     }
 
     public void setModule(Module module) {
@@ -130,96 +129,102 @@ public class Setting<T> {
     }
 
     public String currentEnumName() {
-        return EnumConverter.getProperName((Enum) this.value);
+        return EnumConverter.getProperName((Enum) value);
     }
 
     public String[] getModes() {
-        return EnumConverter.getNames((Enum) this.value);
+        return EnumConverter.getNames((Enum) value);
     }
 
     public void setEnum(Enum mod) {
-        this.plannedValue = (T) mod;
+        plannedValue = (T) mod;
     }
 
     public void increaseEnum() {
-        this.plannedValue = (T) EnumConverter.increaseEnum((Enum) this.value);
-        this.value = this.plannedValue;
+        plannedValue = (T) EnumConverter.increaseEnum((Enum) value);
+        value = plannedValue;
         ThunderHack.EVENT_BUS.post(new EventSetting(this));
     }
 
     public void setEnumByNumber(int id) {
-        this.plannedValue = (T) EnumConverter.setEnumInt((Enum) this.value, id);
-        this.value = this.plannedValue;
+        plannedValue = (T) EnumConverter.setEnumInt((Enum) value, id);
+        value = plannedValue;
         ThunderHack.EVENT_BUS.post(new EventSetting(this));
     }
 
     public String getType() {
-        if (this.isEnumSetting()) {
+        if (isEnumSetting()) {
             return "Enum";
         }
-        if (this.isColorSetting()) {
+        if (isColorSetting()) {
             return "ColorSetting";
         }
-        if (this.isPositionSetting()) {
+        if (isPositionSetting()) {
             return "PositionSetting";
         }
-        if (this.isBooleanParent()) {
+        if (isBooleanParent()) {
             return "BooleanParent";
         }
-        return this.getClassName(this.defaultValue);
+        if (value instanceof ItemSelectSetting) {
+            return "ItemSelectSetting";
+        }
+        return getClassName(defaultValue);
     }
 
     public boolean isBooleanParent() {
-        return this.value instanceof BooleanParent;
+        return value instanceof BooleanParent;
     }
-
 
     public <T> String getClassName(T value) {
         return value.getClass().getSimpleName();
     }
 
     public boolean isNumberSetting() {
-        return this.value instanceof Double || this.value instanceof Integer || this.value instanceof Short || this.value instanceof Long || this.value instanceof Float;
+        return value instanceof Double || value instanceof Integer || value instanceof Short || value instanceof Long || value instanceof Float;
     }
 
     public boolean isInteger() {
-        return this.value instanceof Integer;
+        return value instanceof Integer;
     }
 
     public boolean isFloat() {
-        return this.value instanceof Float;
+        return value instanceof Float;
     }
 
     public boolean isEnumSetting() {
-        return !this.isPositionSetting() && !this.isBooleanParent() && !this.isNumberSetting() && !(this.value instanceof PositionSetting) && !(this.value instanceof JsonPrimitive) && !(this.value instanceof String) && !(this.value instanceof ColorSetting) && !(this.value instanceof Parent) && !(this.value instanceof Bind) && !(this.value instanceof Character) && !(this.value instanceof Boolean);
+        return !isPositionSetting() && !isBooleanParent() && !isNumberSetting() && !(value instanceof ItemSelectSetting) && !(value instanceof PositionSetting) && !(value instanceof JsonPrimitive) && !(value instanceof String) && !(value instanceof ColorSetting) && !(value instanceof SettingGroup) && !(value instanceof Bind) && !(value instanceof Character) && !(value instanceof Boolean);
     }
 
     public boolean isBindSetting() {
-        return this.value instanceof Bind;
+        return value instanceof Bind;
     }
 
     public boolean isStringSetting() {
-        return this.value instanceof String;
+        return value instanceof String;
     }
-
+    
+    public boolean isItemSelectSetting() {
+        return value instanceof ItemSelectSetting;
+    }
+    
     public boolean isColorSetting() {
-        return this.value instanceof ColorSetting;
+        return value instanceof ColorSetting;
     }
 
     public boolean isPositionSetting() {
-        return this.value instanceof PositionSetting;
+        return value instanceof PositionSetting;
     }
 
     public T getDefaultValue() {
-        return this.defaultValue;
+        return defaultValue;
     }
 
     public String getValueAsString() {
-        return this.value.toString();
+        return value.toString();
     }
 
     public boolean hasRestriction() {
-        return this.hasRestriction;
+        return hasRestriction;
     }
 
     public Setting<T> withParent(Setting<?> parent) {
@@ -229,19 +234,19 @@ public class Setting<T> {
 
     public boolean isVisible() {
         if (parent != null) {
-
             if(parent.getValue() instanceof BooleanParent bp)
                 if (!bp.isExtended())
                     return false;
 
-            if(parent.getValue() instanceof Parent p)
+            if(parent.getValue() instanceof SettingGroup p)
                 if (!p.isExtended())
                     return false;
         }
-        if (this.visibility == null) {
+
+        if (visibility == null)
             return true;
-        }
-        return this.visibility.test(this.getValue());
+
+        return visibility.test(getValue());
     }
 
     public boolean is(T colorMode) {

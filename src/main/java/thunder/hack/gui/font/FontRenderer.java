@@ -20,6 +20,7 @@ import thunder.hack.modules.client.HudEditor;
 
 import java.awt.*;
 import java.io.Closeable;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -238,7 +239,12 @@ public class FontRenderer implements Closeable {
                 }
             }
             for (Identifier identifier : GLYPH_PAGE_CACHE.keySet()) {
-                RenderSystem.setShaderTexture(0, identifier);
+                try {
+                    RenderSystem.setShaderTexture(0, identifier);
+                } catch (Exception e) {
+                    continue;
+                }
+
                 List<DrawEntry> objects = GLYPH_PAGE_CACHE.get(identifier);
 
                 bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);

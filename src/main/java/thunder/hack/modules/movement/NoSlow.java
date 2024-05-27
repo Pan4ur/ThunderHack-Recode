@@ -2,20 +2,16 @@ package thunder.hack.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.FoodComponent;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Direction;
 import thunder.hack.events.impl.EventKeyboardInput;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.Parent;
-import thunder.hack.utility.player.PlayerUtility;
+import thunder.hack.setting.impl.SettingGroup;
 
 public class NoSlow extends Module {
     public NoSlow() {
@@ -24,7 +20,7 @@ public class NoSlow extends Module {
 
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
     private final Setting<Boolean> mainHand = new Setting<>("MainHand", true);
-    private final Setting<Parent> selection = new Setting<>("Selection", new Parent(false, 0));
+    private final Setting<SettingGroup> selection = new Setting<>("Selection", new SettingGroup(false, 0));
     private final Setting<Boolean> food = new Setting<>("Food", true).withParent(selection);
     private final Setting<Boolean> projectiles = new Setting<>("Projectiles", true).withParent(selection);
     private final Setting<Boolean> shield = new Setting<>("Shield", true).withParent(selection);
@@ -95,8 +91,10 @@ public class NoSlow extends Module {
     @EventHandler
     public void onKeyboardInput(EventKeyboardInput e) {
         if(mode.getValue() == Mode.Matrix3 && mc.player.isUsingItem() && !mc.player.isFallFlying()) {
-            mc.player.input.movementForward /= 0.2f;
-            mc.player.input.movementSideways /= 0.2f;
+            mc.player.input.movementForward *= 5f;
+            mc.player.input.movementSideways *= 5f;
+            float mult = 1f;
+
             if (mc.player.isOnGround()) {
                 if(mc.player.input.movementForward != 0 && mc.player.input.movementSideways != 0) {
                     mc.player.input.movementForward *= 0.35f;
@@ -107,13 +105,13 @@ public class NoSlow extends Module {
                 }
             } else {
                 if(mc.player.input.movementForward != 0 && mc.player.input.movementSideways != 0) {
-                    mc.player.input.movementForward *= 0.47f;
-                    mc.player.input.movementSideways *= 0.47f;
+                    mult = 0.47f;
                 } else {
-                    mc.player.input.movementForward *= 0.67f;
-                    mc.player.input.movementSideways *= 0.67f;
+                    mult = 0.67f;
                 }
             }
+            mc.player.input.movementForward *= mult;
+            mc.player.input.movementSideways *= mult;
         }
     }
 

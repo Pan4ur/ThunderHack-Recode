@@ -19,7 +19,7 @@ import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.base.PlaceModule;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.world.HoleUtility;
 
@@ -33,7 +33,7 @@ public final class Surround extends PlaceModule {
     private final Setting<Integer> blocksPerTick = new Setting<>("Blocks/Place", 8, 1, 12);
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10);
     private final Setting<CenterMode> center = new Setting<>("Center", CenterMode.Disabled);
-    private final Setting<Parent> autoDisable = new Setting<>("Auto Disable", new Parent(false, 0));
+    private final Setting<SettingGroup> autoDisable = new Setting<>("Auto Disable", new SettingGroup(false, 0));
     private final Setting<Boolean> onYChange = new Setting<>("On Y Change", true).withParent(autoDisable);
     private final Setting<OnTpAction> onTp = new Setting<>("On Tp", OnTpAction.None).withParent(autoDisable);
     private final Setting<Boolean> onDeath = new Setting<>("On Death", false).withParent(autoDisable);

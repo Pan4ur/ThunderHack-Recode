@@ -16,7 +16,7 @@ import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.SearchInvResult;
@@ -40,7 +40,7 @@ public final class PistonPush extends Module {
     private final Setting<Boolean> autoSwap = new Setting<>("Auto Swap", true);
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
 
-    private final Setting<Parent> render = new Setting<>("Render", new Parent(false, 0));
+    private final Setting<SettingGroup> render = new Setting<>("Render", new SettingGroup(false, 0));
     private final Setting<ColorSetting> fillColor = new Setting<>("Fill Color", new ColorSetting(new Color(255, 0, 0, 50))).withParent(render);
     private final Setting<ColorSetting> lineColor = new Setting<>("Line Color", new ColorSetting(new Color(255, 0, 0, 200))).withParent(render);
     private final Setting<Integer> lineWidth = new Setting<>("Line Width", 2, 1, 5).withParent(render);

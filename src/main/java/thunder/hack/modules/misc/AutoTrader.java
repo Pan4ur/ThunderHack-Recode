@@ -14,7 +14,8 @@ import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
+import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 
 import java.util.Comparator;
@@ -28,7 +29,7 @@ public class AutoTrader extends Module {
     private final Setting<String> buyItem = new Setting<>("BuyItem", "apple").withParent(buy);
     private final Setting<BooleanParent> sell = new Setting<>("Sell", new BooleanParent(false));
     private final Setting<String> sellItem = new Setting<>("SellItem", "bread").withParent(sell);
-    private final Setting<Parent> disable = new Setting<>("Disable", new Parent(false, 0));
+    private final Setting<SettingGroup> disable = new Setting<>("Disable", new SettingGroup(false, 0));
     private final Setting<Boolean> noVillagers = new Setting<>("NoVillagers", true).withParent(disable);
     private final Setting<Boolean> noItems = new Setting<>("NoItems", false).withParent(disable);
 
@@ -88,11 +89,14 @@ public class AutoTrader extends Module {
         } else if (interactTicks <= 0 && !(mc.currentScreen instanceof ClickGUI)) {
             Entity ent = Lists.newArrayList(mc.world.getEntities()).stream()
                     .filter(e -> (e instanceof VillagerEntity))
-                    .filter(e -> mc.player.squaredDistanceTo(e) < 3.5f * 3.5f)
+                    .filter(e -> mc.player.squaredDistanceTo(e) < 4f * 4f)
                     .filter(e -> !villagers.containsKey(e.getId()))
                     .min(Comparator.comparing(e -> mc.player.distanceTo(e))).orElse(null);
 
             if (ent != null) {
+                float[] angles = InteractionUtility.calculateAngle(ent.getEyePos().add(Math.random() * 0.2, 0,Math.random() * 0.2));
+                mc.player.setYaw(angles[0]);
+                mc.player.setPitch(angles[1]);
                 mc.interactionManager.interactEntity(mc.player, ent, Hand.MAIN_HAND);
                 lastVillager = ent.getId();
                 interactTicks = 12;

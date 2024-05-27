@@ -12,7 +12,7 @@ import thunder.hack.gui.thundergui.components.*;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ThunderHackGui;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterAnimation;
 
@@ -272,7 +272,7 @@ public class ThunderGui extends Screen {
 
             if (selected_plate != null) {
                 for (Setting<?> setting : selected_plate.getModule().getSettings()) {
-                    if (setting.getValue() instanceof Parent) {
+                    if (setting.getValue() instanceof SettingGroup) {
                         settings.add(new ParentComponent(setting));
                     }
                     if (setting.getValue() instanceof Boolean && !setting.getName().equals("Enabled") && !setting.getName().equals("Drawn")) {

@@ -367,22 +367,27 @@ public class ConfigManager implements IManager {
                     switch (setting2.getType()) {
                         case "Parent":
                             continue;
-                        case "Boolean": {
+
+                        case "Boolean":
                             setting2.setValue(mobject.getAsJsonPrimitive(setting2.getName()).getAsBoolean());
                             continue;
-                        }
+
                         case "Double":
                             setting2.setValue(mobject.getAsJsonPrimitive(setting2.getName()).getAsDouble());
                             continue;
+
                         case "Float":
                             setting2.setValue(mobject.getAsJsonPrimitive(setting2.getName()).getAsFloat());
                             continue;
+
                         case "Integer":
                             setting2.setValue(mobject.getAsJsonPrimitive(setting2.getName()).getAsInt());
                             continue;
+
                         case "String":
                             setting2.setValue(mobject.getAsJsonPrimitive(setting2.getName()).getAsString().replace("_", " ").replace("++", "/"));
                             continue;
+
                         case "Bind":
                             try {
                                 JsonArray bindArray = mobject.getAsJsonArray(setting2.getName());
@@ -394,20 +399,31 @@ public class ConfigManager implements IManager {
                             } catch (Exception ignored) {
                             }
                             continue;
+
                         case "ColorSetting":
                             JsonArray array = mobject.getAsJsonArray(setting2.getName());
                             ((ColorSetting) setting2.getValue()).setColor(array.get(0).getAsInt());
                             ((ColorSetting) setting2.getValue()).setRainbow(array.get(1).getAsBoolean());
                             ((ColorSetting) setting2.getValue()).setGlobalOffset(array.get(2).getAsInt());
                             continue;
+
                         case "PositionSetting":
                             JsonArray array3 = mobject.getAsJsonArray(setting2.getName());
                             ((PositionSetting) setting2.getValue()).setX(array3.get(0).getAsFloat());
                             ((PositionSetting) setting2.getValue()).setY(array3.get(1).getAsFloat());
                             continue;
+
                         case "BooleanParent":
                             ((BooleanParent) setting2.getValue()).setEnabled(mobject.getAsJsonPrimitive(setting2.getName()).getAsBoolean());
                             continue;
+
+                        // е мама герби на хуе ууу
+                        case "ItemSelectSetting":
+                            JsonArray array1 = mobject.getAsJsonArray(setting2.getName());
+                            for (int i = 0; i < array1.size(); i++)
+                                ((ItemSelectSetting) setting2.getValue()).getItemsById().add(array1.get(i).getAsString());
+                            continue;
+
                         case "Enum":
                             try {
                                 EnumConverter converter = new EnumConverter(((Enum) setting2.getValue()).getClass());
@@ -446,6 +462,7 @@ public class ConfigManager implements IManager {
                 attribs.add(setting.getName(), array);
                 continue;
             }
+
             if (setting.isPositionSetting()) {
                 JsonArray array = new JsonArray();
                 float num2 = ((PositionSetting) setting.getValue()).getX();
@@ -456,10 +473,12 @@ public class ConfigManager implements IManager {
                 attribs.add(setting.getName(), array);
                 continue;
             }
+
             if (setting.isBooleanParent()) {
                 attribs.add(setting.getName(), jp.parse(String.valueOf(((BooleanParent) setting.getValue()).isEnabled())));
                 continue;
             }
+
             if (setting.isBindSetting()) {
                 Bind b = (Bind) setting.getValue();
                 JsonArray array = new JsonArray();
@@ -472,6 +491,7 @@ public class ConfigManager implements IManager {
                 attribs.add(setting.getName(), array);
                 continue;
             }
+
             if (setting.isStringSetting()) {
                 String str = (String) setting.getValue();
 
@@ -483,15 +503,24 @@ public class ConfigManager implements IManager {
                 }
                 continue;
             }
+
+            if(setting.isItemSelectSetting()) {
+                JsonArray array = new JsonArray();
+                for(String id : ((ItemSelectSetting) setting.getValue()).getItemsById())
+                    array.add(new JsonPrimitive(id));
+                attribs.add(setting.getName(), array);
+                continue;
+            }
+
             if (setting.isEnumSetting()) {
                 EnumConverter converter = new EnumConverter(((Enum) setting.getValue()).getClass());
                 attribs.add(setting.getName(), converter.doForward((Enum) setting.getValue()));
                 continue;
             }
+
             try {
                 attribs.add(setting.getName(), jp.parse(setting.getValueAsString()));
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
         }
 
         JsonObject moduleObject = new JsonObject();
@@ -570,66 +599,5 @@ public class ConfigManager implements IManager {
         }
         currentConfig = new File(CONFIGS_FOLDER, name + ".th");
         return currentConfig;
-    }
-
-    public void loadChestStealer() {
-        try {
-            File file = new File(CONFIG_FOLDER_NAME + "/misc/search.txt");
-
-            if (file.exists()) {
-                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                    while (reader.ready()) {
-                        ModuleManager.chestStealer.items.add(reader.readLine());
-                    }
-
-                }
-            }
-        } catch (Exception ignored) {
-        }
-    }
-
-    public void saveChestStealer() {
-        File file = new File(CONFIG_FOLDER_NAME + "/misc/search.txt");
-        try {
-            file.createNewFile();
-        } catch (Exception ignored) {
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            for (String item : ModuleManager.chestStealer.items) {
-                writer.write(item + "\n");
-            }
-        } catch (Exception ignored) {
-        }
-    }
-
-    public void loadInvCleaner() {
-        try {
-            File file = new File("ThunderHackRecode/misc/invcleaner.txt");
-
-            if (file.exists()) {
-                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                    while (reader.ready()) {
-                        ModuleManager.inventoryCleaner.items.add(reader.readLine());
-                    }
-                }
-            }
-        } catch (Exception ignored) {
-        }
-    }
-
-    public void saveInvCleaner() {
-        File file = new File("ThunderHackRecode/misc/invcleaner.txt");
-        try {
-            file.createNewFile();
-        } catch (Exception ignored) {
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            for (String item : ModuleManager.inventoryCleaner.items) {
-                writer.write(item + "\n");
-            }
-        } catch (Exception ignored) {
-        }
     }
 }

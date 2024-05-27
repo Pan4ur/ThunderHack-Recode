@@ -28,8 +28,8 @@ public class ModeElement extends AbstractElement {
 
     private float animation, animation2;
 
-    public ModeElement(Setting setting, boolean small) {
-        super(setting, small);
+    public ModeElement(Setting setting) {
+        super(setting);
         this.setting2 = setting;
         prevMode = setting.currentEnumName();
     }

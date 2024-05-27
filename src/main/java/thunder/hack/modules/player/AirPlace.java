@@ -13,7 +13,7 @@ import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
@@ -21,7 +21,7 @@ import java.awt.*;
 public class AirPlace extends Module {
     private final Setting<Float> range = new Setting<>("Range", 5f, 0f, 6f);
 
-    private final Setting<Parent> renderGroup = new Setting<>("Render", new Parent(false, 0));
+    private final Setting<SettingGroup> renderGroup = new Setting<>("Render", new SettingGroup(false, 0));
     private final Setting<Boolean> swing = new Setting<>("Swing", true).withParent(renderGroup);
     private final Setting<ColorSetting> fillColor = new Setting<>("Fill Color", new ColorSetting(new Color(100, 50, 255, 50))).withParent(renderGroup);
     private final Setting<ColorSetting> lineColor = new Setting<>("Line Color", new ColorSetting(new Color(100, 50, 255, 150))).withParent(renderGroup);

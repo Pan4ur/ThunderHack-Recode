@@ -18,7 +18,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModuleWindow extends AbstractWindow {
+public class Category extends AbstractCategory {
     private final Identifier ICON;
 
     private boolean scrollHover;
@@ -26,7 +26,7 @@ public class ModuleWindow extends AbstractWindow {
 
     public float catHeight;
 
-    public ModuleWindow(Module.Category category, ArrayList<Module> features, float x, float y, float width, float height) {
+    public Category(Module.Category category, ArrayList<Module> features, float x, float y, float width, float height) {
         super(category.getName(), x, y, width, height);
         buttons = new ArrayList<>();
         ICON = new Identifier("thunderhack", "textures/gui/headers/" + category.getName().toLowerCase() + ".png");

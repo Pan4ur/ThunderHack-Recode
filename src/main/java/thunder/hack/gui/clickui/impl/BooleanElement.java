@@ -18,8 +18,8 @@ import static thunder.hack.core.IManager.mc;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class BooleanElement extends AbstractElement {
-    public BooleanElement(Setting setting, boolean small) {
-        super(setting, small);
+    public BooleanElement(Setting setting) {
+        super(setting);
     }
 
     float animation = 0f;

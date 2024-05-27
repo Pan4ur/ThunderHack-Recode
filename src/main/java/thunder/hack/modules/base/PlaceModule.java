@@ -15,13 +15,11 @@ import net.minecraft.util.math.Box;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanParent;
 import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
@@ -44,7 +42,7 @@ public abstract class PlaceModule extends Module {
     protected final Setting<InteractMode> breakCrystalMode = new Setting<>("Break Mode", InteractMode.Normal).withParent(crystalBreaker);
     protected final Setting<Boolean> antiWeakness = new Setting<>("Anti Weakness", false).withParent(crystalBreaker);
 
-    protected final Setting<Parent> blocks = new Setting<>("Blocks", new Parent(false, 0));
+    protected final Setting<SettingGroup> blocks = new Setting<>("Blocks", new SettingGroup(false, 0));
     protected final Setting<Boolean> obsidian = new Setting<>("Obsidian", true).withParent(blocks);
     protected final Setting<Boolean> anchor = new Setting<>("Anchor", false).withParent(blocks);
     protected final Setting<Boolean> enderChest = new Setting<>("EnderChest", true).withParent(blocks);
@@ -52,7 +50,7 @@ public abstract class PlaceModule extends Module {
     protected final Setting<Boolean> cryingObsidian = new Setting<>("Crying Obsidian", true).withParent(blocks);
     protected final Setting<Boolean> dirt = new Setting<>("Dirt", false).withParent(blocks);
 
-    protected final Setting<Parent> pause = new Setting<>("Pause", new Parent(false, 0));
+    protected final Setting<SettingGroup> pause = new Setting<>("Pause", new SettingGroup(false, 0));
     protected final Setting<Boolean> eatPause = new Setting<>("On Eat", false).withParent(pause);
     protected final Setting<Boolean> breakPause = new Setting<>("On Break", false).withParent(pause);
 

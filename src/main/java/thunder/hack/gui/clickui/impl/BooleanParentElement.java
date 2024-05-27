@@ -23,8 +23,8 @@ import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 public class BooleanParentElement extends AbstractElement {
     private final Setting<BooleanParent> parentSetting;
 
-    public BooleanParentElement(Setting setting, boolean small) {
-        super(setting, small);
+    public BooleanParentElement(Setting setting) {
+        super(setting);
         this.parentSetting = setting;
     }
 

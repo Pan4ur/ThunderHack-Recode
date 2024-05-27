@@ -11,8 +11,8 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 
 public class BindElement extends AbstractElement {
-    public BindElement(Setting setting, boolean small) {
-        super(setting, small);
+    public BindElement(Setting setting) {
+        super(setting);
     }
 
     public boolean isListening;

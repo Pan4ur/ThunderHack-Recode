@@ -4,9 +4,7 @@ import net.minecraft.client.gui.DrawContext;
 import thunder.hack.modules.Module;
 import thunder.hack.utility.render.Render2DEngine;
 
-import java.awt.*;
-
-public class AbstractWindow {
+public class AbstractCategory {
     private String name;
     public float animationY;
     protected float prevTargetX;
@@ -19,7 +17,7 @@ public class AbstractWindow {
 
     private boolean open;
 
-    public AbstractWindow(String name, float x, float y, float width, float height) {
+    public AbstractCategory(String name, float x, float y, float width, float height) {
         this.name = name;
         this.x = x;
         this.y = y;

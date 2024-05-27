@@ -14,7 +14,7 @@ import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.world.HoleUtility;
 
@@ -29,7 +29,7 @@ public class HoleSnap extends Module {
     private final Setting<Boolean> useTimer = new Setting<>("Use Timer", false);
     private final Setting<Float> timerValue = new Setting<>("Timer Value", 1f, 0f, 20f);
 
-    private final Setting<Parent> autoDisable = new Setting<>("Auto Disable", new Parent(false, 0));
+    private final Setting<SettingGroup> autoDisable = new Setting<>("Auto Disable", new SettingGroup(false, 0));
     private final Setting<Boolean> onDeath = new Setting<>("On Death", true).withParent(autoDisable);
     private final Setting<Boolean> onInHole = new Setting<>("In Hole", true).withParent(autoDisable);
     private final Setting<Boolean> onNoHoleFound = new Setting<>("No Holes", false).withParent(autoDisable);

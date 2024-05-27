@@ -87,8 +87,6 @@ public final class Core {
             ThunderHack.configManager.save(ThunderHack.configManager.getCurrentConfig());
             ThunderHack.wayPointManager.saveWayPoints();
             ThunderHack.macroManager.saveMacro();
-            ThunderHack.configManager.saveChestStealer();
-            ThunderHack.configManager.saveInvCleaner();
             ThunderHack.notificationManager.publicity("AutoSave", isRu() ? "Сохраняю конфиг.." : "Saving config..", 3, Notification.Type.INFO);
         }
     }
@@ -148,8 +146,6 @@ public final class Core {
                 ThunderHack.configManager.save(ThunderHack.configManager.getCurrentConfig());
                 ThunderHack.wayPointManager.saveWayPoints();
                 ThunderHack.macroManager.saveMacro();
-                ThunderHack.configManager.saveChestStealer();
-                ThunderHack.configManager.saveInvCleaner();
                 ThunderHack.notificationManager.publicity("AutoSave", isRu() ? "Сохраняю конфиг.." : "Saving config..", 3, Notification.Type.INFO);
             }
         }

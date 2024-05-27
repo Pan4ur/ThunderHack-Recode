@@ -26,8 +26,8 @@ public class SliderElement extends AbstractElement {
     private boolean dragging, listening;
     public String Stringnumber = "";
 
-    public SliderElement(Setting setting, boolean small) {
-        super(setting, small);
+    public SliderElement(Setting setting) {
+        super(setting);
         min = ((Number) setting.getMin()).floatValue();
         max = ((Number) setting.getMax()).floatValue();
     }

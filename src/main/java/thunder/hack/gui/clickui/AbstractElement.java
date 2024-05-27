@@ -14,11 +14,9 @@ public abstract class AbstractElement {
     protected float offsetY;
 
     protected boolean hovered;
-    protected boolean small;
 
-    public AbstractElement(Setting setting,boolean small) {
+    public AbstractElement(Setting setting) {
         this.setting = setting;
-        this.small = small;
     }
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
@@ -85,10 +83,6 @@ public abstract class AbstractElement {
 
     public boolean isVisible() {
         return setting.isVisible();
-    }
-
-    public boolean isSmall() {
-        return small;
     }
 
     public void charTyped(char key, int keyCode) {

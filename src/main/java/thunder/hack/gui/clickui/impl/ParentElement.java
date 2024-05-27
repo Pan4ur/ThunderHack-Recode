@@ -4,11 +4,10 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
 
 import java.awt.*;
 
@@ -16,11 +15,11 @@ import static thunder.hack.gui.clickui.ClickGUI.arrow;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class ParentElement extends AbstractElement {
-    private final Setting<Parent> parentSetting;
+    private final Setting<SettingGroup> parentSetting;
     private float animation;
 
-    public ParentElement(Setting setting, boolean small) {
-        super(setting, small);
+    public ParentElement(Setting setting) {
+        super(setting);
         this.parentSetting = setting;
     }
 
@@ -41,12 +40,7 @@ public class ParentElement extends AbstractElement {
         matrixStack.translate(-tx, -ty, 0);
         context.drawTexture(arrow, (int) (x + width - 14), (int) (y + 5.5f), 0, 0, 6, 6, 6, 6);
         matrixStack.pop();
-
-        if(!isSmall()) {
-            FontRenderers.getSettingsRenderer().drawString(matrixStack, setting.getName(), (int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy())), (y + height / 2 - 1f), new Color(-1).getRGB());
-        } else {
-            FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), (int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy())), (y + height / 2 - 1f), new Color(-1).getRGB());
-        }
+        FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), (int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy())), (y + height / 2 - 1f), new Color(-1).getRGB());
     }
 
     @Override
@@ -62,7 +56,7 @@ public class ParentElement extends AbstractElement {
         super.mouseClicked(mouseX, mouseY, button);
     }
 
-    public Setting<Parent> getParentSetting() {
+    public Setting<SettingGroup> getParentSetting() {
         return parentSetting;
     }
 }

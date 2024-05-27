@@ -3,7 +3,7 @@ package thunder.hack.gui.thundergui.components;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.client.util.math.MatrixStack;
 
@@ -13,8 +13,8 @@ public class ParentComponent extends SettingElement {
 
     public ParentComponent(Setting setting) {
         super(setting);
-        Parent parent = (Parent) setting.getValue();
-        parent.setExtended(true);
+        SettingGroup settingGroup = (SettingGroup) setting.getValue();
+        settingGroup.setExtended(true);
     }
 
     @Override
@@ -34,8 +34,8 @@ public class ParentComponent extends SettingElement {
             return;
         }
         if (hovered) {
-            Parent parent = (Parent) setting.getValue();
-            parent.setExtended(!parent.isExtended());
+            SettingGroup settingGroup = (SettingGroup) setting.getValue();
+            settingGroup.setExtended(!settingGroup.isExtended());
         }
     }
 }

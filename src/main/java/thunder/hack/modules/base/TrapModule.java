@@ -1,7 +1,6 @@
 package thunder.hack.modules.base;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.util.hit.BlockHitResult;
@@ -26,7 +25,6 @@ public abstract class TrapModule extends PlaceModule {
     protected final Setting<Integer> blocksPerTick = new Setting<>("Block/Tick", 8, 1, 12, v -> placeTiming.getValue() == PlaceTiming.Default);
     protected final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10);
     protected final Setting<TrapMode> trapMode = new Setting<>("Trap Mode", TrapMode.Full);
-    protected final Setting<Boolean> inHole = new Setting<>("Only in hole",false);
 
     private int delay;
     protected PlayerEntity target;
@@ -106,7 +104,6 @@ public abstract class TrapModule extends PlaceModule {
 
     protected @Nullable BlockPos getBlockToPlace() {
         if (target == null || mc.player == null) return null;
-        if(inHole.getValue() && !isHole(target.getBlockPos())) return null;
         return getBlocks(target).stream()
                 .filter(pos -> pos.getSquaredDistance(mc.player.getPos()) < range.getPow2Value())
                 .filter(pos -> InteractionUtility.canPlaceBlock(pos, interact.getValue(), true))
@@ -218,24 +215,6 @@ public abstract class TrapModule extends PlaceModule {
                 .forEach(helpOffsets::add);
 
         return helpOffsets;
-    }
-    private boolean isHole(BlockPos pos){
-        return mc.world.getBlockState(pos).isReplaceable() &&
-                mc.world.getBlockState(pos.up()).isReplaceable() &&
-                isHoleBlock(pos.east()) &&
-                isHoleBlock(pos.west()) &&
-                isHoleBlock(pos.south()) &&
-                isHoleBlock(pos.north()) &&
-                isHoleBlock(pos.down());
-    }
-    private boolean isHoleBlock(BlockPos pos){
-        if (mc.world == null) return false;
-
-        return mc.world.getBlockState(pos).getBlock() == Blocks.OBSIDIAN
-                || mc.world.getBlockState(pos).getBlock() == Blocks.NETHERITE_BLOCK
-                || mc.world.getBlockState(pos).getBlock() == Blocks.CRYING_OBSIDIAN
-                || mc.world.getBlockState(pos).getBlock() == Blocks.RESPAWN_ANCHOR
-                || mc.world.getBlockState(pos).getBlock() == Blocks.BEDROCK;
     }
 
     protected enum TrapMode {

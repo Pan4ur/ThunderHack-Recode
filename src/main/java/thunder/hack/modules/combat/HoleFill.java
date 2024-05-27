@@ -12,13 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.math.PredictUtility;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.Timer;
@@ -45,7 +44,7 @@ public final class HoleFill extends Module {
     private final Setting<Boolean> jumpDisable = new Setting<>("Jump Disable", false);
     private final Setting<FillBlocks> blocks = new Setting<>("Blocks", FillBlocks.All);
 
-    private final Setting<Parent> fill = new Setting<>("Fill Holes", new Parent(true, 0));
+    private final Setting<SettingGroup> fill = new Setting<>("Fill Holes", new SettingGroup(true, 0));
     private final Setting<Boolean> selfFill = new Setting<>("Self Fill", false).withParent(fill);
     private final Setting<SelfFillMode> selfFillMode = new Setting<>("Self Fill Mode", SelfFillMode.Burrow).withParent(fill);
     private final Setting<Boolean> fillSingle = new Setting<>("Single", true).withParent(fill);
@@ -57,7 +56,7 @@ public final class HoleFill extends Module {
     private final Setting<Boolean> autoDisable = new Setting<>("Auto Disable", false);
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Packet);
 
-    private final Setting<Parent> renderCategory = new Setting<>("Render", new Parent(false, 0));
+    private final Setting<SettingGroup> renderCategory = new Setting<>("Render", new SettingGroup(false, 0));
     private final Setting<BlockAnimationUtility.BlockRenderMode> renderMode = new Setting<>("Render Mode", BlockAnimationUtility.BlockRenderMode.All).withParent(renderCategory);
     private final Setting<BlockAnimationUtility.BlockAnimationMode> animationMode = new Setting<>("Animation Mode", BlockAnimationUtility.BlockAnimationMode.Fade).withParent(renderCategory);
     private final Setting<ColorSetting> renderFillColor = new Setting<>("Render Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);

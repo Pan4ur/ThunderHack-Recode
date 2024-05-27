@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.*;
 import thunder.hack.modules.base.PlaceModule;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.Parent;
+import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.world.HoleUtility;
 
@@ -26,14 +26,14 @@ public final class Blocker extends PlaceModule {
     private final Setting<Integer> actionShift = new Setting<>("Place Per Tick", 1, 1, 5);
     private final Setting<Integer> actionInterval = new Setting<>("Delay", 0, 0, 5);
 
-    private final Setting<Parent> logic = new Setting<>("Logic", new Parent(false, 0));
+    private final Setting<SettingGroup> logic = new Setting<>("Logic", new SettingGroup(false, 0));
     private final Setting<Boolean> antiCev = new Setting<>("Anti Cev", true).withParent(logic);
     private final Setting<Boolean> antiCiv = new Setting<>("Anti Civ", true).withParent(logic);
     private final Setting<Boolean> expand = new Setting<>("Expand", true).withParent(logic);
     private final Setting<Boolean> antiTntAura = new Setting<>("Anti TNT", false).withParent(logic);
     private final Setting<Boolean> antiAutoAnchor = new Setting<>("Anti Anchor", false).withParent(logic);
 
-    private final Setting<Parent> detect = new Setting<>("Detect", new Parent(false, 1)).withParent(logic);
+    private final Setting<SettingGroup> detect = new Setting<>("Detect", new SettingGroup(false, 1)).withParent(logic);
     private final Setting<Boolean> onPacket = new Setting<>("On Break Packet", true).withParent(detect);
     private final Setting<Boolean> onAttackBlock = new Setting<>("On Attack Block", false).withParent(detect);
     private final Setting<Boolean> onBreak = new Setting<>("On Break", true).withParent(detect);

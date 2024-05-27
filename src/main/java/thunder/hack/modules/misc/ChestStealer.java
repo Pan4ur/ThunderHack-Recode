@@ -14,6 +14,7 @@ import net.minecraft.util.math.Direction;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.ItemSelectSetting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 
@@ -29,13 +30,13 @@ public class ChestStealer extends Module {
         super("ChestStealer", Category.MISC);
     }
 
+    public final Setting<ItemSelectSetting> items = new Setting<>("Items", new ItemSelectSetting(new ArrayList<>()));
     private final Setting<Integer> delay = new Setting<>("Delay", 100, 0, 1000);
     private final Setting<Boolean> random = new Setting<>("Random", false);
     private final Setting<Boolean> close = new Setting<>("Close", false);
     private final Setting<Boolean> autoMyst = new Setting<>("AutoMyst", false);
     private final Setting<Sort> sort = new Setting<>("Sort", Sort.None);
 
-    public final List<String> items = new ArrayList<>();
     private final Timer autoMystDelay = new Timer();
     private final Timer timer = new Timer();
     private final Random rnd = new Random();
@@ -72,7 +73,7 @@ public class ChestStealer extends Module {
     }
 
     private boolean isAllowed(ItemStack stack) {
-        boolean allowed = items.contains(stack.getItem().getTranslationKey().replace("block.minecraft.", "").replace("item.minecraft.", ""));
+        boolean allowed = items.getValue().getItemsById().contains(stack.getItem().getTranslationKey().replace("block.minecraft.", "").replace("item.minecraft.", ""));
         return switch (sort.getValue()) {
             case None -> true;
             case WhiteList -> allowed;
