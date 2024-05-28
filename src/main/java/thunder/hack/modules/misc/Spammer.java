@@ -86,7 +86,9 @@ public class Spammer extends Module {
     public String getPlayerName(){
         try{
             List<String> list = StaffBoard.getOnlinePlayer();
-            return list.get(random.nextInt(0,list.size()-1));
+            if(list.isEmpty())
+                return "";
+            return list.get(random.nextInt(0,list.size() - 1));
         }catch (NullPointerException e){return null;}
     }
     private void changeFact(){
