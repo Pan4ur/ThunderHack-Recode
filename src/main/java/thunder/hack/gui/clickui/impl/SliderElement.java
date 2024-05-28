@@ -39,11 +39,11 @@ public class SliderElement extends AbstractElement {
 
         MatrixStack matrixStack = context.getMatrices();
 
-        if (setting.parent != null)
+        if (setting.group != null)
             Render2DEngine.drawRect(context.getMatrices(), x + 4, y, 1f, 18, HudEditor.getColor(1));
 
         if (!dragging) {
-            FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), (setting.parent != null ? 2f : 0f) + x + 6, y + 4, new Color(-1).getRGB());
+            FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), (setting.group != null ? 2f : 0f) + x + 6, y + 4, new Color(-1).getRGB());
             FontRenderers.sf_medium_mini.drawString(matrixStack, listening ? (Objects.equals(Stringnumber, "") ? "..." : Stringnumber) : setting.getValue() + "", (int) (x + width - 6 - FontRenderers.sf_medium_mini.getStringWidth(setting.getValue() + "")), y + 5, new Color(-1).getRGB());
         } else {
             if (animation > 0.2f)

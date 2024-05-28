@@ -20,7 +20,7 @@ public class MainMenuProgram extends GlProgram {
     private GlUniform uSize;
     private GlUniform color;
     private Framebuffer input;
-    public static float time_ = 0f;
+    public static float time_ = 10000f;
 
     public MainMenuProgram() {
         super(new Identifier("thunderhack", "mainmenu"), VertexFormats.POSITION);

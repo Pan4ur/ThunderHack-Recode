@@ -57,7 +57,7 @@ public class ModuleButton extends AbstractButton {
                 elements.add(new BooleanElement(setting));
             } else if (setting.getValue() instanceof ColorSetting) {
                 elements.add(new ColorPickerElement(setting));
-            } else if (setting.getValue() instanceof BooleanParent) {
+            } else if (setting.getValue() instanceof BooleanSettingGroup) {
                 elements.add(new BooleanParentElement(setting));
             } else if (setting.isNumberSetting() && setting.hasRestriction()) {
                 elements.add(new SliderElement(setting));

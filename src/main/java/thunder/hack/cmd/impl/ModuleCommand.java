@@ -69,7 +69,7 @@ public class ModuleCommand extends Command {
                             }
 
                             JsonParser jp = new JsonParser();
-                            if (setting.getType().equalsIgnoreCase("String")) {
+                            if (setting.getValue().getClass().toString().equalsIgnoreCase("String")) {
                                 setting.setValue(settingValue);
                                 sendMessage(Formatting.DARK_GRAY + module.getName() + " " + setting.getName() + (isRu() ? " был выставлен " : " has been set to ") + settingValue);
                                 return SINGLE_SUCCESS;
@@ -85,7 +85,7 @@ public class ModuleCommand extends Command {
                                 }
                                 setCommandValue(module, setting, jp.parse(settingValue));
                             } catch (Exception e) {
-                                sendMessage((isRu() ? "Неверное значение! Эта настройка требует тип: " : "Bad Value! This setting requires a: ") + setting.getType());
+                                sendMessage((isRu() ? "Неверное значение! Эта настройка требует тип: " : "Bad Value! This setting requires a: ") + setting.getValue().getClass());
                                 return SINGLE_SUCCESS;
                             }
 
@@ -118,8 +118,8 @@ public class ModuleCommand extends Command {
         String str;
         for (Setting checkSetting : feature.getSettings()) {
             if (Objects.equals(setting.getName(), checkSetting.getName())) {
-                switch (checkSetting.getType()) {
-                    case "Parent", "Bind" -> {
+                switch (checkSetting.getClass().toString()) {
+                    case "SettingGroup", "Bind" -> {
                         return;
                     }
                     case "Boolean" -> {

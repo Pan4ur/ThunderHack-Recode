@@ -27,16 +27,16 @@ public final class Blocker extends PlaceModule {
     private final Setting<Integer> actionInterval = new Setting<>("Delay", 0, 0, 5);
 
     private final Setting<SettingGroup> logic = new Setting<>("Logic", new SettingGroup(false, 0));
-    private final Setting<Boolean> antiCev = new Setting<>("Anti Cev", true).withParent(logic);
-    private final Setting<Boolean> antiCiv = new Setting<>("Anti Civ", true).withParent(logic);
-    private final Setting<Boolean> expand = new Setting<>("Expand", true).withParent(logic);
-    private final Setting<Boolean> antiTntAura = new Setting<>("Anti TNT", false).withParent(logic);
-    private final Setting<Boolean> antiAutoAnchor = new Setting<>("Anti Anchor", false).withParent(logic);
+    private final Setting<Boolean> antiCev = new Setting<>("Anti Cev", true).addToGroup(logic);
+    private final Setting<Boolean> antiCiv = new Setting<>("Anti Civ", true).addToGroup(logic);
+    private final Setting<Boolean> expand = new Setting<>("Expand", true).addToGroup(logic);
+    private final Setting<Boolean> antiTntAura = new Setting<>("Anti TNT", false).addToGroup(logic);
+    private final Setting<Boolean> antiAutoAnchor = new Setting<>("Anti Anchor", false).addToGroup(logic);
 
-    private final Setting<SettingGroup> detect = new Setting<>("Detect", new SettingGroup(false, 1)).withParent(logic);
-    private final Setting<Boolean> onPacket = new Setting<>("On Break Packet", true).withParent(detect);
-    private final Setting<Boolean> onAttackBlock = new Setting<>("On Attack Block", false).withParent(detect);
-    private final Setting<Boolean> onBreak = new Setting<>("On Break", true).withParent(detect);
+    private final Setting<SettingGroup> detect = new Setting<>("Detect", new SettingGroup(false, 1)).addToGroup(logic);
+    private final Setting<Boolean> onPacket = new Setting<>("On Break Packet", true).addToGroup(detect);
+    private final Setting<Boolean> onAttackBlock = new Setting<>("On Attack Block", false).addToGroup(detect);
+    private final Setting<Boolean> onBreak = new Setting<>("On Break", true).addToGroup(detect);
 
     private final List<BlockPos> placePositions = new CopyOnWriteArrayList<>();
     private int tickCounter = 0;

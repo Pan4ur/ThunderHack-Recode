@@ -1,38 +1,34 @@
 package thunder.hack.modules.player;
 
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.ItemSelectSetting;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.player.InventoryUtility;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class InventoryCleaner extends Module {
     public InventoryCleaner() {
         super("InventoryCleaner", Category.PLAYER);
     }
 
+    public final Setting<ItemSelectSetting> items = new Setting<>("Items", new ItemSelectSetting(new ArrayList<>()));
     private final Setting<DropWhen> dropWhen = new Setting<>("DropWhen", DropWhen.NotInInventory);
     private final Setting<Integer> delay = new Setting<>("Delay", 50, 0, 500);
     private final Setting<Boolean> cleanChests = new Setting<>("CleanChests", false);
 
-    public List<String> items = new ArrayList<>();
     private final Timer delayTimer = new Timer();
     private boolean dirty;
 
     public void onRender3D(MatrixStack stack) {
-        boolean inInv = mc.currentScreen instanceof GenericContainerScreen;
+        boolean inInv = mc.currentScreen instanceof InventoryScreen;
 
         if (mc.player.currentScreenHandler instanceof GenericContainerScreenHandler chest && cleanChests.getValue())
             for (int i = 0; i < chest.getInventory().size(); i++) {
@@ -68,7 +64,7 @@ public class InventoryCleaner extends Module {
     }
 
     private boolean dropThisShit(ItemStack stack) {
-        return items.contains(stack.getItem().getTranslationKey().replace("block.minecraft.", "").replace("item.minecraft.", ""));
+        return items.getValue().getItemsById().contains(stack.getItem().getTranslationKey().replace("block.minecraft.", "").replace("item.minecraft.", ""));
     }
 
     public enum DropWhen {

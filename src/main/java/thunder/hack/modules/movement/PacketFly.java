@@ -14,16 +14,12 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.Vec3d;
-import thunder.hack.setting.impl.BooleanParent;
-import thunder.hack.utility.math.MathUtility;
+import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.utility.player.MovementUtility;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 
 public class PacketFly extends Module {
     public PacketFly() {
@@ -34,10 +30,10 @@ public class PacketFly extends Module {
     private final Setting<Type> type = new Setting<>("Type", Type.Preserve);
     private final Setting<Phase> phase = new Setting<>("Phase", Phase.Full);
     private final Setting<Boolean> limit = new Setting<>("Limit", true);
-    private final Setting<BooleanParent> antiKick = new Setting<>("AntiKick", new BooleanParent(true));
-    private final Setting<Integer> interval = new Setting<>("Interval", 4, 1, 50).withParent(antiKick);
-    private final Setting<Integer> upInterval = new Setting<>("UpInterval", 20, 1, 50).withParent(antiKick);
-    private final Setting<Float> anticKickOffset = new Setting<>("anticKickOffset", 0.04f, 0.008f, 1f).withParent(antiKick);
+    private final Setting<BooleanSettingGroup> antiKick = new Setting<>("AntiKick", new BooleanSettingGroup(true));
+    private final Setting<Integer> interval = new Setting<>("Interval", 4, 1, 50).addToGroup(antiKick);
+    private final Setting<Integer> upInterval = new Setting<>("UpInterval", 20, 1, 50).addToGroup(antiKick);
+    private final Setting<Float> anticKickOffset = new Setting<>("anticKickOffset", 0.04f, 0.008f, 1f).addToGroup(antiKick);
     private final Setting<Float> speed = new Setting<>("Speed", 1.0f, 0.0f, 10.0f);
     private final Setting<Float> upSpeed = new Setting<>("UpSpeed", 0.062f, 0.001f, 0.1f);
     private final Setting<Float> timer = new Setting<>("Timer", 1f, 0.01f, 5f);

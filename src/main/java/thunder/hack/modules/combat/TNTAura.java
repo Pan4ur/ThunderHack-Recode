@@ -47,10 +47,10 @@ public class TNTAura extends Module {
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("PlaceMode", InteractionUtility.PlaceMode.Normal);
     private final Setting<InteractionUtility.Rotate> rotate = new Setting<>("Rotate", InteractionUtility.Rotate.None);
     private final Setting<SettingGroup> renderCategory = new Setting<>("Render", new SettingGroup(false, 0));
-    private final Setting<RenderMode> renderMode = new Setting<>("RenderMode", RenderMode.Fade).withParent(renderCategory);
-    private final Setting<ColorSetting> renderFillColor = new Setting<>("Fill", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
-    private final Setting<ColorSetting> renderLineColor = new Setting<>("Line", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
-    private final Setting<Integer> renderLineWidth = new Setting<>("LineWidth", 2, 1, 5).withParent(renderCategory);
+    private final Setting<RenderMode> renderMode = new Setting<>("RenderMode", RenderMode.Fade).addToGroup(renderCategory);
+    private final Setting<ColorSetting> renderFillColor = new Setting<>("Fill", new ColorSetting(HudEditor.getColor(0))).addToGroup(renderCategory);
+    private final Setting<ColorSetting> renderLineColor = new Setting<>("Line", new ColorSetting(HudEditor.getColor(0))).addToGroup(renderCategory);
+    private final Setting<Integer> renderLineWidth = new Setting<>("LineWidth", 2, 1, 5).addToGroup(renderCategory);
 
     private final Map<BlockPos, Long> renderPoses = new ConcurrentHashMap<>();
     public static Timer inactivityTimer = new Timer();

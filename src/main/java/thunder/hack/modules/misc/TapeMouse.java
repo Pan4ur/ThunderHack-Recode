@@ -4,11 +4,10 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import org.jetbrains.annotations.NotNull;
 import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.BooleanParent;
+import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 
@@ -18,8 +17,8 @@ public class TapeMouse extends Module {
     }
 
     private final Setting<Integer> delay = new Setting<>("Delay", 600, 0, 10000);
-    private final Setting<BooleanParent> randomize = new Setting<>("Randomize", new BooleanParent(false));
-    private final Setting<Integer> randomizeValue = new Setting<>("Value", 600, 0, 10000).withParent(randomize);
+    private final Setting<BooleanSettingGroup> randomize = new Setting<>("Randomize", new BooleanSettingGroup(false));
+    private final Setting<Integer> randomizeValue = new Setting<>("Value", 600, 0, 10000).addToGroup(randomize);
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Left);
     private final Setting<Boolean> legit = new Setting<>("Legit", false, v -> mode.getValue() == Mode.Left);
 

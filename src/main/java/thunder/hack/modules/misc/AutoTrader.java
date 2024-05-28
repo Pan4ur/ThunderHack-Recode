@@ -13,7 +13,7 @@ import net.minecraft.village.TradeOfferList;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.BooleanParent;
+import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
@@ -25,13 +25,13 @@ import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class AutoTrader extends Module {
 
-    private final Setting<BooleanParent> buy = new Setting<>("Buy", new BooleanParent(true));
-    private final Setting<String> buyItem = new Setting<>("BuyItem", "apple").withParent(buy);
-    private final Setting<BooleanParent> sell = new Setting<>("Sell", new BooleanParent(false));
-    private final Setting<String> sellItem = new Setting<>("SellItem", "bread").withParent(sell);
+    private final Setting<BooleanSettingGroup> buy = new Setting<>("Buy", new BooleanSettingGroup(true));
+    private final Setting<String> buyItem = new Setting<>("BuyItem", "apple").addToGroup(buy);
+    private final Setting<BooleanSettingGroup> sell = new Setting<>("Sell", new BooleanSettingGroup(false));
+    private final Setting<String> sellItem = new Setting<>("SellItem", "bread").addToGroup(sell);
     private final Setting<SettingGroup> disable = new Setting<>("Disable", new SettingGroup(false, 0));
-    private final Setting<Boolean> noVillagers = new Setting<>("NoVillagers", true).withParent(disable);
-    private final Setting<Boolean> noItems = new Setting<>("NoItems", false).withParent(disable);
+    private final Setting<Boolean> noVillagers = new Setting<>("NoVillagers", true).addToGroup(disable);
+    private final Setting<Boolean> noItems = new Setting<>("NoItems", false).addToGroup(disable);
 
     public AutoTrader() {
         super("AutoTrader", Category.MISC);

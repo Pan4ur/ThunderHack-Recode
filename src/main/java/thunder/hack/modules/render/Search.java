@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.setting.impl.ItemSelectSetting;
 import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.render.Render3DEngine;
 
@@ -23,8 +24,9 @@ import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class Search extends Module {
 
+
+    public final Setting<ItemSelectSetting> selectedBlocks = new Setting<>("SelectedBlocks", new ItemSelectSetting(new ArrayList<>()));
     public static CopyOnWriteArrayList<BlockVec> blocks = new CopyOnWriteArrayList<>();
-    public static ArrayList<Block> defaultBlocks = new ArrayList<>();
     private final Setting<Integer> range = new Setting<>("Range", 100, 1, 128);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0xFF00FFFF));
     private final Setting<Boolean> illegals = new Setting<>("Illegals", true);
@@ -102,13 +104,13 @@ public class Search extends Module {
     }
 
     private boolean shouldAdd(Block block, BlockPos pos) {
-        if (defaultBlocks.contains(block)) return true;
+        if (selectedBlocks.getValue().contains(block)) return true;
         if (illegals.getValue()) return isIllegal(block, pos);
         return false;
     }
 
     private boolean shouldRender(@NotNull BlockVec vec) {
-        if (defaultBlocks.contains(mc.world.getBlockState(new BlockPos((int) vec.x, (int) vec.y, (int) vec.z)).getBlock())) {
+        if (selectedBlocks.getValue().contains(mc.world.getBlockState(new BlockPos((int) vec.x, (int) vec.y, (int) vec.z)).getBlock())) {
             return true;
         }
 

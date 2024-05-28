@@ -20,15 +20,15 @@ public class Shaders extends Module {
     //Thanks to @0x3C50 for Shader rendering example
 
     private final Setting<SettingGroup> select = new Setting<>("Select", new SettingGroup(false, 0));
-    private final Setting<Boolean> hands = new Setting<>("Hands", true).withParent(select);
-    private final Setting<Boolean> players = new Setting<>("Players", true).withParent(select);
-    private final Setting<Boolean> self = new Setting<>("Self", true, v -> players.getValue()).withParent(select);
-    private final Setting<Boolean> friends = new Setting<>("Friends", true).withParent(select);
-    private final Setting<Boolean> crystals = new Setting<>("Crystals", true).withParent(select);
-    private final Setting<Boolean> creatures = new Setting<>("Creatures", false).withParent(select);
-    private final Setting<Boolean> monsters = new Setting<>("Monsters", false).withParent(select);
-    private final Setting<Boolean> ambients = new Setting<>("Ambients", false).withParent(select);
-    private final Setting<Boolean> others = new Setting<>("Others", false).withParent(select);
+    private final Setting<Boolean> hands = new Setting<>("Hands", true).addToGroup(select);
+    private final Setting<Boolean> players = new Setting<>("Players", true).addToGroup(select);
+    private final Setting<Boolean> self = new Setting<>("Self", true, v -> players.getValue()).addToGroup(select);
+    private final Setting<Boolean> friends = new Setting<>("Friends", true).addToGroup(select);
+    private final Setting<Boolean> crystals = new Setting<>("Crystals", true).addToGroup(select);
+    private final Setting<Boolean> creatures = new Setting<>("Creatures", false).addToGroup(select);
+    private final Setting<Boolean> monsters = new Setting<>("Monsters", false).addToGroup(select);
+    private final Setting<Boolean> ambients = new Setting<>("Ambients", false).addToGroup(select);
+    private final Setting<Boolean> others = new Setting<>("Others", false).addToGroup(select);
 
     public Setting<ShaderManager.Shader> mode = new Setting<>("Mode", ShaderManager.Shader.Default);
     public Setting<ShaderManager.Shader> handsMode = new Setting<>("HandsMode", ShaderManager.Shader.Default);
@@ -44,12 +44,12 @@ public class Shaders extends Module {
     public final Setting<Boolean> glow = new Setting<>("SmokeGlow", true);
 
     private final Setting<SettingGroup> colors = new Setting<>("Colors", new SettingGroup(false, 0));
-    public final Setting<ColorSetting> outlineColor = new Setting<>("Outline", new ColorSetting(0x8800FF00)).withParent(colors);
-    public final Setting<ColorSetting> outlineColor1 = new Setting<>("SmokeOutline", new ColorSetting(0x8800FF00), v -> mode.is(ShaderManager.Shader.Smoke) || handsMode.is(ShaderManager.Shader.Smoke)).withParent(colors);
-    public final Setting<ColorSetting> outlineColor2 = new Setting<>("SmokeOutline2", new ColorSetting(0x8800FF00), v -> mode.is(ShaderManager.Shader.Smoke) || handsMode.is(ShaderManager.Shader.Smoke)).withParent(colors);
-    public final Setting<ColorSetting> fillColor1 = new Setting<>("Fill", new ColorSetting(0x8800FF00)).withParent(colors);
-    public final Setting<ColorSetting> fillColor2 = new Setting<>("SmokeFill", new ColorSetting(0x8800FF00)).withParent(colors);
-    public final Setting<ColorSetting> fillColor3 = new Setting<>("SmokeFil2", new ColorSetting(0x8800FF00)).withParent(colors);
+    public final Setting<ColorSetting> outlineColor = new Setting<>("Outline", new ColorSetting(0x8800FF00)).addToGroup(colors);
+    public final Setting<ColorSetting> outlineColor1 = new Setting<>("SmokeOutline", new ColorSetting(0x8800FF00), v -> mode.is(ShaderManager.Shader.Smoke) || handsMode.is(ShaderManager.Shader.Smoke)).addToGroup(colors);
+    public final Setting<ColorSetting> outlineColor2 = new Setting<>("SmokeOutline2", new ColorSetting(0x8800FF00), v -> mode.is(ShaderManager.Shader.Smoke) || handsMode.is(ShaderManager.Shader.Smoke)).addToGroup(colors);
+    public final Setting<ColorSetting> fillColor1 = new Setting<>("Fill", new ColorSetting(0x8800FF00)).addToGroup(colors);
+    public final Setting<ColorSetting> fillColor2 = new Setting<>("SmokeFill", new ColorSetting(0x8800FF00)).addToGroup(colors);
+    public final Setting<ColorSetting> fillColor3 = new Setting<>("SmokeFil2", new ColorSetting(0x8800FF00)).addToGroup(colors);
 
     public boolean shouldRender(Entity entity) {
         if (entity == null)

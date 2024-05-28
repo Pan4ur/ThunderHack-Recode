@@ -8,6 +8,7 @@ import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.SearchArgumentType;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.modules.render.Search;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -21,9 +22,8 @@ public class SearchCommand extends Command {
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("reset").executes(context -> {
-            Search.defaultBlocks.clear();
-            sendMessage("Search got reset.");
-
+            ModuleManager.search.selectedBlocks.getValue().clear();
+            sendMessage(isRu() ? "Search был очищен!" : "Search got reset.");
             mc.worldRenderer.reload();
             return SINGLE_SUCCESS;
         }));
@@ -33,7 +33,7 @@ public class SearchCommand extends Command {
 
             Block result = getRegisteredBlock(blockName);
             if(result != null){
-                Search.defaultBlocks.add(result);
+                ModuleManager.search.selectedBlocks.getValue().add(result);
                 sendMessage(Formatting.GREEN + blockName + (isRu() ? " добавлен в Search" : " added to Search"));
             } else {
                 sendMessage(Formatting.RED + (isRu() ? "Такого блока нет!" : "There is no such block!"));
@@ -49,7 +49,7 @@ public class SearchCommand extends Command {
 
             Block result = getRegisteredBlock(blockName);
             if(result != null){
-                Search.defaultBlocks.remove(result);
+                ModuleManager.search.selectedBlocks.getValue().remove(result);
                 sendMessage(Formatting.GREEN + blockName + (isRu() ? " удален из Search" : " removed from Search"));
             } else {
                 sendMessage(Formatting.RED + (isRu() ? "Такого блока нет!" : "There is no such block!"));
@@ -61,14 +61,14 @@ public class SearchCommand extends Command {
         })));
 
         builder.executes(context -> {
-            if (Search.defaultBlocks.isEmpty()) {
+            if (ModuleManager.search.selectedBlocks.getValue().getItemsById().isEmpty()) {
                 sendMessage("Search list empty");
             } else {
                 StringBuilder f = new StringBuilder("Search list: ");
 
-                for (Block name :  Search.defaultBlocks)
+                for (String name : ModuleManager.search.selectedBlocks.getValue().getItemsById())
                     try {
-                        f.append(name.getTranslationKey().replace("block.minecraft.","")).append(", ");
+                        f.append(name).append(", ");
                     } catch (Exception ignored) {
                     }
 

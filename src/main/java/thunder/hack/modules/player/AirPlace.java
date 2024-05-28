@@ -22,10 +22,10 @@ public class AirPlace extends Module {
     private final Setting<Float> range = new Setting<>("Range", 5f, 0f, 6f);
 
     private final Setting<SettingGroup> renderGroup = new Setting<>("Render", new SettingGroup(false, 0));
-    private final Setting<Boolean> swing = new Setting<>("Swing", true).withParent(renderGroup);
-    private final Setting<ColorSetting> fillColor = new Setting<>("Fill Color", new ColorSetting(new Color(100, 50, 255, 50))).withParent(renderGroup);
-    private final Setting<ColorSetting> lineColor = new Setting<>("Line Color", new ColorSetting(new Color(100, 50, 255, 150))).withParent(renderGroup);
-    private final Setting<Integer> lineWidth = new Setting<>("Line Width", 2, 1, 5).withParent(renderGroup);
+    private final Setting<Boolean> swing = new Setting<>("Swing", true).addToGroup(renderGroup);
+    private final Setting<ColorSetting> fillColor = new Setting<>("Fill Color", new ColorSetting(new Color(100, 50, 255, 50))).addToGroup(renderGroup);
+    private final Setting<ColorSetting> lineColor = new Setting<>("Line Color", new ColorSetting(new Color(100, 50, 255, 150))).addToGroup(renderGroup);
+    private final Setting<Integer> lineWidth = new Setting<>("Line Width", 2, 1, 5).addToGroup(renderGroup);
 
     private BlockHitResult hit;
 

@@ -48,7 +48,7 @@ public class BooleanElement extends AbstractElement {
             ClickGUI.anyHovered = true;
         }
 
-        FontRenderers.sf_medium_mini.drawString(context.getMatrices(), setting.getName(), (setting.parent != null ? 2f : 0f) + (x + 6), (y + height / 2 - 3) + 2, new Color(-1).getRGB());
+        FontRenderers.sf_medium_mini.drawString(context.getMatrices(), setting.getName(), (setting.group != null ? 2f : 0f) + (x + 6), (y + height / 2 - 3) + 2, new Color(-1).getRGB());
     }
 
     @Override

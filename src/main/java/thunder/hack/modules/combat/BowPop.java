@@ -21,12 +21,12 @@ public final class BowPop extends Module {
     public Setting<Boolean> minimize = new Setting<>("Minimize", false);
     public Setting<Float> delay = new Setting<>("Delay", 5f, 0f, 10f);
     public final Setting<SettingGroup> selection = new Setting<>("Selection", new SettingGroup(false, 0));
-    public final Setting<Boolean> bow = new Setting<>("Bows", true).withParent(selection);
-    public final Setting<Boolean> pearls = new Setting<>("EPearls", true).withParent(selection);
-    public final Setting<Boolean> xp = new Setting<>("XP", true).withParent(selection);
-    public final Setting<Boolean> eggs = new Setting<>("Eggs", true).withParent(selection);
-    public final Setting<Boolean> potions = new Setting<>("SplashPotions", true).withParent(selection);
-    public final Setting<Boolean> snowballs = new Setting<>("Snowballs", true).withParent(selection);
+    public final Setting<Boolean> bow = new Setting<>("Bows", true).addToGroup(selection);
+    public final Setting<Boolean> pearls = new Setting<>("EPearls", true).addToGroup(selection);
+    public final Setting<Boolean> xp = new Setting<>("XP", true).addToGroup(selection);
+    public final Setting<Boolean> eggs = new Setting<>("Eggs", true).addToGroup(selection);
+    public final Setting<Boolean> potions = new Setting<>("SplashPotions", true).addToGroup(selection);
+    public final Setting<Boolean> snowballs = new Setting<>("Snowballs", true).addToGroup(selection);
 
     public static Timer delayTimer = new Timer();
     private final Random rnd = new Random();

@@ -41,9 +41,9 @@ public final class PistonPush extends Module {
     private final Setting<Boolean> swing = new Setting<>("Swing", true);
 
     private final Setting<SettingGroup> render = new Setting<>("Render", new SettingGroup(false, 0));
-    private final Setting<ColorSetting> fillColor = new Setting<>("Fill Color", new ColorSetting(new Color(255, 0, 0, 50))).withParent(render);
-    private final Setting<ColorSetting> lineColor = new Setting<>("Line Color", new ColorSetting(new Color(255, 0, 0, 200))).withParent(render);
-    private final Setting<Integer> lineWidth = new Setting<>("Line Width", 2, 1, 5).withParent(render);
+    private final Setting<ColorSetting> fillColor = new Setting<>("Fill Color", new ColorSetting(new Color(255, 0, 0, 50))).addToGroup(render);
+    private final Setting<ColorSetting> lineColor = new Setting<>("Line Color", new ColorSetting(new Color(255, 0, 0, 200))).addToGroup(render);
+    private final Setting<Integer> lineWidth = new Setting<>("Line Width", 2, 1, 5).addToGroup(render);
 
     private PlayerEntity target;
     private BlockPos pistonPos;

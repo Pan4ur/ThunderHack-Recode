@@ -34,9 +34,9 @@ public final class Surround extends PlaceModule {
     private final Setting<Integer> placeDelay = new Setting<>("Delay/Place", 3, 0, 10);
     private final Setting<CenterMode> center = new Setting<>("Center", CenterMode.Disabled);
     private final Setting<SettingGroup> autoDisable = new Setting<>("Auto Disable", new SettingGroup(false, 0));
-    private final Setting<Boolean> onYChange = new Setting<>("On Y Change", true).withParent(autoDisable);
-    private final Setting<OnTpAction> onTp = new Setting<>("On Tp", OnTpAction.None).withParent(autoDisable);
-    private final Setting<Boolean> onDeath = new Setting<>("On Death", false).withParent(autoDisable);
+    private final Setting<Boolean> onYChange = new Setting<>("On Y Change", true).addToGroup(autoDisable);
+    private final Setting<OnTpAction> onTp = new Setting<>("On Tp", OnTpAction.None).addToGroup(autoDisable);
+    private final Setting<Boolean> onDeath = new Setting<>("On Death", false).addToGroup(autoDisable);
 
     private boolean wasTp = false;
     private int delay;

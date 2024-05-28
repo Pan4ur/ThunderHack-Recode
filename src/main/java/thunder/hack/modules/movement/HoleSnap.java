@@ -30,9 +30,9 @@ public class HoleSnap extends Module {
     private final Setting<Float> timerValue = new Setting<>("Timer Value", 1f, 0f, 20f);
 
     private final Setting<SettingGroup> autoDisable = new Setting<>("Auto Disable", new SettingGroup(false, 0));
-    private final Setting<Boolean> onDeath = new Setting<>("On Death", true).withParent(autoDisable);
-    private final Setting<Boolean> onInHole = new Setting<>("In Hole", true).withParent(autoDisable);
-    private final Setting<Boolean> onNoHoleFound = new Setting<>("No Holes", false).withParent(autoDisable);
+    private final Setting<Boolean> onDeath = new Setting<>("On Death", true).addToGroup(autoDisable);
+    private final Setting<Boolean> onInHole = new Setting<>("In Hole", true).addToGroup(autoDisable);
+    private final Setting<Boolean> onNoHoleFound = new Setting<>("No Holes", false).addToGroup(autoDisable);
 
     private BlockPos hole;
     private float prevClientYaw;

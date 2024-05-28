@@ -45,11 +45,11 @@ public final class HoleFill extends Module {
     private final Setting<FillBlocks> blocks = new Setting<>("Blocks", FillBlocks.All);
 
     private final Setting<SettingGroup> fill = new Setting<>("Fill Holes", new SettingGroup(true, 0));
-    private final Setting<Boolean> selfFill = new Setting<>("Self Fill", false).withParent(fill);
-    private final Setting<SelfFillMode> selfFillMode = new Setting<>("Self Fill Mode", SelfFillMode.Burrow).withParent(fill);
-    private final Setting<Boolean> fillSingle = new Setting<>("Single", true).withParent(fill);
-    private final Setting<Boolean> fillDouble = new Setting<>("Double", false).withParent(fill);
-    private final Setting<Boolean> fillQuad = new Setting<>("Quad", false).withParent(fill);
+    private final Setting<Boolean> selfFill = new Setting<>("Self Fill", false).addToGroup(fill);
+    private final Setting<SelfFillMode> selfFillMode = new Setting<>("Self Fill Mode", SelfFillMode.Burrow).addToGroup(fill);
+    private final Setting<Boolean> fillSingle = new Setting<>("Single", true).addToGroup(fill);
+    private final Setting<Boolean> fillDouble = new Setting<>("Double", false).addToGroup(fill);
+    private final Setting<Boolean> fillQuad = new Setting<>("Quad", false).addToGroup(fill);
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Always);
     private final Setting<Float> rangeToTarget = new Setting<>("Range To Target", 2f, 1f, 5f, v -> mode.getValue() == Mode.Target);
@@ -57,11 +57,11 @@ public final class HoleFill extends Module {
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Packet);
 
     private final Setting<SettingGroup> renderCategory = new Setting<>("Render", new SettingGroup(false, 0));
-    private final Setting<BlockAnimationUtility.BlockRenderMode> renderMode = new Setting<>("Render Mode", BlockAnimationUtility.BlockRenderMode.All).withParent(renderCategory);
-    private final Setting<BlockAnimationUtility.BlockAnimationMode> animationMode = new Setting<>("Animation Mode", BlockAnimationUtility.BlockAnimationMode.Fade).withParent(renderCategory);
-    private final Setting<ColorSetting> renderFillColor = new Setting<>("Render Fill Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
-    private final Setting<ColorSetting> renderLineColor = new Setting<>("Render Line Color", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
-    private final Setting<Integer> renderLineWidth = new Setting<>("Render Line Width", 2, 1, 5).withParent(renderCategory);
+    private final Setting<BlockAnimationUtility.BlockRenderMode> renderMode = new Setting<>("Render Mode", BlockAnimationUtility.BlockRenderMode.All).addToGroup(renderCategory);
+    private final Setting<BlockAnimationUtility.BlockAnimationMode> animationMode = new Setting<>("Animation Mode", BlockAnimationUtility.BlockAnimationMode.Fade).addToGroup(renderCategory);
+    private final Setting<ColorSetting> renderFillColor = new Setting<>("Render Fill Color", new ColorSetting(HudEditor.getColor(0))).addToGroup(renderCategory);
+    private final Setting<ColorSetting> renderLineColor = new Setting<>("Render Line Color", new ColorSetting(HudEditor.getColor(0))).addToGroup(renderCategory);
+    private final Setting<Integer> renderLineWidth = new Setting<>("Render Line Width", 2, 1, 5).addToGroup(renderCategory);
 
     private enum Mode {
         Always,

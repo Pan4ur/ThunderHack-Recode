@@ -73,7 +73,7 @@ public class ChestStealer extends Module {
     }
 
     private boolean isAllowed(ItemStack stack) {
-        boolean allowed = items.getValue().getItemsById().contains(stack.getItem().getTranslationKey().replace("block.minecraft.", "").replace("item.minecraft.", ""));
+        boolean allowed = items.getValue().contains(stack.getItem().getTranslationKey().replace("block.minecraft.", "").replace("item.minecraft.", ""));
         return switch (sort.getValue()) {
             case None -> true;
             case WhiteList -> allowed;

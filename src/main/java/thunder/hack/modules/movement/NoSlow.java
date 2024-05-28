@@ -21,16 +21,16 @@ public class NoSlow extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
     private final Setting<Boolean> mainHand = new Setting<>("MainHand", true);
     private final Setting<SettingGroup> selection = new Setting<>("Selection", new SettingGroup(false, 0));
-    private final Setting<Boolean> food = new Setting<>("Food", true).withParent(selection);
-    private final Setting<Boolean> projectiles = new Setting<>("Projectiles", true).withParent(selection);
-    private final Setting<Boolean> shield = new Setting<>("Shield", true).withParent(selection);
-    public final Setting<Boolean> soulSand = new Setting<>("SoulSand", true).withParent(selection);
-    public final Setting<Boolean> honey = new Setting<>("Honey", true).withParent(selection);
-    public final Setting<Boolean> slime = new Setting<>("Slime", true).withParent(selection);
-    public final Setting<Boolean> ice = new Setting<>("Ice", true).withParent(selection);
-    public final Setting<Boolean> sweetBerryBush = new Setting<>("SweetBerryBush", true).withParent(selection);
-    public final Setting<Boolean> sneak = new Setting<>("Sneak", false).withParent(selection);
-    public final Setting<Boolean> crawl = new Setting<>("Crawl", false).withParent(selection);
+    private final Setting<Boolean> food = new Setting<>("Food", true).addToGroup(selection);
+    private final Setting<Boolean> projectiles = new Setting<>("Projectiles", true).addToGroup(selection);
+    private final Setting<Boolean> shield = new Setting<>("Shield", true).addToGroup(selection);
+    public final Setting<Boolean> soulSand = new Setting<>("SoulSand", true).addToGroup(selection);
+    public final Setting<Boolean> honey = new Setting<>("Honey", true).addToGroup(selection);
+    public final Setting<Boolean> slime = new Setting<>("Slime", true).addToGroup(selection);
+    public final Setting<Boolean> ice = new Setting<>("Ice", true).addToGroup(selection);
+    public final Setting<Boolean> sweetBerryBush = new Setting<>("SweetBerryBush", true).addToGroup(selection);
+    public final Setting<Boolean> sneak = new Setting<>("Sneak", false).addToGroup(selection);
+    public final Setting<Boolean> crawl = new Setting<>("Crawl", false).addToGroup(selection);
 
     private boolean returnSneak;
 

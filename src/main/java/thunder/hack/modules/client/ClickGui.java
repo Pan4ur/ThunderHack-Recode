@@ -1,14 +1,12 @@
 package thunder.hack.modules.client;
 
 import meteordevelopment.orbit.EventHandler;
-import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventSetting;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.BooleanParent;
-import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.setting.impl.BooleanSettingGroup;
 
 public class ClickGui extends Module {
     public final Setting<Gradient> gradientMode = new Setting<>("Gradient", Gradient.LeftToRight);
@@ -22,8 +20,8 @@ public class ClickGui extends Module {
     public final Setting<Integer> moduleHeight = new Setting<>("ModuleHeight", 14, 8, 25);
     public final Setting<Integer> settingFontScale = new Setting<>("SettingFontScale", 12, 6, 24);
     public final Setting<Integer> modulesFontScale = new Setting<>("ModulesFontScale", 14, 6, 24);
-    public final Setting<BooleanParent> gear = new Setting<>("Gear", new BooleanParent(true));
-    public final Setting<Integer> gearScale = new Setting<>("GearScale", 60, 6, 300).withParent(gear);
+    public final Setting<BooleanSettingGroup> gear = new Setting<>("Gear", new BooleanSettingGroup(true));
+    public final Setting<Integer> gearScale = new Setting<>("GearScale", 60, 6, 300).addToGroup(gear);
     public final Setting<Boolean> closeAnimation = new Setting<>("CloseAnimation", true);
 
     public ClickGui() {

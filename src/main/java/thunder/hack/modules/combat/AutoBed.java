@@ -66,12 +66,12 @@ public final class AutoBed extends Module {
     public static final Setting<Integer> minBeds = new Setting<>("MinBeds", 4, 0, 10);
     public static final Setting<Integer> bedsPerCraft = new Setting<>("BedsPerCraft", 8, 1, 27);
     private final Setting<SettingGroup> renderCategory = new Setting<>("Render", new SettingGroup(false, 0));
-    private final Setting<Boolean> render = new Setting<>("Render", true).withParent(renderCategory);
-    private final Setting<Boolean> rselfDamage = new Setting<>("SelfDamage", true).withParent(renderCategory);
-    private final Setting<Boolean> drawDamage = new Setting<>("RenderDamage", true).withParent(renderCategory);
-    private final Setting<ColorSetting> fillColor = new Setting<>("Fill", new ColorSetting(Render2DEngine.injectAlpha(HudEditor.getColor(0), 150))).withParent(renderCategory);
-    private final Setting<ColorSetting> lineColor = new Setting<>("Line", new ColorSetting(HudEditor.getColor(0))).withParent(renderCategory);
-    private final Setting<ColorSetting> textColor = new Setting<>("Text", new ColorSetting(Color.WHITE)).withParent(renderCategory);
+    private final Setting<Boolean> render = new Setting<>("Render", true).addToGroup(renderCategory);
+    private final Setting<Boolean> rselfDamage = new Setting<>("SelfDamage", true).addToGroup(renderCategory);
+    private final Setting<Boolean> drawDamage = new Setting<>("RenderDamage", true).addToGroup(renderCategory);
+    private final Setting<ColorSetting> fillColor = new Setting<>("Fill", new ColorSetting(Render2DEngine.injectAlpha(HudEditor.getColor(0), 150))).addToGroup(renderCategory);
+    private final Setting<ColorSetting> lineColor = new Setting<>("Line", new ColorSetting(HudEditor.getColor(0))).addToGroup(renderCategory);
+    private final Setting<ColorSetting> textColor = new Setting<>("Text", new ColorSetting(Color.WHITE)).addToGroup(renderCategory);
 
     private PlayerEntity target;
     private BedData bestBed, bestPos;

@@ -1,9 +1,9 @@
 package thunder.hack.setting.impl;
 
-public class BooleanParent {
+public class BooleanSettingGroup {
     private boolean enabled, extended;
 
-    public BooleanParent(boolean enabled) {
+    public BooleanSettingGroup(boolean enabled) {
         this.enabled = enabled;
         extended = false;
     }

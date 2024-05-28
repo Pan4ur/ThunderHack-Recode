@@ -1,7 +1,6 @@
 package thunder.hack.setting;
 
 
-import com.google.gson.JsonPrimitive;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSetting;
 import thunder.hack.modules.Module;
@@ -16,7 +15,7 @@ public class Setting<T> {
     private T plannedValue;
     private T min;
     private T max;
-    public Setting<?> parent = null;
+    public Setting<?> group = null;
 
     private boolean hasRestriction;
     private Predicate<T> visibility;
@@ -152,33 +151,6 @@ public class Setting<T> {
         ThunderHack.EVENT_BUS.post(new EventSetting(this));
     }
 
-    public String getType() {
-        if (isEnumSetting()) {
-            return "Enum";
-        }
-        if (isColorSetting()) {
-            return "ColorSetting";
-        }
-        if (isPositionSetting()) {
-            return "PositionSetting";
-        }
-        if (isBooleanParent()) {
-            return "BooleanParent";
-        }
-        if (value instanceof ItemSelectSetting) {
-            return "ItemSelectSetting";
-        }
-        return getClassName(defaultValue);
-    }
-
-    public boolean isBooleanParent() {
-        return value instanceof BooleanParent;
-    }
-
-    public <T> String getClassName(T value) {
-        return value.getClass().getSimpleName();
-    }
-
     public boolean isNumberSetting() {
         return value instanceof Double || value instanceof Integer || value instanceof Short || value instanceof Long || value instanceof Float;
     }
@@ -192,7 +164,7 @@ public class Setting<T> {
     }
 
     public boolean isEnumSetting() {
-        return !isPositionSetting() && !isBooleanParent() && !isNumberSetting() && !(value instanceof ItemSelectSetting) && !(value instanceof PositionSetting) && !(value instanceof JsonPrimitive) && !(value instanceof String) && !(value instanceof ColorSetting) && !(value instanceof SettingGroup) && !(value instanceof Bind) && !(value instanceof Character) && !(value instanceof Boolean);
+        return value.getClass().isEnum();
     }
 
     public boolean isBindSetting() {
@@ -206,10 +178,6 @@ public class Setting<T> {
     public boolean isItemSelectSetting() {
         return value instanceof ItemSelectSetting;
     }
-    
-    public boolean isColorSetting() {
-        return value instanceof ColorSetting;
-    }
 
     public boolean isPositionSetting() {
         return value instanceof PositionSetting;
@@ -219,26 +187,22 @@ public class Setting<T> {
         return defaultValue;
     }
 
-    public String getValueAsString() {
-        return value.toString();
-    }
-
     public boolean hasRestriction() {
         return hasRestriction;
     }
 
-    public Setting<T> withParent(Setting<?> parent) {
-        this.parent = parent;
+    public Setting<T> addToGroup(Setting<?> group) {
+        this.group = group;
         return this;
     }
 
     public boolean isVisible() {
-        if (parent != null) {
-            if(parent.getValue() instanceof BooleanParent bp)
+        if (group != null) {
+            if(group.getValue() instanceof BooleanSettingGroup bp)
                 if (!bp.isExtended())
                     return false;
 
-            if(parent.getValue() instanceof SettingGroup p)
+            if(group.getValue() instanceof SettingGroup p)
                 if (!p.isExtended())
                     return false;
         }
@@ -249,8 +213,8 @@ public class Setting<T> {
         return visibility.test(getValue());
     }
 
-    public boolean is(T colorMode) {
-        return value == colorMode;
+    public boolean is(T mode) {
+        return value == mode;
     }
 }
 

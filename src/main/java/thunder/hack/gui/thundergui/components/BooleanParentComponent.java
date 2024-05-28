@@ -3,12 +3,9 @@ package thunder.hack.gui.thundergui.components;
 import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui;
-import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.BooleanParent;
-import thunder.hack.utility.math.FrameRateCounter;
-import thunder.hack.utility.math.MathUtility;
+import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
@@ -17,7 +14,7 @@ import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class BooleanParentComponent extends SettingElement {
     float animation = 0f;
-    private final Setting<BooleanParent> parentSetting;
+    private final Setting<BooleanSettingGroup> parentSetting;
 
     public BooleanParentComponent(Setting setting) {
         super(setting);
@@ -46,7 +43,7 @@ public class BooleanParentComponent extends SettingElement {
         if (isHovered()) getParentSetting().getValue().setEnabled(!getParentSetting().getValue().isEnabled());
     }
 
-    public Setting<BooleanParent> getParentSetting() {
+    public Setting<BooleanSettingGroup> getParentSetting() {
         return parentSetting;
     }
 }

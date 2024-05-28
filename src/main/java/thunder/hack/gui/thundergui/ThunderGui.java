@@ -12,6 +12,8 @@ import thunder.hack.gui.thundergui.components.*;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ThunderHackGui;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.BooleanSettingGroup;
+import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.BetterAnimation;
@@ -278,13 +280,13 @@ public class ThunderGui extends Screen {
                     if (setting.getValue() instanceof Boolean && !setting.getName().equals("Enabled") && !setting.getName().equals("Drawn")) {
                         settings.add(new BooleanComponent(setting));
                     }
-                    if (setting.isBooleanParent()) {
+                    if (setting.getValue() instanceof BooleanSettingGroup) {
                         settings.add(new BooleanParentComponent(setting));
                     }
-                    if (setting.isEnumSetting()) {
+                    if (setting.getValue().getClass().isEnum()) {
                         settings.add(new ModeComponent(setting));
                     }
-                    if (setting.isColorSetting()) {
+                    if (setting.getValue() instanceof ColorSetting) {
                         settings.add(new ColorPickerComponent(setting));
                     }
                     if (setting.isNumberSetting() && setting.hasRestriction()) {

@@ -25,7 +25,7 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.BooleanParent;
+import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
@@ -47,8 +47,8 @@ public class MiddleClick extends Module {
     private final Setting<Boolean> silent = new Setting<>("Silent", true);
     private final Setting<Boolean> inventory = new Setting<>("Inventory", true);
     private final Setting<Integer> swapDelay = new Setting<>("SwapDelay", 100, 0, 1000, v -> !silent.getValue());
-    private final Setting<BooleanParent> antiWaste = new Setting<>("AntiWaste",new BooleanParent(true));
-    private final Setting<Integer> durability = new Setting<>("StopOn", 90, 0, 100).withParent(antiWaste);
+    private final Setting<BooleanSettingGroup> antiWaste = new Setting<>("AntiWaste",new BooleanSettingGroup(true));
+    private final Setting<Integer> durability = new Setting<>("StopOn", 90, 0, 100).addToGroup(antiWaste);
     public final Setting<Boolean> antiPickUp = new Setting<>("AntiPickUp", true);
     private final Setting<Boolean> feetExp = new Setting<>("FeetXP", false);
 

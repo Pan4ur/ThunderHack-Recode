@@ -25,13 +25,13 @@ public class AutoLeave extends Module {
     private final Setting<Boolean> fastLeave = new Setting<>("InstantLeave", true);
     public static Setting<String> command = new Setting<>("Command", "hub");
     private final Setting<SettingGroup> leaveIf = new Setting<>("Leave if", new SettingGroup(false, 0));
-    private final Setting<Boolean> low_hp = new Setting<>("LowHp", false).withParent(leaveIf);
-    private final Setting<Boolean> totems = new Setting<>("Totems", false).withParent(leaveIf);
+    private final Setting<Boolean> low_hp = new Setting<>("LowHp", false).addToGroup(leaveIf);
+    private final Setting<Boolean> totems = new Setting<>("Totems", false).addToGroup(leaveIf);
     private final Setting<Integer> totemsCount = new Setting("TotemsCount", 2, 0, 10, v -> totems.getValue());
     private final Setting<Float> leaveHp = new Setting("HP", 8.0f, 1f, 20.0f, v -> low_hp.getValue());
-    private final Setting<LeaveMode> staff = new Setting<>("Staff", LeaveMode.None).withParent(leaveIf);
-    private final Setting<LeaveMode> players = new Setting<>("Players", LeaveMode.Leave).withParent(leaveIf);
-    private final Setting<Integer> distance = new Setting<>("Distance", 256, 4, 256, v -> players.getValue() != LeaveMode.None).withParent(leaveIf);
+    private final Setting<LeaveMode> staff = new Setting<>("Staff", LeaveMode.None).addToGroup(leaveIf);
+    private final Setting<LeaveMode> players = new Setting<>("Players", LeaveMode.Leave).addToGroup(leaveIf);
+    private final Setting<Integer> distance = new Setting<>("Distance", 256, 4, 256, v -> players.getValue() != LeaveMode.None).addToGroup(leaveIf);
 
     private final Timer chatDelay = new Timer();
 

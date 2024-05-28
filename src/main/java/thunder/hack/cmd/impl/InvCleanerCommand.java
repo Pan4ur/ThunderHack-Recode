@@ -22,7 +22,7 @@ public class InvCleanerCommand extends Command {
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("reset").executes(context -> {
-            ModuleManager.inventoryCleaner.items.clear();
+            ModuleManager.inventoryCleaner.items.getValue().clear();
             sendMessage("InvCleaner got reset.");
             return SINGLE_SUCCESS;
         }));
@@ -32,7 +32,7 @@ public class InvCleanerCommand extends Command {
 
             String result = getRegistered(blockName);
             if(result != null){
-                ModuleManager.inventoryCleaner.items.add(result);
+                ModuleManager.inventoryCleaner.items.getValue().add(result);
                 sendMessage(Formatting.GREEN + blockName + (isRu() ? " добавлен в InvCleaner" : " added to InvCleaner"));
             } else {
                 sendMessage(Formatting.RED + (isRu() ? "Такого предмета нет!" : "There is no such item!"));
@@ -45,7 +45,7 @@ public class InvCleanerCommand extends Command {
 
             String result = getRegistered(blockName);
             if(result != null){
-                ModuleManager.inventoryCleaner.items.remove(result);
+                ModuleManager.inventoryCleaner.items.getValue().remove(result);
                 sendMessage(Formatting.GREEN + blockName + (isRu() ? " удален из InvCleaner" : " removed from InvCleaner"));
             } else {
                 sendMessage(Formatting.RED + (isRu() ? "Такого предмета нет!" : "There is no such item!"));
@@ -54,17 +54,16 @@ public class InvCleanerCommand extends Command {
         })));
 
         builder.executes(context -> {
-            if (ModuleManager.inventoryCleaner.items.isEmpty()) {
+            if (ModuleManager.inventoryCleaner.items.getValue().getItemsById().isEmpty()) {
                 sendMessage("InvCleaner list empty");
             } else {
                 StringBuilder f = new StringBuilder("InvCleaner list: ");
 
-                for (String name :  ModuleManager.inventoryCleaner.items)
+                for (String name :  ModuleManager.inventoryCleaner.items.getValue().getItemsById())
                     try {
                         f.append(name).append(", ");
                     } catch (Exception ignored) {
                     }
-
                 sendMessage(f.toString());
             }
 

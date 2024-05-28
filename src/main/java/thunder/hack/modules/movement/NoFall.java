@@ -187,7 +187,7 @@ public class NoFall extends Module {
 
     @Override
     public String getDisplayInfo() {
-        return mode.getValueAsString() + " " + (isFalling() ? "Ready" : "");
+        return mode.getValue().toString() + " " + (isFalling() ? "Ready" : "");
     }
 
     @EventHandler

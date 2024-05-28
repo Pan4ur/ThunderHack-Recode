@@ -62,28 +62,28 @@ public class ESP extends Module {
 
 
     private final Setting<SettingGroup> boxEsp = new Setting<>("Box", new SettingGroup(false, 0));
-    private final Setting<Boolean> players = new Setting<>("Players", true).withParent(boxEsp);
-    private final Setting<Boolean> friends = new Setting<>("Friends", true).withParent(boxEsp);
-    private final Setting<Boolean> crystals = new Setting<>("Crystals", true).withParent(boxEsp);
-    private final Setting<Boolean> creatures = new Setting<>("Creatures", false).withParent(boxEsp);
-    private final Setting<Boolean> monsters = new Setting<>("Monsters", false).withParent(boxEsp);
-    private final Setting<Boolean> ambients = new Setting<>("Ambients", false).withParent(boxEsp);
-    private final Setting<Boolean> others = new Setting<>("Others", false).withParent(boxEsp);
-    private final Setting<Boolean> outline = new Setting<>("Outline", true).withParent(boxEsp);
-    private final Setting<Colors> colorMode = new Setting<>("ColorMode", Colors.SyncColor).withParent(boxEsp);
-    private final Setting<Boolean> renderHealth = new Setting<>("renderHealth", true).withParent(boxEsp);
+    private final Setting<Boolean> players = new Setting<>("Players", true).addToGroup(boxEsp);
+    private final Setting<Boolean> friends = new Setting<>("Friends", true).addToGroup(boxEsp);
+    private final Setting<Boolean> crystals = new Setting<>("Crystals", true).addToGroup(boxEsp);
+    private final Setting<Boolean> creatures = new Setting<>("Creatures", false).addToGroup(boxEsp);
+    private final Setting<Boolean> monsters = new Setting<>("Monsters", false).addToGroup(boxEsp);
+    private final Setting<Boolean> ambients = new Setting<>("Ambients", false).addToGroup(boxEsp);
+    private final Setting<Boolean> others = new Setting<>("Others", false).addToGroup(boxEsp);
+    private final Setting<Boolean> outline = new Setting<>("Outline", true).addToGroup(boxEsp);
+    private final Setting<Colors> colorMode = new Setting<>("ColorMode", Colors.SyncColor).addToGroup(boxEsp);
+    private final Setting<Boolean> renderHealth = new Setting<>("renderHealth", true).addToGroup(boxEsp);
 
 
     private final Setting<SettingGroup> boxColors = new Setting<>("BoxColors", new SettingGroup(false, 0));
-    private final Setting<ColorSetting> playersC = new Setting<>("PlayersC", new ColorSetting(new Color(0xFF9200))).withParent(boxColors);
-    private final Setting<ColorSetting> friendsC = new Setting<>("FriendsC", new ColorSetting(new Color(0x30FF00))).withParent(boxColors);
-    private final Setting<ColorSetting> crystalsC = new Setting<>("CrystalsC", new ColorSetting(new Color(0x00BBFF))).withParent(boxColors);
-    private final Setting<ColorSetting> creaturesC = new Setting<>("CreaturesC", new ColorSetting(new Color(0xA0A4A6))).withParent(boxColors);
-    private final Setting<ColorSetting> monstersC = new Setting<>("MonstersC", new ColorSetting(new Color(0xFF0000))).withParent(boxColors);
-    private final Setting<ColorSetting> ambientsC = new Setting<>("AmbientsC", new ColorSetting(new Color(0x7B00FF))).withParent(boxColors);
-    private final Setting<ColorSetting> othersC = new Setting<>("OthersC", new ColorSetting(new Color(0xFF0062))).withParent(boxColors);
-    public final Setting<ColorSetting> healthB = new Setting<>("healthB", new ColorSetting(new Color(0xff1100))).withParent(boxColors);
-    public final Setting<ColorSetting> healthU = new Setting<>("healthU", new ColorSetting(new Color(0x2fff00))).withParent(boxColors);
+    private final Setting<ColorSetting> playersC = new Setting<>("PlayersC", new ColorSetting(new Color(0xFF9200))).addToGroup(boxColors);
+    private final Setting<ColorSetting> friendsC = new Setting<>("FriendsC", new ColorSetting(new Color(0x30FF00))).addToGroup(boxColors);
+    private final Setting<ColorSetting> crystalsC = new Setting<>("CrystalsC", new ColorSetting(new Color(0x00BBFF))).addToGroup(boxColors);
+    private final Setting<ColorSetting> creaturesC = new Setting<>("CreaturesC", new ColorSetting(new Color(0xA0A4A6))).addToGroup(boxColors);
+    private final Setting<ColorSetting> monstersC = new Setting<>("MonstersC", new ColorSetting(new Color(0xFF0000))).addToGroup(boxColors);
+    private final Setting<ColorSetting> ambientsC = new Setting<>("AmbientsC", new ColorSetting(new Color(0x7B00FF))).addToGroup(boxColors);
+    private final Setting<ColorSetting> othersC = new Setting<>("OthersC", new ColorSetting(new Color(0xFF0062))).addToGroup(boxColors);
+    public final Setting<ColorSetting> healthB = new Setting<>("healthB", new ColorSetting(new Color(0xff1100))).addToGroup(boxColors);
+    public final Setting<ColorSetting> healthU = new Setting<>("healthU", new ColorSetting(new Color(0x2fff00))).addToGroup(boxColors);
 
     private float dizorentAnimation = 0f;
 
