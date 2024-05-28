@@ -23,7 +23,7 @@ public class Spammer extends Module {
     public Setting<Messages> messages = new Setting<>("messages",Messages.File);
     public Setting<WhisperPrefix> whisper_prefix = new Setting<>("prefix", WhisperPrefix.W, v -> mode.getValue() == Mode.Whispers);
     public Setting<Boolean> global = new Setting<>("global", true,v -> mode.getValue() == Mode.Chat);
-    public Setting<Integer> delay = new Setting<>("delay", 5, 1, 30);
+    public Setting<Float> delay = new Setting<>("delay", 5f, 1f, 30f);
     private final Timer timer_delay = new Timer();
     private final Random random = new Random();
     private String fact;
@@ -109,7 +109,7 @@ public class Spammer extends Module {
 
     @Override
     public void onUpdate() {
-        if (timer_delay.passedS(delay.getValue())) {
+        if (timer_delay.passedMs((long) (delay.getValue() * 1000))) {
             String c;
             if(messages.getValue() == Messages.File){
                 if (SpamList.isEmpty()) {
