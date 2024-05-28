@@ -24,6 +24,7 @@ public class Timer extends Module {
     private final Setting<Float> addOnTheMove = new Setting<>("addOnTheMove", 0.0f, 0.0f, 1.0f, v -> mode.getValue() == Mode.SMART);
     private final Setting<Float> decreaseRate = new Setting<>("decreaseRate", 1.0f, 0.5f, 3.0f, v -> mode.getValue() == Mode.SMART);
     private final Setting<Bind> boostKey = new Setting<>("BoostKey", new Bind(-1, false, false), v -> mode.getValue() == Mode.GrimFunnyGame);
+    private final Setting<Boolean> disableOnFlag = new Setting<>("DisableOnFlag", false, v -> mode.getValue() == Mode.GrimFunnyGame);
 
     public static float violation = 0.0f;
     private static double prevPosX;
@@ -103,9 +104,9 @@ public class Timer extends Module {
                 violation = MathHelper.clamp(violation, 0.0f, 100f / speed.getValue());
                 e.cancel();
             }
-            if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
+            if (e.getPacket() instanceof PlayerPositionLookS2CPacket && disableOnFlag.getValue()) {
                 violation = 40f;
-                disable(isRu() ? "Отключён т.к. ты получил велосити!" : "Disabled because you got velocity packet!");
+                disable(isRu() ? "Отключён т.к. тебя флагнуло!" : "Disabled because you got flagged!");
             }
         }
     }
@@ -119,6 +120,7 @@ public class Timer extends Module {
                 disable(isRu() ? "Перед повторным использованием необходимо постоять на месте!" : "Standing still is required before reuse!");
                 return;
             }
+            
             event.cancel();
             event.setIterations(shiftTicks.getValue());
             violation = 40f;
