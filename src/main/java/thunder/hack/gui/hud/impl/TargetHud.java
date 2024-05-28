@@ -259,21 +259,27 @@ public class TargetHud extends HudElement {
                 } else {
                     RenderSystem.setShaderTexture(0, mc.getEntityRenderDispatcher().getRenderer(target).getTexture(target));
                 }
+
+                context.getMatrices().push();
+                context.getMatrices().translate(getPosX() + 2.5 + 15, getPosY() + 2.5 + 15, 0);
+                context.getMatrices().scale(1 - hurtPercent / 20f, 1 - hurtPercent / 20f, 1f);
+                context.getMatrices().translate(-(getPosX() + 2.5 + 15), -(getPosY() + 2.5 + 15), 0);
                 RenderSystem.enableBlend();
                 RenderSystem.colorMask(false, false, false, true);
                 RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
                 RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
                 RenderSystem.colorMask(true, true, true, true);
-
                 RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-                Render2DEngine.renderRoundedQuadInternal(context.getMatrices().peek().getPositionMatrix(), 1f, 1f - hurtPercent, 1f - hurtPercent, 1f, getPosX() + 2.5f + hurtPercent2, getPosY() + 2.5f + hurtPercent2, getPosX() + 2.5f - hurtPercent + 44, getPosY() + 2.5f - hurtPercent + 44, 5, 10);
+
+                Render2DEngine.renderRoundedQuadInternal(context.getMatrices().peek().getPositionMatrix(), animationFactor, animationFactor, animationFactor, animationFactor,
+                        getPosX() + 2.5, getPosY() + 2.5, getPosX() + 2.5 + 45, getPosY() + 2.5 + 45, 5, 10);
 
                 RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
-                RenderSystem.setShaderColor(1f, 1f - hurtPercent, 1f - hurtPercent, 1f);
-                Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 2.5f + hurtPercent2, getPosY() + 2.5f + hurtPercent2, 44 - hurtPercent2 * 2, 44 - hurtPercent2 * 2, 8, 8, 8, 8, 64, 64);
-                Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 2.5f + hurtPercent2, getPosY() + 2.5f + hurtPercent2, 44 - hurtPercent2 * 2, 44 - hurtPercent2 * 2, 40, 8, 8, 8, 64, 64);
+                RenderSystem.setShaderColor(animationFactor, animationFactor - hurtPercent / 2, animationFactor - hurtPercent / 2, animationFactor);
+                Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 2.5, getPosY() + 2.5, 45, 45, 8, 8, 8, 8, 64, 64);
+                Render2DEngine.renderTexture(context.getMatrices(), getPosX() + 2.5, getPosY() + 2.5, 45, 45, 40, 8, 8, 8, 64, 64);
                 RenderSystem.defaultBlendFunc();
-                RenderSystem.disableBlend();
+                context.getMatrices().pop();
 
                 // Баллон
                 float health = Math.min(20, getHealth());
@@ -286,7 +292,7 @@ public class TargetHud extends HudElement {
                 Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 55, getPosY() + 35 - 14, (int) MathUtility.clamp((90 * (health / 20)), 3, 90), 10, 2f);
 
 
-                FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : ((Math.round(10.0 * health) / 10.0) / 20f) * 100 + "%", getPosX() + 102, getPosY() + 24f, Render2DEngine.applyOpacity(Colors.WHITE, animationFactor));
+                FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (int) (((Math.round(10.0 * health) / 10.0) / 20f) * 100) + "%", getPosX() + 102, getPosY() + 24f, Render2DEngine.applyOpacity(Colors.WHITE, animationFactor));
 
                 //Имя ебыря
                 FontRenderers.sf_bold.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : ModuleManager.nameProtect.isEnabled() && target == mc.player ? NameProtect.getCustomName() : target.getName().getString(), getPosX() + 55, getPosY() + 5, Render2DEngine.applyOpacity(Colors.WHITE, animationFactor));
@@ -437,7 +443,7 @@ public class TargetHud extends HudElement {
                         Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 48, getPosY() + 32, (int) MathUtility.clamp((85 * (health / 20)), 8, 85), 11, 4f);
                     }
 
-                    FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (((Math.round(10.0 * getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 92f, getPosY() + 35.5f,
+                    FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (((Math.round(10.0 * getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 92f, getPosY() + 35f,
                             Render2DEngine.applyOpacity(Colors.WHITE, animationFactor));
                     //
 
