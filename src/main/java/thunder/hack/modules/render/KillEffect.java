@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class KillEffect extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Orthodox);
     private final Setting<Integer> speed = new Setting<>("Y Speed", 0, -10, 10, value -> mode.getValue() == Mode.Orthodox);
+    public final Setting<Integer> volume = new Setting<>("Volume", 100, 0, 100);
     private final Setting<Boolean> playSound = new Setting<>("Play Sound", true, value -> mode.getValue() == Mode.Orthodox);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(new Color(255, 255, 0, 150)), value -> mode.getValue() == Mode.Orthodox);
     private final Setting<Boolean> mobs = new Setting<>("Mobs", false);
@@ -86,7 +87,8 @@ public class KillEffect extends Module {
             if (entity.isAlive() || liv.getHealth() != 0) return;
 
             if (playSound.getValue() && mode.getValue() == Mode.Orthodox)
-                mc.world.playSound(mc.player, entity.getBlockPos(), ThunderHack.soundManager.ORTHODOX_SOUNDEVENT, SoundCategory.BLOCKS, 10f, 1f);
+                mc.world.playSound(mc.player, entity.getBlockPos(), ThunderHack.soundManager.ORTHODOX_SOUNDEVENT, SoundCategory.BLOCKS, volume.getValue() / 100f, 1f);
+
             renderEntities.put(entity, System.currentTimeMillis());
         });
 

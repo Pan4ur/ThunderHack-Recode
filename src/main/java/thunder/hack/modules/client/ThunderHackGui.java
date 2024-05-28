@@ -28,12 +28,11 @@ public final class ThunderHackGui extends Module {
             case 0 -> new Color(37, 27, 41, 250); // Основная плита
             case 1 -> new Color(50, 35, 60, 250); // плита лого
             case 2 -> new Color(-1); // надпись THUNDERHACK+, белые иконки
-            case 3 -> new Color(0x656565); // версия под надписью
+            case 3, 8 -> new Color(0x656565); // версия под надписью
             case 4 -> new Color(50, 35, 60, 178); // плита под категориями, выбор режима гуи (выкл)
             case 5 -> new Color(133, 93, 162, 178); // выбор режима гуи (вкл)
             case 6 -> new Color(88, 64, 107, 178); // цвет разделителя качели выбора режима
             case 7 -> new Color(25, 20, 30, 255); // цвет плиты настроек
-            case 8 -> new Color(0x656565); // версия под надписью
             case 9 -> new Color(50, 35, 60, 178);
             default -> new Color(37, 27, 41, 250); // плита под категориями
         };
