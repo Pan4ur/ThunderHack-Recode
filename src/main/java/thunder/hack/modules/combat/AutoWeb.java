@@ -104,7 +104,7 @@ public final class AutoWeb extends Module {
             while (placed < blocksPerTick.getValue()) {
                 BlockPos targetBlock = getSequentialPos();
                 if (targetBlock == null) break;
-                if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
+                if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, true)) {
                     placed++;
                     renderPoses.put(targetBlock, System.currentTimeMillis());
                     delay = placeDelay.getValue();
@@ -115,7 +115,7 @@ public final class AutoWeb extends Module {
             BlockPos targetBlock = getSequentialPos();
             if (targetBlock == null) return;
 
-            if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, false)) {
+            if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, true)) {
                 sequentialBlocks.add(targetBlock);
                 renderPoses.put(targetBlock, System.currentTimeMillis());
                 delay = placeDelay.getValue();
