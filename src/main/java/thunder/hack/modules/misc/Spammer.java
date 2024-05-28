@@ -23,7 +23,7 @@ public class Spammer extends Module {
     public Setting<Messages> messages = new Setting<>("messages",Messages.File);
     public Setting<WhisperPrefix> whisper_prefix = new Setting<>("prefix", WhisperPrefix.W, v -> mode.getValue() == Mode.Whispers);
     public Setting<Boolean> global = new Setting<>("global", true,v -> mode.getValue() == Mode.Chat);
-    public Setting<Float> delay = new Setting<>("delay", 5f, 1f, 30f);
+    public Setting<Float> delay = new Setting<>("delay", 5f, 0f, 30f);
     private final Timer timer_delay = new Timer();
     private final Random random = new Random();
     private String fact;
