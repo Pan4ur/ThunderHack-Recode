@@ -103,13 +103,15 @@ public final class AutoWeb extends Module {
             int placed = 0;
             while (placed < blocksPerTick.getValue()) {
                 BlockPos targetBlock = getSequentialPos();
-                if (targetBlock == null) break;
+                if (targetBlock == null)
+                    break;
+
                 if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), interact.getValue(), placeMode.getValue(), getSlot(), false, true)) {
                     placed++;
                     renderPoses.put(targetBlock, System.currentTimeMillis());
                     delay = placeDelay.getValue();
                     inactivityTimer.reset();
-                }
+                } else break;
             }
         } else if (placeTiming.getValue() == PlaceTiming.Vanilla) {
             BlockPos targetBlock = getSequentialPos();
