@@ -49,6 +49,7 @@ public class Speed extends Module {
     public final Setting<Integer> fireWorkSlot = new Setting<>("FireSlot", 1, 1, 9, v -> mode.getValue() == Mode.FireWork);
     public final Setting<Integer> delay = new Setting<>("Delay", 8, 1, 20, v -> mode.getValue() == Mode.FireWork);
     public final Setting<Boolean> strict = new Setting<>("Strict", false, v -> mode.is(Mode.GrimIce));
+    public final Setting<Float> matrixJBSpeed = new Setting<>("TimerSpeed", 1.088f, 1f, 2f, v -> mode.is(Mode.MatrixJB));
 
     public double baseSpeed;
     private int stage, ticks, prevSlot;
@@ -94,7 +95,7 @@ public class Speed extends Module {
                 mc.player.setOnGround(true);
                 mc.player.jump();
             } else if (mc.player.fallDistance > 0 && useTimer.getValue()) {
-                ThunderHack.TICK_TIMER = 1.088f;
+                ThunderHack.TICK_TIMER = matrixJBSpeed.getValue();
                 mc.player.addVelocity(0f, -0.003f, 0f);
             }
         }
