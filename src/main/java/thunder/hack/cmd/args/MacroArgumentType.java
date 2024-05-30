@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class MacroArgumentType implements ArgumentType<MacroManager.Macro> {
-    private static final Collection<String> EXAMPLES = ThunderHack.macroManager.getMacros().stream().map(MacroManager.Macro::name).limit(5).toList();
+    private static final Collection<String> EXAMPLES = ThunderHack.macroManager.getMacros().stream().map(MacroManager.Macro::getName).limit(5).toList();
 
     public static MacroArgumentType create() {
         return new MacroArgumentType();
@@ -37,7 +37,7 @@ public class MacroArgumentType implements ArgumentType<MacroManager.Macro> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(ThunderHack.macroManager.getMacros().stream().map(MacroManager.Macro::name), builder);
+        return CommandSource.suggestMatching(ThunderHack.macroManager.getMacros().stream().map(MacroManager.Macro::getName), builder);
     }
 
     @Override

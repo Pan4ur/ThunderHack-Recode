@@ -165,6 +165,28 @@ public class Render2DEngine {
         endRender();
     }
 
+    public static void drawRectWithOutline(MatrixStack matrices, float x, float y, float width, float height, Color c, Color c2) {
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        setupRender();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(c.getRGB()).next();
+        bufferBuilder.vertex(matrix, x + width, y + height, 0.0F).color(c.getRGB()).next();
+        bufferBuilder.vertex(matrix, x + width, y, 0.0F).color(c.getRGB()).next();
+        bufferBuilder.vertex(matrix, x, y, 0.0F).color(c.getRGB()).next();
+        Tessellator.getInstance().draw();
+
+        bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
+        bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(c2.getRGB()).next();
+        bufferBuilder.vertex(matrix, x + width, y + height, 0.0F).color(c2.getRGB()).next();
+        bufferBuilder.vertex(matrix, x + width, y, 0.0F).color(c2.getRGB()).next();
+        bufferBuilder.vertex(matrix, x, y, 0.0F).color(c2.getRGB()).next();
+        bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(c2.getRGB()).next();
+        Tessellator.getInstance().draw();
+        endRender();
+    }
+
     public static void drawRectDumbWay(MatrixStack matrices, float x, float y, float x1, float y1, Color c1) {
         Matrix4f matrix = matrices.peek().getPositionMatrix();
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();

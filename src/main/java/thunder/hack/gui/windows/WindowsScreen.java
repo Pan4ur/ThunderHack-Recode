@@ -4,14 +4,19 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class WindowsScreen extends Screen {
-    private List<WindowBase> windows;
+    private List<WindowBase> windows = new ArrayList<>();
+    public static WindowBase lastClickedWindow;
+    public static WindowBase draggingWindow;
 
     public WindowsScreen(WindowBase... windows) {
         super(Text.of("THWindows"));
+        this.windows.clear();
+        lastClickedWindow = null;
         this.windows = Arrays.stream(windows).toList();
     }
 
@@ -19,9 +24,12 @@ public class WindowsScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         //   super.render(context, mouseX, mouseY, delta);
-
-        windows.forEach(w -> w.render(context, mouseX, mouseY));
-
+        windows.forEach(w -> {
+            if (w != lastClickedWindow)
+                w.render(context, mouseX, mouseY);
+        });
+        if (lastClickedWindow != null)
+            lastClickedWindow.render(context, mouseX, mouseY);
     }
 
     @Override

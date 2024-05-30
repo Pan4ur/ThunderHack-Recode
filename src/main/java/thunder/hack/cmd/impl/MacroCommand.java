@@ -26,7 +26,7 @@ public class MacroCommand extends Command {
         builder.then(literal("list").executes(context -> {
             sendMessage(isRu() ? "Макросы:" : "Macro list:");
             sendMessage(" ");
-            ThunderHack.macroManager.getMacros().forEach(macro -> sendMessage(macro.name() + (macro.bind() != -1 ? " [" + toString(macro.bind()) + "]" : "") + " {" + macro.text() + "}"));
+            ThunderHack.macroManager.getMacros().forEach(macro -> sendMessage(macro.getName() + (macro.getBind() != -1 ? " [" + toString(macro.getBind()) + "]" : "") + " {" + macro.getText() + "}"));
             return SINGLE_SUCCESS;
         }));
 
@@ -38,7 +38,7 @@ public class MacroCommand extends Command {
             }
 
             ThunderHack.macroManager.removeMacro(macro);
-            sendMessage((isRu() ? "Удален макрос " : "Removed macro ") + macro.name());
+            sendMessage((isRu() ? "Удален макрос " : "Removed macro ") + macro.getName());
 
             return SINGLE_SUCCESS;
         })));
@@ -58,7 +58,7 @@ public class MacroCommand extends Command {
 
                                     MacroManager.Macro macro = new MacroManager.Macro(name, args, InputUtil.fromTranslationKey("key.keyboard." + bind.toLowerCase()).getCode());
                                     MacroManager.addMacro(macro);
-                                    sendMessage(isRu() ? "Добавлен макрос " + name + " на кнопку " + toString(macro.bind()) : "Added macro " + name + " to " + toString(macro.bind()));
+                                    sendMessage(isRu() ? "Добавлен макрос " + name + " на кнопку " + toString(macro.getBind()) : "Added macro " + name + " to " + toString(macro.getBind()));
 
                                     return SINGLE_SUCCESS;
                                 })))));

@@ -197,11 +197,9 @@ public final class Core {
     @EventHandler
     public void onKeyPress(EventKeyPress event) {
         if (event.getKey() == -1) return;
-        for (MacroManager.Macro m : ThunderHack.macroManager.getMacros()) {
-            if (m.bind() == event.getKey()) {
+        for (MacroManager.Macro m : ThunderHack.macroManager.getMacros())
+            if (m.getBind() == event.getKey())
                 m.runMacro();
-            }
-        }
     }
 
     @EventHandler

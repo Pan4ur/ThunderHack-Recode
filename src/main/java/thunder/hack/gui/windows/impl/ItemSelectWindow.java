@@ -1,4 +1,4 @@
-package thunder.hack.gui.windows;
+package thunder.hack.gui.windows.impl;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -15,6 +15,8 @@ import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.gui.windows.WindowBase;
+import thunder.hack.gui.windows.WindowsScreen;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ItemSelectSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -36,8 +38,6 @@ public class ItemSelectWindow extends WindowBase {
 
     private boolean allTab = true, listening = false;
     private String search = "Search";
-    private int scrollOffset = 0, prevScrollOffset = 0;
-
 
     public ItemSelectWindow(Setting<ItemSelectSetting> itemSetting) {
         this(mc.getWindow().getScaledWidth() / 2f - 100, mc.getWindow().getScaledHeight() / 2f - 150, 200, 300, itemSetting);
@@ -92,34 +92,40 @@ public class ItemSelectWindow extends WindowBase {
         FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "Selected", getX() + 60, getY() + 25, tabColor2);
 
 
-        prevScrollOffset = (int) AnimationUtility.fast(prevScrollOffset, scrollOffset, 12);
-
         if(!allTab && itemPlates.isEmpty()) {
             FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), isRu() ? "Тут пока пусто" : "It's empty here yet",
                     getX() + getWidth() / 2f, getY() + getHeight() / 2f, new Color(0xBDBDBD).getRGB());
             return;
         }
 
+        Render2DEngine.addWindow(context.getMatrices(), getX(), getY() + 35, getX() + getWidth(), getY() + getHeight() - 1, 1f);
+
         for (ItemPlate itemPlate : (allTab ? allItems : itemPlates)) {
-            if ((int) (itemPlate.offset + getY() + 50) + prevScrollOffset > getY() + getHeight() || itemPlate.offset + prevScrollOffset + getY() < getY())
+            if (itemPlate.offset + getY() + 25 + getScrollOffset() > getY() + getHeight() || itemPlate.offset + getScrollOffset() + getY() + 10 < getY())
                 continue;
 
-            context.drawItem(itemPlate.item().getDefaultStack(), (int) (getX() + 6), (int) (itemPlate.offset + getY() + 32) + prevScrollOffset);
-            FontRenderers.sf_medium.drawString(context.getMatrices(), itemPlate.item().getName().getString(), (int) (getX() + 26), (int) (itemPlate.offset + getY() + 38) + prevScrollOffset, new Color(0xBDBDBD).getRGB());
+            context.getMatrices().push();
+            context.getMatrices().translate(getX() + 6, itemPlate.offset + getY() + 32 + getScrollOffset(), 0);
+            context.drawItem(itemPlate.item().getDefaultStack(), 0, 0);
+            context.getMatrices().pop();
 
-            boolean hover2 = Render2DEngine.isHovered(mouseX, mouseY, (int) (getX() + 180), (int) (itemPlate.offset + getY() + 35) + prevScrollOffset, 11, 11);
+            FontRenderers.sf_medium.drawString(context.getMatrices(), itemPlate.item().getName().getString(), getX() + 26, itemPlate.offset + getY() + 38 + getScrollOffset(), new Color(0xBDBDBD).getRGB());
 
-            Render2DEngine.drawRect(context.getMatrices(), (int) (getX() + 180), (int) (itemPlate.offset + getY() + 35) + prevScrollOffset, 11, 11,
+            boolean hover2 = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 20, itemPlate.offset + getY() + 35 + getScrollOffset(), 11, 11);
+
+            Render2DEngine.drawRect(context.getMatrices(), getX() + getWidth() - 20, itemPlate.offset + getY() + 35 + getScrollOffset(), 11, 11,
                     hover2 ? new Color(0xC57A7A7A, true) : new Color(0xC5575757, true));
 
             boolean selected = itemPlates.stream().anyMatch(sI -> sI.item == itemPlate.item);
 
             if (allTab && !selected) {
-                FontRenderers.categories.drawString(context.getMatrices(), "+", getX() + 183, (int) (itemPlate.offset + getY() + 39) + prevScrollOffset, -1);
+                FontRenderers.categories.drawString(context.getMatrices(), "+", getX() + getWidth() - 17, itemPlate.offset + getY() + 39 + getScrollOffset(), -1);
             } else {
-                FontRenderers.icons.drawString(context.getMatrices(), "w", getX() + 180.5f, (int) (itemPlate.offset + getY() + 39) + prevScrollOffset, -1);
+                FontRenderers.icons.drawString(context.getMatrices(), "w", getX() + getWidth() - 19.5f, itemPlate.offset + getY() + 39 + getScrollOffset(), -1);
             }
         }
+
+        Render2DEngine.popWindow();
     }
 
     @Override
@@ -127,15 +133,13 @@ public class ItemSelectWindow extends WindowBase {
         super.mouseClicked(mouseX, mouseY, button);
         if (Render2DEngine.isHovered(mouseX, mouseY, getX() + 8, getY() + 19, 52, 19)) {
             allTab = true;
-            prevScrollOffset = 0;
-            scrollOffset = 0;
+            resetScroll();
             ThunderHack.soundManager.playBoolean();
         }
 
         if (Render2DEngine.isHovered(mouseX, mouseY, getX() + 54, getY() + 19, 70, 19)) {
             allTab = false;
-            prevScrollOffset = 0;
-            scrollOffset = 0;
+            resetScroll();
             ThunderHack.soundManager.playBoolean();
         }
 
@@ -149,12 +153,12 @@ public class ItemSelectWindow extends WindowBase {
 
         ArrayList<ItemPlate> copy = Lists.newArrayList(allTab ? allItems : itemPlates);
         for (ItemPlate itemPlate : copy) {
-            if ((int) (itemPlate.offset + getY() + 50) + prevScrollOffset > getY() + getHeight())
+            if ((int) (itemPlate.offset + getY() + 50) + getScrollOffset() > getY() + getHeight())
                 continue;
 
             String name = itemPlate.item().getTranslationKey().replace("item.minecraft.", "").replace("block.minecraft.", "");
 
-            if (Render2DEngine.isHovered(mouseX, mouseY, (int) (getX() + 180), (int) (itemPlate.offset + getY() + 35) + prevScrollOffset, 10, 10)) {
+            if (Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 20, itemPlate.offset + getY() + 35 + getScrollOffset(), 10, 10)) {
                 boolean selected = itemPlates.stream().anyMatch(sI -> sI.item == itemPlate.item);
 
                 if (allTab && !selected) {
@@ -209,10 +213,7 @@ public class ItemSelectWindow extends WindowBase {
         }
     }
 
-    @Override
-    public void mouseScrolled(int i) {
-        scrollOffset += i * 2;
-    }
+
 
     private void refreshItemPlates() {
         itemSetting.getValue().updateItems();
@@ -226,18 +227,17 @@ public class ItemSelectWindow extends WindowBase {
 
     private void refreshAllItems() {
         allItems.clear();
-        prevScrollOffset = 0;
-        scrollOffset = 0;
+        resetScroll();
         int id1 = 0;
         for (Block block : Registries.BLOCK) {
-            if (search.equals("") || block.asItem().getTranslationKey().contains(search) || block.asItem().getName().getString().toLowerCase().contains(search.toLowerCase())) {
+            if (search.equals("Search") || search.isEmpty() || block.asItem().getTranslationKey().contains(search) || block.asItem().getName().getString().toLowerCase().contains(search.toLowerCase())) {
                 allItems.add(new ItemPlate(id1, id1 * 20, block.asItem()));
                 id1++;
             }
         }
 
         for (Item item : Registries.ITEM) {
-            if (search.equals("") || item.getTranslationKey().contains(search) || item.getName().getString().toLowerCase().contains(search.toLowerCase())) {
+            if (search.equals("Search") || search.isEmpty() || item.getTranslationKey().contains(search) || item.getName().getString().toLowerCase().contains(search.toLowerCase())) {
                 allItems.add(new ItemPlate(id1, id1 * 20, item));
                 id1++;
             }
