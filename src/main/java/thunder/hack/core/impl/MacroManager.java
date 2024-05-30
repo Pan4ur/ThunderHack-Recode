@@ -68,7 +68,40 @@ public class MacroManager implements IManager {
         return null;
     }
 
-    public record Macro(String name, String text, int bind) {
+    public static class Macro {
+        private String name, text;
+        private int bind;
+
+        public Macro(String name, String text, int bind) {
+            this.name = name;
+            this.text = text;
+            this.bind = bind;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public void setText(String text) {
+            this.text = text;
+        }
+
+        public int getBind() {
+            return bind;
+        }
+
+        public void setBind(int bind) {
+            this.bind = bind;
+        }
+
         public void runMacro() {
             if (mc.player == null) return;
             if (text.contains("/")) mc.player.networkHandler.sendChatCommand(text.replace("/", ""));

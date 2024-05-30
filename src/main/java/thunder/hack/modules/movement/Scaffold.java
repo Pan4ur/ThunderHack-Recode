@@ -303,8 +303,7 @@ public class Scaffold extends Module {
                         sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                     }
                 }
-                case Normal -> hotbarResult.switchTo();
-                case Silent -> hotbarResult.switchToSilent();
+                case Normal, Silent -> hotbarResult.switchTo();
             }
 
         return prevSlot;
@@ -319,7 +318,7 @@ public class Scaffold extends Module {
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, prevSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
                 sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
             }
-            case Silent -> InventoryUtility.switchToSilent(prevSlot);
+            case Silent -> InventoryUtility.switchTo(prevSlot);
         }
     }
 

@@ -1,8 +1,11 @@
 package thunder.hack.setting.impl;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.registry.Registries;
+import thunder.hack.cmd.Command;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +29,11 @@ public class ItemSelectSetting {
     public void updateItems() {
         items.clear();
 
-        for (Block block : Registries.BLOCK)
-            if (itemsById.contains(block.getTranslationKey().replace("block.minecraft.", "")))
+        for (Block block : Registries.BLOCK) {
+            if (itemsById.contains(block.getTranslationKey().replace("block.minecraft.", ""))) {
                 items.add(block.asItem());
+            }
+        }
 
         for (Item item : Registries.ITEM)
             if (itemsById.contains(item.getTranslationKey().replace("item.minecraft.", "")))

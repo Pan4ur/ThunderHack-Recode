@@ -2,21 +2,17 @@ package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.RotationAxis;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.gui.windows.ItemSelectWindow;
+import thunder.hack.gui.windows.impl.ItemSelectWindow;
 import thunder.hack.gui.windows.WindowsScreen;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ItemSelectSetting;
-import thunder.hack.setting.impl.SettingGroup;
-import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 
 import static thunder.hack.core.IManager.mc;
-import static thunder.hack.gui.clickui.ClickGUI.arrow;
 
 public class ItemSelectElement extends AbstractElement {
     private final Setting<ItemSelectSetting> setting;

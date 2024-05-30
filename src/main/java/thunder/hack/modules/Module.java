@@ -26,6 +26,7 @@ import thunder.hack.setting.impl.Bind;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,6 +40,12 @@ public abstract class Module {
     private final String description;
     private final Category category;
     private final String displayName;
+
+    private final List<String> ignoreSoundList = Arrays.asList(
+            "ClickGui",
+            "ThunderGui",
+            "HudEditor"
+    );
 
     public static final MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -123,7 +130,7 @@ public abstract class Module {
         LogUtils.getLogger().info("[ThunderHack] enabled " + this.getName());
         ThunderHack.moduleManager.sortModules();
 
-        if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
+        if (!ignoreSoundList.contains(getDisplayName())) {
             ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль включен!" : "Was Enabled!", 2, Notification.Type.ENABLED);
             ThunderHack.soundManager.playEnable();
         }
@@ -150,7 +157,7 @@ public abstract class Module {
 
         LogUtils.getLogger().info("[ThunderHack] disabled " + getName());
 
-        if ((!Objects.equals(getDisplayName(), "ClickGui")) && (!Objects.equals(getDisplayName(), "ThunderGui"))) {
+        if (!ignoreSoundList.contains(getDisplayName())) {
             ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль выключен!" : "Was Disabled!", 2, Notification.Type.DISABLED);
             ThunderHack.soundManager.playDisable();
         }
