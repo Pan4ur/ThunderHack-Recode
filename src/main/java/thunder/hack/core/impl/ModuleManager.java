@@ -53,6 +53,7 @@ public class ModuleManager implements IManager {
     public static BlockHighLight blockHighLight = new BlockHighLight();
     public static AntiBadEffects antiBadEffects = new AntiBadEffects();
     public static MouseElytraFix mouseElytraFix = new MouseElytraFix();
+    public static TotemAnimation totemAnimation = new TotemAnimation();
     public static PortalGodMode portalGodMode = new PortalGodMode();
     public static OptifineCapes optifineCapes = new OptifineCapes();
     public static Notifications notifications = new Notifications();
