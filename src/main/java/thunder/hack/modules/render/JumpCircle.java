@@ -31,6 +31,8 @@ public class JumpCircle extends Module {
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
     private final Setting<Boolean> easeOut = new Setting<>("EaseOut", true);
+    private final Setting<Float> rotateSpeed = new Setting<>("RotateSpeed", 2f, 0.5f, 5f);
+    private final Setting<Float> circleScale = new Setting<>("CircleScale", 1f, 0.5f, 5f);
     private final Setting<Boolean> onlySelf = new Setting<>("OnlySelf", false);
     private final List<Circle> circles = new ArrayList<>();
     private final List<PlayerEntity> cache = new CopyOnWriteArrayList<>();
@@ -88,12 +90,12 @@ public class JumpCircle extends Module {
 
         for (Circle c : circles) {
             float colorAnim = (float) (c.timer.getPassedTimeMs()) / 6000f;
-            float sizeAnim = 1f - (float) Math.pow(1 - ((c.timer.getPassedTimeMs() * (easeOut.getValue() ? 2f : 1f)) / 5000f), 4);
+            float sizeAnim = circleScale.getValue() - (float) Math.pow(1 - ((c.timer.getPassedTimeMs() * (easeOut.getValue() ? 2f : 1f)) / 5000f), 4);
 
             stack.push();
             stack.translate(c.pos().x - mc.getEntityRenderDispatcher().camera.getPos().getX(), c.pos().y - mc.getEntityRenderDispatcher().camera.getPos().getY(), c.pos().z - mc.getEntityRenderDispatcher().camera.getPos().getZ());
             stack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
-            stack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(sizeAnim * 1000));
+            stack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(sizeAnim * rotateSpeed.getValue() * 1000f));
             float scale = sizeAnim * 2f;
             Matrix4f matrix = stack.peek().getPositionMatrix();
 
