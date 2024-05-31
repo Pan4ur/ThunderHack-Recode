@@ -29,6 +29,7 @@ public class NoRender extends Module {
     }
 
     public final Setting<Boolean> auto = new Setting<>("Auto", false);
+    public final Setting<Boolean> hurtCam = new Setting<>("HurtCam", true);
     public final Setting<Boolean> potions = new Setting<>("Potions", false);
     public final Setting<Boolean> xp = new Setting<>("XP", false);
     public final Setting<Boolean> arrows = new Setting<>("Arrows", false);

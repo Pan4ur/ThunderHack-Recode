@@ -214,4 +214,10 @@ public abstract class MixinGameRenderer {
             ci.cancel();
         }
     }
+
+    @Inject(method = "tiltViewWhenHurt", at = @At("HEAD"), cancellable = true)
+    private void tiltViewWhenHurtHook(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.hurtCam.getValue())
+            ci.cancel();
+    }
 }
