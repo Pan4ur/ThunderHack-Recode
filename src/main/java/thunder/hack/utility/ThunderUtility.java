@@ -12,14 +12,14 @@ import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.utility.math.MathUtility;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import static thunder.hack.core.impl.ConfigManager.IMAGES_FOLDER;
@@ -76,15 +76,27 @@ public final class ThunderUtility {
         }
     }
 
+
     public static String readManifestField(String fieldName) {
         try {
-            String s = new Manifest(ThunderUtility.class.getResourceAsStream("/META-INF/MANIFEST.MF")).getMainAttributes().getValue(fieldName);
-            if (s != null)
-                return s;
+            Enumeration<URL> en = Thread.currentThread().getContextClassLoader().getResources(JarFile.MANIFEST_NAME);
+            while (en.hasMoreElements()) {
+                try {
+                    URL url = en.nextElement();
+                    InputStream is = url.openStream();
+                    if (is != null) {
+                        String s = new Manifest(is).getMainAttributes().getValue(fieldName);
+                        if(s != null) 
+                            return s;
+                    }
+                } catch (Exception ignored) {
+                }
+            }
         } catch (Exception ignored) {
         }
         return "0";
     }
+
 
     public static void parseCommits() {
         try {
