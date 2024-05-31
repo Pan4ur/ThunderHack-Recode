@@ -96,15 +96,15 @@ public class ThunderHack implements ModInitializer {
 
         Render2DEngine.initShaders();
 
+        BUILD_DATE = ThunderUtility.readManifestField("Build-Timestamp");
+        GITH_HASH = ThunderUtility.readManifestField("Git-Commit");
+        
         soundManager.registerSounds();
         syncVersion();
         syncContributors();
         ThunderUtility.parseStarGazer();
         ThunderUtility.parseCommits();
         ModuleManager.rpc.startRpc();
-
-        BUILD_DATE = ThunderUtility.readManifestField("Build-Timestamp");
-        GITH_HASH = ThunderUtility.readManifestField("Git-Commit");
 
         LogUtils.getLogger().info("""
                 \n /$$$$$$$$ /$$                                 /$$                     /$$   /$$                     /$$     \s
