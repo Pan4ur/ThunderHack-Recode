@@ -90,6 +90,16 @@ jar {
 		configurations.libImpl.collect { it.isDirectory() ? it : zipTree(it) }
 	}
 	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+
+	manifest {
+        	attributes(
+            	'Implementation-Title': project.name,
+            	'Implementation-Version': project.version,
+            	'Built-By': System.getProperty('user.name'),
+            	'Build-Timestamp': new Date(),
+            	'Git-Commit': gitCommitHash()
+        	)
+    	}
 }
 
 publishing {
@@ -101,4 +111,13 @@ publishing {
 
 	repositories {
 	}
+}
+
+def gitCommitHash() {
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
 }
