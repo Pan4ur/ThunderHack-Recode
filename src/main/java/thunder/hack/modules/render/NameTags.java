@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.*;
 
 import static thunder.hack.utility.render.Render2DEngine.CONTAINER_BACKGROUND;
+import static thunder.hack.ThunderHack.moduleManager;
 
 public class NameTags extends Module {
     private final Setting<Boolean> self = new Setting<>("Self",false);
@@ -140,7 +141,7 @@ public class NameTags extends Module {
             if (gamemode.getValue()) final_string += translateGamemode(getEntityGamemode(ent)) + " ";
 
 
-            if (FriendManager.friends.stream().anyMatch(i -> i.contains(ent.getDisplayName().getString())) && NameProtect.hideFriends.getValue()) {
+            if (FriendManager.friends.stream().anyMatch(i -> i.contains(ent.getDisplayName().getString())) && NameProtect.hideFriends.getValue() && moduleManager.get("NameProtect").isEnabled()) {
                 final_string += NameProtect.getCustomName() + " ";
             }
             else {
