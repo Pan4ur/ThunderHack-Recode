@@ -20,8 +20,11 @@ public class ClickGui extends Module {
     public final Setting<Integer> moduleHeight = new Setting<>("ModuleHeight", 14, 8, 25);
     public final Setting<Integer> settingFontScale = new Setting<>("SettingFontScale", 12, 6, 24);
     public final Setting<Integer> modulesFontScale = new Setting<>("ModulesFontScale", 14, 6, 24);
-    public final Setting<BooleanSettingGroup> gear = new Setting<>("Gear", new BooleanSettingGroup(true));
+    public static final Setting<BooleanSettingGroup> gear = new Setting<>("Gear", new BooleanSettingGroup(true));
     public final Setting<Integer> gearScale = new Setting<>("GearScale", 60, 6, 300).addToGroup(gear);
+    public static Setting<Float> gearDuration = new Setting<>("GearDuration", 0.5f, 0.1f, 2f).addToGroup(gear);
+    public static Setting<Integer> gearStop = new Setting<>("GearStop", 25, 10, 45).addToGroup(gear);
+
     public final Setting<Boolean> closeAnimation = new Setting<>("CloseAnimation", true);
 
     public ClickGui() {

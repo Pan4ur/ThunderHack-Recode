@@ -47,6 +47,12 @@ public abstract class Module {
             "HudEditor"
     );
 
+    private final List<String> ignoredModules = Arrays.asList(
+            "ClickGui",
+            "ClientSettings",
+            "Rotations"
+    );
+
     public static final MinecraftClient mc = MinecraftClient.getInstance();
 
     public Module(@NotNull String name, @NotNull Category category) {
@@ -126,6 +132,11 @@ public abstract class Module {
         if (!fullNullCheck() || (this instanceof UnHook) ) onEnable();
         if (isOn()) ThunderHack.EVENT_BUS.subscribe(this);
         if (fullNullCheck()) return;
+        if (ignoredModules.contains(getDisplayName())) {
+            enabled.setValue(false);
+            return;
+        }
+
 
         LogUtils.getLogger().info("[ThunderHack] enabled " + this.getName());
         ThunderHack.moduleManager.sortModules();
@@ -153,6 +164,8 @@ public abstract class Module {
         ThunderHack.moduleManager.sortModules();
 
         if (fullNullCheck()) return;
+        if (ignoredModules.contains(getDisplayName())) enabled.setValue(false);
+
         onDisable();
 
         LogUtils.getLogger().info("[ThunderHack] disabled " + getName());

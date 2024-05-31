@@ -1,5 +1,6 @@
 package thunder.hack.utility.render.animation;
 
+import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.render.Render2DEngine;
 
 import static thunder.hack.modules.Module.mc;
@@ -16,8 +17,8 @@ public class GearAnimation {
     public void tick() {
         prevEspValue = espValue;
         espValue += espSpeed;
-        if (espSpeed > 25) flipSpeed = true;
-        if (espSpeed < -25) flipSpeed = false;
-        espSpeed = flipSpeed ? espSpeed - 0.5f : espSpeed + 0.5f;
+        if (espSpeed > ClickGui.gearStop.getValue()) flipSpeed = true;
+        if (espSpeed < -ClickGui.gearStop.getValue()) flipSpeed = false;
+        espSpeed = flipSpeed ? espSpeed - ClickGui.gearDuration.getValue() : espSpeed + ClickGui.gearDuration.getValue();
     }
 }

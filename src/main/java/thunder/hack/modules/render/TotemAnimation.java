@@ -17,6 +17,7 @@ public class TotemAnimation extends Module {
     }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.FadeOut);
+    private final Setting<Integer> speed = new Setting<>("Speed", 40, 1, 100);
 
     private ItemStack floatingItem = null;
     private int floatingItemTimeLeft;
@@ -115,13 +116,15 @@ public class TotemAnimation extends Module {
     }
 
     private int getTime() {
+        int invertedSpeed = 101 - speed.getValue();
+
         if (mode.is(Mode.FadeOut))
-            return 10;
+            return invertedSpeed / 4;
 
         if (mode.is(Mode.Insert))
-            return 20;
+            return invertedSpeed / 2;
 
-        return 40;
+        return invertedSpeed;
     }
 
     private enum Mode {
