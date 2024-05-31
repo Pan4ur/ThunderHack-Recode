@@ -104,6 +104,7 @@ public final class ThunderUtility {
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
             String inputLine;
             changeLog.add("Changelog [Recode; Date: " + ThunderHack.BUILD_DATE + "; GitHash:" + ThunderHack.GITH_HASH + "]");
+            changeLog.add("\n");
 
             while ((inputLine = in.readLine()) != null) {
                 JsonParser parser = new JsonParser();
