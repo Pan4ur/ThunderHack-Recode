@@ -79,7 +79,7 @@ public final class RPC extends Module {
             DiscordEventHandlers handlers = new DiscordEventHandlers();
             rpc.Discord_Initialize("1093053626198523935", handlers, true, "");
             presence.startTimestamp = (System.currentTimeMillis() / 1000L);
-            presence.largeImageText = "v" + ThunderHack.VERSION + " by " + ThunderUtility.getAuthors();
+            presence.largeImageText = "v" + ThunderHack.VERSION + " [" + ThunderHack.GITH_HASH + "]";
             rpc.Discord_UpdatePresence(presence);
 
             thread = new Thread(() -> {
