@@ -24,9 +24,13 @@ import java.nio.charset.StandardCharsets;
 
 public class ThunderHack implements ModInitializer {
     public static final ModMetadata MOD_META;
+
     public static final String MOD_ID = "thunderhack";
-    public static final IEventBus EVENT_BUS = new EventBus();
     public static final String VERSION = "1.6b305";
+    public static String GITH_HASH = "0";
+    public static String BUILD_DATE = "1 Jan 1970";
+
+    public static final IEventBus EVENT_BUS = new EventBus();
 
     public static boolean isOutdated = false;
     public static float TICK_TIMER = 1f;
@@ -95,9 +99,12 @@ public class ThunderHack implements ModInitializer {
         soundManager.registerSounds();
         syncVersion();
         syncContributors();
-        ThunderUtility.parseChangeLog();
         ThunderUtility.parseStarGazer();
+        ThunderUtility.parseCommits();
         ModuleManager.rpc.startRpc();
+
+        BUILD_DATE = ThunderUtility.readManifestField("Build-Timestamp");
+        GITH_HASH = ThunderUtility.readManifestField("Git-Commit");
 
         LogUtils.getLogger().info("""
                 \n /$$$$$$$$ /$$                                 /$$                     /$$   /$$                     /$$     \s

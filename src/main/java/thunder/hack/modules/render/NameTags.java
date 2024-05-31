@@ -40,6 +40,7 @@ import org.joml.Vector4d;
 import org.lwjgl.opengl.GL11;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.FriendManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.PotionHud;
 import thunder.hack.modules.Module;
@@ -57,7 +58,6 @@ import java.util.List;
 import java.util.*;
 
 import static thunder.hack.utility.render.Render2DEngine.CONTAINER_BACKGROUND;
-import static thunder.hack.ThunderHack.moduleManager;
 
 public class NameTags extends Module {
     private final Setting<Boolean> self = new Setting<>("Self",false);
@@ -141,7 +141,7 @@ public class NameTags extends Module {
             if (gamemode.getValue()) final_string += translateGamemode(getEntityGamemode(ent)) + " ";
 
 
-            if (FriendManager.friends.stream().anyMatch(i -> i.contains(ent.getDisplayName().getString())) && NameProtect.hideFriends.getValue() && moduleManager.get("NameProtect").isEnabled()) {
+            if (FriendManager.friends.stream().anyMatch(i -> i.contains(ent.getDisplayName().getString())) && NameProtect.hideFriends.getValue() && ModuleManager.nameProtect.isEnabled()) {
                 final_string += NameProtect.getCustomName() + " ";
             }
             else {
