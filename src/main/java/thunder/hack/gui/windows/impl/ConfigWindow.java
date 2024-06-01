@@ -61,7 +61,6 @@ public class ConfigWindow extends WindowBase {
         if (configPlates.isEmpty()) {
             FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), isRu() ? "Тут пока пусто" : "It's empty here yet",
                     getX() + getWidth() / 2f, getY() + getHeight() / 2f, new Color(0xBDBDBD).getRGB());
-            return;
         }
 
         String blink = (System.currentTimeMillis() / 240) % 2 == 0 ? "" : "   <<<<";

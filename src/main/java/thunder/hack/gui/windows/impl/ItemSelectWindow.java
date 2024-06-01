@@ -95,7 +95,6 @@ public class ItemSelectWindow extends WindowBase {
         if(!allTab && itemPlates.isEmpty()) {
             FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), isRu() ? "Тут пока пусто" : "It's empty here yet",
                     getX() + getWidth() / 2f, getY() + getHeight() / 2f, new Color(0xBDBDBD).getRGB());
-            return;
         }
 
         Render2DEngine.addWindow(context.getMatrices(), getX(), getY() + 35, getX() + getWidth(), getY() + getHeight() - 1, 1f);

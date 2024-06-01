@@ -7,7 +7,6 @@ import net.minecraft.client.network.PendingUpdateManager;
 import net.minecraft.client.network.SequencedPacketCreator;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
@@ -20,6 +19,7 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.injection.accesors.IClientWorldMixin;
 import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.modules.client.Windows;
 import thunder.hack.modules.misc.UnHook;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
@@ -28,7 +28,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
@@ -100,7 +99,7 @@ public abstract class Module {
 
     protected void sendSequencedPacket(SequencedPacketCreator packetCreator) {
         if (mc.getNetworkHandler() == null || mc.world == null) return;
-        try (PendingUpdateManager pendingUpdateManager = ((IClientWorldMixin) mc.world).getPendingUpdateManager().incrementSequence();){
+        try (PendingUpdateManager pendingUpdateManager = ((IClientWorldMixin) mc.world).getPendingUpdateManager().incrementSequence();) {
             int i = pendingUpdateManager.getSequence();
             mc.getNetworkHandler().sendPacket(packetCreator.predict(i));
         }
@@ -126,10 +125,12 @@ public abstract class Module {
     }
 
     public void enable() {
-        if(!(this instanceof UnHook))
+        if (!(this instanceof UnHook))
             enabled.setValue(true);
 
-        if (!fullNullCheck() || (this instanceof UnHook) ) onEnable();
+        if (!fullNullCheck() || (this instanceof UnHook) || (this instanceof Windows))
+            onEnable();
+
         if (isOn()) ThunderHack.EVENT_BUS.subscribe(this);
         if (fullNullCheck()) return;
         if (ignoredModules.contains(getDisplayName())) {

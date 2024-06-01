@@ -18,5 +18,6 @@ public class Windows extends Module {
                 ConfigWindow.get(),
                 FriendsWindow.get()
         ));
+        disable();
     }
 }
