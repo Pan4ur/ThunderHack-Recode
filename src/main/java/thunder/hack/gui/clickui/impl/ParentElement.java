@@ -25,7 +25,7 @@ public class ParentElement extends AbstractElement {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context,mouseX,mouseY,delta);
+        super.render(context, mouseX, mouseY, delta);
 
         MatrixStack matrixStack = context.getMatrices();
 
@@ -40,14 +40,14 @@ public class ParentElement extends AbstractElement {
         matrixStack.translate(-tx, -ty, 0);
         context.drawTexture(arrow, (int) (x + width - 14), (int) (y + 5.5f), 0, 0, 6, 6, 6, 6);
         matrixStack.pop();
-        FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), (int) (x + 6 + (6 * getParentSetting().getValue().getHierarchy())), (y + height / 2 - 1f), new Color(-1).getRGB());
+        FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), x + 6 + (6 * getParentSetting().getValue().getHierarchy()), y + height / 2 - 1f, new Color(-1).getRGB());
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (hovered) {
             getParentSetting().getValue().setExtended(!getParentSetting().getValue().isExtended());
-            if(getParentSetting().getValue().isExtended()) {
+            if (getParentSetting().getValue().isExtended()) {
                 ThunderHack.soundManager.playSwipeIn();
             } else {
                 ThunderHack.soundManager.playSwipeOut();
