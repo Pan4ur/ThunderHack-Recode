@@ -1,15 +1,15 @@
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
-import thunder.hack.events.impl.EventSync;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.misc.FakePlayer;
-import thunder.hack.setting.Setting;
-import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.MathUtility;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import thunder.hack.events.impl.EventSync;
+import thunder.hack.modules.Module;
+import thunder.hack.modules.misc.FakePlayer;
+import thunder.hack.modules.render.NameTags;
+import thunder.hack.setting.Setting;
+import thunder.hack.utility.Timer;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -37,7 +37,10 @@ public final class AntiBot extends Module {
 
         bots.forEach(b -> {
             if (remove.getValue())
-                try {mc.world.removeEntity(b.getId(), Entity.RemovalReason.KILLED);} catch (Exception ignored) {}
+                try {
+                    mc.world.removeEntity(b.getId(), Entity.RemovalReason.KILLED);
+                } catch (Exception ignored) {
+                }
         });
 
         if (timer.passedMs(10000)) {
@@ -48,27 +51,37 @@ public final class AntiBot extends Module {
         }
     }
 
-    private void isABot(PlayerEntity ent){
-        if(bots.contains(ent))
+    private void isABot(PlayerEntity ent) {
+        if (bots.contains(ent))
             return;
 
-        if (mode.getValue() == Mode.MotionCheck) {
-            double speed = (ent.getX() - ent.prevX) * (ent.getX() - ent.prevX) + (ent.getZ() - ent.prevZ) * (ent.getZ() - ent.prevZ);
-            if (speed > 0.5 && !bots.contains(ent)) {
-                if (ticks >= checkticks.getValue()) {
+        switch (mode.getValue()) {
+            case UUIDCheck -> {
+                if (!ent.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + ent.getName().getString()).getBytes(StandardCharsets.UTF_8))) && ent instanceof OtherClientPlayerEntity
+                        && (FakePlayer.fakePlayer == null || ent.getId() != FakePlayer.fakePlayer.getId())
+                        && !ent.getName().getString().contains("-")) {
                     sendMessage(ent.getName().getString() + " is a bot!");
                     ++botsNumber;
                     bots.add(ent);
                 }
-                ticks++;
             }
-        } else {
-            if (!ent.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + ent.getName().getString()).getBytes(StandardCharsets.UTF_8))) && ent instanceof OtherClientPlayerEntity
-                    && (FakePlayer.fakePlayer == null || ent.getId() != FakePlayer.fakePlayer.getId())
-                    && !ent.getName().getString().contains("-")) {
-                sendMessage(ent.getName().getString() + " is a bot!");
-                ++botsNumber;
-                bots.add(ent);
+            case MotionCheck -> {
+                double speed = (ent.getX() - ent.prevX) * (ent.getX() - ent.prevX) + (ent.getZ() - ent.prevZ) * (ent.getZ() - ent.prevZ);
+                if (speed > 0.5 && !bots.contains(ent)) {
+                    if (ticks >= checkticks.getValue()) {
+                        sendMessage(ent.getName().getString() + " is a bot!");
+                        ++botsNumber;
+                        bots.add(ent);
+                    }
+                    ticks++;
+                }
+            }
+            case ZeroPing -> {
+                if (NameTags.getEntityPing(ent) <= 0) {
+                    sendMessage(ent.getName().getString() + " is a bot!");
+                    ++botsNumber;
+                    bots.add(ent);
+                }
             }
         }
     }
@@ -79,6 +92,6 @@ public final class AntiBot extends Module {
     }
 
     public enum Mode {
-        UUIDCheck, MotionCheck
+        UUIDCheck, MotionCheck, ZeroPing
     }
 }
