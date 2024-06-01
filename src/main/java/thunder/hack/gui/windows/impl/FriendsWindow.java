@@ -99,7 +99,7 @@ public class FriendsWindow extends WindowBase {
             FontRenderers.icons.drawString(context.getMatrices(), "w", getX() + getWidth() - 15, friendPlate.offset + getY() + 40 + getScrollOffset(), -1);
             FontRenderers.sf_medium_mini.drawString(context.getMatrices(), id + ".", getX() + 3, friendPlate.offset + getY() + 41 + getScrollOffset(), textColor);
         }
-
+        setMaxElementsHeight(friendPlates.size() * 20);
         Render2DEngine.popWindow();
     }
 

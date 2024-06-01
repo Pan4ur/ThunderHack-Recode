@@ -123,7 +123,7 @@ public class ItemSelectWindow extends WindowBase {
                 FontRenderers.icons.drawString(context.getMatrices(), "w", getX() + getWidth() - 19.5f, itemPlate.offset + getY() + 39 + getScrollOffset(), -1);
             }
         }
-
+        setMaxElementsHeight(itemPlates.size() * 20);
         Render2DEngine.popWindow();
     }
 

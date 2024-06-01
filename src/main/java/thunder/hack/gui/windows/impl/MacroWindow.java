@@ -150,7 +150,7 @@ public class MacroWindow extends WindowBase {
             FontRenderers.icons.drawString(context.getMatrices(), "w", getX() + getWidth() - 15, macroPlate.offset + getY() + 40 + getScrollOffset(), -1);
             FontRenderers.sf_medium_mini.drawString(context.getMatrices(), id + ".", getX() + 3, macroPlate.offset + getY() + 41 + getScrollOffset(), textColor);
         }
-
+        setMaxElementsHeight(macroPlates.size() * 20);
         Render2DEngine.popWindow();
     }
 
