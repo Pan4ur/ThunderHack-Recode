@@ -8,7 +8,6 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -16,7 +15,6 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -24,12 +22,15 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventHeldItemRenderer;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 
 import java.awt.*;
+
+import static thunder.hack.core.impl.ModuleManager.badTrip;
 
 public class Chams extends Module {
     public Chams() {
@@ -56,13 +57,14 @@ public class Chams extends Module {
     }
 
     private final Identifier crystalTexture = new Identifier("textures/entity/end_crystal/end_crystal.png");
-    private final Identifier crystalTexture2 = new Identifier("thunderhack","textures/misc/end_crystal2.png");
+    private final Identifier crystalTexture2 = new Identifier("thunderhack", "textures/misc/end_crystal2.png");
 
     private static final float SINE_45_DEGREES = (float) Math.sin(0.7853981633974483);
 
     public void renderCrystal(EndCrystalEntity endCrystalEntity, float f, float g, MatrixStack matrixStack, int i, ModelPart core, ModelPart frame) {
         RenderSystem.enableBlend();
-        if(alternativeBlending.getValue()) RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
+        if (alternativeBlending.getValue())
+            RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         else RenderSystem.defaultBlendFunc();
         RenderSystem.disableCull();
         RenderSystem.disableDepthTest();
@@ -113,7 +115,8 @@ public class Chams extends Module {
 
     public void renderPlayer(PlayerEntity pe, float f, float g, MatrixStack matrixStack, int i, EntityModel model, CallbackInfo ci, Runnable post) {
         RenderSystem.enableBlend();
-        if(alternativeBlending.getValue()) RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
+        if (alternativeBlending.getValue())
+            RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         else RenderSystem.defaultBlendFunc();
         RenderSystem.enableCull();
         RenderSystem.disableDepthTest();
@@ -167,10 +170,26 @@ public class Chams extends Module {
             matrixStack.translate((float) (-direction.getOffsetX()) * n, 0.0f, (float) (-direction.getOffsetZ()) * n);
         }
         float l = pe.age + g;
-        setupTransforms1(pe, matrixStack, l, h, g);
-        matrixStack.scale(-1.0f, -1.0f, 1.0f);
-        matrixStack.scale(0.9375f, 0.9375f, 0.9375f);
-        matrixStack.translate(0.0f, -1.501f, 0.0f);
+
+
+        if (ModuleManager.badTrip.isEnabled()) {
+            long time = System.currentTimeMillis();
+            float scaleFactorX = -badTrip.factor.getValue() * (float) Math.sin((double) time / badTrip.speed.getValue());
+            float scaleFactorY = badTrip.factor.getValue() * (float) Math.sin((double) time / badTrip.speed.getValue());
+
+            setupTransforms1(pe, matrixStack, l, h, g);
+            matrixStack.scale(-1.0f + scaleFactorX, -1.0f + scaleFactorY, 1.0f);
+            matrixStack.scale(0.9375f, 0.9375f, 0.9375f);
+            matrixStack.translate(0.0f, -1.501f, 0.0f);
+
+        } else {
+            setupTransforms1(pe, matrixStack, l, h, g);
+            matrixStack.scale(-1.0f, -1.0f, 1.0f);
+            matrixStack.scale(0.9375f, 0.9375f, 0.9375f);
+            matrixStack.translate(0.0f, -1.501f, 0.0f);
+        }
+
+
         n = 0.0f;
         float o = 0.0f;
         if (!pe.hasVehicle() && pe.isAlive()) {
@@ -208,7 +227,7 @@ public class Chams extends Module {
         float m;
         if (abstractClientPlayerEntity.isFallFlying()) {
             setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
-            l = (float)abstractClientPlayerEntity.getFallFlyingTicks() + h;
+            l = (float) abstractClientPlayerEntity.getFallFlyingTicks() + h;
             m = MathHelper.clamp(l * l / 100.0F, 0.0F, 1.0F);
             if (!abstractClientPlayerEntity.isUsingRiptide()) {
                 matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(m * (-90.0F - k)));
@@ -221,7 +240,7 @@ public class Chams extends Module {
             if (d > 0.0 && e > 0.0) {
                 double n = (vec3d2.x * vec3d.x + vec3d2.z * vec3d.z) / Math.sqrt(d * e);
                 double o = vec3d2.x * vec3d.z - vec3d2.z * vec3d.x;
-                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotation((float)(Math.signum(o) * Math.acos(n))));
+                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotation((float) (Math.signum(o) * Math.acos(n))));
             }
         } else if (j > 0.0F) {
             setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
@@ -242,7 +261,7 @@ public class Chams extends Module {
         }
 
         if (entity.deathTime > 0) {
-            float f = ((float)entity.deathTime + tickDelta - 1.0F) / 20.0F * 1.6F;
+            float f = ((float) entity.deathTime + tickDelta - 1.0F) / 20.0F * 1.6F;
             f = MathHelper.sqrt(f);
             if (f > 1.0F) {
                 f = 1.0F;
@@ -251,7 +270,7 @@ public class Chams extends Module {
             matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(f * 90.0F));
         } else if (entity.isUsingRiptide()) {
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0F - entity.getPitch()));
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(((float)entity.age + tickDelta) * -75.0F));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(((float) entity.age + tickDelta) * -75.0F));
         } else if (entity.isInPose(EntityPose.SLEEPING)) {
             Direction direction = entity.getSleepingDirection();
             float g = direction != null ? getYaw(direction) : bodyYaw;
