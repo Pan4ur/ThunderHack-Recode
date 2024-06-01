@@ -7,7 +7,9 @@ import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IExplosionS2CPacket;
 import thunder.hack.injection.accesors.ISPacketEntityVelocity;
@@ -209,13 +211,31 @@ public class Velocity extends Module {
             grimTicks--;
     }
 
+    @EventHandler
+    public void onMove(EventMove event) {
+        if (mode.is(modeEn.Polar)) {
+            if (mc.player.hurtTime >= 1 & mc.player.hurtTime < 6) {
+                double multi = 1.2224324;
+                double min = 0.1;
+                double max = 0.5;
+                if (MovementUtility.isMoving() && mc.player.isOnGround() && isValidMotion(mc.player.getVelocity().getX(), min, max) && isValidMotion(mc.player.getVelocity().getZ(), min, max)) {
+                    mc.player.setVelocity(mc.player.getVelocity().getX() - MathHelper.sin((float) multi) * min, mc.player.getVelocity().getY(), mc.player.getVelocity().getX() + MathHelper.cos((float) multi) * max);
+                }
+            }
+        }
+    }
+
+    private boolean isValidMotion(double motion, double min, double max) {
+        return Math.abs(motion) > min && Math.abs(motion) < max;
+    }
+
     @Override
     public void onEnable() {
         grimTicks = 0;
     }
 
     public enum modeEn {
-        Matrix, Cancel, Sunrise, Custom, Redirect, OldGrim, Jump, GrimNew
+        Matrix, Cancel, Sunrise, Custom, Redirect, OldGrim, Jump, GrimNew, Polar
     }
 
     public enum jumpModeEn {
