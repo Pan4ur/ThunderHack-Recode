@@ -29,8 +29,8 @@ public class Phase extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Vanilla);
     private final Setting<Boolean> silent = new Setting<>("Silent", false, v -> mode.getValue() == Mode.Sunrise);
     private final Setting<Boolean> waitBreak = new Setting<>("WaitBreak", true, v -> mode.getValue() == Mode.Sunrise);
+    private final Setting<Boolean> onlyOnGround = new Setting<>("OnlyOnGround", false, v -> mode.is(Mode.Pearl));
     private final Setting<Boolean> autoDisable = new Setting<>("AutoDisable", false, v -> mode.getValue() == Mode.Pearl);
-
     private final Setting<Integer> afterBreak = new Setting<>("BreakTimeout", 4, 1, 20, v -> mode.getValue() == Mode.Sunrise && waitBreak.getValue());
     private final Setting<Integer> afterPearl = new Setting<>("PearlTimeout", 0, 0, 60, v -> mode.getValue() == Mode.Pearl);
     private final Setting<Float> pitch = new Setting<>("Pitch", 80f, 0f, 90f, v -> mode.getValue() == Mode.Pearl);
@@ -95,7 +95,7 @@ public class Phase extends Module {
                 InventoryUtility.switchTo(prevItem);
         }
 
-        if (mode.getValue() == Mode.Pearl) {
+        if (mode.getValue() == Mode.Pearl && (mc.player.isOnGround() || !onlyOnGround.getValue())) {
             if (mc.player.horizontalCollision && !playerInsideBlock() && clipTimer <= 0 && mc.player.age > 60) {
                 double[] dir = MovementUtility.forward(0.5);
                 BlockPos block = BlockPos.ofFloored(mc.player.getX() + dir[0], mc.player.getY(), mc.player.getZ() + dir[1]);
@@ -118,7 +118,7 @@ public class Phase extends Module {
 
     @EventHandler
     public void onPostSync(EventPostSync e) {
-        if (mode.getValue() == Mode.Pearl) {
+        if (mode.getValue() == Mode.Pearl && (mc.player.isOnGround() || !onlyOnGround.getValue())) {
             if (mc.player.horizontalCollision && !playerInsideBlock() && clipTimer <= 0 && mc.player.age > 60) {
                 if (mc.options.sneakKey.isPressed())
                     return;
