@@ -52,13 +52,13 @@ public class Speed extends Module {
     public final Setting<Float> matrixJBSpeed = new Setting<>("TimerSpeed", 1.088f, 1f, 2f, v -> mode.is(Mode.MatrixJB));
 
     public double baseSpeed;
-    private int stage, ticks, prevSlot;
+    private int stage, ticks, prevSlot, sim;
     private float prevForward = 0;
     private thunder.hack.utility.Timer elytraDelay = new thunder.hack.utility.Timer();
     private thunder.hack.utility.Timer startDelay = new thunder.hack.utility.Timer();
 
     public enum Mode {
-        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, GrimEntity, GrimEntity2, FireWork, Vanilla, GrimIce, GrimCombo
+        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, GrimEntity, GrimEntity2, FireWork, Vanilla, GrimIce, GrimCombo, LFCraft
     }
 
     @Override
@@ -73,6 +73,7 @@ public class Speed extends Module {
         baseSpeed = 0.2873D;
         startDelay.reset();
         prevSlot = -1;
+        sim = 0;
     }
 
     @EventHandler
@@ -214,6 +215,18 @@ public class Speed extends Module {
                 if (isMoving())
                     MovementUtility.setMotion(0.85);
                 elytraDelay.reset();
+            }
+        }
+
+        if (mode.getValue() == Mode.LFCraft) {
+            if (mc.player.isOnGround()) {
+                ThunderHack.TICK_TIMER = 0.821f;
+            } else if (mc.player.fallDistance >= 0.1 && mc.player.fallDistance < 1) {
+                if (mc.player.getVelocity().getY() > 0) {
+                    ThunderHack.TICK_TIMER = sim++ % 4 == 0 ? 1 : 1.385f;
+                } else {
+                    ThunderHack.TICK_TIMER = 2.08f;
+                }
             }
         }
     }
