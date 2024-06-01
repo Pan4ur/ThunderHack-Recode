@@ -55,8 +55,8 @@ public class WindowBase {
         }
 
         if (scaling) {
-            setWidth(Math.max(Render2DEngine.scrollAnimate((normaliseX() - dragX), getWidth(), .15f), 150));
-            setHeight(Math.max(Render2DEngine.scrollAnimate((normaliseY() - dragY), getHeight(), .15f), 150));
+            setWidth(Math.max(Render2DEngine.scrollAnimate((normaliseX() - dragX), getWidth(), .15f), getMinWidth()));
+            setHeight(Math.max(Render2DEngine.scrollAnimate((normaliseY() - dragY), getHeight(), .15f), getMinHeight()));
         }
 
         hoveringWindow = Render2DEngine.isHovered(mouseX, mouseY, getX(), getY(), getWidth(), getHeight());
@@ -153,5 +153,13 @@ public class WindowBase {
     protected void resetScroll() {
         prevScrollOffset = 0;
         scrollOffset = 0;
+    }
+
+    protected int getMinWidth() {
+        return 150;
+    }
+
+    protected int getMinHeight() {
+        return 150;
     }
 }

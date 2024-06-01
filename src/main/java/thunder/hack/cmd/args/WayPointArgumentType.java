@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class WayPointArgumentType implements ArgumentType<WayPointManager.WayPoint> {
     private static final Collection<String> EXAMPLES = ThunderHack.wayPointManager.getWayPoints().stream()
-            .map(WayPointManager.WayPoint::name)
+            .map(WayPointManager.WayPoint::getName)
             .limit(5)
             .toList();
 
@@ -39,7 +39,7 @@ public class WayPointArgumentType implements ArgumentType<WayPointManager.WayPoi
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(ThunderHack.wayPointManager.getWayPoints().stream().map(WayPointManager.WayPoint::name), builder);
+        return CommandSource.suggestMatching(ThunderHack.wayPointManager.getWayPoints().stream().map(WayPointManager.WayPoint::getName), builder);
     }
 
     @Override

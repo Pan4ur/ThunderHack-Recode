@@ -9,6 +9,7 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
@@ -32,13 +33,13 @@ public class Coords extends HudElement {
         int posY = (int) mc.player.getY();
         int posZ = (int) mc.player.getZ();
 
-        float nether = !isHell() ? 0.125F : 8.0F;
+        float nether = !PlayerUtility.isInHell() ? 0.125F : 8.0F;
 
         int hposX = (int) (mc.player.getX() * nether);
         int hposZ = (int) (mc.player.getZ() * nether);
 
         String coordinates = "XYZ " + Formatting.WHITE +
-                (posX + " " + posY + " " + posZ + Formatting.WHITE + (netherCoords.is(NetherCoords.On) || (netherCoords.is(NetherCoords.OnlyNether) && isHell()) ? " [" + Formatting.RESET + hposX + " " + hposZ + Formatting.WHITE + "]" : ""));
+                (posX + " " + posY + " " + posZ + Formatting.WHITE + (netherCoords.is(NetherCoords.On) || (netherCoords.is(NetherCoords.OnlyNether) && !PlayerUtility.isInHell()) ? " [" + Formatting.RESET + hposX + " " + hposZ + Formatting.WHITE + "]" : ""));
 
         float pX = getPosX() > mc.getWindow().getScaledWidth() / 2f ? getPosX() - FontRenderers.getModulesRenderer().getStringWidth(coordinates) : getPosX();
 
@@ -56,10 +57,5 @@ public class Coords extends HudElement {
         }
         FontRenderers.getModulesRenderer().drawString(context.getMatrices(), coordinates, pX + 18, getPosY() + 5, HudEditor.getColor(1).getRGB());
         setBounds(pX, getPosY(), FontRenderers.getModulesRenderer().getStringWidth(coordinates) + 21, 13f);
-    }
-
-    public boolean isHell() {
-        if (mc.world == null) return false;
-        return Objects.equals(mc.world.getRegistryKey().getValue().getPath(), "the_nether");
     }
 }

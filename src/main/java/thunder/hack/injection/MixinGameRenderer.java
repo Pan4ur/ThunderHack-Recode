@@ -64,7 +64,7 @@ public abstract class MixinGameRenderer {
     @Shadow
     public abstract void tick();
 
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", ordinal = 0, shift = At.Shift.BEFORE), method = "render")
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", ordinal = 1, shift = At.Shift.BEFORE), method = "render")
     void postHudRenderHook(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
         FrameRateCounter.INSTANCE.recordFrame();
     }

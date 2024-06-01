@@ -9,9 +9,27 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 import static thunder.hack.modules.Module.mc;
 
 public final class PlayerUtility {
+
+    public static boolean isInHell() {
+        if (mc.world == null) return false;
+        return Objects.equals(mc.world.getRegistryKey().getValue().getPath(), "the_nether");
+    }
+
+    public static boolean isInEnd() {
+        if (mc.world == null) return false;
+        return Objects.equals(mc.world.getRegistryKey().getValue().getPath(), "the_end");
+    }
+
+    public static boolean isInOver() {
+        if (mc.world == null) return false;
+        return Objects.equals(mc.world.getRegistryKey().getValue().getPath(), "overworld");
+    }
+
     public static boolean isEating() {
         if (mc.player == null) return false;
 
