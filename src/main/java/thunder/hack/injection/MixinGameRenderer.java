@@ -9,8 +9,6 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PickaxeItem;
 import net.minecraft.item.SwordItem;
@@ -63,10 +61,10 @@ public abstract class MixinGameRenderer {
     @Shadow
     private float viewDistance;
 
-    @Shadow public abstract void tick();
+    @Shadow
+    public abstract void tick();
 
-    @SuppressWarnings("all")
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", shift = At.Shift.BEFORE), method = "render")
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", ordinal = 0, shift = At.Shift.BEFORE), method = "render")
     void postHudRenderHook(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
         FrameRateCounter.INSTANCE.recordFrame();
     }
