@@ -46,7 +46,7 @@ public class HudElement extends Module {
                 float finalY = 0;
 
                 for (Module m : ThunderHack.moduleManager.getEnabledModules())
-                    if (m instanceof HudElement hudElement && hudElement != this) {
+                    if (m instanceof HudElement hudElement && hudElement != this && !(hudElement.getPosX() == 0 && hudElement.getPosY() == 0)) {
                         if(getPosX() > mc.getWindow().getScaledWidth() / 2f) {
                             if (isNear(hudElement.getHitX() + hudElement.getWidth(), getHitX() + getWidth()))
                                 finalX = hudElement.getHitX() + hudElement.getWidth() - getWidth();
@@ -100,7 +100,7 @@ public class HudElement extends Module {
 
             if (mouseButton && mouseState)
                 for (Module m : ThunderHack.moduleManager.getEnabledModules()) {
-                    if (m instanceof HudElement hudElement && hudElement != this) {
+                    if (m instanceof HudElement hudElement && hudElement != this && !(hudElement.getHitX() == 0 && hudElement.getHitY() == 0)) {
 
                         float hitDifX = getPosX() - getHitX();
                         float hitDifY = getPosY() - getHitY();
