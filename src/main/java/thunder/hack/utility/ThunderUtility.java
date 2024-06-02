@@ -100,7 +100,7 @@ public final class ThunderUtility {
 
     public static void parseCommits() {
         try {
-            URL url = new URL("https://api.github.com/repos/Pan4ur/ThunderHack-Recode/commits");
+            URL url = new URL("https://api.github.com/repos/Pan4ur/ThunderHack-Recode/commits?per_page=50");
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
             String inputLine;
             changeLog.add("Changelog [Recode; Date: " + ThunderHack.BUILD_DATE + "; GitHash:" + ThunderHack.GITH_HASH + "]");
