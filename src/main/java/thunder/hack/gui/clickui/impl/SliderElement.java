@@ -2,6 +2,7 @@ package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.StringHelper;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
@@ -44,7 +45,8 @@ public class SliderElement extends AbstractElement {
 
         if (!dragging) {
             FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), (setting.group != null ? 2f : 0f) + x + 6, y + 4, new Color(-1).getRGB());
-            FontRenderers.sf_medium_mini.drawString(matrixStack, listening ? (Objects.equals(Stringnumber, "") ? "..." : Stringnumber) : setting.getValue() + "", (int) (x + width - 6 - FontRenderers.sf_medium_mini.getStringWidth(setting.getValue() + "")), y + 5, new Color(-1).getRGB());
+            FontRenderers.sf_medium_mini.drawString(matrixStack, listening ? (Objects.equals(Stringnumber, "") ? "..." : Stringnumber) : setting.getValue() + "",
+                    (int) (x + width - 6 - FontRenderers.sf_medium_mini.getStringWidth(listening ? (Objects.equals(Stringnumber, "") ? "..." : Stringnumber) : setting.getValue() + "")), y + 5, new Color(-1).getRGB());
         } else {
             if (animation > 0.2f)
                 FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getMin() + "", x + 6, y + 4, new Color(-1).getRGB());
@@ -134,7 +136,17 @@ public class SliderElement extends AbstractElement {
                     return;
                 }
             }
-            Stringnumber = Stringnumber + GLFW.glfwGetKeyName(keyCode, 0);
+        }
+    }
+
+    @Override
+    public void charTyped(char key, int keyCode) {
+        if (StringHelper.isValidChar(key)) {
+            String k = ".";
+            try {
+                k = String.valueOf(Integer.parseInt(String.valueOf(key)));
+            } catch (Exception ignored) {}
+            Stringnumber = Stringnumber + k;
         }
     }
 
