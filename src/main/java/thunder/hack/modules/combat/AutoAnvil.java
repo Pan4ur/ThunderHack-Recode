@@ -24,8 +24,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static thunder.hack.modules.client.ClientSettings.isRu;
+
 public class AutoAnvil extends Module {
     private final Setting<Float> range = new Setting<>("Range", 5f, 1f, 7f);
+    private final Setting<Boolean> once = new Setting<>("Once", false);
     private final Setting<Boolean> placePlates = new Setting<>("PlacePlates", false);
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("Place Mode", InteractionUtility.PlaceMode.Normal);
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact Mode", InteractionUtility.Interact.Vanilla);
@@ -51,12 +54,12 @@ public class AutoAnvil extends Module {
             return;
         }
 
-        // Find poses to place
         final SearchInvResult result = getBlockResult();
         final SearchInvResult plateResult = InventoryUtility.findItemInHotBar(Items.STONE_PRESSURE_PLATE, Items.BIRCH_PRESSURE_PLATE, Items.HEAVY_WEIGHTED_PRESSURE_PLATE, Items.LIGHT_WEIGHTED_PRESSURE_PLATE, Items.OAK_PRESSURE_PLATE);
 
         final BlockPos anvilPos = BlockPos.ofFloored(target.getPos()).up(2);
-        if (!result.found() || (!plateResult.found() || !placePlates.getValue()))
+
+        if (!result.found() || (!plateResult.found() && placePlates.getValue()))
             return;
 
         Block targetBlock = mc.world.getBlockState(BlockPos.ofFloored(target.getPos())).getBlock();
@@ -78,6 +81,8 @@ public class AutoAnvil extends Module {
 
                 if (obsidianPos != null && obbyResult.found()) {
                     InteractionUtility.placeBlock(obsidianPos, rotate.getValue(), interact.getValue(), placeMode.getValue(), obbyResult, true, false);
+                    if(once.getValue())
+                        disable(isRu() ? "Блок размещен" : "Done");
                 }
             }
             return;
