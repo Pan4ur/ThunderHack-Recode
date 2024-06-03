@@ -44,6 +44,7 @@ public final class AutoTotem extends Module {
     private final Setting<BooleanSettingGroup> bindSwap = new Setting<>("BindSwap", new BooleanSettingGroup(false), v -> offhand.is(OffHand.Totem));
     private final Setting<Bind> swapButton = new Setting<>("SwapButton", new Bind(GLFW.GLFW_KEY_CAPS_LOCK, false, false)).addToGroup(bindSwap);
     private final Setting<Swap> swapMode = new Setting<>("Swap", Swap.GappleShield).addToGroup(bindSwap);
+    private final Setting<Boolean> ncpStrict = new Setting<>("NCPStrict", false);
     private final Setting<Float> healthF = new Setting<>("HP", 16f, 0f, 36f);
     private final Setting<Float> healthS = new Setting<>("ShieldGappleHp", 16f, 0f, 20f, v -> offhand.getValue() == OffHand.Shield);
     private final Setting<Boolean> calcAbsorption = new Setting<>("CalcAbsorption", true);
@@ -138,21 +139,24 @@ public final class AutoTotem extends Module {
             if (slot >= 9) {
                 switch (mode.getValue()) {
                     case Default -> {
-                        sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+                        if (ncpStrict.getValue())
+                            sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
                         clickSlot(slot);
                         clickSlot(45);
                         clickSlot(slot);
                         sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                     }
                     case Alternative -> {
-                        sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+                        if (ncpStrict.getValue())
+                            sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
                         clickSlot(slot, nearestSlot, SlotActionType.SWAP);
                         clickSlot(45, nearestSlot, SlotActionType.SWAP);
                         clickSlot(slot, nearestSlot, SlotActionType.SWAP);
                         sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                     }
                     case Matrix -> {
-                        sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+                        if (ncpStrict.getValue())
+                            sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearestSlot, SlotActionType.SWAP, mc.player);
                         debug(slot + " " + nearestSlot);
                         sendPacket(new UpdateSelectedSlotC2SPacket(nearestSlot));
@@ -296,7 +300,7 @@ public final class AutoTotem extends Module {
             item = Items.TOTEM_OF_UNDYING;
 
         if (!rcGap.is(RCGap.Off) && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed() && !(offHandItem instanceof ShieldItem)) {
-            if(rcGap.is(RCGap.Always) || (rcGap.is(RCGap.OnlySafe) && getTriggerHealth() > healthF.getValue())) {
+            if (rcGap.is(RCGap.Always) || (rcGap.is(RCGap.OnlySafe) && getTriggerHealth() > healthF.getValue())) {
                 if (crapple.found() || offHandItem == Items.GOLDEN_APPLE)
                     item = Items.GOLDEN_APPLE;
                 if (gapple.found() || offHandItem == Items.ENCHANTED_GOLDEN_APPLE)
