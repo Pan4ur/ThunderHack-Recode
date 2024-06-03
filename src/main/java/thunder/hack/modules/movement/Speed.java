@@ -4,9 +4,11 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
+import net.minecraft.item.ArmorStandItem;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.screen.slot.SlotActionType;
@@ -23,13 +25,11 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.interfaces.IEntity;
 import thunder.hack.utility.math.MathUtility;
-import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.SearchInvResult;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
-import static thunder.hack.modules.movement.Timer.violation;
 import static thunder.hack.utility.player.MovementUtility.isMoving;
 
 public class Speed extends Module {
@@ -50,15 +50,16 @@ public class Speed extends Module {
     public final Setting<Integer> delay = new Setting<>("Delay", 8, 1, 20, v -> mode.getValue() == Mode.FireWork);
     public final Setting<Boolean> strict = new Setting<>("Strict", false, v -> mode.is(Mode.GrimIce));
     public final Setting<Float> matrixJBSpeed = new Setting<>("TimerSpeed", 1.088f, 1f, 2f, v -> mode.is(Mode.MatrixJB));
+    public final Setting<Boolean> armorStands = new Setting<>("ArmorStands", false, v -> mode.is(Mode.GrimCombo) || mode.is(Mode.GrimEntity2));
 
     public double baseSpeed;
-    private int stage, ticks, prevSlot, sim;
+    private int stage, ticks, prevSlot;
     private float prevForward = 0;
     private thunder.hack.utility.Timer elytraDelay = new thunder.hack.utility.Timer();
     private thunder.hack.utility.Timer startDelay = new thunder.hack.utility.Timer();
 
     public enum Mode {
-        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, GrimEntity, GrimEntity2, FireWork, Vanilla, GrimIce, GrimCombo, LFCraft
+        StrictStrafe, MatrixJB, NCP, ElytraLowHop, MatrixDamage, GrimEntity, GrimEntity2, FireWork, Vanilla, GrimIce, GrimCombo
     }
 
     @Override
@@ -73,7 +74,6 @@ public class Speed extends Module {
         baseSpeed = 0.2873D;
         startDelay.reset();
         prevSlot = -1;
-        sim = 0;
     }
 
     @EventHandler
@@ -119,7 +119,7 @@ public class Speed extends Module {
         if ((mode.is(Mode.GrimEntity2)|| mode.is(Mode.GrimCombo)) && !e.isPre() && ThunderHack.core.getSetBackTime() > 1000 && MovementUtility.isMoving()) {
             int collisions = 0;
             for (Entity ent : mc.world.getEntities())
-                if (ent != mc.player && (ent instanceof LivingEntity || ent instanceof BoatEntity) && mc.player.getBoundingBox().expand(1.0).intersects(ent.getBoundingBox()))
+                if (ent != mc.player && (!(ent instanceof ArmorStandEntity) || armorStands.getValue()) && (ent instanceof LivingEntity || ent instanceof BoatEntity) && mc.player.getBoundingBox().expand(1.0).intersects(ent.getBoundingBox()))
                     collisions++;
 
             double[] motion = MovementUtility.forward(0.08 * collisions);
@@ -217,18 +217,6 @@ public class Speed extends Module {
                 elytraDelay.reset();
             }
         }
-
-        if (mode.getValue() == Mode.LFCraft) {
-            if (mc.player.isOnGround()) {
-                ThunderHack.TICK_TIMER = 0.821f;
-            } else if (mc.player.fallDistance >= 0.1 && mc.player.fallDistance < 1) {
-                if (mc.player.getVelocity().getY() > 0) {
-                    ThunderHack.TICK_TIMER = sim++ % 4 == 0 ? 1 : 1.385f;
-                } else {
-                    ThunderHack.TICK_TIMER = 2.08f;
-                }
-            }
-        }
     }
 
     @EventHandler
@@ -243,7 +231,7 @@ public class Speed extends Module {
                     MovementUtility.setMotion(0.448f * boostFactor.getValue());
                 }
 
-                if (shiftTicks.getValue() > 0 && (MathUtility.clamp((int) (100 - Math.min(violation, 100)), 0, 100) > 90)) {
+                if (shiftTicks.getValue() > 0) {
                     event.cancel();
                     event.setIterations(shiftTicks.getValue());
                 }

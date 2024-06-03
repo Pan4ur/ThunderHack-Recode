@@ -731,9 +731,12 @@ public class Render2DEngine {
         }
     }
 
-    public static void drawHudBase2(MatrixStack matrices, float x, float y, float width, float height, float radius, float blurStrenth, float blurOpacity) {
+    public static void drawHudBase2(MatrixStack matrices, float x, float y, float width, float height, float radius, float blurStrenth, float blurOpacity, float animationFactor) {
         if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
-            drawRoundedBlur(matrices, x, y, width, height, radius, HudEditor.blurColor.getValue().getColorObject(), blurStrenth, blurOpacity);
+            blurStrenth *= animationFactor;
+            blurOpacity = (float) Render2DEngine.interpolate(1f, blurOpacity, animationFactor);
+            Color c = Render2DEngine.interpolateColorC(Color.BLACK, HudEditor.blurColor.getValue().getColorObject(), animationFactor);
+            drawRoundedBlur(matrices, x, y, width, height, radius, c, blurStrenth, blurOpacity);
         } else {
             preShaderDraw(matrices, x - 10, y - 10, width + 20, height + 20);
             HUD_SHADER.setParameters(x, y, width, height, radius, HudEditor.alpha.getValue(), HudEditor.alpha.getValue());

@@ -23,24 +23,18 @@ public class TimerIndicator extends HudElement {
     @Override
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        float f4 = 100f / ModuleManager.timer.speed.getValue();
-        float f5 = Math.min(Timer.violation, f4);
-        timerAnimation.setValue(((f4 - f5) / f4) * 58);
-        int status = (int) (((f4 - f5) / f4) * 100);
-        status = MathUtility.clamp(status, 0, 100);
-
 
         if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
             Render2DEngine.drawRoundedBlur(context.getMatrices(), getPosX(), getPosY(), 65, 15f, 3, HudEditor.blurColor.getValue().getColorObject());
-            Render2DEngine.drawRect(context.getMatrices(), getPosX(), getPosY(), 65 * ((float) status / 100f), 15f, 3f, 0.4f);
-            FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), status >= 99 ? "100%" : status + "%", getPosX() + 32, getPosY() + 5.5f, new Color(200, 200, 200, 255).getRGB());
+            Render2DEngine.drawRect(context.getMatrices(), getPosX(), getPosY(), 65 * Timer.energy, 15f, 3f, 0.4f);
+            FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), Timer.energy >= 0.99f ? "100%" : (int) Math.ceil(Timer.energy * 100) + "%", getPosX() + 32, getPosY() + 5.5f, new Color(200, 200, 200, 255).getRGB());
             setBounds(getPosX(), getPosY(), 65, 15);
         } else {
             Render2DEngine.drawGradientBlurredShadow(context.getMatrices(), getPosX() - 1, getPosY() - 1, 62, 12, 6, HudEditor.getColor(90), HudEditor.getColor(180), HudEditor.getColor(0), HudEditor.getColor(270));
             Render2DEngine.drawRect(context.getMatrices(), getPosX(), getPosY(), 60, 10, new Color(0x9E000000, true));
-            Render2DEngine.draw2DGradientRect(context.getMatrices(), getPosX(), getPosY(), getPosX() + 60 * ((float) status / 100f), getPosY() + 10, HudEditor.getColor(90), HudEditor.getColor(180), HudEditor.getColor(0), HudEditor.getColor(270));
+            Render2DEngine.draw2DGradientRect(context.getMatrices(), getPosX(), getPosY(), getPosX() + 60 * Timer.energy, getPosY() + 10, HudEditor.getColor(90), HudEditor.getColor(180), HudEditor.getColor(0), HudEditor.getColor(270));
             Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX() + 20, getPosY(), 22, 10, 6, new Color(0x47000000, true));
-            FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), status >= 99 ? "100%" : status + "%", getPosX() + 31, getPosY() + 3.5f, new Color(200, 200, 200, 255).getRGB());
+            FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), Timer.energy >= 0.99f ? "100%" : (int) Math.ceil(Timer.energy * 100) + "%", getPosX() + 31, getPosY() + 3.5f, new Color(200, 200, 200, 255).getRGB());
             setBounds(getPosX(), getPosY(), 60, 10);
         }
     }

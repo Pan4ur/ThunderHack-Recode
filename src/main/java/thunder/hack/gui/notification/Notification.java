@@ -58,7 +58,7 @@ public class Notification {
             y = animate(y, getY);
             float x = mc.getWindow().getScaledWidth() - 6 - width + animationX;
 
-            if(HudEditor.hudStyle.is(HudEditor.HudStyle.Glowing)) {
+            if (HudEditor.hudStyle.is(HudEditor.HudStyle.Glowing)) {
                 Render2DEngine.verticalGradient(matrix, x + 25, y + 1, x + 25.5f, y + 12, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
                 Render2DEngine.verticalGradient(matrix, x + 25, y + 11, x + 25.5f, y + 22, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
             } else {
@@ -73,7 +73,7 @@ public class Notification {
             animationX = (float) (width * animation.getAnimationd());
             y = animate(y, getY);
             float x = mc.getWindow().getScaledWidth() / 2f - width / 2f;
-            if(HudEditor.hudStyle.is(HudEditor.HudStyle.Glowing)) {
+            if (HudEditor.hudStyle.is(HudEditor.HudStyle.Glowing)) {
                 Render2DEngine.verticalGradient(matrix, x + 13, y + 1, x + 13.5f, y + 6, Render2DEngine.injectAlpha(color, 0), Render2DEngine.injectAlpha(color, animatedAlpha));
                 Render2DEngine.verticalGradient(matrix, x + 13, y + 6, x + 13.5f, y + 11, Render2DEngine.injectAlpha(color, animatedAlpha), Render2DEngine.injectAlpha(color, 0));
             } else {
@@ -92,10 +92,9 @@ public class Notification {
         direction = isFinished();
         animationX = (float) (width * animation.getAnimationd());
         y = animate(y, getY);
-        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+        if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
             Render2DEngine.drawHudBase2(matrix, isDefault() ? mc.getWindow().getScaledWidth() - 6 - width + animationX : mc.getWindow().getScaledWidth() / 2f - width / 2f,
-                    y, width, height, isDefault() ? 5f : 3f, (float) MathUtility.clamp((1 - animation.getAnimationd()), 0f, 1f) * HudEditor.blurStrength.getValue(),
-                    (float) Render2DEngine.interpolate(0.85f, HudEditor.blurOpacity.getValue(), MathUtility.clamp((1 - animation.getAnimationd()), 0f, 1f)));
+                    y, width, height, isDefault() ? 5f : 3f, HudEditor.blurStrength.getValue(), HudEditor.blurOpacity.getValue(), (float) MathUtility.clamp((1 - animation.getAnimationd()), 0f, 1f));
         } else {
             Render2DEngine.drawHudBase(matrix, isDefault() ? mc.getWindow().getScaledWidth() - 6 - width + animationX : mc.getWindow().getScaledWidth() / 2f - width / 2f,
                     y, width, height, isDefault() ? 5f : 3f, (float) MathUtility.clamp((1 - animation.getAnimationd()), 0f, 1f));

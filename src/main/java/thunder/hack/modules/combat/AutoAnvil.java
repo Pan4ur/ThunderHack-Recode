@@ -39,7 +39,6 @@ public class AutoAnvil extends Module {
     private final Setting<Boolean> concrete = new Setting<>("Сoncrete", false);
     private final Setting<Boolean> anvils = new Setting<>("Anvils", true);
 
-
     private PlayerEntity target;
 
     public AutoAnvil() {

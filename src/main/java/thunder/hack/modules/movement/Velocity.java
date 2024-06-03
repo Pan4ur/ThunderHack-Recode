@@ -211,20 +211,6 @@ public class Velocity extends Module {
             grimTicks--;
     }
 
-    @EventHandler
-    public void onMove(EventMove event) {
-        if (mode.is(modeEn.Polar)) {
-            if (mc.player.hurtTime >= 1 & mc.player.hurtTime < 6) {
-                double multi = 1.2224324;
-                double min = 0.1;
-                double max = 0.5;
-                if (MovementUtility.isMoving() && mc.player.isOnGround() && isValidMotion(mc.player.getVelocity().getX(), min, max) && isValidMotion(mc.player.getVelocity().getZ(), min, max)) {
-                    mc.player.setVelocity(mc.player.getVelocity().getX() - MathHelper.sin((float) multi) * min, mc.player.getVelocity().getY(), mc.player.getVelocity().getX() + MathHelper.cos((float) multi) * max);
-                }
-            }
-        }
-    }
-
     private boolean isValidMotion(double motion, double min, double max) {
         return Math.abs(motion) > min && Math.abs(motion) < max;
     }
@@ -235,7 +221,7 @@ public class Velocity extends Module {
     }
 
     public enum modeEn {
-        Matrix, Cancel, Sunrise, Custom, Redirect, OldGrim, Jump, GrimNew, Polar
+        Matrix, Cancel, Sunrise, Custom, Redirect, OldGrim, Jump, GrimNew
     }
 
     public enum jumpModeEn {
