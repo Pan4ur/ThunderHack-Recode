@@ -33,7 +33,7 @@ public class NotificationManager {
 
         notifications.removeIf(Notification::shouldDelete);
 
-        for (Notification n : notifications) {
+        for (Notification n : Lists.newArrayList(notifications)) {
             startY = (float) (startY - n.getHeight() - 3f);
             n.renderShaders(context.getMatrices(), startY  + (isDefault() ? 0 : notifications.size() * 16));
             n.render(context.getMatrices(), startY  + (isDefault() ? 0 : notifications.size() * 16));
