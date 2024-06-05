@@ -384,11 +384,6 @@ public class Animations extends Module {
         }
         h = 1.0F - (float) Math.pow(g, 27.0);
         int i = arm == Arm.RIGHT ? 1 : -1;
-
-        matrices.translate(h * 0.6F * (float) i * ModuleManager.viewModel.eatX.getValue(), h * -0.5F * ModuleManager.viewModel.eatY.getValue(), h * 0.0F);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) i * h * 90.0F));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(h * 10.0F));
-        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) i * h * 30.0F));
     }
 
     private void translateToViewModel(MatrixStack matrices) {
