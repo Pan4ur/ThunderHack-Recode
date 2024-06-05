@@ -41,6 +41,8 @@ public abstract class MixinHeldItemRenderer {
     }
     @Inject(method = "renderFirstPersonItem", at = @At("HEAD"))
     public void renderFirstPersonItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack m, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+        if (ModuleManager.viewModel.isDisabled()) return;
+
         float mainRotX = ModuleManager.viewModel.rotationMainX.getValue();
         float mainPosX = ModuleManager.viewModel.positionMainX.getValue();
         float mainRotZ = ModuleManager.viewModel.rotationMainZ.getValue();
