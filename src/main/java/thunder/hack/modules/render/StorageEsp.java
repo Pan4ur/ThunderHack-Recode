@@ -51,6 +51,7 @@ public class StorageEsp extends Module {
     private final Setting<ColorSetting> minecartColor = new Setting<>("MinecartColor", new ColorSetting(0x8800FF00));
 
     public void onRender3D(MatrixStack stack) {
+        if(mc.options.hudHidden) return;
         for (BlockEntity blockEntity : getBlockEntities()) {
             Color color = getColor(blockEntity);
 

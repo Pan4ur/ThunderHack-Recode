@@ -116,6 +116,7 @@ public class NameTags extends Module {
     }
 
     public void onRender2D(DrawContext context) {
+        if(mc.options.hudHidden) return;
         for (PlayerEntity ent : mc.world.getPlayers()) {
             if (ent == mc.player && (mc.options.getPerspective().isFirstPerson() || !self.getValue())) continue;
             if (getEntityPing(ent) <= 0 && ignoreBots.getValue()) continue;
