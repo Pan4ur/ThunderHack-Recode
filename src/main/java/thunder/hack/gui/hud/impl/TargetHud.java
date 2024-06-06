@@ -63,6 +63,7 @@ public class TargetHud extends HudElement {
     private final Setting<ColorSetting> color2 = new Setting<>("Color2", new ColorSetting(-16492289), v -> Mode.getValue() == ModeEn.CelkaPasta);
     private final Setting<Boolean> funTimeHP = new Setting<>("FunTimeHP", false);
     private final Setting<Boolean> mini = new Setting<>("Mini", false, v -> Mode.getValue() == ModeEn.NurikZapen);
+    private final Setting<Boolean> absorp = new Setting<>("Absorption",true);
 
     private boolean sentParticles;
     private boolean direction = false;
@@ -162,7 +163,7 @@ public class TargetHud extends HudElement {
                 target = null;
         }
         if (target == null) return;
-
+        float health = Math.min(target.getMaxHealth(), getHealth());
         context.getMatrices().push();
         if (Mode.getValue() == ModeEn.NurikZapen && mini.getValue()) {
             if (!HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry))
@@ -281,15 +282,12 @@ public class TargetHud extends HudElement {
                 RenderSystem.defaultBlendFunc();
                 context.getMatrices().pop();
 
-                // Баллон
-                float health = Math.min(20, getHealth());
                 healthanimation.setValue(health);
                 health = (float) healthanimation.getAnimationD();
-
                 Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX() + 55, getPosY() + 22, 90, 8, blurRadius.getValue(), HudEditor.getColor(0));
 
                 Render2DEngine.drawGradientRound(context.getMatrices(), getPosX() + 55, getPosY() + 35 - 14, 90, 10, 2f, HudEditor.getColor(0).darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker(), HudEditor.getColor(0).darker().darker().darker().darker());
-                Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 55, getPosY() + 35 - 14, (int) MathUtility.clamp((90 * (health / 20)), 3, 90), 10, 2f);
+                Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(0), HudEditor.getColor(270), getPosX() + 55, getPosY() + 35 - 14, (int) MathUtility.clamp((90 * (health / target.getMaxHealth())), 3, 90), 10, 2f);
 
 
                 FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (int) (((Math.round(10.0 * health) / 10.0) / 20f) * 100) + "%", getPosX() + 102, getPosY() + 24f, Render2DEngine.applyOpacity(Colors.WHITE, animationFactor));
@@ -320,7 +318,6 @@ public class TargetHud extends HudElement {
                 }
             } else if (Mode.getValue() == ModeEn.NurikZapen) {
                 float hurtPercent = (Render2DEngine.interpolateFloat(MathUtility.clamp(target.hurtTime == 0 ? 0 : target.hurtTime + 1, 0, 10), target.hurtTime, mc.getTickDelta())) / 8f;
-                float health = Math.min(20, getHealth());
                 healthanimation.setValue(health);
                 health = (float) healthanimation.getAnimationD();
 
@@ -469,7 +466,6 @@ public class TargetHud extends HudElement {
                 }
             } else {
                 float hurtPercent = (target.hurtTime) / 6f;
-                float health = Math.min(20, getHealth());
 
                 Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX() - 2, getPosY() - 2, 164, 51, 5, color.getValue().getColorObject());
                 Render2DEngine.drawRect(context.getMatrices(), getPosX(), getPosY(), 160, 47, new Color(0x66000000, true));
@@ -589,8 +585,8 @@ public class TargetHud extends HudElement {
                 numValue = Float.parseFloat(resolvedHp);
             } catch (NumberFormatException ignored) {
             }
-            return numValue;
-        } else return target.getHealth();
+            return (absorp.getValue()) ? numValue + + target.getAbsorptionAmount() : numValue;
+        } else return (absorp.getValue()) ? target.getHealth() + + target.getAbsorptionAmount() : target.getHealth();
     }
 
     public enum HPmodeEn {
