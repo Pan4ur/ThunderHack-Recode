@@ -88,6 +88,7 @@ public class ESP extends Module {
     private float dizorentAnimation = 0f;
 
     public void onRender3D(MatrixStack stack) {
+        if(mc.options.hudHidden) return;
         if (lingeringPotions.getValue()) {
             for (Entity ent : mc.world.getEntities()) {
                 if (ent instanceof AreaEffectCloudEntity aece) {
@@ -296,6 +297,7 @@ public class ESP extends Module {
     }
 
     public void onRender2D(DrawContext context) {
+        if(mc.options.hudHidden) return;
         if (pearls.getValue()) {
             for (Entity ent : mc.world.getEntities()) {
                 if (ent instanceof EnderPearlEntity pearl) {
