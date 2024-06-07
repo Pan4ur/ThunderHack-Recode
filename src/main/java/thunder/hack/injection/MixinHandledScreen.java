@@ -13,21 +13,14 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.component.type.MapIdComponent;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.*;
 import net.minecraft.item.map.MapState;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ShulkerBoxScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.collection.DefaultedList;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -73,7 +66,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
     @Inject(method = "render", at = @At("HEAD"))
     private void drawScreenHook(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if(Module.fullNullCheck()) return;
+        if (Module.fullNullCheck()) return;
         for (int i1 = 0; i1 < mc.player.currentScreenHandler.slots.size(); ++i1) {
             Slot slot = mc.player.currentScreenHandler.slots.get(i1);
             if (isPointOverSlot(slot, mouseX, mouseY) && slot.isEnabled()) {
@@ -107,7 +100,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if(Module.fullNullCheck()) return;
+        if (Module.fullNullCheck()) return;
         if (focusedSlot != null && !focusedSlot.getStack().isEmpty() && client.player.playerScreenHandler.getCursorStack().isEmpty()) {
             if (hasItems(focusedSlot.getStack()) && Tooltips.storage.getValue()) {
                 renderShulkerToolTip(context, mouseX, mouseY, 0, 0, focusedSlot.getStack());
@@ -152,17 +145,23 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
                 }
             }
 
-            if(postRender != null) {
+            if (postRender != null) {
                 postRender.run();
                 postRender = null;
             }
         }
     }
 
+    @Inject(method = "drawSlot(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/screen/slot/Slot;)V", at = @At("TAIL"))
+    protected void drawSlotHook(DrawContext context, Slot slot, CallbackInfo ci) {
+        if (ModuleManager.fTHelper.isEnabled() && ModuleManager.fTHelper.aucHelper.getValue())
+            ModuleManager.fTHelper.onRenderChest(context, slot);
+    }
+
     public boolean renderShulkerToolTip(DrawContext context, int offsetX, int offsetY, int mouseX, int mouseY, ItemStack stack) {
         try {
             ContainerComponent compoundTag = stack.get(DataComponentTypes.CONTAINER);
-            if(compoundTag == null)
+            if (compoundTag == null)
                 return false;
 
             float[] colors = new float[]{1F, 1F, 1F};
@@ -184,7 +183,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
     @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"), cancellable = true)
     private void onDrawMouseoverTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
-        if(Module.fullNullCheck()) return;
+        if (Module.fullNullCheck()) return;
         if (focusedSlot != null && !focusedSlot.getStack().isEmpty() && client.player.playerScreenHandler.getCursorStack().isEmpty()) {
             if (focusedSlot.getStack().getItem() == Items.FILLED_MAP && Tooltips.maps.getValue()) ci.cancel();
         }
@@ -258,7 +257,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        if(Module.fullNullCheck()) return;
+        if (Module.fullNullCheck()) return;
         if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE && focusedSlot != null && !focusedSlot.getStack().isEmpty() && client.player.playerScreenHandler.getCursorStack().isEmpty()) {
             ItemStack itemStack = focusedSlot.getStack();
 
