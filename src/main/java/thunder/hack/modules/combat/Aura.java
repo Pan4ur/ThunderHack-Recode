@@ -65,7 +65,10 @@ import static thunder.hack.utility.math.MathUtility.random;
 public final class Aura extends Module {
     public final Setting<Float> attackRange = new Setting<>("Range", 3.1f, 1f, 6.0f);
     public final Setting<Float> wallRange = new Setting<>("ThroughWallsRange", 3.1f, 0f, 6.0f);
-    public final Setting<WallsBypass> wallsBypass = new Setting<>("WallsBypass", WallsBypass.Off, v -> wallRange.getValue() > 0);
+    public final Setting<Boolean> elytra = new Setting<>("ElytraOverride",false);
+    public final Setting<Float> elytraAttackRange = new Setting<>("ElytraRange", 3.1f, 1f, 6.0f, v -> elytra.getValue());
+    public final Setting<Float> elytraWallRange = new Setting<>("ElytraThroughWallsRange", 3.1f, 0f, 6.0f,v -> elytra.getValue());
+    public final Setting<WallsBypass> wallsBypass = new Setting<>("WallsBypass", WallsBypass.Off, v -> getWallRange() > 0);
     public final Setting<Integer> fov = new Setting<>("FOV", 180, 1, 180);
     public final Setting<Mode> rotationMode = new Setting<>("RotationMode", Mode.Track);
     public final Setting<Integer> interactTicks = new Setting<>("InteractTicks", 3, 1, 10, v -> rotationMode.getValue() == Mode.Interact);
@@ -151,6 +154,13 @@ public final class Aura extends Module {
 
     public Aura() {
         super("Aura", Category.COMBAT);
+    }
+
+    private float getRange(){
+        return elytra.getValue() && mc.player.isFallFlying() ? elytraAttackRange.getValue() : attackRange.getValue();
+    }
+    private float getWallRange(){
+        return elytra.getValue() && mc.player.isFallFlying() ? elytraWallRange.getValue() : wallRange.getValue();
     }
 
     public void auraLogic() {
@@ -500,7 +510,7 @@ public final class Aura extends Module {
         if (targetVec == null)
             return;
 
-        pitchAcceleration = ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue() + aimRange.getValue(), attackRange.getValue() + aimRange.getValue(), rayTrace.getValue())
+        pitchAcceleration = ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, getRange() + aimRange.getValue(), getRange() + aimRange.getValue(), rayTrace.getValue())
                 ? aimedPitchStep.getValue() : pitchAcceleration < maxPitchStep.getValue() ? pitchAcceleration * pitchAccelerate.getValue() : maxPitchStep.getValue();
 
         float delta_yaw = wrapDegrees((float) wrapDegrees(Math.toDegrees(Math.atan2(targetVec.z - mc.player.getZ(), (targetVec.x - mc.player.getX()))) - 90) - rotationYaw) + (wallsBypass.is(WallsBypass.V2) && !ready && !mc.player.canSee(target) ? 20 : 0);
@@ -547,7 +557,7 @@ public final class Aura extends Module {
 
         if (!rotationMode.is(Mode.Grim))
             ModuleManager.rotations.fixRotation = rotationYaw;
-        lookingAtHitbox = ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), wallRange.getValue(), rayTrace.getValue());
+        lookingAtHitbox = ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, getRange(), getWallRange(), rayTrace.getValue());
     }
 
     public void onRender3D(MatrixStack stack) {
@@ -575,12 +585,12 @@ public final class Aura extends Module {
     }
 
     private float getSquaredRotateDistance() {
-        float dst = attackRange.getValue();
+        float dst = getRange();
         dst += aimRange.getValue();
         if ((mc.player.isFallFlying() || ModuleManager.elytraPlus.isEnabled()) && target != null) dst += 4f;
         if (ModuleManager.strafe.isEnabled()) dst += 4f;
         if (rotationMode.getValue() != Mode.Track || rayTrace.getValue() == RayTrace.OFF)
-            dst = attackRange.getValue();
+            dst = getRange();
 
         return dst * dst;
     }
@@ -649,12 +659,12 @@ public final class Aura extends Module {
         float[] rotation;
 
         // Если мы перестали смотреть на цель
-        if (!ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, attackRange.getValue(), wallRange.getValue(), rayTrace.getValue())) {
+        if (!ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, getRange(), getWallRange(), rayTrace.getValue())) {
             float[] rotation1 = PlayerManager.calcAngle(target.getPos().add(0, target.getEyeHeight(target.getPose()) / 2f, 0));
 
             // Проверяем видимость центра игрока
             if (PlayerUtility.squaredDistanceFromEyes(target.getPos().add(0, target.getEyeHeight(target.getPose()) / 2f, 0)) <= attackRange.getPow2Value()
-                    && ThunderHack.playerManager.checkRtx(rotation1[0], rotation1[1], attackRange.getValue(), 0, rayTrace.getValue())) {
+                    && ThunderHack.playerManager.checkRtx(rotation1[0], rotation1[1], getRange(), 0, rayTrace.getValue())) {
                 // наводим на центр
                 rotationPoint = new Vec3d(random(-0.1f, 0.1f), target.getEyeHeight(target.getPose()) / (random(1.8f, 2.5f)), random(-0.1f, 0.1f));
             } else {
@@ -671,7 +681,7 @@ public final class Aura extends Module {
                             if (PlayerUtility.squaredDistanceFromEyes(v1) > attackRange.getPow2Value()) continue;
 
                             rotation = PlayerManager.calcAngle(v1);
-                            if (ThunderHack.playerManager.checkRtx(rotation[0], rotation[1], attackRange.getValue(), 0, rayTrace.getValue())) {
+                            if (ThunderHack.playerManager.checkRtx(rotation[0], rotation[1], getRange(), 0, rayTrace.getValue())) {
                                 // Наводимся, если видим эту точку
                                 rotationPoint = new Vec3d(x1, y1, z1);
                                 break;
@@ -701,7 +711,7 @@ public final class Aura extends Module {
                         continue;
 
                     rotation = PlayerManager.calcAngle(new Vec3d(target.getX() + x1, target.getY() + y1, target.getZ() + z1));
-                    if (ThunderHack.playerManager.checkRtx(rotation[0], rotation[1], (float) Math.sqrt(getSquaredRotateDistance()), wallRange.getValue(), rayTrace.getValue())) {
+                    if (ThunderHack.playerManager.checkRtx(rotation[0], rotation[1], (float) Math.sqrt(getSquaredRotateDistance()), getWallRange(), rayTrace.getValue())) {
                         return true;
                     }
                 }
