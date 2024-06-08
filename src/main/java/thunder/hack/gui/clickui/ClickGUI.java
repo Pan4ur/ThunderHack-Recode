@@ -1,6 +1,7 @@
 package thunder.hack.gui.clickui;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
@@ -131,15 +132,19 @@ public class ClickGUI extends Screen {
             }
         }
     }
-
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-
         if (ModuleManager.clickGui.blur.getValue())
             applyBlur(delta);
 
         anyHovered = false;
 
+        ClickGui.Image image = ModuleManager.clickGui.image.getValue();
+
+        if(image != ClickGui.Image.None){
+            RenderSystem.setShaderTexture(0,image.file);
+            Render2DEngine.renderTexture(context.getMatrices(),image.pos[0],image.pos[1],image.size * ((float) image.fileWidth /image.fileHeight) ,image.size * ((float) image.fileHeight /image.fileWidth),0,0,image.fileWidth,image.fileHeight,image.fileWidth,image.fileHeight);
+        }
 
         if (closeAnimation <= 6) {
             windows.forEach(w -> {
@@ -147,6 +152,7 @@ public class ClickGUI extends Screen {
                 w.setY((float) (w.getY() + closeDirectionY * AnimationUtility.deltaTime()));
             });
         }
+
 
         if (Module.fullNullCheck())
             renderBackground(context, mouseX, mouseY, delta);
