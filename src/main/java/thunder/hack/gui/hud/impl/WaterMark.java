@@ -112,7 +112,7 @@ public class WaterMark extends HudElement {
         }
     }
     @Override
-    public void onUpdate () {
+    public void onUpdate() {
         textUtil.tick();
     }
 }

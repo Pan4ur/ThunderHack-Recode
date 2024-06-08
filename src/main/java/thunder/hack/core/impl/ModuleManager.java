@@ -323,6 +323,7 @@ public class ModuleManager implements IManager {
     }
 
     public void onRender2D(DrawContext context) {
+        if(mc.getDebugHud().shouldShowDebugHud() || mc.options.hudHidden) return;
         HudElement.anyHovered = false;
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender2D(context));
         if (!HudElement.anyHovered && !ClickGUI.anyHovered)
