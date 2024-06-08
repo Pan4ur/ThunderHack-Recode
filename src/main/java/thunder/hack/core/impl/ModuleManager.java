@@ -214,6 +214,8 @@ public class ModuleManager implements IManager {
     public static Tracers tracers = new Tracers();
     public static Parkour parkour = new Parkour();
     public static ClickTP clickTP = new ClickTP();
+    public static Companion companion = new Companion();
+    public static BadTrip badTrip = new BadTrip();
     public static BowPop bowPop = new BowPop();
     public static XCarry xCarry = new XCarry();
     public static Trails trails = new Trails();
@@ -252,8 +254,8 @@ public class ModuleManager implements IManager {
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
     public static RPC rpc = new RPC();
-    public static BadTrip badTrip = new BadTrip();
-    public static Companion companion = new Companion();
+
+
     public ModuleManager() {
         for (Field field : getClass().getDeclaredFields()) {
             if (Module.class.isAssignableFrom(field.getType())) {
