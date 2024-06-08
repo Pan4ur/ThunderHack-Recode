@@ -31,23 +31,23 @@ public class WaterMark extends HudElement {
     private final Identifier logo = new Identifier("thunderhack", "textures/hud/icons/mini_logo.png");
     private final Identifier player = new Identifier("thunderhack", "textures/gui/headers/player.png");
     private final Identifier server = new Identifier("thunderhack", "textures/hud/icons/server.png");
-
+    private final Identifier baltika = new Identifier("thunderhack", "textures/hud/icons/baltika.png");
 
     private final TextUtil textUtil = new TextUtil(
-                    "ТандерХак",
-                    "ГромХак",
-                    "ГрозаКлиент",
-                    "ТандерХуй",
-                    "ТандерХряк",
-                    "ТандерХрюк",
-                    "ТиндерХак",
-                    "ТундраХак",
-                    "ГромВзлом"
+            "ТандерХак",
+            "ГромХак",
+            "ГрозаКлиент",
+            "ТандерХуй",
+            "ТандерХряк",
+            "ТандерХрюк",
+            "ТиндерХак",
+            "ТундраХак",
+            "ГромВзлом"
     );
 
 
     private enum Mode {
-        Big, Small, Classic
+        Big, Small, Classic, BaltikaClient
     }
 
     public void onRender2D(DrawContext context) {
@@ -60,12 +60,12 @@ public class WaterMark extends HudElement {
             FontRenderers.monsterrat.drawGradientString(context.getMatrices(), "recode", getPosX() + 35.5f, getPosY() + 21f, 1);
             setBounds(getPosX(), getPosY(), 106, 30);
         } else if (mode.getValue() == Mode.Small) {
-            if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+            if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
                 float offset1 = FontRenderers.sf_bold.getStringWidth(username) + 72;
                 float offset2 = FontRenderers.sf_bold.getStringWidth((mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address));
 
-                Render2DEngine.drawRoundedBlur(context.getMatrices(), getPosX(), getPosY(), 50f, 15f, 3, HudEditor.blurColor.getValue().getColorObject());
-                Render2DEngine.drawRoundedBlur(context.getMatrices(), getPosX() + 55, getPosY(), offset1 + offset2 - 36, 15f, 3,  HudEditor.blurColor.getValue().getColorObject());
+                Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX(), getPosY(), 50f, 15f, 3, HudEditor.blurColor.getValue().getColorObject());
+                Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX() + 55, getPosY(), offset1 + offset2 - 36, 15f, 3, HudEditor.blurColor.getValue().getColorObject());
 
                 Render2DEngine.setupRender();
 
@@ -73,7 +73,7 @@ public class WaterMark extends HudElement {
 
                 FontRenderers.sf_bold.drawGradientString(context.getMatrices(), "Recode", getPosX() + 18, getPosY() + 5, 20);
                 RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-                RenderSystem.setShaderTexture(0,  logo);
+                RenderSystem.setShaderTexture(0, logo);
                 Render2DEngine.renderGradientTexture(context.getMatrices(), getPosX() + 1, getPosY() + 2, 11, 11, 0, 0, 128, 128, 128, 128,
                         HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
 
@@ -82,7 +82,7 @@ public class WaterMark extends HudElement {
                         HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
 
                 RenderSystem.setShaderTexture(0, server);
-                Render2DEngine.renderGradientTexture(context.getMatrices(), getPosX() + offset1, getPosY() + 2, 10, 10, 0, 0,128, 128, 128, 128,
+                Render2DEngine.renderGradientTexture(context.getMatrices(), getPosX() + offset1, getPosY() + 2, 10, 10, 0, 0, 128, 128, 128, 128,
                         HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
                 Render2DEngine.endRender();
 
@@ -100,14 +100,20 @@ public class WaterMark extends HudElement {
                 FontRenderers.sf_bold.drawString(context.getMatrices(), info, getPosX() + 2 + FontRenderers.sf_bold.getStringWidth("ThunderHack "), getPosY() + 2.5f, HudEditor.textColor.getValue().getColor());
                 setBounds(getPosX(), getPosY(), width, 10);
             }
+
+        }else if (mode.getValue() == Mode.BaltikaClient) {
+            Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), 100, 64, HudEditor.hudRound.getValue());
+            context.drawTexture(baltika,  (int)getPosX(), (int)getPosY() + 2, 1, 1, 64, 64, 65, 64);
+            FontRenderers.thglitch.drawString(context.getMatrices(), "    BALTIKA", getPosX() + 23, getPosY() + 41.5, -1);
+            setBounds(getPosX(), getPosY(), 106, 30);
         } else {
             FontRenderers.monsterrat.drawGradientString(context.getMatrices(), "ThunderHack v" + ThunderHack.VERSION, getPosX() + 5.5f, getPosY() + 5, 10);
             setBounds(getPosX(), getPosY(), 100, 3);
         }
     }
-
     @Override
     public void onUpdate() {
         textUtil.tick();
     }
 }
+

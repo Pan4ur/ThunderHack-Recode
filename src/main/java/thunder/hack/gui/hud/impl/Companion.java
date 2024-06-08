@@ -19,21 +19,23 @@ import java.awt.*;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
-public class Paimon extends HudElement {
+public class Companion extends HudElement {
 
-    public Paimon() {
-        super("Paimon", 50, 10);
+    public Companion() {
+        super("2D Companion", 50, 10);
     }
 
+    private final Identifier BOYKISSER = new Identifier("thunderhack", "textures/hud/elements/boykisser.png");
     private final Identifier PAIMON = new Identifier("thunderhack", "textures/hud/elements/paimon.png");
+    private final Identifier BALTIKA = new Identifier("thunderhack", "textures/hud/elements/baltika.png");
 
     public Setting<Integer> scale = new Setting<>("Scale", 50, 0, 100);
+    public Setting<Mode> mode = new Setting<>("Mode", Mode.Boykisser);
 
     public static int currentFrame;
     private String message = "";
     private Timer lastPop = new Timer();
     private Timer frameRate = new Timer();
-
 
     @Override
     public void onUpdate() {
@@ -46,9 +48,9 @@ public class Paimon extends HudElement {
             else
                 message = player.getName().getString() + " popped " + (ThunderHack.combatManager.popList.get(player.getName().getString()) > 1 ? ThunderHack.combatManager.popList.get(player.getName().getString()) + "" + " totems and died EZ LMAO!" : "totem and died EZ LMAO!");
             lastPop.reset();
+
         }
     }
-
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
@@ -57,7 +59,12 @@ public class Paimon extends HudElement {
         context.getMatrices().translate((int) getPosX() + 100, (int) getPosY() + 100, 0);
         context.getMatrices().scale((float) scale.getValue() / 100f, (float) scale.getValue() / 100f, 1);
         context.getMatrices().translate(-((int) getPosX() + 100), -((int) getPosY() + 100), 0);
-        context.drawTexture(PAIMON, (int) getPosX(), (int) getPosY(), 0, currentFrame * 200, 200, 200, 200, 10600);
+        if(mode.getValue() == Mode.Boykisser)
+            context.drawTexture(BOYKISSER, (int) getPosX(), (int) getPosY(), 0, currentFrame * 128, 130, 128, 130, 6784);
+        else if(mode.getValue() == Mode.Paimon)
+            context.drawTexture(PAIMON, (int) getPosX(), (int) getPosY(), 0, currentFrame * 200, 200, 200, 200, 10600);
+        else if(mode.getValue() == Mode.Baltika)
+            context.drawTexture(BALTIKA, (int) getPosX(), (int) getPosY(), 0, 0, 421, 800, 421, 800);
         context.getMatrices().pop();
 
         if (!lastPop.passedMs(2000)) {
@@ -70,14 +77,16 @@ public class Paimon extends HudElement {
             Render2DEngine.popWindow();
         }
 
-        if (frameRate.passedMs(32)) {
+        if (frameRate.passedMs(64)) {
             frameRate.reset();
             currentFrame++;
             if (currentFrame > 52)
                 currentFrame = 0;
         }
-
-        setBounds(getPosX(), getPosY(), (scale.getValue() * 3f), (scale.getValue() * 3f));
+        if(mode.getValue() == Mode.Baltika)
+            setBounds(getPosX() + 100, getPosY() + 100, (scale.getValue() * 3f), (scale.getValue() * 3f));
+        else
+            setBounds(getPosX(), getPosY(), (scale.getValue() * 3f), (scale.getValue() * 3f));
     }
 
 
@@ -90,5 +99,8 @@ public class Paimon extends HudElement {
         else
             message = event.getEntity().getName().getString() + " popped " + (event.getPops() > 1 ? event.getPops() + "" + " totems!" : " a totem!");
         lastPop.reset();
+    }
+    private enum Mode{
+        Boykisser, Paimon, Baltika
     }
 }
