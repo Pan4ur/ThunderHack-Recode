@@ -31,8 +31,7 @@ public class WaterMark extends HudElement {
     private final Identifier logo = new Identifier("thunderhack", "textures/hud/icons/mini_logo.png");
     private final Identifier player = new Identifier("thunderhack", "textures/gui/headers/player.png");
     private final Identifier server = new Identifier("thunderhack", "textures/hud/icons/server.png");
-    private final Identifier baltika = new Identifier("thunderhack", "textures/hud/icons/baltika9.png");
-
+    private final Identifier baltika = new Identifier("thunderhack", "textures/hud/icons/baltika.png");
 
     private final TextUtil textUtil = new TextUtil(
             "ТандерХак",

@@ -25,9 +25,10 @@ public class Companion extends HudElement {
         super("2D Companion", 50, 10);
     }
 
-    private final Identifier BOYKISSER = new Identifier("thunderhack", "textures/hud/elements/cute_furry_boy.png");
+    private final Identifier BOYKISSER = new Identifier("thunderhack", "textures/hud/elements/boykisser.png");
     private final Identifier PAIMON = new Identifier("thunderhack", "textures/hud/elements/paimon.png");
-    private final Identifier BALTIKA = new Identifier("thunderhack", "textures/hud/elements/baltika9.png");
+    private final Identifier BALTIKA = new Identifier("thunderhack", "textures/hud/elements/baltika.png");
+
     public Setting<Integer> scale = new Setting<>("Scale", 50, 0, 100);
     public Setting<Mode> mode = new Setting<>("Mode", Mode.Boykisser);
 
@@ -35,7 +36,6 @@ public class Companion extends HudElement {
     private String message = "";
     private Timer lastPop = new Timer();
     private Timer frameRate = new Timer();
-
 
     @Override
     public void onUpdate() {
@@ -52,9 +52,6 @@ public class Companion extends HudElement {
         }
     }
 
-
-
-    //
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
 
