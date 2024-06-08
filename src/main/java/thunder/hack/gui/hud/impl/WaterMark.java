@@ -63,9 +63,9 @@ public class WaterMark extends HudElement {
             if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
                 float offset1 = FontRenderers.sf_bold.getStringWidth(username) + 72;
                 float offset2 = FontRenderers.sf_bold.getStringWidth((mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address));
-
-                Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX(), getPosY(), 50f, 15f, 3, HudEditor.blurColor.getValue().getColorObject());
-                Render2DEngine.drawBlurredShadow(context.getMatrices(), getPosX() + 55, getPosY(), offset1 + offset2 - 36, 15f, 3, HudEditor.blurColor.getValue().getColorObject());
+                
+                Render2DEngine.drawRoundedBlur(context.getMatrices(), getPosX(), getPosY(), 50f, 15f, 3, HudEditor.blurColor.getValue().getColorObject());
+                Render2DEngine.drawRoundedBlur(context.getMatrices(), getPosX() + 55, getPosY(), offset1 + offset2 - 36, 15f, 3,  HudEditor.blurColor.getValue().getColorObject());
 
                 Render2DEngine.setupRender();
 
