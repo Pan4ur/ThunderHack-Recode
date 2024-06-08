@@ -59,7 +59,6 @@ public class FriendsWindow extends WindowBase {
         if (friendPlates.isEmpty()) {
             FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), isRu() ? "Тут пока пусто" : "It's empty here yet",
                     getX() + getWidth() / 2f, getY() + getHeight() / 2f, new Color(0xBDBDBD).getRGB());
-            return;
         }
 
         String blink2 = (System.currentTimeMillis() / 240) % 2 == 0 ? "" : "l";
@@ -100,7 +99,7 @@ public class FriendsWindow extends WindowBase {
             FontRenderers.icons.drawString(context.getMatrices(), "w", getX() + getWidth() - 15, friendPlate.offset + getY() + 40 + getScrollOffset(), -1);
             FontRenderers.sf_medium_mini.drawString(context.getMatrices(), id + ".", getX() + 3, friendPlate.offset + getY() + 41 + getScrollOffset(), textColor);
         }
-
+        setMaxElementsHeight(friendPlates.size() * 20);
         Render2DEngine.popWindow();
     }
 

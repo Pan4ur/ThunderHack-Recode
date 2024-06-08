@@ -3,6 +3,7 @@ package thunder.hack.gui.windows;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import thunder.hack.modules.Module;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +25,9 @@ public class WindowsScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         //   super.render(context, mouseX, mouseY, delta);
+        if (Module.fullNullCheck())
+            renderBackground(context, mouseX, mouseY, delta);
+
         windows.forEach(w -> {
             if (w != lastClickedWindow)
                 w.render(context, mouseX, mouseY);

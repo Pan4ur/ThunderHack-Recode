@@ -60,6 +60,7 @@ public class Trajectories extends Module {
 
     @Override
     public void onRender3D(MatrixStack stack) {
+        if(mc.options.hudHidden) return;
         if (mc.player == null || mc.world == null || !mc.options.getPerspective().isFirstPerson())
             return;
         Hand hand;

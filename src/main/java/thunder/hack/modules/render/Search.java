@@ -1,24 +1,27 @@
 package thunder.hack.modules.render;
 
-import net.minecraft.block.BarrierBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.CommandBlock;
+import com.google.common.collect.Lists;
+import net.minecraft.block.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
+import thunder.hack.gui.hud.impl.FpsCounter;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.ItemSelectSetting;
-import thunder.hack.utility.math.FrameRateCounter;
+import thunder.hack.utility.Timer;
+import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.ArrayList;
-import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
@@ -26,15 +29,21 @@ public class Search extends Module {
 
 
     public final Setting<ItemSelectSetting> selectedBlocks = new Setting<>("SelectedBlocks", new ItemSelectSetting(new ArrayList<>()));
-    public static CopyOnWriteArrayList<BlockVec> blocks = new CopyOnWriteArrayList<>();
+    public static ArrayList<BlockVec> blocks = new ArrayList<>();
     private final Setting<Integer> range = new Setting<>("Range", 100, 1, 128);
+    private final Setting<Integer> limit = new Setting<>("Limit", 50, 1, 2048);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0xFF00FFFF));
     private final Setting<Boolean> illegals = new Setting<>("Illegals", true);
     private final Setting<Boolean> tracers = new Setting<>("Tracers", false);
     private final Setting<Boolean> fill = new Setting<>("Fill", true);
     private final Setting<Boolean> outline = new Setting<>("Outline", true);
 
-    private SearchThread searchThread = new SearchThread();
+
+    private final ExecutorService searchThread = Executors.newSingleThreadExecutor();
+    private final Timer searchTimer = new Timer();
+    private long lastFrameTime;
+    private boolean canContinue;
+
 
     public Search() {
         super("Search", Category.RENDER);
@@ -43,80 +52,82 @@ public class Search extends Module {
     @Override
     public void onEnable() {
         blocks.clear();
-        searchThread = new SearchThread();
-        searchThread.setName("ThunderHack-SearchThread");
-        searchThread.setDaemon(true);
-        searchThread.start();
-    }
-
-    @Override
-    public void onDisable() {
-        searchThread.interrupt();
+        lastFrameTime = System.currentTimeMillis();
+        canContinue = true;
     }
 
     @Override
     public void onUpdate() {
-        if (!searchThread.isAlive()) {
-            searchThread = new SearchThread();
-            searchThread.setName("ThunderHack-SearchThread");
-            searchThread.setDaemon(true);
-            searchThread.start();
+        if (searchTimer.every(1000) && canContinue) {
+            CompletableFuture.supplyAsync(this::scan, searchThread).thenAcceptAsync(this::sync, Util.getMainWorkerExecutor());
+            canContinue = false;
         }
+    }
+
+    private ArrayList<BlockVec> scan() {
+        ArrayList<BlockVec> bloks = new ArrayList<>();
+        for (int x = (int) Math.floor(mc.player.getX() - range.getValue()); x <= Math.ceil(mc.player.getX() + range.getValue()); x++)
+            for (int y = mc.world.getBottomY() + 1; y <= mc.world.getTopY(); y++)
+                for (int z = (int) Math.floor(mc.player.getZ() - range.getValue()); z <= Math.ceil(mc.player.getZ() + range.getValue()); z++) {
+                    BlockPos pos = new BlockPos(x, y, z);
+                    BlockState bs = mc.world.getBlockState(pos);
+                    if (shouldAdd(bs.getBlock(), pos)) {
+                        bloks.add(new BlockVec(pos.getX(), pos.getY(), pos.getZ()));
+                    }
+                }
+        return bloks;
+    }
+
+    private void sync(ArrayList<BlockVec> b) {
+        blocks = b;
+        canContinue = true;
     }
 
     public void onRender3D(MatrixStack stack) {
         if (fullNullCheck() || blocks.isEmpty()) return;
-        if (FrameRateCounter.INSTANCE.getFps() < 10 && mc.player.age > 100)
+        int count = 0;
+
+        if (mc.getCurrentFps() < 8 && mc.player.age > 100) {
             disable(isRu() ? "Спасаем твой ПК :)" : "Saving ur pc :)");
+            return;
+        }
 
         if (fill.getValue() || outline.getValue()) {
-            for (BlockVec vec : blocks) {
-                if (vec.getDistance(new BlockVec(mc.player.getX(), mc.player.getY(), mc.player.getZ())) > range.getValue() || !shouldRender(vec)) {
+            for (BlockVec vec : Lists.newArrayList(blocks)) {
+                if(count > limit.getValue())
+                    continue;
+
+                if (vec.getDistance(mc.player.getPos()) > range.getPow2Value()) {
                     blocks.remove(vec);
                     continue;
                 }
 
-                BlockPos pos = new BlockPos((int) vec.x, (int) vec.y, (int) vec.z);
+                Box b = new Box(vec.x, vec.y, vec.z, vec.x + 1, vec.y + 1, vec.z + 1);
 
                 if (fill.getValue())
-                    Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(new Box(pos), color.getValue().getColorObject()));
+                    Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(b, color.getValue().getColorObject()));
 
                 if (outline.getValue())
-                    Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(new Box(pos), color.getValue().getColorObject(), 2f));
-            }
-        }
+                    Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(b, color.getValue().getColorObject(), 2f));
 
-        if (tracers.getValue()) {
-            for (BlockVec vec : blocks) {
-                if (vec.getDistance(new BlockVec(mc.player.getX(), mc.player.getY(), mc.player.getZ())) > range.getValue() || !shouldRender(vec)) {
-                    blocks.remove(vec);
-                    continue;
+                if (tracers.getValue()) {
+                    Vec3d vec2 = new Vec3d(0, 0, 75)
+                            .rotateX(-(float) Math.toRadians(mc.gameRenderer.getCamera().getPitch()))
+                            .rotateY(-(float) Math.toRadians(mc.gameRenderer.getCamera().getYaw()))
+                            .add(mc.cameraEntity.getEyePos());
+
+                    Render3DEngine.drawLineDebug(vec2, vec.getVector(), color.getValue().getColorObject());
                 }
-
-                Vec3d vec2 = new Vec3d(0, 0, 75)
-                        .rotateX(-(float) Math.toRadians(mc.gameRenderer.getCamera().getPitch()))
-                        .rotateY(-(float) Math.toRadians(mc.gameRenderer.getCamera().getYaw()))
-                        .add(mc.cameraEntity.getEyePos());
-
-                Render3DEngine.drawLineDebug(vec2, vec.getVector(), color.getValue().getColorObject());
+                count++;
             }
         }
+        lastFrameTime = System.currentTimeMillis();
     }
 
     private boolean shouldAdd(Block block, BlockPos pos) {
+        if(block instanceof AirBlock) return false;
         if (selectedBlocks.getValue().contains(block)) return true;
         if (illegals.getValue()) return isIllegal(block, pos);
-        return false;
-    }
-
-    private boolean shouldRender(@NotNull BlockVec vec) {
-        if (selectedBlocks.getValue().contains(mc.world.getBlockState(new BlockPos((int) vec.x, (int) vec.y, (int) vec.z)).getBlock())) {
-            return true;
-        }
-
-        if (illegals.getValue())
-            return isIllegal(mc.world.getBlockState(new BlockPos((int) vec.x, (int) vec.y, (int) vec.z)).getBlock(), new BlockPos((int) vec.x, (int) vec.y, (int) vec.z));
-
         return false;
     }
 
@@ -124,59 +135,24 @@ public class Search extends Module {
         if (block instanceof CommandBlock || block instanceof BarrierBlock) return true;
 
         if (block == Blocks.BEDROCK) {
-            if (!isHell()) {
+            if (!PlayerUtility.isInHell())
                 return pos.getY() > 4;
-            } else {
+            else
                 return pos.getY() > 127 || (pos.getY() < 123 && pos.getY() > 4);
-            }
         }
         return false;
     }
 
-    public boolean isHell() {
-        if (mc.world == null) return false;
-        return Objects.equals(mc.world.getRegistryKey().getValue().getPath(), "the_nether");
-    }
-
-    private record BlockVec(double x, double y, double z) {
-        public double getDistance(@NotNull BlockVec v) {
+    public record BlockVec(double x, double y, double z) {
+        public double getDistance(@NotNull Vec3d v) {
             double dx = x - v.x;
             double dy = y - v.y;
             double dz = z - v.z;
-
-            return Math.sqrt(dx * dx + dy * dy + dz * dz);
+            return dx * dx + dy * dy + dz * dz;
         }
 
         public Vec3d getVector() {
             return new Vec3d(x + 0.5f, y + 0.5f, z + 0.5f);
-        }
-    }
-
-    public class SearchThread extends Thread {
-        @Override
-        public void run() {
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    if (!Module.fullNullCheck()) {
-                        ArrayList<BlockVec> bloks = new ArrayList<>();
-                        for (int x = (int) Math.floor(mc.player.getX() - range.getValue()); x <= Math.ceil(mc.player.getX() + range.getValue()); x++) {
-                            for (int y = mc.world.getBottomY() + 1; y <= mc.world.getTopY(); y++) {
-                                for (int z = (int) Math.floor(mc.player.getZ() - range.getValue()); z <= Math.ceil(mc.player.getZ() + range.getValue()); z++) {
-                                    BlockPos pos = new BlockPos(x, y, z);
-                                    if (mc.world.isAir(pos)) continue;
-                                    if (shouldAdd(mc.world.getBlockState(pos).getBlock(), pos)) {
-                                        bloks.add(new BlockVec(pos.getX(), pos.getY(), pos.getZ()));
-                                    }
-                                }
-                            }
-                        }
-
-                        blocks.clear();
-                        blocks.addAll(bloks);
-                    } else Thread.yield();
-                } catch (Exception ignored) {
-                }
-            }
         }
     }
 }

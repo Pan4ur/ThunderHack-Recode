@@ -3,10 +3,9 @@ package thunder.hack.gui.windows;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Colors;
-import thunder.hack.cmd.Command;
-import thunder.hack.core.impl.CombatManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
@@ -16,9 +15,18 @@ import java.awt.*;
 import static thunder.hack.core.IManager.mc;
 
 public class WindowBase {
-    private float x, y, width, height, dragX, dragY, scrollOffset, prevScrollOffset;
+    private float x;
+    private float y;
+    private float width;
+    private float height;
+    private float dragX;
+    private float dragY;
+    private float scrollOffset;
+    private float prevScrollOffset;
+
+    private float maxElementsHeight;
     private final String name;
-    private boolean mouseState, dragging, hoveringWindow, scaling;
+    private boolean dragging, hoveringWindow, scaling, scrolling;
 
     protected WindowBase(float x, float y, float width, float height, String name) {
         setX(x);
@@ -34,20 +42,23 @@ public class WindowBase {
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        Render2DEngine.drawHudBase(context.getMatrices(), x, y, width, height, 1, false);
-        Render2DEngine.drawRectWithOutline(context.getMatrices(), x + 0.5f, y, width - 1, 16, new Color(0x5F000000, true), color2);
+        Render2DEngine.drawHudBase(context.getMatrices(), x, y, width + 10, height, 1, false);
+        Render2DEngine.drawRect(context.getMatrices(), x + 0.5f, y, width + 9, 16, new Color(0x5F000000, true));
         Render2DEngine.horizontalGradient(context.getMatrices(), x + 2, y + 16f, x + 2 + width / 2f - 2, y + 16.5f, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
         Render2DEngine.horizontalGradient(context.getMatrices(), x + 2 + width / 2f - 2, y + 16f, x + 2 + width - 4, y + 16.5f, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
         FontRenderers.sf_medium.drawString(context.getMatrices(), name, x + 4, y + 5.5f, -1);
-        boolean hover1 = Render2DEngine.isHovered(mouseX, mouseY, x + width - 14, y + 3, 10, 10);
-        Render2DEngine.drawRectWithOutline(context.getMatrices(), x + width - 14, y + 3, 10, 10, hover1 ? new Color(0xC5777777, true) : new Color(0xC5575757, true), color2);
+        boolean hover1 = Render2DEngine.isHovered(mouseX, mouseY, x + width - 4, y + 3, 10, 10);
+        Render2DEngine.drawRectWithOutline(context.getMatrices(), x + width - 4, y + 3, 10, 10, hover1 ? new Color(0xC5777777, true) : new Color(0xC5575757, true), color2);
 
-        Render2DEngine.drawLine(x + width - 12, y + 5, x + width - 6, y + 11, Colors.WHITE);
-        Render2DEngine.drawLine(x + width - 12, y + 11, x + width - 6, y + 5, Colors.WHITE);
+        float ratio = (getHeight() - 35) / maxElementsHeight;
+
+        boolean hover2 = Render2DEngine.isHovered(mouseX, mouseY, x + width, y + 19, 6, getHeight() - 34);
+        Render2DEngine.drawRectWithOutline(context.getMatrices(), x + width, y + 19, 6, getHeight() - 34, hover2 ? new Color(0x5F131313, true) : new Color(0x5F000000, true), color2);
+        Render2DEngine.drawRect(context.getMatrices(), x + width, Math.max(y + 19 - (scrollOffset * ratio), y + 19), 6, Math.min((getHeight() - 34) * ratio, getHeight() - 34), new Color(0xA1313131, true));
+
+        Render2DEngine.drawLine(x + width - 2, y + 5, x + width + 4, y + 11, Colors.WHITE);
+        Render2DEngine.drawLine(x + width - 2, y + 11, x + width + 4, y + 5, Colors.WHITE);
         RenderSystem.disableBlend();
-
-        //  boolean hover2 = Render2DEngine.isHovered(mouseX, mouseY, x + width - 14, y + 3, 10, 10);
-        //  Render2DEngine.drawRect(context.getMatrices(), x + width - 7, y + 23, 4, height - 20, hover2 ? new Color(0xC5777777, true) : new Color(0xC5575757, true));
 
         if (dragging) {
             setX(Render2DEngine.scrollAnimate((normaliseX() - dragX), getX(), .15f));
@@ -55,15 +66,20 @@ public class WindowBase {
         }
 
         if (scaling) {
-            setWidth(Math.max(Render2DEngine.scrollAnimate((normaliseX() - dragX), getWidth(), .15f), 150));
-            setHeight(Math.max(Render2DEngine.scrollAnimate((normaliseY() - dragY), getHeight(), .15f), 150));
+            setWidth(Math.max(Render2DEngine.scrollAnimate((normaliseX() - dragX), getWidth(), .15f), getMinWidth()));
+            setHeight(Math.max(Render2DEngine.scrollAnimate((normaliseY() - dragY), getHeight(), .15f), getMinHeight()));
+        }
+
+        if (scrolling) {
+            float diff = ((float) mouseY - y - 19) / (getHeight() - 34);
+            scrollOffset =  -(diff * maxElementsHeight);
+            scrollOffset = MathUtility.clamp(scrollOffset, -maxElementsHeight + (getHeight() - 40), 0);
         }
 
         hoveringWindow = Render2DEngine.isHovered(mouseX, mouseY, getX(), getY(), getWidth(), getHeight());
 
-        Render2DEngine.drawLine(getX() + getWidth() - 10,getY() + getHeight() - 3, getX() + getWidth() - 3, getY() + getHeight() - 10, color2.getRGB());
-        Render2DEngine.drawLine(getX() + getWidth() - 5,getY() + getHeight() - 3, getX() + getWidth() - 3, getY() + getHeight() - 5, color2.getRGB());
-
+        Render2DEngine.drawLine(getX() + getWidth(), getY() + getHeight() - 3, getX() + getWidth() + 7, getY() + getHeight() - 10, color2.getRGB());
+        Render2DEngine.drawLine(getX() + getWidth() + 5, getY() + getHeight() - 3, getX() + getWidth() + 7, getY() + getHeight() - 5, color2.getRGB());
     }
 
     protected void mouseClicked(double mouseX, double mouseY, int button) {
@@ -77,13 +93,22 @@ public class WindowBase {
             WindowsScreen.lastClickedWindow = this;
             dragX = (int) (mouseX - getX());
             dragY = (int) (mouseY - getY());
+            return;
         }
 
-        if (Render2DEngine.isHovered(mouseX, mouseY, x + width - 10, y + height - 10, 10, 10)) {
+        if (Render2DEngine.isHovered(mouseX, mouseY, x + width, y + height - 10, 10, 10)) {
             WindowsScreen.lastClickedWindow = this;
             dragX = (int) (mouseX - getWidth());
             dragY = (int) (mouseY - getHeight());
             scaling = true;
+            return;
+        }
+
+        if (Render2DEngine.isHovered(mouseX, mouseY, x + width, y + 19, 6, getHeight() - 34)) {
+            WindowsScreen.lastClickedWindow = this;
+            dragX = (int) (mouseX - getWidth());
+            dragY = (int) (mouseY - getHeight());
+            scrolling = true;
         }
     }
 
@@ -96,13 +121,14 @@ public class WindowBase {
     protected void mouseScrolled(int i) {
         if (hoveringWindow) {
             scrollOffset += i * 2;
-            scrollOffset = Math.min(scrollOffset, 0);
+            scrollOffset = MathUtility.clamp(scrollOffset, -maxElementsHeight + (getHeight() - 40), 0);
         }
     }
 
     public void mouseReleased(double mouseX, double mouseY, int button) {
         dragging = false;
         scaling = false;
+        scrolling = false;
         WindowsScreen.draggingWindow = null;
     }
 
@@ -153,5 +179,17 @@ public class WindowBase {
     protected void resetScroll() {
         prevScrollOffset = 0;
         scrollOffset = 0;
+    }
+
+    protected int getMinWidth() {
+        return 150;
+    }
+
+    protected int getMinHeight() {
+        return 150;
+    }
+
+    protected void setMaxElementsHeight(float maxElementsHeight) {
+        this.maxElementsHeight = maxElementsHeight;
     }
 }

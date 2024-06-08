@@ -41,6 +41,7 @@ public class ModuleButton extends AbstractButton {
     private boolean hovered, prevHovered;
     private float animation, animation2;
     float category_animation = 0f;
+    int ticksOpened;
 
     private final Identifier Gear = new Identifier("thunderhack", "textures/gui/headers/client.png");
     private final GearAnimation gearAnimation = new GearAnimation();
@@ -158,7 +159,7 @@ public class ModuleButton extends AbstractButton {
             }
 
             context.getMatrices().push();
-            TargetHud.sizeAnimation(context.getMatrices(), x + width / 2f + 6, y + height / 2f - 12, Math.clamp(category_animation / offsetY, 0f, 1f));
+            TargetHud.sizeAnimation(context.getMatrices(), x + width / 2f + 6, y + height / 2f - 12, ticksOpened < 5 ? Math.clamp(category_animation / offsetY, 0f, 1f) : 1f);
             elements.forEach(e -> {
                 if (e.isVisible())
                     e.render(context, mouseX, mouseY, delta);
@@ -365,7 +366,11 @@ public class ModuleButton extends AbstractButton {
     }
 
     public void tick() {
-        if (isOpen())
+        if (isOpen()) {
             gearAnimation.tick();
+            ticksOpened++;
+        } else {
+            ticksOpened = 0;
+        }
     }
 }

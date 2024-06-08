@@ -14,7 +14,7 @@ public class FrameRateCounter {
         long c = System.currentTimeMillis();
         records.add(c);
         records.removeIf(aLong -> aLong + 1000 < System.currentTimeMillis());
-        fps = Math.max(records.size(), 5);
+        fps = Math.max(records.size(), 4);
     }
 
     public int getFps() {

@@ -13,6 +13,7 @@ import thunder.hack.core.impl.WayPointManager;
 import thunder.hack.modules.client.ClientSettings;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static thunder.hack.modules.Module.mc;
 
 public class WayPointCommand extends Command {
     public WayPointCommand() {
@@ -26,7 +27,7 @@ public class WayPointCommand extends Command {
             else sendMessage("WayPoints:");
 
             sendMessage(" ");
-            ThunderHack.wayPointManager.getWayPoints().forEach(wp -> sendMessage(wp.name() + "X: " + wp.x() + " Y: " + wp.y() + " Z: " + wp.z() + " Server: " + wp.server()));
+            ThunderHack.wayPointManager.getWayPoints().forEach(wp -> sendMessage(wp.getName() + " X: " + wp.getX() + " Y: " + wp.getY() + " Z: " + wp.getZ() + " Server: " + wp.getServer() + " Dimension: " + wp.getDimension()));
 
             return SINGLE_SUCCESS;
         }));
@@ -37,9 +38,9 @@ public class WayPointCommand extends Command {
             ThunderHack.wayPointManager.removeWayPoint(wp);
 
             if (ClientSettings.language.getValue() == ClientSettings.Language.RU) {
-                sendMessage("Удалена метка " + wp.name());
+                sendMessage("Удалена метка " + wp.getName());
             } else {
-                sendMessage("Removed waypoint " + wp.name());
+                sendMessage("Removed waypoint " + wp.getName());
             }
 
             return SINGLE_SUCCESS;
@@ -47,7 +48,7 @@ public class WayPointCommand extends Command {
 
         builder.then(literal("add").then(arg("name", StringArgumentType.word()).executes(context -> {
             String name = context.getArgument("name", String.class);
-            WayPointManager.WayPoint wp = new WayPointManager.WayPoint((int) mc.player.getX(), (int) mc.player.getY(), (int) mc.player.getZ(), name, (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address));
+            WayPointManager.WayPoint wp = new WayPointManager.WayPoint((int) mc.player.getX(), (int) mc.player.getY(), (int) mc.player.getZ(), name, (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address), mc.world.getRegistryKey().getValue().getPath());
             ThunderHack.wayPointManager.addWayPoint(wp);
 
             if (ClientSettings.language.getValue() == ClientSettings.Language.RU) {
@@ -63,7 +64,7 @@ public class WayPointCommand extends Command {
                             String name = context.getArgument("name", String.class);
                             BlockPos pos = new BlockPos(context.getArgument("x", Integer.class), context.getArgument("y", Integer.class), context.getArgument("z", Integer.class));
 
-                            WayPointManager.WayPoint wp = new WayPointManager.WayPoint(pos.getX(), pos.getY(), pos.getZ(), name, (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address));
+                            WayPointManager.WayPoint wp = new WayPointManager.WayPoint(pos.getX(), pos.getY(), pos.getZ(), name, (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address), mc.world.getRegistryKey().getValue().getPath());
                             ThunderHack.wayPointManager.addWayPoint(wp);
 
                             if (ClientSettings.language.getValue() == ClientSettings.Language.RU) {
@@ -73,7 +74,7 @@ public class WayPointCommand extends Command {
                             }
 
                             return SINGLE_SUCCESS;
-                        })))))); // macro remove. // eclip bedrock // waypoints
+                        }))))));
 
         builder.executes(context -> {
             sendMessage(usage());

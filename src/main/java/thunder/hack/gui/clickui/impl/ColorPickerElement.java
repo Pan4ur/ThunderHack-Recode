@@ -49,7 +49,7 @@ public class ColorPickerElement extends AbstractElement {
 
         boolean colorHovered = Render2DEngine.isHovered(mouseX, mouseY, x, y + 5f, 90, 7);
 
-        FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), x + 6, (int) y + 8, new Color(-1).getRGB());
+        FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), x + 6, y + 8, new Color(-1).getRGB());
 
         Render2DEngine.drawBlurredShadow(matrixStack, x + width - 22f, y + 5f, 14, 7, colorHovered ? 6 : 10, getColorSetting().getColorObject());
         if (colorHovered)

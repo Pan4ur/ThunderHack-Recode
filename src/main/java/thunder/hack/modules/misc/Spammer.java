@@ -94,7 +94,7 @@ public class Spammer extends Module {
     private void changeFact(){
         ThunderHack.asyncManager.run(() -> {
             try{
-                String jsonResponse = IOUtils.toString(new URL("https://catfact.ninja/fact?max_length=256"), StandardCharsets.UTF_8);
+                String jsonResponse = IOUtils.toString(new URL("https://catfact.ninja/fact?max_length=200"), StandardCharsets.UTF_8);
                 JsonObject jsonObject = new JsonParser().parse(jsonResponse).getAsJsonObject();
                 fact = jsonObject.get("fact").getAsString();
             }catch (IOException e){
@@ -131,7 +131,7 @@ public class Spammer extends Module {
                 } else mc.player.networkHandler.sendChatMessage(global.getValue() ? "!" + c : c);
             }else{
                 try{
-                    String prefix = whisper_prefix.getValue() == WhisperPrefix.W ? "w " : "msg ";
+                    String prefix = whisper_prefix.getValue().prefix;
                     mc.player.networkHandler.sendCommand(prefix + getPlayerName() + " " + c);
                 }catch (NullPointerException e){}
             }
@@ -141,5 +141,14 @@ public class Spammer extends Module {
     }
     private enum Messages{File,CatFacts}
     private enum Mode{Chat,Whispers}
-    private enum WhisperPrefix {W,Msg}
+    private enum WhisperPrefix {
+        W("w "),
+        Msg("msg "),
+        Tell("tell ");
+
+        final String prefix;
+        WhisperPrefix(String p) {
+            prefix = p;
+        }
+    }
 }

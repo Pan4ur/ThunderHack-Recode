@@ -14,6 +14,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
@@ -51,7 +52,6 @@ public final class Surround extends PlaceModule {
         if (mc.player == null) return;
 
         delay = 0;
-        wasTp = false;
         prevY = mc.player.getY();
 
         // Centering
@@ -70,12 +70,11 @@ public final class Surround extends PlaceModule {
     @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onTick(EventTick event) {
-        if (prevY != mc.player.getY() && onYChange.getValue() && !wasTp) {
+        if (prevY != mc.player.getY() && onYChange.getValue() && ThunderHack.core.getSetBackTime() > 500) {
             disable(isRu() ? "Отключён из-за изменения Y!" : "Disabled due to Y change!");
             return;
         }
 
-        if (wasTp && mc.player.isOnGround()) wasTp = false;
         prevY = mc.player.getY();
 
         Vec3d centerVec = new Vec3d(MathHelper.floor(mc.player.getX()) + 0.5, mc.player.getY(), MathHelper.floor(mc.player.getZ()) + 0.5);
@@ -143,9 +142,8 @@ public final class Surround extends PlaceModule {
             handlePacket();
 
         if (event.getPacket() instanceof PlayerPositionLookS2CPacket)
-            switch (onTp.getValue()) {
-                case Disable -> disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to a rubberband!");
-                case Stay -> wasTp = true;
+            if (onTp.getValue() == OnTpAction.Disable) {
+                disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to a rubberband!");
             }
     }
 

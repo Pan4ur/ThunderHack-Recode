@@ -115,7 +115,7 @@ public class Tracker extends Module {
         int crystals = this.crystals.get() / 64;
         if (crystalStacks != crystals) {
             crystalStacks = crystals;
-            if (isRu()) sendMessage(Formatting.DARK_PURPLE + trackedPlayer.getName().getString() + Formatting.LIGHT_PURPLE + " used " + Formatting.WHITE + crystals + Formatting.LIGHT_PURPLE + (crystals == 1 ? " stack" : " stacks") + " of Crystals!");
+            if (!isRu()) sendMessage(Formatting.DARK_PURPLE + trackedPlayer.getName().getString() + Formatting.LIGHT_PURPLE + " used " + Formatting.WHITE + crystals + Formatting.LIGHT_PURPLE + (crystals == 1 ? " stack" : " stacks") + " of Crystals!");
             else sendMessage(Formatting.DARK_PURPLE + trackedPlayer.getName().getString() + Formatting.LIGHT_PURPLE + " использовал " + Formatting.WHITE + crystals + Formatting.LIGHT_PURPLE + (crystals == 1 ? " стак" : " стаков") + " Кристаллов!");
         }
     }

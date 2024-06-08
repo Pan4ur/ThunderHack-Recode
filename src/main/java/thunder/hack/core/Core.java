@@ -114,7 +114,7 @@ public final class Core {
     @EventHandler
     public void onSync(EventSync event) {
         if (fullNullCheck()) return;
-        ModuleManager.timer.onEntitySync(event);
+        ModuleManager.timer.onEntitySync();
     }
 
     public void onRender2D(DrawContext e) {

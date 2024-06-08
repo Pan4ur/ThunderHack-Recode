@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventMouse;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -12,6 +13,8 @@ import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+
+import java.awt.*;
 
 public class HudElement extends Module {
     private final Setting<PositionSetting> pos = new Setting<>("Position", new PositionSetting(0.5f, 0.5f));
@@ -33,10 +36,38 @@ public class HudElement extends Module {
 
         if (mc.currentScreen instanceof ChatScreen || mc.currentScreen instanceof HudEditorGui) {
             if (mouseButton && mouseState) {
+
                 pos.getValue().setX(MathUtility.clamp(Render2DEngine.scrollAnimate((normaliseX() - dragX) / mc.getWindow().getScaledWidth(), pos.getValue().getX(), .1f),
                         0, 1f));
                 pos.getValue().setY(MathUtility.clamp(Render2DEngine.scrollAnimate((normaliseY() - dragY) / mc.getWindow().getScaledHeight(), pos.getValue().getY(), .1f),
                         0, 1f - (height / mc.getWindow().getScaledHeight())));
+
+                float finalX = 0;
+                float finalY = 0;
+
+                for (Module m : ThunderHack.moduleManager.getEnabledModules())
+                    if (m instanceof HudElement hudElement && hudElement != this && !(hudElement.getPosX() == 0 && hudElement.getPosY() == 0)) {
+                        if(getPosX() > mc.getWindow().getScaledWidth() / 2f) {
+                            if (isNear(hudElement.getHitX() + hudElement.getWidth(), getHitX() + getWidth()))
+                                finalX = hudElement.getHitX() + hudElement.getWidth() - getWidth();
+
+                            if (isNear(hudElement.getHitY(), getHitY()))
+                                finalY = hudElement.getHitY() + hudElement.getHeight() - getHeight();
+
+                        } else {
+                            if (isNear(hudElement.getHitX(), getHitX())) finalX = hudElement.getHitX();
+                            if (isNear(hudElement.getHitY(), getHitY())) finalY = hudElement.getHitY();
+                        }
+                    }
+
+                if (finalX != 0 || finalY != 0)
+                    Render2DEngine.drawRound(context.getMatrices(), finalX == 0 ? getHitX() : finalX, finalY == 0 ? getHitY() : finalY, width, height, 3, new Color(0x7B2F2F2F, true));
+
+                if (finalX != 0)
+                    Render2DEngine.drawLine(finalX, 0, finalX, mc.getWindow().getScaledHeight(), -1);
+
+                if (finalY != 0)
+                    Render2DEngine.drawLine(0, finalY, mc.getWindow().getScaledWidth(), finalY, -1);
             }
         }
 
@@ -62,10 +93,33 @@ public class HudElement extends Module {
     @EventHandler
     @SuppressWarnings("unused")
     public void onMouse(@NotNull EventMouse event) {
-        if(event.getAction() == 0 && event.getButton() == 1 && isHovering() && mc.currentScreen instanceof HudEditorGui)
+        if (event.getAction() == 0 && event.getButton() == 1 && isHovering() && mc.currentScreen instanceof HudEditorGui)
             HudEditorGui.getHudGui().hudClicked(this);
 
         if (event.getAction() == 0) {
+
+            if (mouseButton && mouseState)
+                for (Module m : ThunderHack.moduleManager.getEnabledModules()) {
+                    if (m instanceof HudElement hudElement && hudElement != this && !(hudElement.getHitX() == 0 && hudElement.getHitY() == 0)) {
+
+                        float hitDifX = getPosX() - getHitX();
+                        float hitDifY = getPosY() - getHitY();
+
+                        if(getPosX() > mc.getWindow().getScaledWidth() / 2f) {
+                            if (isNear(hudElement.getHitX() + hudElement.getWidth(), getHitX() + getWidth()))
+                                pos.getValue().setX((hudElement.getHitX() + hitDifX + hudElement.getWidth() - getWidth()) / mc.getWindow().getScaledWidth());
+                            if (isNear(hudElement.getHitY(), getHitY()))
+                                pos.getValue().setY((hudElement.getHitY() + hitDifY + hudElement.getHeight() - getHeight()) / mc.getWindow().getScaledHeight());
+                        } else {
+                            if (isNear(hudElement.getHitX(), getHitX()))
+                                pos.getValue().setX((hudElement.getHitX() + hitDifX) / mc.getWindow().getScaledWidth());
+                            if (isNear(hudElement.getHitY(), getHitY()))
+                                pos.getValue().setY((hudElement.getHitY() + hitDifY) / mc.getWindow().getScaledHeight());
+                        }
+
+                    }
+                }
+
             HudEditorGui.currentlyDragging = null;
             mouseButton = false;
         }
@@ -114,6 +168,14 @@ public class HudElement extends Module {
         return x;
     }
 
+    public float getHitX() {
+        return hitX;
+    }
+
+    public float getHitY() {
+        return hitY;
+    }
+
     public float getPosY() {
         return y;
     }
@@ -124,5 +186,17 @@ public class HudElement extends Module {
 
     public float getY() {
         return pos.getValue().y;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    private boolean isNear(float n1, float n2) {
+        return Math.abs(n1 - n2) < 10;
     }
 }

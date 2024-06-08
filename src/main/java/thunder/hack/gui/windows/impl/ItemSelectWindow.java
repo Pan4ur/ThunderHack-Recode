@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -12,20 +13,18 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
+import thunder.hack.cmd.Command;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
-import thunder.hack.gui.windows.WindowsScreen;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ItemSelectSetting;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.client.ClientSettings.isRu;
@@ -50,12 +49,12 @@ public class ItemSelectWindow extends WindowBase {
 
         int id1 = 0;
         for (Block block : Registries.BLOCK) {
-            allItems.add(new ItemPlate(id1, id1 * 20, block.asItem()));
+            allItems.add(new ItemPlate(id1, id1 * 20, block.asItem(), block.getTranslationKey()));
             id1++;
         }
 
         for (Item item : Registries.ITEM) {
-            allItems.add(new ItemPlate(id1, id1 * 20, item));
+            allItems.add(new ItemPlate(id1, id1 * 20, item, item.getTranslationKey()));
             id1++;
         }
     }
@@ -92,13 +91,12 @@ public class ItemSelectWindow extends WindowBase {
         FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "Selected", getX() + 60, getY() + 25, tabColor2);
 
 
-        if(!allTab && itemPlates.isEmpty()) {
+        if (!allTab && itemPlates.isEmpty()) {
             FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), isRu() ? "Тут пока пусто" : "It's empty here yet",
                     getX() + getWidth() / 2f, getY() + getHeight() / 2f, new Color(0xBDBDBD).getRGB());
-            return;
         }
 
-        Render2DEngine.addWindow(context.getMatrices(), getX(), getY() + 35, getX() + getWidth(), getY() + getHeight() - 1, 1f);
+        Render2DEngine.addWindow(context.getMatrices(), getX(), getY() + 30, getX() + getWidth(), getY() + getHeight() - 1, 1f);
 
         for (ItemPlate itemPlate : (allTab ? allItems : itemPlates)) {
             if (itemPlate.offset + getY() + 25 + getScrollOffset() > getY() + getHeight() || itemPlate.offset + getScrollOffset() + getY() + 10 < getY())
@@ -109,14 +107,14 @@ public class ItemSelectWindow extends WindowBase {
             context.drawItem(itemPlate.item().getDefaultStack(), 0, 0);
             context.getMatrices().pop();
 
-            FontRenderers.sf_medium.drawString(context.getMatrices(), itemPlate.item().getName().getString(), getX() + 26, itemPlate.offset + getY() + 38 + getScrollOffset(), new Color(0xBDBDBD).getRGB());
+            FontRenderers.sf_medium.drawString(context.getMatrices(), I18n.translate(itemPlate.key()), getX() + 26, itemPlate.offset + getY() + 38 + getScrollOffset(), new Color(0xBDBDBD).getRGB());
 
             boolean hover2 = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 20, itemPlate.offset + getY() + 35 + getScrollOffset(), 11, 11);
 
             Render2DEngine.drawRect(context.getMatrices(), getX() + getWidth() - 20, itemPlate.offset + getY() + 35 + getScrollOffset(), 11, 11,
                     hover2 ? new Color(0xC57A7A7A, true) : new Color(0xC5575757, true));
 
-            boolean selected = itemPlates.stream().anyMatch(sI -> sI.item == itemPlate.item);
+            boolean selected = itemPlates.stream().anyMatch(sI -> Objects.equals(sI.key, itemPlate.key));
 
             if (allTab && !selected) {
                 FontRenderers.categories.drawString(context.getMatrices(), "+", getX() + getWidth() - 17, itemPlate.offset + getY() + 39 + getScrollOffset(), -1);
@@ -124,13 +122,14 @@ public class ItemSelectWindow extends WindowBase {
                 FontRenderers.icons.drawString(context.getMatrices(), "w", getX() + getWidth() - 19.5f, itemPlate.offset + getY() + 39 + getScrollOffset(), -1);
             }
         }
-
+        setMaxElementsHeight((allTab ? allItems : itemPlates).size() * 20);
         Render2DEngine.popWindow();
     }
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
+
         if (Render2DEngine.isHovered(mouseX, mouseY, getX() + 8, getY() + 19, 52, 19)) {
             allTab = true;
             resetScroll();
@@ -156,10 +155,10 @@ public class ItemSelectWindow extends WindowBase {
             if ((int) (itemPlate.offset + getY() + 50) + getScrollOffset() > getY() + getHeight())
                 continue;
 
-            String name = itemPlate.item().getTranslationKey().replace("item.minecraft.", "").replace("block.minecraft.", "");
+            String name = itemPlate.key().replace("item.minecraft.", "").replace("block.minecraft.", "");
 
             if (Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 20, itemPlate.offset + getY() + 35 + getScrollOffset(), 10, 10)) {
-                boolean selected = itemPlates.stream().anyMatch(sI -> sI.item == itemPlate.item);
+                boolean selected = itemPlates.stream().anyMatch(sI -> Objects.equals(sI.key(), itemPlate.key));
 
                 if (allTab && !selected) {
                     if (itemSetting.getValue().getItemsById().contains(name))
@@ -214,15 +213,22 @@ public class ItemSelectWindow extends WindowBase {
     }
 
 
-
     private void refreshItemPlates() {
-        itemSetting.getValue().updateItems();
         itemPlates.clear();
+
         int id = 0;
-        for (Item s : itemSetting.getValue().getItems()) {
-            itemPlates.add(new ItemPlate(id, id * 20, s));
-            id++;
+        for (Block block : Registries.BLOCK) {
+            if (itemSetting.getValue().getItemsById().contains(block.getTranslationKey().replace("block.minecraft.", ""))) {
+                itemPlates.add(new ItemPlate(id, id * 20, block.asItem(), block.getTranslationKey()));
+                id++;
+            }
         }
+
+        for (Item item : Registries.ITEM)
+            if (itemSetting.getValue().getItemsById().contains(item.getTranslationKey().replace("item.minecraft.", ""))) {
+                itemPlates.add(new ItemPlate(id, id * 20, item, item.getTranslationKey()));
+                id++;
+            }
     }
 
     private void refreshAllItems() {
@@ -230,20 +236,20 @@ public class ItemSelectWindow extends WindowBase {
         resetScroll();
         int id1 = 0;
         for (Block block : Registries.BLOCK) {
-            if (search.equals("Search") || search.isEmpty() || block.asItem().getTranslationKey().contains(search) || block.asItem().getName().getString().toLowerCase().contains(search.toLowerCase())) {
-                allItems.add(new ItemPlate(id1, id1 * 20, block.asItem()));
+            if (search.equals("Search") || search.isEmpty() || block.getTranslationKey().contains(search) || I18n.translate(block.getTranslationKey()).toLowerCase().contains(search.toLowerCase())) {
+                allItems.add(new ItemPlate(id1, id1 * 20, block.asItem(), block.getTranslationKey()));
                 id1++;
             }
         }
 
         for (Item item : Registries.ITEM) {
             if (search.equals("Search") || search.isEmpty() || item.getTranslationKey().contains(search) || item.getName().getString().toLowerCase().contains(search.toLowerCase())) {
-                allItems.add(new ItemPlate(id1, id1 * 20, item));
+                allItems.add(new ItemPlate(id1, id1 * 20, item, item.getTranslationKey()));
                 id1++;
             }
         }
     }
 
-    private record ItemPlate(float id, float offset, Item item) {
+    private record ItemPlate(float id, float offset, Item item, String key) {
     }
 }

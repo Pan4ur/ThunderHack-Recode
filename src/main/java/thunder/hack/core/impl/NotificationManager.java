@@ -1,5 +1,6 @@
 package thunder.hack.core.impl;
 
+import com.google.common.collect.Lists;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
 import thunder.hack.cmd.Command;
@@ -7,13 +8,14 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.modules.client.Notifications;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static thunder.hack.modules.Module.mc;
 
 public class NotificationManager {
-    public final List<Notification> notifications = new CopyOnWriteArrayList<>();
+    public final List<Notification> notifications = new ArrayList<>();
 
     public void publicity(String title, String content, int second, Notification.Type type) {
         if(ModuleManager.notifications.mode.getValue() == Notifications.Mode.Text)
@@ -26,21 +28,15 @@ public class NotificationManager {
 
         float startY = isDefault() ? mc.getWindow().getScaledHeight() - 36f : mc.getWindow().getScaledHeight() / 2f + 25;
 
-        for (Notification notification : notifications) {
-            notification.renderShaders(context.getMatrices(), startY  + (isDefault() ? 0 : notifications.size() * 16));
-            startY = (float) (startY - notification.getHeight() - 3f);
-        }
-
         if (notifications.size() > 8)
-            notifications.remove(0);
+            notifications.removeFirst();
 
-        float startY1 = isDefault() ? mc.getWindow().getScaledHeight() - 36f : mc.getWindow().getScaledHeight() / 2f + 25;
+        notifications.removeIf(Notification::shouldDelete);
 
-        for (int i = 0; i < notifications.size(); i++) {
-            Notification notification = notifications.get(i);
-            notifications.removeIf(Notification::shouldDelete);
-            notification.render(context.getMatrices(), startY1  + (isDefault() ? 0 : notifications.size() * 16));
-            startY1 = (float) (startY1 - notification.getHeight() - 3f);
+        for (Notification n : Lists.newArrayList(notifications)) {
+            startY = (float) (startY - n.getHeight() - 3f);
+            n.renderShaders(context.getMatrices(), startY  + (isDefault() ? 0 : notifications.size() * 16));
+            n.render(context.getMatrices(), startY  + (isDefault() ? 0 : notifications.size() * 16));
         }
     }
 

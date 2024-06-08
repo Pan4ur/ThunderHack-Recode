@@ -55,17 +55,17 @@ public class KillStats extends HudElement {
         float pX = getPosX() > mc.getWindow().getScaledWidth() / 2f ? getPosX() - FontRenderers.getModulesRenderer().getStringWidth(streak) - FontRenderers.getModulesRenderer().getStringWidth(kd) : getPosX();
 
         if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
-            Render2DEngine.drawRoundedBlur(context.getMatrices(), pX - 18, getPosY() - 2, FontRenderers.getModulesRenderer().getStringWidth(streak) + FontRenderers.getModulesRenderer().getStringWidth(kd) + 21, 13f, 3, HudEditor.blurColor.getValue().getColorObject());
-            Render2DEngine.drawRect(context.getMatrices(), pX - 4, getPosY(), 0.5f, 8, new Color(0x44FFFFFF, true));
+            Render2DEngine.drawRoundedBlur(context.getMatrices(), pX, getPosY(), FontRenderers.getModulesRenderer().getStringWidth(streak) + FontRenderers.getModulesRenderer().getStringWidth(kd) + 21, 13f, 3, HudEditor.blurColor.getValue().getColorObject());
+            Render2DEngine.drawRect(context.getMatrices(), pX + 14, getPosY() + 2, 0.5f, 8, new Color(0x44FFFFFF, true));
             Render2DEngine.setupRender();
             RenderSystem.setShaderTexture(0, icon);
-            Render2DEngine.renderGradientTexture(context.getMatrices(), pX - 16, getPosY() - 1, 10, 10, 0, 0, 16, 16, 16, 16,
+            Render2DEngine.renderGradientTexture(context.getMatrices(), pX + 2, getPosY() + 2, 10, 10, 0, 0, 16, 16, 16, 16,
                     HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
             Render2DEngine.endRender();
         }
 
-        FontRenderers.getModulesRenderer().drawString(context.getMatrices(), streak, pX, getPosY() + 3, HudEditor.getColor(1).getRGB());
-        FontRenderers.getModulesRenderer().drawString(context.getMatrices(),kd,pX + FontRenderers.getModulesRenderer().getStringWidth(streak),getPosY() + 3,HudEditor.getColor(1).getRGB());
-        setBounds(pX - 18, getPosY() - 2, FontRenderers.getModulesRenderer().getStringWidth(streak) + FontRenderers.getModulesRenderer().getStringWidth(kd) + 21, 13f);
+        FontRenderers.getModulesRenderer().drawString(context.getMatrices(), streak, pX + 18, getPosY() + 5, HudEditor.getColor(1).getRGB());
+        FontRenderers.getModulesRenderer().drawString(context.getMatrices(),kd,pX + 18 + FontRenderers.getModulesRenderer().getStringWidth(streak),getPosY() + 5,HudEditor.getColor(1).getRGB());
+        setBounds(pX, getPosY(), FontRenderers.getModulesRenderer().getStringWidth(streak) + FontRenderers.getModulesRenderer().getStringWidth(kd) + 21, 13f);
     }
 }

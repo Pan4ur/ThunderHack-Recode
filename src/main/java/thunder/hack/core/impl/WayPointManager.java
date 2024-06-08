@@ -8,10 +8,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class WayPointManager implements IManager {
     private static CopyOnWriteArrayList<WayPoint> wayPoints = new CopyOnWriteArrayList<>();
 
-    public void addWayPoint(WayPoint macro) {
-        if (!wayPoints.contains(macro)) {
-            wayPoints.add(macro);
-        }
+    public void addWayPoint(WayPoint wp) {
+        if (!wayPoints.contains(wp))
+            wayPoints.add(wp);
     }
 
     public void onLoad() {
@@ -28,8 +27,9 @@ public class WayPointManager implements IManager {
                         String z = line[2];
                         String name = line[3];
                         String server = line[4];
+                        String dimension = line.length == 6 ? line[5] : "overworld";
 
-                        addWayPoint(new WayPoint(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z), name, server));
+                        addWayPoint(new WayPoint(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z), name, server, dimension));
                     }
                 }
             }
@@ -47,7 +47,7 @@ public class WayPointManager implements IManager {
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (WayPoint wayPoint : wayPoints) {
-                writer.write(wayPoint.x + ":" + wayPoint.y + ":" + wayPoint.z + ":" + wayPoint.name + ":" + wayPoint.server + "\n");
+                writer.write(wayPoint.x + ":" + wayPoint.y + ":" + wayPoint.z + ":" + wayPoint.name + ":" + wayPoint.server + ":" + wayPoint.dimension + "\n");
             }
         } catch (Exception ignored) {
         }
@@ -62,14 +62,73 @@ public class WayPointManager implements IManager {
     }
 
     public WayPoint getWayPointByName(String name) {
-        for (WayPoint wayPoint : getWayPoints()) {
-            if (wayPoint.name.equalsIgnoreCase(name)) {
+        for (WayPoint wayPoint : getWayPoints())
+            if (wayPoint.name.equalsIgnoreCase(name))
                 return wayPoint;
-            }
-        }
         return null;
     }
 
-    public record WayPoint(int x, int y, int z, String name, String server) {
+
+    public static class WayPoint {
+
+        private int x, y, z;
+        private String name, server, dimension;
+
+        public WayPoint(int x, int y, int z, String name, String server, String dimension) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.name = name;
+            this.server = server;
+            this.dimension = dimension;
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public void setX(int x) {
+            this.x = x;
+        }
+
+        public int getY() {
+            return y;
+        }
+
+        public void setY(int y) {
+            this.y = y;
+        }
+
+        public int getZ() {
+            return z;
+        }
+
+        public void setZ(int z) {
+            this.z = z;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getServer() {
+            return server;
+        }
+
+        public void setServer(String server) {
+            this.server = server;
+        }
+
+        public String getDimension() {
+            return dimension;
+        }
+
+        public void setDimension(String dimension) {
+            this.dimension = dimension;
+        }
     }
 }
