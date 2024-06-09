@@ -51,7 +51,7 @@ public class MixinEntityLiving implements IEntityLiving {
 
     @Inject(method = {"getHandSwingDuration"}, at = {@At("HEAD")}, cancellable = true)
     private void getArmSwingAnimationEnd(final CallbackInfoReturnable<Integer> info) {
-        if (ModuleManager.animations.isEnabled() && Animations.slowAnimation.getValue())
+        if (ModuleManager.animations.shouldAnimate() && Animations.slowAnimation.getValue())
             info.setReturnValue(Animations.slowAnimationVal.getValue());
     }
 

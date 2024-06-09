@@ -22,6 +22,7 @@ import thunder.hack.events.impl.EventHeldItemRenderer;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IHeldItemRenderer;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
 
 public class Animations extends Module {
@@ -29,6 +30,7 @@ public class Animations extends Module {
         super("Animations", Category.RENDER);
     }
 
+    private final Setting<Boolean> onlyaura = new Setting<>("OnlyAura",false);
     public Setting<Boolean> oldAnimationsM = new Setting<>("DisableSwapMain", true);
     public Setting<Boolean> oldAnimationsOff = new Setting<>("DisableSwapOff", true);
     private final Setting<Mode> mode = new Setting<Mode>("Mode", Mode.Default);
@@ -41,6 +43,9 @@ public class Animations extends Module {
         Default, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twelve, Thirteen, Fourteen
     }
 
+    public boolean shouldAnimate(){
+        return  mode.getValue() != Mode.Default && isEnabled() && (!onlyaura.getValue() || ModuleManager.aura.isEnabled() && Aura.target != null);
+    }
 
     @Override
     public void onUpdate() {
@@ -71,13 +76,8 @@ public class Animations extends Module {
             return;
         }
 
+
         switch (mode.getValue()) {
-            case Default -> {
-                applyEquipOffset(matrices, arm, equipProgress);
-                translateToViewModelOff(matrices);
-                applySwingOffset(matrices, arm, swingProgress);
-                translateBacklOff(matrices);
-            }
             case One -> {
                 float n = -0.4F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
                 applyEquipOffset(matrices, arm, n);
@@ -321,7 +321,7 @@ public class Animations extends Module {
                     matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) l * 65.0F));
                     matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) l * -85.0F));
                 } else {
-                    renderSwordAnimation(matrices, f, swingProgress, equipProgress, arm);
+                     renderSwordAnimation(matrices, f, swingProgress, equipProgress, arm);
                 }
                 EventHeldItemRenderer event = new EventHeldItemRenderer(hand, item, equipProgress, matrices);
                 ThunderHack.EVENT_BUS.post(event);
