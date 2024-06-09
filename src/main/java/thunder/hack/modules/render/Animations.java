@@ -44,7 +44,7 @@ public class Animations extends Module {
     }
 
     public boolean shouldAnimate(){
-        return  mode.getValue() != Mode.Default && isEnabled() && (!onlyaura.getValue() || ModuleManager.aura.isEnabled() && Aura.target != null);
+        return isEnabled() && (!onlyaura.getValue() || ModuleManager.aura.isEnabled() && Aura.target != null);
     }
 
     @Override
@@ -78,6 +78,12 @@ public class Animations extends Module {
 
 
         switch (mode.getValue()) {
+            case Default -> {
+                applyEquipOffset(matrices, arm, equipProgress);
+                translateToViewModelOff(matrices);
+                applySwingOffset(matrices, arm, swingProgress);
+                translateBacklOff(matrices);
+            }
             case One -> {
                 float n = -0.4F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
                 applyEquipOffset(matrices, arm, n);
