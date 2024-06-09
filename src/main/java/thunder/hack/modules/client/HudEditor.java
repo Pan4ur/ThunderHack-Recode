@@ -9,6 +9,7 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 
 public final class HudEditor extends Module {
+    public static final Setting<Boolean> sticky = new Setting<>("Sticky", true);
     public static final Setting<HudStyle> hudStyle = new Setting<>("HudStyle", HudStyle.Blurry);
     public static final Setting<ArrowsStyle> arrowsStyle = new Setting<>("ArrowsStyle", ArrowsStyle.Default);
     public static final Setting<ClickGui.colorModeEn> colorMode = new Setting<>("ColorMode", ClickGui.colorModeEn.Static);
