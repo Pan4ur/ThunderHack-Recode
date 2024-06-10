@@ -205,7 +205,7 @@ public class LegitHelper extends Module {
     @EventHandler
     public void onPacketSendPost(PacketEvent.@NotNull SendPost event) {
         if (event.getPacket() instanceof PlayerActionC2SPacket && ((PlayerActionC2SPacket) event.getPacket()).getAction() == PlayerActionC2SPacket.Action.RELEASE_USE_ITEM) {
-            if (minecarts.getValue().isEnabled() && mc.player.getMainHandStack().getItem() == Items.BOW && cartTimer.passedMs(1000)) {
+            if (minecarts.getValue().isEnabled() && mc.player.getMainHandStack().getItem() == Items.BOW && cartTimer.passedMs(600)) {
                 BlockPos bp = calcTrajectory(mc.player.getYaw());
                 if (bp != null && PlayerUtility.squaredDistanceFromEyes(bp.toCenterPos()) <= 25 && PlayerUtility.squaredDistanceFromEyes(bp.toCenterPos()) > 3) {
 
