@@ -207,7 +207,6 @@ public class LegitHelper extends Module {
         if (event.getPacket() instanceof PlayerActionC2SPacket && ((PlayerActionC2SPacket) event.getPacket()).getAction() == PlayerActionC2SPacket.Action.RELEASE_USE_ITEM) {
             if (minecarts.getValue().isEnabled() && mc.player.getMainHandStack().getItem() == Items.BOW && cartTimer.passedMs(1000)) {
                 BlockPos bp = calcTrajectory(mc.player.getYaw());
-                sendMessage(PlayerUtility.squaredDistanceFromEyes(bp.toCenterPos()) + "");
                 if (bp != null && PlayerUtility.squaredDistanceFromEyes(bp.toCenterPos()) <= 25 && PlayerUtility.squaredDistanceFromEyes(bp.toCenterPos()) > 3) {
 
                     SearchInvResult baseResult = InventoryUtility.findItemInHotBar(Items.RAIL, Items.ACTIVATOR_RAIL, Items.DETECTOR_RAIL, Items.POWERED_RAIL);

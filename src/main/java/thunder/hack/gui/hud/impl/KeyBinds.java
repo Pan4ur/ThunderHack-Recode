@@ -30,54 +30,69 @@ public class KeyBinds extends HudElement {
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
 
-        TEMP:
-        {
-            if (offcolor.getValue().getAlpha() < 5)
-                offcolor.getValue().setColor(Color.GRAY.getRGB());
-
-            if (oncolor.getValue().getAlpha() < 5)
-                oncolor.getValue().setColor(Color.WHITE.getRGB());
-        }
-
         int y_offset1 = 0;
         float max_width = 50;
+
+        float pointerX = 0;
         for (Module feature : ThunderHack.moduleManager.modules) {
             if (feature.isDisabled() && onlyEnabled.getValue()) continue;
             if (!Objects.equals(feature.getBind().getBind(), "None") && feature != ModuleManager.clickGui && feature != ModuleManager.thunderHackGui) {
-                y_offset1 += 10;
-                float width = FontRenderers.sf_bold_mini.getStringWidth("[" + getShortKeyName(feature) + "]  " + feature.getName()) * 1.2f;
+                if (y_offset1 == 0)
+                    y_offset1 += 4;
+
+                y_offset1 += 9;
+
+                float nameWidth = FontRenderers.sf_bold_mini.getStringWidth(feature.getName());
+                float bindWidth = FontRenderers.sf_bold_mini.getStringWidth(getShortKeyName(feature));
+                float width = (nameWidth + bindWidth) * 1.5f;
+
                 if (width > max_width)
                     max_width = width;
+
+                if(bindWidth > pointerX)
+                    pointerX = bindWidth;
             }
         }
 
-        vAnimation = AnimationUtility.fast(vAnimation, 20 + y_offset1, 15);
+        vAnimation = AnimationUtility.fast(vAnimation, 14 + y_offset1, 15);
         hAnimation = AnimationUtility.fast(hAnimation, max_width, 15);
 
         Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue());
 
-        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Glowing)) {
+        if (HudEditor.hudStyle.is(HudEditor.HudStyle.Glowing)) {
             FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KeyBinds", getPosX() + hAnimation / 2, getPosY() + 4, HudEditor.textColor.getValue().getColorObject());
         } else {
             FontRenderers.sf_bold.drawGradientCenteredString(context.getMatrices(), "KeyBinds", getPosX() + hAnimation / 2, getPosY() + 4, 10);
         }
 
-        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
-            Render2DEngine.verticalGradient(context.getMatrices(), getPosX() , getPosY() + 13, getPosX() + hAnimation, getPosY() + 16, new Color(0x7B000000, true), new Color(0x0000000, true));
-        } else {
-            Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
-            Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+        if (y_offset1 > 0) {
+            if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+                Render2DEngine.verticalGradient(context.getMatrices(), getPosX(), getPosY() + 13, getPosX() + hAnimation, getPosY() + 16, new Color(0x7B000000, true), new Color(0x0000000, true));
+            } else {
+                Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
+                Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+            }
         }
 
 
         Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
-        int y_offset = 2;
+        int y_offset = 0;
         for (Module feature : ThunderHack.moduleManager.modules) {
             if (feature.isDisabled() && onlyEnabled.getValue())
                 continue;
             if (!Objects.equals(feature.getBind().getBind(), "None") && feature != ModuleManager.clickGui && feature != ModuleManager.thunderHackGui) {
-                FontRenderers.sf_bold_mini.drawString(context.getMatrices(), "[" + getShortKeyName(feature) + "]  " + feature.getName(), getPosX() + 5, getPosY() + 18 + y_offset, feature.isOn() ? oncolor.getValue().getColor() : offcolor.getValue().getColor());
-                y_offset += 10;
+
+                float px = getPosX() + (max_width - pointerX - 10);
+
+                FontRenderers.sf_bold_mini.drawString(context.getMatrices(), feature.getName(), getPosX() + 5, getPosY() + 19 + y_offset, feature.isOn() ? oncolor.getValue().getColor() : offcolor.getValue().getColor());
+                FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(),  getShortKeyName(feature),
+
+                        px + (getPosX() + max_width - px) / 2f,
+
+                        getPosY() + 19 + y_offset, feature.isOn() ? oncolor.getValue().getColor() : offcolor.getValue().getColor());
+                Render2DEngine.drawRect(context.getMatrices(), px, getPosY() + 17 + y_offset, 0.5f, 8, new Color(0x44FFFFFF, true));
+
+                y_offset += 9;
             }
         }
         Render2DEngine.popWindow();
