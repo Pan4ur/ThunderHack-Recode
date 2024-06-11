@@ -15,7 +15,10 @@ public class Parkour extends Module {
     private final thunder.hack.utility.Timer delay = new thunder.hack.utility.Timer();
 
     public void onRender3D(MatrixStack stack) {
-        if (mc.player.isOnGround() && !mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-jumpFactor.getValue(), 0, -jumpFactor.getValue()).offset(0, -0.99, 0)).iterator().hasNext() && delay.every(150))
+        if (mc.player.isOnGround()
+                && !mc.options.jumpKey.isPressed()
+                && !mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-jumpFactor.getValue(), 0, -jumpFactor.getValue()).offset(0, -0.99, 0)).iterator().hasNext()
+                && delay.every(150))
             mc.player.jump();
     }
 }

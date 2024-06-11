@@ -5,9 +5,9 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.GameMode;
 import thunder.hack.cmd.impl.StaffCommand;
-import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
@@ -15,9 +15,8 @@ import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -25,6 +24,7 @@ public class StaffBoard extends HudElement {
     private static final Pattern validUserPattern = Pattern.compile("^\\w{3,16}$");
     private List<String> players = new ArrayList<>();
     private List<String> notSpec = new ArrayList<>();
+    private Map<String, Identifier> skinMap = new HashMap<>();
 
     private float vAnimation, hAnimation;
 
@@ -103,52 +103,70 @@ public class StaffBoard extends HudElement {
         all.addAll(players);
         all.addAll(notSpec);
 
-        int y_offset1 = 5;
-        float scale_x = 35;
+        int y_offset1 = 0;
+        float max_width = 50;
 
+        float pointerX = 0;
         for (String player : all) {
-            if (player != null) {
-                String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "SPEC" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "SPEC " + Formatting.YELLOW + "(GM3)" : Formatting.GREEN + "Z");
-                if (FontRenderers.sf_bold_mini.getStringWidth(a) > scale_x) {
-                    scale_x = FontRenderers.sf_bold_mini.getStringWidth(a);
-                }
-            }
-            y_offset1 += 11;
+            if (y_offset1 == 0)
+                y_offset1 += 4;
+
+            y_offset1 += 9;
+
+            float nameWidth = FontRenderers.sf_bold_mini.getStringWidth(player.split(":")[0]);
+            float timeWidth = FontRenderers.sf_bold_mini.getStringWidth((player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "V" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "V " + Formatting.YELLOW + "(GM3)" : Formatting.GREEN + "Z"));
+
+            float width = (nameWidth + timeWidth) * 1.4f;
+
+            if (width > max_width)
+                max_width = width;
+
+            if (timeWidth > pointerX)
+                pointerX = timeWidth;
         }
 
-        vAnimation = AnimationUtility.fast(vAnimation, 20 + y_offset1, 15);
-        hAnimation = AnimationUtility.fast(hAnimation, scale_x + 15, 15);
+        vAnimation = AnimationUtility.fast(vAnimation, 14 + y_offset1, 15);
+        hAnimation = AnimationUtility.fast(hAnimation, max_width, 15);
 
         Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue());
 
-        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Glowing)) {
-            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "StaffBoard", getPosX() + hAnimation / 2, getPosY() + 4, HudEditor.textColor.getValue().getColorObject());
+        if (HudEditor.hudStyle.is(HudEditor.HudStyle.Glowing)) {
+            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "Staff", getPosX() + hAnimation / 2, getPosY() + 4, HudEditor.textColor.getValue().getColorObject());
         } else {
-            FontRenderers.sf_bold.drawGradientCenteredString(context.getMatrices(), "StaffBoard", getPosX() + hAnimation / 2, getPosY() + 4, 10);
+            FontRenderers.sf_bold.drawGradientCenteredString(context.getMatrices(), "Staff", getPosX() + hAnimation / 2, getPosY() + 4, 10);
         }
 
-        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
-            Render2DEngine.verticalGradient(context.getMatrices(), getPosX() , getPosY() + 13, getPosX() + hAnimation, getPosY() + 16, new Color(0x7B000000, true), new Color(0x0000000, true));
-        } else {
-            Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + hAnimation / 2f, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
-            Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + hAnimation / 2f, getPosY() + 13.7f, getPosX() + hAnimation - 2, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+        if (y_offset1 > 0) {
+            if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+                Render2DEngine.verticalGradient(context.getMatrices(), getPosX(), getPosY() + 13, getPosX() + hAnimation, getPosY() + 16, new Color(0x7B000000, true), new Color(0x0000000, true));
+            } else {
+                Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
+                Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
+            }
         }
+
 
         Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
-        int y_offset = 5;
+        int y_offset = 0;
+
         for (String player : all) {
-            String a = player.split(":")[0] + " " + (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "SPEC" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.RED + "SPEC " + Formatting.YELLOW + "(GM3)" : Formatting.GREEN + "Z");
+            float px = getPosX() + (max_width - pointerX - 10);
 
-            if (a.contains("SPEC") && ModuleManager.autoLeave.isEnabled())
-                ModuleManager.autoLeave.onStaff();
+            Identifier tex = getTexture(player);
+            if (tex != null) {
+                context.drawTexture(tex, (int) (getPosX() + 3), (int) (getPosY() + 16 + y_offset), 8, 8, 8, 8, 8, 8, 64, 64);
+                context.drawTexture(tex, (int) (getPosX() + 3), (int) (getPosY() + 16 + y_offset), 8, 8, 40, 8, 8, 8, 64, 64);
+            }
 
-            FontRenderers.sf_bold_mini.drawString(context.getMatrices(), a, getPosX() + 5, getPosY() + 18 + y_offset, -1);
-            y_offset += 11;
+            FontRenderers.sf_bold_mini.drawString(context.getMatrices(), player.split(":")[0], getPosX() + 13, getPosY() + 19 + y_offset, HudEditor.textColor.getValue().getColor());
+            FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), (player.split(":")[1].equalsIgnoreCase("vanish") ? Formatting.RED + "O" : player.split(":")[1].equalsIgnoreCase("gm3") ? Formatting.YELLOW + "O" : Formatting.GREEN + "O"),
+                    px + (getPosX() + max_width - px) / 2f, getPosY() + 19 + y_offset, HudEditor.textColor.getValue().getColor());
+            Render2DEngine.drawRect(context.getMatrices(), px, getPosY() + 17 + y_offset, 0.5f, 8, new Color(0x44FFFFFF, true));
+            y_offset += 9;
         }
         Render2DEngine.popWindow();
         setBounds(getPosX(), getPosY(), hAnimation, vAnimation);
     }
-
 
     @Override
     public void onUpdate() {
@@ -158,5 +176,21 @@ public class StaffBoard extends HudElement {
             players.sort(String::compareTo);
             notSpec.sort(String::compareTo);
         }
+    }
+
+    private Identifier getTexture(String n) {
+        Identifier id = null;
+        if (skinMap.containsKey(n))
+            id = skinMap.get(n);
+
+        for (PlayerListEntry ple : mc.getNetworkHandler().getPlayerList())
+            if (n.contains(ple.getProfile().getName())) {
+                id = ple.getSkinTextures().texture();
+                if (!skinMap.containsKey(n))
+                    skinMap.put(n, id);
+                break;
+            }
+
+        return id;
     }
 }

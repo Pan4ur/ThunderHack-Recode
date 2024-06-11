@@ -45,7 +45,8 @@ public class Hotbar extends HudElement {
                 Render2DEngine.drawHudBase(matrices, i - 112.5f, mc.getWindow().getScaledHeight() - 25, 20, 20, HudEditor.hudRound.getValue());
             }
 
-            Render2DEngine.drawRound(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, mc.getWindow().getScaledHeight() - 24, 17, 17, 5f, new Color(0x7C313131, true));
+            Render2DEngine.drawRound(matrices, i - 88 + playerEntity.getInventory().selectedSlot * 19.8f, mc.getWindow().getScaledHeight() - 24, 17, 17, HudEditor.hudRound.getValue(),
+                    HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry) ? new Color(0x7C151515, true) : new Color(0x7C2F2F2F, true));
         }
     }
 

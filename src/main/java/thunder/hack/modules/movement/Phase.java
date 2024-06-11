@@ -4,9 +4,12 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventBreakBlock;
 import thunder.hack.events.impl.EventCollision;
@@ -34,12 +37,13 @@ public class Phase extends Module {
     private final Setting<Integer> afterBreak = new Setting<>("BreakTimeout", 4, 1, 20, v -> mode.getValue() == Mode.Sunrise && waitBreak.getValue());
     private final Setting<Integer> afterPearl = new Setting<>("PearlTimeout", 0, 0, 60, v -> mode.getValue() == Mode.Pearl);
     private final Setting<Float> pitch = new Setting<>("Pitch", 80f, 0f, 90f, v -> mode.getValue() == Mode.Pearl);
+    private final Setting<Boolean> strict = new Setting<>("Strict", false, v -> mode.is(Mode.ForceMine));
 
     public int clipTimer;
     public int afterPearlTime;
 
     private enum Mode {
-        Vanilla, Pearl, Sunrise
+        Vanilla, Pearl, Sunrise, ForceMine
     }
 
     @EventHandler
@@ -48,7 +52,18 @@ public class Phase extends Module {
             return;
         BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
 
-        if (mode.getValue() != Mode.Pearl && canNoClip() || afterPearlTime > 0) {
+        if (!mode.is(Mode.Pearl) && !mode.is(Mode.ForceMine) && canNoClip() || afterPearlTime > 0) {
+            if (!e.getPos().equals(playerPos.down()) || mc.options.sneakKey.isPressed())
+                e.setState(Blocks.AIR.getDefaultState());
+        }
+
+        if (mode.is(Mode.ForceMine)) {
+            float xDelta = Math.abs(playerPos.getX() - e.getPos().getX());
+            float zDelta = Math.abs(playerPos.getZ() - e.getPos().getZ());
+
+            if (xDelta != 0 && zDelta != 0 && strict.getValue())
+                  return;
+
             if (!e.getPos().equals(playerPos.down()) || mc.options.sneakKey.isPressed())
                 e.setState(Blocks.AIR.getDefaultState());
         }
@@ -94,6 +109,20 @@ public class Phase extends Module {
             if (silent.getValue())
                 InventoryUtility.switchTo(prevItem);
         }
+
+        if (mode.getValue() == Mode.ForceMine && (mc.player.horizontalCollision || playerInsideBlock()) && !mc.player.isSubmergedInWater() && !mc.player.isInLava())
+            for (int x = -2; x < 2; x++)
+                for (int y = -1; y < 3; y++)
+                    for (int z = -2; z < 2; z++) {
+                        if (((x == 0 && y == 0 && z == 0) || (x == 0 && y == 1 && z == 0)) && !mc.options.sneakKey.isPressed())
+                            continue;
+
+                        BlockPos bp = BlockPos.ofFloored(mc.player.getPos()).add(x, y, z);
+                        if (mc.player.getBoundingBox().intersects(new Box(bp)) && !mc.world.isAir(bp))
+                            sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, bp, Direction.UP));
+                    }
+
+
 
         if (mode.getValue() == Mode.Pearl && (mc.player.isOnGround() || !onlyOnGround.getValue())) {
             if (mc.player.horizontalCollision && !playerInsideBlock() && clipTimer <= 0 && mc.player.age > 60) {
