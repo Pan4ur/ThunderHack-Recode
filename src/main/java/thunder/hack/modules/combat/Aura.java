@@ -62,7 +62,7 @@ import static net.minecraft.util.math.MathHelper.wrapDegrees;
 import static thunder.hack.modules.client.ClientSettings.isRu;
 import static thunder.hack.utility.math.MathUtility.random;
 
-public final class Aura extends Module {
+public class Aura extends Module {
     public final Setting<Float> attackRange = new Setting<>("Range", 3.1f, 1f, 6.0f);
     public final Setting<Float> wallRange = new Setting<>("ThroughWallsRange", 3.1f, 0f, 6.0f);
     public final Setting<Boolean> elytra = new Setting<>("ElytraOverride",false);

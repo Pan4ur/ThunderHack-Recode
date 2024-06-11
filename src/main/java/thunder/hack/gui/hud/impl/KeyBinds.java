@@ -32,6 +32,7 @@ public class KeyBinds extends HudElement {
 
         int y_offset1 = 0;
         float max_width = 50;
+        float maxBindWidth = 0;
 
         float pointerX = 0;
         for (Module feature : ThunderHack.moduleManager.modules) {
@@ -44,15 +45,17 @@ public class KeyBinds extends HudElement {
 
                 float nameWidth = FontRenderers.sf_bold_mini.getStringWidth(feature.getName());
                 float bindWidth = FontRenderers.sf_bold_mini.getStringWidth(getShortKeyName(feature));
-                float width = (nameWidth + bindWidth) * 1.5f;
 
-                if (width > max_width)
-                    max_width = width;
+                if (bindWidth > maxBindWidth)
+                    maxBindWidth = bindWidth;
 
-                if(bindWidth > pointerX)
-                    pointerX = bindWidth;
+                if(nameWidth > pointerX)
+                    pointerX = nameWidth;
             }
         }
+
+        float px = getPosX() + 10 + pointerX;
+        max_width = Math.max(20 + pointerX + maxBindWidth, 50);
 
         vAnimation = AnimationUtility.fast(vAnimation, 14 + y_offset1, 15);
         hAnimation = AnimationUtility.fast(hAnimation, max_width, 15);
@@ -81,9 +84,6 @@ public class KeyBinds extends HudElement {
             if (feature.isDisabled() && onlyEnabled.getValue())
                 continue;
             if (!Objects.equals(feature.getBind().getBind(), "None") && feature != ModuleManager.clickGui && feature != ModuleManager.thunderHackGui) {
-
-                float px = getPosX() + (max_width - pointerX - 10);
-
                 FontRenderers.sf_bold_mini.drawString(context.getMatrices(), feature.getName(), getPosX() + 5, getPosY() + 19 + y_offset, feature.isOn() ? oncolor.getValue().getColor() : offcolor.getValue().getColor());
                 FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(),  getShortKeyName(feature),
 
