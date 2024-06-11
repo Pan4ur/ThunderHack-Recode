@@ -129,6 +129,9 @@ public final class ThunderUtility {
                     if(info.startsWith("Merge"))
                         continue;
 
+                    if(info.startsWith("Revert"))
+                        continue;
+
                     changeLog.add("- " + info + " [" + Formatting.GRAY + date.split("T")[0] + Formatting.RESET + "]  (@" + Formatting.RED + name + Formatting.RESET + ")");
                 }
             }
