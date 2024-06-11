@@ -67,11 +67,8 @@ public class LegitHelper extends Module {
     private final Setting<BooleanSettingGroup> shieldBreaker = new Setting<>("ShieldBreaker", new BooleanSettingGroup(false));
     private final Setting<Integer> breakerDelay = new Setting<>("BreakerDelay", 50, 5, 250).addToGroup(shieldBreaker);
     private final Setting<Boolean> swapBack = new Setting<>("SwapBack", true).addToGroup(shieldBreaker);
-
-
+    
     private Timer timer = new Timer();
-    private Timer cartTimer = new Timer();
-
     private Vec3d lastCrystalVec = Vec3d.ZERO;
     private Vec3d rotationVec = Vec3d.ZERO;
 
@@ -208,7 +205,7 @@ public class LegitHelper extends Module {
     @EventHandler
     public void onPacketSendPost(PacketEvent.@NotNull SendPost event) {
         if (event.getPacket() instanceof PlayerActionC2SPacket action && action.getAction() == PlayerActionC2SPacket.Action.RELEASE_USE_ITEM) {
-            if (minecarts.getValue().isEnabled() && mc.player.getMainHandStack().getItem() == Items.BOW && cartTimer.passedMs(600)) {
+            if (minecarts.getValue().isEnabled() && mc.player.getMainHandStack().getItem() == Items.BOW) {
                 BlockPos bp = calcTrajectory(mc.player.getYaw());
                 if (bp != null && PlayerUtility.squaredDistanceFromEyes(bp.toCenterPos()) <= maxDistance.getPow2Value() && PlayerUtility.squaredDistanceFromEyes(bp.toCenterPos()) > 3) {
 
@@ -232,7 +229,6 @@ public class LegitHelper extends Module {
                         cartResult.switchTo();
                         sendSequencedPacket(s -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(new Vec3d(bp.getX() + 0.5, railPos.getY() + 0.125f, bp.getZ() + 0.5), Direction.UP, railPos, false), s));
                         InventoryUtility.returnSlot();
-                        cartTimer.reset();
                     }
                 }
             }
