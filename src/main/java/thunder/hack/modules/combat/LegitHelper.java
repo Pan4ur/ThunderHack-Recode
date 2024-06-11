@@ -1,6 +1,5 @@
 package thunder.hack.modules.combat;
 
-import com.google.common.eventbus.Subscribe;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RailBlock;
@@ -8,14 +7,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.item.BowItem;
-import net.minecraft.item.CrossbowItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -32,8 +29,6 @@ import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.render.Trajectories;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.BooleanSettingGroup;
@@ -43,7 +38,6 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.Render3DEngine;
 
 import static thunder.hack.modules.combat.Criticals.getEntity;
 import static thunder.hack.modules.combat.Criticals.getInteractType;
@@ -56,6 +50,8 @@ public class LegitHelper extends Module {
 
     private final Setting<BooleanSettingGroup> minecarts = new Setting<>("Minecarts", new BooleanSettingGroup(true));
     private final Setting<Float> maxDistance = new Setting<>("MaxDistance", 4f, 2f, 6f).addToGroup(minecarts);
+    private final Setting<Boolean> refill = new Setting<>("Refill", true).addToGroup(minecarts);
+    private final Setting<Integer> refillSlot = new Setting<>("RefillSlot", 9, 1, 9, v -> refill.getValue()).addToGroup(minecarts);
 
     private final Setting<BooleanSettingGroup> anchors = new Setting<>("Anchors", new BooleanSettingGroup(true));
     private final Setting<Integer> anchorDelay = new Setting<>("AnchorDelay", 50, 5, 250).addToGroup(anchors);
@@ -174,6 +170,13 @@ public class LegitHelper extends Module {
                 }
             });
         }
+
+        if (minecarts.getValue().isEnabled() && refill.getValue())
+            if (mc.player.getInventory().getStack(refillSlot.getValue() - 1).getItem() != Items.TNT_MINECART) {
+                SearchInvResult result = InventoryUtility.findItemInInventory(Items.TNT_MINECART);
+                if (result.found())
+                    clickSlot(result.slot(), refillSlot.getValue() - 1, SlotActionType.SWAP);
+            }
     }
 
 
@@ -207,7 +210,7 @@ public class LegitHelper extends Module {
         if (event.getPacket() instanceof PlayerActionC2SPacket action && action.getAction() == PlayerActionC2SPacket.Action.RELEASE_USE_ITEM) {
             if (minecarts.getValue().isEnabled() && mc.player.getMainHandStack().getItem() == Items.BOW && cartTimer.passedMs(600)) {
                 BlockPos bp = calcTrajectory(mc.player.getYaw());
-                if (bp != null && PlayerUtility.squaredDistanceFromEyes(bp.toCenterPos()) <= 25 && PlayerUtility.squaredDistanceFromEyes(bp.toCenterPos()) > 3) {
+                if (bp != null && PlayerUtility.squaredDistanceFromEyes(bp.toCenterPos()) <= maxDistance.getPow2Value() && PlayerUtility.squaredDistanceFromEyes(bp.toCenterPos()) > 3) {
 
                     SearchInvResult baseResult = InventoryUtility.findItemInHotBar(Items.RAIL, Items.ACTIVATOR_RAIL, Items.DETECTOR_RAIL, Items.POWERED_RAIL);
                     SearchInvResult cartResult = InventoryUtility.findItemInHotBar(Items.TNT_MINECART);
@@ -238,7 +241,7 @@ public class LegitHelper extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        if(rotationVec != null) {
+        if (rotationVec != null) {
             float[] angle = InteractionUtility.calculateAngle(rotationVec);
             mc.player.setYaw(angle[0]);
             mc.player.setPitch(angle[1]);
