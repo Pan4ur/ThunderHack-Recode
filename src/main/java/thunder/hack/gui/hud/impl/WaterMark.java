@@ -17,6 +17,8 @@ import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.TextUtil;
 
 import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static thunder.hack.core.impl.ServerManager.getPing;
 
@@ -47,7 +49,7 @@ public class WaterMark extends HudElement {
 
 
     private enum Mode {
-        Big, Small, Classic, BaltikaClient
+        Big, Small, Classic, BaltikaClient, Rifk
     }
 
     public void onRender2D(DrawContext context) {
@@ -63,7 +65,7 @@ public class WaterMark extends HudElement {
             if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
                 float offset1 = FontRenderers.sf_bold.getStringWidth(username) + 72;
                 float offset2 = FontRenderers.sf_bold.getStringWidth((mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address));
-                
+
                 Render2DEngine.drawRoundedBlur(context.getMatrices(), getPosX(), getPosY(), 50f, 15f, 3, HudEditor.blurColor.getValue().getColorObject());
                 Render2DEngine.drawRoundedBlur(context.getMatrices(), getPosX() + 55, getPosY(), offset1 + offset2 - 36, 15f, 3,  HudEditor.blurColor.getValue().getColorObject());
 
@@ -106,6 +108,16 @@ public class WaterMark extends HudElement {
             context.drawTexture(baltika,  (int)getPosX(), (int)getPosY() + 2, 1, 1, 64, 64, 65, 64);
             FontRenderers.thglitch.drawString(context.getMatrices(), "    BALTIKA", getPosX() + 23, getPosY() + 41.5, -1);
             setBounds(getPosX(), getPosY(), 106, 30);
+        } else if (mode.is(Mode.Rifk)){
+            Date date = new Date(System.currentTimeMillis());
+            SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+            //лень вставлять реал билд дату
+            String info = Formatting.GREEN + String.format("th7 | build: 16/06/2024 | rate: %d | %s", Math.round(ThunderHack.serverManager.getTPS()), format.format(date));;
+            float width = FontRenderers.profont.getStringWidth(info) + 5;
+            Render2DEngine.drawRectWithOutline(context.getMatrices(), getPosX(), getPosY(), width, 8, Color.decode("#192A1A"), Color.decode("#833B7B"));
+            Render2DEngine.drawGradientBlurredShadow1(context.getMatrices(), getPosX(), getPosY(), width, 8, 10, Color.decode("#161A1E"), Color.decode("#161A1E"), Color.decode("#382E37"), Color.decode("#382E37"));
+            FontRenderers.profont.drawString(context.getMatrices(), info, getPosX() + 2.7, getPosY() + 2.953 , HudEditor.textColor.getValue().getColor());
+            setBounds(getPosX(), getPosY(), width, 8);
         } else {
             FontRenderers.monsterrat.drawGradientString(context.getMatrices(), "ThunderHack v" + ThunderHack.VERSION, getPosX() + 5.5f, getPosY() + 5, 10);
             setBounds(getPosX(), getPosY(), 100, 3);
@@ -116,4 +128,3 @@ public class WaterMark extends HudElement {
         textUtil.tick();
     }
 }
-

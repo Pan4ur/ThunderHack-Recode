@@ -24,6 +24,7 @@ public class FontRenderers {
     public static FontRenderer sf_medium_mini;
     public static FontRenderer sf_medium_modules;
     public static FontRenderer minecraft;
+    public static FontRenderer profont;
 
     public static FontRenderer getSettingsRenderer() {
         return settings;
