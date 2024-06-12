@@ -2,7 +2,6 @@ package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.RailBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -67,7 +66,7 @@ public class LegitHelper extends Module {
     private final Setting<BooleanSettingGroup> shieldBreaker = new Setting<>("ShieldBreaker", new BooleanSettingGroup(false));
     private final Setting<Integer> breakerDelay = new Setting<>("BreakerDelay", 50, 5, 250).addToGroup(shieldBreaker);
     private final Setting<Boolean> swapBack = new Setting<>("SwapBack", true).addToGroup(shieldBreaker);
-    
+
     private Timer timer = new Timer();
     private Vec3d lastCrystalVec = Vec3d.ZERO;
     private Vec3d rotationVec = Vec3d.ZERO;
@@ -214,20 +213,20 @@ public class LegitHelper extends Module {
 
                     if (baseResult.found() && cartResult.found()) {
                         InventoryUtility.saveSlot();
-                        BlockPos railPos;
-
-                        if (!(mc.world.getBlockState(bp).getBlock() instanceof RailBlock)) {
-                            baseResult.switchTo();
-                            InteractionUtility.placeBlock(bp.up(), InteractionUtility.Rotate.None, InteractionUtility.Interact.Vanilla, InteractionUtility.PlaceMode.Normal, true);
-                            railPos = bp.up();
-                        } else {
-                            railPos = bp;
-                        }
+                        baseResult.switchTo();
+                        sendSequencedPacket(s -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND,
+                                new BlockHitResult(new Vec3d(bp.getX() + 0.5, bp.up().getY(), bp.getZ() + 0.)
+                                        , Direction.UP,
+                                        bp,
+                                        false), s));
 
                         rotationVec = bp.up().toCenterPos();
-
                         cartResult.switchTo();
-                        sendSequencedPacket(s -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(new Vec3d(bp.getX() + 0.5, railPos.getY() + 0.125f, bp.getZ() + 0.5), Direction.UP, railPos, false), s));
+                        sendSequencedPacket(s -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND,
+                                new BlockHitResult(new Vec3d(bp.getX() + 0.5, bp.up().getY() + .125, bp.getZ() + 0.5)
+                                        , Direction.UP,
+                                        bp.up(),
+                                        false), s));
                         InventoryUtility.returnSlot();
                     }
                 }
