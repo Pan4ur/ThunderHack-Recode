@@ -84,4 +84,9 @@
       "thunderhack:pmsound"
     ]
   }
+  "rifk": {
+    "sounds": [
+      "thunderhack:rifk"
+    ]
+  }
 }

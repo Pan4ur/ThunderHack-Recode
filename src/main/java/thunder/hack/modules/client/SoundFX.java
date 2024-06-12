@@ -48,7 +48,7 @@ public final class SoundFX extends Module {
     }
 
     public enum HitSound {
-        UWU, MOAN, SKEET, KEYBOARD, CUSTOM, OFF
+        UWU, MOAN, SKEET, RIFK, KEYBOARD, CUSTOM, OFF
     }
 
     public enum KillSound {

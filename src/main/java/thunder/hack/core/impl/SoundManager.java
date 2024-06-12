@@ -56,6 +56,9 @@ public final class SoundManager {
     public SoundEvent ALERT_SOUNDEVENT = SoundEvent.of(ALERT_SOUND);
     public final Identifier PM_SOUND = new Identifier("thunderhack:pmsound");
     public SoundEvent PM_SOUNDEVENT = SoundEvent.of(PM_SOUND);
+    public final Identifier RIFK_SOUND = new Identifier("thunderhack:rifk");
+    public SoundEvent RIFK_SOUNDEVENT = SoundEvent.of(RIFK_SOUND);
+
 
     private final Timer scrollTimer = new Timer();
 
@@ -77,6 +80,7 @@ public final class SoundManager {
         Registry.register(Registries.SOUND_EVENT, SWIPEOUT_SOUND, SWIPEOUT_SOUNDEVENT);
         Registry.register(Registries.SOUND_EVENT, ALERT_SOUND, ALERT_SOUNDEVENT);
         Registry.register(Registries.SOUND_EVENT, PM_SOUND, PM_SOUNDEVENT);
+        Registry.register(Registries.SOUND_EVENT, RIFK_SOUND, RIFK_SOUNDEVENT);
     }
 
     public void playHitSound(SoundFX.HitSound value) {
@@ -93,6 +97,7 @@ public final class SoundManager {
                 };
                 playSound(sound);
             }
+            case RIFK -> playSound(RIFK_SOUNDEVENT);
             case CUSTOM -> playSound("hit");
         }
     }
