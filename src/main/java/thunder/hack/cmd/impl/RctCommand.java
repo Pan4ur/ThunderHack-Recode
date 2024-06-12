@@ -30,8 +30,8 @@ public class RctCommand extends Command {
             asyncManager.run(() -> {
                 mc.player.networkHandler.sendCommand("hub");
                 long failSafe = System.currentTimeMillis();
-                while (ThunderHack.core.getSetBackTime() > 300) {
-                    if (System.currentTimeMillis() - failSafe > 5000)
+                while (ThunderHack.core.getSetBackTime() > 600) {
+                    if (System.currentTimeMillis() - failSafe > 1000)
                         break;
                 }
                 mc.player.networkHandler.sendCommand(an);
