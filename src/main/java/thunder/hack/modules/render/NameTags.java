@@ -185,9 +185,9 @@ public class NameTags extends Module {
                 if (armorMode.getValue() != Armor.Durability) stacks.add(ent.getMainHandStack());
 
                 context.getMatrices().push();
-                context.getMatrices().translate(tagX - 2 + (textWidth + 4) / 2f, (float) (posY - 13f) + 6.5f + scale, 0);
+                context.getMatrices().translate(tagX - 2 + (textWidth + 4) / 2f, (float) (posY - 13f) + 6.5f, 0);
                 context.getMatrices().scale(scale, scale, 1f);
-                context.getMatrices().translate(-(tagX - 2 + (textWidth + 4) / 2f), -(float) ((posY - 13f) + 6.5f) + scale, 0);
+                context.getMatrices().translate(-(tagX - 2 + (textWidth + 4) / 2f), -(float) ((posY - 13f) + 6.5f), 0);
 
                 float item_offset = 0;
                 if (armorMode.getValue() != Armor.None)
