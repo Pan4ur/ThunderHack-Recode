@@ -12,6 +12,7 @@ import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
 
@@ -35,6 +36,8 @@ public class CrosshairArrows extends HudElement {
     private final Setting<ColorSetting> colorf = new Setting<>("Friend", new ColorSetting(new Color(0x00E800)));
     private final Setting<ColorSetting> colors = new Setting<>("Tracer", new ColorSetting(new Color(0xFFFF00)));
 
+    private float smoothYaw = 0;
+
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
         if (fullNullCheck()) return;
@@ -49,10 +52,13 @@ public class CrosshairArrows extends HudElement {
         context.getMatrices().multiply(RotationAxis.POSITIVE_X.rotationDegrees(90f / Math.abs(90f / MathUtility.clamp(mc.player.getPitch(), pitchLock.getValue(), 90f)) - 102));
         context.getMatrices().translate(-middleW, -middleH, 0);
 
+        smoothYaw = AnimationUtility.fast(smoothYaw, mc.player.getYaw(), 13);
+
         for (PlayerEntity e : Lists.newArrayList(mc.world.getPlayers())) {
             if (e != mc.player){
                 context.getMatrices().push();
-                float yaw = getRotations(e) - mc.player.getYaw();
+
+                float yaw = getRotations(e) - smoothYaw;
                 context.getMatrices().translate(middleW, middleH, 0.0F);
                 context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
                 context.getMatrices().translate(-middleW, -middleH, 0.0F);
