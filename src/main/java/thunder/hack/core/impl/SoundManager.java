@@ -97,6 +97,7 @@ public final class SoundManager {
                 };
                 playSound(sound);
             }
+            case RIFK -> playSound(RIFK_SOUNDEVENT);
             case CUSTOM -> playSound("hit");
         }
     }
