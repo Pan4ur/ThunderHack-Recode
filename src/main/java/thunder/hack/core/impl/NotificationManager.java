@@ -3,6 +3,7 @@ package thunder.hack.core.impl;
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
+import org.spongepowered.asm.util.Bytecode;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.notification.Notification;
@@ -20,7 +21,14 @@ public class NotificationManager {
     public void publicity(String title, String content, int second, Notification.Type type) {
         if(ModuleManager.notifications.mode.getValue() == Notifications.Mode.Text)
             Command.sendMessage(Formatting.GRAY + "[" + Formatting.DARK_PURPLE + title + Formatting.GRAY + "] " + type.getColor() + content);
-        else notifications.add(new Notification(title, content, type, second * 1000));
+        else if (ModuleManager.notifications.mode.getValue() == Notifications.Mode.Programming) {
+            if(type == Notification.Type.ENABLED){
+                Command.sendMessage(type.getColor() + title + ".enable();");
+            }
+            else{
+                Command.sendMessage(type.getColor() + title + ".disable();");
+            }
+        } else notifications.add(new Notification(title, content, type, second * 1000));
     }
 
     public void onRender2D(DrawContext context) {
