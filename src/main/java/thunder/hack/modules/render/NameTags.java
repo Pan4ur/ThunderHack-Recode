@@ -62,6 +62,7 @@ import static thunder.hack.utility.render.Render2DEngine.CONTAINER_BACKGROUND;
 public class NameTags extends Module {
     private final Setting<Boolean> self = new Setting<>("Self",false);
     private final Setting<Float> scale = new Setting<>("Scale", 1f, 0.1f, 10f);
+    private final Setting<Boolean> resize= new Setting<>("Resize",false);
     private final Setting<Float> height = new Setting<>("Height", 2f, 0.1f, 10f);
     private final Setting<Boolean> gamemode = new Setting<>("Gamemode", false);
     private final Setting<Boolean> spawners = new Setting<>("SpawnerNameTag", false);
@@ -124,6 +125,7 @@ public class NameTags extends Module {
             double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
             double y = ent.prevY + (ent.getY() - ent.prevY) * mc.getTickDelta();
             double z = ent.prevZ + (ent.getZ() - ent.prevZ) * mc.getTickDelta();
+            float scale = resize.getValue() ? this.scale.getValue() / mc.player.distanceTo(ent) : this.scale.getValue();
             Vec3d vector = new Vec3d(x, y + height.getValue(), z);
 
             Vector4d position = null;
@@ -183,9 +185,9 @@ public class NameTags extends Module {
                 if (armorMode.getValue() != Armor.Durability) stacks.add(ent.getMainHandStack());
 
                 context.getMatrices().push();
-                context.getMatrices().translate(tagX - 2 + (textWidth + 4) / 2f, (float) (posY - 13f) + 6.5f, 0);
-                context.getMatrices().scale(scale.getValue(), scale.getValue(), 1f);
-                context.getMatrices().translate(-(tagX - 2 + (textWidth + 4) / 2f), -(float) ((posY - 13f) + 6.5f), 0);
+                context.getMatrices().translate(tagX - 2 + (textWidth + 4) / 2f, (float) (posY - 13f) + 6.5f + scale, 0);
+                context.getMatrices().scale(scale, scale, 1f);
+                context.getMatrices().translate(-(tagX - 2 + (textWidth + 4) / 2f), -(float) ((posY - 13f) + 6.5f) + scale, 0);
 
                 float item_offset = 0;
                 if (armorMode.getValue() != Armor.None)
