@@ -1,17 +1,12 @@
 package thunder.hack.cmd.impl;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.minecraft.client.gui.screen.LoadingDisplay;
-import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import net.minecraft.command.CommandSource;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
-import thunder.hack.core.impl.AsyncManager;
-import thunder.hack.injection.accesors.IClientPlayNetworkHandler;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-
 import static thunder.hack.ThunderHack.asyncManager;
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
