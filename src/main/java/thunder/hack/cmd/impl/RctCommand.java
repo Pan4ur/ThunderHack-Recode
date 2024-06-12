@@ -21,7 +21,7 @@ public class RctCommand extends Command {
             String serverAddress = mc.player.networkHandler.getServerInfo().address.toLowerCase();
             for (String allowedServer : allowedServers) {
                 if (serverAddress.contains(allowedServer)) {
-                    rct()
+                    rct();
                     return SINGLE_SUCCESS;
                 }
             }
@@ -30,7 +30,7 @@ public class RctCommand extends Command {
         });
 
         builder.then(literal("pohuy").executes(context -> {
-            rct()
+            rct();
             return SINGLE_SUCCESS;
         }));
     }
