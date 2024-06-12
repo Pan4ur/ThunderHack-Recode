@@ -3,6 +3,7 @@ package thunder.hack.modules.misc;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
+import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
@@ -15,6 +16,7 @@ import static thunder.hack.modules.combat.Criticals.getEntity;
 public final class AntiAttack extends Module {
     private final Setting<Boolean> friend = new Setting<>("Friend", true);
     private final Setting<Boolean> zoglin = new Setting<>("Zoglin", true);
+    private final Setting<Boolean> villager = new Setting<>("Villager", false);
 
     public AntiAttack() {
         super("AntiAttack", Category.PLAYER);
@@ -30,6 +32,9 @@ public final class AntiAttack extends Module {
                 e.cancel();
             if (entity instanceof ZombifiedPiglinEntity && zoglin.getValue())
                 e.cancel();
+            if(entity instanceof VillagerEntity && villager.getValue()){
+                e.cancel();
+            }
         }
     }
 }
