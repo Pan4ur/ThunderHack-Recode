@@ -1,9 +1,15 @@
 package thunder.hack.cmd.impl;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.client.gui.screen.LoadingDisplay;
+import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import net.minecraft.command.CommandSource;
 import net.minecraft.scoreboard.ScoreboardObjective;
+import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
+import thunder.hack.core.impl.AsyncManager;
+import thunder.hack.injection.accesors.IClientPlayNetworkHandler;
+
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
 import static thunder.hack.ThunderHack.asyncManager;
@@ -17,31 +23,26 @@ public class RctCommand extends Command {
     @Override
     public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            String[] allowedServers = {"funtime", "spookytime"};
-            String serverAddress = mc.player.networkHandler.getServerInfo().address.toLowerCase();
-            for (String allowedServer : allowedServers) {
-                if (serverAddress.contains(allowedServer)) {
-                    rct();
-                    return SINGLE_SUCCESS;
-                }
+            String sName = mc.player.networkHandler.getServerInfo() == null ? "none" : mc.player.networkHandler.getServerInfo().address;
+
+            if(!sName.contains("funtime") && !sName.contains("spookytime")){
+                sendMessage(isRu() ? "Rct работает только на фанике и спуки" : "Rct works only on funtime and spookytime");
+                return SINGLE_SUCCESS;
             }
-            sendMessage(isRu()? "Rct работает только на фанике и спуки" : "Rct works only on funtime and spookytime");
+
+            String an = "an" + ((ScoreboardObjective) mc.player.getScoreboard().getObjectives().toArray()[0]).getDisplayName().getString().substring(10);
+
+            asyncManager.run(() -> {
+                mc.player.networkHandler.sendCommand("hub");
+                long failSafe = System.currentTimeMillis();
+                while (ThunderHack.core.getSetBackTime() > 300) {
+                    if (System.currentTimeMillis() - failSafe > 5000)
+                        break;
+                }
+                mc.player.networkHandler.sendCommand(an);
+            });
             return SINGLE_SUCCESS;
         });
-
-        builder.then(literal("pohuy").executes(context -> {
-            rct();
-            return SINGLE_SUCCESS;
-        }));
     }
 
-    private void rct() {
-        mc.player.networkHandler.sendCommand("hub");
-        asyncManager.run(() -> {
-            ScoreboardObjective objective = mc.player.getScoreboard().getObjectives().stream().findFirst().orElse(null);
-            if (objective != null) {
-                mc.player.networkHandler.sendCommand("an" + objective.getDisplayName().getString().substring(10));
-            }
-        }, 1500);
-    }
 }
