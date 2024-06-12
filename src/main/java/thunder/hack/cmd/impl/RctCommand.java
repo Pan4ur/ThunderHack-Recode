@@ -17,17 +17,31 @@ public class RctCommand extends Command {
     @Override
     public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            if(!mc.player.networkHandler.getServerInfo().address.equals("mc.funtime.su") && !mc.player.networkHandler.getServerInfo().address.equals("spookytime.net")){
-                sendMessage(isRu() ? "Rct работает только на фанике и спуки" : "Rct works only on funtime and spookytime");
-                return SINGLE_SUCCESS;
+            String[] allowedServers = {"funtime", "spookytime"};
+            String serverAddress = mc.player.networkHandler.getServerInfo().address.toLowerCase();
+            for (String allowedServer : allowedServers) {
+                if (serverAddress.contains(allowedServer)) {
+                    rct()
+                    return SINGLE_SUCCESS;
+                }
             }
-            asyncManager.run(() -> {
-                mc.player.networkHandler.sendCommand("hub");
-                try {Thread.sleep(1500);} catch (InterruptedException e) {throw new RuntimeException(e);}
-                mc.player.networkHandler.sendCommand("an" + ((ScoreboardObjective) mc.player.getScoreboard().getObjectives().toArray()[0]).getDisplayName().getString().substring(10));
-            });
+            sendMessage(isRu()? "Rct работает только на фанике и спуки" : "Rct works only on funtime and spookytime");
             return SINGLE_SUCCESS;
         });
+
+        builder.then(literal("pohuy").executes(context -> {
+            rct()
+            return SINGLE_SUCCESS;
+        }));
     }
 
+    private void rct() {
+        mc.player.networkHandler.sendCommand("hub");
+        asyncManager.run(() -> {
+            ScoreboardObjective objective = mc.player.getScoreboard().getObjectives().stream().findFirst().orElse(null);
+            if (objective != null) {
+                mc.player.networkHandler.sendCommand("an" + objective.getDisplayName().getString().substring(10));
+            }
+        }, 1500);
+    }
 }
