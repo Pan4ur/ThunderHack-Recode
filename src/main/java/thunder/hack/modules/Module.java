@@ -324,6 +324,12 @@ public abstract class Module {
     public boolean isKeyPressed(int button) {
         if (button == -1 || ModuleManager.unHook.isEnabled())
             return false;
+
+        if (ThunderHack.moduleManager.activeMouseKeys.contains(button)) {
+            ThunderHack.moduleManager.activeMouseKeys.clear();
+            return true;
+        }
+
         return InputUtil.isKeyPressed(mc.getWindow().getHandle(), button);
     }
 

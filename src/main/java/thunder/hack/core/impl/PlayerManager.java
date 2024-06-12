@@ -116,11 +116,6 @@ public class PlayerManager implements IManager {
             inInventory = true;
         }
         if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket slot) {
-            if (serverSideSlot == slot.getSelectedSlot() && !(ModuleManager.noSlow.isEnabled() && ModuleManager.noSlow.mode.getValue() == NoSlow.Mode.StrictNCP)) {
-                event.cancel();
-                ModuleManager.clientSettings.debug("Double slot packet!");
-            }
-
             switchTimer.reset();
             serverSideSlot = slot.getSelectedSlot();
         }
