@@ -234,6 +234,7 @@ public class ModuleManager implements IManager {
     public static AimBot aimBot = new AimBot();
     public static Quiver quiver = new Quiver();
     public static NoPush noPush = new NoPush();
+    public static PacketCanceler packetCanceler = new PacketCanceler();
     public static UnHook unHook = new UnHook();
     public static Avoid avoid = new Avoid();
     public static Timer timer = new Timer();
