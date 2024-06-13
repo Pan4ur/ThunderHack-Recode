@@ -12,7 +12,7 @@ import java.awt.*;
 
 public class WorldTweaks extends Module {
     public WorldTweaks() {
-        super("WorldTweaks", Category.MISC);
+        super("WorldTweaks", Category.RENDER);
     }
 
     public static final Setting<BooleanSettingGroup> fogModify = new Setting("FogModify", new BooleanSettingGroup(true));

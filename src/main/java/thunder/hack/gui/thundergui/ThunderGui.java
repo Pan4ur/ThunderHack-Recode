@@ -3,6 +3,7 @@ package thunder.hack.gui.thundergui;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
@@ -587,8 +588,7 @@ public class ThunderGui extends Screen {
                 search_string = (removeLastChar(search_string));
                 return;
             }
-
-            search_string = (search_string + typedChar);
+            if(keyCode >= GLFW.GLFW_KEY_A && keyCode <= GLFW.GLFW_KEY_Z || keyCode >= GLFW.GLFW_KEY_0 && keyCode <= GLFW.GLFW_KEY_9) search_string = (search_string + typedChar);
         }
         if (listening_config) {
             if (config_string.equalsIgnoreCase("Save config")) {
