@@ -22,7 +22,7 @@ public class BlockESPCommand extends Command {
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("reset").executes(context -> {
             ModuleManager.blockESP.selectedBlocks.getValue().clear();
-            sendMessage(isRu() ? "Search был очищен!" : "Search got reset.");
+            sendMessage(isRu() ? "BlockESP был очищен!" : "BlockESP got reset.");
             mc.worldRenderer.reload();
             return SINGLE_SUCCESS;
         }));
@@ -61,9 +61,9 @@ public class BlockESPCommand extends Command {
 
         builder.executes(context -> {
             if (ModuleManager.blockESP.selectedBlocks.getValue().getItemsById().isEmpty()) {
-                sendMessage("Search list empty");
+                sendMessage("BlockESP list empty");
             } else {
-                StringBuilder f = new StringBuilder("Search list: ");
+                StringBuilder f = new StringBuilder("BlockESP list: ");
 
                 for (String name : ModuleManager.blockESP.selectedBlocks.getValue().getItemsById())
                     try {
