@@ -12,6 +12,6 @@ public final class Notifications extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
 
     public enum Mode {
-        Default, CrossHair, Text
+        Default, CrossHair, Text, Programming
     }
 }
