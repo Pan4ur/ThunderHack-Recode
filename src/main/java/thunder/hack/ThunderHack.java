@@ -23,6 +23,10 @@ import java.nio.charset.StandardCharsets;
 
 
 public class ThunderHack implements ModInitializer {
+
+    // ало прием
+
+
     public static final ModMetadata MOD_META;
 
     public static final String MOD_ID = "thunderhack";
