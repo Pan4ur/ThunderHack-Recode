@@ -22,7 +22,7 @@ import static thunder.hack.modules.Module.mc;
 public class FriendComponent {
     float scroll_animation = 0f;
     private Identifier head = null;
-    private final Identifier crackedSkin = new Identifier("thunderhack", "textures/gui/elements/cracked.png");
+    private final Identifier crackedSkin = Identifier.of("thunderhack", "textures/gui/elements/cracked.png");
     private final String name;
     private int posX;
     private int posY;

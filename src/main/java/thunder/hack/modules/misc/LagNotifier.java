@@ -27,7 +27,7 @@ public class LagNotifier extends Module {
     private final Setting<Integer> responseTreshold = new Setting<>("ResponseTreshold", 5, 0, 15, v -> serverResponseNotify.getValue());
     private final Setting<Boolean> tpsNotify = new Setting<>("TPS", true);
 
-    private final Identifier ICON = new Identifier("thunderhack", "textures/hud/elements/lag.png");
+    private final Identifier ICON = Identifier.of("thunderhack", "textures/hud/elements/lag.png");
 
     private Timer notifyTimer = new Timer();
     private Timer rubberbandTimer = new Timer();

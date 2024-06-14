@@ -87,35 +87,33 @@ public class Particles extends Module {
     }
 
     public void onRender3D(MatrixStack stack) {
-        if (FireFlies.getValue().isEnabled()) {
+        if (FireFlies.getValue().isEnabled() && !fireFlies.isEmpty()) {
             stack.push();
             RenderSystem.setShaderTexture(0, firefly);
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(false);
-            BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
             RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-            fireFlies.forEach(p -> p.render(bufferBuilder));
-            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+            fireFlies.forEach(p -> p.render(buffer));
+            BufferRenderer.drawWithGlobalProgram(buffer.end());
             RenderSystem.depthMask(true);
             RenderSystem.disableDepthTest();
             RenderSystem.disableBlend();
             stack.pop();
         }
 
-        if (mode.getValue() != Mode.Off) {
+        if (mode.getValue() != Mode.Off && !particles.isEmpty()) {
             stack.push();
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(false);
-            BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
             RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-            particles.forEach(p -> p.render(bufferBuilder));
-            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+            particles.forEach(p -> p.render(buffer));
+            BufferRenderer.drawWithGlobalProgram(buffer.end());
             RenderSystem.depthMask(true);
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
             RenderSystem.disableDepthTest();
@@ -176,10 +174,10 @@ public class Particles extends Module {
                     matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
                     Matrix4f matrix = matrices.peek().getPositionMatrix();
 
-                    bufferBuilder.vertex(matrix, 0, -ffsize.getValue(), 0).texture(0f, 1f).color(Render2DEngine.injectAlpha(ctx.color(), (int) (255 * ((float) age / (float) maxAge) * ctx.animation(mc.getTickDelta()))).getRGB()).next();
-                    bufferBuilder.vertex(matrix, -ffsize.getValue(), -ffsize.getValue(), 0).texture(1f, 1f).color(Render2DEngine.injectAlpha(ctx.color(), (int) (255 * ((float) age / (float) maxAge) * ctx.animation(mc.getTickDelta()))).getRGB()).next();
-                    bufferBuilder.vertex(matrix, -ffsize.getValue(), 0, 0).texture(1f, 0).color(Render2DEngine.injectAlpha(ctx.color(), (int) (255 * ((float) age / (float) maxAge) * ctx.animation(mc.getTickDelta()))).getRGB()).next();
-                    bufferBuilder.vertex(matrix, 0, 0, 0).texture(0, 0).color(Render2DEngine.injectAlpha(ctx.color(), (int) (255 * ((float) age / (float) maxAge) * ctx.animation(mc.getTickDelta()))).getRGB()).next();
+                    bufferBuilder.vertex(matrix, 0, -ffsize.getValue(), 0).texture(0f, 1f).color(Render2DEngine.injectAlpha(ctx.color(), (int) (255 * ((float) age / (float) maxAge) * ctx.animation(Render3DEngine.getTickDelta()))).getRGB());
+                    bufferBuilder.vertex(matrix, -ffsize.getValue(), -ffsize.getValue(), 0).texture(1f, 1f).color(Render2DEngine.injectAlpha(ctx.color(), (int) (255 * ((float) age / (float) maxAge) * ctx.animation(Render3DEngine.getTickDelta()))).getRGB());
+                    bufferBuilder.vertex(matrix, -ffsize.getValue(), 0, 0).texture(1f, 0).color(Render2DEngine.injectAlpha(ctx.color(), (int) (255 * ((float) age / (float) maxAge) * ctx.animation(Render3DEngine.getTickDelta()))).getRGB());
+                    bufferBuilder.vertex(matrix, 0, 0, 0).texture(0, 0).color(Render2DEngine.injectAlpha(ctx.color(), (int) (255 * ((float) age / (float) maxAge) * ctx.animation(Render3DEngine.getTickDelta()))).getRGB());
                 }
             }
         }
@@ -252,10 +250,10 @@ public class Particles extends Module {
 
             Matrix4f matrix1 = matrices.peek().getPositionMatrix();
 
-            bufferBuilder.vertex(matrix1, 0, -size.getValue(), 0).texture(0f, 1f).color(Render2DEngine.injectAlpha(color1, (int) (255 * ((float) age / (float) maxAge))).getRGB()).next();
-            bufferBuilder.vertex(matrix1, -size.getValue(), -size.getValue(), 0).texture(1f, 1f).color(Render2DEngine.injectAlpha(color1, (int) (255 * ((float) age / (float) maxAge))).getRGB()).next();
-            bufferBuilder.vertex(matrix1, -size.getValue(), 0, 0).texture(1f, 0).color(Render2DEngine.injectAlpha(color1, (int) (255 * ((float) age / (float) maxAge))).getRGB()).next();
-            bufferBuilder.vertex(matrix1, 0, 0, 0).texture(0, 0).color(Render2DEngine.injectAlpha(color1, (int) (255 * ((float) age / (float) maxAge))).getRGB()).next();
+            bufferBuilder.vertex(matrix1, 0, -size.getValue(), 0).texture(0f, 1f).color(Render2DEngine.injectAlpha(color1, (int) (255 * ((float) age / (float) maxAge))).getRGB());
+            bufferBuilder.vertex(matrix1, -size.getValue(), -size.getValue(), 0).texture(1f, 1f).color(Render2DEngine.injectAlpha(color1, (int) (255 * ((float) age / (float) maxAge))).getRGB());
+            bufferBuilder.vertex(matrix1, -size.getValue(), 0, 0).texture(1f, 0).color(Render2DEngine.injectAlpha(color1, (int) (255 * ((float) age / (float) maxAge))).getRGB());
+            bufferBuilder.vertex(matrix1, 0, 0, 0).texture(0, 0).color(Render2DEngine.injectAlpha(color1, (int) (255 * ((float) age / (float) maxAge))).getRGB());
         }
     }
 }

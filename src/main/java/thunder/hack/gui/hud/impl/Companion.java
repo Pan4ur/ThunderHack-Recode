@@ -25,9 +25,9 @@ public class Companion extends HudElement {
         super("2D Companion", 50, 10);
     }
 
-    private final Identifier BOYKISSER = new Identifier("thunderhack", "textures/hud/elements/boykisser.png");
-    private final Identifier PAIMON = new Identifier("thunderhack", "textures/hud/elements/paimon.png");
-    private final Identifier BALTIKA = new Identifier("thunderhack", "textures/hud/elements/baltika.png");
+    private final Identifier BOYKISSER = Identifier.of("thunderhack", "textures/hud/elements/boykisser.png");
+    private final Identifier PAIMON = Identifier.of("thunderhack", "textures/hud/elements/paimon.png");
+    private final Identifier BALTIKA = Identifier.of("thunderhack", "textures/hud/elements/baltika.png");
 
     public Setting<Integer> scale = new Setting<>("Scale", 50, 0, 100);
     public Setting<Mode> mode = new Setting<>("Mode", Mode.Boykisser);

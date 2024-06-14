@@ -24,7 +24,7 @@ public class Speedometer extends HudElement {
         super("Speedometer", 50, 10);
     }
 
-    private Identifier icon = new Identifier("thunderhack", "textures/hud/icons/speedometer.png");
+    private Identifier icon = Identifier.of("thunderhack", "textures/hud/icons/speedometer.png");
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);

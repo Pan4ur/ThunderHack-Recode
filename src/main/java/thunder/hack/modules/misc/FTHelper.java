@@ -171,11 +171,11 @@ public class FTHelper extends Module {
     private void use(SearchInvResult result, SearchInvResult invResult) {
         if (result.found()) {
             InventoryUtility.saveAndSwitchTo(result.slot());
-            sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+            sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
             InventoryUtility.returnSlot();
         } else if (invResult.found()) {
             clickSlot(invResult.slot(), mc.player.getInventory().selectedSlot, SlotActionType.SWAP);
-            sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+            sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
             clickSlot(invResult.slot(), mc.player.getInventory().selectedSlot, SlotActionType.SWAP);
             sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
         }

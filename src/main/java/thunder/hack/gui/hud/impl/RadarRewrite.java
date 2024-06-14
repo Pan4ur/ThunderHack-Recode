@@ -17,6 +17,7 @@ import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.MSAAFramebuffer;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
 import java.util.Objects;
@@ -46,7 +47,7 @@ public class RadarRewrite extends HudElement {
     }
 
     public static double interp(double d, double d2) {
-        return d2 + (d - d2) * (double) mc.getTickDelta();
+        return d2 + (d - d2) * (double) Render3DEngine.getTickDelta();
     }
 
     public void onRender2D(DrawContext context) {
@@ -126,9 +127,7 @@ public class RadarRewrite extends HudElement {
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
 
         float radius = CRadius.getValue() - margin;
 
@@ -140,8 +139,8 @@ public class RadarRewrite extends HudElement {
             cos = (float) Math.cos(i * Math.PI / 180);
             sin = (float) Math.sin(i * Math.PI / 180);
 
-            bufferBuilder.vertex((x + cos * (radius / ry)), (y + sin * (radius / rx)), 0f).color(color.getRGB()).next();
-            bufferBuilder.vertex((x + cos * ((radius - width) / ry)), (y + sin * ((radius - width) / rx)), 0f).color(color.getRGB()).next();
+            bufferBuilder.vertex((x + cos * (radius / ry)), (y + sin * (radius / rx)), 0f).color(color.getRGB());
+            bufferBuilder.vertex((x + cos * ((radius - width) / ry)), (y + sin * ((radius - width) / rx)), 0f).color(color.getRGB());
         }
 
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());

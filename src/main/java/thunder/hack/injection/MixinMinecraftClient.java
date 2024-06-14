@@ -1,6 +1,5 @@
 package thunder.hack.injection;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
 import net.minecraft.client.gui.screen.Overlay;
@@ -32,7 +31,6 @@ import thunder.hack.events.impl.*;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
-import thunder.hack.utility.render.WindowResizeCallback;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -100,11 +98,6 @@ public abstract class MixinMinecraftClient {
     @Shadow
     public abstract void setScreen(@Nullable Screen screen);
 
-    @Inject(method = "onResolutionChanged", at = @At("TAIL"))
-    private void captureResize(CallbackInfo ci) {
-        WindowResizeCallback.EVENT.invoker().onResized((MinecraftClient) (Object) this, this.window);
-    }
-
     @Inject(method = "doItemPick", at = @At("HEAD"), cancellable = true)
     private void doItemPickHook(CallbackInfo ci) {
         if (ModuleManager.middleClick.isEnabled() && ModuleManager.middleClick.antiPickUp.getValue())
@@ -145,7 +138,7 @@ public abstract class MixinMinecraftClient {
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/Window;setIcon(Lnet/minecraft/resource/ResourcePack;Lnet/minecraft/client/util/Icons;)V"))
     private void onChangeIcon(Window instance, ResourcePack resourcePack, Icons icons) throws IOException {
-        RenderSystem.assertInInitPhase();
+        // RenderSystem.assertInInitPhase(); ???
 
         if (GLFW.glfwGetPlatform() == 393218) {
             MacWindowUtil.setApplicationIconImage(icons.getMacIcon(resourcePack));

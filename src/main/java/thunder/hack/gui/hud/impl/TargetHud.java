@@ -35,6 +35,7 @@ import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.render.animation.BetterAnimation;
 import thunder.hack.utility.render.animation.BetterDynamicAnimation;
 
@@ -43,7 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TargetHud extends HudElement {
-    private static final Identifier thudPic = new Identifier("thunderhack", "textures/hud/elements/thud.png");
+    private static final Identifier thudPic = Identifier.of("thunderhack", "textures/hud/elements/thud.png");
     private static Identifier custom;
 
     public static BetterDynamicAnimation healthanimation = new BetterDynamicAnimation();
@@ -317,7 +318,7 @@ public class TargetHud extends HudElement {
                     drawPotionEffect(context.getMatrices(), ((PlayerEntity) target));
                 }
             } else if (Mode.getValue() == ModeEn.NurikZapen) {
-                float hurtPercent = (Render2DEngine.interpolateFloat(MathUtility.clamp(target.hurtTime == 0 ? 0 : target.hurtTime + 1, 0, 10), target.hurtTime, mc.getTickDelta())) / 8f;
+                float hurtPercent = (Render2DEngine.interpolateFloat(MathUtility.clamp(target.hurtTime == 0 ? 0 : target.hurtTime + 1, 0, 10), target.hurtTime, Render3DEngine.getTickDelta())) / 8f;
                 healthanimation.setValue(health);
                 health = (float) healthanimation.getAnimationD();
 

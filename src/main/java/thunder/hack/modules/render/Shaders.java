@@ -11,6 +11,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.SettingGroup;
+import thunder.hack.utility.render.Render3DEngine;
 
 public class Shaders extends Module {
     public Shaders() {
@@ -84,7 +85,7 @@ public class Shaders extends Module {
 
     public void onRender3D(MatrixStack matrices) {
         if (hands.getValue())
-            ThunderHack.shaderManager.renderShader(() -> ((IGameRenderer) mc.gameRenderer).irenderHand(mc.gameRenderer.getCamera(), mc.getTickDelta(), matrices.peek().getPositionMatrix()), handsMode.getValue());
+            ThunderHack.shaderManager.renderShader(() -> ((IGameRenderer) mc.gameRenderer).irenderHand(mc.gameRenderer.getCamera(), Render3DEngine.getTickDelta(), matrices.peek().getPositionMatrix()), handsMode.getValue());
     }
 
     @Override

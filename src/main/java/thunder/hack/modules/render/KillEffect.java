@@ -6,11 +6,9 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.SoundManager;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -69,8 +67,7 @@ public class KillEffect extends Module {
             case LightningBolt -> renderEntities.forEach((entity, time) -> {
                 LightningEntity lightningEntity = new LightningEntity(EntityType.LIGHTNING_BOLT, mc.world);
                 lightningEntity.refreshPositionAfterTeleport(entity.getX(), entity.getY(), entity.getZ());
-                EntitySpawnS2CPacket pac = new EntitySpawnS2CPacket(lightningEntity);
-                pac.apply(mc.getNetworkHandler());
+                mc.world.addEntity(lightningEntity);
                 renderEntities.remove(entity);
                 lightingEntities.put(entity, System.currentTimeMillis());
             });
@@ -83,7 +80,8 @@ public class KillEffect extends Module {
             if (!(entity instanceof PlayerEntity) && !mobs.getValue()) return;
             if (!(entity instanceof LivingEntity liv)) return;
 
-            if (entity == mc.player || renderEntities.containsKey(entity) || lightingEntities.containsKey(entity)) return;
+            if (entity == mc.player || renderEntities.containsKey(entity) || lightingEntities.containsKey(entity))
+                return;
             if (entity.isAlive() || liv.getHealth() != 0) return;
 
             if (playSound.getValue() && mode.getValue() == Mode.Orthodox)

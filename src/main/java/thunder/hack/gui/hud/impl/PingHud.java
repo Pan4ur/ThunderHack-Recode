@@ -21,7 +21,7 @@ public class PingHud extends HudElement {
         super("Ping", 50, 10);
     }
 
-    private Identifier icon = new Identifier("thunderhack", "textures/hud/icons/ping.png");
+    private Identifier icon = Identifier.of("thunderhack", "textures/hud/icons/ping.png");
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);

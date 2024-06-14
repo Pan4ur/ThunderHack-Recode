@@ -20,7 +20,7 @@ public class Coords extends HudElement {
         super("Coords", 100, 10);
     }
 
-    private final Identifier icon = new Identifier("thunderhack", "textures/hud/icons/coords.png");
+    private final Identifier icon = Identifier.of("thunderhack", "textures/hud/icons/coords.png");
     private final Setting<NetherCoords> netherCoords = new Setting<>("NetherCoords", NetherCoords.On);
 
     private enum NetherCoords {

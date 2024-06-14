@@ -56,7 +56,7 @@ public class NoSlow extends Module {
                         sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot % 8 + 1));
                         sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
                     } else if (mainHand.getValue()) {
-                        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id));
+                        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
                     }
                 }
                 case Matrix -> {
@@ -70,7 +70,7 @@ public class NoSlow extends Module {
                         sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot % 8 + 1));
                         sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
                     } else if (mainHand.getValue() && (mc.player.getItemUseTime() <= 3 || mc.player.age % 2 == 0)) {
-                        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id));
+                        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
                     }
                 }
                 case Matrix2 -> {

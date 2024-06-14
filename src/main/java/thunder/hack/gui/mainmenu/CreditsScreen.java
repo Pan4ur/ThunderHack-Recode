@@ -26,7 +26,7 @@ import java.util.Objects;
 import static thunder.hack.modules.Module.mc;
 
 public class CreditsScreen extends Screen {
-    private static final Identifier TH_TEAM = new Identifier("thunderhack", "textures/gui/elements/thteam.png");
+    private static final Identifier TH_TEAM = Identifier.of("thunderhack", "textures/gui/elements/thteam.png");
 
     public ArrayList<Contributor> contributors = new ArrayList<>();
 

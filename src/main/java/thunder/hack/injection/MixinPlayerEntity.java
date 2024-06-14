@@ -1,5 +1,6 @@
 package thunder.hack.injection;
 
+import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -105,7 +106,7 @@ public class MixinPlayerEntity {
     }
 
     @Inject(method = "eatFood", at = @At("RETURN"))
-    public void eatFoodHook(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
+    public void eatFoodHook(World world, ItemStack stack, FoodComponent foodComponent, CallbackInfoReturnable<ItemStack> cir) {
         ThunderHack.EVENT_BUS.post(new EventEatFood(cir.getReturnValue()));
     }
 

@@ -11,6 +11,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 
 public class FreeCam extends Module {
     private final Setting<Float> speed = new Setting<>("HSpeed", 1f, 0.1f, 3f);
@@ -138,22 +139,22 @@ public class FreeCam extends Module {
     }
 
     public float getFakeYaw() {
-        return (float) Render2DEngine.interpolate(prevFakeYaw, fakeYaw, mc.getTickDelta());
+        return (float) Render2DEngine.interpolate(prevFakeYaw, fakeYaw, Render3DEngine.getTickDelta());
     }
 
     public float getFakePitch() {
-        return (float) Render2DEngine.interpolate(prevFakePitch, fakePitch, mc.getTickDelta());
+        return (float) Render2DEngine.interpolate(prevFakePitch, fakePitch, Render3DEngine.getTickDelta());
     }
 
     public double getFakeX() {
-        return Render2DEngine.interpolate(prevFakeX, fakeX, mc.getTickDelta());
+        return Render2DEngine.interpolate(prevFakeX, fakeX, Render3DEngine.getTickDelta());
     }
 
     public double getFakeY() {
-        return Render2DEngine.interpolate(prevFakeY, fakeY, mc.getTickDelta());
+        return Render2DEngine.interpolate(prevFakeY, fakeY, Render3DEngine.getTickDelta());
     }
 
     public double getFakeZ() {
-        return Render2DEngine.interpolate(prevFakeZ, fakeZ, mc.getTickDelta());
+        return Render2DEngine.interpolate(prevFakeZ, fakeZ, Render3DEngine.getTickDelta());
     }
 }

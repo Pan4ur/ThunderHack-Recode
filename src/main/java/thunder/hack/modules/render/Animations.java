@@ -231,8 +231,8 @@ public class Animations extends Module {
                     matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-11.935F));
                     matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) i * 65.3F));
                     matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) i * -9.785F));
-                    f = (float) item.getMaxUseTime() - ((float) mc.player.getItemUseTimeLeft() - tickDelta + 1.0F);
-                    g = f / (float) CrossbowItem.getPullTime(item);
+                    f = (float) item.getMaxUseTime(mc.player) - ((float) mc.player.getItemUseTimeLeft() - tickDelta + 1.0F);
+                    g = f / (float) CrossbowItem.getPullTime(item, mc.player);
                     if (g > 1.0F) {
                         g = 1.0F;
                     }
@@ -281,7 +281,7 @@ public class Animations extends Module {
                             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-13.935F));
                             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) l * 35.3F));
                             matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) l * -9.785F));
-                            m = (float) item.getMaxUseTime() - ((float) mc.player.getItemUseTimeLeft() - tickDelta + 1.0F);
+                            m = (float) item.getMaxUseTime(mc.player) - ((float) mc.player.getItemUseTimeLeft() - tickDelta + 1.0F);
                             f = m / 20.0F;
                             f = (f * f + f * 2.0F) / 3.0F;
                             if (f > 1.0F) {
@@ -303,7 +303,7 @@ public class Animations extends Module {
                             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-55.0F));
                             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) l * 35.3F));
                             matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) l * -9.785F));
-                            m = (float) item.getMaxUseTime() - ((float) mc.player.getItemUseTimeLeft() - tickDelta + 1.0F);
+                            m = (float) item.getMaxUseTime(mc.player) - ((float) mc.player.getItemUseTimeLeft() - tickDelta + 1.0F);
                             f = m / 10.0F;
                             if (f > 1.0F) {
                                 f = 1.0F;
@@ -340,7 +340,7 @@ public class Animations extends Module {
     private void applyBrushTransformation(MatrixStack matrices, float tickDelta, Arm arm, @NotNull ItemStack stack, float equipProgress) {
         applyEquipOffset(matrices, arm, equipProgress);
         float f = (float) mc.player.getItemUseTimeLeft() - tickDelta + 1.0F;
-        float g = 1.0F - f / (float) stack.getMaxUseTime();
+        float g = 1.0F - f / (float) stack.getMaxUseTime(mc.player);
         float m = -15.0F + 75.0F * MathHelper.cos(g * 45.0F * 3.1415927F);
 
         if (arm != Arm.RIGHT) {
@@ -382,7 +382,7 @@ public class Animations extends Module {
 
     private void applyEatOrDrinkTransformationCustom(MatrixStack matrices, float tickDelta, Arm arm, @NotNull ItemStack stack) {
         float f = (float) mc.player.getItemUseTimeLeft() - tickDelta + 1.0F;
-        float g = f / (float) stack.getMaxUseTime();
+        float g = f / (float) stack.getMaxUseTime(mc.player);
         float h;
         if (g < 0.8F) {
             h = MathHelper.abs(MathHelper.cos(f / 4.0F * 3.1415927F) * 0.005F);

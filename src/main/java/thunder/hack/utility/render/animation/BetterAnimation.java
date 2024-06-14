@@ -1,6 +1,7 @@
 package thunder.hack.utility.render.animation;
 
 import net.minecraft.util.math.MathHelper;
+import thunder.hack.utility.render.Render3DEngine;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -30,6 +31,6 @@ public class BetterAnimation {
     }
 
     public double getAnimationd() {
-        return dropAnimation((prevTick + (tick - prevTick) * mc.getTickDelta()) / maxTick);
+        return dropAnimation((prevTick + (tick - prevTick) * Render3DEngine.getTickDelta()) / maxTick);
     }
 }

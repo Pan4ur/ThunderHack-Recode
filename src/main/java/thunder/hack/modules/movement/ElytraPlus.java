@@ -404,19 +404,18 @@ public class ElytraPlus extends Module {
             stack.push();
             Render3DEngine.setupRender();
             RenderSystem.disableCull();
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder bufferBuilder = tessellator.getBuffer();
             RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-            bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+            BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+
             float cos;
             float sin;
             for (int i = 0; i <= 30; i++) {
                 cos = (float) ((flightZonePos.getX() - mc.getEntityRenderDispatcher().camera.getPos().getX()) + Math.cos(i * (Math.PI * 2f) / 30f) * 95);
                 sin = (float) ((flightZonePos.getZ() - mc.getEntityRenderDispatcher().camera.getPos().getZ()) + Math.sin(i * (Math.PI * 2f) / 30f) * 95);
-                bufferBuilder.vertex(stack.peek().getPositionMatrix(), cos, (float) -mc.getEntityRenderDispatcher().camera.getPos().getY(), sin).color(Render2DEngine.injectAlpha(HudEditor.getColor(i), 255).getRGB()).next();
-                bufferBuilder.vertex(stack.peek().getPositionMatrix(), cos, (float) ((float) 128 - mc.getEntityRenderDispatcher().camera.getPos().getY()), sin).color(Render2DEngine.injectAlpha(HudEditor.getColor(i), 0).getRGB()).next();
+                buffer.vertex(stack.peek().getPositionMatrix(), cos, (float) -mc.getEntityRenderDispatcher().camera.getPos().getY(), sin).color(Render2DEngine.injectAlpha(HudEditor.getColor(i), 255).getRGB());
+                buffer.vertex(stack.peek().getPositionMatrix(), cos, (float) ((float) 128 - mc.getEntityRenderDispatcher().camera.getPos().getY()), sin).color(Render2DEngine.injectAlpha(HudEditor.getColor(i), 0).getRGB());
             }
-            tessellator.draw();
+            BufferRenderer.drawWithGlobalProgram(buffer.end());
             RenderSystem.enableCull();
             Render3DEngine.endRender();
             stack.pop();
@@ -506,7 +505,7 @@ public class ElytraPlus extends Module {
                 e.setZ(e.getZ() + m[1]);
             }
         } else {
-            Vec3d rotationVec = mc.player.getRotationVec(mc.getTickDelta());
+            Vec3d rotationVec = mc.player.getRotationVec(1f);
 
             double d6 = Math.hypot(rotationVec.x, rotationVec.z);
             double currentSpeed = Math.hypot(e.getX(), e.getZ());
@@ -698,7 +697,7 @@ public class ElytraPlus extends Module {
 
         boolean inOffhand = mc.player.getOffHandStack().getItem() == Items.FIREWORK_ROCKET;
         if (!inOffhand) sendPacket(new UpdateSelectedSlotC2SPacket(n2));
-        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(inOffhand ? Hand.OFF_HAND : Hand.MAIN_HAND, id));
+        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(inOffhand ? Hand.OFF_HAND : Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
         if (!inOffhand) sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
 
         flying = true;

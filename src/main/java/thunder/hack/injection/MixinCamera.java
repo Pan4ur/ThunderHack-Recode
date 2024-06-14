@@ -16,12 +16,12 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 @Mixin(Camera.class)
 public abstract class MixinCamera {
     @Shadow
-    protected abstract double clipToSpace(double desiredCameraDistance);
+    protected abstract float clipToSpace(float desiredCameraDistance);
 
     @Shadow
     private boolean thirdPerson;
 
-    @ModifyArgs(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;moveBy(DDD)V", ordinal = 0))
+    @ModifyArgs(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;moveBy(FFF)V", ordinal = 0))
     private void modifyCameraDistance(Args args) {
         if (ModuleManager.noCameraClip.isEnabled()) {
             args.set(0, -clipToSpace(ModuleManager.noCameraClip.getDistance()));
@@ -29,7 +29,7 @@ public abstract class MixinCamera {
     }
 
     @Inject(method = "clipToSpace", at = @At("HEAD"), cancellable = true)
-    private void onClipToSpace(double desiredCameraDistance, CallbackInfoReturnable<Double> info) {
+    private void onClipToSpace(float f, CallbackInfoReturnable<Float> info) {
         if (ModuleManager.noCameraClip.isEnabled()) {
             info.setReturnValue(ModuleManager.noCameraClip.getDistance());
         }

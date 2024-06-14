@@ -1,6 +1,7 @@
 package thunder.hack.utility.render.animation;
 
 import net.minecraft.util.math.MathHelper;
+import thunder.hack.utility.render.Render3DEngine;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -37,7 +38,7 @@ public class BetterDynamicAnimation {
 
     public double getAnimationD() {
         double delta = dstValue - value;
-        double animation = createAnimation((prevStep + (step - prevStep) * mc.getTickDelta()) / (double) maxTicks);
+        double animation = createAnimation((prevStep + (step - prevStep) * Render3DEngine.getTickDelta()) / (double) maxTicks);
         return value + delta * animation;
     }
 }

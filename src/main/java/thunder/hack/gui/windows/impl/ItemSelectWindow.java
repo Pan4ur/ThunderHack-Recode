@@ -68,23 +68,24 @@ public class ItemSelectWindow extends WindowBase {
         FontRenderers.sf_medium_mini.drawString(context.getMatrices(), search, getX() + getWidth() - 86, getY() + 7, new Color(0xD5D5D5).getRGB());
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
 
         int tabColor1 = allTab ? new Color(0xD5D5D5).getRGB() : Color.GRAY.getRGB();
         int tabColor2 = allTab ? Color.GRAY.getRGB() : new Color(0xBDBDBD).getRGB();
 
-        bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
-        bufferBuilder.vertex(getX() + 1.5f, getY() + 29, 0f).color(Color.DARK_GRAY.getRGB()).next();
-        bufferBuilder.vertex(getX() + 8, getY() + 29, 0f).color(tabColor1).next();
-        bufferBuilder.vertex(getX() + 8, getY() + 19, 0f).color(tabColor1).next();
-        bufferBuilder.vertex(getX() + 48, getY() + 19, 0f).color(tabColor1).next();
-        bufferBuilder.vertex(getX() + 54, getY() + 29, 0f).color(tabColor1).next();
-        bufferBuilder.vertex(getX() + 52, getY() + 25, 0f).color(tabColor2).next();
-        bufferBuilder.vertex(getX() + 52, getY() + 19, 0f).color(tabColor2).next();
-        bufferBuilder.vertex(getX() + 92, getY() + 19, 0f).color(tabColor2).next();
-        bufferBuilder.vertex(getX() + 100, getY() + 29, 0f).color(Color.GRAY.getRGB()).next();
-        bufferBuilder.vertex(getX() + getWidth() - 1, getY() + 29, 0f).color(Color.DARK_GRAY.getRGB()).next();
+
+
+        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
+
+        bufferBuilder.vertex(getX() + 1.5f, getY() + 29, 0f).color(Color.DARK_GRAY.getRGB());
+        bufferBuilder.vertex(getX() + 8, getY() + 29, 0f).color(tabColor1);
+        bufferBuilder.vertex(getX() + 8, getY() + 19, 0f).color(tabColor1);
+        bufferBuilder.vertex(getX() + 48, getY() + 19, 0f).color(tabColor1);
+        bufferBuilder.vertex(getX() + 54, getY() + 29, 0f).color(tabColor1);
+        bufferBuilder.vertex(getX() + 52, getY() + 25, 0f).color(tabColor2);
+        bufferBuilder.vertex(getX() + 52, getY() + 19, 0f).color(tabColor2);
+        bufferBuilder.vertex(getX() + 92, getY() + 19, 0f).color(tabColor2);
+        bufferBuilder.vertex(getX() + 100, getY() + 29, 0f).color(Color.GRAY.getRGB());
+        bufferBuilder.vertex(getX() + getWidth() - 1, getY() + 29, 0f).color(Color.DARK_GRAY.getRGB());
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 
         FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "All", getX() + 25, getY() + 25, tabColor1);

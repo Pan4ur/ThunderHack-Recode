@@ -78,7 +78,7 @@ public class Crosshair extends Module {
 
         switch (mode.getValue()) {
             case Circle -> {
-                Render2DEngine.drawArc(context.getMatrices(), xAnim - 25, yAnim - 25, 50, 50, 0.05f, 0.12f, 0, Render2DEngine.interpolateFloat(prevProgress, progress, mc.getTickDelta()));
+                Render2DEngine.drawArc(context.getMatrices(), xAnim - 25, yAnim - 25, 50, 50, 0.05f, 0.12f, 0, Render2DEngine.interpolateFloat(prevProgress, progress, Render3DEngine.getTickDelta()));
                 prevProgress = progress;
             }
             case WiseTree -> {
@@ -103,17 +103,16 @@ public class Crosshair extends Module {
                 RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
                 RenderSystem.enableDepthTest();
                 RenderSystem.depthMask(false);
-                BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+                BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
                 RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
                 RenderSystem.setShaderTexture(0, firefly);
                 Color color1 = colorMode.getValue() == ColorMode.Sync ? HudEditor.getColor(1) : color.getValue().getColorObject();
                 Matrix4f posMatrix = context.getMatrices().peek().getPositionMatrix();
-                bufferBuilder.vertex(posMatrix, 0, -8f, 0).texture(0f, 1f).color(color1.getRGB()).next();
-                bufferBuilder.vertex(posMatrix, -8f, -8f, 0).texture(1f, 1f).color(color1.getRGB()).next();
-                bufferBuilder.vertex(posMatrix, -8f, 0, 0).texture(1f, 0).color(color1.getRGB()).next();
-                bufferBuilder.vertex(posMatrix, 0, 0, 0).texture(0, 0).color(color1.getRGB()).next();
-                BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+                buffer.vertex(posMatrix, 0, -8f, 0).texture(0f, 1f).color(color1.getRGB());
+                buffer.vertex(posMatrix, -8f, -8f, 0).texture(1f, 1f).color(color1.getRGB());
+                buffer.vertex(posMatrix, -8f, 0, 0).texture(1f, 0).color(color1.getRGB());
+                buffer.vertex(posMatrix, 0, 0, 0).texture(0, 0).color(color1.getRGB());
+                BufferRenderer.drawWithGlobalProgram(buffer.end());
                 RenderSystem.depthMask(true);
                 RenderSystem.disableDepthTest();
                 RenderSystem.disableBlend();

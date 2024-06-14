@@ -27,12 +27,7 @@ public class PerfectDelay extends Module {
     private final Setting<Boolean> trident = new Setting<>("Trident", true);
 
     private float getEnchantLevel(ItemStack stack) {
-        for (Object2IntMap.Entry<RegistryEntry<Enchantment>> entry : EnchantmentHelper.getEnchantments(stack).getEnchantmentsMap()) {
-            if (entry.getKey().equals(Enchantments.QUICK_CHARGE)) {
-                return entry.getValue();
-            }
-        }
-        return 0;
+        return EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(Enchantments.QUICK_CHARGE).get(), stack);
     }
 
     @Override

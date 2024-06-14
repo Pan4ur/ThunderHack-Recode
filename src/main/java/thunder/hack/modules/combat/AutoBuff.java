@@ -130,7 +130,7 @@ public final class AutoBuff extends Module {
         if (pauseAura.getValue())
             ModuleManager.aura.pause();
         sendPacket(new UpdateSelectedSlotC2SPacket(getPotionSlot(potion)));
-        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
     }
 
     public enum Potions {

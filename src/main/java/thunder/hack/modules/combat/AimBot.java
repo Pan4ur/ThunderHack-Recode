@@ -23,6 +23,7 @@ import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.math.PredictUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -68,7 +69,7 @@ public final class AimBot extends Module {
 
             if (nearestTarget == null) return;
 
-            float currentDuration = (float) (mc.player.getActiveItem().getMaxUseTime() - mc.player.getItemUseTime()) / 20.0f;
+            float currentDuration = (float) (mc.player.getActiveItem().getMaxUseTime(mc.player) - mc.player.getItemUseTime()) / 20.0f;
 
             currentDuration = (currentDuration * currentDuration + currentDuration * 2.0f) / 3.0f;
 
@@ -140,7 +141,7 @@ public final class AimBot extends Module {
             if (target != null && (mc.player.canSee(target) || ignoreWalls.getValue())) {
                 if (mc.player.age % delay.getValue() == 0) {
                     event.addPostAction(() -> {
-                        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+                        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
                     });
                 }
             } else {
@@ -173,8 +174,8 @@ public final class AimBot extends Module {
 
         if (target != null && (mc.player.canSee(target) || ignoreWalls.getValue())) {
             if (rotation.getValue() == Rotation.Client) {
-                mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.prevYaw, rotationYaw, mc.getTickDelta()));
-                mc.player.setPitch((float) Render2DEngine.interpolate(mc.player.prevPitch, rotationPitch, mc.getTickDelta()));
+                mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.prevYaw, rotationYaw, Render3DEngine.getTickDelta()));
+                mc.player.setPitch((float) Render2DEngine.interpolate(mc.player.prevPitch, rotationPitch, Render3DEngine.getTickDelta()));
             }
         } else {
             if (mode.getValue() == Mode.CSAim) {
@@ -184,8 +185,8 @@ public final class AimBot extends Module {
         }
 
         if (rotation.getValue() == Rotation.Client && mode.getValue() == Mode.BowAim && mc.player.getActiveItem().getItem() instanceof BowItem) {
-            mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.prevYaw, rotationYaw, mc.getTickDelta()));
-            mc.player.setPitch((float) Render2DEngine.interpolate(mc.player.prevPitch, rotationPitch, mc.getTickDelta()));
+            mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.prevYaw, rotationYaw, Render3DEngine.getTickDelta()));
+            mc.player.setPitch((float) Render2DEngine.interpolate(mc.player.prevPitch, rotationPitch, Render3DEngine.getTickDelta()));
         }
     }
 

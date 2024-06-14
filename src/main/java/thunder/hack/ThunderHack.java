@@ -30,7 +30,7 @@ public class ThunderHack implements ModInitializer {
     public static final ModMetadata MOD_META;
 
     public static final String MOD_ID = "thunderhack";
-    public static final String VERSION = "1.6b305";
+    public static final String VERSION = "1.7b1406";
     public static String GITH_HASH = "0";
     public static String BUILD_DATE = "1 Jan 1970";
 
@@ -128,8 +128,8 @@ public class ThunderHack implements ModInitializer {
 
     public static void syncVersion() {
         try {
-            if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersionBeta.txt").openStream())).readLine().equals(VERSION))
-                isOutdated = true;
+     //       if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersionBeta.txt").openStream())).readLine().equals(VERSION))
+     //           isOutdated = true;
         } catch (Exception ignored) {
         }
     }

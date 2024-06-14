@@ -13,6 +13,7 @@ import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
 
@@ -35,7 +36,7 @@ public class TotemCounter extends HudElement {
 
         context.getMatrices().push();
         context.getMatrices().translate(xPos, yPos, 0);
-        context.getMatrices().multiply(RotationAxis.NEGATIVE_Z.rotation((float) Math.toRadians(-Render2DEngine.interpolateFloat(prevAngle, angle, mc.getTickDelta()))));
+        context.getMatrices().multiply(RotationAxis.NEGATIVE_Z.rotation((float) Math.toRadians(-Render2DEngine.interpolateFloat(prevAngle, angle, Render3DEngine.getTickDelta()))));
         context.getMatrices().translate(-xPos, -yPos, 0);
 
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);

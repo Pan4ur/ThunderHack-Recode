@@ -25,6 +25,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.scoreboard.ReadableScoreboardScore;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import net.minecraft.scoreboard.ScoreboardObjective;
@@ -87,7 +88,7 @@ public class NameTags extends Module {
     private final Setting<Armor> armorMode = new Setting<>("ArmorMode", Armor.Full);
     private final Setting<Health> health = new Setting<>("Health", Health.Number);
 
-    private final Map<Enchantment, String> encMap = new HashMap<>();
+    private final Map<RegistryKey<Enchantment>, String> encMap = new HashMap<RegistryKey<Enchantment>, String>();
 
     public enum Font {
         Fancy, Fast
@@ -122,9 +123,9 @@ public class NameTags extends Module {
             if (ent == mc.player && (mc.options.getPerspective().isFirstPerson() || !self.getValue())) continue;
             if (getEntityPing(ent) <= 0 && ignoreBots.getValue()) continue;
 
-            double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
-            double y = ent.prevY + (ent.getY() - ent.prevY) * mc.getTickDelta();
-            double z = ent.prevZ + (ent.getZ() - ent.prevZ) * mc.getTickDelta();
+            double x = ent.prevX + (ent.getX() - ent.prevX) * Render3DEngine.getTickDelta();
+            double y = ent.prevY + (ent.getY() - ent.prevY) * Render3DEngine.getTickDelta();
+            double z = ent.prevZ + (ent.getZ() - ent.prevZ) * Render3DEngine.getTickDelta();
             float scale = resize.getValue() ? this.scale.getValue() / mc.player.distanceTo(ent) : this.scale.getValue();
             Vec3d vector = new Vec3d(x, y + height.getValue(), z);
 
@@ -228,11 +229,10 @@ public class NameTags extends Module {
 
                             if (enchantss.getValue()) {
                                 if (!onlyHands.getValue() || (armorComponent == ent.getOffHandStack() || armorComponent == ent.getMainHandStack())) {
-
-                                    for (Enchantment enchantment : encMap.keySet()) {
-                                        if (enchants.getEnchantments().contains(Registries.ENCHANTMENT.getEntry(enchantment))) {
+                                    for (RegistryKey<Enchantment> enchantment : encMap.keySet()) {
+                                        if (enchants.getEnchantments().contains(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(enchantment).get())) {
                                             String id = encMap.get(enchantment);
-                                            int level = enchants.getLevel(enchantment);
+                                            int level = enchants.getLevel(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(enchantment).get());
                                             String encName = id + level;
 
                                             if (font.getValue() == Font.Fancy) {
@@ -386,9 +386,9 @@ public class NameTags extends Module {
             } else continue;
 
             String final_string = "Owned by " + ownerName;
-            double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
-            double y = ent.prevY + (ent.getY() - ent.prevY) * mc.getTickDelta();
-            double z = ent.prevZ + (ent.getZ() - ent.prevZ) * mc.getTickDelta();
+            double x = ent.prevX + (ent.getX() - ent.prevX) * Render3DEngine.getTickDelta();
+            double y = ent.prevY + (ent.getY() - ent.prevY) * Render3DEngine.getTickDelta();
+            double z = ent.prevZ + (ent.getZ() - ent.prevZ) * Render3DEngine.getTickDelta();
             Vec3d vector = new Vec3d(x, y + 2, z);
             Vector4d position = null;
             vector = Render3DEngine.worldSpaceToScreenSpace(new Vec3d(vector.x, vector.y, vector.z));
@@ -529,9 +529,9 @@ public class NameTags extends Module {
     }
 
     private enum HeartType {
-        CONTAINER(new Identifier("hud/heart/container"), new Identifier("hud/heart/container")),
-        NORMAL(new Identifier("hud/heart/full"), new Identifier("hud/heart/half")),
-        ABSORBING(new Identifier("hud/heart/absorbing_full"), new Identifier("hud/heart/absorbing_half"));
+        CONTAINER(Identifier.of("hud/heart/container"), Identifier.of("hud/heart/container")),
+        NORMAL(Identifier.of("hud/heart/full"), Identifier.of("hud/heart/half")),
+        ABSORBING(Identifier.of("hud/heart/absorbing_full"), Identifier.of("hud/heart/absorbing_half"));
 
         private final Identifier fullTexture;
         private final Identifier halfTexture;
@@ -605,7 +605,8 @@ public class NameTags extends Module {
             Item focusedItem = stack.getItem();
             if (focusedItem instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
                 try {
-                    colors = Objects.requireNonNull(ShulkerBoxBlock.getColor(stack.getItem())).getColorComponents();
+                    Color c = new Color(Objects.requireNonNull(ShulkerBoxBlock.getColor(stack.getItem())).getEntityColor());
+                    colors = new float[]{c.getRed() / 255f, c.getGreen() / 255f, c.getRed() / 255f, c.getAlpha() / 255f};
                 } catch (NullPointerException npe) {
                     colors = new float[]{1F, 1F, 1F};
                 }

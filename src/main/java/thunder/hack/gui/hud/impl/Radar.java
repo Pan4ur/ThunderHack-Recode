@@ -8,6 +8,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -65,10 +66,10 @@ public class Radar extends HudElement {
                 if (entityPlayer == mc.player)
                     continue;
 
-                float posX = (float) (entityPlayer.prevX + (entityPlayer.prevX - entityPlayer.getX()) * mc.getTickDelta() - mc.player.getX()) * 2;
-                float posZ = (float) (entityPlayer.prevZ + (entityPlayer.prevZ - entityPlayer.getZ()) * mc.getTickDelta() - mc.player.getZ()) * 2;
-                float cos = (float) Math.cos(mc.player.getYaw(mc.getTickDelta()) * 0.017453292);
-                float sin = (float) Math.sin(mc.player.getYaw(mc.getTickDelta()) * 0.017453292);
+                float posX = (float) (entityPlayer.prevX + (entityPlayer.prevX - entityPlayer.getX()) * Render3DEngine.getTickDelta() - mc.player.getX()) * 2;
+                float posZ = (float) (entityPlayer.prevZ + (entityPlayer.prevZ - entityPlayer.getZ()) * Render3DEngine.getTickDelta() - mc.player.getZ()) * 2;
+                float cos = (float) Math.cos(mc.player.getYaw(Render3DEngine.getTickDelta()) * 0.017453292);
+                float sin = (float) Math.sin(mc.player.getYaw(Render3DEngine.getTickDelta()) * 0.017453292);
                 float rotY = -(posZ * cos - posX * sin);
                 float rotX = -(posX * cos + posZ * sin);
                 if (rotY > size.getValue() / 2F - 6) {

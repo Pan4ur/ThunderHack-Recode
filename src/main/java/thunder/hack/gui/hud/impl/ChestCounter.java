@@ -25,7 +25,7 @@ public class ChestCounter extends HudElement {
         super("ChestCounter", 50, 10);
     }
 
-    private Identifier icon = new Identifier("thunderhack", "textures/hud/icons/chest.png");
+    private Identifier icon = Identifier.of("thunderhack", "textures/hud/icons/chest.png");
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);

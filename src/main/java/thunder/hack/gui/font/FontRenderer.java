@@ -184,7 +184,6 @@ public class FontRenderer implements Closeable {
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 
         RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-        BufferBuilder bb = Tessellator.getInstance().getBuffer();
         Matrix4f mat = stack.peek().getPositionMatrix();
         char[] chars = s.toCharArray();
         float xOffset = 0;
@@ -246,9 +245,7 @@ public class FontRenderer implements Closeable {
                 }
 
                 List<DrawEntry> objects = GLYPH_PAGE_CACHE.get(identifier);
-
-                bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-
+                BufferBuilder bb = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
                 for (DrawEntry object : objects) {
                     float xo = object.atX;
                     float yo = object.atY;
@@ -264,10 +261,10 @@ public class FontRenderer implements Closeable {
                     float u2 = (float) (glyph.u() + glyph.width()) / owner.width;
                     float v2 = (float) (glyph.v() + glyph.height()) / owner.height;
 
-                    bb.vertex(mat, xo + 0, yo + h, 0).texture(u1, v2).color(cr, cg, cb, a).next();
-                    bb.vertex(mat, xo + w, yo + h, 0).texture(u2, v2).color(cr, cg, cb, a).next();
-                    bb.vertex(mat, xo + w, yo + 0, 0).texture(u2, v1).color(cr, cg, cb, a).next();
-                    bb.vertex(mat, xo + 0, yo + 0, 0).texture(u1, v1).color(cr, cg, cb, a).next();
+                    bb.vertex(mat, xo + 0, yo + h, 0).texture(u1, v2).color(cr, cg, cb, a);
+                    bb.vertex(mat, xo + w, yo + h, 0).texture(u2, v2).color(cr, cg, cb, a);
+                    bb.vertex(mat, xo + w, yo + 0, 0).texture(u2, v1).color(cr, cg, cb, a);
+                    bb.vertex(mat, xo + 0, yo + 0, 0).texture(u1, v1).color(cr, cg, cb, a);
                 }
                 BufferRenderer.drawWithGlobalProgram(bb.end());
             }
@@ -355,7 +352,7 @@ public class FontRenderer implements Closeable {
 
     @Contract(value = "-> new", pure = true)
     public static @NotNull Identifier randomIdentifier() {
-        return new Identifier("thunderhack", "temp/" + randomString(32));
+        return Identifier.of("thunderhack", "temp/" + randomString(32));
     }
 
     private static String randomString(int length) {

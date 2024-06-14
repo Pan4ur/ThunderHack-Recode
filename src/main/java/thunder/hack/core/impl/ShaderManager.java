@@ -2,18 +2,18 @@ package thunder.hack.core.impl;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import ladysnake.satin.api.managed.ManagedShaderEffect;
-import ladysnake.satin.api.managed.ShaderEffectManager;
+import org.ladysnake.satin.api.managed.ManagedShaderEffect;
+import org.ladysnake.satin.api.managed.ShaderEffectManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.PostEffectProcessor;
-import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL30C;
 import thunder.hack.core.IManager;
 import thunder.hack.modules.render.Shaders;
 import thunder.hack.utility.interfaces.IShaderEffect;
+import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,7 +113,7 @@ public class ShaderManager implements IManager {
             effect.setUniformValue("moreGradient", shaders.gradient.getValue());
             effect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
             effect.setUniformValue("time", time);
-            effect.render(mc.getTickDelta());
+            effect.render(Render3DEngine.getTickDelta());
             time += 0.008f;
         } else if (shader == Shader.Smoke) {
             effect.setUniformValue("alpha0", shaders.glow.getValue() ? -1.0f : shaders.outlineColor.getValue().getAlpha() / 255.0f);
@@ -129,7 +129,7 @@ public class ShaderManager implements IManager {
             effect.setUniformValue("oct", shaders.octaves.getValue());
             effect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
             effect.setUniformValue("time", time);
-            effect.render(mc.getTickDelta());
+            effect.render(Render3DEngine.getTickDelta());
             time += 0.008f;
         } else if (shader == Shader.Default) {
             effect.setUniformValue("alpha0", shaders.glow.getValue() ? -1.0f : shaders.outlineColor.getValue().getAlpha() / 255.0f);
@@ -137,24 +137,24 @@ public class ShaderManager implements IManager {
             effect.setUniformValue("quality", shaders.quality.getValue());
             effect.setUniformValue("color", shaders.fillColor1.getValue().getGlRed(), shaders.fillColor1.getValue().getGlGreen(), shaders.fillColor1.getValue().getGlBlue(), shaders.fillColor1.getValue().getGlAlpha());
             effect.setUniformValue("outlinecolor", shaders.outlineColor.getValue().getGlRed(), shaders.outlineColor.getValue().getGlGreen(), shaders.outlineColor.getValue().getGlBlue(), shaders.outlineColor.getValue().getGlAlpha());
-            effect.render(mc.getTickDelta());
+            effect.render(Render3DEngine.getTickDelta());
         } else if (shader == Shader.Snow) {
             effect.setUniformValue("color", shaders.fillColor1.getValue().getGlRed(), shaders.fillColor1.getValue().getGlGreen(), shaders.fillColor1.getValue().getGlBlue(), shaders.fillColor1.getValue().getGlAlpha());
             effect.setUniformValue("quality", shaders.quality.getValue());
             effect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
             effect.setUniformValue("time", time);
-            effect.render(mc.getTickDelta());
+            effect.render(Render3DEngine.getTickDelta());
             time += 0.008f;
         }
     }
 
     public void reloadShaders() {
-        DEFAULT = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/outline.json"));
-        SMOKE = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/smoke.json"));
-        GRADIENT = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/gradient.json"));
-        SNOW = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/snow.json"));
+        DEFAULT = ShaderEffectManager.getInstance().manage(Identifier.of("thunderhack", "shaders/post/outline.json"));
+        SMOKE = ShaderEffectManager.getInstance().manage(Identifier.of("thunderhack", "shaders/post/smoke.json"));
+        GRADIENT = ShaderEffectManager.getInstance().manage(Identifier.of("thunderhack", "shaders/post/gradient.json"));
+        SNOW = ShaderEffectManager.getInstance().manage(Identifier.of("thunderhack", "shaders/post/snow.json"));
 
-        DEFAULT_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/outline.json"), managedShaderEffect -> {
+        DEFAULT_OUTLINE = ShaderEffectManager.getInstance().manage(Identifier.of("thunderhack", "shaders/post/outline.json"), managedShaderEffect -> {
             PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
             if (effect == null) return;
 
@@ -162,7 +162,7 @@ public class ShaderManager implements IManager {
             ((IShaderEffect) effect).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
         });
 
-        SMOKE_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/smoke.json"), managedShaderEffect -> {
+        SMOKE_OUTLINE = ShaderEffectManager.getInstance().manage(Identifier.of("thunderhack", "shaders/post/smoke.json"), managedShaderEffect -> {
             PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
             if (effect == null) return;
 
@@ -170,7 +170,7 @@ public class ShaderManager implements IManager {
             ((IShaderEffect) effect).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
         });
 
-        GRADIENT_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/gradient.json"), managedShaderEffect -> {
+        GRADIENT_OUTLINE = ShaderEffectManager.getInstance().manage(Identifier.of("thunderhack", "shaders/post/gradient.json"), managedShaderEffect -> {
             PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
             if (effect == null) return;
 
@@ -178,7 +178,7 @@ public class ShaderManager implements IManager {
             ((IShaderEffect) effect).addFakeTargetHook("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
         });
 
-        SNOW_OUTLINE = ShaderEffectManager.getInstance().manage(new Identifier("thunderhack", "shaders/post/snow.json"), managedShaderEffect -> {
+        SNOW_OUTLINE = ShaderEffectManager.getInstance().manage(Identifier.of("thunderhack", "shaders/post/snow.json"), managedShaderEffect -> {
             PostEffectProcessor effect = managedShaderEffect.getShaderEffect();
             if (effect == null) return;
 

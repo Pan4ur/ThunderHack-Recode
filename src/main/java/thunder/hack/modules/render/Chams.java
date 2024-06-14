@@ -56,8 +56,8 @@ public class Chams extends Module {
         One, Two, Three
     }
 
-    private final Identifier crystalTexture = new Identifier("textures/entity/end_crystal/end_crystal.png");
-    private final Identifier crystalTexture2 = new Identifier("thunderhack", "textures/misc/end_crystal2.png");
+    private final Identifier crystalTexture = Identifier.of("textures/entity/end_crystal/end_crystal.png");
+    private final Identifier crystalTexture2 = Identifier.of("thunderhack", "textures/misc/end_crystal2.png");
 
     private static final float SINE_45_DEGREES = (float) Math.sin(0.7853981633974483);
 
@@ -68,8 +68,9 @@ public class Chams extends Module {
         else RenderSystem.defaultBlendFunc();
         RenderSystem.disableCull();
         RenderSystem.disableDepthTest();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+
+
+        BufferBuilder buffer;
 
         if (crystalMode.getValue() != CMode.One) {
             if (crystalMode.getValue() == CMode.Three) {
@@ -78,10 +79,10 @@ public class Chams extends Module {
                 RenderSystem.setShaderTexture(0, crystalTexture2);
             }
             RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+            buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
         } else {
             RenderSystem.setShader(GameRenderer::getPositionProgram);
-            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+            buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
         }
 
         matrixStack.push();
@@ -106,7 +107,7 @@ public class Chams extends Module {
         core.render(matrixStack, buffer, i, k);
         matrixStack.pop();
         matrixStack.pop();
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();
@@ -121,15 +122,15 @@ public class Chams extends Module {
         RenderSystem.enableCull();
         RenderSystem.disableDepthTest();
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        BufferBuilder buffer;
 
         if (!simple.getValue()) {
             RenderSystem.setShaderTexture(0, ((AbstractClientPlayerEntity) pe).getSkinTextures().texture());
             RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+            buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
         } else {
             RenderSystem.setShader(GameRenderer::getPositionProgram);
-            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+            buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
         }
 
         float n;
@@ -206,13 +207,13 @@ public class Chams extends Module {
         boolean bl = !pe.isInvisible();
         boolean bl2 = !bl && !pe.isInvisibleTo(mc.player);
         int p = LivingEntityRenderer.getOverlay(pe, 0);
-        model.render(matrixStack, buffer, i, p, 1.0f, 1.0f, 1.0f, bl2 ? 0.15f : 1.0f);
-        tessellator.draw();
+
+        model.render(matrixStack, buffer, i, p);
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.disableBlend();
         RenderSystem.disableCull();
         matrixStack.pop();
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.enableDepthTest();
         if (!playerTexture.getValue()) {
             ci.cancel();

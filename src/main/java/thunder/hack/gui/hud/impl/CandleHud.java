@@ -18,7 +18,7 @@ public class CandleHud extends HudElement {
         super("Candle", 10, 100);
     }
 
-    private final Identifier CANDLE = new Identifier("thunderhack", "textures/hud/elements/candle.png");
+    private final Identifier CANDLE = Identifier.of("thunderhack", "textures/hud/elements/candle.png");
     private Setting<Integer> scale = new Setting<>("Scale", 25, 15, 100);
     private Setting<For> mode = new Setting<>("For", For.Win);
 

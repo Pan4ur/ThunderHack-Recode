@@ -18,7 +18,7 @@ public class MemoryHud extends HudElement {
         super("MemoryHud", 100, 10);
     }
 
-    private Identifier icon = new Identifier("thunderhack", "textures/hud/icons/memory.png");
+    private Identifier icon = Identifier.of("thunderhack", "textures/hud/icons/memory.png");
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);

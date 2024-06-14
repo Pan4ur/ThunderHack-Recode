@@ -21,7 +21,7 @@ public class TPSCounter extends HudElement {
 
     private final Setting<Boolean> extraTps = new Setting<>("ExtraTPS", true);
 
-    private Identifier icon = new Identifier("thunderhack", "textures/hud/icons/tps.png");
+    private Identifier icon = Identifier.of("thunderhack", "textures/hud/icons/tps.png");
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);

@@ -28,7 +28,9 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 
+import java.awt.*;
 import java.util.List;
 
 import static thunder.hack.modules.Module.mc;
@@ -59,9 +61,9 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
             livingEntity.setPitch(((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastPitch());
             livingEntity.prevPitch = ThunderHack.playerManager.lastPitch;
             livingEntity.headYaw = ((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw();
-            livingEntity.bodyYaw = Render2DEngine.interpolateFloat(ThunderHack.playerManager.prevBodyYaw, ThunderHack.playerManager.bodyYaw, mc.getTickDelta());
+            livingEntity.bodyYaw = Render2DEngine.interpolateFloat(ThunderHack.playerManager.prevBodyYaw, ThunderHack.playerManager.bodyYaw, Render3DEngine.getTickDelta());
             livingEntity.prevHeadYaw = ThunderHack.playerManager.lastYaw;
-            livingEntity.prevBodyYaw = Render2DEngine.interpolateFloat(ThunderHack.playerManager.prevBodyYaw, ThunderHack.playerManager.bodyYaw, mc.getTickDelta());
+            livingEntity.prevBodyYaw = Render2DEngine.interpolateFloat(ThunderHack.playerManager.prevBodyYaw, ThunderHack.playerManager.bodyYaw, Render3DEngine.getTickDelta());
         }
 
         if (livingEntity != mc.player && ModuleManager.freeCam.isEnabled() && ModuleManager.freeCam.track.getValue() && ModuleManager.freeCam.trackEntity != null && ModuleManager.freeCam.trackEntity == livingEntity) {
@@ -149,14 +151,20 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
         postRender(livingEntity);
     }
 
-    @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/EntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;IIFFFF)V"))
+
+    @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/EntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;III)V"))
     private void renderHook(Args args) {
-        if(Module.fullNullCheck()) return;
+        if (Module.fullNullCheck()) return;
+
+        float alpha = -1f;
 
         if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.antiPlayerCollision.getValue() && lastEntity != mc.player && lastEntity instanceof PlayerEntity pl && !pl.isInvisible())
-            args.set(7, MathUtility.clamp((float) (mc.player.squaredDistanceTo(lastEntity.getPos()) / 3f) + 0.2f, 0f, 1f));
+             alpha = MathUtility.clamp((float) (mc.player.squaredDistanceTo(lastEntity.getPos()) / 3f) + 0.2f, 0f, 1f);
 
         if (lastEntity != mc.player && lastEntity instanceof PlayerEntity pl && pl.isInvisible() && ModuleManager.fTHelper.isEnabled() && ModuleManager.fTHelper.trueSight.getValue())
-            args.set(7, 0.3f);
+            alpha = 0.3f;
+
+        if(alpha != -1)
+            args.set(4, Render2DEngine.applyOpacity(0x26FFFFFF, alpha));
     }
 }

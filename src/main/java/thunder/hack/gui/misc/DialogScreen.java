@@ -13,7 +13,7 @@ import java.awt.*;
 import static thunder.hack.modules.Module.mc;
 
 public class DialogScreen extends Screen {
-    private final Identifier questionPic = new Identifier("thunderhack", "textures/gui/helper/pic1.png");
+    private final Identifier questionPic = Identifier.of("thunderhack", "textures/gui/helper/pic1.png");
 
     private final String header;
     private final String description;

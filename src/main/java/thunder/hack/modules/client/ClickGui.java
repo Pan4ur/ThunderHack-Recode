@@ -104,7 +104,7 @@ public class ClickGui extends Module {
         Image(String file, int fileWidth, int fileHeight, int[] pos, int size){
             this.fileHeight = fileHeight;
             this.fileWidth = fileWidth;
-            this.file = new Identifier("thunderhack","textures/gui/images/"+file);
+            this.file = Identifier.of("thunderhack","textures/gui/images/"+file);
             this.pos = pos;
             this.size = size;
         }

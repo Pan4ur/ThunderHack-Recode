@@ -41,12 +41,11 @@ public class BreadCrumbs extends Module {
     public void drawLine(float width, boolean white) {
         Render3DEngine.setupRender();
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
         RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
         RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
         RenderSystem.lineWidth(width);
-        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
 
         for (int i = 0; i < positions.size(); i++) {
             Vec3d vec1 = null;
@@ -65,7 +64,7 @@ public class BreadCrumbs extends Module {
             }
         }
 
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
         RenderSystem.enableCull();
         RenderSystem.enableDepthTest();
         Render3DEngine.endRender();

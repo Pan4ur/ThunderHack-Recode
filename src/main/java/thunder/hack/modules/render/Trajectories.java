@@ -2,11 +2,14 @@ package thunder.hack.modules.render;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.*;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -76,8 +79,9 @@ public class Trajectories extends Module {
 
         boolean prev_bob = mc.options.getBobView().getValue();
         mc.options.getBobView().setValue(false);
-        if ((mainHand.getItem() instanceof CrossbowItem && EnchantmentHelper.getLevel(Enchantments.MULTISHOT, mainHand) != 0) ||
-                (mainHand.getItem() instanceof CrossbowItem && EnchantmentHelper.getLevel(Enchantments.MULTISHOT, mainHand) != 0)) {
+
+        if ((offHand.getItem() instanceof CrossbowItem && EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.MULTISHOT.getRegistryRef()).getEntry(Enchantments.MULTISHOT).get(), offHand) != 0) ||
+                (mainHand.getItem() instanceof CrossbowItem && EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.MULTISHOT.getRegistryRef()).getEntry(Enchantments.MULTISHOT).get(), mainHand) != 0)) {
 
             calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), mc.player.getYaw() - 10);
             calcTrajectory(hand == Hand.OFF_HAND ? offHand.getItem() : mainHand.getItem(), mc.player.getYaw());
@@ -88,9 +92,9 @@ public class Trajectories extends Module {
     }
 
     private void calcTrajectory(Item item, float yaw) {
-        double x = Render2DEngine.interpolate(mc.player.prevX, mc.player.getX(), mc.getTickDelta());
-        double y = Render2DEngine.interpolate(mc.player.prevY, mc.player.getY(), mc.getTickDelta());
-        double z = Render2DEngine.interpolate(mc.player.prevZ, mc.player.getZ(), mc.getTickDelta());
+        double x = Render2DEngine.interpolate(mc.player.prevX, mc.player.getX(), Render3DEngine.getTickDelta());
+        double y = Render2DEngine.interpolate(mc.player.prevY, mc.player.getY(), Render3DEngine.getTickDelta());
+        double z = Render2DEngine.interpolate(mc.player.prevZ, mc.player.getZ(), Render3DEngine.getTickDelta());
 
         y = y + mc.player.getEyeHeight(mc.player.getPose()) - 0.1000000014901161;
 

@@ -11,7 +11,7 @@ import thunder.hack.modules.client.Media;
 
 @Mixin(SkinTextures.class)
 public class MixinSkinTextures {
-    private final Identifier SUN_SKIN = new Identifier("thunderhack", "textures/misc/sunskin.png");
+    private final Identifier SUN_SKIN = Identifier.of("thunderhack", "textures/misc/sunskin.png");
 
     @Inject(method = "texture", at = @At("HEAD"), cancellable = true)
     public void getSkinTextureHook(CallbackInfoReturnable<Identifier> cir) {

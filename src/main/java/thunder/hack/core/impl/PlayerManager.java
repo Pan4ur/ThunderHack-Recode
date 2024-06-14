@@ -224,7 +224,7 @@ public class PlayerManager implements IManager {
     }
 
     public HitResult rayTrace(double dst, float yaw, float pitch) {
-        Vec3d vec3d = mc.player.getCameraPosVec(mc.getTickDelta());
+        Vec3d vec3d = mc.player.getCameraPosVec(1f);
         Vec3d vec3d2 = getRotationVector(pitch, yaw);
         Vec3d vec3d3 = vec3d.add(vec3d2.x * dst, vec3d2.y * dst, vec3d2.z * dst);
         return mc.world.raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));

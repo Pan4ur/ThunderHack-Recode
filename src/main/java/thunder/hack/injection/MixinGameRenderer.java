@@ -4,9 +4,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.ShaderStage;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -27,7 +29,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.modules.Module;
@@ -37,18 +38,12 @@ import thunder.hack.modules.player.NoEntityTrace;
 import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.render.BlockAnimationUtility;
 import thunder.hack.utility.render.Render3DEngine;
-import thunder.hack.utility.render.shaders.GlProgram;
 
-import java.util.List;
-import java.util.function.Consumer;
 
 import static thunder.hack.modules.Module.mc;
 
 @Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer {
-    @Shadow
-    public abstract void render(float tickDelta, long startTime, boolean tick);
-
     @Shadow
     private float zoom;
 
@@ -65,12 +60,12 @@ public abstract class MixinGameRenderer {
     public abstract void tick();
 
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;pop()V", ordinal = 1, shift = At.Shift.BEFORE), method = "render")
-    void postHudRenderHook(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
+    void postHudRenderHook(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci) {
         FrameRateCounter.INSTANCE.recordFrame();
     }
 
     @Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z", opcode = Opcodes.GETFIELD, ordinal = 0), method = "renderWorld")
-    void render3dHook(float tickDelta, long limitTime, CallbackInfo ci) {
+    void render3dHook(RenderTickCounter tickCounter, CallbackInfo ci) {
         if (Module.fullNullCheck()) return;
 
         Camera camera = mc.gameRenderer.getCamera();
@@ -93,7 +88,7 @@ public abstract class MixinGameRenderer {
     }
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/render/Camera;FLorg/joml/Matrix4f;)V", shift = At.Shift.AFTER))
-    public void postRender3dHook(float tickDelta, long limitTime, CallbackInfo ci) {
+    public void postRender3dHook(RenderTickCounter tickCounter, CallbackInfo ci) {
         if (Module.fullNullCheck()) return;
         ThunderHack.shaderManager.renderShaders();
     }
@@ -131,12 +126,6 @@ public abstract class MixinGameRenderer {
             HitResult hitResult = camera.raycast(d, tickDelta, false);
             cir.setReturnValue(ensureTargetInRangeCustom(hitResult, vec3d, blockInteractionRange));
         }
-    }
-
-
-    @Inject(method = "loadPrograms", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
-    void loadAllTheShaders(ResourceFactory factory, CallbackInfo ci, List<ShaderStage> stages, List<Pair<ShaderProgram, Consumer<ShaderProgram>>> shadersToLoad) {
-        GlProgram.forEachProgram(loader -> shadersToLoad.add(new Pair<>(loader.getLeft().apply(factory), loader.getRight())));
     }
 
     @Inject(method = "getBasicProjectionMatrix", at = @At("TAIL"), cancellable = true)
@@ -206,9 +195,9 @@ public abstract class MixinGameRenderer {
     }
 
     @Inject(method = "renderFloatingItem", at = @At("HEAD"), cancellable = true)
-    private void renderFloatingItemHook(int scaledWidth, int scaledHeight, float tickDelta, CallbackInfo ci) {
+    private void renderFloatingItemHook(DrawContext context, float tickDelta, CallbackInfo ci) {
         if (ModuleManager.totemAnimation.isEnabled()) {
-            ModuleManager.totemAnimation.renderFloatingItem(scaledWidth, scaledHeight, tickDelta);
+            ModuleManager.totemAnimation.renderFloatingItem(tickDelta);
             ci.cancel();
         }
     }

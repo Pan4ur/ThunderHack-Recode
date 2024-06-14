@@ -22,7 +22,7 @@ import java.awt.*;
 
 public class KillStats extends HudElement {
     int death = 0,killstreak = 0,kills = 0;
-    private Identifier icon = new Identifier("thunderhack", "textures/hud/icons/sword.png");
+    private Identifier icon = Identifier.of("thunderhack", "textures/hud/icons/sword.png");
     public KillStats(){
         super("KillStats",100,35);
     }

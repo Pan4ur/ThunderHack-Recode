@@ -24,7 +24,7 @@ public class DurabilityAlert extends Module {
     private final Setting<Boolean> friends = new Setting<>("Friend message", true);
     private final Setting<Integer> percent = new Setting<>("Percent", 20, 1, 100);
 
-    private final Identifier ICON = new Identifier("thunderhack", "textures/hud/elements/broken_shield.png");
+    private final Identifier ICON = Identifier.of("thunderhack", "textures/hud/elements/broken_shield.png");
     private boolean need_alert = false;
     private final Timer timer = new Timer();
 

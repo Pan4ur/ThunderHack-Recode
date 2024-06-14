@@ -18,7 +18,7 @@ public class FpsCounter extends HudElement {
         super("Fps", 50, 10);
     }
 
-    private Identifier icon = new Identifier("thunderhack", "textures/hud/icons/fps.png");
+    private Identifier icon = Identifier.of("thunderhack", "textures/hud/icons/fps.png");
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
