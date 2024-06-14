@@ -239,12 +239,7 @@ public class FontRenderer implements Closeable {
                 }
             }
             for (Identifier identifier : GLYPH_PAGE_CACHE.keySet()) {
-                try {
-                    RenderSystem.setShaderTexture(0, identifier);
-                } catch (Exception e) {
-                    continue;
-                }
-
+                RenderSystem.setShaderTexture(0, identifier);
                 List<DrawEntry> objects = GLYPH_PAGE_CACHE.get(identifier);
 
                 bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
@@ -304,8 +299,7 @@ public class FontRenderer implements Closeable {
                 continue;
             }
             Glyph glyph = locateGlyph1(c1);
-            float w = glyph == null ? 0 : glyph.width();
-            currentLine += w / (float) this.scaleMul;
+            currentLine += glyph.width() / (float) this.scaleMul;
         }
         return Math.max(currentLine, maxPreviousLines);
     }
@@ -327,8 +321,7 @@ public class FontRenderer implements Closeable {
                 continue;
             }
             Glyph glyph = locateGlyph1(c1);
-            float h = glyph == null ? 0 : glyph.height();
-            currentLine = Math.max(h / (float) this.scaleMul, currentLine);
+            currentLine = Math.max(glyph.height() / (float) this.scaleMul, currentLine);
         }
         return currentLine + previous;
     }
@@ -377,11 +370,11 @@ public class FontRenderer implements Closeable {
     }
 
     public void drawGradientString(MatrixStack stack, String s, float x, float y, int offset) {
-        drawString(stack, s, x, y, 1f, 1f, 1f, 1f, true, offset);
+        drawString(stack, s, x, y, 255, 255, 255, 255, true, offset);
     }
 
-    public void drawGradientCenteredString(MatrixStack stack, String s, double x, double y, int offset) {
-        drawString(stack, s, (float) (x - getStringWidth(s) / 2f), (float) y, 1f, 1f, 1f, 1f,true, offset);
+    public void drawGradientCenteredString(MatrixStack matrices, String s, float x, float y, int i) {
+        drawGradientString(matrices, s, x - getStringWidth(s) / 2f, y, i);
     }
 
     record DrawEntry(float atX, float atY, float r, float g, float b, Glyph toDraw) {
