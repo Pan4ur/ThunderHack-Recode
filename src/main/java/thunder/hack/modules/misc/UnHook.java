@@ -1,16 +1,12 @@
 package thunder.hack.modules.misc;
 
 import net.minecraft.SharedConstants;
-import net.minecraft.block.Block;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.Icons;
 import net.minecraft.util.Formatting;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.CommandManager;
 import thunder.hack.core.impl.ConfigManager;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClientSettings;
-import thunder.hack.modules.render.Search;
 import thunder.hack.utility.math.MathUtility;
 
 import java.io.*;

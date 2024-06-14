@@ -14,9 +14,11 @@ import thunder.hack.utility.math.MathUtility;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -40,7 +42,7 @@ public final class ThunderUtility {
 
     public static String solveName(String notSolved) {
         AtomicReference<String> mb = new AtomicReference<>("FATAL ERROR");
-        mc.getNetworkHandler().getListedPlayerListEntries().forEach(player -> {
+        Objects.requireNonNull(mc.getNetworkHandler()).getListedPlayerListEntries().forEach(player -> {
             if (notSolved.contains(player.getProfile().getName())) {
                 mb.set(player.getProfile().getName());
             }
@@ -61,8 +63,7 @@ public final class ThunderUtility {
                 String inputLine;
 
                 while ((inputLine = in.readLine()) != null) {
-                    JsonParser parser = new JsonParser();
-                    JsonArray array = (JsonArray) parser.parse(inputLine);
+                    JsonArray array = (JsonArray) JsonParser.parseString(inputLine);
 
                     for (int i = 0; i < array.size(); i++) {
                         JsonObject jsonObject = (JsonObject) array.get(i);
@@ -101,14 +102,13 @@ public final class ThunderUtility {
     public static void parseCommits() {
         try {
             URL url = new URL("https://api.github.com/repos/Pan4ur/ThunderHack-Recode/commits?per_page=50");
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
             String inputLine;
             changeLog.add("Changelog [Recode; Date: " + ThunderHack.BUILD_DATE + "; GitHash:" + ThunderHack.GITH_HASH + "]");
             changeLog.add("\n");
 
             while ((inputLine = in.readLine()) != null) {
-                JsonParser parser = new JsonParser();
-                JsonArray array = (JsonArray) parser.parse(inputLine);
+                JsonArray array = (JsonArray) JsonParser.parseString(inputLine);
 
                 for (int i = 0; i < array.size(); i++) {
                     JsonObject jsonObject = (JsonObject) array.get(i);

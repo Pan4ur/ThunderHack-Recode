@@ -41,7 +41,7 @@ public class CommandManager implements IManager {
         add(new FriendCommand());
         add(new ModuleCommand());
         add(new PrefixCommand());
-        add(new SearchCommand());
+        add(new BlockESPCommand());
         add(new TrackerCommand());
         add(new DropAllCommand());
         add(new TreasureCommand());

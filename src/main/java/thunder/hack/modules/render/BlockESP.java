@@ -8,8 +8,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.ThunderHack;
-import thunder.hack.gui.hud.impl.FpsCounter;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
@@ -25,7 +23,7 @@ import java.util.concurrent.Executors;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
-public class Search extends Module {
+public class BlockESP extends Module {
 
 
     public final Setting<ItemSelectSetting> selectedBlocks = new Setting<>("SelectedBlocks", new ItemSelectSetting(new ArrayList<>()));
@@ -45,8 +43,8 @@ public class Search extends Module {
     private boolean canContinue;
 
 
-    public Search() {
-        super("Search", Category.RENDER);
+    public BlockESP() {
+        super("BlockESP", Category.RENDER);
     }
 
     @Override
