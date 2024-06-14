@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -41,7 +42,7 @@ public final class ThunderUtility {
 
     public static String solveName(String notSolved) {
         AtomicReference<String> mb = new AtomicReference<>("FATAL ERROR");
-        mc.getNetworkHandler().getListedPlayerListEntries().forEach(player -> {
+        Objects.requireNonNull(mc.getNetworkHandler()).getListedPlayerListEntries().forEach(player -> {
             if (notSolved.contains(player.getProfile().getName())) {
                 mb.set(player.getProfile().getName());
             }
@@ -62,8 +63,7 @@ public final class ThunderUtility {
                 String inputLine;
 
                 while ((inputLine = in.readLine()) != null) {
-                    JsonParser parser = new JsonParser();
-                    JsonArray array = (JsonArray) parser.parse(inputLine);
+                    JsonArray array = (JsonArray) JsonParser.parseString(inputLine);
 
                     for (int i = 0; i < array.size(); i++) {
                         JsonObject jsonObject = (JsonObject) array.get(i);
@@ -108,8 +108,7 @@ public final class ThunderUtility {
             changeLog.add("\n");
 
             while ((inputLine = in.readLine()) != null) {
-                JsonParser parser = new JsonParser();
-                JsonArray array = (JsonArray) parser.parse(inputLine);
+                JsonArray array = (JsonArray) JsonParser.parseString(inputLine);
 
                 for (int i = 0; i < array.size(); i++) {
                     JsonObject jsonObject = (JsonObject) array.get(i);
