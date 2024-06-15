@@ -20,8 +20,8 @@ import thunder.hack.modules.client.HudEditor;
 
 import java.awt.*;
 import java.io.Closeable;
-import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -142,6 +142,7 @@ public class FontRenderer implements Closeable {
         return glyphMap.getGlyph(glyph);
     }
 
+    @Nullable
     private Glyph locateGlyph1(char glyph) {
         return allGlyphs.computeIfAbsent(glyph, this::locateGlyph0);
     }
@@ -167,7 +168,7 @@ public class FontRenderer implements Closeable {
         if (prebakeGlyphsFuture != null && !prebakeGlyphsFuture.isDone()) {
             try {
                 prebakeGlyphsFuture.get();
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (InterruptedException | ExecutionException ignored) {
             }
         }
         sizeCheck();
@@ -299,7 +300,7 @@ public class FontRenderer implements Closeable {
                 continue;
             }
             Glyph glyph = locateGlyph1(c1);
-            currentLine += glyph.width() / (float) this.scaleMul;
+            currentLine +=  glyph == null ? 0 : (glyph.width() / (float) this.scaleMul);
         }
         return Math.max(currentLine, maxPreviousLines);
     }
@@ -314,14 +315,18 @@ public class FontRenderer implements Closeable {
         for (char c1 : c) {
             if (c1 == '\n') {
                 if (currentLine == 0) {
-                    currentLine = locateGlyph1(' ').height() / (float) this.scaleMul;
+                    currentLine = (locateGlyph1(' ') == null ? 0 : (Objects.requireNonNull(locateGlyph1(' ')).height() / (float) this.scaleMul));
                 }
                 previous += currentLine;
                 currentLine = 0;
                 continue;
             }
             Glyph glyph = locateGlyph1(c1);
-            currentLine = Math.max(glyph.height() / (float) this.scaleMul, currentLine);
+            currentLine = Math.max(
+
+                     glyph == null ? 0 : (glyph.height() / (float) this.scaleMul)
+                    
+                    , currentLine);
         }
         return currentLine + previous;
     }
@@ -341,18 +346,17 @@ public class FontRenderer implements Closeable {
             maps.clear();
             allGlyphs.clear();
             initialized = false;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
     @Contract(value = "-> new", pure = true)
     public static @NotNull Identifier randomIdentifier() {
-        return new Identifier("thunderhack", "temp/" + randomString(32));
+        return new Identifier("thunderhack", "temp/" + randomString());
     }
 
-    private static String randomString(int length) {
-        return IntStream.range(0, length)
+    private static String randomString() {
+        return IntStream.range(0, 32)
                 .mapToObj(operand -> String.valueOf((char) new Random().nextInt('a', 'z' + 1)))
                 .collect(Collectors.joining());
     }
