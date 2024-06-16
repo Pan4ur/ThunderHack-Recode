@@ -87,7 +87,7 @@ public final class ExplosionUtility {
         if (!target.isImmuneToExplosion(explosion) && !target.isInvulnerable()) {
             double distExposure = (float) target.squaredDistanceTo(explosionPos) / 144;
             if (distExposure <= 1.0) {
-                terrainIgnore = true;
+                terrainIgnore = ModuleManager.autoCrystal.ignoreTerrain.getValue();
                 double exposure = getExposure(explosionPos, target, optimized);
                 terrainIgnore = false;
                 double finalExposure = (1.0 - distExposure) * exposure;
@@ -152,7 +152,7 @@ public final class ExplosionUtility {
         if (!target.isImmuneToExplosion(explosion) && !target.isInvulnerable()) {
             double distExposure = MathHelper.sqrt((float) predict.squaredDistanceTo(explosionPos)) / 12d;
             if (distExposure <= 1.0) {
-                terrainIgnore = true;
+                terrainIgnore = ModuleManager.autoCrystal.ignoreTerrain.getValue();
                 double exposure = getExposure(explosionPos, predict, optimized);
                 terrainIgnore = false;
                 double finalExposure = (1.0 - distExposure) * exposure;
@@ -251,8 +251,7 @@ public final class ExplosionUtility {
         if (!target.isImmuneToExplosion(explosion) && !target.isInvulnerable()) {
             double distExposure = MathHelper.sqrt((float) target.squaredDistanceTo(explosionPos)) / maxDist;
             if (distExposure <= 1.0) {
-
-                terrainIgnore = true;
+                terrainIgnore = ModuleManager.autoCrystal.ignoreTerrain.getValue();
                 double exposure = getExposureGhost(explosionPos, target, bp);
                 terrainIgnore = false;
                 double finalExposure = (1.0 - distExposure) * exposure;

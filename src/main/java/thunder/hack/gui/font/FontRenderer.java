@@ -8,7 +8,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Contract;
@@ -20,8 +19,8 @@ import thunder.hack.modules.client.HudEditor;
 
 import java.awt.*;
 import java.io.Closeable;
-import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -142,12 +141,13 @@ public class FontRenderer implements Closeable {
         return glyphMap.getGlyph(glyph);
     }
 
+    @Nullable
     private Glyph locateGlyph1(char glyph) {
         return allGlyphs.computeIfAbsent(glyph, this::locateGlyph0);
     }
 
     public void drawString(MatrixStack stack, String s, double x, double y, int color) {
-        float r = ((color >> 16) & 0xff)/ 255f;
+        float r = ((color >> 16) & 0xff) / 255f;
         float g = ((color >> 8) & 0xff) / 255f;
         float b = ((color) & 0xff) / 255f;
         float a = ((color >> 24) & 0xff) / 255f;
@@ -167,7 +167,7 @@ public class FontRenderer implements Closeable {
         if (prebakeGlyphsFuture != null && !prebakeGlyphsFuture.isDone()) {
             try {
                 prebakeGlyphsFuture.get();
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (InterruptedException | ExecutionException ignored) {
             }
         }
         sizeCheck();
@@ -210,7 +210,7 @@ public class FontRenderer implements Closeable {
                     continue;
                 }
 
-                if(gradient) {
+                if (gradient) {
                     Color color = HudEditor.getColor(i * offset);
                     r2 = color.getRed() / 255f;
                     g2 = color.getGreen() / 255f;
@@ -228,7 +228,7 @@ public class FontRenderer implements Closeable {
                     continue;
                 }
                 Glyph glyph = locateGlyph1(c);
-                if(glyph != null) {
+                if (glyph != null) {
                     if (glyph.value() != ' ') {
                         Identifier i1 = glyph.owner().bindToTexture;
                         DrawEntry entry = new DrawEntry(xOffset, yOffset, r2, g2, b2, glyph);
@@ -238,35 +238,33 @@ public class FontRenderer implements Closeable {
                 }
             }
             for (Identifier identifier : GLYPH_PAGE_CACHE.keySet()) {
-                try {
-                    RenderSystem.setShaderTexture(0, identifier);
-                } catch (Exception e) {
-                    continue;
-                }
-
+                RenderSystem.setShaderTexture(0, identifier);
                 List<DrawEntry> objects = GLYPH_PAGE_CACHE.get(identifier);
-                BufferBuilder bb = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-                for (DrawEntry object : objects) {
-                    float xo = object.atX;
-                    float yo = object.atY;
-                    float cr = object.r;
-                    float cg = object.g;
-                    float cb = object.b;
-                    Glyph glyph = object.toDraw;
-                    GlyphMap owner = glyph.owner();
-                    float w = glyph.width();
-                    float h = glyph.height();
-                    float u1 = (float) glyph.u() / owner.width;
-                    float v1 = (float) glyph.v() / owner.height;
-                    float u2 = (float) (glyph.u() + glyph.width()) / owner.width;
-                    float v2 = (float) (glyph.v() + glyph.height()) / owner.height;
 
-                    bb.vertex(mat, xo + 0, yo + h, 0).texture(u1, v2).color(cr, cg, cb, a);
-                    bb.vertex(mat, xo + w, yo + h, 0).texture(u2, v2).color(cr, cg, cb, a);
-                    bb.vertex(mat, xo + w, yo + 0, 0).texture(u2, v1).color(cr, cg, cb, a);
-                    bb.vertex(mat, xo + 0, yo + 0, 0).texture(u1, v1).color(cr, cg, cb, a);
+                if (!objects.isEmpty()) {
+                    BufferBuilder bb = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+                    for (DrawEntry object : objects) {
+                        float xo = object.atX;
+                        float yo = object.atY;
+                        float cr = object.r;
+                        float cg = object.g;
+                        float cb = object.b;
+                        Glyph glyph = object.toDraw;
+                        GlyphMap owner = glyph.owner();
+                        float w = glyph.width();
+                        float h = glyph.height();
+                        float u1 = (float) glyph.u() / owner.width;
+                        float v1 = (float) glyph.v() / owner.height;
+                        float u2 = (float) (glyph.u() + glyph.width()) / owner.width;
+                        float v2 = (float) (glyph.v() + glyph.height()) / owner.height;
+
+                        bb.vertex(mat, xo + 0, yo + h, 0).texture(u1, v2).color(cr, cg, cb, a);
+                        bb.vertex(mat, xo + w, yo + h, 0).texture(u2, v2).color(cr, cg, cb, a);
+                        bb.vertex(mat, xo + w, yo + 0, 0).texture(u2, v1).color(cr, cg, cb, a);
+                        bb.vertex(mat, xo + 0, yo + 0, 0).texture(u1, v1).color(cr, cg, cb, a);
+                    }
+                    BufferRenderer.drawWithGlobalProgram(bb.end());
                 }
-                BufferRenderer.drawWithGlobalProgram(bb.end());
             }
 
             GLYPH_PAGE_CACHE.clear();
@@ -301,8 +299,7 @@ public class FontRenderer implements Closeable {
                 continue;
             }
             Glyph glyph = locateGlyph1(c1);
-            float w = glyph == null ? 0 : glyph.width();
-            currentLine += w / (float) this.scaleMul;
+            currentLine += glyph == null ? 0 : (glyph.width() / (float) this.scaleMul);
         }
         return Math.max(currentLine, maxPreviousLines);
     }
@@ -317,15 +314,18 @@ public class FontRenderer implements Closeable {
         for (char c1 : c) {
             if (c1 == '\n') {
                 if (currentLine == 0) {
-                    currentLine = locateGlyph1(' ').height() / (float) this.scaleMul;
+                    currentLine = (locateGlyph1(' ') == null ? 0 : (Objects.requireNonNull(locateGlyph1(' ')).height() / (float) this.scaleMul));
                 }
                 previous += currentLine;
                 currentLine = 0;
                 continue;
             }
             Glyph glyph = locateGlyph1(c1);
-            float h = glyph == null ? 0 : glyph.height();
-            currentLine = Math.max(h / (float) this.scaleMul, currentLine);
+            currentLine = Math.max(
+
+                    glyph == null ? 0 : (glyph.height() / (float) this.scaleMul)
+
+                    , currentLine);
         }
         return currentLine + previous;
     }
@@ -345,18 +345,17 @@ public class FontRenderer implements Closeable {
             maps.clear();
             allGlyphs.clear();
             initialized = false;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
     @Contract(value = "-> new", pure = true)
     public static @NotNull Identifier randomIdentifier() {
-        return Identifier.of("thunderhack", "temp/" + randomString(32));
+        return Identifier.of("thunderhack", "temp/" + randomString());
     }
 
-    private static String randomString(int length) {
-        return IntStream.range(0, length)
+    private static String randomString() {
+        return IntStream.range(0, 32)
                 .mapToObj(operand -> String.valueOf((char) new Random().nextInt('a', 'z' + 1)))
                 .collect(Collectors.joining());
     }
@@ -374,11 +373,11 @@ public class FontRenderer implements Closeable {
     }
 
     public void drawGradientString(MatrixStack stack, String s, float x, float y, int offset) {
-        drawString(stack, s, x, y, 1f, 1f, 1f, 1f, true, offset);
+        drawString(stack, s, x, y, 255, 255, 255, 255, true, offset);
     }
 
-    public void drawGradientCenteredString(MatrixStack stack, String s, double x, double y, int offset) {
-        drawString(stack, s, (float) (x - getStringWidth(s) / 2f), (float) y, 1f, 1f, 1f, 1f,true, offset);
+    public void drawGradientCenteredString(MatrixStack matrices, String s, float x, float y, int i) {
+        drawGradientString(matrices, s, x - getStringWidth(s) / 2f, y, i);
     }
 
     record DrawEntry(float atX, float atY, float r, float g, float b, Glyph toDraw) {
