@@ -2,6 +2,8 @@ package thunder.hack.modules.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -235,8 +237,11 @@ public class Trails extends Module {
 
             switch (mode.getValue()) {
                 case Stars -> RenderSystem.setShaderTexture(0, star);
-                case Orbiz -> RenderSystem.setShaderTexture(0, firefly);
+                case Bloom -> RenderSystem.setShaderTexture(0, firefly);
                 case Hearts -> RenderSystem.setShaderTexture(0, heart);
+                default -> {
+                    return;
+                }
             }
 
             RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
@@ -419,31 +424,36 @@ public class Trails extends Module {
         }
 
         public void render(MatrixStack matrixStack, BufferBuilder bufferBuilder) {
-            matrixStack.push();
             update();
             float scale = starsScale.getValue() / 10f;
             final double posX = x - mc.getEntityRenderDispatcher().camera.getPos().getX();
             final double posY = y - mc.getEntityRenderDispatcher().camera.getPos().getY();
             final double posZ = z - mc.getEntityRenderDispatcher().camera.getPos().getZ();
 
-            matrixStack.push();
-            matrixStack.translate(posX, posY, posZ);
+            Camera camera = mc.gameRenderer.getCamera();
 
-            matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-mc.gameRenderer.getCamera().getYaw()));
-            matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(mc.gameRenderer.getCamera().getPitch()));
-            Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+            MatrixStack matrices = new MatrixStack();
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
+            matrices.translate(posX, posY, posZ);
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+
+            Matrix4f matrix = matrices.peek().getPositionMatrix();
 
             float colorAnim = (float) (System.currentTimeMillis() - time) / (1000f * lifeTime.getValue());
 
-            bufferBuilder.vertex(matrix, 0, scale, 0).texture(0, 1).color(applyOpacity(HudEditor.getColor(270), 1f - colorAnim).getRGB()).next();
-            bufferBuilder.vertex(matrix, scale, scale, 0).texture(1, 1).color(applyOpacity(HudEditor.getColor(0), 1f - colorAnim).getRGB()).next();
-            bufferBuilder.vertex(matrix, scale, 0, 0).texture(1, 0).color(applyOpacity(HudEditor.getColor(180), 1f - colorAnim).getRGB()).next();
-            bufferBuilder.vertex(matrix, 0, 0, 0).texture(0, 0).color(applyOpacity(HudEditor.getColor(90), 1f - colorAnim).getRGB()).next();
-            matrixStack.pop();
+            Color c = lmode.getValue() == Mode.Sync ? HudEditor.getColor((int) (360 * colorAnim)) : lcolor.getValue().getColorObject();
+
+            bufferBuilder.vertex(matrix, 0, -scale, 0).texture(0, 1).color(applyOpacity(c, 1f - colorAnim).getRGB()).next();
+            bufferBuilder.vertex(matrix, -scale, -scale, 0).texture(1, 1).color(applyOpacity(c, 1f - colorAnim).getRGB()).next();
+            bufferBuilder.vertex(matrix, -scale, 0, 0).texture(1, 0).color(applyOpacity(c, 1f - colorAnim).getRGB()).next();
+            bufferBuilder.vertex(matrix, 0, 0, 0).texture(0, 0).color(applyOpacity(c, 1f - colorAnim).getRGB()).next();
         }
 
         private boolean posBlock(double x, double y, double z) {
-            return (mc.world.getBlockState(new BlockPos((int) x, (int) y, (int) z)).getBlock() != Blocks.AIR && mc.world.getBlockState(new BlockPos((int) x, (int) y, (int) z)).getBlock() != Blocks.WATER && mc.world.getBlockState(new BlockPos((int) x, (int) y, (int) z)).getBlock() != Blocks.LAVA);
+            Block b = mc.world.getBlockState(BlockPos.ofFloored(x, y,  z)).getBlock();
+            return b != Blocks.AIR && b != Blocks.WATER && b != Blocks.LAVA;
         }
     }
 
