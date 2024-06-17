@@ -4,9 +4,13 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
@@ -97,6 +101,38 @@ public class ClickGUI extends Screen {
         windows.forEach(AbstractCategory::init);
     }
 
+    public static void renderTexture(@NotNull MatrixStack matrices, double x0, double y0, double width, double height, float u, float v, double regionWidth, double regionHeight, double textureWidth,
+                                     double textureHeight) {
+        double x1 = x0 + width;
+        double y1 = y0 + height;
+        double z = 0;
+        renderTexturedQuad(
+                matrices.peek().getPositionMatrix(),
+                x0,
+                x1,
+                y0,
+                y1,
+                z,
+                (u + 0.0F) / (float) textureWidth,
+                (u + (float) regionWidth) / (float) textureWidth,
+                (v + 0.0F) / (float) textureHeight,
+                (v + (float) regionHeight) / (float) textureHeight
+        );
+    }
+
+    private static void renderTexturedQuad(Matrix4f matrix, double x0, double x1, double y0, double y1, double z, float u0, float u1, float v0, float v1) {
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+        buffer.vertex(matrix, (float) x0, (float) y1, (float) z).texture(u0, v1);
+        buffer.vertex(matrix, (float) x1, (float) y1, (float) z).texture(u1, v1);
+        buffer.vertex(matrix, (float) x1, (float) y0, (float) z).texture(u1, v0);
+        buffer.vertex(matrix, (float) x0, (float) y0, (float) z).texture(u0, v0);
+
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
+    }
+
+
     @Override
     public boolean shouldPause() {
         return false;
@@ -121,7 +157,7 @@ public class ClickGUI extends Screen {
                     closeDirectionX = (prevYaw - mc.player.getYaw()) * 300;
             }
 
-            if(closeDirectionX < 1 && closeDirectionY < 1 && closeAnimation > 2)
+            if (closeDirectionX < 1 && closeDirectionY < 1 && closeAnimation > 2)
                 closeDirectionY = -3000;
 
             closeAnimation++;
@@ -132,6 +168,7 @@ public class ClickGUI extends Screen {
             }
         }
     }
+
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         if (ModuleManager.clickGui.blur.getValue())
@@ -141,9 +178,10 @@ public class ClickGUI extends Screen {
 
         ClickGui.Image image = ModuleManager.clickGui.image.getValue();
 
-        if(image != ClickGui.Image.None){
-            RenderSystem.setShaderTexture(0,image.file);
-            Render2DEngine.renderTexture(context.getMatrices(),image.pos[0],image.pos[1],image.size * ((float) image.fileWidth /image.fileHeight) ,image.size * ((float) image.fileHeight /image.fileWidth),0,0,image.fileWidth,image.fileHeight,image.fileWidth,image.fileHeight);
+        if (image != ClickGui.Image.None) {
+
+            RenderSystem.setShaderTexture(0, image.file);
+            Render2DEngine.renderTexture(context.getMatrices(), image.pos[0], image.pos[1], image.size * ((float) image.fileWidth / image.fileHeight), image.size * ((float) image.fileHeight / image.fileWidth), 0, 0, image.fileWidth, image.fileHeight, image.fileWidth, image.fileHeight);
         }
 
         if (closeAnimation <= 6) {
@@ -237,7 +275,7 @@ public class ClickGUI extends Screen {
                 return true;
             }
 
-            if(close)
+            if (close)
                 return true;
 
             windows.forEach(AbstractCategory::savePos);

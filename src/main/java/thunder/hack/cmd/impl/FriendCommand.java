@@ -1,8 +1,11 @@
 package thunder.hack.cmd.impl;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.argument.ArgumentTypes;
+import net.minecraft.command.argument.GameProfileArgumentType;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
@@ -24,11 +27,11 @@ public class FriendCommand extends Command {
             return SINGLE_SUCCESS;
         }));
 
-        builder.then(literal("add").then(arg("player", StringArgumentType.word()).executes(context -> {
-            String nickname = context.getArgument("player", String.class);
+        builder.then(literal("add").then(arg("player", GameProfileArgumentType.gameProfile()).executes(context -> {
+            GameProfile player = context.getArgument("player", GameProfile.class);
 
-            ThunderHack.friendManager.addFriend(nickname);
-            sendMessage(nickname + " has been friended");
+            ThunderHack.friendManager.addFriend(player.getName());
+            sendMessage(player.getName() + " has been friended");
             return SINGLE_SUCCESS;
         })));
 
@@ -40,9 +43,9 @@ public class FriendCommand extends Command {
             return SINGLE_SUCCESS;
         })));
 
-        builder.then(arg("player", StringArgumentType.word()).executes(context -> {
-            String nickname = context.getArgument("player", String.class);
-            sendMessage(nickname + (ThunderHack.friendManager.isFriend(nickname) ? " is friended." : " isn't friended."));
+        builder.then(arg("player", GameProfileArgumentType.gameProfile()).executes(context -> {
+            GameProfile player = context.getArgument("player", GameProfile.class);
+            sendMessage(player.getName() + (ThunderHack.friendManager.isFriend(player.getName()) ? " is friended." : " isn't friended."));
 
             return SINGLE_SUCCESS;
         }));

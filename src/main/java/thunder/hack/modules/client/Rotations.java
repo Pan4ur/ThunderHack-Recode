@@ -19,7 +19,7 @@ public class Rotations extends Module {
     public final Setting<Boolean> clientLook = new Setting<>("ClientLook", false);
 
     private enum MoveFix {
-        Off, Focused, Free;
+        Off, Focused, Free
     }
 
     public float fixRotation;
