@@ -25,7 +25,7 @@ public class GotoWaypointCommand extends Command {
             }
             WayPointManager.WayPoint wp = context.getArgument("name", WayPointManager.WayPoint.class);
             if(!mc.world.getRegistryKey().getValue().getPath().equals(wp.getDimension())){
-                sendMessage(isRu() ? "Метка в другом мире" : "Waypoint in another world");
+                sendMessage(isRu() ? "Метка в другом измерении" : "Waypoint in another dimension");
                 return SINGLE_SUCCESS;
             }
             BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("goto " + wp.getX() + " " + wp.getY() + " " + wp.getZ());
