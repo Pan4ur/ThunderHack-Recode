@@ -27,6 +27,10 @@ repositories {
 		name = "meteor-maven"
 		url = "https://maven.meteordev.org/releases"
 	}
+	maven {
+		name = "meteor-maven-snapshots"
+		url = "https://maven.meteordev.org/snapshots"
+	}
 	repositories {
 		maven {
 			name = 'Ladysnake Mods'
@@ -56,6 +60,8 @@ dependencies {
 	modImpl("org.ladysnake:satin:${project.satin_version}")
 
 	libImpl("meteordevelopment:orbit:${project.orbit_version}")
+
+	modCompileOnly "meteordevelopment:baritone:1.20.6-SNAPSHOT"
 
 	configurations.libImpl.dependencies.each {
 		implementation(it)

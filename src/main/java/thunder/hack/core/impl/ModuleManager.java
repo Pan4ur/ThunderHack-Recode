@@ -127,7 +127,6 @@ public class ModuleManager implements IManager {
     public static KillStats killStats = new KillStats();
     public static AutoAnvil autoAnvil = new AutoAnvil();
     public static CandleHud candleHud = new CandleHud();
-    public static AntiCrash antiCrash = new AntiCrash();
     public static Particles particles = new Particles();
     public static ToolSaver toolSaver = new ToolSaver();
     public static DamageFly damageFly = new DamageFly();
