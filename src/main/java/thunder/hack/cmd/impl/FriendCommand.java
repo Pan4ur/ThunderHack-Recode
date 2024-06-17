@@ -6,10 +6,12 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.ArgumentTypes;
 import net.minecraft.command.argument.GameProfileArgumentType;
+import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.FriendArgumentType;
+import thunder.hack.cmd.args.PlayerArgumentType;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
@@ -27,11 +29,11 @@ public class FriendCommand extends Command {
             return SINGLE_SUCCESS;
         }));
 
-        builder.then(literal("add").then(arg("player", GameProfileArgumentType.gameProfile()).executes(context -> {
-            GameProfile player = context.getArgument("player", GameProfile.class);
+        builder.then(literal("add").then(arg("player", PlayerArgumentType.create()).executes(context -> {
+            PlayerEntity player = context.getArgument("player", PlayerEntity.class);
 
-            ThunderHack.friendManager.addFriend(player.getName());
-            sendMessage(player.getName() + " has been friended");
+            ThunderHack.friendManager.addFriend(player.getName().getString());
+            sendMessage(player.getName().getString() + " has been friended");
             return SINGLE_SUCCESS;
         })));
 
@@ -43,12 +45,12 @@ public class FriendCommand extends Command {
             return SINGLE_SUCCESS;
         })));
 
-        builder.then(arg("player", GameProfileArgumentType.gameProfile()).executes(context -> {
-            GameProfile player = context.getArgument("player", GameProfile.class);
-            sendMessage(player.getName() + (ThunderHack.friendManager.isFriend(player.getName()) ? " is friended." : " isn't friended."));
+        builder.then(literal("is").then(arg("player", PlayerArgumentType.create()).executes(context -> {
+            PlayerEntity player = context.getArgument("player", PlayerEntity.class);
+            sendMessage(player.getName().getString() + (ThunderHack.friendManager.isFriend(player.getName().getString()) ? " is friended." : " isn't friended."));
 
             return SINGLE_SUCCESS;
-        }));
+        })));
 
         builder.executes(context -> {
             if (ThunderHack.friendManager.getFriends().isEmpty()) {
