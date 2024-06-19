@@ -117,7 +117,7 @@ public final class InteractionUtility {
 
         switch (rotate) {
             case None -> {
-                
+
             }
             case Default -> {
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
@@ -135,7 +135,7 @@ public final class InteractionUtility {
 
         awaiting.put(bp, System.currentTimeMillis());
 
-        if(rotate == Rotate.Grim)
+        if (rotate == Rotate.Grim)
             mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
 
         if (sneak)
@@ -161,7 +161,7 @@ public final class InteractionUtility {
 
     public static void sendSequencedPacket(SequencedPacketCreator packetCreator) {
         if (mc.getNetworkHandler() == null || mc.world == null) return;
-        try (PendingUpdateManager pendingUpdateManager = ((IClientWorldMixin) mc.world).getPendingUpdateManager().incrementSequence();){
+        try (PendingUpdateManager pendingUpdateManager = ((IClientWorldMixin) mc.world).getPendingUpdateManager().incrementSequence();) {
             int i = pendingUpdateManager.getSequence();
             mc.getNetworkHandler().sendPacket(packetCreator.predict(i));
         }
@@ -177,7 +177,7 @@ public final class InteractionUtility {
         if (!mc.world.getBlockState(bp).isReplaceable())
             return null;
 
-        if(interact == Interact.AirPlace)
+        if (interact == Interact.AirPlace)
             return ExplosionUtility.rayCastBlock(new RaycastContext(InteractionUtility.getEyesPos(mc.player), bp.toCenterPos(), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player), bp);
 
         ArrayList<BlockPosWithFacing> supports = getSupportBlocks(bp);
@@ -192,10 +192,10 @@ public final class InteractionUtility {
             }
             BlockHitResult result = null;
             if (interact == Interact.Legit) {
-                Vec3d p = getVisibleDirectionPoint(support.facing, support.position);
+                Vec3d p = getVisibleDirectionPoint(support.facing, support.position, 0, 6); //TODO Implement Range
                 if (p != null)
                     return new BlockHitResult(p, support.facing, support.position, false);
-           } else {
+            } else {
                 Vec3d directionVec = new Vec3d(support.position.getX() + 0.5 + support.facing.getVector().getX() * 0.5, support.position.getY() + 0.5 + support.facing.getVector().getY() * 0.5, support.position.getZ() + 0.5 + support.facing.getVector().getZ() * 0.5);
                 result = new BlockHitResult(directionVec, support.facing, support.position, false);
             }
@@ -255,6 +255,12 @@ public final class InteractionUtility {
         return (float) (d0 * d0 + d1 * d1 + d2 * d2);
     }
 
+    public static float squaredDistanceFromEyes2d(@NotNull Vec3d vec) {
+        double d0 = vec.x - mc.player.getX();
+        double d1 = vec.z - mc.player.getZ();
+        return (float) (d0 * d0 + d1 * d1);
+    }
+
     public static @NotNull List<Direction> getStrictDirections(@NotNull BlockPos bp) {
         List<Direction> visibleSides = new ArrayList<>();
         Vec3d positionVector = bp.toCenterPos();
@@ -311,22 +317,22 @@ public final class InteractionUtility {
         double upDelta = getEyesPos(mc.player).y - (pV.add(0, 0.5, 0).y);
         double downDelta = getEyesPos(mc.player).y - (pV.add(0, -0.5, 0).y);
 
-        if(westDelta > 0 && mc.world.getBlockState(bp.east()).isReplaceable())
+        if (westDelta > 0 && mc.world.getBlockState(bp.east()).isReplaceable())
             visibleSides.add(Direction.EAST);
 
-        if(eastDelta < 0 && mc.world.getBlockState(bp.west()).isReplaceable())
+        if (eastDelta < 0 && mc.world.getBlockState(bp.west()).isReplaceable())
             visibleSides.add(Direction.WEST);
 
-        if(northDelta > 0 && mc.world.getBlockState(bp.south()).isReplaceable())
+        if (northDelta > 0 && mc.world.getBlockState(bp.south()).isReplaceable())
             visibleSides.add(Direction.SOUTH);
 
-        if(southDelta < 0 && mc.world.getBlockState(bp.north()).isReplaceable())
+        if (southDelta < 0 && mc.world.getBlockState(bp.north()).isReplaceable())
             visibleSides.add(Direction.NORTH);
 
-        if(upDelta > 0 && mc.world.getBlockState(bp.up()).isReplaceable())
+        if (upDelta > 0 && mc.world.getBlockState(bp.up()).isReplaceable())
             visibleSides.add(Direction.UP);
 
-        if(downDelta < 0 && mc.world.getBlockState(bp.down()).isReplaceable())
+        if (downDelta < 0 && mc.world.getBlockState(bp.down()).isReplaceable())
             visibleSides.add(Direction.DOWN);
 
         return visibleSides;
@@ -361,7 +367,7 @@ public final class InteractionUtility {
                     for (float z = 0f; z <= 1; z += 0.2f) {
                         Vec3d point = new Vec3d(bp.getX() + x, bp.getY() + y, bp.getZ() + z);
                         BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), point, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
-                        if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != bp)
+                        if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && !wallCheck.getBlockPos().equals(bp))
                             continue;
                         BlockHitResult result = ExplosionUtility.rayCastBlock(new RaycastContext(InteractionUtility.getEyesPos(mc.player), point, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player), bp);
 
@@ -378,56 +384,80 @@ public final class InteractionUtility {
         return null;
     }
 
-    public static @Nullable Vec3d getVisibleDirectionPoint(Direction dir, BlockPos bp) {
-        Box brutBox = null;
-        if (dir == Direction.DOWN) brutBox = new Box(new Vec3d(0.1f, 0f, 0.1f), new Vec3d(0.9f, 0f, 0.9f));
-        if (dir == Direction.NORTH) brutBox = new Box(new Vec3d(0.1f, 0.1f, 0f), new Vec3d(0.9f, 0.9f, 0f));
-        if (dir == Direction.EAST) brutBox = new Box(new Vec3d(1f, 0.1f, 0.1f), new Vec3d(1f, 0.9f, 0.9f));
-        if (dir == Direction.SOUTH) brutBox = new Box(new Vec3d(0.1f, 0.1f, 1f), new Vec3d(0.9f, 0.9f, 1f));
-        if (dir == Direction.WEST) brutBox = new Box(new Vec3d(0f, 0.1f, 0.1f), new Vec3d(0f, 0.9f, 0.9f));
-        if (dir == Direction.UP) brutBox = new Box(new Vec3d(0.1f, 1f, 0.1f), new Vec3d(0.9f, 1f, 0.9f));
+    public static @Nullable Vec3d getVisibleDirectionPoint(@NotNull Direction dir, @NotNull BlockPos bp, float wallRange, float range) {
+        Box brutBox = getDirectionBox(dir);
 
-        if (brutBox == null) {
-            Command.sendMessage("err");
-            return null;
-        }
-
-        if (brutBox.maxX - brutBox.minX == 0) {
-            for (double y = brutBox.minY; y < brutBox.maxY; y += 0.1f) {
+        // EAST, WEST
+        if (brutBox.maxX - brutBox.minX == 0)
+            for (double y = brutBox.minY; y < brutBox.maxY; y += 0.1f)
                 for (double z = brutBox.minZ; z < brutBox.maxZ; z += 0.1f) {
                     Vec3d point = new Vec3d(bp.getX() + brutBox.minX, bp.getY() + y, bp.getZ() + z);
-                    BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), point, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
-                    if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != bp)
+
+                    if (shouldSkipPoint(point, bp, dir, wallRange, range))
                         continue;
+
                     return point;
                 }
-            }
-        }
-        if (brutBox.maxY - brutBox.minY == 0) {
-            for (double x = brutBox.minX; x < brutBox.maxX; x += 0.1f) {
+
+
+        // DOWN, UP
+        if (brutBox.maxY - brutBox.minY == 0)
+            for (double x = brutBox.minX; x < brutBox.maxX; x += 0.1f)
                 for (double z = brutBox.minZ; z < brutBox.maxZ; z += 0.1f) {
                     Vec3d point = new Vec3d(bp.getX() + x, bp.getY() + brutBox.minY, bp.getZ() + z);
-                    BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), point, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
-                    if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != bp)
+
+                    if (shouldSkipPoint(point, bp, dir, wallRange, range))
                         continue;
+
                     return point;
                 }
 
-            }
-        }
-        if (brutBox.maxZ - brutBox.minZ == 0) {
-            for (double x = brutBox.minX; x < brutBox.maxX; x += 0.1f) {
+
+        // NORTH, SOUTH
+        if (brutBox.maxZ - brutBox.minZ == 0)
+            for (double x = brutBox.minX; x < brutBox.maxX; x += 0.1f)
                 for (double y = brutBox.minY; y < brutBox.maxY; y += 0.1f) {
                     Vec3d point = new Vec3d(bp.getX() + x, bp.getY() + y, bp.getZ() + brutBox.minZ);
-                    BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), point, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
-                    if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != bp)
-                        continue;
-                    return point;
 
+                    if (shouldSkipPoint(point, bp, dir, wallRange, range))
+                        continue;
+
+                    return point;
                 }
-            }
-        }
+
+
         return null;
+    }
+
+    private static @NotNull Box getDirectionBox(Direction dir) {
+        return switch (dir) {
+            case UP -> new Box(.1f, 1f, 0.1f, 0.9f, 1f, 0.9f);
+            case DOWN -> new Box(.1f, 0f, 0.1f, 0.9f, 0f, 0.9f);
+
+            case EAST -> new Box(1f, 0.1f, 0.1f, 1f, 0.9f, 0.9f);
+            case WEST -> new Box(0f, 0.1f, 0.1f, 0f, 0.9f, 0.9f);
+
+            case NORTH -> new Box(0.1f, 0.1f, 0f, 0.9f, 0.9f, 0f);
+            case SOUTH -> new Box(0.1f, 0.1f, 1f, 0.9f, 0.9f, 1f);
+        };
+    }
+
+    private static boolean shouldSkipPoint(Vec3d point, BlockPos bp, Direction dir, float wallRange , float range) {
+        RaycastContext context = new RaycastContext(InteractionUtility.getEyesPos(mc.player), point, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player);
+        BlockHitResult result = mc.world.raycast(context);
+
+        float dst = InteractionUtility.squaredDistanceFromEyes(point);
+
+        if (result != null
+                && result.getType() == HitResult.Type.BLOCK
+                && !result.getBlockPos().equals(bp)
+                && dst > wallRange * wallRange)
+            return true;
+
+        if (dst > range * range)
+            return true;
+
+        return false;
     }
 
     public static boolean needSneak(Block in) {
@@ -435,7 +465,7 @@ public final class InteractionUtility {
     }
 
     public static void lookAt(BlockPos bp) {
-        if(bp != null) {
+        if (bp != null) {
             float[] angle = calculateAngle(bp.toCenterPos());
             mc.player.setYaw(angle[0]);
             mc.player.setPitch(angle[1]);

@@ -9,4 +9,8 @@ public class EventEntityRemoved extends Event {
     public EventEntityRemoved(Entity entity) {
         this.entity = entity;
     }
+
+    public Entity getEntity() {
+        return entity;
+    }
 }
