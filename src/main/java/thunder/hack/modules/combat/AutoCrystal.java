@@ -542,7 +542,7 @@ public class AutoCrystal extends Module {
         if (deadManager.isDead(cr.getId()) && deadCheck)
             return false;
 
-        if (PlayerUtility.squaredDistanceFromEyes(cr.getBoundingBox().getCenter()) > (InteractionUtility.canSee(cr) ? explodeRange.getPow2Value() : explodeWallRange.getValue()))
+        if (PlayerUtility.squaredDistanceFromEyes(cr.getBoundingBox().getCenter()) > (InteractionUtility.canSee(cr) ? explodeRange.getPow2Value() : explodeWallRange.getPow2Value()))
             return false;
 
         if (!cr.isAlive())
@@ -740,7 +740,7 @@ public class AutoCrystal extends Module {
             if (deadManager.isDead(cr.getId()))
                 continue;
 
-            if (PlayerUtility.squaredDistanceFromEyes(ent.getBoundingBox().getCenter()) > (InteractionUtility.canSee(cr) ? explodeRange.getPow2Value() : explodeWallRange.getValue()))
+            if (PlayerUtility.squaredDistanceFromEyes(ent.getBoundingBox().getCenter()) > (InteractionUtility.canSee(cr) ? explodeRange.getPow2Value() : explodeWallRange.getPow2Value()))
                 continue;
 
             if (!ent.isAlive())
@@ -1093,7 +1093,8 @@ public class AutoCrystal extends Module {
     }
 
     private int getPredictTicks() {
-        return Math.round(ServerManager.getPing() * 0.04f);
+        // TODO
+        return 0;
     }
 
     public record PlaceData(BlockHitResult bhr, float damage, float selfDamage, boolean overrideDamage) {
