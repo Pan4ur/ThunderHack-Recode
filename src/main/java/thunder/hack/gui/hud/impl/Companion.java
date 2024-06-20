@@ -28,6 +28,7 @@ public class Companion extends HudElement {
     private final Identifier BOYKISSER = new Identifier("thunderhack", "textures/hud/elements/boykisser.png");
     private final Identifier PAIMON = new Identifier("thunderhack", "textures/hud/elements/paimon.png");
     private final Identifier BALTIKA = new Identifier("thunderhack", "textures/hud/elements/baltika.png");
+    private final Identifier KOWK = new Identifier("thunderhack", "textures/hud/elements/kowk.png"); // kowk!!!1
 
     public Setting<Integer> scale = new Setting<>("Scale", 50, 0, 100);
     public Setting<Mode> mode = new Setting<>("Mode", Mode.Boykisser);
@@ -65,6 +66,8 @@ public class Companion extends HudElement {
             context.drawTexture(PAIMON, (int) getPosX(), (int) getPosY(), 0, currentFrame * 200, 200, 200, 200, 10600);
         else if(mode.getValue() == Mode.Baltika)
             context.drawTexture(BALTIKA, (int) getPosX(), (int) getPosY(), 0, 0, 421, 800, 421, 800);
+        else if(mode.getValue() == Mode.Kowk)
+            context.drawTexture(KOWK, (int) getPosX(), (int) getPosY(), 0, 0, 287, 252, 287, 252);
         context.getMatrices().pop();
 
         if (!lastPop.passedMs(2000)) {
@@ -83,6 +86,7 @@ public class Companion extends HudElement {
             if (currentFrame > 52)
                 currentFrame = 0;
         }
+		
         if(mode.getValue() == Mode.Baltika)
             setBounds(getPosX() + 100, getPosY() + 100, (scale.getValue() * 3f), (scale.getValue() * 3f));
         else
@@ -100,7 +104,7 @@ public class Companion extends HudElement {
             message = event.getEntity().getName().getString() + " popped " + (event.getPops() > 1 ? event.getPops() + "" + " totems!" : " a totem!");
         lastPop.reset();
     }
-    private enum Mode{
-        Boykisser, Paimon, Baltika
+    private enum Mode {
+        Boykisser, Paimon, Baltika, Kowk
     }
 }
