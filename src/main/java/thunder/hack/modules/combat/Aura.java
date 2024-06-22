@@ -87,6 +87,7 @@ public class Aura extends Module {
     public final Setting<ESP> esp = new Setting<>("ESP", ESP.ThunderHack);
     public final Setting<Sort> sort = new Setting<>("Sort", Sort.LowestDistance);
     public final Setting<Boolean> lockTarget = new Setting<>("LockTarget", true);
+    public final Setting<Boolean> attackMobsIfNoPlayers = new Setting<>("AttackMobIfNoPlayers", false);
 
     /*   ADVANCED   */
     public final Setting<SettingGroup> advanced = new Setting<>("Advanced", new SettingGroup(false, 0));
@@ -134,6 +135,7 @@ public class Aura extends Module {
     public final Setting<Boolean> ignoreCreative = new Setting<>("IgnoreCreative", true).addToGroup(targets);
     public final Setting<Boolean> ignoreNaked = new Setting<>("IgnoreNaked", false).addToGroup(targets);
     public final Setting<Boolean> ignoreShield = new Setting<>("AttackShieldingEntities", true).addToGroup(targets);
+
 
 
     public static Entity target;
@@ -312,7 +314,13 @@ public class Aura extends Module {
 
         if (mc.player.isUsingItem() && pauseWhileEating.getValue())
             return;
+        if(!havePlayersNear()  && attackMobsIfNoPlayers.getValue()){
+            Mobs.setValue(true);
 
+        }
+        else{
+            Mobs.setValue(false);
+        }
         resolvePlayers();
         auraLogic();
         restorePlayers();
@@ -830,6 +838,14 @@ public class Aura extends Module {
 
     public void pause() {
         pauseTimer.reset();
+    }
+    public boolean havePlayersNear(){
+        for (PlayerEntity pl : mc.world.getPlayers()) {
+            if (pl != mc.player && !ThunderHack.friendManager.isFriend(pl)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static class Position {
