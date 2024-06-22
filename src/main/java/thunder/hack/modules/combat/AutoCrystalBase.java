@@ -170,19 +170,6 @@ public class AutoCrystalBase extends Module {
         return blocks;
     }
 
-
-    /*
-        @Override
-    @SuppressWarnings("NullableProblems")
-    public int compareTo(PositionData o) {
-        if (Math.abs(o.damage - this.damage) < 1f) {
-            return Float.compare(this.selfDamage, o.getSelfDamage());
-        }
-
-        return Float.compare(o.damage, this.damage);
-    }
-     */
-
     private ObbyData filterPositions(@NotNull List<ObbyData> clearedList) {
         ObbyData bestData = null;
         float bestVal = 0f;
