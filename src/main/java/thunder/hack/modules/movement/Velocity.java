@@ -4,12 +4,12 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.injection.accesors.IExplosionS2CPacket;
@@ -50,10 +50,10 @@ public class Velocity extends Module {
     public void onPacketReceive(PacketEvent.Receive e) {
         if (fullNullCheck()) return;
 
-        if (mc.player != null && (mc.player.isTouchingWater() || mc.player.isSubmergedInWater() || mc.player.isInLava()) && pauseInWater.getValue())
+        if(mc.player != null && (mc.player.isTouchingWater() || mc.player.isSubmergedInWater() || mc.player.isInLava()) && pauseInWater.getValue())
             return;
 
-        if (mc.player != null && mc.player.isOnFire() && fire.getValue() && (mc.player.hurtTime > 0)) {
+        if(mc.player != null && mc.player.isOnFire() && fire.getValue() && (mc.player.hurtTime > 0)){
             return;
         }
 
@@ -77,8 +77,8 @@ public class Velocity extends Module {
                         }
                     }
                     case Redirect -> {
-                        double vX = pac.getVelocityX();
-                        double vZ = pac.getVelocityZ();
+                        int vX = pac.getVelocityX();
+                        int vZ = pac.getVelocityZ();
                         if (vX < 0) vX *= -1;
                         if (vZ < 0) vZ *= -1;
                         double[] motion = MovementUtility.forward((vX + vZ));
@@ -147,7 +147,7 @@ public class Velocity extends Module {
 
         // LAGBACK
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
-            if (cc.getValue() || mode.getValue() == modeEn.GrimNew)
+            if(cc.getValue() || mode.getValue() == modeEn.GrimNew)
                 ccCooldown = 5;
         }
     }
@@ -155,7 +155,7 @@ public class Velocity extends Module {
 
     @Override
     public void onUpdate() {
-        if (mc.player != null && (mc.player.isTouchingWater() || mc.player.isSubmergedInWater()) && pauseInWater.getValue())
+        if(mc.player != null && (mc.player.isTouchingWater() || mc.player.isSubmergedInWater()) && pauseInWater.getValue())
             return;
 
         switch (mode.getValue()) {
@@ -200,8 +200,8 @@ public class Velocity extends Module {
             }
             case GrimNew -> {
                 if (flag) {
-                    if (ccCooldown <= 0) {
-                        sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), ((IClientPlayerEntity) mc.player).getLastYaw(), ((IClientPlayerEntity) mc.player).getLastPitch(), mc.player.isOnGround()));
+                    if(ccCooldown <= 0) {
+                        sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), ((IClientPlayerEntity)mc.player).getLastYaw(), ((IClientPlayerEntity)mc.player).getLastPitch(), mc.player.isOnGround()));
                         sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, BlockPos.ofFloored(mc.player.getPos()), Direction.DOWN));
                     }
                     flag = false;
