@@ -11,6 +11,7 @@ import net.minecraft.util.math.MathHelper;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.injection.accesors.IExplosionS2CPacket;
 import thunder.hack.injection.accesors.ISPacketEntityVelocity;
 import thunder.hack.modules.Module;
@@ -200,7 +201,7 @@ public class Velocity extends Module {
             case GrimNew -> {
                 if (flag) {
                     if(ccCooldown <= 0) {
-                        sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
+                        sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), ((IClientPlayerEntity)mc.player).getLastYaw(), ((IClientPlayerEntity)mc.player).getLastPitch(), mc.player.isOnGround()));
                         sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, BlockPos.ofFloored(mc.player.getPos()), Direction.DOWN));
                     }
                     flag = false;

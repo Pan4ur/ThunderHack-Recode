@@ -1,10 +1,10 @@
 package thunder.hack.modules.combat;
 
-import net.minecraft.network.packet.c2s.play.*;
 import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -17,9 +17,9 @@ import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.EventTick;
+import thunder.hack.gui.notification.Notification;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.setting.impl.ColorSetting;
@@ -115,8 +115,10 @@ public class AutoCrystalBase extends Module {
 
             if (notification.getValue()) {
                 String content;
-                if (isRu()) content = "Ставлю на" + Formatting.GRAY + " X:" + bestData.position().getX() + " Y:" + bestData.position().getY() + " Z:" + bestData.position().getZ() + Formatting.WHITE + " урон возрастет на " + Formatting.RED + MathUtility.round2(bestData.damage - ModuleManager.autoCrystal.renderDamage);
-                else content = "Placing obby on" + Formatting.GRAY + " X:" + bestData.position().getX() + " Y:" + bestData.position().getY() + " Z:" + bestData.position().getZ() + Formatting.WHITE + " damage will increase by " + Formatting.RED + MathUtility.round2(bestData.damage - ModuleManager.autoCrystal.renderDamage);
+                if (isRu())
+                    content = "Ставлю на" + Formatting.GRAY + " X:" + bestData.position().getX() + " Y:" + bestData.position().getY() + " Z:" + bestData.position().getZ() + Formatting.WHITE + " урон возрастет на " + Formatting.RED + MathUtility.round2(bestData.damage - ModuleManager.autoCrystal.renderDamage);
+                else
+                    content = "Placing obby on" + Formatting.GRAY + " X:" + bestData.position().getX() + " Y:" + bestData.position().getY() + " Z:" + bestData.position().getZ() + Formatting.WHITE + " damage will increase by " + Formatting.RED + MathUtility.round2(bestData.damage - ModuleManager.autoCrystal.renderDamage);
                 ThunderHack.notificationManager.publicity("AutoCrystalBase", content, 2, Notification.Type.INFO);
             }
 
@@ -168,21 +170,34 @@ public class AutoCrystalBase extends Module {
         return blocks;
     }
 
+
+    /*
+        @Override
+    @SuppressWarnings("NullableProblems")
+    public int compareTo(PositionData o) {
+        if (Math.abs(o.damage - this.damage) < 1f) {
+            return Float.compare(this.selfDamage, o.getSelfDamage());
+        }
+
+        return Float.compare(o.damage, this.damage);
+    }
+     */
+
     private ObbyData filterPositions(@NotNull List<ObbyData> clearedList) {
         ObbyData bestData = null;
         float bestVal = 0f;
 
         for (ObbyData data : clearedList) {
             if ((ModuleManager.autoCrystal.shouldOverride(data.damage) || data.damage > ModuleManager.autoCrystal.minDamage.getValue())) {
-                if (ModuleManager.autoCrystal.sort.getValue() == AutoCrystal.Sort.DAMAGE) {
-                    if (bestVal < data.damage) {
+                if (bestData != null && Math.abs(bestData.damage - data.damage) < 1f) {
+                    if (bestData.selfDamage >= data.selfDamage) {
                         bestData = data;
                         bestVal = data.damage;
                     }
                 } else {
-                    if (bestVal < data.damage / data.selfDamage) {
+                    if (bestVal < data.damage) {
                         bestData = data;
-                        bestVal = data.damage / data.selfDamage;
+                        bestVal = data.damage;
                     }
                 }
             }

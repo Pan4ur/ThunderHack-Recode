@@ -431,14 +431,14 @@ public final class InteractionUtility {
 
     private static @NotNull Box getDirectionBox(Direction dir) {
         return switch (dir) {
-            case UP -> new Box(.1f, 1f, 0.1f, 0.9f, 1f, 0.9f);
-            case DOWN -> new Box(.1f, 0f, 0.1f, 0.9f, 0f, 0.9f);
+            case UP -> new Box(.15f, 1f, .15f, .85f, 1f, .85f);
+            case DOWN -> new Box(.15f, 0f, .15f, .85f, 0f, .85f);
 
-            case EAST -> new Box(1f, 0.1f, 0.1f, 1f, 0.9f, 0.9f);
-            case WEST -> new Box(0f, 0.1f, 0.1f, 0f, 0.9f, 0.9f);
+            case EAST -> new Box(1f, .15f, .15f, 1f, .85f, .85f);
+            case WEST -> new Box(0f, .15f, .15f, 0f, .85f, .85f);
 
-            case NORTH -> new Box(0.1f, 0.1f, 0f, 0.9f, 0.9f, 0f);
-            case SOUTH -> new Box(0.1f, 0.1f, 1f, 0.9f, 0.9f, 1f);
+            case NORTH -> new Box(.15f, .15f, 0f, .85f, .85f, 0f);
+            case SOUTH -> new Box(.15f, .15f, 1f, .85f, .85f, 1f);
         };
     }
 
@@ -454,10 +454,7 @@ public final class InteractionUtility {
                 && dst > wallRange * wallRange)
             return true;
 
-        if (dst > range * range)
-            return true;
-
-        return false;
+        return dst > range * range;
     }
 
     public static boolean needSneak(Block in) {

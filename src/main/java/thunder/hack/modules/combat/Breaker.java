@@ -32,7 +32,7 @@ public final class Breaker extends Module {
 
     private BlockPos blockPos;
 
-    private Timer pause = new Timer();
+    private final Timer pause = new Timer();
 
     public Breaker() {
         super("Breaker", Category.COMBAT);
@@ -62,7 +62,11 @@ public final class Breaker extends Module {
         if (cevPriority.getValue()) {
             for (int y = 2; y <= 3; y++) {
                 BlockPos bp = BlockPos.ofFloored(target.getX(), target.getY() + y, target.getZ());
-                if (mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN && mc.world.isAir(bp.up()) && !bp.equals(BlockPos.ofFloored(target.getPos()).down())) {
+                if (mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN
+
+                      //  && mc.world.isAir(bp.up())  я не помню зачем
+
+                        && !bp.equals(BlockPos.ofFloored(target.getPos()).down())) {
                     if (ModuleManager.autoCrystal.getInteractResult(bp, new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ())) == null)
                         continue;
                     BlockState currentState = mc.world.getBlockState(bp);
