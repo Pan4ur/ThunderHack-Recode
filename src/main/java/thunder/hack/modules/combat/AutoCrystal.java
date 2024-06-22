@@ -250,7 +250,7 @@ public class AutoCrystal extends Module {
         }
 
         // Rotate
-        if (rotate.getValue() && mc.player != null && rotationYaw != mc.player.getYaw() && rotationPitch != mc.player.getPitch()) {
+        if (rotate.getValue() && mc.player != null) {
 
             boolean hitVisible = bestCrystal == null || PlayerUtility.canSee(bestCrystal.getPos());
             boolean placeVisible = bestPosition == null || PlayerUtility.canSee(bestPosition.getPos());
