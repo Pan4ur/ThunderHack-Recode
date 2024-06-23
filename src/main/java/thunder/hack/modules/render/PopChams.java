@@ -4,15 +4,16 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 import org.jetbrains.annotations.NotNull;
@@ -23,15 +24,24 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.MathUtility;
+import thunder.hack.utility.render.Render2DEngine;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class PopChams extends Module {
+
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Textured);
+    private final Setting<Boolean> secondLayer = new Setting<>("SecondLayer", true);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
-    private final Setting<Integer> ySpeed = new Setting<>("Y Speed", 0, -10, 10);
-    private final Setting<Integer> aSpeed = new Setting<>("Alpha Speed", 5, 1, 100);
+    private final Setting<Integer> ySpeed = new Setting<>("YSpeed", 0, -10, 10);
+    private final Setting<Integer> aSpeed = new Setting<>("AlphaSpeed", 5, 1, 100);
+    private final Setting<Float> rotSpeed = new Setting<>("RotationSpeed", 0.25f, 0f, 6f);
 
     private final CopyOnWriteArrayList<Person> popList = new CopyOnWriteArrayList<>();
+
+    private enum Mode {
+        Simple, Textured
+    }
 
     public PopChams() {
         super("PopChams", Category.RENDER);
@@ -44,23 +54,13 @@ public final class PopChams extends Module {
 
     @Override
     public void onRender3D(MatrixStack stack) {
-        RenderSystem.depthMask(false);
-        RenderSystem.disableDepthTest();
         RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(770, 771, 0, 1);
-
-        popList.forEach(person -> {
-            person.modelPlayer.leftPants.visible = false;
-            person.modelPlayer.rightPants.visible = false;
-            person.modelPlayer.leftSleeve.visible = false;
-            person.modelPlayer.rightSleeve.visible = false;
-            person.modelPlayer.jacket.visible = false;
-            person.modelPlayer.hat.visible = false;
-            renderEntity(stack, person.player, person.modelPlayer, person.getAlpha());
-        });
-
+        RenderSystem.disableDepthTest();
+        if (mode.is(Mode.Simple)) RenderSystem.defaultBlendFunc();
+        else RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
+        popList.forEach(person -> renderEntity(stack, person.player, person.modelPlayer, person.getTexture(), person.getAlpha()));
+        RenderSystem.enableDepthTest();
         RenderSystem.disableBlend();
-        RenderSystem.depthMask(true);
     }
 
     @EventHandler
@@ -69,15 +69,8 @@ public final class PopChams extends Module {
         if (e.getEntity().equals(mc.player) || mc.world == null) return;
 
         PlayerEntity entity = new PlayerEntity(mc.world, BlockPos.ORIGIN, e.getEntity().bodyYaw, new GameProfile(e.getEntity().getUuid(), e.getEntity().getName().getString())) {
-            @Override
-            public boolean isSpectator() {
-                return false;
-            }
-
-            @Override
-            public boolean isCreative() {
-                return false;
-            }
+            @Override public boolean isSpectator() {return false;}
+            @Override public boolean isCreative() {return false;}
         };
 
         entity.copyPositionAndRotation(e.getEntity());
@@ -88,32 +81,55 @@ public final class PopChams extends Module {
         entity.setSneaking(e.getEntity().isSneaking());
         entity.limbAnimator.setSpeed(e.getEntity().limbAnimator.getSpeed());
         entity.limbAnimator.pos = e.getEntity().limbAnimator.getPos();
-        popList.add(new Person(entity));
+        popList.add(new Person(entity, ((AbstractClientPlayerEntity) e.getEntity()).getSkinTextures().texture()));
     }
 
-    private void renderEntity(@NotNull MatrixStack matrices, @NotNull LivingEntity entity, @NotNull BipedEntityModel<PlayerEntity> modelBase, int alpha) {
+    private void renderEntity(@NotNull MatrixStack matrices, @NotNull LivingEntity entity, @NotNull PlayerEntityModel<PlayerEntity> modelBase, Identifier texture, int alpha) {
+
+        modelBase.leftPants.visible = secondLayer.getValue();
+        modelBase.rightPants.visible = secondLayer.getValue();
+        modelBase.leftSleeve.visible = secondLayer.getValue();
+        modelBase.rightSleeve.visible = secondLayer.getValue();
+        modelBase.jacket.visible = secondLayer.getValue();
+        modelBase.hat.visible = secondLayer.getValue();
+
         double x = entity.getX() - mc.getEntityRenderDispatcher().camera.getPos().getX();
         double y = entity.getY() - mc.getEntityRenderDispatcher().camera.getPos().getY();
         double z = entity.getZ() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
-        ((IEntity) entity).setPos(entity.getPos().add(0, (double) ySpeed.getValue() / 50, 0));
+        ((IEntity) entity).setPos(entity.getPos().add(0, (double) ySpeed.getValue() / 50., 0));
 
         matrices.push();
         matrices.translate((float) x, (float) y, (float) z);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotation(MathUtility.rad(180 - entity.bodyYaw)));
+
+        float yRotYaw = ((alpha / 255f) * 360f * rotSpeed.getValue());
+        yRotYaw = yRotYaw == 0 ? 0 : Render2DEngine.interpolateFloat(yRotYaw, yRotYaw - (((aSpeed.getValue() / 255f) * 360f * rotSpeed.getValue())), mc.getTickDelta());
+
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotation(MathUtility.rad(180 - entity.bodyYaw + yRotYaw)));
         prepareScale(matrices);
 
         modelBase.animateModel((PlayerEntity) entity, entity.limbAnimator.getPos(), entity.limbAnimator.getSpeed(), mc.getTickDelta());
-        modelBase.setAngles((PlayerEntity) entity, entity.limbAnimator.getPos(), entity.limbAnimator.getSpeed(), entity.age, entity.headYaw - entity.bodyYaw, entity.getPitch());
 
-        RenderSystem.enableBlend();
+        float limbSpeed = Math.min(entity.limbAnimator.getSpeed(), 1f);
+
+        modelBase.setAngles((PlayerEntity) entity, entity.limbAnimator.getPos(), limbSpeed, entity.age, entity.headYaw - entity.bodyYaw, entity.getPitch());
+
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        if (mode.is(Mode.Textured)) {
+            RenderSystem.setShaderTexture(0, texture);
+            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+        } else {
+            RenderSystem.setShader(GameRenderer::getPositionProgram);
+            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+        }
+
+        RenderSystem.setShaderColor(color.getValue().getGlRed(), color.getValue().getGlGreen(), color.getValue().getGlBlue(), alpha / 255f);
+
         modelBase.render(matrices, buffer, 10, 0, color.getValue().getRed() / 255f, color.getValue().getGreen() / 255f, color.getValue().getBlue() / 255f, alpha / 255f);
         tessellator.draw();
-        RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         matrices.pop();
     }
 
@@ -126,13 +142,15 @@ public final class PopChams extends Module {
     private class Person {
         private final PlayerEntity player;
         private final PlayerEntityModel<PlayerEntity> modelPlayer;
+        private Identifier texture;
         private int alpha;
 
-        public Person(PlayerEntity player) {
+        public Person(PlayerEntity player, Identifier texture) {
             this.player = player;
             modelPlayer = new PlayerEntityModel<>(new EntityRendererFactory.Context(mc.getEntityRenderDispatcher(), mc.getItemRenderer(), mc.getBlockRenderManager(), mc.getEntityRenderDispatcher().getHeldItemRenderer(), mc.getResourceManager(), mc.getEntityModelLoader(), mc.textRenderer).getPart(EntityModelLayers.PLAYER), false);
             modelPlayer.getHead().scale(new Vector3f(-0.3f, -0.3f, -0.3f));
             alpha = color.getValue().getAlpha();
+            this.texture = texture;
         }
 
         public void update(CopyOnWriteArrayList<Person> arrayList) {
@@ -148,6 +166,10 @@ public final class PopChams extends Module {
 
         public int getAlpha() {
             return MathUtility.clamp(alpha, 0, 255);
+        }
+
+        public Identifier getTexture() {
+            return texture;
         }
     }
 }

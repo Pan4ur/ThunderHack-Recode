@@ -179,16 +179,12 @@ public class Chams extends Module {
 
             setupTransforms1(pe, matrixStack, l, h, g);
             matrixStack.scale(-1.0f + scaleFactorX, -1.0f + scaleFactorY, 1.0f);
-            matrixStack.scale(0.9375f, 0.9375f, 0.9375f);
-            matrixStack.translate(0.0f, -1.501f, 0.0f);
-
         } else {
             setupTransforms1(pe, matrixStack, l, h, g);
             matrixStack.scale(-1.0f, -1.0f, 1.0f);
-            matrixStack.scale(0.9375f, 0.9375f, 0.9375f);
-            matrixStack.translate(0.0f, -1.501f, 0.0f);
         }
-
+        matrixStack.scale(0.9375f, 0.9375f, 0.9375f);
+        matrixStack.translate(0.0f, -1.501f, 0.0f);
 
         n = 0.0f;
         float o = 0.0f;
