@@ -15,12 +15,13 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventAttack;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.modules.Module;
-import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.player.InventoryUtility;
@@ -76,7 +77,11 @@ public class FakePlayer extends Module {
             if (fakePlayer.isDead()) {
                 if (fakePlayer.tryUseTotem(mc.world.getDamageSources().generic())) {
                     fakePlayer.setHealth(10f);
-              //      new EntityStatusS2CPacket(fakePlayer, EntityStatuses.USE_TOTEM_OF_UNDYING).apply(mc.player.networkHandler);
+
+
+                    ThunderHack.EVENT_BUS.post(new TotemPopEvent(fakePlayer, 1));
+
+                    //      new EntityStatusS2CPacket(fakePlayer, EntityStatuses.USE_TOTEM_OF_UNDYING).apply(mc.player.networkHandler);
                 }
             }
         }
@@ -146,5 +151,6 @@ public class FakePlayer extends Module {
         deathTime = 0;
     }
 
-    private record PlayerState(double x, double y, double z, float yaw, float pitch) {}
+    private record PlayerState(double x, double y, double z, float yaw, float pitch) {
+    }
 }
