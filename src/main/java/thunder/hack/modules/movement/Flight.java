@@ -75,7 +75,7 @@ public class Flight extends Module {
 
     @Override
     public void onUpdate() {
-        if (mode.getValue() != Mode.MatrixJump) return;
+        if (mode.getValue() != Mode.MatrixJump || mc.player.fallDistance == 0) return;
         mc.player.getAbilities().flying = false;
         mc.player.setVelocity(0.0, 0.0, 0.0);
 
