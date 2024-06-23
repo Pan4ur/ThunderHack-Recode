@@ -24,7 +24,7 @@ import static thunder.hack.modules.Module.mc;
 
 @Mixin(ClientWorld.class)
 public class MixinClientWorld {
-    @Inject(method = "addEntity", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "addEntity", at = @At("RETURN"), cancellable = true)
     public void addEntityHook(Entity entity, CallbackInfo ci) {
         if(Module.fullNullCheck()) return;
         EventEntitySpawn ees = new EventEntitySpawn(entity);

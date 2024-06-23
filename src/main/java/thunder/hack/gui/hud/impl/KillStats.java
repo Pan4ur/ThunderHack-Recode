@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -37,6 +38,7 @@ public class KillStats extends HudElement {
     @EventHandler
     private void death(PacketEvent.Receive event){
         if(event.getPacket() instanceof EntityStatusS2CPacket pac && pac.getStatus() == 3){
+            if(!(pac.getEntity(mc.world) instanceof PlayerEntity)) return;
             if(pac.getEntity(mc.world) == mc.player){
                 death++;
                 killstreak = 0;

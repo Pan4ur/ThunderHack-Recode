@@ -14,6 +14,7 @@ import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
@@ -26,6 +27,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.movement.NoSlow;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.math.MathUtility;
 
 import java.util.ArrayDeque;
@@ -141,6 +143,46 @@ public class PlayerManager implements IManager {
             offset = ((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw();
         float deltaBodyYaw = clamp(MathHelper.wrapDegrees((((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw()) - (bodyYaw + MathHelper.wrapDegrees(offset - bodyYaw) * 0.3f)), -45.0f, 75.0f);
         return (deltaBodyYaw > 50f ? deltaBodyYaw * 0.2f : 0) + ((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw() - deltaBodyYaw;
+    }
+
+    public boolean checkRtx(float yaw, float pitch, float distance, float wallDistance, Entity entity) {
+        HitResult result = rayTrace(distance, yaw, pitch);
+        Vec3d startPoint = mc.player.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0);
+        double distancePow2 = Math.pow(distance, 2);
+
+        if (result != null)
+            distancePow2 = startPoint.squaredDistanceTo(result.getPos());
+
+        Vec3d rotationVector = getRotationVector(pitch, yaw).multiply(distance);
+        Vec3d endPoint = startPoint.add(rotationVector);
+
+        Box entityArea = mc.player.getBoundingBox().stretch(rotationVector).expand(1.0, 1.0, 1.0);
+
+        EntityHitResult ehr;
+
+        double maxDistance = Math.max(distancePow2, Math.pow(wallDistance, 2));
+
+        ehr = ProjectileUtil.raycast(mc.player, startPoint, endPoint, entityArea, e -> !e.isSpectator() && e.canHit() && e == entity, maxDistance);
+
+        if (ehr != null) {
+            boolean allowedWallDistance = startPoint.squaredDistanceTo(ehr.getPos()) <= Math.pow(wallDistance, 2);
+            boolean wallMissing = result == null;
+            boolean wallBehindEntity = startPoint.squaredDistanceTo(ehr.getPos()) < distancePow2;
+            boolean allowWallHit = wallMissing || allowedWallDistance || wallBehindEntity;
+
+            if (allowWallHit && startPoint.squaredDistanceTo(ehr.getPos()) <= Math.pow(distance, 2))
+                return ehr.getEntity() == entity;
+        }
+
+        return false;
+    }
+
+    public boolean isLookingAtBox(float yaw, float pitch, BlockPos blockPos) {
+        Vec3d vec3d = mc.player.getCameraPosVec(1f);
+        Vec3d vec3d2 = getRotationVector(pitch, yaw);
+        Vec3d vec3d3 = vec3d.add(vec3d2.x * 7, vec3d2.y * 7, vec3d2.z * 7);
+        BlockHitResult result = ExplosionUtility.rayCastBlock(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player), blockPos);
+        return result != null && result.getType() == HitResult.Type.BLOCK && result.getBlockPos().equals(blockPos);
     }
 
     public boolean checkRtx(float yaw, float pitch, float distance, float wallDistance, Aura.RayTrace rt) {

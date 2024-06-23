@@ -579,7 +579,7 @@ public class ThunderGui extends Screen {
                 module_y += 35;
             }
 
-            if (keyCode == GLFW.GLFW_KEY_ENTER) {
+            if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
                 search_string = "Search";
                 searching = false;
                 return;

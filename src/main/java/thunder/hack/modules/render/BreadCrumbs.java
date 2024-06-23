@@ -39,6 +39,9 @@ public class BreadCrumbs extends Module {
     }
 
     public void drawLine(float width, boolean white) {
+        if (positions.size() < 2)
+            return;
+
         Render3DEngine.setupRender();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);

@@ -23,17 +23,17 @@ public class GpsCommand extends Command {
         }));
 
         builder.then(arg("x", IntegerArgumentType.integer())
-                .then(arg("y", IntegerArgumentType.integer()).executes(context -> {
+                .then(arg("z", IntegerArgumentType.integer()).executes(context -> {
                     final int x = context.getArgument("x", Integer.class);
-                    final int y = context.getArgument("y", Integer.class);
-                    ThunderHack.gps_position = new BlockPos(x, 0, y);
+                    final int z = context.getArgument("z", Integer.class);
+                    ThunderHack.gps_position = new BlockPos(x, 0, z);
 
                     sendMessage("GPS настроен на X: " + ThunderHack.gps_position.getX() + " Z: " + ThunderHack.gps_position.getZ());
                     return SINGLE_SUCCESS;
                 })));
 
         builder.executes(context -> {
-            sendMessage("Попробуй .gps off / .gps x y");
+            sendMessage("Попробуй .gps off / .gps x z");
             return SINGLE_SUCCESS;
         });
     }

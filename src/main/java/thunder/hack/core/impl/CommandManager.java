@@ -21,7 +21,7 @@ public class CommandManager implements IManager {
     private final List<Command> commands = new ArrayList<>();
 
     public CommandManager() {
-        add(new HorseSpeedCommand());
+        add(new RctCommand());
         add(new RpcCommand());
         add(new KitCommand());
         add(new GpsCommand());
@@ -31,7 +31,6 @@ public class CommandManager implements IManager {
         add(new HelpCommand());
         add(new NukerCommand());
         add(new EClipCommand());
-        add(new RctCommand());
         add(new HClipCommand());
         add(new LoginCommand());
         add(new MacroCommand());
@@ -48,8 +47,10 @@ public class CommandManager implements IManager {
         add(new WayPointCommand());
         add(new TabParseCommand());
         add(new OpenFolderCommand());
+        add(new HorseSpeedCommand());
         add(new ResetBindsCommand());
         add(new InvCleanerCommand());
+        add(new GotoWaypointCommand());
         add(new ChestStealerCommand());
         add(new GarbageCleanerCommand());
     }
