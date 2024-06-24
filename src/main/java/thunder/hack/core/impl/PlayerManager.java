@@ -43,6 +43,9 @@ public class PlayerManager implements IManager {
 
     // Мы можем зайти в инвентарь, и сервер этого не узнает, пока мы не начнем кликать
     // Юзать везде!
+    // We can go into inventory and the server won't know until we start clicking
+    // Use everywhere!
+
     public boolean inInventory;
 
 
