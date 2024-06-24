@@ -60,10 +60,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import static net.minecraft.util.math.MathHelper.wrapDegrees;
 
 public class AutoCrystal extends Module {
+
     /*   MAIN   */
-
-
-    public static Setting<Boolean> test = new Setting<>("test", true);
     private static final Setting<Pages> page = new Setting<>("Page", Pages.Main);
     private final Setting<Boolean> await = new Setting<>("Await", true, v -> page.getValue() == Pages.Main);
     private final Setting<Timing> timing = new Setting<>("Timing", Timing.NORMAL, v -> page.getValue() == Pages.Main);
@@ -74,7 +72,6 @@ public class AutoCrystal extends Module {
     private final Setting<CombatManager.TargetBy> targetLogic = new Setting<>("TargetLogic", CombatManager.TargetBy.Distance, v -> page.getValue() == Pages.Main);
     private final Setting<Float> targetRange = new Setting<>("TargetRange", 10.0f, 1.0f, 15f, v -> page.getValue() == Pages.Main);
     private final Setting<OnBreakBlock> onBreakBlock = new Setting<>("OnBreakBlock", OnBreakBlock.Smart, v -> page.getValue() == Pages.Main);
-    //   public final Setting<Boolean> useOptimizedCalc = new Setting<>("UseOptimizedCalc", true, v -> page.getValue() == Pages.Main); такое
     private final Setting<Integer> extrapolation = new Setting<>("Extrapolation", 0, 0, 20, v -> page.getValue() == Pages.Main);
 
     /*   PLACE   */
