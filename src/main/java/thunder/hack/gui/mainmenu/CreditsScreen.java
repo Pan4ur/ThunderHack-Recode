@@ -16,12 +16,16 @@ import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -29,8 +33,11 @@ public class CreditsScreen extends Screen {
     private static final Identifier TH_TEAM = Identifier.of("thunderhack", "textures/gui/elements/thteam.png");
 
     public ArrayList<Contributor> contributors = new ArrayList<>();
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     private static int scroll;
+    private static final int SCROLL_SPEED = 1;
+    private static final int SCROLL_INTERVAL_MS = 50;
 
     protected CreditsScreen() {
         super(Text.of("CreditsScreen"));
@@ -45,6 +52,8 @@ public class CreditsScreen extends Screen {
             String clickAction = line.split(";")[4];
             CreditsScreen.getInstance().contributors.add(new CreditsScreen.Contributor(name, CreditsScreen.getAvatar(avatar), role, description.replace('т', '\n'), clickAction));
         }
+
+        startAutoScroll();
     }
 
     private static CreditsScreen INSTANCE = new CreditsScreen();
@@ -63,7 +72,7 @@ public class CreditsScreen extends Screen {
         float halfOfHeight = mc.getWindow().getScaledHeight() / 2f;
         float globalOffset = (contributors.size() * 150) / 2f;
 
-      //  Render2DEngine.drawMainMenuShader(context.getMatrices(), 0, 0, halfOfWidth * 2f, halfOfHeight * 2);
+        //  Render2DEngine.drawMainMenuShader(context.getMatrices(), 0, 0, halfOfWidth * 2f, halfOfHeight * 2);
         renderBackground(context, mouseX, mouseY, delta);
 
         RenderSystem.enableBlend();
@@ -123,7 +132,12 @@ public class CreditsScreen extends Screen {
     public static Identifier getAvatar(String name) {
         try {
             NativeImageBackedTexture nIBT = getAvatarFromURL("https://cdn.discordapp.com/avatars/" + name + ".png?size=96");
-            return MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("th-contributors-" + (int) MathUtility.random(0, 1000000), nIBT);
+
+            if (nIBT != null) {
+                return MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("th-contributors-" + (int) MathUtility.random(0, 1000000), nIBT);
+            } else {
+                return null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -170,4 +184,16 @@ public class CreditsScreen extends Screen {
         scroll += (int) (verticalAmount * 5D);
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
+
+    private void startAutoScroll() {
+        scheduler.scheduleAtFixedRate(() -> {
+            scroll += SCROLL_SPEED;
+
+            if (scroll >= (contributors.size() * 150 - 100) / 2) {
+                scroll = 0;
+            }
+
+        }, 0, SCROLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
+    }
+
 }
