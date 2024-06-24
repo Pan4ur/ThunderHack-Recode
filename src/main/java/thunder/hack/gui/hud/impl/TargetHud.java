@@ -126,11 +126,13 @@ public class TargetHud extends HudElement {
     }
 
     //  сила скорка спешка слабость реген сопротивление
+    //  strength speed haste weakness regen resistance
     //  Str 1:23 Spd2 1:23 H3 1:23 Reg4 1:23 Res5 1:23
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        //таргеты
+        // таргеты
+        // targets
 
         if (AutoCrystal.target != null) {
             target = AutoCrystal.target;
@@ -181,10 +183,13 @@ public class TargetHud extends HudElement {
                 float hurtPercent = target.hurtTime / 6f;
 
                 // Основа
+                // Base
                 Render2DEngine.drawRound(context.getMatrices(), getPosX(), getPosY(), 70, 50, 6, new Color(0, 0, 0, 139));
                 Render2DEngine.drawRound(context.getMatrices(), getPosX() + 50, getPosY(), 100, 50, 6, new Color(0, 0, 0, 255));
                 setBounds(getPosX(), getPosY(), 150, 50);
+
                 // Картинка
+                // Image
 
                 imageRender:
                 {
@@ -208,7 +213,8 @@ public class TargetHud extends HudElement {
                     }
                 }
 
-                //Партиклы
+                // Партиклы
+                // Particles
                 for (final Particles p : particles) {
                     if (p.opacity > 4)
                         p.render2D(context.getMatrices());
@@ -248,6 +254,7 @@ public class TargetHud extends HudElement {
                 if (target.hurtTime == 8) sentParticles = false;
 
                 // Бошка
+                // head
                 float hurtPercent2 = hurtPercent;
                 ebaloAnimation.setValue(hurtPercent2);
                 hurtPercent2 = (float) ebaloAnimation.getAnimationD();
@@ -292,11 +299,13 @@ public class TargetHud extends HudElement {
 
                 FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (int) (((Math.round(10.0 * health) / 10.0) / 20f) * 100) + "%", getPosX() + 102, getPosY() + 24f, Render2DEngine.applyOpacity(Colors.WHITE, animationFactor));
 
-                //Имя ебыря
+                // Имя ебыря
+                // Fucker's name
                 FontRenderers.sf_bold.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : ModuleManager.nameProtect.isEnabled() && target == mc.player ? NameProtect.getCustomName() : target.getName().getString(), getPosX() + 55, getPosY() + 5, Render2DEngine.applyOpacity(Colors.WHITE, animationFactor));
 
                 if (target instanceof PlayerEntity) {
-                    //Броня
+                    // Броня
+                    // Armor
                     List<ItemStack> armor = ((PlayerEntity) target).getInventory().armor;
                     ItemStack[] items = new ItemStack[]{target.getMainHandStack(), armor.get(3), armor.get(2), armor.get(1), armor.get(0), target.getOffHandStack()};
 
@@ -313,7 +322,8 @@ public class TargetHud extends HudElement {
                         xItemOffset += 14;
                     }
 
-                    //Поушены
+                    // Поушены
+                    // Pushed
                     drawPotionEffect(context.getMatrices(), ((PlayerEntity) target));
                 }
             } else if (Mode.getValue() == ModeEn.NurikZapen) {
@@ -323,6 +333,7 @@ public class TargetHud extends HudElement {
 
                 if (mini.getValue()) {
                     // Основа
+                    // Base
                     if (animation.getAnimationd() != 1 && !HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
                         Render2DEngine.drawGradientBlurredShadow1(context.getMatrices(), getPosX() + 2, getPosY() + 2, 91, 31, 12, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
                         Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 95, 35, 7);
@@ -333,6 +344,7 @@ public class TargetHud extends HudElement {
                     setBounds(getPosX(), getPosY(), 95, 35.5f);
 
                     // Бошка
+                    // Head
                     if (target instanceof PlayerEntity) {
                         RenderSystem.setShaderTexture(0, ((AbstractClientPlayerEntity) target).getSkinTextures().texture());
                     } else {
@@ -358,6 +370,7 @@ public class TargetHud extends HudElement {
                     context.getMatrices().pop();
 
                     // Баллон
+                    // Health bar rendering logic
                     if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
                         Render2DEngine.drawRect(context.getMatrices(), getPosX() + 38, getPosY() + 25, 52f, 7f, 2f, (float) (0.15f * animation.getAnimationd()));
                         Render2DEngine.drawRect(context.getMatrices(), getPosX() + 38, getPosY() + 25, MathUtility.clamp((52f * (health / target.getMaxHealth())), 8, 52), 7f, 2f, (float) (animation.getAnimationd()));
@@ -367,13 +380,14 @@ public class TargetHud extends HudElement {
                     }
 
                     FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (((Math.round(10.0 * getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 65, getPosY() + 27f, Render2DEngine.applyOpacity(Colors.WHITE, animationFactor));
-                    //
 
-                    //Имя
+                    // Имя
+                    // Name
                     FontRenderers.sf_bold_mini.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : ModuleManager.nameProtect.isEnabled() && target == mc.player ? NameProtect.getCustomName() : target.getName().getString(), getPosX() + 38, getPosY() + 5, Render2DEngine.applyOpacity(Colors.WHITE, animationFactor));
 
                     if (target instanceof PlayerEntity) {
-                        //Броня
+                        // Броня
+                        // screen
                         RenderSystem.setShaderColor(1f, 1f, 1f, (float) MathUtility.clamp(animation.getAnimationd(), 0, 1f));
                         List<ItemStack> armor = ((PlayerEntity) target).getInventory().armor;
                         ItemStack[] items = new ItemStack[]{target.getMainHandStack(), armor.get(3), armor.get(2), armor.get(1), armor.get(0), target.getOffHandStack()};
@@ -392,6 +406,7 @@ public class TargetHud extends HudElement {
                     }
                 } else {
                     // Основа
+                    // Base
                     if (animation.getAnimationd() != 1 && !HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
                         Render2DEngine.drawGradientBlurredShadow1(context.getMatrices(), getPosX() + 4, getPosY() + 4, 131, 40, 14, HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
                         Render2DEngine.renderRoundedGradientRect(context.getMatrices(), HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90), getPosX(), getPosY(), 137, 47.5f, 9);
@@ -402,6 +417,7 @@ public class TargetHud extends HudElement {
                     setBounds(getPosX(), getPosY(), 137, 47.5f);
 
                     // Бошка
+                    // Head
                     if (target instanceof PlayerEntity) {
                         RenderSystem.setShaderTexture(0, ((AbstractClientPlayerEntity) target).getSkinTextures().texture());
                     } else {
@@ -428,6 +444,7 @@ public class TargetHud extends HudElement {
                     context.getMatrices().pop();
 
                     // Баллон
+                    // Health bar
                     if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
                         Render2DEngine.drawRect(context.getMatrices(), getPosX() + 48, getPosY() + 32, 85f, 11f, 4f, (float) (0.15f * animation.getAnimationd()));
                         Render2DEngine.drawRect(context.getMatrices(), getPosX() + 48, getPosY() + 32, MathUtility.clamp((85 * (health / target.getMaxHealth())), 8, 85), 11f, 4f, (float) (animation.getAnimationd()));
@@ -438,16 +455,17 @@ public class TargetHud extends HudElement {
 
                     FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), hpMode.getValue() == HPmodeEn.HP ? String.valueOf(Math.round(10.0 * getHealth()) / 10.0) : (((Math.round(10.0 * getHealth()) / 10.0) / 20f) * 100 + "%"), getPosX() + 92f, getPosY() + 35f,
                             Render2DEngine.applyOpacity(Colors.WHITE, animationFactor));
-                    //
 
-                    //Имя
+                    // Имя
+                    // Name
                     FontRenderers.sf_bold.drawString(context.getMatrices(), ModuleManager.media.isEnabled() ? "Protected " : ModuleManager.nameProtect.isEnabled() && target == mc.player ? NameProtect.getCustomName() : target.getName().getString(), getPosX() + 48, getPosY() + 7,
                             Render2DEngine.applyOpacity(Colors.WHITE, animationFactor));
 
                     if (target instanceof PlayerEntity) {
                         RenderSystem.setShaderColor(1f, 1f, 1f, (float) MathUtility.clamp(animation.getAnimationd(), 0, 1f));
 
-                        //Броня
+                        // Броня
+                        // Armor
                         List<ItemStack> armor = ((PlayerEntity) target).getInventory().armor;
                         ItemStack[] items = new ItemStack[]{target.getMainHandStack(), armor.get(3), armor.get(2), armor.get(1), armor.get(0), target.getOffHandStack()};
 
@@ -569,6 +587,8 @@ public class TargetHud extends HudElement {
 
     public float getHealth() {
         // Первый в комьюнити хп резольвер. Правда, еж?
+        // ????
+
         if (target instanceof PlayerEntity ent && (mc.getNetworkHandler() != null && mc.getNetworkHandler().getServerInfo() != null && mc.getNetworkHandler().getServerInfo().address.contains("funtime") || funTimeHP.getValue())) {
             ScoreboardObjective scoreBoard = null;
             String resolvedHp = "";

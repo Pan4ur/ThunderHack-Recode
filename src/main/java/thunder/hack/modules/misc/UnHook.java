@@ -19,6 +19,7 @@ import static thunder.hack.modules.client.ClientSettings.isRu;
 public class UnHook extends Module {
 
     // Йо фабос, засунь в о4ко себе фалос
+    // Yo dude shove a dick up your ass
     public UnHook() {
         super("UnHook", Category.MISC);
     }
