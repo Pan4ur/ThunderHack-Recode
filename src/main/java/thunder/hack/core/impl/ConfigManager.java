@@ -53,8 +53,7 @@ public class ConfigManager implements IManager {
     public void load(String name, String category) {
         File file = new File(CONFIGS_FOLDER, name + ".th");
         if (!file.exists()) {
-            if (isRu()) Command.sendMessage("Конфига " + name + " не существует!");
-            else Command.sendMessage("Config " + name + " does not exist!");
+            Command.sendMessage(isRu() ? "Конфига " + name + " не существует!" : "Config " + name + " does not exist!");
             return;
         }
 
@@ -70,8 +69,7 @@ public class ConfigManager implements IManager {
     public void load(String name) {
         File file = new File(CONFIGS_FOLDER, name + ".th");
         if (!file.exists()) {
-            if (isRu()) Command.sendMessage("Конфига " + name + " не существует!");
-            else Command.sendMessage("Config " + name + " does not exist!");
+            Command.sendMessage(isRu() ? "Конфига " + name + " не существует!" : "Config " + name + " does not exist!");
 
             return;
         }

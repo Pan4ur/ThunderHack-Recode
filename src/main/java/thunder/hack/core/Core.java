@@ -64,8 +64,8 @@ public final class Core {
         ThunderGui.getInstance().onTick();
 
         if (ModuleManager.clickGui.getBind().getKey() == -1) {
-            Command.sendMessage(Formatting.RED + "Default clickgui keybind --> P");
-            Command.sendMessage(Formatting.RED + "You can get pre built config using command -> @cfg cloudlist");
+            Command.sendMessage(Formatting.RED + (isRu() ? "Привязка клавиш Clickgui по умолчанию -> P" : "Default clickgui keybind --> P"));
+            Command.sendMessage(Formatting.RED + (isRu() ? "Вы можете получить готовую конфигурацию, выполнив следующую команду -> @cfg cloudlist." : "You can obtain a pre-built configuration by executing the following command -> @cfg cloudlist."));
             ModuleManager.clickGui.setBind(InputUtil.fromTranslationKey("key.keyboard.p").getCode(), false, false);
         }
 
