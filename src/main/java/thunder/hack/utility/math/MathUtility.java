@@ -6,10 +6,7 @@ import net.minecraft.util.math.Vec3d;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static thunder.hack.modules.Module.mc;
@@ -135,15 +132,15 @@ public final class MathUtility {
         return bd.doubleValue();
     }
 
-    public static float wrap(float valI) {
-        float val = valI % 360.0f;
-        if (val >= 180.0f) {
-            val -= 360.0f;
+    public static float wrap(float angle) {
+        float wrappedAngle = angle % 360.0f;
+        if (wrappedAngle >= 180.0f) {
+            wrappedAngle -= 360.0f;
         }
-        if (val < -180.0f) {
-            val += 360.0f;
+        if (wrappedAngle < -180.0f) {
+            wrappedAngle += 360.0f;
         }
-        return val;
+        return wrappedAngle;
     }
 
     public static Vec3d direction(float yaw) {
@@ -166,17 +163,20 @@ public final class MathUtility {
     }
 
 
-    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map, boolean descending) {
-        LinkedList<Map.Entry<K, V>> list = new LinkedList<Map.Entry<K, V>>(map.entrySet());
+    public static <K, V extends Comparable<? super V>> LinkedHashMap<K, V> sortByValue(Map<K, V> map, boolean descending) {
+        List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
+
         if (descending) {
             list.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
         } else {
             list.sort(Map.Entry.comparingByValue());
         }
-        LinkedHashMap result = new LinkedHashMap();
-        for (Map.Entry entry : list) {
+
+        LinkedHashMap<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
             result.put(entry.getKey(), entry.getValue());
         }
+
         return result;
     }
 

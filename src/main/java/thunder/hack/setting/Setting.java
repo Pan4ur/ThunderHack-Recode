@@ -135,16 +135,19 @@ public class Setting<T> {
         return EnumConverter.getNames((Enum) value);
     }
 
+    @SuppressWarnings("unchecked")
     public void setEnum(Enum mod) {
         plannedValue = (T) mod;
     }
 
+    @SuppressWarnings("unchecked")
     public void increaseEnum() {
         plannedValue = (T) EnumConverter.increaseEnum((Enum) value);
         value = plannedValue;
         ThunderHack.EVENT_BUS.post(new EventSetting(this));
     }
 
+    @SuppressWarnings("unchecked")
     public void setEnumByNumber(int id) {
         plannedValue = (T) EnumConverter.setEnumInt((Enum) value, id);
         value = plannedValue;
