@@ -14,6 +14,7 @@ import thunder.hack.events.impl.EventCollision;
 @Mixin(value = BlockCollisionSpliterator.class, priority = 800)
 public abstract class MixinBlockCollisionSpliterator {
     // я надеюсь это никто не будет редиректить
+    // I hope no one will redirect this
     @Redirect(method = "computeNext", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/BlockView;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;"))
     private BlockState computeNextHook(BlockView instance, BlockPos blockPos) {
         if(!ModuleManager.antiWeb.isEnabled() && !ModuleManager.phase.isEnabled() && !ModuleManager.jesus.isEnabled())
