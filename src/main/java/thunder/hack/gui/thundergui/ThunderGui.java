@@ -218,9 +218,11 @@ public class ThunderGui extends Screen {
         category_animation = fast(category_animation, 0, 15f);
 
         // Основная плита
+        // Main GUI
         Render2DEngine.drawRound(context.getMatrices(), main_posX, main_posY, main_width, main_height, 9f, ThunderHackGui.getColorByTheme(0));
 
         // Плита с лого
+        // Main GUI logo
         Render2DEngine.drawRound(context.getMatrices(), main_posX + 5, main_posY + 5, 90, 30, 7f, ThunderHackGui.getColorByTheme(1));
 
         context.getMatrices().push();

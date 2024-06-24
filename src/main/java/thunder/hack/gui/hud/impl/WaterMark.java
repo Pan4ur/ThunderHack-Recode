@@ -111,7 +111,10 @@ public class WaterMark extends HudElement {
         } else if (mode.is(Mode.Rifk)){
             Date date = new Date(System.currentTimeMillis());
             SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-            //лень вставлять реал билд дату
+
+            // лень вставлять реал билд дату
+            // too lazy to insert the real build date
+
             String info = Formatting.GREEN + String.format("th7 | build: 16/06/2024 | rate: %d | %s", Math.round(ThunderHack.serverManager.getTPS()), format.format(date));;
             float width = FontRenderers.profont.getStringWidth(info) + 5;
             Render2DEngine.drawRectWithOutline(context.getMatrices(), getPosX(), getPosY(), width, 8, Color.decode("#192A1A"), Color.decode("#833B7B"));

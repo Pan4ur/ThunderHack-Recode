@@ -56,24 +56,30 @@ public final class ThunderUtility {
     }
 
     public static void parseStarGazer() {
+        List<String> starGazers = new ArrayList<>();
+
         try {
             for (int page = 1; page <= 3; page++) {
-                URL url = new URL("https://api.github.com/repos/Pan4ur/ThunderHack-Recode/stargazers?per_page=100;page=" + page);
+                URL url = new URL("https://api.github.com/repos/Pan4ur/ThunderHack-Recode/stargazers?per_page=100&page=" + page);
                 BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+                StringBuilder response = new StringBuilder();
                 String inputLine;
 
                 while ((inputLine = in.readLine()) != null) {
-                    JsonArray array = (JsonArray) JsonParser.parseString(inputLine);
-
-                    for (int i = 0; i < array.size(); i++) {
-                        JsonObject jsonObject = (JsonObject) array.get(i);
-                        starGazer.add(jsonObject.getAsJsonPrimitive("login").getAsString());
-                    }
+                    response.append(inputLine);
                 }
                 in.close();
+
+                JsonArray jsonArray = JsonParser.parseString(response.toString()).getAsJsonArray();
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
+                    starGazers.add(jsonObject.getAsJsonPrimitive("login").getAsString());
+                }
+
                 Thread.sleep(1500);
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -103,40 +109,37 @@ public final class ThunderUtility {
         try {
             URL url = new URL("https://api.github.com/repos/Pan4ur/ThunderHack-Recode/commits?per_page=50");
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
-            String inputLine;
+
+            List<String> changeLog = new ArrayList<>();
             changeLog.add("Changelog [Recode; Date: " + ThunderHack.BUILD_DATE + "; GitHash:" + ThunderHack.GITH_HASH + "]");
             changeLog.add("\n");
 
+            String inputLine;
             while ((inputLine = in.readLine()) != null) {
-                JsonArray array = (JsonArray) JsonParser.parseString(inputLine);
+                JsonArray jsonArray = JsonParser.parseString(inputLine).getAsJsonArray();
 
-                for (int i = 0; i < array.size(); i++) {
-                    JsonObject jsonObject = (JsonObject) array.get(i);
-                    JsonObject commitBlock = jsonObject.getAsJsonObject("commit");
-                    JsonObject nameBlock = commitBlock.getAsJsonObject("author");
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
+                    JsonObject commitObject = jsonObject.getAsJsonObject("commit");
+                    JsonObject authorObject = commitObject.getAsJsonObject("author");
 
-                    String name = nameBlock.get("name").getAsString();
-                    String date = nameBlock.get("date").getAsString();
-                    String info = commitBlock.get("message").getAsString();
+                    String name = authorObject.get("name").getAsString().replace("\n", "");
+                    String date = authorObject.get("date").getAsString().replace("\n", "");
+                    String info = commitObject.get("message").getAsString().replace("\n", "");
 
-                    name = name.replace("\n", "");
-                    date = date.replace("\n", "");
-                    info = info.replace("\n", "");
-
-                    if(name.contains("ImgBot"))
+                    if (name.contains("ImgBot") || info.startsWith("Merge") || info.startsWith("Revert")) {
                         continue;
+                    }
 
-                    if(info.startsWith("Merge"))
-                        continue;
+                    String formattedDate = Formatting.GRAY + date.split("T")[0] + Formatting.RESET;
+                    String formattedName = "@" + Formatting.RED + name + Formatting.RESET;
 
-                    if(info.startsWith("Revert"))
-                        continue;
-
-                    changeLog.add("- " + info + " [" + Formatting.GRAY + date.split("T")[0] + Formatting.RESET + "]  (@" + Formatting.RED + name + Formatting.RESET + ")");
+                    changeLog.add("- " + info + " [" + formattedDate + "]  (" + formattedName + ")");
                 }
             }
             in.close();
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

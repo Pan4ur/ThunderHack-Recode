@@ -4,7 +4,7 @@ import com.sun.jna.Native;
 import com.sun.jna.Library;
 
 public interface DiscordRPC extends Library {
-    DiscordRPC INSTANCE = Native.loadLibrary("discord-rpc", DiscordRPC.class);
+    DiscordRPC INSTANCE = Native.load("discord-rpc", DiscordRPC.class);
     
     void Discord_UpdateHandlers(final DiscordEventHandlers p0);
     
