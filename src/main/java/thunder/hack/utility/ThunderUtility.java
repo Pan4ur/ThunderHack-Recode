@@ -138,8 +138,17 @@ public final class ThunderUtility {
                 }
             }
             in.close();
+
+            processChangeLog(changeLog);
+
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void processChangeLog(List<String> changeLog) {
+        for (String logEntry : changeLog) {
+            System.out.println(logEntry);
         }
     }
 }
