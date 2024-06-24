@@ -187,6 +187,7 @@ public class ConfigManager implements IManager {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void parseModule(JsonObject object, String category) throws NullPointerException {
         Module module = ThunderHack.moduleManager.modules.stream()
                 .filter(m -> object.getAsJsonObject(m.getName()) != null)

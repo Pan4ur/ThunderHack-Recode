@@ -61,6 +61,9 @@ import static net.minecraft.util.math.MathHelper.wrapDegrees;
 
 public class AutoCrystal extends Module {
     /*   MAIN   */
+
+
+    public static Setting<Boolean> test = new Setting<>("test", true);
     private static final Setting<Pages> page = new Setting<>("Page", Pages.Main);
     private final Setting<Boolean> await = new Setting<>("Await", true, v -> page.getValue() == Pages.Main);
     private final Setting<Timing> timing = new Setting<>("Timing", Timing.NORMAL, v -> page.getValue() == Pages.Main);
@@ -126,6 +129,10 @@ public class AutoCrystal extends Module {
     /*   RENDER   */
     private final Setting<Swing> swingMode = new Setting<>("Swing", Swing.Place, v -> page.getValue() == Pages.Render);
     private final Setting<Boolean> render = new Setting<>("Render", true, v -> page.getValue() == Pages.Render);
+    private final Setting<BooleanSettingGroup> renderExtrapolation = new Setting<>("RenderExtrapolation", new BooleanSettingGroup(false), v -> page.getValue() == Pages.Render);
+    private final Setting<ColorSetting> extrapolationColor = new Setting<>("ExtrapolationColor", new ColorSetting(Color.white), v -> page.getValue() == Pages.Render);
+    private final Setting<BooleanSettingGroup> renderInteractVector = new Setting<>("RenderInteractVector", new BooleanSettingGroup(true), v -> page.getValue() == Pages.Render);
+    private final Setting<ColorSetting> interactColor = new Setting<>("InteractColor", new ColorSetting(Color.red), v -> page.getValue() == Pages.Render);
     private final Setting<Render> renderMode = new Setting<>("RenderMode", Render.Fade, v -> page.getValue() == Pages.Render);
     private final Setting<Boolean> rselfDamage = new Setting<>("SelfDamage", true, v -> page.getValue() == Pages.Render);
     private final Setting<Boolean> drawDamage = new Setting<>("RenderDamage", true, v -> page.getValue() == Pages.Render);
@@ -301,7 +308,7 @@ public class AutoCrystal extends Module {
 
     @EventHandler
     public void onCrystalSpawn(@NotNull EventEntitySpawn e) {
-        if (e.getEntity() instanceof EndCrystalEntity crystal) {
+        if (e.getEntity() instanceof EndCrystalEntity crystal && crystalAge.is(0)) {
             HashMap<BlockPos, Long> cache = new HashMap<>(placedCrystals);
             for (BlockPos bp : cache.keySet())
                 if (crystal.squaredDistanceTo(bp.toCenterPos()) < 0.3 && breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue())) {
@@ -371,9 +378,10 @@ public class AutoCrystal extends Module {
             float yawDelta = wrapDegrees((float) wrapDegrees(Math.toDegrees(Math.atan2(vec.z - mc.player.getZ(), (vec.x - mc.player.getX()))) - 90) - rotationYaw);
             float pitchDelta = ((float) (-Math.toDegrees(Math.atan2(vec.y - (mc.player.getPos().y + mc.player.getEyeHeight(mc.player.getPose())), Math.sqrt(Math.pow((vec.x - mc.player.getX()), 2) + Math.pow(vec.z - mc.player.getZ(), 2))))) - rotationPitch);
 
-            float random = MathUtility.random(0, 0.8f) + 0.6f;
-            yawDelta = (float) (yawDelta + Render2DEngine.interpolate(-random, random, Math.sin(mc.player.age % 120) + MathUtility.random(-0.08f, 0.08f)));
-            pitchDelta = pitchDelta + MathUtility.random(-1f, 1f);
+
+            float angleToRad = (float) Math.toRadians(27 * (mc.player.age % 30));
+            yawDelta = (float) (yawDelta + Math.sin(angleToRad) * 3) + MathUtility.random(-1f, 1f);
+            pitchDelta = pitchDelta + MathUtility.random(-0.6f, 0.6f);
 
             if (yawDelta > 180)
                 yawDelta = yawDelta - 180;
@@ -443,6 +451,16 @@ public class AutoCrystal extends Module {
 
                 renderBox(dmg, box);
             }
+        }
+
+        if (target != null && renderExtrapolation.getValue().isEnabled())
+            Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(PredictUtility.predictBox(target, extrapolation.getValue()), extrapolationColor.getValue().getColorObject(), 1f));
+
+        if (target != null && bestPosition != null && renderInteractVector.getValue().isEnabled()) {
+            Vec3d vec = bestPosition.getPos();
+            Box b = new Box(vec.getX() - .05,vec.getY() - .05, vec.getZ() -.05, vec.getX() + .05, vec.getY() + .05, vec.getZ() + .05);
+            Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(b, interactColor.getValue().getColorObject(), 1f));
+            Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(b, Render2DEngine.applyOpacity(interactColor.getValue().getColorObject(), 0.6f)));
         }
     }
 
@@ -697,7 +715,7 @@ public class AutoCrystal extends Module {
             if (onBreakBlock.getValue() == OnBreakBlock.Smart) {
                 // если цивбрикаем - то ставим над
                 if (mc.world.isAir(SpeedMine.minePosition.down())) {
-                    PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
+                    PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null, mc.player.getPos());
                     if (autoMineData != null) {
                         bestPosition = autoMineData.bhr;
                         return;
@@ -707,7 +725,7 @@ public class AutoCrystal extends Module {
                 // иначе ставим рядом, чтоб трахнуть сурраунд
                 for (Direction dir : Direction.values()) {
                     if (dir == Direction.UP || dir == Direction.DOWN) continue;
-                    PlaceData autoMineData = getPlaceData(SpeedMine.minePosition.down().offset(dir), null);
+                    PlaceData autoMineData = getPlaceData(SpeedMine.minePosition.down().offset(dir), null, mc.player.getPos());
                     if (autoMineData != null) {
                         bestPosition = autoMineData.bhr;
                         return;
@@ -715,13 +733,13 @@ public class AutoCrystal extends Module {
                 }
 
                 // если ставить некуда, то ставим все-таки над
-                PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
+                PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null, mc.player.getPos());
                 if (autoMineData != null) {
                     bestPosition = autoMineData.bhr;
                     return;
                 }
             } else if (onBreakBlock.getValue() == OnBreakBlock.PlaceOn) {
-                PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null);
+                PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null, mc.player.getPos());
                 if (autoMineData != null) {
                     bestPosition = autoMineData.bhr;
                     return;
@@ -744,12 +762,13 @@ public class AutoCrystal extends Module {
     private @NotNull List<PlaceData> getPossibleBlocks(PlayerEntity target, Vec3d center, float range) {
         List<PlaceData> blocks = new ArrayList<>();
         BlockPos playerPos = BlockPos.ofFloored(center);
+        Vec3d predictedPlayerPos = PredictUtility.predictPosition(mc.player, 3);
         int r = (int) Math.ceil(range);
 
         for (int x = playerPos.getX() - r; x <= playerPos.getX() + r; x++) {
             for (int y = playerPos.getY() - r; y <= playerPos.getY() + r; y++) {
                 for (int z = playerPos.getZ() - r; z <= playerPos.getZ() + r; z++) {
-                    PlaceData data = getPlaceData(new BlockPos(x, y, z), target);
+                    PlaceData data = getPlaceData(new BlockPos(x, y, z), target, predictedPlayerPos);
                     if (data != null)
                         blocks.add(data);
                 }
@@ -899,11 +918,11 @@ public class AutoCrystal extends Module {
         return bestData.crystal;
     }
 
-    public @Nullable PlaceData getPlaceData(BlockPos bp, PlayerEntity target) {
+    public @Nullable PlaceData getPlaceData(BlockPos bp, PlayerEntity target, Vec3d predictedPlayerPos) {
         if (mc.player == null || mc.world == null)
             return null;
 
-        if (!predictCrystalSpawn(bp))
+        if (!predictCrystalSpawn(bp, predictedPlayerPos))
             return null;
 
         if (target != null && target.getPos().squaredDistanceTo(bp.toCenterPos().add(0, 0.5, 0)) > 144)
@@ -948,10 +967,10 @@ public class AutoCrystal extends Module {
         return new PlaceData(interactResult, damage, selfDamage, overrideDamage);
     }
 
-    public boolean predictCrystalSpawn(BlockPos bp) {
+    public boolean predictCrystalSpawn(BlockPos bp, Vec3d predictedPlayerPos) {
         Vec3d predictedPos = bp.toCenterPos().add(0, 1.5f, 0);
-        PlayerEntity predictedPlayer = PredictUtility.predictPlayer(mc.player, 3);
-        float distance = (float) predictedPlayer.getPos().add(0, mc.player.getEyeHeight(mc.player.getPose()), 0).squaredDistanceTo(predictedPos);
+
+        float distance = (float) predictedPlayerPos.add(0, mc.player.getEyeHeight(mc.player.getPose()), 0).squaredDistanceTo(predictedPos);
 
         if (InteractionUtility.canSee(predictedPos))
             return distance <= explodeRange.getPow2Value();

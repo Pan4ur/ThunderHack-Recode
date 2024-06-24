@@ -16,11 +16,10 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.RaycastContext;
+import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.explosion.Explosion;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.injection.accesors.IExplosion;
-import thunder.hack.modules.combat.AutoCrystal;
 
 import java.util.Objects;
 
@@ -36,12 +35,14 @@ public final class ExplosionUtility {
      *
      * @param crystalPos the position of the crystal whose damage is to be calculated
      * @param target     the damage will be calculated on this entity
-     * @param optimized    use light calculate
+     * @param optimized  use light calculate
      * @return damage value in Float format
      */
     public static float getAutoCrystalDamage(Vec3d crystalPos, PlayerEntity target, int predictTicks, boolean optimized) {
-        if (predictTicks == 0) return getExplosionDamage(crystalPos, target, optimized);
-        return getExplosionDamageWPredict(crystalPos, target, PredictUtility.predictPlayer(target, predictTicks), optimized);
+        if (predictTicks == 0)
+            return getExplosionDamage(crystalPos, target, optimized);
+        else
+            return getExplosionDamageWPredict(crystalPos, target, PredictUtility.predictBox(target, predictTicks), optimized);
     }
 
     /**
@@ -53,10 +54,7 @@ public final class ExplosionUtility {
      * @return damage value in Float format
      */
     public static float getSelfExplosionDamage(Vec3d explosionPos, int predictTicks, boolean optimized) {
-        if (predictTicks == 0)
-            return getExplosionDamage(explosionPos, mc.player, optimized);
-        else
-            return getExplosionDamageWPredict(explosionPos, mc.player, PredictUtility.predictPlayer(mc.player, predictTicks), optimized);
+        return getAutoCrystalDamage(explosionPos, mc.player, predictTicks, optimized);
     }
 
     /**
@@ -81,14 +79,15 @@ public final class ExplosionUtility {
         if (((IExplosion) explosion).getWorld() != mc.world)
             ((IExplosion) explosion).setWorld(mc.world);
 
-        if (!new Box(MathHelper.floor(explosionPos.x - 11), MathHelper.floor(explosionPos.y - 11), MathHelper.floor(explosionPos.z - 11), MathHelper.floor(explosionPos.x + 13), MathHelper.floor(explosionPos.y + 13), MathHelper.floor(explosionPos.z + 13)).intersects(target.getBoundingBox()))
+        if (!new Box(MathHelper.floor(explosionPos.x - 11), MathHelper.floor(explosionPos.y - 11), MathHelper.floor(explosionPos.z - 11),
+                MathHelper.floor(explosionPos.x + 13), MathHelper.floor(explosionPos.y + 13), MathHelper.floor(explosionPos.z + 13)).intersects(target.getBoundingBox()))
             return 0f;
 
         if (!target.isImmuneToExplosion(explosion) && !target.isInvulnerable()) {
-            double distExposure = (float) target.squaredDistanceTo(explosionPos) / 144;
+            double distExposure = (float) target.squaredDistanceTo(explosionPos) / 144.;
             if (distExposure <= 1.0) {
                 terrainIgnore = ModuleManager.autoCrystal.ignoreTerrain.getValue();
-                double exposure = getExposure(explosionPos, target, optimized);
+                double exposure = getExposure(explosionPos, target.getBoundingBox(), optimized);
                 terrainIgnore = false;
                 double finalExposure = (1.0 - distExposure) * exposure;
 
@@ -105,7 +104,8 @@ public final class ExplosionUtility {
                     toDamage = Math.max(resistance_1 / 25f, 0f);
                 }
 
-                if (toDamage <= 0f) toDamage = 0f;
+                if (toDamage <= 0f)
+                    toDamage = 0f;
                 else {
                     int protAmount = ModuleManager.autoCrystal.assumeBestArmor.getValue() ? 32 : EnchantmentHelper.getProtectionAmount(target.getArmorItems(), mc.world.getDamageSources().explosion(explosion));
                     if (protAmount > 0)
@@ -125,7 +125,7 @@ public final class ExplosionUtility {
      * @param predict      predicted copy of target
      * @return damage value in Float format
      */
-    public static float getExplosionDamageWPredict(Vec3d explosionPos, PlayerEntity target, PlayerEntity predict, boolean optimized) {
+    public static float getExplosionDamageWPredict(Vec3d explosionPos, PlayerEntity target, Box predict, boolean optimized) {
         if (mc.world.getDifficulty() == Difficulty.PEACEFUL)
             return 0f;
 
@@ -142,11 +142,12 @@ public final class ExplosionUtility {
         if (((IExplosion) explosion).getWorld() != mc.world)
             ((IExplosion) explosion).setWorld(mc.world);
 
-        if (!new Box(MathHelper.floor(explosionPos.x - 11d), MathHelper.floor(explosionPos.y - 11d), MathHelper.floor(explosionPos.z - 11d), MathHelper.floor(explosionPos.x + 13d), MathHelper.floor(explosionPos.y + 13d), MathHelper.floor(explosionPos.z + 13d)).intersects(predict.getBoundingBox()))
+        if (!new Box(MathHelper.floor(explosionPos.x - 11d), MathHelper.floor(explosionPos.y - 11d), MathHelper.floor(explosionPos.z - 11d),
+                MathHelper.floor(explosionPos.x + 13d), MathHelper.floor(explosionPos.y + 13d), MathHelper.floor(explosionPos.z + 13d)).intersects(predict))
             return 0f;
 
         if (!target.isImmuneToExplosion(explosion) && !target.isInvulnerable()) {
-            double distExposure = MathHelper.sqrt((float) predict.squaredDistanceTo(explosionPos)) / 12d;
+            double distExposure = predict.getCenter().add(0, -0.9, 0).squaredDistanceTo(explosionPos) / 144.;
             if (distExposure <= 1.0) {
                 terrainIgnore = ModuleManager.autoCrystal.ignoreTerrain.getValue();
                 double exposure = getExposure(explosionPos, predict, optimized);
@@ -284,11 +285,14 @@ public final class ExplosionUtility {
         double f = 1.0 / ((box.maxZ - box.minZ) * 2.0 + 1.0);
         double g = (1.0 - Math.floor(1.0 / d) * d) / 2.0;
         double h = (1.0 - Math.floor(1.0 / f) * f) / 2.0;
+
         if (d < 0.0 || e < 0.0 || f < 0.0) {
             return 0.0f;
         }
+
         int i = 0;
         int j = 0;
+
         for (double k = 0.0; k <= 1.0; k += d) {
             for (double l = 0.0; l <= 1.0; l += e) {
                 for (double m = 0.0; m <= 1.0; m += f) {
@@ -306,11 +310,9 @@ public final class ExplosionUtility {
         return (float) i / (float) j;
     }
 
-    public static float getExposure(Vec3d source, Entity entity, boolean optimized) {
+    public static float getExposure(Vec3d source, Box box, boolean optimized) {
         if (!optimized)
-            return Explosion.getExposure(source, entity);
-
-        Box box = entity.getBoundingBox();
+            return getExposure(source, box);
 
         int miss = 0;
         int hit = 0;
@@ -322,13 +324,36 @@ public final class ExplosionUtility {
                     double o = MathHelper.lerp(l, box.minY, box.maxY);
                     double p = MathHelper.lerp(m, box.minZ, box.maxZ);
                     Vec3d vec3d = new Vec3d(n, o, p);
-                    if (raycast(vec3d, source) == HitResult.Type.MISS)
+                    if (raycast(vec3d, source, ModuleManager.autoCrystal.ignoreTerrain.getValue()) == HitResult.Type.MISS)
                         ++miss;
                     ++hit;
                 }
             }
         }
         return (float) miss / (float) hit;
+    }
+
+    public static float getExposure(Vec3d source, Box box) {
+        double d = 0.4545454446934474;
+        double e = 0.21739130885479366;
+        double f = 0.4545454446934474;
+
+        int i = 0;
+        int j = 0;
+
+        for (double k = 0.0; k <= 1.0; k += d)
+            for (double l = 0.0; l <= 1.0; l += e)
+                for (double m = 0.0; m <= 1.0; m += f) {
+                    double n = MathHelper.lerp(k, box.minX, box.maxX);
+                    double o = MathHelper.lerp(l, box.minY, box.maxY);
+                    double p = MathHelper.lerp(m, box.minZ, box.maxZ);
+                    Vec3d vec3d = new Vec3d(n + 0.045454555306552624, o, p + 0.045454555306552624);
+                    if (raycast(vec3d, source, ModuleManager.autoCrystal.ignoreTerrain.getValue()) == HitResult.Type.MISS)
+                        ++i;
+                    ++j;
+                }
+
+        return (float) i / (float) j;
     }
 
     private static BlockHitResult raycastGhost(RaycastContext context, BlockPos bPos) {
@@ -355,13 +380,13 @@ public final class ExplosionUtility {
         });
     }
 
-    private static HitResult.Type raycast(Vec3d start, Vec3d end) {
-        return BlockView.raycast(start, end, null, (_null, blockPos) -> {
+    public static HitResult.Type raycast(Vec3d start, Vec3d end, boolean ignoreTerrain) {
+        return BlockView.raycast(start, end, null, (innerContext, blockPos) -> {
             BlockState blockState = mc.world.getBlockState(blockPos);
-            if (blockState.getBlock().getBlastResistance() < 600) return null;
-
+            if (blockState.getBlock().getBlastResistance() < 600 && ignoreTerrain)
+                return null;
             BlockHitResult hitResult = blockState.getCollisionShape(mc.world, blockPos).raycast(start, end, blockPos);
             return hitResult == null ? null : hitResult.getType();
-        }, (_null) -> HitResult.Type.MISS);
+        }, (innerContext) -> HitResult.Type.MISS);
     }
 }

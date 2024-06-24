@@ -198,7 +198,7 @@ public final class SpeedMine extends Module {
 
                 if (progress >= 1) {
                     if (placeCrystal.getValue()) {
-                        AutoCrystal.PlaceData placeCrystalData = ModuleManager.autoCrystal.getPlaceData(SpeedMine.minePosition, null);
+                        AutoCrystal.PlaceData placeCrystalData = ModuleManager.autoCrystal.getPlaceData(SpeedMine.minePosition, null, mc.player.getPos());
                         if (placeCrystalData != null) {
                             ModuleManager.autoCrystal.placeCrystal(placeCrystalData.bhr(), true, false);
                             debug("placing..");

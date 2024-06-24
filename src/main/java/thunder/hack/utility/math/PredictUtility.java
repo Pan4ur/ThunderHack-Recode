@@ -1,9 +1,11 @@
 package thunder.hack.utility.math;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.UUID;
@@ -18,6 +20,13 @@ public class PredictUtility {
     }
 
     public static PlayerEntity predictPlayer(PlayerEntity entity, int ticks) {
+        Vec3d posVec = predictPosition(entity, ticks);
+        if(posVec == null)
+            return null;
+        return equipAndReturn(entity, posVec);
+    }
+
+    public static Vec3d predictPosition(PlayerEntity entity, int ticks) {
         if(entity == null)
             return null;
 
@@ -26,7 +35,6 @@ public class PredictUtility {
         double motionY = entity.getY() - entity.prevY;
         double motionZ = entity.getZ() - entity.prevZ;
 
-        // Можно въебать себя при спрыгивании с блока
         if(entity == mc.player)
             motionY = 0;
 
@@ -44,7 +52,14 @@ public class PredictUtility {
 
         }
 
-        return equipAndReturn(entity, posVec);
+        return posVec;
+    }
+
+    public static Box predictBox(PlayerEntity entity, int ticks) {
+        Vec3d posVec = predictPosition(entity, ticks);
+        if(posVec == null)
+            return null;
+        return createBox(posVec, entity);
     }
 
     public static PlayerEntity equipAndReturn(PlayerEntity original, Vec3d posVec) {
@@ -71,5 +86,9 @@ public class PredictUtility {
         }
 
         return copyEntity;
+    }
+
+    public static Box createBox(Vec3d vec, Entity entity) {
+        return entity.getBoundingBox().offset(entity.getPos().relativize(vec));
     }
 }
