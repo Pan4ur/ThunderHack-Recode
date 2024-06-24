@@ -8,6 +8,7 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.utility.math.ExplosionUtility;
 
 import java.util.Objects;
 
@@ -103,7 +104,7 @@ public final class PlayerUtility {
         if (pos.distanceTo(vec3d) > 128.0)
             return false;
         else
-            return mc.world.raycast(new RaycastContext(vec3d, pos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.MISS;
+            return ExplosionUtility.raycast(vec3d, pos, false) == HitResult.Type.MISS;
     }
 
     public static boolean isFalling() {
