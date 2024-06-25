@@ -115,7 +115,6 @@ public class Strafe extends Module {
                 mc.interactionManager.clickSlot(0, elytra, 1, SlotActionType.PICKUP, mc.player);
             }
             disableTime = System.currentTimeMillis();
-            mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
         }
         disabled = true;
     }
