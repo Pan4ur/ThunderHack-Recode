@@ -20,10 +20,11 @@ public class AntiAFK extends Module {
     }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Simple);
-    public final Setting<Boolean> onlyWhenAfk = new Setting<>("OnlyWhenAFK", false);
-    public final Setting<Boolean> move = new Setting<>("Move", false, v -> mode.getValue() == Mode.Simple);
+    private final Setting<Boolean> onlyWhenAfk = new Setting<>("OnlyWhenAFK", false);
+    private final Setting<Boolean> command = new Setting<>("Command", false, v -> mode.getValue() == Mode.Simple);
+    private final Setting<Boolean> move = new Setting<>("Move", false, v -> mode.getValue() == Mode.Simple);
     private final Setting<Boolean> spin = new Setting<>("Spin", false, v -> mode.getValue() == Mode.Simple);
-    private final Setting<Float> speed = new Setting<>("Speed", 5f, 1f, 7f, v -> mode.getValue() == Mode.Simple);
+    private final Setting<Float> rotateSpeed = new Setting<>("RotateSpeed", 5f, 1f, 7f, v -> mode.getValue() == Mode.Simple);
     private final Setting<Boolean> jump = new Setting<>("Jump", false, v -> mode.getValue() == Mode.Simple);
     private final Setting<Boolean> swing = new Setting<>("Swing", false, v -> mode.getValue() == Mode.Simple);
     private final Setting<Boolean> alwayssneak = new Setting<>("AlwaysSneak", false, v -> mode.getValue() == Mode.Simple);
@@ -77,7 +78,7 @@ public class AntiAFK extends Module {
 
             if (spin.getValue()) {
                 double gcdFix = (Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0)) * 1.2;
-                float newYaw = mc.player.getYaw() + speed.getValue();
+                float newYaw = mc.player.getYaw() + rotateSpeed.getValue();
                 mc.player.setYaw((float) (newYaw - (newYaw - mc.player.getYaw()) % gcdFix));
             }
 
@@ -86,6 +87,10 @@ public class AntiAFK extends Module {
 
             if (swing.getValue() && ThreadLocalRandom.current().nextInt(99) == 0)
                 mc.player.swingHand(mc.player.getActiveHand());
+
+            if (command.getValue() && ThreadLocalRandom.current().nextInt(99) == 0)
+                mc.player.networkHandler.sendChatCommand("qwerty");
+
         } else {
             if (inactiveTime.every(5000)) {
                 if (step > 3)
