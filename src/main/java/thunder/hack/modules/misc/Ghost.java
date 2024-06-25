@@ -5,6 +5,8 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 
+import static thunder.hack.modules.client.ClientSettings.isRu;
+
 public class Ghost extends Module {
     private boolean bypass = false;
 
@@ -15,6 +17,7 @@ public class Ghost extends Module {
     @Override
     public void onEnable() {
         bypass = false;
+        sendMessage(isRu() ? "Для возрождения выключи модуль!" : "To revive, turn off the module!");
     }
 
     @Override
