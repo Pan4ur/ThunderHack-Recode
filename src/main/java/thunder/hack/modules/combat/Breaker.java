@@ -45,6 +45,9 @@ public final class Breaker extends Module {
         if (target == null)
             return;
 
+        BlockPos burrow = BlockPos.ofFloored(target.getPos());
+        BlockState burrowState = mc.world.getBlockState(burrow);
+
         if (!pause.passedMs(600))
             return;
 
@@ -63,9 +66,7 @@ public final class Breaker extends Module {
             for (int y = 2; y <= 3; y++) {
                 BlockPos bp = BlockPos.ofFloored(target.getX(), target.getY() + y, target.getZ());
                 if (mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN
-
-                      //  && mc.world.isAir(bp.up())  я не помню зачем
-
+                        // && mc.world.isAir(bp.up())
                         && !bp.equals(BlockPos.ofFloored(target.getPos()).down())) {
                     if (ModuleManager.autoCrystal.getInteractResult(bp, new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ())) == null)
                         continue;
@@ -85,6 +86,12 @@ public final class Breaker extends Module {
             }
         }
 
+        if (burrowState.getBlock() == Blocks.OBSIDIAN || burrowState.getBlock() == Blocks.ENDER_CHEST) {
+            blockPos = burrow;
+            return;
+        }
+
+
         for (int x = -2; x <= 2; x++) {
             for (int y = 0; y <= 3; y++) {
                 for (int z = -2; z <= 2; z++) {
@@ -99,7 +106,7 @@ public final class Breaker extends Module {
 
                     if ((mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN || mc.world.getBlockState(bp).getBlock() == Blocks.ENDER_CHEST)
                             && (mc.world.getBlockState(bp.down()).getBlock() == Blocks.OBSIDIAN || mc.world.getBlockState(bp.down()).getBlock() == Blocks.BEDROCK)
-                         //   && mc.world.isAir(bp.up())
+                            // && mc.world.isAir(bp.up())
                             && !bp.equals(BlockPos.ofFloored(target.getPos()).down())
 
                     ) {
