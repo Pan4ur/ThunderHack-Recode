@@ -17,6 +17,7 @@ import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
+import thunder.hack.utility.render.animation.EaseOutBack;
 
 import java.util.List;
 import java.util.Objects;
@@ -29,10 +30,11 @@ public class ClickGUI extends Screen {
 
     private boolean firstOpen;
     private float scrollY, closeAnimation, prevYaw, prevPitch, closeDirectionX, closeDirectionY;
-    public static boolean close = false;
+    public static boolean close = false, imageDirection;
 
     public static String currentDescription = "";
-    public static final Identifier arrow = Identifier.of("thunderhack", "textures/gui/elements/arrow.png");
+    public static final Identifier arrow = new Identifier("thunderhack", "textures/gui/elements/arrow.png");
+    public EaseOutBack imageAnimation = new EaseOutBack(6);
 
     public ClickGUI() {
         super(Text.of("NewClickGUI"));
@@ -47,6 +49,9 @@ public class ClickGUI extends Screen {
         if (INSTANCE == null) {
             INSTANCE = new ClickGUI();
         }
+
+        imageDirection = true;
+
         return INSTANCE;
     }
 
@@ -105,6 +110,7 @@ public class ClickGUI extends Screen {
     @Override
     public void tick() {
         windows.forEach(AbstractCategory::tick);
+        imageAnimation.update(imageDirection);
 
         if (close) {
             if (mc.player != null) {
@@ -121,7 +127,7 @@ public class ClickGUI extends Screen {
                     closeDirectionX = (prevYaw - mc.player.getYaw()) * 300;
             }
 
-            if(closeDirectionX < 1 && closeDirectionY < 1 && closeAnimation > 2)
+            if (closeDirectionX < 1 && closeDirectionY < 1 && closeAnimation > 2)
                 closeDirectionY = -3000;
 
             closeAnimation++;
@@ -132,6 +138,7 @@ public class ClickGUI extends Screen {
             }
         }
     }
+
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         if (ModuleManager.clickGui.blur.getValue())
@@ -141,9 +148,20 @@ public class ClickGUI extends Screen {
 
         ClickGui.Image image = ModuleManager.clickGui.image.getValue();
 
-        if(image != ClickGui.Image.None){
-            RenderSystem.setShaderTexture(0,image.file);
-            Render2DEngine.renderTexture(context.getMatrices(),image.pos[0],image.pos[1],image.size * ((float) image.fileWidth /image.fileHeight) ,image.size * ((float) image.fileHeight /image.fileWidth),0,0,image.fileWidth,image.fileHeight,image.fileWidth,image.fileHeight);
+        if (image != ClickGui.Image.None) {
+            RenderSystem.setShaderTexture(0, image.file);
+
+            Render2DEngine.renderTexture(context.getMatrices(),
+
+                    mc.getWindow().getScaledWidth() - image.fileWidth * imageAnimation.getAnimationd(),
+                    mc.getWindow().getScaledHeight() - image.fileHeight,
+
+                    image.fileWidth,
+                    image.fileHeight,
+
+
+                    0, 0,
+                    image.fileWidth, image.fileHeight, image.fileWidth, image.fileHeight);
         }
 
         if (closeAnimation <= 6) {
@@ -233,12 +251,16 @@ public class ClickGUI extends Screen {
 
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             if (mc.player == null || !ModuleManager.clickGui.closeAnimation.getValue()) {
+                imageDirection = false;
+                imageAnimation.reset();
                 super.keyPressed(keyCode, scanCode, modifiers);
                 return true;
             }
 
-            if(close)
+            if (close)
                 return true;
+
+            imageDirection = false;
 
             windows.forEach(AbstractCategory::savePos);
 

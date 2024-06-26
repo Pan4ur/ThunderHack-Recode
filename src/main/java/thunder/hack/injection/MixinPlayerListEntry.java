@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.utility.OptifineCapes;
 import thunder.hack.utility.ThunderUtility;
@@ -59,16 +58,16 @@ public class MixinPlayerListEntry {
                     String name = colune.split(":")[0];
                     String cape = colune.split(":")[1];
                     if (Objects.equals(profile.getName(), name)) {
-                        customCapeTexture = Identifier.of("thunderhack", "textures/capes/" + cape + ".png");
+                        customCapeTexture = new Identifier("thunderhack", "textures/capes/" + cape + ".png");
                         return;
                     }
                 }
             } catch (Exception ignored) {
             }
 
-            for(String str : ThunderUtility.starGazer) {
-                if(profile.getName().toLowerCase().equals(str.toLowerCase()))
-                    customCapeTexture = Identifier.of("thunderhack", "textures/capes/starcape.png");
+            for (String str : ThunderUtility.starGazer) {
+                if (profile.getName().toLowerCase().equals(str.toLowerCase()))
+                    customCapeTexture = new Identifier("thunderhack", "textures/capes/starcape.png");
             }
 
             if (ModuleManager.optifineCapes.isEnabled())

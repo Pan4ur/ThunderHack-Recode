@@ -22,12 +22,12 @@ import static thunder.hack.modules.client.ClientSettings.isRu;
 public class Companion extends HudElement {
 
     public Companion() {
-        super("2D Companion", 50, 10);
+        super("2DCompanion", 50, 10);
     }
 
     private final Identifier BOYKISSER = new Identifier("thunderhack", "textures/hud/elements/boykisser.png");
     private final Identifier PAIMON = new Identifier("thunderhack", "textures/hud/elements/paimon.png");
-    private final Identifier BALTIKA = new Identifier("thunderhack", "textures/hud/elements/baltika.png");
+    public final Identifier BALTIKA = new Identifier("thunderhack", "textures/hud/elements/baltika.png");
     private final Identifier KOWK = new Identifier("thunderhack", "textures/hud/elements/kowk.png"); // kowk!!!1
 
     public Setting<Integer> scale = new Setting<>("Scale", 50, 0, 100);

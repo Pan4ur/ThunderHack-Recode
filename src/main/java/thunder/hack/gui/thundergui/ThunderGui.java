@@ -3,7 +3,6 @@ package thunder.hack.gui.thundergui;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
-import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
@@ -17,7 +16,7 @@ import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.animation.BetterAnimation;
+import thunder.hack.utility.render.animation.EaseOutBack;
 
 import java.awt.*;
 import java.io.File;
@@ -33,7 +32,7 @@ public class ThunderGui extends Screen {
     public static CurrentMode currentMode = CurrentMode.Modules;
     public static boolean scroll_lock = false;
     public static ModulePlate selected_plate, prev_selected_plate;
-    public static BetterAnimation open_animation = new BetterAnimation(5);
+    public static EaseOutBack open_animation = new EaseOutBack(5);
     public static boolean open_direction = false;
     private static ThunderGui INSTANCE;
 
@@ -102,7 +101,7 @@ public class ThunderGui extends Screen {
     }
 
     public static ThunderGui getThunderGui() {
-        open_animation = new BetterAnimation();
+        open_animation = new EaseOutBack();
         open_direction = true;
         return getInstance();
     }
@@ -171,7 +170,7 @@ public class ThunderGui extends Screen {
             renderGui(context, mouseX, mouseY, delta);
         }
         if (open_animation.getAnimationd() <= 0.01 && !open_direction) {
-            open_animation = new BetterAnimation();
+            open_animation = new EaseOutBack();
             mc.currentScreen = null;
             mc.setScreen(null);
         }

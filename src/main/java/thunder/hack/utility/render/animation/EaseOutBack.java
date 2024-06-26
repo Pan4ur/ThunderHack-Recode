@@ -6,23 +6,21 @@ import thunder.hack.utility.render.Render3DEngine;
 import static thunder.hack.modules.Module.mc;
 
 
-public class BetterAnimation {
+public class EaseOutBack {
     private int prevTick;
     private int tick;
     private final int maxTick;
 
-    public BetterAnimation(int maxTick) {
+    public EaseOutBack(int maxTick) {
         this.maxTick = maxTick;
     }
 
-    public BetterAnimation() {
+    public EaseOutBack() {
         this(10);
     }
 
     public static double dropAnimation(double value) {
-        double c1 = 1.70158;
-        double c3 = 2.70158;
-        return 1 + c3 * Math.pow(value - 1, 3) + c1 * Math.pow(value - 1, 2);
+        return 1 + 2.70158 * Math.pow(value - 1, 3) + 1.70158 * Math.pow(value - 1, 2);
     }
 
     public void update(boolean update) {
@@ -32,5 +30,10 @@ public class BetterAnimation {
 
     public double getAnimationd() {
         return dropAnimation((prevTick + (tick - prevTick) * Render3DEngine.getTickDelta()) / maxTick);
+    }
+
+    public void reset() {
+        prevTick = 0;
+        tick = 0;
     }
 }
