@@ -46,6 +46,7 @@ public class Velocity extends Module {
     private boolean doJump, failJump, skip, flag;
     private int grimTicks, ccCooldown;
 
+
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (fullNullCheck()) return;
