@@ -1,20 +1,17 @@
 package thunder.hack.gui.hud.impl;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.util.Formatting;
-import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.movement.Timer;
-import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.animation.BetterDynamicAnimation;
+import thunder.hack.utility.render.animation.EaseOutCirc;
 
 import java.awt.*;
 
 public class TimerIndicator extends HudElement {
-    private final BetterDynamicAnimation timerAnimation = new BetterDynamicAnimation();
+    private final EaseOutCirc timerAnimation = new EaseOutCirc();
 
     public TimerIndicator() {
         super("TimerIndicator", 60, 10);

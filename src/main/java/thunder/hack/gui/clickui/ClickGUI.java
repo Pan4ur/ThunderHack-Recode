@@ -4,13 +4,9 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.*;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.NotNull;
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
@@ -21,6 +17,7 @@ import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
+import thunder.hack.utility.render.animation.EaseOutBack;
 
 import java.util.List;
 import java.util.Objects;
@@ -33,10 +30,11 @@ public class ClickGUI extends Screen {
 
     private boolean firstOpen;
     private float scrollY, closeAnimation, prevYaw, prevPitch, closeDirectionX, closeDirectionY;
-    public static boolean close = false;
+    public static boolean close = false, imageDirection;
 
     public static String currentDescription = "";
     public static final Identifier arrow = new Identifier("thunderhack", "textures/gui/elements/arrow.png");
+    public EaseOutBack imageAnimation = new EaseOutBack(6);
 
     public ClickGUI() {
         super(Text.of("NewClickGUI"));
@@ -51,6 +49,9 @@ public class ClickGUI extends Screen {
         if (INSTANCE == null) {
             INSTANCE = new ClickGUI();
         }
+
+        imageDirection = true;
+
         return INSTANCE;
     }
 
@@ -101,38 +102,6 @@ public class ClickGUI extends Screen {
         windows.forEach(AbstractCategory::init);
     }
 
-    public static void renderTexture(@NotNull MatrixStack matrices, double x0, double y0, double width, double height, float u, float v, double regionWidth, double regionHeight, double textureWidth,
-                                     double textureHeight) {
-        double x1 = x0 + width;
-        double y1 = y0 + height;
-        double z = 0;
-        renderTexturedQuad(
-                matrices.peek().getPositionMatrix(),
-                x0,
-                x1,
-                y0,
-                y1,
-                z,
-                (u + 0.0F) / (float) textureWidth,
-                (u + (float) regionWidth) / (float) textureWidth,
-                (v + 0.0F) / (float) textureHeight,
-                (v + (float) regionHeight) / (float) textureHeight
-        );
-    }
-
-    private static void renderTexturedQuad(Matrix4f matrix, double x0, double x1, double y0, double y1, double z, float u0, float u1, float v0, float v1) {
-        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-        buffer.vertex(matrix, (float) x0, (float) y1, (float) z).texture(u0, v1);
-        buffer.vertex(matrix, (float) x1, (float) y1, (float) z).texture(u1, v1);
-        buffer.vertex(matrix, (float) x1, (float) y0, (float) z).texture(u1, v0);
-        buffer.vertex(matrix, (float) x0, (float) y0, (float) z).texture(u0, v0);
-
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        BufferRenderer.drawWithGlobalProgram(buffer.end());
-    }
-
-
     @Override
     public boolean shouldPause() {
         return false;
@@ -141,6 +110,7 @@ public class ClickGUI extends Screen {
     @Override
     public void tick() {
         windows.forEach(AbstractCategory::tick);
+        imageAnimation.update(imageDirection);
 
         if (close) {
             if (mc.player != null) {
@@ -179,9 +149,19 @@ public class ClickGUI extends Screen {
         ClickGui.Image image = ModuleManager.clickGui.image.getValue();
 
         if (image != ClickGui.Image.None) {
-
             RenderSystem.setShaderTexture(0, image.file);
-            Render2DEngine.renderTexture(context.getMatrices(), image.pos[0], image.pos[1], image.size * ((float) image.fileWidth / image.fileHeight), image.size * ((float) image.fileHeight / image.fileWidth), 0, 0, image.fileWidth, image.fileHeight, image.fileWidth, image.fileHeight);
+
+            Render2DEngine.renderTexture(context.getMatrices(),
+
+                    mc.getWindow().getScaledWidth() - image.fileWidth * imageAnimation.getAnimationd(),
+                    mc.getWindow().getScaledHeight() - image.fileHeight,
+
+                    image.fileWidth,
+                    image.fileHeight,
+
+
+                    0, 0,
+                    image.fileWidth, image.fileHeight, image.fileWidth, image.fileHeight);
         }
 
         if (closeAnimation <= 6) {
@@ -271,12 +251,16 @@ public class ClickGUI extends Screen {
 
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             if (mc.player == null || !ModuleManager.clickGui.closeAnimation.getValue()) {
+                imageDirection = false;
+                imageAnimation.reset();
                 super.keyPressed(keyCode, scanCode, modifiers);
                 return true;
             }
 
             if (close)
                 return true;
+
+            imageDirection = false;
 
             windows.forEach(AbstractCategory::savePos);
 

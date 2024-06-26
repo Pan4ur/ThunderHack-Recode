@@ -987,7 +987,6 @@ public class AutoCrystal extends Module {
     public boolean checkEntities(@NotNull BlockPos base) {
         if (mc.player == null || mc.world == null) return false;
 
-
         Box posBoundingBox = new Box(base.up());
 
         if (!ccPlace.getValue())
@@ -999,9 +998,9 @@ public class AutoCrystal extends Module {
             if (ent.getBoundingBox().intersects(posBoundingBox)) {
                 if (ent instanceof ExperienceOrbEntity)
                     continue;
-                if (ent instanceof EndCrystalEntity cr && canAttackCrystal(cr, false)) {
+
+                if (ent instanceof EndCrystalEntity cr && canAttackCrystal(cr, false))
                     continue;
-                }
                 return true;
             }
         }
@@ -1027,7 +1026,7 @@ public class AutoCrystal extends Module {
                         && cr.getPos().squaredDistanceTo(posBoundingBox.getCenter()) > 0.3) {
                     attackCrystal(cr);
                     debug("attack stuck crystal");
-                    return false;
+                    return true;
                 }
                 return true;
             }

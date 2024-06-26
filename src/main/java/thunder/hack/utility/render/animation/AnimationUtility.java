@@ -4,11 +4,12 @@ import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.math.MathUtility;
 
 public class AnimationUtility {
-    public static double deltaTime() {
-        return FrameRateCounter.INSTANCE.getFps() > 5 ? (1f / FrameRateCounter.INSTANCE.getFps()) : 0.016;
+    public static float deltaTime() {
+        return FrameRateCounter.INSTANCE.getFps() > 5 ? (1f / FrameRateCounter.INSTANCE.getFps()) : 0.016f;
     }
 
     public static float fast(float end, float start, float multiple) {
-        return (1 - MathUtility.clamp((float) (deltaTime() * multiple), 0, 1)) * end + MathUtility.clamp((float) (deltaTime() * multiple), 0, 1) * start;
+        float clampedDelta = MathUtility.clamp(deltaTime() * multiple, 0f, 1f);
+        return (1f - clampedDelta) * end + clampedDelta * start;
     }
 }

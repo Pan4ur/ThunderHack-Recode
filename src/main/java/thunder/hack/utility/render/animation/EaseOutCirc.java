@@ -4,16 +4,16 @@ import net.minecraft.util.math.MathHelper;
 
 import static thunder.hack.modules.Module.mc;
 
-public class BetterDynamicAnimation {
+public class EaseOutCirc {
     private final int maxTicks;
     private double value, dstValue;
     private int prevStep, step;
 
-    public BetterDynamicAnimation(int maxTicks) {
+    public EaseOutCirc(int maxTicks) {
         this.maxTicks = maxTicks;
     }
 
-    public BetterDynamicAnimation() {
+    public EaseOutCirc() {
         this(5);
     }
 

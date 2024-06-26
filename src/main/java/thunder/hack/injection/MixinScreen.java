@@ -3,11 +3,7 @@ package thunder.hack.injection;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.multiplayer.AddServerScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.text.Style;
-import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,12 +11,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CommandManager;
-import thunder.hack.gui.clickui.ClickGUI;
-import thunder.hack.gui.mainmenu.CreditsScreen;
-import thunder.hack.gui.mainmenu.MainMenuScreen;
 import thunder.hack.gui.misc.DialogScreen;
 import thunder.hack.modules.client.ClientSettings;
-import thunder.hack.utility.ClientClickEvent;
+import thunder.hack.events.impl.ClientClickEvent;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.io.File;
@@ -33,21 +26,6 @@ import static thunder.hack.modules.client.ClientSettings.isRu;
 
 @Mixin(Screen.class)
 public abstract class MixinScreen {
-    /*@ModifyArgs(method = "renderTooltip(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/item/ItemStack;II)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;renderTooltip(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/item/ItemStack;II)V"))
-    private void getList(Args args, MatrixStack matrixStack, ItemStack itemStack, int x, int y) {
-        Tooltips tooltips = (Tooltips) Thunderhack.moduleRegistry.get(Tooltips.class);
-
-        if (hasItems(itemStack) && tooltips.storage.getValue() || (itemStack.getItem() == Items.ENDER_CHEST && tooltips.echest.getValue())) {
-            //if(args.size() < 3) return;
-            //List<Text> lines = args.get(1);
-
-            //int yChanged = y - 4;
-            //yChanged -= 10 * lines.size();
-
-            args.set(4, 30);
-        }
-    }*/
-
     @Inject(method = "handleTextClick", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;error(Ljava/lang/String;Ljava/lang/Object;)V", ordinal = 1, remap = false), cancellable = true)
     private void onRunCommand(Style style, CallbackInfoReturnable<Boolean> cir) {
         if (Objects.requireNonNull(style.getClickEvent()) instanceof ClientClickEvent clientClickEvent && clientClickEvent.getValue().startsWith(ThunderHack.commandManager.getPrefix()))
@@ -59,9 +37,8 @@ public abstract class MixinScreen {
             }
     }
 
-    @Inject(method = "filesDragged", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "filesDragged", at = @At("HEAD"))
     public void filesDragged(List<Path> paths, CallbackInfo ci) {
-        //  Command.sendMessage(paths.get(0).toString());
         String configPath = paths.get(0).toString();
         File cfgFile = new File(configPath);
         String configName = cfgFile.getName();
