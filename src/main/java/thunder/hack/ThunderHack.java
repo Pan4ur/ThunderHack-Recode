@@ -2,10 +2,15 @@ package thunder.hack;
 
 import com.mojang.logging.LogUtils;
 import meteordevelopment.orbit.EventBus;
+import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.IEventBus;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.*;
@@ -31,6 +36,7 @@ public class ThunderHack implements ModInitializer {
     public static String BUILD_DATE = "1 Jan 1970";
 
     public static final IEventBus EVENT_BUS = new EventBus();
+    public static MinecraftClient mc;
 
     public static boolean isOutdated = false;
     public static float TICK_TIMER = 1f;
@@ -55,6 +61,8 @@ public class ThunderHack implements ModInitializer {
     public static MacroManager macroManager = new MacroManager();
     public static CommandManager commandManager = new CommandManager();
     public static SoundManager soundManager = new SoundManager();
+    public static TelemetryManager telemetryManager = new TelemetryManager();
+
     public static Core core = new Core();
     /*--------------------------------------------------------*/
 
@@ -68,6 +76,7 @@ public class ThunderHack implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        mc = MinecraftClient.getInstance();
         initTime = System.currentTimeMillis();
 
         EVENT_BUS.registerLambdaFactory("thunder.hack", (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
@@ -94,6 +103,7 @@ public class ThunderHack implements ModInitializer {
 
         macroManager.onLoad();
         wayPointManager.onLoad();
+        telemetryManager.onLoad();
 
         Render2DEngine.initShaders();
 
@@ -123,6 +133,8 @@ public class ThunderHack implements ModInitializer {
 
         LogUtils.getLogger().info("[ThunderHack] Init time: " + (System.currentTimeMillis() - initTime) + " ms.");
         initTime = System.currentTimeMillis();
+
+        telemetryManager.telemetryLogin();
     }
 
     public static void syncVersion() {
