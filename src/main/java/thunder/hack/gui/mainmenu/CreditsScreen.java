@@ -78,6 +78,7 @@ public class CreditsScreen extends Screen {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         int offset = 0;
+
         for (Contributor contributor : contributors) {
             float cX = halfOfWidth + offset - globalOffset + scroll;
             float cY = halfOfHeight - 120;
@@ -195,5 +196,4 @@ public class CreditsScreen extends Screen {
 
         }, 0, SCROLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
     }
-
 }
