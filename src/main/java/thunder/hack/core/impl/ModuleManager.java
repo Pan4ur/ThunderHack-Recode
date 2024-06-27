@@ -131,7 +131,6 @@ public class ModuleManager implements IManager {
     public static CandleHud candleHud = new CandleHud();
     public static Particles particles = new Particles();
     public static ToolSaver toolSaver = new ToolSaver();
-    public static DamageFly damageFly = new DamageFly();
     public static WayPoints wayPoints = new WayPoints();
     public static WaterMark waterMark = new WaterMark();
     public static ViewModel viewModel = new ViewModel();
@@ -257,7 +256,6 @@ public class ModuleManager implements IManager {
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
     public static RPC rpc = new RPC();
-
 
     public ModuleManager() {
         for (Field field : getClass().getDeclaredFields()) {

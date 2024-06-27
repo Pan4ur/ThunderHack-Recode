@@ -15,10 +15,16 @@ public final class ClientSettings extends Module {
     public static Setting<Boolean> customBob = new Setting<>("CustomBob", true);
     public static Setting<Language> language = new Setting<>("Language", Language.ENG);
     public static Setting<String> prefix = new Setting<>("Prefix", "@");
+    public static Setting<ClipCommandMode> clipCommandMode = new Setting<>("ClipCommandMode", ClipCommandMode.Matrix);
 
     public enum Language {
         RU,
         ENG
+    }
+
+    public enum ClipCommandMode {
+        Default,
+        Matrix
     }
 
     public ClientSettings() {
