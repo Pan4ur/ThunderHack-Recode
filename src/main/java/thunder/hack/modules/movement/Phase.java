@@ -81,7 +81,7 @@ public class Phase extends Module {
         if (clipTimer > 0) clipTimer--;
         if (afterPearlTime > 0) afterPearlTime--;
 
-        if (mode.getValue() == Mode.Sunrise && (mc.player.horizontalCollision || playerInsideBlock()) && !mc.player.isSubmergedInWater() && !mc.player.isInLava()) {
+        if (mode.getValue() == Mode.Sunrise && (mc.player.horizontalCollision || playerInsideBlock()) && !mc.player.isSubmergedInWater() && !mc.player.isInLava() && clipTimer <= 0) {
             double[] dir = MovementUtility.forward(0.5);
 
             BlockPos blockToBreak = null;
@@ -100,12 +100,9 @@ public class Phase extends Module {
 
             int prevItem = mc.player.getInventory().selectedSlot;
 
-
             InventoryUtility.switchTo(best_tool);
-
             mc.interactionManager.updateBlockBreakingProgress(blockToBreak, mc.player.getHorizontalFacing());
             mc.player.swingHand(Hand.MAIN_HAND);
-
             if (silent.getValue())
                 InventoryUtility.switchTo(prevItem);
         }

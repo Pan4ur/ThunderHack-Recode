@@ -3,6 +3,7 @@ package thunder.hack.modules.movement;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.Formatting;
 import thunder.hack.events.impl.EventSync;
@@ -10,8 +11,6 @@ import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
-
-import java.text.Format;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
@@ -22,8 +21,10 @@ public class Flight extends Module {
     private final Setting<Float> vSpeed = new Setting<>("Vertical", 0.78F, 0.0F, 5F, v -> !mode.is(Mode.StormBreak));
     private final Setting<Float> boostValue = new Setting<>("Boost", 1f, 0.1F, 1f, v -> mode.is(Mode.StormBreak));
     private final Setting<Boolean> autoToggle = new Setting<>("AutoToggle", false, v -> mode.is(Mode.MatrixJump));
+    private final Setting<Integer> boostTicks = new Setting<>("Ticks", 8, 0, 40, v -> mode.is(Mode.Damage));
+    private final Setting<Boolean> antiKick = new Setting<>("AntiKick", false, v -> mode.is(Mode.Creative) || mode.is(Mode.Vanilla));
 
-    private double prevX, prevY, prevZ;
+    private double prevX, prevY, prevZ, velocityMotion;
     public boolean onPosLook = false;
     private int flyTicks = 0;
 
@@ -67,29 +68,48 @@ public class Flight extends Module {
             }
 
             case StormBreak -> {
-                if(mc.player.age % 60 == 0)
+                if (mc.player.age % 60 == 0)
                     sendMessage(Formatting.RED + (isRu() ? "В этом режиме нужно ломать блоки!" : "In this mode you need to break blocks!"));
             }
         }
+
+        if (antiKick.getValue() && (mode.is(Mode.Creative) || mode.is(Mode.Vanilla)))
+            mc.player.setVelocity(mc.player.getVelocity().add(0, -0.08, 0));
     }
 
     @Override
     public void onUpdate() {
-        if (mode.getValue() != Mode.MatrixJump || mc.player.fallDistance == 0) return;
-        mc.player.getAbilities().flying = false;
-        mc.player.setVelocity(0.0, 0.0, 0.0);
+        if (mode.is(Mode.Damage))
+            if (flyTicks-- > boostTicks.getValue())
+                mc.player.setVelocity(mc.player.getVelocity().x, velocityMotion, mc.player.getVelocity().getZ());
 
-        if (mc.options.jumpKey.isPressed()) mc.player.setVelocity(mc.player.getVelocity().add(0, vSpeed.getValue(), 0));
-        if (mc.options.sneakKey.isPressed())
-            mc.player.setVelocity(mc.player.getVelocity().add(0, -vSpeed.getValue(), 0));
 
-        final double[] dir = MovementUtility.forward(hSpeed.getValue());
-        mc.player.setVelocity(dir[0], mc.player.getVelocity().getY(), dir[1]);
+        if (mode.is(Mode.MatrixJump)) {
+            if (mc.player.fallDistance == 0)
+                return;
+
+            mc.player.getAbilities().flying = false;
+            mc.player.setVelocity(0.0, 0.0, 0.0);
+
+            if (mc.options.jumpKey.isPressed())
+                mc.player.setVelocity(mc.player.getVelocity().add(0, vSpeed.getValue(), 0));
+
+            if (mc.options.sneakKey.isPressed())
+                mc.player.setVelocity(mc.player.getVelocity().add(0, -vSpeed.getValue(), 0));
+
+            final double[] dir = MovementUtility.forward(hSpeed.getValue());
+            mc.player.setVelocity(dir[0], mc.player.getVelocity().getY(), dir[1]);
+        }
+
+        if (mode.is(Mode.Creative)) {
+            mc.player.getAbilities().flying = true;
+            mc.player.getAbilities().setFlySpeed(hSpeed.getValue() / 10f);
+        }
     }
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
-        if (mode.getValue() == Mode.MatrixJump) {
+        if (mode.is(Mode.MatrixJump)) {
             if (fullNullCheck()) return;
             if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
                 onPosLook = true;
@@ -98,11 +118,18 @@ public class Flight extends Module {
                 prevZ = mc.player.getVelocity().getZ();
             }
         }
+
+        if (mode.is(Mode.Damage))
+            if (e.getPacket() instanceof EntityVelocityUpdateS2CPacket v)
+                if (v.getVelocityY() / 8000.0 > 0.2) {
+                    velocityMotion = v.getVelocityY() / 8000.0;
+                    flyTicks = boostTicks.getValue();
+                }
     }
 
     @EventHandler
     public void onPacketSend(PacketEvent.Send e) {
-        if (mode.getValue() == Mode.MatrixJump) {
+        if (mode.is(Mode.MatrixJump)) {
             if (e.getPacket() instanceof PlayerMoveC2SPacket.Full) {
                 if (onPosLook) {
                     mc.player.setVelocity(prevX, prevY, prevZ);
@@ -119,7 +146,13 @@ public class Flight extends Module {
         }
     }
 
+    @Override
+    public void onDisable() {
+        mc.player.getAbilities().flying = false;
+        mc.player.getAbilities().setFlySpeed(0.05f);
+    }
+
     private enum Mode {
-        Vanilla, MatrixJump, AirJump, MatrixGlide, StormBreak
+        Vanilla, MatrixJump, AirJump, MatrixGlide, StormBreak, Damage, Creative
     }
 }

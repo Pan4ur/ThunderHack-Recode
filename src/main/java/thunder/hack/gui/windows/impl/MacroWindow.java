@@ -11,10 +11,8 @@ import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
-import thunder.hack.gui.windows.WindowsScreen;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -27,7 +25,7 @@ import static thunder.hack.modules.client.ClientSettings.isRu;
 public class MacroWindow extends WindowBase {
     private static MacroWindow instance = new MacroWindow();
     private ArrayList<MacroPlate> macroPlates = new ArrayList<>();
-    private int listeningId = -1;
+    private int listeningId = -1, addBindKeyCode = -1;
     private ListeningType listeningType;
     private String search = "Search", addName = "Name", addBind = "Bind", addText = "Text";
 
@@ -109,8 +107,8 @@ public class MacroWindow extends WindowBase {
         Render2DEngine.horizontalGradient(context.getMatrices(), getX() + 2, getY() + 33f, getX() + 2 + getWidth() / 2f - 2, getY() + 33.5f, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
         Render2DEngine.horizontalGradient(context.getMatrices(), getX() + 2 + getWidth() / 2f - 2, getY() + 33f, getX() + 2 + getWidth() - 4, getY() + 33.5f, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
 
-     //   FontRenderers.sf_medium.drawString(context.getMatrices(), "      Name        l   Bind   l                         Text   ",
-      //          getX() + 13, getY() + 40, new Color(0xBDBDBD).getRGB());
+        //   FontRenderers.sf_medium.drawString(context.getMatrices(), "      Name        l   Bind   l                         Text   ",
+        //          getX() + 13, getY() + 40, new Color(0xBDBDBD).getRGB());
 
 
         FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), "Name", nameX + nameWidth / 2f, getY() + 40, textColor);
@@ -189,6 +187,7 @@ public class MacroWindow extends WindowBase {
         if (hoveringBind) {
             listeningType = ListeningType.Bind;
             addBind = "";
+            addBindKeyCode = -1;
         }
 
         if (hoveringText) {
@@ -200,18 +199,9 @@ public class MacroWindow extends WindowBase {
             listeningId = -3;
 
         if (hoveringAdd) {
-            InputUtil.Key key = null;
-            try {
-                key = InputUtil.fromTranslationKey("key.keyboard." + addBind.toLowerCase());
-            } catch (Exception ignored) {
-                return;
-            }
-            if (key != null) {
-                int bind = key.getCode();
-                if (bind != -1) {
-                    MacroManager.addMacro(new MacroManager.Macro(addName, addText, bind));
-                    refresh();
-                }
+            if (addBindKeyCode != -1) {
+                MacroManager.addMacro(new MacroManager.Macro(addName, addText, addBindKeyCode));
+                refresh();
             }
         }
 
@@ -329,6 +319,7 @@ public class MacroWindow extends WindowBase {
 
             if (listeningId == -3 && keyCode != -1 && listeningType == ListeningType.Bind) {
                 addBind = toString(keyCode);
+                addBindKeyCode = keyCode;
                 listeningId = -1;
             }
         }
