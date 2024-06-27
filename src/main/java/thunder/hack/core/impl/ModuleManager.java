@@ -42,6 +42,7 @@ public class ModuleManager implements IManager {
     public static CrosshairArrows crosshairArrows = new CrosshairArrows();
     public static PearlBlockThrow pearlBlockThrow = new PearlBlockThrow();
     public static ChatTranslator chatTranslator = new ChatTranslator();
+    public static PacketCanceler packetCanceler = new PacketCanceler();
     public static ClientSettings clientSettings = new ClientSettings();
     public static TimerIndicator timerIndicator = new TimerIndicator();
     public static ThunderHackGui thunderHackGui = new ThunderHackGui();
@@ -62,6 +63,7 @@ public class ModuleManager implements IManager {
     public static MoreKnockback moreKnockback = new MoreKnockback();
     public static AntiServerAdd antiServerAdd = new AntiServerAdd();
     public static AntiLegitMiss antiLegitMiss = new AntiLegitMiss();
+    public static AntiBallPlace antiBallPlace = new AntiBallPlace();
     public static Trajectories trajectories = new Trajectories();
     public static TargetStrafe targetStrafe = new TargetStrafe();
     public static RadarRewrite radarRewrite = new RadarRewrite();
@@ -154,6 +156,7 @@ public class ModuleManager implements IManager {
     public static TapeMouse tapeMouse = new TapeMouse();
     public static Rotations rotations = new Rotations();
     public static MemoryHud memoryHud = new MemoryHud();
+    public static Companion companion = new Companion();
     public static AutoGear autoGear = new AutoGear();
     public static ViewLock viewLock = new ViewLock();
     public static Velocity velocity = new Velocity();
@@ -186,6 +189,7 @@ public class ModuleManager implements IManager {
     public static KillFeed killFeed = new KillFeed();
     public static AutoWalk autoWalk = new AutoWalk();
     public static AutoSign autoSign = new AutoSign();
+    public static BlockESP blockESP = new BlockESP();
     public static Windows windows = new Windows();
     public static Breaker breaker = new Breaker();
     public static AutoEat autoEat = new AutoEat();
@@ -215,14 +219,12 @@ public class ModuleManager implements IManager {
     public static Tracers tracers = new Tracers();
     public static Parkour parkour = new Parkour();
     public static ClickTP clickTP = new ClickTP();
-    public static Companion companion = new Companion();
     public static BadTrip badTrip = new BadTrip();
     public static BowPop bowPop = new BowPop();
     public static XCarry xCarry = new XCarry();
     public static Trails trails = new Trails();
     public static Strafe strafe = new Strafe();
     public static Spider spider = new Spider();
-    public static Search search = new Search();
     public static NoSlow noSlow = new NoSlow();
     public static NoFall noFall = new NoFall();
     public static Hotbar hotbar = new Hotbar();
@@ -234,7 +236,6 @@ public class ModuleManager implements IManager {
     public static AimBot aimBot = new AimBot();
     public static Quiver quiver = new Quiver();
     public static NoPush noPush = new NoPush();
-    public static PacketCanceler packetCanceler = new PacketCanceler();
     public static UnHook unHook = new UnHook();
     public static Avoid avoid = new Avoid();
     public static Timer timer = new Timer();
