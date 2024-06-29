@@ -156,6 +156,7 @@ public class ModuleManager implements IManager {
     public static Rotations rotations = new Rotations();
     public static MemoryHud memoryHud = new MemoryHud();
     public static Companion companion = new Companion();
+    public static AntiCrash antiCrash = new AntiCrash();
     public static AutoGear autoGear = new AutoGear();
     public static ViewLock viewLock = new ViewLock();
     public static Velocity velocity = new Velocity();
