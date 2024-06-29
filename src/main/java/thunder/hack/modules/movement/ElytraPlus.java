@@ -9,6 +9,7 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.data.DataTracker;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -43,6 +44,8 @@ import thunder.hack.utility.player.MovementUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+
+import java.util.List;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 import static thunder.hack.modules.player.ElytraSwap.getChestPlateSlot;
@@ -307,8 +310,15 @@ public class ElytraPlus extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
-        if (e.getPacket() instanceof EntityTrackerUpdateS2CPacket pac && pac.id() == mc.player.getId() && mode.is(Mode.Packet))
-            e.cancel();
+        if (e.getPacket() instanceof EntityTrackerUpdateS2CPacket pac && pac.id() == mc.player.getId() && (mode.is(Mode.Packet) || mode.is(Mode.SunriseOld))) {
+            List<DataTracker.SerializedEntry<?>> values = pac.trackedValues();
+            if (values.isEmpty())
+                return;
+
+            for (DataTracker.SerializedEntry<?> value : values)
+                if (value.id() == 0 && (value.value().toString().equals("-120") || value.value().toString().equals("-128") || value.value().toString().equals("-126")))
+                    e.cancel();
+        }
 
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             acceleration = 0;
