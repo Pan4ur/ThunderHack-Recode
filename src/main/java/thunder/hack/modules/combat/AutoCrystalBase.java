@@ -129,7 +129,6 @@ public class AutoCrystalBase extends Module {
     public boolean isWorth() {
         return ModuleManager.autoCrystal.isEnabled()
                 && bestData != null
-                && ModuleManager.autoCrystal.renderDamage > 2
                 && (ModuleManager.autoCrystal.renderDamage + minDamageDelta.getValue()) < bestData.damage;
     }
 

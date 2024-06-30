@@ -52,13 +52,13 @@ public class HudElement extends Module {
                                 if (isNear(hudElement.getHitX() + hudElement.getWidth(), getHitX() + getWidth()))
                                     finalX = hudElement.getHitX() + hudElement.getWidth() - getWidth();
 
-                                if (isNear(hudElement.getHitY(), getHitY()))
-                                    finalY = hudElement.getHitY() + hudElement.getHeight() - getHeight();
-
                             } else {
-                                if (isNear(hudElement.getHitX(), getHitX())) finalX = hudElement.getHitX();
-                                if (isNear(hudElement.getHitY(), getHitY())) finalY = hudElement.getHitY();
+                                if (isNear(hudElement.getHitX(), getHitX()))
+                                    finalX = hudElement.getHitX();
+
                             }
+                            if (isNear(hudElement.getHitY(), getHitY()))
+                                finalY = hudElement.getHitY();
                         }
 
                 if (finalX != 0 || finalY != 0)
@@ -110,14 +110,12 @@ public class HudElement extends Module {
                             if (getPosX() > mc.getWindow().getScaledWidth() / 2f) {
                                 if (isNear(hudElement.getHitX() + hudElement.getWidth(), getHitX() + getWidth()))
                                     pos.getValue().setX((hudElement.getHitX() + hitDifX + hudElement.getWidth() - getWidth()) / mc.getWindow().getScaledWidth());
-                                if (isNear(hudElement.getHitY(), getHitY()))
-                                    pos.getValue().setY((hudElement.getHitY() + hitDifY + hudElement.getHeight() - getHeight()) / mc.getWindow().getScaledHeight());
                             } else {
                                 if (isNear(hudElement.getHitX(), getHitX()))
                                     pos.getValue().setX((hudElement.getHitX() + hitDifX) / mc.getWindow().getScaledWidth());
-                                if (isNear(hudElement.getHitY(), getHitY()))
-                                    pos.getValue().setY((hudElement.getHitY() + hitDifY) / mc.getWindow().getScaledHeight());
                             }
+                            if (isNear(hudElement.getHitY(), getHitY()))
+                                pos.getValue().setY((hudElement.getHitY() + hitDifY) / mc.getWindow().getScaledHeight());
 
                         }
                     }

@@ -33,11 +33,9 @@ public class CreditsScreen extends Screen {
     private static final Identifier TH_TEAM = new Identifier("thunderhack", "textures/gui/elements/thteam.png");
 
     public ArrayList<Contributor> contributors = new ArrayList<>();
-    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     private static int scroll;
     private static final int SCROLL_SPEED = 1;
-    private static final int SCROLL_INTERVAL_MS = 50;
 
     protected CreditsScreen() {
         super(Text.of("CreditsScreen"));
@@ -52,14 +50,12 @@ public class CreditsScreen extends Screen {
             String clickAction = line.split(";")[4];
             CreditsScreen.getInstance().contributors.add(new CreditsScreen.Contributor(name, CreditsScreen.getAvatar(avatar), role, description.replace('т', '\n'), clickAction));
         }
-
-        startAutoScroll();
     }
 
     private static CreditsScreen INSTANCE = new CreditsScreen();
 
     public static CreditsScreen getInstance() {
-        scroll = 0;
+        scroll = 150;
         if (INSTANCE == null) {
             INSTANCE = new CreditsScreen();
         }
@@ -84,7 +80,7 @@ public class CreditsScreen extends Screen {
             float cY = halfOfHeight - 120;
             Render2DEngine.drawHudBase(context.getMatrices(), cX, cY, 140, 240, 20, false);
             FontRenderers.sf_medium.drawGradientString(context.getMatrices(), contributor.name, (cX + 70) - FontRenderers.sf_medium.getStringWidth(contributor.name) / 2f, halfOfHeight - 57, 30);
-            FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), contributor.role, cX + 70, halfOfHeight - 50, new Color(0x818181).getRGB());
+            FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), contributor.role, cX + 70, halfOfHeight - 48, new Color(0x818181).getRGB());
 
             Render2DEngine.horizontalGradient(context.getMatrices(), cX + 2, cY + 90, cX + 70, cY + 91, Render2DEngine.injectAlpha(new Color(-1), 0), new Color(-1));
             Render2DEngine.horizontalGradient(context.getMatrices(), cX + 70, cY + 90, cX + 138, cY + 91, new Color(-1), Render2DEngine.injectAlpha(new Color(-1), 0));
@@ -114,7 +110,7 @@ public class CreditsScreen extends Screen {
         float globalOffset = (contributors.size() * 150) / 2f;
         int offset = 0;
         for (Contributor contributor : contributors) {
-            float cX = halfOfWidth + offset - globalOffset + scroll;
+            float cX = (float) (halfOfWidth + offset - globalOffset + Render2DEngine.interpolate(scroll, scroll + 1, mc.getTickDelta()));
             float cY = halfOfHeight - 120;
             if (Render2DEngine.isHovered(mouseX, mouseY, cX, cY, 140, 240) && !Objects.equals(contributor.clickAction, "none"))
                 Util.getOperatingSystem().open(URI.create(contributor.clickAction));
@@ -186,14 +182,12 @@ public class CreditsScreen extends Screen {
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
-    private void startAutoScroll() {
-        scheduler.scheduleAtFixedRate(() -> {
-            scroll += SCROLL_SPEED;
 
-            if (scroll >= (contributors.size() * 150 - 100) / 2) {
-                scroll = 0;
-            }
+    @Override
+    public void tick() {
+        scroll -= SCROLL_SPEED;
 
-        }, 0, SCROLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
+        if (scroll <= -(contributors.size() * 150) + 100)
+            scroll = 0;
     }
 }
