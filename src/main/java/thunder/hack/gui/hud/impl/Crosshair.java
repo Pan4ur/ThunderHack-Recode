@@ -30,6 +30,9 @@ public class Crosshair extends Module {
     }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Circle);
+    private final Setting<Boolean> animated = new Setting<>("Animated", true, v -> mode.is(Mode.Default));
+    private final Setting<Boolean> dot = new Setting<>("Dot", false, v -> mode.is(Mode.Default));
+    private final Setting<Boolean> t = new Setting<>("T", false, v -> mode.is(Mode.Default));
     private final Setting<ColorMode> colorMode = new Setting<>("ColorMode", ColorMode.Sync);
     public final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x2250b4b4));
     private final Setting<Boolean> dynamic = new Setting<>("Dynamic", true);
@@ -42,7 +45,7 @@ public class Crosshair extends Module {
     }
 
     private enum Mode {
-        Circle, WiseTree, Dot
+        Circle, WiseTree, Dot, Default
     }
 
     private float xAnim, yAnim, prevPitch, prevProgress;
@@ -117,6 +120,31 @@ public class Crosshair extends Module {
                 RenderSystem.disableDepthTest();
                 RenderSystem.disableBlend();
                 context.getMatrices().pop();
+            }
+            case Default -> {
+                Color color = this.color.getValue().getColorObject();
+
+                float offset = animated.getValue() ? -3f + (Render2DEngine.interpolateFloat(prevProgress, progress, mc.getTickDelta()) / 100f) : 0;
+                prevProgress = progress;
+
+                if (!t.getValue()) {
+                    Render2DEngine.drawRect(context.getMatrices(), xAnim - 1, yAnim - 6 + offset, 2, 4, Color.BLACK);
+                    Render2DEngine.drawRect(context.getMatrices(), xAnim - 0.5f, yAnim - 5.5f + offset, 1, 3, color);
+                }
+
+                Render2DEngine.drawRect(context.getMatrices(), xAnim - 1, yAnim + 2 - offset, 2, 4, Color.BLACK);
+                Render2DEngine.drawRect(context.getMatrices(), xAnim - 0.5f, yAnim + 2.5f - offset, 1, 3, color);
+
+                Render2DEngine.drawRect(context.getMatrices(), xAnim - 6 + offset, yAnim - 1, 4, 2, Color.BLACK);
+                Render2DEngine.drawRect(context.getMatrices(), xAnim - 5.5f + offset, yAnim - 0.5f, 3, 1, color);
+
+                Render2DEngine.drawRect(context.getMatrices(), xAnim + 2 - offset, yAnim - 1, 4, 2, Color.BLACK);
+                Render2DEngine.drawRect(context.getMatrices(), xAnim + 2.5f - offset, yAnim - 0.5f, 3, 1, color);
+
+                if (dot.getValue()) {
+                    Render2DEngine.drawRect(context.getMatrices(), xAnim - 1f, yAnim - 1f, 2, 2, Color.BLACK);
+                    Render2DEngine.drawRect(context.getMatrices(), xAnim - .5f, yAnim - .5f, 1, 1, color);
+                }
             }
         }
     }
