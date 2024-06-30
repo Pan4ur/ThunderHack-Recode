@@ -231,6 +231,6 @@
   "descriptions.commands.gethorsespeed": "Узнать скорость твоей лошади.",
   "descriptions.commands.kit": "Команда для настройки AutoGear.",
   "descriptions.commands.gettreasure": "Узнать координаты клада из карты сокровищ.",
-  "descriptions.commands.tabparse": "Сохранить список игроков в файл.",
+  "descriptions.commands.tabparse": "Сохранить список игроков в файл."
   "descriptions.commands.gc": "Очистить оперативную память.",
 }
