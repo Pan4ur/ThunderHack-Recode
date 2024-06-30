@@ -73,6 +73,7 @@
   "descriptions.misc.visualrange": "Предупреждает тебя об игроках в зоне видимости.",
   "descriptions.misc.worldtweaks": "Твики для мира.",
   "descriptions.misc.xray": "Алмазы? Без проблем.",
+  "descriptions.misc.autoclanxp": "Нурик прем функция",
 
   "descriptions.render.animations": "Анимация удара.",
   "descriptions.render.aspectratio": "Позволяет изменять соотношение сторон экрана.",
@@ -230,6 +231,6 @@
   "descriptions.commands.gethorsespeed": "Узнать скорость твоей лошади.",
   "descriptions.commands.kit": "Команда для настройки AutoGear.",
   "descriptions.commands.gettreasure": "Узнать координаты клада из карты сокровищ.",
-  "descriptions.commands.tabparse": "Сохранить список игроков в файл.",
-  "descriptions.commands.gc": "Очистить оперативную память."
+  "descriptions.commands.tabparse": "Сохранить список игроков в файл."
+  "descriptions.commands.gc": "Очистить оперативную память.",
 }
