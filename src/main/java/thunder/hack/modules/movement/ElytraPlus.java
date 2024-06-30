@@ -389,6 +389,7 @@ public class ElytraPlus extends Module {
     }
 
     private void doPreLegacy() {
+        if (twoBee.getValue() && mode.is(Mode.Boost)) return;
         if (mc.player.isOnGround()) hasTouchedGround = true;
         if (!cruiseControl.getValue()) height = (float) mc.player.getY();
 

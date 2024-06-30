@@ -28,8 +28,8 @@ public class PVPResources extends HudElement {
         if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
             Render2DEngine.verticalGradient(context.getMatrices(), getPosX(), getPosY() + 22f, getPosX() + 50, getPosY() + 25,  new Color(0x0000000, true), new Color(0x7B000000, true));
             Render2DEngine.verticalGradient(context.getMatrices(), getPosX(), getPosY() + 25f, getPosX() + 50, getPosY() + 28, new Color(0x7B000000, true), new Color(0x0000000, true));
-            Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 22, getPosY(), getPosX() + 25, getPosY() + 50,  new Color(0x0000000, true), new Color(0x7B000000, true));
-            Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 25, getPosY(), getPosX() + 27, getPosY() + 50, new Color(0x7B000000, true), new Color(0x0000000, true));
+            Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 22, getPosY() - 1, getPosX() + 25, getPosY() + 49,  new Color(0x0000000, true), new Color(0x7B000000, true));
+            Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 25, getPosY() - 1, getPosX() + 27, getPosY() + 49, new Color(0x7B000000, true), new Color(0x0000000, true));
         } else {
             Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 24.5f, getPosX() + 26, getPosY() + 25, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
             Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 26, getPosY() + 24.5f, getPosX() + 48, getPosY() + 25, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));

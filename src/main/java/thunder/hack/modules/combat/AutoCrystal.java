@@ -227,6 +227,9 @@ public class AutoCrystal extends Module {
             return;
         }
 
+        if (placeTimer.passedTicks(20))
+            renderDamage = 0f;
+
         // Right click gapple
         if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL && autoGapple.getValue()
                 && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() == Items.END_CRYSTAL) {
