@@ -258,7 +258,6 @@ public class ModuleManager implements IManager {
     public static ESP esp = new ESP();
     public static RPC rpc = new RPC();
     public static SafeWalk safeWalk = new SafeWalk();
-    public static AutoClanXP autoClanXP = new AutoClanXP();
 
     public ModuleManager() {
         for (Field field : getClass().getDeclaredFields()) {
