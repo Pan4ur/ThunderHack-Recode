@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
@@ -18,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import static thunder.hack.core.IManager.mc;
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
-public class PlayerArgumentType implements ArgumentType<PlayerEntity> {
+public class PlayerArgumentType implements ArgumentType<PlayerListEntry> {
     private static final Collection<String> EXAMPLES = List.of("pan4ur", "06ED");
 
     public static PlayerArgumentType create() {
@@ -26,23 +27,22 @@ public class PlayerArgumentType implements ArgumentType<PlayerEntity> {
     }
 
     @Override
-    public PlayerEntity parse(StringReader reader) throws CommandSyntaxException {
+    public PlayerListEntry parse(StringReader reader) throws CommandSyntaxException {
         String name = reader.readString();
 
-        final PlayerEntity player = mc.world.getPlayers().stream()
-                .filter(p -> name.equals(p.getName().getString()))
+        final PlayerListEntry player = mc.getNetworkHandler().getPlayerList().stream()
+                .filter(p -> name.equals(p.getProfile().getName()))
                 .findFirst()
                 .orElse(null);
         if (player == null) {
             throw new DynamicCommandExceptionType(nickname -> Text.literal(isRu() ? "Игрок " + nickname + " не в сети" : "Player " + nickname + " offline")).create(name);
         }
-
         return player;
     }
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(mc.world.getPlayers().stream().map(p -> p.getName().getString()), builder);
+        return CommandSource.suggestMatching(mc.getNetworkHandler().getPlayerList().stream().map(p -> p.getProfile().getName()), builder);
     }
 
     @Override
