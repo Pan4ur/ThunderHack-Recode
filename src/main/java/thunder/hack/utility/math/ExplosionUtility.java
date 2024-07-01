@@ -251,7 +251,7 @@ public final class ExplosionUtility {
         }
 
         if (!target.isImmuneToExplosion(explosion) && !target.isInvulnerable()) {
-            double distExposure = MathHelper.sqrt((float) target.squaredDistanceTo(explosionPos)) / maxDist;
+            double distExposure = target.squaredDistanceTo(explosionPos) / 144.;
             if (distExposure <= 1.0) {
                 terrainIgnore = ModuleManager.autoCrystal.ignoreTerrain.getValue();
                 double exposure = getExposureGhost(explosionPos, target, bp);
