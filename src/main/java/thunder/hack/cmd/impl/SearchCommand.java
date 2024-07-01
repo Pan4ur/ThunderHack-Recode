@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.args.SearchArgumentType;
 import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.render.Search;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static thunder.hack.modules.client.ClientSettings.isRu;
@@ -22,7 +21,7 @@ public class SearchCommand extends Command {
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("reset").executes(context -> {
-            ModuleManager.search.selectedBlocks.getValue().clear();
+            ModuleManager.blockESP.selectedBlocks.getValue().clear();
             sendMessage(isRu() ? "Search был очищен!" : "Search got reset.");
             mc.worldRenderer.reload();
             return SINGLE_SUCCESS;
@@ -33,7 +32,7 @@ public class SearchCommand extends Command {
 
             Block result = getRegisteredBlock(blockName);
             if(result != null){
-                ModuleManager.search.selectedBlocks.getValue().add(result);
+                ModuleManager.blockESP.selectedBlocks.getValue().add(result);
                 sendMessage(Formatting.GREEN + blockName + (isRu() ? " добавлен в Search" : " added to Search"));
             } else {
                 sendMessage(Formatting.RED + (isRu() ? "Такого блока нет!" : "There is no such block!"));
@@ -49,7 +48,7 @@ public class SearchCommand extends Command {
 
             Block result = getRegisteredBlock(blockName);
             if(result != null){
-                ModuleManager.search.selectedBlocks.getValue().remove(result);
+                ModuleManager.blockESP.selectedBlocks.getValue().remove(result);
                 sendMessage(Formatting.GREEN + blockName + (isRu() ? " удален из Search" : " removed from Search"));
             } else {
                 sendMessage(Formatting.RED + (isRu() ? "Такого блока нет!" : "There is no such block!"));
@@ -61,12 +60,12 @@ public class SearchCommand extends Command {
         })));
 
         builder.executes(context -> {
-            if (ModuleManager.search.selectedBlocks.getValue().getItemsById().isEmpty()) {
+            if (ModuleManager.blockESP.selectedBlocks.getValue().getItemsById().isEmpty()) {
                 sendMessage("Search list empty");
             } else {
                 StringBuilder f = new StringBuilder("Search list: ");
 
-                for (String name : ModuleManager.search.selectedBlocks.getValue().getItemsById())
+                for (String name : ModuleManager.blockESP.selectedBlocks.getValue().getItemsById())
                     try {
                         f.append(name).append(", ");
                     } catch (Exception ignored) {

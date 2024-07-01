@@ -124,7 +124,7 @@ public class Crosshair extends Module {
             case Default -> {
                 Color color = this.color.getValue().getColorObject();
 
-                float offset = animated.getValue() ? -3f + (Render2DEngine.interpolateFloat(prevProgress, progress, mc.getTickDelta()) / 100f) : 0;
+                float offset = animated.getValue() ? -3f + (Render2DEngine.interpolateFloat(prevProgress, progress, Render3DEngine.getTickDelta()) / 100f) : 0;
                 prevProgress = progress;
 
                 if (!t.getValue()) {

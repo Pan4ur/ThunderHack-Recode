@@ -677,11 +677,11 @@ public class Render2DEngine {
         endRender();
     }
 
-    public static void drawRect(MatrixStack matrices, float x, float y, float width, float height, float radius, float alpha, Color c1, Color c2, Color c3, Color c4, BufferBuilder bufferBuilder) {
-        preShaderDraw(matrices, x - 10, y - 10, width + 20, height + 20);
+    public static void drawRect(MatrixStack matrices, float x, float y, float width, float height, float radius, float alpha, Color c1, Color c2, Color c3, Color c4) {
+        BufferBuilder bb =  preShaderDraw(matrices, x - 10, y - 10, width + 20, height + 20);
         RECTANGLE_SHADER.setParameters(x, y, width, height, radius, alpha, c1, c2, c3, c4);
         RECTANGLE_SHADER.use();
-        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        BufferRenderer.drawWithGlobalProgram(bb.end());
         endRender();
     }
 

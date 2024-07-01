@@ -35,6 +35,7 @@ import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.render.animation.EaseOutBack;
 import thunder.hack.utility.render.animation.EaseOutCirc;
 
@@ -56,7 +57,7 @@ public class TargetHud extends HudElement {
     private final Setting<Boolean> absorp = new Setting<>("Absorption", true);
 
 
-    private static final Identifier thudPic = new Identifier("thunderhack", "textures/hud/elements/thud.png");
+    private static final Identifier thudPic = Identifier.of("thunderhack", "textures/hud/elements/thud.png");
     private static Identifier custom;
 
     public EaseOutBack animation = new EaseOutBack();
@@ -206,7 +207,7 @@ public class TargetHud extends HudElement {
     }
 
     private void renderNurik(DrawContext context, float health, float animationFactor) {
-        float hurtPercent = (Render2DEngine.interpolateFloat(MathUtility.clamp(target.hurtTime == 0 ? 0 : target.hurtTime + 1, 0, 10), target.hurtTime, mc.getTickDelta())) / 8f;
+        float hurtPercent = (Render2DEngine.interpolateFloat(MathUtility.clamp(target.hurtTime == 0 ? 0 : target.hurtTime + 1, 0, 10), target.hurtTime, Render3DEngine.getTickDelta())) / 8f;
         healthAnimation.setValue(health);
         health = (float) healthAnimation.getAnimationD();
 
@@ -284,7 +285,7 @@ public class TargetHud extends HudElement {
     }
 
     private void renderMiniNurik(DrawContext context, float health, float animationFactor) {
-        float hurtPercent = (Render2DEngine.interpolateFloat(MathUtility.clamp(target.hurtTime == 0 ? 0 : target.hurtTime + 1, 0, 10), target.hurtTime, mc.getTickDelta())) / 8f;
+        float hurtPercent = (Render2DEngine.interpolateFloat(MathUtility.clamp(target.hurtTime == 0 ? 0 : target.hurtTime + 1, 0, 10), target.hurtTime, Render3DEngine.getTickDelta())) / 8f;
         healthAnimation.setValue(health);
         health = (float) healthAnimation.getAnimationD();
 

@@ -174,22 +174,21 @@ public class LogoutSpots extends Module {
         matrices.translate((float) x, (float) y, (float) z);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotation(MathUtility.rad(180 - entity.bodyYaw)));
         prepareScale(matrices);
-        modelBase.animateModel((PlayerEntity) entity, entity.limbAnimator.getPos(), entity.limbAnimator.getSpeed(), mc.getTickDelta());
+        modelBase.animateModel((PlayerEntity) entity, entity.limbAnimator.getPos(), entity.limbAnimator.getSpeed(), Render3DEngine.getTickDelta());
         float limbSpeed = Math.min(entity.limbAnimator.getSpeed(), 1f);
         modelBase.setAngles((PlayerEntity) entity, entity.limbAnimator.getPos(), limbSpeed, entity.age, entity.headYaw - entity.bodyYaw, entity.getPitch());
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        BufferBuilder buffer;
         if (renderMode.is(RenderMode.TexturedChams)) {
             RenderSystem.setShaderTexture(0, texture);
             RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+            buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
         } else {
             RenderSystem.setShader(GameRenderer::getPositionProgram);
-            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+            buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
         }
         RenderSystem.setShaderColor(color.getValue().getGlRed(), color.getValue().getGlGreen(), color.getValue().getGlBlue(), alpha / 255f);
-        modelBase.render(matrices, buffer, 10, 0, color.getValue().getRed() / 255f, color.getValue().getGreen() / 255f, color.getValue().getBlue() / 255f, alpha / 255f);
-        tessellator.draw();
+        modelBase.render(matrices, buffer, 10, 0);
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         matrices.pop();
     }

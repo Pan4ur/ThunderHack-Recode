@@ -14,6 +14,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
@@ -110,7 +111,7 @@ public class CreditsScreen extends Screen {
         float globalOffset = (contributors.size() * 150) / 2f;
         int offset = 0;
         for (Contributor contributor : contributors) {
-            float cX = (float) (halfOfWidth + offset - globalOffset + Render2DEngine.interpolate(scroll, scroll + 1, mc.getTickDelta()));
+            float cX = (float) (halfOfWidth + offset - globalOffset + Render2DEngine.interpolate(scroll, scroll + 1, Render3DEngine.getTickDelta()));
             float cY = halfOfHeight - 120;
             if (Render2DEngine.isHovered(mouseX, mouseY, cX, cY, 140, 240) && !Objects.equals(contributor.clickAction, "none"))
                 Util.getOperatingSystem().open(URI.create(contributor.clickAction));

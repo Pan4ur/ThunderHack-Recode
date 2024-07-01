@@ -258,7 +258,7 @@ public class Render3DEngine {
         setupRender();
         matrices.translate(offX, offY - 0.1, -0.01);
         matrices.scale(-0.025f, -0.025f, 0);
-        FontRenderers.modules.drawCenteredString(matrices, text, textOffset, 0f, color.getRGB());
+        FontRenderers.sf_medium.drawCenteredString(matrices, text, textOffset, 0f, color.getRGB());
         RenderSystem.enableCull();
         RenderSystem.enableDepthTest();
         endRender();

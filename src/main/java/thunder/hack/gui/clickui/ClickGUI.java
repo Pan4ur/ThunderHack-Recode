@@ -33,7 +33,7 @@ public class ClickGUI extends Screen {
     public static boolean close = false, imageDirection;
 
     public static String currentDescription = "";
-    public static final Identifier arrow = new Identifier("thunderhack", "textures/gui/elements/arrow.png");
+    public static final Identifier arrow = Identifier.of("thunderhack", "textures/gui/elements/arrow.png");
     public EaseOutBack imageAnimation = new EaseOutBack(6);
 
     public ClickGUI() {
