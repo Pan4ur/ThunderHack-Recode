@@ -3,7 +3,6 @@ package thunder.hack.modules.render;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -48,12 +47,12 @@ public class Trails extends Module {
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
     private final Setting<Float> down = new Setting<>("Down", 0.5F, 0.0F, 2.0F);
     private final Setting<Float> width = new Setting<>("Height", 1.3F, 0.1F, 2.0F);
-    private final Setting<Integer> speed = new Setting<>("Speed", 2, 1, 20, v -> players.getValue() == Players.Particles);
+    private final Setting<Integer> speed = new Setting<>("Speed", 2, 1, 20, v -> players.is(Players.Particles) || arrows.is(Particles.Particles) || pearls.is(Particles.Particles));
     private final Setting<HitParticles.Mode> mode = new Setting<>("Mode", HitParticles.Mode.Stars);
-    private final Setting<HitParticles.Physics> physics = new Setting<>("Physics", HitParticles.Physics.Fall, v -> players.getValue() == Players.Particles);
-    private final Setting<Integer> starsScale = new Setting<>("Scale", 3, 1, 10, v -> players.getValue() == Players.Particles);
-    private final Setting<Integer> amount = new Setting<>("Amount", 2, 1, 5, v -> players.getValue() == Players.Particles);
-    private final Setting<Integer> lifeTime = new Setting<>("LifeTime", 2, 1, 10, v -> players.getValue() == Players.Particles);
+    private final Setting<HitParticles.Physics> physics = new Setting<>("Physics", HitParticles.Physics.Fall, v -> players.is(Players.Particles) || arrows.is(Particles.Particles) || pearls.is(Particles.Particles));
+    private final Setting<Integer> starsScale = new Setting<>("Scale", 3, 1, 10, v -> players.is(Players.Particles) || arrows.is(Particles.Particles) || pearls.is(Particles.Particles));
+    private final Setting<Integer> amount = new Setting<>("Amount", 2, 1, 5, v -> players.is(Players.Particles) || arrows.is(Particles.Particles) || pearls.is(Particles.Particles));
+    private final Setting<Integer> lifeTime = new Setting<>("LifeTime", 2, 1, 10, v -> players.is(Players.Particles) || arrows.is(Particles.Particles) || pearls.is(Particles.Particles));
     private final Setting<Mode> lmode = new Setting<>("ColorMode", Mode.Sync);
     private final Setting<ColorSetting> lcolor = new Setting<>("Color2", new ColorSetting(0x2250b4b4), v -> lmode.getValue() == Mode.Custom);
 
@@ -72,7 +71,7 @@ public class Trails extends Module {
         }
         if (players.getValue() == Players.Trail) {
             for (PlayerEntity entity : mc.world.getPlayers()) {
-                if(entity != mc.player && onlySelf.getValue())
+                if (entity != mc.player && onlySelf.getValue())
                     continue;
 
                 float alpha = color.getValue().getAlpha() / 255f;
@@ -105,7 +104,7 @@ public class Trails extends Module {
             }
         } else if (players.getValue() == Players.Tail) {
             for (PlayerEntity entity : mc.world.getPlayers()) {
-                if(entity != mc.player && onlySelf.getValue())
+                if (entity != mc.player && onlySelf.getValue())
                     continue;
                 float alpha = color.getValue().getAlpha();
                 Camera camera = mc.gameRenderer.getCamera();
@@ -156,7 +155,7 @@ public class Trails extends Module {
             }
         } else if (players.getValue() == Players.Cute) {
             for (PlayerEntity entity : mc.world.getPlayers()) {
-                if(entity != mc.player && onlySelf.getValue())
+                if (entity != mc.player && onlySelf.getValue())
                     continue;
 
                 float alpha = color.getValue().getAlpha() / 255f;
@@ -233,6 +232,7 @@ public class Trails extends Module {
 
         if (!particles.isEmpty()) {
             RenderSystem.enableBlend();
+            RenderSystem.disableDepthTest();
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
 
             switch (mode.getValue()) {
@@ -253,6 +253,7 @@ public class Trails extends Module {
 
             BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
             RenderSystem.disableBlend();
+            RenderSystem.enableDepthTest();
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         }
     }
@@ -276,10 +277,12 @@ public class Trails extends Module {
 
         for (Entity en : ThunderHack.asyncManager.getAsyncEntities()) {
             if (en instanceof ArrowEntity ae && (ae.prevY != ae.getY()) && arrows.is(Particles.Particles))
-                particles.add(new Particle(en.getX(), en.getY(), en.getZ(), HudEditor.getColor(mc.player.age)));
+                for (int i = 0; i < 5; i++)
+                    particles.add(new Particle(en.getX(), en.getY(), en.getZ(), HudEditor.getColor(mc.player.age)));
 
             if (en instanceof EnderPearlEntity && pearls.is(Particles.Particles))
-                particles.add(new Particle(en.getX(), en.getY(), en.getZ(), HudEditor.getColor(mc.player.age)));
+                for (int i = 0; i < 5; i++)
+                    particles.add(new Particle(en.getX(), en.getY(), en.getZ(), HudEditor.getColor(mc.player.age)));
         }
 
         if (ThunderHack.playerManager.currentPlayerSpeed != 0) {
@@ -386,9 +389,9 @@ public class Trails extends Module {
             this.x = x;
             this.y = y;
             this.z = z;
-            motionX = MathUtility.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
-            motionY = MathUtility.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
-            motionZ = MathUtility.random(-(float) speed.getValue() / 100f, (float) speed.getValue() / 100f);
+            motionX = MathUtility.random(-(float) speed.getValue() / 200f, (float) speed.getValue() / 200f);
+            motionY = MathUtility.random(-(float) speed.getValue() / 200f, (float) speed.getValue() / 200f);
+            motionZ = MathUtility.random(-(float) speed.getValue() / 200f, (float) speed.getValue() / 200f);
             time = System.currentTimeMillis();
             this.color = color;
         }
@@ -445,14 +448,14 @@ public class Trails extends Module {
 
             Color c = lmode.getValue() == Mode.Sync ? HudEditor.getColor((int) (360 * colorAnim)) : lcolor.getValue().getColorObject();
 
-            bufferBuilder.vertex(matrix, 0, -scale, 0).texture(0, 1).color(applyOpacity(c, 1f - colorAnim).getRGB()).next();
-            bufferBuilder.vertex(matrix, -scale, -scale, 0).texture(1, 1).color(applyOpacity(c, 1f - colorAnim).getRGB()).next();
-            bufferBuilder.vertex(matrix, -scale, 0, 0).texture(1, 0).color(applyOpacity(c, 1f - colorAnim).getRGB()).next();
-            bufferBuilder.vertex(matrix, 0, 0, 0).texture(0, 0).color(applyOpacity(c, 1f - colorAnim).getRGB()).next();
+            bufferBuilder.vertex(matrix, -scale / 2, scale, 0).texture(0, 1).color(applyOpacity(c, 1f - colorAnim).getRGB()).next();
+            bufferBuilder.vertex(matrix, scale, scale, 0).texture(1, 1).color(applyOpacity(c, 1f - colorAnim).getRGB()).next();
+            bufferBuilder.vertex(matrix, scale, -scale / 2, 0).texture(1, 0).color(applyOpacity(c, 1f - colorAnim).getRGB()).next();
+            bufferBuilder.vertex(matrix, -scale / 2, -scale / 2, 0).texture(0, 0).color(applyOpacity(c, 1f - colorAnim).getRGB()).next();
         }
 
         private boolean posBlock(double x, double y, double z) {
-            Block b = mc.world.getBlockState(BlockPos.ofFloored(x, y,  z)).getBlock();
+            Block b = mc.world.getBlockState(BlockPos.ofFloored(x, y, z)).getBlock();
             return b != Blocks.AIR && b != Blocks.WATER && b != Blocks.LAVA;
         }
     }
