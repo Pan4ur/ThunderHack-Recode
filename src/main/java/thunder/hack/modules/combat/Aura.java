@@ -92,7 +92,7 @@ public class Aura extends Module {
     /*   ADVANCED   */
     public final Setting<SettingGroup> advanced = new Setting<>("Advanced", new SettingGroup(false, 0));
     public final Setting<Float> aimRange = new Setting<>("AimRange", 3.1f, 0f, 6.0f).addToGroup(advanced);
-    public final Setting<RandomHitDelay> randomHitDelay = new Setting<>("RandomHitTiming", RandomHitDelay.Off).addToGroup(advanced);
+    public final Setting<Boolean> randomHitDelay = new Setting<>("RandomHitDelay", false).addToGroup(advanced);
     public final Setting<Boolean> pauseInInventory = new Setting<>("PauseInInventory", true).addToGroup(advanced);
     public final Setting<Boolean> dropSprint = new Setting<>("DropSprint", true).addToGroup(advanced);
     public final Setting<Boolean> returnSprint = new Setting<>("ReturnSprint", true, v -> dropSprint.getValue()).addToGroup(advanced);
@@ -304,7 +304,7 @@ public class Aura extends Module {
     }
 
     private int getHitTicks() {
-        return oldDelay.getValue().isEnabled() ? 1 + (int) (20f / random(minCPS.getValue(), maxCPS.getValue())) : (randomHitDelay.getValue().equals(RandomHitDelay.Delay) ? (int) MathUtility.random(11, 13) : attackTickLimit.getValue());
+        return oldDelay.getValue().isEnabled() ? 1 + (int) (20f / random(minCPS.getValue(), maxCPS.getValue())) : (shouldRandomizeDelay() ? (int) MathUtility.random(11, 13) : attackTickLimit.getValue());
     }
 
     @EventHandler
@@ -432,7 +432,7 @@ public class Aura extends Module {
             return false;
 
         if (!reasonForSkipCrit)
-            return !mc.player.isOnGround() && mc.player.fallDistance > (randomHitDelay.getValue().equals(RandomHitDelay.FallDistance) ? MathUtility.random(0f, 0.4f) : critFallDistance.getValue());
+            return !mc.player.isOnGround() && mc.player.fallDistance > (shouldRandomizeFallDistance() ? MathUtility.random(0.15f, 0.7f) : critFallDistance.getValue());
         return true;
     }
 
@@ -846,6 +846,14 @@ public class Aura extends Module {
             }
         }
         return false;
+    }
+
+    private boolean shouldRandomizeDelay() {
+        return randomHitDelay.getValue() && (mc.player.isOnGround() || mc.player.fallDistance < 0.12f || mc.player.isSwimming() || mc.player.isFallFlying());
+    }
+
+    private boolean shouldRandomizeFallDistance() {
+        return randomHitDelay.getValue() && !shouldRandomizeDelay();
     }
 
     public static class Position {
