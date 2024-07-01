@@ -9,5 +9,5 @@ public class Fullbright extends Module {
         super("Fullbright", Category.RENDER);
     }
 
-    public static Setting<Integer> brightness = new Setting<>("Brightness", 15, 0, 15);
+    public static Setting<Float> minBright = new Setting<>("MinBright", 0.5f, 0f, 1f);
 }
