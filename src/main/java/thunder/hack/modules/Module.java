@@ -13,6 +13,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CommandManager;
 import thunder.hack.core.impl.ModuleManager;
@@ -330,13 +331,16 @@ public abstract class Module {
             return true;
         }
 
+        if (button < 10) // check
+            return false;
+
         return InputUtil.isKeyPressed(mc.getWindow().getHandle(), button);
     }
 
     public boolean isKeyPressed(Setting<Bind> bind) {
         if (bind.getValue().getKey() == -1 || ModuleManager.unHook.isEnabled())
             return false;
-        return InputUtil.isKeyPressed(mc.getWindow().getHandle(), bind.getValue().getKey());
+        return isKeyPressed(bind.getValue().getKey());
     }
 
     public @Nullable Setting<?> getSettingByName(String name) {

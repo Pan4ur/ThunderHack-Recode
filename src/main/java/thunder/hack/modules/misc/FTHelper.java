@@ -62,14 +62,14 @@ public class FTHelper extends Module {
         if (fullNullCheck()) return;
 
         if (isKeyPressed(desorient.getValue().getKey()) && disorientTimer.passedMs(3000) && mc.currentScreen == null) {
-            use(InventoryUtility.findInHotBar(i -> i.getItem() == Items.ENDER_EYE && i.getName().getString().contains("Дезориентация")),
-                    InventoryUtility.findInInventory(i -> i.getItem() == Items.ENDER_EYE && i.getName().getString().contains("Дезориентация")));
+            use(InventoryUtility.findInHotBar(i -> i.getItem() == Items.ENDER_EYE),
+                    InventoryUtility.findInInventory(i -> i.getItem() == Items.ENDER_EYE));
             disorientTimer.reset();
         }
 
         if (isKeyPressed(trap.getValue().getKey()) && trapTimer.passedMs(3000) && mc.currentScreen == null) {
-            use(InventoryUtility.findInHotBar(i -> i.getItem() == Items.NETHERITE_SCRAP && i.getName().getString().contains("Трапка")),
-                    InventoryUtility.findInInventory(i -> i.getItem() == Items.NETHERITE_SCRAP && i.getName().getString().contains("Трапка")));
+            use(InventoryUtility.findInHotBar(i -> i.getItem() == Items.NETHERITE_SCRAP),
+                    InventoryUtility.findInInventory(i -> i.getItem() == Items.NETHERITE_SCRAP));
             trapTimer.reset();
         }
     }
