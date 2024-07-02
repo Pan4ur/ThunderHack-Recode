@@ -50,7 +50,7 @@ public class BanStats extends HudElement {
     public void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof GameMessageS2CPacket pac) {
             String content = pac.content().getString().toLowerCase();
-            if (content.contains("забанил") || content.contains("banned")) {
+            if (content.contains("забанил") || content.contains("banned") || content.contains("забанен") || content.contains("временно заблокировал игрока")) {
                 banCount += 1;
             }
         }
