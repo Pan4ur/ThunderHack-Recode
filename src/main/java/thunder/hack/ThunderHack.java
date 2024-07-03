@@ -17,6 +17,7 @@ import thunder.hack.api.IAddon;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.*;
 import thunder.hack.core.impl.NotificationManager;
+import thunder.hack.gui.notification.Notification;
 import thunder.hack.modules.client.RPC;
 import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -99,18 +100,17 @@ public class ThunderHack implements ModInitializer {
         for (EntrypointContainer<IAddon> entrypoint : FabricLoader.getInstance().getEntrypointContainers("thunderhack", IAddon.class)) {
             IAddon addon = entrypoint.getEntrypoint();
 
-            // Log addon initialization
             LogUtils.getLogger().info("Initializing addon: " + addon.getClass().getName());
             addon.onInitialize();
+            AddonManager.incrementAddonCount();
+            AddonManager.addAddon(addon);
 
             addon.getModules().stream().filter(Objects::nonNull).forEach(module -> {
-                // Log module registration
                 LogUtils.getLogger().info("Registering module: " + module.getClass().getName());
                 moduleManager.registerModule(module);
             });
         }
 
-        // Log the end of the initialization process
         LogUtils.getLogger().info("Addon initialization complete.");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -156,6 +156,8 @@ public class ThunderHack implements ModInitializer {
         initTime = System.currentTimeMillis();
 
         telemetryManager.telemetryLogin();
+
+        notificationManager.publicity("Loaded " + AddonManager.getTotalAddons() + " addons!", "", 3, Notification.Type.SUCCESS);
     }
 
     public static void syncVersion() {
