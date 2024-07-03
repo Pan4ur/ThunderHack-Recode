@@ -107,10 +107,17 @@ public class ThunderHack implements ModInitializer {
             AddonManager.incrementAddonCount();
             AddonManager.addAddon(addon);
 
+            // Register Modules
             addon.getModules().stream().filter(Objects::nonNull).forEach(module -> {
                 // Log module registration
                 LogUtils.getLogger().info("Registering module: " + module.getClass().getName());
                 moduleManager.registerModule(module);
+            });
+
+            // Register Commands
+            addon.getCommands().stream().filter(Objects::nonNull).forEach(command -> {
+                LogUtils.getLogger().info("Registering command: " + command.getClass().getName());
+                commandManager.registerCommand(command);
             });
         }
 
