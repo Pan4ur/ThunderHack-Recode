@@ -48,11 +48,10 @@ public class ThunderHack implements ModInitializer {
     public static long initTime;
     public static KeyListening currentKeyListener;
     public static String[] contributors = new String[16];
-    public static final boolean baritone = FabricLoader.getInstance().isModLoaded("baritone") || FabricLoader.getInstance().isModLoaded("baritone-meteor");
+    public static boolean baritone = false;
 
     /*-----------------    Managers  ---------------------*/
     public static NotificationManager notificationManager = new NotificationManager();
-    public static TelemetryManager telemetryManager = new TelemetryManager();
     public static WayPointManager wayPointManager = new WayPointManager();
     public static ModuleManager moduleManager = new ModuleManager();
     public static FriendManager friendManager = new FriendManager();
@@ -63,8 +62,9 @@ public class ThunderHack implements ModInitializer {
     public static ShaderManager shaderManager = new ShaderManager();
     public static AsyncManager asyncManager = new AsyncManager();
     public static MacroManager macroManager = new MacroManager();
-    public static SoundManager soundManager = new SoundManager();
     public static CommandManager commandManager = new CommandManager();
+    public static SoundManager soundManager = new SoundManager();
+    public static TelemetryManager telemetryManager = new TelemetryManager();
 
     public static Core core = new Core();
     /*--------------------------------------------------------*/
@@ -89,7 +89,6 @@ public class ThunderHack implements ModInitializer {
         EVENT_BUS.subscribe(playerManager);
         EVENT_BUS.subscribe(combatManager);
         EVENT_BUS.subscribe(asyncManager);
-        EVENT_BUS.subscribe(telemetryManager);
         EVENT_BUS.subscribe(core);
 
         FriendManager.loadFriends();
@@ -125,22 +124,23 @@ public class ThunderHack implements ModInitializer {
 
         macroManager.onLoad();
         wayPointManager.onLoad();
+        telemetryManager.onLoad();
+
         Render2DEngine.initShaders();
 
         BUILD_DATE = ThunderUtility.readManifestField("Build-Timestamp");
         GITH_HASH = ThunderUtility.readManifestField("Git-Commit");
         
         soundManager.registerSounds();
-
-        // TODO Move to dedicated Thread
         syncVersion();
         syncContributors();
         ThunderUtility.parseStarGazer();
         ThunderUtility.parseCommits();
         ModuleManager.rpc.startRpc();
-
-        telemetryManager.fetchData();
-
+        try {
+            Class.forName("baritone.api.BaritoneAPI");
+            baritone = true;
+        } catch (ClassNotFoundException e) {}
         LogUtils.getLogger().info("""
                 \n /$$$$$$$$ /$$                                 /$$                     /$$   /$$                     /$$     \s
                 |__  $$__/| $$                                | $$                    | $$  | $$                    | $$     \s
@@ -154,6 +154,8 @@ public class ThunderHack implements ModInitializer {
 
         LogUtils.getLogger().info("[ThunderHack] Init time: " + (System.currentTimeMillis() - initTime) + " ms.");
         initTime = System.currentTimeMillis();
+
+        telemetryManager.telemetryLogin();
     }
 
     public static void syncVersion() {
