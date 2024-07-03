@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 
 public class ThunderHack implements ModInitializer {
@@ -93,12 +94,24 @@ public class ThunderHack implements ModInitializer {
         FriendManager.loadFriends();
         configManager.load(configManager.getCurrentConfig());
         moduleManager.onLoad();
-        for (EntrypointContainer<IAddon> entrypoint : FabricLoader.getInstance().getEntrypointContainers("thunderhack-addon", IAddon.class)) {
+        LogUtils.getLogger().info("Starting addon initialization.");
+
+        for (EntrypointContainer<IAddon> entrypoint : FabricLoader.getInstance().getEntrypointContainers("thunderhack", IAddon.class)) {
             IAddon addon = entrypoint.getEntrypoint();
+
+            // Log addon initialization
+            LogUtils.getLogger().info("Initializing addon: " + addon.getClass().getName());
             addon.onInitialize();
-            // Register addon modules or perform other interactions
-            addon.getModules().forEach(module -> moduleManager.registerModule(module));
+
+            addon.getModules().stream().filter(Objects::nonNull).forEach(module -> {
+                // Log module registration
+                LogUtils.getLogger().info("Registering module: " + module.getClass().getName());
+                moduleManager.registerModule(module);
+            });
         }
+
+        // Log the end of the initialization process
+        LogUtils.getLogger().info("Addon initialization complete.");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if(ModuleManager.unHook.isEnabled())
