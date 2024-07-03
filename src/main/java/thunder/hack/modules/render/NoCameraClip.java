@@ -4,9 +4,7 @@ import net.minecraft.client.option.Perspective;
 import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
-import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
-import thunder.hack.utility.render.animation.BetterDynamicAnimation;
 
 public class NoCameraClip extends Module {
     public NoCameraClip() {

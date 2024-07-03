@@ -9,6 +9,7 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.data.DataTracker;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -44,6 +45,8 @@ import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
+import java.util.List;
+
 import static thunder.hack.modules.client.ClientSettings.isRu;
 import static thunder.hack.modules.player.ElytraSwap.getChestPlateSlot;
 
@@ -53,13 +56,14 @@ public class ElytraPlus extends Module {
     }
 
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.FireWork);
+    private final Setting<Integer> disablerDelay = new Setting<>("DisablerDelay", 1, 0, 10, v -> mode.is(Mode.SunriseOld));
     private final Setting<Boolean> twoBee = new Setting<>("2b2t", false, v -> mode.is(Mode.Boost));
     private final Setting<Boolean> onlySpace = new Setting<>("OnlySpace", true, v -> mode.is(Mode.Boost) && twoBee.getValue());
     private final Setting<Boolean> stopOnGround = new Setting<>("StopOnGround", false, v -> mode.is(Mode.Packet));
     private final Setting<Boolean> infDurability = new Setting<>("InfDurability", true, v -> mode.is(Mode.Packet));
     private final Setting<Boolean> vertical = new Setting<>("Vertical", false, v -> mode.is(Mode.Packet));
     private final Setting<NCPStrict> ncpStrict = new Setting<>("NCPStrict", NCPStrict.Off, v -> mode.is(Mode.Packet));
-    private final Setting<AntiKick> antiKick = new Setting<>("AntiKick", AntiKick.Jitter, v -> mode.is(Mode.FireWork));
+    private final Setting<AntiKick> antiKick = new Setting<>("AntiKick", AntiKick.Jitter, v -> mode.is(Mode.FireWork) || mode.is(Mode.SunriseOld));
     private final Setting<Float> xzSpeed = new Setting<>("XZSpeed", 1.55f, 0.1f, 10f, v -> !mode.is(Mode.Boost) && mode.getValue() != Mode.Pitch40Infinite);
     private final Setting<Float> ySpeed = new Setting<>("YSpeed", 0.47f, 0f, 2f, v -> mode.is(Mode.FireWork) || mode.getValue() == Mode.SunriseOld || (mode.is(Mode.Packet) && vertical.getValue()));
     private final Setting<Integer> fireSlot = new Setting<>("FireSlot", 1, 1, 9, v -> mode.is(Mode.FireWork));
@@ -105,13 +109,12 @@ public class ElytraPlus extends Module {
 
     private boolean infiniteFlag, hasTouchedGround, elytraEquiped, flying, started;
     private float acceleration, accelerationY, height, prevClientPitch, infinitePitch, lastInfinitePitch;
-    public static long lastStartFalling;
 
     private ItemStack prevArmorItemCopy, getStackInSlotCopy;
     private Item prevArmorItem = Items.AIR;
     private Item prevItemInHand = Items.AIR;
     private Vec3d flightZonePos;
-    private int prevElytraSlot = -1;
+    private int prevElytraSlot = -1, disablerTicks;
     private int slotWithFireWorks = -1;
     private long lastFireworkTime;
 
@@ -307,8 +310,15 @@ public class ElytraPlus extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
-        if (e.getPacket() instanceof EntityTrackerUpdateS2CPacket pac && pac.id() == mc.player.getId() && mode.is(Mode.Packet))
-            e.cancel();
+        if (e.getPacket() instanceof EntityTrackerUpdateS2CPacket pac && pac.id() == mc.player.getId() && (mode.is(Mode.Packet) || mode.is(Mode.SunriseOld))) {
+            List<DataTracker.SerializedEntry<?>> values = pac.trackedValues();
+            if (values.isEmpty())
+                return;
+
+            for (DataTracker.SerializedEntry<?> value : values)
+                if (value.id() == 0 && (value.value().toString().equals("-120") || value.value().toString().equals("-128") || value.value().toString().equals("-126")))
+                    e.cancel();
+        }
 
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             acceleration = 0;
@@ -379,6 +389,7 @@ public class ElytraPlus extends Module {
     }
 
     private void doPreLegacy() {
+        if (twoBee.getValue() && mode.is(Mode.Boost)) return;
         if (mc.player.isOnGround()) hasTouchedGround = true;
         if (!cruiseControl.getValue()) height = (float) mc.player.getY();
 
@@ -447,7 +458,9 @@ public class ElytraPlus extends Module {
         int elytra = InventoryUtility.getElytra();
         if (elytra == -1) return;
         if (mc.player.isOnGround()) mc.player.jump();
-        if (System.currentTimeMillis() - lastStartFalling > 80L) matrixDisabler(elytra);
+
+        if (disablerTicks-- <= 0)
+            matrixDisabler(elytra);
 
         if (mc.player.fallDistance > 0.25f) {
             MovementUtility.setMotion(Math.min((acceleration = (acceleration + 11.0F / xzSpeed.getValue())) / 100.0F, xzSpeed.getValue()));
@@ -457,9 +470,13 @@ public class ElytraPlus extends Module {
                 MovementUtility.setMotion(0.8f);
                 mc.player.setVelocity(mc.player.getVelocity().getX(), mc.player.age % 2 == 0 ? 0.41999998688697815 : -0.41999998688697815, mc.player.getVelocity().getZ());
                 acceleration = 70;
-            } else
-                mc.player.setVelocity(mc.player.getVelocity().getX(), -0.01F - (mc.player.age % 2 == 0 ? 1.0E-4F : 0.006F), mc.player.getVelocity().getZ());
-
+            } else {
+                switch (antiKick.getValue()) {
+                    case Jitter -> mc.player.setVelocity(mc.player.getVelocity().getX(), mc.player.age % 2 == 0 ? 0.08 : -0.08, mc.player.getVelocity().getZ());
+                    case Glide -> mc.player.setVelocity(mc.player.getVelocity().getX(), -0.01F - (mc.player.age % 2 == 0 ? 1.0E-4F : 0.006F), mc.player.getVelocity().getZ());
+                    case Off -> mc.player.setVelocity(mc.player.getVelocity().getX(), 0, mc.player.getVelocity().getZ());
+                }
+            }
 
             if (!mc.player.isSneaking() && mc.options.jumpKey.isPressed())
                 mc.player.setVelocity(mc.player.getVelocity().getX(), ySpeed.getValue(), mc.player.getVelocity().getZ());
@@ -577,7 +594,7 @@ public class ElytraPlus extends Module {
         e.cancel();
     }
 
-    public static void matrixDisabler(int elytra) {
+    public void matrixDisabler(int elytra) {
         elytra = elytra >= 0 && elytra < 9 ? elytra + 36 : elytra;
         if (elytra != -2) {
             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, elytra, 1, SlotActionType.PICKUP, mc.player);
@@ -588,7 +605,7 @@ public class ElytraPlus extends Module {
             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 6, 1, SlotActionType.PICKUP, mc.player);
             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, elytra, 1, SlotActionType.PICKUP, mc.player);
         }
-        lastStartFalling = System.currentTimeMillis();
+        disablerTicks = disablerDelay.getValue();
     }
 
     private int getFireWorks(boolean hotbar) {

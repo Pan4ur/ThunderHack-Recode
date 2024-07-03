@@ -71,10 +71,11 @@ public class EbatteSratte extends Module {
                     case Local -> "";
                 };
 
-                mc.getNetworkHandler().sendChatMessage(
-                        chatPrefix + entity.getName().getString() + " " +
-                                (mode.getValue() == Messages.Default ? WORDS[n] : words.get(n))
-                );
+                if (chatPrefix.contains("/"))
+                    mc.getNetworkHandler().sendChatCommand("/msg " + entity.getName().getString() + " " + (mode.getValue() == Messages.Default ? WORDS[n] : words.get(n)));
+                else
+                    mc.getNetworkHandler().sendChatMessage(chatPrefix + entity.getName().getString() + " " + (mode.getValue() == Messages.Default ? WORDS[n] : words.get(n)));
+
 
                 timer.reset();
             }

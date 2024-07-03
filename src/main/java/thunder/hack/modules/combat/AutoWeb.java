@@ -42,6 +42,11 @@ public final class AutoWeb extends Module {
     private final Setting<InteractionUtility.Interact> interact = new Setting<>("Interact", InteractionUtility.Interact.Strict);
     private final Setting<InteractionUtility.PlaceMode> placeMode = new Setting<>("PlaceMode", InteractionUtility.PlaceMode.Normal);
     private final Setting<InteractionUtility.Rotate> rotate = new Setting<>("Rotate", InteractionUtility.Rotate.None);
+    private final Setting<SettingGroup> selection = new Setting<>("Selection", new SettingGroup(false, 0));
+    private final Setting<Boolean> head = new Setting<>("Head", true).addToGroup(selection);
+    private final Setting<Boolean> leggs = new Setting<>("Leggs", true).addToGroup(selection);
+    private final Setting<Boolean> surround = new Setting<>("Surround", true).addToGroup(selection);
+    private final Setting<Boolean> upperSurround = new Setting<>("UpperSurround", false).addToGroup(selection);
     private final Setting<SettingGroup> renderCategory = new Setting<>("Render", new SettingGroup(false, 0));
     private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Fade).addToGroup(renderCategory);
     private final Setting<ColorSetting> renderFillColor = new Setting<>("Render Fill Color", new ColorSetting(HudEditor.getColor(0))).addToGroup(renderCategory);
@@ -135,18 +140,31 @@ public final class AutoWeb extends Module {
             BlockPos targetBp = BlockPos.ofFloored(target.getPos());
 
             ArrayList<BlockPos> positions = new ArrayList<>();
-            positions.add(targetBp);
-            positions.add(targetBp.up());
-            positions.add(targetBp.east());
-            positions.add(targetBp.west());
-            positions.add(targetBp.south());
-            positions.add(targetBp.north());
+            if (leggs.getValue())
+                positions.add(targetBp);
+
+            if (head.getValue())
+                positions.add(targetBp.up());
+
+            if (surround.getValue()) {
+                positions.add(targetBp.east());
+                positions.add(targetBp.west());
+                positions.add(targetBp.south());
+                positions.add(targetBp.north());
+            }
+
+            if (upperSurround.getValue()) {
+                positions.add(targetBp.east().up());
+                positions.add(targetBp.west().up());
+                positions.add(targetBp.south().up());
+                positions.add(targetBp.north().up());
+            }
 
             for (BlockPos bp : positions) {
                 BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), bp.toCenterPos().offset(Direction.UP, 0.5f), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
                 if (wallCheck != null && wallCheck.getType() == HitResult.Type.BLOCK && wallCheck.getBlockPos() != bp)
                     if (squaredDistanceFromEyes(bp.toCenterPos()) > placeWallRange.getPow2Value()) continue;
-                if (InteractionUtility.canPlaceBlock(bp, interact.getValue(), true) && mc.world.isAir(bp)) {
+                if (InteractionUtility.canPlaceBlock(bp, interact.getValue(), true) && mc.world.getBlockState(bp).isReplaceable()) {
                     return bp;
                 }
             }

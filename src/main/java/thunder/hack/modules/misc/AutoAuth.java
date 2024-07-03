@@ -14,11 +14,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public final class AutoAuth extends Module {
-    private final Setting<Mode> passwordMode = new Setting<>("Password Mode", Mode.Custom);
-    private final Setting<String> cpass = new Setting<>("Password", "babidjon777", v -> passwordMode.getValue() == Mode.Custom);
-    private final Setting<Boolean> showPasswordInChat = new Setting<>("Show Pass In Chat", true);
-
-    private String password;
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Custom);
+    private final Setting<String> cpass = new Setting<>("Password", "babidjon777", v -> mode.getValue() == Mode.Custom);
+    private final Setting<Boolean> show = new Setting<>("ShowPassword", true);
 
     public AutoAuth() {
         super("AutoAuth", Category.MISC);
@@ -44,27 +42,29 @@ public final class AutoAuth extends Module {
 
     @EventHandler
     public void onPacketReceive(PacketEvent.@NotNull Receive event) {
-        if (event.getPacket() instanceof GameMessageS2CPacket) {
-            GameMessageS2CPacket pac = event.getPacket();
-            if (passwordMode.getValue() == Mode.Custom) {
-                this.password = cpass.getValue();
-            } else if (passwordMode.getValue() == Mode.Qwerty) {
-                this.password = "qwerty123";
-            } else if (passwordMode.getValue() == Mode.Random) {
-                String str1 = RandomStringUtils.randomAlphabetic(5);
-                String str2 = RandomStringUtils.randomPrint(5);
-                this.password = str1 + str2;
+        if (event.getPacket() instanceof GameMessageS2CPacket pac && mc.getNetworkHandler() != null) {
+            String password = "";
+            switch (mode.getValue()) {
+                case Custom -> {
+                    password = cpass.getValue();
+                    if (password.isEmpty()) {
+                        sendMessage(Formatting.RED + (isRu() ? "Ошибка регистрации: Пароль пуст!" : "Registration error: Password is empty!"));
+                        return;
+                    }
+                }
+                case Qwerty -> password = "qwerty123";
+                case Random -> password = RandomStringUtils.randomAlphabetic(5) + RandomStringUtils.randomPrint(5);
             }
-            if (passwordMode.getValue() == Mode.Custom && (this.password == null || this.password.isEmpty()))
-                return;
-            if (pac.content().getString().contains("/reg") || pac.content().getString().contains("/register") || pac.content().getString().contains("Зарегистрируйтесь")) {
-                mc.getNetworkHandler().sendChatCommand("reg " + this.password + " " + this.password);
-                if (this.showPasswordInChat.getValue())
-                    sendMessage("Твой пароль: " + Formatting.RED + this.password);
-                ThunderHack.notificationManager.publicity("AutoAuth", "Выполнена регистрация!", 4, Notification.Type.SUCCESS);
-            } else if (pac.content().getString().contains("Авторизуйтесь") || pac.content().getString().contains("/l")) {
-                mc.getNetworkHandler().sendChatCommand("login " + this.password);
-                ThunderHack.notificationManager.publicity("AutoAuth", "Выполнен вход!", 4, Notification.Type.SUCCESS);
+
+            String m = pac.content().getString().toLowerCase();
+
+            if (m.contains("/reg") || m.contains("/register") || m.contains("зарегистрируйтесь")) {
+                mc.getNetworkHandler().sendChatCommand("reg " + password + " " + password);
+                if (show.getValue()) sendMessage((isRu() ? "Твой пароль: " : "Your password: ") + Formatting.RED + password);
+                ThunderHack.notificationManager.publicity("AutoAuth", isRu() ? "Выполнена регистрация!" : "Registration completed!", 4, Notification.Type.SUCCESS);
+            } else if (m.contains("авторизуйтесь") || m.contains("/l")) {
+                mc.getNetworkHandler().sendChatCommand("login " + password);
+                ThunderHack.notificationManager.publicity("AutoAuth", isRu() ? "Выполнен вход!" : "Logged in!", 4, Notification.Type.SUCCESS);
             }
         }
     }

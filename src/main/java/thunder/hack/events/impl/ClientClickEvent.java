@@ -1,4 +1,4 @@
-package thunder.hack.utility;
+package thunder.hack.events.impl;
 
 import net.minecraft.text.ClickEvent;
 

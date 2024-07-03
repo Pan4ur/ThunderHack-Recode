@@ -259,7 +259,7 @@ public class Render3DEngine {
         matrices.translate(offX, offY - 0.1, -0.01);
         matrices.scale(-0.025f, -0.025f, 0);
         VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-        FontRenderers.modules.drawCenteredString(matrices, text, textOffset, 0f, color.getRGB());
+        FontRenderers.sf_medium.drawCenteredString(matrices, text, textOffset, 0f, color.getRGB());
         immediate.draw();
         RenderSystem.enableCull();
         RenderSystem.enableDepthTest();

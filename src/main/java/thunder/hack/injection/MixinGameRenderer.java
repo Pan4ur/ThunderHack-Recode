@@ -108,12 +108,14 @@ public abstract class MixinGameRenderer {
     private void onUpdateTargetedEntity(float tickDelta, CallbackInfo info) {
         if (Module.fullNullCheck()) return;
 
+        /*
         if (ModuleManager.aura.isEnabled() && Aura.target != null && mc.player.distanceTo(Aura.target) <= ModuleManager.aura.attackRange.getValue() && ModuleManager.aura.rotationMode.getValue() != Aura.Mode.None) {
             mc.getProfiler().pop();
             info.cancel();
             //add vector from aura
             mc.crosshairTarget = new EntityHitResult(Aura.target);
         }
+         */
 
         if (ModuleManager.freeCam.isEnabled()) {
             mc.getProfiler().pop();

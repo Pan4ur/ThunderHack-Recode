@@ -334,7 +334,7 @@ public class Render2DEngine {
         }
     }
 
-    public static void registerTexture(Texture i, byte[] content) {
+    private static void registerTexture(Texture i, byte[] content) {
         try {
             ByteBuffer data = BufferUtils.createByteBuffer(content.length).put(content);
             data.flip();

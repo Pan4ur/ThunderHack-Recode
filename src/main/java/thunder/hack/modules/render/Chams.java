@@ -22,6 +22,7 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventHeldItemRenderer;
 import thunder.hack.modules.Module;
@@ -47,6 +48,7 @@ public class Chams extends Module {
 
     public final Setting<Boolean> players = new Setting<>("Players", false);
     private final Setting<ColorSetting> playerColor = new Setting<>("PlayerColor", new ColorSetting(new Color(0x932DD8E8, true)), v -> players.getValue());
+    private final Setting<ColorSetting> friendColor = new Setting<>("FriendColor", new ColorSetting(new Color(0x932DE830, true)), v -> players.getValue());
     private final Setting<Boolean> playerTexture = new Setting<>("PlayerTexture", true, v -> players.getValue());
     private final Setting<Boolean> simple = new Setting<>("Simple", false, v -> players.getValue());
 
@@ -136,7 +138,11 @@ public class Chams extends Module {
         Direction direction;
         Entity entity;
         matrixStack.push();
-        RenderSystem.setShaderColor(playerColor.getValue().getGlRed(), playerColor.getValue().getGlGreen(), playerColor.getValue().getGlBlue(), playerColor.getValue().getGlAlpha());
+        if (ThunderHack.friendManager.isFriend(pe)) {
+            RenderSystem.setShaderColor(friendColor.getValue().getGlRed(), friendColor.getValue().getGlGreen(), friendColor.getValue().getGlBlue(), friendColor.getValue().getGlAlpha());
+        } else {
+            RenderSystem.setShaderColor(playerColor.getValue().getGlRed(), playerColor.getValue().getGlGreen(), playerColor.getValue().getGlBlue(), playerColor.getValue().getGlAlpha());
+        }
         model.handSwingProgress = pe.getHandSwingProgress(g);
         model.riding = pe.hasVehicle();
         model.child = false;

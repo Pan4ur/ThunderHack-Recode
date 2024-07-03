@@ -63,6 +63,8 @@ dependencies {
 
 	modCompileOnly "meteordevelopment:baritone:1.20.6-SNAPSHOT"
 
+	compileOnlyApi("org.apiguardian:apiguardian-api:1.1.2")
+
 	configurations.libImpl.dependencies.each {
 		implementation(it)
 	}

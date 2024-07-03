@@ -7,7 +7,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.animation.BetterAnimation;
+import thunder.hack.utility.render.animation.EaseOutBack;
 
 import java.awt.*;
 
@@ -18,7 +18,7 @@ public class Notification {
     private final String message, title;
     private final String icon;
     private final int lifeTime;
-    public final BetterAnimation animation;
+    public final EaseOutBack animation;
     private float y, width, animationX, height = 25;
     private boolean direction = false;
     private final Timer timer = new Timer();
@@ -39,7 +39,7 @@ public class Notification {
         width = isDefault() ? FontRenderers.sf_bold_mini.getStringWidth(message) + 38f : FontRenderers.sf_bold_micro.getStringWidth(title + " " + message) + 20f;
         height = isDefault() ? 25 : 13;
 
-        animation = new BetterAnimation(isDefault() ? 10 : 20);
+        animation = new EaseOutBack(isDefault() ? 10 : 20);
 
         animationX = width;
         if (isDefault())

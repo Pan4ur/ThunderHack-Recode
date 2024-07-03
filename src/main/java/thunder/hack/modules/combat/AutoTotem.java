@@ -95,7 +95,7 @@ public final class AutoTotem extends Module {
         if (e.getPacket() instanceof EntitySpawnS2CPacket spawn && hotbarFallBack.getValue()) {
             if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
                 if (getPlayerPos().squaredDistanceTo(spawn.getX(), spawn.getY(), spawn.getZ()) < 36) {
-                    if (fallBackCalc.getValue() && ExplosionUtility.getExplosionDamageWPredict(new Vec3d(spawn.getX(), spawn.getY(), spawn.getZ()), mc.player, PredictUtility.movePlayer(mc.player, getPlayerPos()), false) < getTriggerHealth() + 4f)
+                    if (fallBackCalc.getValue() && ExplosionUtility.getExplosionDamageWPredict(new Vec3d(spawn.getX(), spawn.getY(), spawn.getZ()), mc.player, PredictUtility.createBox(getPlayerPos(), mc.player), false) < getTriggerHealth() + 4f)
                         return;
                     runInstant();
                 }
@@ -157,17 +157,23 @@ public final class AutoTotem extends Module {
                     case Matrix -> {
                         if (ncpStrict.getValue())
                             sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearestSlot, SlotActionType.SWAP, mc.player);
                         debug(slot + " " + nearestSlot);
+
                         sendPacket(new UpdateSelectedSlotC2SPacket(nearestSlot));
                         mc.player.getInventory().selectedSlot = nearestSlot;
+
                         ItemStack itemstack = mc.player.getOffHandStack();
                         mc.player.setStackInHand(Hand.OFF_HAND, mc.player.getMainHandStack());
                         mc.player.setStackInHand(Hand.MAIN_HAND, itemstack);
                         sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+
                         sendPacket(new UpdateSelectedSlotC2SPacket(prevCurrentItem));
                         mc.player.getInventory().selectedSlot = prevCurrentItem;
+
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, slot, nearestSlot, SlotActionType.SWAP, mc.player);
+
                         sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
                         if (resetAttackCooldown.getValue())
                             mc.player.resetLastAttackedTicks();
@@ -195,7 +201,7 @@ public final class AutoTotem extends Module {
                 if (resetAttackCooldown.getValue())
                     mc.player.resetLastAttackedTicks();
             }
-            delay = 5;
+            delay = 3;
         }
     }
 
@@ -334,7 +340,7 @@ public final class AutoTotem extends Module {
 
             if (onCrystal.getValue()) {
                 if (entity instanceof EndCrystalEntity) {
-                    if (getTriggerHealth() - ExplosionUtility.getExplosionDamageWPredict(entity.getPos(), mc.player, PredictUtility.movePlayer(mc.player, getPlayerPos()), false) < 0.5) {
+                    if (getTriggerHealth() - ExplosionUtility.getExplosionDamageWPredict(entity.getPos(), mc.player, PredictUtility.createBox(getPlayerPos(), mc.player), false) < 0.5) {
                         item = Items.TOTEM_OF_UNDYING;
                         break;
                     }

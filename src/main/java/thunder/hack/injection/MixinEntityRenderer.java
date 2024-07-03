@@ -26,10 +26,4 @@ public abstract class MixinEntityRenderer<T extends Entity> {
         if (entity instanceof PlayerEntity && ModuleManager.nameTags.isEnabled())
             info.cancel();
     }
-
-    @Inject(method = "getSkyLight", at = @At("RETURN"), cancellable = true)
-    private void onGetSkyLight(CallbackInfoReturnable<Integer> cir) {
-        if(ModuleManager.fullbright.isEnabled())
-            cir.setReturnValue(Fullbright.brightness.getValue());
-    }
 }

@@ -26,7 +26,6 @@ public class ClickGui extends Module {
     public final Setting<Integer> gearScale = new Setting<>("GearScale", 60, 6, 300).addToGroup(gear);
     public static Setting<Float> gearDuration = new Setting<>("GearDuration", 0.5f, 0.1f, 2f).addToGroup(gear);
     public static Setting<Integer> gearStop = new Setting<>("GearStop", 25, 10, 45).addToGroup(gear);
-
     public final Setting<Boolean> closeAnimation = new Setting<>("CloseAnimation", true);
 
     public ClickGui() {
@@ -56,6 +55,9 @@ public class ClickGui extends Module {
 
             if (e.getSetting() == modulesFontScale)
                 FontRenderers.sf_medium_modules = FontRenderers.create(modulesFontScale.getValue(), "sf_medium");
+
+            if (e.getSetting() == image)
+                ClickGUI.getClickGui().imageAnimation.reset();
         } catch (Exception ignored) {
         }
     }
@@ -91,7 +93,7 @@ public class ClickGui extends Module {
         Bdsm("bdsm.png", 1414, 823, new int[]{-100, 90}, 900),
         Cutie("cutie.png", 476, 490, new int[]{500, 60}, 500),
         Cutie2("cutie2.png", 540, 540, new int[]{500, 60}, 500),
-        Nya("nya.png", 746, 720, new int[]{500, 60}, 500),
+        Nya("nya.png", 246, 238, new int[]{500, 60}, 500),
         Smile("smile.png", 324, 406, new int[]{500, 40}, 500),
         Bat("bat.png", 352, 503, new int[]{500, 40}, 500),
         Gacha("gacha.png", 592, 592, new int[]{500, 60}, 500),

@@ -216,8 +216,12 @@ public class Setting<T> {
         return visibility.test(getValue());
     }
 
-    public boolean is(T mode) {
-        return value == mode;
+    public boolean is(T v) {
+        return value == v;
+    }
+
+    public boolean not(T v) {
+        return value != v;
     }
 }
 

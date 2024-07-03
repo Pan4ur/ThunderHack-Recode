@@ -110,7 +110,6 @@ public final class ThunderUtility {
             URL url = new URL("https://api.github.com/repos/Pan4ur/ThunderHack-Recode/commits?per_page=50");
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
 
-            List<String> changeLog = new ArrayList<>();
             changeLog.add("Changelog [Recode; Date: " + ThunderHack.BUILD_DATE + "; GitHash:" + ThunderHack.GITH_HASH + "]");
             changeLog.add("\n");
 
@@ -138,17 +137,8 @@ public final class ThunderUtility {
                 }
             }
             in.close();
-
-            processChangeLog(changeLog);
-
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private static void processChangeLog(List<String> changeLog) {
-        for (String logEntry : changeLog) {
-            System.out.println(logEntry);
         }
     }
 }

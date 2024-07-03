@@ -53,11 +53,11 @@ public final class InteractionUtility {
         if (mc.player == null || mc.world == null) return false;
 
         Vec3d playerEyes = getEyesPos(mc.player);
-        if (mc.world.raycast(new RaycastContext(playerEyes, entityEyes, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.MISS)
+        if (ExplosionUtility.raycast(playerEyes, entityEyes, false) == HitResult.Type.MISS)
             return true;
 
         if (playerEyes.getY() > entityPos.getY())
-            return mc.world.raycast(new RaycastContext(playerEyes, entityPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.MISS;
+            return ExplosionUtility.raycast(playerEyes, entityEyes, false) == HitResult.Type.MISS;
         return false;
     }
 
