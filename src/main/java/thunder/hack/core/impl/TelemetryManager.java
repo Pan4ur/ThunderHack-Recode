@@ -1,63 +1,80 @@
 package thunder.hack.core.impl;
 
-import com.mojang.logging.LogUtils;
-import net.minecraft.client.MinecraftClient;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
+import org.apache.commons.compress.utils.Lists;
 import thunder.hack.core.IManager;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.utility.Timer;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TelemetryManager implements IManager {
-    public String SERVER = "https://thunderhack-site.vercel.app";
-    private String playerName;
 
-    public void onLoad() {
-        LogUtils.getLogger().info("Loading TelemetryManager...");
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc != null) {
-            playerName = mc.getSession().getUsername();
-            LogUtils.getLogger().info("Player name set to: " + playerName);
-        } else {
-            playerName = "Unknown";
-            LogUtils.getLogger().warn("Player name could not be set. Defaulting to 'Unknown'.");
+    private final Timer pingTimer = new Timer();
+    private List<String> onlinePlayers = new ArrayList<>();
+    private List<String> allPlayers = new ArrayList<>();
+
+    public void onUpdate() {
+        if (pingTimer.every(90000))
+            fetchData();
+    }
+
+    public void fetchData() {
+        if (ClientSettings.telemetry.getValue())
+            pingServer(mc.getSession().getUsername());
+        onlinePlayers = getPlayers(true);
+        allPlayers = getPlayers(false);
+    }
+
+    public void pingServer(String name) {
+        HttpRequest req = HttpRequest.newBuilder(URI.create("https://api.thunderhack.net/v1/users/online?name=" + name))
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            client.send(req, HttpResponse.BodyHandlers.ofString());
+        } catch (Throwable ignored) {
         }
     }
 
-    public void telemetryLogin() {
-        int responseCode = -1;
-        HttpURLConnection connection = null;
-        try {
-            LogUtils.getLogger().info("Starting telemetry login process.");
+    public void getPlayers(String name) {
+        HttpRequest req = HttpRequest.newBuilder(URI.create("https://api.thunderhack.net/v1/users/online?name=" + name))
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
 
-            URL url = new URL(SERVER + "/api/play");
-            LogUtils.getLogger().info("Connecting to URL: " + url.toString());
-
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json; utf-8");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setDoOutput(true);
-            LogUtils.getLogger().info("HTTP connection configured. Method: POST");
-
-            String jsonPayload = "{\"username\": \"" + playerName + "\"}";
-            LogUtils.getLogger().info("Payload prepared: " + jsonPayload);
-
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonPayload.getBytes("utf-8");
-                os.write(input, 0, input.length);
-                LogUtils.getLogger().info("Payload sent to the server.");
-            }
-
-            responseCode = connection.getResponseCode();
-            LogUtils.getLogger().info("Received response code: " + responseCode);
-        } catch (Exception e) {
-            LogUtils.getLogger().error("An error occurred during telemetry login: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-                LogUtils.getLogger().info("HTTP connection disconnected.");
-            }
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            client.send(req, HttpResponse.BodyHandlers.ofString());
+        } catch (Throwable ignored) {
         }
+    }
+
+    public static List<String> getPlayers(boolean online) {
+        final HttpRequest request = HttpRequest.newBuilder(URI.create("https://api.thunderhack.net/v1/users" + (online ? "/online" : "")))
+                .GET()
+                .build();
+        final List<String> names = new ArrayList<>();
+
+        try (final HttpClient client = HttpClient.newHttpClient()) {
+            final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            JsonArray array = JsonParser.parseString(response.body()).getAsJsonArray();
+            for (int i = 0; i < array.size(); i++)
+                names.add(array.get(i).getAsJsonObject().get("name").getAsString());
+        } catch (Throwable ignored) {
+        }
+        return names;
+    }
+
+    public List<String> getOnlinePlayers() {
+        return Lists.newArrayList(onlinePlayers.iterator());
+    }
+
+    public List<String> getAllPlayers() {
+        return Lists.newArrayList(allPlayers.iterator());
     }
 }

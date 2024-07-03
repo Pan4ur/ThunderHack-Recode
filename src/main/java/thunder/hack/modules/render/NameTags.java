@@ -1,6 +1,7 @@
 package thunder.hack.modules.render;
 
 import com.google.common.collect.Ordering;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.BlockEntity;
@@ -44,6 +45,7 @@ import thunder.hack.core.impl.FriendManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.PotionHud;
+import thunder.hack.gui.hud.impl.WaterMark;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.misc.NameProtect;
@@ -258,6 +260,17 @@ public class NameTags extends Module {
 
                 Render2DEngine.drawRect(context.getMatrices(), tagX - 2, (float) (posY - 13f), textWidth + 4, 11, color);
 
+                if (ThunderHack.telemetryManager.getOnlinePlayers().contains(ent.getGameProfile().getName())) {
+                    Render2DEngine.drawRect(context.getMatrices(), tagX - 14, (float) (posY - 13f), 12, 11, color.brighter().brighter());
+                    RenderSystem.enableBlend();
+                    RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
+                    Color lColor = HudEditor.getColor(0);
+                    RenderSystem.setShaderColor(lColor.getRed() / 255f, lColor.getGreen() / 255f, lColor.getBlue() / 255f, 1f);
+                    RenderSystem.setShaderTexture(0, WaterMark.logo);
+                    Render2DEngine.renderTexture(context.getMatrices(), tagX - 13, (float) (posY - 12.5f), 10, 10, 0, 0, 256, 256, 256, 256);
+                    RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+                    RenderSystem.disableBlend();
+                }
 
                 OutlineColor cl = ThunderHack.friendManager.isFriend(ent) ? friendOutline.getValue() : outline.getValue();
 

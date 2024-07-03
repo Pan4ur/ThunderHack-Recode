@@ -72,6 +72,7 @@ public class CandleHud extends HudElement {
         RenderSystem.setShaderTexture(0, Render2DEngine.firefly);
         Render2DEngine.renderTexture(matrices, x, y, width, height, 0, 0, width, height, width, height);
         RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 
     private enum For {

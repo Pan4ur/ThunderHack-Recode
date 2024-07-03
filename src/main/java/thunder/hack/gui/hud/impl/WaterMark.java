@@ -15,7 +15,6 @@ import thunder.hack.modules.client.Media;
 import thunder.hack.modules.misc.NameProtect;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.render.TextUtil;
 
 import java.awt.*;
@@ -32,9 +31,9 @@ public class WaterMark extends HudElement {
     public static final Setting<Mode> mode = new Setting<>("Mode", Mode.Big);
     private final Setting<Boolean> ru = new Setting<>("RU", false);
 
-    private final Identifier logo = Identifier.of("thunderhack", "textures/hud/icons/mini_logo.png");
-    private final Identifier player = Identifier.of("thunderhack", "textures/gui/headers/player.png");
-    private final Identifier server = Identifier.of("thunderhack", "textures/hud/icons/server.png");
+    public static Identifier logo = new Identifier("thunderhack", "textures/hud/icons/mini_logo.png");
+    private final Identifier player = new Identifier("thunderhack", "textures/gui/headers/player.png");
+    private final Identifier server = new Identifier("thunderhack", "textures/hud/icons/server.png");
 
     private final TextUtil textUtil = new TextUtil(
             "ТандерХак",
@@ -110,7 +109,7 @@ public class WaterMark extends HudElement {
             Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + 100, getPosY() + 64, 1f);
             context.getMatrices().push();
             context.getMatrices().translate(getPosX() + 10, getPosY() + 32, 0);
-            context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotation((float) Math.toRadians(mc.player.age * 3 + Render3DEngine.getTickDelta())));
+            context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotation((float) Math.toRadians(mc.player.age * 3 + mc.getTickDelta())));
             context.getMatrices().translate(-(getPosX() + 10), -(getPosY() + 32), 0);
             context.drawTexture(ModuleManager.companion.BALTIKA, (int) getPosX() - 10, (int) getPosY() + 2, 0, 0, 40, 64, 40, 64);
             context.getMatrices().pop();
