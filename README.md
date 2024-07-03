@@ -39,3 +39,9 @@
 
 ## Screenshots
 ![image](https://github.com/Pan4ur/ThunderHack-Recode/assets/82473048/1e56338f-58a1-4759-8234-858878bdde3f)
+
+## Addons
+
+### Resources
+- [Addon Template](https://github.com/cvs0/ThunderHack-Recode-Addon-Template) by cvs0
+- [ThunderHack Addon Docs (COMING SOON)]()
