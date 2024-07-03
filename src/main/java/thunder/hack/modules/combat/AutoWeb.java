@@ -47,6 +47,7 @@ public final class AutoWeb extends Module {
     private final Setting<ColorSetting> renderFillColor = new Setting<>("Render Fill Color", new ColorSetting(HudEditor.getColor(0))).addToGroup(renderCategory);
     private final Setting<ColorSetting> renderLineColor = new Setting<>("Render Line Color", new ColorSetting(HudEditor.getColor(0))).addToGroup(renderCategory);
     private final Setting<Integer> renderLineWidth = new Setting<>("Render Line Width", 2, 1, 5).addToGroup(renderCategory);
+    private final Setting<Integer> effectDurationMs = new Setting<>("Effect Duration (MS)", 500, 0, 10000).addToGroup(renderCategory);
 
     private final ArrayList<BlockPos> sequentialBlocks = new ArrayList<>();
     public static Timer inactivityTimer = new Timer();
@@ -61,7 +62,7 @@ public final class AutoWeb extends Module {
 
     public void onRender3D(MatrixStack stack) {
         renderPoses.forEach((pos, time) -> {
-            if (System.currentTimeMillis() - time > 500) {
+            if (System.currentTimeMillis() - time > effectDurationMs.getValue()) {
                 renderPoses.remove(pos);
             } else {
                 switch (renderMode.getValue()) {

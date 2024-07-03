@@ -415,4 +415,14 @@ public class ModuleManager implements IManager {
         });
         return modulesCategory;
     }
+
+    public void registerModule(Module module) {
+        if (module == null) return;
+
+        this.modules.add(module);
+
+        if (module.listening()) {
+            ThunderHack.EVENT_BUS.subscribe(module);
+        }
+    }
 }

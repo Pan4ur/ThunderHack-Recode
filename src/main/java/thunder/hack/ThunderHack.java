@@ -6,12 +6,14 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.IEventBus;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import thunder.hack.api.IAddon;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.*;
 import thunder.hack.core.impl.NotificationManager;
@@ -91,6 +93,12 @@ public class ThunderHack implements ModInitializer {
         FriendManager.loadFriends();
         configManager.load(configManager.getCurrentConfig());
         moduleManager.onLoad();
+        for (EntrypointContainer<IAddon> entrypoint : FabricLoader.getInstance().getEntrypointContainers("thunderhack-addon", IAddon.class)) {
+            IAddon addon = entrypoint.getEntrypoint();
+            addon.onInitialize();
+            // Register addon modules or perform other interactions
+            addon.getModules().forEach(module -> moduleManager.registerModule(module));
+        }
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if(ModuleManager.unHook.isEnabled())

@@ -82,7 +82,7 @@ public class TNTAura extends Module {
     @EventHandler
     public void onTick(EventTick e) {
         if (getTntSlot() == -1) {
-            disable(isRu() ? "Нет динамита!" : "No tnt");
+            disable(isRu() ? "Нет динамита!" : "No TNT!");
             return;
         }
         if (getFlintSlot() == -1) {
@@ -94,9 +94,9 @@ public class TNTAura extends Module {
             return;
         }
 
-        PlayerEntity pl = ThunderHack.combatManager.getNearestTarget(range.getValue());
+        PlayerEntity targetedPlayer = ThunderHack.combatManager.getNearestTarget(range.getValue());
 
-        List<BlockPos> blocks = getBlocks(pl);
+        List<BlockPos> blocks = getBlocks(targetedPlayer);
         if (!blocks.isEmpty()) {
             if (delay > 0) {
                 delay--;
@@ -106,7 +106,7 @@ public class TNTAura extends Module {
             InventoryUtility.saveSlot();
             int placed = 0;
             while (placed < blocksPerTick.getValue()) {
-                BlockPos targetBlock = getSequentialPos(pl);
+                BlockPos targetBlock = getSequentialPos(targetedPlayer);
                 if (targetBlock == null)
                     break;
                 if (InteractionUtility.placeBlock(targetBlock, rotate.getValue(), InteractionUtility.Interact.Vanilla, placeMode.getValue(), getObbySlot(), false, false)) {
@@ -119,8 +119,8 @@ public class TNTAura extends Module {
             InventoryUtility.returnSlot();
         }
 
-        if (pl != null) {
-            BlockPos headBlock = BlockPos.ofFloored(pl.getPos()).up(2);
+        if (targetedPlayer != null) {
+            BlockPos headBlock = BlockPos.ofFloored(targetedPlayer.getPos()).up(2);
             InventoryUtility.saveSlot();
             InteractionUtility.placeBlock(headBlock, rotate.getValue(), InteractionUtility.Interact.Vanilla, placeMode.getValue(), getTntSlot(), false, false);
             BlockHitResult igniteResult = getIgniteResult(headBlock);

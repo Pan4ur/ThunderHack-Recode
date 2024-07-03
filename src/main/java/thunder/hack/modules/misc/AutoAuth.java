@@ -31,8 +31,8 @@ public final class AutoAuth extends Module {
     @Override
     public void onEnable() {
         String warningMsg = isRu() ?
-                Formatting.RED + "Внимание!!! " + Formatting.RESET + "Пароль сохраняется в конфиге, перед передачей конфига " + Formatting.RED + " ВЫКЛЮЧИ МОДУЛЬ!" :
-                Formatting.RED + "Attention!!! " + Formatting.RESET + "The passwords are stored in the config, so before sharing your configs " + Formatting.RED + " TOGGLE OFF THE MODULE!";
+                Formatting.RED + "Внимание! " + Formatting.RESET + "Пароль сохраняется в конфиге, перед передачей конфига " + Formatting.RED + " ВЫКЛЮЧИ МОДУЛЬ!" :
+                Formatting.RED + "Attention! " + Formatting.RESET + "The passwords are stored in the config, so before sharing your configs " + Formatting.RED + " TOGGLE OFF THE MODULE!";
         sendMessage(warningMsg);
     }
 

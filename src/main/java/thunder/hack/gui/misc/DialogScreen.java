@@ -56,16 +56,20 @@ public class DialogScreen extends Screen {
         context.drawTexture(questionPic, (int) (mainX + (mainWidth / 2f) - 35), (int) mainY + 25, 0, 0, 70, 65, 70, 65);
     }
 
+    private boolean isHovered(int mouseX, int mouseY, int x, int y, int width, int height) {
+        return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + height;
+    }
+
     private boolean yesHovered(int mX, int mY) {
         float mainX = (mc.getWindow().getScaledWidth() / 2f) - 120f;
         float mainY = (mc.getWindow().getScaledHeight() / 2f) - 80f;
-        return mX > mainX + 5 && mX < mainX + 115 && mY > mainY + 95 && mY < mainX + 135;
+        return isHovered(mX, mY, (int) mainX + 5, (int) mainY + 95, 110, 40);
     }
 
     private boolean noHovered(int mX, int mY) {
         float mainX = (mc.getWindow().getScaledWidth() / 2f) - 120f;
         float mainY = (mc.getWindow().getScaledHeight() / 2f) - 80f;
-        return mX > mainX + 125 && mX < mainX + 235 && mY > mainY + 95 && mY < mainX + 135;
+        return isHovered(mX, mY, (int) mainX + 125, (int) mainY + 95, 110, 40);
     }
 
     @Override

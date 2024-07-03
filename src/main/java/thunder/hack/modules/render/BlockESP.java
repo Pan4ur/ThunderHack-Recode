@@ -63,17 +63,26 @@ public class BlockESP extends Module {
     }
 
     private ArrayList<BlockVec> scan() {
-        ArrayList<BlockVec> bloks = new ArrayList<>();
-        for (int x = (int) Math.floor(mc.player.getX() - range.getValue()); x <= Math.ceil(mc.player.getX() + range.getValue()); x++)
-            for (int y = mc.world.getBottomY() + 1; y <= mc.world.getTopY(); y++)
-                for (int z = (int) Math.floor(mc.player.getZ() - range.getValue()); z <= Math.ceil(mc.player.getZ() + range.getValue()); z++) {
+        ArrayList<BlockVec> blocks = new ArrayList<>();
+        int startX = (int) Math.floor(mc.player.getX() - range.getValue());
+        int endX = (int) Math.ceil(mc.player.getX() + range.getValue());
+        int startY = mc.world.getBottomY() + 1;
+        int endY = mc.world.getTopY();
+        int startZ = (int) Math.floor(mc.player.getZ() - range.getValue());
+        int endZ = (int) Math.ceil(mc.player.getZ() + range.getValue());
+
+        for (int x = startX; x <= endX; x++) {
+            for (int y = startY; y <= endY; y++) {
+                for (int z = startZ; z <= endZ; z++) {
                     BlockPos pos = new BlockPos(x, y, z);
                     BlockState bs = mc.world.getBlockState(pos);
                     if (shouldAdd(bs.getBlock(), pos)) {
-                        bloks.add(new BlockVec(pos.getX(), pos.getY(), pos.getZ()));
+                        blocks.add(new BlockVec(pos.getX(), pos.getY(), pos.getZ()));
                     }
                 }
-        return bloks;
+            }
+        }
+        return blocks;
     }
 
     private void sync(ArrayList<BlockVec> b) {
@@ -92,7 +101,7 @@ public class BlockESP extends Module {
 
         if (fill.getValue() || outline.getValue()) {
             for (BlockVec vec : Lists.newArrayList(blocks)) {
-                if(count > limit.getValue())
+                if (count > limit.getValue())
                     continue;
 
                 if (vec.getDistance(mc.player.getPos()) > range.getPow2Value()) {
@@ -123,7 +132,7 @@ public class BlockESP extends Module {
     }
 
     private boolean shouldAdd(Block block, BlockPos pos) {
-        if(block instanceof AirBlock) return false;
+        if (block instanceof AirBlock) return false;
         if (selectedBlocks.getValue().contains(block)) return true;
         if (illegals.getValue()) return isIllegal(block, pos);
         return false;
