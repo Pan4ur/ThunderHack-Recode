@@ -29,7 +29,7 @@
   },
   "contact": {
     "sources": "https://github.com/Pan4ur/ThunderHack-Recode",
-    "homepage": "https://thunderhack.onrender.com",
+    "homepage": "https://thunderhack-site.vercel.app",
     "issues": "https://github.com/Pan4ur/ThunderHack-Recode/issues"
   },
   "mixins": [
