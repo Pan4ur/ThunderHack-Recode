@@ -168,7 +168,7 @@ public class MainMenuScreen extends Screen {
             Util.getOperatingSystem().open(URI.create("https://www.donationalerts.com/r/06ed/"));
 
         if (Render2DEngine.isHovered(mouseX, mouseY, (int) (halfOfWidth - 157), (int) (halfOfHeight - 140), 300, 70))
-            Util.getOperatingSystem().open(URI.create("https://thunderhack.onrender.com/"));
+            Util.getOperatingSystem().open(URI.create("https://thunderhack-site.vercel.app/"));
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
