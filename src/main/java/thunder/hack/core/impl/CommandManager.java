@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.impl.*;
 import thunder.hack.core.IManager;
+import thunder.hack.modules.Module;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,5 +90,11 @@ public class CommandManager implements IManager {
 
     public CommandDispatcher<CommandSource> getDispatcher() {
         return dispatcher;
+    }
+
+    public void registerCommand(Command command) {
+        if (command == null) return;
+
+        this.commands.add(command);
     }
 }
