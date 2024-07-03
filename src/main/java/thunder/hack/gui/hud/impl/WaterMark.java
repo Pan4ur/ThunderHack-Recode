@@ -31,7 +31,7 @@ public class WaterMark extends HudElement {
     public static final Setting<Mode> mode = new Setting<>("Mode", Mode.Big);
     private final Setting<Boolean> ru = new Setting<>("RU", false);
 
-    private final Identifier logo = new Identifier("thunderhack", "textures/hud/icons/mini_logo.png");
+    public static Identifier logo = new Identifier("thunderhack", "textures/hud/icons/mini_logo.png");
     private final Identifier player = new Identifier("thunderhack", "textures/gui/headers/player.png");
     private final Identifier server = new Identifier("thunderhack", "textures/hud/icons/server.png");
 
