@@ -427,4 +427,10 @@ public class ModuleManager implements IManager {
             ThunderHack.EVENT_BUS.subscribe(module);
         }
     }
+
+    public void registerHudElement(HudElement hudElement) {
+        if (hudElement == null) return;
+
+        this.modules.add(hudElement);
+    }
 }

@@ -109,15 +109,23 @@ public class ThunderHack implements ModInitializer {
 
             // Register Modules
             addon.getModules().stream().filter(Objects::nonNull).forEach(module -> {
-                // Log module registration
                 LogUtils.getLogger().info("Registering module: " + module.getClass().getName());
+
                 moduleManager.registerModule(module);
             });
 
             // Register Commands
             addon.getCommands().stream().filter(Objects::nonNull).forEach(command -> {
                 LogUtils.getLogger().info("Registering command: " + command.getClass().getName());
+
                 commandManager.registerCommand(command);
+            });
+
+            // Register HUD Elements
+            addon.getHudElements().stream().filter(Objects::nonNull).forEach(hudElement -> {
+                LogUtils.getLogger().info("Registering HUD element: " + hudElement.getClass().getName());
+
+                moduleManager.registerHudElement(hudElement);
             });
         }
 
