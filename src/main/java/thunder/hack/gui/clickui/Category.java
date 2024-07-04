@@ -30,7 +30,8 @@ public class Category extends AbstractCategory {
         super(category.getName(), x, y, width, height);
         buttons = new ArrayList<>();
         ICON = new Identifier("thunderhack", "textures/gui/headers/" +
-                (Module.Category.isCustomCategory(category) ? "stock" : category.getName().toLowerCase()) + ".png");        if (category.getName().equals("Client"))
+                (Module.Category.isCustomCategory(category) ? "stock" : category.getName().toLowerCase()) + ".png");
+        if (category.getName().equals("Client"))
             buttons.add(new SearchBar());
         features.forEach(feature -> buttons.add(new ModuleButton(feature)));
     }
