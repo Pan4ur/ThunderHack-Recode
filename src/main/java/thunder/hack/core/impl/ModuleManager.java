@@ -300,7 +300,7 @@ public class ModuleManager implements IManager {
     }
 
     public List<Module.Category> getCategories() {
-        return Arrays.asList(Module.Category.values());
+        return new ArrayList<>(Module.Category.values());
     }
 
     public void onLoad() {

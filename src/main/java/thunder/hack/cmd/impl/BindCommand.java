@@ -71,6 +71,11 @@ public class BindCommand extends Command {
             return SINGLE_SUCCESS;
         }));
 
+        builder.then(literal("clear").executes(context -> {
+            for (Module mod : ThunderHack.moduleManager.modules) mod.setBind(new Bind(-1, false, false));
+            return SINGLE_SUCCESS;
+        }));
+
         builder.then(literal("reset").executes(context -> {
             for (Module mod : ThunderHack.moduleManager.modules) mod.setBind(new Bind(-1, false, false));
             sendMessage("Done!");
