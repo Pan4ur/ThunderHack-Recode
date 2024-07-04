@@ -133,7 +133,7 @@ public class MainMenuScreen extends Screen {
         int totalAddonsLoaded = AddonManager.getTotalAddons();
         String addonsText = "Addons Loaded: " + totalAddonsLoaded;
         int screenWidth = mc.getWindow().getScaledWidth();
-        int textWidth = (int) FontRenderers.thglitch.getStringWidth(addonsText);
+        int textWidth = (int) FontRenderers.sf_bold.getStringWidth(addonsText);
         int textX = screenWidth - textWidth - 5;
         FontRenderers.sf_bold.drawString(context.getMatrices(), addonsText, textX, 5, Color.WHITE.getRGB());
     }
