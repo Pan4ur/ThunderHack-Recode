@@ -164,8 +164,6 @@ public class ThunderHack implements ModInitializer {
 
         LogUtils.getLogger().info("[ThunderHack] Init time: " + (System.currentTimeMillis() - initTime) + " ms.");
         initTime = System.currentTimeMillis();
-
-        notificationManager.publicity("Loaded " + AddonManager.getTotalAddons() + " addons!", "", 3, Notification.Type.SUCCESS);
     }
 
     public static void syncVersion() {
