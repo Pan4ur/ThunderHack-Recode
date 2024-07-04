@@ -1,6 +1,7 @@
 package thunder.hack.core.impl;
 
 import com.google.gson.*;
+import com.mojang.logging.LogUtils;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
@@ -231,12 +232,14 @@ public class ConfigManager implements IManager {
                     } else if (setting.getValue() instanceof ItemSelectSetting iSetting) {
                         JsonArray array = mobject.getAsJsonArray(setting.getName());
                         for (int i = 0; i < array.size(); i++)
-                            iSetting.getItemsById().add(array.get(i).getAsString());
+                            if (!iSetting.getItemsById().contains(array.get(i).getAsString()))
+                                iSetting.getItemsById().add(array.get(i).getAsString());
                     } else if (setting.getValue().getClass().isEnum()) {
                         Enum value = new EnumConverter(((Enum) setting.getValue()).getClass()).doBackward(mobject.getAsJsonPrimitive(setting.getName()));
                         setting.setValue((value == null) ? setting.getDefaultValue() : value);
                     }
                 } catch (Exception e) {
+                    LogUtils.getLogger().warn("[Thunderhack] Module: " + module.getName() + " Setting: " + setting.getName() + " Error: ");
                     e.printStackTrace();
                 }
             }
