@@ -23,7 +23,7 @@
 - Be aware, DoxWare 2.0, gumballoff, and Quick Client are both ratted and renames of this client.
 
 ## Requires these mods:
-- [FabricApi 1.20.6](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/4933446)
+- [FabricApi 1.20.6](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/5473788)
 - [Java 21+](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
 
 ## Recommended to read:

@@ -26,9 +26,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
@@ -352,23 +350,65 @@ public abstract class Module {
         return null;
     }
 
-    public enum Category {
-        COMBAT("Combat"),
-        MISC("Misc"),
-        RENDER("Render"),
-        MOVEMENT("Movement"),
-        PLAYER("Player"),
-        CLIENT("Client"),
-        HUD("HUD");
-
+    public static class Category {
         private final String name;
+        private static final Map<String, Category> CATEGORIES = new HashMap<>();
 
-        Category(String n) {
-            name = n;
+        // Predefined categories as static instances
+        public static final Category COMBAT = new Category("Combat");
+        public static final Category MISC = new Category("Misc");
+        public static final Category RENDER = new Category("Render");
+        public static final Category MOVEMENT = new Category("Movement");
+        public static final Category PLAYER = new Category("Player");
+        public static final Category CLIENT = new Category("Client");
+        public static final Category HUD = new Category("HUD");
+
+        // Initialize predefined categories
+        static {
+            CATEGORIES.put("Combat", COMBAT);
+            CATEGORIES.put("Misc", MISC);
+            CATEGORIES.put("Render", RENDER);
+            CATEGORIES.put("Movement", MOVEMENT);
+            CATEGORIES.put("Player", PLAYER);
+            CATEGORIES.put("Client", CLIENT);
+            CATEGORIES.put("HUD", HUD);
+        }
+
+        // Private constructor to control creation
+        private Category(String name) {
+            this.name = name;
         }
 
         public String getName() {
             return name;
+        }
+
+        // Static method to get or create a category
+        public static Category getCategory(String name) {
+            return CATEGORIES.computeIfAbsent(name, Category::new);
+        }
+
+        public static Collection<Category> values() {
+            return CATEGORIES.values();
+        }
+
+        public static boolean isCustomCategory(Category category) {
+            Set<String> predefinedCategoryNames = Set.of("Combat", "Misc", "Render", "Movement", "Player", "Client", "HUD");
+
+            return !predefinedCategoryNames.contains(category.getName());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Category category = (Category) o;
+            return Objects.equals(name, category.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name);
         }
     }
 }
