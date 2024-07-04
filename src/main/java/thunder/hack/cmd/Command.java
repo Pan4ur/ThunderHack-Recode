@@ -32,7 +32,7 @@ public abstract class Command {
 
     public static void sendMessage(String message) {
         if (mc.player == null) return;
-        mc.player.sendMessage(Text.of(thunder.hack.core.impl.CommandManager.getClientMessage() + " "  + message));
+        mc.player.sendMessage(Text.of(thunder.hack.core.impl.CommandManager.getClientMessage() + " " + message));
     }
 
     protected static <T> @NotNull RequiredArgumentBuilder<CommandSource, T> arg(final String name, final ArgumentType<T> type) {

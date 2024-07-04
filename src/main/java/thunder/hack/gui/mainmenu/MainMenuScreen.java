@@ -14,6 +14,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.AddonManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.utility.ThunderUtility;
@@ -129,6 +130,12 @@ public class MainMenuScreen extends Screen {
             offsetY += 10;
         }
 
+        int totalAddonsLoaded = AddonManager.getTotalAddons();
+        String addonsText = "Addons Loaded: " + totalAddonsLoaded;
+        int screenWidth = mc.getWindow().getScaledWidth();
+        int textWidth = (int) FontRenderers.thglitch.getStringWidth(addonsText);
+        int textX = screenWidth - textWidth - 5;
+        FontRenderers.sf_bold.drawString(context.getMatrices(), addonsText, textX, 5, Color.WHITE.getRGB());
     }
 
     private static @NotNull String getPrefix(@NotNull String change) {
