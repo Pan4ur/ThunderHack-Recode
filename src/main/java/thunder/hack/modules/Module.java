@@ -392,6 +392,12 @@ public abstract class Module {
             return CATEGORIES.values();
         }
 
+        public static boolean isCustomCategory(Category category) {
+            Set<String> predefinedCategoryNames = Set.of("Combat", "Misc", "Render", "Movement", "Player", "Client", "HUD");
+
+            return !predefinedCategoryNames.contains(category.getName());
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
