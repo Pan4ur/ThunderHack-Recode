@@ -41,7 +41,7 @@ public final class AimBot extends Module {
     private final Setting<Boolean> ignoreTeam = new Setting<>("IgnoreTeam", true, v -> mode.getValue() == Mode.CSAim || mode.is(Mode.AimAssist));
     private final Setting<Integer> reactionTime = new Setting<>("ReactionTime", 80, 1, 500, v -> mode.getValue() == Mode.AimAssist && !ignoreWalls.getValue());
     private final Setting<Boolean> ignoreInvisible = new Setting<>("IgnoreInvis", false, v -> mode.is(Mode.AimAssist));
-    private final Setting<Float> rotYawRandom = new Setting<>("Yaw Random", 0f, 0f, 3f, v -> mode.getValue() == Mode.CSAim);
+    private final Setting<Float> rotYawRandom = new Setting<>("YawRandom", 0f, 0f, 3f, v -> mode.getValue() == Mode.CSAim);
     private final Setting<Float> rotPitchRandom = new Setting<>("PitchRandom", 0f, 0f, 3f, v -> mode.getValue() == Mode.CSAim);
     private final Setting<Float> predict = new Setting<>("AimPredict", 0.5f, 0.5f, 8f, v -> mode.getValue() == Mode.CSAim);
     private final Setting<Integer> delay = new Setting<>("Shoot delay", 5, 0, 10, v -> mode.getValue() == Mode.CSAim);
