@@ -29,7 +29,7 @@ public class Category extends AbstractCategory {
     public Category(Module.Category category, ArrayList<Module> features, float x, float y, float width, float height) {
         super(category.getName(), x, y, width, height);
         buttons = new ArrayList<>();
-        ICON = new Identifier("thunderhack", "textures/gui/headers/" +
+        ICON = Identifier.of("thunderhack", "textures/gui/headers/" +
                 (Module.Category.isCustomCategory(category) ? "stock" : category.getName().toLowerCase()) + ".png");
         if (category.getName().equals("Client"))
             buttons.add(new SearchBar());
@@ -103,8 +103,7 @@ public class Category extends AbstractCategory {
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
             Render2DEngine.addWindow(context.getMatrices(), getX() + 2, getY() - 4, getX() + 2 + width - 4, getY() - 5 + height, 1);
             RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-            BufferBuilder b = Tessellator.getInstance().getBuffer();
-            b.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+            BufferBuilder b = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
             Render2DEngine.renderGradientTextureInternal(b, context.getMatrices(), getX() + 85, (getY() + (height - 24) / 2), 12, 12, 0, 0, 12, 12, 12, 12, m1.darker(), m2.darker(), m3.darker(), m4.darker());
             Render2DEngine.renderGradientTextureInternal(b, context.getMatrices(), getX() + 75, (getY() + (height - 34) / 2), 16, 16, 0, 0, 16, 16, 16, 16, m1, m2, m3, m4);
             Render2DEngine.renderGradientTextureInternal(b, context.getMatrices(), getX() + 65, (getY() + (height - 20) / 2), 12, 12, 0, 0, 12, 12, 12, 12, m1.darker().darker(), m2.darker().darker(), m3.darker().darker(), m4.darker().darker());

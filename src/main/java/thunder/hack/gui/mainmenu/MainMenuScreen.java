@@ -29,8 +29,8 @@ import java.util.Locale;
 import static thunder.hack.modules.Module.mc;
 
 public class MainMenuScreen extends Screen {
-    private static final Identifier TH_TEAM = new Identifier("thunderhack", "textures/gui/elements/thteam.png");
-    private static final Identifier DONATION = new Identifier("thunderhack", "textures/gui/elements/donationalerts.png");
+    private static final Identifier TH_TEAM = Identifier.of("thunderhack", "textures/gui/elements/thteam.png");
+    private static final Identifier DONATION = Identifier.of("thunderhack", "textures/gui/elements/donationalerts.png");
 
     private final List<MainMenuButton> buttons = new ArrayList<>();
     public boolean confirm = false;
