@@ -6,6 +6,7 @@ import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.impl.*;
 import thunder.hack.core.IManager;
@@ -22,7 +23,7 @@ public class CommandManager implements IManager {
     private final List<Command> commands = new ArrayList<>();
 
     public CommandManager() {
-        add(new RctCommand());
+        add(new HorseSpeedCommand());
         add(new RpcCommand());
         add(new KitCommand());
         add(new GpsCommand());
@@ -32,6 +33,7 @@ public class CommandManager implements IManager {
         add(new HelpCommand());
         add(new NukerCommand());
         add(new EClipCommand());
+        add(new RctCommand());
         add(new HClipCommand());
         add(new LoginCommand());
         add(new MacroCommand());
@@ -41,19 +43,19 @@ public class CommandManager implements IManager {
         add(new FriendCommand());
         add(new ModuleCommand());
         add(new PrefixCommand());
-        add(new SearchCommand());
+        add(new BlockESPCommand());
         add(new TrackerCommand());
         add(new DropAllCommand());
         add(new TreasureCommand());
         add(new WayPointCommand());
         add(new TabParseCommand());
         add(new OpenFolderCommand());
-        add(new HorseSpeedCommand());
         add(new ResetBindsCommand());
         add(new InvCleanerCommand());
-        add(new GotoWaypointCommand());
         add(new ChestStealerCommand());
         add(new GarbageCleanerCommand());
+        add(new GotoWaypointCommand());
+        add(new AddonsCommand());
     }
 
     private void add(@NotNull Command command) {
