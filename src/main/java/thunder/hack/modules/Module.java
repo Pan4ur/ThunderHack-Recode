@@ -315,6 +315,18 @@ public abstract class Module {
         mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + message));
     }
 
+    public void sendChatMessage(String message) {
+        if (fullNullCheck()) return;
+
+        mc.getNetworkHandler().sendChatMessage(message);
+    }
+
+    public void sendChatCommand(String command) {
+        if (fullNullCheck()) return;
+
+        mc.getNetworkHandler().sendChatCommand(command);
+    }
+
     public void debug(String message) {
         if (fullNullCheck() || !ClientSettings.debug.getValue()) return;
         mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] [\uD83D\uDD27] " + message));
