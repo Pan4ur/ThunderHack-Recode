@@ -96,40 +96,66 @@ public class ThunderHack implements ModInitializer {
         FriendManager.loadFriends();
         configManager.load(configManager.getCurrentConfig());
         moduleManager.onLoad();
+
         LogUtils.getLogger().info("Starting addon initialization.");
 
         for (EntrypointContainer<IAddon> entrypoint : FabricLoader.getInstance().getEntrypointContainers("thunderhack", IAddon.class)) {
             IAddon addon = entrypoint.getEntrypoint();
 
-            // Log addon initialization
-            LogUtils.getLogger().info("Initializing addon: " + addon.getClass().getName());
-            addon.onInitialize();
-            AddonManager.incrementAddonCount();
-            AddonManager.addAddon(addon);
+            try {
+                LogUtils.getLogger().info("Initializing addon: " + addon.getClass().getName());
+                LogUtils.getLogger().debug("Addon class loader: " + addon.getClass().getClassLoader());
+                addon.onInitialize();
+                LogUtils.getLogger().info("Addon initialized successfully: " + addon.getClass().getName());
 
-            // Register Modules
-            addon.getModules().stream().filter(Objects::nonNull).forEach(module -> {
-                LogUtils.getLogger().info("Registering module: " + module.getClass().getName());
+                AddonManager.incrementAddonCount();
+                LogUtils.getLogger().debug("Addon count incremented.");
 
-                moduleManager.registerModule(module);
-            });
+                AddonManager.addAddon(addon);
+                LogUtils.getLogger().debug("Addon added to manager.");
+                EVENT_BUS.registerLambdaFactory(addon.getPackage() , (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
 
-            // Register Commands
-            addon.getCommands().stream().filter(Objects::nonNull).forEach(command -> {
-                LogUtils.getLogger().info("Registering command: " + command.getClass().getName());
+                // Register Modules
+                addon.getModules().stream().filter(Objects::nonNull).forEach(module -> {
+                    try {
+                        LogUtils.getLogger().info("Registering module: " + module.getClass().getName());
+                        LogUtils.getLogger().debug("Module class loader: " + module.getClass().getClassLoader());
+                        moduleManager.registerModule(module);
+                        LogUtils.getLogger().info("Module registered successfully: " + module.getClass().getName());
+                    } catch (Exception e) {
+                        LogUtils.getLogger().error("Error registering module: " + module.getClass().getName(), e);
+                    }
+                });
 
-                commandManager.registerCommand(command);
-            });
+                // Register Commands
+                addon.getCommands().stream().filter(Objects::nonNull).forEach(command -> {
+                    try {
+                        LogUtils.getLogger().info("Registering command: " + command.getClass().getName());
+                        LogUtils.getLogger().debug("Command class loader: " + command.getClass().getClassLoader());
+                        commandManager.registerCommand(command);
+                        LogUtils.getLogger().info("Command registered successfully: " + command.getClass().getName());
+                    } catch (Exception e) {
+                        LogUtils.getLogger().error("Error registering command: " + command.getClass().getName(), e);
+                    }
+                });
 
-            // Register HUD Elements
-            addon.getHudElements().stream().filter(Objects::nonNull).forEach(hudElement -> {
-                LogUtils.getLogger().info("Registering HUD element: " + hudElement.getClass().getName());
+                // Register HUD Elements
+                addon.getHudElements().stream().filter(Objects::nonNull).forEach(hudElement -> {
+                    try {
+                        LogUtils.getLogger().info("Registering HUD element: " + hudElement.getClass().getName());
+                        LogUtils.getLogger().debug("HUD element class loader: " + hudElement.getClass().getClassLoader());
+                        moduleManager.registerHudElement(hudElement);
+                        LogUtils.getLogger().info("HUD element registered successfully: " + hudElement.getClass().getName());
+                    } catch (Exception e) {
+                        LogUtils.getLogger().error("Error registering HUD element: " + hudElement.getClass().getName(), e);
+                    }
+                });
 
-                moduleManager.registerHudElement(hudElement);
-            });
+            } catch (Exception e) {
+                LogUtils.getLogger().error("Error initializing addon: " + addon.getClass().getName(), e);
+            }
         }
 
-        // Log the end of the initialization process
         LogUtils.getLogger().info("Addon initialization complete.");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
