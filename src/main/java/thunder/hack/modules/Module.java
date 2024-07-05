@@ -352,7 +352,7 @@ public abstract class Module {
 
     public static class Category {
         private final String name;
-        private static final Map<String, Category> CATEGORIES = new HashMap<>();
+        private static final Map<String, Category> CATEGORIES = new LinkedHashMap<>();
 
         // Predefined categories as static instances
         public static final Category COMBAT = new Category("Combat");

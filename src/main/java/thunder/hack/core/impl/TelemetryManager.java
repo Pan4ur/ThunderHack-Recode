@@ -43,17 +43,6 @@ public class TelemetryManager implements IManager {
         }
     }
 
-    public void getPlayers(String name) {
-        HttpRequest req = HttpRequest.newBuilder(URI.create("https://api.thunderhack.net/v1/users/online?name=" + name))
-                .POST(HttpRequest.BodyPublishers.noBody())
-                .build();
-
-        try (HttpClient client = HttpClient.newHttpClient()) {
-            client.send(req, HttpResponse.BodyHandlers.ofString());
-        } catch (Throwable ignored) {
-        }
-    }
-
     public static List<String> getPlayers(boolean online) {
         final HttpRequest request = HttpRequest.newBuilder(URI.create("https://api.thunderhack.net/v1/users" + (online ? "/online" : "")))
                 .GET()
@@ -63,8 +52,7 @@ public class TelemetryManager implements IManager {
         try (final HttpClient client = HttpClient.newHttpClient()) {
             final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             JsonArray array = JsonParser.parseString(response.body()).getAsJsonArray();
-            for (int i = 0; i < array.size(); i++)
-                names.add(array.get(i).getAsJsonObject().get("name").getAsString());
+            array.forEach(e -> names.add(e.getAsJsonObject().get("name").getAsString()));
         } catch (Throwable ignored) {
         }
         return names;
