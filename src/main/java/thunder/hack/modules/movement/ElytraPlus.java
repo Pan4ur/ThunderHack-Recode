@@ -316,7 +316,7 @@ public class ElytraPlus extends Module {
                 return;
 
             for (DataTracker.SerializedEntry<?> value : values)
-                if (value.id() == 0 && (value.value().toString().equals("-120") || value.value().toString().equals("-128") || value.value().toString().equals("-126")))
+                if (value.value().toString().equals("FALL_FLYING") || (value.id() == 0 && (value.value().toString().equals("-120") || value.value().toString().equals("-128") || value.value().toString().equals("-126"))))
                     e.cancel();
         }
 
