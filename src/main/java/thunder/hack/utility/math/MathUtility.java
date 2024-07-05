@@ -53,10 +53,10 @@ public final class MathUtility {
 
     public static double roundToDecimal(double n, int point) {
         if (point == 0) {
-            return java.lang.Math.floor(n);
+            return Math.floor(n);
         }
-        double factor = java.lang.Math.pow(10, point);
-        return java.lang.Math.round(n * factor) / factor;
+        double factor = Math.pow(10, point);
+        return Math.round(n * factor) / factor;
     }
 
     public static double angle(Vec3d vec3d, Vec3d other) {
