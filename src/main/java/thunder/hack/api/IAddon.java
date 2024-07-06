@@ -15,4 +15,9 @@ public interface IAddon {
     String getName();
     String getAuthor();
     String getRepo();
+    String getVersion();
+
+    default String getDescription() {
+        return "";
+    }
 }
