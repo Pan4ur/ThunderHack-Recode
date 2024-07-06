@@ -98,7 +98,7 @@ public abstract class Module {
 
     protected void sendSequencedPacket(SequencedPacketCreator packetCreator) {
         if (mc.getNetworkHandler() == null || mc.world == null) return;
-        try (PendingUpdateManager pendingUpdateManager = ((IClientWorldMixin) mc.world).getPendingUpdateManager().incrementSequence();) {
+        try (PendingUpdateManager pendingUpdateManager = mc.world.getPendingUpdateManager().incrementSequence();) {
             int i = pendingUpdateManager.getSequence();
             mc.getNetworkHandler().sendPacket(packetCreator.predict(i));
         }
