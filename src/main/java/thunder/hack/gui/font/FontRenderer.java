@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static thunder.hack.core.IManager.mc;
+import static thunder.hack.utility.math.MathUtility.roundToDecimal;
 
 public class FontRenderer implements Closeable {
     private static final Char2IntArrayMap colorCodes = new Char2IntArrayMap() {{
@@ -163,7 +164,6 @@ public class FontRenderer implements Closeable {
         drawString(stack, s, x, y, r, g, b, a, false, 0);
     }
 
-
     public void drawString(MatrixStack stack, String s, float x, float y, float r, float g, float b, float a, boolean gradient, int offset) {
         if (prebakeGlyphsFuture != null && !prebakeGlyphsFuture.isDone()) {
             try {
@@ -171,11 +171,12 @@ public class FontRenderer implements Closeable {
             } catch (InterruptedException | ExecutionException ignored) {
             }
         }
+
         sizeCheck();
         float r2 = r, g2 = g, b2 = b;
         stack.push();
         y -= 3f;
-        stack.translate(x, y, 0);
+        stack.translate(roundToDecimal(x, 1), roundToDecimal(y, 1), 0);
         stack.scale(1f / this.scaleMul, 1f / this.scaleMul, 1f);
 
         RenderSystem.enableBlend();
@@ -324,8 +325,8 @@ public class FontRenderer implements Closeable {
             Glyph glyph = locateGlyph1(c1);
             currentLine = Math.max(
 
-                     glyph == null ? 0 : (glyph.height() / (float) this.scaleMul)
-                    
+                    glyph == null ? 0 : (glyph.height() / (float) this.scaleMul)
+
                     , currentLine);
         }
         return currentLine + previous;
@@ -381,6 +382,5 @@ public class FontRenderer implements Closeable {
         drawGradientString(matrices, s, x - getStringWidth(s) / 2f, y, i);
     }
 
-    record DrawEntry(float atX, float atY, float r, float g, float b, Glyph toDraw) {
-    }
+    record DrawEntry(float atX, float atY, float r, float g, float b, Glyph toDraw) {}
 }
