@@ -162,7 +162,7 @@ public class Aura extends Module {
         return elytra.getValue() && mc.player.isFallFlying() ? elytraAttackRange.getValue() : attackRange.getValue();
     }
     private float getWallRange(){
-        return elytra.getValue() && mc.player.isFallFlying() ? elytraWallRange.getValue() : wallRange.getValue();
+        return elytra.getValue() && mc.player != null && mc.player.isFallFlying() ? elytraWallRange.getValue() : wallRange.getValue();
     }
 
     public void auraLogic() {
