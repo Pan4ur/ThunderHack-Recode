@@ -142,7 +142,7 @@ public class FriendComponent {
 
         FontRenderers.modules.drawString(context.getMatrices(), name, posX + 37, posY + 6, Render2DEngine.applyOpacity(-1, getFadeFactor()));
 
-        boolean online = mc.player.networkHandler.getPlayerList().contains(name);
+        boolean online = mc.player.networkHandler.getPlayerList().stream().map(p -> p.getProfile().getName()).toList().contains(name);
 
         FontRenderers.settings.drawString(context.getMatrices(), online ? "online" : "offline", posX + 37, posY + 17, online ? Render2DEngine.applyOpacity(new Color(0xFF0B7A00, true).getRGB(), getFadeFactor()) : Render2DEngine.applyOpacity(new Color(0xFFBDBDBD, true).getRGB(), getFadeFactor()));
     }
