@@ -9,7 +9,7 @@ public final class Notifications extends Module {
         super("Notifications", Category.CLIENT);
     }
 
-    public final Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
+    public final Setting<Mode> mode = new Setting<>("Mode", Mode.CrossHair);
 
     public enum Mode {
         Default, CrossHair, Text
