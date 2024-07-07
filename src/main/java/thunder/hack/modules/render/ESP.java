@@ -313,15 +313,6 @@ public class ESP extends Module {
             }
         }
 
-        boolean any = false;
-
-        for (Entity ent : mc.world.getEntities())
-            if (shouldRender(ent)) {
-                any = true;
-            }
-        if(!any)
-            return;
-
         Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
         Render2DEngine.setupRender();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -331,7 +322,10 @@ public class ESP extends Module {
             if (shouldRender(ent))
                 drawBox(bufferBuilder, ent, matrix);
 
-        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        BuiltBuffer builtBuffer = bufferBuilder.endNullable();
+        if (builtBuffer == null)
+            return;
+        BufferRenderer.drawWithGlobalProgram(builtBuffer);
         Render2DEngine.endRender();
     }
 
