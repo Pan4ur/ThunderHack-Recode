@@ -8,11 +8,18 @@ import java.util.List;
 
 public interface IAddon {
     void onInitialize();
+
     List<Module> getModules();
+
     List<Command> getCommands();
+
     List<HudElement> getHudElements();
+
     String getPackage();
+
     String getName();
+
     String getAuthor();
+
     String getRepo();
 }

@@ -2,7 +2,6 @@ package thunder.hack.modules.base;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -11,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
-import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.world.HoleUtility;

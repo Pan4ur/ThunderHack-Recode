@@ -40,11 +40,18 @@ public class Animations extends Module {
     public boolean flip;
 
     private enum Mode {
-        Default, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twelve, Thirteen, Fourteen
+        Normal, Default, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twelve, Thirteen, Fourteen
     }
 
     public boolean shouldAnimate() {
-        return isEnabled() && (!onlyaura.getValue() || ModuleManager.aura.isEnabled() && Aura.target != null);
+        return isEnabled()
+                && (!onlyaura.getValue() || ModuleManager.aura.isEnabled() && Aura.target != null)
+                && mode.getValue() != Mode.Normal;
+    }
+
+    public boolean shouldChangeAnimationDuration() {
+        return isEnabled()
+                && (!onlyaura.getValue() || ModuleManager.aura.isEnabled() && Aura.target != null);
     }
 
     @Override
@@ -97,9 +104,8 @@ public class Animations extends Module {
                 matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) i * -45.0F));
                 translateBack(matrices);
             }
-            case Two -> {
-                applyEquipOffset(matrices, arm, 0.2F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 6.2831855F));
-            }
+            case Two ->
+                    applyEquipOffset(matrices, arm, 0.2F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 6.2831855F));
             case Three -> {
                 float n = -0.4F * MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
                 float g = MathHelper.sin(MathHelper.sqrt(swingProgress) * 3.1415927F);
