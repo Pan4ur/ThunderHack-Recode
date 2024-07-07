@@ -64,12 +64,15 @@ dependencies {
 	libImpl("meteordevelopment:orbit:${project.orbit_version}")
 
 	modCompileOnly "meteordevelopment:baritone:1.20.6-SNAPSHOT"
+	libImpl("io.netty:netty-handler-proxy:${project.netty_version}")
+
 
 	compileOnlyApi("org.apiguardian:apiguardian-api:1.1.2")
 
 	configurations.libImpl.dependencies.each {
 		implementation(it)
 	}
+
 	configurations.modImpl.dependencies.each {
 		modImplementation(it)
 		include(it)

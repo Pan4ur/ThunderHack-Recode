@@ -5,6 +5,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Colors;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
@@ -15,6 +17,8 @@ import java.awt.*;
 import static thunder.hack.core.IManager.mc;
 
 public class WindowBase {
+    public final Setting<PositionSetting> position;
+
     private float x;
     private float y;
     private float width;
@@ -28,12 +32,13 @@ public class WindowBase {
     private final String name;
     private boolean dragging, hoveringWindow, scaling, scrolling;
 
-    protected WindowBase(float x, float y, float width, float height, String name) {
+    protected WindowBase(float x, float y, float width, float height, String name, Setting<PositionSetting> pos) {
         setX(x);
         setY(y);
         setWidth(width);
         setHeight(height);
         this.name = name;
+        this.position = pos;
     }
 
     protected void render(DrawContext context, int mouseX, int mouseY) {
@@ -63,6 +68,10 @@ public class WindowBase {
         if (dragging) {
             setX(Render2DEngine.scrollAnimate((normaliseX() - dragX), getX(), .15f));
             setY(Render2DEngine.scrollAnimate((normaliseY() - dragY), getY(), .15f));
+            if (position != null) {
+                position.getValue().setX(getX() / mc.getWindow().getScaledWidth());
+                position.getValue().setY(getY() / mc.getWindow().getScaledHeight());
+            }
         }
 
         if (scaling) {

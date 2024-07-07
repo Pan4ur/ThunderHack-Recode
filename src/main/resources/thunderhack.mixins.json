@@ -33,6 +33,7 @@
     "MixinLivingEntityRenderer",
     "MixinMinecraftClient",
     "MixinMouse",
+    "MixinMultiplayerScreen",
     "MixinOtherClientPlayerEntity",
     "MixinParticleManager",
     "MixinPlayerListEntry",
