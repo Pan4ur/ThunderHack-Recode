@@ -34,6 +34,7 @@ public class WaterMark extends HudElement {
     public static Identifier logo = new Identifier("thunderhack", "textures/hud/icons/mini_logo.png");
     private final Identifier player = new Identifier("thunderhack", "textures/gui/headers/player.png");
     private final Identifier server = new Identifier("thunderhack", "textures/hud/icons/server.png");
+    private final Identifier proxy = new Identifier("thunderhack", "textures/hud/icons/proxy.png");
 
     private final TextUtil textUtil = new TextUtil(
             "ТандерХак",
@@ -65,15 +66,17 @@ public class WaterMark extends HudElement {
             if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
                 float offset1 = FontRenderers.sf_bold.getStringWidth(username) + 72;
                 float offset2 = FontRenderers.sf_bold.getStringWidth((mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address));
+                float offset3 = (ThunderHack.proxyManager.isActive() ? FontRenderers.sf_bold.getStringWidth(ThunderHack.proxyManager.getActiveProxy().getName()) + 11 : 0);
 
                 Render2DEngine.drawRoundedBlur(context.getMatrices(), getPosX(), getPosY(), 50f, 15f, 3, HudEditor.blurColor.getValue().getColorObject());
-                Render2DEngine.drawRoundedBlur(context.getMatrices(), getPosX() + 55, getPosY(), offset1 + offset2 - 36, 15f, 3, HudEditor.blurColor.getValue().getColorObject());
+                Render2DEngine.drawRoundedBlur(context.getMatrices(), getPosX() + 55, getPosY(), offset1 + offset2 - 36 + offset3, 15f, 3, HudEditor.blurColor.getValue().getColorObject());
 
                 Render2DEngine.setupRender();
 
                 Render2DEngine.drawRect(context.getMatrices(), getPosX() + 13, getPosY() + 1.5f, 0.5f, 11, new Color(0x44FFFFFF, true));
 
                 FontRenderers.sf_bold.drawGradientString(context.getMatrices(), "Recode", getPosX() + 18, getPosY() + 5, 20);
+
                 RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
                 RenderSystem.setShaderTexture(0, logo);
                 Render2DEngine.renderGradientTexture(context.getMatrices(), getPosX() + 1, getPosY() + 2, 11, 11, 0, 0, 128, 128, 128, 128,
@@ -86,6 +89,15 @@ public class WaterMark extends HudElement {
                 RenderSystem.setShaderTexture(0, server);
                 Render2DEngine.renderGradientTexture(context.getMatrices(), getPosX() + offset1, getPosY() + 2, 10, 10, 0, 0, 128, 128, 128, 128,
                         HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+
+                if (ThunderHack.proxyManager.isActive()) {
+                    RenderSystem.setShaderTexture(0, proxy);
+                    Render2DEngine.renderGradientTexture(context.getMatrices(), getPosX() + offset1 + offset2 + 16, getPosY() + 2, 10, 10, 0, 0, 128, 128, 128, 128,
+                            HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
+
+                    FontRenderers.sf_bold.drawString(context.getMatrices(), ThunderHack.proxyManager.getActiveProxy().getName(), getPosX() + offset1 + offset2 + 28, getPosY() + 5, -1);
+                }
+
                 Render2DEngine.endRender();
 
                 Render2DEngine.setupRender();
