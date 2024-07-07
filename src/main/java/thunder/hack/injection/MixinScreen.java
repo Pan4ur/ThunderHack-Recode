@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CommandManager;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.misc.DialogScreen;
 import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.events.impl.ClientClickEvent;
@@ -34,7 +35,7 @@ public abstract class MixinScreen {
                 manager.getDispatcher().execute(style.getClickEvent().getValue().substring(ThunderHack.commandManager.getPrefix().length()), manager.getSource());
                 cir.setReturnValue(true);
             } catch (CommandSyntaxException ignored) {
-            }
+        }
     }
 
     @Inject(method = "filesDragged", at = @At("HEAD"))
@@ -42,7 +43,7 @@ public abstract class MixinScreen {
         String configPath = paths.get(0).toString();
         File cfgFile = new File(configPath);
         String configName = cfgFile.getName();
-        if(!configName.contains(".th"))
+        if (!configName.contains(".th"))
             return;
 
         DialogScreen dialogScreen = new DialogScreen(isRu() ? "Обнаружен конфиг!" : "Config detected!",
@@ -61,9 +62,23 @@ public abstract class MixinScreen {
 
     @Inject(method = "renderPanoramaBackground", at = @At("HEAD"), cancellable = true)
     public void renderPanoramaBackgroundHook(DrawContext context, float delta, CallbackInfo ci) {
-        if(ClientSettings.customMainMenu.getValue() && mc.world == null) {
+        if (ClientSettings.customMainMenu.getValue() && mc.world == null) {
             ci.cancel();
             Render2DEngine.drawMainMenuShader(context.getMatrices(), 0, 0, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
+        }
+    }
+
+    @Inject(method = "renderInGameBackground", at = @At("HEAD"), cancellable = true)
+    private void renderInGameBackground(CallbackInfo info) {
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.disableGuiBackGround.getValue()) {
+            info.cancel();
+        }
+    }
+
+    @Inject(method = "renderBackground(Lnet/minecraft/client/gui/DrawContext;IIF)V",at = @At("HEAD"),cancellable = true)
+    public void onRenderBackground(DrawContext context, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.disableGuiBackGround.getValue() && mc.world != null) {
+            ci.cancel();
         }
     }
 }
