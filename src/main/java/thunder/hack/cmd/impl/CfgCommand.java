@@ -7,8 +7,8 @@ import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
+import thunder.hack.cmd.args.CategoryArgumentType;
 import thunder.hack.cmd.args.CfgArgumentType;
-import thunder.hack.cmd.args.CfgModeType;
 import thunder.hack.cmd.args.ModuleArgumentType;
 import thunder.hack.modules.Module;
 
@@ -82,8 +82,8 @@ public class CfgCommand extends Command {
 
         builder.then(literal("load")
                 .then(arg("name", CfgArgumentType.create())
-                        .then(arg("category", ModuleArgumentType.create()).executes(context -> {
-                            ThunderHack.configManager.load(context.getArgument("name", String.class), context.getArgument("category", String.class));
+                        .then(arg("module", ModuleArgumentType.create()).executes(context -> {
+                            ThunderHack.configManager.loadModuleOnly(context.getArgument("name", String.class), context.getArgument("module", Module.class));
                             return SINGLE_SUCCESS;
                         }))
                         .executes(context -> {
@@ -93,9 +93,15 @@ public class CfgCommand extends Command {
 
 
         builder.then(literal("loadCategory")
-                .then(arg("name", CfgArgumentType.create()).then(arg("category", CfgModeType.create()).executes(context -> {
-                            ThunderHack.configManager.load(context.getArgument("name", String.class), context.getArgument("category", String.class));
-                            return SINGLE_SUCCESS;
-                        }))));
+                .then(arg("name", CfgArgumentType.create()).then(arg("category", CategoryArgumentType.create()).executes(context -> {
+                    ThunderHack.configManager.load(context.getArgument("name", String.class), context.getArgument("category", String.class));
+                    return SINGLE_SUCCESS;
+                }))));
+
+        builder.then(literal("loadBinds")
+                .then(arg("name", CfgArgumentType.create()).executes(context -> {
+                    ThunderHack.configManager.loadBinds(context.getArgument("name", String.class));
+                    return SINGLE_SUCCESS;
+                })));
     }
 }
