@@ -24,6 +24,7 @@ import thunder.hack.modules.client.Windows;
 import thunder.hack.modules.misc.UnHook;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
+import thunder.hack.utility.player.InteractionUtility;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -97,11 +98,7 @@ public abstract class Module {
     }
 
     protected void sendSequencedPacket(SequencedPacketCreator packetCreator) {
-        if (mc.getNetworkHandler() == null || mc.world == null) return;
-        try (PendingUpdateManager pendingUpdateManager = ((IClientWorldMixin) mc.world).getPendingUpdateManager().incrementSequence();) {
-            int i = pendingUpdateManager.getSequence();
-            mc.getNetworkHandler().sendPacket(packetCreator.predict(i));
-        }
+        InteractionUtility.sendSequencedPacket(packetCreator);
     }
 
     public String getDisplayInfo() {
