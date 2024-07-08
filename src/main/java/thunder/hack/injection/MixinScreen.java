@@ -53,24 +53,25 @@ public abstract class MixinScreen {
     public void filesDragged(List<Path> paths, CallbackInfo ci) {
         String configPath = paths.get(0).toString();
         File cfgFile = new File(configPath);
-        String configName = cfgFile.getName();
+        String fileName = cfgFile.getName();
 
-        DialogScreen dialogScreen = new DialogScreen(isRu() ? "Обнаружен конфиг!" : "Config detected!",
-                isRu() ? "Ты действительно хочешь загрузить " + configName + "?" : "Are you sure you want to load " + configName + "?",
-                isRu() ? "Да ебать" : "Do it, piece of shit!", isRu() ? "Не, че за хуйня?" : "Nooo fuck ur ass nigga!",
-                () -> {
-                    ThunderHack.moduleManager.onUnload();
-                    ThunderHack.moduleManager.onUnloadPost();
-                    ThunderHack.configManager.load(cfgFile);
-                    ThunderHack.moduleManager.onLoad();
-                    mc.setScreen(null);
-                }, () -> mc.setScreen(null));
+        if (fileName.contains(".th")) {
+            DialogScreen dialogScreen = new DialogScreen(isRu() ? "Обнаружен конфиг!" : "Config detected!",
+                    isRu() ? "Ты действительно хочешь загрузить " + fileName + "?" : "Are you sure you want to load " + fileName + "?",
+                    isRu() ? "Да ебать" : "Do it, piece of shit!", isRu() ? "Не, че за хуйня?" : "Nooo fuck ur ass nigga!",
+                    () -> {
+                        ThunderHack.moduleManager.onUnload();
+                        ThunderHack.moduleManager.onUnloadPost();
+                        ThunderHack.configManager.load(cfgFile);
+                        ThunderHack.moduleManager.onLoad();
+                        mc.setScreen(null);
+                    }, () -> mc.setScreen(null));
+            mc.setScreen(dialogScreen);
 
-
-        if (mc.currentScreen instanceof WindowsScreen) {
-            DialogScreen dialogScreen2 = new DialogScreen(isRu() ? "Обнаружен файл!" : "File detected!",
-                    isRu() ? "Импортировать файл " + configName + " как" : "Import file " + configName + " as",
-                    isRu() ? "Прокси" : "Proxies", isRu() ? "Конфиг" : "Config",
+        } else if (fileName.contains(".txt")){
+            DialogScreen dialogScreen2 = new DialogScreen(isRu() ? "Обнаружен текстовый файл!" : "Text file detected!",
+                    isRu() ? "Импортировать файл " + fileName + " как" : "Import file " + fileName + " as",
+                    isRu() ? "Прокси" : "Proxies", isRu() ? "Забить" : "Cancel",
                     () -> {
                         try {
                             try (BufferedReader reader = new BufferedReader(new FileReader(cfgFile))) {
@@ -98,16 +99,10 @@ public abstract class MixinScreen {
                         mc.setScreen(null);
                     },
                     () -> {
-                        mc.setScreen(dialogScreen);
+                        mc.setScreen(null);
                     });
             mc.setScreen(dialogScreen2);
-            return;
         }
-
-        if (!configName.contains(".th"))
-            return;
-
-        mc.setScreen(dialogScreen);
     }
 
     @Inject(method = "renderPanoramaBackground", at = @At("HEAD"), cancellable = true)

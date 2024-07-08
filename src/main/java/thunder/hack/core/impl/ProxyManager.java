@@ -1,9 +1,14 @@
 package thunder.hack.core.impl;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import thunder.hack.core.IManager;
 
 import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.URI;
+import java.net.http.HttpRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

@@ -62,7 +62,9 @@ dependencies {
 	libImpl("meteordevelopment:orbit:${project.orbit_version}")
 
 	modCompileOnly "meteordevelopment:baritone:1.20.6-SNAPSHOT"
-	libImpl("io.netty:netty-handler-proxy:${project.netty_version}")
+
+	libImpl("io.netty:netty-handler-proxy:${project.netty_version}") { transitive = false }
+	libImpl("io.netty:netty-codec-socks:${project.netty_version}") { transitive = false }
 
 
 	compileOnlyApi("org.apiguardian:apiguardian-api:1.1.2")
