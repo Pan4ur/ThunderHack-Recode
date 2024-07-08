@@ -6,11 +6,9 @@ import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.impl.*;
 import thunder.hack.core.IManager;
-import thunder.hack.modules.Module;
 
 import java.util.ArrayList;
 import java.util.List;

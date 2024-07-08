@@ -95,7 +95,10 @@ public class Trails extends Module {
                         bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + width.getValue() + down.getValue(), (float) pos.z).color(Render2DEngine.injectAlpha(((IEntity) entity).getTrails().get(i).color(), (int) ((alpha * ctx.animation(Render3DEngine.getTickDelta())) * 255)).getRGB());
                     }
 
-                    BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+                    BuiltBuffer builtBuffer = bufferBuilder.endNullable();
+                    if (builtBuffer != null)
+                        BufferRenderer.drawWithGlobalProgram(builtBuffer);
+
                     Render3DEngine.endRender();
                     RenderSystem.enableCull();
                     RenderSystem.disableDepthTest();
@@ -146,7 +149,11 @@ public class Trails extends Module {
                         bufferBuilder.vertex(matrix, -sc, -sc, 0).texture(0, 0).color(Render2DEngine.injectAlpha(col, animatedAlpha).getRGB());
                     }
                 }
-                BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+
+                BuiltBuffer builtBuffer = bufferBuilder.endNullable();
+                if (builtBuffer != null)
+                    BufferRenderer.drawWithGlobalProgram(builtBuffer);
+
                 RenderSystem.depthMask(true);
                 RenderSystem.disableDepthTest();
                 RenderSystem.disableBlend();

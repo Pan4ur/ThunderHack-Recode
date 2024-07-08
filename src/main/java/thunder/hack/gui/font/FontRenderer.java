@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static thunder.hack.core.IManager.mc;
+import static thunder.hack.utility.math.MathUtility.roundToDecimal;
 
 public class FontRenderer implements Closeable {
     private static final Char2IntArrayMap colorCodes = new Char2IntArrayMap() {{
@@ -174,9 +175,8 @@ public class FontRenderer implements Closeable {
         float r2 = r, g2 = g, b2 = b;
         stack.push();
         y -= 3f;
-        stack.translate(x, y, 0);
+        stack.translate(roundToDecimal(x, 1), roundToDecimal(y, 1), 0);
         stack.scale(1f / this.scaleMul, 1f / this.scaleMul, 1f);
-
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableCull();
@@ -266,7 +266,6 @@ public class FontRenderer implements Closeable {
                     BufferRenderer.drawWithGlobalProgram(bb.end());
                 }
             }
-
             GLYPH_PAGE_CACHE.clear();
         }
         stack.pop();

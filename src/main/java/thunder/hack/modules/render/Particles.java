@@ -97,7 +97,9 @@ public class Particles extends Module {
             RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
             BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
             fireFlies.forEach(p -> p.render(buffer));
-            BufferRenderer.drawWithGlobalProgram(buffer.end());
+            BuiltBuffer builtBuffer = buffer.endNullable();
+            if (builtBuffer != null)
+                BufferRenderer.drawWithGlobalProgram(builtBuffer);
             RenderSystem.depthMask(true);
             RenderSystem.disableDepthTest();
             RenderSystem.disableBlend();
@@ -113,7 +115,9 @@ public class Particles extends Module {
             RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
             BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
             particles.forEach(p -> p.render(buffer));
-            BufferRenderer.drawWithGlobalProgram(buffer.end());
+            BuiltBuffer builtBuffer = buffer.endNullable();
+            if (builtBuffer != null)
+                BufferRenderer.drawWithGlobalProgram(builtBuffer);
             RenderSystem.depthMask(true);
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
             RenderSystem.disableDepthTest();
