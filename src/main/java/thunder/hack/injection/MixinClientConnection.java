@@ -1,6 +1,8 @@
 package thunder.hack.injection;
 
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.proxy.Socks5ProxyHandler;
+
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ProxyManager;
 import thunder.hack.events.impl.PacketEvent;
@@ -10,7 +12,6 @@ import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.network.handler.PacketSizeLogger;
-import io.netty.handler.proxy.Socks5ProxyHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

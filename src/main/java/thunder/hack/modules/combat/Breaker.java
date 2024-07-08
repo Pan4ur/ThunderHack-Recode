@@ -18,17 +18,25 @@ import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.ExplosionUtility;
+import thunder.hack.utility.world.HoleUtility;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 
 public final class Breaker extends Module {
-    private final Setting<CombatManager.TargetBy> targetBy = new Setting<>("TargetBy", CombatManager.TargetBy.Distance);
-    private final Setting<Integer> range = new Setting<>("Range", 5, 1, 7);
+
+    private final Setting<Target> targetMode = new Setting<>("Target", Target.AutoCrystal);
+    private final Setting<Boolean> onlyIfHole = new Setting<>("OnlyIfHole", false);
+    private final Setting<CombatManager.TargetBy> targetBy = new Setting<>("TargetBy", CombatManager.TargetBy.Distance, v -> targetMode.is(Target.Breaker));
+    private final Setting<Integer> range = new Setting<>("Range", 5, 1, 7, v -> targetMode.is(Target.Breaker));
     private final Setting<Float> minDamage = new Setting<>("MinDamage", 7f, 0f, 36f);
     private final Setting<Float> maxSelfDamage = new Setting<>("MaxSelfDamage", 4f, 0f, 36f);
     private final Setting<Boolean> cevPriority = new Setting<>("CevPriority", true);
     private final Setting<Boolean> antiShulker = new Setting<>("AntiShulker", true);
+
+    private enum Target {
+        AutoCrystal, Breaker
+    }
 
     private BlockPos blockPos;
 
@@ -41,8 +49,18 @@ public final class Breaker extends Module {
     @EventHandler
     @SuppressWarnings("unused")
     private void onSync(EventSync event) {
-        PlayerEntity target = ThunderHack.combatManager.getTarget(range.getValue(), targetBy.getValue());
+        PlayerEntity target;
+
+        if (targetMode.is(Target.Breaker)) {
+            target = ThunderHack.combatManager.getTarget(range.getValue(), targetBy.getValue());
+        } else {
+            target = AutoCrystal.target;
+        }
+
         if (target == null)
+            return;
+
+        if (onlyIfHole.getValue() && !HoleUtility.isHole(BlockPos.ofFloored(target.getPos())))
             return;
 
         BlockPos burrow = BlockPos.ofFloored(target.getPos());
@@ -72,8 +90,8 @@ public final class Breaker extends Module {
                         continue;
                     BlockState currentState = mc.world.getBlockState(bp);
                     mc.world.setBlockState(bp, Blocks.AIR.getDefaultState());
-                    float damage = ExplosionUtility.getExplosionDamage(bp.toCenterPos().add(0,-0.5,0), target, false);
-                    float selfDamage = ExplosionUtility.getExplosionDamage(bp.toCenterPos().add(0,-0.5,0), mc.player, false);
+                    float damage = ExplosionUtility.getExplosionDamage(bp.toCenterPos().add(0, -0.5, 0), target, false);
+                    float selfDamage = ExplosionUtility.getExplosionDamage(bp.toCenterPos().add(0, -0.5, 0), mc.player, false);
                     mc.world.setBlockState(bp, currentState);
                     if ((Float.isNaN(ModuleManager.autoCrystal.renderDamage) || ModuleManager.autoCrystal.renderDamage < damage) && selfDamage < maxSelfDamage.getValue() && damage >= minDamage.getValue())
                         list.add(new BreakData(bp, damage));
@@ -115,8 +133,8 @@ public final class Breaker extends Module {
 
                         BlockState currentState = mc.world.getBlockState(bp);
                         mc.world.setBlockState(bp, Blocks.AIR.getDefaultState());
-                        float damage = ExplosionUtility.getExplosionDamage(bp.toCenterPos().add(0,-0.5,0), target, false);
-                        float selfDamage = ExplosionUtility.getExplosionDamage(bp.toCenterPos().add(0,-0.5,0), mc.player, false);
+                        float damage = ExplosionUtility.getExplosionDamage(bp.toCenterPos().add(0, -0.5, 0), target, false);
+                        float selfDamage = ExplosionUtility.getExplosionDamage(bp.toCenterPos().add(0, -0.5, 0), mc.player, false);
                         mc.world.setBlockState(bp, currentState);
 
                         if (ModuleManager.autoCrystal.renderDamage < damage
