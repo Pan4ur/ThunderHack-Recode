@@ -2,12 +2,14 @@ package thunder.hack.modules.combat;
 
 import io.netty.buffer.Unpooled;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;

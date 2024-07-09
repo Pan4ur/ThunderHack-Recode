@@ -21,14 +21,7 @@ public class NotificationManager {
     public void publicity(String title, String content, int second, Notification.Type type) {
         if(ModuleManager.notifications.mode.getValue() == Notifications.Mode.Text)
             Command.sendMessage(Formatting.GRAY + "[" + Formatting.DARK_PURPLE + title + Formatting.GRAY + "] " + type.getColor() + content);
-        else if (ModuleManager.notifications.mode.getValue() == Notifications.Mode.Programming) {
-            if(type == Notification.Type.ENABLED){
-                Command.sendMessage(type.getColor() + title + ".enable();");
-            }
-            else{
-                Command.sendMessage(type.getColor() + title + ".disable();");
-            }
-        } else notifications.add(new Notification(title, content, type, second * 1000));
+        notifications.add(new Notification(title, content, type, second * 1000));
     }
 
     public void onRender2D(DrawContext context) {

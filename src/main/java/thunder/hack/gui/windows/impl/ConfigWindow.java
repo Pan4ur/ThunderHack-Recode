@@ -12,6 +12,8 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
 import thunder.hack.gui.windows.WindowsScreen;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
@@ -23,23 +25,20 @@ import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class ConfigWindow extends WindowBase {
-    private static ConfigWindow instance = new ConfigWindow();
+    private static ConfigWindow instance;
+
     private ArrayList<ConfigPlate> configPlates = new ArrayList<>();
     private int listeningId = -1;
     private String search = "Search", addName = "Name";
 
-    public ConfigWindow() {
-        this(mc.getWindow().getScaledWidth() / 2f - 70, mc.getWindow().getScaledHeight() / 2f - 120, 200, 180);
-    }
-
-    public ConfigWindow(float x, float y, float width, float height) {
-        super(x, y, width, height, "Config");
+    public ConfigWindow(float x, float y, float width, float height, Setting<PositionSetting> position) {
+        super(x, y, width, height, "Config", position);
         refresh();
     }
 
-    public static ConfigWindow get() {
+    public static ConfigWindow get(float x, float y, Setting<PositionSetting> position) {
         if (instance == null)
-            instance = new ConfigWindow();
+            instance = new ConfigWindow(x, y, 200, 180, position);
         instance.refresh();
         return instance;
     }

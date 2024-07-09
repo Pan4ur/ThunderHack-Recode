@@ -87,7 +87,6 @@ public class Aura extends Module {
     public final Setting<ESP> esp = new Setting<>("ESP", ESP.ThunderHack);
     public final Setting<Sort> sort = new Setting<>("Sort", Sort.LowestDistance);
     public final Setting<Boolean> lockTarget = new Setting<>("LockTarget", true);
-    public final Setting<Boolean> attackMobsIfNoPlayers = new Setting<>("AttackMobIfNoPlayers", false);
 
     /*   ADVANCED   */
     public final Setting<SettingGroup> advanced = new Setting<>("Advanced", new SettingGroup(false, 0));
@@ -162,7 +161,7 @@ public class Aura extends Module {
         return elytra.getValue() && mc.player.isFallFlying() ? elytraAttackRange.getValue() : attackRange.getValue();
     }
     private float getWallRange(){
-        return elytra.getValue() && mc.player.isFallFlying() ? elytraWallRange.getValue() : wallRange.getValue();
+        return elytra.getValue() && mc.player != null && mc.player.isFallFlying() ? elytraWallRange.getValue() : wallRange.getValue();
     }
 
     public void auraLogic() {
@@ -314,13 +313,7 @@ public class Aura extends Module {
 
         if (mc.player.isUsingItem() && pauseWhileEating.getValue())
             return;
-        if(!havePlayersNear()  && attackMobsIfNoPlayers.getValue()){
-            Mobs.setValue(true);
 
-        }
-        else{
-            Mobs.setValue(false);
-        }
         resolvePlayers();
         auraLogic();
         restorePlayers();

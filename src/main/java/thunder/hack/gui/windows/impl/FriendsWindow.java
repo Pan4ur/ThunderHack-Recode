@@ -3,6 +3,7 @@ package thunder.hack.gui.windows.impl;
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
@@ -12,6 +13,8 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
 import thunder.hack.gui.windows.WindowsScreen;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
@@ -22,23 +25,19 @@ import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class FriendsWindow extends WindowBase {
-    private static FriendsWindow instance = new FriendsWindow();
+    private static FriendsWindow instance;
     private ArrayList<FriendPlate> friendPlates = new ArrayList<>();
     private int listeningId = -1;
     private String search = "Search", addName = "Name";
 
-    public FriendsWindow() {
-        this(mc.getWindow().getScaledWidth() / 2f - 40, mc.getWindow().getScaledHeight() / 2f - 90, 200, 180);
-    }
-
-    public FriendsWindow(float x, float y, float width, float height) {
-        super(x, y, width, height, "Friends");
+    public FriendsWindow(float x, float y, float width, float height, Setting<PositionSetting> position) {
+        super(x, y, width, height, "Friends", position);
         refresh();
     }
 
-    public static FriendsWindow get() {
+    public static FriendsWindow get(float x, float y, Setting<PositionSetting> position) {
         if (instance == null)
-            instance = new FriendsWindow();
+            instance = new FriendsWindow(x, y, 200, 180, position);
         instance.refresh();
         return instance;
     }
@@ -89,9 +88,11 @@ public class FriendsWindow extends WindowBase {
             if ((int) (friendPlate.offset + getY() + 25) + getScrollOffset() > getY() + getHeight() || friendPlate.offset + getScrollOffset() + getY() + 10 < getY())
                 continue;
 
+            boolean online = mc.player != null && mc.player.networkHandler.getPlayerList().stream().map(p -> p.getProfile().getName()).toList().contains(friendPlate.name()) || ThunderHack.telemetryManager.getOnlinePlayers().contains(friendPlate.name());
+
             // Name
             Render2DEngine.drawRectWithOutline(context.getMatrices(), getX() + 11, friendPlate.offset + getY() + 36 + getScrollOffset(), getWidth() - 28, 11, color, color2);
-            FontRenderers.sf_medium.drawString(context.getMatrices(), friendPlate.name(), getX() + 13, friendPlate.offset + getY() + 40 + getScrollOffset(), textColor);
+            FontRenderers.sf_medium.drawString(context.getMatrices(), friendPlate.name() + (online ? Formatting.DARK_GRAY + " l " + Formatting.GREEN + "Online" : ""), getX() + 13, friendPlate.offset + getY() + 40 + getScrollOffset(), textColor);
 
             // Delete
             boolean hover5 = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 15, friendPlate.offset + getY() + 36 + getScrollOffset(), 11, 11);
@@ -134,7 +135,7 @@ public class FriendsWindow extends WindowBase {
             if ((int) (friendPlate.offset + getY() + 50) + getScrollOffset() > getY() + getHeight())
                 continue;
 
-            boolean hoveringRemove = Render2DEngine.isHovered(mouseX, mouseY, getX() + 180, friendPlate.offset + getY() + 36 + getScrollOffset(), 11, 11);
+            boolean hoveringRemove = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 15, friendPlate.offset + getY() + 36 + getScrollOffset(), 11, 11);
 
             if (hoveringRemove) {
                 ThunderHack.friendManager.removeFriend(friendPlate.name());
@@ -153,10 +154,15 @@ public class FriendsWindow extends WindowBase {
         if (listeningId != -1) {
             switch (keyCode) {
                 case GLFW.GLFW_KEY_ENTER -> {
+
                     if (!addName.isEmpty())
                         ThunderHack.friendManager.addFriend(addName);
+
                     if (listeningId != -2)
                         listeningId = -1;
+
+                    addName = "Name";
+                    refresh();
                 }
 
                 case GLFW.GLFW_KEY_ESCAPE -> {

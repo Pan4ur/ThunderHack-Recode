@@ -16,7 +16,6 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.RaycastContext;
-import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.explosion.Explosion;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.injection.accesors.IExplosion;

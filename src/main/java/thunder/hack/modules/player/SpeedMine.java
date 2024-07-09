@@ -48,6 +48,7 @@ import java.util.Objects;
 
 public final class SpeedMine extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
+    private final Setting<Boolean> avoidNetherrack = new Setting<>("AvoidNetherrack", false);
     private final Setting<StartMode> startMode = new Setting<>("StartMode", StartMode.StartAbort, v -> mode.getValue() == Mode.Packet);
     private final Setting<SwitchMode> switchMode = new Setting<>("SwitchMode", SwitchMode.Alternative, v -> mode.getValue() != Mode.Damage);
     private final Setting<Integer> swapDelay = new Setting<>("SwapDelay", 50, 0, 1000, v -> switchMode.getValue() == SwitchMode.Alternative && mode.getValue() != Mode.Damage);

@@ -24,6 +24,7 @@ import thunder.hack.modules.client.Windows;
 import thunder.hack.modules.misc.UnHook;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
+import thunder.hack.utility.player.InteractionUtility;
 
 import java.lang.reflect.Field;
 import java.util.*;

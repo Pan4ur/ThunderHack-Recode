@@ -1,13 +1,8 @@
 package thunder.hack.cmd.impl;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.command.CommandSource;
-import net.minecraft.command.argument.ArgumentTypes;
-import net.minecraft.command.argument.GameProfileArgumentType;
-import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
