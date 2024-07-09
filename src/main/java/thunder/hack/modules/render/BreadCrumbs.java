@@ -49,8 +49,6 @@ public class BreadCrumbs extends Module {
         RenderSystem.lineWidth(width);
         buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
 
-        EntityRenderDispatcher
-
         for (int i = 0; i < positions.size(); i++) {
             Vec3d vec1 = null;
             try {
