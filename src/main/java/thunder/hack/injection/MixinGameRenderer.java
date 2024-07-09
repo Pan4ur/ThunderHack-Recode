@@ -2,6 +2,7 @@ package thunder.hack.injection;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
+import thunder.hack.utility.render.shaders.satin.impl.ReloadableShaderEffectManager;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.ShaderStage;
 import net.minecraft.client.option.Perspective;
@@ -102,6 +103,11 @@ public abstract class MixinGameRenderer {
     private float applyCameraTransformationsMathHelperLerpProxy(float delta, float first, float second) {
         if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.nausea.getValue()) return 0;
         return MathHelper.lerp(delta, first, second);
+    }
+
+    @Inject(method = "loadPrograms", at = @At(value = "RETURN"))
+    private void loadSatinPrograms(ResourceFactory factory, CallbackInfo ci) {
+        ReloadableShaderEffectManager.INSTANCE.reload(factory);
     }
 
     @Inject(method = "updateCrosshairTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;findCrosshairTarget(Lnet/minecraft/entity/Entity;DDF)Lnet/minecraft/util/hit/HitResult;"), cancellable = true)

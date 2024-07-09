@@ -45,6 +45,13 @@ import static thunder.hack.modules.Module.mc;
 @Mixin(MinecraftClient.class)
 public abstract class MixinMinecraftClient {
 
+    @Shadow
+    @Final
+    private Window window;
+
+    @Shadow
+    public abstract void setScreen(@Nullable Screen screen);
+
     @Unique
     private String[] shittyServers = {
             "mineblaze",
@@ -90,20 +97,11 @@ public abstract class MixinMinecraftClient {
         if (!Module.fullNullCheck()) ThunderHack.EVENT_BUS.post(new EventPostTick());
     }
 
-    @Shadow
-    @Final
-    private Window window;
-
-    @Shadow
-    private static MinecraftClient instance;
-
-    @Shadow
-    public abstract void setScreen(@Nullable Screen screen);
-
     @Inject(method = "onResolutionChanged", at = @At("TAIL"))
     private void captureResize(CallbackInfo ci) {
         WindowResizeCallback.EVENT.invoker().onResized((MinecraftClient) (Object) this, this.window);
     }
+
 
     @Inject(method = "doItemPick", at = @At("HEAD"), cancellable = true)
     private void doItemPickHook(CallbackInfo ci) {
@@ -151,6 +149,7 @@ public abstract class MixinMinecraftClient {
             MacWindowUtil.setApplicationIconImage(icons.getMacIcon(resourcePack));
             return;
         }
+
         setWindowIcon(ThunderHack.class.getResourceAsStream("/icon.png"), ThunderHack.class.getResourceAsStream("/icon.png"));
     }
 

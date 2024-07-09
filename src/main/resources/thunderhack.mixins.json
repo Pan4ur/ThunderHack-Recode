@@ -4,6 +4,7 @@
   "package": "thunder.hack.injection",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "JsonEffectGlShaderMixin",
     "MixinArmorFeatureRenderer",
     "MixinBackgroundRenderer",
     "MixinBlockCollisionSpliterator",
@@ -45,6 +46,7 @@
     "MixinTextVisitFactory",
     "MixinTitleScreen",
     "MixinWorldRenderer",
+    "accesors.AccessiblePassesShaderEffect",
     "accesors.IClientPlayerEntity",
     "accesors.IClientWorldMixin",
     "accesors.IFrustum",

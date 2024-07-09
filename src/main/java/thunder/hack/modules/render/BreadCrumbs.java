@@ -3,6 +3,7 @@ package thunder.hack.modules.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.events.impl.EventPostSync;
@@ -47,6 +48,8 @@ public class BreadCrumbs extends Module {
         RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
         RenderSystem.lineWidth(width);
         buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+
+        EntityRenderDispatcher
 
         for (int i = 0; i < positions.size(); i++) {
             Vec3d vec1 = null;

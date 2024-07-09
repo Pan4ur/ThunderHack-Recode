@@ -166,9 +166,11 @@ public class ProxyWindow extends WindowBase {
             FontRenderers.icons.drawString(context.getMatrices(), "w", getX() + getWidth() - 15, proxyPlate.offset + getY() + 40 + getScrollOffset(), -1);
             FontRenderers.sf_medium_mini.drawString(context.getMatrices(), id + ".", getX() + 3, getY() + 41 + getScrollOffset() + proxyPlate.offset, textColor);
 
+
+            boolean selected = ThunderHack.proxyManager.getActiveProxy() == proxyPlate.proxy;
             boolean hover9 = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 28, getY() + 36 + getScrollOffset() + proxyPlate.offset, 11, 11);
             Render2DEngine.drawRectWithOutline(context.getMatrices(), getX() + getWidth() - 28, getY() + 36 + getScrollOffset() + proxyPlate.offset, 11, 11, hover9 ? hoveredColor : color, color2);
-            FontRenderers.icons.drawString(context.getMatrices(), ThunderHack.proxyManager.getActiveProxy() == proxyPlate.proxy ? "i" : "k", getX() + getWidth() - 26, proxyPlate.offset + getY() + 41 + getScrollOffset(), -1);
+            FontRenderers.icons.drawString(context.getMatrices(), selected? "i" : "k", getX() + getWidth() - 26, proxyPlate.offset + getY() + 41 + getScrollOffset(), selected ? -1 : Color.GRAY.getRGB());
         }
         setMaxElementsHeight(proxyPlates.size() * 20);
         Render2DEngine.popWindow();
