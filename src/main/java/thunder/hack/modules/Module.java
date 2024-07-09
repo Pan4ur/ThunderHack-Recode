@@ -98,7 +98,11 @@ public abstract class Module {
     }
 
     protected void sendSequencedPacket(SequencedPacketCreator packetCreator) {
-        InteractionUtility.sendSequencedPacket(packetCreator);
+        if (mc.getNetworkHandler() == null || mc.world == null) return;
+        try (PendingUpdateManager pendingUpdateManager = mc.world.getPendingUpdateManager().incrementSequence();) {
+            int i = pendingUpdateManager.getSequence();
+            mc.getNetworkHandler().sendPacket(packetCreator.predict(i));
+        }
     }
 
     public String getDisplayInfo() {

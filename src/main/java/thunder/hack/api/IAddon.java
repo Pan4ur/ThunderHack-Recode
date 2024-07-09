@@ -22,4 +22,9 @@ public interface IAddon {
     String getAuthor();
 
     String getRepo();
+    String getVersion();
+
+    default String getDescription() {
+        return "";
+    }
 }
