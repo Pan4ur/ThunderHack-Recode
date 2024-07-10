@@ -36,7 +36,7 @@ public class BooleanParentElement extends AbstractElement {
         MatrixStack matrixStack = context.getMatrices();
 
         float tx = x + width - 11;
-        float ty = y + 8.5f;
+        float ty = y + 7.5f;
 
         arrowAnimation = fast(arrowAnimation, getParentSetting().getValue().isExtended() ? 0 : 1, 15f);
 
@@ -44,8 +44,11 @@ public class BooleanParentElement extends AbstractElement {
         matrixStack.translate(tx, ty, 0);
         matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-180f * arrowAnimation));
         matrixStack.translate(-tx, -ty, 0);
-        context.drawTexture(arrow, (int) (x + width - 14), (int) (y + 6), 0, 0, 6, 6, 6, 6);
+        matrixStack.translate((x + width - 14), (y + 4.5f), 0);
+        context.drawTexture(arrow, 0, 0, 0, 0, 6, 6, 6, 6);
+        matrixStack.translate(-(x + width - 14), -(y + 4.5f), 0);
         matrixStack.pop();
+
         FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), x + 6, y + height / 2 - 1f, new Color(-1).getRGB());
         animation = fast(animation, getParentSetting().getValue().isEnabled() ? 1 : 0, 15f);
         float paddingX = 7f * animation;

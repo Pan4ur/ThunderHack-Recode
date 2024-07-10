@@ -366,11 +366,10 @@ public class AutoCrystal extends Module {
                 return;
             }
 
-
-            // TODO check on matrix ac
-
             // Shitty NCP (cc) OK
             // Updated NCP (mio test server, constantiam prob) OK
+            // Shitty Matrix (forcemine) OK
+            // Grim (mio test server) OK
 
             Vec3d vec = !rotate.getValue().needSeparate() ? (bestPosition == null ? bestCrystal.getPos() : rotate.getValue().getVector(bestPosition))
                     : (rotationVec.hitVec() == null ? rotationVec.vec() : rotate.getValue().getVector(rotationVec.hitVec()));

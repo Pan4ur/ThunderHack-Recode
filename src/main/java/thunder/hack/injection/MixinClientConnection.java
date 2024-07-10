@@ -1,9 +1,11 @@
 package thunder.hack.injection;
 
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.proxy.Socks5ProxyHandler;
 
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.core.impl.ProxyManager;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -21,6 +23,14 @@ import java.net.InetSocketAddress;
 
 @Mixin(ClientConnection.class)
 public class MixinClientConnection {
+
+    @Inject(method = "exceptionCaught", at = @At("HEAD"), cancellable = true)
+    private void exceptionCaughtHook(ChannelHandlerContext context, Throwable t, CallbackInfo ci) {
+        if (ModuleManager.antiPacketException.isEnabled()) {
+            ModuleManager.antiPacketException.sendChatMessage(t.getMessage());
+            ci.cancel();
+        }
+    }
 
     @Inject(method = "handlePacket", at = @At("HEAD"), cancellable = true)
     private static <T extends PacketListener> void onHandlePacket(Packet<T> packet, PacketListener listener, CallbackInfo info) {
