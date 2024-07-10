@@ -37,7 +37,7 @@ public class DurabilityAlert extends Module {
                 for (ItemStack stack : player.getInventory().armor) {
                     if (stack.isEmpty() || !(stack.getItem() instanceof ArmorItem)) continue;
                     if (getDurability(stack) < percent.getValue() && timer.passedMs(30000)) {
-                        mc.player.networkHandler.sendChatCommand("msg " + player.getName().getString() + (isRu() ? " Срочно чини броню!" : "Fix your armor right now!"));
+                        mc.player.networkHandler.sendChatCommand("msg " + player.getName().getString() + (isRu() ? " Срочно чини броню!" : " Fix your armor right now!"));
 
                         timer.reset();
                     }
@@ -58,7 +58,7 @@ public class DurabilityAlert extends Module {
 
     public void onRender2D(DrawContext context) {
         if (need_alert) {
-            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), isRu() ? " Срочно чини броню!" : "Fix your armor right now!", (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
+            FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), isRu() ? "Срочно чини броню!" : "Fix your armor right now!", (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
 
             Color c1 = new Color(0xFFDF00);
             RenderSystem.setShaderColor(c1.getRed() / 255f, c1.getGreen() / 255f, c1.getBlue() / 255f, 1f);
