@@ -172,7 +172,9 @@ public abstract class MixinMinecraftClient {
                 buffers.add(bytebuffer);
             }
 
-            GLFW.glfwSetWindowIcon(mc.getWindow().getHandle(), buffer);
+            try {
+                GLFW.glfwSetWindowIcon(mc.getWindow().getHandle(), buffer);
+            } catch (Exception ignored) {}
             buffers.forEach(MemoryUtil::memFree);
         } catch (IOException ignored) {
         }
