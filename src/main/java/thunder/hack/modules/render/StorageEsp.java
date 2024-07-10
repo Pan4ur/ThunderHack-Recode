@@ -30,6 +30,7 @@ public class StorageEsp extends Module {
     public final Setting<Boolean> fill = new Setting<>("Fill", true);
 
     public final Setting<Boolean> chest = new Setting<>("Chest", true);
+    public final Setting<Boolean> trappedChest = new Setting<>("Trapped Chest", true);
     public final Setting<Boolean> dispenser = new Setting<>("Dispenser", false);
     public final Setting<Boolean> shulker = new Setting<>("Shulker", true);
     public final Setting<Boolean> echest = new Setting<>("Ender Chest", true);
@@ -40,6 +41,7 @@ public class StorageEsp extends Module {
     public final Setting<Boolean> cart = new Setting<>("Minecart", false);
     public final Setting<Boolean> frame = new Setting<>("ItemFrame", false);
     private final Setting<ColorSetting> chestColor = new Setting<>("ChestColor", new ColorSetting(0x8800FF00));
+    private final Setting<ColorSetting> trappedChestColor = new Setting<>("TrappedChestColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> shulkColor = new Setting<>("ShulkerColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> echestColor = new Setting<>("EChestColor", new ColorSetting(0x8800FF00));
     private final Setting<ColorSetting> frameColor = new Setting<>("FrameColor", new ColorSetting(0x8800FF00));
@@ -110,8 +112,8 @@ public class StorageEsp extends Module {
     private Color getColor(BlockEntity bEnt) {
         Color color = null;
 
-        if (bEnt instanceof TrappedChestBlockEntity && chest.getValue()) color = chestColor.getValue().getColorObject();
-        else if (bEnt instanceof ChestBlockEntity && chest.getValue())
+        if (bEnt instanceof TrappedChestBlockEntity && trappedChest.getValue()) color = trappedChestColor.getValue().getColorObject();
+        else if (bEnt instanceof ChestBlockEntity && chest.getValue() && bEnt.getType() != BlockEntityType.TRAPPED_CHEST)
             color = chestColor.getValue().getColorObject();
         else if (bEnt instanceof EnderChestBlockEntity && echest.getValue())
             color = echestColor.getValue().getColorObject();
