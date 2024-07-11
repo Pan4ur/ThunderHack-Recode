@@ -62,9 +62,11 @@ public class BooleanParentElement extends AbstractElement {
             FontRenderers.sf_bold_mini.drawString(context.getMatrices(), "x", x + width - 27f, y + height / 2 - 2f, new Color(-1).getRGB());
         }
 
-        if(Render2DEngine.isHovered(mouseX, mouseY, x + width - 36, y + height / 2 - 4, 15, 8)) {
-            GLFW.glfwSetCursor(mc.getWindow().getHandle(),
-                    GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
+        if (Render2DEngine.isHovered(mouseX, mouseY, x + width - 36, y + height / 2 - 4, 15, 8)) {
+            if (GLFW.glfwGetPlatform() != GLFW.GLFW_PLATFORM_WAYLAND) {
+                GLFW.glfwSetCursor(mc.getWindow().getHandle(),
+                        GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
+            }
             ClickGUI.anyHovered = true;
         }
     }

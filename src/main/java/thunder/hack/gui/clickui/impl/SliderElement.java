@@ -66,8 +66,10 @@ public class SliderElement extends AbstractElement {
             setValue(mouseX, x + 7, width - 14);
 
         if (Render2DEngine.isHovered(mouseX, mouseY, (x + 6), y + height - 7, width - 12, 3)) {
-            GLFW.glfwSetCursor(mc.getWindow().getHandle(),
-                    GLFW.glfwCreateStandardCursor(GLFW.GLFW_HRESIZE_CURSOR));
+            if (GLFW.glfwGetPlatform() != GLFW.GLFW_PLATFORM_WAYLAND) {
+                GLFW.glfwSetCursor(mc.getWindow().getHandle(),
+                        GLFW.glfwCreateStandardCursor(GLFW.GLFW_HRESIZE_CURSOR));
+            }
             ClickGUI.anyHovered = true;
         }
     }
@@ -145,7 +147,8 @@ public class SliderElement extends AbstractElement {
             String k = ".";
             try {
                 k = String.valueOf(Integer.parseInt(String.valueOf(key)));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
             Stringnumber = Stringnumber + k;
         }
     }

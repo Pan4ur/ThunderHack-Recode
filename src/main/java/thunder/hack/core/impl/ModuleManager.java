@@ -328,11 +328,13 @@ public class ModuleManager implements IManager {
     }
 
     public void onRender2D(DrawContext context) {
-        if(mc.getDebugHud().shouldShowDebugHud() || mc.options.hudHidden) return;
+        if (mc.getDebugHud().shouldShowDebugHud() || mc.options.hudHidden) return;
         HudElement.anyHovered = false;
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender2D(context));
         if (!HudElement.anyHovered && !ClickGUI.anyHovered)
-            GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
+            if (GLFW.glfwGetPlatform() != GLFW.GLFW_PLATFORM_WAYLAND) {
+                GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
+            }
         ThunderHack.core.onRender2D(context);
     }
 
