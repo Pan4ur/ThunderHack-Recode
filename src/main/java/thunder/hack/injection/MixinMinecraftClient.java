@@ -173,8 +173,11 @@ public abstract class MixinMinecraftClient {
             }
 
             try {
-                GLFW.glfwSetWindowIcon(mc.getWindow().getHandle(), buffer);
-            } catch (Exception ignored) {}
+                if (GLFW.glfwGetPlatform() != GLFW.GLFW_PLATFORM_WAYLAND) {
+                    GLFW.glfwSetWindowIcon(mc.getWindow().getHandle(), buffer);
+                }
+            } catch (Exception ignored) {
+            }
             buffers.forEach(MemoryUtil::memFree);
         } catch (IOException ignored) {
         }
