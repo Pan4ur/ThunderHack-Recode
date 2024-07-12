@@ -2,23 +2,16 @@ package thunder.hack;
 
 import com.mojang.logging.LogUtils;
 import meteordevelopment.orbit.EventBus;
-import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.IEventBus;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.api.IAddon;
 import thunder.hack.core.Core;
 import thunder.hack.core.impl.*;
-import thunder.hack.core.impl.NotificationManager;
-import thunder.hack.gui.notification.Notification;
-import thunder.hack.modules.client.RPC;
 import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.render.Render2DEngine;
 
@@ -114,7 +107,7 @@ public class ThunderHack implements ModInitializer {
 
                 AddonManager.addAddon(addon);
                 LogUtils.getLogger().debug("Addon added to manager.");
-                EVENT_BUS.registerLambdaFactory(addon.getPackage() , (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
+                EVENT_BUS.registerLambdaFactory(addon.getPackage(), (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
 
                 // Register Modules
                 addon.getModules().stream().filter(Objects::nonNull).forEach(module -> {
@@ -160,13 +153,20 @@ public class ThunderHack implements ModInitializer {
         LogUtils.getLogger().info("Addon initialization complete.");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if(ModuleManager.unHook.isEnabled())
+            if (ModuleManager.unHook.isEnabled())
                 ModuleManager.unHook.disable();
             FriendManager.saveFriends();
             configManager.save(configManager.getCurrentConfig());
             wayPointManager.saveWayPoints();
             macroManager.saveMacro();
             proxyManager.saveProxies();
+            for (IAddon addon : AddonManager.getAddons()) {
+                try {
+                    addon.onShutdown();
+                } catch (Exception e) {
+                    LogUtils.getLogger().error("Error running addon onShutdown method: " + addon.getClass().getName(), e);
+                }
+            }
         }));
 
         macroManager.onLoad();
@@ -176,7 +176,7 @@ public class ThunderHack implements ModInitializer {
 
         BUILD_DATE = ThunderUtility.readManifestField("Build-Timestamp");
         GITH_HASH = ThunderUtility.readManifestField("Git-Commit");
-        
+
         soundManager.registerSounds();
 
         // TODO Move to dedicated Thread
