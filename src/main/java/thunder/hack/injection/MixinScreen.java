@@ -60,10 +60,9 @@ public abstract class MixinScreen {
                     isRu() ? "Ты действительно хочешь загрузить " + fileName + "?" : "Are you sure you want to load " + fileName + "?",
                     isRu() ? "Да ебать" : "Do it, piece of shit!", isRu() ? "Не, че за хуйня?" : "Nooo fuck ur ass nigga!",
                     () -> {
-                        ThunderHack.moduleManager.onUnload();
-                        ThunderHack.moduleManager.onUnloadPost();
+                        ThunderHack.moduleManager.onUnload("none");
                         ThunderHack.configManager.load(cfgFile);
-                        ThunderHack.moduleManager.onLoad();
+                        ThunderHack.moduleManager.onLoad("none");
                         mc.setScreen(null);
                     }, () -> mc.setScreen(null));
             mc.setScreen(dialogScreen);
