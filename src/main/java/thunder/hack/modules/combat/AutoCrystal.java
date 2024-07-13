@@ -165,7 +165,7 @@ public class AutoCrystal extends Module {
 
     private int prevCrystalsAmount, crystalSpeed, invTimer, rotationTicks;
 
-    private boolean rotated, facePlacing, placedOnSpawn;
+    private boolean rotated, rotating, facePlacing, placedOnSpawn;
 
     private long confirmTime, calcTime;
 
@@ -244,7 +244,7 @@ public class AutoCrystal extends Module {
         }
 
         // Rotate
-        if (!rotate.is(Rotation.OFF) && mc.player != null) {
+        if (!rotate.is(Rotation.OFF) && mc.player != null && rotating) {
 
             boolean hitVisible = bestCrystal == null || PlayerUtility.canSee(bestCrystal.getPos());
             boolean placeVisible = bestPosition == null || PlayerUtility.canSee(bestPosition.getPos());
@@ -404,9 +404,11 @@ public class AutoCrystal extends Module {
             rotationPitch = (float) (newPitch - (newPitch - rotationPitch) % gcdFix);
 
             ModuleManager.rotations.fixRotation = rotationYaw;
+            rotating = true;
         } else {
             rotationYaw = mc.player.getYaw();
             rotationPitch = mc.player.getPitch();
+            rotating = false;
         }
     }
 
