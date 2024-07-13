@@ -165,7 +165,7 @@ public class AutoCrystal extends Module {
 
     private int prevCrystalsAmount, crystalSpeed, invTimer, rotationTicks;
 
-    private boolean rotated, facePlacing, placedOnSpawn;
+    private boolean rotated, rotating, facePlacing, placedOnSpawn;
 
     private long confirmTime, calcTime;
 
@@ -244,7 +244,7 @@ public class AutoCrystal extends Module {
         }
 
         // Rotate
-        if (!rotate.is(Rotation.OFF) && mc.player != null) {
+        if (!rotate.is(Rotation.OFF) && mc.player != null && rotating) {
 
             boolean hitVisible = bestCrystal == null || PlayerUtility.canSee(bestCrystal.getPos());
             boolean placeVisible = bestPosition == null || PlayerUtility.canSee(bestPosition.getPos());
@@ -366,11 +366,10 @@ public class AutoCrystal extends Module {
                 return;
             }
 
-
-            // TODO check on matrix ac
-
             // Shitty NCP (cc) OK
             // Updated NCP (mio test server, constantiam prob) OK
+            // Shitty Matrix (forcemine) OK
+            // Grim (mio test server) OK
 
             Vec3d vec = !rotate.getValue().needSeparate() ? (bestPosition == null ? bestCrystal.getPos() : rotate.getValue().getVector(bestPosition))
                     : (rotationVec.hitVec() == null ? rotationVec.vec() : rotate.getValue().getVector(rotationVec.hitVec()));
@@ -405,9 +404,11 @@ public class AutoCrystal extends Module {
             rotationPitch = (float) (newPitch - (newPitch - rotationPitch) % gcdFix);
 
             ModuleManager.rotations.fixRotation = rotationYaw;
+            rotating = true;
         } else {
             rotationYaw = mc.player.getYaw();
             rotationPitch = mc.player.getPitch();
+            rotating = false;
         }
     }
 

@@ -30,16 +30,22 @@ vec3 createGradient(vec2 coords, vec3 color1, vec3 color2, vec3 color3, vec3 col
 }
 
 void main() {
-    float distance = roundedBoxSDF(gl_FragCoord.xy - uLocation - (uSize / 2.0), uSize / 2.0, radius);
+    vec2 centeredCoord = gl_FragCoord.xy - uLocation - (uSize / 2.0);
+    vec2 normCoord = (gl_FragCoord.xy - uLocation) / uSize;
+
+    float distance = roundedBoxSDF(centeredCoord, uSize / 2.0, radius);
     float smoothedAlpha = (1.0 - smoothstep(-10, 10, distance)) * color1.a;
     float smoothedAlpha2 = (1.0 - smoothstep(-1., 1., distance)) * color1.a;
 
+    vec3 gradientColor = createGradient(normCoord, color1.rgb, color2.rgb, color3.rgb, color4.rgb);
+
     if (smoothedAlpha2 < glow) {
-        fragColor = vec4(createGradient((gl_FragCoord.xy - uLocation) / uSize, color1.rgb, color2.rgb, color3.rgb, color4.rgb), smoothedAlpha);
+        fragColor = vec4(gradientColor, smoothedAlpha);
     } else {
-        float distance1 = roundedBoxSDF(gl_FragCoord.xy - uLocation - (uSize / 2.), (uSize / 2.) + (1. *.5) - outline, radius);
+        float distance1 = roundedBoxSDF(centeredCoord, (uSize / 2.0) + 0.5 - outline, radius);
         float blendAmount = smoothstep(0., 2., abs(distance1) - outline);
-        vec4 insideColor = (distance1 < 0.) ? vec4(createGradient((gl_FragCoord.xy - uLocation) / uSize, color1.rgb / blend, color2.rgb / blend, color3.rgb / blend, color4.rgb / blend), alpha) : vec4(createGradient((gl_FragCoord.xy - uLocation) / uSize, color1.rgb, color2.rgb, color3.rgb, color4.rgb), 0.0);
-        fragColor = mix(vec4(createGradient((gl_FragCoord.xy - uLocation) / uSize, color1.rgb, color2.rgb, color3.rgb, color4.rgb), 1.), insideColor, blendAmount);
+        vec3 insideColor = createGradient(normCoord, color1.rgb / blend, color2.rgb / blend, color3.rgb / blend, color4.rgb / blend);
+        vec4 insideColorVec = (distance1 < 0.) ? vec4(insideColor, alpha) : vec4(insideColor, 0.0);
+        fragColor = mix(vec4(gradientColor, 1.), insideColorVec, blendAmount);
     }
 }

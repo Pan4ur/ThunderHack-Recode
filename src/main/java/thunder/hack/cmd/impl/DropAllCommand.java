@@ -17,7 +17,7 @@ public class DropAllCommand extends Command {
 
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
-        builder.executes(context -> {
+        builder.then(literal("legit").executes(context -> {
             ThunderHack.asyncManager.run(() -> {
                 for (int i = 5; i <= 45; i++) {
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 1, SlotActionType.THROW, mc.player);
@@ -29,11 +29,17 @@ public class DropAllCommand extends Command {
                 }
                 mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
             }, 1);
+            sendMessage("ok");
+            return SINGLE_SUCCESS;
+        }));
 
+
+        builder.executes(context -> {
+            for (int i = 5; i <= 45; i++)
+                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 1, SlotActionType.THROW, mc.player);
+            mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
             sendMessage("ok");
             return SINGLE_SUCCESS;
         });
     }
-
-
 }

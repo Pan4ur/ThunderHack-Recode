@@ -70,7 +70,9 @@ public class ElytraPlus extends Module {
     private final Setting<BooleanSettingGroup> accelerate = new Setting<>("Acceleration", new BooleanSettingGroup(false), v -> mode.is(Mode.Control) || mode.is(Mode.Packet));
     private final Setting<Float> accelerateFactor = new Setting<>("AccelerateFactor", 9f, 0f, 100f, v -> mode.is(Mode.Control) || mode.is(Mode.Packet)).addToGroup(accelerate);
     private final Setting<Float> fireDelay = new Setting<>("FireDelay", 1.5f, 0f, 1.5f, v -> mode.is(Mode.FireWork));
-    private final Setting<Boolean> grim = new Setting<>("Grim", false, v -> mode.is(Mode.FireWork));
+    private final Setting<BooleanSettingGroup> grim = new Setting<>("Grim", new BooleanSettingGroup(false), v -> mode.is(Mode.FireWork));
+    private final Setting<Boolean> rotate = new Setting<>("Rotate", true, v -> mode.is(Mode.FireWork)).addToGroup(grim);
+    private final Setting<Boolean> fireWorkExtender = new Setting<>("FireWorkExtender", true, v -> mode.is(Mode.FireWork)).addToGroup(grim);
     private final Setting<Boolean> stayMad = new Setting<>("GroundSafe", false, v -> mode.is(Mode.FireWork));
     private final Setting<Boolean> keepFlying = new Setting<>("KeepFlying", false, v -> mode.is(Mode.FireWork));
     private final Setting<Boolean> disableOnFlag = new Setting<>("DisableOnFlag", false, v -> mode.is(Mode.FireWork));
@@ -303,7 +305,7 @@ public class ElytraPlus extends Module {
             if (command.getMode() == ClientCommandC2SPacket.Mode.START_FALL_FLYING)
                 doFireWork(false);
 
-        if (event.getPacket() instanceof PlayerInteractEntityC2SPacket p && mode.is(Mode.FireWork) && grim.getValue())
+        if (event.getPacket() instanceof PlayerInteractEntityC2SPacket p && mode.is(Mode.FireWork) && grim.getValue().isEnabled() && fireWorkExtender.getValue())
             if (flying && flightZonePos != null && Criticals.getEntity(p).age < (pingTimer.getPassedTimeMs() / 50f))
                 sendMessage(Formatting.RED + (isRu() ? "В этом режиме нельзя бить сущностей которые появились после включения модуля!" : "In this mode, you cannot hit entities that spawned after the module was turned on!"));
     }
@@ -329,7 +331,7 @@ public class ElytraPlus extends Module {
                 disable(isRu() ? "Выключен из-за флага!" : "Disabled due to flag!");
         }
 
-        if (e.getPacket() instanceof CommonPingS2CPacket && mode.is(Mode.FireWork) && grim.getValue() && flying)
+        if (e.getPacket() instanceof CommonPingS2CPacket && mode.is(Mode.FireWork) && grim.getValue().isEnabled() && fireWorkExtender.getValue() && flying)
             if (!pingTimer.passedMs(50000)) {
                 if (pingTimer.passedMs(1000) && PlayerUtility.getSquaredDistance2D(flightZonePos) < 7000)
                     e.cancel();
@@ -411,7 +413,7 @@ public class ElytraPlus extends Module {
     }
 
     public void onRender3D(MatrixStack stack) {
-        if (mode.is(Mode.FireWork) && grim.getValue() && flying && flightZonePos != null) {
+        if (mode.is(Mode.FireWork) && grim.getValue().isEnabled() && fireWorkExtender.getValue() && flying && flightZonePos != null) {
             stack.push();
             Render3DEngine.setupRender();
             RenderSystem.disableCull();
@@ -435,7 +437,7 @@ public class ElytraPlus extends Module {
     }
 
     public void onRender2D(DrawContext context) {
-        if (mode.is(Mode.FireWork) && grim.getValue() && flying) {
+        if (mode.is(Mode.FireWork) && grim.getValue().isEnabled() && fireWorkExtender.getValue() && flying) {
             if (!pingTimer.passedMs(50000)) {
                 if (pingTimer.passedMs(1000)) {
                     int timeS = (int) MathUtility.round2(((float) (50000 - pingTimer.getPassedTimeMs()) / 1000f));
@@ -700,7 +702,7 @@ public class ElytraPlus extends Module {
         if (started && (float) (System.currentTimeMillis() - lastFireworkTime) < fireDelay.getValue() * 1000.0f)
             return;
 
-        if (grim.getValue() && started && pingTimer.passedMs(200) && flightZonePos != null && PlayerUtility.getSquaredDistance2D(flightZonePos) < 7000)
+        if (grim.getValue().isEnabled() && fireWorkExtender.getValue() && started && pingTimer.passedMs(200) && flightZonePos != null && PlayerUtility.getSquaredDistance2D(flightZonePos) < 7000)
             return;
 
         if (started && !mc.player.isFallFlying()) return;
@@ -810,7 +812,7 @@ public class ElytraPlus extends Module {
     }
 
     public void fireworkOnSync() {
-        if (grim.getValue()) {
+        if (grim.getValue().isEnabled() && rotate.getValue()) {
             if (mc.options.jumpKey.isPressed() && mc.player.isFallFlying() && flying)
                 mc.player.setPitch(-45f);
 

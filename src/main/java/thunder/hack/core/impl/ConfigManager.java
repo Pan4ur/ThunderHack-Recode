@@ -61,10 +61,41 @@ public class ConfigManager implements IManager {
         if (currentConfig != null)
             save(currentConfig);
 
-        ThunderHack.moduleManager.onUnload();
-        ThunderHack.moduleManager.onUnloadPost();
+        ThunderHack.moduleManager.onUnload(category);
         load(file, category);
-        ThunderHack.moduleManager.onLoad();
+        ThunderHack.moduleManager.onLoad(category);
+    }
+
+    public void loadBinds(String name) {
+        File file = new File(CONFIGS_FOLDER, name + ".th");
+        if (!file.exists()) {
+            Command.sendMessage(isRu() ? "Конфига " + name + " не существует!" : "Config " + name + " does not exist!");
+            return;
+        }
+
+        if (currentConfig != null)
+            save(currentConfig);
+
+        loadBinds(file);
+    }
+
+    private void loadBinds(@NotNull File config) {
+        if (!config.exists())
+            save(config);
+
+        try (FileReader reader = new FileReader(config, StandardCharsets.UTF_8)) {
+            JsonObject modulesObject = JsonParser.parseReader(reader).getAsJsonArray().get(0).getAsJsonObject();
+            JsonArray modules = modulesObject.getAsJsonArray("Modules");
+
+            if (modules != null)
+                for (JsonElement element : modules)
+                    parseBinds(element.getAsJsonObject());
+
+            Command.sendMessage(isRu() ? "Загружены бинды с конфига: " + config.getName() : "Loaded bind from config: " + config.getName());
+        } catch (IOException e) {
+            LogUtils.getLogger().warn(e.getMessage());
+        }
+        saveCurrentConfig();
     }
 
     public void load(String name) {
@@ -78,10 +109,9 @@ public class ConfigManager implements IManager {
         if (currentConfig != null)
             save(currentConfig);
 
-        ThunderHack.moduleManager.onUnload();
-        ThunderHack.moduleManager.onUnloadPost();
+        ThunderHack.moduleManager.onUnload("none");
         load(file);
-        ThunderHack.moduleManager.onLoad();
+        ThunderHack.moduleManager.onLoad("none");
     }
 
     public void loadCloud(String name) {
@@ -106,10 +136,9 @@ public class ConfigManager implements IManager {
             return;
         }
 
-        ThunderHack.moduleManager.onUnload();
-        ThunderHack.moduleManager.onUnloadPost();
+        ThunderHack.moduleManager.onUnload("none");
         loadModuleOnly(file, module);
-        ThunderHack.moduleManager.onLoad();
+        ThunderHack.moduleManager.onLoad("none");
     }
 
     public void load(@NotNull File config) {
@@ -132,7 +161,10 @@ public class ConfigManager implements IManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        currentConfig = config;
+
+        if (Objects.equals(category, "none"))
+            currentConfig = config;
+
         saveCurrentConfig();
     }
 
@@ -152,8 +184,9 @@ public class ConfigManager implements IManager {
             }
             Command.sendMessage(isRu() ? "Загружен модуль " + module.getName() + " с конфига " + config.getName() :
                     "Loaded " + module.getName() + " from " + config.getName());
+
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.getLogger().warn(e.getMessage());
         }
     }
 
@@ -182,7 +215,7 @@ public class ConfigManager implements IManager {
             new GsonBuilder().setPrettyPrinting().create().toJson(array, writer);
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.getLogger().warn(e.getMessage());
         }
     }
 
@@ -193,55 +226,85 @@ public class ConfigManager implements IManager {
                 .findFirst()
                 .orElse(null);
 
-        if (!Objects.equals(category, "none") && !module.getCategory().getName().toLowerCase().equals(category))
+        if (module == null)
             return;
 
-        if (module != null) {
-            JsonObject mobject = object.getAsJsonObject(module.getName());
+        if (!Objects.equals(category, "none") && !module.getCategory().getName().toLowerCase().equals(category.toLowerCase()))
+            return;
 
-            for (Setting setting : module.getSettings()) {
-                try {
-                    if (setting.getValue() instanceof SettingGroup) {
+        JsonObject mobject = object.getAsJsonObject(module.getName());
 
-                    } else if (setting.getValue() instanceof Boolean) {
-                        setting.setValue(mobject.getAsJsonPrimitive(setting.getName()).getAsBoolean());
-                    } else if (setting.getValue() instanceof Float) {
-                        setting.setValue(mobject.getAsJsonPrimitive(setting.getName()).getAsFloat());
-                    } else if (setting.getValue() instanceof Integer) {
-                        setting.setValue(mobject.getAsJsonPrimitive(setting.getName()).getAsInt());
-                    } else if (setting.getValue() instanceof String) {
-                        setting.setValue(mobject.getAsJsonPrimitive(setting.getName()).getAsString().replace("%%", " ").replace("++", "/"));
-                    } else if (setting.getValue() instanceof Bind) {
-                        JsonArray array = mobject.getAsJsonArray(setting.getName());
-                        if (array.get(0).getAsString().contains("M")) {
-                            setting.setValue(new Bind(Integer.parseInt(array.get(0).getAsString().replace("M", "")), true, array.get(1).getAsBoolean()));
-                        } else {
-                            setting.setValue(new Bind(Integer.parseInt(array.get(0).getAsString()), false, array.get(1).getAsBoolean()));
-                        }
-                    } else if (setting.getValue() instanceof ColorSetting colorSetting) {
-                        JsonArray array = mobject.getAsJsonArray(setting.getName());
-                        colorSetting.setColor(array.get(0).getAsInt());
-                        colorSetting.setRainbow(array.get(1).getAsBoolean());
-                        colorSetting.setGlobalOffset(array.get(2).getAsInt());
-                    } else if (setting.getValue() instanceof PositionSetting posSetting) {
-                        JsonArray array = mobject.getAsJsonArray(setting.getName());
-                        posSetting.setX(array.get(0).getAsFloat());
-                        posSetting.setY(array.get(1).getAsFloat());
-                    } else if (setting.getValue() instanceof BooleanSettingGroup bGroup) {
-                        bGroup.setEnabled(mobject.getAsJsonPrimitive(setting.getName()).getAsBoolean());
-                    } else if (setting.getValue() instanceof ItemSelectSetting iSetting) {
-                        JsonArray array = mobject.getAsJsonArray(setting.getName());
-                        for (int i = 0; i < array.size(); i++)
-                            if (!iSetting.getItemsById().contains(array.get(i).getAsString()))
-                                iSetting.getItemsById().add(array.get(i).getAsString());
-                    } else if (setting.getValue().getClass().isEnum()) {
-                        Enum value = new EnumConverter(((Enum) setting.getValue()).getClass()).doBackward(mobject.getAsJsonPrimitive(setting.getName()));
-                        setting.setValue((value == null) ? setting.getDefaultValue() : value);
+        for (Setting setting : module.getSettings()) {
+            try {
+                if (setting.getValue() instanceof SettingGroup) {
+
+                } else if (setting.getValue() instanceof Boolean) {
+                    setting.setValue(mobject.getAsJsonPrimitive(setting.getName()).getAsBoolean());
+                } else if (setting.getValue() instanceof Float) {
+                    setting.setValue(mobject.getAsJsonPrimitive(setting.getName()).getAsFloat());
+                } else if (setting.getValue() instanceof Integer) {
+                    setting.setValue(mobject.getAsJsonPrimitive(setting.getName()).getAsInt());
+                } else if (setting.getValue() instanceof String) {
+                    setting.setValue(mobject.getAsJsonPrimitive(setting.getName()).getAsString().replace("%%", " ").replace("++", "/"));
+                } else if (setting.getValue() instanceof Bind) {
+                    JsonArray array = mobject.getAsJsonArray(setting.getName());
+                    if (array.get(0).getAsString().contains("M")) {
+                        setting.setValue(new Bind(Integer.parseInt(array.get(0).getAsString().replace("M", "")), true, array.get(1).getAsBoolean()));
+                    } else {
+                        setting.setValue(new Bind(Integer.parseInt(array.get(0).getAsString()), false, array.get(1).getAsBoolean()));
                     }
-                } catch (Exception e) {
-                    LogUtils.getLogger().warn("[Thunderhack] Module: " + module.getName() + " Setting: " + setting.getName() + " Error: ");
-                    e.printStackTrace();
+                } else if (setting.getValue() instanceof ColorSetting colorSetting) {
+                    JsonArray array = mobject.getAsJsonArray(setting.getName());
+                    colorSetting.setColor(array.get(0).getAsInt());
+                    colorSetting.setRainbow(array.get(1).getAsBoolean());
+                    colorSetting.setGlobalOffset(array.get(2).getAsInt());
+                } else if (setting.getValue() instanceof PositionSetting posSetting) {
+                    JsonArray array = mobject.getAsJsonArray(setting.getName());
+                    posSetting.setX(array.get(0).getAsFloat());
+                    posSetting.setY(array.get(1).getAsFloat());
+                } else if (setting.getValue() instanceof BooleanSettingGroup bGroup) {
+                    bGroup.setEnabled(mobject.getAsJsonPrimitive(setting.getName()).getAsBoolean());
+                } else if (setting.getValue() instanceof ItemSelectSetting iSetting) {
+                    JsonArray array = mobject.getAsJsonArray(setting.getName());
+                    for (int i = 0; i < array.size(); i++)
+                        if (!iSetting.getItemsById().contains(array.get(i).getAsString()))
+                            iSetting.getItemsById().add(array.get(i).getAsString());
+                } else if (setting.getValue().getClass().isEnum()) {
+                    Enum value = new EnumConverter(((Enum) setting.getValue()).getClass()).doBackward(mobject.getAsJsonPrimitive(setting.getName()));
+                    setting.setValue((value == null) ? setting.getDefaultValue() : value);
                 }
+            } catch (Exception e) {
+                LogUtils.getLogger().warn("[Thunderhack] Module: " + module.getName() + " Setting: " + setting.getName() + " Error: ");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void parseBinds(JsonObject object) throws NullPointerException {
+        Module module = ThunderHack.moduleManager.modules.stream()
+                .filter(m -> object.getAsJsonObject(m.getName()) != null)
+                .findFirst()
+                .orElse(null);
+
+        if (module == null)
+            return;
+
+        JsonObject mobject = object.getAsJsonObject(module.getName());
+
+        for (Setting setting : module.getSettings()) {
+            try {
+                if (setting.getValue() instanceof Bind) {
+                    JsonArray array = mobject.getAsJsonArray(setting.getName());
+                    if (array.get(0).getAsString().contains("M")) {
+                        setting.setValue(new Bind(Integer.parseInt(array.get(0).getAsString().replace("M", "")), true, array.get(1).getAsBoolean()));
+                    } else {
+                        setting.setValue(new Bind(Integer.parseInt(array.get(0).getAsString()), false, array.get(1).getAsBoolean()));
+                    }
+                }
+            } catch (Exception e) {
+                LogUtils.getLogger().warn("[Thunderhack] Module: " + module.getName() + " Setting: " + setting.getName() + " Error: ");
+                e.printStackTrace();
             }
         }
     }
@@ -357,7 +420,7 @@ public class ConfigManager implements IManager {
                 writer.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.getLogger().warn(e.getMessage());
         }
     }
 
@@ -372,7 +435,7 @@ public class ConfigManager implements IManager {
                 reader.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.getLogger().warn(e.getMessage());
         }
         currentConfig = new File(CONFIGS_FOLDER, name + ".th");
         return currentConfig;

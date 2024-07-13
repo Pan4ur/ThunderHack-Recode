@@ -1,6 +1,5 @@
 package thunder.hack.injection;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
@@ -15,7 +14,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
-import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventTravel;
 import thunder.hack.modules.Module;
@@ -49,15 +47,15 @@ public class MixinEntityLiving implements IEntityLiving {
         return positonHistory;
     }
 
-    @Inject(method = {"getHandSwingDuration"}, at = {@At("HEAD")}, cancellable = true)
+    @Inject(method = "getHandSwingDuration", at = {@At("HEAD")}, cancellable = true)
     private void getArmSwingAnimationEnd(final CallbackInfoReturnable<Integer> info) {
-        if (ModuleManager.animations.shouldAnimate() && Animations.slowAnimation.getValue())
+        if (!ModuleManager.noRender.noSwing.getValue() && ModuleManager.animations.shouldChangeAnimationDuration() && Animations.slowAnimation.getValue())
             info.setReturnValue(Animations.slowAnimationVal.getValue());
     }
 
     @Inject(method = {"updateTrackedPositionAndAngles"}, at = {@At("HEAD")})
     private void updateTrackedPositionAndAnglesHook(double x, double y, double z, float yaw, float pitch, int interpolationSteps, CallbackInfo ci) {
-        if(Module.fullNullCheck()) return;
+        if (Module.fullNullCheck()) return;
         prevServerX = serverX;
         prevServerY = serverY;
         prevServerZ = serverZ;
@@ -96,7 +94,7 @@ public class MixinEntityLiving implements IEntityLiving {
 
     @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
     public void travelHook(Vec3d movementInput, CallbackInfo ci) {
-        if(Module.fullNullCheck()) return;
+        if (Module.fullNullCheck()) return;
         if ((LivingEntity) (Object) this != mc.player) return;
         final EventTravel event = new EventTravel(mc.player.getVelocity(), true);
         ThunderHack.EVENT_BUS.post(event);
@@ -108,7 +106,7 @@ public class MixinEntityLiving implements IEntityLiving {
 
     @Inject(method = "travel", at = @At("RETURN"), cancellable = true)
     public void travelPostHook(Vec3d movementInput, CallbackInfo ci) {
-        if(Module.fullNullCheck()) return;
+        if (Module.fullNullCheck()) return;
         if ((LivingEntity) (Object) this != mc.player) return;
         final EventTravel event = new EventTravel(movementInput, false);
         ThunderHack.EVENT_BUS.post(event);
@@ -121,9 +119,17 @@ public class MixinEntityLiving implements IEntityLiving {
     @ModifyVariable(method = "setSprinting", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private boolean setSprintingHook(boolean sprinting) {
         if (mc.player != null && mc.world != null && ModuleManager.waterSpeed.isEnabled() && ModuleManager.waterSpeed.mode.is(CancelResurface)) {
-            if (mc.player.isTouchingWater() || mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos().add(0,-0.5,0))).getBlock() instanceof FluidBlock)
+            if (mc.player.isTouchingWater() || mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos().add(0, -0.5, 0))).getBlock() instanceof FluidBlock)
                 return true;
         }
         return sprinting;
+    }
+
+    @Inject(method = "getHandSwingDuration", at = @At("HEAD"), cancellable = true)
+    private void onGetHandSwingDuration(CallbackInfoReturnable<Integer> cir) {
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.noSwing.getValue()) {
+            cir.setReturnValue(0);
+            cir.cancel();
+        }
     }
 }

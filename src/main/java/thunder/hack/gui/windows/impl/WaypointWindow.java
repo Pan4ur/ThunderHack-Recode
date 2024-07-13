@@ -12,6 +12,8 @@ import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
@@ -23,7 +25,7 @@ import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class WaypointWindow extends WindowBase {
-    private static WaypointWindow instance = new WaypointWindow();
+    private static WaypointWindow instance;
     private ArrayList<WaypointPlate> waypointPlates = new ArrayList<>();
     private int listeningId = -1;
     private ListeningType listeningType;
@@ -34,18 +36,14 @@ public class WaypointWindow extends WindowBase {
         Name, X, Y, Z, Server
     }
 
-    public WaypointWindow() {
-        this(mc.getWindow().getScaledWidth() / 2f - 60, mc.getWindow().getScaledHeight() / 2f - 40, 340, 180);
-    }
-
-    public WaypointWindow(float x, float y, float width, float height) {
-        super(x, y, width, height, "Waypoints");
+    public WaypointWindow(float x, float y, float width, float height, Setting<PositionSetting> position) {
+        super(x, y, width, height, "Waypoints", position);
         refresh();
     }
 
-    public static WaypointWindow get() {
+    public static WaypointWindow get(float x, float y, Setting<PositionSetting> position) {
         if (instance == null)
-            instance = new WaypointWindow();
+            instance = new WaypointWindow(x, y, 340, 180, position);
         instance.refresh();
         return instance;
     }

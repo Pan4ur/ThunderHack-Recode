@@ -65,6 +65,7 @@ public class ThunderHack implements ModInitializer {
     public static AsyncManager asyncManager = new AsyncManager();
     public static MacroManager macroManager = new MacroManager();
     public static SoundManager soundManager = new SoundManager();
+    public static ProxyManager proxyManager = new ProxyManager();
     public static CommandManager commandManager = new CommandManager();
 
     public static Core core = new Core();
@@ -95,7 +96,7 @@ public class ThunderHack implements ModInitializer {
 
         FriendManager.loadFriends();
         configManager.load(configManager.getCurrentConfig());
-        moduleManager.onLoad();
+        moduleManager.onLoad("none");
 
         LogUtils.getLogger().info("Starting addon initialization.");
 
@@ -165,10 +166,12 @@ public class ThunderHack implements ModInitializer {
             configManager.save(configManager.getCurrentConfig());
             wayPointManager.saveWayPoints();
             macroManager.saveMacro();
+            proxyManager.saveProxies();
         }));
 
         macroManager.onLoad();
         wayPointManager.onLoad();
+        proxyManager.onLoad();
         Render2DEngine.initShaders();
 
         BUILD_DATE = ThunderUtility.readManifestField("Build-Timestamp");

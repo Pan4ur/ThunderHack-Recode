@@ -30,6 +30,7 @@ public class ModuleManager implements IManager {
     public List<Module> sortedModules = new ArrayList<>();
     public List<Integer> activeMouseKeys = new ArrayList<>();
 
+    public static AntiPacketException antiPacketException = new AntiPacketException();
     public static LevitationControl levitationControl = new LevitationControl();
     public static InventoryCleaner inventoryCleaner = new InventoryCleaner();
     public static NoCommentExploit noCommentExploit = new NoCommentExploit();
@@ -157,6 +158,7 @@ public class ModuleManager implements IManager {
     public static MemoryHud memoryHud = new MemoryHud();
     public static Companion companion = new Companion();
     public static AntiCrash antiCrash = new AntiCrash();
+    // public static Baritone baritone = new Baritone();
     public static AutoGear autoGear = new AutoGear();
     public static ViewLock viewLock = new ViewLock();
     public static Velocity velocity = new Velocity();
@@ -303,7 +305,7 @@ public class ModuleManager implements IManager {
         return new ArrayList<>(Module.Category.values());
     }
 
-    public void onLoad() {
+    public void onLoad(String category) {
         try {
             ThunderHack.EVENT_BUS.unsubscribe(unHook);
         } catch (Exception ignored) {
@@ -311,7 +313,11 @@ public class ModuleManager implements IManager {
         unHook.setEnabled(false);
 
         modules.sort(Comparator.comparing(Module::getName));
-        modules.stream().filter(Module::listening).forEach(ThunderHack.EVENT_BUS::subscribe);
+
+        modules.forEach(m -> {
+            if (m.isEnabled() && (m.getCategory().getName().toLowerCase().equals(category.toLowerCase()) || category.equals("none")))
+                ThunderHack.EVENT_BUS.subscribe(m);
+        });
 
         if (ConfigManager.firstLaunch) {
             ModuleManager.notifications.enable();
@@ -326,11 +332,13 @@ public class ModuleManager implements IManager {
     }
 
     public void onRender2D(DrawContext context) {
-        if(mc.getDebugHud().shouldShowDebugHud() || mc.options.hudHidden) return;
+        if (mc.getDebugHud().shouldShowDebugHud() || mc.options.hudHidden) return;
         HudElement.anyHovered = false;
         modules.stream().filter(Module::isEnabled).forEach(module -> module.onRender2D(context));
         if (!HudElement.anyHovered && !ClickGUI.anyHovered)
-            GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
+            if (GLFW.glfwGetPlatform() != GLFW.GLFW_PLATFORM_WAYLAND) {
+                GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
+            }
         ThunderHack.core.onRender2D(context);
     }
 
@@ -350,19 +358,14 @@ public class ModuleManager implements IManager {
         modules.forEach(Module::onLogin);
     }
 
-    public void onUnload() {
+    public void onUnload(String category) {
         modules.forEach(module -> {
-            if (module.isEnabled()) {
+            if (module.isEnabled() && (module.getCategory().getName().toLowerCase().equals(category.toLowerCase()) || category.equals("none"))) {
                 ThunderHack.EVENT_BUS.unsubscribe(module);
+                module.setEnabled(false);
             }
         });
         modules.forEach(Module::onUnload);
-    }
-
-    public void onUnloadPost() {
-        for (Module module : modules) {
-            module.setEnabled(false);
-        }
     }
 
     public void onKeyPressed(int eventKey) {
@@ -423,9 +426,8 @@ public class ModuleManager implements IManager {
 
         this.modules.add(module);
 
-        if (module.listening()) {
+        if (module.isEnabled())
             ThunderHack.EVENT_BUS.subscribe(module);
-        }
     }
 
     public void registerHudElement(HudElement hudElement) {

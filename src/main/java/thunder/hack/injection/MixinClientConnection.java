@@ -1,19 +1,36 @@
 package thunder.hack.injection;
 
-import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.PacketEvent;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
+import io.netty.handler.proxy.Socks5ProxyHandler;
 
+import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.impl.ProxyManager;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.network.NetworkSide;
+import net.minecraft.network.handler.PacketSizeLogger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.net.InetSocketAddress;
+
 @Mixin(ClientConnection.class)
 public class MixinClientConnection {
+
+    @Inject(method = "exceptionCaught", at = @At("HEAD"), cancellable = true)
+    private void exceptionCaughtHook(ChannelHandlerContext context, Throwable t, CallbackInfo ci) {
+        if (ModuleManager.antiPacketException.isEnabled()) {
+            ModuleManager.antiPacketException.sendChatMessage(t.getMessage());
+            ci.cancel();
+        }
+    }
 
     @Inject(method = "handlePacket", at = @At("HEAD"), cancellable = true)
     private static <T extends PacketListener> void onHandlePacket(Packet<T> packet, PacketListener listener, CallbackInfo info) {
@@ -54,5 +71,13 @@ public class MixinClientConnection {
         PacketEvent.SendPost event = new PacketEvent.SendPost(packet);
         ThunderHack.EVENT_BUS.post(event);
         if (event.isCancelled()) info.cancel();
+    }
+
+    // Thanks to Meteor
+    @Inject(method = "addHandlers", at = @At("RETURN"))
+    private static void addHandlersHook(ChannelPipeline pipeline, NetworkSide side, boolean local, PacketSizeLogger packetSizeLogger, CallbackInfo ci) {
+        ProxyManager.ThProxy proxy = ThunderHack.proxyManager.getActiveProxy();
+        if (proxy != null && side == NetworkSide.CLIENTBOUND && !local)
+            pipeline.addFirst(new Socks5ProxyHandler(new InetSocketAddress(proxy.getIp(), proxy.getPort()), proxy.getL(), proxy.getP()));
     }
 }

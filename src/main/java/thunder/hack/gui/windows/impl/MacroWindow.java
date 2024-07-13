@@ -12,6 +12,8 @@ import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
@@ -23,7 +25,7 @@ import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class MacroWindow extends WindowBase {
-    private static MacroWindow instance = new MacroWindow();
+    private static MacroWindow instance;
     private ArrayList<MacroPlate> macroPlates = new ArrayList<>();
     private int listeningId = -1, addBindKeyCode = -1;
     private ListeningType listeningType;
@@ -33,18 +35,15 @@ public class MacroWindow extends WindowBase {
         Name, Text, Bind
     }
 
-    public MacroWindow() {
-        this(mc.getWindow().getScaledWidth() / 2f - 100, mc.getWindow().getScaledHeight() / 2f - 150, 200, 180);
-    }
 
-    public MacroWindow(float x, float y, float width, float height) {
-        super(x, y, width, height, "Macros");
+    public MacroWindow(float x, float y, float width, float height, Setting<PositionSetting> position) {
+        super(x, y, width, height, "Macros", position);
         refresh();
     }
 
-    public static MacroWindow get() {
+    public static MacroWindow get(float x, float y, Setting<PositionSetting> position) {
         if (instance == null)
-            instance = new MacroWindow();
+            instance = new MacroWindow(x, y, 200, 180, position);
         instance.refresh();
         return instance;
     }
