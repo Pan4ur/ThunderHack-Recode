@@ -155,6 +155,7 @@ public class AutoCrystal extends Module {
     private final TickTimer placeTimer = new TickTimer();
     private final TickTimer breakTimer = new TickTimer();
     private final TickTimer calcTimer = new TickTimer();
+    private final TickTimer placeSyncTimer = new TickTimer();
 
     private final Timer blockRecalcTimer = new Timer();
     private final Timer pauseTimer = new Timer();
@@ -283,12 +284,12 @@ public class AutoCrystal extends Module {
         if (sequential.is(Sequential.Off) || rotate.is(Rotation.MATRIX)) {
             if (bestCrystal != null && breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
                 attackCrystal(bestCrystal);
-            else if (bestPosition != null && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()) && !placedOnSpawn)
+            else if (bestPosition != null && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()) && !placedOnSpawn && placeSyncTimer.passedTicks(3))
                 placeCrystal(bestPosition, false, false);
         } else {
             if (bestCrystal != null && breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
                 attackCrystal(bestCrystal);
-            if (bestPosition != null && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()) && !placedOnSpawn)
+            if (bestPosition != null && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()) && !placedOnSpawn && placeSyncTimer.passedTicks(3))
                 placeCrystal(bestPosition, false, false);
         }
         placedOnSpawn = false;
@@ -323,9 +324,11 @@ public class AutoCrystal extends Module {
                 if (cr.squaredDistanceTo(bp.toCenterPos()) < 0.3) {
                     confirmTime = System.currentTimeMillis() - cache.get(bp);
                     placedCrystals.remove(bp);
-
-                    if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
+                    if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue())) {
                         ThunderHack.asyncManager.run(() -> handleSpawn(cr));
+                        if (sequential.is(Sequential.Strong) && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()))
+                            placeSyncTimer.reset();
+                    }
                 }
         }
 
@@ -693,8 +696,12 @@ public class AutoCrystal extends Module {
         renderPositions.put(bhr.getBlockPos(), System.currentTimeMillis());
         postPlaceSwitch(prevSlot);
 
-        if (onSpawn)
+        sendMessage(onSpawn + "");
+
+        if (onSpawn) {
             placedOnSpawn = true;
+            placeSyncTimer.reset();
+        }
     }
 
     private void postPlaceSwitch(int slot) {
@@ -856,17 +863,17 @@ public class AutoCrystal extends Module {
 
         for (PlaceData data : clearedList) {
             if ((shouldOverride(data.damage) || data.damage > minDamage.getValue())) {
-                if (bestData != null && Math.abs(bestData.damage - data.damage) < (facePlacing ? 0.25f : 1f)) {
-                    if (bestData.selfDamage >= data.selfDamage) {
-                        bestData = data;
-                        bestVal = data.damage;
-                    }
-                } else {
-                    if (bestVal < data.damage) {
-                        bestData = data;
-                        bestVal = data.damage;
-                    }
+                //   if (bestData != null && Math.abs(bestData.damage - data.damage) < (facePlacing ? 0.25f : 3f)) {
+                //       if (bestData.selfDamage >= data.selfDamage) {
+                //           bestData = data;
+                //           bestVal = data.damage;
+                //       }
+                //   } else {
+                if (bestVal < data.damage) {
+                    bestData = data;
+                    bestVal = data.damage;
                 }
+                //  }
             }
         }
 
@@ -903,17 +910,17 @@ public class AutoCrystal extends Module {
         float bestVal = 0f;
         for (CrystalData data : clearedList) {
             if ((shouldOverride(data.damage()) || data.damage() > minDamage.getValue())) {
-                if (bestData != null && Math.abs(bestData.damage - data.damage) < (facePlacing ? 0.25f : 1f)) {
-                    if (bestData.selfDamage >= data.selfDamage) {
-                        bestData = data;
-                        bestVal = data.damage;
-                    }
-                } else {
-                    if (bestVal < data.damage) {
-                        bestData = data;
-                        bestVal = data.damage;
-                    }
+                //  if (bestData != null && Math.abs(bestData.damage - data.damage) < (facePlacing ? 0.25f : 3f)) {
+                //      if (bestData.selfDamage >= data.selfDamage) {
+                //          bestData = data;
+                //          bestVal = data.damage;
+                //      }
+                //  } else {
+                if (bestVal < data.damage) {
+                    bestData = data;
+                    bestVal = data.damage;
                 }
+                //  }
             }
         }
 

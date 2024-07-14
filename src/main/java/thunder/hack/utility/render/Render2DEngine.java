@@ -545,6 +545,7 @@ public class Render2DEngine {
     }
 
     public static void endRender() {
+        RenderSystem.defaultBlendFunc();
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }

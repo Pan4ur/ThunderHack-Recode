@@ -27,7 +27,7 @@ public class TickTimer {
     }
 
     public void set(int t) {
-        time = getPassedTicks() - t;
+        time = t;
     }
 
     public void reset() {
