@@ -23,6 +23,7 @@ public class Spammer extends Module {
     public Setting<Messages> messages = new Setting<>("messages",Messages.File);
     public Setting<WhisperPrefix> whisper_prefix = new Setting<>("prefix", WhisperPrefix.W, v -> mode.getValue() == Mode.Whispers);
     public Setting<Boolean> global = new Setting<>("global", true,v -> mode.getValue() == Mode.Chat);
+    public Setting<Boolean> antiSpam = new Setting<>("AntiSpam", false);
     public Setting<Float> delay = new Setting<>("delay", 5f, 0f, 30f);
     private final Timer timer_delay = new Timer();
     private final Random random = new Random();
@@ -102,6 +103,15 @@ public class Spammer extends Module {
             }
         });
     }
+    public static String generateRandomSymbol() {
+        Random random = new Random();
+        String randomSymbol = "[";
+        randomSymbol += (char) (random.nextInt(26) + 'a');
+        randomSymbol += random.nextInt(10);
+        randomSymbol += (char) (random.nextInt(26) + 'a');
+        randomSymbol += "]";
+        return randomSymbol;
+    }
 
     @Override
     public void onEnable() {
@@ -123,6 +133,9 @@ public class Spammer extends Module {
                 if(fact == null){return;}
                 c = fact;
                 changeFact();
+            }
+            if(antiSpam.getValue()){
+                c  += generateRandomSymbol();
             }
             if(mode.getValue() == Mode.Chat){
                 if (c.charAt(0) == '/') {
