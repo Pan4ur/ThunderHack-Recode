@@ -8,6 +8,7 @@ import net.minecraft.util.Identifier;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
@@ -18,7 +19,6 @@ public class CandleHud extends HudElement {
         super("Candle", 10, 100);
     }
 
-    private final Identifier CANDLE = new Identifier("thunderhack", "textures/hud/elements/candle.png");
     private Setting<Integer> scale = new Setting<>("Scale", 25, 15, 100);
     private Setting<For> mode = new Setting<>("For", For.Win);
 
@@ -43,7 +43,7 @@ public class CandleHud extends HudElement {
         context.getMatrices().translate((int) getPosX(), (int) getPosY(), 0);
         float scalefactor = (float) scale.getValue() / 100f;
         context.getMatrices().scale(scalefactor, scalefactor, 1);
-        context.drawTexture(CANDLE, 0, -5, 0, 0, 102, 529, 102, 529);
+        context.drawTexture(TextureStorage.candle, 0, -5, 0, 0, 102, 529, 102, 529);
         context.getMatrices().pop();
 
         drawFire(context.getMatrices(), getPosX() + (40 + 15f - xAnim) * scalefactor, getPosY() + (10 - yAnim) * scalefactor, 7 * scalefactor, 7 * scalefactor,
@@ -69,7 +69,7 @@ public class CandleHud extends HudElement {
         RenderSystem.enableBlend();
         RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-        RenderSystem.setShaderTexture(0, Render2DEngine.firefly);
+        RenderSystem.setShaderTexture(0, TextureStorage.firefly);
         Render2DEngine.renderTexture(matrices, x, y, width, height, 0, 0, width, height, width, height);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);

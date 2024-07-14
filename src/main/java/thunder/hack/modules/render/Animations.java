@@ -203,7 +203,7 @@ public class Animations extends Module {
                     matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(g * -85.0F));
 
                     if (ModuleManager.viewModel.isEnabled())
-                        matrices.translate(-0.1F * ModuleManager.viewModel.scale.getValue(), 0.28F * ModuleManager.viewModel.scale.getValue(), 0.2F * ModuleManager.viewModel.scale.getValue());
+                        matrices.translate(-0.1F * ModuleManager.viewModel.scaleMain.getValue(), 0.28F * ModuleManager.viewModel.scaleMain.getValue(), 0.2F * ModuleManager.viewModel.scaleMain.getValue());
                     else
                         matrices.translate(-0.1F, 0.28F, 0.2F);
 

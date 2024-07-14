@@ -15,6 +15,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class ProxyWindow extends WindowBase {
     }
 
     public ProxyWindow(float x, float y, float width, float height, Setting<PositionSetting> position) {
-        super(x, y, width, height, "Proxies", position);
+        super(x, y, width, height, "Proxies", position, TextureStorage.proxyIcon);
         refresh();
     }
 

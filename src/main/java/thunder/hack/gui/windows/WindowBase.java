@@ -3,6 +3,7 @@ package thunder.hack.gui.windows;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Colors;
+import net.minecraft.util.Identifier;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
@@ -32,13 +33,17 @@ public class WindowBase {
     private final String name;
     private boolean dragging, hoveringWindow, scaling, scrolling;
 
-    protected WindowBase(float x, float y, float width, float height, String name, Setting<PositionSetting> pos) {
+    private boolean visible = true;
+    private final Identifier icon;
+
+    protected WindowBase(float x, float y, float width, float height, String name, Setting<PositionSetting> pos, Identifier icon) {
         setX(x);
         setY(y);
         setWidth(width);
         setHeight(height);
         this.name = name;
         this.position = pos;
+        this.icon = icon;
     }
 
     protected void render(DrawContext context, int mouseX, int mouseY) {
@@ -92,6 +97,12 @@ public class WindowBase {
     }
 
     protected void mouseClicked(double mouseX, double mouseY, int button) {
+
+        if (Render2DEngine.isHovered(mouseX, mouseY, x + width - 4, y + 3, 10, 10)) {
+            setVisible(false);
+            return;
+        }
+
         if (Render2DEngine.isHovered(mouseX, mouseY, x, y, width, 10)) {
             if (WindowsScreen.draggingWindow == null)
                 dragging = true;
@@ -200,5 +211,17 @@ public class WindowBase {
 
     protected void setMaxElementsHeight(float maxElementsHeight) {
         this.maxElementsHeight = maxElementsHeight;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    public Identifier getIcon() {
+        return icon;
     }
 }

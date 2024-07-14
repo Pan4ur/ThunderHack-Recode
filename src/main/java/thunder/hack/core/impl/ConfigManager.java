@@ -136,9 +136,15 @@ public class ConfigManager implements IManager {
             return;
         }
 
-        ThunderHack.moduleManager.onUnload("none");
+        if (module.isEnabled()) {
+            ThunderHack.EVENT_BUS.unsubscribe(module);
+            module.setEnabled(false);
+        }
+
         loadModuleOnly(file, module);
-        ThunderHack.moduleManager.onLoad("none");
+
+        if (module.isEnabled())
+            ThunderHack.EVENT_BUS.subscribe(module);
     }
 
     public void load(@NotNull File config) {

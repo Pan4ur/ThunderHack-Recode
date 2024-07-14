@@ -8,6 +8,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -15,6 +16,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
@@ -261,8 +263,9 @@ public class AutoCrystal extends Module {
         if (mc.player == null || mc.world == null) return;
 
         ThunderHack.asyncManager.run(() -> {
-            if (mc.player != null && (!await.getValue() || calcTimer.passedTicks((long) ((float) ServerManager.getPing() / 25f))))
+            if (mc.player != null && (!await.getValue() || calcTimer.passedTicks((long) ((float) ServerManager.getPing() / 25f)))) {
                 calcPosition(placeRange.getValue(), mc.player.getPos());
+            }
             getCrystalToExplode();
         });
 
@@ -307,21 +310,24 @@ public class AutoCrystal extends Module {
     }
 
     @EventHandler
-    public void onCrystalSpawn(@NotNull EventEntitySpawn e) {
-        if (e.getEntity() instanceof EndCrystalEntity crystal && crystalAge.is(0)) {
-            HashMap<BlockPos, Long> cache = new HashMap<>(placedCrystals);
-            for (BlockPos bp : cache.keySet())
-                if (crystal.squaredDistanceTo(bp.toCenterPos()) < 0.3 && breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue())) {
-                    confirmTime = System.currentTimeMillis() - cache.get(bp);
-                    placedCrystals.remove(bp);
-                    ThunderHack.asyncManager.run(() -> handleSpawn(crystal));
-                }
-        }
-    }
-
-    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (mc.player == null || mc.world == null) return;
+
+        if (e.getPacket() instanceof EntitySpawnS2CPacket spawn && spawn.getEntityType() == EntityType.END_CRYSTAL && crystalAge.is(0)) {
+            HashMap<BlockPos, Long> cache = new HashMap<>(placedCrystals);
+
+            EndCrystalEntity cr = new EndCrystalEntity(mc.world, spawn.getX(), spawn.getY(), spawn.getZ());
+            cr.setId(spawn.getId());
+
+            for (BlockPos bp : cache.keySet())
+                if (cr.squaredDistanceTo(bp.toCenterPos()) < 0.3) {
+                    confirmTime = System.currentTimeMillis() - cache.get(bp);
+                    placedCrystals.remove(bp);
+
+                    if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
+                        ThunderHack.asyncManager.run(() -> handleSpawn(cr));
+                }
+        }
 
         if (e.getPacket() instanceof ExplosionS2CPacket explosion) {
             for (Entity ent : Lists.newArrayList(mc.world.getEntities())) {
@@ -347,12 +353,10 @@ public class AutoCrystal extends Module {
 
     private void handleSpawn(EndCrystalEntity crystal) {
         if (mc.player == null || mc.world == null) return;
-
-        getCrystalToExplode();
-        if (bestCrystal == crystal) {
+        if (canAttackCrystal(crystal, true)) {
             attackCrystal(crystal);
             if (sequential.is(Sequential.Strong) && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue())) {
-                ThunderHack.asyncManager.run(() -> calcPosition(placeRange.getValue(), mc.player.getPos()));
+                calcPosition(placeRange.getValue(), mc.player.getPos());
                 if (bestPosition != null)
                     placeCrystal(bestPosition, false, true);
             }
@@ -361,7 +365,7 @@ public class AutoCrystal extends Module {
 
     public void calcRotations() {
         if (!rotate.is(Rotation.OFF) && !shouldPause() && (!rotate.getValue().needSeparate() ? (bestPosition != null || bestCrystal != null) : rotationVec != null) && mc.player != null) {
-            if (rotationTicks -- < 0 && rotate.getValue().needSeparate()) {
+            if (rotationTicks-- < 0 && rotate.getValue().needSeparate()) {
                 rotationVec = null;
                 return;
             }
@@ -459,7 +463,7 @@ public class AutoCrystal extends Module {
 
         if (target != null && bestPosition != null && renderInteractVector.getValue().isEnabled()) {
             Vec3d vec = bestPosition.getPos();
-            Box b = new Box(vec.getX() - .05,vec.getY() - .05, vec.getZ() -.05, vec.getX() + .05, vec.getY() + .05, vec.getZ() + .05);
+            Box b = new Box(vec.getX() - .05, vec.getY() - .05, vec.getZ() - .05, vec.getX() + .05, vec.getY() + .05, vec.getZ() + .05);
             Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(b, interactColor.getValue().getColorObject(), 1f));
             Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(b, Render2DEngine.applyOpacity(interactColor.getValue().getColorObject(), 0.6f)));
         }
@@ -560,7 +564,7 @@ public class AutoCrystal extends Module {
         swingHand(false, true);
 
         if (rotate.getValue().needSeparate() && !ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, explodeRange.getValue(), explodeWallRange.getValue(), crystal))
-            rotationVec = new RotationVec(crystal.getBoundingBox().getCenter(), null,false);
+            rotationVec = new RotationVec(crystal.getBoundingBox().getCenter(), null, false);
 
         breakTimer.reset();
         deadManager.setDead(crystal.getId(), System.currentTimeMillis());
@@ -649,7 +653,7 @@ public class AutoCrystal extends Module {
         boolean holdingCrystal = mc.player.getMainHandStack().getItem() instanceof EndCrystalItem || offhand;
 
         if (!rotate.is(Rotation.OFF)) {
-            rotationVec = new RotationVec(bhr.getPos(), bhr,true);
+            rotationVec = new RotationVec(bhr.getPos(), bhr, true);
 
             if (instant) {
                 float[] angle = InteractionUtility.calculateAngle(bhr.getPos());

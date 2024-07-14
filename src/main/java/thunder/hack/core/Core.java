@@ -36,6 +36,7 @@ import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,7 +49,6 @@ public final class Core {
     public static boolean lockSprint, serverSprint, hold_mouse0, showSkull;
     public static final Map<String, Identifier> HEADS = new ConcurrentHashMap<>();
     public ArrayList<Packet<?>> silentPackets = new ArrayList<>();
-    private final Identifier SKULL = new Identifier("thunderhack", "textures/hud/elements/skull.png");
     private final Timer skullTimer = new Timer();
     private final Timer lastPacket = new Timer();
     private final Timer autoSave = new Timer();
@@ -168,7 +168,7 @@ public final class Core {
             int yPos = (int) (mc.getWindow().getScaledHeight() / 2f - 150);
             float alpha = (1f - (skullTimer.getPassedTimeMs() / 3000f));
             RenderSystem.setShaderColor(1f, 1f, 1f, alpha);
-            e.drawTexture(SKULL, xPos, yPos, 0, 0, 300, 300, 300, 300);
+            e.drawTexture(TextureStorage.skull, xPos, yPos, 0, 0, 300, 300, 300, 300);
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         } else showSkull = false;
     }

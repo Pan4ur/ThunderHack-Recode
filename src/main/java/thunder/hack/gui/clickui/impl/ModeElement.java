@@ -13,11 +13,11 @@ import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 import java.util.Objects;
 
-import static thunder.hack.gui.clickui.ClickGUI.arrow;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class ModeElement extends AbstractElement {
@@ -52,7 +52,7 @@ public class ModeElement extends AbstractElement {
         matrixStack.translate(-tx, -ty, 0);
 
         matrixStack.translate((x + width - 14), y + 4.5f, 0);
-        context.drawTexture(arrow, 0, 0, 0, 0, 6, 6, 6, 6);
+        context.drawTexture(TextureStorage.guiArrow, 0, 0, 0, 0, 6, 6, 6, 6);
         matrixStack.translate(-(x + width - 14), -y - 4.5f, 0);
 
         matrixStack.pop();

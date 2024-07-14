@@ -6,6 +6,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
+import thunder.hack.gui.windows.WindowsScreen;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -24,6 +25,9 @@ public class Hotbar extends HudElement {
     }
 
     public void onRender2D(DrawContext context) {
+        if (mc.currentScreen instanceof WindowsScreen)
+            return;
+
         PlayerEntity playerEntity = mc.player;
         if (playerEntity != null) {
             MatrixStack matrices = context.getMatrices();
@@ -53,6 +57,9 @@ public class Hotbar extends HudElement {
 
     // Bake only items
     public static void renderHotBarItems(float tickDelta, DrawContext context) {
+        if (mc.currentScreen instanceof WindowsScreen)
+            return;
+
         PlayerEntity playerEntity = mc.player;
         if (playerEntity != null) {
 

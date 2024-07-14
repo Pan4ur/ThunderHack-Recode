@@ -33,7 +33,6 @@ public class ClickGUI extends Screen {
     public static boolean close = false, imageDirection;
 
     public static String currentDescription = "";
-    public static final Identifier arrow = new Identifier("thunderhack", "textures/gui/elements/arrow.png");
     public EaseOutBack imageAnimation = new EaseOutBack(6);
 
     public ClickGUI() {
@@ -215,6 +214,7 @@ public class ClickGUI extends Screen {
             if (GLFW.glfwGetPlatform() != GLFW.GLFW_PLATFORM_WAYLAND) {
                 GLFW.glfwSetCursor(mc.getWindow().getHandle(), GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR));
             }
+
     }
 
     @Override

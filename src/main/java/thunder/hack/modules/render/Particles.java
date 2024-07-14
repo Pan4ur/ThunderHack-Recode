@@ -16,6 +16,7 @@ import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -89,7 +90,7 @@ public class Particles extends Module {
     public void onRender3D(MatrixStack stack) {
         if (FireFlies.getValue().isEnabled()) {
             stack.push();
-            RenderSystem.setShaderTexture(0, firefly);
+            RenderSystem.setShaderTexture(0, TextureStorage.firefly);
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
             RenderSystem.enableDepthTest();
@@ -163,7 +164,7 @@ public class Particles extends Module {
 
         @Override
         public void render(BufferBuilder bufferBuilder) {
-            RenderSystem.setShaderTexture(0, firefly);
+            RenderSystem.setShaderTexture(0, TextureStorage.firefly);
             if (!trails.isEmpty()) {
                 Camera camera = mc.gameRenderer.getCamera();
                 for (Trails.Trail ctx : trails) {
@@ -232,11 +233,11 @@ public class Particles extends Module {
 
         public void render(BufferBuilder bufferBuilder) {
             switch (mode.getValue()) {
-                case Bloom -> RenderSystem.setShaderTexture(0, firefly);
-                case SnowFlake -> RenderSystem.setShaderTexture(0, snowflake);
-                case Dollars -> RenderSystem.setShaderTexture(0, dollar);
-                case Hearts -> RenderSystem.setShaderTexture(0, heart);
-                case Stars -> RenderSystem.setShaderTexture(0, star);
+                case Bloom -> RenderSystem.setShaderTexture(0, TextureStorage.firefly);
+                case SnowFlake -> RenderSystem.setShaderTexture(0, TextureStorage.snowflake);
+                case Dollars -> RenderSystem.setShaderTexture(0, TextureStorage.dollar);
+                case Hearts -> RenderSystem.setShaderTexture(0, TextureStorage.heart);
+                case Stars -> RenderSystem.setShaderTexture(0, TextureStorage.star);
             }
 
             Camera camera = mc.gameRenderer.getCamera();

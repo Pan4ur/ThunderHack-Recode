@@ -12,10 +12,14 @@ public class TickTimer {
     }
 
     public boolean passedTicks(long t) {
+        if (getPassedTicks() < 0)
+            reset();
         return getPassedTicks() >= t;
     }
 
     public boolean every(long ms) {
+        if (getPassedTicks() < 0)
+            reset();
         boolean passed = getPassedTicks() >= ms;
         if (passed)
             reset();

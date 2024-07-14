@@ -11,6 +11,7 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
@@ -23,8 +24,6 @@ public class DurabilityAlert extends Module {
 
     private final Setting<Boolean> friends = new Setting<>("Friend message", true);
     private final Setting<Integer> percent = new Setting<>("Percent", 20, 1, 100);
-
-    private final Identifier ICON = new Identifier("thunderhack", "textures/hud/elements/broken_shield.png");
     private boolean need_alert = false;
     private final Timer timer = new Timer();
 
@@ -62,7 +61,7 @@ public class DurabilityAlert extends Module {
 
             Color c1 = new Color(0xFFDF00);
             RenderSystem.setShaderColor(c1.getRed() / 255f, c1.getGreen() / 255f, c1.getBlue() / 255f, 1f);
-            context.drawTexture(ICON, (int) (mc.getWindow().getScaledWidth() / 2f - 40), (int) (mc.getWindow().getScaledHeight() / 3f - 120), 80, 80, 0, 0, 80, 80, 80, 80);
+            context.drawTexture(TextureStorage.brokenShield, (int) (mc.getWindow().getScaledWidth() / 2f - 40), (int) (mc.getWindow().getScaledHeight() / 3f - 120), 80, 80, 0, 0, 80, 80, 80, 80);
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         }
     }

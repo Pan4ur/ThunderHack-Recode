@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.Unique;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.hud.impl.Hotbar;
+import thunder.hack.gui.windows.WindowsScreen;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.ClickGui;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -14,6 +15,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import static thunder.hack.core.IManager.mc;
 
 @Mixin(InGameHud.class)
 public abstract class MixinInGameHud {
@@ -27,13 +30,16 @@ public abstract class MixinInGameHud {
 
     @Inject(at = @At(value = "HEAD"), method = "renderStatusBars", cancellable = true)
     private void renderStatusBarsHook(DrawContext context, CallbackInfo ci) {
-        if (ModuleManager.hotbar.isEnabled()) {
-   //         ci.cancel();
+        if (mc != null && mc.currentScreen instanceof WindowsScreen) {
+            ci.cancel();
         }
     }
 
     @Inject(at = @At(value = "HEAD"), method = "renderHotbar", cancellable = true)
     public void renderHotbarCustom(DrawContext context, float tickDelta, CallbackInfo ci) {
+        if (mc != null && mc.currentScreen instanceof WindowsScreen)
+            ci.cancel();
+
         if (ModuleManager.hotbar.isEnabled()) {
             ci.cancel();
             Hotbar.renderHotBarItems(tickDelta, context);
@@ -49,6 +55,9 @@ public abstract class MixinInGameHud {
 
     @Inject(method = "renderExperienceBar", at = @At(value = "HEAD"), cancellable = true)
     public void renderXpBarCustom(DrawContext context, int x, CallbackInfo ci) {
+        if (mc != null && mc.currentScreen instanceof WindowsScreen)
+            ci.cancel();
+
         if (ModuleManager.hotbar.isEnabled()) {
             ci.cancel();
             Hotbar.renderXpBar(x, context.getMatrices());

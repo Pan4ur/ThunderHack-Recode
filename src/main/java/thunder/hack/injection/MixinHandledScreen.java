@@ -38,13 +38,12 @@ import thunder.hack.modules.Module;
 import thunder.hack.modules.render.Tooltips;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.util.*;
 
 import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.render.Tooltips.hasItems;
-import static thunder.hack.utility.render.Render2DEngine.CONTAINER_BACKGROUND;
-
 @Mixin(value = {HandledScreen.class})
 public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen implements ScreenHandlerProvider<T> {
 
@@ -225,7 +224,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
         RenderSystem.setShaderColor(colors[0], colors[1], colors[2], 1F);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
-        context.drawTexture(CONTAINER_BACKGROUND, x, y, 0, 0, 176, 67, 176, 67);
+        context.drawTexture(TextureStorage.container, x, y, 0, 0, 176, 67, 176, 67);
         RenderSystem.enableBlend();
     }
 

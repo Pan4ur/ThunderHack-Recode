@@ -4,24 +4,17 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.render.Particles;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.render.TextureStorage;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
-
-import static thunder.hack.utility.render.Render2DEngine.*;
-import static thunder.hack.utility.render.Render2DEngine.star;
 
 public class Crosshair extends Module {
 
@@ -76,7 +69,7 @@ public class Crosshair extends Module {
             yAnim = midY;
         }
 
-        float progress =  (360f * mc.player.getAttackCooldownProgress(0.5f));
+        float progress = (360f * mc.player.getAttackCooldownProgress(0.5f));
         progress = progress == 0 ? 360f : progress;
 
         switch (mode.getValue()) {
@@ -101,15 +94,12 @@ public class Crosshair extends Module {
             case Dot -> {
                 context.getMatrices().push();
                 context.getMatrices().translate(xAnim + 4, yAnim + 4, 0);
-                RenderSystem.setShaderTexture(0, firefly);
                 RenderSystem.enableBlend();
                 RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-                RenderSystem.enableDepthTest();
-                RenderSystem.depthMask(false);
                 BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
                 RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
                 bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-                RenderSystem.setShaderTexture(0, firefly);
+                RenderSystem.setShaderTexture(0, TextureStorage.firefly);
                 Color color1 = colorMode.getValue() == ColorMode.Sync ? HudEditor.getColor(1) : color.getValue().getColorObject();
                 Matrix4f posMatrix = context.getMatrices().peek().getPositionMatrix();
                 bufferBuilder.vertex(posMatrix, 0, -8f, 0).texture(0f, 1f).color(color1.getRGB()).next();
@@ -117,8 +107,6 @@ public class Crosshair extends Module {
                 bufferBuilder.vertex(posMatrix, -8f, 0, 0).texture(1f, 0).color(color1.getRGB()).next();
                 bufferBuilder.vertex(posMatrix, 0, 0, 0).texture(0, 0).color(color1.getRGB()).next();
                 BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-                RenderSystem.depthMask(true);
-                RenderSystem.disableDepthTest();
                 RenderSystem.disableBlend();
                 context.getMatrices().pop();
             }

@@ -10,28 +10,27 @@ import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
+import thunder.hack.api.IAddon;
 import thunder.hack.core.impl.AddonManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 import static thunder.hack.modules.Module.mc;
 
 public class MainMenuScreen extends Screen {
-    private static final Identifier TH_TEAM = new Identifier("thunderhack", "textures/gui/elements/thteam.png");
-    private static final Identifier DONATION = new Identifier("thunderhack", "textures/gui/elements/donationalerts.png");
-
     private final List<MainMenuButton> buttons = new ArrayList<>();
     public boolean confirm = false;
     public static int ticksActive;
@@ -115,12 +114,12 @@ public class MainMenuScreen extends Screen {
 
         Render2DEngine.drawHudBase(context.getMatrices(), mc.getWindow().getScaledWidth() - 40, mc.getWindow().getScaledHeight() - 40, 30, 30, 5, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 40, mc.getWindow().getScaledHeight() - 40, 30, 30) ? 0.7f : 1f);
         RenderSystem.setShaderColor(1f, 1f, 1f, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 40, mc.getWindow().getScaledHeight() - 40, 30, 30) ? 0.7f : 1f);
-        context.drawTexture(TH_TEAM, mc.getWindow().getScaledWidth() - 40, mc.getWindow().getScaledHeight() - 40, 30, 30, 0, 0, 30, 30, 30, 30);
+        context.drawTexture(TextureStorage.thTeam, mc.getWindow().getScaledWidth() - 40, mc.getWindow().getScaledHeight() - 40, 30, 30, 0, 0, 30, 30, 30, 30);
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
         Render2DEngine.drawHudBase(context.getMatrices(), mc.getWindow().getScaledWidth() - 80, mc.getWindow().getScaledHeight() - 40, 30, 30, 5, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 80, mc.getWindow().getScaledHeight() - 40, 30, 30) ? 0.7f : 1f);
         RenderSystem.setShaderColor(1f, 1f, 1f, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 80, mc.getWindow().getScaledHeight() - 40, 30, 30) ? 0.7f : 1f);
-        context.drawTexture(DONATION, mc.getWindow().getScaledWidth() - 79, mc.getWindow().getScaledHeight() - 39, 28, 28, 0, 0, 30, 30, 30, 30);
+        context.drawTexture(TextureStorage.donation, mc.getWindow().getScaledWidth() - 79, mc.getWindow().getScaledHeight() - 39, 28, 28, 0, 0, 30, 30, 30, 30);
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
         int offsetY = 10;
@@ -136,6 +135,15 @@ public class MainMenuScreen extends Screen {
         int textWidth = (int) FontRenderers.sf_bold.getStringWidth(addonsText);
         int textX = screenWidth - textWidth - 5;
         FontRenderers.sf_bold.drawString(context.getMatrices(), addonsText, textX, 5, Color.WHITE.getRGB());
+
+        int offset = 0;
+        for (IAddon addon : AddonManager.getAddons()) {
+       // for (String addon : Arrays.asList("Addon", "Addon2", "Addon3", "Addon4", "Addon5")) {
+            textWidth = (int) FontRenderers.sf_bold.getStringWidth(addon.getName() + " |");
+            textX = screenWidth - textWidth - 5;
+            FontRenderers.sf_bold.drawString(context.getMatrices(), addon.getName() + Formatting.WHITE + " |", textX, 13 + offset, Color.GRAY.getRGB());
+            offset += 9;
+        }
     }
 
     private static @NotNull String getPrefix(@NotNull String change) {

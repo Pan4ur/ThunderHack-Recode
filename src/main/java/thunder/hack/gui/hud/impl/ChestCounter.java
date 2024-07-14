@@ -15,6 +15,7 @@ import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
@@ -24,9 +25,6 @@ public class ChestCounter extends HudElement {
     public ChestCounter() {
         super("ChestCounter", 50, 10);
     }
-
-    private Identifier icon = new Identifier("thunderhack", "textures/hud/icons/chest.png");
-
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
         Pair<Integer, Integer> chests = getChestCount();
@@ -39,7 +37,7 @@ public class ChestCounter extends HudElement {
 
             Render2DEngine.setupRender();
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-            RenderSystem.setShaderTexture(0, icon);
+            RenderSystem.setShaderTexture(0, TextureStorage.chestIcon);
             Render2DEngine.renderGradientTexture(context.getMatrices(), pX + 2, getPosY() + 1, 10, 10, 0, 0, 512, 512, 512, 512,
                     HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
             Render2DEngine.endRender();

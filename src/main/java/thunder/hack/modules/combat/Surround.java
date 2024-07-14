@@ -2,13 +2,11 @@ package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.*;
@@ -118,15 +116,17 @@ public final class Surround extends PlaceModule {
 
     @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.HIGHEST)
-    private void onEntitySpawn(@NotNull EventEntitySpawn event) {
-        if (event.getEntity() instanceof EndCrystalEntity cr && crystalBreaker.getValue().isEnabled() && cr.squaredDistanceTo(mc.player) <= remove.getPow2Value())
-            handlePacket();
-    }
-
-    @SuppressWarnings("unused")
-    @EventHandler(priority = EventPriority.HIGHEST)
     private void onPacketReceive(PacketEvent.@NotNull Receive event) {
         if (!getBlockResult().found()) disable(isRu() ? "Нет блоков!" : "No blocks!");
+
+        if (event.getPacket() instanceof EntitySpawnS2CPacket spawn && spawn.getEntityType() == EntityType.END_CRYSTAL) {
+
+            EndCrystalEntity cr = new EndCrystalEntity(mc.world, spawn.getX(), spawn.getY(), spawn.getZ());
+            cr.setId(spawn.getId());
+
+            if (crystalBreaker.getValue().isEnabled() && cr.squaredDistanceTo(mc.player) <= remove.getPow2Value())
+                handlePacket();
+        }
 
         if (event.getPacket() instanceof BlockUpdateS2CPacket pac && mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value() && pac.getState().isReplaceable())
             handlePacket();

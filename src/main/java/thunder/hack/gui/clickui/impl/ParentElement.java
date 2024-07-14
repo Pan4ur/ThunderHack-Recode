@@ -8,10 +8,10 @@ import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.SettingGroup;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
-import static thunder.hack.gui.clickui.ClickGUI.arrow;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class ParentElement extends AbstractElement {
@@ -39,7 +39,7 @@ public class ParentElement extends AbstractElement {
         matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-180f * animation));
         matrixStack.translate(-tx, -ty, 0);
         matrixStack.translate((x + width - 14), (y + 4.5f), 0);
-        context.drawTexture(arrow, 0, 0, 0, 0, 6, 6, 6, 6);
+        context.drawTexture(TextureStorage.guiArrow, 0, 0, 0, 0, 6, 6, 6, 6);
         matrixStack.translate(-(x + width - 14), -(y + 4.5f), 0);
         matrixStack.pop();
 

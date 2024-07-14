@@ -76,6 +76,11 @@ public class Setting<T> {
     }
 
     public void setValue(T value) {
+        setValueSilent(value);
+        ThunderHack.EVENT_BUS.post(new EventSetting(this));
+    }
+
+    public void setValueSilent(T value) {
         setPlannedValue(value);
         if (hasRestriction) {
             if (((Number) min).floatValue() > ((Number) value).floatValue()) {
@@ -86,7 +91,6 @@ public class Setting<T> {
             }
         }
         this.value = plannedValue;
-        ThunderHack.EVENT_BUS.post(new EventSetting(this));
     }
 
     public float getPow2Value() {

@@ -24,8 +24,11 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.impl.ServerManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
+import thunder.hack.gui.hud.impl.PingHud;
+import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.movement.Blink;
 import thunder.hack.setting.Setting;
@@ -87,27 +90,45 @@ public final class AutoTotem extends Module {
     @EventHandler
     public void onSync(EventSync e) {
         swapTo(getItemSlot());
+
+        if (rcGap.not(RCGap.Off) && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed() && !mc.player.isUsingItem())
+            ((IMinecraftClient) mc).idoItemUse();
+
         delay--;
     }
 
     @EventHandler
     public void onPacketReceive(PacketEvent.@NotNull Receive e) {
-        if (e.getPacket() instanceof EntitySpawnS2CPacket spawn && hotbarFallBack.getValue()) {
-            if (spawn.getEntityType() == EntityType.END_CRYSTAL) {
+        if (e.getPacket() instanceof EntitySpawnS2CPacket spawn)
+            if (spawn.getEntityType() == EntityType.END_CRYSTAL)
                 if (getPlayerPos().squaredDistanceTo(spawn.getX(), spawn.getY(), spawn.getZ()) < 36) {
-                    if (fallBackCalc.getValue() && ExplosionUtility.getExplosionDamageWPredict(new Vec3d(spawn.getX(), spawn.getY(), spawn.getZ()), mc.player, PredictUtility.createBox(getPlayerPos(), mc.player), false) < getTriggerHealth() + 4f)
-                        return;
-                    runInstant();
+                    if (hotbarFallBack.getValue()) {
+                        if (fallBackCalc.getValue() && ExplosionUtility.getExplosionDamageWPredict(new Vec3d(spawn.getX(), spawn.getY(), spawn.getZ()), mc.player, PredictUtility.createBox(getPlayerPos(), mc.player), false) < getTriggerHealth() + 4f)
+                            return;
+                        runInstant();
+                    }
+
+                    if (onCrystal.getValue()) {
+                        if (getTriggerHealth() - ExplosionUtility.getExplosionDamageWPredict(new Vec3d(spawn.getX(), spawn.getY(), spawn.getZ()), mc.player, PredictUtility.createBox(getPlayerPos(), mc.player), false) < 0.5) {
+                            int slot = -1;
+                            for (int i = 9; i < 45; i++) {
+                                if (mc.player.getInventory().getStack(i >= 36 ? i - 36 : i).getItem().equals(Items.TOTEM_OF_UNDYING)) {
+                                    slot = i >= 36 ? i - 36 : i;
+                                    break;
+                                }
+                            }
+
+                            swapTo(slot);
+                            debug("spawn switch");
+                        }
+                    }
                 }
-            }
-        }
-        if (e.getPacket() instanceof BlockUpdateS2CPacket blockUpdate) {
-            if (blockUpdate.getState().getBlock() == Blocks.OBSIDIAN && onObsidianPlace.getValue()) {
-                if (getPlayerPos().squaredDistanceTo(blockUpdate.getPos().toCenterPos()) < 36 && delay <= 0) {
+
+
+        if (e.getPacket() instanceof BlockUpdateS2CPacket blockUpdate)
+            if (blockUpdate.getState().getBlock() == Blocks.OBSIDIAN && onObsidianPlace.getValue())
+                if (getPlayerPos().squaredDistanceTo(blockUpdate.getPos().toCenterPos()) < 36 && delay <= 0)
                     runInstant();
-                }
-            }
-        }
     }
 
     private float getTriggerHealth() {
@@ -201,7 +222,7 @@ public final class AutoTotem extends Module {
                 if (resetAttackCooldown.getValue())
                     mc.player.resetLastAttackedTicks();
             }
-            delay = 3;
+            delay = (int) (2 + (ServerManager.getPing() / 25f));
         }
     }
 
@@ -390,6 +411,7 @@ public final class AutoTotem extends Module {
         }
 
         if (item == mc.player.getMainHandStack().getItem() && mc.options.useKey.isPressed()) return -1;
+
 
         return itemSlot;
     }

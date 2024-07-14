@@ -10,6 +10,7 @@ import org.joml.Matrix4f;
 import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -39,7 +40,7 @@ public class CaptureMark {
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-        RenderSystem.setShaderTexture(0, Render2DEngine.capture);
+        RenderSystem.setShaderTexture(0, TextureStorage.capture);
         matrices.translate(-0.75, -0.75, -0.01);
         Matrix4f matrix = matrices.peek().getPositionMatrix();
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
