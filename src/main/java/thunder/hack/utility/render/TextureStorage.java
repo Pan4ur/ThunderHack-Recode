@@ -28,6 +28,6 @@ public final class TextureStorage {
     public static final Identifier proxyIcon = new Identifier("thunderhack", "textures/hud/icons/proxy.png");
     public static final Identifier waypoint = new Identifier("thunderhack", "textures/hud/elements/waypoint.png");
     public static final Identifier configIcon = new Identifier("thunderhack", "textures/gui/elements/configpng.png");
-    public static final Identifier waypointIcon = new Identifier("thunderhack", "textures/gui/elements/waypointIcon.png");
-    public static final Identifier macrosIcon = new Identifier("thunderhack", "textures/gui/elements/macrosIcon.png");
+    public static final Identifier waypointIcon = new Identifier("thunderhack", "textures/gui/elements/waypointicon.png");
+    public static final Identifier macrosIcon = new Identifier("thunderhack", "textures/gui/elements/macrosicon.png");
 }
