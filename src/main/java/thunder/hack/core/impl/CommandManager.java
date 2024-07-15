@@ -97,6 +97,7 @@ public class CommandManager implements IManager {
     public void registerCommand(Command command) {
         if (command == null) return;
 
+        command.register(dispatcher);
         this.commands.add(command);
     }
 }
