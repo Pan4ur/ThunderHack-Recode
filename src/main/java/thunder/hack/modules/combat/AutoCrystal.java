@@ -696,8 +696,6 @@ public class AutoCrystal extends Module {
         renderPositions.put(bhr.getBlockPos(), System.currentTimeMillis());
         postPlaceSwitch(prevSlot);
 
-        sendMessage(onSpawn + "");
-
         if (onSpawn) {
             placedOnSpawn = true;
             placeSyncTimer.reset();
