@@ -7,12 +7,11 @@ import thunder.hack.events.impl.EventSetting;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
-import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
-public class Baritone extends Module {
-    public Baritone() {
-        super("Baritone", Category.CLIENT);
+public final class BaritoneSettings extends Module {
+    public BaritoneSettings() {
+        super("BaritoneSettings", Category.CLIENT);
     }
     public final Setting<Boolean> allowBreakBlock = new Setting<>("AllowBreakBlock", true);
     public final Setting<Boolean> allowPlace = new Setting<>("AllowPlace", true);
