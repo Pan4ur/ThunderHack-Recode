@@ -158,7 +158,8 @@ public class ModuleManager implements IManager {
     public static MemoryHud memoryHud = new MemoryHud();
     public static Companion companion = new Companion();
     public static AntiCrash antiCrash = new AntiCrash();
-    // public static Baritone baritone = new Baritone();
+    public static UnfocusedCPU unfocusedCPU = new UnfocusedCPU();
+    public static BaritoneSettings baritoneSettings = new BaritoneSettings();
     public static AutoGear autoGear = new AutoGear();
     public static ViewLock viewLock = new ViewLock();
     public static Velocity velocity = new Velocity();

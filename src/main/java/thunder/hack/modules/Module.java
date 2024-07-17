@@ -49,7 +49,8 @@ public abstract class Module {
     private final List<String> ignoredModules = Arrays.asList(
             "ClickGui",
             "ClientSettings",
-            "Rotations"
+            "Rotations",
+            "BaritoneSettings"
     );
 
     public static final MinecraftClient mc = MinecraftClient.getInstance();
