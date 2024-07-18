@@ -88,5 +88,10 @@
     "sounds": [
       "thunderhack:rifk"
     ]
+  },
+  "cutie": {
+    "sounds": [
+      "thunderhack:cutie"
+    ]
   }
 }
