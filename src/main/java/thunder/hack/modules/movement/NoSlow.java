@@ -54,6 +54,7 @@ public class NoSlow extends Module {
                 case Grim -> {
                     if (mc.player.getActiveHand() == Hand.OFF_HAND) {
                         sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot % 8 + 1));
+                        sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot % 7 + 2));
                         sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
                     } else if (mainHand.getValue()) {
                         sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id));
@@ -68,6 +69,7 @@ public class NoSlow extends Module {
                 case GrimNew -> {
                     if (mc.player.getActiveHand() == Hand.OFF_HAND) {
                         sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot % 8 + 1));
+                        sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot % 7 + 2));
                         sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
                     } else if (mainHand.getValue() && (mc.player.getItemUseTime() <= 3 || mc.player.age % 2 == 0)) {
                         sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id));
