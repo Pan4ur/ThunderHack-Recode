@@ -1,5 +1,6 @@
 package thunder.hack.api;
 
+import com.mojang.logging.LogUtils;
 import thunder.hack.cmd.Command;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.Module;
@@ -26,5 +27,9 @@ public interface IAddon {
 
     default String getDescription() {
         return "";
+    }
+
+    default void onShutdown() {
+        LogUtils.getLogger().info("Shutting down addon: " + getName());
     }
 }
