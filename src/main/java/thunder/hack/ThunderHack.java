@@ -88,8 +88,6 @@ public class ThunderHack implements ModInitializer {
         EVENT_BUS.subscribe(core);
 
         FriendManager.loadFriends();
-        configManager.load(configManager.getCurrentConfig());
-        moduleManager.onLoad("none");
 
         LogUtils.getLogger().info("Starting addon initialization.");
 
@@ -151,6 +149,9 @@ public class ThunderHack implements ModInitializer {
         }
 
         LogUtils.getLogger().info("Addon initialization complete.");
+
+        configManager.load(configManager.getCurrentConfig());
+        moduleManager.onLoad("none");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (ModuleManager.unHook.isEnabled())
