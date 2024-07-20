@@ -1,9 +1,13 @@
 package thunder.hack.injection;
 
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.proxy.Socks5ProxyHandler;
 
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.core.impl.ProxyManager;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.Module;
@@ -18,27 +22,57 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.net.InetSocketAddress;
+import java.util.Iterator;
 
 @Mixin(ClientConnection.class)
 public class MixinClientConnection {
 
+    @Inject(method = "exceptionCaught", at = @At("HEAD"), cancellable = true)
+    private void exceptionCaughtHook(ChannelHandlerContext context, Throwable t, CallbackInfo ci) {
+        if (ModuleManager.antiPacketException.isEnabled()) {
+            ModuleManager.antiPacketException.sendChatMessage(t.getMessage());
+            ci.cancel();
+        }
+    }
+
     @Inject(method = "handlePacket", at = @At("HEAD"), cancellable = true)
     private static <T extends PacketListener> void onHandlePacket(Packet<T> packet, PacketListener listener, CallbackInfo info) {
         if(Module.fullNullCheck()) return;
-        PacketEvent.Receive event = new PacketEvent.Receive(packet);
-        ThunderHack.EVENT_BUS.post(event);
-        if (event.isCancelled()) {
-            info.cancel();
+        if (packet instanceof BundleS2CPacket packs) {
+            packs.getPackets().forEach(p -> {
+                PacketEvent.Receive event = new PacketEvent.Receive(p);
+                ThunderHack.EVENT_BUS.post(event);
+                if (event.isCancelled()) {
+                    info.cancel();
+                }
+            });
+        } else {
+            PacketEvent.Receive event = new PacketEvent.Receive(packet);
+            ThunderHack.EVENT_BUS.post(event);
+            if (event.isCancelled()) {
+                info.cancel();
+            }
         }
     }
+
 
     @Inject(method = "handlePacket", at = @At("TAIL"), cancellable = true)
     private static <T extends PacketListener> void onHandlePacketPost(Packet<T> packet, PacketListener listener, CallbackInfo info) {
         if(Module.fullNullCheck()) return;
-        PacketEvent.ReceivePost event = new PacketEvent.ReceivePost(packet);
-        ThunderHack.EVENT_BUS.post(event);
-        if (event.isCancelled()) {
-            info.cancel();
+        if (packet instanceof BundleS2CPacket packs) {
+            packs.getPackets().forEach(p -> {
+                PacketEvent.ReceivePost event = new PacketEvent.ReceivePost(p);
+                ThunderHack.EVENT_BUS.post(event);
+                if (event.isCancelled()) {
+                    info.cancel();
+                }
+            });
+        } else {
+            PacketEvent.ReceivePost event = new PacketEvent.ReceivePost(packet);
+            ThunderHack.EVENT_BUS.post(event);
+            if (event.isCancelled()) {
+                info.cancel();
+            }
         }
     }
 

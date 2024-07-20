@@ -12,6 +12,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL45;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
@@ -78,7 +79,7 @@ public class Render3DEngine {
             RenderSystem.lineWidth(2f);
 
             OUTLINE_QUEUE.forEach(action -> {
-                setOutlinePoints(action.box(), matrixFrom(action.box().minX, action.box().minY, action.box().minZ), buffer, action.color());
+               setOutlinePoints(action.box(), matrixFrom(action.box().minX, action.box().minY, action.box().minZ), buffer, action.color());
             });
 
             OUTLINE_SIDE_QUEUE.forEach(action -> {
@@ -100,8 +101,7 @@ public class Render3DEngine {
             BufferBuilder buffer = tessellator.getBuffer();
             RenderSystem.disableCull();
             RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
-            RenderSystem.lineWidth(1f);
-            buffer.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.LINES);
+            buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.LINES);
             DEBUG_LINE_QUEUE.forEach(action -> {
                 MatrixStack matrices = matrixFrom(action.start.getX(), action.start.getY(), action.start.getZ());
                 vertexLine(matrices, buffer, 0f, 0f, 0f, (float) (action.end.getX() - action.start.getX()), (float) (action.end.getY() - action.start.getY()), (float) (action.end.getZ() - action.start.getZ()), action.color);
@@ -462,6 +462,7 @@ public class Render3DEngine {
         Matrix4f model = matrices.peek().getPositionMatrix();
         MatrixStack.Entry entry = matrices.peek();
         Vector3f normalVec = getNormal(x1, y1, z1, x2, y2, z2);
+
 
         //TODO Test
         buffer.vertex(model, x1, y1, z1).color(lineColor.getRed(), lineColor.getGreen(), lineColor.getBlue(), lineColor.getAlpha()).normal(entry, normalVec.x(), normalVec.y(), normalVec.z()).next();

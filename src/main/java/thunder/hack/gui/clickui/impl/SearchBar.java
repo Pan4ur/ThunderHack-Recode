@@ -26,8 +26,10 @@ public class SearchBar extends AbstractButton {
             FontRenderers.sf_medium.drawGradientString(context.getMatrices(), moduleName + (mc.player == null || ((mc.player.age / 10) % 2 == 0) ? " " : "_"), x + 7f, y + 5f, 2);
 
         if (Render2DEngine.isHovered(mouseX, mouseY, x, y, width, height)) {
-            GLFW.glfwSetCursor(mc.getWindow().getHandle(),
-                    GLFW.glfwCreateStandardCursor(GLFW.GLFW_IBEAM_CURSOR));
+            if (GLFW.glfwGetPlatform() != GLFW.GLFW_PLATFORM_WAYLAND) {
+                GLFW.glfwSetCursor(mc.getWindow().getHandle(),
+                        GLFW.glfwCreateStandardCursor(GLFW.GLFW_IBEAM_CURSOR));
+            }
             ClickGUI.anyHovered = true;
         }
     }

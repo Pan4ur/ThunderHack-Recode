@@ -89,7 +89,7 @@ public class ThunderHack implements ModInitializer {
 
         FriendManager.loadFriends();
         configManager.load(configManager.getCurrentConfig());
-        moduleManager.onLoad();
+        moduleManager.onLoad("none");
 
         LogUtils.getLogger().info("Starting addon initialization.");
 

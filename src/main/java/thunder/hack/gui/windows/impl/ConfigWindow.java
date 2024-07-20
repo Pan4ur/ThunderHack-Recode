@@ -15,6 +15,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
@@ -32,7 +33,7 @@ public class ConfigWindow extends WindowBase {
     private String search = "Search", addName = "Name";
 
     public ConfigWindow(float x, float y, float width, float height, Setting<PositionSetting> position) {
-        super(x, y, width, height, "Config", position);
+        super(x, y, width, height, "Config", position, TextureStorage.configIcon);
         refresh();
     }
 

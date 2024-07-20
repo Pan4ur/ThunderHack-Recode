@@ -12,11 +12,11 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
 import static thunder.hack.core.IManager.mc;
-import static thunder.hack.gui.clickui.ClickGUI.arrow;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class BooleanParentElement extends AbstractElement {
@@ -36,7 +36,7 @@ public class BooleanParentElement extends AbstractElement {
         MatrixStack matrixStack = context.getMatrices();
 
         float tx = x + width - 11;
-        float ty = y + 8.5f;
+        float ty = y + 7.5f;
 
         arrowAnimation = fast(arrowAnimation, getParentSetting().getValue().isExtended() ? 0 : 1, 15f);
 
@@ -44,8 +44,11 @@ public class BooleanParentElement extends AbstractElement {
         matrixStack.translate(tx, ty, 0);
         matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-180f * arrowAnimation));
         matrixStack.translate(-tx, -ty, 0);
-        context.drawTexture(arrow, (int) (x + width - 14), (int) (y + 6), 0, 0, 6, 6, 6, 6);
+        matrixStack.translate((x + width - 14), (y + 4.5f), 0);
+        context.drawTexture(TextureStorage.guiArrow, 0, 0, 0, 0, 6, 6, 6, 6);
+        matrixStack.translate(-(x + width - 14), -(y + 4.5f), 0);
         matrixStack.pop();
+
         FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), x + 6, y + height / 2 - 1f, new Color(-1).getRGB());
         animation = fast(animation, getParentSetting().getValue().isEnabled() ? 1 : 0, 15f);
         float paddingX = 7f * animation;
@@ -59,9 +62,11 @@ public class BooleanParentElement extends AbstractElement {
             FontRenderers.sf_bold_mini.drawString(context.getMatrices(), "x", x + width - 27f, y + height / 2 - 2f, new Color(-1).getRGB());
         }
 
-        if(Render2DEngine.isHovered(mouseX, mouseY, x + width - 36, y + height / 2 - 4, 15, 8)) {
-            GLFW.glfwSetCursor(mc.getWindow().getHandle(),
-                    GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
+        if (Render2DEngine.isHovered(mouseX, mouseY, x + width - 36, y + height / 2 - 4, 15, 8)) {
+            if (GLFW.glfwGetPlatform() != GLFW.GLFW_PLATFORM_WAYLAND) {
+                GLFW.glfwSetCursor(mc.getWindow().getHandle(),
+                        GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
+            }
             ClickGUI.anyHovered = true;
         }
     }

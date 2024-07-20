@@ -16,6 +16,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class FriendsWindow extends WindowBase {
     private String search = "Search", addName = "Name";
 
     public FriendsWindow(float x, float y, float width, float height, Setting<PositionSetting> position) {
-        super(x, y, width, height, "Friends", position);
+        super(x, y, width, height, "Friends", position, TextureStorage.playerIcon);
         refresh();
     }
 

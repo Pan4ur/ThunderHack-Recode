@@ -196,6 +196,7 @@ public final class PistonAura extends Module {
 
         if (mc.world.getBlockState(redStonePos.down()).isReplaceable() && supportPlace.getValue()) {
             InteractionUtility.placeBlock(redStonePos.down(), rotate.getValue(), interact.getValue(), placeMode.getValue(), InventoryUtility.findBlockInHotBar(Blocks.OBSIDIAN), false, false);
+            return;
         }
 
         final float[] angle = InteractionUtility.getPlaceAngle(redStonePos, interact.getValue(), false);
@@ -792,7 +793,7 @@ public final class PistonAura extends Module {
                     .sorted(Comparator.comparingDouble(Structure::getMaxRange))
                     .toList();
             if (!bestStructure.isEmpty()) {
-                Structure structure = bestStructure.get(0);
+                Structure structure = bestStructure.getFirst();
                 pistonPos = structure.getPistonPos();
                 crystalPos = structure.getCrystalPos();
                 redStonePos = structure.getRedStonePos();
@@ -905,17 +906,32 @@ public final class PistonAura extends Module {
 
         private boolean canPlace(BlockPos pos) {
             if (pos == null) return false;
-            return InteractionUtility.canPlaceBlock(pos, interact.getValue(), false);
+
+            BlockState prevBlockState = null;
+            if (supportPlace.getValue()) {
+                prevBlockState = mc.world.getBlockState(pos.down());
+                if (prevBlockState.isReplaceable()) {
+                    mc.world.setBlockState(pos.down(), Blocks.OBSIDIAN.getDefaultState());
+                } else prevBlockState = null;
+            }
+
+            boolean canPlace =  InteractionUtility.canPlaceBlock(pos, interact.getValue(), false);
+
+            if (prevBlockState != null) {
+                mc.world.setBlockState(pos.down(), prevBlockState);
+            }
+
+            return canPlace;
         }
 
         public double getMaxRange() {
             if (this.pistonPos == null || this.crystalPos == null || this.redStonePos == null) return 999;
-            final double piston = mc.player.squaredDistanceTo(this.pistonPos.toCenterPos());
-            final double crystal = mc.player.squaredDistanceTo(this.crystalPos.toCenterPos());
-            final double redStone = mc.player.squaredDistanceTo(this.redStonePos.toCenterPos());
+            final double piston = InteractionUtility.squaredDistanceFromEyes(this.pistonPos.toCenterPos());
+            final double crystal = InteractionUtility.squaredDistanceFromEyes(this.crystalPos.toCenterPos());
+            final double redStone = InteractionUtility.squaredDistanceFromEyes(this.redStonePos.toCenterPos());
 
             BlockPos firePos = this.firePos != null ? this.firePos : this.pistonPos;
-            final double fire = mc.player.squaredDistanceTo(firePos.toCenterPos());
+            final double fire = InteractionUtility.squaredDistanceFromEyes(firePos.toCenterPos());
             return Math.max(Math.max(fire, crystal), Math.max(redStone, piston));
         }
     }

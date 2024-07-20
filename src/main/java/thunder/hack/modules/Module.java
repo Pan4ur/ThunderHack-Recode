@@ -49,7 +49,8 @@ public abstract class Module {
     private final List<String> ignoredModules = Arrays.asList(
             "ClickGui",
             "ClientSettings",
-            "Rotations"
+            "Rotations",
+            "BaritoneSettings"
     );
 
     public static final MinecraftClient mc = MinecraftClient.getInstance();
@@ -313,12 +314,17 @@ public abstract class Module {
 
     public void sendMessage(String message) {
         if (fullNullCheck() || !ClientSettings.clientMessages.getValue() || ModuleManager.unHook.isEnabled()) return;
-        mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + message));
+        if (mc.isOnThread()) {
+            mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + message));
+        } else {
+            mc.executeSync(() ->{
+                mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + message));
+            });
+        }
     }
 
     public void sendChatMessage(String message) {
         if (fullNullCheck()) return;
-
         mc.getNetworkHandler().sendChatMessage(message);
     }
 
@@ -330,7 +336,13 @@ public abstract class Module {
 
     public void debug(String message) {
         if (fullNullCheck() || !ClientSettings.debug.getValue()) return;
-        mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] [\uD83D\uDD27] " + message));
+        if (mc.isOnThread()) {
+            mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] [\uD83D\uDD27] " + message));
+        } else {
+            mc.executeSync(() ->{
+                mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] [\uD83D\uDD27] " + message));
+            });
+        }
     }
 
     public boolean isKeyPressed(int button) {

@@ -16,6 +16,7 @@ import thunder.hack.modules.misc.NameProtect;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.TextUtil;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
@@ -30,11 +31,6 @@ public class WaterMark extends HudElement {
 
     public static final Setting<Mode> mode = new Setting<>("Mode", Mode.Big);
     private final Setting<Boolean> ru = new Setting<>("RU", false);
-
-    public static Identifier logo = new Identifier("thunderhack", "textures/hud/icons/mini_logo.png");
-    private final Identifier player = new Identifier("thunderhack", "textures/gui/headers/player.png");
-    private final Identifier server = new Identifier("thunderhack", "textures/hud/icons/server.png");
-    private final Identifier proxy = new Identifier("thunderhack", "textures/hud/icons/proxy.png");
 
     private final TextUtil textUtil = new TextUtil(
             "ТандерХак",
@@ -78,20 +74,20 @@ public class WaterMark extends HudElement {
                 FontRenderers.sf_bold.drawGradientString(context.getMatrices(), "Recode", getPosX() + 18, getPosY() + 5, 20);
 
                 RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-                RenderSystem.setShaderTexture(0, logo);
+                RenderSystem.setShaderTexture(0, TextureStorage.miniLogo);
                 Render2DEngine.renderGradientTexture(context.getMatrices(), getPosX() + 1, getPosY() + 2, 11, 11, 0, 0, 128, 128, 128, 128,
                         HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
 
-                RenderSystem.setShaderTexture(0, player);
+                RenderSystem.setShaderTexture(0, TextureStorage.playerIcon);
                 Render2DEngine.renderGradientTexture(context.getMatrices(), getPosX() + 58, getPosY() + 3, 8, 8, 0, 0, 128, 128, 128, 128,
                         HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
 
-                RenderSystem.setShaderTexture(0, server);
+                RenderSystem.setShaderTexture(0, TextureStorage.serverIcon);
                 Render2DEngine.renderGradientTexture(context.getMatrices(), getPosX() + offset1, getPosY() + 2, 10, 10, 0, 0, 128, 128, 128, 128,
                         HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
 
                 if (ThunderHack.proxyManager.isActive()) {
-                    RenderSystem.setShaderTexture(0, proxy);
+                    RenderSystem.setShaderTexture(0, TextureStorage.proxyIcon);
                     Render2DEngine.renderGradientTexture(context.getMatrices(), getPosX() + offset1 + offset2 + 16, getPosY() + 2, 10, 10, 0, 0, 128, 128, 128, 128,
                             HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
 

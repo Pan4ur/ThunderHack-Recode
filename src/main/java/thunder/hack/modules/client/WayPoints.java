@@ -11,10 +11,9 @@ import thunder.hack.core.impl.WayPointManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 public final class WayPoints extends Module {
-    private static final Identifier ICON = new Identifier("thunderhack", "textures/hud/elements/waypoint.png");
-
     public WayPoints() {
         super("WayPoints", Category.CLIENT);
     }
@@ -60,7 +59,7 @@ public final class WayPoints extends Module {
 
                 context.getMatrices().push();
                 context.getMatrices().translate(posX - 10, (posY - 35), 0);
-                context.drawTexture(ICON, 0, 0, 20, 20, 0, 0, 20, 20, 20, 20);
+                context.drawTexture(TextureStorage.waypoint, 0, 0, 20, 20, 0, 0, 20, 20, 20, 20);
                 context.getMatrices().pop();
 
                 FontRenderers.sf_bold_mini.drawString(context.getMatrices(), wp.getName(), tagX, (float) posY - 10, -1);

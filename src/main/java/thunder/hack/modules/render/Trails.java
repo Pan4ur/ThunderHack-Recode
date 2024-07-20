@@ -27,6 +27,7 @@ import thunder.hack.utility.interfaces.IEntity;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -109,7 +110,7 @@ public class Trails extends Module {
                 float alpha = color.getValue().getAlpha();
                 Camera camera = mc.gameRenderer.getCamera();
                 stack.push();
-                RenderSystem.setShaderTexture(0, firefly);
+                RenderSystem.setShaderTexture(0, TextureStorage.firefly);
                 RenderSystem.enableBlend();
                 RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
                 RenderSystem.enableDepthTest();
@@ -236,9 +237,9 @@ public class Trails extends Module {
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
 
             switch (mode.getValue()) {
-                case Stars -> RenderSystem.setShaderTexture(0, star);
-                case Bloom -> RenderSystem.setShaderTexture(0, firefly);
-                case Hearts -> RenderSystem.setShaderTexture(0, heart);
+                case Stars -> RenderSystem.setShaderTexture(0, TextureStorage.star);
+                case Bloom -> RenderSystem.setShaderTexture(0, TextureStorage.firefly);
+                case Hearts -> RenderSystem.setShaderTexture(0, TextureStorage.heart);
                 default -> {
                     return;
                 }

@@ -39,19 +39,6 @@ public class Render2DEngine {
     public static MainMenuProgram MAIN_MENU_PROGRAM;
     public static ArcShader ARC_PROGRAM;
     public static BlurProgram BLUR_PROGRAM;
-
-    public static final Identifier star = new Identifier("thunderhack", "textures/particles/star.png");
-    public static final Identifier heart = new Identifier("thunderhack", "textures/particles/heart.png");
-    public static final Identifier dollar = new Identifier("thunderhack", "textures/particles/dollar.png");
-    public static final Identifier snowflake = new Identifier("thunderhack", "textures/particles/snowflake.png");
-    public static final Identifier firefly = new Identifier("thunderhack", "textures/particles/firefly.png");
-    public static final Identifier arrow = new Identifier("thunderhack", "textures/hud/elements/triangle.png");
-    public static final Identifier capture = new Identifier("thunderhack", "textures/hud/elements/capture.png");
-    public static final Identifier bubble = new Identifier("thunderhack", "textures/particles/hitbubble.png");
-
-    public static final Identifier default_circle = new Identifier("thunderhack", "textures/particles/circle.png");
-    public static final Identifier CONTAINER_BACKGROUND = new Identifier("thunderhack", "textures/hud/elements/container.png");
-
     public static HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
     public static HashMap<Integer, BlurredShadow> shadowCache1 = new HashMap<>();
     final static Stack<Rectangle> clipStack = new Stack<>();
@@ -497,7 +484,7 @@ public class Render2DEngine {
     }
 
     public static void drawNewArrow(MatrixStack matrices, float x, float y, float size, Color color) {
-        RenderSystem.setShaderTexture(0, arrow);
+        RenderSystem.setShaderTexture(0, TextureStorage.arrow);
         setupRender();
         RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
         RenderSystem.disableDepthTest();
@@ -558,6 +545,7 @@ public class Render2DEngine {
     }
 
     public static void endRender() {
+        RenderSystem.defaultBlendFunc();
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
@@ -815,7 +803,7 @@ public class Render2DEngine {
     public static void drawStar(MatrixStack matrices, Color c, float scale) {
         setupRender();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-        RenderSystem.setShaderTexture(0, star);
+        RenderSystem.setShaderTexture(0, TextureStorage.star);
         RenderSystem.setShaderColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f);
         Render2DEngine.renderGradientTexture(matrices, 0, 0, scale, scale, 0, 0, 128, 128, 128, 128,
                 c, c, c, c);
@@ -825,7 +813,7 @@ public class Render2DEngine {
     public static void drawHeart(MatrixStack matrices, Color c, float scale) {
         setupRender();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-        RenderSystem.setShaderTexture(0, heart);
+        RenderSystem.setShaderTexture(0, TextureStorage.heart);
         RenderSystem.setShaderColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f);
         Render2DEngine.renderGradientTexture(matrices, 0, 0, scale, scale, 0, 0, 128, 128, 128, 128,
                 c, c, c, c);
@@ -835,7 +823,7 @@ public class Render2DEngine {
     public static void drawBloom(MatrixStack matrices, Color c, float scale) {
         setupRender();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-        RenderSystem.setShaderTexture(0, firefly);
+        RenderSystem.setShaderTexture(0, TextureStorage.firefly);
         RenderSystem.setShaderColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f);
         Render2DEngine.renderGradientTexture(matrices, 0, 0, scale, scale, 0, 0, 128, 128, 128, 128,
                 c, c, c, c);
@@ -845,7 +833,7 @@ public class Render2DEngine {
     public static void drawBubble(MatrixStack matrices, float angle, float factor) {
         setupRender();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-        RenderSystem.setShaderTexture(0, bubble);
+        RenderSystem.setShaderTexture(0, TextureStorage.bubble);
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(angle));
         float scale = factor * 2f;
         Render2DEngine.renderGradientTexture(matrices, -scale / 2, -scale / 2, scale, scale, 0, 0, 128, 128, 128, 128,

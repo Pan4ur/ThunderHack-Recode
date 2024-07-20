@@ -61,10 +61,9 @@ public class ConfigManager implements IManager {
         if (currentConfig != null)
             save(currentConfig);
 
-        ThunderHack.moduleManager.onUnload();
-        ThunderHack.moduleManager.onUnloadPost();
+        ThunderHack.moduleManager.onUnload(category);
         load(file, category);
-        ThunderHack.moduleManager.onLoad();
+        ThunderHack.moduleManager.onLoad(category);
     }
 
     public void loadBinds(String name) {
@@ -110,10 +109,9 @@ public class ConfigManager implements IManager {
         if (currentConfig != null)
             save(currentConfig);
 
-        ThunderHack.moduleManager.onUnload();
-        ThunderHack.moduleManager.onUnloadPost();
+        ThunderHack.moduleManager.onUnload("none");
         load(file);
-        ThunderHack.moduleManager.onLoad();
+        ThunderHack.moduleManager.onLoad("none");
     }
 
     public void loadCloud(String name) {
@@ -138,10 +136,15 @@ public class ConfigManager implements IManager {
             return;
         }
 
-        ThunderHack.moduleManager.onUnload();
-        ThunderHack.moduleManager.onUnloadPost();
+        if (module.isEnabled()) {
+            ThunderHack.EVENT_BUS.unsubscribe(module);
+            module.setEnabled(false);
+        }
+
         loadModuleOnly(file, module);
-        ThunderHack.moduleManager.onLoad();
+
+        if (module.isEnabled())
+            ThunderHack.EVENT_BUS.subscribe(module);
     }
 
     public void load(@NotNull File config) {

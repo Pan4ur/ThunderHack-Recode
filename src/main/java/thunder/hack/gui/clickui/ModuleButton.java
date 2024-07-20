@@ -23,12 +23,14 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.*;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 import thunder.hack.utility.render.animation.AnimationUtility;
 import thunder.hack.utility.render.animation.GearAnimation;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.client.ClientSettings.isRu;
@@ -43,7 +45,6 @@ public class ModuleButton extends AbstractButton {
     float category_animation = 0f;
     int ticksOpened;
 
-    private final Identifier Gear = new Identifier("thunderhack", "textures/gui/headers/client.png");
     private final GearAnimation gearAnimation = new GearAnimation();
 
     private boolean binding = false;
@@ -54,6 +55,7 @@ public class ModuleButton extends AbstractButton {
         elements = new ArrayList<>();
 
         for (Setting setting : module.getSettings()) {
+
             if (setting.getValue() instanceof Boolean && !setting.getName().equals("Enabled") && !setting.getName().equals("Drawn")) {
                 elements.add(new BooleanElement(setting));
             } else if (setting.getValue() instanceof ColorSetting) {
@@ -113,7 +115,7 @@ public class ModuleButton extends AbstractButton {
                 context.getMatrices().translate(px, py, 0.0F);
                 context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(gearAnimation.getValue()));
                 context.getMatrices().translate(-px, -py, 0.0F);
-                RenderSystem.setShaderTexture(0, Gear);
+                RenderSystem.setShaderTexture(0, TextureStorage.Gear);
                 RenderSystem.enableBlend();
                 RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
                 Render2DEngine.renderGradientTexture(context.getMatrices(), px - gScale / 2f, py - gScale / 2f, gScale, gScale, 0, 0, gScale, gScale, gScale, gScale,

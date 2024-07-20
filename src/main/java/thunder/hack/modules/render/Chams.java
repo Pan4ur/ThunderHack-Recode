@@ -28,6 +28,7 @@ import thunder.hack.events.impl.EventHeldItemRenderer;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
@@ -59,8 +60,6 @@ public class Chams extends Module {
     }
 
     private final Identifier crystalTexture = new Identifier("textures/entity/end_crystal/end_crystal.png");
-    private final Identifier crystalTexture2 = new Identifier("thunderhack", "textures/misc/end_crystal2.png");
-
     private static final float SINE_45_DEGREES = (float) Math.sin(0.7853981633974483);
 
     public void renderCrystal(EndCrystalEntity endCrystalEntity, float f, float g, MatrixStack matrixStack, int i, ModelPart core, ModelPart frame) {
@@ -77,7 +76,7 @@ public class Chams extends Module {
             if (crystalMode.getValue() == CMode.Three) {
                 RenderSystem.setShaderTexture(0, crystalTexture);
             } else {
-                RenderSystem.setShaderTexture(0, crystalTexture2);
+                RenderSystem.setShaderTexture(0, TextureStorage.crystalTexture2);
             }
             RenderSystem.setShader(GameRenderer::getPositionTexProgram);
             buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);

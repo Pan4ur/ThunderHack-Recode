@@ -52,14 +52,13 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.*;
-
-import static thunder.hack.utility.render.Render2DEngine.CONTAINER_BACKGROUND;
 
 public class NameTags extends Module {
     private final Setting<Boolean> self = new Setting<>("Self",false);
@@ -266,7 +265,7 @@ public class NameTags extends Module {
                     RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
                     Color lColor = HudEditor.getColor(0);
                     RenderSystem.setShaderColor(lColor.getRed() / 255f, lColor.getGreen() / 255f, lColor.getBlue() / 255f, 1f);
-                    RenderSystem.setShaderTexture(0, WaterMark.logo);
+                    RenderSystem.setShaderTexture(0, TextureStorage.miniLogo);
                     Render2DEngine.renderTexture(context.getMatrices(), tagX - 13, (float) (posY - 12.5f), 10, 10, 0, 0, 256, 256, 256, 256);
                     RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
                     RenderSystem.disableBlend();
@@ -559,7 +558,7 @@ public class NameTags extends Module {
         }
     }
 
-    private @NotNull String getHealthColor(float health) {
+    public @NotNull String getHealthColor(float health) {
         if (health <= 15 && health > 7) return Formatting.YELLOW + "";
         if (health > 15) return Formatting.GREEN + "";
         return Formatting.RED + "";
@@ -663,7 +662,7 @@ public class NameTags extends Module {
         RenderSystem.setShaderColor(colors[0], colors[1], colors[2], 1F);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
-        context.drawTexture(CONTAINER_BACKGROUND, x, y, 0, 0, 176, 67, 176, 67);
+        context.drawTexture(TextureStorage.container, x, y, 0, 0, 176, 67, 176, 67);
         RenderSystem.enableBlend();
     }
 }

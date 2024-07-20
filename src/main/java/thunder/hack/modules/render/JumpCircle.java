@@ -15,6 +15,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,10 +79,10 @@ public class JumpCircle extends Module {
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
 
         switch (mode.getValue()) {
-            case Portal -> RenderSystem.setShaderTexture(0, Render2DEngine.bubble);
-            case Default -> RenderSystem.setShaderTexture(0, Render2DEngine.default_circle);
+            case Portal -> RenderSystem.setShaderTexture(0, TextureStorage.bubble);
+            case Default -> RenderSystem.setShaderTexture(0, TextureStorage.default_circle);
             case Custom ->
-                    RenderSystem.setShaderTexture(0, Objects.requireNonNullElse(custom, Render2DEngine.default_circle));
+                    RenderSystem.setShaderTexture(0, Objects.requireNonNullElse(custom, TextureStorage.default_circle));
         }
 
         RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);

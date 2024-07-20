@@ -15,6 +15,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -37,7 +38,7 @@ public class MacroWindow extends WindowBase {
 
 
     public MacroWindow(float x, float y, float width, float height, Setting<PositionSetting> position) {
-        super(x, y, width, height, "Macros", position);
+        super(x, y, width, height, "Macros", position, TextureStorage.macrosIcon);
         refresh();
     }
 
@@ -162,7 +163,6 @@ public class MacroWindow extends WindowBase {
         if (Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 15, getY() + 3, 10, 10))
             mc.setScreen(ClickGUI.getClickGui());
 
-
         float nameX = getX() + 11;
         float nameWidth = getWidth() / 4.5f;
 
@@ -171,7 +171,6 @@ public class MacroWindow extends WindowBase {
 
         float textX = bindX + bindWidth + 2;
         float textWidth = getWidth() - (textX - getX()) - 17;
-
 
         boolean hoveringName = Render2DEngine.isHovered(mouseX, mouseY, nameX, getY() + 19, nameWidth, 11);
         boolean hoveringBind = Render2DEngine.isHovered(mouseX, mouseY, bindX, getY() + 19, bindWidth, 11);

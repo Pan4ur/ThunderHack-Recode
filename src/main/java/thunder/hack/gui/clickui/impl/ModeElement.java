@@ -13,11 +13,11 @@ import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 import java.util.Objects;
 
-import static thunder.hack.gui.clickui.ClickGUI.arrow;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class ModeElement extends AbstractElement {
@@ -40,7 +40,7 @@ public class ModeElement extends AbstractElement {
         animation2 = fast(animation2, 1f, 10f);
 
         float tx = x + width - 11;
-        float ty = (float) (y + (wheight / 2));
+        float ty = y + 7.5f;
 
         MatrixStack matrixStack = context.getMatrices();
 
@@ -51,7 +51,9 @@ public class ModeElement extends AbstractElement {
         matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(thetaRotation));
         matrixStack.translate(-tx, -ty, 0);
 
-        context.drawTexture(arrow, (int) (x + width - 14), (int) (y + (wheight - 6) / 2), 0, 0, 6, 6, 6, 6);
+        matrixStack.translate((x + width - 14), y + 4.5f, 0);
+        context.drawTexture(TextureStorage.guiArrow, 0, 0, 0, 0, 6, 6, 6, 6);
+        matrixStack.translate(-(x + width - 14), -y - 4.5f, 0);
 
         matrixStack.pop();
 

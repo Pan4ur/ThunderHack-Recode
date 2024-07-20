@@ -76,7 +76,7 @@ public class Category extends AbstractCategory {
 
             Render2DEngine.drawBlurredShadow(context.getMatrices(), (int) getX() + 4, (int) (getY() + height - 6), (int) width - 8, 8, 7, new Color(0, 0, 0, 180));
             for (AbstractButton button : buttons) {
-                if (button instanceof ModuleButton mb && SearchBar.listening && !mb.module.getName().toLowerCase().contains(SearchBar.moduleName))
+                if (button instanceof ModuleButton mb && SearchBar.listening && !mb.module.getName().toLowerCase().contains(SearchBar.moduleName.toLowerCase()))
                     continue;
 
                 if (popStack && buttons.getFirst().getY() + moduleOffset < getY() + height) {
@@ -180,7 +180,7 @@ public class Category extends AbstractCategory {
         float offsetY = 0;
         float openY = 0;
         for (AbstractButton button : buttons) {
-            if (button instanceof ModuleButton mb && SearchBar.listening && !mb.module.getName().toLowerCase().contains(SearchBar.moduleName)) {
+            if (button instanceof ModuleButton mb && SearchBar.listening && !mb.module.getName().toLowerCase().contains(SearchBar.moduleName.toLowerCase())) {
                 continue;
             }
             button.setTargetOffset(offsetY);
@@ -208,7 +208,7 @@ public class Category extends AbstractCategory {
     public double getButtonsHeight() {
         double height = 8;
         for (AbstractButton button : buttons) {
-            if (button instanceof ModuleButton mb && SearchBar.listening && !mb.module.getName().toLowerCase().contains(SearchBar.moduleName))
+            if (button instanceof ModuleButton mb && SearchBar.listening && !mb.module.getName().toLowerCase().contains(SearchBar.moduleName.toLowerCase()))
                 continue;
 
             if (button instanceof ModuleButton mbutton) {

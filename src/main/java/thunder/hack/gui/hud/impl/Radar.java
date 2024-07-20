@@ -2,9 +2,13 @@ package thunder.hack.gui.hud.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Formatting;
+import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.modules.render.NameTags;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -17,19 +21,22 @@ public class Radar extends HudElement {
         super("Radar", 100, 100);
     }
 
-    public Setting<Mode> mode = new Setting<>("Mode", Mode.Rect);
-    public Setting<ColorMode> colorMode = new Setting<>("ColorMode", ColorMode.Sync);
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Rect);
+    private final Setting<ColorMode> colorMode = new Setting<>("ColorMode", ColorMode.Sync);
     private final Setting<Integer> size = new Setting<>("Size", 80, 20, 300);
-    public final Setting<ColorSetting> color2 = new Setting<>("Color", new ColorSetting(0xFF101010));
-    public final Setting<ColorSetting> color3 = new Setting<>("PlayerColor", new ColorSetting(0xC59B9B9B));
+    private final Setting<ColorSetting> color2 = new Setting<>("Color", new ColorSetting(0xFF101010));
+    private final Setting<ColorSetting> color3 = new Setting<>("PlayerColor", new ColorSetting(0xC59B9B9B));
 
-    private CopyOnWriteArrayList<PlayerEntity> players = new CopyOnWriteArrayList<>();
+    private final Setting<Component> c1 = new Setting<>("Component1", Component.Name, v -> mode.is(Mode.Text));
+    private final Setting<Component> c2 = new Setting<>("Component2", Component.Hp, v -> mode.is(Mode.Text));
+    private final Setting<Component> c3 = new Setting<>("Component3", Component.Ping, v -> mode.is(Mode.Text));
+    private final Setting<Component> c4 = new Setting<>("Component4", Component.None, v -> mode.is(Mode.Text));
+    private final Setting<Component> c5 = new Setting<>("Component5", Component.None, v -> mode.is(Mode.Text));
 
-    @Override
-    public void onUpdate() {
-        players.clear();
-        players.addAll(mc.world.getPlayers());
-    }
+    private final Setting<Formatting> c12 = new Setting<>("Color1", Formatting.WHITE, v -> mode.is(Mode.Text));
+    private final Setting<Formatting> c22 = new Setting<>("Color2", Formatting.WHITE, v -> mode.is(Mode.Text));
+    private final Setting<Formatting> c32 = new Setting<>("Color3", Formatting.WHITE, v -> mode.is(Mode.Text));
+    private final Setting<Formatting> c42 = new Setting<>("Color4", Formatting.WHITE, v -> mode.is(Mode.Text));
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
@@ -37,10 +44,10 @@ public class Radar extends HudElement {
         if (mode.getValue() == Mode.Rect) {
             Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), size.getValue(), size.getValue(), HudEditor.hudRound.getValue());
 
-            if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
-                Render2DEngine.verticalGradient(context.getMatrices(), getPosX(), getPosY() + (size.getValue() / 2F - 2), getPosX() + size.getValue(), getPosY() + (size.getValue() / 2F),  new Color(0x0000000, true), new Color(0x7B000000, true));
+            if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+                Render2DEngine.verticalGradient(context.getMatrices(), getPosX(), getPosY() + (size.getValue() / 2F - 2), getPosX() + size.getValue(), getPosY() + (size.getValue() / 2F), new Color(0x0000000, true), new Color(0x7B000000, true));
                 Render2DEngine.verticalGradient(context.getMatrices(), getPosX(), getPosY() + (size.getValue() / 2F), getPosX() + size.getValue(), getPosY() + (size.getValue() / 2F + 2), new Color(0x7B000000, true), new Color(0x0000000, true));
-                Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + (size.getValue() / 2F - 2), getPosY() - 1, getPosX() + (size.getValue() / 2F), getPosY() + size.getValue() - 1,  new Color(0x0000000, true), new Color(0x7B000000, true));
+                Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + (size.getValue() / 2F - 2), getPosY() - 1, getPosX() + (size.getValue() / 2F), getPosY() + size.getValue() - 1, new Color(0x0000000, true), new Color(0x7B000000, true));
                 Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + (size.getValue() / 2F), getPosY() - 1, getPosX() + (size.getValue() / 2F + 2), getPosY() + size.getValue() - 1, new Color(0x7B000000, true), new Color(0x0000000, true));
             } else {
                 Render2DEngine.draw2DGradientRect(context.getMatrices(),
@@ -61,7 +68,7 @@ public class Radar extends HudElement {
                 );
             }
 
-            for (PlayerEntity entityPlayer : players) {
+            for (PlayerEntity entityPlayer : ThunderHack.asyncManager.getAsyncPlayers()) {
                 if (entityPlayer == mc.player)
                     continue;
 
@@ -88,11 +95,11 @@ public class Radar extends HudElement {
 
         if (mode.getValue() == Mode.Text) {
             float offset_y = 0;
-            for (PlayerEntity entityPlayer : players) {
+            for (PlayerEntity entityPlayer : ThunderHack.asyncManager.getAsyncPlayers()) {
                 if (entityPlayer == mc.player)
                     continue;
 
-                String str = entityPlayer.getName().getString() + " " + String.format("%.1f", (entityPlayer.getHealth() + entityPlayer.getAbsorptionAmount())) + " " + String.format("%.1f", mc.player.distanceTo(entityPlayer)) + " m";
+                String str = String.format("%s %s %s %s %s", getText(c1, entityPlayer), getText(c2, entityPlayer), getText(c3, entityPlayer), getText(c4, entityPlayer), getText(c5, entityPlayer));
                 if (colorMode.getValue() == ColorMode.Sync) {
                     FontRenderers.sf_bold.drawString(context.getMatrices(), str, getPosX(), getPosY() + offset_y, HudEditor.getColor((int) (offset_y * 2f)).getRGB());
                 } else {
@@ -111,5 +118,33 @@ public class Radar extends HudElement {
 
     public enum ColorMode {
         Sync, Custom
+    }
+
+    public String getText(Setting<Component> c, PlayerEntity player) {
+        switch (c.getValue()) {
+            default -> {
+                return "";
+            }
+            case Hp -> {
+                int health = (int) Math.ceil(player.getHealth() + player.getAbsorptionAmount());
+                return ModuleManager.nameTags.getHealthColor(health) + health + Formatting.RESET;
+            }
+            case Name -> {
+                return c12.getValue() + player.getName().getString() + Formatting.RESET;
+            }
+            case Ping -> {
+                return c22.getValue()+ (NameTags.getEntityPing(player) + "ms") + Formatting.RESET;
+            }
+            case Distance -> {
+                return c32.getValue() + (((int) Math.ceil(mc.player.distanceTo(player))) + "m") + Formatting.RESET;
+            }
+            case TotemPops -> {
+                return c42.getValue() + (ThunderHack.combatManager.getPops(player) + "") + Formatting.RESET;
+            }
+        }
+    }
+
+    public enum Component {
+        Name, Hp, Distance, Ping, TotemPops, None
     }
 }

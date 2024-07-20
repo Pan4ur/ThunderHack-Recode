@@ -8,10 +8,10 @@ import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.SettingGroup;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
-import static thunder.hack.gui.clickui.ClickGUI.arrow;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class ParentElement extends AbstractElement {
@@ -29,8 +29,8 @@ public class ParentElement extends AbstractElement {
 
         MatrixStack matrixStack = context.getMatrices();
 
-        float tx = x + width - 11f;
-        float ty = y + 8.5f;
+        float tx = x + width - 11;
+        float ty = y + 7.5f;
 
         animation = fast(animation, getParentSetting().getValue().isExtended() ? 0 : 1, 15f);
 
@@ -38,8 +38,11 @@ public class ParentElement extends AbstractElement {
         matrixStack.translate(tx, ty, 0);
         matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-180f * animation));
         matrixStack.translate(-tx, -ty, 0);
-        context.drawTexture(arrow, (int) (x + width - 14), (int) (y + 5.5f), 0, 0, 6, 6, 6, 6);
+        matrixStack.translate((x + width - 14), (y + 4.5f), 0);
+        context.drawTexture(TextureStorage.guiArrow, 0, 0, 0, 0, 6, 6, 6, 6);
+        matrixStack.translate(-(x + width - 14), -(y + 4.5f), 0);
         matrixStack.pop();
+
         FontRenderers.sf_medium_mini.drawString(matrixStack, setting.getName(), x + 6 + (6 * getParentSetting().getValue().getHierarchy()), y + height / 2 - 1f, new Color(-1).getRGB());
     }
 
