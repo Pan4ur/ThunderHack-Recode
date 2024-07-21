@@ -129,9 +129,9 @@ public class AutoCrystal extends Module {
     private final Setting<Swing> swingMode = new Setting<>("Swing", Swing.Place, v -> page.getValue() == Pages.Render);
     private final Setting<Boolean> render = new Setting<>("Render", true, v -> page.getValue() == Pages.Render);
     private final Setting<BooleanSettingGroup> renderExtrapolation = new Setting<>("RenderExtrapolation", new BooleanSettingGroup(false), v -> page.getValue() == Pages.Render);
-    private final Setting<ColorSetting> extrapolationColor = new Setting<>("ExtrapolationColor", new ColorSetting(Color.white), v -> page.getValue() == Pages.Render);
+    private final Setting<ColorSetting> extrapolationColor = new Setting<>("ExtrapolationColor", new ColorSetting(Color.white), v -> page.getValue() == Pages.Render).addToGroup(renderExtrapolation);
     private final Setting<BooleanSettingGroup> renderInteractVector = new Setting<>("RenderInteractVector", new BooleanSettingGroup(true), v -> page.getValue() == Pages.Render);
-    private final Setting<ColorSetting> interactColor = new Setting<>("InteractColor", new ColorSetting(Color.red), v -> page.getValue() == Pages.Render);
+    private final Setting<ColorSetting> interactColor = new Setting<>("InteractColor", new ColorSetting(Color.red), v -> page.getValue() == Pages.Render).addToGroup(renderInteractVector);
     private final Setting<Render> renderMode = new Setting<>("RenderMode", Render.Fade, v -> page.getValue() == Pages.Render);
     private final Setting<Boolean> rselfDamage = new Setting<>("SelfDamage", true, v -> page.getValue() == Pages.Render);
     private final Setting<Boolean> drawDamage = new Setting<>("RenderDamage", true, v -> page.getValue() == Pages.Render);

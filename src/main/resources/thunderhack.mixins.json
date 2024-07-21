@@ -86,6 +86,7 @@
     "MixinSodiumBlockOcclusionCache",
     "MixinSplashOverlay",
     "MixinSweetBerryBushBlock",
+    "MixinTridentItem",
     "MixinWorld",
     "MixinWorldChunk",
     "accesors.IAreaEffectCloudEntity",

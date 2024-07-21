@@ -17,10 +17,7 @@
  */
 package thunder.hack.utility.render.shaders.satin.api.managed.uniform;
 
-import org.apiguardian.api.API;
 import org.joml.Vector2f;
-
-import static org.apiguardian.api.API.Status.MAINTAINED;
 
 public interface Uniform2f {
 

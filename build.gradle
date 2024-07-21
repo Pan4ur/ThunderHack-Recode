@@ -64,9 +64,6 @@ dependencies {
 	libImpl("io.netty:netty-handler-proxy:${project.netty_version}") { transitive = false }
 	libImpl("io.netty:netty-codec-socks:${project.netty_version}") { transitive = false }
 
-
-	compileOnlyApi("org.apiguardian:apiguardian-api:1.1.2")
-
 	configurations.libImpl.dependencies.each {
 		implementation(it)
 	}

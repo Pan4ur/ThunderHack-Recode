@@ -2,6 +2,7 @@ package thunder.hack.cmd.impl;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
+import thunder.hack.ThunderHack;
 import thunder.hack.api.IAddon;
 import thunder.hack.cmd.Command;
 import thunder.hack.core.impl.AddonManager;
@@ -20,10 +21,10 @@ public class AddonsCommand extends Command {
     @Override
     public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            List<IAddon> sortedAddons = AddonManager.getAddons().stream()
+            List<IAddon> sortedAddons = ThunderHack.addonManager.getAddons().stream()
                     .filter(Objects::nonNull)
                     .sorted(Comparator.comparing(IAddon::getName))
-                    .collect(Collectors.toList());
+                    .toList();
 
             if (sortedAddons.isEmpty()) {
                 sendMessage("No addons installed.");

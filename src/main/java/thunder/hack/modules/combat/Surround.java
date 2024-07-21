@@ -1,10 +1,12 @@
 package thunder.hack.modules.combat;
 
+import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.sound.SoundCategory;
@@ -13,18 +15,17 @@ import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.base.PlaceModule;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.player.InteractionUtility;
-import thunder.hack.utility.world.HoleUtility;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
@@ -92,8 +93,7 @@ public final class Surround extends PlaceModule {
             return;
         }
 
-        if (!getBlockResult().found())
-            disable(isRu() ? "Нет блоков!" : "No blocks!");
+        if (!getBlockResult().found()) disable(isRu() ? "Нет блоков!" : "No blocks!");
 
 
         int placed = 0;
@@ -102,8 +102,7 @@ public final class Surround extends PlaceModule {
             if (!getBlockResult().found()) disable(isRu() ? "Нет блоков!" : "No blocks!");
 
             BlockPos targetBlock = getSequentialPos();
-            if (targetBlock == null)
-                break;
+            if (targetBlock == null) break;
 
             if (placeBlock(targetBlock, true)) {
                 placed++;
@@ -131,124 +130,67 @@ public final class Surround extends PlaceModule {
         if (event.getPacket() instanceof BlockUpdateS2CPacket pac && mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value() && pac.getState().isReplaceable())
             handlePacket();
 
-        if (event.getPacket() instanceof ExplosionS2CPacket p
-                && mc.player.squaredDistanceTo(p.getX(), p.getY(), p.getZ()) < range.getPow2Value())
+        if (event.getPacket() instanceof ExplosionS2CPacket p && mc.player.squaredDistanceTo(p.getX(), p.getY(), p.getZ()) < range.getPow2Value())
             handlePacket();
 
-        if (event.getPacket() instanceof PlaySoundS2CPacket p
-                && p.getCategory().equals(SoundCategory.BLOCKS)
-                && p.getSound().value().equals(SoundEvents.ENTITY_GENERIC_EXPLODE)
-                && mc.player.squaredDistanceTo(p.getX(), p.getY(), p.getZ()) < range.getPow2Value())
+        if (event.getPacket() instanceof PlaySoundS2CPacket p && p.getCategory().equals(SoundCategory.BLOCKS) && p.getSound().value().equals(SoundEvents.ENTITY_GENERIC_EXPLODE) && mc.player.squaredDistanceTo(p.getX(), p.getY(), p.getZ()) < range.getPow2Value())
             handlePacket();
 
-        if (event.getPacket() instanceof PlayerPositionLookS2CPacket)
-            if (onTp.getValue() == OnTpAction.Disable) {
-                disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to a rubberband!");
-            }
+        if (event.getPacket() instanceof PlayerPositionLookS2CPacket) if (onTp.getValue() == OnTpAction.Disable) {
+            disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to a rubberband!");
+        }
     }
 
     private void handlePacket() {
         BlockPos bp = getSequentialPos();
         if (bp != null) {
-            if (placeBlock(bp, InteractMode.Packet))
-                inactivityTimer.reset();
+            if (placeBlock(bp, InteractMode.Packet)) inactivityTimer.reset();
         }
     }
 
     private @Nullable BlockPos getSequentialPos() {
         for (BlockPos bp : getBlocks()) {
-            if (new Box(bp).intersects(mc.player.getBoundingBox()))
-                continue;
+            if (new Box(bp).intersects(mc.player.getBoundingBox())) continue;
             if (InteractionUtility.canPlaceBlock(bp, interact.getValue(), true) && mc.world.getBlockState(bp).isReplaceable())
                 return bp;
         }
         return null;
     }
 
-    private @NotNull List<BlockPos> getBlocks() {
-        final BlockPos playerPos = getPlayerPos();
-        final List<BlockPos> offsets = new ArrayList<>();
 
-        if (center.getValue() == CenterMode.Disabled && mc.player != null) {
-            int z;
-            int x;
-            final double decimalX = Math.abs(mc.player.getX()) - Math.floor(Math.abs(mc.player.getX()));
-            final double decimalZ = Math.abs(mc.player.getZ()) - Math.floor(Math.abs(mc.player.getZ()));
-            final int lengthXPos = HoleUtility.calcLength(decimalX, false);
-            final int lengthXNeg = HoleUtility.calcLength(decimalX, true);
-            final int lengthZPos = HoleUtility.calcLength(decimalZ, false);
-            final int lengthZNeg = HoleUtility.calcLength(decimalZ, true);
-            final ArrayList<BlockPos> tempOffsets = new ArrayList<>();
-            offsets.addAll(getOverlapPos());
+    public List<BlockPos> getBlocks() {
+        List<BlockPos> finalPoses = new ArrayList<>();
+        List<BlockPos> playerPos = new ArrayList<>();
+        Box box = mc.player.getBoundingBox();
+        double y = mc.player.getY() - Math.floor(mc.player.getY()) > 0.8 ? Math.floor(mc.player.getY()) + 1.0 : Math.floor(mc.player.getY());
+        playerPos.add(BlockPos.ofFloored(box.maxX, y, box.maxZ));
+        playerPos.add(BlockPos.ofFloored(box.minX, y, box.minZ));
+        playerPos.add(BlockPos.ofFloored(box.maxX, y, box.minZ));
+        playerPos.add(BlockPos.ofFloored(box.minX, y, box.maxZ));
 
-            for (x = 1; x < lengthXPos + 1; ++x) {
-                tempOffsets.add(HoleUtility.addToPlayer(playerPos, x, 0.0, 1 + lengthZPos));
-                tempOffsets.add(HoleUtility.addToPlayer(playerPos, x, 0.0, -(1 + lengthZNeg)));
-            }
-            for (x = 0; x <= lengthXNeg; ++x) {
-                tempOffsets.add(HoleUtility.addToPlayer(playerPos, -x, 0.0, 1 + lengthZPos));
-                tempOffsets.add(HoleUtility.addToPlayer(playerPos, -x, 0.0, -(1 + lengthZNeg)));
-            }
-            for (z = 1; z < lengthZPos + 1; ++z) {
-                tempOffsets.add(HoleUtility.addToPlayer(playerPos, 1 + lengthXPos, 0.0, z));
-                tempOffsets.add(HoleUtility.addToPlayer(playerPos, -(1 + lengthXNeg), 0.0, z));
-            }
-            for (z = 0; z <= lengthZNeg; ++z) {
-                tempOffsets.add(HoleUtility.addToPlayer(playerPos, 1 + lengthXPos, 0.0, -z));
-                tempOffsets.add(HoleUtility.addToPlayer(playerPos, -(1 + lengthXNeg), 0.0, -z));
-            }
-
-            for (BlockPos pos : tempOffsets) {
-                if (getDown(pos))
-                    offsets.add(pos.add(0, -1, 0));
-                offsets.add(pos);
-            }
-        } else {
-            offsets.add(playerPos.add(0, -1, 0));
-
-            for (Vec3i surround : HoleUtility.VECTOR_PATTERN) {
-                if (getDown(playerPos.add(surround)))
-                    offsets.add(playerPos.add(surround.getX(), -1, surround.getZ()));
-
-                offsets.add(playerPos.add(surround));
-            }
-        }
-
-        return offsets;
-    }
-
-    private boolean getDown(BlockPos pos) {
-        for (Direction dir : Direction.values())
-            if (!mc.world.getBlockState(pos.add(dir.getVector())).isReplaceable())
-                return false;
-
-        return mc.world.getBlockState(pos).isReplaceable()
-                && interact.getValue() != InteractionUtility.Interact.AirPlace;
-    }
-
-    private @NotNull List<BlockPos> getOverlapPos() {
-        List<BlockPos> positions = new ArrayList<>();
-
-        if (mc.player != null) {
-            double decimalX = mc.player.getX() - Math.floor(mc.player.getX());
-            double decimalZ = mc.player.getZ() - Math.floor(mc.player.getZ());
-            int offX = HoleUtility.calcOffset(decimalX);
-            int offZ = HoleUtility.calcOffset(decimalZ);
-            positions.add(getPlayerPos());
-            for (int x = 0; x <= Math.abs(offX); ++x) {
-                for (int z = 0; z <= Math.abs(offZ); ++z) {
-                    int properX = x * offX;
-                    int properZ = z * offZ;
-                    positions.add(Objects.requireNonNull(getPlayerPos()).add(properX, -1, properZ));
+        for (BlockPos pos : playerPos) {
+            for (Direction direction : Direction.values()) {
+                if (direction == Direction.UP || direction == Direction.DOWN) continue;
+                BlockPos offset = pos.offset(direction);
+                if (!playerPos.contains(offset)) {
+                    finalPoses.add(offset);
+                    finalPoses.add(offset.down());
                 }
             }
+            finalPoses.add(pos.down());
         }
 
-        return positions;
-    }
-
-    private @NotNull BlockPos getPlayerPos() {
-        return BlockPos.ofFloored(mc.player.getX(), mc.player.getY() - Math.floor(mc.player.getY()) > 0.8 ? Math.floor(mc.player.getY()) + 1.0 : Math.floor(mc.player.getY()), mc.player.getZ());
+        for (BlockPos pos : Lists.newArrayList(finalPoses))
+            for (PlayerEntity player : ThunderHack.asyncManager.getAsyncPlayers())
+                if (player.getBoundingBox().intersects(new Box(pos))) {
+                    finalPoses.removeIf(b -> b.equals(pos));
+                    for (Direction direction : Direction.values()) {
+                        if (direction == Direction.UP || direction == Direction.DOWN) continue;
+                        if (player.getBoundingBox().intersects(new Box(pos.offset(direction)))) continue;
+                        finalPoses.add(pos.offset(direction));
+                    }
+                }
+        return finalPoses;
     }
 
     private enum CenterMode {

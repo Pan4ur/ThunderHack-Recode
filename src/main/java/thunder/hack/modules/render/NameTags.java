@@ -44,7 +44,6 @@ import thunder.hack.core.impl.FriendManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.PotionHud;
-import thunder.hack.gui.hud.impl.WaterMark;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.modules.misc.NameProtect;
@@ -61,9 +60,9 @@ import java.util.List;
 import java.util.*;
 
 public class NameTags extends Module {
-    private final Setting<Boolean> self = new Setting<>("Self",false);
+    private final Setting<Boolean> self = new Setting<>("Self", false);
     private final Setting<Float> scale = new Setting<>("Scale", 1f, 0.1f, 10f);
-    private final Setting<Boolean> resize= new Setting<>("Resize",false);
+    private final Setting<Boolean> resize = new Setting<>("Resize", false);
     private final Setting<Float> height = new Setting<>("Height", 2f, 0.1f, 10f);
     private final Setting<Boolean> gamemode = new Setting<>("Gamemode", false);
     private final Setting<Boolean> spawners = new Setting<>("SpawnerNameTag", false);
@@ -72,7 +71,7 @@ public class NameTags extends Module {
     private final Setting<Boolean> hp = new Setting<>("HP", true);
     private final Setting<Boolean> distance = new Setting<>("Distance", true);
     private final Setting<Boolean> pops = new Setting<>("TotemPops", true);
-    private final Setting<OutlineColor> outline = new Setting<>("Outline", OutlineColor.None);
+    private final Setting<OutlineColor> outline = new Setting<>("OutlineType", OutlineColor.New);
     private final Setting<OutlineColor> friendOutline = new Setting<>("FriendOutline", OutlineColor.None);
     private final Setting<ColorSetting> outlineColor = new Setting<>("OutlineColor", new ColorSetting(0x80000000));
     private final Setting<ColorSetting> friendOutlineColor = new Setting<>("FriendOutlineColor", new ColorSetting(0x80000000));
@@ -103,7 +102,7 @@ public class NameTags extends Module {
     }
 
     private enum OutlineColor {
-        Sync, Custom, None
+        Sync, Custom, None, New
     }
 
     public NameTags() {
@@ -118,7 +117,7 @@ public class NameTags extends Module {
     }
 
     public void onRender2D(DrawContext context) {
-        if(mc.options.hudHidden) return;
+        if (mc.options.hudHidden) return;
         for (PlayerEntity ent : mc.world.getPlayers()) {
             if (ent == mc.player && (mc.options.getPerspective().isFirstPerson() || !self.getValue())) continue;
             if (getEntityPing(ent) <= 0 && ignoreBots.getValue()) continue;
@@ -147,8 +146,7 @@ public class NameTags extends Module {
 
             if (FriendManager.friends.stream().anyMatch(i -> i.contains(ent.getDisplayName().getString())) && NameProtect.hideFriends.getValue() && ModuleManager.nameProtect.isEnabled()) {
                 final_string += NameProtect.getCustomName() + " ";
-            }
-            else {
+            } else {
                 final_string += ent.getDisplayName().getString() + " ";
             }
 
@@ -257,7 +255,12 @@ public class NameTags extends Module {
 
                 Color color = ThunderHack.friendManager.isFriend(ent) ? fillColorF.getValue().getColorObject() : fillColorA.getValue().getColorObject();
 
-                Render2DEngine.drawRect(context.getMatrices(), tagX - 2, (float) (posY - 13f), textWidth + 4, 11, color);
+                OutlineColor cl = ThunderHack.friendManager.isFriend(ent) ? friendOutline.getValue() : outline.getValue();
+
+                if (cl == OutlineColor.New)
+                    Render2DEngine.drawRectWithOutline(context.getMatrices(), tagX - 2, (float) (posY - 13f), textWidth + 4, 11, color, outlineColor.getValue().getColorObject());
+                else
+                    Render2DEngine.drawRect(context.getMatrices(), tagX - 2, (float) (posY - 13f), textWidth + 4, 11, color);
 
                 if (ThunderHack.telemetryManager.getOnlinePlayers().contains(ent.getGameProfile().getName())) {
                     Render2DEngine.drawRect(context.getMatrices(), tagX - 14, (float) (posY - 13f), 12, 11, color.brighter().brighter());
@@ -271,10 +274,8 @@ public class NameTags extends Module {
                     RenderSystem.disableBlend();
                 }
 
-                OutlineColor cl = ThunderHack.friendManager.isFriend(ent) ? friendOutline.getValue() : outline.getValue();
-
                 switch (cl) {
-                    case None -> {
+                    case None, New -> {
 
                     }
                     case Sync -> {
@@ -285,15 +286,16 @@ public class NameTags extends Module {
                     }
                     case Custom -> {
                         Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1,
-                                ThunderHack.friendManager.isFriend(ent) ?  friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
+                                ThunderHack.friendManager.isFriend(ent) ? friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
                         Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 3f), textWidth + 6, 1,
-                                ThunderHack.friendManager.isFriend(ent) ?  friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
+                                ThunderHack.friendManager.isFriend(ent) ? friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
                         Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), 1, 11,
-                                ThunderHack.friendManager.isFriend(ent) ?  friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
+                                ThunderHack.friendManager.isFriend(ent) ? friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
                         Render2DEngine.drawRect(context.getMatrices(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11,
-                                ThunderHack.friendManager.isFriend(ent) ?  friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
+                                ThunderHack.friendManager.isFriend(ent) ? friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
                     }
                 }
+
 
                 if (font.getValue() == Font.Fancy) {
                     FontRenderers.sf_bold.drawString(context.getMatrices(), final_string, tagX, (float) posY - 10, -1);

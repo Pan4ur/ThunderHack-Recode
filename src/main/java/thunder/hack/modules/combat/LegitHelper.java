@@ -83,19 +83,23 @@ public class LegitHelper extends Module {
             ThunderHack.asyncManager.run(() -> {
                 mc.player.getInventory().selectedSlot = anchorSlot;
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(anchorSlot));
-                AsyncManager.sleep(anchorDelay.getValue());
-                ((IMinecraftClient) mc).idoItemUse();
-                AsyncManager.sleep(anchorDelay.getValue());
+            });
+
+            ThunderHack.asyncManager.run(() -> mc.executeSync(() -> ((IMinecraftClient) mc).idoItemUse()), anchorDelay.getValue());
+
+            ThunderHack.asyncManager.run(() -> {
                 mc.player.getInventory().selectedSlot = glowSlot;
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(glowSlot));
-                AsyncManager.sleep(anchorDelay.getValue());
-                ((IMinecraftClient) mc).idoItemUse();
-                AsyncManager.sleep(anchorDelay.getValue());
+            }, anchorDelay.getValue() * 2);
+
+            ThunderHack.asyncManager.run(() -> mc.executeSync(() -> ((IMinecraftClient) mc).idoItemUse()), anchorDelay.getValue() * 3L);
+
+            ThunderHack.asyncManager.run(() -> {
                 mc.player.getInventory().selectedSlot = prevSlot;
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
-                AsyncManager.sleep(anchorDelay.getValue());
-                ((IMinecraftClient) mc).idoItemUse();
-            });
+            }, anchorDelay.getValue() * 4);
+
+            ThunderHack.asyncManager.run(() -> mc.executeSync(() -> ((IMinecraftClient) mc).idoItemUse()), anchorDelay.getValue() * 5L);
 
             return;
         }
@@ -116,14 +120,16 @@ public class LegitHelper extends Module {
 
             int prevSlot = mc.player.getInventory().selectedSlot;
 
+            if (!obbyAtCrosshair) {
+                mc.player.getInventory().selectedSlot = obbySlot;
+                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(obbySlot));
+                ((IMinecraftClient) mc).idoItemUse();
+            }
+
             ThunderHack.asyncManager.run(() -> {
-                if (!obbyAtCrosshair) {
-                    mc.player.getInventory().selectedSlot = obbySlot;
-                    mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(obbySlot));
+                if (!obbyAtCrosshair)
                     AsyncManager.sleep(crystalDelay.getValue());
-                    ((IMinecraftClient) mc).idoItemUse();
-                    AsyncManager.sleep(crystalDelay.getValue());
-                }
+
                 mc.player.getInventory().selectedSlot = crystalSlot;
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(crystalSlot));
                 AsyncManager.sleep(crystalDelay.getValue());
@@ -150,6 +156,7 @@ public class LegitHelper extends Module {
                 return;
 
             int prevSlot = mc.player.getInventory().selectedSlot;
+
             ThunderHack.asyncManager.run(() -> {
                 AsyncManager.sleep(breakerDelay.getValue());
                 mc.player.getInventory().selectedSlot = axeSlot;

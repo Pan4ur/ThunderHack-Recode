@@ -10,6 +10,7 @@ import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.TridentItem;
 import net.minecraft.registry.entry.RegistryEntry;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -38,7 +39,7 @@ public class PerfectDelay extends Module {
     @Override
     public void onUpdate() {
         if (mc.player.getActiveItem().getItem() instanceof TridentItem && trident.getValue()) {
-            if (mc.player.getItemUseTime() > 9)
+            if (mc.player.getItemUseTime() > (ModuleManager.tridentBoost.isEnabled() ? ModuleManager.tridentBoost.cooldown.getValue() : 9))
                 mc.interactionManager.stopUsingItem(mc.player);
         }
 

@@ -5,10 +5,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.util.Identifier;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.clickui.impl.SearchBar;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.client.BaritoneSettings;
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
@@ -29,11 +31,15 @@ public class Category extends AbstractCategory {
     public Category(Module.Category category, ArrayList<Module> features, float x, float y, float width, float height) {
         super(category.getName(), x, y, width, height);
         buttons = new ArrayList<>();
-        ICON = new Identifier("thunderhack", "textures/gui/headers/" +
-                (Module.Category.isCustomCategory(category) ? "stock" : category.getName().toLowerCase()) + ".png");
+        ICON = new Identifier("thunderhack", "textures/gui/headers/" + (Module.Category.isCustomCategory(category) ? "stock" : category.getName().toLowerCase()) + ".png");
+
         if (category.getName().equals("Client"))
             buttons.add(new SearchBar());
-        features.forEach(feature -> buttons.add(new ModuleButton(feature)));
+
+        features.forEach(feature -> {
+            if (!(feature instanceof BaritoneSettings) || ThunderHack.baritone)
+                buttons.add(new ModuleButton(feature));
+        });
     }
 
     @Override

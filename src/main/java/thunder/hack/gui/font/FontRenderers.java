@@ -26,10 +26,6 @@ public class FontRenderers {
     public static FontRenderer minecraft;
     public static FontRenderer profont;
 
-    public static FontRenderer getSettingsRenderer() {
-        return settings;
-    }
-
     public static FontRenderer getModulesRenderer() {
         return modules;
     }

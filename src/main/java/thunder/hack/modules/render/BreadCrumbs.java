@@ -3,7 +3,6 @@ package thunder.hack.modules.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.events.impl.EventPostSync;
@@ -23,6 +22,7 @@ public class BreadCrumbs extends Module {
         super("BreadCrumbs", Category.RENDER);
     }
 
+    private final Setting<Boolean> throughWalls = new Setting<>("ThroughWalls", true);
     private final Setting<Integer> limit = new Setting<>("ListLimit", 1000, 10, 99999);
     private final List<Vec3d> positions = new CopyOnWriteArrayList<>();
     private final Setting<Mode> lmode = new Setting<>("ColorMode", Mode.Sync);
@@ -33,20 +33,16 @@ public class BreadCrumbs extends Module {
     }
 
     public void onRender3D(MatrixStack stack) {
-        drawLine(2f, false);
-        drawLine(5, false);
-        drawLine(10, false);
-        drawLine(1, true);
-    }
-
-    public void drawLine(float width, boolean white) {
         Render3DEngine.setupRender();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        RenderSystem.disableDepthTest();
+
+        if (throughWalls.getValue())
+            RenderSystem.disableDepthTest();
+
         RenderSystem.disableCull();
+        RenderSystem.lineWidth(1f);
         RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
-        RenderSystem.lineWidth(width);
         buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
 
         for (int i = 0; i < positions.size(); i++) {
@@ -58,8 +54,6 @@ public class BreadCrumbs extends Module {
             Vec3d vec2 = positions.get(i);
             if (vec1 != null && vec2 != null) {
                 Color c = lmode.getValue() == Mode.Sync ? HudEditor.getColor(i) : color.getValue().getColorObject();
-                if (white) c = Color.WHITE;
-
                 if (i < 10) c = Render2DEngine.injectAlpha(c, (int) (c.getAlpha() * (i / 10f)));
                 MatrixStack matrices = Render3DEngine.matrixFrom(vec1.getX(), vec1.getY(), vec1.getZ());
                 Render3DEngine.vertexLine(matrices, buffer, 0f, 0f, 0f, (float) (vec2.getX() - vec1.getX()), (float) (vec2.getY() - vec1.getY()), (float) (vec2.getZ() - vec1.getZ()), c);
@@ -68,7 +62,8 @@ public class BreadCrumbs extends Module {
 
         tessellator.draw();
         RenderSystem.enableCull();
-        RenderSystem.enableDepthTest();
+        if (throughWalls.getValue())
+            RenderSystem.enableDepthTest();
         Render3DEngine.endRender();
     }
 

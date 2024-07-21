@@ -36,7 +36,7 @@ public class PacketFly extends Module {
     private final Setting<Float> anticKickOffset = new Setting<>("anticKickOffset", 0.04f, 0.008f, 1f).addToGroup(antiKick);
     private final Setting<Float> speed = new Setting<>("Speed", 1.0f, 0.0f, 10.0f);
     private final Setting<Float> upSpeed = new Setting<>("UpSpeed", 0.062f, 0.001f, 0.1f);
-    private final Setting<Float> timer = new Setting<>("Timer", 1f, 0.01f, 5f);
+    private final Setting<Float> timer = new Setting<>("Timer", 1f, 0.1f, 5f);
     private final Setting<Integer> increaseTicks = new Setting<>("IncreaseTicks", 1, 1, 20);
     private final Setting<Float> factor = new Setting<>("Factor", 1f, 1f, 10f);
     private final Setting<Float> offset = new Setting<>("Offset", 1337f, 1f, 1337f, v-> type.is(Type.Up) || type.is(Type.Down));

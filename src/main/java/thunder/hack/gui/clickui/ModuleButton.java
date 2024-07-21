@@ -6,7 +6,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -30,7 +29,6 @@ import thunder.hack.utility.render.animation.GearAnimation;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.client.ClientSettings.isRu;
@@ -292,7 +290,8 @@ public class ModuleButton extends AbstractButton {
             }
 
             if (button == 0) {
-                module.toggle();
+                if (module.isToggleable())
+                    module.toggle();
             } else if (button == 1 && (module.getSettings().size() > 3)) {
                 setOpen(!isOpen());
 

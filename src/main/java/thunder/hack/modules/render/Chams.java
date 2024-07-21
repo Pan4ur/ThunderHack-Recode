@@ -39,7 +39,7 @@ public class Chams extends Module {
         super("Chams", Category.RENDER);
     }
 
-    private final Setting<Boolean> handItems = new Setting<>("HandItems", false);
+    public final Setting<Boolean> handItems = new Setting<>("HandItems", false);
     private final Setting<ColorSetting> handItemsColor = new Setting<>("HandItemsColor", new ColorSetting(new Color(0x9317DE5D, true)), v -> handItems.getValue());
 
     public final Setting<Boolean> crystals = new Setting<>("Crystals", false);

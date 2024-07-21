@@ -78,4 +78,9 @@ public class Rotations extends Module {
         float g = MathHelper.cos(yaw * MathHelper.RADIANS_PER_DEGREE);
         return new Vec3d(vec3d.x * (double) g - vec3d.z * (double) f, vec3d.y, vec3d.z * (double) g + vec3d.x * (double) f);
     }
+
+    @Override
+    public boolean isToggleable() {
+        return false;
+    }
 }

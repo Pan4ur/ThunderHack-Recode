@@ -31,4 +31,9 @@ public final class BaritoneSettings extends Module {
         BaritoneAPI.getSettings().chatDebug.value = debug.getValue();
         BaritoneAPI.getSettings().enterPortal.value = enterPortal.getValue();
     }
+
+    @Override
+    public boolean isToggleable() {
+        return false;
+    }
 }

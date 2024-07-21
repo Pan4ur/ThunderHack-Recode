@@ -6,11 +6,9 @@ import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.ThunderHack;
 import thunder.hack.cmd.Command;
 import thunder.hack.cmd.impl.*;
 import thunder.hack.core.IManager;
-import thunder.hack.modules.Module;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,39 +21,40 @@ public class CommandManager implements IManager {
     private final List<Command> commands = new ArrayList<>();
 
     public CommandManager() {
-        add(new HorseSpeedCommand());
         add(new RpcCommand());
         add(new KitCommand());
         add(new GpsCommand());
         add(new CfgCommand());
+        add(new RctCommand());
         add(new BindCommand());
         add(new DrawCommand());
         add(new HelpCommand());
         add(new NukerCommand());
         add(new EClipCommand());
-        add(new RctCommand());
         add(new HClipCommand());
         add(new LoginCommand());
         add(new MacroCommand());
         add(new StaffCommand());
         add(new VClipCommand());
+        add(new AddonsCommand());
         add(new GetNbtCommand());
         add(new FriendCommand());
         add(new ModuleCommand());
         add(new PrefixCommand());
-        add(new BlockESPCommand());
         add(new TrackerCommand());
+        add(new GamemodeCommand());
         add(new DropAllCommand());
         add(new TreasureCommand());
         add(new WayPointCommand());
         add(new TabParseCommand());
+        add(new BlockESPCommand());
+        add(new HorseSpeedCommand());
         add(new OpenFolderCommand());
         add(new ResetBindsCommand());
         add(new InvCleanerCommand());
+        add(new GotoWaypointCommand());
         add(new ChestStealerCommand());
         add(new GarbageCleanerCommand());
-        add(new GotoWaypointCommand());
-        add(new AddonsCommand());
     }
 
     private void add(@NotNull Command command) {

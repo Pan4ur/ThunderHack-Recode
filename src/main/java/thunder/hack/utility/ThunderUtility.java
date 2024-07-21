@@ -20,7 +20,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -55,6 +54,14 @@ public final class ThunderUtility {
         return mc.getTextureManager().registerDynamicTexture("th-" + name + "-" + (int) MathUtility.random(0, 1000), new NativeImageBackedTexture(NativeImage.read(new FileInputStream(IMAGES_FOLDER + "/" + name + ".png"))));
     }
 
+    public static void syncVersion() {
+        try {
+            if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersionBeta.txt").openStream())).readLine().equals(ThunderHack.VERSION))
+                ThunderHack.isOutdated = true;
+        } catch (Exception ignored) {
+        }
+    }
+
     public static void parseStarGazer() {
         List<String> starGazers = new ArrayList<>();
 
@@ -83,6 +90,21 @@ public final class ThunderUtility {
         }
     }
 
+    public static void syncContributors() {
+        try {
+            URL list = new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/thTeam.txt");
+            BufferedReader in = new BufferedReader(new InputStreamReader(list.openStream(), StandardCharsets.UTF_8));
+            String inputLine;
+            int i = 0;
+            while ((inputLine = in.readLine()) != null) {
+                ThunderHack.contributors[i] = inputLine.trim();
+                i++;
+            }
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static String readManifestField(String fieldName) {
         try {
@@ -93,7 +115,7 @@ public final class ThunderUtility {
                     InputStream is = url.openStream();
                     if (is != null) {
                         String s = new Manifest(is).getMainAttributes().getValue(fieldName);
-                        if(s != null) 
+                        if (s != null)
                             return s;
                     }
                 } catch (Exception ignored) {
