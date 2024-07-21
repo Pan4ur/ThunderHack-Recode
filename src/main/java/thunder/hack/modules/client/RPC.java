@@ -133,7 +133,7 @@ public final class RPC extends Module {
         String result = "";
 
         if (mc.currentScreen instanceof TitleScreen) {
-            result = isRu() ? "В главном меню" : "In Main menu";
+            result = isRu() ? "Трогает траву" : "Touching the grass";
         } else if (mc.currentScreen instanceof MultiplayerScreen || mc.currentScreen instanceof AddServerScreen) {
             result = isRu() ? "Выбирает сервер" : "Picks a server";
         } else if (mc.getCurrentServerEntry() != null) {
