@@ -339,7 +339,7 @@ public class PlayerManager implements IManager {
         return new Vec2f((float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difZ, difX)) - 90.0), (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(difY, dist))));
     }
 
-    private @NotNull Vec3d getRotationVector(float yaw, float pitch) {
+    public @NotNull Vec3d getRotationVector(float yaw, float pitch) {
         return new Vec3d(MathHelper.sin(-pitch * 0.017453292F) * MathHelper.cos(yaw * 0.017453292F), -MathHelper.sin(yaw * 0.017453292F), MathHelper.cos(-pitch * 0.017453292F) * MathHelper.cos(yaw * 0.017453292F));
     }
 

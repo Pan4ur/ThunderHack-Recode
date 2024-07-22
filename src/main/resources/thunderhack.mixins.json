@@ -75,6 +75,7 @@
     "MixinEndCrystal",
     "MixinEntity",
     "MixinEntityLiving",
+    "MixinFireWorkEntity",
     "MixinFlowableFluid",
     "MixinPlayerEntity",
     "MixinPlayerEntityRenderer",

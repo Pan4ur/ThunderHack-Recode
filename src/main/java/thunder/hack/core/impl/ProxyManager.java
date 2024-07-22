@@ -143,8 +143,6 @@ public class ProxyManager implements IManager {
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-            System.err.println("Exception caught: " + cause.getMessage());
-            cause.printStackTrace();
             ctx.close();
         }
     }

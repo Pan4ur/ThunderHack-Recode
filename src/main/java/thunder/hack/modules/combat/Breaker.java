@@ -51,11 +51,10 @@ public final class Breaker extends Module {
     private void onSync(EventSync event) {
         PlayerEntity target;
 
-        if (targetMode.is(Target.Breaker)) {
+        if (targetMode.is(Target.Breaker))
             target = ThunderHack.combatManager.getTarget(range.getValue(), targetBy.getValue());
-        } else {
+        else
             target = AutoCrystal.target;
-        }
 
         if (target == null)
             return;

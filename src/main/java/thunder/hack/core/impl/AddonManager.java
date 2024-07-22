@@ -52,40 +52,43 @@ public class AddonManager implements IManager {
                 ThunderHack.EVENT_BUS.registerLambdaFactory(addon.getPackage(), (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
 
                 // Register Modules
-                addon.getModules().stream().filter(Objects::nonNull).forEach(module -> {
-                    try {
-                        LogUtils.getLogger().info("Registering module: " + module.getClass().getName());
-                        LogUtils.getLogger().debug("Module class loader: " + module.getClass().getClassLoader());
-                        ThunderHack.moduleManager.registerModule(module);
-                        LogUtils.getLogger().info("Module registered successfully: " + module.getClass().getName());
-                    } catch (Exception e) {
-                        LogUtils.getLogger().error("Error registering module: " + module.getClass().getName(), e);
-                    }
-                });
+                if (addon.getModules() != null)
+                    addon.getModules().stream().filter(Objects::nonNull).forEach(module -> {
+                        try {
+                            LogUtils.getLogger().info("Registering module: " + module.getClass().getName());
+                            LogUtils.getLogger().debug("Module class loader: " + module.getClass().getClassLoader());
+                            ThunderHack.moduleManager.registerModule(module);
+                            LogUtils.getLogger().info("Module registered successfully: " + module.getClass().getName());
+                        } catch (Exception e) {
+                            LogUtils.getLogger().error("Error registering module: " + module.getClass().getName(), e);
+                        }
+                    });
 
                 // Register Commands
-                addon.getCommands().stream().filter(Objects::nonNull).forEach(command -> {
-                    try {
-                        LogUtils.getLogger().info("Registering command: " + command.getClass().getName());
-                        LogUtils.getLogger().debug("Command class loader: " + command.getClass().getClassLoader());
-                        ThunderHack.commandManager.registerCommand(command);
-                        LogUtils.getLogger().info("Command registered successfully: " + command.getClass().getName());
-                    } catch (Exception e) {
-                        LogUtils.getLogger().error("Error registering command: " + command.getClass().getName(), e);
-                    }
-                });
+                if (addon.getCommands() != null)
+                    addon.getCommands().stream().filter(Objects::nonNull).forEach(command -> {
+                        try {
+                            LogUtils.getLogger().info("Registering command: " + command.getClass().getName());
+                            LogUtils.getLogger().debug("Command class loader: " + command.getClass().getClassLoader());
+                            ThunderHack.commandManager.registerCommand(command);
+                            LogUtils.getLogger().info("Command registered successfully: " + command.getClass().getName());
+                        } catch (Exception e) {
+                            LogUtils.getLogger().error("Error registering command: " + command.getClass().getName(), e);
+                        }
+                    });
 
                 // Register HUD Elements
-                addon.getHudElements().stream().filter(Objects::nonNull).forEach(hudElement -> {
-                    try {
-                        LogUtils.getLogger().info("Registering HUD element: " + hudElement.getClass().getName());
-                        LogUtils.getLogger().debug("HUD element class loader: " + hudElement.getClass().getClassLoader());
-                        ThunderHack.moduleManager.registerHudElement(hudElement);
-                        LogUtils.getLogger().info("HUD element registered successfully: " + hudElement.getClass().getName());
-                    } catch (Exception e) {
-                        LogUtils.getLogger().error("Error registering HUD element: " + hudElement.getClass().getName(), e);
-                    }
-                });
+                if (addon.getHudElements() != null)
+                    addon.getHudElements().stream().filter(Objects::nonNull).forEach(hudElement -> {
+                        try {
+                            LogUtils.getLogger().info("Registering HUD element: " + hudElement.getClass().getName());
+                            LogUtils.getLogger().debug("HUD element class loader: " + hudElement.getClass().getClassLoader());
+                            ThunderHack.moduleManager.registerHudElement(hudElement);
+                            LogUtils.getLogger().info("HUD element registered successfully: " + hudElement.getClass().getName());
+                        } catch (Exception e) {
+                            LogUtils.getLogger().error("Error registering HUD element: " + hudElement.getClass().getName(), e);
+                        }
+                    });
 
             } catch (Exception e) {
                 LogUtils.getLogger().error("Error initializing addon: " + addon.getClass().getName(), e);

@@ -37,7 +37,7 @@ public class Shaders extends Module {
     public final Setting<Float> factor = new Setting<>("GradientFactor", 2f, 0f, 20f, v -> mode.is(ShaderManager.Shader.Gradient) || handsMode.is(ShaderManager.Shader.Gradient));
     public final Setting<Float> gradient = new Setting<>("Gradient", 2f, 0f, 20f, v -> mode.is(ShaderManager.Shader.Gradient) || handsMode.is(ShaderManager.Shader.Gradient));
     public final Setting<Integer> alpha2 = new Setting<>("GradientAlpha", 170, 0, 255, v -> mode.is(ShaderManager.Shader.Gradient) || handsMode.is(ShaderManager.Shader.Gradient));
-    public final Setting<Integer> lineWidth = new Setting<>("LineWidth", 2, 0, 20);
+    public final Setting<Integer> lineWidth = new Setting<>("LineWidth", 2, 0, 100);
     public final Setting<Integer> quality = new Setting<>("Quality", 3, 0, 20);
     public final Setting<Integer> octaves = new Setting<>("SmokeOctaves", 10, 5, 30);
     public final Setting<Integer> fillAlpha = new Setting<>("FillAlpha", 170, 0, 255);
@@ -79,8 +79,6 @@ public class Shaders extends Module {
             default -> others.getValue();
         };
     }
-
-    public static boolean rendering = false;
 
     public void onRender3D(MatrixStack matrices) {
         if (hands.getValue())
