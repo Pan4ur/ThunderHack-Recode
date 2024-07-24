@@ -16,14 +16,14 @@
 
 
 ## Information
-- Minecraft version: ```Fabric``` 1.20.6 (or whatever version's the latest)
+- Minecraft version: ```Fabric``` 1.21 (or whatever version's the latest)
 - Default ClickGui keybind - **```P```** (Lies!! Go to the Discord server and ask for the real keybind.)
 - Default prefix  - **```@```**
 - Middle click the module to bind it.
 - Be aware Expensive, DoxWare 2.0, gumballoff, and Quick Client are both ratted and renames of this client.
 
 ## Requires these mods:
-- [FabricApi 1.20.6](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/5473788)
+- [FabricApi 1.21](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/5531908)
 - [Java 21+](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
 
 ## Recommended to read:
