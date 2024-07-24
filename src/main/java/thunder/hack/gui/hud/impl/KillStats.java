@@ -15,13 +15,13 @@ import thunder.hack.modules.combat.Aura;
 import thunder.hack.modules.combat.AutoCrystal;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
 
 public class KillStats extends HudElement {
     int death = 0,killstreak = 0,kills = 0;
-    private Identifier icon = new Identifier("thunderhack", "textures/hud/icons/sword.png");
     public KillStats(){
         super("KillStats",100,35);
     }
@@ -58,7 +58,7 @@ public class KillStats extends HudElement {
             Render2DEngine.drawRoundedBlur(context.getMatrices(), pX, getPosY(), FontRenderers.getModulesRenderer().getStringWidth(streak) + FontRenderers.getModulesRenderer().getStringWidth(kd) + 21, 13f, 3, HudEditor.blurColor.getValue().getColorObject());
             Render2DEngine.drawRect(context.getMatrices(), pX + 14, getPosY() + 2, 0.5f, 8, new Color(0x44FFFFFF, true));
             Render2DEngine.setupRender();
-            RenderSystem.setShaderTexture(0, icon);
+            RenderSystem.setShaderTexture(0, TextureStorage.swordIcon);
             Render2DEngine.renderGradientTexture(context.getMatrices(), pX + 2, getPosY() + 1, 10, 10, 0, 0, 16, 16, 16, 16,
                     HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
             Render2DEngine.endRender();

@@ -9,6 +9,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -258,7 +259,7 @@ public final class SpeedMine extends Module {
         switch (renderMode.getValue()) {
             case Shrink -> {
                 Box shrunkMineBox = new Box(minePosition.getX(), minePosition.getY(), minePosition.getZ(), minePosition.getX(), minePosition.getY(), minePosition.getZ());
-                float noom = (float) MathUtility.clamp(Render2DEngine.interpolate(prevProgress, progress, mc.getTickDelta()), 0f, 1f);
+                float noom = (float) MathUtility.clamp(Render2DEngine.interpolate(prevProgress, progress, Render3DEngine.getTickDelta()), 0f, 1f);
 
                 Render3DEngine.FILLED_QUEUE.add(
                         new Render3DEngine.FillAction(
@@ -276,7 +277,7 @@ public final class SpeedMine extends Module {
                 );
             }
             case Grow -> {
-                float noom = (float) MathUtility.clamp(Render2DEngine.interpolate(prevProgress, progress, mc.getTickDelta()), 0f, 1f);
+                float noom = (float) MathUtility.clamp(Render2DEngine.interpolate(prevProgress, progress, Render3DEngine.getTickDelta()), 0f, 1f);
                 Box shrunkMineBox = new Box(minePosition.getX(), minePosition.getY(), minePosition.getZ(), minePosition.getX() + 1, minePosition.getY() + noom, minePosition.getZ() + 1);
 
                 Render3DEngine.FILLED_QUEUE.add(
@@ -424,7 +425,7 @@ public final class SpeedMine extends Module {
 
         if (digSpeed > 1) {
             ItemStack itemstack = mc.player.getInventory().getStack(getTool(position));
-            int efficiencyModifier = EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, itemstack);
+            int efficiencyModifier = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.EFFICIENCY.getRegistryRef()).getEntry(Enchantments.EFFICIENCY).get(), itemstack);
             if (efficiencyModifier > 0 && !itemstack.isEmpty()) {
                 digSpeed += (float) (StrictMath.pow(efficiencyModifier, 2) + 1);
             }
@@ -438,7 +439,9 @@ public final class SpeedMine extends Module {
             digSpeed *= (float) Math.pow(0.3f, Objects.requireNonNull(mc.player.getStatusEffect(StatusEffects.MINING_FATIGUE)).getAmplifier() + 1);
 
 
-        if (mc.player.isSubmergedInWater() && !EnchantmentHelper.hasAquaAffinity(mc.player)) digSpeed /= 5;
+        if (mc.player.isSubmergedInWater())
+            digSpeed *= (float) mc.player.getAttributeInstance(EntityAttributes.PLAYER_SUBMERGED_MINING_SPEED).getValue();
+
         if (!mc.player.isOnGround()) digSpeed /= 5;
 
         return digSpeed < 0 ? 0 : digSpeed * factor.getValue();
@@ -460,7 +463,7 @@ public final class SpeedMine extends Module {
                 if (!(stack.getMaxDamage() - stack.getDamage() > 10))
                     continue;
 
-                final float digSpeed = EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, stack);
+                final float digSpeed = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(Enchantments.EFFICIENCY).get(), stack);
                 final float destroySpeed = stack.getMiningSpeedMultiplier(mc.world.getBlockState(pos));
 
                 if (digSpeed + destroySpeed > currentFastest) {

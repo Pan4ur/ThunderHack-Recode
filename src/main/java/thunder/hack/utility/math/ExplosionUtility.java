@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
@@ -95,7 +96,7 @@ public final class ExplosionUtility {
                 if (mc.world.getDifficulty() == Difficulty.EASY) toDamage = Math.min(toDamage / 2f + 1f, toDamage);
                 else if (mc.world.getDifficulty() == Difficulty.HARD) toDamage = toDamage * 3f / 2f;
 
-                toDamage = DamageUtil.getDamageLeft(toDamage, ((IExplosion) explosion).getDamageSource(), target.getArmor(), (float) target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
+                toDamage = DamageUtil.getDamageLeft(target, toDamage, ((IExplosion) explosion).getDamageSource(), target.getArmor(), (float) target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
 
                 if (target.hasStatusEffect(StatusEffects.RESISTANCE)) {
                     int resistance = 25 - (target.getStatusEffect(StatusEffects.RESISTANCE).getAmplifier() + 1) * 5;
@@ -106,7 +107,11 @@ public final class ExplosionUtility {
                 if (toDamage <= 0f)
                     toDamage = 0f;
                 else {
-                    int protAmount = ModuleManager.autoCrystal.assumeBestArmor.getValue() ? 32 : EnchantmentHelper.getProtectionAmount(target.getArmorItems(), mc.world.getDamageSources().explosion(explosion));
+                    float protAmount = 0;
+                    if (mc.player.getWorld() instanceof ServerWorld sw) {
+                        protAmount = ModuleManager.autoCrystal.assumeBestArmor.getValue() ? 32f :  EnchantmentHelper.getProtectionAmount(sw, target, mc.world.getDamageSources().explosion(explosion));
+                    }
+
                     if (protAmount > 0)
                         toDamage = DamageUtil.getInflictedDamage(toDamage, protAmount);
                 }
@@ -158,7 +163,7 @@ public final class ExplosionUtility {
                 if (mc.world.getDifficulty() == Difficulty.EASY) toDamage = Math.min(toDamage / 2f + 1f, toDamage);
                 else if (mc.world.getDifficulty() == Difficulty.HARD) toDamage = toDamage * 3f / 2f;
 
-                toDamage = DamageUtil.getDamageLeft(toDamage, ((IExplosion) explosion).getDamageSource(), target.getArmor(), (float) Objects.requireNonNull(target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS)).getValue());
+                toDamage = DamageUtil.getDamageLeft(target, toDamage, ((IExplosion) explosion).getDamageSource(), target.getArmor(), (float) Objects.requireNonNull(target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS)).getValue());
 
                 if (target.hasStatusEffect(StatusEffects.RESISTANCE)) {
                     int resistance = 25 - (Objects.requireNonNull(target.getStatusEffect(StatusEffects.RESISTANCE)).getAmplifier() + 1) * 5;
@@ -169,7 +174,11 @@ public final class ExplosionUtility {
                 if (toDamage <= 0f)
                     toDamage = 0f;
                 else {
-                    int protAmount = ModuleManager.autoCrystal.assumeBestArmor.getValue() ? 32 : EnchantmentHelper.getProtectionAmount(target.getArmorItems(), mc.world.getDamageSources().explosion(explosion));
+                    float protAmount = 0;
+                    if (mc.player.getWorld() instanceof ServerWorld sw) {
+                        protAmount = ModuleManager.autoCrystal.assumeBestArmor.getValue() ? 32f :  EnchantmentHelper.getProtectionAmount(sw, target, mc.world.getDamageSources().explosion(explosion));
+                    }
+
                     if (protAmount > 0)
                         toDamage = DamageUtil.getInflictedDamage(toDamage, protAmount);
                 }
@@ -256,7 +265,7 @@ public final class ExplosionUtility {
                     toDamage = toDamage * 3f / 2f;
                 }
 
-                toDamage = DamageUtil.getDamageLeft(toDamage, ((IExplosion) explosion).getDamageSource(), target.getArmor(), (float) target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
+                toDamage = DamageUtil.getDamageLeft(target, toDamage, ((IExplosion) explosion).getDamageSource(), target.getArmor(), (float) target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
 
                 if (target.hasStatusEffect(StatusEffects.RESISTANCE)) {
                     int resistance = 25 - (target.getStatusEffect(StatusEffects.RESISTANCE).getAmplifier() + 1) * 5;
@@ -266,7 +275,11 @@ public final class ExplosionUtility {
 
                 if (toDamage <= 0f) toDamage = 0f;
                 else {
-                    int protAmount = ModuleManager.autoCrystal.assumeBestArmor.getValue() ? 32 : EnchantmentHelper.getProtectionAmount(target.getArmorItems(), mc.world.getDamageSources().explosion(explosion));
+                    float protAmount = 0;
+                    if (mc.player.getWorld() instanceof ServerWorld sw) {
+                        protAmount = ModuleManager.autoCrystal.assumeBestArmor.getValue() ? 32f :  EnchantmentHelper.getProtectionAmount(sw, target, mc.world.getDamageSources().explosion(explosion));
+                    }
+
                     if (protAmount > 0)
                         toDamage = DamageUtil.getInflictedDamage(toDamage, protAmount);
                 }

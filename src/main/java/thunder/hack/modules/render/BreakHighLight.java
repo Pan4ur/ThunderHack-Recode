@@ -40,8 +40,8 @@ public class BreakHighLight extends Module {
             float noom; //ам ням не ебался
 
             switch (mode.getValue()) {
-                case Grow -> noom = Render2DEngine.interpolateFloat(prevProgress, MathUtility.clamp(mc.interactionManager.currentBreakingProgress, 0f, 1f), mc.getTickDelta());
-                case Shrink -> noom = 1f - Render2DEngine.interpolateFloat(prevProgress, mc.interactionManager.currentBreakingProgress, mc.getTickDelta());
+                case Grow -> noom = Render2DEngine.interpolateFloat(prevProgress, MathUtility.clamp(mc.interactionManager.currentBreakingProgress, 0f, 1f), Render3DEngine.getTickDelta());
+                case Shrink -> noom = 1f - Render2DEngine.interpolateFloat(prevProgress, mc.interactionManager.currentBreakingProgress, Render3DEngine.getTickDelta());
                 default -> noom = 1;
             }
 

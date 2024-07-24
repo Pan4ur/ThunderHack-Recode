@@ -18,8 +18,6 @@ import static thunder.hack.modules.Module.mc;
 
 @Mixin(WorldRenderer.class)
 public abstract class MixinWorldRenderer {
-    @Shadow
-    public abstract void render(float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, Matrix4f matrix4f2);
 
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;setupTerrain(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/Frustum;ZZ)V"), index = 3)
     private boolean renderSetupTerrainModifyArg(boolean spectator) {

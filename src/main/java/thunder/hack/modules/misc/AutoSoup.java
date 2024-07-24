@@ -23,7 +23,7 @@ public class AutoSoup extends Module {
             int prevSlot = mc.player.getInventory().selectedSlot;
             if (result.found()) {
                 result.switchTo();
-                sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+                sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
                 InventoryUtility.switchTo(prevSlot);
             }
         }

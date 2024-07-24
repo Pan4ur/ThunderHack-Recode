@@ -7,13 +7,12 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.RotationAxis;
 import org.joml.Matrix4f;
-import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.render.TextureStorage;
 
 import static thunder.hack.modules.Module.mc;
-
 
 public class CaptureMark {
 
@@ -24,9 +23,9 @@ public class CaptureMark {
     public static void render(Entity target) {
         Camera camera = mc.gameRenderer.getCamera();
 
-        double tPosX = Render2DEngine.interpolate(target.prevX, target.getX(), mc.getTickDelta()) - camera.getPos().x;
-        double tPosY = Render2DEngine.interpolate(target.prevY, target.getY(), mc.getTickDelta()) - camera.getPos().y;
-        double tPosZ = Render2DEngine.interpolate(target.prevZ, target.getZ(), mc.getTickDelta()) - camera.getPos().z;
+        double tPosX = Render2DEngine.interpolate(target.prevX, target.getX(), Render3DEngine.getTickDelta()) - camera.getPos().x;
+        double tPosY = Render2DEngine.interpolate(target.prevY, target.getY(), Render3DEngine.getTickDelta()) - camera.getPos().y;
+        double tPosZ = Render2DEngine.interpolate(target.prevZ, target.getZ(), Render3DEngine.getTickDelta()) - camera.getPos().z;
 
         MatrixStack matrices = new MatrixStack();
         RenderSystem.disableDepthTest();
@@ -36,22 +35,19 @@ public class CaptureMark {
         matrices.translate(tPosX, (tPosY + target.getEyeHeight(target.getPose()) / 2f), tPosZ);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(Render2DEngine.interpolateFloat(prevEspValue, espValue, mc.getTickDelta())));
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(Render2DEngine.interpolateFloat(prevEspValue, espValue, Render3DEngine.getTickDelta())));
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
         RenderSystem.setShaderTexture(0, TextureStorage.capture);
         matrices.translate(-0.75, -0.75, -0.01);
         Matrix4f matrix = matrices.peek().getPositionMatrix();
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-        bufferBuilder.vertex(matrix, 0, 1.5f, 0).texture(0f, 1f).color(HudEditor.getColor(90).getRGB()).next();
-        bufferBuilder.vertex(matrix, 1.5f, 1.5f, 0).texture(1f, 1f).color(HudEditor.getColor(0).getRGB()).next();
-        bufferBuilder.vertex(matrix, 1.5f, 0, 0).texture(1f, 0).color(HudEditor.getColor(180).getRGB()).next();
-        bufferBuilder.vertex(matrix, 0, 0, 0).texture(0, 0).color(HudEditor.getColor(270).getRGB()).next();
-        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-        immediate.draw();
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+        buffer.vertex(matrix, 0, 1.5f, 0).texture(0f, 1f).color(HudEditor.getColor(90).getRGB());
+        buffer.vertex(matrix, 1.5f, 1.5f, 0).texture(1f, 1f).color(HudEditor.getColor(0).getRGB());
+        buffer.vertex(matrix, 1.5f, 0, 0).texture(1f, 0).color(HudEditor.getColor(180).getRGB());
+        buffer.vertex(matrix, 0, 0, 0).texture(0, 0).color(HudEditor.getColor(270).getRGB());
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
         RenderSystem.enableCull();
         RenderSystem.enableDepthTest();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);

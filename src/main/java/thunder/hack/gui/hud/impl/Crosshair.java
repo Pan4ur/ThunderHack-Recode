@@ -11,6 +11,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.render.TextureStorage;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
@@ -74,7 +75,7 @@ public class Crosshair extends Module {
 
         switch (mode.getValue()) {
             case Circle -> {
-                Render2DEngine.drawArc(context.getMatrices(), xAnim - 25, yAnim - 25, 50, 50, 0.05f, 0.12f, 0, Render2DEngine.interpolateFloat(prevProgress, progress, mc.getTickDelta()));
+                Render2DEngine.drawArc(context.getMatrices(), xAnim - 25, yAnim - 25, 50, 50, 0.05f, 0.12f, 0, Render2DEngine.interpolateFloat(prevProgress, progress, Render3DEngine.getTickDelta()));
                 prevProgress = progress;
             }
             case WiseTree -> {
@@ -96,16 +97,16 @@ public class Crosshair extends Module {
                 context.getMatrices().translate(xAnim + 4, yAnim + 4, 0);
                 RenderSystem.enableBlend();
                 RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-                BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
                 RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+                BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+
                 RenderSystem.setShaderTexture(0, TextureStorage.firefly);
                 Color color1 = colorMode.getValue() == ColorMode.Sync ? HudEditor.getColor(1) : color.getValue().getColorObject();
                 Matrix4f posMatrix = context.getMatrices().peek().getPositionMatrix();
-                bufferBuilder.vertex(posMatrix, 0, -8f, 0).texture(0f, 1f).color(color1.getRGB()).next();
-                bufferBuilder.vertex(posMatrix, -8f, -8f, 0).texture(1f, 1f).color(color1.getRGB()).next();
-                bufferBuilder.vertex(posMatrix, -8f, 0, 0).texture(1f, 0).color(color1.getRGB()).next();
-                bufferBuilder.vertex(posMatrix, 0, 0, 0).texture(0, 0).color(color1.getRGB()).next();
+                bufferBuilder.vertex(posMatrix, 0, -8f, 0).texture(0f, 1f).color(color1.getRGB());
+                bufferBuilder.vertex(posMatrix, -8f, -8f, 0).texture(1f, 1f).color(color1.getRGB());
+                bufferBuilder.vertex(posMatrix, -8f, 0, 0).texture(1f, 0).color(color1.getRGB());
+                bufferBuilder.vertex(posMatrix, 0, 0, 0).texture(0, 0).color(color1.getRGB());
                 BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
                 RenderSystem.defaultBlendFunc();
                 RenderSystem.disableBlend();
@@ -114,7 +115,7 @@ public class Crosshair extends Module {
             case Default -> {
                 Color color = this.color.getValue().getColorObject();
 
-                float offset = animated.getValue() ? -3f + (Render2DEngine.interpolateFloat(prevProgress, progress, mc.getTickDelta()) / 100f) : 0;
+                float offset = animated.getValue() ? -3f + (Render2DEngine.interpolateFloat(prevProgress, progress, Render3DEngine.getTickDelta()) / 100f) : 0;
                 prevProgress = progress;
 
                 if (!t.getValue()) {

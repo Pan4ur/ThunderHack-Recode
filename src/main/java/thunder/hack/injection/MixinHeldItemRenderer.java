@@ -5,6 +5,7 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
@@ -52,7 +53,7 @@ public abstract class MixinHeldItemRenderer {
 
     private void applyEatOrDrinkTransformationCustom(MatrixStack matrices, float tickDelta, Arm arm, @NotNull ItemStack stack) {
         float f = (float) mc.player.getItemUseTimeLeft() - tickDelta + 1.0F;
-        float g = f / (float) stack.getMaxUseTime();
+        float g = f / (float) stack.getMaxUseTime(mc.player);
         float h;
         if (g < 0.8F) {
             h = MathHelper.abs(MathHelper.cos(f / 4.0F * 3.1415927F) * 0.005F);
@@ -68,7 +69,7 @@ public abstract class MixinHeldItemRenderer {
     }
 
     @Inject(method = "applyEatOrDrinkTransformation", at = @At(value = "HEAD"), cancellable = true)
-    private void applyEatOrDrinkTransformationHook(MatrixStack matrices, float tickDelta, Arm arm, ItemStack stack, CallbackInfo ci) {
+    private void applyEatOrDrinkTransformationHook(MatrixStack matrices, float tickDelta, Arm arm, ItemStack stack, PlayerEntity player, CallbackInfo ci) {
         if (ModuleManager.animations.isEnabled()) {
             applyEatOrDrinkTransformationCustom(matrices, tickDelta, arm, stack);
             ci.cancel();

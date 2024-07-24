@@ -4,29 +4,29 @@ in vec2 texCoord;
 out vec4 fragColor;
 
 uniform sampler2D DiffuseSampler;
-uniform vec3 primaryColor;
-uniform vec3 secondaryColor;
+uniform vec4 primaryColor;
+uniform vec4 secondaryColor;
 uniform float time;
 uniform vec2 InSize;
 
 uniform vec4 outlinecolor;
 uniform float alpha0;
+uniform float fillAlpha;
 uniform int quality;
 uniform int lineWidth;
 in vec2 oneTexel;
 
 vec3 wave(vec2 pos)
 {
-    return mix(primaryColor, secondaryColor, sin((distance(vec2(0), pos) - time * 60.0) / 60.) * 0.5 + 0.5);
+    return mix(primaryColor.rgb, secondaryColor.rgb, sin((distance(vec2(0), pos) - time * 60.0) / 60.) * 0.5 + 0.5);
 }
 
 void main()
 {
-
     vec4 centerCol = texture(DiffuseSampler, texCoord);
 
     if (centerCol.a != 0) {
-        fragColor = vec4(wave(gl_FragCoord.xy), 1);
+        fragColor = vec4(wave(gl_FragCoord.xy), fillAlpha);
     } else {
         float alphaOutline = 0;
         vec3 colorFinal = vec3(-1);

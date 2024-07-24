@@ -17,6 +17,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
@@ -173,9 +174,9 @@ public class HitParticles extends Module {
             float size = starsScale.getValue();
             float scale = mode.is(Mode.Text) ? 0.025f * size : 0.07f;
 
-            final double posX = Render2DEngine.interpolate(px, x, mc.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getX();
-            final double posY = Render2DEngine.interpolate(py, y, mc.getTickDelta()) + 0.1 - mc.getEntityRenderDispatcher().camera.getPos().getY();
-            final double posZ = Render2DEngine.interpolate(pz, z, mc.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getZ();
+            final double posX = Render2DEngine.interpolate(px, x, Render3DEngine.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getX();
+            final double posY = Render2DEngine.interpolate(py, y, Render3DEngine.getTickDelta()) + 0.1 - mc.getEntityRenderDispatcher().camera.getPos().getY();
+            final double posZ = Render2DEngine.interpolate(pz, z, Render3DEngine.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getZ();
 
             matrixStack.push();
             matrixStack.translate(posX, posY, posZ);

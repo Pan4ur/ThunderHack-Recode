@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 import java.util.Optional;
@@ -32,8 +33,6 @@ public abstract class MixinSplashOverlay {
     @Shadow private long reloadStartTime = -1L;
     @Final @Shadow private ResourceReload reload;
     @Final @Shadow private Consumer<Optional<Throwable>> exceptionHandler;
-
-    private static final Identifier TH_LOGO = new Identifier("thunderhack", "textures/gui/elements/th.png");
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
@@ -86,10 +85,10 @@ public abstract class MixinSplashOverlay {
         RenderSystem.blendFunc(770, 1);
 
         RenderSystem.setShaderColor(0.1F, 0.1F, 0.1F, h);
-        context.drawTexture(TH_LOGO, k - 150, p - 35, 0, 0, 300, 70, 300, 70);
+        context.drawTexture(TextureStorage.thLogo, k - 150, p - 35, 0, 0, 300, 70, 300, 70);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, h);
         Render2DEngine.addWindow(context.getMatrices(),k - 150, p - 35, k - 150 + (300 * progress), p + 35, 1f);
-        context.drawTexture(TH_LOGO, k - 150, p - 35, 0, 0, 300, 70, 300, 70);
+        context.drawTexture(TextureStorage.thLogo, k - 150, p - 35, 0, 0, 300, 70, 300, 70);
         Render2DEngine.popWindow();
 
         float t = this.reload.getProgress();

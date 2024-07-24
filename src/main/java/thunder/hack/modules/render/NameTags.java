@@ -26,6 +26,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.scoreboard.ReadableScoreboardScore;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import net.minecraft.scoreboard.ScoreboardObjective;
@@ -87,7 +88,7 @@ public class NameTags extends Module {
     private final Setting<Armor> armorMode = new Setting<>("ArmorMode", Armor.Full);
     private final Setting<Health> health = new Setting<>("Health", Health.Number);
 
-    private final Map<Enchantment, String> encMap = new HashMap<>();
+    private final Map<RegistryKey<Enchantment>, String> encMap = new HashMap<>();
 
     public enum Font {
         Fancy, Fast
@@ -122,9 +123,9 @@ public class NameTags extends Module {
             if (ent == mc.player && (mc.options.getPerspective().isFirstPerson() || !self.getValue())) continue;
             if (getEntityPing(ent) <= 0 && ignoreBots.getValue()) continue;
 
-            double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
-            double y = ent.prevY + (ent.getY() - ent.prevY) * mc.getTickDelta();
-            double z = ent.prevZ + (ent.getZ() - ent.prevZ) * mc.getTickDelta();
+            double x = ent.prevX + (ent.getX() - ent.prevX) * Render3DEngine.getTickDelta();
+            double y = ent.prevY + (ent.getY() - ent.prevY) * Render3DEngine.getTickDelta();
+            double z = ent.prevZ + (ent.getZ() - ent.prevZ) * Render3DEngine.getTickDelta();
             float scale = resize.getValue() ? this.scale.getValue() / mc.player.distanceTo(ent) : this.scale.getValue();
             Vec3d vector = new Vec3d(x, y + height.getValue(), z);
 
@@ -189,69 +190,67 @@ public class NameTags extends Module {
                 context.getMatrices().translate(-(tagX - 2 + (textWidth + 4) / 2f), -(float) ((posY - 13f) + 6.5f), 0);
 
                 float item_offset = 0;
-                if (armorMode.getValue() != Armor.None)
-                    for (ItemStack armorComponent : stacks) {
-                        if (!armorComponent.isEmpty()) {
-                            if (armorMode.getValue() == Armor.Full) {
-                                context.getMatrices().push();
-                                context.getMatrices().translate(posX - 55 + item_offset, (float) (posY - 33f), 0);
-                                context.getMatrices().scale(1.1f, 1.1f, 1.1f);
-                                DiffuseLighting.disableGuiDepthLighting();
-                                context.drawItem(armorComponent, 0, 0);
-                                context.drawItemInSlot(mc.textRenderer, armorComponent, 0, 0);
-                                context.getMatrices().pop();
+                if (armorMode.getValue() != Armor.None) for (ItemStack armorComponent : stacks) {
+                    if (!armorComponent.isEmpty()) {
+                        if (armorMode.getValue() == Armor.Full) {
+                            context.getMatrices().push();
+                            context.getMatrices().translate(posX - 55 + item_offset, (float) (posY - 33f), 0);
+                            context.getMatrices().scale(1.1f, 1.1f, 1.1f);
+                            DiffuseLighting.disableGuiDepthLighting();
+                            context.drawItem(armorComponent, 0, 0);
+                            context.drawItemInSlot(mc.textRenderer, armorComponent, 0, 0);
+                            context.getMatrices().pop();
+                        } else {
+                            context.getMatrices().push();
+                            context.getMatrices().translate(posX - 35 + item_offset, (float) (posY - 20), 0);
+                            context.getMatrices().scale(0.7f, 0.7f, 0.7f);
+
+                            float durability = armorComponent.getMaxDamage() - armorComponent.getDamage();
+                            int percent = (int) ((durability / (float) armorComponent.getMaxDamage()) * 100F);
+
+                            Color color;
+                            if (percent < 33) {
+                                color = Color.RED;
+                            } else if (percent > 33 && percent < 66) {
+                                color = Color.YELLOW;
                             } else {
-                                context.getMatrices().push();
-                                context.getMatrices().translate(posX - 35 + item_offset, (float) (posY - 20), 0);
-                                context.getMatrices().scale(0.7f, 0.7f, 0.7f);
-
-                                float durability = armorComponent.getMaxDamage() - armorComponent.getDamage();
-                                int percent = (int) ((durability / (float) armorComponent.getMaxDamage()) * 100F);
-
-                                Color color;
-                                if (percent < 33) {
-                                    color = Color.RED;
-                                } else if (percent > 33 && percent < 66) {
-                                    color = Color.YELLOW;
-                                } else {
-                                    color = Color.GREEN;
-                                }
-                                context.drawText(mc.textRenderer, percent + "%", 0, 0, color.getRGB(), false);
-                                context.getMatrices().pop();
+                                color = Color.GREEN;
                             }
+                            context.drawText(mc.textRenderer, percent + "%", 0, 0, color.getRGB(), false);
+                            context.getMatrices().pop();
+                        }
 
-                            float enchantmentY = 0;
+                        float enchantmentY = 0;
 
-                            ItemEnchantmentsComponent enchants = EnchantmentHelper.getEnchantments(armorComponent);
+                        ItemEnchantmentsComponent enchants = EnchantmentHelper.getEnchantments(armorComponent);
 
 
-                            if (enchantss.getValue()) {
-                                if (!onlyHands.getValue() || (armorComponent == ent.getOffHandStack() || armorComponent == ent.getMainHandStack())) {
+                        if (enchantss.getValue()) {
+                            if (!onlyHands.getValue() || (armorComponent == ent.getOffHandStack() || armorComponent == ent.getMainHandStack())) {
+                                for (RegistryKey<Enchantment> enchantment : encMap.keySet()) {
+                                    if (enchants.getEnchantments().contains(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(enchantment).get())) {
+                                        String id = encMap.get(enchantment);
+                                        int level = enchants.getLevel(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(enchantment).get());
+                                        String encName = id + level;
 
-                                    for (Enchantment enchantment : encMap.keySet()) {
-                                        if (enchants.getEnchantments().contains(Registries.ENCHANTMENT.getEntry(enchantment))) {
-                                            String id = encMap.get(enchantment);
-                                            int level = enchants.getLevel(enchantment);
-                                            String encName = id + level;
-
-                                            if (font.getValue() == Font.Fancy) {
-                                                FontRenderers.sf_bold.drawString(context.getMatrices(), encName, posX - 50 + item_offset, (float) posY - 45 + enchantmentY, -1);
-                                            } else {
-                                                context.getMatrices().push();
-                                                context.getMatrices().translate((posX - 50f + item_offset), (posY - 45f + enchantmentY), 0);
-                                                context.drawText(mc.textRenderer, encName, 0, 0, -1, false);
-                                                context.getMatrices().pop();
-                                            }
-                                            enchantmentY -= 8;
-                                            if (maxEnchantY > enchantmentY)
-                                                maxEnchantY = enchantmentY;
+                                        if (font.getValue() == Font.Fancy) {
+                                            FontRenderers.sf_bold.drawString(context.getMatrices(), encName, posX - 50 + item_offset, (float) posY - 45 + enchantmentY, -1);
+                                        } else {
+                                            context.getMatrices().push();
+                                            context.getMatrices().translate((posX - 50f + item_offset), (posY - 45f + enchantmentY), 0);
+                                            context.drawText(mc.textRenderer, encName, 0, 0, -1, false);
+                                            context.getMatrices().pop();
                                         }
+                                        enchantmentY -= 8;
+                                        if (maxEnchantY > enchantmentY)
+                                            maxEnchantY = enchantmentY;
                                     }
                                 }
                             }
                         }
-                        item_offset += 18f;
                     }
+                    item_offset += 18f;
+                }
 
                 Color color = ThunderHack.friendManager.isFriend(ent) ? fillColorF.getValue().getColorObject() : fillColorA.getValue().getColorObject();
 
@@ -285,14 +284,10 @@ public class NameTags extends Module {
                         Render2DEngine.drawRect(context.getMatrices(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11, HudEditor.getColor(90));
                     }
                     case Custom -> {
-                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1,
-                                ThunderHack.friendManager.isFriend(ent) ? friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
-                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 3f), textWidth + 6, 1,
-                                ThunderHack.friendManager.isFriend(ent) ? friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
-                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), 1, 11,
-                                ThunderHack.friendManager.isFriend(ent) ? friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
-                        Render2DEngine.drawRect(context.getMatrices(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11,
-                                ThunderHack.friendManager.isFriend(ent) ? friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), textWidth + 6, 1, ThunderHack.friendManager.isFriend(ent) ? friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 3f), textWidth + 6, 1, ThunderHack.friendManager.isFriend(ent) ? friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
+                        Render2DEngine.drawRect(context.getMatrices(), tagX - 3, (float) (posY - 14f), 1, 11, ThunderHack.friendManager.isFriend(ent) ? friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
+                        Render2DEngine.drawRect(context.getMatrices(), tagX + textWidth + 2, (float) (posY - 14f), 1, 11, ThunderHack.friendManager.isFriend(ent) ? friendOutlineColor.getValue().getColorObject() : outlineColor.getValue().getColorObject());
                     }
                 }
 
@@ -400,9 +395,9 @@ public class NameTags extends Module {
             } else continue;
 
             String final_string = "Owned by " + ownerName;
-            double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
-            double y = ent.prevY + (ent.getY() - ent.prevY) * mc.getTickDelta();
-            double z = ent.prevZ + (ent.getZ() - ent.prevZ) * mc.getTickDelta();
+            double x = ent.prevX + (ent.getX() - ent.prevX) * Render3DEngine.getTickDelta();
+            double y = ent.prevY + (ent.getY() - ent.prevY) * Render3DEngine.getTickDelta();
+            double z = ent.prevZ + (ent.getZ() - ent.prevZ) * Render3DEngine.getTickDelta();
             Vec3d vector = new Vec3d(x, y + 2, z);
             Vector4d position = null;
             vector = Render3DEngine.worldSpaceToScreenSpace(new Vec3d(vector.x, vector.y, vector.z));
@@ -491,8 +486,7 @@ public class NameTags extends Module {
         } else return ent.getHealth() + ent.getAbsorptionAmount();
     }
 
-    private void renderHealthBar(DrawContext context, PlayerEntity player, float maxHealth, int lastHealth,
-                                 int absorption) {
+    private void renderHealthBar(DrawContext context, PlayerEntity player, float maxHealth, int lastHealth, int absorption) {
         int i = MathHelper.ceil((double) maxHealth / 2.0);
         int j = MathHelper.ceil((double) absorption / 2.0);
         int k = i * 2;
@@ -543,9 +537,7 @@ public class NameTags extends Module {
     }
 
     private enum HeartType {
-        CONTAINER(new Identifier("hud/heart/container"), new Identifier("hud/heart/container")),
-        NORMAL(new Identifier("hud/heart/full"), new Identifier("hud/heart/half")),
-        ABSORBING(new Identifier("hud/heart/absorbing_full"), new Identifier("hud/heart/absorbing_half"));
+        CONTAINER(Identifier.of("hud/heart/container"), Identifier.of("hud/heart/container")), NORMAL(Identifier.of("hud/heart/full"), Identifier.of("hud/heart/half")), ABSORBING(Identifier.of("hud/heart/absorbing_full"), Identifier.of("hud/heart/absorbing_half"));
 
         private final Identifier fullTexture;
         private final Identifier halfTexture;
@@ -573,8 +565,7 @@ public class NameTags extends Module {
     }
 
     public static float round2(float value) {
-        if (Float.isNaN(value) || Float.isInfinite(value))
-            return 1f;
+        if (Float.isNaN(value) || Float.isInfinite(value)) return 1f;
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(1, RoundingMode.HALF_UP);
         return bd.floatValue();
@@ -582,8 +573,7 @@ public class NameTags extends Module {
 
     private void renderStatusEffectOverlay(DrawContext context, float x, float y, PlayerEntity player) {
         ArrayList<StatusEffectInstance> effects = new ArrayList<>(player.getStatusEffects());
-        if (effects.isEmpty())
-            return;
+        if (effects.isEmpty()) return;
         x += effects.size() * 12.5f;
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
@@ -612,14 +602,14 @@ public class NameTags extends Module {
     public boolean renderShulkerToolTip(DrawContext context, int offsetX, int offsetY, ItemStack stack) {
         try {
             ContainerComponent compoundTag = stack.get(DataComponentTypes.CONTAINER);
-            if (compoundTag == null)
-                return false;
+            if (compoundTag == null) return false;
 
             float[] colors = new float[]{1F, 1F, 1F};
             Item focusedItem = stack.getItem();
             if (focusedItem instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
                 try {
-                    colors = Objects.requireNonNull(ShulkerBoxBlock.getColor(stack.getItem())).getColorComponents();
+                    Color c = new Color(Objects.requireNonNull(ShulkerBoxBlock.getColor(stack.getItem())).getEntityColor());
+                    colors = new float[]{c.getRed() / 255f, c.getGreen() / 255f, c.getRed() / 255f, c.getAlpha() / 255f};
                 } catch (NullPointerException npe) {
                     colors = new float[]{1F, 1F, 1F};
                 }

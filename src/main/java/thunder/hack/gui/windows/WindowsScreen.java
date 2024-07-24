@@ -24,7 +24,7 @@ public class WindowsScreen extends Screen {
     private List<WindowBase> windows = new ArrayList<>();
     public static WindowBase lastClickedWindow;
     public static WindowBase draggingWindow;
-    private static final Identifier clickGuiIcon = new Identifier("thunderhack", "textures/gui/elements/clickgui.png");
+    private static final Identifier clickGuiIcon = Identifier.of("thunderhack", "textures/gui/elements/clickgui.png");
 
     public WindowsScreen(WindowBase... windows) {
         super(Text.of("THWindows"));

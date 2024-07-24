@@ -3,10 +3,10 @@ package thunder.hack.utility.render.shaders;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
 
-public class TextureColorProgram extends GlProgram {
-
+public class TextureColorProgram {
+/*
     public TextureColorProgram() {
-        super(new Identifier("thunderhack", "position_tex_color2"), VertexFormats.POSITION);
+        super(Identifier.of("thunderhack", "position_tex_color2"), VertexFormats.POSITION);
     }
 
     @Override
@@ -17,4 +17,6 @@ public class TextureColorProgram extends GlProgram {
     @Override
     protected void setup() {
     }
+
+ */
 }

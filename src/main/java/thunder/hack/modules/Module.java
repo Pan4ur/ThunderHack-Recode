@@ -13,18 +13,15 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.CommandManager;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.gui.notification.Notification;
-import thunder.hack.injection.accesors.IClientWorldMixin;
 import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.modules.client.Windows;
 import thunder.hack.modules.misc.UnHook;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
-import thunder.hack.utility.player.InteractionUtility;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -308,7 +305,7 @@ public abstract class Module {
         if (mc.isOnThread()) {
             mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + message));
         } else {
-            mc.executeSync(() ->{
+            mc.executeSync(() -> {
                 mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + message));
             });
         }
@@ -330,7 +327,7 @@ public abstract class Module {
         if (mc.isOnThread()) {
             mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] [\uD83D\uDD27] " + message));
         } else {
-            mc.executeSync(() ->{
+            mc.executeSync(() -> {
                 mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] [\uD83D\uDD27] " + message));
             });
         }

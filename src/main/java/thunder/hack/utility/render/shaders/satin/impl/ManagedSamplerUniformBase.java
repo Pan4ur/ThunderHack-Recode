@@ -17,8 +17,10 @@
  */
 package thunder.hack.utility.render.shaders.satin.impl;
 
+import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import thunder.hack.cmd.Command;
 import thunder.hack.utility.render.shaders.satin.api.managed.uniform.SamplerUniform;
 import net.minecraft.client.gl.GlUniform;
 import net.minecraft.client.gl.JsonEffectShaderProgram;
@@ -62,10 +64,11 @@ public abstract class ManagedSamplerUniformBase extends ManagedUniformBase imple
 
     @Override
     public boolean findUniformTarget(ShaderProgram shader) {
-        return findUniformTarget(((SamplerAccess) shader));
+        LogUtils.getLogger().warn(shader.getName());
+        return findUniformTarget1(((SamplerAccess) shader));
     }
 
-    private boolean findUniformTarget(SamplerAccess access) {
+    private boolean findUniformTarget1(SamplerAccess access) {
         if (access.hasSampler(this.name)) {
             this.targets = new SamplerAccess[] {access};
             this.locations = new int[] {getSamplerLoc(access)};

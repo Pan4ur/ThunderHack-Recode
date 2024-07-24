@@ -14,6 +14,8 @@ import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
@@ -30,8 +32,6 @@ import java.util.concurrent.TimeUnit;
 import static thunder.hack.modules.Module.mc;
 
 public class CreditsScreen extends Screen {
-    private static final Identifier TH_TEAM = new Identifier("thunderhack", "textures/gui/elements/thteam.png");
-
     public ArrayList<Contributor> contributors = new ArrayList<>();
 
     private static int scroll;
@@ -98,7 +98,7 @@ public class CreditsScreen extends Screen {
         RenderSystem.disableBlend();
         Render2DEngine.drawHudBase(context.getMatrices(), mc.getWindow().getScaledWidth() - 40, mc.getWindow().getScaledHeight() - 40, 30, 30, 5, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 60, mc.getWindow().getScaledHeight() - 60, 40, 40) ? 0.7f : 1f);
         RenderSystem.setShaderColor(1f, 1f, 1f, Render2DEngine.isHovered(mouseX, mouseY, mc.getWindow().getScaledWidth() - 40, mc.getWindow().getScaledHeight() - 40, 30, 30) ? 0.7f : 1f);
-        context.drawTexture(TH_TEAM, mc.getWindow().getScaledWidth() - 40, mc.getWindow().getScaledHeight() - 40, 30, 30, 0, 0, 30, 30, 30, 30);
+        context.drawTexture(TextureStorage.thTeam, mc.getWindow().getScaledWidth() - 40, mc.getWindow().getScaledHeight() - 40, 30, 30, 0, 0, 30, 30, 30, 30);
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 
@@ -110,7 +110,7 @@ public class CreditsScreen extends Screen {
         float globalOffset = (contributors.size() * 150) / 2f;
         int offset = 0;
         for (Contributor contributor : contributors) {
-            float cX = (float) (halfOfWidth + offset - globalOffset + Render2DEngine.interpolate(scroll, scroll + 1, mc.getTickDelta()));
+            float cX = (float) (halfOfWidth + offset - globalOffset + Render2DEngine.interpolate(scroll, scroll + 1, Render3DEngine.getTickDelta()));
             float cY = halfOfHeight - 120;
             if (Render2DEngine.isHovered(mouseX, mouseY, cX, cY, 140, 240) && !Objects.equals(contributor.clickAction, "none"))
                 Util.getOperatingSystem().open(URI.create(contributor.clickAction));

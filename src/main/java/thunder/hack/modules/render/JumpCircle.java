@@ -86,8 +86,7 @@ public class JumpCircle extends Module {
         }
 
         RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 
         for (Circle c : circles) {
             float colorAnim = (float) (c.timer.getPassedTimeMs()) / 6000f;
@@ -100,15 +99,15 @@ public class JumpCircle extends Module {
             float scale = sizeAnim * 2f;
             Matrix4f matrix = stack.peek().getPositionMatrix();
 
-            bufferBuilder.vertex(matrix, -sizeAnim, -sizeAnim + scale, 0).texture(0, 1).color(applyOpacity(HudEditor.getColor(270), 1f - colorAnim).getRGB()).next();
-            bufferBuilder.vertex(matrix, -sizeAnim + scale, -sizeAnim + scale, 0).texture(1, 1).color(applyOpacity(HudEditor.getColor(0), 1f - colorAnim).getRGB()).next();
-            bufferBuilder.vertex(matrix, -sizeAnim + scale, -sizeAnim, 0).texture(1, 0).color(applyOpacity(HudEditor.getColor(180), 1f - colorAnim).getRGB()).next();
-            bufferBuilder.vertex(matrix, -sizeAnim, -sizeAnim, 0).texture(0, 0).color(applyOpacity(HudEditor.getColor(90), 1f - colorAnim).getRGB()).next();
+            buffer.vertex(matrix, -sizeAnim, -sizeAnim + scale, 0).texture(0, 1).color(applyOpacity(HudEditor.getColor(270), 1f - colorAnim).getRGB());
+            buffer.vertex(matrix, -sizeAnim + scale, -sizeAnim + scale, 0).texture(1, 1).color(applyOpacity(HudEditor.getColor(0), 1f - colorAnim).getRGB());
+            buffer.vertex(matrix, -sizeAnim + scale, -sizeAnim, 0).texture(1, 0).color(applyOpacity(HudEditor.getColor(180), 1f - colorAnim).getRGB());
+            buffer.vertex(matrix, -sizeAnim, -sizeAnim, 0).texture(0, 0).color(applyOpacity(HudEditor.getColor(90), 1f - colorAnim).getRGB());
 
             stack.pop();
         }
 
-        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        Render2DEngine.endBuilding(buffer);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.enableDepthTest();

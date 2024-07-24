@@ -10,19 +10,20 @@ import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.utility.render.Render2DEngine;
 import net.minecraft.util.Identifier;
+import thunder.hack.utility.render.TextureStorage;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
 
 public class FriendComponent {
     float scroll_animation = 0f;
     private Identifier head = null;
-    private final Identifier crackedSkin = new Identifier("thunderhack", "textures/gui/elements/cracked.png");
     private final String name;
     private int posX;
     private int posY;
@@ -134,11 +135,7 @@ public class FriendComponent {
         FontRenderers.icons.drawString(context.getMatrices(), "w", posX + 268, posY + 13, Render2DEngine.applyOpacity(-1, getFadeFactor()));
 
 
-        if (head != null) {
-            context.drawTexture(head, posX + 10, posY + 3, 0, 0, 22, 22, 22, 22);
-        } else {
-            context.drawTexture(crackedSkin, posX + 10, posY + 3, 0, 0, 22, 22, 22, 22);
-        }
+        context.drawTexture(Objects.requireNonNullElse(head, TextureStorage.crackedSkin), posX + 10, posY + 3, 0, 0, 22, 22, 22, 22);
 
         FontRenderers.modules.drawString(context.getMatrices(), name, posX + 37, posY + 6, Render2DEngine.applyOpacity(-1, getFadeFactor()));
 

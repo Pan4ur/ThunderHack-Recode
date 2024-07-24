@@ -76,12 +76,40 @@ public class ItemESP extends Module {
             }
         }
 
-        if (espMode.getValue() == ESPMode.Rect) {
+        if (espMode.getValue() == ESPMode.Rect ) {
+            boolean any = false;
+
+            // TODO SHIT
+            for (Entity ent : mc.world.getEntities()) {
+                if (!(ent instanceof ItemEntity)) continue;
+                Vec3d[] vectors = getPoints(ent);
+
+                Vector4d position = null;
+                for (Vec3d vector : vectors) {
+                    vector = Render3DEngine.worldSpaceToScreenSpace(new Vec3d(vector.x, vector.y, vector.z));
+                    if (vector.z > 0 && vector.z < 1) {
+                        if (position == null)
+                            position = new Vector4d(vector.x, vector.y, vector.z, 0);
+                        position.x = Math.min(vector.x, position.x);
+                        position.y = Math.min(vector.y, position.y);
+                        position.z = Math.max(vector.x, position.z);
+                        position.w = Math.max(vector.y, position.w);
+                    }
+                }
+
+                if (position != null)
+                    any = true;
+            }
+
+            if (!any)
+                return;
+
             Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-            BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
             Render2DEngine.setupRender();
             RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+            BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
             for (Entity ent : mc.world.getEntities()) {
                 if (!(ent instanceof ItemEntity)) continue;
                 Vec3d[] vectors = getPoints(ent);
@@ -108,7 +136,7 @@ public class ItemESP extends Module {
                     drawRect(bufferBuilder, matrix, posX, posY, endPosX, endPosY);
                 }
             }
-            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            Render2DEngine.endBuilding(bufferBuilder);
             Render2DEngine.endRender();
         }
     }
@@ -134,12 +162,18 @@ public class ItemESP extends Module {
 
     @NotNull
     private static Vec3d[] getPoints(Entity ent) {
-        double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
-        double y = ent.prevY + (ent.getY() - ent.prevY) * mc.getTickDelta();
-        double z = ent.prevZ + (ent.getZ() - ent.prevZ) * mc.getTickDelta();
-        Box axisAlignedBB2 = ent.getBoundingBox();
-        Box axisAlignedBB = new Box(axisAlignedBB2.minX - ent.getX() + x - 0.05, axisAlignedBB2.minY - ent.getY() + y, axisAlignedBB2.minZ - ent.getZ() + z - 0.05, axisAlignedBB2.maxX - ent.getX() + x + 0.05, axisAlignedBB2.maxY - ent.getY() + y + 0.15, axisAlignedBB2.maxZ - ent.getZ() + z + 0.05);
+        Box axisAlignedBB = getBox(ent);
         Vec3d[] vectors = new Vec3d[]{new Vec3d(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.maxZ)};
         return vectors;
+    }
+
+    @NotNull
+    private static Box getBox(Entity ent) {
+        double x = ent.prevX + (ent.getX() - ent.prevX) * Render3DEngine.getTickDelta();
+        double y = ent.prevY + (ent.getY() - ent.prevY) * Render3DEngine.getTickDelta();
+        double z = ent.prevZ + (ent.getZ() - ent.prevZ) * Render3DEngine.getTickDelta();
+        Box axisAlignedBB2 = ent.getBoundingBox();
+        Box axisAlignedBB = new Box(axisAlignedBB2.minX - ent.getX() + x - 0.05, axisAlignedBB2.minY - ent.getY() + y, axisAlignedBB2.minZ - ent.getZ() + z - 0.05, axisAlignedBB2.maxX - ent.getX() + x + 0.05, axisAlignedBB2.maxY - ent.getY() + y + 0.15, axisAlignedBB2.maxZ - ent.getZ() + z + 0.05);
+        return axisAlignedBB;
     }
 }

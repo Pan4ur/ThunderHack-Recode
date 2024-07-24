@@ -37,8 +37,12 @@ public class TotemAnimation extends Module {
         }
     }
 
-    public void renderFloatingItem(int scaledWidth, int scaledHeight, float tickDelta) {
+    public void renderFloatingItem(float tickDelta) {
         if (floatingItem != null && floatingItemTimeLeft > 0 && !mode.is(Mode.Off)) {
+
+            int scaledWidth = mc.getWindow().getScaledWidth();
+            int scaledHeight = mc.getWindow().getScaledHeight();
+
             int elapsedTime = getTime() - floatingItemTimeLeft;
             float animationProgress = ((float) elapsedTime + tickDelta) / (float) getTime();
             float progressSquared = animationProgress * animationProgress;

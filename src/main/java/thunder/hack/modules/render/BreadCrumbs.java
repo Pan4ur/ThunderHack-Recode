@@ -34,8 +34,6 @@ public class BreadCrumbs extends Module {
 
     public void onRender3D(MatrixStack stack) {
         Render3DEngine.setupRender();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
 
         if (throughWalls.getValue())
             RenderSystem.disableDepthTest();
@@ -43,7 +41,7 @@ public class BreadCrumbs extends Module {
         RenderSystem.disableCull();
         RenderSystem.lineWidth(1f);
         RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
-        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
 
         for (int i = 0; i < positions.size(); i++) {
             Vec3d vec1 = null;
@@ -60,7 +58,8 @@ public class BreadCrumbs extends Module {
             }
         }
 
-        tessellator.draw();
+        Render2DEngine.endBuilding(buffer);
+
         RenderSystem.enableCull();
         if (throughWalls.getValue())
             RenderSystem.enableDepthTest();

@@ -56,7 +56,7 @@ public final class ThunderUtility {
 
     public static void syncVersion() {
         try {
-            if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersionBeta.txt").openStream())).readLine().equals(ThunderHack.VERSION))
+            if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersion121.txt").openStream())).readLine().equals(ThunderHack.VERSION))
                 ThunderHack.isOutdated = true;
         } catch (Exception ignored) {
         }

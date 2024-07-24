@@ -2,6 +2,7 @@ package thunder.hack.utility.render.animation;
 
 import thunder.hack.modules.client.ClickGui;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 
 import static thunder.hack.modules.Module.mc;
 
@@ -11,7 +12,7 @@ public class GearAnimation {
     private boolean flipSpeed;
 
     public float getValue() {
-        return Render2DEngine.interpolateFloat(prevEspValue, espValue, mc.getTickDelta());
+        return Render2DEngine.interpolateFloat(prevEspValue, espValue, Render3DEngine.getTickDelta());
     }
 
     public void tick() {

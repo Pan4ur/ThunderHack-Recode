@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import thunder.hack.modules.client.HudEditor;
+import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 import java.io.Closeable;
@@ -149,7 +150,7 @@ public class FontRenderer implements Closeable {
     }
 
     public void drawString(MatrixStack stack, String s, double x, double y, int color) {
-        float r = ((color >> 16) & 0xff)/ 255f;
+        float r = ((color >> 16) & 0xff) / 255f;
         float g = ((color >> 8) & 0xff) / 255f;
         float b = ((color) & 0xff) / 255f;
         float a = ((color >> 24) & 0xff) / 255f;
@@ -186,7 +187,7 @@ public class FontRenderer implements Closeable {
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 
         RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-        BufferBuilder bb = Tessellator.getInstance().getBuffer();
+        BufferBuilder bb;
         Matrix4f mat = stack.peek().getPositionMatrix();
         char[] chars = s.toCharArray();
         float xOffset = 0;
@@ -213,7 +214,7 @@ public class FontRenderer implements Closeable {
                     continue;
                 }
 
-                if(gradient) {
+                if (gradient) {
                     Color color = HudEditor.getColor(i * offset);
                     r2 = color.getRed() / 255f;
                     g2 = color.getGreen() / 255f;
@@ -231,7 +232,7 @@ public class FontRenderer implements Closeable {
                     continue;
                 }
                 Glyph glyph = locateGlyph1(c);
-                if(glyph != null) {
+                if (glyph != null) {
                     if (glyph.value() != ' ') {
                         Identifier i1 = glyph.owner().bindToTexture;
                         DrawEntry entry = new DrawEntry(xOffset, yOffset, r2, g2, b2, glyph);
@@ -244,7 +245,7 @@ public class FontRenderer implements Closeable {
                 RenderSystem.setShaderTexture(0, identifier);
                 List<DrawEntry> objects = GLYPH_PAGE_CACHE.get(identifier);
 
-                bb.begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+                bb = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 
                 for (DrawEntry object : objects) {
                     float xo = object.atX;
@@ -261,12 +262,12 @@ public class FontRenderer implements Closeable {
                     float u2 = (float) (glyph.u() + glyph.width()) / owner.width;
                     float v2 = (float) (glyph.v() + glyph.height()) / owner.height;
 
-                    bb.vertex(mat, xo + 0, yo + h, 0).texture(u1, v2).color(cr, cg, cb, a).next();
-                    bb.vertex(mat, xo + w, yo + h, 0).texture(u2, v2).color(cr, cg, cb, a).next();
-                    bb.vertex(mat, xo + w, yo + 0, 0).texture(u2, v1).color(cr, cg, cb, a).next();
-                    bb.vertex(mat, xo + 0, yo + 0, 0).texture(u1, v1).color(cr, cg, cb, a).next();
+                    bb.vertex(mat, xo + 0, yo + h, 0).texture(u1, v2).color(cr, cg, cb, a);
+                    bb.vertex(mat, xo + w, yo + h, 0).texture(u2, v2).color(cr, cg, cb, a);
+                    bb.vertex(mat, xo + w, yo + 0, 0).texture(u2, v1).color(cr, cg, cb, a);
+                    bb.vertex(mat, xo + 0, yo + 0, 0).texture(u1, v1).color(cr, cg, cb, a);
                 }
-                BufferRenderer.drawWithGlobalProgram(bb.end());
+                Render2DEngine.endBuilding(bb);
             }
 
             GLYPH_PAGE_CACHE.clear();
@@ -301,7 +302,7 @@ public class FontRenderer implements Closeable {
                 continue;
             }
             Glyph glyph = locateGlyph1(c1);
-            currentLine +=  glyph == null ? 0 : (glyph.width() / (float) this.scaleMul);
+            currentLine += glyph == null ? 0 : (glyph.width() / (float) this.scaleMul);
         }
         return Math.max(currentLine, maxPreviousLines);
     }
@@ -353,13 +354,11 @@ public class FontRenderer implements Closeable {
 
     @Contract(value = "-> new", pure = true)
     public static @NotNull Identifier randomIdentifier() {
-        return new Identifier("thunderhack", "temp/" + randomString());
+        return Identifier.of("thunderhack", "temp/" + randomString());
     }
 
     private static String randomString() {
-        return IntStream.range(0, 32)
-                .mapToObj(operand -> String.valueOf((char) new Random().nextInt('a', 'z' + 1)))
-                .collect(Collectors.joining());
+        return IntStream.range(0, 32).mapToObj(operand -> String.valueOf((char) new Random().nextInt('a', 'z' + 1))).collect(Collectors.joining());
     }
 
     @Contract(value = "_ -> new", pure = true)
@@ -382,5 +381,6 @@ public class FontRenderer implements Closeable {
         drawGradientString(matrices, s, x - getStringWidth(s) / 2f, y, i);
     }
 
-    record DrawEntry(float atX, float atY, float r, float g, float b, Glyph toDraw) {}
+    record DrawEntry(float atX, float atY, float r, float g, float b, Glyph toDraw) {
+    }
 }

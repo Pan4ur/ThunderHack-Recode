@@ -197,8 +197,8 @@ public class Strafe extends Module {
         if (e.getPacket() instanceof EntityVelocityUpdateS2CPacket && (velocity = e.getPacket()).getId() == mc.player.getId() && boost.getValue() == Boost.Damage) {
             if (mc.player.isOnGround()) return;
 
-            int vX = velocity.getVelocityX();
-            int vZ = velocity.getVelocityZ();
+            double vX = velocity.getVelocityX();
+            double vZ = velocity.getVelocityZ();
 
             if (vX < 0) vX *= -1;
             if (vZ < 0) vZ *= -1;

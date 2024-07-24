@@ -22,6 +22,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.*;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.render.TextureStorage;
 import thunder.hack.utility.render.animation.AnimationUtility;
 import thunder.hack.utility.render.animation.GearAnimation;
@@ -123,7 +124,7 @@ public class ModuleButton extends AbstractButton {
                         Render2DEngine.injectAlpha(HudEditor.getColor(90).darker(), 110));
                 RenderSystem.disableBlend();
                 context.getMatrices().translate(px, py, 0.0F);
-                context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) Render2DEngine.interpolate(mc.player.age - 1, mc.player.age, mc.getTickDelta()) * -4f));
+                context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) Render2DEngine.interpolate(mc.player.age - 1, mc.player.age, Render3DEngine.getTickDelta()) * -4f));
                 context.getMatrices().translate(-px, -py, 0.0F);
                 context.getMatrices().pop();
                 Render2DEngine.popWindow();
