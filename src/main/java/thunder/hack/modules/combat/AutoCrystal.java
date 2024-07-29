@@ -721,42 +721,6 @@ public class AutoCrystal extends Module {
         long currentTime = System.currentTimeMillis();
         calcTimer.reset();
 
-        if (ModuleManager.speedMine.isWorth()) {
-            if (onBreakBlock.getValue() == OnBreakBlock.Smart) {
-                // если цивбрикаем - то ставим над
-                if (mc.world.isAir(SpeedMine.minePosition.down())) {
-                    PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null, mc.player.getPos());
-                    if (autoMineData != null) {
-                        bestPosition = autoMineData.bhr;
-                        return;
-                    }
-                }
-
-                // иначе ставим рядом, чтоб трахнуть сурраунд
-                for (Direction dir : Direction.values()) {
-                    if (dir == Direction.UP || dir == Direction.DOWN) continue;
-                    PlaceData autoMineData = getPlaceData(SpeedMine.minePosition.down().offset(dir), null, mc.player.getPos());
-                    if (autoMineData != null) {
-                        bestPosition = autoMineData.bhr;
-                        return;
-                    }
-                }
-
-                // если ставить некуда, то ставим все-таки над
-                PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null, mc.player.getPos());
-                if (autoMineData != null) {
-                    bestPosition = autoMineData.bhr;
-                    return;
-                }
-            } else if (onBreakBlock.getValue() == OnBreakBlock.PlaceOn) {
-                PlaceData autoMineData = getPlaceData(SpeedMine.minePosition, null, mc.player.getPos());
-                if (autoMineData != null) {
-                    bestPosition = autoMineData.bhr;
-                    return;
-                }
-            }
-        }
-
         if (target == null) {
             renderPos = null;
             prevRenderPos = null;
