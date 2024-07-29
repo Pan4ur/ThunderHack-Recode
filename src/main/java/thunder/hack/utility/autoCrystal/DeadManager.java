@@ -17,7 +17,7 @@ public class DeadManager {
 
         if (!cache.isEmpty()) {
             cache.forEach((crystal, deathTime) -> {
-                if (System.currentTimeMillis() - deathTime > ServerManager.getPing() * 3L) {
+                if (System.currentTimeMillis() - deathTime > ServerManager.getPing() * 2L) {
                     deadCrystals.remove(crystal);
                 }
             });
