@@ -63,6 +63,8 @@ import static net.minecraft.util.math.MathHelper.wrapDegrees;
 
 public class AutoCrystal extends Module {
 
+
+
     /*   MAIN   */
     private static final Setting<Pages> page = new Setting<>("Page", Pages.Main);
     private final Setting<Boolean> await = new Setting<>("Await", true, v -> page.getValue() == Pages.Main);
@@ -73,7 +75,6 @@ public class AutoCrystal extends Module {
     private final Setting<Float> yawAngle = new Setting<>("YawAngle", 180.0f, 1.0f, 180.0f, v -> !rotate.is(Rotation.OFF) && page.getValue() == Pages.Main).addToGroup(yawStep);
     private final Setting<CombatManager.TargetBy> targetLogic = new Setting<>("TargetLogic", CombatManager.TargetBy.Distance, v -> page.getValue() == Pages.Main);
     private final Setting<Float> targetRange = new Setting<>("TargetRange", 10.0f, 1.0f, 15f, v -> page.getValue() == Pages.Main);
-    private final Setting<OnBreakBlock> onBreakBlock = new Setting<>("OnBreakBlock", OnBreakBlock.Smart, v -> page.getValue() == Pages.Main);
     private final Setting<Integer> extrapolation = new Setting<>("Extrapolation", 0, 0, 20, v -> page.getValue() == Pages.Main);
 
     /*   PLACE   */
@@ -88,6 +89,7 @@ public class AutoCrystal extends Module {
     private final Setting<Float> placeWallRange = new Setting<>("PlaceWallRange", 3.5f, 0f, 6f, v -> page.getValue() == Pages.Place);
 
     /*   BREAK   */
+    private final Setting<Boolean> inhibit = new Setting<>("Inhibit", true, v -> page.getValue() == Pages.Break);
     private final Setting<Integer> breakDelay = new Setting<>("BreakDelay", 0, 0, 20, v -> page.getValue() == Pages.Break);
     private final Setting<Integer> lowBreakDelay = new Setting<>("LowBreakDelay", 11, 0, 20, v -> page.getValue() == Pages.Break);
     private final Setting<Float> explodeRange = new Setting<>("BreakRange", 5.0f, 1.0f, 6f, v -> page.getValue() == Pages.Break);
@@ -264,9 +266,9 @@ public class AutoCrystal extends Module {
         if (mc.player == null || mc.world == null) return;
 
         ThunderHack.asyncManager.run(() -> {
-            if (mc.player != null && (!await.getValue() || calcTimer.passedTicks((long) ((float) ServerManager.getPing() / 25f)))) {
+            if (mc.player != null && (!await.getValue() || calcTimer.passedTicks((long) ((float) ServerManager.getPing() / 25f))))
                 calcPosition(placeRange.getValue(), mc.player.getPos());
-            }
+
             getCrystalToExplode();
         });
 
@@ -356,7 +358,7 @@ public class AutoCrystal extends Module {
 
     private void handleSpawn(EndCrystalEntity crystal) {
         if (mc.player == null || mc.world == null) return;
-        if (canAttackCrystal(crystal, true)) {
+        if (canAttackCrystal(crystal)) {
             attackCrystal(crystal);
             if (sequential.is(Sequential.Strong) && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue())) {
                 calcPosition(placeRange.getValue(), mc.player.getPos());
@@ -433,7 +435,7 @@ public class AutoCrystal extends Module {
 
             String dmg = MathUtility.round2(renderDamage) + (rselfDamage.getValue() ? " / " + MathUtility.round2(renderSelfDamage) : "");
 
-            if (renderMode.getValue() == Render.Fade) {
+            if (renderMode.is(Render.Fade)) {
                 cache.forEach((pos, time) -> {
                     if (System.currentTimeMillis() - time < 500) {
                         int alpha = (int) (100f * (1f - ((System.currentTimeMillis() - time) / 500f)));
@@ -453,11 +455,10 @@ public class AutoCrystal extends Module {
 
                 renderBox(dmg, interpolatedBox);
             } else if (renderPos != null) {
-                Box box = new Box(renderPos);
                 if (renderPositions.isEmpty())
                     return;
 
-                renderBox(dmg, box);
+                renderBox(dmg, new Box(renderPos));
             }
         }
 
@@ -543,7 +544,7 @@ public class AutoCrystal extends Module {
     }
 
     public void attackCrystal(EndCrystalEntity crystal) {
-        if (mc.player == null || mc.world == null || mc.interactionManager == null || crystal == null) return;
+        if (mc.player == null || mc.world == null || mc.interactionManager == null || crystal == null || (deadManager.isDead(crystal.getId()) && inhibit.getValue())) return;
 
         if (shouldPause() || target == null)
             return;
@@ -592,11 +593,8 @@ public class AutoCrystal extends Module {
         }
     }
 
-    private boolean canAttackCrystal(EndCrystalEntity cr, boolean deadCheck) {
+    private boolean canAttackCrystal(EndCrystalEntity cr) {
         if (crystalAge.getValue() != 0 && cr.age < crystalAge.getValue())
-            return false;
-
-        if (deadManager.isDead(cr.getId()) && deadCheck)
             return false;
 
         if (PlayerUtility.squaredDistanceFromEyes(cr.getBoundingBox().getCenter()) > (InteractionUtility.canSee(cr) ? explodeRange.getPow2Value() : explodeWallRange.getPow2Value()))
@@ -765,7 +763,7 @@ public class AutoCrystal extends Module {
             if (crystalAge.getValue() != 0 && cr.age < crystalAge.getValue())
                 continue;
 
-            if (deadManager.isDead(cr.getId()))
+            if (deadManager.isDead(cr.getId()) && inhibit.getValue())
                 continue;
 
             if (PlayerUtility.squaredDistanceFromEyes(ent.getBoundingBox().getCenter()) > (InteractionUtility.canSee(cr) ? explodeRange.getPow2Value() : explodeWallRange.getPow2Value()))
@@ -976,7 +974,7 @@ public class AutoCrystal extends Module {
                 if (ent instanceof ExperienceOrbEntity)
                     continue;
 
-                if (ent instanceof EndCrystalEntity cr && canAttackCrystal(cr, false))
+                if (ent instanceof EndCrystalEntity cr && canAttackCrystal(cr))
                     continue;
                 return true;
             }
@@ -997,14 +995,16 @@ public class AutoCrystal extends Module {
 
                 if (ent instanceof EndCrystalEntity cr && deadManager.isDead(cr.getId()))
                     continue;
-
+/*
                 if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()) && ent instanceof EndCrystalEntity cr
                         && canAttackCrystal(cr, true)
                         && cr.getPos().squaredDistanceTo(posBoundingBox.getCenter()) > 0.3) {
-                    attackCrystal(cr);
+                    //attackCrystal(cr);
                     debug("attack stuck crystal");
                     return true;
                 }
+
+ */
                 return true;
             }
         }
