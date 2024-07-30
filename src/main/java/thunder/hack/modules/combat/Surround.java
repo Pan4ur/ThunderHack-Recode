@@ -21,11 +21,9 @@ import thunder.hack.modules.base.PlaceModule;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.player.InteractionUtility;
+import thunder.hack.utility.world.HoleUtility;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
@@ -158,39 +156,90 @@ public final class Surround extends PlaceModule {
     }
 
 
-    public List<BlockPos> getBlocks() {
-        List<BlockPos> finalPoses = new ArrayList<>();
-        List<BlockPos> playerPos = new ArrayList<>();
-        Box box = mc.player.getBoundingBox();
-        double y = mc.player.getY() - Math.floor(mc.player.getY()) > 0.8 ? Math.floor(mc.player.getY()) + 1.0 : Math.floor(mc.player.getY());
-        playerPos.add(BlockPos.ofFloored(box.maxX, y, box.maxZ));
-        playerPos.add(BlockPos.ofFloored(box.minX, y, box.minZ));
-        playerPos.add(BlockPos.ofFloored(box.maxX, y, box.minZ));
-        playerPos.add(BlockPos.ofFloored(box.minX, y, box.maxZ));
+    private @NotNull List<BlockPos> getBlocks() {
+        final BlockPos playerPos = getPlayerPos();
+        final List<BlockPos> offsets = new ArrayList<>();
 
-        for (BlockPos pos : playerPos) {
-            for (Direction direction : Direction.values()) {
-                if (direction == Direction.UP || direction == Direction.DOWN) continue;
-                BlockPos offset = pos.offset(direction);
-                if (!playerPos.contains(offset)) {
-                    finalPoses.add(offset);
-                    finalPoses.add(offset.down());
-                }
+        if (center.getValue() == CenterMode.Disabled && mc.player != null) {
+            int z;
+            int x;
+            final double decimalX = Math.abs(mc.player.getX()) - Math.floor(Math.abs(mc.player.getX()));
+            final double decimalZ = Math.abs(mc.player.getZ()) - Math.floor(Math.abs(mc.player.getZ()));
+            final int lengthXPos = HoleUtility.calcLength(decimalX, false);
+            final int lengthXNeg = HoleUtility.calcLength(decimalX, true);
+            final int lengthZPos = HoleUtility.calcLength(decimalZ, false);
+            final int lengthZNeg = HoleUtility.calcLength(decimalZ, true);
+            final ArrayList<BlockPos> tempOffsets = new ArrayList<>();
+            offsets.addAll(getOverlapPos());
+
+            for (x = 1; x < lengthXPos + 1; ++x) {
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, x, 0.0, 1 + lengthZPos));
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, x, 0.0, -(1 + lengthZNeg)));
             }
-            finalPoses.add(pos.down());
+            for (x = 0; x <= lengthXNeg; ++x) {
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, -x, 0.0, 1 + lengthZPos));
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, -x, 0.0, -(1 + lengthZNeg)));
+            }
+            for (z = 1; z < lengthZPos + 1; ++z) {
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, 1 + lengthXPos, 0.0, z));
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, -(1 + lengthXNeg), 0.0, z));
+            }
+            for (z = 0; z <= lengthZNeg; ++z) {
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, 1 + lengthXPos, 0.0, -z));
+                tempOffsets.add(HoleUtility.addToPlayer(playerPos, -(1 + lengthXNeg), 0.0, -z));
+            }
+
+            for (BlockPos pos : tempOffsets) {
+                if (getDown(pos))
+                    offsets.add(pos.add(0, -1, 0));
+                offsets.add(pos);
+            }
+        } else {
+            offsets.add(playerPos.add(0, -1, 0));
+
+            for (Vec3i surround : HoleUtility.VECTOR_PATTERN) {
+                if (getDown(playerPos.add(surround)))
+                    offsets.add(playerPos.add(surround.getX(), -1, surround.getZ()));
+
+                offsets.add(playerPos.add(surround));
+            }
         }
 
-        for (BlockPos pos : Lists.newArrayList(finalPoses))
-            for (PlayerEntity player : ThunderHack.asyncManager.getAsyncPlayers())
-                if (player.getBoundingBox().intersects(new Box(pos))) {
-                    finalPoses.removeIf(b -> b.equals(pos));
-                    for (Direction direction : Direction.values()) {
-                        if (direction == Direction.UP || direction == Direction.DOWN) continue;
-                        if (player.getBoundingBox().intersects(new Box(pos.offset(direction)))) continue;
-                        finalPoses.add(pos.offset(direction));
-                    }
+        return offsets;
+    }
+
+    private boolean getDown(BlockPos pos) {
+        for (Direction dir : Direction.values())
+            if (!mc.world.getBlockState(pos.add(dir.getVector())).isReplaceable())
+                return false;
+
+        return mc.world.getBlockState(pos).isReplaceable()
+                && interact.getValue() != InteractionUtility.Interact.AirPlace;
+    }
+
+    private @NotNull List<BlockPos> getOverlapPos() {
+        List<BlockPos> positions = new ArrayList<>();
+
+        if (mc.player != null) {
+            double decimalX = mc.player.getX() - Math.floor(mc.player.getX());
+            double decimalZ = mc.player.getZ() - Math.floor(mc.player.getZ());
+            int offX = HoleUtility.calcOffset(decimalX);
+            int offZ = HoleUtility.calcOffset(decimalZ);
+            positions.add(getPlayerPos());
+            for (int x = 0; x <= Math.abs(offX); ++x) {
+                for (int z = 0; z <= Math.abs(offZ); ++z) {
+                    int properX = x * offX;
+                    int properZ = z * offZ;
+                    positions.add(Objects.requireNonNull(getPlayerPos()).add(properX, -1, properZ));
                 }
-        return finalPoses;
+            }
+        }
+
+        return positions;
+    }
+
+    private @NotNull BlockPos getPlayerPos() {
+        return BlockPos.ofFloored(mc.player.getX(), mc.player.getY() - Math.floor(mc.player.getY()) > 0.8 ? Math.floor(mc.player.getY()) + 1.0 : Math.floor(mc.player.getY()), mc.player.getZ());
     }
 
     private enum CenterMode {
