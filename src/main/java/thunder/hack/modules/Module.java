@@ -128,8 +128,7 @@ public abstract class Module {
 
         if (isOn()) ThunderHack.EVENT_BUS.subscribe(this);
         if (fullNullCheck()) return;
-
-        LogUtils.getLogger().info("[ThunderHack] enabled " + this.getName());
+        
         ThunderHack.moduleManager.sortModules();
 
         if (!ignoreSoundList.contains(getDisplayName())) {
@@ -157,8 +156,6 @@ public abstract class Module {
         if (fullNullCheck()) return;
 
         onDisable();
-
-        LogUtils.getLogger().info("[ThunderHack] disabled " + getName());
 
         if (!ignoreSoundList.contains(getDisplayName())) {
             ThunderHack.notificationManager.publicity(getDisplayName(), isRu() ? "Модуль выключен!" : "Was Disabled!", 2, Notification.Type.DISABLED);
