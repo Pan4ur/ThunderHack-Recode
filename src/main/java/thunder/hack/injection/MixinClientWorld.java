@@ -14,6 +14,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.EventEntityRemoved;
 import thunder.hack.events.impl.EventEntitySpawn;
+import thunder.hack.events.impl.EventEntitySpawnPost;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.render.WorldTweaks;
 import thunder.hack.setting.impl.ColorSetting;
@@ -24,10 +25,20 @@ import static thunder.hack.modules.Module.mc;
 
 @Mixin(ClientWorld.class)
 public class MixinClientWorld {
-    @Inject(method = "addEntity", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "addEntity", at = @At("HEAD"), cancellable = true)
     public void addEntityHook(Entity entity, CallbackInfo ci) {
         if(Module.fullNullCheck()) return;
         EventEntitySpawn ees = new EventEntitySpawn(entity);
+        ThunderHack.EVENT_BUS.post(ees);
+        if (ees.isCancelled()) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "addEntity", at = @At("RETURN"), cancellable = true)
+    public void addEntityHookPost(Entity entity, CallbackInfo ci) {
+        if(Module.fullNullCheck()) return;
+        EventEntitySpawnPost ees = new EventEntitySpawnPost(entity);
         ThunderHack.EVENT_BUS.post(ees);
         if (ees.isCancelled()) {
             ci.cancel();

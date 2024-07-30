@@ -64,12 +64,12 @@ import static net.minecraft.util.math.MathHelper.wrapDegrees;
 public class AutoCrystal extends Module {
 
 
-
     /*   MAIN   */
     private static final Setting<Pages> page = new Setting<>("Page", Pages.Main);
     private final Setting<Boolean> await = new Setting<>("Await", true, v -> page.getValue() == Pages.Main);
     private final Setting<Timing> timing = new Setting<>("Timing", Timing.NORMAL, v -> page.getValue() == Pages.Main);
     private final Setting<Sequential> sequential = new Setting<>("Sequential", Sequential.Strong, v -> page.getValue() == Pages.Main);
+    private final Setting<InstantBreak> instantBreak = new Setting<>("InstantBreak", InstantBreak.OnSpawn, v -> page.is(Pages.Main) && sequential.is(Sequential.Strong));
     private final Setting<Rotation> rotate = new Setting<>("Rotate", Rotation.CC, v -> page.getValue() == Pages.Main);
     private final Setting<BooleanSettingGroup> yawStep = new Setting<>("YawStep", new BooleanSettingGroup(false), v -> !rotate.is(Rotation.OFF) && page.getValue() == Pages.Main);
     private final Setting<Float> yawAngle = new Setting<>("YawAngle", 180.0f, 1.0f, 180.0f, v -> !rotate.is(Rotation.OFF) && page.getValue() == Pages.Main).addToGroup(yawStep);
@@ -313,10 +313,29 @@ public class AutoCrystal extends Module {
     }
 
     @EventHandler
+    public void onCrystalSpawn(@NotNull EventEntitySpawnPost e) {
+        if (e.getEntity() instanceof EndCrystalEntity cr && crystalAge.is(0) && instantBreak.is(InstantBreak.OnSpawn)) {
+            HashMap<BlockPos, Long> cache = new HashMap<>(placedCrystals);
+
+            for (BlockPos bp : cache.keySet())
+                if (cr.squaredDistanceTo(bp.toCenterPos()) < 0.3) {
+                    confirmTime = System.currentTimeMillis() - cache.get(bp);
+                    placedCrystals.remove(bp);
+                    if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue())) {
+                        ThunderHack.asyncManager.run(() -> handleSpawn(cr));
+                        if (sequential.is(Sequential.Strong) && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()))
+                            placeSyncTimer.reset();
+                    }
+                }
+        }
+    }
+
+
+    @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
         if (mc.player == null || mc.world == null) return;
 
-        if (e.getPacket() instanceof EntitySpawnS2CPacket spawn && spawn.getEntityType() == EntityType.END_CRYSTAL && crystalAge.is(0)) {
+        if (e.getPacket() instanceof EntitySpawnS2CPacket spawn && spawn.getEntityType() == EntityType.END_CRYSTAL && crystalAge.is(0) && instantBreak.is(InstantBreak.OnPacket)) {
             HashMap<BlockPos, Long> cache = new HashMap<>(placedCrystals);
 
             EndCrystalEntity cr = new EndCrystalEntity(mc.world, spawn.getX(), spawn.getY(), spawn.getZ());
@@ -544,7 +563,8 @@ public class AutoCrystal extends Module {
     }
 
     public void attackCrystal(EndCrystalEntity crystal) {
-        if (mc.player == null || mc.world == null || mc.interactionManager == null || crystal == null || (deadManager.isDead(crystal.getId()) && inhibit.getValue())) return;
+        if (mc.player == null || mc.world == null || mc.interactionManager == null || crystal == null || (deadManager.isDead(crystal.getId()) && inhibit.getValue()))
+            return;
 
         if (shouldPause() || target == null)
             return;
@@ -1162,8 +1182,8 @@ public class AutoCrystal extends Module {
         Fade, Slide, Default
     }
 
-    public enum OnBreakBlock {
-        PlaceOn, Smart, None
+    public enum InstantBreak {
+        OnPacket, OnSpawn
     }
 
     public enum Rotation {
