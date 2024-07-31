@@ -48,6 +48,7 @@ public class CommandManager implements IManager {
         add(new WayPointCommand());
         add(new TabParseCommand());
         add(new BlockESPCommand());
+        add(new BenchMarkCommand());
         add(new HorseSpeedCommand());
         add(new OpenFolderCommand());
         add(new ResetBindsCommand());
