@@ -19,6 +19,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.injection.accesors.IInteractionManager;
 import thunder.hack.modules.Module;
@@ -116,7 +117,7 @@ public class Speed extends Module {
             }
         }
 
-        if ((mode.is(Mode.GrimEntity2)|| mode.is(Mode.GrimCombo)) && !e.isPre() && ThunderHack.core.getSetBackTime() > 1000 && MovementUtility.isMoving()) {
+        if ((mode.is(Mode.GrimEntity2) || mode.is(Mode.GrimCombo)) && !e.isPre() && ThunderHack.core.getSetBackTime() > 1000 && MovementUtility.isMoving()) {
             int collisions = 0;
             for (Entity ent : mc.world.getEntities())
                 if (ent != mc.player && (!(ent instanceof ArmorStandEntity) || armorStands.getValue()) && (ent instanceof LivingEntity || ent instanceof BoatEntity) && mc.player.getBoundingBox().expand(1.0).intersects(ent.getBoundingBox()))
@@ -133,13 +134,13 @@ public class Speed extends Module {
         if ((mode.is(Mode.GrimIce) || mode.is(Mode.GrimCombo)) && mc.player.isOnGround()) {
             BlockPos pos = ((IEntity) mc.player).thunderHack_Recode$getVelocityBP();
             SearchInvResult result = InventoryUtility.findBlockInHotBar(Blocks.ICE, Blocks.PACKED_ICE, Blocks.BLUE_ICE);
-            if(mc.world.isAir(pos) || !result.found() || !mc.options.jumpKey.isPressed())
+            if (mc.world.isAir(pos) || !result.found() || !mc.options.jumpKey.isPressed())
                 return;
 
             prevSlot = mc.player.getInventory().selectedSlot;
             result.switchTo();
             sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), 90, mc.player.isOnGround()));
-            
+
             if (strict.getValue()) {
                 sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos, Direction.UP));
                 sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, pos, Direction.UP));
@@ -254,7 +255,9 @@ public class Speed extends Module {
         if (MovementUtility.isMoving()) {
             ThunderHack.TICK_TIMER = useTimer.getValue() ? 1.088f : 1f;
             float currentSpeed = mode.getValue() == Mode.NCP && mc.player.input.movementForward <= 0 && prevForward > 0 ? ThunderHack.playerManager.currentPlayerSpeed * 0.66f : ThunderHack.playerManager.currentPlayerSpeed;
-            if (stage == 1 && mc.player.isOnGround()) {
+            boolean canJump = !mc.player.horizontalCollision || ModuleManager.step.isDisabled();
+
+            if (stage == 1 && mc.player.isOnGround() && canJump) {
                 mc.player.setVelocity(mc.player.getVelocity().x, MovementUtility.getJumpSpeed(), mc.player.getVelocity().z);
                 event.setY(MovementUtility.getJumpSpeed());
                 baseSpeed *= 2.149;

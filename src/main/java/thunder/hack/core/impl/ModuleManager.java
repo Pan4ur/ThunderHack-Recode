@@ -43,6 +43,7 @@ public class ModuleManager implements IManager {
     public static AutoCrystalBase autoCrystalBase = new AutoCrystalBase();
     public static CrosshairArrows crosshairArrows = new CrosshairArrows();
     public static PearlBlockThrow pearlBlockThrow = new PearlBlockThrow();
+    public static AutoCrystalInfo autoCrystalInfo = new AutoCrystalInfo();
     public static ChatTranslator chatTranslator = new ChatTranslator();
     public static PacketCanceler packetCanceler = new PacketCanceler();
     public static ClientSettings clientSettings = new ClientSettings();

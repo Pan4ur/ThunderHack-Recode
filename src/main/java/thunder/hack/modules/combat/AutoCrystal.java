@@ -34,7 +34,6 @@ import thunder.hack.core.impl.ServerManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.modules.Module;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.BooleanSettingGroup;
@@ -69,7 +68,7 @@ public class AutoCrystal extends Module {
     private final Setting<Boolean> await = new Setting<>("Await", true, v -> page.getValue() == Pages.Main);
     private final Setting<Timing> timing = new Setting<>("Timing", Timing.NORMAL, v -> page.getValue() == Pages.Main);
     private final Setting<Sequential> sequential = new Setting<>("Sequential", Sequential.Strong, v -> page.getValue() == Pages.Main);
-    private final Setting<InstantBreak> instantBreak = new Setting<>("InstantBreak", InstantBreak.OnSpawn, v -> page.is(Pages.Main) && sequential.is(Sequential.Strong));
+    private final Setting<InstantBreak> instantBreak = new Setting<>("InstantBreak", InstantBreak.OnSpawn, v -> page.is(Pages.Main));
     private final Setting<Rotation> rotate = new Setting<>("Rotate", Rotation.CC, v -> page.getValue() == Pages.Main);
     private final Setting<BooleanSettingGroup> yawStep = new Setting<>("YawStep", new BooleanSettingGroup(false), v -> !rotate.is(Rotation.OFF) && page.getValue() == Pages.Main);
     private final Setting<Float> yawAngle = new Setting<>("YawAngle", 180.0f, 1.0f, 180.0f, v -> !rotate.is(Rotation.OFF) && page.getValue() == Pages.Main).addToGroup(yawStep);
@@ -151,6 +150,7 @@ public class AutoCrystal extends Module {
     private final Setting<Boolean> calcInfo = new Setting<>("CalcInfo", false, v -> page.getValue() == Pages.Info);
 
     public static PlayerEntity target;
+    private PlaceData currentData;
     private BlockHitResult bestPosition;
     private EndCrystalEntity bestCrystal;
 
@@ -172,13 +172,17 @@ public class AutoCrystal extends Module {
 
     private boolean rotated, rotating, facePlacing, placedOnSpawn;
 
-    private long confirmTime, calcTime;
+    private long confirmTime;
+
+    private long calcTime;
 
     private BlockPos renderPos, prevRenderPos;
     private long renderMultiplier;
     private final Map<BlockPos, Long> renderPositions = new ConcurrentHashMap<>();
 
     private RotationVec rotationVec;
+
+    public State currentState = State.NoTarget;
 
     public AutoCrystal() {
         super("AutoCrystal", Category.COMBAT);
@@ -209,8 +213,10 @@ public class AutoCrystal extends Module {
         calcTimer.reset();
         bestCrystal = null;
         bestPosition = null;
+        currentData = null;
         renderPos = null;
         prevRenderPos = null;
+        currentState = State.NoTarget;
         target = null;
         rotationVec = null;
     }
@@ -229,6 +235,7 @@ public class AutoCrystal extends Module {
 
         if (target != null && (target.isDead() || target.getHealth() < 0)) {
             target = null;
+            currentState = State.NoTarget;
             return;
         }
 
@@ -286,12 +293,12 @@ public class AutoCrystal extends Module {
         if (sequential.is(Sequential.Off) || rotate.is(Rotation.MATRIX)) {
             if (bestCrystal != null && breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
                 attackCrystal(bestCrystal);
-            else if (bestPosition != null && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()) && !placedOnSpawn && placeSyncTimer.passedTicks(3))
+            else if (bestPosition != null && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()) && !placedOnSpawn /*&& placeSyncTimer.passedTicks(3)*/)
                 placeCrystal(bestPosition, false, false);
         } else {
             if (bestCrystal != null && breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
                 attackCrystal(bestCrystal);
-            if (bestPosition != null && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()) && !placedOnSpawn && placeSyncTimer.passedTicks(3))
+            if (bestPosition != null && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()) && !placedOnSpawn /*&& placeSyncTimer.passedTicks(3)*/)
                 placeCrystal(bestPosition, false, false);
         }
         placedOnSpawn = false;
@@ -320,16 +327,13 @@ public class AutoCrystal extends Module {
             for (BlockPos bp : cache.keySet())
                 if (cr.squaredDistanceTo(bp.toCenterPos()) < 0.3) {
                     confirmTime = System.currentTimeMillis() - cache.get(bp);
+                    ModuleManager.autoCrystalInfo.addSpeed((int) (1000f / (float) confirmTime));
                     placedCrystals.remove(bp);
-                    if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue())) {
-                        ThunderHack.asyncManager.run(() -> handleSpawn(cr));
-                        if (sequential.is(Sequential.Strong) && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()))
-                            placeSyncTimer.reset();
-                    }
+                    if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
+                        handleSpawn(cr);
                 }
         }
     }
-
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
@@ -345,11 +349,8 @@ public class AutoCrystal extends Module {
                 if (cr.squaredDistanceTo(bp.toCenterPos()) < 0.3) {
                     confirmTime = System.currentTimeMillis() - cache.get(bp);
                     placedCrystals.remove(bp);
-                    if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue())) {
-                        ThunderHack.asyncManager.run(() -> handleSpawn(cr));
-                        if (sequential.is(Sequential.Strong) && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue()))
-                            placeSyncTimer.reset();
-                    }
+                    if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
+                        handleSpawn(cr);
                 }
         }
 
@@ -379,11 +380,13 @@ public class AutoCrystal extends Module {
         if (mc.player == null || mc.world == null) return;
         if (canAttackCrystal(crystal)) {
             attackCrystal(crystal);
-            if (sequential.is(Sequential.Strong) && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue())) {
-                calcPosition(placeRange.getValue(), mc.player.getPos());
-                if (bestPosition != null)
-                    placeCrystal(bestPosition, false, true);
-            }
+            ThunderHack.asyncManager.run(() -> {
+                if (sequential.is(Sequential.Strong) && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue())) {
+                    calcPosition(placeRange.getValue(), mc.player.getPos());
+                    if (bestPosition != null)
+                        placeCrystal(bestPosition, false, true);
+                }
+            });
         }
     }
 
@@ -506,38 +509,61 @@ public class AutoCrystal extends Module {
         boolean offhand = mc.player.getOffHandStack().getItem() instanceof EndCrystalItem;
         boolean mainHand = mc.player.getMainHandStack().getItem() instanceof EndCrystalItem;
 
-        if (!pauseTimer.passedMs(1000))
+        if (!pauseTimer.passedMs(1000)) {
+            currentState = State.ExternalPause;
             return true;
+        }
 
-        if (mc.interactionManager.isBreakingBlock() && !offhand && mining.getValue())
+        if (mc.interactionManager.isBreakingBlock() && !offhand && mining.getValue()) {
+            currentState = State.Mining;
             return true;
+        }
 
-        if (autoSwitch.is(Switch.NONE) && !offhand && !mainHand)
+        if (autoSwitch.is(Switch.NONE) && !offhand && !mainHand) {
+            currentState = State.NoCrystalls;
             return true;
+        }
 
-        if ((autoSwitch.is(Switch.SILENT) || autoSwitch.is(Switch.NORMAL)) && !InventoryUtility.findItemInHotBar(Items.END_CRYSTAL).found() && !offhand)
+        if ((autoSwitch.is(Switch.SILENT) || autoSwitch.is(Switch.NORMAL)) && !InventoryUtility.findItemInHotBar(Items.END_CRYSTAL).found() && !offhand) {
+            currentState = State.NoCrystalls;
             return true;
+        }
 
-        if (autoSwitch.is(Switch.INVENTORY) && !InventoryUtility.findItemInInventory(Items.END_CRYSTAL).found() && !offhand)
+        if (autoSwitch.is(Switch.INVENTORY) && !InventoryUtility.findItemInInventory(Items.END_CRYSTAL).found() && !offhand) {
+            currentState = State.NoCrystalls;
             return true;
+        }
 
-        if (mc.player.isUsingItem() && eating.getValue())
+        if (mc.player.isUsingItem() && eating.getValue()) {
+            currentState = State.Eating;
             return true;
+        }
 
-        if (rotationMarkedDirty())
+        if (rotationMarkedDirty()) {
+            currentState = State.ExternalPause;
             return true;
+        }
 
-        if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < pauseHP.getValue())
+        if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < pauseHP.getValue()) {
+            currentState = State.LowHP;
             return true;
+        }
 
-        if (!offhand && autoGapple.getValue() && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+        if (!offhand && autoGapple.getValue() && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() == Items.ENCHANTED_GOLDEN_APPLE) {
+            currentState = State.Eating;
             return true;
+        }
 
         boolean silentWeakness = antiWeakness.getValue() == Switch.SILENT || antiWeakness.getValue() == Switch.INVENTORY;
 
         boolean silent = autoSwitch.getValue() == Switch.SILENT || autoSwitch.getValue() == Switch.INVENTORY;
 
-        return switchPause.getValue().isEnabled() && !ThunderHack.playerManager.switchTimer.passedMs(switchDelay.getValue()) && !silent && !silentWeakness;
+        boolean switchPause1 = switchPause.getValue().isEnabled() && !ThunderHack.playerManager.switchTimer.passedMs(switchDelay.getValue()) && !silent && !silentWeakness;
+
+        if (!switchPause1)
+            currentState = State.Active;
+
+        return switchPause1;
     }
 
     public boolean rotationMarkedDirty() {
@@ -743,6 +769,7 @@ public class AutoCrystal extends Module {
             renderPos = null;
             prevRenderPos = null;
             bestPosition = null;
+            currentData = null;
             return;
         }
 
@@ -861,6 +888,7 @@ public class AutoCrystal extends Module {
         facePlacing = bestData.damage < minDamage.getValue();
         renderDamage = bestData.damage;
         renderSelfDamage = bestData.selfDamage;
+        currentData = bestData;
         return bestData.bhr;
     }
 
@@ -1136,6 +1164,14 @@ public class AutoCrystal extends Module {
         }
     }
 
+    public PlaceData getCurrentData() {
+        return currentData;
+    }
+
+    public long getCalcTime() {
+        return calcTime;
+    }
+
     public void pause() {
         pauseTimer.reset();
     }
@@ -1143,6 +1179,10 @@ public class AutoCrystal extends Module {
     private int getPredictTicks() {
         // TODO smart
         return extrapolation.getValue();
+    }
+
+    public String getPauseState() {
+        return currentState.name();
     }
 
     public record PlaceData(BlockHitResult bhr, float damage, float selfDamage, boolean overrideDamage) {
@@ -1180,6 +1220,10 @@ public class AutoCrystal extends Module {
 
     public enum Render {
         Fade, Slide, Default
+    }
+
+    public enum State {
+        Active, Eating, LowHP, NoTarget, NoCrystalls, ExternalPause, Mining
     }
 
     public enum InstantBreak {
