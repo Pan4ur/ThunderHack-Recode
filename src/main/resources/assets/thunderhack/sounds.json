@@ -74,11 +74,6 @@
       "thunderhack:swipeout"
     ]
   },
-  "alert": {
-    "sounds": [
-      "thunderhack:alert"
-    ]
-  },
   "pmsound": {
     "sounds": [
       "thunderhack:pmsound"

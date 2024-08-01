@@ -30,15 +30,11 @@ public class MixinKeyboard {
         switch (action) {
             case 0 -> {
                 EventKeyRelease event = new EventKeyRelease(key, scanCode);
-               // mc.world.playSound(mc.player, mc.player.getBlockPos(), Thunderhack.KEYRELEASE_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
-
                 ThunderHack.EVENT_BUS.post(event);
                 if (event.isCancelled()) ci.cancel();
             }
             case 1 -> {
                 EventKeyPress event = new EventKeyPress(key, scanCode);
-              //  mc.world.playSound(mc.player, mc.player.getBlockPos(), Thunderhack.KEYPRESS_SOUNDEVENT, SoundCategory.BLOCKS, 1f, 1f);
-
                 ThunderHack.EVENT_BUS.post(event);
                 if (event.isCancelled()) ci.cancel();
             }

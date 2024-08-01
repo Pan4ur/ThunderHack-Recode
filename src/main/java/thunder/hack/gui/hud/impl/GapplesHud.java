@@ -14,6 +14,7 @@ import thunder.hack.gui.hud.HudElement;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
 
@@ -46,7 +47,7 @@ public class GapplesHud extends HudElement {
 
         context.getMatrices().push();
         context.getMatrices().translate(xPos, yPos, 0);
-        context.getMatrices().multiply(RotationAxis.NEGATIVE_Z.rotation((float) Math.toRadians(-Render2DEngine.interpolateFloat(prevAngle, angle, mc.getTickDelta()))));
+        context.getMatrices().multiply(RotationAxis.NEGATIVE_Z.rotation((float) Math.toRadians(-Render2DEngine.interpolateFloat(prevAngle, angle, Render3DEngine.getTickDelta()))));
         context.getMatrices().translate(-xPos, -yPos, 0);
 
 

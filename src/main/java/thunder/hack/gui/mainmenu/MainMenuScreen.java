@@ -129,7 +129,7 @@ public class MainMenuScreen extends Screen {
             offsetY += 10;
         }
 
-        int totalAddonsLoaded = AddonManager.getTotalAddons();
+        int totalAddonsLoaded = ThunderHack.addonManager.getTotalAddons();
         String addonsText = "Addons Loaded: " + totalAddonsLoaded;
         int screenWidth = mc.getWindow().getScaledWidth();
         int textWidth = (int) FontRenderers.sf_bold.getStringWidth(addonsText);
@@ -137,7 +137,7 @@ public class MainMenuScreen extends Screen {
         FontRenderers.sf_bold.drawString(context.getMatrices(), addonsText, textX, 5, Color.WHITE.getRGB());
 
         int offset = 0;
-        for (IAddon addon : AddonManager.getAddons()) {
+        for (IAddon addon : ThunderHack.addonManager.getAddons()) {
        // for (String addon : Arrays.asList("Addon", "Addon2", "Addon3", "Addon4", "Addon5")) {
             textWidth = (int) FontRenderers.sf_bold.getStringWidth(addon.getName() + " |");
             textX = screenWidth - textWidth - 5;

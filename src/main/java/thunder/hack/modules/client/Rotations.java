@@ -1,12 +1,17 @@
 package thunder.hack.modules.client;
 
+import net.minecraft.item.FireworkRocketItem;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import thunder.hack.ThunderHack;
+import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.impl.PlayerManager;
 import thunder.hack.events.impl.EventFixVelocity;
 import thunder.hack.events.impl.EventKeyboardInput;
 import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.modules.Module;
+import thunder.hack.modules.combat.Aura;
 import thunder.hack.setting.Setting;
 
 
@@ -23,16 +28,16 @@ public class Rotations extends Module {
     }
 
     public float fixRotation;
-    private float prevRotation;
+    private float prevYaw, prevPitch;
 
     public void onJump(EventPlayerJump e) {
         if (Float.isNaN(fixRotation) || moveFix.getValue() == MoveFix.Off || mc.player.isRiding())
             return;
 
         if (e.isPre()) {
-            prevRotation = mc.player.getYaw();
+            prevYaw = mc.player.getYaw();
             mc.player.setYaw(fixRotation);
-        } else mc.player.setYaw(prevRotation);
+        } else mc.player.setYaw(prevYaw);
     }
 
     public void onPlayerMove(EventFixVelocity event) {
@@ -44,12 +49,28 @@ public class Rotations extends Module {
     }
 
     public void modifyVelocity(EventPlayerTravel e) {
+        if (ModuleManager.aura.isEnabled() && ModuleManager.aura.target != null && ModuleManager.aura.rotationMode.not(Aura.Mode.None)
+                && ModuleManager.aura.elytraTarget.getValue() && ThunderHack.playerManager.ticksElytraFlying > 5) {
+            if (e.isPre()) {
+                prevYaw = mc.player.getYaw();
+                prevPitch = mc.player.getPitch();
+
+                mc.player.setYaw(fixRotation);
+                mc.player.setPitch(ModuleManager.aura.rotationPitch);
+            } else {
+                mc.player.setYaw(prevYaw);
+                mc.player.setPitch(prevPitch);
+            }
+            return;
+        }
+
+
         if (moveFix.getValue() == MoveFix.Focused && !Float.isNaN(fixRotation) && !mc.player.isRiding()) {
             if (e.isPre()) {
-                prevRotation = mc.player.getYaw();
+                prevYaw = mc.player.getYaw();
                 mc.player.setYaw(fixRotation);
             } else {
-                mc.player.setYaw(prevRotation);
+                mc.player.setYaw(prevYaw);
             }
         }
     }
@@ -77,5 +98,10 @@ public class Rotations extends Module {
         float f = MathHelper.sin(yaw * MathHelper.RADIANS_PER_DEGREE);
         float g = MathHelper.cos(yaw * MathHelper.RADIANS_PER_DEGREE);
         return new Vec3d(vec3d.x * (double) g - vec3d.z * (double) f, vec3d.y, vec3d.z * (double) g + vec3d.x * (double) f);
+    }
+
+    @Override
+    public boolean isToggleable() {
+        return false;
     }
 }

@@ -48,7 +48,7 @@ public final class InventoryUtility {
             ItemStack itemStack = mc.player.getInventory().getStack(b1 >= 36 ? b1 - 36 : b1);
             if (itemStack != null && itemStack.getItem() instanceof AxeItem axe) {
                 float f1 = axe.getComponents().get(DataComponentTypes.MAX_DAMAGE);
-                f1 += EnchantmentHelper.getLevel(Enchantments.SHARPNESS, itemStack);
+                f1 += EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.SHARPNESS.getRegistryRef()).getEntry(Enchantments.SHARPNESS).get(), itemStack);
                 if (f1 > f) {
                     f = f1;
                     slot = b1;
@@ -71,7 +71,7 @@ public final class InventoryUtility {
             ItemStack itemStack = mc.player.getInventory().getStack(b1);
             if (itemStack != null && itemStack.getItem() instanceof PickaxeItem) {
                 float f1 = 0;
-                f1 += EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, itemStack);
+                f1 += EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.EFFICIENCY.getRegistryRef()).getEntry(Enchantments.EFFICIENCY).get(), itemStack);
                 if (f1 > f) {
                     f = f1;
                     slot = b1;
@@ -92,7 +92,7 @@ public final class InventoryUtility {
             ItemStack itemStack = mc.player.getInventory().getStack(b1);
             if (itemStack != null && itemStack.getItem() instanceof PickaxeItem) {
                 float f1 = 0;
-                f1 += EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, itemStack);
+                f1 += EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.EFFICIENCY.getRegistryRef()).getEntry(Enchantments.EFFICIENCY).get(), itemStack);
                 if (f1 > f) {
                     f = f1;
                     slot = b1;
@@ -113,7 +113,7 @@ public final class InventoryUtility {
             ItemStack itemStack = mc.player.getInventory().getStack(b1);
             if (itemStack != null && itemStack.getItem() instanceof PickaxeItem) {
                 float f1 = 0;
-                f1 += EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, itemStack);
+                f1 += EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.EFFICIENCY.getRegistryRef()).getEntry(Enchantments.EFFICIENCY).get(), itemStack);
                 if (f1 > f) {
                     f = f1;
                     slot = b1;
@@ -153,7 +153,7 @@ public final class InventoryUtility {
             ItemStack itemStack = mc.player.getInventory().getStack(b1);
             if (itemStack != null && itemStack.getItem() instanceof SwordItem sword) {
                 float f1 = sword.getComponents().get(DataComponentTypes.MAX_DAMAGE);
-                f1 += EnchantmentHelper.getLevel(Enchantments.SHARPNESS, itemStack);
+                f1 += EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.SHARPNESS.getRegistryRef()).getEntry(Enchantments.SHARPNESS).get(), itemStack);
                 if (f1 > f) {
                     f = f1;
                     slot = b1;
@@ -174,7 +174,7 @@ public final class InventoryUtility {
             ItemStack itemStack = mc.player.getInventory().getStack(b1);
             if (itemStack != null && itemStack.getItem() instanceof SwordItem sword) {
                 float f1 = sword.getComponents().get(DataComponentTypes.MAX_DAMAGE);
-                f1 += EnchantmentHelper.getLevel(Enchantments.SHARPNESS, itemStack);
+                f1 += EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.SHARPNESS.getRegistryRef()).getEntry(Enchantments.SHARPNESS).get(), itemStack);
                 if (f1 > f) {
                     f = f1;
                     slot = b1;
@@ -186,6 +186,7 @@ public final class InventoryUtility {
         return new SearchInvResult(slot, true, mc.player.getInventory().getStack(slot));
     }
 
+    // TODO check
     public static SearchInvResult getAxeHotBar() {
         if (mc.player == null) return SearchInvResult.notFound();
 
@@ -195,7 +196,7 @@ public final class InventoryUtility {
             ItemStack itemStack = mc.player.getInventory().getStack(b1);
             if (itemStack != null && itemStack.getItem() instanceof AxeItem axe) {
                 float f1 = axe.getComponents().get(DataComponentTypes.MAX_DAMAGE);
-                f1 += EnchantmentHelper.getLevel(Enchantments.SHARPNESS, itemStack);
+                f1 += EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.SHARPNESS.getRegistryRef()).getEntry(Enchantments.SHARPNESS).get(), itemStack);
                 if (f1 > f) {
                     f = f1;
                     slot = b1;
@@ -351,15 +352,13 @@ public final class InventoryUtility {
         if (mc.player.fallDistance > 0 || ModuleManager.criticals.isEnabled())
             baseDamage += baseDamage / 2f;
 
-        baseDamage += EnchantmentHelper.getLevel(Enchantments.SHARPNESS, weapon);
-
         if (mc.player.hasStatusEffect(StatusEffects.STRENGTH)) {
             int strength = Objects.requireNonNull(mc.player.getStatusEffect(StatusEffects.STRENGTH)).getAmplifier() + 1;
             baseDamage += 3 * strength;
         }
 
         // Reduce by armour
-        baseDamage = DamageUtil.getDamageLeft(baseDamage, mc.world.getDamageSources().generic(), ent.getArmor(), (float) ent.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
+        baseDamage = DamageUtil.getDamageLeft(ent, baseDamage, mc.world.getDamageSources().generic(), ent.getArmor(), (float) ent.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
         return baseDamage;
     }
 

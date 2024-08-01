@@ -31,17 +31,6 @@ repositories {
 		name = "meteor-maven-snapshots"
 		url = "https://maven.meteordev.org/snapshots"
 	}
-	repositories {
-		maven {
-			name = 'Ladysnake Mods'
-			url = 'https://maven.ladysnake.org/releases'
-			content {
-				includeGroup 'io.github.ladysnake'
-				includeGroup 'org.ladysnake'
-				includeGroupByRegex 'dev\\.onyxstudios.*'
-			}
-		}
-	}
 	mavenCentral()
 	jcenter()
 }
@@ -59,13 +48,10 @@ dependencies {
 
 	libImpl("meteordevelopment:orbit:${project.orbit_version}")
 
-	modCompileOnly "meteordevelopment:baritone:1.20.6-SNAPSHOT"
+	modCompileOnly "meteordevelopment:baritone:1.21-SNAPSHOT"
 
 	libImpl("io.netty:netty-handler-proxy:${project.netty_version}") { transitive = false }
 	libImpl("io.netty:netty-codec-socks:${project.netty_version}") { transitive = false }
-
-
-	compileOnlyApi("org.apiguardian:apiguardian-api:1.1.2")
 
 	configurations.libImpl.dependencies.each {
 		implementation(it)
@@ -103,14 +89,14 @@ jar {
 	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 
 	manifest {
-        	attributes(
-            	'Implementation-Title': project.name,
-            	'Implementation-Version': project.version,
-            	'Built-By': System.getProperty('user.name'),
-            	'Build-Timestamp': new Date(),
-            	'Git-Commit': gitCommitHash()
-        	)
-    	}
+		attributes(
+				'Implementation-Title': project.name,
+				'Implementation-Version': project.version,
+				'Built-By': System.getProperty('user.name'),
+				'Build-Timestamp': new Date(),
+				'Git-Commit': gitCommitHash()
+		)
+	}
 }
 
 publishing {
@@ -125,10 +111,10 @@ publishing {
 }
 
 def gitCommitHash() {
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'rev-parse', '--short', 'HEAD'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
+	def stdout = new ByteArrayOutputStream()
+	exec {
+		commandLine 'git', 'rev-parse', '--short', 'HEAD'
+		standardOutput = stdout
+	}
+	return stdout.toString().trim()
 }

@@ -17,16 +17,11 @@
  */
 package thunder.hack.utility.render.shaders.satin.api.managed;
 
-import thunder.hack.utility.render.shaders.satin.impl.ReloadableShaderEffectManager;
 import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
-import org.apiguardian.api.API;
+import thunder.hack.utility.render.shaders.satin.impl.ReloadableShaderEffectManager;
 
 import java.util.function.Consumer;
-
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * @see ManagedShaderEffect

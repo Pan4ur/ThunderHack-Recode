@@ -40,7 +40,9 @@ import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.TextureStorage;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.render.Tooltips.hasItems;
@@ -167,7 +169,8 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
             Item focusedItem = stack.getItem();
             if (focusedItem instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
                 try {
-                    colors = Objects.requireNonNull(ShulkerBoxBlock.getColor(stack.getItem())).getColorComponents();
+                    Color c = new Color(Objects.requireNonNull(ShulkerBoxBlock.getColor(stack.getItem())).getEntityColor());
+                    colors = new float[]{c.getRed() / 255f, c.getGreen() / 255f, c.getRed() / 255f, c.getAlpha() / 255f};
                 } catch (NullPointerException npe) {
                     colors = new float[]{1F, 1F, 1F};
                 }
@@ -178,7 +181,6 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
         }
         return true;
     }
-
 
     @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"), cancellable = true)
     private void onDrawMouseoverTooltip(DrawContext context, int x, int y, CallbackInfo ci) {

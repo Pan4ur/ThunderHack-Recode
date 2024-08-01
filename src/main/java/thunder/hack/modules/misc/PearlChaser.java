@@ -132,13 +132,16 @@ public class PearlChaser extends Module {
         mc.player.setYaw(rotationYaw);
         mc.player.setPitch(MathUtility.clamp(rotationPitch, -89, 89));
 
+        float yaw = mc.player.getYaw();
+        float pitch = mc.player.getPitch();
+
         postSyncAction = () -> {
             int epSlot = findEPSlot();
             int originalSlot = mc.player.getInventory().selectedSlot;
             if (epSlot != -1) {
                 mc.player.getInventory().selectedSlot = epSlot;
                 sendPacket(new UpdateSelectedSlotC2SPacket(epSlot));
-                sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+                sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, yaw, pitch));
                 sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                 mc.player.getInventory().selectedSlot = originalSlot;
                 sendPacket(new UpdateSelectedSlotC2SPacket(originalSlot));

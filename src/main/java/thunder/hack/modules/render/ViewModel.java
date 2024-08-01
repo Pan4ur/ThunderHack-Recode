@@ -9,6 +9,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 
 public class ViewModel extends Module {
     public ViewModel() {
@@ -128,15 +129,15 @@ public class ViewModel extends Module {
         if (event.getHand() == Hand.MAIN_HAND) {
             event.getStack().translate(positionMainX.getValue(), positionMainY.getValue(), positionMainZ.getValue());
             event.getStack().scale(scaleMain.getValue(), scaleMain.getValue(), scaleMain.getValue());
-            event.getStack().multiply(RotationAxis.POSITIVE_X.rotationDegrees(Render2DEngine.interpolateFloat(prevMainX, rotationMainX.getValue(), mc.getTickDelta())));
-            event.getStack().multiply(RotationAxis.POSITIVE_Y.rotationDegrees(Render2DEngine.interpolateFloat(prevMainY, rotationMainY.getValue(), mc.getTickDelta())));
-            event.getStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(Render2DEngine.interpolateFloat(prevMainZ, rotationMainZ.getValue(), mc.getTickDelta())));
+            event.getStack().multiply(RotationAxis.POSITIVE_X.rotationDegrees(Render2DEngine.interpolateFloat(prevMainX, rotationMainX.getValue(), Render3DEngine.getTickDelta())));
+            event.getStack().multiply(RotationAxis.POSITIVE_Y.rotationDegrees(Render2DEngine.interpolateFloat(prevMainY, rotationMainY.getValue(), Render3DEngine.getTickDelta())));
+            event.getStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(Render2DEngine.interpolateFloat(prevMainZ, rotationMainZ.getValue(), Render3DEngine.getTickDelta())));
         } else {
             event.getStack().translate(-positionOffX.getValue(), positionOffY.getValue(), positionOffZ.getValue());
             event.getStack().scale(scaleOff.getValue(), scaleOff.getValue(), scaleOff.getValue());
-            event.getStack().multiply(RotationAxis.POSITIVE_X.rotationDegrees(Render2DEngine.interpolateFloat(prevOffX, rotationOffX.getValue(), mc.getTickDelta())));
-            event.getStack().multiply(RotationAxis.POSITIVE_Y.rotationDegrees(Render2DEngine.interpolateFloat(prevOffY, rotationOffY.getValue(), mc.getTickDelta())));
-            event.getStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(Render2DEngine.interpolateFloat(prevOffZ, rotationOffZ.getValue(), mc.getTickDelta())));
+            event.getStack().multiply(RotationAxis.POSITIVE_X.rotationDegrees(Render2DEngine.interpolateFloat(prevOffX, rotationOffX.getValue(), Render3DEngine.getTickDelta())));
+            event.getStack().multiply(RotationAxis.POSITIVE_Y.rotationDegrees(Render2DEngine.interpolateFloat(prevOffY, rotationOffY.getValue(), Render3DEngine.getTickDelta())));
+            event.getStack().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(Render2DEngine.interpolateFloat(prevOffZ, rotationOffZ.getValue(), Render3DEngine.getTickDelta())));
         }
     }
 }

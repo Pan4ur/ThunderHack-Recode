@@ -143,7 +143,7 @@ public abstract class MixinMinecraftClient {
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/Window;setIcon(Lnet/minecraft/resource/ResourcePack;Lnet/minecraft/client/util/Icons;)V"))
     private void onChangeIcon(Window instance, ResourcePack resourcePack, Icons icons) throws IOException {
-        RenderSystem.assertInInitPhase();
+        // RenderSystem.assertInInitPhase();
 
         if (GLFW.glfwGetPlatform() == 393218) {
             MacWindowUtil.setApplicationIconImage(icons.getMacIcon(resourcePack));

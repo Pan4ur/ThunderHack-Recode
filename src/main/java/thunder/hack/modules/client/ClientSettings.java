@@ -35,4 +35,9 @@ public final class ClientSettings extends Module {
     public static boolean isRu() {
         return language.is(Language.RU);
     }
+
+    @Override
+    public boolean isToggleable() {
+        return false;
+    }
 }

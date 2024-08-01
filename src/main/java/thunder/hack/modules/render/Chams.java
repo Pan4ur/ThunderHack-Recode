@@ -28,6 +28,7 @@ import thunder.hack.events.impl.EventHeldItemRenderer;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
+import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
@@ -39,7 +40,7 @@ public class Chams extends Module {
         super("Chams", Category.RENDER);
     }
 
-    private final Setting<Boolean> handItems = new Setting<>("HandItems", false);
+    public final Setting<Boolean> handItems = new Setting<>("HandItems", false);
     private final Setting<ColorSetting> handItemsColor = new Setting<>("HandItemsColor", new ColorSetting(new Color(0x9317DE5D, true)), v -> handItems.getValue());
 
     public final Setting<Boolean> crystals = new Setting<>("Crystals", false);
@@ -59,7 +60,7 @@ public class Chams extends Module {
         One, Two, Three
     }
 
-    private final Identifier crystalTexture = new Identifier("textures/entity/end_crystal/end_crystal.png");
+    private final Identifier crystalTexture = Identifier.of("textures/entity/end_crystal/end_crystal.png");
     private static final float SINE_45_DEGREES = (float) Math.sin(0.7853981633974483);
 
     public void renderCrystal(EndCrystalEntity endCrystalEntity, float f, float g, MatrixStack matrixStack, int i, ModelPart core, ModelPart frame) {
@@ -69,8 +70,7 @@ public class Chams extends Module {
         else RenderSystem.defaultBlendFunc();
         RenderSystem.disableCull();
         RenderSystem.disableDepthTest();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        BufferBuilder buffer;
 
         if (crystalMode.getValue() != CMode.One) {
             if (crystalMode.getValue() == CMode.Three) {
@@ -79,10 +79,10 @@ public class Chams extends Module {
                 RenderSystem.setShaderTexture(0, TextureStorage.crystalTexture2);
             }
             RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+            buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
         } else {
             RenderSystem.setShader(GameRenderer::getPositionProgram);
-            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+            buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
         }
 
         matrixStack.push();
@@ -107,7 +107,7 @@ public class Chams extends Module {
         core.render(matrixStack, buffer, i, k);
         matrixStack.pop();
         matrixStack.pop();
-        tessellator.draw();
+        Render2DEngine.endBuilding(buffer);
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();
@@ -121,16 +121,15 @@ public class Chams extends Module {
         else RenderSystem.defaultBlendFunc();
         RenderSystem.enableCull();
         RenderSystem.disableDepthTest();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        BufferBuilder buffer;
 
         if (!simple.getValue()) {
             RenderSystem.setShaderTexture(0, ((AbstractClientPlayerEntity) pe).getSkinTextures().texture());
             RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+            buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
         } else {
             RenderSystem.setShader(GameRenderer::getPositionProgram);
-            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+            buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
         }
 
         float n;
@@ -204,12 +203,9 @@ public class Chams extends Module {
         }
         model.animateModel(pe, o, n, g);
         model.setAngles(pe, o, n, l, k, m);
-        boolean bl = !pe.isInvisible();
-        boolean bl2 = !bl && !pe.isInvisibleTo(mc.player);
         int p = LivingEntityRenderer.getOverlay(pe, 0);
-        model.render(matrixStack, buffer, i, p, 1.0f, 1.0f, 1.0f, bl2 ? 0.15f : 1.0f);
-        tessellator.draw();
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        model.render(matrixStack, buffer, i, p);
+        Render2DEngine.endBuilding(buffer);
         RenderSystem.disableBlend();
         RenderSystem.disableCull();
         matrixStack.pop();

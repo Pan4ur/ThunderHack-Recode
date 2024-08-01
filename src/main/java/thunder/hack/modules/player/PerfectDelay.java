@@ -10,6 +10,7 @@ import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.TridentItem;
 import net.minecraft.registry.entry.RegistryEntry;
+import thunder.hack.core.impl.ModuleManager;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
@@ -27,18 +28,13 @@ public class PerfectDelay extends Module {
     private final Setting<Boolean> trident = new Setting<>("Trident", true);
 
     private float getEnchantLevel(ItemStack stack) {
-        for (Object2IntMap.Entry<RegistryEntry<Enchantment>> entry : EnchantmentHelper.getEnchantments(stack).getEnchantmentsMap()) {
-            if (entry.getKey().equals(Enchantments.QUICK_CHARGE)) {
-                return entry.getValue();
-            }
-        }
-        return 0;
+        return EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(Enchantments.QUICK_CHARGE).get(), stack);
     }
 
     @Override
     public void onUpdate() {
         if (mc.player.getActiveItem().getItem() instanceof TridentItem && trident.getValue()) {
-            if (mc.player.getItemUseTime() > 9)
+            if (mc.player.getItemUseTime() > (ModuleManager.tridentBoost.isEnabled() ? ModuleManager.tridentBoost.cooldown.getValue() : 9))
                 mc.interactionManager.stopUsingItem(mc.player);
         }
 

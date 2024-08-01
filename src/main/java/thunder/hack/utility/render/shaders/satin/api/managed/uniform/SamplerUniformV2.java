@@ -17,11 +17,8 @@
  */
 package thunder.hack.utility.render.shaders.satin.api.managed.uniform;
 
-import org.apiguardian.api.API;
 
 import java.util.function.IntSupplier;
-
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 public interface SamplerUniformV2 extends SamplerUniform {
     void set(IntSupplier textureSupplier);

@@ -3,6 +3,7 @@ package thunder.hack.gui.windows.impl;
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
@@ -34,6 +35,7 @@ public class ProxyWindow extends WindowBase {
     private ListeningType listeningType;
 
     private String search = "Search", addIp = "Ip", addPort = "Port", addPassword = "Password", addLogin = "Login", addName = "Name";
+    private String[] pinging = new String[]{".", "..", "..."};
 
     private enum ListeningType {
         Name, Ip, Port, Login, Password
@@ -79,14 +81,13 @@ public class ProxyWindow extends WindowBase {
         float posXWidth = getWidth() / 5f;
 
         float portX = ipX + posXWidth + 2;
-        float posYWidth = getWidth() / 6.5f;
+        float posYWidth = getWidth() / 12f;
 
         float posZX = portX + posYWidth + 2;
         float posZWidth = getWidth() / 6.5f;
 
         float serverX = posZX + posZWidth + 2;
         float serverWidth = getWidth() / 6f;
-
 
         {
             boolean hover2 = Render2DEngine.isHovered(mouseX, mouseY, nameX, getY() + 19, nameWidth, 11);
@@ -154,7 +155,7 @@ public class ProxyWindow extends WindowBase {
 
             boolean hover5 = Render2DEngine.isHovered(mouseX, mouseY, posZX, getY() + 36 + getScrollOffset() + proxyPlate.offset, posZWidth, 11);
             Render2DEngine.drawRectWithOutline(context.getMatrices(), posZX, getY() + 36 + getScrollOffset() + proxyPlate.offset, posZWidth, 11, hover5 ? hoveredColor : color, color2);
-            FontRenderers.sf_medium.drawString(context.getMatrices(), hover5 ?  (proxyPlate.proxy.getL() + (listeningId == proxyPlate.id && listeningType == ListeningType.Login ? blink : "")) : "*******"
+            FontRenderers.sf_medium.drawString(context.getMatrices(), hover5 ? (proxyPlate.proxy.getL() + (listeningId == proxyPlate.id && listeningType == ListeningType.Login ? blink : "")) : "*******"
                     , posZX + 2, getY() + 40 + getScrollOffset() + proxyPlate.offset, new Color(0xBDBDBD).getRGB());
 
             boolean hover6 = Render2DEngine.isHovered(mouseX, mouseY, serverX, getY() + 36 + getScrollOffset() + proxyPlate.offset, serverWidth, 11);
@@ -167,11 +168,15 @@ public class ProxyWindow extends WindowBase {
             FontRenderers.icons.drawString(context.getMatrices(), "w", getX() + getWidth() - 15, proxyPlate.offset + getY() + 40 + getScrollOffset(), -1);
             FontRenderers.sf_medium_mini.drawString(context.getMatrices(), id + ".", getX() + 3, getY() + 41 + getScrollOffset() + proxyPlate.offset, textColor);
 
-
             boolean selected = ThunderHack.proxyManager.getActiveProxy() == proxyPlate.proxy;
             boolean hover9 = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 28, getY() + 36 + getScrollOffset() + proxyPlate.offset, 11, 11);
             Render2DEngine.drawRectWithOutline(context.getMatrices(), getX() + getWidth() - 28, getY() + 36 + getScrollOffset() + proxyPlate.offset, 11, 11, hover9 ? hoveredColor : color, color2);
-            FontRenderers.icons.drawString(context.getMatrices(), selected? "i" : "k", getX() + getWidth() - 26, proxyPlate.offset + getY() + 41 + getScrollOffset(), selected ? -1 : Color.GRAY.getRGB());
+            FontRenderers.icons.drawString(context.getMatrices(), selected ? "i" : "k", getX() + getWidth() - 26, proxyPlate.offset + getY() + 41 + getScrollOffset(), selected ? -1 : Color.GRAY.getRGB());
+
+            boolean hover10 = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 51.5f, getY() + 36 + getScrollOffset() + proxyPlate.offset, 21.5f, 11);
+            String ping = proxyPlate.proxy.getPing() <= 0 ? proxyPlate.proxy.getPing() == -1 ? Formatting.RED + "shit" : proxyPlate.proxy.getPing() == -2 ? pinging[(int) (System.currentTimeMillis() / 200 % 3)] : "check" : proxyPlate.proxy.getPing() + "ms";
+            Render2DEngine.drawRectWithOutline(context.getMatrices(), getX() + getWidth() - 51.5f, getY() + 36 + getScrollOffset() + proxyPlate.offset, 21.5f, 11, hover10 ? hoveredColor : color, color2);
+            FontRenderers.sf_medium_mini.drawCenteredString(context.getMatrices(), ping, getX() + getWidth() - 41, proxyPlate.offset + getY() + 40 + getScrollOffset(), hover10 ? -1 : Color.GRAY.getRGB());
         }
         setMaxElementsHeight(proxyPlates.size() * 20);
         Render2DEngine.popWindow();
@@ -195,7 +200,7 @@ public class ProxyWindow extends WindowBase {
         float posXWidth = getWidth() / 5f;
 
         float posYX = posXX + posXWidth + 2;
-        float posYWidth = getWidth() / 6.5f;
+        float posYWidth = getWidth() / 12f;
 
         float posZX = posYX + posYWidth + 2;
         float posZWidth = getWidth() / 6.5f;
@@ -260,6 +265,7 @@ public class ProxyWindow extends WindowBase {
             boolean hoveringPassword = Render2DEngine.isHovered(mouseX, mouseY, serverX, getY() + 36 + getScrollOffset() + proxyPlate.offset, serverWidth, 11);
             boolean hoveringRemove = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 15, getY() + 36 + getScrollOffset() + proxyPlate.offset, 11, 11);
             boolean hoveringSelect = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 28, getY() + 36 + getScrollOffset() + proxyPlate.offset, 11, 11);
+            boolean hoveringCheck = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 51.5f, getY() + 36 + getScrollOffset() + proxyPlate.offset, 21.5f, 11);
 
             if (hoveringName)
                 listeningType = ListeningType.Name;
@@ -275,6 +281,9 @@ public class ProxyWindow extends WindowBase {
 
             if (hoveringPassword)
                 listeningType = ListeningType.Password;
+
+            if (hoveringCheck)
+                ThunderHack.proxyManager.checkPing(proxyPlate.proxy());
 
             if (hoveringName || hoveringIp || hoveringPort || hoveringLogin || hoveringPassword)
                 listeningId = proxyPlate.id;

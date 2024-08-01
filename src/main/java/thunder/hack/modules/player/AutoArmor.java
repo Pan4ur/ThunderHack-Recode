@@ -79,7 +79,7 @@ public class AutoArmor extends Module {
             if (slot != -1) {
                 if ((armorPiece.getPrevProt() == -1 || !oldVersion.getValue()) && slot < 9) {
                     InventoryUtility.saveAndSwitchTo(slot);
-                    sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+                    sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
                     InventoryUtility.returnSlot();
                 } else {
                     if (MovementUtility.isMoving() && noMove.getValue())
@@ -147,13 +147,16 @@ public class AutoArmor extends Module {
             if (is.hasEnchantments()) {
                 ItemEnchantmentsComponent enchants = EnchantmentHelper.getEnchantments(is);
 
-                if (enchants.getEnchantments().contains(Registries.ENCHANTMENT.getEntry(Enchantments.PROTECTION)))
-                    prot += enchants.getLevel(Enchantments.PROTECTION) * protectionMultiplier;
+                //mc.world.getRegistryManager().get(Enchantments.BLAST_PROTECTION.getRegistryRef()).getEntry(Enchantments.BLAST_PROTECTION).get()
 
-                if (enchants.getEnchantments().contains(Registries.ENCHANTMENT.getEntry(Enchantments.BLAST_PROTECTION)))
-                    prot += enchants.getLevel(Enchantments.BLAST_PROTECTION) * blastMultiplier;
 
-                if (enchants.getEnchantments().contains(Registries.ENCHANTMENT.getEntry(Enchantments.BINDING_CURSE)) && ignoreCurse.getValue())
+                if (enchants.getEnchantments().contains(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(Enchantments.PROTECTION).get()))
+                    prot += enchants.getLevel(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(Enchantments.PROTECTION).get()) * protectionMultiplier;
+
+                if (enchants.getEnchantments().contains(mc.world.getRegistryManager().get(Enchantments.BLAST_PROTECTION.getRegistryRef()).getEntry(Enchantments.BLAST_PROTECTION).get()))
+                    prot += enchants.getLevel(mc.world.getRegistryManager().get(Enchantments.BLAST_PROTECTION.getRegistryRef()).getEntry(Enchantments.BLAST_PROTECTION).get()) * blastMultiplier;
+
+                if (enchants.getEnchantments().contains(mc.world.getRegistryManager().get(Enchantments.BLAST_PROTECTION.getRegistryRef()).getEntry(Enchantments.BINDING_CURSE).get()) && ignoreCurse.getValue())
                     prot = -999;
             }
 

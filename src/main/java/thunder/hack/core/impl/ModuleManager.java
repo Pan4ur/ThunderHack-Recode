@@ -35,6 +35,7 @@ public class ModuleManager implements IManager {
     public static InventoryCleaner inventoryCleaner = new InventoryCleaner();
     public static NoCommentExploit noCommentExploit = new NoCommentExploit();
     public static NoWaterCollision noWaterCollision = new NoWaterCollision();
+    public static BaritoneSettings baritoneSettings = new BaritoneSettings();
     public static PortalInventory portalInventory = new PortalInventory();
     public static TotemPopCounter totemPopCounter = new TotemPopCounter();
     public static HotbarReplenish hotbarReplenish = new HotbarReplenish();
@@ -42,6 +43,7 @@ public class ModuleManager implements IManager {
     public static AutoCrystalBase autoCrystalBase = new AutoCrystalBase();
     public static CrosshairArrows crosshairArrows = new CrosshairArrows();
     public static PearlBlockThrow pearlBlockThrow = new PearlBlockThrow();
+    public static AutoCrystalInfo autoCrystalInfo = new AutoCrystalInfo();
     public static ChatTranslator chatTranslator = new ChatTranslator();
     public static PacketCanceler packetCanceler = new PacketCanceler();
     public static ClientSettings clientSettings = new ClientSettings();
@@ -65,6 +67,7 @@ public class ModuleManager implements IManager {
     public static AntiServerAdd antiServerAdd = new AntiServerAdd();
     public static AntiLegitMiss antiLegitMiss = new AntiLegitMiss();
     public static AntiBallPlace antiBallPlace = new AntiBallPlace();
+    public static TridentBoost tridentBoost = new TridentBoost();
     public static Trajectories trajectories = new Trajectories();
     public static TargetStrafe targetStrafe = new TargetStrafe();
     public static RadarRewrite radarRewrite = new RadarRewrite();
@@ -81,6 +84,7 @@ public class ModuleManager implements IManager {
     public static TotemCounter totemCounter = new TotemCounter();
     public static PerfectDelay perfectDelay = new PerfectDelay();
     public static ChestCounter chestCounter = new ChestCounter();
+    public static UnfocusedCPU unfocusedCPU = new UnfocusedCPU();
     public static StashLogger stashLogger = new StashLogger();
     public static FastLatency fastLatency = new FastLatency();
     public static PearlChaser pearlChaser = new PearlChaser();
@@ -158,8 +162,6 @@ public class ModuleManager implements IManager {
     public static MemoryHud memoryHud = new MemoryHud();
     public static Companion companion = new Companion();
     public static AntiCrash antiCrash = new AntiCrash();
-    public static UnfocusedCPU unfocusedCPU = new UnfocusedCPU();
-    public static BaritoneSettings baritoneSettings = new BaritoneSettings();
     public static AutoGear autoGear = new AutoGear();
     public static ViewLock viewLock = new ViewLock();
     public static Velocity velocity = new Velocity();
@@ -193,6 +195,7 @@ public class ModuleManager implements IManager {
     public static AutoWalk autoWalk = new AutoWalk();
     public static AutoSign autoSign = new AutoSign();
     public static BlockESP blockESP = new BlockESP();
+    public static SafeWalk safeWalk = new SafeWalk();
     public static Windows windows = new Windows();
     public static Breaker breaker = new Breaker();
     public static AutoEat autoEat = new AutoEat();
@@ -260,7 +263,6 @@ public class ModuleManager implements IManager {
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
     public static RPC rpc = new RPC();
-    public static SafeWalk safeWalk = new SafeWalk();
 
     public ModuleManager() {
         for (Field field : getClass().getDeclaredFields()) {

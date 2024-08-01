@@ -1,10 +1,12 @@
 package thunder.hack.modules.combat;
 
+import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.sound.SoundCategory;
@@ -13,7 +15,6 @@ import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thunder.hack.ThunderHack;
-import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.modules.base.PlaceModule;
@@ -22,9 +23,7 @@ import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.world.HoleUtility;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
@@ -92,8 +91,7 @@ public final class Surround extends PlaceModule {
             return;
         }
 
-        if (!getBlockResult().found())
-            disable(isRu() ? "Нет блоков!" : "No blocks!");
+        if (!getBlockResult().found()) disable(isRu() ? "Нет блоков!" : "No blocks!");
 
 
         int placed = 0;
@@ -102,8 +100,7 @@ public final class Surround extends PlaceModule {
             if (!getBlockResult().found()) disable(isRu() ? "Нет блоков!" : "No blocks!");
 
             BlockPos targetBlock = getSequentialPos();
-            if (targetBlock == null)
-                break;
+            if (targetBlock == null) break;
 
             if (placeBlock(targetBlock, true)) {
                 placed++;
@@ -131,39 +128,33 @@ public final class Surround extends PlaceModule {
         if (event.getPacket() instanceof BlockUpdateS2CPacket pac && mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value() && pac.getState().isReplaceable())
             handlePacket();
 
-        if (event.getPacket() instanceof ExplosionS2CPacket p
-                && mc.player.squaredDistanceTo(p.getX(), p.getY(), p.getZ()) < range.getPow2Value())
+        if (event.getPacket() instanceof ExplosionS2CPacket p && mc.player.squaredDistanceTo(p.getX(), p.getY(), p.getZ()) < range.getPow2Value())
             handlePacket();
 
-        if (event.getPacket() instanceof PlaySoundS2CPacket p
-                && p.getCategory().equals(SoundCategory.BLOCKS)
-                && p.getSound().value().equals(SoundEvents.ENTITY_GENERIC_EXPLODE)
-                && mc.player.squaredDistanceTo(p.getX(), p.getY(), p.getZ()) < range.getPow2Value())
+        if (event.getPacket() instanceof PlaySoundS2CPacket p && p.getCategory().equals(SoundCategory.BLOCKS) && p.getSound().value().equals(SoundEvents.ENTITY_GENERIC_EXPLODE) && mc.player.squaredDistanceTo(p.getX(), p.getY(), p.getZ()) < range.getPow2Value())
             handlePacket();
 
-        if (event.getPacket() instanceof PlayerPositionLookS2CPacket)
-            if (onTp.getValue() == OnTpAction.Disable) {
-                disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to a rubberband!");
-            }
+        if (event.getPacket() instanceof PlayerPositionLookS2CPacket) if (onTp.getValue() == OnTpAction.Disable) {
+            disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to a rubberband!");
+        }
     }
 
     private void handlePacket() {
         BlockPos bp = getSequentialPos();
         if (bp != null) {
-            if (placeBlock(bp, InteractMode.Packet))
-                inactivityTimer.reset();
+            if (placeBlock(bp, InteractMode.Packet)) inactivityTimer.reset();
         }
     }
 
     private @Nullable BlockPos getSequentialPos() {
         for (BlockPos bp : getBlocks()) {
-            if (new Box(bp).intersects(mc.player.getBoundingBox()))
-                continue;
+            if (new Box(bp).intersects(mc.player.getBoundingBox())) continue;
             if (InteractionUtility.canPlaceBlock(bp, interact.getValue(), true) && mc.world.getBlockState(bp).isReplaceable())
                 return bp;
         }
         return null;
     }
+
 
     private @NotNull List<BlockPos> getBlocks() {
         final BlockPos playerPos = getPlayerPos();

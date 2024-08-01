@@ -37,6 +37,7 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 
 import static thunder.hack.modules.combat.Criticals.getEntity;
 import static thunder.hack.modules.combat.Criticals.getInteractType;
@@ -83,19 +84,23 @@ public class LegitHelper extends Module {
             ThunderHack.asyncManager.run(() -> {
                 mc.player.getInventory().selectedSlot = anchorSlot;
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(anchorSlot));
-                AsyncManager.sleep(anchorDelay.getValue());
-                ((IMinecraftClient) mc).idoItemUse();
-                AsyncManager.sleep(anchorDelay.getValue());
+            });
+
+            ThunderHack.asyncManager.run(() -> mc.executeSync(() -> ((IMinecraftClient) mc).idoItemUse()), anchorDelay.getValue());
+
+            ThunderHack.asyncManager.run(() -> {
                 mc.player.getInventory().selectedSlot = glowSlot;
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(glowSlot));
-                AsyncManager.sleep(anchorDelay.getValue());
-                ((IMinecraftClient) mc).idoItemUse();
-                AsyncManager.sleep(anchorDelay.getValue());
+            }, anchorDelay.getValue() * 2);
+
+            ThunderHack.asyncManager.run(() -> mc.executeSync(() -> ((IMinecraftClient) mc).idoItemUse()), anchorDelay.getValue() * 3L);
+
+            ThunderHack.asyncManager.run(() -> {
                 mc.player.getInventory().selectedSlot = prevSlot;
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
-                AsyncManager.sleep(anchorDelay.getValue());
-                ((IMinecraftClient) mc).idoItemUse();
-            });
+            }, anchorDelay.getValue() * 4);
+
+            ThunderHack.asyncManager.run(() -> mc.executeSync(() -> ((IMinecraftClient) mc).idoItemUse()), anchorDelay.getValue() * 5L);
 
             return;
         }
@@ -116,14 +121,16 @@ public class LegitHelper extends Module {
 
             int prevSlot = mc.player.getInventory().selectedSlot;
 
+            if (!obbyAtCrosshair) {
+                mc.player.getInventory().selectedSlot = obbySlot;
+                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(obbySlot));
+                ((IMinecraftClient) mc).idoItemUse();
+            }
+
             ThunderHack.asyncManager.run(() -> {
-                if (!obbyAtCrosshair) {
-                    mc.player.getInventory().selectedSlot = obbySlot;
-                    mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(obbySlot));
+                if (!obbyAtCrosshair)
                     AsyncManager.sleep(crystalDelay.getValue());
-                    ((IMinecraftClient) mc).idoItemUse();
-                    AsyncManager.sleep(crystalDelay.getValue());
-                }
+
                 mc.player.getInventory().selectedSlot = crystalSlot;
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(crystalSlot));
                 AsyncManager.sleep(crystalDelay.getValue());
@@ -150,6 +157,7 @@ public class LegitHelper extends Module {
                 return;
 
             int prevSlot = mc.player.getInventory().selectedSlot;
+
             ThunderHack.asyncManager.run(() -> {
                 AsyncManager.sleep(breakerDelay.getValue());
                 mc.player.getInventory().selectedSlot = axeSlot;
@@ -245,9 +253,9 @@ public class LegitHelper extends Module {
     }
 
     private BlockPos calcTrajectory(float yaw) {
-        double x = Render2DEngine.interpolate(mc.player.prevX, mc.player.getX(), mc.getTickDelta());
-        double y = Render2DEngine.interpolate(mc.player.prevY, mc.player.getY(), mc.getTickDelta());
-        double z = Render2DEngine.interpolate(mc.player.prevZ, mc.player.getZ(), mc.getTickDelta());
+        double x = Render2DEngine.interpolate(mc.player.prevX, mc.player.getX(), Render3DEngine.getTickDelta());
+        double y = Render2DEngine.interpolate(mc.player.prevY, mc.player.getY(), Render3DEngine.getTickDelta());
+        double z = Render2DEngine.interpolate(mc.player.prevZ, mc.player.getZ(), Render3DEngine.getTickDelta());
 
         y = y + mc.player.getEyeHeight(mc.player.getPose()) - 0.1000000014901161;
 

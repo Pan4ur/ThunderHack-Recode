@@ -9,6 +9,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -80,7 +81,6 @@ public final class SpeedMine extends Module {
     private Direction mineFacing;
     private int mineBreaks;
     public static float progress, prevProgress;
-    public boolean worth = false;
 
     private final Timer attackTimer = new Timer();
 
@@ -131,6 +131,9 @@ public final class SpeedMine extends Module {
                 if (hotBarPickSlot == -1 && switchMode.getValue() != SwitchMode.Alternative) return;
 
                 if (progress >= 1) {
+                    if (placeCrystal.getValue())
+                        placeCrystal();
+
                     if (switchMode.getValue() == SwitchMode.Alternative) {
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, invPickSlot < 9 ? invPickSlot + 36 : invPickSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
                         closeScreen();
@@ -198,16 +201,8 @@ public final class SpeedMine extends Module {
                 if (hotBarPickSlot == -1 && switchMode.getValue() != SwitchMode.Alternative) return;
 
                 if (progress >= 1) {
-                    if (placeCrystal.getValue()) {
-                        AutoCrystal.PlaceData placeCrystalData = ModuleManager.autoCrystal.getPlaceData(SpeedMine.minePosition, null, mc.player.getPos());
-                        if (placeCrystalData != null) {
-                            ModuleManager.autoCrystal.placeCrystal(placeCrystalData.bhr(), true, false);
-                            debug("placing..");
-                        } else
-                            debug("placeCrystalData is null");
-                        ModuleManager.autoTrap.pause();
-                        ModuleManager.breaker.pause();
-                    }
+                    if (placeCrystal.getValue())
+                        placeCrystal();
 
                     if (switchMode.getValue() == SwitchMode.Alternative) {
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, invPickSlot < 9 ? invPickSlot + 36 : invPickSlot, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
@@ -235,6 +230,9 @@ public final class SpeedMine extends Module {
 
                     progress = 0;
                     mineBreaks++;
+
+                    if (placeCrystal.getValue())
+                        placeCrystal();
                 }
                 prevProgress = progress;
                 progress += getBlockStrength(mc.world.getBlockState(minePosition), minePosition) * (mineBreaks >= 1 ? rebreakfactor.getValue() : 1);
@@ -247,7 +245,6 @@ public final class SpeedMine extends Module {
 
     @Override
     public void onRender3D(MatrixStack stack) {
-        worth = checkWorth();
 
         if (mode.getValue() == Mode.Damage
                 || mc.world == null
@@ -258,7 +255,7 @@ public final class SpeedMine extends Module {
         switch (renderMode.getValue()) {
             case Shrink -> {
                 Box shrunkMineBox = new Box(minePosition.getX(), minePosition.getY(), minePosition.getZ(), minePosition.getX(), minePosition.getY(), minePosition.getZ());
-                float noom = (float) MathUtility.clamp(Render2DEngine.interpolate(prevProgress, progress, mc.getTickDelta()), 0f, 1f);
+                float noom = (float) MathUtility.clamp(Render2DEngine.interpolate(prevProgress, progress, Render3DEngine.getTickDelta()), 0f, 1f);
 
                 Render3DEngine.FILLED_QUEUE.add(
                         new Render3DEngine.FillAction(
@@ -276,7 +273,7 @@ public final class SpeedMine extends Module {
                 );
             }
             case Grow -> {
-                float noom = (float) MathUtility.clamp(Render2DEngine.interpolate(prevProgress, progress, mc.getTickDelta()), 0f, 1f);
+                float noom = (float) MathUtility.clamp(Render2DEngine.interpolate(prevProgress, progress, Render3DEngine.getTickDelta()), 0f, 1f);
                 Box shrunkMineBox = new Box(minePosition.getX(), minePosition.getY(), minePosition.getZ(), minePosition.getX() + 1, minePosition.getY() + noom, minePosition.getZ() + 1);
 
                 Render3DEngine.FILLED_QUEUE.add(
@@ -330,7 +327,7 @@ public final class SpeedMine extends Module {
     @SuppressWarnings("unused")
     private void onSync(EventSync event) {
         if (rotate.getValue() && progress > 0.95 && minePosition != null && mc.player != null) {
-            float[] angle = PlayerManager.calcAngle(mc.player.getEyePos(), minePosition.toCenterPos());
+            float[] angle = PlayerManager.calcAngle(mc.player.getEyePos(), minePosition.toCenterPos().add(0, -0.25f, 0));
 
             mc.player.setYaw(angle[0]);
             mc.player.setPitch(angle[1]);
@@ -357,40 +354,6 @@ public final class SpeedMine extends Module {
         if (mc.player == null) return;
 
         sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-    }
-
-    private boolean checkWorth() {
-        return checkWorth(7.5f, minePosition);
-    }
-
-    public boolean checkWorth(float damage, BlockPos pos) {
-        if (isDisabled()
-                || mode.getValue() == Mode.Damage
-                || pos == null
-                || mc.world == null
-                || progress < 0.95
-                || mc.world.getBlockState(pos).getBlock() != Blocks.OBSIDIAN)
-            return false;
-
-        for (PlayerEntity player : ThunderHack.asyncManager.getAsyncPlayers()) {
-            if (player == null
-                    || player == mc.player
-                    || ThunderHack.friendManager.isFriend(player))
-                continue;
-
-            BlockState currentState = mc.world.getBlockState(pos);
-            mc.world.removeBlock(pos, false);
-            float dmg = ExplosionUtility.getExplosionDamage(pos.toCenterPos(), player, false);
-            float selfDamage = ExplosionUtility.getExplosionDamage(pos.toCenterPos(), mc.player, false);
-            mc.world.setBlockState(pos, currentState);
-
-            boolean overrideDamage = ModuleManager.autoCrystal.shouldOverrideDamage(damage, selfDamage);
-
-            if (dmg > damage && ModuleManager.autoCrystal.isSafe(dmg, selfDamage, overrideDamage))
-                return true;
-        }
-
-        return false;
     }
 
     private float getBlockStrength(@NotNull BlockState state, BlockPos position) {
@@ -423,10 +386,13 @@ public final class SpeedMine extends Module {
         float digSpeed = getDestroySpeed(position, state);
 
         if (digSpeed > 1) {
-            ItemStack itemstack = mc.player.getInventory().getStack(getTool(position));
-            int efficiencyModifier = EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, itemstack);
-            if (efficiencyModifier > 0 && !itemstack.isEmpty()) {
-                digSpeed += (float) (StrictMath.pow(efficiencyModifier, 2) + 1);
+            int slot = getTool(position);
+            if (slot != -1) {
+                ItemStack itemstack = mc.player.getInventory().getStack(slot);
+                int efficiencyModifier = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.EFFICIENCY.getRegistryRef()).getEntry(Enchantments.EFFICIENCY).get(), itemstack);
+                if (efficiencyModifier > 0 && !itemstack.isEmpty()) {
+                    digSpeed += (float) (StrictMath.pow(efficiencyModifier, 2) + 1);
+                }
             }
         }
 
@@ -438,7 +404,9 @@ public final class SpeedMine extends Module {
             digSpeed *= (float) Math.pow(0.3f, Objects.requireNonNull(mc.player.getStatusEffect(StatusEffects.MINING_FATIGUE)).getAmplifier() + 1);
 
 
-        if (mc.player.isSubmergedInWater() && !EnchantmentHelper.hasAquaAffinity(mc.player)) digSpeed /= 5;
+        if (mc.player.isSubmergedInWater())
+            digSpeed *= (float) mc.player.getAttributeInstance(EntityAttributes.PLAYER_SUBMERGED_MINING_SPEED).getValue();
+
         if (!mc.player.isOnGround()) digSpeed /= 5;
 
         return digSpeed < 0 ? 0 : digSpeed * factor.getValue();
@@ -460,7 +428,7 @@ public final class SpeedMine extends Module {
                 if (!(stack.getMaxDamage() - stack.getDamage() > 10))
                     continue;
 
-                final float digSpeed = EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, stack);
+                final float digSpeed = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(Enchantments.EFFICIENCY).get(), stack);
                 final float destroySpeed = stack.getMiningSpeedMultiplier(mc.world.getBlockState(pos));
 
                 if (digSpeed + destroySpeed > currentFastest) {
@@ -498,12 +466,38 @@ public final class SpeedMine extends Module {
                 fixColorValue(startColor.getAlpha() + (int) (aDiff * progress)));
     }
 
-    private int fixColorValue(int colorVal) {
-        return colorVal > 255 ? 255 : Math.max(colorVal, 0);
+    public void placeCrystal() {
+        AutoCrystal.PlaceData data = getBestData();
+
+        if (data != null) {
+            ModuleManager.autoCrystal.placeCrystal(data.bhr(), true, false);
+            debug("placing..");
+            ModuleManager.autoTrap.pause();
+            ModuleManager.breaker.pause();
+        }
     }
 
-    public boolean isWorth() {
-        return worth;
+
+    public AutoCrystal.PlaceData getBestData() {
+        if (mc.world.isAir(minePosition.down())) {
+            AutoCrystal.PlaceData autoMineData = ModuleManager.autoCrystal.getPlaceData(minePosition, null, mc.player.getPos());
+            if (autoMineData != null)
+                return autoMineData;
+        }
+
+        for (Direction dir : Direction.values()) {
+            if (dir == Direction.UP || dir == Direction.DOWN) continue;
+            AutoCrystal.PlaceData autoMineData = ModuleManager.autoCrystal.getPlaceData(minePosition.down().offset(dir), null, mc.player.getPos());
+            if (autoMineData != null)
+                return autoMineData;
+        }
+
+        AutoCrystal.PlaceData autoMineData = ModuleManager.autoCrystal.getPlaceData(minePosition, null, mc.player.getPos());
+        return autoMineData;
+    }
+
+    private int fixColorValue(int colorVal) {
+        return colorVal > 255 ? 255 : Math.max(colorVal, 0);
     }
 
     public void addBlockToMine(BlockPos pos, @Nullable Direction facing, boolean allowReMine) {

@@ -17,10 +17,6 @@
  */
 package thunder.hack.utility.render.shaders.satin.api.managed.uniform;
 
-import org.apiguardian.api.API;
-
-import static org.apiguardian.api.API.Status.MAINTAINED;
-
 public interface Uniform2i {
     void set(int value0, int value1);
 }

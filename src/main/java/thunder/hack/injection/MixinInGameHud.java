@@ -1,6 +1,7 @@
 package thunder.hack.injection;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.Entity;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import org.spongepowered.asm.mixin.Unique;
@@ -15,6 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import thunder.hack.utility.render.Render3DEngine;
 
 import static thunder.hack.core.IManager.mc;
 
@@ -22,7 +24,7 @@ import static thunder.hack.core.IManager.mc;
 public abstract class MixinInGameHud {
 
     @Inject(at = @At(value = "HEAD"), method = "render")
-    public void renderHook(DrawContext context, float tickDelta, CallbackInfo ci) {
+    public void renderHook(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if(Module.fullNullCheck()) return;
         ThunderHack.moduleManager.onRender2D(context);
         ThunderHack.notificationManager.onRender2D(context);
@@ -36,18 +38,18 @@ public abstract class MixinInGameHud {
     }
 
     @Inject(at = @At(value = "HEAD"), method = "renderHotbar", cancellable = true)
-    public void renderHotbarCustom(DrawContext context, float tickDelta, CallbackInfo ci) {
+    public void renderHotbarCustom(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (mc != null && mc.currentScreen instanceof WindowsScreen)
             ci.cancel();
 
         if (ModuleManager.hotbar.isEnabled()) {
             ci.cancel();
-            Hotbar.renderHotBarItems(tickDelta, context);
+            Hotbar.renderHotBarItems(tickCounter.getTickDelta(true), context);
         }
     }
 
     @Inject(at = @At(value = "HEAD"), method = "renderStatusEffectOverlay", cancellable = true)
-    public void renderStatusEffectOverlayHook(DrawContext context, float tickDelta, CallbackInfo ci) {
+    public void renderStatusEffectOverlayHook(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (ModuleManager.potionHud.isEnabled() || (ModuleManager.legacyHud.isEnabled() && ModuleManager.legacyHud.potions.getValue())) {
             ci.cancel();
         }
@@ -84,9 +86,8 @@ public abstract class MixinInGameHud {
     }
 
     @Inject(method = "renderCrosshair", at = @At(value = "HEAD"), cancellable = true)
-    public void renderCrosshair(DrawContext context, float tickDelta, CallbackInfo ci) {
-        if (ModuleManager.crosshair.isEnabled()) {
+    public void renderCrosshair(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+        if (ModuleManager.crosshair.isEnabled())
             ci.cancel();
-        }
     }
 }

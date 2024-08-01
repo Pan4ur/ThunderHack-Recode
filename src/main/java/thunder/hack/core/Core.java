@@ -83,7 +83,7 @@ public final class Core {
         });
 
         if(autoSave.every(600000)) {
-            FriendManager.saveFriends();
+            ThunderHack.friendManager.saveFriends();
             ThunderHack.configManager.save(ThunderHack.configManager.getCurrentConfig());
             ThunderHack.wayPointManager.saveWayPoints();
             ThunderHack.macroManager.saveMacro();
@@ -142,7 +142,7 @@ public final class Core {
             setBackTimer.reset();
 
             if(autoSave.every(200000)) {
-                FriendManager.saveFriends();
+                ThunderHack.friendManager.saveFriends();
                 ThunderHack.configManager.save(ThunderHack.configManager.getCurrentConfig());
                 ThunderHack.wayPointManager.saveWayPoints();
                 ThunderHack.macroManager.saveMacro();

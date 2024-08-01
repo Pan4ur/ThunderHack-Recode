@@ -17,10 +17,7 @@
  */
 package thunder.hack.utility.render.shaders.satin.api.managed.uniform;
 
-import org.apiguardian.api.API;
 import org.joml.Vector4f;
-
-import static org.apiguardian.api.API.Status.MAINTAINED;
 
 public interface Uniform4f {
     void set(float value0, float value1, float value2, float value3);

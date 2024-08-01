@@ -7,14 +7,13 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
 import static thunder.hack.modules.Module.mc;
 
 public class DialogScreen extends Screen {
-    private final Identifier questionPic = new Identifier("thunderhack", "textures/gui/helper/pic1.png");
-
     private final String header;
     private final String description;
     private final String yesText;
@@ -53,7 +52,7 @@ public class DialogScreen extends Screen {
         Render2DEngine.drawHudBase(context.getMatrices(), mainX + 125, mainY + 95, 110, 40, 15, false);
         FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), noText, mainX + 180f, mainY + 112, noHovered(mouseX, mouseY) ? -1 : new Color(0xABFFFFFF, true).getRGB());
 
-        context.drawTexture(questionPic, (int) (mainX + (mainWidth / 2f) - 35), (int) mainY + 25, 0, 0, 70, 65, 70, 65);
+        context.drawTexture(TextureStorage.questionPic, (int) (mainX + (mainWidth / 2f) - 35), (int) mainY + 25, 0, 0, 70, 65, 70, 65);
     }
 
     private boolean isHovered(int mouseX, int mouseY, int x, int y, int width, int height) {

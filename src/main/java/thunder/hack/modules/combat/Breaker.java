@@ -51,16 +51,12 @@ public final class Breaker extends Module {
     private void onSync(EventSync event) {
         PlayerEntity target;
 
-        if (targetMode.is(Target.Breaker)) {
+        if (targetMode.is(Target.Breaker))
             target = ThunderHack.combatManager.getTarget(range.getValue(), targetBy.getValue());
-        } else {
+        else
             target = AutoCrystal.target;
-        }
 
         if (target == null)
-            return;
-
-        if (onlyIfHole.getValue() && !HoleUtility.isHole(BlockPos.ofFloored(target.getPos())))
             return;
 
         BlockPos burrow = BlockPos.ofFloored(target.getPos());
@@ -104,11 +100,13 @@ public final class Breaker extends Module {
             }
         }
 
+        if (onlyIfHole.getValue() && !HoleUtility.isHole(BlockPos.ofFloored(target.getPos())))
+            return;
+
         if (burrowState.getBlock() == Blocks.OBSIDIAN || burrowState.getBlock() == Blocks.ENDER_CHEST) {
             blockPos = burrow;
             return;
         }
-
 
         for (int x = -2; x <= 2; x++) {
             for (int y = 0; y <= 3; y++) {

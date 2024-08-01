@@ -11,6 +11,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 import java.util.Objects;
@@ -20,7 +21,6 @@ public class Coords extends HudElement {
         super("Coords", 100, 10);
     }
 
-    private final Identifier icon = new Identifier("thunderhack", "textures/hud/icons/coords.png");
     private final Setting<NetherCoords> netherCoords = new Setting<>("NetherCoords", NetherCoords.On);
 
     private enum NetherCoords {
@@ -49,7 +49,7 @@ public class Coords extends HudElement {
 
             Render2DEngine.setupRender();
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-            RenderSystem.setShaderTexture(0, icon);
+            RenderSystem.setShaderTexture(0, TextureStorage.coordsIcon);
             Render2DEngine.renderGradientTexture(context.getMatrices(), pX + 2, getPosY() + 1, 10, 10, 0, 0, 512, 512, 512, 512,
                     HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
             Render2DEngine.endRender();

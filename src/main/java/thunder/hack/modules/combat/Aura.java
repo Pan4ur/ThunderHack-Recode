@@ -87,6 +87,7 @@ public class Aura extends Module {
     public final Setting<ESP> esp = new Setting<>("ESP", ESP.ThunderHack);
     public final Setting<Sort> sort = new Setting<>("Sort", Sort.LowestDistance);
     public final Setting<Boolean> lockTarget = new Setting<>("LockTarget", true);
+    public final Setting<Boolean> elytraTarget = new Setting<>("ElytraTarget", true);
 
     /*   ADVANCED   */
     public final Setting<SettingGroup> advanced = new Setting<>("Advanced", new SettingGroup(false, 0));
@@ -139,7 +140,9 @@ public class Aura extends Module {
 
     public static Entity target;
 
-    public float rotationYaw, rotationPitch, pitchAcceleration = 1f, prevYaw;
+    public float rotationYaw;
+    public float rotationPitch;
+    public float pitchAcceleration = 1f;
 
     private Vec3d rotationPoint = Vec3d.ZERO;
     private Vec3d rotationMotion = Vec3d.ZERO;
@@ -253,7 +256,7 @@ public class Aura extends Module {
             enableSprint();
 
         if (block && unpressShield.getValue())
-            sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id));
+            sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id, rotationYaw, rotationPitch));
 
         if (rotationMode.is(Mode.Grim))
             sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
@@ -272,14 +275,14 @@ public class Aura extends Module {
     }
 
     public void resolvePlayers() {
-        if (resolver.getValue() != Resolver.Off)
+        if (resolver.not(Resolver.Off))
             for (PlayerEntity player : mc.world.getPlayers())
                 if (player instanceof OtherClientPlayerEntity)
                     ((IOtherClientPlayerEntity) player).resolve(resolver.getValue());
     }
 
     public void restorePlayers() {
-        if (resolver.getValue() != Resolver.Off)
+        if (resolver.not(Resolver.Off))
             for (PlayerEntity player : mc.world.getPlayers())
                 if (player instanceof OtherClientPlayerEntity)
                     ((IOtherClientPlayerEntity) player).releaseResolver();
@@ -518,18 +521,12 @@ public class Aura extends Module {
         float delta_pitch = ((float) (-Math.toDegrees(Math.atan2(targetVec.y - (mc.player.getPos().y + mc.player.getEyeHeight(mc.player.getPose())), Math.sqrt(Math.pow((targetVec.x - mc.player.getX()), 2) + Math.pow(targetVec.z - mc.player.getZ(), 2))))) - rotationPitch);
 
         float yawStep = rotationMode.getValue() != Mode.Track ? 360f : random(minYawStep.getValue(), maxYawStep.getValue());
-        float pitchStep = rotationMode.getValue() != Mode.Track ? 180f : pitchAcceleration + random(-1f, 1f);
+        float pitchStep = rotationMode.getValue() != Mode.Track ? 180f : ThunderHack.playerManager.ticksElytraFlying > 5 ? 180 : (pitchAcceleration + random(-1f, 1f));
 
         if (ready)
             switch (accelerateOnHit.getValue()) {
-                case Off -> {
-                }
-                case Yaw -> {
-                    yawStep = 180f;
-                }
-                case Pitch -> {
-                    pitchStep = 90f;
-                }
+                case Yaw -> yawStep = 180f;
+                case Pitch -> pitchStep = 90f;
                 case Both -> {
                     yawStep = 180f;
                     pitchStep = 90f;
@@ -575,8 +572,8 @@ public class Aura extends Module {
         }
 
         if (clientLook.getValue() && rotationMode.getValue() != Mode.None) {
-            mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.prevYaw, rotationYaw, mc.getTickDelta()));
-            mc.player.setPitch((float) Render2DEngine.interpolate(mc.player.prevPitch, rotationPitch, mc.getTickDelta()));
+            mc.player.setYaw((float) Render2DEngine.interpolate(mc.player.prevYaw, rotationYaw, Render3DEngine.getTickDelta()));
+            mc.player.setPitch((float) Render2DEngine.interpolate(mc.player.prevPitch, rotationPitch, Render3DEngine.getTickDelta()));
         }
     }
 

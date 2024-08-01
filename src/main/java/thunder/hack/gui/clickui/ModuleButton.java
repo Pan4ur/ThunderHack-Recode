@@ -6,7 +6,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -23,6 +22,7 @@ import thunder.hack.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.*;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.render.TextureStorage;
 import thunder.hack.utility.render.animation.AnimationUtility;
 import thunder.hack.utility.render.animation.GearAnimation;
@@ -30,7 +30,6 @@ import thunder.hack.utility.render.animation.GearAnimation;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static thunder.hack.modules.Module.mc;
 import static thunder.hack.modules.client.ClientSettings.isRu;
@@ -125,7 +124,7 @@ public class ModuleButton extends AbstractButton {
                         Render2DEngine.injectAlpha(HudEditor.getColor(90).darker(), 110));
                 RenderSystem.disableBlend();
                 context.getMatrices().translate(px, py, 0.0F);
-                context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) Render2DEngine.interpolate(mc.player.age - 1, mc.player.age, mc.getTickDelta()) * -4f));
+                context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) Render2DEngine.interpolate(mc.player.age - 1, mc.player.age, Render3DEngine.getTickDelta()) * -4f));
                 context.getMatrices().translate(-px, -py, 0.0F);
                 context.getMatrices().pop();
                 Render2DEngine.popWindow();
@@ -292,7 +291,8 @@ public class ModuleButton extends AbstractButton {
             }
 
             if (button == 0) {
-                module.toggle();
+                if (module.isToggleable())
+                    module.toggle();
             } else if (button == 1 && (module.getSettings().size() > 3)) {
                 setOpen(!isOpen());
 

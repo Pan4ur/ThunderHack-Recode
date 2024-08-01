@@ -85,7 +85,7 @@ public class ElytraSwap extends Module {
             return;
         }
 
-        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
         sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
         if (fireWorkMode.getValue() == FireWorkMode.Silent) {

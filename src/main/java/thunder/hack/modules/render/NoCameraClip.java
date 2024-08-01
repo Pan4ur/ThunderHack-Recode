@@ -23,7 +23,7 @@ public class NoCameraClip extends Module {
             mc.options.setPerspective(Perspective.FIRST_PERSON);
     }
 
-    public double getDistance() {
+    public float getDistance() {
         return 1f + ((distance.getValue() - 1f) * animation);
     }
 }

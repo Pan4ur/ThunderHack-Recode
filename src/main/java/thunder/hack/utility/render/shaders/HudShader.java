@@ -1,40 +1,37 @@
 package thunder.hack.utility.render.shaders;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.gl.GlUniform;
-import net.minecraft.client.gl.SimpleFramebuffer;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
-import org.lwjgl.opengl.GL30;
 import thunder.hack.modules.client.HudEditor;
-import thunder.hack.utility.render.WindowResizeCallback;
+import thunder.hack.utility.render.shaders.satin.api.managed.ManagedCoreShader;
+import thunder.hack.utility.render.shaders.satin.api.managed.ShaderEffectManager;
+import thunder.hack.utility.render.shaders.satin.api.managed.uniform.Uniform1f;
+import thunder.hack.utility.render.shaders.satin.api.managed.uniform.Uniform2f;
+import thunder.hack.utility.render.shaders.satin.api.managed.uniform.Uniform4f;
 
 import java.awt.*;
 
 import static thunder.hack.modules.Module.mc;
 
-public class HudShader extends GlProgram {
+public class HudShader {
+    private Uniform2f uSize;
+    private Uniform2f uLocation;
+    private Uniform1f radius;
+    private Uniform1f blend;
+    private Uniform1f alpha;
+    private Uniform1f outline;
+    private Uniform1f glow;
+    private Uniform4f color1;
+    private Uniform4f color2;
+    private Uniform4f color3;
+    private Uniform4f color4;
 
-    private GlUniform uSize;
-    private GlUniform uLocation;
-    private GlUniform radius;
-    private GlUniform blend;
-    private GlUniform alpha;
-    private GlUniform outline;
-    private GlUniform glow;
-    private GlUniform color1;
-    private GlUniform color2;
-    private GlUniform color3;
-    private GlUniform color4;
-
-    private Framebuffer input;
+    public static final ManagedCoreShader HUD_SHADER = ShaderEffectManager.getInstance()
+            .manageCoreShader(Identifier.of("thunderhack", "hudshader"), VertexFormats.POSITION);
 
     public HudShader() {
-        super(new Identifier("thunderhack", "hudshader"), VertexFormats.POSITION);
-        WindowResizeCallback.EVENT.register((client, window) -> {
-            if (input != null) input.resize(window.getFramebufferWidth(), window.getFramebufferHeight(), MinecraftClient.IS_SYSTEM_MAC);
-        });
+        setup();
     }
 
     public void setParameters(float x, float y, float width, float height, float r, float externalAlpha, float internalAlpha) {
@@ -43,10 +40,10 @@ public class HudShader extends GlProgram {
         uLocation.set(x * i, -y * i + mc.getWindow().getScaledHeight() * i - height * i);
         uSize.set(width * i, height * i);
 
-        Color c1 =  HudEditor.getColor(270);
-        Color c2 =  HudEditor.getColor(0);
-        Color c3 =  HudEditor.getColor(180);
-        Color c4 =  HudEditor.getColor(90);
+        Color c1 = HudEditor.getColor(270);
+        Color c2 = HudEditor.getColor(0);
+        Color c3 = HudEditor.getColor(180);
+        Color c4 = HudEditor.getColor(90);
 
         color1.set(c1.getRed() / 255f, c1.getGreen() / 255f, c1.getBlue() / 255f, externalAlpha);
         color2.set(c2.getRed() / 255f, c2.getGreen() / 255f, c2.getBlue() / 255f, externalAlpha);
@@ -58,30 +55,21 @@ public class HudShader extends GlProgram {
         alpha.set(internalAlpha);
     }
 
-    @Override
     public void use() {
-        var buffer = MinecraftClient.getInstance().getFramebuffer();
-        input.beginWrite(false);
-        GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, buffer.fbo);
-        GL30.glBlitFramebuffer(0, 0, buffer.textureWidth, buffer.textureHeight, 0, 0, buffer.textureWidth, buffer.textureHeight, GL30.GL_COLOR_BUFFER_BIT, GL30.GL_LINEAR);
-        buffer.beginWrite(false);
-        super.use();
+        RenderSystem.setShader(HUD_SHADER::getProgram);
     }
 
-    @Override
-    protected void setup() {
-        uSize = findUniform("uSize");
-        uLocation = findUniform("uLocation");
-        radius = findUniform("radius");
-        blend = findUniform("blend");
-        alpha = findUniform("alpha");
-        color1 = findUniform("color1");
-        color2 = findUniform("color2");
-        color3 = findUniform("color3");
-        color4 = findUniform("color4");
-        outline = findUniform("outline");
-        glow = findUniform("glow");
-        var window = MinecraftClient.getInstance().getWindow();
-        input = new SimpleFramebuffer(window.getFramebufferWidth(), window.getFramebufferHeight(), false, MinecraftClient.IS_SYSTEM_MAC);
+    public void setup() {
+        uSize = HUD_SHADER.findUniform2f("uSize");
+        uLocation = HUD_SHADER.findUniform2f("uLocation");
+        radius = HUD_SHADER.findUniform1f("radius");
+        blend = HUD_SHADER.findUniform1f("blend");
+        alpha = HUD_SHADER.findUniform1f("alpha");
+        color1 = HUD_SHADER.findUniform4f("color1");
+        color2 = HUD_SHADER.findUniform4f("color2");
+        color3 = HUD_SHADER.findUniform4f("color3");
+        color4 = HUD_SHADER.findUniform4f("color4");
+        outline = HUD_SHADER.findUniform1f("outline");
+        glow = HUD_SHADER.findUniform1f("glow");
     }
 }

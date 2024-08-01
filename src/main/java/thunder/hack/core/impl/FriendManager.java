@@ -46,7 +46,7 @@ public class FriendManager implements IManager {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void saveFriends() {
+    public void saveFriends() {
         File file = new File(ConfigManager.CONFIG_FOLDER_NAME + "/misc/friends.txt");
         try {
             file.createNewFile();
@@ -60,7 +60,7 @@ public class FriendManager implements IManager {
         }
     }
 
-    public static void loadFriends() {
+    public void loadFriends() {
         try {
             File file = new File(ConfigManager.CONFIG_FOLDER_NAME + "/misc/friends.txt");
 

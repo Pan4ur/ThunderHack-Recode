@@ -2,25 +2,32 @@ package thunder.hack.gui.font;
 
 import net.minecraft.util.Identifier;
 
-public class Texture extends Identifier {
+public class Texture {
+
+    final Identifier id;
+
     public Texture(String path) {
-        super("thunderhack", validatePath(path));
+        id = Identifier.of("thunderhack", validatePath(path));
     }
 
     public Texture(Identifier i) {
-        super(i.getNamespace(), i.getPath());
+        id = Identifier.of(i.getNamespace(), i.getPath());
     }
 
-    static String validatePath(String path) {
-        if (isValid(path)) {
+    String validatePath(String path) {
+        if (Identifier.isPathValid(path)) {
             return path;
         }
         StringBuilder ret = new StringBuilder();
         for (char c : path.toLowerCase().toCharArray()) {
-            if (isPathCharacterValid(c)) {
+            if (Identifier.isPathCharacterValid(c)) {
                 ret.append(c);
             }
         }
         return ret.toString();
+    }
+
+    public Identifier getId() {
+        return id;
     }
 }

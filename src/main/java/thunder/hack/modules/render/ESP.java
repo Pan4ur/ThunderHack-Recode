@@ -101,29 +101,28 @@ public class ESP extends Module {
                     stack.push();
                     stack.translate(x, y, z);
 
-                    Tessellator tessellator = Tessellator.getInstance();
-                    BufferBuilder bufferBuilder = tessellator.getBuffer();
                     Render3DEngine.setupRender();
                     RenderSystem.disableDepthTest();
                     RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-                    bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+                    BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+
                     for (int i = 0; i <= 360; i += 6) {
                         double v = Math.sin(Math.toRadians(i));
                         double u = Math.cos(Math.toRadians(i));
-                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(getAreaCloudColor(aece)), 100).getRGB()).next();
-                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), 0, 0, 0).color(Render2DEngine.injectAlpha(new Color(getAreaCloudColor(aece)), 0).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(getAreaCloudColor(aece)), 100).getRGB());
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), 0, 0, 0).color(Render2DEngine.injectAlpha(new Color(getAreaCloudColor(aece)), 0).getRGB());
                     }
-                    tessellator.draw();
+                    Render2DEngine.endBuilding(bufferBuilder);
 
                     RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-                    bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+                    bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
                     for (int i = 0; i <= 360; i += 6) {
                         double v = Math.sin(Math.toRadians(i));
                         double u = Math.cos(Math.toRadians(i));
-                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(getAreaCloudColor(aece)), 255).getRGB()).next();
-                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * (middle - 0.04f), (float) 0, (float) v * (middle - 0.04f)).color(Render2DEngine.injectAlpha(new Color(getAreaCloudColor(aece)), 255).getRGB()).next();
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * middle, (float) 0, (float) v * middle).color(Render2DEngine.injectAlpha(new Color(getAreaCloudColor(aece)), 255).getRGB());
+                        bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * (middle - 0.04f), (float) 0, (float) v * (middle - 0.04f)).color(Render2DEngine.injectAlpha(new Color(getAreaCloudColor(aece)), 255).getRGB());
                     }
-                    tessellator.draw();
+                    Render2DEngine.endBuilding(bufferBuilder);
 
                     Render3DEngine.endRender();
                     RenderSystem.enableDepthTest();
@@ -142,9 +141,7 @@ public class ESP extends Module {
                     RenderSystem.defaultBlendFunc();
                     matrices.translate(0, 0, 0);
                     matrices.scale(-0.05f, -0.05f, 0);
-                    VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
                     FontRenderers.modules.drawCenteredString(matrices, String.format("%.1f", ((aece.getRadius() * 10) - 5f)), 0, -10f, -1);
-                    immediate.draw();
                     RenderSystem.disableBlend();
                     RenderSystem.enableDepthTest();
                 }
@@ -155,37 +152,36 @@ public class ESP extends Module {
             dizorentAnimation = fast(dizorentAnimation, mc.player.getMainHandStack().getItem() == Items.ENDER_EYE ? 10 : 0, 15f);
 
             if (mc.player.getMainHandStack().getItem() == Items.ENDER_EYE) {
-                double x = Render2DEngine.interpolate(mc.player.prevX, mc.player.getX(), mc.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getX();
-                double y = Render2DEngine.interpolate(mc.player.prevY, mc.player.getY(), mc.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getY();
-                double z = Render2DEngine.interpolate(mc.player.prevZ, mc.player.getZ(), mc.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getZ();
+                double x = Render2DEngine.interpolate(mc.player.prevX, mc.player.getX(), Render3DEngine.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getX();
+                double y = Render2DEngine.interpolate(mc.player.prevY, mc.player.getY(), Render3DEngine.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getY();
+                double z = Render2DEngine.interpolate(mc.player.prevZ, mc.player.getZ(), Render3DEngine.getTickDelta()) - mc.getEntityRenderDispatcher().camera.getPos().getZ();
 
 
                 stack.push();
                 stack.translate(x, y, z);
 
-                Tessellator tessellator = Tessellator.getInstance();
-                BufferBuilder bufferBuilder = tessellator.getBuffer();
                 Render3DEngine.setupRender();
                 RenderSystem.disableDepthTest();
                 RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-                bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+                BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+
                 for (int i = 0; i <= 360; i += 6) {
                     double v = Math.sin(Math.toRadians(i));
                     double u = Math.cos(Math.toRadians(i));
-                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * dizorentAnimation, (float) 0, (float) v * dizorentAnimation).color(Render2DEngine.injectAlpha(new Color(dizorentColor.getValue().getColor()), 100).getRGB()).next();
-                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), 0, 0, 0).color(Render2DEngine.injectAlpha(new Color(dizorentColor.getValue().getColor()), 0).getRGB()).next();
+                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * dizorentAnimation, (float) 0, (float) v * dizorentAnimation).color(Render2DEngine.injectAlpha(new Color(dizorentColor.getValue().getColor()), 100).getRGB());
+                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), 0, 0, 0).color(Render2DEngine.injectAlpha(new Color(dizorentColor.getValue().getColor()), 0).getRGB());
                 }
-                tessellator.draw();
+                Render2DEngine.endBuilding(bufferBuilder);
 
                 RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-                bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+                bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
                 for (int i = 0; i <= 360; i += 6) {
                     double v = Math.sin(Math.toRadians(i));
                     double u = Math.cos(Math.toRadians(i));
-                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * dizorentAnimation, (float) 0, (float) v * dizorentAnimation).color(Render2DEngine.injectAlpha(new Color(dizorentColor.getValue().getColor()), 255).getRGB()).next();
-                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * (dizorentAnimation - 0.04f), (float) 0, (float) v * (dizorentAnimation - 0.04f)).color(Render2DEngine.injectAlpha(new Color(dizorentColor.getValue().getColor()), 255).getRGB()).next();
+                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * dizorentAnimation, (float) 0, (float) v * dizorentAnimation).color(Render2DEngine.injectAlpha(new Color(dizorentColor.getValue().getColor()), 255).getRGB());
+                    bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) u * (dizorentAnimation - 0.04f), (float) 0, (float) v * (dizorentAnimation - 0.04f)).color(Render2DEngine.injectAlpha(new Color(dizorentColor.getValue().getColor()), 255).getRGB());
                 }
-                tessellator.draw();
+                Render2DEngine.endBuilding(bufferBuilder);
 
                 Render3DEngine.endRender();
                 RenderSystem.enableDepthTest();
@@ -248,9 +244,7 @@ public class ESP extends Module {
                     RenderSystem.defaultBlendFunc();
                     matrices.translate(0, 0, 0);
                     matrices.scale(-0.025f, -0.025f, 0);
-                    VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
                     FontRenderers.modules.drawCenteredString(matrices, "BURROW", 0, -5, burrowTextColor.getValue().getColor());
-                    immediate.draw();
                     RenderSystem.disableBlend();
                     RenderSystem.enableDepthTest();
                 }
@@ -260,9 +254,9 @@ public class ESP extends Module {
         if (tntFuse.getValue() || tntRadius.getValue()) {
             for (Entity ent : mc.world.getEntities()) {
                 if (ent instanceof TntEntity tnt) {
-                    double x = tnt.prevX + (tnt.getPos().getX() - tnt.prevX) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getX();
-                    double y = tnt.prevY + (tnt.getPos().getY() - tnt.prevY) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getY();
-                    double z = tnt.prevZ + (tnt.getPos().getZ() - tnt.prevZ) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
+                    double x = tnt.prevX + (tnt.getPos().getX() - tnt.prevX) * Render3DEngine.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getX();
+                    double y = tnt.prevY + (tnt.getPos().getY() - tnt.prevY) * Render3DEngine.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getY();
+                    double z = tnt.prevZ + (tnt.getPos().getZ() - tnt.prevZ) * Render3DEngine.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
 
                     if (tntFuse.getValue()) {
                         RenderSystem.disableDepthTest();
@@ -277,9 +271,7 @@ public class ESP extends Module {
                         RenderSystem.defaultBlendFunc();
                         matrices.translate(0, 0, 0);
                         matrices.scale(-0.025f, -0.025f, 0);
-                        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
                         FontRenderers.modules.drawCenteredString(matrices, String.format("%.1f", ((float) tnt.getFuse() / 20f)) + "s", 0, -5, tntFuseText.getValue().getColor());
-                        immediate.draw();
                         RenderSystem.disableBlend();
                         RenderSystem.enableDepthTest();
                     }
@@ -304,8 +296,8 @@ public class ESP extends Module {
                     float xOffset = mc.getWindow().getScaledWidth() / 2f;
                     float yOffset = mc.getWindow().getScaledHeight() / 2f;
 
-                    float xPos = (float) (pearl.prevX + (pearl.getPos().getX() - pearl.prevX) * mc.getTickDelta());
-                    float zPos = (float) (pearl.prevZ + (pearl.getPos().getZ() - pearl.prevZ) * mc.getTickDelta());
+                    float xPos = (float) (pearl.prevX + (pearl.getPos().getX() - pearl.prevX) * Render3DEngine.getTickDelta());
+                    float zPos = (float) (pearl.prevZ + (pearl.getPos().getZ() - pearl.prevZ) * Render3DEngine.getTickDelta());
 
                     float yaw = getRotations(new Vec2f(xPos, zPos)) - mc.player.getYaw();
                     context.getMatrices().translate(xOffset, yOffset, 0.0F);
@@ -322,15 +314,15 @@ public class ESP extends Module {
         }
 
         Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         Render2DEngine.setupRender();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        for (Entity ent : mc.world.getEntities()) {
+        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        for (Entity ent : mc.world.getEntities())
             if (shouldRender(ent))
                 drawBox(bufferBuilder, ent, matrix);
-        }
-        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+
+        Render2DEngine.endBuilding(bufferBuilder);
         Render2DEngine.endRender();
     }
 
@@ -382,12 +374,7 @@ public class ESP extends Module {
     }
 
     public void drawBox(BufferBuilder bufferBuilder, @NotNull Entity ent, Matrix4f matrix) {
-        double x = ent.prevX + (ent.getX() - ent.prevX) * mc.getTickDelta();
-        double y = ent.prevY + (ent.getY() - ent.prevY) * mc.getTickDelta();
-        double z = ent.prevZ + (ent.getZ() - ent.prevZ) * mc.getTickDelta();
-        Box axisAlignedBB2 = ent.getBoundingBox();
-        Box axisAlignedBB = new Box(axisAlignedBB2.minX - ent.getX() + x - 0.05, axisAlignedBB2.minY - ent.getY() + y, axisAlignedBB2.minZ - ent.getZ() + z - 0.05, axisAlignedBB2.maxX - ent.getX() + x + 0.05, axisAlignedBB2.maxY - ent.getY() + y + 0.15, axisAlignedBB2.maxZ - ent.getZ() + z + 0.05);
-        Vec3d[] vectors = new Vec3d[]{new Vec3d(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.maxZ)};
+        Vec3d[] vectors = getVectors(ent);
 
         Color col = getEntityColor(ent);
 
@@ -440,6 +427,17 @@ public class ESP extends Module {
                     case SyncColor ->  Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 5), (float) (endPosY + (posY - endPosY) * lent.getHealth() / lent.getMaxHealth()), (float) posX - 3, (float) endPosY, HudEditor.getColor(90), HudEditor.getColor(90), HudEditor.getColor(270), HudEditor.getColor(270));
                 }
             } }
+    }
+
+    @NotNull
+    private static Vec3d[] getVectors(@NotNull Entity ent) {
+        double x = ent.prevX + (ent.getX() - ent.prevX) * Render3DEngine.getTickDelta();
+        double y = ent.prevY + (ent.getY() - ent.prevY) * Render3DEngine.getTickDelta();
+        double z = ent.prevZ + (ent.getZ() - ent.prevZ) * Render3DEngine.getTickDelta();
+        Box axisAlignedBB2 = ent.getBoundingBox();
+        Box axisAlignedBB = new Box(axisAlignedBB2.minX - ent.getX() + x - 0.05, axisAlignedBB2.minY - ent.getY() + y, axisAlignedBB2.minZ - ent.getZ() + z - 0.05, axisAlignedBB2.maxX - ent.getX() + x + 0.05, axisAlignedBB2.maxY - ent.getY() + y + 0.15, axisAlignedBB2.maxZ - ent.getZ() + z + 0.05);
+        Vec3d[] vectors = new Vec3d[]{new Vec3d(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.minZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.minX, axisAlignedBB.maxY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.maxZ), new Vec3d(axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.maxZ)};
+        return vectors;
     }
 
     private int getAreaCloudColor(AreaEffectCloudEntity ent) {

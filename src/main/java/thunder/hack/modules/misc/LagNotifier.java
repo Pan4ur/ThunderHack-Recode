@@ -15,6 +15,7 @@ import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 import java.text.DecimalFormat;
@@ -26,8 +27,6 @@ public class LagNotifier extends Module {
     private final Setting<Boolean> serverResponseNotify = new Setting<>("ServerResponse", true);
     private final Setting<Integer> responseTreshold = new Setting<>("ResponseTreshold", 5, 0, 15, v -> serverResponseNotify.getValue());
     private final Setting<Boolean> tpsNotify = new Setting<>("TPS", true);
-
-    private final Identifier ICON = new Identifier("thunderhack", "textures/hud/elements/lag.png");
 
     private Timer notifyTimer = new Timer();
     private Timer rubberbandTimer = new Timer();
@@ -63,7 +62,6 @@ public class LagNotifier extends Module {
 
         if (!rubberbandTimer.passedMs(5000) && rubberbandNotify.getValue()) {
             DecimalFormat decimalFormat = new DecimalFormat("#.#");
-
             FontRenderers.modules.drawCenteredString(context.getMatrices(), (isRu() ? "Обнаружен руббербенд! " : "Rubberband detected! ") + decimalFormat.format((5000f - (float) rubberbandTimer.getTimeMs()) / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
         }
 
@@ -72,7 +70,7 @@ public class LagNotifier extends Module {
             FontRenderers.modules.drawCenteredString(context.getMatrices(), (isRu() ? "Сервер перестал отвечать! " : "The server stopped responding! ") + decimalFormat.format((float) packetTimer.getTimeMs() / 1000f), (float) mc.getWindow().getScaledWidth() / 2f, (float) mc.getWindow().getScaledHeight() / 3f, new Color(0xFFDF00).getRGB());
 
             RenderSystem.setShaderColor(1f, 0.87f, 0f, 1f);
-            context.drawTexture(ICON, (int) ((float) mc.getWindow().getScaledWidth() / 2f - 40), (int) ((float) mc.getWindow().getScaledHeight() / 3f - 120), 0, 0, 80, 80, 80, 80);
+            context.drawTexture(TextureStorage.lagIcon, (int) ((float) mc.getWindow().getScaledWidth() / 2f - 40), (int) ((float) mc.getWindow().getScaledHeight() / 3f - 120), 0, 0, 80, 80, 80, 80);
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         }
 

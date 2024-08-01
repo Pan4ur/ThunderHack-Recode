@@ -11,6 +11,7 @@ import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.SettingGroup;
+import thunder.hack.utility.render.Render3DEngine;
 
 public class Shaders extends Module {
     public Shaders() {
@@ -37,8 +38,8 @@ public class Shaders extends Module {
     public final Setting<Float> factor = new Setting<>("GradientFactor", 2f, 0f, 20f, v -> mode.is(ShaderManager.Shader.Gradient) || handsMode.is(ShaderManager.Shader.Gradient));
     public final Setting<Float> gradient = new Setting<>("Gradient", 2f, 0f, 20f, v -> mode.is(ShaderManager.Shader.Gradient) || handsMode.is(ShaderManager.Shader.Gradient));
     public final Setting<Integer> alpha2 = new Setting<>("GradientAlpha", 170, 0, 255, v -> mode.is(ShaderManager.Shader.Gradient) || handsMode.is(ShaderManager.Shader.Gradient));
-    public final Setting<Integer> lineWidth = new Setting<>("LineWidth", 2, 0, 20);
-    public final Setting<Integer> quality = new Setting<>("Quality", 3, 0, 20);
+    public final Setting<Integer> lineWidth = new Setting<>("LineWidth", 2, 0, 500);
+    public final Setting<Integer> quality = new Setting<>("Quality", 3, 0, 6);
     public final Setting<Integer> octaves = new Setting<>("SmokeOctaves", 10, 5, 30);
     public final Setting<Integer> fillAlpha = new Setting<>("FillAlpha", 170, 0, 255);
     public final Setting<Boolean> glow = new Setting<>("SmokeGlow", true);
@@ -80,11 +81,9 @@ public class Shaders extends Module {
         };
     }
 
-    public static boolean rendering = false;
-
     public void onRender3D(MatrixStack matrices) {
         if (hands.getValue())
-            ThunderHack.shaderManager.renderShader(() -> ((IGameRenderer) mc.gameRenderer).irenderHand(mc.gameRenderer.getCamera(), mc.getTickDelta(), matrices.peek().getPositionMatrix()), handsMode.getValue());
+            ThunderHack.shaderManager.renderShader(() -> ((IGameRenderer) mc.gameRenderer).irenderHand(mc.gameRenderer.getCamera(), Render3DEngine.getTickDelta(), matrices.peek().getPositionMatrix()), handsMode.getValue());
     }
 
     @Override
