@@ -1,5 +1,6 @@
 package thunder.hack.modules.player;
 
+import baritone.api.BaritoneAPI;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -7,11 +8,14 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
 import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 
 import java.util.Stack;
+
+import static thunder.hack.modules.client.ClientSettings.isRu;
 
 public class AutoEat extends Module {
 
@@ -25,11 +29,18 @@ public class AutoEat extends Module {
     public final Setting<Boolean> rottenFlesh = new Setting("RottenFlesh", false);
     public final Setting<Boolean> spiderEye = new Setting("SpiderEye", false);
     public final Setting<Boolean> pufferfish = new Setting("Pufferfish", false);
+    public final Setting<Boolean> swapBack = new Setting<>("SwapBack", true);
+    public final Setting<Boolean> pauseBaritone = new Setting<>("PauseBaritone", true);
 
     private boolean eating;
+    private int prevSlot;
 
     @Override
     public void onUpdate() {
+        if(!ThunderHack.baritone) {
+            sendMessage(isRu() ? "Баритон не найден (можешь скачать на https://meteorclient.com)" : "Baritone not found (you can download it on https://meteorclient.com)");
+            return;
+        }
         if (mc.player.getHungerManager().getFoodLevel() <= hunger.getValue()) {
             if(!isHandGood(Hand.MAIN_HAND) && !isHandGood(Hand.OFF_HAND)) {
                 for (int i = 0; i < 9; i++) {
@@ -45,6 +56,7 @@ public class AutoEat extends Module {
                             continue;
                         if (!pufferfish.getValue() && (stack.getItem() == Items.PUFFERFISH))
                             continue;
+                        prevSlot = mc.player.getInventory().selectedSlot;
                         mc.player.getInventory().selectedSlot = i;
                         sendPacket(new UpdateSelectedSlotC2SPacket(i));
                         break;
@@ -57,11 +69,20 @@ public class AutoEat extends Module {
             if (mc.currentScreen != null && !mc.player.isUsingItem())
                 ((IMinecraftClient) mc).idoItemUse();
             else
+                if(pauseBaritone.getValue()){
+                    BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("pause");
+                }
                 mc.options.useKey.setPressed(true);
 
         } else if (eating) {
             eating = false;
             mc.options.useKey.setPressed(false);
+            if(swapBack.getValue()){
+                mc.player.getInventory().selectedSlot = prevSlot;
+            }
+            if(pauseBaritone.getValue()){
+                BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("resume");
+            }
         }
     }
 

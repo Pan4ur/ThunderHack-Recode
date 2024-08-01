@@ -10,6 +10,7 @@ import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.ItemSelectSetting;
 import thunder.hack.utility.Timer;
@@ -29,7 +30,8 @@ public class BlockESP extends Module {
     public final Setting<ItemSelectSetting> selectedBlocks = new Setting<>("SelectedBlocks", new ItemSelectSetting(new ArrayList<>()));
     public static ArrayList<BlockVec> blocks = new ArrayList<>();
     private final Setting<Integer> range = new Setting<>("Range", 100, 1, 128);
-    private final Setting<Integer> limit = new Setting<>("Limit", 50, 1, 2048);
+    private final Setting<BooleanSettingGroup> limit = new Setting<>("Limit", new BooleanSettingGroup(true));
+    private final Setting<Integer> limitCount = new Setting<>("LimitCount", 50, 1, 2048).addToGroup(limit);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0xFF00FFFF));
     private final Setting<Boolean> illegals = new Setting<>("Illegals", true);
     private final Setting<Boolean> tracers = new Setting<>("Tracers", false);
@@ -101,7 +103,7 @@ public class BlockESP extends Module {
 
         if (fill.getValue() || outline.getValue()) {
             for (BlockVec vec : Lists.newArrayList(blocks)) {
-                if (count > limit.getValue())
+                if (count > limitCount.getValue() && limit.getValue().isEnabled())
                     continue;
 
                 if (vec.getDistance(mc.player.getPos()) > range.getPow2Value()) {
