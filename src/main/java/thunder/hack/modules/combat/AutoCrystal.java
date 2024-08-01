@@ -327,7 +327,7 @@ public class AutoCrystal extends Module {
             for (BlockPos bp : cache.keySet())
                 if (cr.squaredDistanceTo(bp.toCenterPos()) < 0.3) {
                     confirmTime = System.currentTimeMillis() - cache.get(bp);
-                    ModuleManager.autoCrystalInfo.addSpeed((int) (1000f / (float) confirmTime));
+                    ModuleManager.autoCrystalInfo.onSpawn();
                     placedCrystals.remove(bp);
                     if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
                         handleSpawn(cr);
@@ -348,7 +348,7 @@ public class AutoCrystal extends Module {
             for (BlockPos bp : cache.keySet())
                 if (cr.squaredDistanceTo(bp.toCenterPos()) < 0.3) {
                     confirmTime = System.currentTimeMillis() - cache.get(bp);
-                    ModuleManager.autoCrystalInfo.addSpeed((int) (1000f / (float) confirmTime));
+                    ModuleManager.autoCrystalInfo.onSpawn();
                     placedCrystals.remove(bp);
                     if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
                         handleSpawn(cr);

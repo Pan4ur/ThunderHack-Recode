@@ -23,11 +23,12 @@ public class AutoCrystalInfo extends HudElement {
 
     private final ArrayDeque<Integer> speeds = new ArrayDeque<>(20);
     private int max, min;
+    private long time;
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
 
-        Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), 175, 80, HudEditor.hudRound.getValue());
+        Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), getWidth(), getHeight(), HudEditor.hudRound.getValue());
 
         Color c1 = HudEditor.getColor(0).darker().darker().darker();
         Color c2 = HudEditor.getColor(0);
@@ -86,9 +87,7 @@ public class AutoCrystalInfo extends HudElement {
 
         Render2DEngine.drawRect(context.getMatrices(), getPosX() + 110.5f, getPosY() + 12, 0.5f, 65, new Color(0x44FFFFFF, true));
 
-
-        setBounds(getPosX(), getPosY(), 150, 150);
-
+        setBounds(getPosX(), getPosY(), getWidth(), getHeight());
     }
 
     public Formatting getCalcColor(float val) {
@@ -103,12 +102,15 @@ public class AutoCrystalInfo extends HudElement {
         return Formatting.YELLOW;
     }
 
-    public void addSpeed(int ammount) {
-        if (speeds.size() > 20)
-            speeds.poll();
+    public void onSpawn() {
+        if (time != 0L) {
+            if (speeds.size() > 20)
+                speeds.poll();
 
-        speeds.add(ammount);
-        max = Collections.max(speeds);
-        min = Collections.min(speeds);
+            speeds.add((int) (1000f / (float) (System.currentTimeMillis() - time)));
+            max = Collections.max(speeds);
+            min = Collections.min(speeds);
+        }
+        time = System.currentTimeMillis();
     }
 }
