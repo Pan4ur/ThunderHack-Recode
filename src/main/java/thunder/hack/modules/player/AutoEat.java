@@ -73,10 +73,10 @@ public class AutoEat extends Module {
         } else if (eating) {
             eating = false;
             mc.options.useKey.setPressed(false);
-            if(swapBack.getValue()
+            if (swapBack.getValue())
                 mc.player.getInventory().selectedSlot = prevSlot;
             
-            if(pauseBaritone.getValue() && ThunderHack.baritone)
+            if (pauseBaritone.getValue() && ThunderHack.baritone)
                 BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("resume");
         }
     }
