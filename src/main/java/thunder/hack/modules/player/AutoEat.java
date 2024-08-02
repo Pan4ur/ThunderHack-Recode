@@ -30,17 +30,13 @@ public class AutoEat extends Module {
     public final Setting<Boolean> spiderEye = new Setting("SpiderEye", false);
     public final Setting<Boolean> pufferfish = new Setting("Pufferfish", false);
     public final Setting<Boolean> swapBack = new Setting<>("SwapBack", true);
-    public final Setting<Boolean> pauseBaritone = new Setting<>("PauseBaritone", true);
+    public final Setting<Boolean> pauseBaritone = new Setting<>("PauseBaritone", true, v -> ThunderHack.baritone);
 
     private boolean eating;
     private int prevSlot;
 
     @Override
     public void onUpdate() {
-        if(!ThunderHack.baritone) {
-            sendMessage(isRu() ? "Баритон не найден (можешь скачать на https://meteorclient.com)" : "Baritone not found (you can download it on https://meteorclient.com)");
-            return;
-        }
         if (mc.player.getHungerManager().getFoodLevel() <= hunger.getValue()) {
             if(!isHandGood(Hand.MAIN_HAND) && !isHandGood(Hand.OFF_HAND)) {
                 for (int i = 0; i < 9; i++) {
@@ -68,21 +64,20 @@ public class AutoEat extends Module {
 
             if (mc.currentScreen != null && !mc.player.isUsingItem())
                 ((IMinecraftClient) mc).idoItemUse();
-            else
-                if(pauseBaritone.getValue()){
+            else {
+                if(pauseBaritone.getValue() && ThunderHack.baritone)
                     BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("pause");
-                }
+               
                 mc.options.useKey.setPressed(true);
-
+            }
         } else if (eating) {
             eating = false;
             mc.options.useKey.setPressed(false);
-            if(swapBack.getValue()){
+            if(swapBack.getValue()
                 mc.player.getInventory().selectedSlot = prevSlot;
-            }
-            if(pauseBaritone.getValue()){
+            
+            if(pauseBaritone.getValue() && ThunderHack.baritone)
                 BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("resume");
-            }
         }
     }
 
