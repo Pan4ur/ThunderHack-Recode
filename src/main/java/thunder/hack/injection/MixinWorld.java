@@ -9,11 +9,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import thunder.hack.modules.combat.AutoCrystal;
-import thunder.hack.modules.combat.AutoCrystalBase;
+import thunder.hack.features.modules.combat.AutoCrystal;
+import thunder.hack.features.modules.combat.AutoCrystalBase;
 import thunder.hack.utility.math.ExplosionUtility;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 @Mixin(World.class)
 public abstract class MixinWorld {

@@ -20,11 +20,12 @@ import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventHeldItemRenderer;
-import thunder.hack.modules.Module;
+import thunder.hack.features.modules.Module;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 @Mixin(HeldItemRenderer.class)
 public abstract class MixinHeldItemRenderer {
@@ -44,7 +45,7 @@ public abstract class MixinHeldItemRenderer {
 
     @Inject(method = "renderFirstPersonItem", at = @At(value = "HEAD"), cancellable = true)
     private void onRenderItemHook(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if (ThunderHack.moduleManager != null && ModuleManager.animations.shouldAnimate() && !(item.isEmpty()) && !(item.getItem() instanceof FilledMapItem)) {
+        if (Managers.MODULE != null && ModuleManager.animations.shouldAnimate() && !(item.isEmpty()) && !(item.getItem() instanceof FilledMapItem)) {
             ci.cancel();
             ModuleManager.animations.renderFirstPersonItemCustom(player, tickDelta, pitch, hand, swingProgress, item, equipProgress, matrices, vertexConsumers, light);
         }

@@ -18,13 +18,13 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import thunder.hack.cmd.Command;
+import thunder.hack.features.cmd.Command;
 import thunder.hack.injection.accesors.IClientWorldMixin;
 import thunder.hack.utility.math.ExplosionUtility;
 
 import java.util.*;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public final class InteractionUtility {
     private static final List<Block> SHIFT_BLOCKS = Arrays.asList(

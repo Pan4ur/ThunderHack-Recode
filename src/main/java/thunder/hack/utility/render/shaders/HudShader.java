@@ -3,7 +3,7 @@ package thunder.hack.utility.render.shaders;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.utility.render.shaders.satin.api.managed.ManagedCoreShader;
 import thunder.hack.utility.render.shaders.satin.api.managed.ShaderEffectManager;
 import thunder.hack.utility.render.shaders.satin.api.managed.uniform.Uniform1f;
@@ -12,7 +12,7 @@ import thunder.hack.utility.render.shaders.satin.api.managed.uniform.Uniform4f;
 
 import java.awt.*;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class HudShader {
     private Uniform2f uSize;

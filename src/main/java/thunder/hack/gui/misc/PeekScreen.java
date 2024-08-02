@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ShulkerBoxScreenHandler;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.modules.render.Tooltips;
+import thunder.hack.features.modules.render.Tooltips;
 
 import java.util.Arrays;
 import java.util.List;

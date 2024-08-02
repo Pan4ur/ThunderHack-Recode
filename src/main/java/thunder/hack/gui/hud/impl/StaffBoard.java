@@ -7,10 +7,10 @@ import net.minecraft.scoreboard.Team;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameMode;
-import thunder.hack.cmd.impl.StaffCommand;
+import thunder.hack.features.cmd.impl.StaffCommand;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
 

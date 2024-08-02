@@ -5,7 +5,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.RotationAxis;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanSettingGroup;
@@ -63,7 +64,7 @@ public class CrosshairArrows extends HudElement {
                 context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
                 context.getMatrices().translate(-middleW, -middleH, 0.0F);
 
-                if (ThunderHack.friendManager.isFriend(e))
+                if (Managers.FRIEND.isFriend(e))
                     color = colorf.getValue().getColor();
                 else color = switch (triangleMode.getValue()) {
                     case Custom -> colors.getValue().getColor();

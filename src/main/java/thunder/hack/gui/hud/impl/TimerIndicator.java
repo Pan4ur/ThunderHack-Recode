@@ -3,8 +3,8 @@ package thunder.hack.gui.hud.impl;
 import net.minecraft.client.gui.DrawContext;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.movement.Timer;
+import thunder.hack.features.modules.client.HudEditor;
+import thunder.hack.features.modules.movement.Timer;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.EaseOutCirc;
 

@@ -1,6 +1,5 @@
 package thunder.hack.injection;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
 import net.minecraft.client.gui.screen.Overlay;
@@ -27,11 +26,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.modules.Module;
+import thunder.hack.features.modules.Module;
 import thunder.hack.utility.render.WindowResizeCallback;
 
 import java.io.IOException;
@@ -40,7 +39,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 @Mixin(MinecraftClient.class)
 public abstract class MixinMinecraftClient {
@@ -112,7 +111,7 @@ public abstract class MixinMinecraftClient {
     @Inject(method = "setOverlay", at = @At("HEAD"))
     public void setOverlay(Overlay overlay, CallbackInfo ci) {
         //   if (overlay instanceof SplashOverlay)
-        //  ThunderHack.shaderManager.reloadShaders();
+        //  Managers.SHADER.reloadShaders();
     }
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)

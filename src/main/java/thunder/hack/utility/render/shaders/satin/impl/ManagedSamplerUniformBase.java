@@ -20,7 +20,7 @@ package thunder.hack.utility.render.shaders.satin.impl;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import thunder.hack.cmd.Command;
+import thunder.hack.features.cmd.Command;
 import thunder.hack.utility.render.shaders.satin.api.managed.uniform.SamplerUniform;
 import net.minecraft.client.gl.GlUniform;
 import net.minecraft.client.gl.JsonEffectShaderProgram;

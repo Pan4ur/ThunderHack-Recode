@@ -1,6 +1,5 @@
 package thunder.hack.injection;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -9,11 +8,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.windows.WindowsScreen;
 import thunder.hack.gui.windows.impl.*;
 
-import static thunder.hack.core.IManager.mc;
+import static thunder.hack.core.manager.IManager.mc;
 
 @Mixin(MultiplayerScreen.class)
 public abstract class MixinMultiplayerScreen extends Screen {

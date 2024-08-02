@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;

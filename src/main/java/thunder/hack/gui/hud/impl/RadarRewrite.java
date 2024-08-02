@@ -10,9 +10,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.Managers;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.MathUtility;
@@ -78,7 +79,7 @@ public class RadarRewrite extends HudElement {
                     context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(yaw));
                     context.getMatrices().translate(-(middleW + CRadius.getValue()), -(middleH + CRadius.getValue()), 0.0F);
 
-                    if (ThunderHack.friendManager.isFriend(e))
+                    if (Managers.FRIEND.isFriend(e))
                         color = colorf.getValue().getColor();
                     else color = switch (triangleMode.getValue()) {
                         case Custom -> colors.getValue().getColor();

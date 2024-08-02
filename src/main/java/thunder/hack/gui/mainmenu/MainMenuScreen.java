@@ -14,8 +14,8 @@ import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.api.IAddon;
-import thunder.hack.core.impl.AddonManager;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.utility.ThunderUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -24,11 +24,10 @@ import thunder.hack.utility.render.TextureStorage;
 import java.awt.*;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class MainMenuScreen extends Screen {
     private final List<MainMenuButton> buttons = new ArrayList<>();
@@ -96,7 +95,7 @@ public class MainMenuScreen extends Screen {
 
         onlineText:
         {
-            String onlineUsers = String.format("online: %s%s", Formatting.DARK_GREEN, ThunderHack.telemetryManager.getOnlinePlayers().size());
+            String onlineUsers = String.format("online: %s%s", Formatting.DARK_GREEN, Managers.TELEMETRY.getOnlinePlayers().size());
 
             FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), onlineUsers, halfOfWidth, halfOfHeight * 2 - 15, Color.GREEN);
 
@@ -129,7 +128,7 @@ public class MainMenuScreen extends Screen {
             offsetY += 10;
         }
 
-        int totalAddonsLoaded = ThunderHack.addonManager.getTotalAddons();
+        int totalAddonsLoaded = Managers.ADDON.getTotalAddons();
         String addonsText = "Addons Loaded: " + totalAddonsLoaded;
         int screenWidth = mc.getWindow().getScaledWidth();
         int textWidth = (int) FontRenderers.sf_bold.getStringWidth(addonsText);
@@ -137,7 +136,7 @@ public class MainMenuScreen extends Screen {
         FontRenderers.sf_bold.drawString(context.getMatrices(), addonsText, textX, 5, Color.WHITE.getRGB());
 
         int offset = 0;
-        for (IAddon addon : ThunderHack.addonManager.getAddons()) {
+        for (IAddon addon : Managers.ADDON.getAddons()) {
        // for (String addon : Arrays.asList("Addon", "Addon2", "Addon3", "Addon4", "Addon5")) {
             textWidth = (int) FontRenderers.sf_bold.getStringWidth(addon.getName() + " |");
             textX = screenWidth - textWidth - 5;

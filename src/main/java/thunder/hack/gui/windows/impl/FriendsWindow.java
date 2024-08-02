@@ -7,12 +7,13 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.Managers;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
 import thunder.hack.gui.windows.WindowsScreen;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -22,8 +23,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.features.modules.Module.mc;
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class FriendsWindow extends WindowBase {
     private static FriendsWindow instance;
@@ -89,7 +90,7 @@ public class FriendsWindow extends WindowBase {
             if ((int) (friendPlate.offset + getY() + 25) + getScrollOffset() > getY() + getHeight() || friendPlate.offset + getScrollOffset() + getY() + 10 < getY())
                 continue;
 
-            boolean online = mc.player != null && mc.player.networkHandler.getPlayerList().stream().map(p -> p.getProfile().getName()).toList().contains(friendPlate.name()) || ThunderHack.telemetryManager.getOnlinePlayers().contains(friendPlate.name());
+            boolean online = mc.player != null && mc.player.networkHandler.getPlayerList().stream().map(p -> p.getProfile().getName()).toList().contains(friendPlate.name()) || Managers.TELEMETRY.getOnlinePlayers().contains(friendPlate.name());
 
             // Name
             Render2DEngine.drawRectWithOutline(context.getMatrices(), getX() + 11, friendPlate.offset + getY() + 36 + getScrollOffset(), getWidth() - 28, 11, color, color2);
@@ -126,7 +127,7 @@ public class FriendsWindow extends WindowBase {
         }
 
         if (hoveringAdd && !addName.isEmpty()) {
-            ThunderHack.friendManager.addFriend(addName);
+            Managers.FRIEND.addFriend(addName);
             addName = "";
             refresh();
         }
@@ -139,7 +140,7 @@ public class FriendsWindow extends WindowBase {
             boolean hoveringRemove = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 15, friendPlate.offset + getY() + 36 + getScrollOffset(), 11, 11);
 
             if (hoveringRemove) {
-                ThunderHack.friendManager.removeFriend(friendPlate.name());
+                Managers.FRIEND.removeFriend(friendPlate.name());
                 refresh();
             }
         }
@@ -157,7 +158,7 @@ public class FriendsWindow extends WindowBase {
                 case GLFW.GLFW_KEY_ENTER -> {
 
                     if (!addName.isEmpty())
-                        ThunderHack.friendManager.addFriend(addName);
+                        Managers.FRIEND.addFriend(addName);
 
                     if (listeningId != -2)
                         listeningId = -1;
@@ -214,7 +215,7 @@ public class FriendsWindow extends WindowBase {
         resetScroll();
         friendPlates.clear();
         int id1 = 0;
-        for (String f : ThunderHack.friendManager.getFriends())
+        for (String f : Managers.FRIEND.getFriends())
             if (search.equals("Search") || search.isEmpty() || f.contains(search)) {
                 friendPlates.add(new FriendPlate(id1, id1 * 20 + 8, f));
                 id1++;

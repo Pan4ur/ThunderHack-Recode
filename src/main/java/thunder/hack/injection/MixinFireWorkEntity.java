@@ -7,12 +7,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.core.impl.PlayerManager;
-import thunder.hack.modules.combat.Aura;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.features.modules.combat.Aura;
 
-import static thunder.hack.core.IManager.mc;
+import static thunder.hack.core.manager.IManager.mc;
 
 @Mixin(FireworkRocketEntity.class)
 public class MixinFireWorkEntity {
@@ -26,7 +25,7 @@ public class MixinFireWorkEntity {
                 && ModuleManager.aura.target != null && shooter == mc.player && ModuleManager.aura.elytraTarget.getValue()) {
 
           //  float[] nonLimitedRotation = PlayerManager.calcAngle(ModuleManager.aura.target.getEyePos().add(0, 0.5, 0));
-            return ThunderHack.playerManager.getRotationVector(ModuleManager.aura.rotationPitch, ModuleManager.aura.rotationYaw);
+            return Managers.PLAYER.getRotationVector(ModuleManager.aura.rotationPitch, ModuleManager.aura.rotationYaw);
         }
         return shooter.getRotationVector();
     }

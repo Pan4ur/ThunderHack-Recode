@@ -32,10 +32,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.core.Core;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.misc.PeekScreen;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.render.Tooltips;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.render.Tooltips;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.TextureStorage;
@@ -44,8 +44,8 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.render.Tooltips.hasItems;
+import static thunder.hack.features.modules.Module.mc;
+import static thunder.hack.features.modules.render.Tooltips.hasItems;
 @Mixin(value = {HandledScreen.class})
 public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen implements ScreenHandlerProvider<T> {
 

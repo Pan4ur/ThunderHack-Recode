@@ -13,7 +13,8 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
-import thunder.hack.cmd.Command;
+import thunder.hack.core.Managers;
+import thunder.hack.features.cmd.Command;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
@@ -26,8 +27,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.features.modules.Module.mc;
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class ItemSelectWindow extends WindowBase {
 
@@ -130,13 +131,13 @@ public class ItemSelectWindow extends WindowBase {
         if (Render2DEngine.isHovered(mouseX, mouseY, getX() + 8, getY() + 19, 52, 19)) {
             allTab = true;
             resetScroll();
-            ThunderHack.soundManager.playBoolean();
+            Managers.SOUND.playBoolean();
         }
 
         if (Render2DEngine.isHovered(mouseX, mouseY, getX() + 54, getY() + 19, 70, 19)) {
             allTab = false;
             resetScroll();
-            ThunderHack.soundManager.playBoolean();
+            Managers.SOUND.playBoolean();
         }
 
         if (Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 90, getY() + 3, 70, 10)) {
@@ -166,7 +167,7 @@ public class ItemSelectWindow extends WindowBase {
                     itemSetting.getValue().getItemsById().remove(name);
                     refreshItemPlates();
                 }
-                ThunderHack.soundManager.playScroll();
+                Managers.SOUND.playScroll();
             }
         }
     }

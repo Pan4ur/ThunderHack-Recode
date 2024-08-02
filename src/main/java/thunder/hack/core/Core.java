@@ -22,17 +22,16 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec2f;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
-import thunder.hack.cmd.Command;
-import thunder.hack.core.impl.FriendManager;
-import thunder.hack.core.impl.MacroManager;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.core.impl.ServerManager;
+import thunder.hack.features.cmd.Command;
+import thunder.hack.core.manager.client.MacroManager;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.core.manager.client.ServerManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.gui.thundergui.ThunderGui;
-import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.features.modules.client.HudEditor;
+import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -41,9 +40,9 @@ import thunder.hack.utility.render.TextureStorage;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static thunder.hack.modules.Module.fullNullCheck;
-import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.features.modules.Module.fullNullCheck;
+import static thunder.hack.features.modules.Module.mc;
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public final class Core {
     public static boolean lockSprint, serverSprint, hold_mouse0, showSkull;
@@ -59,8 +58,8 @@ public final class Core {
     public void onTick(PlayerUpdateEvent event) {
         if (fullNullCheck()) return;
 
-        ThunderHack.notificationManager.onUpdate();
-        ThunderHack.moduleManager.onUpdate();
+        Managers.NOTIFICATION.onUpdate();
+        Managers.MODULE.onUpdate();
         ThunderGui.getInstance().onTick();
 
         if (ModuleManager.clickGui.getBind().getKey() == -1) {
@@ -74,20 +73,20 @@ public final class Core {
                 ThunderHack.EVENT_BUS.post(new EventDeath(p));
         }
 
-        if (!Objects.equals(ThunderHack.commandManager.getPrefix(), ClientSettings.prefix.getValue().toString()))
-            ThunderHack.commandManager.setPrefix(ClientSettings.prefix.getValue());
+        if (!Objects.equals(Managers.COMMAND.getPrefix(), ClientSettings.prefix.getValue().toString()))
+            Managers.COMMAND.setPrefix(ClientSettings.prefix.getValue());
 
         new HashMap<>(InteractionUtility.awaiting).forEach((bp, time) -> {
             if (System.currentTimeMillis() - time > ServerManager.getPing() * 2f)
                 InteractionUtility.awaiting.remove(bp);
         });
 
-        if(autoSave.every(600000)) {
-            ThunderHack.friendManager.saveFriends();
-            ThunderHack.configManager.save(ThunderHack.configManager.getCurrentConfig());
-            ThunderHack.wayPointManager.saveWayPoints();
-            ThunderHack.macroManager.saveMacro();
-            ThunderHack.notificationManager.publicity("AutoSave", isRu() ? "Сохраняю конфиг.." : "Saving config..", 3, Notification.Type.INFO);
+        if (autoSave.every(600000)) {
+            Managers.FRIEND.saveFriends();
+            Managers.CONFIG.save(Managers.CONFIG.getCurrentConfig());
+            Managers.WAYPOINT.saveWayPoints();
+            Managers.MACRO.saveMacro();
+            Managers.NOTIFICATION.publicity("AutoSave", isRu() ? "Сохраняю конфиг.." : "Saving config..", 3, Notification.Type.INFO);
         }
     }
 
@@ -136,17 +135,17 @@ public final class Core {
         }
 
         if (e.getPacket() instanceof GameJoinS2CPacket)
-            ThunderHack.moduleManager.onLogin();
+            Managers.MODULE.onLogin();
 
-        if(e.getPacket() instanceof PlayerPositionLookS2CPacket) {
+        if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             setBackTimer.reset();
 
-            if(autoSave.every(200000)) {
-                ThunderHack.friendManager.saveFriends();
-                ThunderHack.configManager.save(ThunderHack.configManager.getCurrentConfig());
-                ThunderHack.wayPointManager.saveWayPoints();
-                ThunderHack.macroManager.saveMacro();
-                ThunderHack.notificationManager.publicity("AutoSave", isRu() ? "Сохраняю конфиг.." : "Saving config..", 3, Notification.Type.INFO);
+            if (autoSave.every(200000)) {
+                Managers.FRIEND.saveFriends();
+                Managers.CONFIG.save(Managers.CONFIG.getCurrentConfig());
+                Managers.WAYPOINT.saveWayPoints();
+                Managers.MACRO.saveMacro();
+                Managers.NOTIFICATION.publicity("AutoSave", isRu() ? "Сохраняю конфиг.." : "Saving config..", 3, Notification.Type.INFO);
             }
         }
     }
@@ -189,7 +188,7 @@ public final class Core {
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             FontRenderers.modules.drawCenteredString(e.getMatrices(), "gps (" + dst + "m)", (float) (Math.sin(Math.toRadians(yaw)) * 50f) + xOffset, (float) (yOffset - (Math.cos(Math.toRadians(yaw)) * 50f)) - 23, -1);
 
-            if(dst < 10)
+            if (dst < 10)
                 ThunderHack.gps_position = null;
         }
     }
@@ -197,7 +196,7 @@ public final class Core {
     @EventHandler
     public void onKeyPress(EventKeyPress event) {
         if (event.getKey() == -1) return;
-        for (MacroManager.Macro m : ThunderHack.macroManager.getMacros())
+        for (MacroManager.Macro m : Managers.MACRO.getMacros())
             if (m.getBind() == event.getKey())
                 m.runMacro();
     }
@@ -226,14 +225,14 @@ public final class Core {
     }
 
     public void bobView(MatrixStack matrices, float tickDelta) {
-        if (!(mc.getCameraEntity() instanceof PlayerEntity)) {
+        if (!(mc.getCameraEntity() instanceof PlayerEntity playerEntity)) {
             return;
         }
-        PlayerEntity playerEntity = (PlayerEntity)mc.getCameraEntity();
+
         float g = -(playerEntity.horizontalSpeed + (playerEntity.horizontalSpeed - playerEntity.prevHorizontalSpeed) * tickDelta);
         float h = MathHelper.lerp(tickDelta, playerEntity.prevStrideDistance, playerEntity.strideDistance);
-        matrices.translate(MathHelper.sin(g * (float)Math.PI) * h * 0.1f, -Math.abs(MathHelper.cos(g * (float)Math.PI) * h) * 0.3, 0.0f);
-        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(g * (float)Math.PI) * h * 3.0f));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(g * (float)Math.PI - 0.2f) * h) * 0.3f));
+        matrices.translate(MathHelper.sin(g * (float) Math.PI) * h * 0.1f, -Math.abs(MathHelper.cos(g * (float) Math.PI) * h) * 0.3, 0.0f);
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(g * (float) Math.PI) * h * 3.0f));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(g * (float) Math.PI - 0.2f) * h) * 0.3f));
     }
 }

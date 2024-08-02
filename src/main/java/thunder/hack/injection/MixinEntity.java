@@ -17,18 +17,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventFixVelocity;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.combat.HitBox;
-import thunder.hack.modules.render.Shaders;
-import thunder.hack.modules.render.Trails;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.combat.HitBox;
+import thunder.hack.features.modules.render.Shaders;
+import thunder.hack.features.modules.render.Trails;
 import thunder.hack.utility.interfaces.IEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity implements IEntity {

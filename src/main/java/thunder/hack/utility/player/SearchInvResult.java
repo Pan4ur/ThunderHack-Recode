@@ -3,7 +3,7 @@ package thunder.hack.utility.player;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public record SearchInvResult(int slot, boolean found, ItemStack stack) {
     private static final SearchInvResult NOT_FOUND_RESULT = new SearchInvResult(-1, false, null);

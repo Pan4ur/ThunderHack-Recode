@@ -10,9 +10,8 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.render.XRay;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.features.modules.render.XRay;
 
 @SuppressWarnings("UnresolvedMixinReference")
 @Pseudo

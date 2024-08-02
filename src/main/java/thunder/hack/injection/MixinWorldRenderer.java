@@ -2,19 +2,14 @@ package thunder.hack.injection;
 
 import net.minecraft.client.gl.PostEffectProcessor;
 import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
-import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.core.impl.ShaderManager;
-import thunder.hack.modules.render.Fullbright;
-import thunder.hack.modules.render.Shaders;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.core.manager.client.ShaderManager;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 @Mixin(WorldRenderer.class)
 public abstract class MixinWorldRenderer {
@@ -28,8 +23,8 @@ public abstract class MixinWorldRenderer {
     private void replaceShaderHook(PostEffectProcessor instance, float tickDelta) {
         ShaderManager.Shader shaders = ModuleManager.shaders.mode.getValue();
         if (ModuleManager.shaders.isEnabled() && mc.world != null) {
-            if (ThunderHack.shaderManager.fullNullCheck()) return;
-            ThunderHack.shaderManager.setupShader(shaders, ThunderHack.shaderManager.getShaderOutline(shaders));
+            if (Managers.SHADER.fullNullCheck()) return;
+            Managers.SHADER.setupShader(shaders, Managers.SHADER.getShaderOutline(shaders));
         } else {
             instance.render(tickDelta);
         }

@@ -4,11 +4,10 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import thunder.hack.ThunderHack;
+import thunder.hack.core.Managers;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.TextureStorage;
@@ -24,7 +23,7 @@ public class TPSCounter extends HudElement {
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
-        String str = "TPS " + Formatting.WHITE + ThunderHack.serverManager.getTPS() + (extraTps.getValue() ? " [" + ThunderHack.serverManager.getTPS2() + "]" : "");
+        String str = "TPS " + Formatting.WHITE + Managers.SERVER.getTPS() + (extraTps.getValue() ? " [" + Managers.SERVER.getTPS2() + "]" : "");
 
         float pX = getPosX() > mc.getWindow().getScaledWidth() / 2f ? getPosX() - FontRenderers.getModulesRenderer().getStringWidth(str) : getPosX();
 

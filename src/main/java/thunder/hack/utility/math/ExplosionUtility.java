@@ -20,12 +20,12 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.explosion.Explosion;
 import org.apache.commons.lang3.mutable.MutableInt;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.injection.accesors.IExplosion;
 
 import java.util.Objects;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public final class ExplosionUtility {
 

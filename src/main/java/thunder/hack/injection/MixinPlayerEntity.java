@@ -3,7 +3,6 @@ package thunder.hack.injection;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -15,18 +14,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventAttack;
 import thunder.hack.events.impl.EventEatFood;
 import thunder.hack.events.impl.EventPlayerJump;
 import thunder.hack.events.impl.EventPlayerTravel;
-import thunder.hack.modules.client.Media;
-import thunder.hack.modules.combat.Aura;
-import thunder.hack.modules.combat.Reach;
-import thunder.hack.modules.movement.AutoSprint;
-import thunder.hack.modules.movement.Speed;
+import thunder.hack.features.modules.client.Media;
+import thunder.hack.features.modules.combat.Aura;
+import thunder.hack.features.modules.movement.AutoSprint;
+import thunder.hack.features.modules.movement.Speed;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 @Mixin(value = PlayerEntity.class, priority = 800)
 public class MixinPlayerEntity {

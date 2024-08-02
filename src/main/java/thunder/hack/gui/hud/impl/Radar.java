@@ -4,18 +4,18 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Formatting;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.render.NameTags;
+import thunder.hack.features.modules.client.HudEditor;
+import thunder.hack.features.modules.render.NameTags;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.awt.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Radar extends HudElement {
     public Radar() {
@@ -69,7 +69,7 @@ public class Radar extends HudElement {
                 );
             }
 
-            for (PlayerEntity entityPlayer : ThunderHack.asyncManager.getAsyncPlayers()) {
+            for (PlayerEntity entityPlayer : Managers.ASYNC.getAsyncPlayers()) {
                 if (entityPlayer == mc.player)
                     continue;
 
@@ -96,7 +96,7 @@ public class Radar extends HudElement {
 
         if (mode.getValue() == Mode.Text) {
             float offset_y = 0;
-            for (PlayerEntity entityPlayer : ThunderHack.asyncManager.getAsyncPlayers()) {
+            for (PlayerEntity entityPlayer : Managers.ASYNC.getAsyncPlayers()) {
                 if (entityPlayer == mc.player)
                     continue;
 
@@ -140,7 +140,7 @@ public class Radar extends HudElement {
                 return c32.getValue() + (((int) Math.ceil(mc.player.distanceTo(player))) + "m") + Formatting.RESET;
             }
             case TotemPops -> {
-                return c42.getValue() + (ThunderHack.combatManager.getPops(player) + "") + Formatting.RESET;
+                return c42.getValue() + (Managers.COMBAT.getPops(player) + "") + Formatting.RESET;
             }
         }
     }

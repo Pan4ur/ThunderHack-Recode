@@ -1,7 +1,7 @@
 package thunder.hack.gui.clickui;
 
 import net.minecraft.client.gui.DrawContext;
-import thunder.hack.modules.Module;
+import thunder.hack.features.modules.Module;
 import thunder.hack.utility.render.Render2DEngine;
 
 public class AbstractCategory {

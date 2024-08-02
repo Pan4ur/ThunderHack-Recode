@@ -1,9 +1,9 @@
 package thunder.hack.api;
 
 import com.mojang.logging.LogUtils;
-import thunder.hack.cmd.Command;
+import thunder.hack.features.cmd.Command;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.Module;
+import thunder.hack.features.modules.Module;
 
 import java.util.List;
 
@@ -23,6 +23,7 @@ public interface IAddon {
     String getAuthor();
 
     String getRepo();
+
     String getVersion();
 
     default String getDescription() {

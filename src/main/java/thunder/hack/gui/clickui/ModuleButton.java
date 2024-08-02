@@ -10,15 +10,16 @@ import net.minecraft.util.math.RotationAxis;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
-import thunder.hack.cmd.Command;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
+import thunder.hack.features.cmd.Command;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.clickui.impl.*;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.impl.TargetHud;
 import thunder.hack.gui.misc.DialogScreen;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.client.ClickGui;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.ClickGui;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.*;
 import thunder.hack.utility.render.Render2DEngine;
@@ -31,8 +32,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.features.modules.Module.mc;
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class ModuleButton extends AbstractButton {
@@ -88,7 +89,7 @@ public class ModuleButton extends AbstractButton {
 
         if (hovered) {
             if (!prevHovered)
-                ThunderHack.soundManager.playScroll();
+                Managers.SOUND.playScroll();
             ClickGUI.currentDescription = I18n.translate(module.getDescription());
         }
 
@@ -296,8 +297,8 @@ public class ModuleButton extends AbstractButton {
             } else if (button == 1 && (module.getSettings().size() > 3)) {
                 setOpen(!isOpen());
 
-                if (open) ThunderHack.soundManager.playSwipeIn();
-                else ThunderHack.soundManager.playSwipeOut();
+                if (open) Managers.SOUND.playSwipeIn();
+                else Managers.SOUND.playSwipeOut();
 
                 animation = 0.5f;
             } else if (button == 2) {

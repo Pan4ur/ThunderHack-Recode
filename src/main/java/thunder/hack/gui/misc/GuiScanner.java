@@ -3,15 +3,15 @@ package thunder.hack.gui.misc;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.modules.misc.NoCommentExploit;
+import thunder.hack.features.modules.misc.NoCommentExploit;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 import java.util.ArrayList;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class GuiScanner extends Screen {
     public static boolean neartrack = false;

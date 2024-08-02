@@ -5,13 +5,13 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.WayPointManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.world.WayPointManager;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -21,9 +21,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static thunder.hack.modules.Module.fullNullCheck;
-import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.features.modules.Module.fullNullCheck;
+import static thunder.hack.features.modules.Module.mc;
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class WaypointWindow extends WindowBase {
     private static WaypointWindow instance;
@@ -265,8 +265,8 @@ public class WaypointWindow extends WindowBase {
 
             if (hoveringAdd) {
                 try {
-                    ThunderHack.wayPointManager.addWayPoint(new WayPointManager.WayPoint(Integer.parseInt(addX), Integer.parseInt(addY), Integer.parseInt(addZ), addName, addServer, addDimension));
-                } catch (Exception e){}
+                    Managers.WAYPOINT.addWayPoint(new WayPointManager.WayPoint(Integer.parseInt(addX), Integer.parseInt(addY), Integer.parseInt(addZ), addName, addServer, addDimension));
+                } catch (Exception ignored){}
                 refresh();
             }
         }
@@ -306,7 +306,7 @@ public class WaypointWindow extends WindowBase {
                 listeningId = waypointPlate.id;
 
             if (hoveringRemove) {
-                ThunderHack.wayPointManager.removeWayPoint(waypointPlate.waypoint);
+                Managers.WAYPOINT.removeWayPoint(waypointPlate.waypoint);
                 refresh();
             }
         }
@@ -457,7 +457,7 @@ public class WaypointWindow extends WindowBase {
         resetScroll();
         waypointPlates.clear();
         int id1 = 0;
-        for (WayPointManager.WayPoint w : ThunderHack.wayPointManager.getWayPoints())
+        for (WayPointManager.WayPoint w : Managers.WAYPOINT.getWayPoints())
             if (search.equals("Search") || search.isEmpty() || w.getName().contains(search) || w.getServer().contains(search)) {
                 waypointPlates.add(new WaypointPlate(id1, id1 * 20 + 18, w));
                 id1++;

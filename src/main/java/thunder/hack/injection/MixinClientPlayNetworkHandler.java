@@ -2,16 +2,15 @@ package thunder.hack.injection;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.combat.Criticals;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.features.modules.Module;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class MixinClientPlayNetworkHandler {
@@ -21,11 +20,11 @@ public class MixinClientPlayNetworkHandler {
             ModuleManager.unHook.disable();
 
         if(Module.fullNullCheck()) return;
-        if (message.startsWith(ThunderHack.commandManager.getPrefix())) {
+        if (message.startsWith(Managers.COMMAND.getPrefix())) {
             try {
-                ThunderHack.commandManager.getDispatcher().execute(
-                        message.substring(ThunderHack.commandManager.getPrefix().length()),
-                        ThunderHack.commandManager.getSource()
+                Managers.COMMAND.getDispatcher().execute(
+                        message.substring(Managers.COMMAND.getPrefix().length()),
+                        Managers.COMMAND.getSource()
                 );
             } catch (CommandSyntaxException ignored) {}
 

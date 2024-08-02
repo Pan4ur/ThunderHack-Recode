@@ -6,10 +6,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.Managers;
 import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.combat.AntiBot;
+import thunder.hack.features.modules.combat.AntiBot;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
@@ -18,7 +19,7 @@ import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class Companion extends HudElement {
 
@@ -37,13 +38,13 @@ public class Companion extends HudElement {
     @Override
     public void onUpdate() {
         for (PlayerEntity player : mc.world.getPlayers()) {
-            if (player == mc.player || AntiBot.bots.contains(player) || player.getHealth() > 0 || !ThunderHack.combatManager.popList.containsKey(player.getName().getString()))
+            if (player == mc.player || AntiBot.bots.contains(player) || player.getHealth() > 0 || !Managers.COMBAT.popList.containsKey(player.getName().getString()))
                 continue;
 
             if (isRu())
-                message = player.getName().getString() + " попнул " + (ThunderHack.combatManager.popList.get(player.getName().getString()) > 1 ? ThunderHack.combatManager.popList.get(player.getName().getString()) + "" + " тотемов и сдох!" : "тотем и сдох!");
+                message = player.getName().getString() + " попнул " + (Managers.COMBAT.popList.get(player.getName().getString()) > 1 ? Managers.COMBAT.popList.get(player.getName().getString()) + "" + " тотемов и сдох!" : "тотем и сдох!");
             else
-                message = player.getName().getString() + " popped " + (ThunderHack.combatManager.popList.get(player.getName().getString()) > 1 ? ThunderHack.combatManager.popList.get(player.getName().getString()) + "" + " totems and died EZ LMAO!" : "totem and died EZ LMAO!");
+                message = player.getName().getString() + " popped " + (Managers.COMBAT.popList.get(player.getName().getString()) > 1 ? Managers.COMBAT.popList.get(player.getName().getString()) + "" + " totems and died EZ LMAO!" : "totem and died EZ LMAO!");
             lastPop.reset();
 
         }

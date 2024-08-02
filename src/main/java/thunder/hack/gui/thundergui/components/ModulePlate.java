@@ -3,11 +3,11 @@ package thunder.hack.gui.thundergui.components;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
-import thunder.hack.cmd.Command;
+import thunder.hack.features.cmd.Command;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.client.ThunderHackGui;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.ThunderHackGui;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
@@ -15,7 +15,7 @@ import thunder.hack.utility.render.animation.AnimationUtility;
 import java.awt.*;
 import java.util.Objects;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class ModulePlate {
 

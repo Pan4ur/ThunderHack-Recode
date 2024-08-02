@@ -3,7 +3,7 @@ package thunder.hack.injection;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.manager.client.ModuleManager;
 import net.minecraft.client.render.Camera;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

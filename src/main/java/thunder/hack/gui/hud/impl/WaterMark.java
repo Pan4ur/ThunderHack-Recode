@@ -4,15 +4,15 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.client.Media;
-import thunder.hack.modules.misc.NameProtect;
+import thunder.hack.features.modules.client.HudEditor;
+import thunder.hack.features.modules.client.Media;
+import thunder.hack.features.modules.misc.NameProtect;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
@@ -23,7 +23,7 @@ import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static thunder.hack.core.impl.ServerManager.getPing;
+import static thunder.hack.core.manager.client.ServerManager.getPing;
 
 public class WaterMark extends HudElement {
     public WaterMark() {
@@ -63,7 +63,7 @@ public class WaterMark extends HudElement {
             if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
                 float offset1 = FontRenderers.sf_bold.getStringWidth(username) + 72;
                 float offset2 = FontRenderers.sf_bold.getStringWidth((mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address));
-                float offset3 = (ThunderHack.proxyManager.isActive() ? FontRenderers.sf_bold.getStringWidth(ThunderHack.proxyManager.getActiveProxy().getName()) + 11 : 0);
+                float offset3 = (Managers.PROXY.isActive() ? FontRenderers.sf_bold.getStringWidth(Managers.PROXY.getActiveProxy().getName()) + 11 : 0);
 
                 Render2DEngine.drawRoundedBlur(context.getMatrices(), getPosX(), getPosY(), 50f, 15f, 3, HudEditor.blurColor.getValue().getColorObject());
                 Render2DEngine.drawRoundedBlur(context.getMatrices(), getPosX() + 55, getPosY(), offset1 + offset2 - 36 + offset3, 15f, 3, HudEditor.blurColor.getValue().getColorObject());
@@ -87,12 +87,12 @@ public class WaterMark extends HudElement {
                 Render2DEngine.renderGradientTexture(context.getMatrices(), getPosX() + offset1, getPosY() + 2, 10, 10, 0, 0, 128, 128, 128, 128,
                         HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
 
-                if (ThunderHack.proxyManager.isActive()) {
+                if (Managers.PROXY.isActive()) {
                     RenderSystem.setShaderTexture(0, TextureStorage.proxyIcon);
                     Render2DEngine.renderGradientTexture(context.getMatrices(), getPosX() + offset1 + offset2 + 16, getPosY() + 2, 10, 10, 0, 0, 128, 128, 128, 128,
                             HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
 
-                    FontRenderers.sf_bold.drawString(context.getMatrices(), ThunderHack.proxyManager.getActiveProxy().getName(), getPosX() + offset1 + offset2 + 28, getPosY() + 5, -1);
+                    FontRenderers.sf_bold.drawString(context.getMatrices(), Managers.PROXY.getActiveProxy().getName(), getPosX() + offset1 + offset2 + 28, getPosY() + 5, -1);
                 }
 
                 Render2DEngine.endRender();
@@ -133,7 +133,7 @@ public class WaterMark extends HudElement {
             // лень вставлять реал билд дату
             // too lazy to insert the real build date
 
-            String info = Formatting.GREEN + String.format("th7 | build: 16/06/2024 | rate: %d | %s", Math.round(ThunderHack.serverManager.getTPS()), format.format(date));
+            String info = Formatting.GREEN + String.format("th7 | build: 16/06/2024 | rate: %d | %s", Math.round(Managers.SERVER.getTPS()), format.format(date));
             float width = FontRenderers.profont.getStringWidth(info) + 5;
             Render2DEngine.drawRectWithOutline(context.getMatrices(), getPosX(), getPosY(), width, 8, Color.decode("#192A1A"), Color.decode("#833B7B"));
             Render2DEngine.drawGradientBlurredShadow1(context.getMatrices(), getPosX(), getPosY(), width, 8, 10, Color.decode("#161A1E"), Color.decode("#161A1E"), Color.decode("#382E37"), Color.decode("#382E37"));

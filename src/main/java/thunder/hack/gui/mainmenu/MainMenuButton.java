@@ -4,12 +4,12 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class MainMenuButton {
     private final float posX, posY, width, height;

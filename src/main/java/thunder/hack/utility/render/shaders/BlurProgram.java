@@ -17,7 +17,7 @@ import thunder.hack.utility.render.shaders.satin.api.managed.uniform.Uniform4f;
 
 import java.awt.*;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class BlurProgram {
 

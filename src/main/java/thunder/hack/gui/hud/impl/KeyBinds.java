@@ -3,11 +3,12 @@ package thunder.hack.gui.hud.impl;
 import net.minecraft.client.gui.DrawContext;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -35,7 +36,7 @@ public class KeyBinds extends HudElement {
         float maxBindWidth = 0;
 
         float pointerX = 0;
-        for (Module feature : ThunderHack.moduleManager.modules) {
+        for (Module feature : Managers.MODULE.modules) {
             if (feature.isDisabled() && onlyEnabled.getValue()) continue;
             if (!Objects.equals(feature.getBind().getBind(), "None") && feature != ModuleManager.clickGui && feature != ModuleManager.thunderHackGui) {
                 if (y_offset1 == 0)
@@ -80,7 +81,7 @@ public class KeyBinds extends HudElement {
 
         Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
         int y_offset = 0;
-        for (Module feature : ThunderHack.moduleManager.modules) {
+        for (Module feature : Managers.MODULE.modules) {
             if (feature.isDisabled() && onlyEnabled.getValue())
                 continue;
             if (!Objects.equals(feature.getBind().getBind(), "None") && feature != ModuleManager.clickGui && feature != ModuleManager.thunderHackGui) {

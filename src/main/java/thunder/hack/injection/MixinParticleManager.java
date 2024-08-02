@@ -5,8 +5,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.render.NoRender;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.features.modules.render.NoRender;
 
 @Mixin(ParticleManager.class)
 public class MixinParticleManager {

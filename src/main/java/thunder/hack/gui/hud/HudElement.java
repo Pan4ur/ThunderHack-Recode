@@ -6,9 +6,10 @@ import net.minecraft.client.gui.screen.ChatScreen;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.Managers;
 import thunder.hack.events.impl.EventMouse;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -46,7 +47,7 @@ public class HudElement extends Module {
                 float finalY = 0;
 
                 if (HudEditor.sticky.getValue())
-                    for (Module m : ThunderHack.moduleManager.getEnabledModules())
+                    for (Module m : Managers.MODULE.getEnabledModules())
                         if (m instanceof HudElement hudElement && hudElement != this && !(hudElement.getPosX() == 0 && hudElement.getPosY() == 0)) {
                             if (getPosX() > mc.getWindow().getScaledWidth() / 2f) {
                                 if (isNear(hudElement.getHitX() + hudElement.getWidth(), getHitX() + getWidth()))
@@ -103,7 +104,7 @@ public class HudElement extends Module {
 
             if (mouseButton && mouseState)
                 if (HudEditor.sticky.getValue())
-                    for (Module m : ThunderHack.moduleManager.getEnabledModules()) {
+                    for (Module m : Managers.MODULE.getEnabledModules()) {
                         if (m instanceof HudElement hudElement && hudElement != this && !(hudElement.getHitX() == 0 && hudElement.getHitY() == 0)) {
 
                             float hitDifX = getPosX() - getHitX();

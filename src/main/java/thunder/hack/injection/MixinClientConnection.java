@@ -4,13 +4,13 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.proxy.Socks5ProxyHandler;
 
-import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.core.impl.ProxyManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.core.manager.client.ProxyManager;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.modules.Module;
+import thunder.hack.features.modules.Module;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
@@ -22,7 +22,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.net.InetSocketAddress;
-import java.util.Iterator;
 
 @Mixin(ClientConnection.class)
 public class MixinClientConnection {
@@ -100,7 +99,7 @@ public class MixinClientConnection {
     // Thanks to Meteor
     @Inject(method = "addHandlers", at = @At("RETURN"))
     private static void addHandlersHook(ChannelPipeline pipeline, NetworkSide side, boolean local, PacketSizeLogger packetSizeLogger, CallbackInfo ci) {
-        ProxyManager.ThProxy proxy = ThunderHack.proxyManager.getActiveProxy();
+        ProxyManager.ThProxy proxy = Managers.PROXY.getActiveProxy();
         if (proxy != null && side == NetworkSide.CLIENTBOUND && !local)
             pipeline.addFirst(new Socks5ProxyHandler(new InetSocketAddress(proxy.getIp(), proxy.getPort()), proxy.getL(), proxy.getP()));
     }

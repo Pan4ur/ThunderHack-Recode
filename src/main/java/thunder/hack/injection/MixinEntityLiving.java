@@ -14,18 +14,18 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventTravel;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.combat.Aura;
-import thunder.hack.modules.render.Animations;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.combat.Aura;
+import thunder.hack.features.modules.render.Animations;
 import thunder.hack.utility.interfaces.IEntityLiving;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.movement.WaterSpeed.Mode.CancelResurface;
+import static thunder.hack.features.modules.Module.mc;
+import static thunder.hack.features.modules.movement.WaterSpeed.Mode.CancelResurface;
 
 @Mixin(LivingEntity.class)
 public class MixinEntityLiving implements IEntityLiving {

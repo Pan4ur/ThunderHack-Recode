@@ -6,15 +6,15 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.client.ClickGui;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.ClickGui;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
 import thunder.hack.utility.render.animation.EaseOutBack;
@@ -22,7 +22,7 @@ import thunder.hack.utility.render.animation.EaseOutBack;
 import java.util.List;
 import java.util.Objects;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class ClickGUI extends Screen {
     public static List<AbstractCategory> windows;
@@ -72,9 +72,9 @@ public class ClickGUI extends Screen {
             int halfWidth = mc.getWindow().getScaledWidth() / 2;
             int halfWidthCats = (int) (3 * (ModuleManager.clickGui.moduleWidth.getValue() + 4f));
 
-            for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
+            for (final Module.Category category : Managers.MODULE.getCategories()) {
                 if (category == Module.Category.HUD) continue;
-                Category window = new Category(category, ThunderHack.moduleManager.getModulesByCategory(category), (halfWidth - halfWidthCats) + offset, 20, 100, windowHeight);
+                Category window = new Category(category, Managers.MODULE.getModulesByCategory(category), (halfWidth - halfWidthCats) + offset, 20, 100, windowHeight);
                 window.setOpen(true);
                 windows.add(window);
                 offset += ModuleManager.clickGui.moduleWidth.getValue() + 2;

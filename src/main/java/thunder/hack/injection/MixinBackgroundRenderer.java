@@ -1,8 +1,7 @@
 package thunder.hack.injection;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.render.NoRender;
+import thunder.hack.core.manager.client.ModuleManager;
 import net.minecraft.client.render.BackgroundRenderer;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
@@ -11,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import thunder.hack.modules.render.WorldTweaks;
+import thunder.hack.features.modules.render.WorldTweaks;
 
 @Mixin(BackgroundRenderer.class)
 public class MixinBackgroundRenderer {

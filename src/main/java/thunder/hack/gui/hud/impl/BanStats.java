@@ -22,7 +22,7 @@ import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class BanStats extends HudElement {
     public BanStats() {

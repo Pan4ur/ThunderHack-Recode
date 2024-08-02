@@ -6,12 +6,13 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.Managers;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
 import thunder.hack.gui.windows.WindowsScreen;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -22,8 +23,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.features.modules.Module.mc;
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class ConfigWindow extends WindowBase {
     private static ConfigWindow instance;
@@ -91,7 +92,7 @@ public class ConfigWindow extends WindowBase {
 
             // Name
             Render2DEngine.drawRectWithOutline(context.getMatrices(), getX() + 11, configPlate.offset + getY() + 36 + getScrollOffset(), getWidth() - 52, 11, color, color2);
-            FontRenderers.sf_medium.drawString(context.getMatrices(), configPlate.name() + (Objects.equals(configPlate.name() + ".th", ThunderHack.configManager.currentConfig.getName()) ? blink : "")
+            FontRenderers.sf_medium.drawString(context.getMatrices(), configPlate.name() + (Objects.equals(configPlate.name() + ".th", Managers.CONFIG.currentConfig.getName()) ? blink : "")
                     , getX() + 13, configPlate.offset + getY() + 40 + getScrollOffset(), textColor);
 
             // Load
@@ -130,7 +131,7 @@ public class ConfigWindow extends WindowBase {
         }
 
         if (hoveringAdd && !addName.isEmpty()) {
-            ThunderHack.configManager.save(addName);
+            Managers.CONFIG.save(addName);
             addName = "";
             refresh();
         }
@@ -144,10 +145,10 @@ public class ConfigWindow extends WindowBase {
             boolean hoverLoad = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 39, configPlate.offset + getY() + 36 + getScrollOffset(), 22, 11);
 
             if(hoverLoad)
-                ThunderHack.configManager.load(configPlate.name());
+                Managers.CONFIG.load(configPlate.name());
 
             if (hoveringRemove) {
-                ThunderHack.configManager.delete(configPlate.name());
+                Managers.CONFIG.delete(configPlate.name());
                 refresh();
             }
         }
@@ -215,7 +216,7 @@ public class ConfigWindow extends WindowBase {
         resetScroll();
         configPlates.clear();
         int id1 = 0;
-        for (String s : ThunderHack.configManager.getConfigList())
+        for (String s : Managers.CONFIG.getConfigList())
             if (search.equals("Search") || search.isEmpty() || s.contains(search)) {
                 configPlates.add(new ConfigPlate(id1, id1 * 20 + 8, s));
                 id1++;

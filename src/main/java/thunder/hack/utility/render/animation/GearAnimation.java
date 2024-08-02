@@ -1,10 +1,10 @@
 package thunder.hack.utility.render.animation;
 
-import thunder.hack.modules.client.ClickGui;
+import thunder.hack.features.modules.client.ClickGui;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class GearAnimation {
     private float espValue = 1f, prevEspValue;
