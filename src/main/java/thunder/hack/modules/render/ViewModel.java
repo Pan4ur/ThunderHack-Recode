@@ -93,35 +93,30 @@ public class ViewModel extends Module {
 
     @Override
     public void onUpdate() {
-        if (animateMainX.getValue()) {
-            prevMainX = rotationMainX.getValue();
+        prevMainX = rotationMainX.getValue();
+        prevMainY = rotationMainY.getValue();
+        prevMainZ = rotationMainZ.getValue();
+        prevOffX = rotationOffX.getValue();
+        prevOffY = rotationOffY.getValue();
+        prevOffZ = rotationOffZ.getValue();
+
+        if (animateMainX.getValue())
             rotationMainX.setValue(rotate(rotationMainX.getValue(), speedAnimateMain.getValue()));
-        }
 
-        if (animateMainY.getValue()) {
-            prevMainY = rotationMainY.getValue();
+        if (animateMainY.getValue())
             rotationMainY.setValue(rotate(rotationMainY.getValue(), speedAnimateMain.getValue()));
-        }
 
-        if (animateMainZ.getValue()) {
-            prevMainZ = rotationMainZ.getValue();
+        if (animateMainZ.getValue())
             rotationMainZ.setValue(rotate(rotationMainZ.getValue(), speedAnimateMain.getValue()));
-        }
 
-        if (animateOffX.getValue()) {
-            prevOffX = rotationOffX.getValue();
+        if (animateOffX.getValue())
             rotationOffX.setValue(rotate(rotationOffX.getValue(), speedAnimateOff.getValue()));
-        }
 
-        if (animateOffY.getValue()) {
-            prevOffY = rotationOffY.getValue();
+        if (animateOffY.getValue())
             rotationOffY.setValue(rotate(rotationOffY.getValue(), speedAnimateOff.getValue()));
-        }
 
-        if (animateOffZ.getValue()) {
-            prevOffZ = rotationOffZ.getValue();
+        if (animateOffZ.getValue())
             rotationOffZ.setValue(rotate(rotationOffZ.getValue(), speedAnimateOff.getValue()));
-        }
     }
 
     @EventHandler

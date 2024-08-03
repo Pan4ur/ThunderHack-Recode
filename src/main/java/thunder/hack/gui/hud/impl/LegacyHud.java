@@ -285,11 +285,13 @@ public class LegacyHud extends Module {
         int width = mc.getWindow().getScaledWidth();
         int height = mc.getWindow().getScaledHeight();
         int totems = mc.player.getInventory().main.stream().filter(itemStack -> (itemStack.getItem() == Items.TOTEM_OF_UNDYING)).mapToInt(ItemStack::getCount).sum();
+        int u = mc.player.getMaxAir();
+        int v = Math.min(mc.player.getAir(), u);
         if (mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING)
             totems += mc.player.getOffHandStack().getCount();
         if (totems > 0) {
             int i = width / 2;
-            int y = height - 55 - ((mc.player.isSubmergedInWater()) ? 10 : 0);
+            int y = height - 55 - (mc.player.isSubmergedInWater() || v < u ? 10 : 0);
             int x = i - 189 + 180 + 2;
             context.drawItem(totem, x, y);
             context.drawItemInSlot(mc.textRenderer, totem, x, y);
@@ -299,13 +301,16 @@ public class LegacyHud extends Module {
 
     public void renderArmorHUD(boolean percent, DrawContext context) {
         int i = 0;
-        int y = mc.getWindow().getScaledHeight() - 55 - (mc.player.isSubmergedInWater() ? 10 : 0);
+        int u = mc.player.getMaxAir();
+        int v = Math.min(mc.player.getAir(), u);
+
+        int y = mc.getWindow().getScaledHeight() - 55 - (mc.player.isSubmergedInWater() || v < u ? 10 : 0);
         for (ItemStack is : mc.player.getInventory().armor) {
             i++;
             if (is.isEmpty())
                 continue;
             int x = (mc.getWindow().getScaledWidth() / 2) - 90 + (9 - i) * 20 + 2;
-            context.drawItem(is, x, mc.getWindow().getScaledHeight() - 55 - ((mc.player.isSubmergedInWater()) ? 10 : 0));
+            context.drawItem(is, x, y);
             context.drawItemInSlot(mc.textRenderer, is, x, y);
             String s = (is.getCount() > 1) ? (is.getCount() + "") : "";
             drawText(context, s, (x + 19 - 2 - getStringWidth(s)), (y + 9), 16777215);

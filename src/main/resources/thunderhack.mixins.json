@@ -78,7 +78,6 @@
     "MixinFireWorkEntity",
     "MixinFlowableFluid",
     "MixinPlayerEntity",
-    "MixinPlayerEntityRenderer",
     "MixinScoreBoard",
     "MixinScoreboardPlayerScore",
     "MixinShulkerBoxBlock",

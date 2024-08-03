@@ -23,10 +23,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class ChatUtils extends Module {
     private final Setting<Welcomer> welcomer = new Setting<>("Welcomer", Welcomer.Off);
@@ -36,8 +33,8 @@ public class ChatUtils extends Module {
     private final Setting<Boolean> mention = new Setting<>("Mention", false);
     private final Setting<PMSound> pmSound = new Setting<>("PMSound", PMSound.Default);
     private final Setting<Boolean> zov = new Setting<>("ZOV", false);
-    private final Setting<Boolean> wavy = new Setting<>("wAvY",false);
-    private final Setting<Boolean> translit = new Setting<>("Translit",false);
+    private final Setting<Boolean> wavy = new Setting<>("wAvY", false);
+    private final Setting<Boolean> translit = new Setting<>("Translit", false);
     private final Setting<Boolean> antiCoordLeak = new Setting<>("AntiCoordLeak", false);
 
     private final Timer timer = new Timer();
@@ -45,6 +42,80 @@ public class ChatUtils extends Module {
     private final Timer messageTimer = new Timer();
     private final LinkedHashMap<UUID, String> nameMap = new LinkedHashMap<>();
     private String skip;
+
+    Map<String, String> ruToEng = Map.ofEntries(
+            Map.entry("а", "a"),
+            Map.entry("б", "6"),
+            Map.entry("в", "B"),
+            Map.entry("г", "r"),
+            Map.entry("д", "d"),
+            Map.entry("е", "e"),
+            Map.entry("ё", "e"),
+            Map.entry("ж", ">I<"),
+            Map.entry("з", "3"),
+            Map.entry("и", "u"),
+            Map.entry("й", "u"),
+            Map.entry("к", "k"),
+            Map.entry("л", "JI"),
+            Map.entry("м", "m"),
+            Map.entry("н", "H"),
+            Map.entry("о", "o"),
+            Map.entry("п", "n"),
+            Map.entry("р", "p"),
+            Map.entry("с", "c"),
+            Map.entry("т", "T"),
+            Map.entry("у", "y"),
+            Map.entry("ф", "f"),
+            Map.entry("х", "x"),
+            Map.entry("ц", "lI"),
+            Map.entry("ч", "4"),
+            Map.entry("ш", "w"),
+            Map.entry("щ", "w"),
+            Map.entry("ь", "b"),
+            Map.entry("ы", "bI"),
+            Map.entry("ъ", "b"),
+            Map.entry("э", "-)"),
+            Map.entry("ю", "I-O"),
+            Map.entry("я", "9I")
+    );
+
+    private final String[] bb = new String[]{
+            "See you later, ",
+            "Catch ya later, ",
+            "See you next time, ",
+            "Farewell, ",
+            "Bye, ",
+            "Good bye, ",
+            "Later, "
+    };
+
+    private final String[] qq = new String[]{
+            "Good to see you, ",
+            "Greetings, ",
+            "Hello, ",
+            "Howdy, ",
+            "Hey, ",
+            "Good evening, ",
+            "Welcome to SERVERIP1D5A9E, "
+    };
+
+    private final String[] popMessages = new String[]{
+            " EZZZ POP <pop> TIMES PIECE OF SHIT GET GOOD",
+            " ez pop <pop> times fuckin unbrain",
+            " pop <pop> times get good kiddo ",
+            " EZZZZZZZ pop <pop> times GO LEARN PVP PUSSY",
+            " piece of shit popped <pop> times so ez",
+            " easiest pop <pop> times in my life",
+            " HAHAHAHA BRO POPPED <pop> TIMES SO EZ LMAO",
+            " POP <pop> TIMES OMG MAN UR SO BAD LMAO",
+            " my grandma has more skill than you nigga pop <pop> times",
+            " trash pop <pop> times retard ",
+            " ezz no skill dog pop <pop> times",
+            " lame dude tryes to pvp with me but dyes) hahah pop <pop> times",
+            " get better tbh bruh pop <pop> times",
+            " pop <pop> times ur eyes don't work right? ",
+            " cringelord popped <pop> times so ez "
+    };
 
 
     public ChatUtils() {
@@ -118,7 +189,7 @@ public class ChatUtils extends Module {
             }
 
             String content = pac.content.getString().toLowerCase();
-            if(!pmSound.is(PMSound.Off) && (content.contains("whisper") || content.contains("-> я") || content.contains("-> " + NameProtect.getCustomName()) || content.contains("-> me") || content.contains(" says:"))) {
+            if (!pmSound.is(PMSound.Off) && (content.contains("whisper") || content.contains("-> я") || content.contains("-> " + NameProtect.getCustomName()) || content.contains("-> me") || content.contains(" says:"))) {
                 ThunderHack.soundManager.playPmSound(pmSound.getValue());
             }
         }
@@ -135,7 +206,7 @@ public class ChatUtils extends Module {
     }
 
     private @NotNull String getPrefix() {
-        return switch (prefix.getValue()){
+        return switch (prefix.getValue()) {
             case Green -> ">";
             case Global -> "!";
             case None -> "";
@@ -153,63 +224,6 @@ public class ChatUtils extends Module {
         }
         return false;
     }
-    private static final char[] cyrillicChars = {
-            'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И',
-            'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т',
-            'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь',
-            'Э', 'Ю', 'Я', 'а', 'б', 'в', 'г', 'д', 'е', 'ё',
-            'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п',
-            'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ',
-            'ъ', 'ы', 'ь', 'э', 'ю', 'я'
-    };
-
-    private static final String[] latinChars = {
-            "A", "B", "V", "G", "D", "E", "YO", "ZH", "Z", "I",
-            "Y", "K", "L", "M", "N", "O", "P", "R", "S", "T",
-            "U", "F", "KH", "TS", "CH", "SH", "SCH", "", "Y", "",
-            "E", "YU", "YA", "a", "b", "v", "g", "d", "e", "yo",
-            "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p",
-            "r", "s", "t", "u", "f", "kh", "ts", "ch", "sh", "sch",
-            "", "y", "", "e", "yu", "ya"
-    };
-
-    private final String[] bb = new String[]{
-            "See you later, ",
-            "Catch ya later, ",
-            "See you next time, ",
-            "Farewell, ",
-            "Bye, ",
-            "Good bye, ",
-            "Later, "
-    };
-
-    private final String[] qq = new String[]{
-            "Good to see you, ",
-            "Greetings, ",
-            "Hello, ",
-            "Howdy, ",
-            "Hey, ",
-            "Good evening, ",
-            "Welcome to SERVERIP1D5A9E, "
-    };
-
-    private final String[] popMessages = new String[]{
-            " EZZZ POP <pop> TIMES PIECE OF SHIT GET GOOD",
-            " ez pop <pop> times fuckin unbrain",
-            " pop <pop> times get good kiddo ",
-            " EZZZZZZZ pop <pop> times GO LEARN PVP PUSSY",
-            " piece of shit popped <pop> times so ez",
-            " easiest pop <pop> times in my life",
-            " HAHAHAHA BRO POPPED <pop> TIMES SO EZ LMAO",
-            " POP <pop> TIMES OMG MAN UR SO BAD LMAO",
-            " my grandma has more skill than you nigga pop <pop> times",
-            " trash pop <pop> times retard ",
-            " ezz no skill dog pop <pop> times",
-            " lame dude tryes to pvp with me but dyes) hahah pop <pop> times",
-            " get better tbh bruh pop <pop> times",
-            " pop <pop> times ur eyes don't work right? ",
-            " cringelord popped <pop> times so ez "
-    };
 
     @EventHandler
     public void onPacketSend(PacketEvent.@NotNull Send e) {
@@ -236,9 +250,9 @@ public class ChatUtils extends Module {
                 return;
 
             String message = pac.chatMessage();
-            if(zov.getValue()){
+            if (zov.getValue()) {
                 StringBuilder builder = new StringBuilder();
-                for(char Z:message.toCharArray()){
+                for (char Z : message.toCharArray()) {
                     if ('З' == Z || 'з' == Z) {
                         builder.append("Z");
                     } else if ('В' == Z || 'в' == Z) {
@@ -249,21 +263,20 @@ public class ChatUtils extends Module {
                 }
                 message = builder.toString();
             }
-            if(wavy.getValue()){
+            if (wavy.getValue()) {
                 StringBuilder builder = new StringBuilder();
                 boolean up = false;
-                for(char C : message.toCharArray()){
-                    if(up){
+                for (char C : message.toCharArray()) {
+                    if (up) {
                         builder.append(Character.toUpperCase(C));
-                    }
-                    else{
+                    } else {
                         builder.append(Character.toLowerCase(C));
                     }
                     up = Character.isLetter(C) != up;
                 }
                 message = builder.toString();
             }
-            if(translit.getValue()){
+            if (translit.getValue()) {
                 message = transliterate(message.toString());
             }
             skip = message;
@@ -271,28 +284,18 @@ public class ChatUtils extends Module {
             e.cancel();
         }
     }
-    public static String transliterate(String text) {
+
+    public String transliterate(String text) {
         StringBuilder result = new StringBuilder();
 
         for (char ch : text.toCharArray()) {
-            int index = -1;
-
-            for (int i = 0; i < cyrillicChars.length; i++) {
-                if (cyrillicChars[i] == ch) {
-                    index = i;
-                    break;
-                }
-            }
-
-            if (index != -1) {
-                result.append(latinChars[index]);
-            } else {
-                result.append(ch);
-            }
+            String str = ruToEng.get(ch + "");
+            result.append(str != null ? str : ch);
         }
 
         return result.toString();
     }
+
     private enum Welcomer {
         Off, Server, Client
     }

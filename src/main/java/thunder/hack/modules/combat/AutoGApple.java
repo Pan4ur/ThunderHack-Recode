@@ -1,6 +1,7 @@
 package thunder.hack.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Formatting;
 import thunder.hack.core.impl.ModuleManager;
@@ -9,6 +10,7 @@ import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.player.InventoryUtility;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;
 
@@ -47,7 +49,7 @@ public final class AutoGApple extends Module {
     }
 
     private boolean GapInOffHand() {
-        if (autoTotemIntegration.getValue() && ModuleManager.autoTotem.isEnabled()) {
+        if (autoTotemIntegration.getValue() && ModuleManager.autoTotem.isEnabled() && InventoryUtility.findItemInHotBar(Items.GOLDEN_APPLE, Items.ENCHANTED_GOLDEN_APPLE).found()) {
             if (!ModuleManager.autoTotem.rcGap.is(AutoTotem.RCGap.Off))
                 return true;
             else

@@ -65,89 +65,89 @@ public class AutoCrystal extends Module {
 
     /*   MAIN   */
     private static final Setting<Pages> page = new Setting<>("Page", Pages.Main);
-    private final Setting<Boolean> await = new Setting<>("Await", true, v -> page.getValue() == Pages.Main);
-    private final Setting<Timing> timing = new Setting<>("Timing", Timing.NORMAL, v -> page.getValue() == Pages.Main);
-    private final Setting<Sequential> sequential = new Setting<>("Sequential", Sequential.Strong, v -> page.getValue() == Pages.Main);
+    private final Setting<Boolean> await = new Setting<>("Await", true, v -> page.is(Pages.Main));
+    private final Setting<Timing> timing = new Setting<>("Timing", Timing.NORMAL, v -> page.is(Pages.Main));
+    private final Setting<Sequential> sequential = new Setting<>("Sequential", Sequential.Strong, v -> page.is(Pages.Main));
     private final Setting<InstantBreak> instantBreak = new Setting<>("InstantBreak", InstantBreak.OnSpawn, v -> page.is(Pages.Main));
-    private final Setting<Rotation> rotate = new Setting<>("Rotate", Rotation.CC, v -> page.getValue() == Pages.Main);
-    private final Setting<BooleanSettingGroup> yawStep = new Setting<>("YawStep", new BooleanSettingGroup(false), v -> !rotate.is(Rotation.OFF) && page.getValue() == Pages.Main);
-    private final Setting<Float> yawAngle = new Setting<>("YawAngle", 180.0f, 1.0f, 180.0f, v -> !rotate.is(Rotation.OFF) && page.getValue() == Pages.Main).addToGroup(yawStep);
-    private final Setting<CombatManager.TargetBy> targetLogic = new Setting<>("TargetLogic", CombatManager.TargetBy.Distance, v -> page.getValue() == Pages.Main);
-    private final Setting<Float> targetRange = new Setting<>("TargetRange", 10.0f, 1.0f, 15f, v -> page.getValue() == Pages.Main);
-    private final Setting<Integer> extrapolation = new Setting<>("Extrapolation", 0, 0, 20, v -> page.getValue() == Pages.Main);
+    private final Setting<Rotation> rotate = new Setting<>("Rotate", Rotation.CC, v -> page.is(Pages.Main));
+    private final Setting<BooleanSettingGroup> yawStep = new Setting<>("YawStep", new BooleanSettingGroup(false), v -> !rotate.is(Rotation.OFF) && page.is(Pages.Main));
+    private final Setting<Float> yawAngle = new Setting<>("YawAngle", 180.0f, 1.0f, 180.0f, v -> !rotate.is(Rotation.OFF) && page.is(Pages.Main)).addToGroup(yawStep);
+    private final Setting<CombatManager.TargetBy> targetLogic = new Setting<>("TargetLogic", CombatManager.TargetBy.Distance, v -> page.is(Pages.Main));
+    private final Setting<Float> targetRange = new Setting<>("TargetRange", 10.0f, 1.0f, 15f, v -> page.is(Pages.Main));
+    private final Setting<Integer> extrapolation = new Setting<>("Extrapolation", 0, 0, 20, v -> page.is(Pages.Main));
 
     /*   PLACE   */
-    private final Setting<Interact> interact = new Setting<>("Interact", Interact.Default, v -> page.getValue() == Pages.Place);
-    private final Setting<Boolean> strictCenter = new Setting<>("ССStrict", true, v -> page.getValue() == Pages.Place && interact.getValue() == Interact.Strict);
-    private final Setting<Boolean> rayTraceBypass = new Setting<>("RayTraceBypass", false, v -> page.getValue() == Pages.Place);
-    private final Setting<Boolean> oldVer = new Setting<>("1.12", false, v -> page.getValue() == Pages.Place);
-    private final Setting<Boolean> ccPlace = new Setting<>("CC", true, v -> page.getValue() == Pages.Place);
-    private final Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 0, 0, 20, v -> page.getValue() == Pages.Place);
-    private final Setting<Integer> lowPlaceDelay = new Setting<>("LowPlaceDelay", 11, 0, 20, v -> page.getValue() == Pages.Place);
-    private final Setting<Float> placeRange = new Setting<>("PlaceRange", 5f, 1.0f, 6f, v -> page.getValue() == Pages.Place);
-    private final Setting<Float> placeWallRange = new Setting<>("PlaceWallRange", 3.5f, 0f, 6f, v -> page.getValue() == Pages.Place);
+    private final Setting<Interact> interact = new Setting<>("Interact", Interact.Default, v -> page.is(Pages.Place));
+    private final Setting<Boolean> strictCenter = new Setting<>("ССStrict", true, v -> page.is(Pages.Place) && interact.getValue() == Interact.Strict);
+    private final Setting<Boolean> rayTraceBypass = new Setting<>("RayTraceBypass", false, v -> page.is(Pages.Place));
+    private final Setting<Boolean> oldVer = new Setting<>("1.12", false, v -> page.is(Pages.Place));
+    private final Setting<Boolean> ccPlace = new Setting<>("CC", true, v -> page.is(Pages.Place));
+    private final Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 0, 0, 20, v -> page.is(Pages.Place));
+    private final Setting<Integer> lowPlaceDelay = new Setting<>("LowPlaceDelay", 11, 0, 20, v -> page.is(Pages.Place));
+    private final Setting<Float> placeRange = new Setting<>("PlaceRange", 5f, 1.0f, 6f, v -> page.is(Pages.Place));
+    private final Setting<Float> placeWallRange = new Setting<>("PlaceWallRange", 3.5f, 0f, 6f, v -> page.is(Pages.Place));
 
     /*   BREAK   */
-    private final Setting<Boolean> inhibit = new Setting<>("Inhibit", true, v -> page.getValue() == Pages.Break);
-    private final Setting<Integer> breakDelay = new Setting<>("BreakDelay", 0, 0, 20, v -> page.getValue() == Pages.Break);
-    private final Setting<Integer> lowBreakDelay = new Setting<>("LowBreakDelay", 11, 0, 20, v -> page.getValue() == Pages.Break);
-    private final Setting<Float> explodeRange = new Setting<>("BreakRange", 5.0f, 1.0f, 6f, v -> page.getValue() == Pages.Break);
-    private final Setting<Float> explodeWallRange = new Setting<>("BreakWallRange", 3.5f, 0f, 6f, v -> page.getValue() == Pages.Break);
-    private final Setting<Integer> crystalAge = new Setting<>("CrystalAge", 0, 0, 20, v -> page.getValue() == Pages.Break);
+    private final Setting<Boolean> inhibit = new Setting<>("Inhibit", true, v -> page.is(Pages.Break));
+    private final Setting<Integer> breakDelay = new Setting<>("BreakDelay", 0, 0, 20, v -> page.is(Pages.Break));
+    private final Setting<Integer> lowBreakDelay = new Setting<>("LowBreakDelay", 11, 0, 20, v -> page.is(Pages.Break));
+    private final Setting<Float> explodeRange = new Setting<>("BreakRange", 5.0f, 1.0f, 6f, v -> page.is(Pages.Break));
+    private final Setting<Float> explodeWallRange = new Setting<>("BreakWallRange", 3.5f, 0f, 6f, v -> page.is(Pages.Break));
+    private final Setting<Integer> crystalAge = new Setting<>("CrystalAge", 0, 0, 20, v -> page.is(Pages.Break));
 
     /*   PAUSE   */
-    private final Setting<Boolean> mining = new Setting<>("Mining", true, v -> page.getValue() == Pages.Pause);
-    private final Setting<Boolean> eating = new Setting<>("Eating", true, v -> page.getValue() == Pages.Pause);
-    private final Setting<Boolean> aura = new Setting<>("Aura", false, v -> page.getValue() == Pages.Pause);
-    private final Setting<Boolean> pistonAura = new Setting<>("PistonAura", true, v -> page.getValue() == Pages.Pause);
-    private final Setting<Boolean> surround = new Setting<>("Surround", true, v -> page.getValue() == Pages.Pause);
-    private final Setting<Boolean> middleClick = new Setting<>("MiddleClick", true, v -> page.getValue() == Pages.Pause);
-    private final Setting<Float> pauseHP = new Setting<>("HP", 8.0f, 2.0f, 10f, v -> page.getValue() == Pages.Pause);
-    private final Setting<BooleanSettingGroup> switchPause = new Setting<>("SwitchPause", new BooleanSettingGroup(true), v -> page.getValue() == Pages.Pause);
-    private final Setting<Integer> switchDelay = new Setting<>("SwitchDelay", 100, 0, 1000, v -> page.getValue() == Pages.Pause).addToGroup(switchPause);
+    private final Setting<Boolean> mining = new Setting<>("Mining", true, v -> page.is(Pages.Pause));
+    private final Setting<Boolean> eating = new Setting<>("Eating", true, v -> page.is(Pages.Pause));
+    private final Setting<Boolean> aura = new Setting<>("Aura", false, v -> page.is(Pages.Pause));
+    private final Setting<Boolean> pistonAura = new Setting<>("PistonAura", true, v -> page.is(Pages.Pause));
+    private final Setting<Boolean> surround = new Setting<>("Surround", true, v -> page.is(Pages.Pause));
+    private final Setting<Boolean> middleClick = new Setting<>("MiddleClick", true, v -> page.is(Pages.Pause));
+    private final Setting<Float> pauseHP = new Setting<>("HP", 8.0f, 2.0f, 10f, v -> page.is(Pages.Pause));
+    private final Setting<BooleanSettingGroup> switchPause = new Setting<>("SwitchPause", new BooleanSettingGroup(true), v -> page.is(Pages.Pause));
+    private final Setting<Integer> switchDelay = new Setting<>("SwitchDelay", 100, 0, 1000, v -> page.is(Pages.Pause)).addToGroup(switchPause);
 
     /*   DAMAGES   */
-    public final Setting<Boolean> assumeBestArmor = new Setting<>("AssumeBestArmor", false, v -> page.getValue() == Pages.Damages);
-    public final Setting<Float> minDamage = new Setting<>("MinDamage", 6.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
-    public final Setting<Float> maxSelfDamage = new Setting<>("MaxSelfDamage", 10.0f, 2.0f, 20f, v -> page.getValue() == Pages.Damages);
-    private final Setting<Safety> safety = new Setting<>("Safety", Safety.NONE, v -> page.getValue() == Pages.Damages);
-    private final Setting<Float> safetyBalance = new Setting<>("SafetyBalance", 1.1f, 0.1f, 3f, v -> page.getValue() == Pages.Damages && safety.getValue() == Safety.BALANCE);
-    public final Setting<Boolean> protectFriends = new Setting<>("ProtectFriends", true, v -> page.getValue() == Pages.Damages);
-    private final Setting<Boolean> overrideSelfDamage = new Setting<>("OverrideSelfDamage", true, v -> page.getValue() == Pages.Damages);
-    private final Setting<Float> lethalMultiplier = new Setting<>("LethalMultiplier", 1.0f, 0.0f, 5f, v -> page.getValue() == Pages.Damages);
-    private final Setting<BooleanSettingGroup> armorBreaker = new Setting<>("ArmorBreaker", new BooleanSettingGroup(true), v -> page.getValue() == Pages.Damages);
-    private final Setting<Float> armorScale = new Setting<>("Armor %", 5.0f, 0.0f, 40f, v -> page.getValue() == Pages.Damages).addToGroup(armorBreaker);
-    private final Setting<Float> facePlaceHp = new Setting<>("FacePlaceHp", 5.0f, 0.0f, 20f, v -> page.getValue() == Pages.Damages);
-    private final Setting<Bind> facePlaceButton = new Setting<>("FacePlaceBtn", new Bind(GLFW.GLFW_KEY_LEFT_SHIFT, false, false), v -> page.getValue() == Pages.Damages);
-    public final Setting<Boolean> ignoreTerrain = new Setting<>("IgnoreTerrain", true, v -> page.getValue() == Pages.Damages);
+    public final Setting<Boolean> assumeBestArmor = new Setting<>("AssumeBestArmor", false, v -> page.is(Pages.Damages));
+    public final Setting<Float> minDamage = new Setting<>("MinDamage", 6.0f, 2.0f, 20f, v -> page.is(Pages.Damages));
+    public final Setting<Float> maxSelfDamage = new Setting<>("MaxSelfDamage", 10.0f, 2.0f, 20f, v -> page.is(Pages.Damages));
+    private final Setting<Safety> safety = new Setting<>("Safety", Safety.NONE, v -> page.is(Pages.Damages));
+    private final Setting<Float> safetyBalance = new Setting<>("SafetyBalance", 1.1f, 0.1f, 3f, v -> page.is(Pages.Damages) && safety.is(Safety.BALANCE));
+    public final Setting<Boolean> protectFriends = new Setting<>("ProtectFriends", true, v -> page.is(Pages.Damages));
+    private final Setting<Boolean> overrideSelfDamage = new Setting<>("OverrideSelfDamage", true, v -> page.is(Pages.Damages));
+    private final Setting<Float> lethalMultiplier = new Setting<>("LethalMultiplier", 1.0f, 0.0f, 5f, v -> page.is(Pages.Damages));
+    private final Setting<BooleanSettingGroup> armorBreaker = new Setting<>("ArmorBreaker", new BooleanSettingGroup(true), v -> page.is(Pages.Damages));
+    private final Setting<Float> armorScale = new Setting<>("Armor %", 5.0f, 0.0f, 40f, v -> page.is(Pages.Damages)).addToGroup(armorBreaker);
+    private final Setting<Float> facePlaceHp = new Setting<>("FacePlaceHp", 5.0f, 0.0f, 20f, v -> page.is(Pages.Damages));
+    private final Setting<Bind> facePlaceButton = new Setting<>("FacePlaceBtn", new Bind(GLFW.GLFW_KEY_LEFT_SHIFT, false, false), v -> page.is(Pages.Damages));
+    public final Setting<Boolean> ignoreTerrain = new Setting<>("IgnoreTerrain", true, v -> page.is(Pages.Damages));
 
     /*   SWITCH   */
-    private final Setting<Boolean> autoGapple = new Setting<>("AutoGapple", true, v -> page.getValue() == Pages.Switch);
-    private final Setting<Switch> autoSwitch = new Setting<>("Switch", Switch.NORMAL, v -> page.getValue() == Pages.Switch);
-    private final Setting<Switch> antiWeakness = new Setting<>("AntiWeakness", Switch.SILENT, v -> page.getValue() == Pages.Switch);
+    private final Setting<Boolean> autoGapple = new Setting<>("AutoGapple", true, v -> page.is(Pages.Switch));
+    private final Setting<Switch> autoSwitch = new Setting<>("Switch", Switch.NORMAL, v -> page.is(Pages.Switch));
+    private final Setting<Switch> antiWeakness = new Setting<>("AntiWeakness", Switch.SILENT, v -> page.is(Pages.Switch));
 
     /*   RENDER   */
-    private final Setting<Swing> swingMode = new Setting<>("Swing", Swing.Place, v -> page.getValue() == Pages.Render);
-    private final Setting<Boolean> render = new Setting<>("Render", true, v -> page.getValue() == Pages.Render);
-    private final Setting<BooleanSettingGroup> renderExtrapolation = new Setting<>("RenderExtrapolation", new BooleanSettingGroup(false), v -> page.getValue() == Pages.Render);
-    private final Setting<ColorSetting> extrapolationColor = new Setting<>("ExtrapolationColor", new ColorSetting(Color.white), v -> page.getValue() == Pages.Render).addToGroup(renderExtrapolation);
-    private final Setting<BooleanSettingGroup> renderInteractVector = new Setting<>("RenderInteractVector", new BooleanSettingGroup(true), v -> page.getValue() == Pages.Render);
-    private final Setting<ColorSetting> interactColor = new Setting<>("InteractColor", new ColorSetting(Color.red), v -> page.getValue() == Pages.Render).addToGroup(renderInteractVector);
-    private final Setting<Render> renderMode = new Setting<>("RenderMode", Render.Fade, v -> page.getValue() == Pages.Render);
-    private final Setting<Boolean> rselfDamage = new Setting<>("SelfDamage", true, v -> page.getValue() == Pages.Render);
-    private final Setting<Boolean> drawDamage = new Setting<>("RenderDamage", true, v -> page.getValue() == Pages.Render);
-    private final Setting<ColorSetting> fillColor = new Setting<>("Block Fill Color", new ColorSetting(HudEditor.getColor(0)), v -> page.getValue() == Pages.Render);
-    private final Setting<ColorSetting> lineColor = new Setting<>("Block Line Color", new ColorSetting(HudEditor.getColor(0)), v -> page.getValue() == Pages.Render);
-    private final Setting<Integer> lineWidth = new Setting<>("Block Line Width", 2, 1, 10, v -> page.getValue() == Pages.Render);
-    private final Setting<Integer> slideDelay = new Setting<>("Slide Delay", 200, 1, 1000, v -> page.getValue() == Pages.Render);
-    private final Setting<ColorSetting> textColor = new Setting<>("Text Color", new ColorSetting(Color.WHITE), v -> page.getValue() == Pages.Render);
+    private final Setting<Swing> swingMode = new Setting<>("Swing", Swing.Place, v -> page.is(Pages.Render));
+    private final Setting<Boolean> render = new Setting<>("Render", true, v -> page.is(Pages.Render));
+    private final Setting<BooleanSettingGroup> renderExtrapolation = new Setting<>("RExtrapolation", new BooleanSettingGroup(false), v -> page.is(Pages.Render));
+    private final Setting<ColorSetting> extrapolationColor = new Setting<>("ExtrapolationColor", new ColorSetting(Color.white), v -> page.is(Pages.Render)).addToGroup(renderExtrapolation);
+    private final Setting<BooleanSettingGroup> renderInteractVector = new Setting<>("RInteractVector", new BooleanSettingGroup(true), v -> page.is(Pages.Render));
+    private final Setting<ColorSetting> interactColor = new Setting<>("InteractColor", new ColorSetting(Color.red), v -> page.is(Pages.Render)).addToGroup(renderInteractVector);
+    private final Setting<Render> renderMode = new Setting<>("RenderMode", Render.Fade, v -> page.is(Pages.Render));
+    private final Setting<Boolean> rselfDamage = new Setting<>("SelfDamage", true, v -> page.is(Pages.Render));
+    private final Setting<Boolean> drawDamage = new Setting<>("RenderDamage", true, v -> page.is(Pages.Render));
+    private final Setting<ColorSetting> fillColor = new Setting<>("Block Fill Color", new ColorSetting(HudEditor.getColor(0)), v -> page.is(Pages.Render));
+    private final Setting<ColorSetting> lineColor = new Setting<>("Block Line Color", new ColorSetting(HudEditor.getColor(0)), v -> page.is(Pages.Render));
+    private final Setting<Integer> lineWidth = new Setting<>("Block Line Width", 2, 1, 10, v -> page.is(Pages.Render));
+    private final Setting<Integer> slideDelay = new Setting<>("Slide Delay", 200, 1, 1000, v -> page.is(Pages.Render));
+    private final Setting<ColorSetting> textColor = new Setting<>("Text Color", new ColorSetting(Color.WHITE), v -> page.is(Pages.Render));
 
     /*   INFO   */
-    private final Setting<Boolean> targetName = new Setting<>("TargetName", false, v -> page.getValue() == Pages.Info);
-    private final Setting<Boolean> currentSide = new Setting<>("CurrentSide", true, v -> page.getValue() == Pages.Info);
-    private final Setting<Boolean> speed = new Setting<>("Speed", true, v -> page.getValue() == Pages.Info);
-    private final Setting<Boolean> confirmInfo = new Setting<>("ConfirmTime", true, v -> page.getValue() == Pages.Info);
-    private final Setting<Boolean> calcInfo = new Setting<>("CalcInfo", false, v -> page.getValue() == Pages.Info);
+    private final Setting<Boolean> targetName = new Setting<>("TargetName", false, v -> page.is(Pages.Info));
+    private final Setting<Boolean> currentSide = new Setting<>("CurrentSide", true, v -> page.is(Pages.Info));
+    private final Setting<Boolean> speed = new Setting<>("Speed", true, v -> page.is(Pages.Info));
+    private final Setting<Boolean> confirmInfo = new Setting<>("ConfirmTime", true, v -> page.is(Pages.Info));
+    private final Setting<Boolean> calcInfo = new Setting<>("CalcInfo", false, v -> page.is(Pages.Info));
 
     public static PlayerEntity target;
     private PlaceData currentData;

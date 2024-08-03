@@ -68,6 +68,9 @@ public class LegitHelper extends Module {
     private final Setting<Integer> breakerDelay = new Setting<>("BreakerDelay", 50, 5, 250).addToGroup(shieldBreaker);
     private final Setting<Boolean> swapBack = new Setting<>("SwapBack", true).addToGroup(shieldBreaker);
 
+    private final Setting<BooleanSettingGroup> windBoostJump = new Setting<>("WindBoostJump", new BooleanSettingGroup(true));
+    private final Setting<Bind> windBoostBind = new Setting<>("WindBoostBind", new Bind(GLFW.GLFW_KEY_I, false, false)).addToGroup(windBoostJump);
+
     private Timer timer = new Timer();
     private Vec3d lastCrystalVec = Vec3d.ZERO;
     private Vec3d rotationVec = Vec3d.ZERO;
@@ -249,6 +252,17 @@ public class LegitHelper extends Module {
             mc.player.setYaw(angle[0]);
             mc.player.setPitch(angle[1]);
             rotationVec = null;
+        }
+
+        if (isKeyPressed(windBoostBind) && mc.player.isOnGround()) {
+            SearchInvResult result = InventoryUtility.findItemInHotBar(Items.WIND_CHARGE);
+            if (result.found()) {
+                mc.player.setPitch(90);
+                mc.player.jump();
+                InventoryUtility.saveAndSwitchTo(result.slot());
+                mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
+                InventoryUtility.returnSlot();
+            }
         }
     }
 

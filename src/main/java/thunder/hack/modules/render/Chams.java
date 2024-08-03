@@ -33,8 +33,6 @@ import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
-import static thunder.hack.core.impl.ModuleManager.badTrip;
-
 public class Chams extends Module {
     public Chams() {
         super("Chams", Category.RENDER);
@@ -175,18 +173,9 @@ public class Chams extends Module {
         }
         float l = pe.age + g;
 
+        setupTransforms1(pe, matrixStack, l, h, g);
+        matrixStack.scale(-1.0f, -1.0f, 1.0f);
 
-        if (ModuleManager.badTrip.isEnabled()) {
-            long time = System.currentTimeMillis();
-            float scaleFactorX = -badTrip.factor.getValue() * (float) Math.sin((double) time / badTrip.speed.getValue());
-            float scaleFactorY = badTrip.factor.getValue() * (float) Math.sin((double) time / badTrip.speed.getValue());
-
-            setupTransforms1(pe, matrixStack, l, h, g);
-            matrixStack.scale(-1.0f + scaleFactorX, -1.0f + scaleFactorY, 1.0f);
-        } else {
-            setupTransforms1(pe, matrixStack, l, h, g);
-            matrixStack.scale(-1.0f, -1.0f, 1.0f);
-        }
         matrixStack.scale(0.9375f, 0.9375f, 0.9375f);
         matrixStack.translate(0.0f, -1.501f, 0.0f);
 

@@ -31,7 +31,7 @@ public class HitParticles extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Stars);
     private final Setting<Physics> physics = new Setting<>("Physics", Physics.Fall);
     private final Setting<ColorSetting> colorrr = new Setting<>("Color", new ColorSetting(0x8800FF00));
-    private final Setting<Boolean> selfp = new Setting<>("Self", false);
+    private final Setting<Boolean> onlySelf = new Setting<>("Self", false);
     private final Setting<Integer> amount = new Setting<>("Amount", 2, 1, 5);
     private final Setting<Integer> lifeTime = new Setting<>("LifeTime", 2, 1, 10);
     private final Setting<Integer> speed = new Setting<>("Speed", 2, 1, 20);
@@ -70,7 +70,8 @@ public class HitParticles extends Module {
         }
 
         for (PlayerEntity player : mc.world.getPlayers()) {
-            if (!selfp.getValue() && player == mc.player) continue;
+            if (onlySelf.getValue() && player != mc.player)
+                continue;
             if (player.hurtTime > 0) {
                 Color c = colorMode.getValue() == ColorMode.Sync ? HudEditor.getColor((int) MathUtility.random(1, 228)) : colorrr.getValue().getColorObject();
                 for (int i = 0; i < amount.getValue(); i++) {

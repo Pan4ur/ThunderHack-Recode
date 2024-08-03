@@ -15,6 +15,7 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.world.HoleUtility;
 
+import java.awt.*;
 import java.util.Objects;
 
 import static thunder.hack.modules.client.ClientSettings.isRu;

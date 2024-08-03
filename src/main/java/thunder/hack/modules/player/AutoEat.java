@@ -38,48 +38,70 @@ public class AutoEat extends Module {
     @Override
     public void onUpdate() {
         if (mc.player.getHungerManager().getFoodLevel() <= hunger.getValue()) {
+
+            boolean found;
+
             if(!isHandGood(Hand.MAIN_HAND) && !isHandGood(Hand.OFF_HAND)) {
-                for (int i = 0; i < 9; i++) {
-                    ItemStack stack = mc.player.getInventory().getStack(i);
-                    if (stack.getComponents().contains(DataComponentTypes.FOOD)) {
-                        if (!gapple.getValue() && (stack.getItem() == Items.GOLDEN_APPLE || stack.getItem() == Items.ENCHANTED_GOLDEN_APPLE))
-                            continue;
-                        if (!chorus.getValue() && (stack.getItem() == Items.CHORUS_FRUIT))
-                            continue;
-                        if (!rottenFlesh.getValue() && (stack.getItem() == Items.ROTTEN_FLESH))
-                            continue;
-                        if (!spiderEye.getValue() && (stack.getItem() == Items.SPIDER_EYE))
-                            continue;
-                        if (!pufferfish.getValue() && (stack.getItem() == Items.PUFFERFISH))
-                            continue;
-                        prevSlot = mc.player.getInventory().selectedSlot;
-                        mc.player.getInventory().selectedSlot = i;
-                        sendPacket(new UpdateSelectedSlotC2SPacket(i));
-                        break;
-                    }
-                }
+                found = switchToFood();
+            } else found = true;
+
+            if (!found) {
+                if (eating)
+                    stopEating();
+                return;
             }
 
-            eating = true;
+            startEating();
+        } else if (eating)
+            stopEating();
+    }
 
-            if (mc.currentScreen != null && !mc.player.isUsingItem())
-                ((IMinecraftClient) mc).idoItemUse();
-            else {
-                if(pauseBaritone.getValue() && ThunderHack.baritone)
-                    BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("pause");
-               
-                mc.options.useKey.setPressed(true);
-            }
-        } else if (eating) {
-            eating = false;
-            mc.options.useKey.setPressed(false);
-            if (swapBack.getValue())
-                mc.player.getInventory().selectedSlot = prevSlot;
-            
-            if (pauseBaritone.getValue() && ThunderHack.baritone)
-                BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("resume");
+    public void startEating() {
+        eating = true;
+
+        if (mc.currentScreen != null && !mc.player.isUsingItem())
+            ((IMinecraftClient) mc).idoItemUse();
+        else {
+            if(pauseBaritone.getValue() && ThunderHack.baritone)
+                BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("pause");
+
+            mc.options.useKey.setPressed(true);
         }
     }
+
+    public void stopEating() {
+        eating = false;
+        mc.options.useKey.setPressed(false);
+        if (swapBack.getValue())
+            mc.player.getInventory().selectedSlot = prevSlot;
+
+        if (pauseBaritone.getValue() && ThunderHack.baritone)
+            BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("resume");
+    }
+
+    public boolean switchToFood() {
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            if (stack.getComponents().contains(DataComponentTypes.FOOD)) {
+                if (!gapple.getValue() && (stack.getItem() == Items.GOLDEN_APPLE || stack.getItem() == Items.ENCHANTED_GOLDEN_APPLE))
+                    continue;
+                if (!chorus.getValue() && (stack.getItem() == Items.CHORUS_FRUIT))
+                    continue;
+                if (!rottenFlesh.getValue() && (stack.getItem() == Items.ROTTEN_FLESH))
+                    continue;
+                if (!spiderEye.getValue() && (stack.getItem() == Items.SPIDER_EYE))
+                    continue;
+                if (!pufferfish.getValue() && (stack.getItem() == Items.PUFFERFISH))
+                    continue;
+                prevSlot = mc.player.getInventory().selectedSlot;
+                mc.player.getInventory().selectedSlot = i;
+                sendPacket(new UpdateSelectedSlotC2SPacket(i));
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private boolean isHandGood(Hand hand) {
         ItemStack stack = hand == Hand.MAIN_HAND ? mc.player.getMainHandStack() : mc.player.getOffHandStack();
