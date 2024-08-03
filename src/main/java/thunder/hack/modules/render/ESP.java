@@ -218,7 +218,7 @@ public class ESP extends Module {
 
         if (burrow.getValue()) {
             for (PlayerEntity pl : mc.world.getPlayers()) {
-                BlockPos blockPos = BlockPos.ofFloored(pl.getPos());
+                BlockPos blockPos = BlockPos.ofFloored(pl.getPos().add(0,0.15f,0));
                 Block block = mc.world.getBlockState(blockPos).getBlock();
 
                 double x = blockPos.getX() - mc.getEntityRenderDispatcher().camera.getPos().getX();

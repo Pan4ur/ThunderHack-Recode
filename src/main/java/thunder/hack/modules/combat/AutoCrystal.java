@@ -154,6 +154,7 @@ public class AutoCrystal extends Module {
     private PlaceData currentData;
     private BlockHitResult bestPosition;
     private EndCrystalEntity bestCrystal;
+    private EndCrystalEntity secondaryCrystal;
 
     private final TickTimer placeTimer = new TickTimer();
     private final TickTimer breakTimer = new TickTimer();
@@ -870,6 +871,15 @@ public class AutoCrystal extends Module {
             return;
         }
 
+        if (secondaryCrystal != null) {
+            if (canAttackCrystal(secondaryCrystal)) {
+                bestCrystal = secondaryCrystal;
+                debug("secondary crystal accepted");
+            } else debug("secondary crystal declined");
+            secondaryCrystal = null;
+            return;
+        }
+
         List<CrystalData> list = getPossibleCrystals(target).stream().filter(data -> isSafe(data.damage, data.selfDamage, data.overrideDamage)).toList();
         bestCrystal = list.isEmpty() ? null : filterCrystals(list);
     }
@@ -1047,8 +1057,9 @@ public class AutoCrystal extends Module {
                 if (ent instanceof ItemEntity && ent.age < 3)
                     continue;
 
-                if (ent instanceof EndCrystalEntity cr && canAttackCrystal(cr))
+                if (ent instanceof EndCrystalEntity cr && (canAttackCrystal(cr) || deadManager.isDead(cr.getId())))
                     continue;
+
                 return true;
             }
         }
@@ -1066,21 +1077,19 @@ public class AutoCrystal extends Module {
                 if (ent instanceof ExperienceOrbEntity)
                     continue;
 
-                if (ent instanceof EndCrystalEntity cr && deadManager.isDead(cr.getId()))
-                    continue;
+                if (ent instanceof EndCrystalEntity cr) {
+                    if (deadManager.isDead(cr.getId()))
+                        continue;
+
+                    if (cr.getPos().squaredDistanceTo(posBoundingBox.getCenter()) > 0.3) {
+                        secondaryCrystal = cr;
+                        debug("secondary crystal created");
+                    }
+                }
 
                 if (ent instanceof ItemEntity && ent.age < 3)
                     continue;
-/*
-                if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()) && ent instanceof EndCrystalEntity cr
-                        && canAttackCrystal(cr, true)
-                        && cr.getPos().squaredDistanceTo(posBoundingBox.getCenter()) > 0.3) {
-                    //attackCrystal(cr);
-                    debug("attack stuck crystal");
-                    return true;
-                }
 
- */
                 return true;
             }
         }

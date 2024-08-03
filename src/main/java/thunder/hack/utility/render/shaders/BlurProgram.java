@@ -60,6 +60,9 @@ public class BlurProgram {
         GL30.glBlitFramebuffer(0, 0, buffer.textureWidth, buffer.textureHeight, 0, 0, buffer.textureWidth, buffer.textureHeight, GL30.GL_COLOR_BUFFER_BIT, GL30.GL_LINEAR);
         buffer.beginWrite(false);
 
+        if (input != null && (input.textureWidth != mc.getWindow().getFramebufferWidth() ||  input.textureHeight != mc.getWindow().getFramebufferHeight()))
+            input.resize(mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight(), MinecraftClient.IS_SYSTEM_MAC);
+
         inputResolution.set((float) buffer.textureWidth, (float) buffer.textureHeight);
         sampler.set(input.getColorAttachment());
 
