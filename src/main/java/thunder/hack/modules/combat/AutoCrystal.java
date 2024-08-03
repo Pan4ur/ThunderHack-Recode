@@ -10,6 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ExperienceOrbEntity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -366,14 +367,29 @@ public class AutoCrystal extends Module {
         }
     }
 
+    /*
     @EventHandler
-    public void onBlockDestruct(EventSetBlockState e) {
+    public void onBlockBreakServer(EventSetBlockState e) {
         if (mc.player == null || mc.world == null) return;
 
         if (e.getPrevState() == null || e.getState() == null)
             return;
+
         if (target != null && target.squaredDistanceTo(e.getPos().toCenterPos()) <= 4 && e.getState().isAir() && !e.getPrevState().isAir() && blockRecalcTimer.every(200)) {
-            ThunderHack.asyncManager.run(() -> calcPosition(2f, e.getPos().toCenterPos()));
+            calcPosition(2f, e.getPos().toCenterPos());
+            debug("break server");
+        }
+    }
+     */
+
+    @EventHandler
+    public void onBlockBreakClient(EventBreakBlock e) {
+        if (mc.player == null || mc.world == null) return;
+
+        if (target != null && target.squaredDistanceTo(e.getPos().toCenterPos()) <= 4) {
+            calcPosition(2f, e.getPos().toCenterPos());
+            debug("break client");
+            blockRecalcTimer.reset();
         }
     }
 
@@ -621,12 +637,17 @@ public class AutoCrystal extends Module {
         deadManager.setDead(crystal.getId(), System.currentTimeMillis());
         rotationTicks = 10;
 
-        for (Entity ent : Lists.newArrayList(mc.world.getEntities()))
+        for (Entity ent : Lists.newArrayList(mc.world.getEntities())) {
             if (ent instanceof EndCrystalEntity exCrystal
                     && exCrystal.squaredDistanceTo(crystal.getX(), crystal.getY(), crystal.getZ()) <= 144
                     && !deadManager.isDead(exCrystal.getId())) {
                 deadManager.setDead(exCrystal.getId(), System.currentTimeMillis());
             }
+
+            //  if (ent instanceof ItemEntity && ent.squaredDistanceTo(crystal.getX(), crystal.getY(), crystal.getZ()) <= 144) {
+            //       sendMessage("item detected");
+            //    }
+        }
 
         if (prevSlot != -1) {
             if (antiWeakness.getValue() == Switch.SILENT) {
@@ -1023,6 +1044,9 @@ public class AutoCrystal extends Module {
                 if (ent instanceof ExperienceOrbEntity)
                     continue;
 
+                if (ent instanceof ItemEntity && ent.age < 3)
+                    continue;
+
                 if (ent instanceof EndCrystalEntity cr && canAttackCrystal(cr))
                     continue;
                 return true;
@@ -1043,6 +1067,9 @@ public class AutoCrystal extends Module {
                     continue;
 
                 if (ent instanceof EndCrystalEntity cr && deadManager.isDead(cr.getId()))
+                    continue;
+
+                if (ent instanceof ItemEntity && ent.age < 3)
                     continue;
 /*
                 if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()) && ent instanceof EndCrystalEntity cr

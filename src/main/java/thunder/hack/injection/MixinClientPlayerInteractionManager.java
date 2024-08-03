@@ -101,7 +101,7 @@ public class MixinClientPlayerInteractionManager {
     }
      */
 
-    @Inject(method = "breakBlock", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "breakBlock", at = @At("RETURN"), cancellable = true)
     public void breakBlockHook(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         if(Module.fullNullCheck()) return;
         EventBreakBlock event = new EventBreakBlock(pos);

@@ -66,6 +66,11 @@ public final class Breaker extends Module {
             return;
 
         if (blockPos != null) {
+            if (mc.player.squaredDistanceTo(blockPos.toCenterPos()) > (ModuleManager.speedMine.isEnabled() ? ModuleManager.speedMine.range.getPow2Value() : ModuleManager.reach.isEnabled() ? ModuleManager.reach.blocksRange.getPow2Value() : 9)) {
+                blockPos = null;
+                return;
+            }
+
             if (ModuleManager.speedMine.isEnabled()) {
                 if (SpeedMine.minePosition == blockPos || (SpeedMine.minePosition != null && !mc.world.isAir(SpeedMine.minePosition)))
                     return;
