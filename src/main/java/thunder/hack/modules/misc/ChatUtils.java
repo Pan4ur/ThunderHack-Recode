@@ -37,14 +37,15 @@ public class ChatUtils extends Module {
     private final Setting<PMSound> pmSound = new Setting<>("PMSound", PMSound.Default);
     private final Setting<Boolean> zov = new Setting<>("ZOV", false);
     private final Setting<Boolean> wavy = new Setting<>("wAvY",false);
+    private final Setting<Boolean> translit = new Setting<>("Translit",false);
     private final Setting<Boolean> antiCoordLeak = new Setting<>("AntiCoordLeak", false);
 
     private final Timer timer = new Timer();
     private final Timer antiSpam = new Timer();
     private final Timer messageTimer = new Timer();
-
     private final LinkedHashMap<UUID, String> nameMap = new LinkedHashMap<>();
     private String skip;
+
 
     public ChatUtils() {
         super("ChatUtils", Category.MISC);
@@ -152,6 +153,25 @@ public class ChatUtils extends Module {
         }
         return false;
     }
+    private static final char[] cyrillicChars = {
+            'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И',
+            'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т',
+            'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь',
+            'Э', 'Ю', 'Я', 'а', 'б', 'в', 'г', 'д', 'е', 'ё',
+            'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п',
+            'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ',
+            'ъ', 'ы', 'ь', 'э', 'ю', 'я'
+    };
+
+    private static final String[] latinChars = {
+            "A", "B", "V", "G", "D", "E", "YO", "ZH", "Z", "I",
+            "Y", "K", "L", "M", "N", "O", "P", "R", "S", "T",
+            "U", "F", "KH", "TS", "CH", "SH", "SCH", "", "Y", "",
+            "E", "YU", "YA", "a", "b", "v", "g", "d", "e", "yo",
+            "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p",
+            "r", "s", "t", "u", "f", "kh", "ts", "ch", "sh", "sch",
+            "", "y", "", "e", "yu", "ya"
+    };
 
     private final String[] bb = new String[]{
             "See you later, ",
@@ -203,7 +223,7 @@ public class ChatUtils extends Module {
         }
 
         if (fullNullCheck()) return;
-        if (e.getPacket() instanceof ChatMessageC2SPacket pac && (zov.getValue() || wavy.getValue())) {
+        if (e.getPacket() instanceof ChatMessageC2SPacket pac && (zov.getValue() || wavy.getValue() || translit.getValue())) {
 
             if (Objects.equals(pac.chatMessage(), skip)) {
                 return;
@@ -243,12 +263,36 @@ public class ChatUtils extends Module {
                 }
                 message = builder.toString();
             }
+            if(translit.getValue()){
+                message = transliterate(message.toString());
+            }
             skip = message;
             mc.player.networkHandler.sendChatMessage(skip);
             e.cancel();
         }
     }
+    public static String transliterate(String text) {
+        StringBuilder result = new StringBuilder();
 
+        for (char ch : text.toCharArray()) {
+            int index = -1;
+
+            for (int i = 0; i < cyrillicChars.length; i++) {
+                if (cyrillicChars[i] == ch) {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index != -1) {
+                result.append(latinChars[index]);
+            } else {
+                result.append(ch);
+            }
+        }
+
+        return result.toString();
+    }
     private enum Welcomer {
         Off, Server, Client
     }
