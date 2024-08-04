@@ -11,8 +11,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.render.Chams;
+import thunder.hack.core.manager.client.ModuleManager;
 
 @Mixin(EndCrystalEntityRenderer.class)
 public class MixinEndCrystalEntityRenderer {

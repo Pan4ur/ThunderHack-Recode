@@ -2,7 +2,7 @@ package thunder.hack.utility.interfaces;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import thunder.hack.modules.render.Trails;
+import thunder.hack.features.modules.render.Trails;
 
 import java.util.List;
 

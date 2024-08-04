@@ -3,7 +3,7 @@ package thunder.hack.setting;
 
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSetting;
-import thunder.hack.modules.Module;
+import thunder.hack.features.modules.Module;
 import thunder.hack.setting.impl.*;
 
 import java.util.function.Predicate;

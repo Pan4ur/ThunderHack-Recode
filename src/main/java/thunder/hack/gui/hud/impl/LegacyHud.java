@@ -9,11 +9,11 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Pair;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.font.FontRenderer;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.FrameRateCounter;
@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
 
-import static thunder.hack.core.impl.ServerManager.getPing;
+import static thunder.hack.core.manager.client.ServerManager.getPing;
 import static thunder.hack.gui.hud.impl.PotionHud.getDuration;
 
 public class LegacyHud extends Module {
@@ -94,7 +94,7 @@ public class LegacyHud extends Module {
         int j = (mc.currentScreen instanceof ChatScreen && !renderingUp.getValue()) ? 14 : 0;
 
         if (arrayList.getValue())
-            for (Module module : ThunderHack.moduleManager.getEnabledModules().stream().filter(Module::isDrawn).sorted(Comparator.comparing(module -> getStringWidth(module.getFullArrayString()) * -1)).toList()) {
+            for (Module module : Managers.MODULE.getEnabledModules().stream().filter(Module::isDrawn).sorted(Comparator.comparing(module -> getStringWidth(module.getFullArrayString()) * -1)).toList()) {
                 if (!module.isDrawn()) {
                     continue;
                 }
@@ -147,7 +147,7 @@ public class LegacyHud extends Module {
         }
 
         if (speed.getValue()) {
-            String str = "Speed " + Formatting.WHITE + MathUtility.round(ThunderHack.playerManager.currentPlayerSpeed * (bps.getValue() ? 20f : 72f) * ThunderHack.TICK_TIMER) + (bps.getValue() ? " b/s" : " km/h");
+            String str = "Speed " + Formatting.WHITE + MathUtility.round(Managers.PLAYER.currentPlayerSpeed * (bps.getValue() ? 20f : 72f) * ThunderHack.TICK_TIMER) + (bps.getValue() ? " b/s" : " km/h");
             drawText(context, str, (width - getStringWidth(str) - 2), renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
         }
 
@@ -163,7 +163,7 @@ public class LegacyHud extends Module {
         }
 
         if (tps.getValue()) {
-            String str = "TPS " + Formatting.WHITE + ThunderHack.serverManager.getTPS() + (extraTps.getValue() ? " [" + ThunderHack.serverManager.getTPS2() + "]" : "");
+            String str = "TPS " + Formatting.WHITE + Managers.SERVER.getTPS() + (extraTps.getValue() ? " [" + Managers.SERVER.getTPS2() + "]" : "");
             drawText(context, str, (width - getStringWidth(str) - 2), renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
         }
 

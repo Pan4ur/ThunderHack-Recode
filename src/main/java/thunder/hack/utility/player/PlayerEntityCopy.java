@@ -5,7 +5,7 @@ import net.minecraft.client.network.OtherClientPlayerEntity;
 import java.util.Objects;
 import java.util.UUID;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class PlayerEntityCopy extends OtherClientPlayerEntity {
     public PlayerEntityCopy() {

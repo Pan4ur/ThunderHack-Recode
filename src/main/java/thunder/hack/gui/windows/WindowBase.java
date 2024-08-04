@@ -5,7 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.math.MathUtility;
@@ -15,7 +15,7 @@ import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
 
-import static thunder.hack.core.IManager.mc;
+import static thunder.hack.core.manager.IManager.mc;
 
 public class WindowBase {
     public final Setting<PositionSetting> position;

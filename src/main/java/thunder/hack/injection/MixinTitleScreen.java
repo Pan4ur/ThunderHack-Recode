@@ -13,11 +13,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.mainmenu.MainMenuScreen;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.features.modules.client.ClientSettings;
 
 import java.net.URI;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 @Mixin(TitleScreen.class)
 public class MixinTitleScreen extends Screen {

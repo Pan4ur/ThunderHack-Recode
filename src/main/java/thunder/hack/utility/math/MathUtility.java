@@ -9,7 +9,7 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public final class MathUtility {
     public static double random(double min, double max) {

@@ -4,13 +4,10 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
 import thunder.hack.ThunderHack;
-import thunder.hack.cmd.Command;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.gui.hud.HudEditorGui;
-import thunder.hack.modules.client.ClickGui;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.TextureStorage;
@@ -86,13 +83,13 @@ public class ModeElement extends AbstractElement {
                 prevMode = setting2.currentEnumName();
                 animation2 = 0;
                 setting2.increaseEnum();
-                ThunderHack.soundManager.playBoolean();
+                Managers.SOUND.playBoolean();
             } else {
                 open = !open;
                 if(open) {
-                    ThunderHack.soundManager.playSwipeIn();
+                    Managers.SOUND.playSwipeIn();
                 } else {
-                    ThunderHack.soundManager.playSwipeOut();
+                    Managers.SOUND.playSwipeOut();
                 }
             }
         }
@@ -104,7 +101,7 @@ public class ModeElement extends AbstractElement {
                     prevMode = setting2.currentEnumName();
                     animation2 = 0;
                     setting2.setEnumByNumber(i);
-                    ThunderHack.soundManager.playBoolean();
+                    Managers.SOUND.playBoolean();
                 }
                 offsetY += 12;
             }

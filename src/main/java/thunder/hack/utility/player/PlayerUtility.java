@@ -12,7 +12,7 @@ import thunder.hack.utility.math.ExplosionUtility;
 
 import java.util.Objects;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public final class PlayerUtility {
 

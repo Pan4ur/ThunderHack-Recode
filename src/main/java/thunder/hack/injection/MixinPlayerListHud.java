@@ -10,13 +10,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.features.modules.client.ClientSettings;
 
 import java.util.Comparator;
 import java.util.List;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 @Mixin(PlayerListHud.class)
 public class MixinPlayerListHud {

@@ -22,17 +22,18 @@ import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 import java.util.List;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extends EntityModel<T>> {
@@ -58,11 +59,11 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
             originalHeadPitch = livingEntity.getPitch();
 
             livingEntity.setPitch(((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastPitch());
-            livingEntity.prevPitch = ThunderHack.playerManager.lastPitch;
+            livingEntity.prevPitch = Managers.PLAYER.lastPitch;
             livingEntity.headYaw = ((IClientPlayerEntity) MinecraftClient.getInstance().player).getLastYaw();
-            livingEntity.bodyYaw = Render2DEngine.interpolateFloat(ThunderHack.playerManager.prevBodyYaw, ThunderHack.playerManager.bodyYaw, Render3DEngine.getTickDelta());
-            livingEntity.prevHeadYaw = ThunderHack.playerManager.lastYaw;
-            livingEntity.prevBodyYaw = Render2DEngine.interpolateFloat(ThunderHack.playerManager.prevBodyYaw, ThunderHack.playerManager.bodyYaw, Render3DEngine.getTickDelta());
+            livingEntity.bodyYaw = Render2DEngine.interpolateFloat(Managers.PLAYER.prevBodyYaw, Managers.PLAYER.bodyYaw, Render3DEngine.getTickDelta());
+            livingEntity.prevHeadYaw = Managers.PLAYER.lastYaw;
+            livingEntity.prevBodyYaw = Render2DEngine.interpolateFloat(Managers.PLAYER.prevBodyYaw, Managers.PLAYER.bodyYaw, Render3DEngine.getTickDelta());
         }
 
         if (livingEntity != mc.player && ModuleManager.freeCam.isEnabled() && ModuleManager.freeCam.track.getValue() && ModuleManager.freeCam.trackEntity != null && ModuleManager.freeCam.trackEntity == livingEntity) {

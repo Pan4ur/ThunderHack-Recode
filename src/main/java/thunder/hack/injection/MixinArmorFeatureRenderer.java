@@ -1,7 +1,6 @@
 package thunder.hack.injection;
 
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.render.NoRender;
+import thunder.hack.core.manager.client.ModuleManager;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.client.render.entity.model.BipedEntityModel;

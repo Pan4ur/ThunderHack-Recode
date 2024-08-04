@@ -1,7 +1,6 @@
 package thunder.hack.injection;
 
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.render.NoRender;
+import thunder.hack.core.manager.client.ModuleManager;
 import net.minecraft.client.gui.hud.BossBarHud;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -3,7 +3,6 @@ package thunder.hack.injection;
 import net.minecraft.block.*;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.SlotActionType;
@@ -21,15 +20,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventBreakBlock;
 import thunder.hack.events.impl.EventClickSlot;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.player.NoInteract;
-import thunder.hack.modules.player.SpeedMine;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.player.NoInteract;
+import thunder.hack.features.modules.player.SpeedMine;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 @Mixin(ClientPlayerInteractionManager.class)
 public class MixinClientPlayerInteractionManager {

@@ -11,7 +11,7 @@ import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class DialogScreen extends Screen {
     private final String header;

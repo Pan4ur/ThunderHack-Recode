@@ -17,12 +17,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.*;
-import thunder.hack.modules.Module;
+import thunder.hack.features.modules.Module;
 
-import static thunder.hack.modules.Module.fullNullCheck;
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.fullNullCheck;
+import static thunder.hack.features.modules.Module.mc;
 
 @Mixin(value = ClientPlayerEntity.class, priority = 800)
 public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity {

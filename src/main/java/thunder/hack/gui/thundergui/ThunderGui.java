@@ -5,12 +5,13 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
-import thunder.hack.cmd.Command;
-import thunder.hack.core.impl.ConfigManager;
+import thunder.hack.core.Managers;
+import thunder.hack.features.cmd.Command;
+import thunder.hack.core.manager.client.ConfigManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.components.*;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.client.ThunderHackGui;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.ThunderHackGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.setting.impl.ColorSetting;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class ThunderGui extends Screen {
@@ -125,13 +126,13 @@ public class ThunderGui extends Screen {
         friends.clear();
 
         int module_y = 0;
-        for (Module module : ThunderHack.moduleManager.getModulesByCategory(current_category)) {
+        for (Module module : Managers.MODULE.getModulesByCategory(current_category)) {
             components.add(new ModulePlate(module, main_posX + 100, main_posY + 40 + module_y, module_y / 35));
             module_y += 35;
         }
 
         int category_y = 0;
-        for (final Module.Category category : ThunderHack.moduleManager.getCategories()) {
+        for (final Module.Category category : Managers.MODULE.getCategories()) {
             categories.add(new CategoryPlate(category, main_posX + 8, main_posY + 43 + category_y));
             category_y += 17;
         }
@@ -142,7 +143,7 @@ public class ThunderGui extends Screen {
         configs.clear();
         (new Thread(() -> {
             int config_y = 3;
-            for (String file1 : Objects.requireNonNull(ThunderHack.configManager.getConfigList())) {
+            for (String file1 : Objects.requireNonNull(Managers.CONFIG.getConfigList())) {
                 configs.add(new ConfigComponent(file1, ConfigManager.getConfigDate(file1), main_posX + 100, main_posY + 40 + config_y, config_y / 35));
                 config_y += 35;
             }
@@ -153,7 +154,7 @@ public class ThunderGui extends Screen {
         configs.clear();
         friends.clear();
         int friend_y = 3;
-        for (String friend : ThunderHack.friendManager.getFriends()) {
+        for (String friend : Managers.FRIEND.getFriends()) {
             friends.add(new FriendComponent(friend, main_posX + 100, main_posY + 40 + friend_y, friend_y / 35));
             friend_y += 35;
         }
@@ -355,7 +356,7 @@ public class ThunderGui extends Screen {
         } else {
             Render2DEngine.drawRound(context.getMatrices(), main_posX + 105, main_posY + 14, 11, 11, 3f, new Color(52, 38, 58, 250));
         }
-        FontRenderers.modules.drawString(context.getMatrices(), "current cfg: " + ThunderHack.configManager.currentConfig.getName(), main_posX + 120, main_posY + 18, new Color(0xCDFFFFFF, true).getRGB());
+        FontRenderers.modules.drawString(context.getMatrices(), "current cfg: " + Managers.CONFIG.currentConfig.getName(), main_posX + 120, main_posY + 18, new Color(0xCDFFFFFF, true).getRGB());
         FontRenderers.icons.drawString(context.getMatrices(), "t", main_posX + 106, main_posY + 17, new Color(0xC2FFFFFF, true).getRGB());
 
         // Поиск
@@ -460,14 +461,14 @@ public class ThunderGui extends Screen {
         mouse_state = true;
         if (isHoveringItem(main_posX + 368, main_posY + 17, 20, 6, (float) mouseX, (float) mouseY)) {
             if (listening_config) {
-                ThunderHack.configManager.save(config_string);
+                Managers.CONFIG.save(config_string);
                 config_string = "Save config";
                 listening_config = false;
                 loadConfigs();
                 return super.mouseClicked(mouseX, mouseY, clickedButton);
             }
             if (listening_friend) {
-                ThunderHack.friendManager.addFriend(friend_string);
+                Managers.FRIEND.addFriend(friend_string);
                 friend_string = "Add friend";
                 listening_friend = false;
                 loadFriends();
@@ -573,7 +574,7 @@ public class ThunderGui extends Screen {
 
             int module_y = 0;
 
-            for (Module module : ThunderHack.moduleManager.getModulesSearch(search_string)) {
+            for (Module module : Managers.MODULE.getModulesSearch(search_string)) {
                 ModulePlate mPlate = new ModulePlate(module, main_posX + 100, main_posY + 40 + module_y, module_y / 35);
                 if (!components.contains(mPlate))
                     components.add(mPlate);
@@ -607,7 +608,7 @@ public class ThunderGui extends Screen {
                 }
                 case GLFW.GLFW_KEY_ENTER -> {
                     if (!config_string.equals("Save config") && !config_string.equals("")) {
-                        ThunderHack.configManager.save(config_string);
+                        Managers.CONFIG.save(config_string);
                         config_string = "Save config";
                         listening_config = false;
                         loadConfigs();
@@ -634,7 +635,7 @@ public class ThunderGui extends Screen {
                 }
                 case GLFW.GLFW_KEY_ENTER -> {
                     if (!friend_string.equals("Add friend") && !config_string.equals("")) {
-                        ThunderHack.friendManager.addFriend(friend_string);
+                        Managers.FRIEND.addFriend(friend_string);
                         friend_string = "Add friend";
                         listening_friend = false;
                         loadFriends();

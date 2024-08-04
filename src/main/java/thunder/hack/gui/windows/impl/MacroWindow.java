@@ -6,12 +6,13 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.MacroManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.MacroManager;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -22,8 +23,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.features.modules.Module.mc;
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class MacroWindow extends WindowBase {
     private static MacroWindow instance;
@@ -227,7 +228,7 @@ public class MacroWindow extends WindowBase {
                 listeningId = macroPlate.id;
 
             if (hoveringRemove) {
-                ThunderHack.macroManager.removeMacro(macroPlate.macro());
+                Managers.MACRO.removeMacro(macroPlate.macro());
                 refresh();
             }
         }
@@ -362,7 +363,7 @@ public class MacroWindow extends WindowBase {
         resetScroll();
         macroPlates.clear();
         int id1 = 0;
-        for (MacroManager.Macro m : ThunderHack.macroManager.getMacros())
+        for (MacroManager.Macro m : Managers.MACRO.getMacros())
             if (search.equals("Search") || search.isEmpty() || m.getName().contains(search) || m.getText().contains(search)) {
                 macroPlates.add(new MacroPlate(id1, id1 * 20 + 18, m));
                 id1++;

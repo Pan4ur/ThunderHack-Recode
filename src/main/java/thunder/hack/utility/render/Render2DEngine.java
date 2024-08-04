@@ -13,9 +13,9 @@ import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL40C;
-import thunder.hack.cmd.Command;
+import thunder.hack.features.cmd.Command;
 import thunder.hack.gui.font.Texture;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.shaders.*;
 
@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Stack;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class Render2DEngine {
 

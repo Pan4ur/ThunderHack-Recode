@@ -1,7 +1,7 @@
 package thunder.hack.injection;
 
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.player.AutoTool;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.features.modules.player.AutoTool;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static net.minecraft.enchantment.Enchantments.EFFICIENCY;
-import static thunder.hack.core.IManager.mc;
+import static thunder.hack.core.manager.IManager.mc;
 
 @Mixin({AbstractBlock.class})
 public abstract class MixinAbstractBlock {

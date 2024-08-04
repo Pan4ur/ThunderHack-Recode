@@ -1,7 +1,6 @@
 package thunder.hack.injection;
 
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.render.NoRender;
+import thunder.hack.core.manager.client.ModuleManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameOverlayRenderer;
 import net.minecraft.client.texture.Sprite;

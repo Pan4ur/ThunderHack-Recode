@@ -1,8 +1,6 @@
 package thunder.hack.utility;
 
-import thunder.hack.cmd.Command;
-
-import static thunder.hack.core.IManager.mc;
+import static thunder.hack.core.manager.IManager.mc;
 
 public class TickTimer {
     private int time;

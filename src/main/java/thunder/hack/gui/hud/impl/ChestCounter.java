@@ -12,14 +12,14 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
-import static thunder.hack.modules.render.StorageEsp.getBlockEntities;
+import static thunder.hack.features.modules.render.StorageEsp.getBlockEntities;
 
 public class ChestCounter extends HudElement {
     public ChestCounter() {

@@ -10,7 +10,7 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.UUID;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class PredictUtility {
     public static PlayerEntity movePlayer(PlayerEntity entity, Vec3d newPos) {

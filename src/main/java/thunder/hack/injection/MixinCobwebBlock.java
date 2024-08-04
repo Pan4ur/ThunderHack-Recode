@@ -11,11 +11,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.movement.AntiWeb;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.features.modules.movement.AntiWeb;
 import thunder.hack.utility.player.InteractionUtility;
 
-import static thunder.hack.core.IManager.mc;
+import static thunder.hack.core.manager.IManager.mc;
 
 @Mixin(CobwebBlock.class)
 public class MixinCobwebBlock {

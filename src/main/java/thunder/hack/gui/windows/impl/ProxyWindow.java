@@ -7,12 +7,13 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ProxyManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ProxyManager;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -22,8 +23,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.features.modules.Module.mc;
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class ProxyWindow extends WindowBase {
 
@@ -168,7 +169,7 @@ public class ProxyWindow extends WindowBase {
             FontRenderers.icons.drawString(context.getMatrices(), "w", getX() + getWidth() - 15, proxyPlate.offset + getY() + 40 + getScrollOffset(), -1);
             FontRenderers.sf_medium_mini.drawString(context.getMatrices(), id + ".", getX() + 3, getY() + 41 + getScrollOffset() + proxyPlate.offset, textColor);
 
-            boolean selected = ThunderHack.proxyManager.getActiveProxy() == proxyPlate.proxy;
+            boolean selected = Managers.PROXY.getActiveProxy() == proxyPlate.proxy;
             boolean hover9 = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 28, getY() + 36 + getScrollOffset() + proxyPlate.offset, 11, 11);
             Render2DEngine.drawRectWithOutline(context.getMatrices(), getX() + getWidth() - 28, getY() + 36 + getScrollOffset() + proxyPlate.offset, 11, 11, hover9 ? hoveredColor : color, color2);
             FontRenderers.icons.drawString(context.getMatrices(), selected ? "i" : "k", getX() + getWidth() - 26, proxyPlate.offset + getY() + 41 + getScrollOffset(), selected ? -1 : Color.GRAY.getRGB());
@@ -246,7 +247,7 @@ public class ProxyWindow extends WindowBase {
 
             if (hoveringAdd) {
                 try {
-                    ThunderHack.proxyManager.addProxy(new ProxyManager.ThProxy(addName, addIp, Integer.parseInt(addPort), addLogin, addPassword));
+                    Managers.PROXY.addProxy(new ProxyManager.ThProxy(addName, addIp, Integer.parseInt(addPort), addLogin, addPassword));
                 } catch (Exception e) {
                 }
                 refresh();
@@ -283,20 +284,20 @@ public class ProxyWindow extends WindowBase {
                 listeningType = ListeningType.Password;
 
             if (hoveringCheck)
-                ThunderHack.proxyManager.checkPing(proxyPlate.proxy());
+                Managers.PROXY.checkPing(proxyPlate.proxy());
 
             if (hoveringName || hoveringIp || hoveringPort || hoveringLogin || hoveringPassword)
                 listeningId = proxyPlate.id;
 
             if (hoveringSelect) {
-                if (ThunderHack.proxyManager.getActiveProxy() == proxyPlate.proxy)
-                    ThunderHack.proxyManager.setActiveProxy(null);
+                if (Managers.PROXY.getActiveProxy() == proxyPlate.proxy)
+                    Managers.PROXY.setActiveProxy(null);
                 else
-                    ThunderHack.proxyManager.setActiveProxy(proxyPlate.proxy);
+                    Managers.PROXY.setActiveProxy(proxyPlate.proxy);
             }
 
             if (hoveringRemove) {
-                ThunderHack.proxyManager.removeProxy(proxyPlate.proxy);
+                Managers.PROXY.removeProxy(proxyPlate.proxy);
                 refresh();
             }
         }
@@ -499,7 +500,7 @@ public class ProxyWindow extends WindowBase {
         resetScroll();
         proxyPlates.clear();
         int id1 = 0;
-        for (ProxyManager.ThProxy p : ThunderHack.proxyManager.getProxies())
+        for (ProxyManager.ThProxy p : Managers.PROXY.getProxies())
             if (search.equals("Search") || search.isEmpty() || p.getName().contains(search)) {
                 proxyPlates.add(new ProxyPlate(id1, id1 * 20 + 18, p));
                 id1++;

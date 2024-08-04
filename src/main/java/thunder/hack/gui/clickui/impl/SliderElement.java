@@ -6,11 +6,11 @@ import net.minecraft.util.StringHelper;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -18,7 +18,7 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 import java.util.Objects;
 
-import static thunder.hack.core.IManager.mc;
+import static thunder.hack.core.manager.IManager.mc;
 
 public class SliderElement extends AbstractElement {
 
@@ -83,7 +83,7 @@ public class SliderElement extends AbstractElement {
         }
 
         if (value != prevValue)
-            ThunderHack.soundManager.playSlider();
+            Managers.SOUND.playSlider();
 
         prevValue = value;
     }

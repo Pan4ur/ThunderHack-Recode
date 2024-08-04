@@ -3,18 +3,16 @@ package thunder.hack.gui.hud.impl;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
-import static thunder.hack.core.impl.ServerManager.getPing;
+import static thunder.hack.core.manager.client.ServerManager.getPing;
 
 public class PingHud extends HudElement {
 

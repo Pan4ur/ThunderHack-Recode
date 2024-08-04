@@ -1,14 +1,14 @@
 package thunder.hack.injection;
 
-import thunder.hack.core.impl.FriendManager;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.misc.NameProtect;
+import thunder.hack.core.manager.player.FriendManager;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.features.modules.misc.NameProtect;
 import net.minecraft.text.TextVisitFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 @Mixin(value = {TextVisitFactory.class})
 public class MixinTextVisitFactory {

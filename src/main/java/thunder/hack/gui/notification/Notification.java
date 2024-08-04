@@ -3,7 +3,7 @@ package thunder.hack.gui.notification;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Formatting;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -11,8 +11,8 @@ import thunder.hack.utility.render.animation.EaseOutBack;
 
 import java.awt.*;
 
-import static thunder.hack.core.impl.NotificationManager.isDefault;
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.core.manager.client.NotificationManager.isDefault;
+import static thunder.hack.features.modules.Module.mc;
 
 public class Notification {
     private final String message, title;

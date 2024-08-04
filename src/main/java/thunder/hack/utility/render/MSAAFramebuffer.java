@@ -7,11 +7,8 @@ import net.minecraft.client.gl.Framebuffer;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL30C;
-import thunder.hack.core.impl.ModuleManager;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MSAAFramebuffer extends Framebuffer {

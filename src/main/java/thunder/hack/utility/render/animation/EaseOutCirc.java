@@ -3,7 +3,7 @@ package thunder.hack.utility.render.animation;
 import net.minecraft.util.math.MathHelper;
 import thunder.hack.utility.render.Render3DEngine;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class EaseOutCirc {
     private final int maxTicks;

@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventKeyboardInput;
-import thunder.hack.modules.Module;
+import thunder.hack.features.modules.Module;
 
 @Mixin(KeyboardInput.class)
 public class MixinKeyboardInput {

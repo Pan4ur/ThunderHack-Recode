@@ -26,7 +26,7 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.resource.ResourceFactory;
 import net.minecraft.util.Identifier;
-import thunder.hack.cmd.Command;
+import thunder.hack.features.cmd.Command;
 import thunder.hack.utility.render.WindowResizeCallback;
 
 import java.util.Set;

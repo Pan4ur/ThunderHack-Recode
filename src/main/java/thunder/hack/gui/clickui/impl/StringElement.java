@@ -14,7 +14,7 @@ import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class StringElement extends AbstractElement {
     public StringElement(Setting setting) {

@@ -14,7 +14,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import thunder.hack.ThunderHack;
-import thunder.hack.modules.Module;
+import thunder.hack.core.Managers;
+import thunder.hack.features.modules.Module;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -31,16 +32,16 @@ public abstract class MixinChatInputSuggestor {
     @Inject(method = "refresh", at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/StringReader;canRead()Z", remap = false), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
     public void refreshHook(CallbackInfo ci, String string, StringReader reader) {
         if(Module.fullNullCheck()) return;
-        if (reader.canRead(ThunderHack.commandManager.getPrefix().length()) && reader.getString().startsWith(ThunderHack.commandManager.getPrefix(), reader.getCursor())) {
+        if (reader.canRead(Managers.COMMAND.getPrefix().length()) && reader.getString().startsWith(Managers.COMMAND.getPrefix(), reader.getCursor())) {
             reader.setCursor(reader.getCursor() + 1);
 
             if (parse == null)
-                parse = ThunderHack.commandManager.getDispatcher().parse(reader, ThunderHack.commandManager.getSource());
+                parse = Managers.COMMAND.getDispatcher().parse(reader, Managers.COMMAND.getSource());
 
             final int cursor = textField.getCursor();
 
             if (cursor >= 1 && (window == null || !completingSuggestions)) {
-                pendingSuggestions = ThunderHack.commandManager.getDispatcher().getCompletionSuggestions(parse, cursor);
+                pendingSuggestions = Managers.COMMAND.getDispatcher().getCompletionSuggestions(parse, cursor);
                 pendingSuggestions.thenRun(() -> {
                     if (pendingSuggestions.isDone()) showCommandSuggestions();
                 });

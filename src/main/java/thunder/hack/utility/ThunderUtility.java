@@ -23,8 +23,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import static thunder.hack.core.impl.ConfigManager.IMAGES_FOLDER;
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.core.manager.client.ConfigManager.IMAGES_FOLDER;
+import static thunder.hack.features.modules.Module.mc;
 
 public final class ThunderUtility {
     public static List<String> changeLog = new ArrayList<>();
@@ -132,7 +132,7 @@ public final class ThunderUtility {
             URL url = new URL("https://api.github.com/repos/Pan4ur/ThunderHack-Recode/commits?per_page=50");
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
 
-            changeLog.add("Changelog [Recode; Date: " + ThunderHack.BUILD_DATE + "; GitHash:" + ThunderHack.GITH_HASH + "]");
+            changeLog.add("Changelog [Recode; Date: " + ThunderHack.BUILD_DATE + "; GitHash:" + ThunderHack.GITHUB_HASH + "]");
             changeLog.add("\n");
 
             String inputLine;

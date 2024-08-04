@@ -2,17 +2,13 @@ package thunder.hack.injection;
 
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.dimension.DimensionType;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.render.Fullbright;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.features.modules.render.Fullbright;
 import net.minecraft.client.render.LightmapTextureManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
-
-import java.awt.*;
 
 @Mixin(LightmapTextureManager.class)
 public class MixinLightmapTextureManager {

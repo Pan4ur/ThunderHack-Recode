@@ -4,21 +4,18 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.Entity;
 import net.minecraft.scoreboard.ScoreboardObjective;
-import org.spongepowered.asm.mixin.Unique;
-import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.hud.impl.Hotbar;
 import thunder.hack.gui.windows.WindowsScreen;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.client.ClickGui;
+import thunder.hack.features.modules.Module;
 import net.minecraft.client.gui.hud.InGameHud;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import thunder.hack.utility.render.Render3DEngine;
 
-import static thunder.hack.core.IManager.mc;
+import static thunder.hack.core.manager.IManager.mc;
 
 @Mixin(InGameHud.class)
 public abstract class MixinInGameHud {
@@ -26,8 +23,8 @@ public abstract class MixinInGameHud {
     @Inject(at = @At(value = "HEAD"), method = "render")
     public void renderHook(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if(Module.fullNullCheck()) return;
-        ThunderHack.moduleManager.onRender2D(context);
-        ThunderHack.notificationManager.onRender2D(context);
+        Managers.MODULE.onRender2D(context);
+        Managers.NOTIFICATION.onRender2D(context);
     }
 
     @Inject(at = @At(value = "HEAD"), method = "renderStatusBars", cancellable = true)

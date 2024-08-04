@@ -13,13 +13,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.CommandManager;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.core.impl.ProxyManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.CommandManager;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.core.manager.client.ProxyManager;
 import thunder.hack.events.impl.ClientClickEvent;
 import thunder.hack.gui.misc.DialogScreen;
-import thunder.hack.gui.windows.WindowsScreen;
-import thunder.hack.modules.client.ClientSettings;
+import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
 
@@ -30,8 +30,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
-import static thunder.hack.modules.Module.mc;
-import static thunder.hack.modules.client.ClientSettings.isRu;
+import static thunder.hack.features.modules.Module.mc;
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 @Mixin(Screen.class)
 public abstract class MixinScreen {
@@ -40,10 +40,10 @@ public abstract class MixinScreen {
 
     @Inject(method = "handleTextClick", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;error(Ljava/lang/String;Ljava/lang/Object;)V", ordinal = 1, remap = false), cancellable = true)
     private void onRunCommand(Style style, CallbackInfoReturnable<Boolean> cir) {
-        if (Objects.requireNonNull(style.getClickEvent()) instanceof ClientClickEvent clientClickEvent && clientClickEvent.getValue().startsWith(ThunderHack.commandManager.getPrefix()))
+        if (Objects.requireNonNull(style.getClickEvent()) instanceof ClientClickEvent clientClickEvent && clientClickEvent.getValue().startsWith(Managers.COMMAND.getPrefix()))
             try {
-                CommandManager manager = ThunderHack.commandManager;
-                manager.getDispatcher().execute(style.getClickEvent().getValue().substring(ThunderHack.commandManager.getPrefix().length()), manager.getSource());
+                CommandManager manager = Managers.COMMAND;
+                manager.getDispatcher().execute(style.getClickEvent().getValue().substring(Managers.COMMAND.getPrefix().length()), manager.getSource());
                 cir.setReturnValue(true);
             } catch (CommandSyntaxException ignored) {
             }
@@ -60,9 +60,9 @@ public abstract class MixinScreen {
                     isRu() ? "Ты действительно хочешь загрузить " + fileName + "?" : "Are you sure you want to load " + fileName + "?",
                     isRu() ? "Да ебать" : "Do it, piece of shit!", isRu() ? "Не, че за хуйня?" : "Nooo fuck ur ass nigga!",
                     () -> {
-                        ThunderHack.moduleManager.onUnload("none");
-                        ThunderHack.configManager.load(cfgFile);
-                        ThunderHack.moduleManager.onLoad("none");
+                        Managers.MODULE.onUnload("none");
+                        Managers.CONFIG.load(cfgFile);
+                        Managers.MODULE.onLoad("none");
                         mc.setScreen(null);
                     }, () -> mc.setScreen(null));
             mc.setScreen(dialogScreen);
@@ -90,7 +90,7 @@ public abstract class MixinScreen {
                                         LogUtils.getLogger().warn(e.getMessage());
                                     }
 
-                                    ThunderHack.proxyManager.addProxy(new ProxyManager.ThProxy("Proxy" + (int) MathUtility.random(0, 10000), ip, p, login, password));
+                                    Managers.PROXY.addProxy(new ProxyManager.ThProxy("Proxy" + (int) MathUtility.random(0, 10000), ip, p, login, password));
                                 }
                             }
                         } catch (Exception ignored) {

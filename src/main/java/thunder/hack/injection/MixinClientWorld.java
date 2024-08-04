@@ -11,17 +11,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventEntityRemoved;
 import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.EventEntitySpawnPost;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.render.WorldTweaks;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.render.WorldTweaks;
 import thunder.hack.setting.impl.ColorSetting;
 
-import java.awt.*;
-
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 @Mixin(ClientWorld.class)
 public class MixinClientWorld {

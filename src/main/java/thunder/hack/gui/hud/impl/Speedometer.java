@@ -6,9 +6,10 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.Managers;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.hud.HudElement;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -54,10 +55,10 @@ public class Speedometer extends HudElement {
     }
 
     public float getSpeedKpH() {
-        return (average.getValue() ? ThunderHack.playerManager.averagePlayerSpeed : ThunderHack.playerManager.currentPlayerSpeed) * 72f;
+        return (average.getValue() ? Managers.PLAYER.averagePlayerSpeed : Managers.PLAYER.currentPlayerSpeed) * 72f;
     }
 
     public float getSpeedMpS() {
-        return (average.getValue() ? ThunderHack.playerManager.averagePlayerSpeed : ThunderHack.playerManager.currentPlayerSpeed) * 20f;
+        return (average.getValue() ? Managers.PLAYER.averagePlayerSpeed : Managers.PLAYER.currentPlayerSpeed) * 20f;
     }
 }

@@ -4,8 +4,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Core;
+import thunder.hack.core.Managers;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.utility.render.Render2DEngine;
@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Objects;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public class FriendComponent {
     float scroll_animation = 0f;
@@ -174,7 +174,7 @@ public class FriendComponent {
             return;
         }
         if (Render2DEngine.isHovered(MouseX, MouseY, posX + 268, posY + 10, 10, 10)) {
-            ThunderHack.friendManager.removeFriend(name);
+            Managers.FRIEND.removeFriend(name);
             ThunderGui.getInstance().loadFriends();
         }
     }

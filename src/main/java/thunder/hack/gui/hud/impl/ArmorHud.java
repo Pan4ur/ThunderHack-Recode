@@ -1,6 +1,5 @@
 package thunder.hack.gui.hud.impl;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.EquipmentSlot;
@@ -9,8 +8,6 @@ import net.minecraft.item.ItemStack;
 import thunder.hack.gui.hud.HudElement;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
-
-import java.awt.*;
 
 public class ArmorHud extends HudElement {
     public ArmorHud() {

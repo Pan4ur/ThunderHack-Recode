@@ -12,15 +12,15 @@ import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.Registries;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.injection.accesors.IInteractionManager;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 public final class InventoryUtility {
     private static int cachedSlot = -1;
@@ -301,7 +301,7 @@ public final class InventoryUtility {
     public static void saveAndSwitchTo(int slot) {
         saveSlot();
         if (mc.player == null || mc.getNetworkHandler() == null) return;
-        if (mc.player.getInventory().selectedSlot == slot && ThunderHack.playerManager.serverSideSlot == slot)
+        if (mc.player.getInventory().selectedSlot == slot && Managers.PLAYER.serverSideSlot == slot)
             return;
         mc.player.getInventory().selectedSlot = slot;
         ((IInteractionManager) mc.interactionManager).syncSlot();
@@ -309,7 +309,7 @@ public final class InventoryUtility {
 
     public static void switchTo(int slot) {
         if (mc.player == null || mc.getNetworkHandler() == null) return;
-        if (mc.player.getInventory().selectedSlot == slot && ThunderHack.playerManager.serverSideSlot == slot)
+        if (mc.player.getInventory().selectedSlot == slot && Managers.PLAYER.serverSideSlot == slot)
             return;
         mc.player.getInventory().selectedSlot = slot;
         ((IInteractionManager) mc.interactionManager).syncSlot();

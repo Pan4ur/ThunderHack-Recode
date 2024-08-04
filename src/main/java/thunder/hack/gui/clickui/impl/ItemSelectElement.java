@@ -2,7 +2,7 @@ package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
-import thunder.hack.ThunderHack;
+import thunder.hack.core.Managers;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.impl.ItemSelectWindow;
@@ -12,7 +12,7 @@ import thunder.hack.setting.impl.ItemSelectSetting;
 
 import java.awt.*;
 
-import static thunder.hack.core.IManager.mc;
+import static thunder.hack.core.manager.IManager.mc;
 
 public class ItemSelectElement extends AbstractElement {
     private final Setting<ItemSelectSetting> setting;
@@ -34,7 +34,7 @@ public class ItemSelectElement extends AbstractElement {
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (hovered) {
             mc.setScreen(new WindowsScreen(new ItemSelectWindow(getItemSetting())));
-            ThunderHack.soundManager.playSwipeIn();
+            Managers.SOUND.playSwipeIn();
         }
         super.mouseClicked(mouseX, mouseY, button);
     }

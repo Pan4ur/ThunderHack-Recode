@@ -1,12 +1,10 @@
 package thunder.hack.injection;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
+import thunder.hack.core.Managers;
 import thunder.hack.utility.render.shaders.satin.impl.ReloadableShaderEffectManager;
-import net.minecraft.client.gl.ShaderProgram;
-import net.minecraft.client.gl.ShaderStage;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -29,20 +27,16 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.client.ClientSettings;
-import thunder.hack.modules.player.NoEntityTrace;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.ClientSettings;
+import thunder.hack.features.modules.player.NoEntityTrace;
 import thunder.hack.utility.math.FrameRateCounter;
 import thunder.hack.utility.render.BlockAnimationUtility;
 import thunder.hack.utility.render.Render3DEngine;
 
-import java.util.List;
-import java.util.function.Consumer;
-
-import static thunder.hack.modules.Module.mc;
+import static thunder.hack.features.modules.Module.mc;
 
 @Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer {
@@ -82,7 +76,7 @@ public abstract class MixinGameRenderer {
         Render3DEngine.lastModMat.set(RenderSystem.getModelViewMatrix());
         Render3DEngine.lastWorldSpaceMatrix.set(matrixStack.peek().getPositionMatrix());
 
-        ThunderHack.moduleManager.onRender3D(matrixStack);
+        Managers.MODULE.onRender3D(matrixStack);
         BlockAnimationUtility.onRender(matrixStack);
         Render3DEngine.onRender3D(matrixStack); // <- не двигать
 
@@ -93,7 +87,7 @@ public abstract class MixinGameRenderer {
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/render/Camera;FLorg/joml/Matrix4f;)V", shift = At.Shift.AFTER))
     public void postRender3dHook(RenderTickCounter tickCounter, CallbackInfo ci) {
         if (Module.fullNullCheck()) return;
-        ThunderHack.shaderManager.renderShaders();
+        Managers.SHADER.renderShaders();
     }
 
     @Redirect(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;lerp(FFF)F"))
@@ -123,7 +117,7 @@ public abstract class MixinGameRenderer {
         if (ModuleManager.freeCam.isEnabled()) {
             mc.getProfiler().pop();
             info.cancel();
-            mc.crosshairTarget = ThunderHack.playerManager.getRtxTarget(ModuleManager.freeCam.getFakeYaw(), ModuleManager.freeCam.getFakePitch(), ModuleManager.freeCam.getFakeX(), ModuleManager.freeCam.getFakeY(), ModuleManager.freeCam.getFakeZ());
+            mc.crosshairTarget = Managers.PLAYER.getRtxTarget(ModuleManager.freeCam.getFakeYaw(), ModuleManager.freeCam.getFakePitch(), ModuleManager.freeCam.getFakeX(), ModuleManager.freeCam.getFakeY(), ModuleManager.freeCam.getFakeZ());
         }
     }
 

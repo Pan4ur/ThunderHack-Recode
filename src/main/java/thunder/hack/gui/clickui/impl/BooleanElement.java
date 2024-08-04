@@ -2,19 +2,17 @@ package thunder.hack.gui.clickui.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.modules.client.HudEditor;
-import thunder.hack.modules.client.SoundFX;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 
-import static thunder.hack.core.IManager.mc;
+import static thunder.hack.core.manager.IManager.mc;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class BooleanElement extends AbstractElement {
@@ -57,7 +55,7 @@ public class BooleanElement extends AbstractElement {
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (hovered && button == 0) {
             setting.setValue(!((Boolean) setting.getValue()));
-            ThunderHack.soundManager.playBoolean();
+            Managers.SOUND.playBoolean();
         }
 
         super.mouseClicked(mouseX, mouseY, button);

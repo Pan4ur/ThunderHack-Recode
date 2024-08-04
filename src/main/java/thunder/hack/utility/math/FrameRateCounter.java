@@ -3,8 +3,6 @@ package thunder.hack.utility.math;
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.core.IManager.mc;
-
 public class FrameRateCounter {
     public static final FrameRateCounter INSTANCE = new FrameRateCounter();
     final List<Long> records = new ArrayList<>();

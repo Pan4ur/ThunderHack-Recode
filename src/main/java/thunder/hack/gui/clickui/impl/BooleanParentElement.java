@@ -4,11 +4,11 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.ThunderHack;
+import thunder.hack.core.Managers;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.utility.render.Render2DEngine;
@@ -16,7 +16,7 @@ import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
-import static thunder.hack.core.IManager.mc;
+import static thunder.hack.core.manager.IManager.mc;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
 public class BooleanParentElement extends AbstractElement {
@@ -76,13 +76,13 @@ public class BooleanParentElement extends AbstractElement {
         if (hovered) {
             if (button == 0) {
                 getParentSetting().getValue().setEnabled(!getParentSetting().getValue().isEnabled());
-                ThunderHack.soundManager.playBoolean();
+                Managers.SOUND.playBoolean();
             } else {
                 getParentSetting().getValue().setExtended(!getParentSetting().getValue().isExtended());
                 if (getParentSetting().getValue().isExtended()) {
-                    ThunderHack.soundManager.playSwipeIn();
+                    Managers.SOUND.playSwipeIn();
                 } else {
-                    ThunderHack.soundManager.playSwipeOut();
+                    Managers.SOUND.playSwipeOut();
                 }
             }
         }
