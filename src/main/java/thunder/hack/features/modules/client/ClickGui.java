@@ -1,7 +1,10 @@
 package thunder.hack.features.modules.client;
 
+import baritone.api.BaritoneAPI;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.Identifier;
+import thunder.hack.ThunderHack;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventSetting;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
@@ -17,6 +20,7 @@ public class ClickGui extends Module {
     public final Setting<Boolean> descriptions = new Setting<>("Descriptions", true);
     public final Setting<Boolean> blur = new Setting<>("Blur", true);
     public final Setting<Boolean> tips = new Setting<>("Tips", true);
+    public final Setting<Boolean> pauseBaritone = new Setting<>("PauseBaritone", true);
     public final Setting<Image> image = new Setting<>("Image", Image.None);
     public final Setting<Integer> moduleWidth = new Setting<>("ModuleWidth", 100, 50, 200);
     public final Setting<Integer> moduleHeight = new Setting<>("ModuleHeight", 14, 8, 25);
@@ -34,7 +38,17 @@ public class ClickGui extends Module {
 
     @Override
     public void onEnable() {
+        if(pauseBaritone.getValue() && !fullNullCheck() && ThunderHack.baritone){
+            BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("pause");
+        }
         setGui();
+    }
+
+    @Override
+    public void onDisable() {
+        if(pauseBaritone.getValue() && !fullNullCheck() && ThunderHack.baritone){
+            BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("resume");
+        }
     }
 
     public void setGui() {

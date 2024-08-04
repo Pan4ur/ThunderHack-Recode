@@ -1,5 +1,6 @@
 package thunder.hack.features.modules.combat;
 
+import baritone.api.BaritoneAPI;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.OtherClientPlayerEntity;
@@ -81,6 +82,7 @@ public class Aura extends Module {
     public final Setting<Boolean> pauseWhileEating = new Setting<>("PauseWhileEating", false);
     public final Setting<Boolean> tpsSync = new Setting<>("TPSSync", false);
     public final Setting<Boolean> clientLook = new Setting<>("ClientLook", false);
+    public final Setting<Boolean> pauseBaritone = new Setting<>("PauseBaritone", false);
     public final Setting<BooleanSettingGroup> oldDelay = new Setting<>("OldDelay", new BooleanSettingGroup(false));
     public final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 20).addToGroup(oldDelay);
     public final Setting<Integer> maxCPS = new Setting<>("MaxCPS", 12, 1, 20).addToGroup(oldDelay);
@@ -155,6 +157,7 @@ public class Aura extends Module {
     private final Timer pauseTimer = new Timer();
 
     public Box resolvedBox;
+    static boolean wasTargeted = false;
 
     public Aura() {
         super("Aura", Category.COMBAT);
@@ -316,6 +319,16 @@ public class Aura extends Module {
 
         if (mc.player.isUsingItem() && pauseWhileEating.getValue())
             return;
+        if(pauseBaritone.getValue() && ThunderHack.baritone){
+            boolean isTargeted = (target != null);
+            if (isTargeted && !wasTargeted) {
+                BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("pause");
+                wasTargeted = true; // Обновляем, что мы находимся в состоянии "таргет"
+            } else if (!isTargeted && wasTargeted) {
+                BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("resume");
+                wasTargeted = false; // Обновляем, что мы вышли из состояния "таргет"
+            }
+        }
 
         resolvePlayers();
         auraLogic();
