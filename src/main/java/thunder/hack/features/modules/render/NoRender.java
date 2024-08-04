@@ -1,6 +1,7 @@
 package thunder.hack.features.modules.render;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.render.block.entity.MobSpawnerBlockEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -61,6 +62,7 @@ public class NoRender extends Module {
     public final Setting<Boolean> signText = new Setting<>("SignText", false);
     public final Setting<Boolean> noWeather = new Setting<>("NoWeather", false);
     public final Setting<Boolean> noArmorStands = new Setting<>("NoArmorStands", false);
+    public final Setting<Boolean> spawnerEntity = new Setting<>("SpawnerEntity", false);
 
     private int potionCouter, xpCounter, arrowCounter, itemsCounter;
 

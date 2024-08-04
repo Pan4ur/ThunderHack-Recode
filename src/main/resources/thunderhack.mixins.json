@@ -34,6 +34,7 @@
     "MixinLightmapTextureManager",
     "MixinLivingEntityRenderer",
     "MixinMinecraftClient",
+    "MixinMobSpawnerBlockEntityRenderer",
     "MixinMouse",
     "MixinMultiplayerScreen",
     "MixinOtherClientPlayerEntity",
