@@ -16,7 +16,7 @@ import thunder.hack.setting.impl.Bind;
 import java.util.Objects;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import static thunder.hack.gui.hud.impl.KeyBinds.getShortKeyName;
+import static thunder.hack.features.hud.impl.KeyBinds.getShortKeyName;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class BindCommand extends Command {

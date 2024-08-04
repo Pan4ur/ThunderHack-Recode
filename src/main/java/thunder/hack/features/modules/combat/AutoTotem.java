@@ -222,7 +222,7 @@ public final class AutoTotem extends Module {
                 if (resetAttackCooldown.getValue())
                     mc.player.resetLastAttackedTicks();
             }
-            delay = (int) (2 + (ServerManager.getPing() / 25f));
+            delay = (int) (2 + (Managers.SERVER.getPing() / 25f));
         }
     }
 

@@ -108,7 +108,6 @@ public final class Surround extends PlaceModule {
                 inactivityTimer.reset();
             } else break;
         }
-
     }
 
     @SuppressWarnings("unused")

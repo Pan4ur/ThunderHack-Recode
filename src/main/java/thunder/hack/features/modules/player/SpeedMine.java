@@ -37,6 +37,7 @@ import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.Timer;
+import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
@@ -471,10 +472,10 @@ public final class SpeedMine extends Module {
         if (AutoCrystal.target == null)
             return;
 
-        BlockState prevState = mc.world.getBlockState(minePosition);
-        mc.world.setBlockState(minePosition, Blocks.AIR.getDefaultState());
-        AutoCrystal.PlaceData data = getBestData();
-        mc.world.setBlockState(minePosition, prevState);
+        AutoCrystal.PlaceData data = getCevData();
+
+        if (data == null)
+            data = getBestData();
 
         if (data != null) {
             ModuleManager.autoCrystal.placeCrystal(data.bhr(), true, false);
@@ -484,17 +485,20 @@ public final class SpeedMine extends Module {
         }
     }
 
-
-    public AutoCrystal.PlaceData getBestData() {
-
+    public AutoCrystal.PlaceData getCevData() {
         if (mc.world.isAir(minePosition.down())) {
-            if (ExplosionUtility.getSelfExplosionDamage(minePosition.down().toCenterPos().add(0,0.5,0), 0, false) > ModuleManager.autoCrystal.maxSelfDamage.getValue())
+            if (ExplosionUtility.getSelfExplosionDamage(minePosition.toCenterPos().add(0,0.5,0), 0, false) > ModuleManager.autoCrystal.maxSelfDamage.getValue())
                 return null;
 
-            AutoCrystal.PlaceData autoMineData = ModuleManager.autoCrystal.getPlaceData(minePosition, null, mc.player.getPos());
-            if (autoMineData != null)
-                return autoMineData;
+            return ModuleManager.autoCrystal.getPlaceData(minePosition, null, mc.player.getPos());
         }
+
+        return null;
+    }
+
+    public AutoCrystal.PlaceData getBestData() {
+        BlockState prevState = mc.world.getBlockState(minePosition);
+        mc.world.setBlockState(minePosition, Blocks.AIR.getDefaultState());
 
         for (Direction dir : Direction.values()) {
             if (dir == Direction.UP || dir == Direction.DOWN) continue;
@@ -502,13 +506,20 @@ public final class SpeedMine extends Module {
                 continue;
 
             AutoCrystal.PlaceData autoMineData = ModuleManager.autoCrystal.getPlaceData(minePosition.down().offset(dir), null, mc.player.getPos());
-            if (autoMineData != null)
+            if (autoMineData != null) {
+                mc.world.setBlockState(minePosition, prevState);
                 return autoMineData;
+            }
         }
 
+
+        float selfDmg = ExplosionUtility.getSelfExplosionDamage(minePosition.toCenterPos().add(0,0.5,0), 0, false);
+        mc.world.setBlockState(minePosition, prevState);
+
         AutoCrystal.PlaceData autoMineData = ModuleManager.autoCrystal.getPlaceData(minePosition, null, mc.player.getPos());
-        if (ExplosionUtility.getSelfExplosionDamage(minePosition.toCenterPos().add(0,0.5,0), 0, false) > ModuleManager.autoCrystal.maxSelfDamage.getValue())
+        if (selfDmg > ModuleManager.autoCrystal.maxSelfDamage.getValue())
             return null;
+
         return autoMineData;
     }
 

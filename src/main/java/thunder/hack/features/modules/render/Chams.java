@@ -1,4 +1,4 @@
-package thunder.hack.modules.render;
+package thunder.hack.features.modules.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -23,9 +23,9 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.ModuleManager;
+import thunder.hack.core.Managers;
 import thunder.hack.events.impl.EventHeldItemRenderer;
-import thunder.hack.modules.Module;
+import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -134,11 +134,13 @@ public class Chams extends Module {
         Direction direction;
         Entity entity;
         matrixStack.push();
-        if (ThunderHack.friendManager.isFriend(pe)) {
+
+        if (Managers.FRIEND.isFriend(pe)) {
             RenderSystem.setShaderColor(friendColor.getValue().getGlRed(), friendColor.getValue().getGlGreen(), friendColor.getValue().getGlBlue(), friendColor.getValue().getGlAlpha());
         } else {
             RenderSystem.setShaderColor(playerColor.getValue().getGlRed(), playerColor.getValue().getGlGreen(), playerColor.getValue().getGlBlue(), playerColor.getValue().getGlAlpha());
         }
+
         model.handSwingProgress = pe.getHandSwingProgress(g);
         model.riding = pe.hasVehicle();
         model.child = false;

@@ -44,7 +44,7 @@ import thunder.hack.core.Managers;
 import thunder.hack.core.manager.player.FriendManager;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.gui.hud.impl.PotionHud;
+import thunder.hack.features.hud.impl.PotionHud;
 import thunder.hack.features.modules.Module;
 import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.features.modules.misc.NameProtect;

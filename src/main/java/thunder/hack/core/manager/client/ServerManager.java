@@ -58,7 +58,7 @@ public class ServerManager implements IManager {
     }
 
 
-    public static int getPing() {
+    public int getPing() {
         if (mc.getNetworkHandler() == null || mc.player == null) return 0;
 
         if (ModuleManager.fastLatency.isEnabled())

@@ -1,4 +1,4 @@
-package thunder.hack.modules.combat;
+package thunder.hack.features.modules.combat;
 
 import com.google.common.collect.Lists;
 import meteordevelopment.orbit.EventHandler;
@@ -29,19 +29,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
-import thunder.hack.core.impl.CombatManager;
-import thunder.hack.core.impl.ModuleManager;
-import thunder.hack.core.impl.ServerManager;
+import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.core.manager.player.CombatManager;
+import thunder.hack.core.manager.world.DeadManager;
 import thunder.hack.events.impl.*;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.client.HudEditor;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.TickTimer;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.autoCrystal.DeadManager;
 import thunder.hack.utility.math.ExplosionUtility;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.math.PredictUtility;
@@ -233,7 +233,7 @@ public class AutoCrystal extends Module {
     public void onSync(EventSync e) {
         if (mc.player == null || mc.world == null) return;
 
-        target = ThunderHack.combatManager.getTarget(targetRange.getValue(), targetLogic.getValue());
+        target = Managers.COMBAT.getTarget(targetRange.getValue(), targetLogic.getValue());
 
         if (target != null && (target.isDead() || target.getHealth() < 0)) {
             target = null;
@@ -274,8 +274,8 @@ public class AutoCrystal extends Module {
     public void onTick(EventTick e) {
         if (mc.player == null || mc.world == null) return;
 
-        ThunderHack.asyncManager.run(() -> {
-            if (mc.player != null && (!await.getValue() || calcTimer.passedTicks((long) ((float) ServerManager.getPing() / 25f))))
+        Managers.ASYNC.run(() -> {
+            if (mc.player != null && (!await.getValue() || calcTimer.passedTicks((long) ((float) Managers.SERVER.getPing() / 25f))))
                 calcPosition(placeRange.getValue(), mc.player.getPos());
 
             getCrystalToExplode();
@@ -398,7 +398,7 @@ public class AutoCrystal extends Module {
         if (mc.player == null || mc.world == null) return;
         if (canAttackCrystal(crystal)) {
             attackCrystal(crystal);
-            ThunderHack.asyncManager.run(() -> {
+            Managers.ASYNC.run(() -> {
                 if (sequential.is(Sequential.Strong) && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue())) {
                     calcPosition(placeRange.getValue(), mc.player.getPos());
                     if (bestPosition != null)
@@ -576,7 +576,7 @@ public class AutoCrystal extends Module {
 
         boolean silent = autoSwitch.getValue() == Switch.SILENT || autoSwitch.getValue() == Switch.INVENTORY;
 
-        boolean switchPause1 = switchPause.getValue().isEnabled() && !ThunderHack.playerManager.switchTimer.passedMs(switchDelay.getValue()) && !silent && !silentWeakness;
+        boolean switchPause1 = switchPause.getValue().isEnabled() && !Managers.PLAYER.switchTimer.passedMs(switchDelay.getValue()) && !silent && !silentWeakness;
 
         if (!switchPause1)
             currentState = State.Active;
@@ -631,7 +631,7 @@ public class AutoCrystal extends Module {
         sendPacket(PlayerInteractEntityC2SPacket.attack(crystal, mc.player.isSneaking()));
         swingHand(false, true);
 
-        if (rotate.getValue().needSeparate() && !ThunderHack.playerManager.checkRtx(rotationYaw, rotationPitch, explodeRange.getValue(), explodeWallRange.getValue(), crystal))
+        if (rotate.getValue().needSeparate() && !Managers.PLAYER.checkRtx(rotationYaw, rotationPitch, explodeRange.getValue(), explodeWallRange.getValue(), crystal))
             rotationVec = new RotationVec(crystal.getBoundingBox().getCenter(), null, false);
 
         breakTimer.reset();
@@ -680,7 +680,7 @@ public class AutoCrystal extends Module {
         if (protectFriends.getValue()) {
             List<PlayerEntity> players = Lists.newArrayList(mc.world.getPlayers());
             for (PlayerEntity pl : players) {
-                if (!ThunderHack.friendManager.isFriend(pl)) continue;
+                if (!Managers.FRIEND.isFriend(pl)) continue;
                 float fdamage = ExplosionUtility.getAutoCrystalDamage(cr.getPos(), pl, getPredictTicks(), false);
                 if (fdamage > selfDamage) {
                     selfDamage = fdamage;
@@ -850,7 +850,7 @@ public class AutoCrystal extends Module {
             if (protectFriends.getValue()) {
                 List<PlayerEntity> players = Lists.newArrayList(mc.world.getPlayers());
                 for (PlayerEntity pl : players) {
-                    if (!ThunderHack.friendManager.isFriend(pl)) continue;
+                    if (!Managers.FRIEND.isFriend(pl)) continue;
                     float fdamage = ExplosionUtility.getAutoCrystalDamage(ent.getPos(), pl, getPredictTicks(), false);
                     if (fdamage > selfDamage) {
                         selfDamage = fdamage;
@@ -1003,7 +1003,7 @@ public class AutoCrystal extends Module {
         if (protectFriends.getValue()) {
             List<PlayerEntity> players = Lists.newArrayList(mc.world.getPlayers());
             for (PlayerEntity pl : players) {
-                if (!ThunderHack.friendManager.isFriend(pl)) continue;
+                if (!Managers.FRIEND.isFriend(pl)) continue;
                 float fdamage = ExplosionUtility.getAutoCrystalDamage(crystalVec, pl, getPredictTicks(), false);
                 if (fdamage > selfDamage) {
                     selfDamage = fdamage;

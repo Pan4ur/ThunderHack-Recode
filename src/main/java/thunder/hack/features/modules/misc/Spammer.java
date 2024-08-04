@@ -5,7 +5,7 @@ import com.google.gson.JsonParser;
 import org.apache.commons.io.IOUtils;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
-import thunder.hack.gui.hud.impl.StaffBoard;
+import thunder.hack.features.hud.impl.StaffBoard;
 import thunder.hack.features.modules.Module;
 import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.setting.Setting;

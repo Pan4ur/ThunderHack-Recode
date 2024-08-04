@@ -1,5 +1,6 @@
 package thunder.hack.core.manager.world;
 
+import thunder.hack.core.Managers;
 import thunder.hack.core.manager.IManager;
 import thunder.hack.core.manager.client.ServerManager;
 
@@ -18,7 +19,7 @@ public class DeadManager implements IManager {
 
         if (!cache.isEmpty()) {
             cache.forEach((crystal, deathTime) -> {
-                if (System.currentTimeMillis() - deathTime > ServerManager.getPing() * 2L) {
+                if (System.currentTimeMillis() - deathTime > Managers.SERVER.getPing() * 2L) {
                     deadCrystals.remove(crystal);
                 }
             });

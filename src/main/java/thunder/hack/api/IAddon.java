@@ -2,7 +2,7 @@ package thunder.hack.api;
 
 import com.mojang.logging.LogUtils;
 import thunder.hack.features.cmd.Command;
-import thunder.hack.gui.hud.HudElement;
+import thunder.hack.features.hud.HudElement;
 import thunder.hack.features.modules.Module;
 
 import java.util.List;

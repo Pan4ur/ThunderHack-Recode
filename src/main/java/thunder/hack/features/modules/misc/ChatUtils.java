@@ -1,4 +1,4 @@
-package thunder.hack.modules.misc;
+package thunder.hack.features.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.PlayerListEntry;
@@ -13,11 +13,12 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.Managers;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.TotemPopEvent;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.injection.accesors.IGameMessageS2CPacket;
-import thunder.hack.modules.Module;
-import thunder.hack.modules.client.ClientSettings;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
@@ -183,14 +184,14 @@ public class ChatUtils extends Module {
 
             if (mention.getValue()) {
                 if (pac.content.getString().contains(mc.player.getName().getString()) && messageTimer.passedMs(1000)) {
-                    ThunderHack.notificationManager.publicity("ChatUtils", ClientSettings.language.getValue() == ClientSettings.Language.RU ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
+                    Managers.NOTIFICATION.publicity("ChatUtils", ClientSettings.language.getValue() == ClientSettings.Language.RU ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
                     mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 5f, 1f);
                 }
             }
 
             String content = pac.content.getString().toLowerCase();
             if (!pmSound.is(PMSound.Off) && (content.contains("whisper") || content.contains("-> я") || content.contains("-> " + NameProtect.getCustomName()) || content.contains("-> me") || content.contains(" says:"))) {
-                ThunderHack.soundManager.playPmSound(pmSound.getValue());
+                Managers.SOUND.playPmSound(pmSound.getValue());
             }
         }
     }
@@ -246,7 +247,7 @@ public class ChatUtils extends Module {
             if (mc.player.getMainHandStack().getItem() == Items.FILLED_MAP || mc.player.getOffHandStack().getItem() == Items.FILLED_MAP)
                 return;
 
-            if (pac.chatMessage().startsWith("/") || pac.chatMessage().startsWith(ThunderHack.commandManager.getPrefix()))
+            if (pac.chatMessage().startsWith("/") || pac.chatMessage().startsWith(Managers.COMMAND.getPrefix()))
                 return;
 
             String message = pac.chatMessage();

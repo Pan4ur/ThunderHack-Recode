@@ -15,7 +15,7 @@ import thunder.hack.features.cmd.Command;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.clickui.impl.*;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.gui.hud.impl.TargetHud;
+import thunder.hack.features.hud.impl.TargetHud;
 import thunder.hack.gui.misc.DialogScreen;
 import thunder.hack.features.modules.Module;
 import thunder.hack.features.modules.client.ClickGui;

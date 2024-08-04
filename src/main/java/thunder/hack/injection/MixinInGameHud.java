@@ -6,7 +6,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
-import thunder.hack.gui.hud.impl.Hotbar;
+import thunder.hack.features.hud.impl.Hotbar;
 import thunder.hack.gui.windows.WindowsScreen;
 import thunder.hack.features.modules.Module;
 import net.minecraft.client.gui.hud.InGameHud;

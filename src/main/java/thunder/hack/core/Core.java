@@ -77,7 +77,7 @@ public final class Core {
             Managers.COMMAND.setPrefix(ClientSettings.prefix.getValue());
 
         new HashMap<>(InteractionUtility.awaiting).forEach((bp, time) -> {
-            if (System.currentTimeMillis() - time > ServerManager.getPing() * 2f)
+            if (System.currentTimeMillis() - time > Managers.SERVER.getPing() * 2f)
                 InteractionUtility.awaiting.remove(bp);
         });
 
