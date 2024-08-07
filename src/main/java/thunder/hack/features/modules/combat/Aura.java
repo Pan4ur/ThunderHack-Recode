@@ -323,10 +323,10 @@ public class Aura extends Module {
             boolean isTargeted = (target != null);
             if (isTargeted && !wasTargeted) {
                 BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("pause");
-                wasTargeted = true; // Обновляем, что мы находимся в состоянии "таргет"
+                wasTargeted = true;
             } else if (!isTargeted && wasTargeted) {
                 BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("resume");
-                wasTargeted = false; // Обновляем, что мы вышли из состояния "таргет"
+                wasTargeted = false;
             }
         }
 
