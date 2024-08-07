@@ -20,7 +20,7 @@ public class ClickGui extends Module {
     public final Setting<Boolean> descriptions = new Setting<>("Descriptions", true);
     public final Setting<Boolean> blur = new Setting<>("Blur", true);
     public final Setting<Boolean> tips = new Setting<>("Tips", true);
-    public final Setting<Boolean> pauseBaritone = new Setting<>("PauseBaritone", true);
+    public final Setting<Boolean> pauseBaritone = new Setting<>("PauseBaritone", false);
     public final Setting<Image> image = new Setting<>("Image", Image.None);
     public final Setting<Integer> moduleWidth = new Setting<>("ModuleWidth", 100, 50, 200);
     public final Setting<Integer> moduleHeight = new Setting<>("ModuleHeight", 14, 8, 25);
