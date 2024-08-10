@@ -133,6 +133,7 @@ public class Aura extends Module {
     public final Setting<Boolean> onlyAngry = new Setting<>("OnlyAngryHostiles", true, v -> hostiles.getValue()).addToGroup(targets);
     public final Setting<Boolean> Projectiles = new Setting<>("Projectiles", true).addToGroup(targets);
     public final Setting<Boolean> ignoreInvisible = new Setting<>("IgnoreInvisibleEntities", false).addToGroup(targets);
+    public final Setting<Boolean> ignoreNamed = new Setting<>("IgnoreNamed", false).addToGroup(targets);
     public final Setting<Boolean> ignoreTeam = new Setting<>("IgnoreTeam", false).addToGroup(targets);
     public final Setting<Boolean> ignoreCreative = new Setting<>("IgnoreCreative", true).addToGroup(targets);
     public final Setting<Boolean> ignoreNaked = new Setting<>("IgnoreNaked", false).addToGroup(targets);
@@ -806,7 +807,7 @@ public class Aura extends Module {
                 return true;
         }
 
-        return !isInRange(entity);
+        return !isInRange(entity) || (entity.hasCustomName() && ignoreNamed.getValue());
     }
 
     private boolean isBullet(Entity entity) {
