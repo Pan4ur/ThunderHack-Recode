@@ -18,7 +18,7 @@ public final class BaritoneSettings extends Module {
     public final Setting<Boolean> allowSprint = new Setting<>("AllowSprint", true);
     public final Setting<Boolean> debug = new Setting<>("Debug", false);
     public final Setting<Boolean> enterPortal = new Setting<>("EnterPortal", false);
-
+    public final Setting<Boolean> desktopNotifications = new Setting<>("DesktopNotifications", false);
     @EventHandler
     public void onSettingChange(EventSetting e){
         if(!ThunderHack.baritone) {
@@ -30,6 +30,7 @@ public final class BaritoneSettings extends Module {
         BaritoneAPI.getSettings().allowSprint.value = allowSprint.getValue();
         BaritoneAPI.getSettings().chatDebug.value = debug.getValue();
         BaritoneAPI.getSettings().enterPortal.value = enterPortal.getValue();
+        BaritoneAPI.getSettings().desktopNotifications.value = desktopNotifications.getValue();
     }
 
     @Override
