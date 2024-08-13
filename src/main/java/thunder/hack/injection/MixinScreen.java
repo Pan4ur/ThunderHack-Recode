@@ -60,8 +60,8 @@ public abstract class MixinScreen {
                     TextureStorage.questionPic,
                     isRu() ? "Обнаружен конфиг!" : "Config detected!",
                     isRu() ? "Ты действительно хочешь загрузить " + fileName + "?" : "Are you sure you want to load " + fileName + "?",
-                    isRu() ? "Да ебать" : "Do it, piece of shit!", 
-                    isRu() ? "Не, че за хуйня?" : "Nooo fuck ur ass nigga!",
+                    isRu() ? "Да" : "Yes", 
+                    isRu() ? "Нет" : "No",
                     () -> {
                         Managers.MODULE.onUnload("none");
                         Managers.CONFIG.load(cfgFile);
