@@ -22,6 +22,7 @@ import thunder.hack.gui.misc.DialogScreen;
 import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.io.BufferedReader;
 import java.io.File;
