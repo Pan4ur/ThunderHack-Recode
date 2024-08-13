@@ -22,6 +22,7 @@ import thunder.hack.gui.misc.DialogScreen;
 import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.TextureStorage;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -56,9 +57,12 @@ public abstract class MixinScreen {
         String fileName = cfgFile.getName();
 
         if (fileName.contains(".th")) {
-            DialogScreen dialogScreen = new DialogScreen(isRu() ? "Обнаружен конфиг!" : "Config detected!",
+            DialogScreen dialogScreen = new DialogScreen(
+                    TextureStorage.questionPic,
+                    isRu() ? "Обнаружен конфиг!" : "Config detected!",
                     isRu() ? "Ты действительно хочешь загрузить " + fileName + "?" : "Are you sure you want to load " + fileName + "?",
-                    isRu() ? "Да ебать" : "Do it, piece of shit!", isRu() ? "Не, че за хуйня?" : "Nooo fuck ur ass nigga!",
+                    isRu() ? "Да" : "Yes", 
+                    isRu() ? "Нет" : "No",
                     () -> {
                         Managers.MODULE.onUnload("none");
                         Managers.CONFIG.load(cfgFile);
@@ -68,9 +72,12 @@ public abstract class MixinScreen {
             mc.setScreen(dialogScreen);
 
         } else if (fileName.contains(".txt")){
-            DialogScreen dialogScreen2 = new DialogScreen(isRu() ? "Обнаружен текстовый файл!" : "Text file detected!",
+            DialogScreen dialogScreen2 = new DialogScreen(
+                    TextureStorage.questionPic,
+                    isRu() ? "Обнаружен текстовый файл!" : "Text file detected!",
                     isRu() ? "Импортировать файл " + fileName + " как" : "Import file " + fileName + " as",
-                    isRu() ? "Прокси" : "Proxies", isRu() ? "Забить" : "Cancel",
+                    isRu() ? "Прокси" : "Proxies", 
+                    isRu() ? "Забить" : "Cancel",
                     () -> {
                         try {
                             try (BufferedReader reader = new BufferedReader(new FileReader(cfgFile))) {
