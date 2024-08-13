@@ -56,9 +56,12 @@ public abstract class MixinScreen {
         String fileName = cfgFile.getName();
 
         if (fileName.contains(".th")) {
-            DialogScreen dialogScreen = new DialogScreen(isRu() ? "Обнаружен конфиг!" : "Config detected!",
+            DialogScreen dialogScreen = new DialogScreen(
+                    TextureStorage.questionPic,
+                    isRu() ? "Обнаружен конфиг!" : "Config detected!",
                     isRu() ? "Ты действительно хочешь загрузить " + fileName + "?" : "Are you sure you want to load " + fileName + "?",
-                    isRu() ? "Да ебать" : "Do it, piece of shit!", isRu() ? "Не, че за хуйня?" : "Nooo fuck ur ass nigga!",
+                    isRu() ? "Да ебать" : "Do it, piece of shit!", 
+                    isRu() ? "Не, че за хуйня?" : "Nooo fuck ur ass nigga!",
                     () -> {
                         Managers.MODULE.onUnload("none");
                         Managers.CONFIG.load(cfgFile);
