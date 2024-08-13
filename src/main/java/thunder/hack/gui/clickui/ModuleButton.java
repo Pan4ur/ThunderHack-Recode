@@ -282,8 +282,8 @@ public class ModuleButton extends AbstractButton {
                     TextureStorage.questionPic,
                     isRu() ? "Сброс модуля" : "Reset module",
                     isRu() ? "Ты действительно хочешь сбросить " + module.getName() + "?" : "Are you sure you want to reset " + module.getName() + "?",
-                    isRu() ? "Да ебать" : "Do it, piece of shit!",
-                    isRu() ? "Не, че за хуйня?" : "Nooo fuck ur ass nigga!",
+                    isRu() ? "Да" : "Yes",
+                    isRu() ? "Нет" : "No",
                        () -> {
                          if (module.isEnabled())
                              module.disable("reseting");
