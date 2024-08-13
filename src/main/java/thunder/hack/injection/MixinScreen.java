@@ -71,9 +71,12 @@ public abstract class MixinScreen {
             mc.setScreen(dialogScreen);
 
         } else if (fileName.contains(".txt")){
-            DialogScreen dialogScreen2 = new DialogScreen(isRu() ? "Обнаружен текстовый файл!" : "Text file detected!",
+            DialogScreen dialogScreen2 = new DialogScreen(
+                    TextureStorage.questionPic,
+                    isRu() ? "Обнаружен текстовый файл!" : "Text file detected!",
                     isRu() ? "Импортировать файл " + fileName + " как" : "Import file " + fileName + " as",
-                    isRu() ? "Прокси" : "Proxies", isRu() ? "Забить" : "Cancel",
+                    isRu() ? "Прокси" : "Proxies", 
+                    isRu() ? "Забить" : "Cancel",
                     () -> {
                         try {
                             try (BufferedReader reader = new BufferedReader(new FileReader(cfgFile))) {
