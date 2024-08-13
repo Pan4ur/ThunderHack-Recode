@@ -3,13 +3,13 @@ package thunder.hack.features.modules.movement;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.RaycastContext;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventBreakBlock;
 import thunder.hack.events.impl.EventCollision;
@@ -43,7 +43,7 @@ public class Phase extends Module {
     public int afterPearlTime;
 
     private enum Mode {
-        Vanilla, Pearl, Sunrise, ForceMine
+        Vanilla, Pearl, Sunrise, ForceMine, CCClip
     }
 
     @EventHandler
@@ -52,7 +52,7 @@ public class Phase extends Module {
             return;
         BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
 
-        if (!mode.is(Mode.Pearl) && !mode.is(Mode.ForceMine) && canNoClip() || afterPearlTime > 0) {
+        if (!mode.is(Mode.CCClip) && !mode.is(Mode.Pearl) && !mode.is(Mode.ForceMine) && canNoClip() || afterPearlTime > 0) {
             if (!e.getPos().equals(playerPos.down()) || mc.options.sneakKey.isPressed())
                 e.setState(Blocks.AIR.getDefaultState());
         }
@@ -73,6 +73,49 @@ public class Phase extends Module {
     public void onEnable() {
         afterPearlTime = 0;
         clipTimer = 0;
+
+        if (mc.player.isOnGround() && mode.is(Mode.CCClip)) {
+            double[] diagonalOffset = MovementUtility.forwardWithoutStrafe(0.44);
+            boolean diagonal = mc.player.getYaw() % 90 > 35 && mc.player.getYaw() % 90 < 55;
+
+            sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+
+            if (diagonal) {
+                double[] directionVec = MovementUtility.forwardWithoutStrafe(0.51);
+
+                int height = mc.world.raycast(
+                        new RaycastContext(mc.player.getEyePos(), mc.player.getEyePos().add(diagonalOffset[0],0, diagonalOffset[1]), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)
+                ).getType().equals(HitResult.Type.MISS) ? 1 : 2;
+
+                mc.player.setPosition(mc.player.getX() + directionVec[0], mc.player.getY() + height, mc.player.getZ() + directionVec[1]);
+                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), true));
+
+                height = mc.world.isAir(BlockPos.ofFloored(mc.player.getPos().add(diagonalOffset[0], -2, diagonalOffset[1]))) ? 2 : 1;
+
+                mc.player.setPosition(mc.player.getX() + directionVec[0], mc.player.getY() - height, mc.player.getZ() + directionVec[1]);
+                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), true));
+                disable("diagonal");
+
+            } else {
+                double[] directionVec = MovementUtility.forwardWithoutStrafe(0.57);
+
+                int height = mc.world.raycast(
+                        new RaycastContext(mc.player.getEyePos(), mc.player.getEyePos().add(diagonalOffset[0],0, diagonalOffset[1]), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)
+                ).getType().equals(HitResult.Type.MISS) ? 1 : 2;
+
+                mc.player.setPosition(mc.player.getX() + directionVec[0], mc.player.getY() + height, mc.player.getZ() + directionVec[1]);
+                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), true));
+
+                mc.player.setPosition(mc.player.getX() + directionVec[0], mc.player.getY(), mc.player.getZ() + directionVec[1]);
+                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), true));
+
+                height = mc.world.isAir(BlockPos.ofFloored(mc.player.getPos().add(diagonalOffset[0], -2, diagonalOffset[1]))) ? 2 : 1;
+
+                mc.player.setPosition(mc.player.getX() + directionVec[0], mc.player.getY() - height, mc.player.getZ() + directionVec[1]);
+                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), true));
+                disable("normal");
+            }
+        }
     }
 
     @EventHandler
