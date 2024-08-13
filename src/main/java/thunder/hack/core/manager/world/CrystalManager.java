@@ -5,6 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.IManager;
+import thunder.hack.core.manager.client.ModuleManager;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,8 +29,8 @@ public class CrystalManager implements IManager {
     public void update() {
         long time = System.currentTimeMillis();
         deadCrystals.entrySet().removeIf(entry -> time - entry.getValue() > Managers.SERVER.getPing() * 2L);
-        awaitingPositions.entrySet().removeIf(entry -> Math.abs(entry.getValue().getDistance() - mc.player.squaredDistanceTo(entry.getKey().toCenterPos())) >= 1f);
-        attackedCrystals.entrySet().removeIf(entry -> Math.abs(entry.getValue().getDistance() - mc.player.squaredDistanceTo(entry.getValue().getPos())) >= 1f);
+        attackedCrystals.entrySet().removeIf(entry -> entry.getValue().shouldRemove());
+        awaitingPositions.entrySet().removeIf(entry -> entry.getValue().shouldRemove());
     }
 
     public boolean isDead(Integer id) {
@@ -49,7 +50,8 @@ public class CrystalManager implements IManager {
             if (attempt == null) {
                 return new Attempt(System.currentTimeMillis(), 1, entity.getPos());
             } else {
-                attempt.addAttempt();
+                if (ModuleManager.autoCrystal.breakFailsafe.getValue())
+                    attempt.addAttempt();
                 return attempt;
             }
         });
@@ -60,15 +62,21 @@ public class CrystalManager implements IManager {
     }
 
     public void confirmSpawn(BlockPos bp) {
-        awaitingPositions.remove(bp);
+        if (ModuleManager.autoCrystal.resetWhenSuccess.getValue())
+            awaitingPositions.clear();
+        else
+            awaitingPositions.remove(bp);
     }
 
     public void addAwaitingPos(BlockPos blockPos) {
+        boolean blocked = ModuleManager.autoCrystal.isPositionBlockedByCrystal(blockPos.up());
+
         awaitingPositions.compute(blockPos, (pos, attempt) -> {
             if (attempt == null) {
                 return new Attempt(System.currentTimeMillis(), 1, blockPos.toCenterPos());
             } else {
-                attempt.addAttempt();
+                if (!blocked && ModuleManager.autoCrystal.placeFailsafe.getValue())
+                    attempt.addAttempt();
                 return attempt;
             }
         });
@@ -103,12 +111,19 @@ public class CrystalManager implements IManager {
             return distance;
         }
 
+        public boolean shouldRemove() {
+            boolean duePositionChanged = Math.abs(distance - mc.player.squaredDistanceTo(pos)) >= ModuleManager.autoCrystal.resetDistance.getValue();
+            boolean dueTimeout = ModuleManager.autoCrystal.removeByTimeout.getValue() && System.currentTimeMillis() - time > ModuleManager.autoCrystal.timeOutVal.getValue();
+
+            return duePositionChanged || dueTimeout;
+        }
+
         public void addAttempt() {
             attempts++;
         }
 
         public boolean canSetPosBlocked() {
-            return attempts >= 5;
+            return attempts >= Math.max(ModuleManager.autoCrystal.attempts.getValue(), Managers.SERVER.getPing() / 25f);
         }
     }
 }

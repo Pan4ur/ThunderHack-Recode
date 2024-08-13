@@ -124,6 +124,15 @@ public class AutoCrystal extends Module {
     private final Setting<Switch> autoSwitch = new Setting<>("Switch", Switch.NORMAL, v -> page.is(Pages.Switch));
     private final Setting<Switch> antiWeakness = new Setting<>("AntiWeakness", Switch.SILENT, v -> page.is(Pages.Switch));
 
+    /*   FAILSAFE   */ // Temp
+    public final Setting<Boolean> placeFailsafe = new Setting<>("PlaceFailsafe", true, v -> page.is(Pages.FailSafe));
+    public final Setting<Boolean> breakFailsafe = new Setting<>("BreakFailsafe", true, v -> page.is(Pages.FailSafe));
+    public final Setting<Integer> attempts = new Setting<>("MaxAttempts", 5, 1, 30, v -> page.is(Pages.FailSafe));
+    public final Setting<Boolean> resetWhenSuccess = new Setting<>("ResetWhenSuccess", false, v -> page.is(Pages.FailSafe) && placeFailsafe.getValue());
+    public final Setting<Float> resetDistance = new Setting<>("ResetDistance", 1.0f, 0.0f, 25f, v -> page.is(Pages.FailSafe));
+    public final Setting<Boolean> removeByTimeout = new Setting<>("RemoveByTimeout", true, v -> page.is(Pages.FailSafe));
+    public final Setting<Integer> timeOutVal = new Setting<>("TimeOutVal", 1000, 1000, 30000, v -> page.is(Pages.FailSafe) && removeByTimeout.getValue());
+
     /*   RENDER   */
     private final Setting<Swing> swingMode = new Setting<>("Swing", Swing.Place, v -> page.is(Pages.Render));
     private final Setting<Boolean> render = new Setting<>("Render", true, v -> page.is(Pages.Render));
@@ -319,10 +328,8 @@ public class AutoCrystal extends Module {
     public void onCrystalSpawn(@NotNull EventEntitySpawnPost e) {
         if (e.getEntity() instanceof EndCrystalEntity cr && crystalAge.is(0) && instantBreak.is(InstantBreak.OnSpawn)) {
             long now = System.currentTimeMillis();
-            Map<BlockPos, CrystalManager.Attempt> awaitingPositions = crystalManager.getAwaitingPositions();
 
-            for (Map.Entry<BlockPos, CrystalManager.Attempt> entry : awaitingPositions.entrySet()) {
-
+            for (Map.Entry<BlockPos, CrystalManager.Attempt> entry : crystalManager.getAwaitingPositions().entrySet()) {
                 BlockPos bp = entry.getKey();
                 CrystalManager.Attempt attempt = entry.getValue();
 
@@ -347,9 +354,8 @@ public class AutoCrystal extends Module {
             cr.setId(spawn.getId());
 
             long now = System.currentTimeMillis();
-            Map<BlockPos, CrystalManager.Attempt> awaitingPositions = crystalManager.getAwaitingPositions();
 
-            for (Map.Entry<BlockPos, CrystalManager.Attempt> entry : awaitingPositions.entrySet()) {
+            for (Map.Entry<BlockPos, CrystalManager.Attempt> entry : crystalManager.getAwaitingPositions().entrySet()) {
 
                 BlockPos bp = entry.getKey();
                 CrystalManager.Attempt attempt = entry.getValue();
@@ -366,13 +372,9 @@ public class AutoCrystal extends Module {
         }
 
         if (e.getPacket() instanceof ExplosionS2CPacket explosion) {
-            for (Entity ent : Lists.newArrayList(mc.world.getEntities())) {
-                if (ent instanceof EndCrystalEntity crystal
-                        && crystal.squaredDistanceTo(explosion.getX(), explosion.getY(), explosion.getZ()) <= 144
-                        && !crystalManager.isDead(crystal.getId())) {
+            for (Entity ent : Lists.newArrayList(mc.world.getEntities()))
+                if (ent instanceof EndCrystalEntity crystal && crystal.squaredDistanceTo(explosion.getX(), explosion.getY(), explosion.getZ()) <= 144 && !crystalManager.isDead(crystal.getId()))
                     crystalManager.setDead(crystal.getId(), System.currentTimeMillis());
-                }
-            }
         }
     }
 
@@ -722,7 +724,7 @@ public class AutoCrystal extends Module {
         return prevSlot;
     }
 
-    public void placeCrystal(BlockHitResult bhr, boolean instant, boolean onSpawn) {
+    public void placeCrystal(BlockHitResult bhr, boolean packetRotate, boolean onSpawn) {
         if (shouldPause() || mc.player == null) return;
         int prevSlot = -1;
 
@@ -734,8 +736,7 @@ public class AutoCrystal extends Module {
 
         if (!rotate.is(Rotation.OFF)) {
             rotationVec = new RotationVec(bhr.getPos(), bhr, true);
-
-            if (instant) {
+            if (packetRotate) {
                 float[] angle = InteractionUtility.calculateAngle(bhr.getPos());
                 sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), angle[0], angle[1], mc.player.isOnGround()));
             } else if (!rotated && !rotate.getValue().needSeparate()) // TODO check ray trace
@@ -1090,6 +1091,11 @@ public class AutoCrystal extends Module {
         return false;
     }
 
+    public boolean isPositionBlockedByCrystal(@NotNull BlockPos base) {
+        Box box = new Box(base.up());
+        return Lists.newArrayList(mc.world.getEntities()).stream().anyMatch(ent -> ent != null && ent.getBoundingBox().intersects(box) && ent instanceof EndCrystalEntity);
+    }
+
     public boolean shouldOverrideDamage(float damage, float selfDamage) {
         if (overrideSelfDamage.getValue() && target != null) {
             if (mc.player == null || mc.world == null) return false;
@@ -1226,7 +1232,7 @@ public class AutoCrystal extends Module {
     }
 
     private enum Pages {
-        Main, Place, Break, Damages, Pause, Render, Switch, Info
+        Main, Place, Break, Damages, Pause, Render, Switch, FailSafe, Info
     }
 
     private enum Switch {
