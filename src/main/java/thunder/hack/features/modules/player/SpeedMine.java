@@ -547,7 +547,7 @@ public final class SpeedMine extends Module {
     }
 
     public boolean isBlockDrop(Entity ent) {
-        return isOn() && minePosition != null && minePosition.toCenterPos().squaredDistanceTo(ent.getPos()) <= 1f && ent.age < 3;
+        return isOn() && minePosition != null && ent instanceof ItemEntity && minePosition.toCenterPos().squaredDistanceTo(ent.getPos()) <= 1f && ent.age < 3;
     }
 
     public enum Mode {
