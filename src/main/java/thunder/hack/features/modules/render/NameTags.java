@@ -141,7 +141,7 @@ public class NameTags extends Module {
 
             String final_string = "";
 
-            if (ping.getValue()) final_string += getEntityPing(ent) + "ms ";
+            if (ping.getValue()) final_string += getPingColor(getEntityPing(ent)) + getEntityPing(ent) + "ms " + Formatting.WHITE;
             if (gamemode.getValue()) final_string += translateGamemode(getEntityGamemode(ent)) + " ";
 
 
@@ -556,6 +556,11 @@ public class NameTags extends Module {
         if (health <= 15 && health > 7) return Formatting.YELLOW + "";
         if (health > 15) return Formatting.GREEN + "";
         return Formatting.RED + "";
+    }
+    public @NotNull String getPingColor(int ping){
+        if(ping <= 60) return Formatting.GREEN + "";
+        if(ping > 60 && ping < 120) return Formatting.YELLOW + "";
+        return  Formatting.RED + "";
     }
 
     private @NotNull Color getHealthColor2(float health) {
