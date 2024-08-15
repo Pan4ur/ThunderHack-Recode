@@ -103,6 +103,7 @@ public class AutoCrystal extends Module {
     private final Setting<Boolean> pistonAura = new Setting<>("PistonAura", true, v -> page.is(Pages.Pause));
     private final Setting<Boolean> surround = new Setting<>("Surround", true, v -> page.is(Pages.Pause));
     private final Setting<Boolean> middleClick = new Setting<>("MiddleClick", true, v -> page.is(Pages.Pause));
+    private final Setting<Boolean> inventory = new Setting<>("Inventory", false, v -> page.is(Pages.Pause));
     private final Setting<Float> pauseHP = new Setting<>("HP", 8.0f, 2.0f, 10f, v -> page.is(Pages.Pause));
     private final Setting<BooleanSettingGroup> switchPause = new Setting<>("SwitchPause", new BooleanSettingGroup(true), v -> page.is(Pages.Pause));
     private final Setting<Integer> switchDelay = new Setting<>("SwitchDelay", 100, 0, 1000, v -> page.is(Pages.Pause)).addToGroup(switchPause);
@@ -589,6 +590,8 @@ public class AutoCrystal extends Module {
             return true;
 
         if (ModuleManager.middleClick.isEnabled() && mc.options.pickItemKey.isPressed() && middleClick.getValue())
+            return true;
+        if(inventory.getValue() && Managers.PLAYER.inInventory)
             return true;
 
         if (ModuleManager.autoTrap.isEnabled() && !ModuleManager.surround.inactivityTimer.passedMs(500))
