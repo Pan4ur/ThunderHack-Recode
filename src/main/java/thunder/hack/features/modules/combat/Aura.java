@@ -596,7 +596,7 @@ public class Aura extends Module {
         target = null;
     }
 
-    private float getSquaredRotateDistance() {
+    public float getSquaredRotateDistance() {
         float dst = getRange();
         dst += aimRange.getValue();
         if ((mc.player.isFallFlying() || ModuleManager.elytraPlus.isEnabled()) && target != null) dst += 4f;
