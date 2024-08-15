@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static thunder.hack.features.modules.Module.mc;
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class ClickGUI extends Screen {
     public static List<AbstractCategory> windows;
@@ -202,12 +203,24 @@ public class ClickGUI extends Screen {
 
         if (ModuleManager.clickGui.tips.getValue() && !close)
             FontRenderers.sf_medium.drawString(context.getMatrices(),
-                    "Left Mouse Click to enable module" +
-                            "\nRight Mouse Click to open module settings\nMiddle Mouse Click to bind module" +
-                            "\nCtrl + F to start searching\nDrag n Drop config there to load" +
-                            "\nShift + Left Mouse Click to change module visibility in array list" +
+                    isRu() ? "Щелкните левой кнопкой мыши, чтобы включить модуль." +
+                            "\nЩелкните правой кнопкой мыши, чтобы открыть настройки модуля." +
+                            "\nЩелкните колёсиком мыши, чтобы привязать модуль" +
+                            "\nCtrl + F, чтобы начать поиск" +
+                            "\nПерекиньте конфиг в окошко майна, чтобы загрузить его" +
+                            "\nShift + Left Mouse Click, чтобы изменить отображение модуля в Array list" +
+                            "\nЩелкните колёсиком мыши по слайдеру, чтобы ввести значение с клавиатуры." +
+                            "\nDelete + Left Mouse Click по модулю, чтобы сбросить его настройки"
+                            :
+                            "Left Mouse Click to enable module" +
+                            "\nRight Mouse Click to open module settings" +
+                            "\nMiddle Mouse Click to bind module" +
+                            "\nCtrl + F to start searching" +
+                            "\nDrag n Drop config there to load" +
+                            "\nShift + Left Mouse Click to change module visibility in Array list" +
                             "\nMiddle Mouse Click on slider to enter value from keyboard" +
-                            "\nDelete + Left Mouse Click on module to reset", 5, mc.getWindow().getScaledHeight() - 80, HudEditor.getColor(0).getRGB());
+                            "\nDelete + Left Mouse Click on module to reset",
+                    5, mc.getWindow().getScaledHeight() - 80, HudEditor.getColor(0).getRGB());
 
         if (!HudElement.anyHovered && !ClickGUI.anyHovered)
             if (GLFW.glfwGetPlatform() != GLFW.GLFW_PLATFORM_WAYLAND) {

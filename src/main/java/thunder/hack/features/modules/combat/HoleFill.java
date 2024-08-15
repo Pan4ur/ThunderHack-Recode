@@ -282,13 +282,15 @@ public final class HoleFill extends Module {
                     BlockPos pos = new BlockPos(i, j, k);
                     boolean foundEntity = false;
                     if (isHole(pos) && !isFillingNow(pos)) {
-                        for(PlayerEntity pe : Managers.ASYNC.getAsyncPlayers()) {
-                            if(new Box(pos).offset(-1,0,-1).expand(2,-0.3,2).intersects(pe.getBoundingBox())) {
+
+                        for (PlayerEntity pe : Managers.ASYNC.getAsyncPlayers()) {
+                            if (new Box(pos).intersects(pe.getBoundingBox())) {
                                 foundEntity = true;
                                 break;
                             }
                         }
-                        if(foundEntity)
+
+                        if (foundEntity)
                             continue;
 
                         BlockHitResult wallCheck = mc.world.raycast(new RaycastContext(InteractionUtility.getEyesPos(mc.player), pos.toCenterPos().offset(Direction.UP, 0.5f), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));

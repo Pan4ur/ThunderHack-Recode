@@ -14,6 +14,7 @@ import java.awt.*;
 import static thunder.hack.features.modules.Module.mc;
 
 public class DialogScreen extends Screen {
+    private final Identifier pic;
     private final String header;
     private final String description;
     private final String yesText;
@@ -21,8 +22,9 @@ public class DialogScreen extends Screen {
     private final Runnable yesAction;
     private final Runnable noAction;
 
-    public DialogScreen(String header, String description, String yesText, String noText, Runnable yesAction, Runnable noAction) {
+    public DialogScreen(Identifier pic, String header, String description, String yesText, String noText, Runnable yesAction, Runnable noAction) {
         super(Text.of("ThDialogScreen"));
+        this.pic = pic;
         this.header = header;
         this.description = description;
         this.yesText = yesText;
@@ -52,7 +54,7 @@ public class DialogScreen extends Screen {
         Render2DEngine.drawHudBase(context.getMatrices(), mainX + 125, mainY + 95, 110, 40, 15, false);
         FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), noText, mainX + 180f, mainY + 112, noHovered(mouseX, mouseY) ? -1 : new Color(0xABFFFFFF, true).getRGB());
 
-        context.drawTexture(TextureStorage.questionPic, (int) (mainX + (mainWidth / 2f) - 35), (int) mainY + 25, 0, 0, 70, 65, 70, 65);
+        context.drawTexture(pic, (int) (mainX + (mainWidth / 2f) - 35), (int) mainY + 25, 0, 0, 70, 65, 70, 65);
     }
 
     private boolean isHovered(int mouseX, int mouseY, int x, int y, int width, int height) {

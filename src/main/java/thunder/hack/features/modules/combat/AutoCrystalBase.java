@@ -12,7 +12,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventPostSync;
@@ -199,7 +198,7 @@ public class AutoCrystalBase extends Module {
         if (!mc.world.isAir(bp.up()))
             return null;
 
-        if (ModuleManager.autoCrystal.checkEntities(bp)) return null;
+        if (ModuleManager.autoCrystal.isPositionBlockedByEntity(bp, true)) return null;
 
         Vec3d crystalVec = new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ());
 

@@ -6,7 +6,6 @@ import thunder.hack.core.manager.client.*;
 import thunder.hack.core.manager.player.CombatManager;
 import thunder.hack.core.manager.player.FriendManager;
 import thunder.hack.core.manager.player.PlayerManager;
-import thunder.hack.core.manager.world.DeadManager;
 import thunder.hack.core.manager.world.HoleManager;
 import thunder.hack.core.manager.world.WayPointManager;
 import thunder.hack.utility.ThunderUtility;
@@ -28,7 +27,6 @@ public class Managers {
     public static final PlayerManager PLAYER = new PlayerManager();
 
     // World
-    public static final DeadManager DEAD = new DeadManager();
     public static final HoleManager HOLE = new HoleManager();
     public static final WayPointManager WAYPOINT = new WayPointManager();
 
