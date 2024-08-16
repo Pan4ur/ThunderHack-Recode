@@ -7,6 +7,7 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.discord.DiscordEventHandlers;
 import thunder.hack.utility.discord.DiscordRPC;
 import thunder.hack.utility.discord.DiscordRichPresence;
@@ -26,7 +27,12 @@ public final class RPC extends Module {
     public static DiscordRichPresence presence = new DiscordRichPresence();
     public static boolean started;
     static String String1 = "none";
+    private final Timer timer_delay = new Timer();
     private static Thread thread;
+    String slov;
+    String[] rpc_perebor_en = {"Parkour", "Reporting cheaters", "Touching grass", "Asks how to bind", "Reporting bugs", "Watching Kilab"};
+    String[] rpc_perebor_ru = {"Паркурит", "Репортит читеров", "Трогает траву", "Спрашивает как забиндить", "Репортит баги", "Смотрит Флюгера"};
+    int randomInt;
 
     public RPC() {
         super("DiscordRPC", Category.CLIENT);
@@ -85,7 +91,6 @@ public final class RPC extends Module {
             thread = new Thread(() -> {
                 while (!Thread.currentThread().isInterrupted()) {
                     rpc.Discord_RunCallbacks();
-
                     presence.details = getDetails();
 
                     switch (smode.getValue()) {
@@ -132,10 +137,13 @@ public final class RPC extends Module {
     private String getDetails() {
         String result = "";
 
-        if (mc.currentScreen instanceof TitleScreen) {
-            result = isRu() ? "Трогает траву" : "Touching the grass";
-        } else if (mc.currentScreen instanceof MultiplayerScreen || mc.currentScreen instanceof AddServerScreen) {
-            result = isRu() ? "Выбирает сервер" : "Picks a server";
+        if (mc.currentScreen instanceof MultiplayerScreen || mc.currentScreen instanceof AddServerScreen || mc.currentScreen instanceof TitleScreen) {
+            if(timer_delay.passedMs(60 * 1000)){
+                randomInt = (int)(Math.random() * (5 - 0 + 1) + 0);
+                slov = isRu() ? rpc_perebor_ru[randomInt] : rpc_perebor_en[randomInt];
+                timer_delay.reset();
+            }
+            result = slov;
         } else if (mc.getCurrentServerEntry() != null) {
             result = isRu() ? (showIP.getValue() ? "Играет на " + mc.getCurrentServerEntry().address : "Играет на сервере") : (showIP.getValue() ? "Playing on " + mc.getCurrentServerEntry().address : "Playing on server");
         } else if (mc.isInSingleplayer()) {
