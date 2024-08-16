@@ -53,7 +53,8 @@ public class MixinClientPlayerInteractionManager {
                         bs == Blocks.DROPPER ||
                         bs instanceof ShulkerBoxBlock ||
                         bs instanceof FenceBlock ||
-                        bs instanceof FenceGateBlock)
+                        bs instanceof FenceGateBlock ||
+                        bs instanceof TrapdoorBlock)
                 && (ModuleManager.aura.isEnabled() || !NoInteract.onlyAura.getValue())) {
             cir.setReturnValue(ActionResult.PASS);
         }
