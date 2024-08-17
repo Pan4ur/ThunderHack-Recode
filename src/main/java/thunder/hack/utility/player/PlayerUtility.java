@@ -34,7 +34,8 @@ public final class PlayerUtility {
     public static boolean isEating() {
         if (mc.player == null) return false;
 
-        return (mc.player.getMainHandStack().getComponents().contains(DataComponentTypes.FOOD) || mc.player.getOffHandStack().getComponents().contains(DataComponentTypes.FOOD))
+        return (mc.player.getMainHandStack().getComponents().contains(DataComponentTypes.FOOD)
+                || mc.player.getOffHandStack().getComponents().contains(DataComponentTypes.FOOD))
                 && mc.player.isUsingItem();
     }
 

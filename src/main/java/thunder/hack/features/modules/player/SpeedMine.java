@@ -24,7 +24,6 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.core.manager.player.PlayerManager;
@@ -51,7 +50,6 @@ import java.util.Objects;
 
 public final class SpeedMine extends Module {
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
-    private final Setting<Boolean> avoidNetherrack = new Setting<>("AvoidNetherrack", false);
     private final Setting<StartMode> startMode = new Setting<>("StartMode", StartMode.StartAbort, v -> mode.getValue() == Mode.Packet);
     private final Setting<SwitchMode> switchMode = new Setting<>("SwitchMode", SwitchMode.Alternative, v -> mode.getValue() != Mode.Damage);
     private final Setting<Integer> swapDelay = new Setting<>("SwapDelay", 50, 0, 1000, v -> switchMode.getValue() == SwitchMode.Alternative && mode.getValue() != Mode.Damage);
@@ -63,6 +61,7 @@ public final class SpeedMine extends Module {
     private final Setting<Boolean> placeCrystal = new Setting<>("PlaceCrystal", true, v -> mode.getValue() == Mode.GrimInstant);
     private final Setting<Boolean> resetOnSwitch = new Setting<>("ResetOnSwitch", true, v -> mode.getValue() != Mode.Damage);
     private final Setting<Integer> breakAttempts = new Setting<>("BreakAttempts", 10, 1, 50, v -> mode.getValue() == Mode.Packet);
+    private final Setting<Boolean> pauseEat = new Setting<>("Pause On Eat", false);
 
     private final Setting<SettingGroup> packets = new Setting<>("Packets", new SettingGroup(false, 0), v -> mode.getValue() == Mode.Packet);
     private final Setting<Boolean> stop = new Setting<>("Stop", true, v -> mode.getValue() == Mode.Packet).addToGroup(packets);
@@ -106,6 +105,7 @@ public final class SpeedMine extends Module {
                 || mc.world == null
                 || mc.interactionManager == null
                 || mc.player.getAbilities().creativeMode) return;
+        if (PlayerUtility.isEating() && pauseEat.getValue()) return;
 
         if (mode.getValue() == Mode.Damage) {
             if (((IInteractionManager) mc.interactionManager).getCurBlockDamageMP() < speed.getValue())
@@ -487,7 +487,7 @@ public final class SpeedMine extends Module {
         }
     }
 
-    public AutoCrystal.PlaceData getCevData() {
+    public AutoCrystal.@Nullable PlaceData getCevData() {
         if (mc.world.isAir(minePosition.down())) {
             if (ExplosionUtility.getSelfExplosionDamage(minePosition.toCenterPos().add(0,0.5,0), 0, false) > ModuleManager.autoCrystal.maxSelfDamage.getValue())
                 return null;
@@ -498,7 +498,7 @@ public final class SpeedMine extends Module {
         return null;
     }
 
-    public AutoCrystal.PlaceData getBestData() {
+    public AutoCrystal.@Nullable PlaceData getBestData() {
         BlockState prevState = mc.world.getBlockState(minePosition);
         mc.world.setBlockState(minePosition, Blocks.AIR.getDefaultState());
 
