@@ -728,7 +728,7 @@ public class AutoCrystal extends Module {
     }
 
     public void placeCrystal(BlockHitResult bhr, boolean packetRotate, boolean onSpawn) {
-        if (shouldPause() || mc.player == null) return;
+        if (shouldPause() || mc.player == null || bhr == null) return;
         int prevSlot = -1;
 
         SearchInvResult crystalResult = InventoryUtility.findItemInHotBar(Items.END_CRYSTAL);
