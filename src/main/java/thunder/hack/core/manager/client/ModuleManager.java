@@ -32,7 +32,7 @@ public class ModuleManager implements IManager {
 
     public static PenisESP penisESP = new PenisESP();
     public static AntiPacketException antiPacketException = new AntiPacketException();
-    public static AutoDuel autoDuel = new AutoDuel();
+    // public static AutoDuel autoDuel = new AutoDuel();
     public static LevitationControl levitationControl = new LevitationControl();
     public static InventoryCleaner inventoryCleaner = new InventoryCleaner();
     public static NoCommentExploit noCommentExploit = new NoCommentExploit();

@@ -27,6 +27,7 @@ import thunder.hack.setting.impl.Bind;
 import java.lang.reflect.Field;
 import java.util.*;
 
+import static thunder.hack.ThunderHack.LOGGER;
 import static thunder.hack.core.Managers.NOTIFICATION;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
@@ -145,7 +146,10 @@ public abstract class Module {
         disable();
     }
 
-    @Deprecated
+    /**
+     * @see #disable(String)
+     * @deprecated recommended to use
+     */
     public void disable() {
         try {
             ThunderHack.EVENT_BUS.unsubscribe(this);
@@ -160,7 +164,7 @@ public abstract class Module {
 
         onDisable();
 
-        LogUtils.getLogger().info("[ThunderHack] disabled " + getName());
+        LOGGER.info("[ThunderHack] disabled {}", getName());
 
         if (!ignoreSoundList.contains(getDisplayName())) {
             NOTIFICATION.publicity(getDisplayName(), isRu() ? "Модуль выключен!" : "Was Disabled!", 2, Notification.Type.DISABLED);
@@ -223,55 +227,22 @@ public abstract class Module {
 
     public List<Setting<?>> getSettings() {
         ArrayList<Setting<?>> settingList = new ArrayList<>();
+        Class<?> currentSuperclass = getClass();
 
-        for (Field field : getClass().getDeclaredFields()) {
-            if (Setting.class.isAssignableFrom(field.getType())) {
-                field.setAccessible(true);
-                try {
-                    settingList.add((Setting<?>) field.get(this));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        for (Field field : getClass().getSuperclass().getDeclaredFields()) {
-            if (Setting.class.isAssignableFrom(field.getType())) {
-                field.setAccessible(true);
+        while (currentSuperclass != null) {
+            for (Field field : currentSuperclass.getDeclaredFields()) {
+                if (!Setting.class.isAssignableFrom(field.getType()))
+                    continue;
 
                 try {
-                    settingList.add((Setting<?>) field.get(this));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        for (Field field : getClass().getSuperclass().getSuperclass().getDeclaredFields()) {
-            if (Setting.class.isAssignableFrom(field.getType())) {
-                field.setAccessible(true);
-
-                try {
-                    settingList.add((Setting<?>) field.get(this));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        try {
-            for (Field field : getClass().getSuperclass().getSuperclass().getSuperclass().getDeclaredFields()) {
-                if (Setting.class.isAssignableFrom(field.getType())) {
                     field.setAccessible(true);
-
-                    try {
-                        settingList.add((Setting<?>) field.get(this));
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
+                    settingList.add((Setting<?>) field.get(this));
+                } catch (IllegalAccessException error) {
+                    LOGGER.warn(error.getMessage());
                 }
             }
-        } catch (Exception ignored) {
+
+            currentSuperclass = currentSuperclass.getSuperclass();
         }
 
         settingList.forEach(s -> s.setModule(this));
