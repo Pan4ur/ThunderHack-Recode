@@ -7,7 +7,8 @@ public class UnfocusedCPU extends Module {
     public UnfocusedCPU() {
         super("UnfocusedCPU", Module.Category.MISC);
     }
-    private final Setting<Integer> fps = new Setting("Fps", 15, 0, 100);
+
+    private final Setting<Integer> fps = new Setting<>("Fps", 15, 0, 100);
     private int maxFps;
 
     @Override
@@ -17,10 +18,9 @@ public class UnfocusedCPU extends Module {
 
     @Override
     public void onUpdate() {
-        if(!mc.isWindowFocused() && !fullNullCheck()){
+        if (!mc.isWindowFocused() && !fullNullCheck()) {
             mc.getWindow().setFramerateLimit(fps.getValue());
-        }
-        else {
+        } else {
             mc.getWindow().setFramerateLimit(maxFps);
         }
     }
