@@ -45,6 +45,13 @@ public abstract class MixinInGameHud {
         }
     }
 
+
+    @Inject(at = @At(value = "HEAD"), method = "renderHeldItemTooltip", cancellable = true)
+    public void renderHeldItemTooltipHook(DrawContext context, CallbackInfo ci) {
+        if (ModuleManager.noRender.isEnabled() && ModuleManager.noRender.hotbarItemName.getValue())
+            ci.cancel();
+    }
+
     @Inject(at = @At(value = "HEAD"), method = "renderStatusEffectOverlay", cancellable = true)
     public void renderStatusEffectOverlayHook(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (ModuleManager.potionHud.isEnabled() || (ModuleManager.legacyHud.isEnabled() && ModuleManager.legacyHud.potions.getValue())) {
