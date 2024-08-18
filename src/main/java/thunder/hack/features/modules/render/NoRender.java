@@ -63,6 +63,7 @@ public class NoRender extends Module {
     public final Setting<Boolean> noWeather = new Setting<>("NoWeather", false);
     public final Setting<Boolean> noArmorStands = new Setting<>("NoArmorStands", false);
     public final Setting<Boolean> spawnerEntity = new Setting<>("SpawnerEntity", false);
+    public final Setting<Boolean> hotbarItemName = new Setting<>("HotbarItemName", false);
 
     private int potionCouter, xpCounter, arrowCounter, itemsCounter;
 
