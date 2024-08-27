@@ -117,7 +117,7 @@ public class MixinPlayerEntity {
     @Inject(method = "getBlockInteractionRange", at = @At("HEAD"), cancellable = true)
     public void getBlockInteractionRangeHook(CallbackInfoReturnable<Double> cir) {
         if (ModuleManager.reach.isEnabled()) {
-            if (ModuleManager.reach.Creative.getValue()) {
+            if (ModuleManager.reach.Creative.getValue() && mc.player.isCreative()) {
                 cir.setReturnValue((double) ModuleManager.reach.creativeBlocksRange.getValue());
             }
             else {
@@ -129,7 +129,7 @@ public class MixinPlayerEntity {
     @Inject(method = "getEntityInteractionRange", at = @At("HEAD"), cancellable = true)
     public void getEntityInteractionRangeHook(CallbackInfoReturnable<Double> cir) {
         if (ModuleManager.reach.isEnabled()) {
-            if (ModuleManager.reach.Creative.getValue()) {
+            if (ModuleManager.reach.Creative.getValue() && mc.player.isCreative()) {
                 cir.setReturnValue((double) ModuleManager.reach.creativeEntityRange.getValue());
             }
             else {
