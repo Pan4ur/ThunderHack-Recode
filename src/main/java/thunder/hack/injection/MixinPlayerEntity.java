@@ -117,14 +117,24 @@ public class MixinPlayerEntity {
     @Inject(method = "getBlockInteractionRange", at = @At("HEAD"), cancellable = true)
     public void getBlockInteractionRangeHook(CallbackInfoReturnable<Double> cir) {
         if (ModuleManager.reach.isEnabled()) {
-            cir.setReturnValue((double) ModuleManager.reach.blocksRange.getValue());
+            if (ModuleManager.reach.Creative.getValue()) {
+                cir.setReturnValue((double) ModuleManager.reach.creativeBlocksRange.getValue());
+            }
+            else {
+                cir.setReturnValue((double) ModuleManager.reach.blocksRange.getValue());
+            }
         }
     }
 
     @Inject(method = "getEntityInteractionRange", at = @At("HEAD"), cancellable = true)
     public void getEntityInteractionRangeHook(CallbackInfoReturnable<Double> cir) {
         if (ModuleManager.reach.isEnabled()) {
-            cir.setReturnValue((double) ModuleManager.reach.entityRange.getValue());
+            if (ModuleManager.reach.Creative.getValue()) {
+                cir.setReturnValue((double) ModuleManager.reach.creativeEntityRange.getValue());
+            }
+            else {
+                cir.setReturnValue((double) ModuleManager.reach.entityRange.getValue());
+            }
         }
     }
 }
