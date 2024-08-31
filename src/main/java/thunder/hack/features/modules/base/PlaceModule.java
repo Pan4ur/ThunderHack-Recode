@@ -37,6 +37,7 @@ public abstract class PlaceModule extends Module {
     protected final Setting<Boolean> swing = new Setting<>("Swing", false);
 
     protected final Setting<BooleanSettingGroup> crystalBreaker = new Setting<>("Crystal Breaker", new BooleanSettingGroup(false));
+    protected final Setting<Integer> crystalAge = new Setting<>("CrystalAge", 0, 1, 20).addToGroup(crystalBreaker);
     protected final Setting<Integer> breakDelay = new Setting<>("Break Delay", 100, 1, 1000).addToGroup(crystalBreaker);
     protected final Setting<Boolean> remove = new Setting<>("Remove", false).addToGroup(crystalBreaker);
     protected final Setting<InteractMode> breakCrystalMode = new Setting<>("Break Mode", InteractMode.Normal).addToGroup(crystalBreaker);
@@ -49,6 +50,7 @@ public abstract class PlaceModule extends Module {
     protected final Setting<Boolean> netherite = new Setting<>("Netherite", false).addToGroup(blocks);
     protected final Setting<Boolean> cryingObsidian = new Setting<>("Crying Obsidian", true).addToGroup(blocks);
     protected final Setting<Boolean> dirt = new Setting<>("Dirt", false).addToGroup(blocks);
+    protected final Setting<Boolean> oakPlanks = new Setting<>("OakPlanks", false).addToGroup(blocks);
 
     protected final Setting<SettingGroup> pause = new Setting<>("Pause", new SettingGroup(false, 0));
     protected final Setting<Boolean> eatPause = new Setting<>("On Eat", false).addToGroup(pause);
@@ -130,7 +132,7 @@ public abstract class PlaceModule extends Module {
                 || shouldPause()
                 || !attackTimer.passedMs(breakDelay.getValue())
                 || mc.player.squaredDistanceTo(entity) > range.getPow2Value()
-                || !crystalBreaker.getValue().isEnabled())
+                || entity.age < crystalAge.getValue())
             return;
 
         int preSlot = mc.player.getInventory().selectedSlot;
@@ -185,7 +187,8 @@ public abstract class PlaceModule extends Module {
         if (anchor.getValue()) canUseBlocks.add(Blocks.RESPAWN_ANCHOR);
         if (dirt.getValue())
             canUseBlocks.addAll(List.of(Blocks.DIRT, Blocks.GRASS_BLOCK, Blocks.PODZOL));
-
+        if (oakPlanks.getValue())
+            canUseBlocks.addAll(List.of(Blocks.OAK_PLANKS, Blocks.BIRCH_PLANKS, Blocks.DARK_OAK_PLANKS));
         final ItemStack mainHandStack = mc.player.getMainHandStack();
         if (mainHandStack != ItemStack.EMPTY && mainHandStack.getItem() instanceof BlockItem) {
             final Block blockFromMainHandItem = ((BlockItem) mainHandStack.getItem()).getBlock();
