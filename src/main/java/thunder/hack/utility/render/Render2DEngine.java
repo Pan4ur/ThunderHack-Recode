@@ -634,9 +634,9 @@ public class Render2DEngine {
         return (int) interpolate(oldValue, newValue, (float) interpolationValue);
     }
 
-    public static void drawArc(MatrixStack matrices, float x, float y, float width, float height, float radius, float thickness, float start, float end) {
+    public static void drawArc(MatrixStack matrices, float x, float y, float width, float height, float radius, float thickness, float start, float end, Color c1, Color c2) {
         BufferBuilder bb = preShaderDraw(matrices, x - width / 2f, y - height / 2f, x + width / 2f, y + height / 2f);
-        ARC_PROGRAM.setParameters(x, y, width, height, radius, thickness, start, end);
+        ARC_PROGRAM.setParameters(x, y, width, height, radius, thickness, start, end, c1, c2);
         ARC_PROGRAM.use();
         BufferRenderer.drawWithGlobalProgram(bb.end());
         endRender();
