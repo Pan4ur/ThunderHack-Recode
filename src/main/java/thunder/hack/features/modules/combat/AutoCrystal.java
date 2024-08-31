@@ -143,7 +143,7 @@ public class AutoCrystal extends Module {
 
     /*    ID Predict    */
     public final Setting<Boolean> idPredict = new Setting<>("IDPredict", false, v -> page.is(Pages.IDPredict));
-    public final Setting<Integer> idAttacks = new Setting<>("IDAttacks", 1, 1, 10, v -> page.is(Pages.IDPredict));
+    public final Setting<Integer> idAttacks = new Setting<>("IDAttacks", 3, 1, 10, v -> page.is(Pages.IDPredict));
     public final Setting<Boolean> idPredictOnlyDuels = new Setting<>("IDPredictOnlyDuels", false, v -> page.is(Pages.IDPredict));
 
     /*   RENDER   */
@@ -694,7 +694,7 @@ public class AutoCrystal extends Module {
         if (!cr.isAlive()) return false;
 
         float damage = ExplosionUtility.getAutoCrystalDamage(cr.getPos(), target, getPredictTicks(), false);
-        float selfDamage = ExplosionUtility.getSelfExplosionDamage(cr.getPos(), getPredictTicks(), false);
+        float selfDamage = ExplosionUtility.getSelfExplosionDamage(cr.getPos(), getSelfPredictTicks(), false);
 
         boolean overrideDamage = shouldOverrideDamage(damage, selfDamage);
 
@@ -858,7 +858,7 @@ public class AutoCrystal extends Module {
             if (!ent.isAlive()) continue;
 
             float damage = ExplosionUtility.getAutoCrystalDamage(ent.getPos(), target, getPredictTicks(), false);
-            float selfDamage = ExplosionUtility.getSelfExplosionDamage(ent.getPos(), getPredictTicks(), false);
+            float selfDamage = ExplosionUtility.getSelfExplosionDamage(ent.getPos(), getSelfPredictTicks(), false);
 
             boolean overrideDamage = shouldOverrideDamage(damage, selfDamage);
 
@@ -1006,7 +1006,7 @@ public class AutoCrystal extends Module {
 
         float damage = target == null ? 10f : ExplosionUtility.getAutoCrystalDamage(crystalVec, target, getPredictTicks(), false);
         if (damage < 1.5f) return null;
-        float selfDamage = ExplosionUtility.getSelfExplosionDamage(crystalVec, getPredictTicks(), false);
+        float selfDamage = ExplosionUtility.getSelfExplosionDamage(crystalVec, getSelfPredictTicks(), false);
         boolean overrideDamage = shouldOverrideDamage(damage, selfDamage);
 
         if (protectFriends.getValue()) {
@@ -1222,6 +1222,15 @@ public class AutoCrystal extends Module {
     private int getPredictTicks() {
         // TODO smart
         return extrapolation.getValue();
+    }
+
+    private int getSelfPredictTicks() {
+        // TESSSSSSSSSST
+
+        // * 1.5 because after the calculation we will receive a response from the server in the form of a crystal appearing via ping,
+        // and then our attack will reach the server via ping / 2
+
+        return (int) Math.ceil(((float) Managers.SERVER.getPing() * 1.5f) / 50f);
     }
 
     public String getPauseState() {
