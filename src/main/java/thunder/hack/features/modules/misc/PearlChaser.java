@@ -3,6 +3,7 @@ package thunder.hack.features.modules.misc;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.Items;
@@ -23,6 +24,8 @@ import thunder.hack.events.impl.EventEntitySpawn;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.combat.Aura;
+import thunder.hack.features.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.utility.Timer;
@@ -30,6 +33,7 @@ import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.MovementUtility;
 
 import java.util.Comparator;
+import java.util.HashMap;
 
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
@@ -46,13 +50,14 @@ public class PearlChaser extends Module {
     private final Setting<Boolean> pauseAura = new Setting<>("PauseAura", false);
     private final Setting<Boolean> onlyOnGround = new Setting<>("OnlyOnGround", false);
     private final Setting<Boolean> noMove = new Setting<>("NoMove", false);
-
+    private final Setting<Boolean> onlyTarget = new Setting<>("OnlyTarget", false);
 
     private Runnable postSyncAction;
     private final Timer delayTimer = new Timer();
     private BlockPos targetBlock;
     private int lastPearlId;
     private int lastOurPearlId;
+    private HashMap<PlayerEntity, Long> targets = new HashMap<>();
 
     @EventHandler
     public void onEntitySpawn(EventEntitySpawn e) {
@@ -68,6 +73,19 @@ public class PearlChaser extends Module {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onSync(EventSync event) {
+        if (onlyTarget.getValue()) {
+            if (Aura.target != null && ModuleManager.aura.isEnabled() && Aura.target instanceof PlayerEntity pl && !targets.containsKey(pl))
+                targets.put(pl, System.currentTimeMillis());
+
+            if (AutoCrystal.target != null && ModuleManager.autoCrystal.isEnabled() && AutoCrystal.target instanceof PlayerEntity pl && !targets.containsKey(pl))
+                targets.put(pl, System.currentTimeMillis());
+
+            new HashMap<>(targets).forEach((k, v) -> {
+                if (System.currentTimeMillis() - v > 10000)
+                    targets.remove(k);
+            });
+        }
+
         // Анти селфкилл
         if (mc.player.getHealth() < 5)
             return;
@@ -80,6 +98,7 @@ public class PearlChaser extends Module {
             if (!(ent instanceof EnderPearlEntity)) continue;
             if (ent.getId() == lastPearlId || ent.getId() == lastOurPearlId) continue;
             mc.world.getPlayers().stream()
+                    .filter(e -> targets.containsKey(e) || !onlyTarget.getValue())
                     .min(Comparator.comparingDouble((p) -> p.squaredDistanceTo(ent.getPos())))
                     .ifPresent((player) -> {
                         if (!player.equals(mc.player)) {
