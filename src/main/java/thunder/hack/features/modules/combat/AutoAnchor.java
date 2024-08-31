@@ -1,6 +1,8 @@
 package thunder.hack.features.modules.combat;
 
 import com.google.common.collect.Lists;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.BlockState;
@@ -22,7 +24,6 @@ import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.core.manager.player.CombatManager;
@@ -183,7 +184,7 @@ public final class AutoAnchor extends Module {
         if (mc.player == null || mc.world == null) return;
 
         long currentTime = System.currentTimeMillis();
-        @NotNull List<PlaceData> blocks = getPossibleBlocks(target, mc.player.getPos(), placeRange.getValue());
+        final List<PlaceData> blocks = getPossibleBlocks(target, mc.player.getPos(), placeRange.getValue());
         calcPosition(blocks);
         getAnchorToExplode(blocks);
         calcTime = System.currentTimeMillis() - currentTime;
@@ -307,7 +308,7 @@ public final class AutoAnchor extends Module {
     @Override
     public void onRender3D(MatrixStack stack) {
         if (render.getValue()) {
-            Map<BlockPos, Long> cache = new ConcurrentHashMap<>(renderPositions);
+            final Object2ObjectMap<BlockPos, Long> cache = new Object2ObjectOpenHashMap<>(renderPositions);
 
             cache.forEach((pos, time) -> {
                 if (System.currentTimeMillis() - time > 500)
@@ -607,6 +608,7 @@ public final class AutoAnchor extends Module {
 
     private @Nullable PlaceData filterPositions(@NotNull List<PlaceData> clearedList) {
         PlaceData bestData = null;
+
         float bestVal = 0f;
         for (PlaceData data : clearedList) {
             if ((shouldOverride(data.damage) || data.damage > minDamage.getValue())) {
