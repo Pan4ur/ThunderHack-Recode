@@ -1,5 +1,6 @@
 package thunder.hack.utility.render;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
@@ -41,7 +42,6 @@ public class Render3DEngine {
     private static float circleStep;
 
     // getTickDelta() -> mc.getRenderTickCounter().getTickDelta(true)
-
 
     public static void onRender3D(MatrixStack stack) {
         if (!FILLED_QUEUE.isEmpty() || !FADE_QUEUE.isEmpty() || !FILLED_SIDE_QUEUE.isEmpty()) {
@@ -284,7 +284,6 @@ public class Render3DEngine {
     public static double getScaleFactor() {
         return ClientSettings.scaleFactorFix.getValue() ? ClientSettings.scaleFactorFixValue.getValue() : mc.getWindow().getScaleFactor();
     }
-
 
     @Deprecated
     @SuppressWarnings("unused")
@@ -533,7 +532,6 @@ public class Render3DEngine {
         RenderSystem.disableCull();
         RenderSystem.disableDepthTest();
 
-
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
 
@@ -687,6 +685,62 @@ public class Render3DEngine {
         endRender();
         RenderSystem.enableDepthTest();
         stack.pop();
+    }
+
+    // Kalry не пасть
+    // anti yg protection
+    public static void renderGhosts(int espLength, int factor, float shaking, float amplitude, Entity target) {
+        Camera camera = mc.gameRenderer.getCamera();
+
+        double tPosX = Render2DEngine.interpolate(target.prevX, target.getX(), Render3DEngine.getTickDelta()) - camera.getPos().x;
+        double tPosY = Render2DEngine.interpolate(target.prevY, target.getY(), Render3DEngine.getTickDelta()) - camera.getPos().y;
+        double tPosZ = Render2DEngine.interpolate(target.prevZ, target.getZ(), Render3DEngine.getTickDelta()) - camera.getPos().z;
+        float iAge = (float) Render2DEngine.interpolate(target.age - 1, target.age, Render3DEngine.getTickDelta());
+
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
+        RenderSystem.setShaderTexture(0, TextureStorage.firefly);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+
+        boolean canSee = mc.player.canSee(target);
+
+        if (canSee) {
+            RenderSystem.enableDepthTest();
+            RenderSystem.depthMask(false);
+        } else RenderSystem.disableDepthTest();
+
+        for (int j = 0; j < 3; j++) {
+            for (int i = 0; i <= espLength; i++) {
+                double radians = Math.toRadians((( (float) i / 1.5f + iAge) * factor + (j * 120)) % (factor * 360));
+                double sinQuad = Math.sin(Math.toRadians(iAge * 2.5f + i * (j + 1)) * amplitude) / shaking;
+
+                float offset = ((float) i / espLength);
+                MatrixStack matrices = new MatrixStack();
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
+                matrices.translate(tPosX + Math.cos(radians) * target.getWidth(), (tPosY + 1 + sinQuad), tPosZ + Math.sin(radians) * target.getWidth());
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+                Matrix4f matrix = matrices.peek().getPositionMatrix();
+                int color = Render2DEngine.applyOpacity(HudEditor.getColor((int) (180 * offset)), offset).getRGB();
+                float scale = Math.max(0.24f * (offset), 0.2f);
+                buffer.vertex(matrix, -scale, scale, 0).texture(0f, 1f).color(color);
+                buffer.vertex(matrix, scale, scale, 0).texture(1f, 1f).color(color);
+                buffer.vertex(matrix, scale, -scale, 0).texture(1f, 0).color(color);
+                buffer.vertex(matrix, -scale, -scale, 0).texture(0, 0).color(color);
+            }
+        }
+
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
+
+        if (canSee) {
+            RenderSystem.depthMask(true);
+            RenderSystem.disableDepthTest();
+        }
+        else RenderSystem.enableDepthTest();
+
+        RenderSystem.disableBlend();
     }
 
     public static void updateTargetESP() {
