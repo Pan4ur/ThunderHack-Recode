@@ -129,8 +129,10 @@ public final class SpeedMine extends Module {
                 int hotBarPickSlot = InventoryUtility.getPickAxeHotbar().slot();
                 int prevSlot = -1;
 
-                if (invPickSlot == -1 && switchMode.getValue() == SwitchMode.Alternative) return;
-                if (hotBarPickSlot == -1 && switchMode.getValue() != SwitchMode.Alternative) return;
+                if (invPickSlot == -1 && switchMode.getValue() == SwitchMode.Alternative)
+                    return;
+                if (hotBarPickSlot == -1 && switchMode.getValue() != SwitchMode.Alternative)
+                    return;
 
                 if (progress >= 1) {
                     if (placeCrystal.getValue())
@@ -217,6 +219,7 @@ public final class SpeedMine extends Module {
                     }
 
                     sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, minePosition, mineFacing));
+                    mc.interactionManager.breakBlock(minePosition);
 
                     if (switchMode.getValue() == SwitchMode.Alternative) {
                         if (swapDelay.getValue() != 0) {
@@ -411,7 +414,8 @@ public final class SpeedMine extends Module {
         if (mc.player.isSubmergedInWater())
             digSpeed *= (float) mc.player.getAttributeInstance(EntityAttributes.PLAYER_SUBMERGED_MINING_SPEED).getValue();
 
-        if (!mc.player.isOnGround()) digSpeed /= 5;
+        if (!mc.player.isOnGround() && ModuleManager.freeCam.isDisabled())
+            digSpeed /= 5;
 
         return digSpeed < 0 ? 0 : digSpeed * factor.getValue();
     }

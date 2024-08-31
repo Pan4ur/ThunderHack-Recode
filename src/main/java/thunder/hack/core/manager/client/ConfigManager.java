@@ -157,7 +157,8 @@ public class ConfigManager implements IManager {
         if (!config.exists())
             save(config);
 
-        try (FileReader reader = new FileReader(config, StandardCharsets.UTF_8)) {
+        try {
+            FileReader reader = new FileReader(config, StandardCharsets.UTF_8);
             JsonObject modulesObject = JsonParser.parseReader(reader).getAsJsonArray().get(0).getAsJsonObject();
             JsonArray modules = modulesObject.getAsJsonArray("Modules");
 
@@ -166,7 +167,7 @@ public class ConfigManager implements IManager {
                     parseModule(element.getAsJsonObject(), category);
 
             Command.sendMessage(isRu() ? "Загружен конфиг " + config.getName() : "Loaded " + config.getName());
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

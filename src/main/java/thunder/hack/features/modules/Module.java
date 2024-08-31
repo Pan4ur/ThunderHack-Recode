@@ -148,7 +148,6 @@ public abstract class Module {
 
     /**
      * @see #disable(String)
-     * @deprecated recommended to use
      */
     public void disable() {
         try {

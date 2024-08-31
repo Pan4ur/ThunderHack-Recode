@@ -139,14 +139,6 @@ public final class Core {
 
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             setBackTimer.reset();
-
-            if (autoSave.every(200000)) {
-                Managers.FRIEND.saveFriends();
-                Managers.CONFIG.save(Managers.CONFIG.getCurrentConfig());
-                Managers.WAYPOINT.saveWayPoints();
-                Managers.MACRO.saveMacro();
-                Managers.NOTIFICATION.publicity("AutoSave", isRu() ? "Сохраняю конфиг.." : "Saving config..", 3, Notification.Type.INFO);
-            }
         }
     }
 
