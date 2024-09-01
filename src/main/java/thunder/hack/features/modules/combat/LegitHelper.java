@@ -2,15 +2,14 @@ package thunder.hack.features.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -72,7 +71,13 @@ public class LegitHelper extends Module {
     private final Setting<BooleanSettingGroup> windBoostJump = new Setting<>("WindBoostJump", new BooleanSettingGroup(true));
     private final Setting<Bind> windBoostBind = new Setting<>("WindBoostBind", new Bind(GLFW.GLFW_KEY_I, false, false)).addToGroup(windBoostJump);
 
+    private final Setting<BooleanSettingGroup> crossBow = new Setting<>("CrossBow", new BooleanSettingGroup(true));
+    private final Setting<Bind> crossBowBind = new Setting<>("CrossBowBind", new Bind(GLFW.GLFW_KEY_O, false, false)).addToGroup(crossBow);
+    private final Setting<Boolean> cbswapBack = new Setting<>("CBSwapBack", true).addToGroup(crossBow);
+
     private Timer timer = new Timer();
+    private Timer cbtimer = new Timer();
+
     private Vec3d lastCrystalVec = Vec3d.ZERO;
     private Vec3d rotationVec = Vec3d.ZERO;
 
@@ -185,6 +190,16 @@ public class LegitHelper extends Module {
                 if (result.found())
                     clickSlot(result.slot(), refillSlot.getValue() - 1, SlotActionType.SWAP);
             }
+
+        if (crossBow.getValue().isEnabled() && isKeyPressed(crossBowBind) && cbtimer.every(300)) {
+            SearchInvResult result = InventoryUtility.findInHotBar(i -> i.getItem() == Items.CROSSBOW && i.get(DataComponentTypes.CHARGED_PROJECTILES) != null && !i.get(DataComponentTypes.CHARGED_PROJECTILES).isEmpty());
+            if (result.found()) {
+                InventoryUtility.saveAndSwitchTo(result.slot());
+                InteractionUtility.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
+                if (cbswapBack.getValue())
+                    InventoryUtility.returnSlot();
+            }
+        }
     }
 
 
