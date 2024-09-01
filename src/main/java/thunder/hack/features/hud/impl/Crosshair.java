@@ -75,7 +75,11 @@ public class Crosshair extends Module {
 
         switch (mode.getValue()) {
             case Circle -> {
-                Render2DEngine.drawArc(context.getMatrices(), xAnim - 25, yAnim - 25, 50, 50, 0.05f, 0.12f, 0, Render2DEngine.interpolateFloat(prevProgress, progress, Render3DEngine.getTickDelta()));
+                Color c1 = colorMode.getValue() == ColorMode.Sync ? HudEditor.hcolor1.getValue().getColorObject() : color.getValue().getColorObject();
+                Color c2 = colorMode.getValue() == ColorMode.Sync ? HudEditor.acolor.getValue().getColorObject() : color.getValue().getColorObject();
+
+                Render2DEngine.drawArc(context.getMatrices(), xAnim - 25, yAnim - 25, 50, 50, 0.05f, 0.12f, 0,
+                        Render2DEngine.interpolateFloat(prevProgress, progress, Render3DEngine.getTickDelta()), c1, c2);
                 prevProgress = progress;
             }
             case WiseTree -> {

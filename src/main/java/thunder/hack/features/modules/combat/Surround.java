@@ -36,7 +36,6 @@ public final class Surround extends PlaceModule {
     private final Setting<OnTpAction> onTp = new Setting<>("On Tp", OnTpAction.None).addToGroup(autoDisable);
     private final Setting<Boolean> onDeath = new Setting<>("On Death", false).addToGroup(autoDisable);
 
-    private boolean wasTp = false;
     private int delay;
     private double prevY;
 
@@ -125,12 +124,6 @@ public final class Surround extends PlaceModule {
         }
 
         if (event.getPacket() instanceof BlockUpdateS2CPacket pac && mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value() && pac.getState().isReplaceable())
-            handlePacket();
-
-        if (event.getPacket() instanceof ExplosionS2CPacket p && mc.player.squaredDistanceTo(p.getX(), p.getY(), p.getZ()) < range.getPow2Value())
-            handlePacket();
-
-        if (event.getPacket() instanceof PlaySoundS2CPacket p && p.getCategory().equals(SoundCategory.BLOCKS) && p.getSound().value().equals(SoundEvents.ENTITY_GENERIC_EXPLODE) && mc.player.squaredDistanceTo(p.getX(), p.getY(), p.getZ()) < range.getPow2Value())
             handlePacket();
 
         if (event.getPacket() instanceof PlayerPositionLookS2CPacket) if (onTp.getValue() == OnTpAction.Disable) {

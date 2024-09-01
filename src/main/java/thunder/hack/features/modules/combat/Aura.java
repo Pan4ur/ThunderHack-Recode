@@ -86,7 +86,14 @@ public class Aura extends Module {
     public final Setting<BooleanSettingGroup> oldDelay = new Setting<>("OldDelay", new BooleanSettingGroup(false));
     public final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 20).addToGroup(oldDelay);
     public final Setting<Integer> maxCPS = new Setting<>("MaxCPS", 12, 1, 20).addToGroup(oldDelay);
+
     public final Setting<ESP> esp = new Setting<>("ESP", ESP.ThunderHack);
+    public final Setting<SettingGroup> espGroup = new Setting<>("ESPSettings", new SettingGroup(false, 0), v -> esp.is(ESP.ThunderHackV2));
+    public final Setting<Integer> espLength = new Setting<>("ESPLength", 14, 1, 40, v -> esp.is(ESP.ThunderHackV2)).addToGroup(espGroup);
+    public final Setting<Integer> espFactor = new Setting<>("ESPFactor", 8, 1, 20, v -> esp.is(ESP.ThunderHackV2)).addToGroup(espGroup);
+    public final Setting<Float> espShaking = new Setting<>("ESPShaking", 1.8f, 1.5f, 10f, v -> esp.is(ESP.ThunderHackV2)).addToGroup(espGroup);
+    public final Setting<Float> espAmplitude = new Setting<>("ESPAmplitude", 3f, 0.1f, 8f, v -> esp.is(ESP.ThunderHackV2)).addToGroup(espGroup);
+
     public final Setting<Sort> sort = new Setting<>("Sort", Sort.LowestDistance);
     public final Setting<Boolean> lockTarget = new Setting<>("LockTarget", true);
     public final Setting<Boolean> elytraTarget = new Setting<>("ElytraTarget", true);
@@ -339,8 +346,6 @@ public class Aura extends Module {
 
     @EventHandler
     public void onSync(EventSync e) {
-        CaptureMark.tick();
-
         if (!pauseTimer.passedMs(1000))
             return;
 
@@ -364,7 +369,6 @@ public class Aura extends Module {
 
         if (target != null && pullDown.getValue() && (mc.player.hasStatusEffect(StatusEffects.JUMP_BOOST) || !onlyJumpBoost.getValue()))
             mc.player.addVelocity(0f, -pullValue.getValue() / 1000f, 0f);
-        Render3DEngine.updateTargetESP();
     }
 
     @EventHandler
@@ -582,6 +586,7 @@ public class Aura extends Module {
         switch (esp.getValue()) {
             case CelkaPasta -> Render3DEngine.drawOldTargetEsp(stack, target);
             case NurikZapen -> CaptureMark.render(target);
+            case ThunderHackV2 -> Render3DEngine.renderGhosts(espLength.getValue(), espFactor.getValue(), espShaking.getValue(), espAmplitude.getValue(), target);
             case ThunderHack -> Render3DEngine.drawTargetEsp(stack, target);
         }
 
@@ -913,7 +918,7 @@ public class Aura extends Module {
     }
 
     public enum ESP {
-        Off, ThunderHack, NurikZapen, CelkaPasta
+        Off, ThunderHack, NurikZapen, CelkaPasta, ThunderHackV2
     }
 
     public enum RandomHitDelay {

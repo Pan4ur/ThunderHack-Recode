@@ -132,7 +132,7 @@ public abstract class Module {
         if (isOn()) ThunderHack.EVENT_BUS.subscribe(this);
         if (fullNullCheck()) return;
 
-        LOGGER.info("[ThunderHack] enabled {}", this.getName());
+        LogUtils.getLogger().info("[ThunderHack] enabled " + this.getName());
         Managers.MODULE.sortModules();
 
         if (!ignoreSoundList.contains(getDisplayName())) {
@@ -148,9 +148,7 @@ public abstract class Module {
 
     /**
      * @see #disable(String)
-     * @deprecated recommended to use another disable method
      */
-    @Deprecated
     public void disable() {
         try {
             ThunderHack.EVENT_BUS.unsubscribe(this);
@@ -275,10 +273,7 @@ public abstract class Module {
     }
 
     public void sendMessage(String message) {
-        if (fullNullCheck()
-                || !ClientSettings.clientMessages.getValue()
-                || ModuleManager.unHook.isEnabled()) return;
-
+        if (fullNullCheck() || !ClientSettings.clientMessages.getValue() || ModuleManager.unHook.isEnabled()) return;
         if (mc.isOnThread()) {
             mc.player.sendMessage(Text.of(CommandManager.getClientMessage() + " " + Formatting.GRAY + "[" + Formatting.DARK_PURPLE + getDisplayName() + Formatting.GRAY + "] " + message));
         } else {
@@ -325,7 +320,7 @@ public abstract class Module {
         return InputUtil.isKeyPressed(mc.getWindow().getHandle(), button);
     }
 
-    public boolean isKeyPressed(@NotNull Setting<Bind> bind) {
+    public boolean isKeyPressed(Setting<Bind> bind) {
         if (bind.getValue().getKey() == -1 || ModuleManager.unHook.isEnabled())
             return false;
         return isKeyPressed(bind.getValue().getKey());
@@ -378,11 +373,11 @@ public abstract class Module {
             return CATEGORIES.computeIfAbsent(name, Category::new);
         }
 
-        public static @NotNull Collection<Category> values() {
+        public static Collection<Category> values() {
             return CATEGORIES.values();
         }
 
-        public static boolean isCustomCategory(@NotNull Category category) {
+        public static boolean isCustomCategory(Category category) {
             Set<String> predefinedCategoryNames = Set.of("Combat", "Misc", "Render", "Movement", "Player", "Client", "HUD");
 
             return !predefinedCategoryNames.contains(category.getName());

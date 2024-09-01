@@ -25,10 +25,20 @@ public class CfgCommand extends Command {
 
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
+        builder.executes(context -> {
+            StringBuilder configs = new StringBuilder("Configs: ");
+            for (String str : Objects.requireNonNull(Managers.CONFIG.getConfigList())) {
+                configs.append("\n- " + (str.equals(Managers.CONFIG.getCurrentConfig().getName().replace(".th", "")) ? Formatting.GREEN : "")).append(str).append(Formatting.RESET);
+            }
+            sendMessage(configs.toString());
+
+            return SINGLE_SUCCESS;
+        });
+
         builder.then(literal("list").executes(context -> {
             StringBuilder configs = new StringBuilder("Configs: ");
             for (String str : Objects.requireNonNull(Managers.CONFIG.getConfigList())) {
-                configs.append("\n- ").append(str);
+                configs.append("\n- " + (str.equals(Managers.CONFIG.getCurrentConfig().getName().replace(".th", "")) ? Formatting.GREEN : "")).append(str).append(Formatting.RESET);
             }
             sendMessage(configs.toString());
 

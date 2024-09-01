@@ -35,7 +35,9 @@ import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.render.Render2DEngine;
+import thunder.hack.utility.render.Render3DEngine;
 import thunder.hack.utility.render.TextureStorage;
+import thunder.hack.utility.render.animation.CaptureMark;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -114,6 +116,8 @@ public final class Core {
     public void onSync(EventSync event) {
         if (fullNullCheck()) return;
         ModuleManager.timer.onEntitySync();
+        CaptureMark.tick();
+        Render3DEngine.updateTargetESP();
     }
 
     public void onRender2D(DrawContext e) {
@@ -139,14 +143,6 @@ public final class Core {
 
         if (e.getPacket() instanceof PlayerPositionLookS2CPacket) {
             setBackTimer.reset();
-
-            if (autoSave.every(200000)) {
-                Managers.FRIEND.saveFriends();
-                Managers.CONFIG.save(Managers.CONFIG.getCurrentConfig());
-                Managers.WAYPOINT.saveWayPoints();
-                Managers.MACRO.saveMacro();
-                Managers.NOTIFICATION.publicity("AutoSave", isRu() ? "Сохраняю конфиг.." : "Saving config..", 3, Notification.Type.INFO);
-            }
         }
     }
 

@@ -5,6 +5,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.client.render.entity.model.ParrotEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
@@ -51,8 +52,8 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void onRenderPre(T livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
-        if(Module.fullNullCheck()) return;
-        if (MinecraftClient.getInstance().player != null && livingEntity == MinecraftClient.getInstance().player && ClientSettings.renderRotations.getValue() && !ThunderHack.isFuturePresent()) {
+        if (Module.fullNullCheck()) return;
+        if (mc.player != null && livingEntity == mc.player && mc.player.getControllingVehicle() == null && ClientSettings.renderRotations.getValue() && !ThunderHack.isFuturePresent()) {
             originalHeadYaw = livingEntity.headYaw;
             originalPrevHeadYaw = livingEntity.prevHeadYaw;
             originalPrevHeadPitch = livingEntity.prevPitch;
@@ -136,8 +137,8 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
 
     @Unique
     public void postRender(T livingEntity) {
-        if(Module.fullNullCheck()) return;
-        if (MinecraftClient.getInstance().player != null && livingEntity == MinecraftClient.getInstance().player && ClientSettings.renderRotations.getValue() && !ThunderHack.isFuturePresent()) {
+        if (Module.fullNullCheck()) return;
+        if (mc.player != null && livingEntity == mc.player && mc.player.getControllingVehicle() == null && ClientSettings.renderRotations.getValue() && !ThunderHack.isFuturePresent()) {
             livingEntity.prevPitch = originalPrevHeadPitch;
             livingEntity.setPitch(originalHeadPitch);
             livingEntity.headYaw = originalHeadYaw;
@@ -147,7 +148,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
 
     @Inject(method = "render", at = @At("TAIL"))
     public void onRenderPost(T livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
-        if(Module.fullNullCheck()) return;
+        if (Module.fullNullCheck()) return;
         postRender(livingEntity);
     }
 
@@ -163,7 +164,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
         if (lastEntity != mc.player && lastEntity instanceof PlayerEntity pl && pl.isInvisible() && ModuleManager.fTHelper.isEnabled() && ModuleManager.fTHelper.trueSight.getValue())
             alpha = 0.3f;
 
-        if(alpha != -1)
+        if (alpha != -1)
             args.set(4, Render2DEngine.applyOpacity(0x26FFFFFF, alpha));
     }
 }

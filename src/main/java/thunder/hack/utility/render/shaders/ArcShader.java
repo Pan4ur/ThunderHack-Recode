@@ -33,16 +33,13 @@ public class ArcShader {
         setup();
     }
 
-    public void setParameters(float x, float y, float width, float height, float r, float thickness, float start, float end) {
+    public void setParameters(float x, float y, float width, float height, float r, float thickness, float start, float end, Color c1, Color c2) {
         if (mc.player == null)
             return;
         float i = (float) mc.getWindow().getScaleFactor();
         radius.set(r * i);
         uLocation.set(x * i, -y * i + mc.getWindow().getScaledHeight() * i - height * i);
         uSize.set(width * i, height * i);
-
-        Color c1 = HudEditor.hcolor1.getValue().getColorObject();
-        Color c2 = HudEditor.acolor.getValue().getColorObject();
         color1.set(c1.getRed() / 255f, c1.getGreen() / 255f, c1.getBlue() / 255f, 1f);
         color2.set(c2.getRed() / 255f, c2.getGreen() / 255f, c2.getBlue() / 255f, 1f);
         time.set((float) mc.player.age * 4);

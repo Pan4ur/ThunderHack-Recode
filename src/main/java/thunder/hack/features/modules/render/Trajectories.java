@@ -107,11 +107,15 @@ public class Trajectories extends Module {
         double motionX = -MathHelper.sin(yaw / 180.0f * 3.1415927f) * MathHelper.cos(mc.player.getPitch() / 180.0f * 3.1415927f) * maxDist;
         double motionY = -MathHelper.sin((mc.player.getPitch() - getThrowPitch(item)) / 180.0f * 3.141593f) * maxDist;
         double motionZ = MathHelper.cos(yaw / 180.0f * 3.1415927f) * MathHelper.cos(mc.player.getPitch() / 180.0f * 3.1415927f) * maxDist;
+
+
         float power = mc.player.getItemUseTime() / 20.0f;
         power = (power * power + power * 2.0f) / 3.0f;
-        if (power > 1.0f) {
+
+        if (power > 1.0f || power == 0) {
             power = 1.0f;
         }
+
         final float distance = MathHelper.sqrt((float) (motionX * motionX + motionY * motionY + motionZ * motionZ));
         motionX /= distance;
         motionY /= distance;
