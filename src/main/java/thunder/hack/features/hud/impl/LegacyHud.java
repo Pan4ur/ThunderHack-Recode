@@ -53,6 +53,7 @@ public class LegacyHud extends Module {
     private final Setting<Boolean> mainhandDurability = new Setting<>("MainhandDurability", false);
     private final Setting<Boolean> fps = new Setting<>("FPS", false);
     private final Setting<Boolean> chests = new Setting<>("Chests", false);
+    private final Setting<Boolean> worldTime = new Setting<>("WorldTime", false);
     public Setting<Boolean> time = new Setting<>("Time", false);
 
 
@@ -174,6 +175,10 @@ public class LegacyHud extends Module {
         if (ping.getValue()) {
             String str1 = "Ping " + Formatting.WHITE + Managers.SERVER.getPing();
             drawText(context, str1, width - getStringWidth(str1) - 2, renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
+        }
+        if(worldTime.getValue()){
+            String str2 = "WorldTime: " + Formatting.WHITE + mc.world.getTimeOfDay() % 24000;
+            drawText(context, str2, width - getStringWidth(str2) - 2, renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
         }
 
         boolean inHell = Objects.equals(mc.world.getRegistryKey().getValue().getPath(), "the_nether");
