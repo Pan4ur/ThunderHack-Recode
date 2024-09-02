@@ -170,7 +170,7 @@ public class Nuker extends Module {
     public synchronized void breakBlock() {
         if (blockData == null || mc.options.attackKey.isPressed()) return;
         if (ModuleManager.speedMine.isEnabled() && ModuleManager.speedMine.mode.getValue() == SpeedMine.Mode.Packet) {
-            if (SpeedMine.minePosition != blockData.bp) {
+            if (!ModuleManager.speedMine.alreadyActing(blockData.bp)) {
                 mc.interactionManager.attackBlock(blockData.bp, blockData.dir);
                 mc.player.swingHand(Hand.MAIN_HAND);
             }

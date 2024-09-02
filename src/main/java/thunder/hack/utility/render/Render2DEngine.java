@@ -9,6 +9,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
@@ -826,6 +827,26 @@ public class Render2DEngine {
         ARC_PROGRAM = new ArcShader();
         RECTANGLE_SHADER = new RectangleShader();
         BLUR_PROGRAM = new BlurProgram();
+    }
+
+    public static @NotNull Color getColor(@NotNull Color start, @NotNull Color end, float progress, boolean smooth) {
+        if (!smooth)
+            return progress >= 0.95 ? end : start;
+
+        final int rDiff = end.getRed() - start.getRed();
+        final int gDiff = end.getGreen() - start.getGreen();
+        final int bDiff = end.getBlue() - start.getBlue();
+        final int aDiff = end.getAlpha() - start.getAlpha();
+
+        return new Color(
+                fixColorValue(start.getRed() + (int) (rDiff * progress)),
+                fixColorValue(start.getGreen() + (int) (gDiff * progress)),
+                fixColorValue(start.getBlue() + (int) (bDiff * progress)),
+                fixColorValue(start.getAlpha() + (int) (aDiff * progress)));
+    }
+
+    private static int fixColorValue(int colorVal) {
+        return colorVal > 255 ? 255 : Math.max(colorVal, 0);
     }
 
     public static void endBuilding(BufferBuilder bb) {

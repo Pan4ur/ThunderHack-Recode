@@ -73,8 +73,16 @@ public final class Breaker extends Module {
             }
 
             if (ModuleManager.speedMine.isEnabled()) {
-                if (SpeedMine.minePosition == blockPos || (SpeedMine.minePosition != null && !mc.world.isAir(SpeedMine.minePosition)))
+                //   if (SpeedMine.minePosition == blockPos || (SpeedMine.minePosition != null && !mc.world.isAir(SpeedMine.minePosition)))
+                //                    return;
+
+                if (ModuleManager.speedMine.alreadyActing(blockPos))
                     return;
+
+                for (SpeedMine.MineAction action : ModuleManager.speedMine.actions)
+                    if (action.instantBreaking())
+                        return;
+
                 mc.interactionManager.attackBlock(blockPos, Direction.UP);
             } else mc.interactionManager.updateBlockBreakingProgress(blockPos, Direction.UP);
             mc.player.swingHand(Hand.MAIN_HAND);
@@ -86,7 +94,6 @@ public final class Breaker extends Module {
             for (int y = 2; y <= 3; y++) {
                 BlockPos bp = BlockPos.ofFloored(target.getX(), target.getY() + y, target.getZ());
                 if (mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN
-                        // && mc.world.isAir(bp.up())
                         && !bp.equals(BlockPos.ofFloored(target.getPos()).down())) {
                     if (ModuleManager.autoCrystal.getInteractResult(bp, new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ())) == null)
                         continue;
@@ -99,20 +106,20 @@ public final class Breaker extends Module {
                         list.add(new BreakData(bp, damage));
                 }
             }
+
             BreakData best = list.stream().max(Comparator.comparing(BreakData::damage)).orElse(null);
-            if (best != null && cevPriority.getValue()) {
-                blockPos = best.blockPos();
-                return;
-            }
+
+            if (best != null && cevPriority.getValue())
+                list.add(new BreakData(best.blockPos, 999));
         }
 
-        if (onlyIfHole.getValue() && !HoleUtility.isHole(BlockPos.ofFloored(target.getPos())))
-            return;
+        boolean inBurrow = burrowState.getBlock() == Blocks.OBSIDIAN || burrowState.getBlock() == Blocks.ENDER_CHEST;
 
-        if (burrowState.getBlock() == Blocks.OBSIDIAN || burrowState.getBlock() == Blocks.ENDER_CHEST) {
-            blockPos = burrow;
+        if (inBurrow) {
+            list.add(new BreakData(burrow, 995));
+            mc.world.setBlockState(burrow, Blocks.AIR.getDefaultState());
+        } else if (onlyIfHole.getValue() && !HoleUtility.isHole(BlockPos.ofFloored(target.getPos())))
             return;
-        }
 
         for (int x = -2; x <= 2; x++) {
             for (int y = 0; y <= 3; y++) {
@@ -121,16 +128,12 @@ public final class Breaker extends Module {
                         continue;
                     BlockPos bp = BlockPos.ofFloored(target.getX() + x, target.getY() + y, target.getZ() + z);
 
-                    if (mc.world.getBlockState(bp).getBlock() instanceof ShulkerBoxBlock && antiShulker.getValue()) {
-                        blockPos = bp;
-                        return;
-                    }
+                    if (mc.world.getBlockState(bp).getBlock() instanceof ShulkerBoxBlock && antiShulker.getValue())
+                        list.add(new BreakData(burrow, 990));
 
                     if ((mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN || mc.world.getBlockState(bp).getBlock() == Blocks.ENDER_CHEST)
                             && (mc.world.getBlockState(bp.down()).getBlock() == Blocks.OBSIDIAN || mc.world.getBlockState(bp.down()).getBlock() == Blocks.BEDROCK)
-                            // && mc.world.isAir(bp.up())
                             && !bp.equals(BlockPos.ofFloored(target.getPos()).down())
-
                     ) {
                         if (ModuleManager.autoCrystal.getInteractResult(bp, new Vec3d(0.5f + bp.getX(), 1f + bp.getY(), 0.5f + bp.getZ())) == null)
                             continue;
@@ -141,17 +144,20 @@ public final class Breaker extends Module {
                         float selfDamage = ExplosionUtility.getExplosionDamage(bp.toCenterPos().add(0, -0.5, 0), mc.player, false);
                         mc.world.setBlockState(bp, currentState);
 
-                        if (ModuleManager.autoCrystal.renderDamage < damage
-                                && selfDamage <= maxSelfDamage.getValue()
-                                && damage >= minDamage.getValue())
+                        if (ModuleManager.autoCrystal.renderDamage < damage && selfDamage <= maxSelfDamage.getValue() && damage >= minDamage.getValue() && bp != blockPos)
                             list.add(new BreakData(bp, damage));
                     }
                 }
             }
         }
 
+        if (inBurrow)
+            mc.world.setBlockState(burrow, burrowState);
+
         BreakData best = list.stream().max(Comparator.comparing(BreakData::damage)).orElse(null);
-        blockPos = best == null ? null : best.blockPos();
+        BreakData secondBest = ModuleManager.speedMine.doubleMine.getValue() ? list.stream().sorted(Comparator.comparing(BreakData::damage).reversed()).skip(1).findFirst().orElse(null) : null;
+
+        blockPos = best == null ? null : (!ModuleManager.speedMine.alreadyActing(best.blockPos()) || secondBest == null ? best.blockPos() : secondBest.blockPos());
     }
 
     public void pause() {
