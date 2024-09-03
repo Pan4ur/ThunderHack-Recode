@@ -6,8 +6,11 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
+import org.apache.commons.lang3.StringUtils;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
@@ -23,6 +26,7 @@ import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static thunder.hack.features.hud.impl.PotionHud.getDuration;
 
@@ -54,6 +58,7 @@ public class LegacyHud extends Module {
     private final Setting<Boolean> fps = new Setting<>("FPS", false);
     private final Setting<Boolean> chests = new Setting<>("Chests", false);
     private final Setting<Boolean> worldTime = new Setting<>("WorldTime", false);
+    private final Setting<Boolean> biome = new Setting<>("Biome", false);
     public Setting<Boolean> time = new Setting<>("Time", false);
 
 
@@ -135,14 +140,17 @@ public class LegacyHud extends Module {
                 }
             }
         }
+        if(worldTime.getValue()){
+            String str2 = "WorldTime: " + Formatting.WHITE + mc.world.getTimeOfDay() % 24000;
+            drawText(context, str2, width - getStringWidth(str2) - 2, renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
+        }
 
         if (mainhandDurability.getValue()) {
             String str = "MainHand" + Formatting.WHITE +" [" +  (mc.player.getMainHandStack().getMaxDamage() - mc.player.getMainHandStack().getDamage()) + "]";
             drawText(context, str, (width - getStringWidth(str) - 2), renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
         }
-
-        if (offhandDurability.getValue()) {
-            String str = "OffHand" + Formatting.WHITE +" [" + (mc.player.getOffHandStack().getMaxDamage() - mc.player.getOffHandStack().getDamage()) + "]";
+        if (tps.getValue()) {
+            String str = "TPS " + Formatting.WHITE + Managers.SERVER.getTPS() + (extraTps.getValue() ? " [" + Managers.SERVER.getTPS2() + "]" : "");
             drawText(context, str, (width - getStringWidth(str) - 2), renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
         }
 
@@ -150,35 +158,32 @@ public class LegacyHud extends Module {
             String str = "Speed " + Formatting.WHITE + MathUtility.round(Managers.PLAYER.currentPlayerSpeed * (bps.getValue() ? 20f : 72f) * ThunderHack.TICK_TIMER) + (bps.getValue() ? " b/s" : " km/h");
             drawText(context, str, (width - getStringWidth(str) - 2), renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
         }
-
         if (chests.getValue()) {
             Pair<Integer, Integer> chests = ModuleManager.chestCounter.getChestCount();
             String str = "Chests: " + Formatting.WHITE + "S:" + chests.getLeft() + " D:" + chests.getRight();
             drawText(context, str, (width - getStringWidth(str) - 2), renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
+        }
+        if(biome.getValue()){
+            String str3 = "Biome: " + Formatting.WHITE + biome();
+            drawText(context, str3, width - getStringWidth(str3) - 2, renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
         }
 
         if (time.getValue()) {
             String str = "Time " + Formatting.WHITE + (new SimpleDateFormat("h:mm a")).format(new Date());
             drawText(context, str, (width - getStringWidth(str) - 2), renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
         }
-
-        if (tps.getValue()) {
-            String str = "TPS " + Formatting.WHITE + Managers.SERVER.getTPS() + (extraTps.getValue() ? " [" + Managers.SERVER.getTPS2() + "]" : "");
+        if (offhandDurability.getValue()) {
+            String str = "OffHand" + Formatting.WHITE + " [" + (mc.player.getOffHandStack().getMaxDamage() - mc.player.getOffHandStack().getDamage()) + "]";
             drawText(context, str, (width - getStringWidth(str) - 2), renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
+        }
+        if (ping.getValue()) {
+            String str1 = "Ping " + Formatting.WHITE + Managers.SERVER.getPing();
+            drawText(context, str1, width - getStringWidth(str1) - 2, renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
         }
 
         if (fps.getValue()) {
             String fpsText = "FPS " + Formatting.WHITE + FrameRateCounter.INSTANCE.getFps();
             drawText(context, fpsText, width - getStringWidth(fpsText) - 2, renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
-        }
-
-        if (ping.getValue()) {
-            String str1 = "Ping " + Formatting.WHITE + Managers.SERVER.getPing();
-            drawText(context, str1, width - getStringWidth(str1) - 2, renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
-        }
-        if(worldTime.getValue()){
-            String str2 = "WorldTime: " + Formatting.WHITE + mc.world.getTimeOfDay() % 24000;
-            drawText(context, str2, width - getStringWidth(str2) - 2, renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
         }
 
         boolean inHell = Objects.equals(mc.world.getRegistryKey().getValue().getPath(), "the_nether");
@@ -301,6 +306,13 @@ public class LegacyHud extends Module {
             context.drawItemInSlot(mc.textRenderer, totem, x, y);
             drawText(context, totems + "", 8 + (int) (x - (float) getStringWidth(totems + "") / 2f), (y - 7), 16777215);
         }
+    }
+    private static String biome() {
+        if (mc.player == null || mc.world == null) return null;
+        Identifier id = mc.world.getRegistryManager().get(RegistryKeys.BIOME).getId(mc.world.getBiome(mc.player.getBlockPos()).value());
+        if (id == null) return ("Unknown");
+
+        return (Arrays.stream(id.getPath().split("_")).map(StringUtils::capitalize).collect(Collectors.joining(" ")));
     }
 
     public void renderArmorHUD(boolean percent, DrawContext context) {
