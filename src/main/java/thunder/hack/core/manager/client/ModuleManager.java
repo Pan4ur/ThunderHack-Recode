@@ -186,7 +186,6 @@ public class ModuleManager implements IManager {
     public static AutoBuff autoBuff = new AutoBuff();
     public static AutoAuth autoAuth = new AutoAuth();
     public static ArmorHud armorHud = new ArmorHud();
-    public static BanStats banStats = new BanStats();
     public static AirPlace airPlace = new AirPlace();
     public static SelfTrap selfTrap = new SelfTrap();
     public static AntiVoid antiVoid = new AntiVoid();
