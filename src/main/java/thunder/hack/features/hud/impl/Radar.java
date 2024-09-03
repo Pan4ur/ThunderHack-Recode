@@ -45,10 +45,8 @@ public class Radar extends HudElement {
             Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), size.getValue(), size.getValue(), HudEditor.hudRound.getValue());
 
             if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
-                Render2DEngine.verticalGradient(context.getMatrices(), getPosX(), getPosY() + (size.getValue() / 2F - 2), getPosX() + size.getValue(), getPosY() + (size.getValue() / 2F), new Color(0x0000000, true), new Color(0x7B000000, true));
-                Render2DEngine.verticalGradient(context.getMatrices(), getPosX(), getPosY() + (size.getValue() / 2F), getPosX() + size.getValue(), getPosY() + (size.getValue() / 2F + 2), new Color(0x7B000000, true), new Color(0x0000000, true));
-                Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + (size.getValue() / 2F - 2), getPosY() - 1, getPosX() + (size.getValue() / 2F), getPosY() + size.getValue() - 1, new Color(0x0000000, true), new Color(0x7B000000, true));
-                Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + (size.getValue() / 2F), getPosY() - 1, getPosX() + (size.getValue() / 2F + 2), getPosY() + size.getValue() - 1, new Color(0x7B000000, true), new Color(0x0000000, true));
+                Render2DEngine.drawRectDumbWay(context.getMatrices(), getPosX(), getPosY() + (size.getValue() / 2F + 0.25f), getPosX() + size.getValue(), getPosY() + (size.getValue() / 2F) - 0.25f, new Color(0x54FFFFFF, true));
+                Render2DEngine.drawRectDumbWay(context.getMatrices(),getPosX() + (size.getValue() / 2F - 0.25f), getPosY() - 0.5f, getPosX() + (size.getValue() / 2F) + 0.25f, getPosY() + size.getValue() - 1, new Color(0x54FFFFFF, true));
             } else {
                 Render2DEngine.draw2DGradientRect(context.getMatrices(),
                         (float) (getPosX() + (size.getValue() / 2F - 0.5)),

@@ -32,11 +32,10 @@ public class PredictUtility {
 
         Vec3d posVec = new Vec3d(entity.getX(), entity.getY(), entity.getZ());
         double motionX = entity.getX() - entity.prevX;
-        double motionY = entity.getY() - entity.prevY;
+      //  double motionY = entity.getY() - entity.prevY;
+        // TODO Smarter
+        double motionY = 0;
         double motionZ = entity.getZ() - entity.prevZ;
-
-        if(entity == mc.player)
-            motionY = 0;
 
         for (int i = 0; i < ticks; i++) {
             if (!mc.world.isAir(BlockPos.ofFloored(posVec.add(0, motionY, 0)))) {

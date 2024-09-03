@@ -126,9 +126,8 @@ public final class Surround extends PlaceModule {
         if (event.getPacket() instanceof BlockUpdateS2CPacket pac && mc.player.squaredDistanceTo(pac.getPos().toCenterPos()) < range.getPow2Value() && pac.getState().isReplaceable())
             handlePacket();
 
-        if (event.getPacket() instanceof PlayerPositionLookS2CPacket) if (onTp.getValue() == OnTpAction.Disable) {
+        if (event.getPacket() instanceof PlayerPositionLookS2CPacket && onTp.getValue() == OnTpAction.Disable)
             disable(isRu() ? "Выключен из-за руббербенда!" : "Disabled due to a rubberband!");
-        }
     }
 
     private void handlePacket() {

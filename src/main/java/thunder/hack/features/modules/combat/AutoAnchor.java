@@ -35,7 +35,7 @@ import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.ExplosionUtility;
+import thunder.hack.utility.world.ExplosionUtility;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;

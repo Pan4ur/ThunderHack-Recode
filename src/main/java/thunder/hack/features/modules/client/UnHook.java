@@ -1,13 +1,11 @@
-package thunder.hack.features.modules.misc;
+package thunder.hack.features.modules.client;
 
 import net.minecraft.SharedConstants;
 import net.minecraft.client.util.Icons;
 import net.minecraft.util.Formatting;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ConfigManager;
 import thunder.hack.features.modules.Module;
-import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.utility.math.MathUtility;
 
 import java.io.*;
@@ -22,7 +20,7 @@ public class UnHook extends Module {
     // Йо фабос, засунь в о4ко себе фалос
     // Yo dude shove a dick up your ass
     public UnHook() {
-        super("UnHook", Category.MISC);
+        super("UnHook", Category.CLIENT);
     }
 
     List<Module> list;

@@ -20,7 +20,7 @@ import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.features.modules.client.Windows;
-import thunder.hack.features.modules.misc.UnHook;
+import thunder.hack.features.modules.client.UnHook;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 

@@ -1,5 +1,6 @@
 package thunder.hack.utility.world;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -284,10 +285,9 @@ public final class HoleUtility {
     private static boolean isIndestructible(BlockPos bp) {
         if (mc.world == null) return false;
 
-        return mc.world.getBlockState(bp).getBlock() == Blocks.OBSIDIAN
-                || mc.world.getBlockState(bp).getBlock() == Blocks.NETHERITE_BLOCK
-                || mc.world.getBlockState(bp).getBlock() == Blocks.CRYING_OBSIDIAN
-                || mc.world.getBlockState(bp).getBlock() == Blocks.RESPAWN_ANCHOR;
+        Block block = mc.world.getBlockState(bp).getBlock();
+        return block == Blocks.OBSIDIAN || block == Blocks.NETHERITE_BLOCK
+                || block == Blocks.CRYING_OBSIDIAN || block == Blocks.RESPAWN_ANCHOR;
     }
 
     private static boolean isBedrock(BlockPos bp) {

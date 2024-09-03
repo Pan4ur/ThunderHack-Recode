@@ -43,7 +43,7 @@ import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.TickTimer;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.ExplosionUtility;
+import thunder.hack.utility.world.ExplosionUtility;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.math.PredictUtility;
 import thunder.hack.utility.player.InteractionUtility;
@@ -293,12 +293,10 @@ public class AutoCrystal extends Module {
     public void onTick(EventTick e) {
         if (mc.player == null || mc.world == null) return;
 
-        Managers.ASYNC.run(() -> {
-            if (mc.player != null && (!await.getValue() || calcTimer.passedTicks((long) ((float) Managers.SERVER.getPing() / 25f))))
-                calcPosition(placeRange.getValue(), mc.player.getPos());
+        if (mc.player != null && (!await.getValue() || placeTimer.passedTicks(20) || calcTimer.passedTicks((long) ((float) Managers.SERVER.getPing() / 25f))))
+            calcPosition(placeRange.getValue(), mc.player.getPos());
 
-            getCrystalToExplode();
-        });
+        getCrystalToExplode();
 
         if (timing.is(Timing.NORMAL)) doAction();
     }
@@ -428,12 +426,11 @@ public class AutoCrystal extends Module {
         if (mc.player == null || mc.world == null) return;
         if (canAttackCrystal(crystal)) {
             attackCrystal(crystal);
-            Managers.ASYNC.run(() -> {
-                if (sequential.is(Sequential.Strong) && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue())) {
-                    calcPosition(placeRange.getValue(), mc.player.getPos());
-                    if (bestPosition != null) placeCrystal(bestPosition, false, true);
-                }
-            });
+
+            if (sequential.is(Sequential.Strong) && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue())) {
+                calcPosition(placeRange.getValue(), mc.player.getPos());
+                if (bestPosition != null) placeCrystal(bestPosition, false, true);
+            }
         }
     }
 

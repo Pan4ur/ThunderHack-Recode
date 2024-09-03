@@ -1,4 +1,4 @@
-package thunder.hack.utility.math;
+package thunder.hack.utility.world;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -22,6 +22,7 @@ import net.minecraft.world.explosion.Explosion;
 import org.apache.commons.lang3.mutable.MutableInt;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.injection.accesors.IExplosion;
+import thunder.hack.utility.math.PredictUtility;
 
 import java.util.Objects;
 

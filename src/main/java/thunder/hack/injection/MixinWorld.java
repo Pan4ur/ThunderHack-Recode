@@ -9,9 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import thunder.hack.features.modules.combat.AutoCrystal;
-import thunder.hack.features.modules.combat.AutoCrystalBase;
-import thunder.hack.utility.math.ExplosionUtility;
+import thunder.hack.utility.world.ExplosionUtility;
 
 import static thunder.hack.features.modules.Module.mc;
 

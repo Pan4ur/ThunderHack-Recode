@@ -9,7 +9,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.core.manager.player.CombatManager;
@@ -18,7 +17,7 @@ import thunder.hack.features.modules.Module;
 import thunder.hack.features.modules.player.SpeedMine;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.ExplosionUtility;
+import thunder.hack.utility.world.ExplosionUtility;
 import thunder.hack.utility.world.HoleUtility;
 
 import java.util.ArrayList;

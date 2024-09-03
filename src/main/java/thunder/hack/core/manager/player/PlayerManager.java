@@ -26,7 +26,7 @@ import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.features.modules.Module;
 import thunder.hack.features.modules.combat.Aura;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.ExplosionUtility;
+import thunder.hack.utility.world.ExplosionUtility;
 import thunder.hack.utility.math.MathUtility;
 
 import java.util.ArrayDeque;

@@ -97,7 +97,7 @@ public class PotionHud extends HudElement {
 
         if (y_offset1 > 0) {
             if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
-                Render2DEngine.verticalGradient(context.getMatrices(), getPosX(), getPosY() + 13, getPosX() + hAnimation, getPosY() + 16, new Color(0x7B000000, true), new Color(0x0000000, true));
+                Render2DEngine.drawRectDumbWay(context.getMatrices(), getPosX() + 4, getPosY() + 13, getPosX() + getWidth() - 4, getPosY() + 13.5f, new Color(0x54FFFFFF, true));
             } else {
                 Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 14, Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0), HudEditor.textColor.getValue().getColorObject());
                 Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));

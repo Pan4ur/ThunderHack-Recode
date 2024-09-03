@@ -110,7 +110,7 @@ public abstract class MixinEntity implements IEntity {
 
     @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
     public void isInvisibleToHook(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
-        if (ModuleManager.fTHelper.isEnabled() && ModuleManager.fTHelper.trueSight.getValue()) {
+        if (ModuleManager.serverHelper.isEnabled() && ModuleManager.serverHelper.trueSight.getValue()) {
             cir.setReturnValue(false);
         }
     }

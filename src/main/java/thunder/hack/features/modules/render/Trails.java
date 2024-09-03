@@ -232,7 +232,9 @@ public class Trails extends Module {
 
         if (!particles.isEmpty()) {
             RenderSystem.enableBlend();
-            RenderSystem.disableDepthTest();
+            RenderSystem.enableDepthTest();
+            RenderSystem.depthMask(false);
+
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
 
             switch (mode.getValue()) {
@@ -252,7 +254,8 @@ public class Trails extends Module {
 
             Render2DEngine.endBuilding(bufferBuilder);
             RenderSystem.disableBlend();
-            RenderSystem.enableDepthTest();
+            RenderSystem.depthMask(true);
+            RenderSystem.disableDepthTest();
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         }
     }

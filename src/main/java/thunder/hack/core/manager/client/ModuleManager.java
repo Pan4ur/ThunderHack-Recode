@@ -32,7 +32,6 @@ public class ModuleManager implements IManager {
 
     public static PenisESP penisESP = new PenisESP();
     public static AntiPacketException antiPacketException = new AntiPacketException();
-    // public static AutoDuel autoDuel = new AutoDuel();
     public static LevitationControl levitationControl = new LevitationControl();
     public static InventoryCleaner inventoryCleaner = new InventoryCleaner();
     public static NoCommentExploit noCommentExploit = new NoCommentExploit();
@@ -85,8 +84,8 @@ public class ModuleManager implements IManager {
     public static AntiServerRP antiServerRP = new AntiServerRP();
     public static TotemCounter totemCounter = new TotemCounter();
     public static PerfectDelay perfectDelay = new PerfectDelay();
+    public static ServerHelper serverHelper = new ServerHelper();
     public static ChestCounter chestCounter = new ChestCounter();
-    public static UnfocusedCPU unfocusedCPU = new UnfocusedCPU();
     public static StashLogger stashLogger = new StashLogger();
     public static FastLatency fastLatency = new FastLatency();
     public static PearlChaser pearlChaser = new PearlChaser();
@@ -172,13 +171,11 @@ public class ModuleManager implements IManager {
     public static Scaffold scaffold = new Scaffold();
     public static PopChams popChams = new PopChams();
     public static NoRender noRender = new NoRender();
-    public static FTHelper fTHelper = new FTHelper();
     public static NameTags nameTags = new NameTags();
     public static LongJump longJump = new LongJump();
     public static KeyBinds keyBinds = new KeyBinds();
     public static HoleSnap holeSnap = new HoleSnap();
     public static HoleFill holeFill = new HoleFill();
-    public static FGHelper fgHelper = new FGHelper();
     public static ExtraTab extraTab = new ExtraTab();
     public static ClickGui clickGui = new ClickGui();
     public static AutoTrap autoTrap = new AutoTrap();

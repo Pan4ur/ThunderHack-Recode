@@ -38,7 +38,7 @@ import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.math.ExplosionUtility;
+import thunder.hack.utility.world.ExplosionUtility;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
@@ -61,7 +61,7 @@ public final class SpeedMine extends Module {
     private final Setting<Float> speed = new Setting<>("Speed", 0.5f, 0f, 1f, v -> mode.getValue() == Mode.Damage);
     public final Setting<Float> range = new Setting<>("Range", 4.2f, 3.0f, 10.0f, v -> mode.getValue() != Mode.Damage);
     private final Setting<Boolean> rotate = new Setting<>("Rotate", false, v -> mode.getValue() != Mode.Damage);
-    private final Setting<Boolean> placeCrystal = new Setting<>("PlaceCrystal", true, v -> mode.getValue() == Mode.GrimInstant);
+    private final Setting<Boolean> placeCrystal = new Setting<>("PlaceCrystal", true);
     private final Setting<Boolean> resetOnSwitch = new Setting<>("ResetOnSwitch", true, v -> mode.getValue() != Mode.Damage);
     private final Setting<Integer> breakAttempts = new Setting<>("BreakAttempts", 10, 1, 50, v -> mode.getValue() == Mode.Packet);
     private final Setting<Boolean> pauseEat = new Setting<>("Pause On Eat", false);
