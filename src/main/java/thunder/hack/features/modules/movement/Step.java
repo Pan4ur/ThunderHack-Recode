@@ -8,20 +8,28 @@ import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.utility.world.HoleUtility;
 
 public class Step extends Module {
-
-    private final thunder.hack.utility.Timer stepTimer = new thunder.hack.utility.Timer();
     private final Setting<Boolean> strict = new Setting<>("Strict", false);
-    private final Setting<Float> height = new Setting("Height", 2.0F, 1F, 2.5F, v -> !strict.getValue());
+    private final Setting<Float> height = new Setting<>("Height", 2.0F, 1F, 2.5F, v -> !strict.getValue());
     private final Setting<Boolean> useTimer = new Setting<>("Timer", true);
     private final Setting<Boolean> pauseIfShift = new Setting<>("PauseIfShift", false);
-    private final Setting<Integer> stepDelay = new Setting("StepDelay", 200, 0, 1000);
+    private final Setting<Integer> stepDelay = new Setting<>("StepDelay", 200, 0, 1000);
+    private final Setting<Boolean> holeDisable = new Setting<>("HoleDisable", false);
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.NCP);
+
+    private final thunder.hack.utility.Timer stepTimer = new thunder.hack.utility.Timer();
+    private boolean alreadyInHole;
     private boolean timer;
 
     public Step() {
         super("Step", Category.MOVEMENT);
+    }
+
+    @Override
+    public void onEnable() {
+        alreadyInHole = mc.player != null && HoleUtility.isHole(mc.player.getBlockPos());
     }
 
     @Override
@@ -32,6 +40,12 @@ public class Step extends Module {
 
     @Override
     public void onUpdate() {
+        if (holeDisable.getValue() && HoleUtility.isHole(mc.player.getBlockPos()) && !alreadyInHole) {
+            disable("Player in hole... Disabling...");
+            return;
+        }
+        alreadyInHole = mc.player != null && HoleUtility.isHole(mc.player.getBlockPos());
+
         if (pauseIfShift.getValue() && mc.options.sneakKey.isPressed()) {
             setStepHeight(0.6F);
             return;
