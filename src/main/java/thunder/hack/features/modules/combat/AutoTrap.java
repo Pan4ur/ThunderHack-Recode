@@ -10,6 +10,7 @@ import thunder.hack.setting.Setting;
 
 public final class AutoTrap extends TrapModule {
     private final Setting<CombatManager.TargetBy> targetBy = new Setting<>("Target By", CombatManager.TargetBy.Distance);
+    private final Setting<Boolean> targetMovingPlayers = new Setting<>("MovingPlayers", false);
 
     public AutoTrap() {
         super("AutoTrap", Category.COMBAT);
@@ -25,6 +26,6 @@ public final class AutoTrap extends TrapModule {
 
     @Override
     protected @Nullable PlayerEntity getTarget() {
-        return Managers.COMBAT.getTarget(range.getValue(), targetBy.getValue());
+        return Managers.COMBAT.getTarget(range.getValue(), targetBy.getValue(), p -> p.getVelocity().lengthSquared() < 0.08 || targetMovingPlayers.getValue());
     }
 }

@@ -152,7 +152,7 @@ public class ColorPickerElement extends AbstractElement {
         hue = -1 + hsb[0];
         saturation = hsb[1];
         brightness = hsb[2];
-        alpha = getColorSetting().getColorObject().getAlpha();
+        alpha = getColorSetting().getAlpha();
     }
 
     private void setColor(Color color) {

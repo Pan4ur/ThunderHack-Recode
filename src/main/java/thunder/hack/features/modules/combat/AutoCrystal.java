@@ -113,14 +113,11 @@ public class AutoCrystal extends Module {
     public final Setting<Boolean> assumeBestArmor = new Setting<>("AssumeBestArmor", false, v -> page.is(Pages.Damages));
     public final Setting<Float> minDamage = new Setting<>("MinDamage", 6.0f, 2.0f, 20f, v -> page.is(Pages.Damages));
     public final Setting<Float> maxSelfDamage = new Setting<>("MaxSelfDamage", 10.0f, 2.0f, 20f, v -> page.is(Pages.Damages));
-    private final Setting<Safety> safety = new Setting<>("Safety", Safety.NONE, v -> page.is(Pages.Damages));
-    private final Setting<Float> safetyBalance = new Setting<>("SafetyBalance", 1.1f, 0.1f, 3f, v -> page.is(Pages.Damages) && safety.is(Safety.BALANCE));
+    private final Setting<BooleanSettingGroup> efficiency = new Setting<>("Efficiency", new BooleanSettingGroup(false), v -> page.is(Pages.Damages));
+    private final Setting<Float> efficiencyFactor = new Setting<>("EfficiencyFactor", 1.0f, 0.1f, 5f, v -> page.is(Pages.Damages)).addToGroup(efficiency);
     public final Setting<Boolean> protectFriends = new Setting<>("ProtectFriends", true, v -> page.is(Pages.Damages));
     private final Setting<BooleanSettingGroup> overrideSelfDamage = new Setting<>("OverrideSelfDamage", new BooleanSettingGroup(true), v -> page.is(Pages.Damages));
     public final Setting<Boolean> sacrificeTotem = new Setting<>("SacrificeTotem", true, v -> page.is(Pages.Damages)).addToGroup(overrideSelfDamage);
-
-
-    private final Setting<Float> lethalMultiplier = new Setting<>("LethalMultiplier", 1.0f, 0.0f, 5f, v -> page.is(Pages.Damages));
     private final Setting<BooleanSettingGroup> armorBreaker = new Setting<>("ArmorBreaker", new BooleanSettingGroup(true), v -> page.is(Pages.Damages));
     private final Setting<Float> armorScale = new Setting<>("Armor %", 5.0f, 0.0f, 40f, v -> page.is(Pages.Damages)).addToGroup(armorBreaker);
     private final Setting<Float> facePlaceHp = new Setting<>("FacePlaceHp", 5.0f, 0.0f, 20f, v -> page.is(Pages.Damages));
@@ -265,9 +262,8 @@ public class AutoCrystal extends Module {
         if (placeTimer.passedTicks(20)) renderDamage = 0f;
 
         // Right click gapple
-        if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL && autoGapple.getValue() && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() == Items.END_CRYSTAL) {
+        if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL && autoGapple.getValue() && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() == Items.END_CRYSTAL)
             InventoryUtility.findItemInHotBar(Items.ENCHANTED_GOLDEN_APPLE).switchTo();
-        }
 
         // CA Speed counter
         if (invTimer++ >= 20) {
@@ -693,7 +689,7 @@ public class AutoCrystal extends Module {
         float damage = ExplosionUtility.getAutoCrystalDamage(cr.getPos(), target, getPredictTicks(), false);
         float selfDamage = ExplosionUtility.getSelfExplosionDamage(cr.getPos(), getSelfPredictTicks(), false);
 
-        boolean overrideDamage = shouldOverrideDamage(damage, selfDamage);
+        boolean overrideDamage = shouldOverrideMaxSelfDmg(damage, selfDamage);
 
         if (protectFriends.getValue()) {
             List<PlayerEntity> players = Lists.newArrayList(mc.world.getPlayers());
@@ -857,7 +853,7 @@ public class AutoCrystal extends Module {
             float damage = ExplosionUtility.getAutoCrystalDamage(ent.getPos(), target, getPredictTicks(), false);
             float selfDamage = ExplosionUtility.getSelfExplosionDamage(ent.getPos(), getSelfPredictTicks(), false);
 
-            boolean overrideDamage = shouldOverrideDamage(damage, selfDamage);
+            boolean overrideDamage = shouldOverrideMaxSelfDmg(damage, selfDamage);
 
             if (protectFriends.getValue()) {
                 List<PlayerEntity> players = Lists.newArrayList(mc.world.getPlayers());
@@ -901,9 +897,12 @@ public class AutoCrystal extends Module {
 
         if (overrideDamage) return true;
 
-        if (selfDamage + 0.5 > mc.player.getHealth() + mc.player.getAbsorptionAmount()) return false;
-        else if (safety.getValue() == Safety.STABLE) return damage - selfDamage > 0;
-        else if (safety.getValue() == Safety.BALANCE) return (damage * safetyBalance.getValue()) - selfDamage > 0;
+        if (selfDamage + 0.5 > mc.player.getHealth() + mc.player.getAbsorptionAmount())
+            return false;
+
+        if (efficiency.getValue().isEnabled())
+            return damage / selfDamage >= efficiencyFactor.getValue();
+
         return true;
     }
 
@@ -912,18 +911,26 @@ public class AutoCrystal extends Module {
         float bestVal = 0f;
 
         for (PlaceData data : clearedList) {
-            if ((shouldOverride(data.damage) || data.damage > minDamage.getValue())) {
-                //   if (bestData != null && Math.abs(bestData.damage - data.damage) < (facePlacing ? 0.25f : 3f)) {
-                //       if (bestData.selfDamage >= data.selfDamage) {
-                //           bestData = data;
-                //           bestVal = data.damage;
-                //       }
-                //   } else {
-                if (bestVal < data.damage) {
-                    bestData = data;
-                    bestVal = data.damage;
+            if ((shouldOverrideMinDmg(data.damage) || data.damage > minDamage.getValue())) {
+
+                if (bestData != null && data.overrideDamage && target.getAbsorptionAmount() + target.getHealth() < bestData.damage && bestData.selfDamage < data.selfDamage)
+                    continue;
+
+                boolean shouldStopOverride = bestData != null && bestData.overrideDamage && data.damage > target.getHealth() + target.getAbsorptionAmount() && data.selfDamage < bestData.selfDamage;
+
+                float safetyComparatorDelta = shouldStopOverride ? 10f : 1f;
+
+                if (bestData != null && Math.abs(bestData.damage - data.damage) < safetyComparatorDelta && Math.abs(bestData.selfDamage - data.selfDamage) > 1f) {
+                    if (bestData.selfDamage >= data.selfDamage) {
+                        bestData = data;
+                        bestVal = data.damage;
+                    }
+                } else {
+                    if (bestVal < data.damage) {
+                        bestData = data;
+                        bestVal = data.damage;
+                    }
                 }
-                //  }
             }
         }
 
@@ -935,42 +942,29 @@ public class AutoCrystal extends Module {
         return bestData.bhr;
     }
 
-    public boolean shouldOverride(float damage) {
-        if (target == null) return false;
-
-        boolean override = target.getHealth() + target.getAbsorptionAmount() <= facePlaceHp.getValue();
-
-        if (armorBreaker.getValue().isEnabled()) for (ItemStack armor : target.getArmorItems())
-            if (armor != null && !armor.getItem().equals(Items.AIR) && ((armor.getMaxDamage() - armor.getDamage()) / (float) armor.getMaxDamage()) * 100 < armorScale.getValue()) {
-                override = true;
-                break;
-            }
-
-        if (facePlaceButton.getValue().getKey() != -1 && InputUtil.isKeyPressed(mc.getWindow().getHandle(), facePlaceButton.getValue().getKey()))
-            override = true;
-
-        if ((target.getHealth() + target.getAbsorptionAmount()) - (damage * lethalMultiplier.getValue()) < 0.5)
-            override = true;
-
-        return override;
-    }
-
     private @Nullable EndCrystalEntity filterCrystals(@NotNull List<CrystalData> clearedList) {
         CrystalData bestData = null;
         float bestVal = 0f;
         for (CrystalData data : clearedList) {
-            if ((shouldOverride(data.damage()) || data.damage() > minDamage.getValue())) {
-                //  if (bestData != null && Math.abs(bestData.damage - data.damage) < (facePlacing ? 0.25f : 3f)) {
-                //      if (bestData.selfDamage >= data.selfDamage) {
-                //          bestData = data;
-                //          bestVal = data.damage;
-                //      }
-                //  } else {
-                if (bestVal < data.damage) {
-                    bestData = data;
-                    bestVal = data.damage;
+            if ((shouldOverrideMinDmg(data.damage) || data.damage > minDamage.getValue())) {
+                if (bestData != null && data.overrideDamage && target.getAbsorptionAmount() + target.getHealth() < bestData.damage && bestData.selfDamage < data.selfDamage)
+                    continue;
+
+                boolean shouldStopOverride = bestData != null && bestData.overrideDamage && data.damage > target.getHealth() + target.getAbsorptionAmount() && data.selfDamage < bestData.selfDamage;
+
+                float safetyComparatorDelta = shouldStopOverride ? 10f : 1f;
+
+                if (bestData != null && Math.abs(bestData.damage - data.damage) < safetyComparatorDelta && Math.abs(bestData.selfDamage - data.selfDamage) > 1f) {
+                    if (bestData.selfDamage >= data.selfDamage) {
+                        bestData = data;
+                        bestVal = data.damage;
+                    }
+                } else {
+                    if (bestVal < data.damage) {
+                        bestData = data;
+                        bestVal = data.damage;
+                    }
                 }
-                //  }
             }
         }
 
@@ -1004,7 +998,7 @@ public class AutoCrystal extends Module {
         float damage = target == null ? 10f : ExplosionUtility.getAutoCrystalDamage(crystalVec, target, getPredictTicks(), false);
         if (damage < 1.5f) return null;
         float selfDamage = ExplosionUtility.getSelfExplosionDamage(crystalVec, getSelfPredictTicks(), false);
-        boolean overrideDamage = shouldOverrideDamage(damage, selfDamage);
+        boolean overrideDamage = shouldOverrideMaxSelfDmg(damage, selfDamage);
 
         if (protectFriends.getValue()) {
             List<PlayerEntity> players = Lists.newArrayList(mc.world.getPlayers());
@@ -1086,7 +1080,7 @@ public class AutoCrystal extends Module {
         return Lists.newArrayList(mc.world.getEntities()).stream().anyMatch(ent -> ent != null && ent.getBoundingBox().intersects(box) && ent instanceof EndCrystalEntity);
     }
 
-    public boolean shouldOverrideDamage(float damage, float selfDamage) {
+    public boolean shouldOverrideMaxSelfDmg(float damage, float selfDamage) {
         if (overrideSelfDamage.getValue().isEnabled() && target != null) {
             if (mc.player == null || mc.world == null) return false;
 
@@ -1094,11 +1088,11 @@ public class AutoCrystal extends Module {
 
             boolean playerSafe = (mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING || mc.player.getMainHandStack().getItem() == Items.TOTEM_OF_UNDYING);
 
-            float targetHp = target.getHealth() + target.getAbsorptionAmount() - 1f;
+            float targetHp = target.getHealth() + target.getAbsorptionAmount();
 
-            float playerHp = mc.player.getHealth() + mc.player.getAbsorptionAmount() - 1f;
+            float playerHp = mc.player.getHealth() + mc.player.getAbsorptionAmount();
 
-            boolean canPop = damage > targetHp && targetSafe && sacrificeTotem.getValue();
+            boolean canPop = damage > targetHp && targetSafe;
 
             boolean canKill = damage > targetHp && !targetSafe;
 
@@ -1106,11 +1100,29 @@ public class AutoCrystal extends Module {
 
             boolean canKillSelf = selfDamage > playerHp && !playerSafe;
 
-            if (canPopSelf && canKill) return true;
+            if (canPopSelf && canKill && sacrificeTotem.getValue()) return true;
 
             return selfDamage > maxSelfDamage.getValue() && (canPop || canKill) && !canKillSelf && !canPopSelf;
         }
         return false;
+    }
+
+    public boolean shouldOverrideMinDmg(float damage) {
+        if (target == null)
+            return false;
+
+        if (isKeyPressed(facePlaceButton))
+            return true;
+
+        if ((target.getHealth() + target.getAbsorptionAmount()) - damage < 0)
+            return true;
+
+        if (armorBreaker.getValue().isEnabled())
+            for (ItemStack armor : target.getArmorItems())
+                if (armor != null && !armor.getItem().equals(Items.AIR) && ((armor.getMaxDamage() - armor.getDamage()) / (float) armor.getMaxDamage()) * 100 < armorScale.getValue())
+                    return true;
+
+        return target.getHealth() + target.getAbsorptionAmount() <= facePlaceHp.getValue();
     }
 
     private @Nullable BlockHitResult getDefaultInteract(Vec3d crystalVector, BlockPos bp) {

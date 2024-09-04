@@ -21,6 +21,7 @@ import thunder.hack.features.modules.combat.AntiBot;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class CombatManager implements IManager {
@@ -102,6 +103,39 @@ public class CombatManager implements IManager {
         return getTargets(range).stream()
                 .filter(entityPlayer -> getFOVAngle(entityPlayer) < fov)
                 .min(Comparator.comparing(this::getFOVAngle)).orElse(null);
+    }
+
+    public @Nullable PlayerEntity getTarget(float range, @NotNull TargetBy targetBy, @NotNull Predicate<PlayerEntity> predicate) {
+        PlayerEntity target = null;
+
+        switch (targetBy) {
+            case FOV -> target = getTargetByFOV(range, predicate);
+            case Health -> target = getTargetByHealth(range, predicate);
+            case Distance -> target = getNearestTarget(range, predicate);
+        }
+
+        return target;
+    }
+
+    public @Nullable PlayerEntity getNearestTarget(float range, Predicate<PlayerEntity> predicate) {
+        return getTargets(range).stream()
+                .filter(predicate)
+                .min(Comparator.comparing(t -> mc.player.distanceTo(t)))
+                .orElse(null);
+    }
+
+    public PlayerEntity getTargetByHealth(float range, Predicate<PlayerEntity> predicate) {
+        return getTargets(range).stream()
+                .filter(predicate)
+                .min(Comparator.comparing(t -> (t.getHealth() + t.getAbsorptionAmount())))
+                .orElse(null);
+    }
+
+    public PlayerEntity getTargetByFOV(float range, Predicate<PlayerEntity> predicate) {
+        return getTargets(range).stream()
+                .filter(predicate)
+                .min(Comparator.comparing(this::getFOVAngle))
+                .orElse(null);
     }
 
     private float getFOVAngle(@NotNull LivingEntity e) {

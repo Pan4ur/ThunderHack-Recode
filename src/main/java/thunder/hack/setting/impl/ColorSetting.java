@@ -1,6 +1,8 @@
 package thunder.hack.setting.impl;
 
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.features.modules.client.HudEditor;
+import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
 
@@ -29,21 +31,7 @@ public final class ColorSetting {
     }
 
     public int getColor() {
-        if (rainbow) {
-            float[] hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
-            double rainbowState = Math.ceil((System.currentTimeMillis()) / 20.0);
-            rainbowState %= 360;
-            int rgb = Color.getHSBColor((float) (rainbowState / 360.0f), hsb[1], hsb[2]).getRGB();
-            int alpha = (color >> 24) & 0xff;
-            int red = (rgb >> 16) & 0xFF;
-            int green = (rgb >> 8) & 0xFF;
-            int blue = (rgb) & 0xFF;
-            return ((alpha & 0xFF) << 24) |
-                    ((red & 0xFF) << 16) |
-                    ((green & 0xFF) << 8) |
-                    ((blue & 0xFF));
-        }
-        return color;
+        return rainbow ? Render2DEngine.rainbow(HudEditor.colorSpeed.getValue(), 1, 1f, 1, 1).getRGB() : color;
     }
 
     public void setColor(int color) {
@@ -51,36 +39,15 @@ public final class ColorSetting {
     }
 
     public int getRed() {
-        if (rainbow) {
-            float[] hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
-            double rainbowState = Math.ceil((System.currentTimeMillis()) / 20.0);
-            rainbowState %= 360;
-            int rgb = Color.getHSBColor((float) (rainbowState / 360.0f), hsb[1], hsb[2]).getRGB();
-            return (rgb >> 16) & 0xFF;
-        }
-        return (color >> 16) & 0xFF;
+        return rainbow ? Render2DEngine.rainbow(HudEditor.colorSpeed.getValue(), 1, 1f, 1, 1).getRed() : (color >> 16) & 0xFF;
     }
 
     public int getGreen() {
-        if (rainbow) {
-            float[] hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
-            double rainbowState = Math.ceil((System.currentTimeMillis()) / 20.0);
-            rainbowState %= 360;
-            int rgb = Color.getHSBColor((float) (rainbowState / 360.0f), hsb[1], hsb[2]).getRGB();
-            return (rgb >> 8) & 0xFF;
-        }
-        return (color >> 8) & 0xFF;
+        return rainbow ? Render2DEngine.rainbow(HudEditor.colorSpeed.getValue(), 1, 1f, 1, 1).getGreen() : (color >> 8) & 0xFF;
     }
 
     public int getBlue() {
-        if (rainbow) {
-            float[] hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
-            double rainbowState = Math.ceil((System.currentTimeMillis()) / 20.0);
-            rainbowState %= 360;
-            int rgb = Color.getHSBColor((float) (rainbowState / 360.0f), hsb[1], hsb[2]).getRGB();
-            return (rgb) & 0xFF;
-        }
-        return (color) & 0xFF;
+        return rainbow ? Render2DEngine.rainbow(HudEditor.colorSpeed.getValue(), 1, 1f, 1, 1).getBlue() : (color) & 0xFF;
     }
 
     public float getGlRed() {
@@ -104,11 +71,11 @@ public final class ColorSetting {
     }
 
     public @NotNull Color getColorObject() {
-        return new Color(color);
+        return rainbow ? Render2DEngine.rainbow(HudEditor.colorSpeed.getValue(), 1, 1f, 1, 1) : new Color(color, true);
     }
 
     public int getRawColor() {
-        return color;
+        return rainbow ? Render2DEngine.rainbow(HudEditor.colorSpeed.getValue(), 1, 1f, 1, 1).getRGB() : color;
     }
 
     public boolean isRainbow() {

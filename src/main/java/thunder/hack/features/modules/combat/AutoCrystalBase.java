@@ -174,7 +174,7 @@ public class AutoCrystalBase extends Module {
         float bestVal = 0f;
 
         for (ObbyData data : clearedList) {
-            if ((ModuleManager.autoCrystal.shouldOverride(data.damage) || data.damage > ModuleManager.autoCrystal.minDamage.getValue())) {
+            if ((ModuleManager.autoCrystal.shouldOverrideMinDmg(data.damage) || data.damage > ModuleManager.autoCrystal.minDamage.getValue())) {
                 if (bestData != null && Math.abs(bestData.damage - data.damage) < 1f) {
                     if (bestData.selfDamage >= data.selfDamage) {
                         bestData = data;
@@ -204,7 +204,7 @@ public class AutoCrystalBase extends Module {
 
         float damage = target == null ? 10f : ExplosionUtility.getDamageOfGhostBlock(crystalVec, target, bp);
         float selfDamage = ExplosionUtility.getDamageOfGhostBlock(crystalVec, mc.player, bp);
-        boolean overrideDamage = ModuleManager.autoCrystal.shouldOverrideDamage(damage, selfDamage);
+        boolean overrideDamage = ModuleManager.autoCrystal.shouldOverrideMaxSelfDmg(damage, selfDamage);
 
         if (ModuleManager.autoCrystal.protectFriends.getValue()) {
             List<PlayerEntity> players = Lists.newArrayList(mc.world.getPlayers());

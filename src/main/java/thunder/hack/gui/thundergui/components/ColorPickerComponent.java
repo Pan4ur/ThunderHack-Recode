@@ -131,9 +131,9 @@ public class ColorPickerComponent extends SettingElement {
         Render2DEngine.drawRound(stack,(float) getX(), (float) cy + 13, 40, 10, 2f, copy_focused ? new Color(66, 48, 80, 250) : new Color(50, 35, 60, 250));
         Render2DEngine.drawRound(stack,(float) getX(), (float) cy + 26, 40, 9.5f, 2f, paste_focused ? new Color(66, 48, 80, 250) : new Color(50, 35, 60, 250));
 
-        FontRenderers.modules.drawCenteredString(stack,"rainbow", (float) getX() + 20, (float) cy + 1, rainbow_focused ? -1 : (getColorSetting().isRainbow() ? getColorSetting().getColor() : new Color(0xB5FFFFFF, true).getRGB()));
-        FontRenderers.modules.drawCenteredString(stack,"copy", (float) getX() + 20, (float) cy + 13.5f, copy_focused ? -1 : new Color(0xB5FFFFFF, true).getRGB());
-        FontRenderers.modules.drawCenteredString(stack,"paste", (float) getX() + 20, (float) cy + 26.5f, paste_focused ? -1 : new Color(0xB5FFFFFF, true).getRGB());
+        FontRenderers.modules.drawCenteredString(stack,"rainbow", (float) getX() + 20, (float) cy + 3, rainbow_focused ? -1 : (getColorSetting().isRainbow() ? getColorSetting().getColor() : new Color(0xB5FFFFFF, true).getRGB()));
+        FontRenderers.modules.drawCenteredString(stack,"copy", (float) getX() + 20, (float) cy + 15.5f, copy_focused ? -1 : new Color(0xB5FFFFFF, true).getRGB());
+        FontRenderers.modules.drawCenteredString(stack,"paste", (float) getX() + 20, (float) cy + 28.5f, paste_focused ? -1 : new Color(0xB5FFFFFF, true).getRGB());
     }
 
     private void updatePos() {
@@ -141,7 +141,7 @@ public class ColorPickerComponent extends SettingElement {
         hue = -1 + hsb[0];
         saturation = hsb[1];
         brightness = hsb[2];
-        alpha = getColorSetting().getColorObject().getAlpha();
+        alpha = getColorSetting().getAlpha();
     }
 
     private void setColor(Color color) {
