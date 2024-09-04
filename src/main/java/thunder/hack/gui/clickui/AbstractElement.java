@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
 
 public abstract class AbstractElement {
@@ -28,7 +29,10 @@ public abstract class AbstractElement {
 
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_DELETE) && button == 2 && hovered) {
-            setting.setValue(setting.getDefaultValue());
+            if (setting.getValue() instanceof ColorSetting cs)
+                cs.setDefault();
+            else
+                setting.setValue(setting.getDefaultValue());
         }
     }
 

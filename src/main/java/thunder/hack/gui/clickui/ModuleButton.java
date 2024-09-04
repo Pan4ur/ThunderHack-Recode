@@ -279,18 +279,22 @@ public class ModuleButton extends AbstractButton {
 
             if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), InputUtil.GLFW_KEY_DELETE) && button == 0) {
                 DialogScreen dialogScreen = new DialogScreen(
-                    TextureStorage.questionPic,
-                    isRu() ? "Сброс модуля" : "Reset module",
-                    isRu() ? "Ты действительно хочешь сбросить " + module.getName() + "?" : "Are you sure you want to reset " + module.getName() + "?",
-                    isRu() ? "Да" : "Yes",
-                    isRu() ? "Нет" : "No",
-                       () -> {
-                         if (module.isEnabled())
-                             module.disable("reseting");
-                         for (Setting s : module.getSettings())
-                              s.setValue(s.getDefaultValue());
-                          mc.setScreen(null);
-                       }, () -> mc.setScreen(null));
+                        TextureStorage.questionPic,
+                        isRu() ? "Сброс модуля" : "Reset module",
+                        isRu() ? "Ты действительно хочешь сбросить " + module.getName() + "?" : "Are you sure you want to reset " + module.getName() + "?",
+                        isRu() ? "Да" : "Yes",
+                        isRu() ? "Нет" : "No",
+                        () -> {
+                            if (module.isEnabled())
+                                module.disable("reseting");
+                            for (Setting s : module.getSettings()) {
+                                if (s.getValue() instanceof ColorSetting cs)
+                                    cs.setDefault();
+                                else
+                                    s.setValue(s.getDefaultValue());
+                            }
+                            mc.setScreen(null);
+                        }, () -> mc.setScreen(null));
                 mc.setScreen(dialogScreen);
             }
 

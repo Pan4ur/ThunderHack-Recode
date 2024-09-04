@@ -266,7 +266,6 @@ public class ConfigManager implements IManager {
                     JsonArray array = mobject.getAsJsonArray(setting.getName());
                     colorSetting.setColor(array.get(0).getAsInt());
                     colorSetting.setRainbow(array.get(1).getAsBoolean());
-                    colorSetting.setGlobalOffset(array.get(2).getAsInt());
                 } else if (setting.getValue() instanceof PositionSetting posSetting) {
                     JsonArray array = mobject.getAsJsonArray(setting.getName());
                     posSetting.setX(array.get(0).getAsFloat());
@@ -335,7 +334,6 @@ public class ConfigManager implements IManager {
                 JsonArray array = new JsonArray();
                 array.add(new JsonPrimitive(color.getRawColor()));
                 array.add(new JsonPrimitive(color.isRainbow()));
-                array.add(new JsonPrimitive(color.getGlobalOffset()));
                 attribs.add(setting.getName(), array);
             } else if (setting.getValue() instanceof PositionSetting pos) {
                 JsonArray array = new JsonArray();

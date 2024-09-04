@@ -37,7 +37,7 @@ public abstract class PlaceModule extends Module {
     protected final Setting<Boolean> swing = new Setting<>("Swing", false);
 
     protected final Setting<BooleanSettingGroup> crystalBreaker = new Setting<>("Crystal Breaker", new BooleanSettingGroup(false));
-    protected final Setting<Integer> crystalAge = new Setting<>("CrystalAge", 0, 1, 20).addToGroup(crystalBreaker);
+    protected final Setting<Integer> crystalAge = new Setting<>("CrystalAge", 0, 0, 20).addToGroup(crystalBreaker);
     protected final Setting<Integer> breakDelay = new Setting<>("Break Delay", 100, 1, 1000).addToGroup(crystalBreaker);
     protected final Setting<Boolean> remove = new Setting<>("Remove", false).addToGroup(crystalBreaker);
     protected final Setting<InteractMode> breakCrystalMode = new Setting<>("Break Mode", InteractMode.Normal).addToGroup(crystalBreaker);

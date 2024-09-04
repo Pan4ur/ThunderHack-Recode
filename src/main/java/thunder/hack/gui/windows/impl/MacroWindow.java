@@ -241,6 +241,36 @@ public class MacroWindow extends WindowBase {
             return;
         }
 
+        if (keyCode == GLFW.GLFW_KEY_V && (InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_CONTROL) || InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_CONTROL))) {
+
+            String paste = GLFW.glfwGetClipboardString(mc.getWindow().getHandle());
+            if (paste == null)
+                return;
+
+            for (MacroWindow.MacroPlate plate : macroPlates) {
+                if (listeningId == plate.id) {
+                    switch (listeningType) {
+                        case Text -> {
+                            plate.macro.setText(paste);
+                            return;
+                        }
+                        case Name -> {
+                            plate.macro.setName(paste);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            if (listeningId == -3) {
+                switch (listeningType) {
+                    case Name -> addName = paste;
+                    case Text -> addText = paste;
+                }
+            }
+            return;
+        }
+
         if (listeningId != -1) {
             switch (keyCode) {
                 case GLFW.GLFW_KEY_ENTER -> {

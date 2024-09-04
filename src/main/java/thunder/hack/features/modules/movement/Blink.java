@@ -36,7 +36,7 @@ public class Blink extends Module {
     private final Setting<Integer> pulsePackets = new Setting<>("PulsePackets", 20, 1, 1000, v-> pulse.getValue());
     private final Setting<Boolean> render = new Setting<>("Render", true);
     private final Setting<RenderMode> renderMode = new Setting<>("Render Mode", RenderMode.Circle, value -> render.getValue());
-    private final Setting<ColorSetting> circleColor = new Setting<>("Color", new ColorSetting(0xFFda6464, true), value -> render.getValue() && renderMode.getValue() == RenderMode.Circle || renderMode.getValue() == RenderMode.Both);
+    private final Setting<ColorSetting> circleColor = new Setting<>("Color", new ColorSetting(0xFFda6464), value -> render.getValue() && renderMode.getValue() == RenderMode.Circle || renderMode.getValue() == RenderMode.Both);
     private final Setting<Bind> cancel = new Setting<>("Cancel", new Bind(GLFW.GLFW_KEY_LEFT_SHIFT, false, false));
 
     private enum RenderMode {

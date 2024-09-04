@@ -6,26 +6,16 @@ import java.awt.*;
 
 public final class ColorSetting {
     private int color;
+    private final int defaultColor;
     private boolean rainbow;
-    private int globalOffset = 0;
 
     public ColorSetting(@NotNull Color color) {
-        this.color = color.getRGB();
+        this(color.getRGB());
     }
 
     public ColorSetting(int color) {
         this.color = color;
-    }
-
-    public ColorSetting(int color, boolean cycle) {
-        this.color = color;
-        this.rainbow = cycle;
-    }
-
-    public ColorSetting(int color, boolean cycle, int globalOffset) {
-        this.color = color;
-        this.rainbow = cycle;
-        this.globalOffset = globalOffset;
+        this.defaultColor = color;
     }
 
     public @NotNull ColorSetting withAlpha(int alpha) {
@@ -41,7 +31,7 @@ public final class ColorSetting {
     public int getColor() {
         if (rainbow) {
             float[] hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
-            double rainbowState = Math.ceil((System.currentTimeMillis() + 300 + globalOffset) / 20.0);
+            double rainbowState = Math.ceil((System.currentTimeMillis()) / 20.0);
             rainbowState %= 360;
             int rgb = Color.getHSBColor((float) (rainbowState / 360.0f), hsb[1], hsb[2]).getRGB();
             int alpha = (color >> 24) & 0xff;
@@ -60,18 +50,10 @@ public final class ColorSetting {
         this.color = color;
     }
 
-    public int getGlobalOffset() {
-        return globalOffset;
-    }
-
-    public void setGlobalOffset(int globalOffset) {
-        this.globalOffset = globalOffset;
-    }
-
     public int getRed() {
         if (rainbow) {
             float[] hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
-            double rainbowState = Math.ceil((System.currentTimeMillis() + 300 + globalOffset) / 20.0);
+            double rainbowState = Math.ceil((System.currentTimeMillis()) / 20.0);
             rainbowState %= 360;
             int rgb = Color.getHSBColor((float) (rainbowState / 360.0f), hsb[1], hsb[2]).getRGB();
             return (rgb >> 16) & 0xFF;
@@ -82,7 +64,7 @@ public final class ColorSetting {
     public int getGreen() {
         if (rainbow) {
             float[] hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
-            double rainbowState = Math.ceil((System.currentTimeMillis() + 300 + globalOffset) / 20.0);
+            double rainbowState = Math.ceil((System.currentTimeMillis()) / 20.0);
             rainbowState %= 360;
             int rgb = Color.getHSBColor((float) (rainbowState / 360.0f), hsb[1], hsb[2]).getRGB();
             return (rgb >> 8) & 0xFF;
@@ -93,7 +75,7 @@ public final class ColorSetting {
     public int getBlue() {
         if (rainbow) {
             float[] hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
-            double rainbowState = Math.ceil((System.currentTimeMillis() + 300 + globalOffset) / 20.0);
+            double rainbowState = Math.ceil((System.currentTimeMillis()) / 20.0);
             rainbowState %= 360;
             int rgb = Color.getHSBColor((float) (rainbowState / 360.0f), hsb[1], hsb[2]).getRGB();
             return (rgb) & 0xFF;
@@ -122,12 +104,7 @@ public final class ColorSetting {
     }
 
     public @NotNull Color getColorObject() {
-        int color = getColor();
-        int alpha = (color >> 24) & 0xff;
-        int red = (color >> 16) & 0xFF;
-        int green = (color >> 8) & 0xFF;
-        int blue = (color) & 0xFF;
-        return new Color(red, green, blue, alpha);
+        return new Color(color);
     }
 
     public int getRawColor() {
@@ -140,5 +117,9 @@ public final class ColorSetting {
 
     public void setRainbow(boolean rainbow) {
         this.rainbow = rainbow;
+    }
+
+    public void setDefault() {
+        setColor(defaultColor);
     }
 }

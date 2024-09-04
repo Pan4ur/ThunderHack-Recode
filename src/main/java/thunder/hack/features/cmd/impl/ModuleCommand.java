@@ -48,8 +48,11 @@ public class ModuleCommand extends Command {
                 .then(literal("reset").executes(context -> {
                     Module module = context.getArgument("module", Module.class);
 
-                    for (Setting setting3 : module.getSettings()) {
-                        setting3.setValue(setting3.getDefaultValue());
+                    for (Setting s : module.getSettings()) {
+                        if (s.getValue() instanceof ColorSetting cs)
+                            cs.setDefault();
+                        else
+                            s.setValue(s.getDefaultValue());
                     }
 
                     return SINGLE_SUCCESS;
@@ -76,6 +79,7 @@ public class ModuleCommand extends Command {
                                 sendMessage(Formatting.DARK_GRAY + module.getName() + " " + setting.getName() + (isRu() ? " был выставлен " : " has been set to ") + settingValue);
                                 return SINGLE_SUCCESS;
                             }
+
                             try {
                                 if (setting.getName().equalsIgnoreCase("Enabled")) {
                                     if (settingValue.equalsIgnoreCase("true")) {
@@ -120,8 +124,6 @@ public class ModuleCommand extends Command {
         String str;
         for (Setting checkSetting : feature.getSettings()) {
             if (Objects.equals(setting.getName(), checkSetting.getName())) {
-
-                sendMessage(checkSetting.getValue().getClass().getSimpleName());
                 switch (checkSetting.getValue().getClass().getSimpleName()) {
                     case "SettingGroup", "Bind" -> {
                         return;
@@ -158,7 +160,6 @@ public class ModuleCommand extends Command {
                         JsonArray array = element.getAsJsonArray();
                         ((ColorSetting) checkSetting.getValue()).setColor(array.get(0).getAsInt());
                         ((ColorSetting) checkSetting.getValue()).setRainbow(array.get(1).getAsBoolean());
-                        ((ColorSetting) checkSetting.getValue()).setGlobalOffset(array.get(2).getAsInt());
                         return;
                     }
                     case "PositionSetting" -> {
