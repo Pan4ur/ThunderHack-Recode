@@ -6,10 +6,8 @@ import meteordevelopment.orbit.EventPriority;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -70,7 +68,6 @@ public class AutoCrystal extends Module {
     private final Setting<Boolean> await = new Setting<>("Await", true, v -> page.is(Pages.Main));
     private final Setting<Timing> timing = new Setting<>("Timing", Timing.NORMAL, v -> page.is(Pages.Main));
     private final Setting<Sequential> sequential = new Setting<>("Sequential", Sequential.Strong, v -> page.is(Pages.Main));
-    private final Setting<InstantBreak> instantBreak = new Setting<>("InstantBreak", InstantBreak.OnSpawn, v -> page.is(Pages.Main));
     private final Setting<Rotation> rotate = new Setting<>("Rotate", Rotation.CC, v -> page.is(Pages.Main));
     private final Setting<BooleanSettingGroup> yawStep = new Setting<>("YawStep", new BooleanSettingGroup(false), v -> !rotate.is(Rotation.OFF) && page.is(Pages.Main));
     private final Setting<Float> yawAngle = new Setting<>("YawAngle", 180.0f, 1.0f, 180.0f, v -> !rotate.is(Rotation.OFF) && page.is(Pages.Main)).addToGroup(yawStep);
@@ -83,7 +80,6 @@ public class AutoCrystal extends Module {
     private final Setting<Boolean> strictCenter = new Setting<>("ССStrict", true, v -> page.is(Pages.Place) && interact.getValue() == Interact.Strict);
     private final Setting<Boolean> rayTraceBypass = new Setting<>("RayTraceBypass", false, v -> page.is(Pages.Place));
     private final Setting<Boolean> oldVer = new Setting<>("1.12", false, v -> page.is(Pages.Place));
-    private final Setting<Boolean> ccPlace = new Setting<>("CC", true, v -> page.is(Pages.Place));
     private final Setting<Integer> placeDelay = new Setting<>("PlaceDelay", 0, 0, 20, v -> page.is(Pages.Place));
     private final Setting<Integer> lowPlaceDelay = new Setting<>("LowPlaceDelay", 11, 0, 20, v -> page.is(Pages.Place));
     private final Setting<Float> placeRange = new Setting<>("PlaceRange", 5f, 1.0f, 6f, v -> page.is(Pages.Place));
@@ -133,10 +129,6 @@ public class AutoCrystal extends Module {
     public final Setting<Boolean> placeFailsafe = new Setting<>("PlaceFailsafe", true, v -> page.is(Pages.FailSafe));
     public final Setting<Boolean> breakFailsafe = new Setting<>("BreakFailsafe", true, v -> page.is(Pages.FailSafe));
     public final Setting<Integer> attempts = new Setting<>("MaxAttempts", 5, 1, 30, v -> page.is(Pages.FailSafe));
-    public final Setting<Boolean> resetWhenSuccess = new Setting<>("ResetWhenSuccess", false, v -> page.is(Pages.FailSafe) && placeFailsafe.getValue());
-    public final Setting<Float> resetDistance = new Setting<>("ResetDistance", 1.0f, 0.0f, 25f, v -> page.is(Pages.FailSafe));
-    public final Setting<Boolean> removeByTimeout = new Setting<>("RemoveByTimeout", true, v -> page.is(Pages.FailSafe));
-    public final Setting<Integer> timeOutVal = new Setting<>("TimeOutVal", 1000, 1000, 30000, v -> page.is(Pages.FailSafe) && removeByTimeout.getValue());
 
     /*    ID Predict    */
     public final Setting<Boolean> idPredict = new Setting<>("IDPredict", false, v -> page.is(Pages.IDPredict));
@@ -182,8 +174,6 @@ public class AutoCrystal extends Module {
     private final TickTimer breakTimer = new TickTimer();
     private final TickTimer calcTimer = new TickTimer();
     private final TickTimer placeSyncTimer = new TickTimer();
-
-    private final Timer blockRecalcTimer = new Timer();
     private final Timer pauseTimer = new Timer();
 
     private final CrystalManager crystalManager = new CrystalManager();
@@ -261,18 +251,15 @@ public class AutoCrystal extends Module {
 
         if (placeTimer.passedTicks(20)) renderDamage = 0f;
 
-        // Right click gapple
         if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL && autoGapple.getValue() && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() == Items.END_CRYSTAL)
             InventoryUtility.findItemInHotBar(Items.ENCHANTED_GOLDEN_APPLE).switchTo();
 
-        // CA Speed counter
         if (invTimer++ >= 20) {
             crystalSpeed = MathUtility.clamp(prevCrystalsAmount - InventoryUtility.getItemCount(Items.END_CRYSTAL), 0, 255);
             prevCrystalsAmount = InventoryUtility.getItemCount(Items.END_CRYSTAL);
             invTimer = 0;
         }
 
-        // Rotate
         if (!rotate.is(Rotation.OFF) && mc.player != null && rotating) {
 
             boolean hitVisible = bestCrystal == null || PlayerUtility.canSee(bestCrystal.getPos());
@@ -334,7 +321,7 @@ public class AutoCrystal extends Module {
 
     @EventHandler
     public void onCrystalSpawn(@NotNull EventEntitySpawnPost e) {
-        if (e.getEntity() instanceof EndCrystalEntity cr && crystalAge.is(0) && instantBreak.is(InstantBreak.OnSpawn)) {
+        if (e.getEntity() instanceof EndCrystalEntity cr && crystalAge.is(0)) {
             long now = System.currentTimeMillis();
 
             for (Map.Entry<BlockPos, CrystalManager.Attempt> entry : crystalManager.getAwaitingPositions().entrySet()) {
@@ -357,33 +344,11 @@ public class AutoCrystal extends Module {
     public void onPacketReceive(PacketEvent.Receive e) {
         if (mc.player == null || mc.world == null) return;
 
-        if (e.getPacket() instanceof ExperienceOrbSpawnS2CPacket spawn) processSpawnPacket(spawn.getId());
-
-        if (e.getPacket() instanceof EntitySpawnS2CPacket spawn) {
+        if (e.getPacket() instanceof ExperienceOrbSpawnS2CPacket spawn)
             processSpawnPacket(spawn.getId());
 
-            if (spawn.getEntityType() == EntityType.END_CRYSTAL && crystalAge.is(0) && instantBreak.is(InstantBreak.OnPacket)) {
-                EndCrystalEntity cr = new EndCrystalEntity(mc.world, spawn.getX(), spawn.getY(), spawn.getZ());
-                cr.setId(spawn.getId());
-
-                long now = System.currentTimeMillis();
-
-                for (Map.Entry<BlockPos, CrystalManager.Attempt> entry : crystalManager.getAwaitingPositions().entrySet()) {
-
-                    BlockPos bp = entry.getKey();
-                    CrystalManager.Attempt attempt = entry.getValue();
-
-                    if (cr.squaredDistanceTo(bp.toCenterPos()) < 0.3) {
-                        confirmTime = now - attempt.getTime();
-                        ModuleManager.autoCrystalInfo.onSpawn();
-                        crystalManager.confirmSpawn(bp);
-
-                        if (breakTimer.passedTicks(facePlacing ? lowBreakDelay.getValue() : breakDelay.getValue()))
-                            handleSpawn(cr);
-                    }
-                }
-            }
-        }
+        if (e.getPacket() instanceof EntitySpawnS2CPacket spawn)
+            processSpawnPacket(spawn.getId());
 
         if (e.getPacket() instanceof ExplosionS2CPacket explosion) {
             for (Entity ent : Lists.newArrayList(mc.world.getEntities()))
@@ -392,30 +357,10 @@ public class AutoCrystal extends Module {
         }
     }
 
-    /*
-    @EventHandler
-    public void onBlockBreakServer(EventSetBlockState e) {
-        if (mc.player == null || mc.world == null) return;
-
-        if (e.getPrevState() == null || e.getState() == null)
-            return;
-
-        if (target != null && target.squaredDistanceTo(e.getPos().toCenterPos()) <= 4 && e.getState().isAir() && !e.getPrevState().isAir() && blockRecalcTimer.every(200)) {
-            calcPosition(2f, e.getPos().toCenterPos());
-            debug("break server");
-        }
-    }
-     */
-
     @EventHandler
     public void onBlockBreakClient(EventBreakBlock e) {
-        if (mc.player == null || mc.world == null) return;
-
-        if (target != null && target.squaredDistanceTo(e.getPos().toCenterPos()) <= 4) {
+        if (target != null && target.squaredDistanceTo(e.getPos().toCenterPos()) <= 4)
             calcPosition(2f, e.getPos().toCenterPos());
-            debug("break client");
-            blockRecalcTimer.reset();
-        }
     }
 
     private void handleSpawn(EndCrystalEntity crystal) {
@@ -424,8 +369,10 @@ public class AutoCrystal extends Module {
             attackCrystal(crystal);
 
             if (sequential.is(Sequential.Strong) && placeTimer.passedTicks(facePlacing ? lowPlaceDelay.getValue() : placeDelay.getValue())) {
-                calcPosition(placeRange.getValue(), mc.player.getPos());
-                if (bestPosition != null) placeCrystal(bestPosition, false, true);
+                Managers.ASYNC.run(()-> {
+                    calcPosition(placeRange.getValue(), mc.player.getPos());
+                    if (bestPosition != null) placeCrystal(bestPosition, false, true);
+                });
             }
         }
     }
@@ -815,7 +762,7 @@ public class AutoCrystal extends Module {
     private @NotNull List<PlaceData> getPossibleBlocks(PlayerEntity target, Vec3d center, float range) {
         List<PlaceData> blocks = new ArrayList<>();
         BlockPos playerPos = BlockPos.ofFloored(center);
-        Vec3d predictedPlayerPos = PredictUtility.predictPosition(mc.player, 3);
+        Vec3d predictedPlayerPos = PredictUtility.predictPosition(mc.player, getSelfPredictTicks());
         int r = (int) Math.ceil(range);
 
         for (int x = playerPos.getX() - r; x <= playerPos.getX() + r; x++) {
@@ -1042,7 +989,8 @@ public class AutoCrystal extends Module {
 
         Box box = new Box(base.up());
 
-        if (!ccPlace.getValue()) box = box.expand(0, 1f, 0);
+        if (!(mc.getNetworkHandler() != null && mc.getNetworkHandler().getServerInfo() != null && mc.getNetworkHandler().getServerInfo().address.contains("crystalpvp.cc")))
+            box = box.expand(0, 1f, 0);
 
         for (Entity ent : Lists.newArrayList(mc.world.getEntities())) {
             if (ent == null) continue;
@@ -1271,10 +1219,6 @@ public class AutoCrystal extends Module {
         Default, Strict
     }
 
-    public enum Safety {
-        BALANCE, STABLE, NONE
-    }
-
     public enum Sequential {
         Off, Strict, Strong
     }
@@ -1285,10 +1229,6 @@ public class AutoCrystal extends Module {
 
     public enum State {
         Active, Eating, LowHP, NoTarget, NoCrystalls, ExternalPause, Mining
-    }
-
-    public enum InstantBreak {
-        OnPacket, OnSpawn
     }
 
     public enum Rotation {

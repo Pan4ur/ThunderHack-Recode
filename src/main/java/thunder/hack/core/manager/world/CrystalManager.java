@@ -62,10 +62,7 @@ public class CrystalManager implements IManager {
     }
 
     public void confirmSpawn(BlockPos bp) {
-        if (ModuleManager.autoCrystal.resetWhenSuccess.getValue())
-            awaitingPositions.clear();
-        else
-            awaitingPositions.remove(bp);
+        awaitingPositions.remove(bp);
     }
 
     public void addAwaitingPos(BlockPos blockPos) {
@@ -112,10 +109,7 @@ public class CrystalManager implements IManager {
         }
 
         public boolean shouldRemove() {
-            boolean duePositionChanged = Math.abs(distance - mc.player.squaredDistanceTo(pos)) >= ModuleManager.autoCrystal.resetDistance.getValue();
-            boolean dueTimeout = ModuleManager.autoCrystal.removeByTimeout.getValue() && System.currentTimeMillis() - time > ModuleManager.autoCrystal.timeOutVal.getValue();
-
-            return duePositionChanged || dueTimeout;
+            return Math.abs(distance - mc.player.squaredDistanceTo(pos)) >= 1f;
         }
 
         public void addAttempt() {

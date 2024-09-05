@@ -146,8 +146,6 @@ public class Aura extends Module {
     public final Setting<Boolean> ignoreNaked = new Setting<>("IgnoreNaked", false).addToGroup(targets);
     public final Setting<Boolean> ignoreShield = new Setting<>("AttackShieldingEntities", true).addToGroup(targets);
 
-
-
     public static Entity target;
 
     public float rotationYaw;
@@ -231,7 +229,7 @@ public class Aura extends Module {
     private boolean skipRayTraceCheck() {
         return rotationMode.getValue() == Mode.None || rayTrace.getValue() == RayTrace.OFF
                 || rotationMode.is(Mode.Grim)
-                || (rotationMode.getValue() == Mode.Interact && (interactTicks.getValue() <= 1
+                || (rotationMode.is(Mode.Interact) && (interactTicks.getValue() <= 1
                 || mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().expand(-0.25, 0.0, -0.25).offset(0.0, 1, 0.0)).iterator().hasNext()));
     }
 
@@ -848,14 +846,6 @@ public class Aura extends Module {
     public void pause() {
         pauseTimer.reset();
     }
-    public boolean havePlayersNear(){
-        for (PlayerEntity pl : mc.world.getPlayers()) {
-            if (pl != mc.player && !Managers.FRIEND.isFriend(pl)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     private boolean shouldRandomizeDelay() {
         return randomHitDelay.getValue() && (mc.player.isOnGround() || mc.player.fallDistance < 0.12f || mc.player.isSwimming() || mc.player.isFallFlying());
@@ -919,10 +909,6 @@ public class Aura extends Module {
 
     public enum ESP {
         Off, ThunderHack, NurikZapen, CelkaPasta, ThunderHackV2
-    }
-
-    public enum RandomHitDelay {
-        Off, Delay, FallDistance
     }
 
     public enum AccelerateOnHit {

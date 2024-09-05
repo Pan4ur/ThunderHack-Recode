@@ -2,16 +2,11 @@ package thunder.hack.features.modules.combat;
 
 import io.netty.buffer.Unpooled;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.injection.accesors.IClientPlayerEntity;
 import thunder.hack.features.modules.Module;
@@ -62,7 +57,7 @@ public final class Criticals extends Module {
                 }
                 case Grim -> {
                     if (!mc.player.isOnGround())
-                        critPacket(-0.000001, false);
+                        critPacket(-0.000001, true);
 
                 }
             }
@@ -70,7 +65,7 @@ public final class Criticals extends Module {
     }
 
     private void critPacket(double yDelta, boolean full) {
-        if (full)
+        if (!full)
             sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() + yDelta, mc.player.getZ(), false));
         else
             sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY() + yDelta, mc.player.getZ(), ((IClientPlayerEntity) mc.player).getLastYaw(), ((IClientPlayerEntity) mc.player).getLastPitch(), false));
