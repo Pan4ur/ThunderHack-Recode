@@ -127,7 +127,9 @@ public class HoleESP extends Module {
     public void onThread() {
         if (fullNullCheck() || !logicTimer.passedMs(500))
             return;
+        long now = System.currentTimeMillis();
         findHoles();
+        sendMessage(System.currentTimeMillis() - now + "");
         logicTimer.reset();
     }
 
@@ -147,6 +149,7 @@ public class HoleESP extends Module {
                     Box box = new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + height.getValue(), pos.getZ() + 1);
                     Color color = indestrictibleColor.getValue().getColorObject();
                     if (HoleUtility.validIndestructible(pos)) {
+
                     } else if (HoleUtility.validBedrock(pos)) {
                         color = bedrockColor.getValue().getColorObject();
                     } else if (HoleUtility.validTwoBlockBedrock(pos)) {

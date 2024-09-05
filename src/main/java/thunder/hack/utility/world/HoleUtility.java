@@ -136,6 +136,10 @@ public final class HoleUtility {
         BlockPos[] checkPoses = new BlockPos[]{pos, pos.add(addVec)};
         // Check surround poses of checkPoses
         for (BlockPos checkPos : checkPoses) {
+
+            if(!isReplaceable(checkPos.add(0, 1, 0)) || !isReplaceable(checkPos.add(0, 2, 0)))
+                return false;
+
             BlockPos downPos = checkPos.down();
             if (!isBedrock(downPos))
                 return false;
@@ -163,9 +167,13 @@ public final class HoleUtility {
         boolean wasIndestrictible = false;
         for (BlockPos checkPos : checkPoses) {
             BlockPos downPos = checkPos.down();
+
             if (isIndestructible(downPos))
                 wasIndestrictible = true;
             else if (!isBedrock(downPos))
+                return false;
+
+            if(!isReplaceable(checkPos.add(0, 1, 0)) || !isReplaceable(checkPos.add(0, 2, 0)))
                 return false;
 
             for (Vec3i vec : VECTOR_PATTERN) {
@@ -208,6 +216,9 @@ public final class HoleUtility {
                 return false;
             }
 
+            if(!isReplaceable(checkPos.add(0, 1, 0)) || !isReplaceable(checkPos.add(0, 2, 0)))
+                return false;
+
             for (Vec3i vec : VECTOR_PATTERN) {
                 BlockPos reducedPos = checkPos.add(vec);
 
@@ -232,9 +243,11 @@ public final class HoleUtility {
 
         for (BlockPos checkPos : checkPoses) {
             BlockPos downPos = checkPos.down();
-            if (!isBedrock(downPos)) {
+            if (!isBedrock(downPos))
                 return false;
-            }
+
+            if(!isReplaceable(checkPos.add(0, 1, 0)) || !isReplaceable(checkPos.add(0, 2, 0)))
+                return false;
 
             for (Vec3i vec : VECTOR_PATTERN) {
                 BlockPos reducedPos = checkPos.add(vec);
