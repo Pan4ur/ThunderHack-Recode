@@ -127,9 +127,7 @@ public class HoleESP extends Module {
     public void onThread() {
         if (fullNullCheck() || !logicTimer.passedMs(500))
             return;
-        long now = System.currentTimeMillis();
         findHoles();
-        sendMessage(System.currentTimeMillis() - now + "");
         logicTimer.reset();
     }
 

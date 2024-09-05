@@ -71,7 +71,6 @@ public class AsyncManager implements IManager {
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    Managers.TELEMETRY.onUpdate();
                     if (!Module.fullNullCheck()) {
                         Managers.MODULE.modules.forEach(m -> {
                             if (m.isEnabled()) m.onThread();

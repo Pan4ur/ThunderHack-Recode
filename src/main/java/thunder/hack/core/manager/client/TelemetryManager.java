@@ -3,6 +3,7 @@ package thunder.hack.core.manager.client;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import org.apache.commons.compress.utils.Lists;
+import thunder.hack.core.Managers;
 import thunder.hack.core.manager.IManager;
 import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.utility.Timer;
@@ -21,7 +22,7 @@ public class TelemetryManager implements IManager {
 
     public void onUpdate() {
         if (pingTimer.every(90000))
-            fetchData();
+            Managers.ASYNC.run(this::fetchData);
     }
 
     public void fetchData() {
