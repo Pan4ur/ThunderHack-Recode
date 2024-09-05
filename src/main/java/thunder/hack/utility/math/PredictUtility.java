@@ -31,23 +31,20 @@ public class PredictUtility {
             return null;
 
         Vec3d posVec = new Vec3d(entity.getX(), entity.getY(), entity.getZ());
-        double motionX = entity.getX() - entity.prevX;
-      //  double motionY = entity.getY() - entity.prevY;
-        // TODO Smarter
-        double motionY = 0;
-        double motionZ = entity.getZ() - entity.prevZ;
+
+        double motionX = entity.getVelocity().getX();
+        double motionZ = entity.getVelocity().getZ();
 
         for (int i = 0; i < ticks; i++) {
-            if (!mc.world.isAir(BlockPos.ofFloored(posVec.add(0, motionY, 0)))) {
-                motionY = 0;
-            }
-            if (!mc.world.isAir(BlockPos.ofFloored(posVec.add(motionX, 0, 0))) || !mc.world.isAir(BlockPos.ofFloored(posVec.add(motionX, 1, 0)))) {
+            float hbDeltaX = motionX > 0 ? 0.3f : -0.3f;
+            float hbDeltaZ = motionZ > 0 ? 0.3f : -0.3f;
+
+            if (!mc.world.isAir(BlockPos.ofFloored(posVec.add(motionX + hbDeltaX, 0.1, motionZ + hbDeltaZ))) || !mc.world.isAir(BlockPos.ofFloored(posVec.add(motionX + hbDeltaX, 1, motionZ + hbDeltaZ)))) {
                 motionX = 0;
-            }
-            if (!mc.world.isAir(BlockPos.ofFloored(posVec.add(0, 0, motionZ))) || !mc.world.isAir(BlockPos.ofFloored(posVec.add(0, 1, motionZ)))) {
                 motionZ = 0;
             }
-            posVec = posVec.add(motionX, motionY, motionZ);
+
+            posVec = posVec.add(motionX, 0, motionZ);
 
         }
 
