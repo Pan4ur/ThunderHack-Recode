@@ -52,6 +52,7 @@ public class ESP extends Module {
     private final Setting<Boolean> tntRadius = new Setting<>("TNTRadius", false);
     private final Setting<ColorSetting> tntRadiusColor = new Setting<>("TNTSphereColor", new ColorSetting(new Color(-1)), v -> tntRadius.getValue());
     private final Setting<Boolean> beaconRadius = new Setting<>("BeaconRadius", false);
+    private final Setting<Boolean> keepY = new Setting<>("KeepY", false, v -> beaconRadius.getValue());
     private final Setting<ColorSetting> sphereColor = new Setting<>("SphereColor", new ColorSetting(new Color(-1)), v -> beaconRadius.getValue());
     private final Setting<ColorSetting> beakonColor = new Setting<>("BeakonColor", new ColorSetting(new Color(-1)), v -> beaconRadius.getValue());
     private final Setting<Boolean> burrow = new Setting<>("Burrow", false);
@@ -60,7 +61,6 @@ public class ESP extends Module {
     private final Setting<Boolean> pearls = new Setting<>("Pearls", false);
     private final Setting<Boolean> dizorentRadius = new Setting<>("DizorentRadius", true);
     private final Setting<ColorSetting> dizorentColor = new Setting<>("DizorentColor", new ColorSetting(new Color(0xB300F1CC, true)), v -> dizorentRadius.getValue());
-
 
     private final Setting<SettingGroup> boxEsp = new Setting<>("Box", new SettingGroup(false, 0));
     private final Setting<Boolean> players = new Setting<>("Players", true).addToGroup(boxEsp);
@@ -73,7 +73,6 @@ public class ESP extends Module {
     private final Setting<Boolean> outline = new Setting<>("Outline", true).addToGroup(boxEsp);
     private final Setting<Colors> colorMode = new Setting<>("ColorMode", Colors.SyncColor).addToGroup(boxEsp);
     private final Setting<Boolean> renderHealth = new Setting<>("renderHealth", true).addToGroup(boxEsp);
-
 
     private final Setting<SettingGroup> boxColors = new Setting<>("BoxColors", new SettingGroup(false, 0));
     private final Setting<ColorSetting> playersC = new Setting<>("PlayersC", new ColorSetting(new Color(0xFF9200))).addToGroup(boxColors);
@@ -205,13 +204,14 @@ public class ESP extends Module {
                     double z = be.getPos().getZ() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
 
                     Render3DEngine.drawBoxOutline(new Box(be.getPos()), beakonColor.getValue().getColorObject(), 2);
-                    int level = ((IBeaconBlockEntity) bbe).getLevel();
-                    float range = level == 1.0F ? 19.0F : (level == 2.0F ? 29.0F : (level == 3.0F ? 40.0F : (level == 4.0F ? 51.f : 0.0F)));
+                    float range = ((IBeaconBlockEntity) bbe).getLevel() * 10 + 11;
+
+                    boolean ky = keepY.getValue();
 
                     stack.push();
-                    stack.translate(x, y, z);
-                    Render3DEngine.drawSphere(stack, range, 20, 20, sphereColor.getValue().getColor());
-                    stack.translate(-x, -y, -z);
+                    stack.translate(x,  ky ? -10 : y, z);
+                    Render3DEngine.drawCylinder(stack, range, ky ? 20 : 256, 20, ky ? 5 : 20, sphereColor.getValue().getColor());
+                    stack.translate(-x, ky ? 10 : y, -z);
                     stack.pop();
                 }
             }

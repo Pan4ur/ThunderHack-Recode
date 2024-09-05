@@ -458,7 +458,7 @@ public class Render3DEngine {
         MatrixStack.Entry entry = matrices.peek();
         Vector3f normalVec = getNormal(x1, y1, z1, x2, y2, z2);
         buffer.vertex(model, x1, y1, z1).color(lineColor.getRed(), lineColor.getGreen(), lineColor.getBlue(), lineColor.getAlpha()).normal(entry, normalVec.x(), normalVec.y(), normalVec.z());
-        buffer.vertex(model, x2, y2, z2).color(lineColor.getRed(), lineColor.getGreen(), lineColor.getBlue(), lineColor.getAlpha()).normal(entry,normalVec.x(), normalVec.y(), normalVec.z());
+        buffer.vertex(model, x2, y2, z2).color(lineColor.getRed(), lineColor.getGreen(), lineColor.getBlue(), lineColor.getAlpha()).normal(entry, normalVec.x(), normalVec.y(), normalVec.z());
     }
 
     public static @NotNull Vector3f getNormal(float x1, float y1, float z1, float x2, float y2, float z2) {
@@ -633,6 +633,42 @@ public class Render3DEngine {
         endRender();
     }
 
+    public static void drawCylinder(MatrixStack stack, final float radius, final float height, final int slices, final int stacks, int color) {
+
+        final float da = (float) ((Math.PI * 2f) / slices);
+        final float dz = height / stacks;
+
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+
+        float y = 0;
+
+        for (int j = 0; j <= stacks; ++j) {
+            for (int i = 0; i <= slices; ++i) {
+                final float x = (float) Math.cos(i * da);
+                final float z = (float) Math.sin(i * da);
+                buffer.vertex(stack.peek().getPositionMatrix(), x * radius, y, z * radius).color(color);
+            }
+            y += dz;
+        }
+
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
+
+        buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+
+        for (int i = 0; i <= slices; ++i) {
+            final float x = (float) Math.cos(i * da);
+            final float z = (float) Math.sin(i * da);
+
+            buffer.vertex(stack.peek().getPositionMatrix(), x * radius, 0, z * radius).color(color);
+            buffer.vertex(stack.peek().getPositionMatrix(), x * radius, height, z * radius).color(color);
+        }
+
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
+    }
+
+
     public static void drawCircle3D(MatrixStack stack, Entity ent, float radius, int color, int points, boolean hudColor, int colorOffset) {
         setupRender();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -712,7 +748,7 @@ public class Render3DEngine {
 
         for (int j = 0; j < 3; j++) {
             for (int i = 0; i <= espLength; i++) {
-                double radians = Math.toRadians((( (float) i / 1.5f + iAge) * factor + (j * 120)) % (factor * 360));
+                double radians = Math.toRadians((((float) i / 1.5f + iAge) * factor + (j * 120)) % (factor * 360));
                 double sinQuad = Math.sin(Math.toRadians(iAge * 2.5f + i * (j + 1)) * amplitude) / shaking;
 
                 float offset = ((float) i / espLength);
@@ -737,8 +773,7 @@ public class Render3DEngine {
         if (canSee) {
             RenderSystem.depthMask(true);
             RenderSystem.disableDepthTest();
-        }
-        else RenderSystem.enableDepthTest();
+        } else RenderSystem.enableDepthTest();
 
         RenderSystem.disableBlend();
     }
