@@ -709,17 +709,24 @@ public class ElytraPlus extends Module {
         if (started && !mc.player.isFallFlying()) return;
         if (!started && Managers.PLAYER.ticksElytraFlying > 1) return;
 
-        int n2 = getFireworks();
-        if (n2 == -1) {
+        int slot = getFireworks();
+        if (slot == -1) {
             slotWithFireWorks = -1;
             return;
         }
-        slotWithFireWorks = n2;
+        slotWithFireWorks = slot;
 
         boolean inOffhand = mc.player.getOffHandStack().getItem() == Items.FIREWORK_ROCKET;
-        if (!inOffhand) sendPacket(new UpdateSelectedSlotC2SPacket(n2));
+
+        int prevSlot = mc.player.getInventory().selectedSlot;
+
+        if (!inOffhand && prevSlot != slot)
+            sendPacket(new UpdateSelectedSlotC2SPacket(slot));
+
         sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(inOffhand ? Hand.OFF_HAND : Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
-        if (!inOffhand) sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+
+        if (!inOffhand && prevSlot != mc.player.getInventory().selectedSlot)
+            sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
 
         flying = true;
         lastFireworkTime = System.currentTimeMillis();
