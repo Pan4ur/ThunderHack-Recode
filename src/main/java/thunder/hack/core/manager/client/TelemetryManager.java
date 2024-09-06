@@ -22,7 +22,7 @@ public class TelemetryManager implements IManager {
 
     public void onUpdate() {
         if (pingTimer.every(90000))
-            Managers.ASYNC.run(this::fetchData);
+            fetchData();
     }
 
     public void fetchData() {

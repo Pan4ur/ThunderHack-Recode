@@ -90,8 +90,6 @@ public final class Core {
             Managers.MACRO.saveMacro();
             Managers.NOTIFICATION.publicity("AutoSave", isRu() ? "Сохраняю конфиг.." : "Saving config..", 3, Notification.Type.INFO);
         }
-
-        Managers.TELEMETRY.onUpdate();
     }
 
     @EventHandler
