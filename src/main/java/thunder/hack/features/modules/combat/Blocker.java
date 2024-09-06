@@ -14,6 +14,7 @@ import thunder.hack.features.modules.base.PlaceModule;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.player.InteractionUtility;
+import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.world.HoleUtility;
 
 import java.util.Comparator;
@@ -66,6 +67,8 @@ public final class Blocker extends PlaceModule {
 
         if (!getBlockResult().found() || placePositions.isEmpty())
             return;
+
+        placePositions.removeIf(b -> PlayerUtility.squaredDistanceFromEyes(b.toCenterPos()) > range.getPow2Value());
 
         int blocksPlaced = 0;
 
