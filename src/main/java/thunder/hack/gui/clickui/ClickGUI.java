@@ -70,7 +70,7 @@ public class ClickGUI extends Screen {
             int windowHeight = 18;
 
             int halfWidth = mc.getWindow().getScaledWidth() / 2;
-            int halfWidthCats = (int) (3 * (ModuleManager.clickGui.moduleWidth.getValue() + 4f));
+            int halfWidthCats = (int) (((float)Module.Category.values().size() / 2f) * (ModuleManager.clickGui.moduleWidth.getValue() + 4f));
 
             for (final Module.Category category : Managers.MODULE.getCategories()) {
                 if (category == Module.Category.HUD) continue;

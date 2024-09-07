@@ -144,7 +144,7 @@ public class SliderElement extends AbstractElement {
     @Override
     public void charTyped(char key, int keyCode) {
         if (StringHelper.isValidChar(key)) {
-            String k = ".";
+            String k = (key == '-' ? "-" : ".");
             try {
                 k = String.valueOf(Integer.parseInt(String.valueOf(key)));
             } catch (Exception ignored) {
