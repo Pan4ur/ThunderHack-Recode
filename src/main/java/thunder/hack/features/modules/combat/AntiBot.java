@@ -79,7 +79,7 @@ public final class AntiBot extends Module {
 
     private void addBot(PlayerEntity entity) {
         this.sendMessage(entity.getName().getString() + " is a bot!");
-        bots.add(ent);
+        bots.add(entity);
     }
 
     @Override
