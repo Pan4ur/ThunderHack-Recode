@@ -13,6 +13,7 @@ import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanSettingGroup;
+import java.util.Random;
 
 public final class TriggerBot extends Module {
     public final Setting<Float> attackRange = new Setting<>("Range", 3f, 1f, 7.0f);
@@ -23,6 +24,7 @@ public final class TriggerBot extends Module {
     public final Setting<Boolean> pauseEating = new Setting<>("PauseWhileEating", false);
 
     private int delay;
+    private final Random random = new Random(); // For random delay
 
     public TriggerBot() {
         super("TriggerBot", Category.COMBAT);
@@ -36,16 +38,21 @@ public final class TriggerBot extends Module {
         if (!mc.options.jumpKey.isPressed() && mc.player.isOnGround() && autoJump.getValue())
             mc.player.jump();
 
-        if (delay > 0) {
-            delay--;
-            return;
+        // Smart crits should not be delayed
+        if (!autoCrit()) {
+            if (delay > 0) {
+                delay--;
+                return;
+            }
         }
-        if (!autoCrit()) return;
+
         Entity ent = Managers.PLAYER.getRtxTarget(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());
         if (ent != null && !Managers.FRIEND.isFriend(ent.getName().getString())) {
             mc.interactionManager.attackEntity(mc.player, ent);
             mc.player.swingHand(Hand.MAIN_HAND);
-            delay = 10;
+
+            // Set delay for the next hit (10 to 20 ms)
+            delay = random.nextInt(11) + 2; // (20ms / 50ms per tick = ~0.4 ticks, 10ms / 50ms = ~0.2 ticks)
         }
     }
 
@@ -58,8 +65,6 @@ public final class TriggerBot extends Module {
                         || mc.player.isHoldingOntoLadder()
                         || mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos())).getBlock() == Blocks.COBWEB;
 
-
-        // я хз почему оно не критует когда фд больше 1.14
         if (mc.player.fallDistance > 1 && mc.player.fallDistance < 1.14)
             return false;
 
@@ -83,3 +88,4 @@ public final class TriggerBot extends Module {
         return true;
     }
 }
+
