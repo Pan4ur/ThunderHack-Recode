@@ -63,10 +63,6 @@ public class Companion extends HudElement {
             context.drawTexture(TextureStorage.baltika, (int) getPosX(), (int) getPosY(), 0, 0, 421, 800, 421, 800);
         else if(mode.getValue() == Mode.Kowk)
             context.drawTexture(TextureStorage.kowk, (int) getPosX(), (int) getPosY(), 0, 0, 287, 252, 287, 252);
-        else if(mode.getValue() == Mode.Hamster)
-            context.drawTexture(TextureStorage.hamster, (int) getPosX(), (int) getPosY(), 0, 0, 540, 540, 540, 540);
-        else if(mode.getValue() == Mode.SkibidiToilet)
-            context.drawTexture(TextureStorage.skibidi, (int) getPosX(), (int) getPosY(), 0, 0, 158, 285, 158, 285);
         context.getMatrices().pop();
 
         if (!lastPop.passedMs(2000)) {
@@ -104,6 +100,6 @@ public class Companion extends HudElement {
         lastPop.reset();
     }
     private enum Mode {
-        Boykisser, Paimon, Baltika, Kowk, Hamster, SkibidiToilet
+        Boykisser, Paimon, Baltika, Kowk
     }
 }
