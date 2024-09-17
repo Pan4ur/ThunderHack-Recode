@@ -91,19 +91,19 @@ public class AntiAim extends Module {
             rotationYaw =  mc.player.getYaw() % 360 + yawDelta.getValue();
 
         if (pitchMode.getValue() == Mode.Jitter) {
-            if ((mc.player.age % Speed.getValue() * 2) == 0) {
+            if ((mc.player.age % Speed.getValue()) * 2 == 0) {
                 rotationPitch = pitchDelta.getValue() / 2f;
             }
-            if ((mc.player.age % Speed.getValue() * 2) == Speed.getValue()) {
+            if ((mc.player.age % Speed.getValue()) * 2 == Speed.getValue()) {
                 rotationPitch = pitchDelta.getValue() / -2f;
             }
         }
 
         if (yawMode.getValue() == Mode.Jitter) {
-            if ((mc.player.age % Speed.getValue() * 2) == 0) {
+            if ((mc.player.age % Speed.getValue()) * 2 == 0) {
                 rotationYaw = yawDelta.getValue() / 2f + (float) yawOffset.getValue();
             }
-            if ((mc.player.age % Speed.getValue() * 2) == Speed.getValue()) {
+            if ((mc.player.age % Speed.getValue()) * 2 == Speed.getValue()) {
                 rotationYaw = yawDelta.getValue() / -2f + (float) yawOffset.getValue();
             }
         }
