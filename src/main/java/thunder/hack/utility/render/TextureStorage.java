@@ -48,6 +48,4 @@ public final class TextureStorage {
     public static final Identifier crackedSkin = Identifier.of("thunderhack", "textures/gui/elements/cracked.png");
     public static final Identifier questionPic = Identifier.of("thunderhack", "textures/gui/helper/pic1.png");
     public static final Identifier cutie = Identifier.of("thunderhack", "textures/gui/images/cutie.png");
-    public static final Identifier hamster = Identifier.of("thunderhack", "textures/hud/elements/epichamster.png");
-    public static final Identifier skibidi = Identifier.of("thunderhack", "textures/hud/elements/skibidi.png");
 }
