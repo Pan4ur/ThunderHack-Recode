@@ -17,12 +17,13 @@ public class AntiAim extends Module {
     private final Setting<Mode> pitchMode = new Setting<>("PitchMode", Mode.None);
     private final Setting<Mode> yawMode = new Setting<>("YawMode", Mode.None);
 
-    public enum Mode {None, RandomAngle, Spin, Sinus, Fixed, Static}
+    public enum Mode {None, RandomAngle, Spin, Sinus, Fixed, Static, Jitter}
 
 
     public Setting<Integer> Speed = new Setting<>("Speed", 1, 1, 45);
     public Setting<Integer> yawDelta = new Setting<>("YawDelta", 60, -360, 360);
     public Setting<Integer> pitchDelta = new Setting<>("PitchDelta", 10, -90, 90);
+    public Setting<Integer> yawOffset = new Setting<>("YawOffset", 0, -180, 180);
     public final Setting<Boolean> bodySync = new Setting<>("BodySync", true);
     public final Setting<Boolean> allowInteract = new Setting<>("AllowInteract", true);
 
@@ -73,7 +74,7 @@ public class AntiAim extends Module {
 
         if (yawMode.getValue() == Mode.Sinus) {
             yaw_sinus_step += Speed.getValue() / 10f;
-            rotationYaw = (float) (mc.player.getYaw() + yawDelta.getValue() * Math.sin(yaw_sinus_step));
+            rotationYaw = (float) ((mc.player.getYaw() + yawDelta.getValue() * Math.sin(yaw_sinus_step)) + yawOffset.getValue());
         }
 
         if (pitchMode.getValue() == Mode.Fixed)
@@ -88,6 +89,31 @@ public class AntiAim extends Module {
         }
         if (yawMode.getValue() == Mode.Static)
             rotationYaw =  mc.player.getYaw() % 360 + yawDelta.getValue();
+
+
+        // господи какое говно я написал
+        if (pitchMode.getValue() == Mode.Jitter) {
+
+            if (mc.player.age % (Speed.getValue() * 2) == 0) {
+                rotationPitch = pitchDelta.getValue() / 2f;
+            }
+
+            if (mc.player.age % (Speed.getValue() * 2) == Speed.getValue()) {
+                rotationPitch = pitchDelta.getValue() / -2f;
+            }
+        }
+
+        if (yawMode.getValue() == Mode.Jitter) {
+
+            if (mc.player.age % (Speed.getValue() * 2) == 0) {
+                rotationYaw = yawDelta.getValue() / 2f + (float) yawOffset.getValue() + mc.player.getYaw();
+            }
+
+            if (mc.player.age % (Speed.getValue() * 2) == Speed.getValue()) {
+                rotationYaw = yawDelta.getValue() / -2f + (float) yawOffset.getValue() + mc.player.getYaw();
+            }
+
+        }
 
         ModuleManager.rotations.fixRotation = rotationYaw;
     }
