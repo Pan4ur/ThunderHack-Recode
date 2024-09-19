@@ -15,7 +15,6 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.SearchInvResult;
 import thunder.hack.utility.world.HoleUtility;
 
-import java.awt.*;
 import java.util.Objects;
 
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
@@ -95,15 +94,13 @@ public final class Quiver extends Module {
     }
 
     private SearchInvResult getArrow(String name) {
-        SearchInvResult result = InventoryUtility.findInInventory(stack -> {
+        return InventoryUtility.findInInventory(stack -> {
             if (stack.getItem() instanceof TippedArrowItem tai) {
                 String key = tai.getTranslationKey(stack);
                 return key.contains("effect." + name);
             }
             return false;
         });
-
-        return result;
     }
 
     private void switchInvSlot(int from, int to) {
@@ -116,5 +113,4 @@ public final class Quiver extends Module {
         clickSlot(from);
         sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
     }
-
 }

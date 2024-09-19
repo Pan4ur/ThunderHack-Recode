@@ -1,7 +1,5 @@
 package thunder.hack.features.modules.player;
 
-import thunder.hack.features.modules.Module;
-import thunder.hack.setting.Setting;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.EnderChestBlock;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -10,6 +8,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import thunder.hack.features.modules.Module;
+import thunder.hack.setting.Setting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +30,10 @@ public class AutoTool extends Module {
 
     @Override
     public void onUpdate() {
-        if (!(mc.crosshairTarget instanceof BlockHitResult )) return;
+        if (!(mc.crosshairTarget instanceof BlockHitResult)) return;
         BlockHitResult result = (BlockHitResult) mc.crosshairTarget;
         BlockPos pos = result.getBlockPos();
-        if(mc.world.getBlockState(pos).isAir())
+        if (mc.world.getBlockState(pos).isAir())
             return;
 
         if (getTool(pos) != -1 && mc.options.attackKey.isPressed()) {
@@ -46,10 +46,9 @@ public class AutoTool extends Module {
             swap = true;
 
             swapDelay = System.currentTimeMillis();
-
         } else if (swap && !lastItem.isEmpty() && System.currentTimeMillis() >= swapDelay + 300 && swapBack.getValue()) {
-
-            if (silent.getValue()) mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(lastItem.get(0)));
+            if (silent.getValue())
+                mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(lastItem.get(0)));
             else mc.player.getInventory().selectedSlot = lastItem.get(0);
 
             itemIndex = lastItem.get(0);
@@ -57,7 +56,6 @@ public class AutoTool extends Module {
             swap = false;
         }
     }
-
 
     public static int getTool(final BlockPos pos) {
         int index = -1;

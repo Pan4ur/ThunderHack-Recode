@@ -52,11 +52,9 @@ public class ChestCounter extends HudElement {
         for (BlockEntity be : getBlockEntities()) {
             if (be instanceof ChestBlockEntity chest) {
                 ChestType chestType = mc.world.getBlockState(chest.getPos()).get(ChestBlock.CHEST_TYPE);
-                if(chestType == ChestType.SINGLE) {
+                if (chestType == ChestType.SINGLE) {
                     singleCount++;
-                } else {
-                    doubleCount++;
-                }
+                } else doubleCount++;
             }
         }
         return new Pair<>(singleCount, doubleCount / 2);

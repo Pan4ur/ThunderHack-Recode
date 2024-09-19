@@ -3,7 +3,6 @@ package thunder.hack.features.modules.misc;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.commons.io.IOUtils;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.features.hud.impl.StaffBoard;
 import thunder.hack.features.modules.Module;
@@ -20,10 +19,10 @@ import java.util.Random;
 
 public class Spammer extends Module {
     public static ArrayList<String> SpamList = new ArrayList<>();
-    public Setting<Mode> mode = new Setting<>("mode",Mode.Chat);
-    public Setting<Messages> messages = new Setting<>("messages",Messages.File);
+    public Setting<Mode> mode = new Setting<>("mode", Mode.Chat);
+    public Setting<Messages> messages = new Setting<>("messages", Messages.File);
     public Setting<WhisperPrefix> whisper_prefix = new Setting<>("prefix", WhisperPrefix.W, v -> mode.getValue() == Mode.Whispers);
-    public Setting<Boolean> global = new Setting<>("global", true,v -> mode.getValue() == Mode.Chat);
+    public Setting<Boolean> global = new Setting<>("global", true, v -> mode.getValue() == Mode.Chat);
     public Setting<Boolean> antiSpam = new Setting<>("AntiSpam", false);
     public Setting<Float> delay = new Setting<>("delay", 5f, 0f, 30f);
     private final Timer timer_delay = new Timer();
@@ -85,25 +84,29 @@ public class Spammer extends Module {
         }
     }
 
-    public String getPlayerName(){
-        try{
+    public String getPlayerName() {
+        try {
             List<String> list = StaffBoard.getOnlinePlayer();
-            if(list.isEmpty())
+            if (list.isEmpty())
                 return "";
-            return list.get(random.nextInt(0,list.size() - 1));
-        }catch (NullPointerException e){return null;}
+            return list.get(random.nextInt(0, list.size() - 1));
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
-    private void changeFact(){
+
+    private void changeFact() {
         Managers.ASYNC.run(() -> {
-            try{
+            try {
                 String jsonResponse = IOUtils.toString(new URL("https://catfact.ninja/fact?max_length=200"), StandardCharsets.UTF_8);
                 JsonObject jsonObject = new JsonParser().parse(jsonResponse).getAsJsonObject();
                 fact = jsonObject.get("fact").getAsString();
-            }catch (IOException e){
+            } catch (IOException e) {
                 disable(ClientSettings.isRu() ? "Не удалось загрузить факт,может ты включишь интернет?" : "Failed to load the fact, can you turn on the Internet?");
             }
         });
     }
+
     public static String generateRandomSymbol() {
         Random random = new Random();
         String randomSymbol = "[";
@@ -124,43 +127,50 @@ public class Spammer extends Module {
     public void onUpdate() {
         if (timer_delay.passedMs((long) (delay.getValue() * 1000))) {
             String c;
-            if(messages.getValue() == Messages.File){
+            if (messages.getValue() == Messages.File) {
                 if (SpamList.isEmpty()) {
                     disable(ClientSettings.isRu() ? "Файл spammer пустой!" : "The spammer file is empty!");
                     return;
                 }
                 c = SpamList.get(new Random().nextInt(SpamList.size()));
-            }else{
-                if(fact == null){return;}
+            } else {
+                if (fact == null) {
+                    return;
+                }
                 c = fact;
                 changeFact();
             }
-            if(antiSpam.getValue()){
-                c  += generateRandomSymbol();
+            if (antiSpam.getValue()) {
+                c += generateRandomSymbol();
             }
-            if(mode.getValue() == Mode.Chat){
+            if (mode.getValue() == Mode.Chat) {
                 if (c.charAt(0) == '/') {
                     c = c.replace("/", "");
                     mc.player.networkHandler.sendCommand(c);
                 } else mc.player.networkHandler.sendChatMessage(global.getValue() ? "!" + c : c);
-            }else{
-                try{
+            } else {
+                try {
                     String prefix = whisper_prefix.getValue().prefix;
                     mc.player.networkHandler.sendCommand(prefix + getPlayerName() + " " + c);
-                }catch (NullPointerException e){}
+                } catch (NullPointerException e) {
+                }
             }
 
             timer_delay.reset();
         }
     }
-    private enum Messages{File,CatFacts}
-    private enum Mode{Chat,Whispers}
+
+    private enum Messages {File, CatFacts}
+
+    private enum Mode {Chat, Whispers}
+
     private enum WhisperPrefix {
         W("w "),
         Msg("msg "),
         Tell("tell ");
 
         final String prefix;
+
         WhisperPrefix(String p) {
             prefix = p;
         }

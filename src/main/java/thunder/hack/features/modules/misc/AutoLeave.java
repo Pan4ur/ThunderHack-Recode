@@ -8,11 +8,12 @@ import net.minecraft.util.Formatting;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.features.modules.Module;
-import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InventoryUtility;
+
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class AutoLeave extends Module {
     public AutoLeave() {
@@ -27,8 +28,8 @@ public class AutoLeave extends Module {
     private final Setting<SettingGroup> leaveIf = new Setting<>("Leave if", new SettingGroup(false, 0));
     private final Setting<Boolean> low_hp = new Setting<>("LowHp", false).addToGroup(leaveIf);
     private final Setting<Boolean> totems = new Setting<>("Totems", false).addToGroup(leaveIf);
-    private final Setting<Integer> totemsCount = new Setting("TotemsCount", 2, 0, 10, v -> totems.getValue());
-    private final Setting<Float> leaveHp = new Setting("HP", 8.0f, 1f, 20.0f, v -> low_hp.getValue());
+    private final Setting<Integer> totemsCount = new Setting<>("TotemsCount", 2, 0, 10, v -> totems.getValue());
+    private final Setting<Float> leaveHp = new Setting<>("HP", 8.0f, 1f, 20.0f, v -> low_hp.getValue());
     private final Setting<LeaveMode> staff = new Setting<>("Staff", LeaveMode.None).addToGroup(leaveIf);
     private final Setting<LeaveMode> players = new Setting<>("Players", LeaveMode.Leave).addToGroup(leaveIf);
     private final Setting<Integer> distance = new Setting<>("Distance", 256, 4, 256, v -> players.getValue() != LeaveMode.None).addToGroup(leaveIf);
@@ -61,12 +62,12 @@ public class AutoLeave extends Module {
                 switch (players.getValue()) {
                     case Command -> {
                         if (autoDisable.getValue()) disable();
-                        sendMessage(ClientSettings.isRu() ? "Ливнул т.к. рядом появился игрок!" : "Logged out because there was a player!");
+                        sendMessage(isRu() ? "Ливнул т.к. рядом появился игрок!" : "Logged out because there was a player!");
                         mc.player.networkHandler.sendChatCommand(command.getValue());
                         return;
                     }
                     case Leave -> {
-                        leave(ClientSettings.isRu() ? "Ливнул т.к. рядом появился игрок" : "Logged out because there was a player");
+                        leave(isRu() ? "Ливнул т.к. рядом появился игрок" : "Logged out because there was a player");
                         return;
                     }
                 }
@@ -74,13 +75,13 @@ public class AutoLeave extends Module {
         }
 
         if (totems.getValue() && InventoryUtility.getItemCount(Items.TOTEM_OF_UNDYING) <= totemsCount.getValue())
-            leave(ClientSettings.isRu() ? "Ливнул т.к. кончились тотемы" : "Logged out because out of totems");
+            leave(isRu() ? "Ливнул т.к. кончились тотемы" : "Logged out because out of totems");
 
         if (mc.player.getHealth() < leaveHp.getValue() && low_hp.getValue())
-            leave(ClientSettings.isRu() ? "Ливнул т.к. мало хп" : "Logged out because ur hp is low");
+            leave(isRu() ? "Ливнул т.к. мало хп" : "Logged out because ur hp is low");
 
         if (staff.getValue() != LeaveMode.None && ModuleManager.staffBoard.isDisabled() && mc.player.age % 5 == 0)
-            sendMessage(ClientSettings.isRu() ? "Включи StaffBoard!" : "Turn on StaffBoard!");
+            sendMessage(isRu() ? "Включи StaffBoard!" : "Turn on StaffBoard!");
     }
 
     private void leave(String message) {
@@ -95,7 +96,7 @@ public class AutoLeave extends Module {
         else mc.player.networkHandler.getConnection().disconnect(Text.of("[AutoLeave] " + message));
     }
 
-    public void onStaff() {
+    /*public void onStaff() { todo
         if (!chatDelay.passedMs(1000))
             return;
         chatDelay.reset();
@@ -103,20 +104,18 @@ public class AutoLeave extends Module {
         if (hurtTimer.passedMs(30000) || !antiKTLeave.getValue()) {
             switch (staff.getValue()) {
                 case Command -> {
-                    sendMessage(ClientSettings.isRu() ? "Ливнул т.к. хелпер в спеке!" : "Logged out because helper in vanish!");
+                    sendMessage(isRu() ? "Ливнул т.к. хелпер в спеке!" : "Logged out because helper in vanish!");
                     mc.player.networkHandler.sendChatCommand(command.getValue());
                     if (autoDisable.getValue())
                         disable();
                 }
-                case Leave ->
-                        leave(ClientSettings.isRu() ? "Ливнул т.к. хелпер в спеке!" : "Logged out because helper in vanish!");
+                case Leave -> leave(isRu() ? "Ливнул т.к. хелпер в спеке!" : "Logged out because helper in vanish!");
             }
         }
-    }
+    }*/
 
     public static boolean isStaff(String name) {
-        if(name == null)
-            return false;
+        if (name == null) return false;
 
         name = name.toLowerCase();
 

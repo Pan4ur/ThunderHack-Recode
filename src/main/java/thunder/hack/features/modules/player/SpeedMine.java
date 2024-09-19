@@ -30,27 +30,30 @@ import thunder.hack.core.manager.player.PlayerManager;
 import thunder.hack.events.impl.EventAttackBlock;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.injection.accesors.IInteractionManager;
 import thunder.hack.features.modules.Module;
 import thunder.hack.features.modules.combat.AutoCrystal;
+import thunder.hack.injection.accesors.IInteractionManager;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.Timer;
-import thunder.hack.utility.world.ExplosionUtility;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
+import thunder.hack.utility.world.ExplosionUtility;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
 public final class SpeedMine extends Module {
+    public SpeedMine() {
+        super("SpeedMine", Category.PLAYER);
+    }
 
     public final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
     public final Setting<Boolean> doubleMine = new Setting<>("DoubleMine", false);
@@ -82,9 +85,6 @@ public final class SpeedMine extends Module {
     private final Setting<ColorSetting> startFillColor = new Setting<>("Start Fill Color", new ColorSetting(new Color(255, 0, 0, 120)), v -> mode.getValue() != Mode.Damage).addToGroup(render);
     private final Setting<ColorSetting> endFillColor = new Setting<>("End Fill Color", new ColorSetting(new Color(47, 255, 0, 120)), v -> mode.getValue() != Mode.Damage).addToGroup(render);
 
-    public SpeedMine() {
-        super("SpeedMine", Category.PLAYER);
-    }
 
     public ArrayList<MineAction> actions = new ArrayList<>();
 
@@ -126,10 +126,12 @@ public final class SpeedMine extends Module {
 
                         switch (renderMode.getValue()) {
                             case Block -> new Box(a.getPos());
-                            case Grow -> new Box(a.getPos().getX(), a.getPos().getY(), a.getPos().getZ(), a.getPos().getX() + 1, a.getPos().getY() + noom, a.getPos().getZ() + 1);
-                            case Shrink -> new Box(a.getPos().getX(), a.getPos().getY(), a.getPos().getZ(), a.getPos().getX(), a.getPos().getY(), a.getPos().getZ())
-                                    .shrink(noom, noom, noom)
-                                    .offset(0.5 + noom * 0.5, 0.5 + noom * 0.5, 0.5 + noom * 0.5);
+                            case Grow ->
+                                    new Box(a.getPos().getX(), a.getPos().getY(), a.getPos().getZ(), a.getPos().getX() + 1, a.getPos().getY() + noom, a.getPos().getZ() + 1);
+                            case Shrink ->
+                                    new Box(a.getPos().getX(), a.getPos().getY(), a.getPos().getZ(), a.getPos().getX(), a.getPos().getY(), a.getPos().getZ())
+                                            .shrink(noom, noom, noom)
+                                            .offset(0.5 + noom * 0.5, 0.5 + noom * 0.5, 0.5 + noom * 0.5);
                         };
 
                 Render3DEngine.FILLED_QUEUE.add(new Render3DEngine.FillAction(

@@ -46,7 +46,6 @@ public class ChestStealerArgumentType implements ArgumentType<String> {
         return EXAMPLES;
     }
 
-
     private static @NotNull List<String> getRegistered() {
         List<String> result = new ArrayList<>();
 

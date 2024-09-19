@@ -6,14 +6,13 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.features.cmd.Command;
 import thunder.hack.features.cmd.args.WayPointArgumentType;
 import thunder.hack.core.manager.world.WayPointManager;
-import thunder.hack.features.modules.client.ClientSettings;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class WayPointCommand extends Command {
     public WayPointCommand() {
@@ -23,8 +22,7 @@ public class WayPointCommand extends Command {
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("list").executes(context -> {
-            if (ClientSettings.language.getValue() == ClientSettings.Language.RU) sendMessage("Метки:");
-            else sendMessage("WayPoints:");
+            sendMessage(isRu() ? "Метки:" : "Waypoints:");
 
             sendMessage(" ");
             Managers.WAYPOINT.getWayPoints().forEach(wp -> sendMessage(wp.getName() + " X: " + wp.getX() + " Y: " + wp.getY() + " Z: " + wp.getZ() + " Server: " + wp.getServer() + " Dimension: " + wp.getDimension()));
@@ -34,14 +32,8 @@ public class WayPointCommand extends Command {
 
         builder.then(literal("remove").then(arg("name", WayPointArgumentType.create()).executes(context -> {
             WayPointManager.WayPoint wp = context.getArgument("name", WayPointManager.WayPoint.class);
-
             Managers.WAYPOINT.removeWayPoint(wp);
-
-            if (ClientSettings.language.getValue() == ClientSettings.Language.RU) {
-                sendMessage("Удалена метка " + wp.getName());
-            } else {
-                sendMessage("Removed waypoint " + wp.getName());
-            }
+            sendMessage(isRu() ? "Удалена метка " : "Deleted waypoint " + wp.getName());
 
             return SINGLE_SUCCESS;
         })));
@@ -51,11 +43,7 @@ public class WayPointCommand extends Command {
             WayPointManager.WayPoint wp = new WayPointManager.WayPoint((int) mc.player.getX(), (int) mc.player.getY(), (int) mc.player.getZ(), name, (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address), mc.world.getRegistryKey().getValue().getPath());
             Managers.WAYPOINT.addWayPoint(wp);
 
-            if (ClientSettings.language.getValue() == ClientSettings.Language.RU) {
-                sendMessage("Добавлена метка " + name + " с координатами x: " + ((int) mc.player.getX()) + " y: " + ((int) mc.player.getY()) + " z: " + ((int) mc.player.getZ()));
-            } else {
-                sendMessage("Added waypoint " + name + " with coords x: " + ((int) mc.player.getX()) + " y: " + ((int) mc.player.getY()) + " z: " + ((int) mc.player.getZ()));
-            }
+            sendMessage((isRu() ? "Добавлена метка " + name + " с координатами" : "Added waypoint " + name + " with coords") + " X: " + ((int) mc.player.getX()) + " Y: " + ((int) mc.player.getY()) + " Z: " + ((int) mc.player.getZ()));
 
             return SINGLE_SUCCESS;
         }).then(arg("x", IntegerArgumentType.integer())
@@ -67,11 +55,7 @@ public class WayPointCommand extends Command {
                             WayPointManager.WayPoint wp = new WayPointManager.WayPoint(pos.getX(), pos.getY(), pos.getZ(), name, (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address), mc.world.getRegistryKey().getValue().getPath());
                             Managers.WAYPOINT.addWayPoint(wp);
 
-                            if (ClientSettings.language.getValue() == ClientSettings.Language.RU) {
-                                sendMessage("Добавлена метка " + name + " с координатами x: " + pos.getX() + " y: " + pos.getY() + " z: " + pos.getZ());
-                            } else {
-                                sendMessage("Added waypoint " + name + " with coords x: " + pos.getX() + " y: " + pos.getY() + " z: " + pos.getZ());
-                            }
+                            sendMessage((isRu() ? "Добавлена метка " + name + " с координатами X: " : "Added waypoint " + name + " with coords") + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ());
 
                             return SINGLE_SUCCESS;
                         }))))));

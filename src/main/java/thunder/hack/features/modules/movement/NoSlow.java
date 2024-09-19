@@ -93,13 +93,13 @@ public class NoSlow extends Module {
 
     @EventHandler
     public void onKeyboardInput(EventKeyboardInput e) {
-        if(mode.getValue() == Mode.Matrix3 && mc.player.isUsingItem() && !mc.player.isFallFlying()) {
+        if (mode.getValue() == Mode.Matrix3 && mc.player.isUsingItem() && !mc.player.isFallFlying()) {
             mc.player.input.movementForward *= 5f;
             mc.player.input.movementSideways *= 5f;
             float mult = 1f;
 
             if (mc.player.isOnGround()) {
-                if(mc.player.input.movementForward != 0 && mc.player.input.movementSideways != 0) {
+                if (mc.player.input.movementForward != 0 && mc.player.input.movementSideways != 0) {
                     mc.player.input.movementForward *= 0.35f;
                     mc.player.input.movementSideways *= 0.35f;
                 } else {
@@ -107,7 +107,7 @@ public class NoSlow extends Module {
                     mc.player.input.movementSideways *= 0.5f;
                 }
             } else {
-                if(mc.player.input.movementForward != 0 && mc.player.input.movementSideways != 0) {
+                if (mc.player.input.movementForward != 0 && mc.player.input.movementSideways != 0) {
                     mult = 0.47f;
                 } else {
                     mult = 0.67f;

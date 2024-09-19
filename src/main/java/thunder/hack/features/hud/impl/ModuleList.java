@@ -71,7 +71,7 @@ public class ModuleList extends HudElement {
             stringWidth = (int) (FontRenderers.modules.getStringWidth(module.getDisplayName() + Formatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + Formatting.WHITE + module.getDisplayInfo() + Formatting.GRAY + "]") : "")) + 3);
             Color color1 = HudEditor.getColor(offset);
 
-            if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+            if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
                 Render2DEngine.drawRoundedBlur(context.getMatrices(), reverse ? reversedX - stringWidth : getPosX(), getPosY() + offset, stringWidth + 1.0f, 9.0f, 2, HudEditor.blurColor.getValue().getColorObject());
             } else {
                 Render2DEngine.drawRect(context.getMatrices(), reverse ? reversedX - stringWidth : getPosX(), getPosY() + offset, stringWidth + 1.0f, 9.0f, mode.getValue() == Mode.ColorRect ? color1 : color3.getValue().getColorObject());

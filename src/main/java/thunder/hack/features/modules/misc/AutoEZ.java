@@ -60,7 +60,7 @@ public final class AutoEZ extends Module {
                     }
                     boolean newline = false;
                     for (String l : lines) {
-                        if (l.equals("")) {
+                        if (l.isEmpty()) {
                             newline = true;
                             break;
                         }
@@ -70,7 +70,7 @@ public final class AutoEZ extends Module {
                     if (newline) {
                         StringBuilder spamChunk = new StringBuilder();
                         for (String l : lines) {
-                            if (l.equals("")) {
+                            if (l.isEmpty()) {
                                 if (!spamChunk.isEmpty()) {
                                     spamList.add(spamChunk.toString());
                                     spamChunk = new StringBuilder();

@@ -5,12 +5,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.features.cmd.Command;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-
 
 public class CalcCommand extends Command {
     public CalcCommand() {

@@ -383,7 +383,7 @@ public class ElytraPlus extends Module {
             e.setY(-0.07840000152587923);
 
         if ((infDurability.getValue() || ncpStrict.is(NCPStrict.Motion))) {
-            if (!MovementUtility.isMoving() && Math.abs(e.getX()) < 0.121 && Math.abs(e.getX()) < 0.121) {
+            if (!MovementUtility.isMoving() && Math.abs(e.getX()) < 0.121) {
                 float angleToRad = (float) Math.toRadians(4.5 * (mc.player.age % 80));
                 e.setX(Math.sin(angleToRad) * 0.12);
                 e.setZ(Math.cos(angleToRad) * 0.12);

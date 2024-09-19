@@ -12,7 +12,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.TotemPopEvent;
@@ -277,9 +276,8 @@ public class ChatUtils extends Module {
                 }
                 message = builder.toString();
             }
-            if (translit.getValue()) {
-                message = transliterate(message.toString());
-            }
+            if (translit.getValue())
+                message = transliterate(message);
             skip = message;
             mc.player.networkHandler.sendChatMessage(skip);
             e.cancel();

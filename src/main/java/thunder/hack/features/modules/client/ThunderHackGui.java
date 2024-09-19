@@ -12,7 +12,6 @@ public final class ThunderHackGui extends Module {
     public static final Setting<ColorSetting> onColor2 = new Setting<>("OnColor2", new ColorSetting(new Color(32, 1, 96, 255).getRGB()));
     public static final Setting<Float> scrollSpeed = new Setting<>("ScrollSpeed", 1f, 0.1F, 2.0F);
 
-
     public ThunderHackGui() {
         super("ThunderGui", Category.CLIENT);
     }

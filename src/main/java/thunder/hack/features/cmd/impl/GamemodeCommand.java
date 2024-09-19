@@ -15,7 +15,6 @@ public class GamemodeCommand extends Command {
 
     @Override
     public void executeBuild(LiteralArgumentBuilder<CommandSource> builder) {
-
         builder.then(arg("mode", StringArgumentType.greedyString()).executes(context -> {
             final String mode = context.getArgument("mode", String.class);
 

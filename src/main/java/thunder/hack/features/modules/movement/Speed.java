@@ -33,7 +33,6 @@ import static thunder.hack.features.modules.client.ClientSettings.isRu;
 import static thunder.hack.utility.player.MovementUtility.isMoving;
 
 public class Speed extends Module {
-
     public Speed() {
         super("Speed", Category.MOVEMENT);
     }

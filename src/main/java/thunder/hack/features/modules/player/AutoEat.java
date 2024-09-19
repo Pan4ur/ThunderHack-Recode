@@ -7,18 +7,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
-import org.jetbrains.annotations.NotNull;
 import thunder.hack.ThunderHack;
 import thunder.hack.injection.accesors.IMinecraftClient;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 
-import java.util.Stack;
-
-import static thunder.hack.features.modules.client.ClientSettings.isRu;
-
 public class AutoEat extends Module {
-
     public AutoEat() {
         super("AutoEat", Category.PLAYER);
     }

@@ -24,7 +24,6 @@ import thunder.hack.utility.player.MovementUtility;
 import static thunder.hack.features.modules.player.AutoTool.getTool;
 
 public class Phase extends Module {
-
     public Phase() {
         super("Phase", Category.MOVEMENT);
     }

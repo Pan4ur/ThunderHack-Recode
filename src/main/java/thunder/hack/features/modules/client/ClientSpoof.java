@@ -1,6 +1,5 @@
 package thunder.hack.features.modules.client;
 
-import org.jetbrains.annotations.NotNull;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 
@@ -17,24 +16,14 @@ public class ClientSpoof extends Module {
         Vanilla, Lunar1_20_4, Lunar1_20_1, Custom, Null
     }
 
+    @SuppressWarnings("StringOperationCanBeSimplified")
     public String getClientName() {
-        switch (mode.getValue()) {
-            case Vanilla -> {
-                return "vanilla";
-            }
-            case Lunar1_20_4 -> {
-                return "lunarclient:1.20.4";
-            }
-            case Lunar1_20_1 -> {
-                return "lunarclient:1.20.1";
-            }
-            case Custom -> {
-                return (String) custom.getValue();
-            }
-            default ->
-            {
-                return null;
-            }
-        }
+        return switch (mode.getValue()) {
+            case Vanilla -> "vanilla";
+            case Lunar1_20_4 -> "lunarclient:1.20.4";
+            case Lunar1_20_1 -> "lunarclient:1.20.1";
+            case Custom -> custom.getValue().toString();
+            default -> null;
+        };
     }
 }

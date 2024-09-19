@@ -19,13 +19,11 @@ import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import static thunder.hack.features.modules.render.StorageEsp.getBlockEntities;
 
 public class ChestStealer extends Module {
-
     public ChestStealer() {
         super("ChestStealer", Category.MISC);
     }
