@@ -3,9 +3,6 @@ package thunder.hack.utility.render.animation;
 import net.minecraft.util.math.MathHelper;
 import thunder.hack.utility.render.Render3DEngine;
 
-import static thunder.hack.features.modules.Module.mc;
-
-
 public class EaseOutBack {
     private int prevTick;
     private int tick;

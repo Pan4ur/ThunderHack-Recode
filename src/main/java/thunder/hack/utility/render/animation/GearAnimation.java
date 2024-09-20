@@ -4,8 +4,6 @@ import thunder.hack.features.modules.client.ClickGui;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
-import static thunder.hack.features.modules.Module.mc;
-
 public class GearAnimation {
     private float espValue = 1f, prevEspValue;
     private float espSpeed = 1f;

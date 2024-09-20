@@ -7,11 +7,11 @@ import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.world.WayPointManager;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
-import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -266,7 +266,8 @@ public class WaypointWindow extends WindowBase {
             if (hoveringAdd) {
                 try {
                     Managers.WAYPOINT.addWayPoint(new WayPointManager.WayPoint(Integer.parseInt(addX), Integer.parseInt(addY), Integer.parseInt(addZ), addName, addServer, addDimension));
-                } catch (Exception ignored){}
+                } catch (Exception ignored) {
+                }
                 refresh();
             }
         }
@@ -358,7 +359,7 @@ public class WaypointWindow extends WindowBase {
                                 }
                                 case X -> {
                                     String num = SliderElement.removeLastChar(String.valueOf(plate.waypoint.getX()));
-                                    if(num.isEmpty())
+                                    if (num.isEmpty())
                                         num = "0";
 
                                     plate.waypoint.setX(Integer.parseInt(num));
@@ -366,7 +367,7 @@ public class WaypointWindow extends WindowBase {
                                 }
                                 case Y -> {
                                     String num = SliderElement.removeLastChar(String.valueOf(plate.waypoint.getY()));
-                                    if(num.isEmpty())
+                                    if (num.isEmpty())
                                         num = "0";
 
                                     plate.waypoint.setY(Integer.parseInt(num));
@@ -374,7 +375,7 @@ public class WaypointWindow extends WindowBase {
                                 }
                                 case Z -> {
                                     String num = SliderElement.removeLastChar(String.valueOf(plate.waypoint.getZ()));
-                                    if(num.isEmpty())
+                                    if (num.isEmpty())
                                         num = "0";
 
                                     plate.waypoint.setZ(Integer.parseInt(num));
@@ -386,21 +387,11 @@ public class WaypointWindow extends WindowBase {
 
                     if (listeningId == -3) {
                         switch (listeningType) {
-                            case Name -> {
-                                addName = SliderElement.removeLastChar(addName);
-                            }
-                            case Server -> {
-                                addServer = SliderElement.removeLastChar(addServer);
-                            }
-                            case X -> {
-                                addX = SliderElement.removeLastChar(addX);
-                            }
-                            case Y -> {
-                                addY = SliderElement.removeLastChar(addY);
-                            }
-                            case Z -> {
-                                addZ = SliderElement.removeLastChar(addZ);
-                            }
+                            case Name -> addName = SliderElement.removeLastChar(addName);
+                            case Server -> addServer = SliderElement.removeLastChar(addServer);
+                            case X -> addX = SliderElement.removeLastChar(addX);
+                            case Y -> addY = SliderElement.removeLastChar(addY);
+                            case Z -> addZ = SliderElement.removeLastChar(addZ);
                         }
                     }
                 }
@@ -425,9 +416,12 @@ public class WaypointWindow extends WindowBase {
                         switch (listeningType) {
                             case Name -> plate.waypoint.setName(plate.waypoint.getName() + key);
                             case Server -> plate.waypoint.setServer(plate.waypoint.getServer() + key);
-                            case X -> plate.waypoint.setX(Integer.parseInt(String.valueOf(plate.waypoint.getX()) + key));
-                            case Y -> plate.waypoint.setY(Integer.parseInt(String.valueOf(plate.waypoint.getY()) + key));
-                            case Z -> plate.waypoint.setZ(Integer.parseInt(String.valueOf(plate.waypoint.getZ()) + key));
+                            case X ->
+                                    plate.waypoint.setX(Integer.parseInt(String.valueOf(plate.waypoint.getX()) + key));
+                            case Y ->
+                                    plate.waypoint.setY(Integer.parseInt(String.valueOf(plate.waypoint.getY()) + key));
+                            case Z ->
+                                    plate.waypoint.setZ(Integer.parseInt(String.valueOf(plate.waypoint.getZ()) + key));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

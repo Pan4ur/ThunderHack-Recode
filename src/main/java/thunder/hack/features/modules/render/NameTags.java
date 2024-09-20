@@ -39,7 +39,6 @@ import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector4d;
 import org.lwjgl.opengl.GL11;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.player.FriendManager;
 import thunder.hack.core.manager.client.ModuleManager;
@@ -61,6 +60,19 @@ import java.util.List;
 import java.util.*;
 
 public class NameTags extends Module {
+    private final Map<RegistryKey<Enchantment>, String> encMap = new HashMap<>();
+
+    public NameTags() {
+        super("NameTags", Category.RENDER);
+        encMap.put(Enchantments.BLAST_PROTECTION, "B");
+        encMap.put(Enchantments.PROTECTION, "P");
+        encMap.put(Enchantments.SHARPNESS, "S");
+        encMap.put(Enchantments.EFFICIENCY, "E");
+        encMap.put(Enchantments.UNBREAKING, "U");
+        encMap.put(Enchantments.POWER, "PO");
+        encMap.put(Enchantments.THORNS, "T");
+    }
+
     private final Setting<Boolean> self = new Setting<>("Self", false);
     private final Setting<Float> scale = new Setting<>("Scale", 1f, 0.1f, 10f);
     private final Setting<Boolean> resize = new Setting<>("Resize", false);
@@ -88,34 +100,6 @@ public class NameTags extends Module {
     private final Setting<Armor> armorMode = new Setting<>("ArmorMode", Armor.Full);
     private final Setting<Health> health = new Setting<>("Health", Health.Number);
 
-    private final Map<RegistryKey<Enchantment>, String> encMap = new HashMap<>();
-
-    public enum Font {
-        Fancy, Fast
-    }
-
-    public enum Armor {
-        None, Full, Durability
-    }
-
-    public enum Health {
-        Number, Hearts, Dots
-    }
-
-    private enum OutlineColor {
-        Sync, Custom, None, New
-    }
-
-    public NameTags() {
-        super("NameTags", Category.RENDER);
-        encMap.put(Enchantments.BLAST_PROTECTION, "B");
-        encMap.put(Enchantments.PROTECTION, "P");
-        encMap.put(Enchantments.SHARPNESS, "S");
-        encMap.put(Enchantments.EFFICIENCY, "E");
-        encMap.put(Enchantments.UNBREAKING, "U");
-        encMap.put(Enchantments.POWER, "PO");
-        encMap.put(Enchantments.THORNS, "T");
-    }
 
     public void onRender2D(DrawContext context) {
         if (mc.options.hudHidden) return;
@@ -143,7 +127,6 @@ public class NameTags extends Module {
 
             if (ping.getValue()) final_string += getPingColor(getEntityPing(ent)) + getEntityPing(ent) + "ms " + Formatting.WHITE;
             if (gamemode.getValue()) final_string += translateGamemode(getEntityGamemode(ent)) + " ";
-
 
             if (FriendManager.friends.stream().anyMatch(i -> i.contains(ent.getDisplayName().getString())) && NameProtect.hideFriends.getValue() && ModuleManager.nameProtect.isEnabled()) {
                 final_string += NameProtect.getCustomName() + " ";
@@ -557,10 +540,11 @@ public class NameTags extends Module {
         if (health > 15) return Formatting.GREEN + "";
         return Formatting.RED + "";
     }
-    public @NotNull String getPingColor(int ping){
-        if(ping <= 60) return Formatting.GREEN + "";
-        if(ping > 60 && ping < 120) return Formatting.YELLOW + "";
-        return  Formatting.RED + "";
+
+    public @NotNull String getPingColor(int ping) {
+        if (ping <= 60) return Formatting.GREEN + "";
+        if (ping > 60 && ping < 120) return Formatting.YELLOW + "";
+        return Formatting.RED + "";
     }
 
     private @NotNull Color getHealthColor2(float health) {
@@ -661,5 +645,21 @@ public class NameTags extends Module {
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
         context.drawTexture(TextureStorage.container, x, y, 0, 0, 176, 67, 176, 67);
         RenderSystem.enableBlend();
+    }
+
+    public enum Font {
+        Fancy, Fast
+    }
+
+    public enum Armor {
+        None, Full, Durability
+    }
+
+    public enum Health {
+        Number, Hearts, Dots
+    }
+
+    private enum OutlineColor {
+        Sync, Custom, None, New
     }
 }

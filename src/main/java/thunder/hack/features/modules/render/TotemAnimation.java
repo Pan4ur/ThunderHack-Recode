@@ -39,7 +39,6 @@ public class TotemAnimation extends Module {
 
     public void renderFloatingItem(float tickDelta) {
         if (floatingItem != null && floatingItemTimeLeft > 0 && !mode.is(Mode.Off)) {
-
             int scaledWidth = mc.getWindow().getScaledWidth();
             int scaledHeight = mc.getWindow().getScaledHeight();
 

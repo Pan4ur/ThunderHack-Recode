@@ -30,7 +30,7 @@ public class TunnelEsp extends Module {
         try {
             for (Box box_ : renderBoxes) {
                 // рандомные генерации
-                if(box_.getLengthZ() < 5 && box_.getLengthX() < 5)
+                if (box_.getLengthZ() < 5 && box_.getLengthX() < 5)
                     continue;
 
                 if (box.getValue()) Render3DEngine.drawFilledBox(stack, box_, color.getValue().getColorObject());
@@ -77,7 +77,7 @@ public class TunnelEsp extends Module {
         }
     }
 
-    private Box getFullBox(Box raw, int x, int y, int z, int mode){
+    private Box getFullBox(Box raw, int x, int y, int z, int mode) {
         BlockPos checkBp1 = new BlockPos(x, y, z + 1);
 
         Function<BlockPos, Boolean> check = getCheckByMode(mode);
@@ -167,7 +167,7 @@ public class TunnelEsp extends Module {
     }
 
 
-    private static boolean isAir(BlockPos bp){
+    private static boolean isAir(BlockPos bp) {
         return mc.world.isAir(bp);
     }
 }

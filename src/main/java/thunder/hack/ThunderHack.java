@@ -20,7 +20,6 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 import java.lang.invoke.MethodHandles;
 
-
 public class ThunderHack implements ModInitializer {
     public static final ModMetadata MOD_META;
 

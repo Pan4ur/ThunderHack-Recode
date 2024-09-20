@@ -12,9 +12,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
-import thunder.hack.features.cmd.Command;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
@@ -31,7 +29,6 @@ import static thunder.hack.features.modules.Module.mc;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class ItemSelectWindow extends WindowBase {
-
     private Setting<ItemSelectSetting> itemSetting;
     private ArrayList<ItemPlate> itemPlates = new ArrayList<>();
     private ArrayList<ItemPlate> allItems = new ArrayList<>();
@@ -87,7 +84,6 @@ public class ItemSelectWindow extends WindowBase {
 
         FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "All", getX() + 25, getY() + 25, tabColor1);
         FontRenderers.sf_medium_mini.drawString(context.getMatrices(), "Selected", getX() + 60, getY() + 25, tabColor2);
-
 
         if (!allTab && itemPlates.isEmpty()) {
             FontRenderers.sf_medium.drawCenteredString(context.getMatrices(), isRu() ? "Тут пока пусто" : "It's empty here yet",

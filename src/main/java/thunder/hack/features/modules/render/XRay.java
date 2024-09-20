@@ -14,11 +14,11 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.events.impl.EventMove;
-import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.EventSetting;
-import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.features.modules.Module;
 import thunder.hack.features.modules.client.HudEditor;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.FrameRateCounter;
@@ -34,7 +34,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class XRay extends Module {
-
     public XRay() {
         super("XRay", Category.MISC);
     }
@@ -66,10 +65,6 @@ public class XRay extends Module {
     private BlockPos displayBlock;
     private int done, all;
     private Box area = new Box(BlockPos.ORIGIN);
-
-    private enum Plugin {
-        Old, New;
-    }
 
     @Override
     public void onEnable() {
@@ -145,8 +140,7 @@ public class XRay extends Module {
             });
     }
 
-    public void onRender3D(MatrixStack stack) {
-        // FABOS IDI NAHUI
+    public void onRender3D(MatrixStack stack) { //FABOS IDI NAHUI
         for (BlockPos pos : ores) {
             Block block = mc.world.getBlockState(pos).getBlock();
             if ((block == Blocks.DIAMOND_ORE || block == Blocks.DEEPSLATE_DIAMOND_ORE) && diamond.getValue())
@@ -169,7 +163,8 @@ public class XRay extends Module {
 
         if (displayBlock != null && (done != all)) draw(displayBlock, 255, 0, 60);
 
-        if (brutForce.getValue()) Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(area, HudEditor.getColor(1), 2));
+        if (brutForce.getValue())
+            Render3DEngine.OUTLINE_QUEUE.add(new Render3DEngine.OutlineAction(area, HudEditor.getColor(1), 2));
 
         if (toCheck.isEmpty() || !brutForce.getValue()) return;
 
@@ -217,7 +212,7 @@ public class XRay extends Module {
             double time = 0;
             try {
                 time = MathUtility.round((all - done) * ((1000. / FrameRateCounter.INSTANCE.getFps() + delay.getValue()) / 1000f), 1);
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ignored) {
             }
             FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), done + " / " + all + (isRu() ? " Осталось: " : " Estimated time: ") + time + "s", posX + 68, posY + 18, -1);
 
@@ -269,5 +264,9 @@ public class XRay extends Module {
         private boolean isDelayed() {
             return this.time++ > 10;
         }
+    }
+
+    private enum Plugin {
+        Old, New;
     }
 }

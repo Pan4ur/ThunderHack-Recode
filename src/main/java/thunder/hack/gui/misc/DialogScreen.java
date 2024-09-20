@@ -7,7 +7,6 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.utility.render.Render2DEngine;
-import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 

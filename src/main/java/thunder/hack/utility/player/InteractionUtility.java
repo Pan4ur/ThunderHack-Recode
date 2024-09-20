@@ -118,12 +118,8 @@ public final class InteractionUtility {
             case None -> {
 
             }
-            case Default -> {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
-            }
-            case Grim -> {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), angle[0], angle[1], mc.player.isOnGround()));
-            }
+            case Default -> mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(angle[0], angle[1], mc.player.isOnGround()));
+            case Grim -> mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), angle[0], angle[1], mc.player.isOnGround()));
         }
 
         if (mode == PlaceMode.Normal)
@@ -205,7 +201,6 @@ public final class InteractionUtility {
 
 
     public static @NotNull ArrayList<BlockPosWithFacing> getSupportBlocks(@NotNull BlockPos bp) {
-
         ArrayList<BlockPosWithFacing> list = new ArrayList<>();
 
         if (mc.world.getBlockState(bp.add(0, -1, 0)).isSolid() || awaiting.containsKey(bp.add(0, -1, 0)))
@@ -441,7 +436,7 @@ public final class InteractionUtility {
         };
     }
 
-    private static boolean shouldSkipPoint(Vec3d point, BlockPos bp, Direction dir, float wallRange , float range) {
+    private static boolean shouldSkipPoint(Vec3d point, BlockPos bp, Direction dir, float wallRange, float range) {
         RaycastContext context = new RaycastContext(InteractionUtility.getEyesPos(mc.player), point, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player);
         BlockHitResult result = mc.world.raycast(context);
 

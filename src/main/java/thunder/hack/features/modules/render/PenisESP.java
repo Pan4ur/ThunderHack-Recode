@@ -9,26 +9,26 @@ import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render3DEngine;
-import static thunder.hack.core.Managers.FRIEND;
-
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PenisESP extends Module {
-    private final Setting<Boolean> onlyOwn = new Setting<>("OnlyOwn",false);
-    private final Setting<Float> ballSize = new Setting<>("BallSize",0.1f,0.1f,0.5f);
-    private final Setting<Float> penisSize = new Setting<>("PenisSize",1.5f,0.1f,3.0f);
-    private final Setting<Float> friendSize = new Setting<>("FriendSize",1.5f,0.1f,3.0f);
-    private final Setting<Float> enemySize = new Setting<>("EnemySize",0.5f,0.1f,3.0f);
-    private final Setting<Integer> gradation = new Setting<>("Gradation",30,20,100);
-    private final Setting<ColorSetting> penisColor = new Setting<>("PenisColor", new ColorSetting(new Color(231, 180, 122,255)));
-    private final Setting<ColorSetting> headColor = new Setting<>("HeadColor", new ColorSetting(new Color(240, 50, 180,255)));
+import static thunder.hack.core.Managers.FRIEND;
 
-    public PenisESP(){
-        super("PenisESP",Category.RENDER);
+public class PenisESP extends Module {
+    public PenisESP() {
+        super("PenisESP", Category.RENDER);
     }
+
+    private final Setting<Boolean> onlyOwn = new Setting<>("OnlyOwn", false);
+    private final Setting<Float> ballSize = new Setting<>("BallSize", 0.1f, 0.1f, 0.5f);
+    private final Setting<Float> penisSize = new Setting<>("PenisSize", 1.5f, 0.1f, 3.0f);
+    private final Setting<Float> friendSize = new Setting<>("FriendSize", 1.5f, 0.1f, 3.0f);
+    private final Setting<Float> enemySize = new Setting<>("EnemySize", 0.5f, 0.1f, 3.0f);
+    private final Setting<Integer> gradation = new Setting<>("Gradation", 30, 20, 100);
+    private final Setting<ColorSetting> penisColor = new Setting<>("PenisColor", new ColorSetting(new Color(231, 180, 122, 255)));
+    private final Setting<ColorSetting> headColor = new Setting<>("HeadColor", new ColorSetting(new Color(240, 50, 180, 255)));
 
     @Override
     public void onRender2D(DrawContext event) {
@@ -42,8 +42,8 @@ public class PenisESP extends Module {
             Vec3d left = forward.add(Vec3d.fromPolar(0, player.getYaw() - 90).multiply(ballSize.getValue()));
             Vec3d right = forward.add(Vec3d.fromPolar(0, player.getYaw() + 90).multiply(ballSize.getValue()));
 
-            drawBall(player,  ballSize.getValue(), gradation.getValue(), left, penisColor.getValue().getColorObject(), 0);
-            drawBall(player,  ballSize.getValue(), gradation.getValue(), right, penisColor.getValue().getColorObject(), 0);
+            drawBall(player, ballSize.getValue(), gradation.getValue(), left, penisColor.getValue().getColorObject(), 0);
+            drawBall(player, ballSize.getValue(), gradation.getValue(), right, penisColor.getValue().getColorObject(), 0);
             drawPenis(player, event.getMatrices(), size, forward);
         }
     }
@@ -84,7 +84,7 @@ public class PenisESP extends Module {
                     }
                 }
 
-                Render3DEngine.drawLine(vec3d,new Vec3d(x2,y2,z2),color);
+                Render3DEngine.drawLine(vec3d, new Vec3d(x2, y2, z2), color);
             }
         }
     }
@@ -99,11 +99,11 @@ public class PenisESP extends Module {
             if (!vec3d.isInRange(copy, 0.145)) return;
             if (vec3d.isInRange(copy, 0.135)) return;
             Vec3d pos = vec3d.add(Vec3d.fromPolar(0, player.getYaw()).multiply(size));
-            Render3DEngine.drawLine(vec3d,pos,penisColor.getValue().getColorObject());
+            Render3DEngine.drawLine(vec3d, pos, penisColor.getValue().getColorObject());
         });
 
-        drawBall(player,  0.1, gradation.getValue(), start, penisColor.getValue().getColorObject(), 1);
-        drawBall(player,  0.1, gradation.getValue(), end, headColor.getValue().getColorObject(), 2);
+        drawBall(player, 0.1, gradation.getValue(), start, penisColor.getValue().getColorObject(), 1);
+        drawBall(player, 0.1, gradation.getValue(), end, headColor.getValue().getColorObject(), 2);
     }
 
     public List<Vec3d> getVec3ds(Vec3d vec3d, double radius) {

@@ -1,7 +1,5 @@
 package thunder.hack.utility.render;
 
-import static thunder.hack.features.modules.Module.mc;
-
 public class TextUtil {
     private final String[] words;
     private String currentWord = "_", currentResult = "_";

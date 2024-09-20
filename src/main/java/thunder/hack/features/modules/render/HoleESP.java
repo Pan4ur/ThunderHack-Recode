@@ -21,6 +21,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HoleESP extends Module {
+    public HoleESP() {
+        super("HoleESP", Category.RENDER);
+    }
+
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.CubeOutline);
     private final Setting<Integer> rangeXZ = new Setting<>("Range XY", 10, 1, 128);
     private final Setting<Integer> rangeY = new Setting<>("Range Y", 5, 1, 128);
@@ -32,20 +36,8 @@ public class HoleESP extends Module {
     private final Setting<Float> lineWith = new Setting<>("Line Width", 0.5f, 0.01f, 5f);
     public final Setting<Boolean> culling = new Setting<>("Culling", true, v -> mode.getValue() == Mode.Fade || mode.getValue() == Mode.Fade2);
 
-    private enum Mode {
-        Fade,
-        Fade2,
-        CubeOutline,
-        CubeFill,
-        CubeBoth
-    }
-
     private final Timer logicTimer = new Timer();
     private final List<BoxWithColor> positions = new CopyOnWriteArrayList<>();
-
-    public HoleESP() {
-        super("HoleESP", Category.RENDER);
-    }
 
     @Override
     public void onDisable() {
@@ -78,7 +70,6 @@ public class HoleESP extends Module {
                 new Render3DEngine.OutlineSideAction(posWithColor.box, getColor(posWithColor.box, posWithColor.color(), posWithColor.color.getAlpha()), lineWith.getValue(), Direction.DOWN)
         );
     }
-
 
     public void renderFade2(@NotNull HoleESP.BoxWithColor boxWithColor) {
         Render3DEngine.FADE_QUEUE.add(
@@ -187,5 +178,13 @@ public class HoleESP extends Module {
     }
 
     public record BoxWithColor(Box box, Color color) {
+    }
+
+    private enum Mode {
+        Fade,
+        Fade2,
+        CubeOutline,
+        CubeFill,
+        CubeBoth
     }
 }
