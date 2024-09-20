@@ -10,11 +10,12 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import thunder.hack.core.Managers;
-import thunder.hack.features.modules.client.ClientSettings;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class FriendArgumentType implements ArgumentType<String> {
     private static final List<String> EXAMPLES = Managers.FRIEND.getFriends().stream().limit(5).toList();
@@ -27,7 +28,7 @@ public class FriendArgumentType implements ArgumentType<String> {
     public String parse(StringReader reader) throws CommandSyntaxException {
         String friend = reader.readString();
         if (!Managers.FRIEND.isFriend(friend)) throw new DynamicCommandExceptionType(
-                name -> Text.literal(ClientSettings.language.getValue().equals(ClientSettings.Language.RU) ? "Друга с именем " + name.toString() + " не существует(" : "Friend with name " + name.toString() + " does not exists(")
+                name -> Text.literal(isRu() ? "Друга с именем " + name.toString() + " не существует(" : "Friend with name " + name.toString() + " does not exist :(")
         ).create(friend);
 
         return friend;

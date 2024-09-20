@@ -9,12 +9,12 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
-import thunder.hack.features.modules.client.ClientSettings;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class CfgArgumentType implements ArgumentType<String> {
     private static final Collection<String> EXAMPLES = Managers.CONFIG.getConfigList().stream()
@@ -29,7 +29,7 @@ public class CfgArgumentType implements ArgumentType<String> {
     public String parse(StringReader reader) throws CommandSyntaxException {
         String config = reader.readString();
         if (!Managers.CONFIG.getConfigList().contains(config)) throw new DynamicCommandExceptionType(
-                name -> Text.literal(ClientSettings.language.getValue().equals(ClientSettings.Language.RU) ? "Конфига " + name.toString() + " не существует(" : "Config " + name.toString() + " does not exists(")
+                name -> Text.literal(isRu() ? "Конфига " + name.toString() + " не существует(" : "Config " + name.toString() + " does not exist :(")
         ).create(config);
 
         return config;

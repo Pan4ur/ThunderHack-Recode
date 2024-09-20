@@ -9,13 +9,13 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.features.modules.Module;
-import thunder.hack.features.modules.client.ClientSettings;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class ModuleArgumentType implements ArgumentType<Module> {
     private static final Collection<String> EXAMPLES = Managers.MODULE.modules.stream()
@@ -31,7 +31,7 @@ public class ModuleArgumentType implements ArgumentType<Module> {
     public Module parse(StringReader reader) throws CommandSyntaxException {
         Module module = Managers.MODULE.get(reader.readString());
         if (module == null) throw new DynamicCommandExceptionType(
-                name -> Text.literal(ClientSettings.language.getValue().equals(ClientSettings.Language.RU) ? "Модуля " + name.toString() + " не существует(" : "Module " + name.toString() + " does not exists(")
+                name -> Text.literal(isRu() ? "Модуля " + name.toString() + " не существует(" : "Module " + name.toString() + " does not exist :(")
         ).create(reader.readString());
 
         return module;

@@ -6,7 +6,6 @@ import org.apache.commons.io.IOUtils;
 import thunder.hack.core.Managers;
 import thunder.hack.features.hud.impl.StaffBoard;
 import thunder.hack.features.modules.Module;
-import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 
@@ -16,6 +15,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class Spammer extends Module {
     public static ArrayList<String> SpamList = new ArrayList<>();
@@ -102,7 +103,7 @@ public class Spammer extends Module {
                 JsonObject jsonObject = new JsonParser().parse(jsonResponse).getAsJsonObject();
                 fact = jsonObject.get("fact").getAsString();
             } catch (IOException e) {
-                disable(ClientSettings.isRu() ? "Не удалось загрузить факт,может ты включишь интернет?" : "Failed to load the fact, can you turn on the Internet?");
+                disable(isRu() ? "Не удалось загрузить факт, может ты включишь интернет?" : "Failed to load the fact, can you turn on the Internet?");
             }
         });
     }
@@ -129,7 +130,7 @@ public class Spammer extends Module {
             String c;
             if (messages.getValue() == Messages.File) {
                 if (SpamList.isEmpty()) {
-                    disable(ClientSettings.isRu() ? "Файл spammer пустой!" : "The spammer file is empty!");
+                    disable(isRu() ? "Файл spammer пустой!" : "The spammer file is empty!");
                     return;
                 }
                 c = SpamList.get(new Random().nextInt(SpamList.size()));
