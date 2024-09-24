@@ -529,8 +529,8 @@ public final class AutoAnchor extends Module {
             renderPos = data.bp();
         }
 
-     //   if (!placedAnchors.containsKey(data.bp()))
-      //      placedAnchors.put(data.bp(), System.currentTimeMillis());
+        //if (!placedAnchors.containsKey(data.bp()))
+        //placedAnchors.put(data.bp(), System.currentTimeMillis());
 
         renderPositions.put(data.bp(), System.currentTimeMillis());
 

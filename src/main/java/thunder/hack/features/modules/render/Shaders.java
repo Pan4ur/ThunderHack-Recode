@@ -4,22 +4,20 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ShaderManager;
-import thunder.hack.injection.accesors.IGameRenderer;
 import thunder.hack.features.modules.Module;
+import thunder.hack.injection.accesors.IGameRenderer;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.render.Render3DEngine;
 
+//Thanks to @0x3C50 for Shader rendering example
 public class Shaders extends Module {
     public Shaders() {
         super("Shaders", Category.RENDER);
     }
-
-    //Thanks to @0x3C50 for Shader rendering example
 
     private final Setting<SettingGroup> select = new Setting<>("Select", new SettingGroup(false, 0));
     private final Setting<Boolean> hands = new Setting<>("Hands", true).addToGroup(select);

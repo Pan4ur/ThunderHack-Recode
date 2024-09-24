@@ -7,11 +7,12 @@ import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 
 public class LevitationControl extends Module {
-    private final Setting<Integer> upAmplifier = new Setting<>("Up Speed", 1, 1, 5);
-    private final Setting<Integer> downAmplifier = new Setting<>("Down Speed", 1, 1, 5);
     public LevitationControl() {
         super("LevitCtrl", Category.MOVEMENT);
     }
+
+    private final Setting<Integer> upAmplifier = new Setting<>("Up Speed", 1, 1, 5);
+    private final Setting<Integer> downAmplifier = new Setting<>("Down Speed", 1, 1, 5);
 
     @EventHandler
     public void onMove(EventMove e) {

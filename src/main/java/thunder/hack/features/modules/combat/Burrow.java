@@ -20,7 +20,6 @@ import net.minecraft.util.math.Vec3d;
 import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.features.modules.Module;
-import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
@@ -29,6 +28,8 @@ import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.SearchInvResult;
 
 import java.lang.reflect.Field;
+
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public final class Burrow extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Default);
@@ -105,7 +106,7 @@ public final class Burrow extends Module {
         if (wait.getValue()) {
             BlockPos currentPos = getPlayerPos();
             if (!currentPos.equals(startPos)) {
-                disable(ClientSettings.isRu() ? "Отключен из-за движения!" : "Disabled due to movement!");
+                disable(isRu() ? "Отключен из-за движения!" : "Disabled due to movement!");
                 return;
             }
         }
@@ -113,7 +114,7 @@ public final class Burrow extends Module {
         BlockPos pos = getPosition(mc.player);
         if (!mc.world.getBlockState(pos).isReplaceable()) {
             if (!wait.getValue())
-                disable(ClientSettings.isRu() ? "Невозможно поставить блок! Отключаю.." : "Can't place the block! Disabling..");
+                disable(isRu() ? "Невозможно поставить блок! Отключаю.." : "Can't place the block! Disabling..");
             return;
         }
 
@@ -127,7 +128,7 @@ public final class Burrow extends Module {
                     continue;
                 }
                 if (!wait.getValue())
-                    disable(ClientSettings.isRu() ? "Невозможно поставить блок! Отключаю.." : "Can't place the block on! Disabling..");
+                    disable(isRu() ? "Невозможно поставить блок! Отключаю.." : "Can't place the block on! Disabling..");
                 return;
             }
         }
@@ -143,7 +144,7 @@ public final class Burrow extends Module {
         SearchInvResult webResult = InventoryUtility.findBlockInHotBar(Blocks.COBWEB);
 
         if (!webResult.found()) {
-            disable(ClientSettings.isRu() ? "Нет паутины!" : "No webs found!");
+            disable(isRu() ? "Нет паутины!" : "No webs found!");
             return;
         }
 
@@ -156,7 +157,7 @@ public final class Burrow extends Module {
             timer.reset();
             InventoryUtility.returnSlot();
             if (!wait.getValue() || placeDisable.getValue())
-                disable(ClientSettings.isRu() ? "Успешно забурровился! Отключаю.." : "Successfully burrowed! Disabling..");
+                disable(isRu() ? "Успешно забурровился! Отключаю.." : "Successfully burrowed! Disabling..");
         }
     }
 
@@ -164,7 +165,7 @@ public final class Burrow extends Module {
         SearchInvResult skullResult = InventoryUtility.getSkull();
 
         if (!skullResult.found()) {
-            disable(ClientSettings.isRu() ? "Нет голов!" : "No heads found!");
+            disable(isRu() ? "Нет голов!" : "No heads found!");
             return;
         }
 
@@ -176,7 +177,7 @@ public final class Burrow extends Module {
             timer.reset();
             InventoryUtility.returnSlot();
             if (!wait.getValue() || placeDisable.getValue())
-                disable(ClientSettings.isRu() ? "Успешно забурровился! Отключаю.." : "Successfully burrowed! Disabling..");
+                disable(isRu() ? "Успешно забурровился! Отключаю.." : "Successfully burrowed! Disabling..");
         }
     }
 
@@ -197,7 +198,7 @@ public final class Burrow extends Module {
             BlockState upState = mc.world.getBlockState(upUp);
             if (upState.blocksMovement()) {
                 if (!wait.getValue())
-                    disable(ClientSettings.isRu() ? "Над головой блок, невозможно забурровиться! Отключаю.." : "Above the head block, impossible to burrow! Disabling..");
+                    disable(isRu() ? "Над головой блок, невозможно забурровиться! Отключаю.." : "Above the head block, impossible to burrow! Disabling..");
                 return;
             }
         }
@@ -207,7 +208,7 @@ public final class Burrow extends Module {
 
         int slot = (!obbyResult.found() || mc.world.getBlockState(pos.down()).getBlock() == Blocks.ENDER_CHEST ? echestResult.slot() : obbyResult.slot());
         if (slot == -1) {
-            disable(ClientSettings.isRu() ? "Нет блоков!" : "No Block found!");
+            disable(isRu() ? "Нет блоков!" : "No Block found!");
             return;
         }
 
@@ -219,7 +220,7 @@ public final class Burrow extends Module {
         float[] r = InteractionUtility.getPlaceAngle(pos, InteractionUtility.Interact.Strict, true);
 
         if (mc.isInSingleplayer()) {
-            disable(ClientSettings.isRu() ? "Дебил! Ты в одиночке.." : "Retard! You're in singleplayer..");
+            disable(isRu() ? "Дебил! Ты в одиночке.." : "Retard! You're in singleplayer..");
             return;
         }
 
@@ -244,7 +245,7 @@ public final class Burrow extends Module {
             InventoryUtility.returnSlot();
 
             if (!wait.getValue() || placeDisable.getValue())
-                disable(ClientSettings.isRu() ? "Успешно забурровился! Отключаю.." : "Successfully burrowed! Disabling..");
+                disable(isRu() ? "Успешно забурровился! Отключаю.." : "Successfully burrowed! Disabling..");
         }
     }
 

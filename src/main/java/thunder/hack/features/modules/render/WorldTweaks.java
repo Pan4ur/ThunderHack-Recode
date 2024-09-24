@@ -15,12 +15,12 @@ public class WorldTweaks extends Module {
         super("WorldTweaks", Category.RENDER);
     }
 
-    public static final Setting<BooleanSettingGroup> fogModify = new Setting("FogModify", new BooleanSettingGroup(true));
-    public static final Setting<Integer> fogStart = new Setting("FogStart", 0, 0, 256).addToGroup(fogModify);
-    public static final Setting<Integer> fogEnd = new Setting("FogEnd", 64, 10, 256).addToGroup(fogModify);
+    public static final Setting<BooleanSettingGroup> fogModify = new Setting<>("FogModify", new BooleanSettingGroup(true));
+    public static final Setting<Integer> fogStart = new Setting<>("FogStart", 0, 0, 256).addToGroup(fogModify);
+    public static final Setting<Integer> fogEnd = new Setting<>("FogEnd", 64, 10, 256).addToGroup(fogModify);
     public static final Setting<ColorSetting> fogColor = new Setting<>("FogColor", new ColorSetting(new Color(0xA900FF))).addToGroup(fogModify);
     public final Setting<Boolean> ctime = new Setting<>("ChangeTime", false);
-    public final Setting<Integer> ctimeVal = new Setting("Time", 21, 0, 23);
+    public final Setting<Integer> ctimeVal = new Setting<>("Time", 21, 0, 23);
 
     long oldTime;
 

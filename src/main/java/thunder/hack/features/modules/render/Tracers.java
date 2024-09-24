@@ -3,7 +3,6 @@ package thunder.hack.features.modules.render;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
@@ -13,7 +12,6 @@ import thunder.hack.utility.render.Render3DEngine;
 import java.awt.*;
 
 public class Tracers extends Module {
-
     public Tracers() {
         super("Tracers", Category.RENDER);
     }
@@ -23,9 +21,7 @@ public class Tracers extends Module {
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(new Color(0x93FF0000, true)));
     private final Setting<ColorSetting> friendColor = new Setting<>("Friends", new ColorSetting(new Color(0x9317DE5D, true)));
 
-
     public void onRender3D(MatrixStack stack) {
-
         for (PlayerEntity player : Managers.ASYNC.getAsyncPlayers()) {
             if (player == mc.player)
                 continue;

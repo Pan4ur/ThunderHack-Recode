@@ -27,6 +27,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static thunder.hack.utility.render.Render2DEngine.*;
 
 public class HitParticles extends Module {
+    public HitParticles() {
+        super("HitParticles", Category.RENDER);
+    }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Stars);
     private final Setting<Physics> physics = new Setting<>("Physics", Physics.Fall);
@@ -39,10 +42,6 @@ public class HitParticles extends Module {
     private final Setting<ColorMode> colorMode = new Setting<>("ColorMode", ColorMode.Sync);
     private final Setting<ColorSetting> colorH = new Setting<>("HealColor", new ColorSetting(3142544), v -> mode.is(Mode.Text));
     private final Setting<ColorSetting> colorD = new Setting<>("DamageColor", new ColorSetting(15811379), v -> mode.is(Mode.Text));
-
-    public HitParticles() {
-        super("HitParticles", Category.RENDER);
-    }
 
     private final HashMap<Integer, Float> healthMap = new HashMap<>();
     private final CopyOnWriteArrayList<Particle> particles = new CopyOnWriteArrayList<>();

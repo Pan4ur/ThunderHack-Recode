@@ -20,12 +20,12 @@ public class BindElement extends AbstractElement {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        FontRenderers.sf_medium_mini.drawString(context.getMatrices(),setting.getName(), getX() + 6, (getY()  + height / 2 - 3) + 2, new Color(-1).getRGB());
+        FontRenderers.sf_medium_mini.drawString(context.getMatrices(), setting.getName(), getX() + 6, (getY() + height / 2 - 3) + 2, new Color(-1).getRGB());
 
         float tWidth = FontRenderers.sf_medium_mini.getStringWidth(isListening ? "..." : (((Bind) setting.getValue()).getBind()));
 
         Render2DEngine.drawRect(context.getMatrices(), getX() + (getWidth() - tWidth - 11), getY() + 2, tWidth + 4, 10, new Color(0x94000000, true));
-        FontRenderers.sf_medium_mini.drawString(context.getMatrices(),isListening ? "..." : (((Bind) setting.getValue()).getBind()), getX() + (getWidth() - tWidth - 9), (getY()  + height / 2 - 1), new Color(-1).getRGB());
+        FontRenderers.sf_medium_mini.drawString(context.getMatrices(), isListening ? "..." : (((Bind) setting.getValue()).getBind()), getX() + (getWidth() - tWidth - 9), (getY() + height / 2 - 1), new Color(-1).getRGB());
     }
 
     @Override

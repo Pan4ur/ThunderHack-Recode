@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 public final class Breaker extends Module {
-
     private final Setting<Target> targetMode = new Setting<>("Target", Target.AutoCrystal);
     private final Setting<Boolean> onlyIfHole = new Setting<>("OnlyIfHole", false);
     private final Setting<CombatManager.TargetBy> targetBy = new Setting<>("TargetBy", CombatManager.TargetBy.Distance, v -> targetMode.is(Target.Breaker));

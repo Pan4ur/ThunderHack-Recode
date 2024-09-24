@@ -9,11 +9,11 @@ import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
-import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.features.hud.HudElement;
 import thunder.hack.features.modules.Module;
 import thunder.hack.features.modules.client.ClickGui;
 import thunder.hack.features.modules.client.HudEditor;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
 import thunder.hack.utility.render.animation.EaseOutBack;
@@ -70,7 +70,7 @@ public class ClickGUI extends Screen {
             int windowHeight = 18;
 
             int halfWidth = mc.getWindow().getScaledWidth() / 2;
-            int halfWidthCats = (int) ((((float)Module.Category.values().size() - 1) / 2f) * (ModuleManager.clickGui.moduleWidth.getValue() + 4f));
+            int halfWidthCats = (int) ((((float) Module.Category.values().size() - 1) / 2f) * (ModuleManager.clickGui.moduleWidth.getValue() + 4f));
 
             for (final Module.Category category : Managers.MODULE.getCategories()) {
                 if (category == Module.Category.HUD) continue;
@@ -213,13 +213,13 @@ public class ClickGUI extends Screen {
                             "\nDelete + Left Mouse Click по модулю, чтобы сбросить его настройки"
                             :
                             "Left Mouse Click to enable module" +
-                            "\nRight Mouse Click to open module settings" +
-                            "\nMiddle Mouse Click to bind module" +
-                            "\nCtrl + F to start searching" +
-                            "\nDrag n Drop config there to load" +
-                            "\nShift + Left Mouse Click to change module visibility in Array list" +
-                            "\nMiddle Mouse Click on slider to enter value from keyboard" +
-                            "\nDelete + Left Mouse Click on module to reset",
+                                    "\nRight Mouse Click to open module settings" +
+                                    "\nMiddle Mouse Click to bind module" +
+                                    "\nCtrl + F to start searching" +
+                                    "\nDrag n Drop config there to load" +
+                                    "\nShift + Left Mouse Click to change module visibility in Array list" +
+                                    "\nMiddle Mouse Click on slider to enter value from keyboard" +
+                                    "\nDelete + Left Mouse Click on module to reset",
                     5, mc.getWindow().getScaledHeight() - 80, HudEditor.getColor(0).getRGB());
 
         if (!HudElement.anyHovered && !ClickGUI.anyHovered)

@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class KillFeed extends HudElement {
-
     public KillFeed() {
         super("KillFeed", 50, 50);
     }
@@ -51,7 +50,7 @@ public class KillFeed extends HudElement {
 
         Render2DEngine.drawHudBase(context.getMatrices(), getPosX(), getPosY(), hAnimation, vAnimation, HudEditor.hudRound.getValue());
 
-        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Glowing)) {
+        if (HudEditor.hudStyle.is(HudEditor.HudStyle.Glowing)) {
             FontRenderers.sf_bold.drawCenteredString(context.getMatrices(), "KillFeed", getPosX() + hAnimation / 2, getPosY() + 4, HudEditor.textColor.getValue().getColorObject());
         } else {
             FontRenderers.sf_bold.drawGradientCenteredString(context.getMatrices(), "KillFeed", getPosX() + hAnimation / 2, getPosY() + 4, 10);

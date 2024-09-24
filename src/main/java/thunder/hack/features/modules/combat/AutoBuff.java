@@ -41,8 +41,7 @@ public final class AutoBuff extends Module {
 
     public static int getPotionSlot(Potions potion) {
         for (int i = 0; i < 9; ++i)
-            if (isStackPotion(mc.player.getInventory().getStack(i), potion))
-                return i;
+            if (isStackPotion(mc.player.getInventory().getStack(i), potion)) return i;
         return -1;
     }
 
@@ -51,8 +50,7 @@ public final class AutoBuff extends Module {
     }
 
     public static boolean isStackPotion(ItemStack stack, Potions potion) {
-        if (stack == null)
-            return false;
+        if (stack == null) return false;
 
         if (stack.getItem() instanceof SplashPotionItem) {
             PotionContentsComponent potionContentsComponent = stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
@@ -68,8 +66,7 @@ public final class AutoBuff extends Module {
             }
 
             for (StatusEffectInstance effect : potionContentsComponent.getEffects()) {
-                if (effect.getEffectType() == id)
-                    return true;
+                if (effect.getEffectType() == id) return true;
             }
         }
         return false;
@@ -77,8 +74,7 @@ public final class AutoBuff extends Module {
 
     @EventHandler
     public void onPostRotationSet(EventAfterRotate event) {
-        if (Aura.target != null && mc.player.getAttackCooldownProgress(1) > 0.5f)
-            return;
+        if (Aura.target != null && mc.player.getAttackCooldownProgress(1) > 0.5f) return;
         if (mc.player.age > 80 && shouldThrow()) {
             mc.player.setPitch(90);
             spoofed = true;
@@ -86,21 +82,14 @@ public final class AutoBuff extends Module {
     }
 
     private boolean shouldThrow() {
-        return (!mc.player.hasStatusEffect(StatusEffects.SPEED) && isPotionOnHotBar(Potions.SPEED) && speed.getValue())
-                || (!mc.player.hasStatusEffect(StatusEffects.STRENGTH) && isPotionOnHotBar(Potions.STRENGTH) && strength.getValue())
-                || (!mc.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE) && isPotionOnHotBar(Potions.FIRERES) && fire.getValue())
-                || (mc.player.getHealth() + mc.player.getAbsorptionAmount() < healthH.getValue() && isPotionOnHotBar(Potions.HEAL) && heal.getValue().isEnabled())
-                || (!mc.player.hasStatusEffect(StatusEffects.REGENERATION) && triggerOn.is(TriggerOn.LackOfRegen) && isPotionOnHotBar(Potions.REGEN) && regen.getValue().isEnabled())
-                || (mc.player.getHealth() + mc.player.getAbsorptionAmount() < healthR.getValue() && triggerOn.is(TriggerOn.Health) && isPotionOnHotBar(Potions.REGEN) && regen.getValue().isEnabled());
+        return (!mc.player.hasStatusEffect(StatusEffects.SPEED) && isPotionOnHotBar(Potions.SPEED) && speed.getValue()) || (!mc.player.hasStatusEffect(StatusEffects.STRENGTH) && isPotionOnHotBar(Potions.STRENGTH) && strength.getValue()) || (!mc.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE) && isPotionOnHotBar(Potions.FIRERES) && fire.getValue()) || (mc.player.getHealth() + mc.player.getAbsorptionAmount() < healthH.getValue() && isPotionOnHotBar(Potions.HEAL) && heal.getValue().isEnabled()) || (!mc.player.hasStatusEffect(StatusEffects.REGENERATION) && triggerOn.is(TriggerOn.LackOfRegen) && isPotionOnHotBar(Potions.REGEN) && regen.getValue().isEnabled()) || (mc.player.getHealth() + mc.player.getAbsorptionAmount() < healthR.getValue() && triggerOn.is(TriggerOn.Health) && isPotionOnHotBar(Potions.REGEN) && regen.getValue().isEnabled());
     }
 
     @EventHandler
     public void onPostSync(EventPostSync e) {
-        if (Aura.target != null && mc.player.getAttackCooldownProgress(1) > 0.5f)
-            return;
+        if (Aura.target != null && mc.player.getAttackCooldownProgress(1) > 0.5f) return;
 
-        if (onDaGround.getValue() && !mc.player.isOnGround())
-            return;
+        if (onDaGround.getValue() && !mc.player.isOnGround()) return;
 
         if (mc.player.age > 80 && shouldThrow() && timer.passedMs(1000) && spoofed) {
             if (!mc.player.hasStatusEffect(StatusEffects.SPEED) && isPotionOnHotBar(Potions.SPEED) && speed.getValue())
@@ -115,9 +104,7 @@ public final class AutoBuff extends Module {
             if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < healthH.getValue() && heal.getValue().isEnabled() && isPotionOnHotBar(Potions.HEAL))
                 throwPotion(Potions.HEAL);
 
-            if (((!mc.player.hasStatusEffect(StatusEffects.REGENERATION) && triggerOn.is(TriggerOn.LackOfRegen)) ||
-                    (mc.player.getHealth() + mc.player.getAbsorptionAmount() < healthR.getValue() && triggerOn.is(TriggerOn.Health)))
-                    && isPotionOnHotBar(Potions.REGEN) && regen.getValue().isEnabled())
+            if (((!mc.player.hasStatusEffect(StatusEffects.REGENERATION) && triggerOn.is(TriggerOn.LackOfRegen)) || (mc.player.getHealth() + mc.player.getAbsorptionAmount() < healthR.getValue() && triggerOn.is(TriggerOn.Health))) && isPotionOnHotBar(Potions.REGEN) && regen.getValue().isEnabled())
                 throwPotion(Potions.REGEN);
 
             sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
@@ -127,8 +114,7 @@ public final class AutoBuff extends Module {
     }
 
     public void throwPotion(Potions potion) {
-        if (pauseAura.getValue())
-            ModuleManager.aura.pause();
+        if (pauseAura.getValue()) ModuleManager.aura.pause();
         sendPacket(new UpdateSelectedSlotC2SPacket(getPotionSlot(potion)));
         sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
     }

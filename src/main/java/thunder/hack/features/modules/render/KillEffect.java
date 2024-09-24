@@ -8,7 +8,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
@@ -20,6 +19,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class KillEffect extends Module {
+    public KillEffect() {
+        super("KillEffect", Category.RENDER);
+    }
+
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Orthodox);
     private final Setting<Integer> speed = new Setting<>("Y Speed", 0, -10, 10, value -> mode.getValue() == Mode.Orthodox);
     public final Setting<Integer> volume = new Setting<>("Volume", 100, 0, 100);
@@ -34,10 +37,6 @@ public class KillEffect extends Module {
         Orthodox,
         FallingLava,
         LightningBolt
-    }
-
-    public KillEffect() {
-        super("KillEffect", Category.RENDER);
     }
 
     @Override

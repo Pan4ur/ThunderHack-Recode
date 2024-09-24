@@ -51,8 +51,8 @@ public class Coords extends HudElement {
             Render2DEngine.renderGradientTexture(context.getMatrices(), pX + 2, getPosY() + 1, 10, 10, 0, 0, 512, 512, 512, 512,
                     HudEditor.getColor(270), HudEditor.getColor(0), HudEditor.getColor(180), HudEditor.getColor(90));
             Render2DEngine.endRender();
-
         }
+
         FontRenderers.getModulesRenderer().drawString(context.getMatrices(), coordinates, pX + 18, getPosY() + 5, HudEditor.getColor(1).getRGB());
         setBounds(pX, getPosY(), FontRenderers.getModulesRenderer().getStringWidth(coordinates) + 21, 13f);
     }

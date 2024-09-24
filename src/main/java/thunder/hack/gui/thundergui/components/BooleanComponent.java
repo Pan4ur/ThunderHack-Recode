@@ -1,10 +1,9 @@
 package thunder.hack.gui.thundergui.components;
 
 import net.minecraft.client.util.math.MatrixStack;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui;
-import thunder.hack.features.modules.client.ClickGui;
-import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 

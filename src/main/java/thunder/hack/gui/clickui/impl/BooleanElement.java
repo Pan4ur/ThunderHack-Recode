@@ -3,10 +3,10 @@ package thunder.hack.gui.clickui.impl;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.core.Managers;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
-import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 

@@ -7,7 +7,6 @@ import thunder.hack.events.impl.EventHandleBlockBreaking;
 import thunder.hack.features.modules.Module;
 
 public class AntiLegitMiss extends Module {
-
     public AntiLegitMiss() {
         super("AntiLegitMiss", Category.COMBAT);
     }

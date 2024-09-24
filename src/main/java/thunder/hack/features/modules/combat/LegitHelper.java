@@ -7,7 +7,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.screen.slot.SlotActionType;
@@ -19,7 +18,6 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.AsyncManager;
 import thunder.hack.core.manager.client.ModuleManager;
@@ -43,7 +41,6 @@ import static thunder.hack.features.modules.combat.Criticals.getEntity;
 import static thunder.hack.features.modules.combat.Criticals.getInteractType;
 
 public class LegitHelper extends Module {
-
     public LegitHelper() {
         super("LegitHelper", Category.COMBAT);
     }

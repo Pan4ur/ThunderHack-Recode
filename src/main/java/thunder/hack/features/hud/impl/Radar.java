@@ -131,7 +131,7 @@ public class Radar extends HudElement {
                 return c12.getValue() + player.getName().getString() + Formatting.RESET;
             }
             case Ping -> {
-                return c22.getValue()+ (NameTags.getEntityPing(player) + "ms") + Formatting.RESET;
+                return c22.getValue() + (NameTags.getEntityPing(player) + "ms") + Formatting.RESET;
             }
             case Distance -> {
                 return c32.getValue() + (((int) Math.ceil(mc.player.distanceTo(player))) + "m") + Formatting.RESET;

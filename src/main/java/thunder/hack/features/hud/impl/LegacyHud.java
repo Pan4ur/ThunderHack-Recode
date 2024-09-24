@@ -61,7 +61,6 @@ public class LegacyHud extends Module {
     private final Setting<Boolean> biome = new Setting<>("Biome", false);
     public Setting<Boolean> time = new Setting<>("Time", false);
 
-
     public Setting<Integer> waterMarkY = new Setting<>("WatermarkPosY", 2, 0, 20, v -> waterMark.getValue());
     private int color;
 
@@ -77,19 +76,11 @@ public class LegacyHud extends Module {
         int height = mc.getWindow().getScaledHeight();
         int offset;
 
-
         switch (customFont.getValue()) {
-            case Minecraft -> {
-                offset = 10;
-            }
-            case Monsterrat -> {
-                offset = 9;
-            }
-            default -> {
-                offset = 8;
-            }
+            case Minecraft -> offset = 10;
+            case Monsterrat -> offset = 9;
+            default -> offset = 8;
         }
-
 
         color = colorSetting.getValue().getColor();
 
@@ -111,7 +102,6 @@ public class LegacyHud extends Module {
                     j += offset;
                     drawText(context, str, (width - 2 - getStringWidth(str)), (height - j));
                 }
-
             }
 
         int i = (mc.currentScreen instanceof ChatScreen && renderingUp.getValue()) ? 13 : (renderingUp.getValue() ? -2 : 0);
@@ -140,7 +130,8 @@ public class LegacyHud extends Module {
                 }
             }
         }
-        if(worldTime.getValue()){
+
+        if(worldTime.getValue()) {
             String str2 = "WorldTime: " + Formatting.WHITE + mc.world.getTimeOfDay() % 24000;
             drawText(context, str2, width - getStringWidth(str2) - 2, renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
         }
@@ -163,7 +154,7 @@ public class LegacyHud extends Module {
             String str = "Chests: " + Formatting.WHITE + "S:" + chests.getLeft() + " D:" + chests.getRight();
             drawText(context, str, (width - getStringWidth(str) - 2), renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
         }
-        if(biome.getValue()){
+        if(biome.getValue()) {
             String str3 = "Biome: " + Formatting.WHITE + biome();
             drawText(context, str3, width - getStringWidth(str3) - 2, renderingUp.getValue() ? (height - 2 - (i += offset)) : (2 + i++ * offset));
         }
@@ -209,10 +200,7 @@ public class LegacyHud extends Module {
             drawText(context, direction1, 2, (height - i - 11));
         }
 
-
-        if (coords.getValue())
-            drawText(context, coordinates, 2, (height - i));
-
+        if (coords.getValue()) drawText(context, coordinates, 2, (height - i));
         if (armor.getValue()) renderArmorHUD(true, context);
         if (totems.getValue()) renderTotemHUD(context);
         if (greeter.getValue()) renderGreeter(context);
@@ -222,15 +210,9 @@ public class LegacyHud extends Module {
         if (!customFont.getValue().equals(Font.Minecraft)) {
             FontRenderer adapter;
             switch (customFont.getValue()) {
-                case Monsterrat -> {
-                    adapter = FontRenderers.monsterrat;
-                }
-                case SF -> {
-                    adapter = FontRenderers.sf_medium;
-                }
-                default -> {
-                    adapter = FontRenderers.modules;
-                }
+                case Monsterrat -> adapter = FontRenderers.monsterrat;
+                case SF -> adapter = FontRenderers.sf_medium;
+                default -> adapter = FontRenderers.modules;
             }
             adapter.drawString(context.getMatrices(), str.replace(Formatting.WHITE + "", ""), x + 0.5, y + 0.5, Color.BLACK.getRGB());
             adapter.drawString(context.getMatrices(), str, x, y, color);
@@ -243,15 +225,9 @@ public class LegacyHud extends Module {
         if (!customFont.getValue().equals(Font.Minecraft)) {
             FontRenderer adapter;
             switch (customFont.getValue()) {
-                case Monsterrat -> {
-                    adapter = FontRenderers.monsterrat;
-                }
-                case SF -> {
-                    adapter = FontRenderers.sf_medium;
-                }
-                default -> {
-                    adapter = FontRenderers.modules;
-                }
+                case Monsterrat -> adapter = FontRenderers.monsterrat;
+                case SF -> adapter = FontRenderers.sf_medium;
+                default -> adapter = FontRenderers.modules;
             }
             adapter.drawString(context.getMatrices(), str.replace(Formatting.WHITE + "", ""), x + 0.5, y + 0.5, Color.BLACK.getRGB());
             adapter.drawString(context.getMatrices(), str, x, y, color);

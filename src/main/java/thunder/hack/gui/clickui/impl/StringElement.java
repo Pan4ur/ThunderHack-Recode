@@ -1,8 +1,6 @@
 package thunder.hack.gui.clickui.impl;
 
-import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
@@ -72,12 +70,8 @@ public class StringElement extends AbstractElement {
                     currentString = "";
                     listening = !listening;
                 }
-                case GLFW.GLFW_KEY_BACKSPACE -> {
-                    currentString = SliderElement.removeLastChar(currentString);
-                }
-                case GLFW.GLFW_KEY_SPACE -> {
-                    currentString = currentString + " ";
-                }
+                case GLFW.GLFW_KEY_BACKSPACE -> currentString = SliderElement.removeLastChar(currentString);
+                case GLFW.GLFW_KEY_SPACE -> currentString = currentString + " ";
             }
         }
     }

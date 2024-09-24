@@ -9,7 +9,6 @@ import thunder.hack.features.modules.Module;
 import thunder.hack.utility.math.MathUtility;
 
 public final class AntiServerRP extends Module {
-
     public AntiServerRP() {
         super("AntiServerRP", Category.CLIENT);
     }

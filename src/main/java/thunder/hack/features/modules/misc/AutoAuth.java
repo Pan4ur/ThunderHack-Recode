@@ -2,7 +2,6 @@ package thunder.hack.features.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.features.modules.Module;

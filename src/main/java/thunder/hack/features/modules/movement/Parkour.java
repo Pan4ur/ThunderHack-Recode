@@ -5,7 +5,6 @@ import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 
 public class Parkour extends Module {
-
     public Parkour() {
         super("Parkour", Category.MOVEMENT);
     }

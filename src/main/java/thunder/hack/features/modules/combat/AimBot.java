@@ -1,4 +1,3 @@
-
 package thunder.hack.features.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
@@ -13,7 +12,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventSync;
@@ -141,9 +139,7 @@ public final class AimBot extends Module {
         if (mode.is(Mode.CSAim)) {
             if (target != null && (mc.player.canSee(target) || ignoreWalls.getValue())) {
                 if (mc.player.age % delay.getValue() == 0) {
-                    event.addPostAction(() -> {
-                        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
-                    });
+                    event.addPostAction(() -> sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch())));
                 }
             } else {
                 rotationYaw = mc.player.getYaw();

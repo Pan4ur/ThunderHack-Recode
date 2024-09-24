@@ -18,7 +18,6 @@ public class FpsCounter extends HudElement {
         super("Fps", 50, 10);
     }
 
-
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
 
@@ -26,7 +25,7 @@ public class FpsCounter extends HudElement {
 
         float pX = getPosX() > mc.getWindow().getScaledWidth() / 2f ? getPosX() - FontRenderers.getModulesRenderer().getStringWidth(str) : getPosX();
 
-        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+        if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
             Render2DEngine.drawRoundedBlur(context.getMatrices(), pX, getPosY(), FontRenderers.getModulesRenderer().getStringWidth(str) + 21, 13f, 3, HudEditor.blurColor.getValue().getColorObject());
             Render2DEngine.drawRect(context.getMatrices(), pX + 14, getPosY() + 2, 0.5f, 8, new Color(0x44FFFFFF, true));
             Render2DEngine.setupRender();

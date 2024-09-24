@@ -15,19 +15,19 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render3DEngine;
 
 public class ClickTP extends Module {
+    public ClickTP() {
+        super("ClickTP", Category.MOVEMENT);
+    }
+
     private final Setting<Float> blockOffset = new Setting<>("BlockOffset", 1.0f, -1f, 1f);
     private final Setting<Integer> spoofs = new Setting<>("Spoofs", 0, 0, 40);
     private final Setting<Boolean> ground = new Setting<>("Ground", false);
 
     private int delay;
 
-    public ClickTP() {
-        super("ClickTP", Category.MOVEMENT);
-    }
-
     @EventHandler
     public void onSync(EventSync e) {
-        if(delay >= 0)
+        if (delay >= 0)
             delay--;
 
         if (mc.options.pickItemKey.isPressed() && delay < 0) {

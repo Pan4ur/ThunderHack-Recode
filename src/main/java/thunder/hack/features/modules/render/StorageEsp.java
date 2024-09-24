@@ -10,7 +10,6 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
@@ -54,7 +53,7 @@ public class StorageEsp extends Module {
     private final Setting<ColorSetting> minecartColor = new Setting<>("MinecartColor", new ColorSetting(0x8800FF00));
 
     public void onRender3D(MatrixStack stack) {
-        if(mc.options.hudHidden) return;
+        if (mc.options.hudHidden) return;
         for (BlockEntity blockEntity : getBlockEntities()) {
             Color color = getColor(blockEntity);
 
@@ -113,7 +112,8 @@ public class StorageEsp extends Module {
     private Color getColor(BlockEntity bEnt) {
         Color color = null;
 
-        if (bEnt instanceof TrappedChestBlockEntity && trappedChest.getValue()) color = trappedChestColor.getValue().getColorObject();
+        if (bEnt instanceof TrappedChestBlockEntity && trappedChest.getValue())
+            color = trappedChestColor.getValue().getColorObject();
         else if (bEnt instanceof ChestBlockEntity && chest.getValue() && bEnt.getType() != BlockEntityType.TRAPPED_CHEST)
             color = chestColor.getValue().getColorObject();
         else if (bEnt instanceof EnderChestBlockEntity && echest.getValue())

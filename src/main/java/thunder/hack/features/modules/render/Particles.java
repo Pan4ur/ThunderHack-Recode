@@ -22,15 +22,11 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.utility.render.Render2DEngine.*;
-
+// Фабос, чекнул сурс - сдох отец, спастишь - сдохнет мать
 public class Particles extends Module {
-
     public Particles() {
         super("Particles", Category.RENDER);
     }
-
-    // Фабос, чекнул сурс - сдох отец, спастишь - сдохнет мать
 
     private final Setting<BooleanSettingGroup> FireFlies = new Setting<>("FireFlies", new BooleanSettingGroup(true));
     private final Setting<Integer> ffcount = new Setting<>("FFCount", 30, 20, 200).addToGroup(FireFlies);
@@ -41,19 +37,6 @@ public class Particles extends Module {
     private final Setting<ColorMode> lmode = new Setting<>("ColorMode", ColorMode.Sync);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(3649978), v -> lmode.getValue() == ColorMode.Custom);
     private final Setting<Physics> physics = new Setting<>("Physics", Physics.Fly, v -> mode.getValue() != Mode.Off);
-
-
-    public enum ColorMode {
-        Custom, Sync
-    }
-
-    public enum Mode {
-        Off, SnowFlake, Stars, Hearts, Dollars, Bloom;
-    }
-
-    public enum Physics {
-        Drop, Fly
-    }
 
     private final ArrayList<ParticleBase> fireFlies = new ArrayList<>();
     private final ArrayList<ParticleBase> particles = new ArrayList<>();
@@ -126,7 +109,6 @@ public class Particles extends Module {
     public class FireFly extends ParticleBase {
         private final List<Trails.Trail> trails = new ArrayList<>();
 
-
         public FireFly(float posX, float posY, float posZ, float motionX, float motionY, float motionZ) {
             super(posX, posY, posZ, motionX, motionY, motionZ);
         }
@@ -183,7 +165,6 @@ public class Particles extends Module {
             }
         }
     }
-
 
     public class ParticleBase {
 
@@ -256,5 +237,17 @@ public class Particles extends Module {
             bufferBuilder.vertex(matrix1, -size.getValue(), 0, 0).texture(1f, 0).color(Render2DEngine.injectAlpha(color1, (int) (255 * ((float) age / (float) maxAge))).getRGB());
             bufferBuilder.vertex(matrix1, 0, 0, 0).texture(0, 0).color(Render2DEngine.injectAlpha(color1, (int) (255 * ((float) age / (float) maxAge))).getRGB());
         }
+    }
+
+    public enum ColorMode {
+        Custom, Sync
+    }
+
+    public enum Mode {
+        Off, SnowFlake, Stars, Hearts, Dollars, Bloom;
+    }
+
+    public enum Physics {
+        Drop, Fly
     }
 }

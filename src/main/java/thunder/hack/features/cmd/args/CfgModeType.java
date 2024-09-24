@@ -9,13 +9,13 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
-import thunder.hack.features.modules.client.ClientSettings;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class CfgModeType implements ArgumentType<String> {
     private static final Collection<String> EXAMPLES = List.of("combat", "render", "player", "misc", "client", "hud", "movement");
@@ -28,7 +28,7 @@ public class CfgModeType implements ArgumentType<String> {
     public String parse(StringReader reader) throws CommandSyntaxException {
         String cat = reader.readString();
         if (!getExamples().contains(cat)) throw new DynamicCommandExceptionType(
-                name -> Text.literal(ClientSettings.language.getValue().equals(ClientSettings.Language.RU) ? "Вкладки " + name.toString() + " не существует(" : "Category " + name.toString() + " does not exists(")
+                name -> Text.literal(isRu() ? "Вкладки " + name.toString() + " не существует(" : "Category " + name.toString() + " does not exist :(")
         ).create(cat);
 
         return cat;

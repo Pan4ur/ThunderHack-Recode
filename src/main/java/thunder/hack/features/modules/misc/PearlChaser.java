@@ -38,10 +38,7 @@ import java.util.HashMap;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class PearlChaser extends Module {
-
-    // Better targeting?..
-
-    public PearlChaser() {
+    public PearlChaser() { //todo better targeting?..
         super("PearlChaser", Category.MISC);
     }
 

@@ -12,7 +12,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.ThunderHack;
 import thunder.hack.api.IAddon;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
@@ -137,7 +136,7 @@ public class MainMenuScreen extends Screen {
 
         int offset = 0;
         for (IAddon addon : Managers.ADDON.getAddons()) {
-       // for (String addon : Arrays.asList("Addon", "Addon2", "Addon3", "Addon4", "Addon5")) {
+            // for (String addon : Arrays.asList("Addon", "Addon2", "Addon3", "Addon4", "Addon5")) {
             textWidth = (int) FontRenderers.sf_bold.getStringWidth(addon.getName() + " |");
             textX = screenWidth - textWidth - 5;
             FontRenderers.sf_bold.drawString(context.getMatrices(), addon.getName() + Formatting.WHITE + " |", textX, 13 + offset, Color.GRAY.getRGB());

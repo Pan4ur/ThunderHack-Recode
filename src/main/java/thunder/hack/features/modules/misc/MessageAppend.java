@@ -3,7 +3,6 @@ package thunder.hack.features.modules.misc;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.features.modules.Module;
@@ -12,13 +11,12 @@ import thunder.hack.setting.Setting;
 import java.util.Objects;
 
 public class MessageAppend extends Module {
-    private final Setting<String> word = new Setting<>("word", " TH RECODE");
-    private String skip;
-
     public MessageAppend() {
         super("MessageAppend", Category.MISC);
     }
 
+    private final Setting<String> word = new Setting<>("word", " TH RECODE");
+    private String skip;
 
     @EventHandler
     public void onPacketSend(PacketEvent.Send e) {

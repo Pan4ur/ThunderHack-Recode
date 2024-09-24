@@ -7,7 +7,6 @@ import thunder.hack.features.modules.Module;
 import thunder.hack.utility.Timer;
 
 public class MouseElytraFix extends Module {
-
     public MouseElytraFix() {
         super("MouseElytraFix", Category.PLAYER);
     }
@@ -29,7 +28,6 @@ public class MouseElytraFix extends Module {
                         mc.interactionManager.clickSlot(0, -999, 1, SlotActionType.PICKUP, mc.player);
                 }
         }
-
     }
 
     public static int findEmptySlot() {

@@ -8,8 +8,8 @@ import net.minecraft.util.math.BlockPos;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.EventTick;
 import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.injection.accesors.IPlayerMoveC2SPacket;
 import thunder.hack.features.modules.Module;
+import thunder.hack.injection.accesors.IPlayerMoveC2SPacket;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InteractionUtility;
 import thunder.hack.utility.player.InventoryUtility;
@@ -33,15 +33,6 @@ public class NoFall extends Module {
     private thunder.hack.utility.Timer pearlCooldown = new thunder.hack.utility.Timer();
 
     private boolean retrieveFlag;
-
-    private enum Mode {
-        Rubberband, Items, MatrixOffGround, Vanilla, Grim2b2t
-    }
-
-    private enum FallDistance {
-        Calc, Custom
-    }
-
     private boolean cancelGround = false;
 
     @EventHandler
@@ -51,10 +42,8 @@ public class NoFall extends Module {
 
         if (isFalling()) {
             switch (mode.getValue()) {
-                case Rubberband -> {
-                    sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
-                }
-
+                case MatrixOffGround, Vanilla -> cancelGround = true;
+                case Rubberband -> sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
                 case Items -> {
                     BlockPos playerPos = BlockPos.ofFloored(mc.player.getPos());
 
@@ -80,10 +69,6 @@ public class NoFall extends Module {
                         mc.player.setPitch(90);
                         doSnowDrop(snowResult, playerPos);
                     }
-                }
-
-                case MatrixOffGround, Vanilla -> {
-                    cancelGround = true;
                 }
             }
         } else if (retrieveFlag) {
@@ -171,7 +156,7 @@ public class NoFall extends Module {
         if (mc.player.isFallFlying())
             return false;
 
-        if(mode.is(Mode.Grim2b2t))
+        if (mode.is(Mode.Grim2b2t))
             return mc.player.fallDistance > 3f;
 
         switch (fallDistance.getValue()) {
@@ -201,5 +186,13 @@ public class NoFall extends Module {
     @Override
     public void onEnable() {
         cancelGround = false;
+    }
+
+    private enum Mode {
+        Rubberband, Items, MatrixOffGround, Vanilla, Grim2b2t
+    }
+
+    private enum FallDistance {
+        Calc, Custom
     }
 }

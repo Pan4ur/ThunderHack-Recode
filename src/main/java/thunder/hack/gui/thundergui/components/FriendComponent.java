@@ -4,12 +4,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.util.Identifier;
 import thunder.hack.core.Core;
 import thunder.hack.core.Managers;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui;
 import thunder.hack.utility.render.Render2DEngine;
-import net.minecraft.util.Identifier;
 import thunder.hack.utility.render.TextureStorage;
 import thunder.hack.utility.render.animation.AnimationUtility;
 

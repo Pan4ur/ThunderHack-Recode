@@ -15,7 +15,7 @@ public class EventMouse extends Event {
 
     int action;
 
-    public EventMouse(int b,int action){
+    public EventMouse(int b,int action) {
         button = b;
         this.action = action;
     }
