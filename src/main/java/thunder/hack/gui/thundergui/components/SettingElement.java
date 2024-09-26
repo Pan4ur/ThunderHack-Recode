@@ -1,9 +1,8 @@
 package thunder.hack.gui.thundergui.components;
 
-import thunder.hack.gui.thundergui.ThunderGui;
+import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
-import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.io.IOException;

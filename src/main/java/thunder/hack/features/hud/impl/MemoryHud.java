@@ -25,7 +25,6 @@ public class MemoryHud extends HudElement {
         long o = t - f;
         String str = "Mem: " + Formatting.WHITE + toMiB(o) + "/" + toMiB(m) + "MB [" + (o * 100L / m) + "%]";
 
-
         float pX = getPosX() > mc.getWindow().getScaledWidth() / 2f ? getPosX() - FontRenderers.getModulesRenderer().getStringWidth(str) : getPosX();
 
         if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {

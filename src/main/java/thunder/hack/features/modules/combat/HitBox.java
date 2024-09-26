@@ -6,7 +6,6 @@ import thunder.hack.setting.Setting;
 import static thunder.hack.core.manager.client.ServerManager.round2;
 
 public final class HitBox extends Module {
-
     public HitBox() {
         super("HitBoxes", Category.COMBAT);
     }

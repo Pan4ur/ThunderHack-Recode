@@ -38,7 +38,6 @@ public final class AutoDuel extends Module {
         if (event.getPacket() instanceof GameMessageS2CPacket pac) {
             final String message = pac.content().getString().toLowerCase();
 
-
             switch (mode.getValue()) {
                 case Accept -> {
                     if (!pac.content.getString().contains("duel request received from " + nickname.getValue().toLowerCase()))

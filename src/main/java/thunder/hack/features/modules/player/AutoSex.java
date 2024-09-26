@@ -1,7 +1,6 @@
 package thunder.hack.features.modules.player;
 
 import net.minecraft.entity.player.PlayerEntity;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;

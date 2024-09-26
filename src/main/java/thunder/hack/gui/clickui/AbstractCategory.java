@@ -36,8 +36,7 @@ public class AbstractCategory {
             prevTargetX = x;
             this.x = this.prevX + mouseX;
             this.y = this.prevY + mouseY;
-        } else
-            prevTargetX = x;
+        } else prevTargetX = x;
     }
 
     public void mouseClicked(int mouseX, int mouseY, int button) {
@@ -117,7 +116,7 @@ public class AbstractCategory {
         }
     }
 
-    public void tick(){
+    public void tick() {
     }
 
     public void hudClicked(Module module) {

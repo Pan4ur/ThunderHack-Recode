@@ -1,7 +1,6 @@
 package thunder.hack.features.modules.render;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.render.block.entity.MobSpawnerBlockEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -11,7 +10,6 @@ import net.minecraft.entity.projectile.thrown.EggEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.events.impl.PacketEvent;
@@ -25,10 +23,10 @@ import java.util.List;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class NoRender extends Module {
-
     public NoRender() {
         super("NoRender", Category.RENDER);
     }
+
     public final Setting<Boolean> disableGuiBackGround = new Setting<>("noGuiBackGround", true);
     public final Setting<Boolean> noSwing = new Setting<>("NoHandSwing", false);
     public final Setting<Boolean> auto = new Setting<>("Auto", false);

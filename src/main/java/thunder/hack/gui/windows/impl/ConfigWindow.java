@@ -5,19 +5,16 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
-import thunder.hack.gui.windows.WindowsScreen;
-import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.TextureStorage;
-import thunder.hack.utility.render.animation.AnimationUtility;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -144,7 +141,7 @@ public class ConfigWindow extends WindowBase {
             boolean hoveringRemove = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 15, configPlate.offset + getY() + 36 + getScrollOffset(), 11, 11);
             boolean hoverLoad = Render2DEngine.isHovered(mouseX, mouseY, getX() + getWidth() - 39, configPlate.offset + getY() + 36 + getScrollOffset(), 22, 11);
 
-            if(hoverLoad)
+            if (hoverLoad)
                 Managers.CONFIG.load(configPlate.name());
 
             if (hoveringRemove) {

@@ -30,6 +30,9 @@ import thunder.hack.utility.render.Render3DEngine;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class PopChams extends Module {
+    public PopChams() {
+        super("PopChams", Category.RENDER);
+    }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Textured);
     private final Setting<Boolean> secondLayer = new Setting<>("SecondLayer", true);
@@ -42,10 +45,6 @@ public final class PopChams extends Module {
 
     private enum Mode {
         Simple, Textured
-    }
-
-    public PopChams() {
-        super("PopChams", Category.RENDER);
     }
 
     @Override

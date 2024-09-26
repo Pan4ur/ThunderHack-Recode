@@ -1,9 +1,7 @@
 package thunder.hack.features.modules.client;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.decoration.EndCrystalEntity;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.events.impl.EventDeath;
 import thunder.hack.events.impl.EventAttack;
@@ -11,7 +9,6 @@ import thunder.hack.features.modules.Module;
 import thunder.hack.features.modules.combat.Aura;
 import thunder.hack.features.modules.combat.AutoCrystal;
 import thunder.hack.setting.Setting;
-
 
 public final class SoundFX extends Module {
     public SoundFX() {

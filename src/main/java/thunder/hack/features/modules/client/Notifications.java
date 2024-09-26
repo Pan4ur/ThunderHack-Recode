@@ -4,7 +4,6 @@ import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 
 public final class Notifications extends Module {
-
     public Notifications() {
         super("Notifications", Category.CLIENT);
     }

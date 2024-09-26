@@ -49,7 +49,6 @@ public class PlayerManager implements IManager {
 
     public boolean inInventory;
 
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSync(EventSync event) {
         if (Module.fullNullCheck()) return;

@@ -1,13 +1,13 @@
 package thunder.hack.gui.thundergui.components;
 
+import net.minecraft.client.util.math.MatrixStack;
 import thunder.hack.ThunderHack;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui;
-import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
-import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;
 
@@ -43,15 +43,15 @@ public class ColorPickerComponent extends SettingElement {
 
     @Override
     public void render(MatrixStack stack, int mouseX, int mouseY, float delta) {
-        super.render(stack,mouseX, mouseY, delta);
+        super.render(stack, mouseX, mouseY, delta);
         if ((getY() > ThunderGui.getInstance().main_posY + ThunderGui.getInstance().height) || getY() < ThunderGui.getInstance().main_posY) {
             return;
         }
-        FontRenderers.modules.drawString(stack,getSetting().getName(), (float) getX(), (float) getY() + 5, isHovered() ? -1 : new Color(0xB0FFFFFF, true).getRGB());
-        Render2DEngine.drawBlurredShadow(stack,(int) (x + width - 20), (int) (y + 5), 14, 6, 10, getColorSetting().getColorObject());
-        Render2DEngine.drawRound(stack,(float) (x + width - 20), (float) (y + 5), 14, 6, 1, getColorSetting().getColorObject());
+        FontRenderers.modules.drawString(stack, getSetting().getName(), getX(), getY() + 5, isHovered() ? -1 : new Color(0xB0FFFFFF, true).getRGB());
+        Render2DEngine.drawBlurredShadow(stack, (int) (x + width - 20), (int) (y + 5), 14, 6, 10, getColorSetting().getColorObject());
+        Render2DEngine.drawRound(stack, x + width - 20, y + 5, 14, 6, 1, getColorSetting().getColorObject());
         if (open)
-            renderPicker(stack,mouseX, mouseY, getColorSetting().getColorObject());
+            renderPicker(stack, mouseX, mouseY, getColorSetting().getColorObject());
     }
 
     @Override
@@ -59,9 +59,9 @@ public class ColorPickerComponent extends SettingElement {
         super.onTick();
     }
 
-    private void renderPicker(MatrixStack stack,int mouseX, int mouseY, Color color) {
+    private void renderPicker(MatrixStack stack, int mouseX, int mouseY, Color color) {
         double cx = x + 6;
-        float cy = (float) (y + 20);
+        float cy = y + 20;
         double cw = width - 38;
         double ch = height - 20;
 
@@ -86,21 +86,21 @@ public class ColorPickerComponent extends SettingElement {
         Color colorA = Color.getHSBColor(hue, 0.0F, 1.0F), colorB = Color.getHSBColor(hue, 1.0F, 1.0F);
         Color colorC = new Color(0, 0, 0, 0), colorD = new Color(0, 0, 0);
 
-        Render2DEngine.horizontalGradient(stack,(float)(cx + 40), cy, (float) (cx + cw), (float) (cy + ch), colorA, colorB);
+        Render2DEngine.horizontalGradient(stack, (float) (cx + 40), cy, (float) (cx + cw), (float) (cy + ch), colorA, colorB);
         Render2DEngine.verticalGradient(stack, (float) (cx + 40), cy, (float) (cx + cw), (float) (cy + ch), colorC, colorD);
 
         for (float i = 1f; i < ch - 2f; i += 1f) {
             float curHue = (float) (1f / (ch / i));
-            Render2DEngine.drawRect(stack,(float) (cx + cw + 4), (float) (cy + i), 8, 1, Color.getHSBColor(curHue, 1f, 1f));
+            Render2DEngine.drawRect(stack, (float) (cx + cw + 4), cy + i, 8, 1, Color.getHSBColor(curHue, 1f, 1f));
         }
 
-        Render2DEngine.drawRect(stack,(float) (cx + cw + 17), (float) (cy + 1), 8, (float) (ch - 3), new Color(-1));
+        Render2DEngine.drawRect(stack, (float) (cx + cw + 17), cy + 1, 8, (float) (ch - 3), new Color(-1));
 
         Render2DEngine.verticalGradient(stack, (float) (cx + cw + 17), (float) (cy + 0.8), (float) (cx + cw + 25), (float) (cy + ch - 2), new Color(color.getRed(), color.getGreen(), color.getBlue(), 255), new Color(0, 0, 0, 0));
 
-        Render2DEngine.drawRect(stack,(float) (cx + cw + 3), hpos + 0.5f, 10, 1, Color.WHITE);
-        Render2DEngine.drawRect(stack,(float) (cx + cw + 16), apos + 0.5f, 10, 1, Color.WHITE);
-        Render2DEngine.drawRound(stack,spos, bpos, 3, 3, 1.5f, new Color(-1));
+        Render2DEngine.drawRect(stack, (float) (cx + cw + 3), hpos + 0.5f, 10, 1, Color.WHITE);
+        Render2DEngine.drawRect(stack, (float) (cx + cw + 16), apos + 0.5f, 10, 1, Color.WHITE);
+        Render2DEngine.drawRound(stack, spos, bpos, 3, 3, 1.5f, new Color(-1));
 
         Color value = Color.getHSBColor(hue, saturation, brightness);
 
@@ -113,13 +113,13 @@ public class ColorPickerComponent extends SettingElement {
         }
 
         if (hfocused) {
-            hue = (float) -((ch - MathUtility.clamp((float) (mouseY - cy), 0, (float) ch)) / ch);
+            hue = (float) -((ch - MathUtility.clamp(mouseY - cy, 0, (float) ch)) / ch);
             value = Color.getHSBColor(hue, saturation, brightness);
             setColor(new Color(value.getRed(), value.getGreen(), value.getBlue(), alpha));
         }
 
         if (afocused) {
-            alpha = (int) (((ch - MathUtility.clamp((float) (mouseY - cy), 0, (float) ch)) / ch) * 255);
+            alpha = (int) (((ch - MathUtility.clamp(mouseY - cy, 0, (float) ch)) / ch) * 255);
             setColor(new Color(value.getRed(), value.getGreen(), value.getBlue(), alpha));
         }
 
@@ -127,13 +127,13 @@ public class ColorPickerComponent extends SettingElement {
         copy_focused = Render2DEngine.isHovered(mouseX, mouseY, getX(), cy + 13, 40, 10);
         paste_focused = Render2DEngine.isHovered(mouseX, mouseY, getX(), cy + 26, 40, 10);
 
-        Render2DEngine.drawRound(stack,(float) getX(), (float) cy, 40, 10, 2f, getColorSetting().isRainbow() ? new Color(86, 63, 105, 250) : (rainbow_focused ? new Color(66, 48, 80, 250) : new Color(50, 35, 60, 250)));
-        Render2DEngine.drawRound(stack,(float) getX(), (float) cy + 13, 40, 10, 2f, copy_focused ? new Color(66, 48, 80, 250) : new Color(50, 35, 60, 250));
-        Render2DEngine.drawRound(stack,(float) getX(), (float) cy + 26, 40, 9.5f, 2f, paste_focused ? new Color(66, 48, 80, 250) : new Color(50, 35, 60, 250));
+        Render2DEngine.drawRound(stack, getX(), cy, 40, 10, 2f, getColorSetting().isRainbow() ? new Color(86, 63, 105, 250) : (rainbow_focused ? new Color(66, 48, 80, 250) : new Color(50, 35, 60, 250)));
+        Render2DEngine.drawRound(stack, getX(), cy + 13, 40, 10, 2f, copy_focused ? new Color(66, 48, 80, 250) : new Color(50, 35, 60, 250));
+        Render2DEngine.drawRound(stack, getX(), cy + 26, 40, 9.5f, 2f, paste_focused ? new Color(66, 48, 80, 250) : new Color(50, 35, 60, 250));
 
-        FontRenderers.modules.drawCenteredString(stack,"rainbow", (float) getX() + 20, (float) cy + 3, rainbow_focused ? -1 : (getColorSetting().isRainbow() ? getColorSetting().getColor() : new Color(0xB5FFFFFF, true).getRGB()));
-        FontRenderers.modules.drawCenteredString(stack,"copy", (float) getX() + 20, (float) cy + 15.5f, copy_focused ? -1 : new Color(0xB5FFFFFF, true).getRGB());
-        FontRenderers.modules.drawCenteredString(stack,"paste", (float) getX() + 20, (float) cy + 28.5f, paste_focused ? -1 : new Color(0xB5FFFFFF, true).getRGB());
+        FontRenderers.modules.drawCenteredString(stack, "rainbow", getX() + 20, cy + 3, rainbow_focused ? -1 : (getColorSetting().isRainbow() ? getColorSetting().getColor() : new Color(0xB5FFFFFF, true).getRGB()));
+        FontRenderers.modules.drawCenteredString(stack, "copy", getX() + 20, cy + 15.5f, copy_focused ? -1 : new Color(0xB5FFFFFF, true).getRGB());
+        FontRenderers.modules.drawCenteredString(stack, "paste", getX() + 20, cy + 28.5f, paste_focused ? -1 : new Color(0xB5FFFFFF, true).getRGB());
     }
 
     private void updatePos() {

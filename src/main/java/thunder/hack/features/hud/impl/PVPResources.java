@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PVPResources extends HudElement {
-
     public PVPResources() {
         super("PVPResources", 50, 50);
     }

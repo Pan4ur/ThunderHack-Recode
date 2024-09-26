@@ -25,7 +25,6 @@ import thunder.hack.ThunderHack;
 import thunder.hack.features.cmd.Command;
 import thunder.hack.core.manager.client.MacroManager;
 import thunder.hack.core.manager.client.ModuleManager;
-import thunder.hack.core.manager.client.ServerManager;
 import thunder.hack.events.impl.*;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.notification.Notification;
@@ -75,7 +74,7 @@ public final class Core {
                 ThunderHack.EVENT_BUS.post(new EventDeath(p));
         }
 
-        if (!Objects.equals(Managers.COMMAND.getPrefix(), ClientSettings.prefix.getValue().toString()))
+        if (!Objects.equals(Managers.COMMAND.getPrefix(), ClientSettings.prefix.getValue()))
             Managers.COMMAND.setPrefix(ClientSettings.prefix.getValue());
 
         new HashMap<>(InteractionUtility.awaiting).forEach((bp, time) -> {
@@ -154,8 +153,7 @@ public final class Core {
             if (e.getEntity() != null && bp.getSquaredDistance(e.getEntity().getPos()) < 4.)
                 InteractionUtility.awaiting.remove(bp);
         });
-    }
-     */
+    }*/
 
     public void drawSkull(DrawContext e) {
         if (showSkull && !skullTimer.passedMs(3000) && ClientSettings.skullEmoji.getValue()) {

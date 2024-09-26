@@ -15,7 +15,6 @@ import java.awt.*;
 import static thunder.hack.features.modules.Module.mc;
 
 public class RectangleShader {
-
     private Uniform2f uSize;
     private Uniform2f uLocation;
     private Uniform1f radius;
@@ -23,7 +22,6 @@ public class RectangleShader {
     private Uniform4f color2;
     private Uniform4f color3;
     private Uniform4f color4;
-
 
     public static final ManagedCoreShader RECTANGLE_SHADER = ShaderEffectManager.getInstance()
             .manageCoreShader(Identifier.of("thunderhack", "rectangle"), VertexFormats.POSITION);

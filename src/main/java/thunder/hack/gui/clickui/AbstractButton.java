@@ -6,6 +6,7 @@ public class AbstractButton {
     public float x, y, width, height;
     public float target_offset;
     public float offsetY;
+
     public void init() {
     }
 

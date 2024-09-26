@@ -6,7 +6,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Formatting;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventEntityRemoved;
@@ -44,8 +43,7 @@ public class VisualRange extends Module {
     public void onEntityRemoved(EventEntityRemoved event) {
         if (!isValid(event.entity)) return;
 
-        if (entities.contains(event.entity.getName().getString()))
-            entities.remove(event.entity.getName().getString());
+        if (entities.contains(event.entity.getName().getString())) entities.remove(event.entity.getName().getString());
         else return;
 
         if (leave.getValue()) notify(event.entity, false);
@@ -53,7 +51,7 @@ public class VisualRange extends Module {
 
     public void notify(Entity entity, boolean enter) {
         String message = "";
-        if(ModuleManager.nameProtect.isEnabled() && NameProtect.hideFriends.getValue()){
+        if (ModuleManager.nameProtect.isEnabled() && NameProtect.hideFriends.getValue()) {
             message = Formatting.AQUA + NameProtect.newName.getValue();
         }
         if (Managers.FRIEND.isFriend(entity.getName().getString()))
@@ -62,14 +60,12 @@ public class VisualRange extends Module {
 
 
         if (enter) message += Formatting.GREEN + " was found!";
-        else message += Formatting.RED + " left to X:" + (int)entity.getX() + " Z:" + (int) entity.getZ();
+        else message += Formatting.RED + " left to X:" + (int) entity.getX() + " Z:" + (int) entity.getZ();
 
-        if (mode.is(Mode.Chat) || mode.is(Mode.Both))
-            sendMessage(message);
+        if (mode.is(Mode.Chat) || mode.is(Mode.Both)) sendMessage(message);
 
         if (mode.is(Mode.Notification) || mode.is(Mode.Both))
             Managers.NOTIFICATION.publicity("VisualRange", message, 2, Notification.Type.WARNING);
-
 
         if (soundpl.getValue()) {
             try {

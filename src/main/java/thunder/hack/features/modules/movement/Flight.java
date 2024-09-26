@@ -15,6 +15,9 @@ import thunder.hack.utility.player.MovementUtility;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class Flight extends Module {
+    public Flight() {
+        super("Flight", Category.MOVEMENT);
+    }
 
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Vanilla);
     private final Setting<Float> hSpeed = new Setting<>("Horizontal", 1f, 0.0f, 10.0f, v -> !mode.is(Mode.StormBreak));
@@ -28,9 +31,6 @@ public class Flight extends Module {
     public boolean onPosLook = false;
     private int flyTicks = 0;
 
-    public Flight() {
-        super("Flight", Module.Category.MOVEMENT);
-    }
 
     @EventHandler
     public void onEventSync(EventSync event) {
@@ -82,7 +82,6 @@ public class Flight extends Module {
         if (mode.is(Mode.Damage))
             if (flyTicks-- > boostTicks.getValue())
                 mc.player.setVelocity(mc.player.getVelocity().x, velocityMotion, mc.player.getVelocity().getZ());
-
 
         if (mode.is(Mode.MatrixJump)) {
             if (mc.player.fallDistance == 0)

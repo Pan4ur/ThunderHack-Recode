@@ -10,11 +10,11 @@ import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.features.hud.HudElement;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.ClickGui;
 import thunder.hack.gui.clickui.AbstractCategory;
 import thunder.hack.gui.clickui.Category;
 import thunder.hack.gui.clickui.ClickGUI;
-import thunder.hack.features.modules.Module;
-import thunder.hack.features.modules.client.ClickGui;
 
 import java.util.List;
 

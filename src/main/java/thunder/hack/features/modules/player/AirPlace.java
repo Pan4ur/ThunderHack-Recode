@@ -18,6 +18,10 @@ import thunder.hack.utility.render.Render3DEngine;
 import java.awt.*;
 
 public class AirPlace extends Module {
+    public AirPlace() {
+        super("AirPlace", Category.PLAYER);
+    }
+
     private final Setting<Float> range = new Setting<>("Range", 5f, 0f, 6f);
 
     private final Setting<SettingGroup> renderGroup = new Setting<>("Render", new SettingGroup(false, 0));
@@ -28,10 +32,6 @@ public class AirPlace extends Module {
 
     private BlockHitResult hit;
     private int cooldown;
-
-    public AirPlace() {
-        super("AirPlace", Category.PLAYER);
-    }
 
     @Override
     public void onUpdate() {

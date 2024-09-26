@@ -238,7 +238,7 @@ public class ConfigManager implements IManager {
         if (module == null)
             return;
 
-        if (!Objects.equals(category, "none") && !module.getCategory().getName().toLowerCase().equals(category.toLowerCase()))
+        if (!Objects.equals(category, "none") && !module.getCategory().getName().equalsIgnoreCase(category))
             return;
 
         JsonObject mobject = object.getAsJsonObject(module.getName());
@@ -246,7 +246,6 @@ public class ConfigManager implements IManager {
         for (Setting setting : module.getSettings()) {
             try {
                 if (setting.getValue() instanceof SettingGroup) {
-
                 } else if (setting.getValue() instanceof Boolean) {
                     setting.setValue(mobject.getAsJsonPrimitive(setting.getName()).getAsBoolean());
                 } else if (setting.getValue() instanceof Float) {
@@ -353,7 +352,7 @@ public class ConfigManager implements IManager {
             } else if (setting.getValue() instanceof String str) {
                 try {
                     attribs.add(setting.getName(), jp.parse(str.replace(" ", "%%").replace("/", "++")));
-                } catch (Exception exception) {
+                } catch (Exception ignored) {
                 }
             } else if (setting.getValue() instanceof ItemSelectSetting iSelect) {
                 JsonArray array = new JsonArray();
@@ -393,7 +392,7 @@ public class ConfigManager implements IManager {
         List<String> list = new ArrayList<>();
 
         if (CONFIGS_FOLDER.listFiles() != null) {
-            for (File file : Arrays.stream(Objects.requireNonNull(CONFIGS_FOLDER.listFiles())).filter(f -> f.getName().endsWith(".th")).collect(Collectors.toList())) {
+            for (File file : Arrays.stream(Objects.requireNonNull(CONFIGS_FOLDER.listFiles())).filter(f -> f.getName().endsWith(".th")).toList()) {
                 list.add(file.getName().replace(".th", ""));
             }
         }

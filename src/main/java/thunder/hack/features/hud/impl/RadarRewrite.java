@@ -111,8 +111,6 @@ public class RadarRewrite extends HudElement {
     }
 
     public void drawElipse(MatrixStack matrices, float x, float y, float rx, float ry, float start, float end, float margin, float width, Color color, String direction) {
-
-
         float sin;
         float cos;
         float endOffset;

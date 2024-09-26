@@ -4,8 +4,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import thunder.hack.core.manager.client.ModuleManager;
-import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.features.modules.misc.NoCommentExploit;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.utility.render.Render2DEngine;
 
 import java.awt.*;
@@ -28,7 +28,7 @@ public class GuiScanner extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        if(mc.player == null) return;
+        if (mc.player == null) return;
 
         radarx = mc.getWindow().getScaledWidth() / 8;
         radarx1 = ((mc.getWindow().getScaledWidth() * 5) / 8);
@@ -104,7 +104,7 @@ public class GuiScanner extends Screen {
         if (mouseX > consolex && mouseX < consolex1 && mouseY > consoley1 + 20 && mouseY < consoley1 + 36) {
             track = !track;
         }
-        if (mouseX > consolex && mouseX < consolex1 && mouseY > consoley1 + 38 && mouseY <  consoley1 + 53) {
+        if (mouseX > consolex && mouseX < consolex1 && mouseY > consoley1 + 38 && mouseY < consoley1 + 53) {
             ModuleManager.noCommentExploit.couti = 1;
             consoleout.clear();
         }

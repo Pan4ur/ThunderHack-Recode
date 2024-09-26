@@ -9,13 +9,13 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.world.WayPointManager;
-import thunder.hack.features.modules.client.ClientSettings;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class WayPointArgumentType implements ArgumentType<WayPointManager.WayPoint> {
     private static final Collection<String> EXAMPLES = Managers.WAYPOINT.getWayPoints().stream()
@@ -32,7 +32,7 @@ public class WayPointArgumentType implements ArgumentType<WayPointManager.WayPoi
         WayPointManager.WayPoint wp = Managers.WAYPOINT.getWayPointByName(reader.readString());
 
         if (wp == null) throw new DynamicCommandExceptionType(
-                name -> Text.literal(ClientSettings.language.getValue().equals(ClientSettings.Language.RU) ? "Вейпоинта " + name.toString() + " не существует(" : "Waypoint " + name.toString() + " does not exists(")
+                name -> Text.literal(isRu() ? "Вейпоинта " + name.toString() + " не существует(" : "Waypoint " + name.toString() + " does not exist :(")
         ).create(reader.readString());
 
         return wp;

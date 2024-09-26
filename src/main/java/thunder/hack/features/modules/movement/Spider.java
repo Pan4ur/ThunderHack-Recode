@@ -5,23 +5,23 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.*;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import thunder.hack.events.impl.EventPostSync;
 import thunder.hack.events.impl.EventSync;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.MovementUtility;
-import thunder.hack.utility.player.PlayerUtility;
 
 public class Spider extends Module {
-    public final Setting<Integer> delay = new Setting("delay", 2, 1, 15);
-    private final Setting<Mode> mode = new Setting("Mode", Mode.Matrix);
+    public final Setting<Integer> delay = new Setting<>("delay", 2, 1, 15);
+    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Matrix);
 
     public Spider() {
         super("Spider", Category.MOVEMENT);

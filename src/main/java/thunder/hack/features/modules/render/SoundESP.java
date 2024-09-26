@@ -1,14 +1,11 @@
 package thunder.hack.features.modules.render;
 
 import com.google.common.collect.Lists;
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector4d;
-import thunder.hack.events.impl.PacketEvent;
-import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.features.modules.Module;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -28,7 +25,7 @@ public class SoundESP extends Module {
     private List<Sound> sounds = new ArrayList<>();
 
     public void add(double x, double y, double z, String name) {
-            sounds.add(new Sound(x, y, z, name.replace("minecraft.block.", "").replace("minecraft.entity", "").replace(".", " ")));
+        sounds.add(new Sound(x, y, z, name.replace("minecraft.block.", "").replace("minecraft.entity", "").replace(".", " ")));
     }
 
     public void onRender2D(DrawContext context) {
@@ -52,13 +49,13 @@ public class SoundESP extends Module {
                 float textWidth = (FontRenderers.sf_bold.getStringWidth(s.name) * 1);
                 float tagX = (float) ((posX + diff - textWidth / 2) * 1);
 
-                float alpha = (float) (1f - Math.pow(1f - ((float)s.ticks / 60f), 3f));
+                float alpha = (float) (1f - Math.pow(1f - ((float) s.ticks / 60f), 3f));
 
                 context.getMatrices().push();
                 context.getMatrices().translate(tagX - 2 + (textWidth + 4) / 2f, (float) (posY - 13f) + 6.5f, 0);
                 context.getMatrices().scale(scale.getValue(), scale.getValue(), 1f);
                 context.getMatrices().translate(-(tagX - 2 + (textWidth + 4) / 2f), -(float) ((posY - 13f) + 6.5f), 0);
-                Render2DEngine.drawRect(context.getMatrices(), tagX - 2, (float) (posY - 13f), textWidth + 4, 11, fillColorA.getValue().withAlpha((int)(fillColorA.getValue().getAlpha() * alpha)).getColorObject());
+                Render2DEngine.drawRect(context.getMatrices(), tagX - 2, (float) (posY - 13f), textWidth + 4, 11, fillColorA.getValue().withAlpha((int) (fillColorA.getValue().getAlpha() * alpha)).getColorObject());
                 FontRenderers.sf_bold.drawString(context.getMatrices(), s.name, tagX, (float) posY - 10, Render2DEngine.applyOpacity(-1, alpha));
                 context.getMatrices().pop();
             }

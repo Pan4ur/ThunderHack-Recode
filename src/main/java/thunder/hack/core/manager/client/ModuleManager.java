@@ -315,7 +315,7 @@ public class ModuleManager implements IManager {
         modules.sort(Comparator.comparing(Module::getName));
 
         modules.forEach(m -> {
-            if (m.isEnabled() && (m.getCategory().getName().toLowerCase().equals(category.toLowerCase()) || category.equals("none")))
+            if (m.isEnabled() && (m.getCategory().getName().equalsIgnoreCase(category) || category.equals("none")))
                 ThunderHack.EVENT_BUS.subscribe(m);
         });
 
@@ -360,7 +360,7 @@ public class ModuleManager implements IManager {
 
     public void onUnload(String category) {
         modules.forEach(module -> {
-            if (module.isEnabled() && (module.getCategory().getName().toLowerCase().equals(category.toLowerCase()) || category.equals("none"))) {
+            if (module.isEnabled() && (module.getCategory().getName().equalsIgnoreCase(category) || category.equals("none"))) {
                 ThunderHack.EVENT_BUS.unsubscribe(module);
                 module.setEnabled(false);
             }

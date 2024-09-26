@@ -20,14 +20,13 @@ import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GuiMove extends Module {
+    public GuiMove() {
+        super("GuiMove", Category.MOVEMENT);
+    }
 
     private final Setting<Bypass> clickBypass = new Setting<>("Bypass", Bypass.None);
     private final Setting<Boolean> rotateOnArrows = new Setting<>("RotateOnArrows", true);
     private final Setting<Boolean> sneak = new Setting<>("sneak", false);
-
-    public GuiMove() {
-        super("GuiMove", Category.MOVEMENT);
-    }
 
     private final Queue<ClickSlotC2SPacket> storedClicks = new LinkedList<>();
     private AtomicBoolean pause = new AtomicBoolean();
@@ -54,7 +53,7 @@ public class GuiMove extends Module {
                 if (isKeyPressed(263))
                     deltaX -= 30f;
 
-                if(deltaX != 0 || deltaY != 0)
+                if (deltaX != 0 || deltaY != 0)
                     mc.player.changeLookDirection(deltaX, deltaY);
             }
 
@@ -65,7 +64,7 @@ public class GuiMove extends Module {
 
     @EventHandler
     public void onClickSlot(EventClickSlot e) {
-        if(clickBypass.is(Bypass.DisableClicks) && (MovementUtility.isMoving() || mc.options.jumpKey.isPressed()))
+        if (clickBypass.is(Bypass.DisableClicks) && (MovementUtility.isMoving() || mc.options.jumpKey.isPressed()))
             e.cancel();
     }
 
@@ -111,8 +110,8 @@ public class GuiMove extends Module {
             }
         }
 
-        if(e.getPacket() instanceof CloseHandledScreenC2SPacket) {
-            if(clickBypass.is(Bypass.Delay)) {
+        if (e.getPacket() instanceof CloseHandledScreenC2SPacket) {
+            if (clickBypass.is(Bypass.Delay)) {
                 pause.set(true);
                 while (!storedClicks.isEmpty())
                     sendPacket(storedClicks.poll());

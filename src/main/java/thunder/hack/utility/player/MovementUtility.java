@@ -2,7 +2,6 @@ package thunder.hack.utility.player;
 
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.MathHelper;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.events.impl.EventMove;
 import thunder.hack.features.modules.Module;
@@ -10,7 +9,6 @@ import thunder.hack.features.modules.Module;
 import static thunder.hack.features.modules.Module.mc;
 
 public final class MovementUtility {
-
     public static boolean isMoving() {
         return mc.player != null && mc.world != null && mc.player.input != null && (mc.player.input.movementForward != 0.0 || mc.player.input.movementSideways != 0.0);
     }

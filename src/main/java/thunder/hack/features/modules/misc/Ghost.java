@@ -8,16 +8,15 @@ import thunder.hack.features.modules.Module;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class Ghost extends Module {
-    private boolean bypass = false;
-
     public Ghost() {
         super("Ghost", Category.MISC);
     }
 
+    private boolean bypass = false;
+
     @Override
     public void onEnable() {
         bypass = false;
-        sendMessage(isRu() ? "Для возрождения выключи модуль!" : "To revive, turn off the module!");
     }
 
     @Override
@@ -34,6 +33,7 @@ public class Ghost extends Module {
             bypass = true;
             mc.setScreen(null);
             mc.player.setPosition(mc.player.getX(), mc.player.getY(), mc.player.getZ());
+            sendMessage(isRu() ? "Для возрождения выключи модуль!" : "To revive, turn off the module!");
         }
     }
 

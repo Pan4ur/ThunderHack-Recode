@@ -40,6 +40,5 @@ public class AntiCrash extends Module { //https://github.com/Bram1903/MinecraftP
             }
             receive.cancel();
         }
-
     }
 }

@@ -10,7 +10,6 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventTick;

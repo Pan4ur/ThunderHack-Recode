@@ -5,8 +5,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PressurePlateBlock;
 import net.minecraft.block.TripwireBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.EndermanEntity;
 import thunder.hack.events.impl.EventCollision;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
@@ -30,8 +28,7 @@ public class Avoid extends Module {
 
     @EventHandler
     public void onCollide(EventCollision e) {
-        if (fullNullCheck())
-            return;
+        if (fullNullCheck()) return;
         Block b = e.getState().getBlock();
 
         boolean avoidUnloaded = !mc.world.isChunkLoaded(e.getPos().getX() >> 4, e.getPos().getZ() >> 4) && unloaded.getValue();

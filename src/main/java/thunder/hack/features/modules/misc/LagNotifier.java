@@ -5,7 +5,6 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
-import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.PacketEvent;
@@ -23,6 +22,10 @@ import java.text.DecimalFormat;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class LagNotifier extends Module {
+    public LagNotifier() {
+        super("LagNotifier", Category.MISC);
+    }
+
     private final Setting<Boolean> rubberbandNotify = new Setting<>("Rubberband", true);
     private final Setting<Boolean> serverResponseNotify = new Setting<>("ServerResponse", true);
     private final Setting<Integer> responseTreshold = new Setting<>("ResponseTreshold", 5, 0, 15, v -> serverResponseNotify.getValue());
@@ -33,10 +36,6 @@ public class LagNotifier extends Module {
     private Timer packetTimer = new Timer();
 
     private boolean isLagging = false;
-
-    public LagNotifier() {
-        super("LagNotifier", Category.MISC);
-    }
 
     @Override
     public void onEnable() {
