@@ -5,6 +5,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
+import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.features.modules.client.Capes;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,9 +25,28 @@ public final class OptifineCapes {
     public static void loadPlayerCape(GameProfile player, ReturnCapeTexture response) {
         try {
             String uuid = player.getId().toString();
-            NativeImageBackedTexture nIBT = getCapeFromURL(String.format("http://s.optifine.net/capes/%s.png", player.getName()));
-            Identifier capeTexture = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("th-cape-" + uuid, nIBT);
-            response.response(capeTexture);
+            NativeImageBackedTexture optifineCape = getCapeFromURL(String.format("http://s.optifine.net/capes/%s.png", player.getName()));
+            NativeImageBackedTexture minecraftcapesCape = getCapeFromURL(String.format("https://api.minecraftcapes.net/profile/%s/cape/map", player.getId().toString().replace("-","")));
+            switch (ModuleManager.capes.priority.getValue()) {
+                case Capes.capePriority.Optifine:
+                    if (optifineCape != null && ModuleManager.capes.optifineCapes.getValue()) {
+                        Identifier capeTexture = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("th-cape-" + uuid, optifineCape);
+                        response.response(capeTexture);
+                    } else if (ModuleManager.capes.minecraftcapesCapes.getValue()) {
+                        Identifier capeTexture = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("th-cape-" + uuid, minecraftcapesCape);
+                        response.response(capeTexture);
+                    }
+                    break;
+                case Capes.capePriority.Minecraftcapes:
+                    if (minecraftcapesCape != null && ModuleManager.capes.minecraftcapesCapes.getValue()) {
+                        Identifier capeTexture = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("th-cape-" + uuid, minecraftcapesCape);
+                        response.response(capeTexture);
+                    } else if (ModuleManager.capes.optifineCapes.getValue()) {
+                        Identifier capeTexture = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("th-cape-" + uuid, optifineCape);
+                        response.response(capeTexture);
+                    }
+                    break;
+            }
         } catch (Exception ignored) {
         }
     }
@@ -57,7 +78,6 @@ public final class OptifineCapes {
         int imageHeight = 32;
         int imageSrcWidth = image.getWidth();
         int srcHeight = image.getHeight();
-
         for (int imageSrcHeight = image.getHeight(); imageWidth < imageSrcWidth || imageHeight < imageSrcHeight; imageHeight *= 2) {
             imageWidth *= 2;
         }
