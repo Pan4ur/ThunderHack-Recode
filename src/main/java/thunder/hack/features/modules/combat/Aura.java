@@ -84,8 +84,8 @@ public class Aura extends Module {
     public final Setting<Boolean> clientLook = new Setting<>("ClientLook", false);
     public final Setting<Boolean> pauseBaritone = new Setting<>("PauseBaritone", false);
     public final Setting<BooleanSettingGroup> oldDelay = new Setting<>("OldDelay", new BooleanSettingGroup(false));
-    public final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 100).addToGroup(oldDelay);
-    public final Setting<Integer> maxCPS = new Setting<>("MaxCPS", 12, 1, 100).addToGroup(oldDelay);
+    public final Setting<Integer> minCPS = new Setting<>("MinCPS", 7, 1, 20).addToGroup(oldDelay);
+    public final Setting<Integer> maxCPS = new Setting<>("MaxCPS", 12, 1, 20).addToGroup(oldDelay);
 
     public final Setting<ESP> esp = new Setting<>("ESP", ESP.ThunderHack);
     public final Setting<SettingGroup> espGroup = new Setting<>("ESPSettings", new SettingGroup(false, 0), v -> esp.is(ESP.ThunderHackV2));
