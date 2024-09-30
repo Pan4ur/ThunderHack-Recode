@@ -69,8 +69,8 @@ public final class OptifineCapes {
             URL request = new URL(String.format("https://api.mojang.com/users/profiles/minecraft/%s", player.getName()));
             HttpsURLConnection connection = (HttpsURLConnection) request.openConnection();
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(500);
-            connection.setReadTimeout(500);
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
             String inputLine;
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(connection.getInputStream()));
