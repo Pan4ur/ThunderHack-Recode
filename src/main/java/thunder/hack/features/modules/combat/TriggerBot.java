@@ -21,8 +21,8 @@ public final class TriggerBot extends Module {
     public final Setting<Boolean> autoJump = new Setting<>("AutoJump", false).addToGroup(smartCrit);
     public final Setting<Boolean> ignoreWalls = new Setting<>("IgnoreWalls", false);
     public final Setting<Boolean> pauseEating = new Setting<>("PauseWhileEating", false);
-    public final Setting<Integer> minDelay = new Setting<>("RandomDelayMin", 2, 0, 20);
-    public final Setting<Integer> maxDelay = new Setting<>("RandomDelayMax", 13, 0, 20);
+    public final Setting<Integer> minDelay = new Setting<>("RandomDelayMin", 50, 0, 20);
+    public final Setting<Integer> maxDelay = new Setting<>("RandomDelayMax", 100, 0, 20);
 
     private int delay;
     private final Random random = new Random(); // For random delay
