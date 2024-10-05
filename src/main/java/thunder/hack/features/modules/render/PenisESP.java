@@ -6,6 +6,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.combat.Aura;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render3DEngine;
@@ -27,8 +28,9 @@ public class PenisESP extends Module {
     private final Setting<Float> friendSize = new Setting<>("FriendSize", 1.5f, 0.1f, 3.0f);
     private final Setting<Float> enemySize = new Setting<>("EnemySize", 0.5f, 0.1f, 3.0f);
     private final Setting<Integer> gradation = new Setting<>("Gradation", 30, 20, 100);
+    private final Setting<Boolean> fimoz = new Setting<>("Fimoz", false);
     private final Setting<ColorSetting> penisColor = new Setting<>("PenisColor", new ColorSetting(new Color(231, 180, 122, 255)));
-    private final Setting<ColorSetting> headColor = new Setting<>("HeadColor", new ColorSetting(new Color(240, 50, 180, 255)));
+    private final Setting<ColorSetting> headColor = new Setting<>("HeadColor", new ColorSetting(new Color(240, 50, 180, 255)), v -> !fimoz.getValue());
 
     @Override
     public void onRender2D(DrawContext event) {
@@ -103,7 +105,11 @@ public class PenisESP extends Module {
         });
 
         drawBall(player, 0.1, gradation.getValue(), start, penisColor.getValue().getColorObject(), 1);
-        drawBall(player, 0.1, gradation.getValue(), end, headColor.getValue().getColorObject(), 2);
+        if (fimoz.getValue()) {
+            drawBall(player, 0.1, gradation.getValue(), end, penisColor.getValue().getColorObject(), 2);
+        } else {
+            drawBall(player, 0.1, gradation.getValue(), end, headColor.getValue().getColorObject(), 2);
+        }
     }
 
     public List<Vec3d> getVec3ds(Vec3d vec3d, double radius) {
