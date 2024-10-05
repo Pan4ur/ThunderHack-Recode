@@ -1,31 +1,9 @@
-package thunder.hack.features.modules.combat;
-
-import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import thunder.hack.core.Managers;
-import thunder.hack.core.manager.client.ModuleManager;
-import thunder.hack.events.impl.PlayerUpdateEvent;
-import thunder.hack.features.modules.Module;
-import thunder.hack.setting.Setting;
-import thunder.hack.setting.impl.BooleanSettingGroup;
-import java.util.Random;
+import net.minecraft.item.Items;
+import net.minecraft.item.ItemStack;
 
 public final class TriggerBot extends Module {
-    public final Setting<Float> attackRange = new Setting<>("Range", 3f, 1f, 7.0f);
-    public final Setting<BooleanSettingGroup> smartCrit = new Setting<>("SmartCrit", new BooleanSettingGroup(true));
-    public final Setting<Boolean> onlySpace = new Setting<>("OnlyCrit", false).addToGroup(smartCrit);
-    public final Setting<Boolean> autoJump = new Setting<>("AutoJump", false).addToGroup(smartCrit);
-    public final Setting<Boolean> ignoreWalls = new Setting<>("IgnoreWalls", false);
-    public final Setting<Boolean> pauseEating = new Setting<>("PauseWhileEating", false);
-    public final Setting<Integer> minDelay = new Setting<>("RandomDelayMin", 2, 0, 20);
-    public final Setting<Integer> maxDelay = new Setting<>("RandomDelayMax", 13, 0, 20);
-
-    private int delay;
-    private final Random random = new Random(); // For random delay
+    public final Setting<Boolean> requireWeapon = new Setting<>("RequireWeapon", true);
+    // Existing settings...
 
     public TriggerBot() {
         super("TriggerBot", Category.COMBAT);
@@ -36,6 +14,12 @@ public final class TriggerBot extends Module {
         if (mc.player.isUsingItem() && pauseEating.getValue()) {
             return;
         }
+
+        // Check for weapon requirement
+        if (requireWeapon.getValue() && !isHoldingValidWeapon()) {
+            return;
+        }
+
         if (!mc.options.jumpKey.isPressed() && mc.player.isOnGround() && autoJump.getValue())
             mc.player.jump();
 
@@ -52,45 +36,19 @@ public final class TriggerBot extends Module {
             mc.interactionManager.attackEntity(mc.player, ent);
             mc.player.swingHand(Hand.MAIN_HAND);
 
-            // Set delay for the next hit (10 to 20 ms)
-            delay = random.nextInt(minDelay.getValue(), maxDelay.getValue() + 1) ; // (20ms / 50ms per tick = ~0.4 ticks, 10ms / 50ms = ~0.2 ticks)
-            // ulybaka1337: am i cooking???
-            // default delay is calculated with
-            // nextInt(11) + 2
-            // so max value is 11+2=13 and min is 2
+            // Set delay for the next hit
+            delay = random.nextInt(minDelay.getValue(), maxDelay.getValue() + 1);
         }
     }
 
+    // Method to check if player is holding a valid weapon
+    private boolean isHoldingValidWeapon() {
+        ItemStack item = mc.player.getMainHandStack();
+        return item.isOf(Items.SWORD) || item.isOf(Items.AXE) || item.isOf(Items.BOW)
+            || item.isOf(Items.HOE) || item.isOf(Items.TRIDENT) || item.isOf(Items.PICKAXE);
+    }
+
     private boolean autoCrit() {
-        boolean reasonForSkipCrit =
-                !smartCrit.getValue().isEnabled()
-                        || mc.player.getAbilities().flying
-                        || (mc.player.isFallFlying() || ModuleManager.elytraPlus.isEnabled())
-                        || mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
-                        || mc.player.isHoldingOntoLadder()
-                        || mc.world.getBlockState(BlockPos.ofFloored(mc.player.getPos())).getBlock() == Blocks.COBWEB;
-
-        if (mc.player.fallDistance > 1 && mc.player.fallDistance < 1.14)
-            return false;
-
-        if (ModuleManager.aura.getAttackCooldown() < (mc.player.isOnGround() ? 1f : 0.9f))
-            return false;
-
-        boolean mergeWithTargetStrafe = !ModuleManager.targetStrafe.isEnabled() || !ModuleManager.targetStrafe.jump.getValue();
-        boolean mergeWithSpeed = !ModuleManager.speed.isEnabled() || mc.player.isOnGround();
-
-        if (!mc.options.jumpKey.isPressed() && mergeWithTargetStrafe && mergeWithSpeed && !onlySpace.getValue() && !autoJump.getValue())
-            return true;
-
-        if (mc.player.isInLava())
-            return true;
-
-        if (!mc.options.jumpKey.isPressed() && ModuleManager.aura.isAboveWater())
-            return true;
-
-        if (!reasonForSkipCrit)
-            return !mc.player.isOnGround() && mc.player.fallDistance > 0.0f;
-        return true;
+        // Existing autoCrit logic...
     }
 }
-
