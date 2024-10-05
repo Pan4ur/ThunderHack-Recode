@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.*;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import thunder.hack.core.Managers;
@@ -12,6 +13,7 @@ import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanSettingGroup;
+
 import java.util.Random;
 
 public final class TriggerBot extends Module {
@@ -23,6 +25,7 @@ public final class TriggerBot extends Module {
     public final Setting<Boolean> pauseEating = new Setting<>("PauseWhileEating", false);
     public final Setting<Integer> minDelay = new Setting<>("RandomDelayMin", 2, 0, 20);
     public final Setting<Integer> maxDelay = new Setting<>("RandomDelayMax", 13, 0, 20);
+    public final Setting<Boolean> requireWeapon = new Setting<>("RequireWeapon", true);
 
     private int delay;
     private final Random random = new Random(); // For random delay
@@ -33,13 +36,21 @@ public final class TriggerBot extends Module {
 
     @EventHandler
     public void onAttack(PlayerUpdateEvent e) {
+        // Pause while eating if setting is enabled
         if (mc.player.isUsingItem() && pauseEating.getValue()) {
             return;
         }
+
+        // Check if the player has a valid weapon equipped if the weapon requirement is enabled
+        if (requireWeapon.getValue() && !isWeaponEquipped()) {
+            return; // Exit if no valid weapon is equipped
+        }
+
+        // Auto jump if necessary
         if (!mc.options.jumpKey.isPressed() && mc.player.isOnGround() && autoJump.getValue())
             mc.player.jump();
 
-        // Smart crits should not be delayed
+        // Smart crit logic
         if (!autoCrit()) {
             if (delay > 0) {
                 delay--;
@@ -47,18 +58,25 @@ public final class TriggerBot extends Module {
             }
         }
 
+        // Target selection and attack
         Entity ent = Managers.PLAYER.getRtxTarget(mc.player.getYaw(), mc.player.getPitch(), attackRange.getValue(), ignoreWalls.getValue());
         if (ent != null && !Managers.FRIEND.isFriend(ent.getName().getString())) {
             mc.interactionManager.attackEntity(mc.player, ent);
             mc.player.swingHand(Hand.MAIN_HAND);
 
-            // Set delay for the next hit (10 to 20 ms)
-            delay = random.nextInt(minDelay.getValue(), maxDelay.getValue() + 1) ; // (20ms / 50ms per tick = ~0.4 ticks, 10ms / 50ms = ~0.2 ticks)
-            // ulybaka1337: am i cooking???
-            // default delay is calculated with
-            // nextInt(11) + 2
-            // so max value is 11+2=13 and min is 2
+            // Set delay for the next hit
+            delay = random.nextInt(minDelay.getValue(), maxDelay.getValue() + 1);
         }
+    }
+
+    // Method to check if the player is holding a valid weapon
+    private boolean isWeaponEquipped() {
+        ItemStack mainHandItem = mc.player.getMainHandStack();
+        return mainHandItem.getItem() instanceof SwordItem ||
+               mainHandItem.getItem() instanceof AxeItem ||
+               mainHandItem.getItem() instanceof TridentItem ||
+               mainHandItem.getItem() instanceof PickaxeItem ||
+               mainHandItem.getItem() instanceof BowItem;
     }
 
     private boolean autoCrit() {
@@ -93,4 +111,3 @@ public final class TriggerBot extends Module {
         return true;
     }
 }
-
