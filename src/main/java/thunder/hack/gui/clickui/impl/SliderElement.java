@@ -7,10 +7,10 @@ import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
-import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.gui.clickui.AbstractElement;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;
@@ -21,6 +21,7 @@ import java.util.Objects;
 import static thunder.hack.core.manager.IManager.mc;
 
 public class SliderElement extends AbstractElement {
+
     private final float min, max;
     private float animation, prevValue;
     private boolean dragging, listening;

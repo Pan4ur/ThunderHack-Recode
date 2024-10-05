@@ -5,6 +5,7 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.util.Formatting;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.features.modules.Module;
@@ -17,7 +18,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import static org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4;
 
 public class ChatTranslator extends Module {
+
     public ChatTranslator() {
         super("ChatTranslator", Category.CLIENT);
     }
@@ -91,9 +92,9 @@ public class ChatTranslator extends Module {
     public String translate(String text, String to) throws UnsupportedEncodingException, MalformedURLException {
         StringBuilder response = new StringBuilder();
 
-        URL url = new URL(String.format("https://translate.google.com/m?hl=en&sl=auto&tl=%s&ie=UTF-8&prev=_m&q=%s", to, URLEncoder.encode(text.trim(), StandardCharsets.UTF_8)));
+        URL url = new URL(String.format("https://translate.google.com/m?hl=en&sl=auto&tl=%s&ie=UTF-8&prev=_m&q=%s", to, URLEncoder.encode(text.trim(), "UTF-8")));
         try {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"))) {
                 String line;
                 while ((line = br.readLine()) != null)
                     response.append(line + "\n");

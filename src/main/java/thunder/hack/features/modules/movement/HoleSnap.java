@@ -23,10 +23,6 @@ import java.util.ArrayList;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class HoleSnap extends Module {
-    public HoleSnap() {
-        super("HoleSnap", Category.MOVEMENT);
-    }
-
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Yaw);
     private final Setting<Integer> searchRange = new Setting<>("Search Range", 5, 1, 20);
     private final Setting<Integer> searchFOV = new Setting<>("Search FOV", 360, 1, 360);
@@ -40,6 +36,10 @@ public class HoleSnap extends Module {
 
     private BlockPos hole;
     private float prevClientYaw;
+
+    public HoleSnap() {
+        super("HoleSnap", Category.MOVEMENT);
+    }
 
     @Override
     public void onEnable() {

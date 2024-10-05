@@ -57,6 +57,7 @@ public class ServerManager implements IManager {
         }
     }
 
+
     public int getPing() {
         if (mc.getNetworkHandler() == null || mc.player == null) return 0;
 

@@ -19,9 +19,11 @@ import java.awt.*;
 import static thunder.hack.features.hud.impl.RadarRewrite.getRotations;
 
 public class CrosshairArrows extends HudElement {
+
     public CrosshairArrows() {
         super("CrosshairArrows", 0, 0);
     }
+
 
     public static Setting<Boolean> glow = new Setting<>("Glow", false);
     private final Setting<Float> width = new Setting<>("Height", 2.28f, 0.1f, 5f);

@@ -16,6 +16,7 @@ public class ViewModel extends Module {
         super("ViewModel", Category.RENDER);
     }
 
+
     public final Setting<Boolean> syncHands = new Setting<>("SyncHands", true);
 
     public final Setting<SettingGroup> mainHand = new Setting<>("MainHand", new SettingGroup(false, 0));
@@ -58,6 +59,7 @@ public class ViewModel extends Module {
     private float rotate(float value, float speed) {
         return value - speed <= 180 && value - speed > -180 ? value - speed : 180;
     }
+
 
     @EventHandler
     public void onSettingChange(EventSetting e) {

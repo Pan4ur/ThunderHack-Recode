@@ -54,7 +54,7 @@ public class StaffBoard extends HudElement {
                     || player.getProfile().getName().toLowerCase().contains("ruthless")
                     || player.getScoreboardTeam().getPrefix().getString().contains("YT")
                     || (player.getScoreboardTeam().getPrefix().getString().contains("Y") && player.getScoreboardTeam().getPrefix().getString().contains("T"))) {
-                String name = Arrays.asList(player.getScoreboardTeam().getPlayerList().toArray()).toString().replace("[", "").replace("]", "");
+                String name = Arrays.asList(player.getScoreboardTeam().getPlayerList().stream().toArray()).toString().replace("[", "").replace("]", "");
 
                 if (player.getGameMode() == GameMode.SPECTATOR) {
                     S.add(player.getScoreboardTeam().getPrefix().getString() + name + ":gm3");
@@ -70,7 +70,7 @@ public class StaffBoard extends HudElement {
         List<String> list = new ArrayList<>();
         for (Team s : mc.world.getScoreboard().getTeams()) {
             if (s.getPrefix().getString().isEmpty() || mc.isInSingleplayer()) continue;
-            String name = Arrays.asList(s.getPlayerList().toArray()).toString().replace("[", "").replace("]", "");
+            String name = Arrays.asList(s.getPlayerList().stream().toArray()).toString().replace("[", "").replace("]", "");
 
             if (getOnlinePlayer().contains(name) || name.isEmpty())
                 continue;

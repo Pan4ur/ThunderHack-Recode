@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.gui.font.FontRenderers;
@@ -16,6 +17,7 @@ import thunder.hack.utility.math.MathUtility;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class AutoTpAccept extends Module {
+
     public AutoTpAccept() {
         super("AutoTPaccept", Category.MISC);
     }
@@ -39,7 +41,8 @@ public class AutoTpAccept extends Module {
                         else
                             tpTask = new TpTask(() -> acceptRequest(packet.content.getString()), System.currentTimeMillis());
                     }
-                } else acceptRequest(packet.content().getString());
+                } else
+                    acceptRequest(packet.content().getString());
             }
         }
     }

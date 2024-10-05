@@ -4,12 +4,15 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
+import net.minecraft.entity.passive.DonkeyEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.combat.AutoAnchor;
 import thunder.hack.setting.Setting;
 
 import static thunder.hack.features.modules.combat.Criticals.getEntity;
@@ -35,10 +38,11 @@ public final class AntiAttack extends Module {
                 e.cancel();
             if (entity instanceof ZombifiedPiglinEntity && zoglin.getValue())
                 e.cancel();
-            if (entity instanceof VillagerEntity && villager.getValue()) {
+            if(entity instanceof VillagerEntity && villager.getValue()){
                 e.cancel();
-            } else if (oneHp.getValue() && entity instanceof LivingEntity lent) {
-                if (lent.getHealth() <= hp.getValue()) {
+            }
+            else if(oneHp.getValue() && entity instanceof LivingEntity lent){
+                if(lent.getHealth() <= hp.getValue()){
                     e.cancel();
                 }
             }

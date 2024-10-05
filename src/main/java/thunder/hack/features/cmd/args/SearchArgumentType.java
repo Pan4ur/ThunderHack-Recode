@@ -11,13 +11,12 @@ import net.minecraft.block.Block;
 import net.minecraft.command.CommandSource;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
+import thunder.hack.features.modules.client.ClientSettings;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
-import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class SearchArgumentType implements ArgumentType<String> {
     private static final List<String> EXAMPLES = getRegisteredBlocks().stream().limit(5).toList();
@@ -30,7 +29,7 @@ public class SearchArgumentType implements ArgumentType<String> {
     public String parse(StringReader reader) throws CommandSyntaxException {
         String blockName = reader.readString();
         if (!getRegisteredBlocks().contains(blockName)) throw new DynamicCommandExceptionType(
-                name -> Text.literal(isRu() ? "Такого блока нет!" : "There is no such block!")
+                name -> Text.literal(ClientSettings.language.getValue().equals(ClientSettings.Language.RU) ? "Такого блока нет!" : "There is no such block!")
         ).create(blockName);
         return blockName;
     }
@@ -52,4 +51,5 @@ public class SearchArgumentType implements ArgumentType<String> {
         }
         return result;
     }
+
 }

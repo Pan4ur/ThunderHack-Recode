@@ -57,6 +57,7 @@ public class TargetHud extends HudElement {
     private final Setting<Boolean> mini = new Setting<>("Mini", false, v -> Mode.getValue() == ModeEn.NurikZapen);
     private final Setting<Boolean> absorp = new Setting<>("Absorption", true);
 
+
     private static Identifier custom;
 
     public EaseOutBack animation = new EaseOutBack();

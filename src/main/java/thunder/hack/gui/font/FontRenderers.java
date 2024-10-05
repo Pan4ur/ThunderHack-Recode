@@ -29,7 +29,7 @@ public class FontRenderers {
     public static FontRenderer getModulesRenderer() {
         return modules;
     }
-
+    
     public static @NotNull FontRenderer create(float size, String name) throws IOException, FontFormatException {
         return new FontRenderer(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(ThunderHack.class.getClassLoader().getResourceAsStream("assets/thunderhack/fonts/" + name + ".ttf"))).deriveFont(Font.PLAIN, size / 2f), size / 2f);
     }

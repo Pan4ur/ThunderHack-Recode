@@ -17,7 +17,6 @@ import thunder.hack.injection.accesors.IMinecraftClient;
 import java.util.Optional;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class LoginCommand extends Command {
     public LoginCommand() {
@@ -28,13 +27,13 @@ public class LoginCommand extends Command {
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(arg("name", StringArgumentType.word()).executes(context -> {
             login(context.getArgument("name", String.class));
-            sendMessage((isRu() ? "Аккаунт изменен на: " : "Switched account to: ") + mc.getSession().getUsername());
+            sendMessage("Аккаунт изменен на: " + mc.getSession().getUsername());
 
             return SINGLE_SUCCESS;
         }));
 
         builder.executes(context -> {
-            sendMessage(isRu() ? "Использование: .login <nickname>" : "Usage: .login <nickname>");
+            sendMessage("Использование: .login <nickname>");
 
             return SINGLE_SUCCESS;
         });
@@ -44,9 +43,10 @@ public class LoginCommand extends Command {
         try {
             setSession(new Session(name, Uuids.getOfflinePlayerUuid(name), "", Optional.empty(), Optional.empty(), Session.AccountType.MOJANG));
         } catch (Exception exception) {
-            sendMessage((isRu() ? "Неверное имя! " : "Incorrect username! ") + exception);
+            sendMessage("Неверное имя! " + exception);
         }
     }
+
 
     public void setSession(Session session) {
         IMinecraftClient mca = (IMinecraftClient) mc;

@@ -18,11 +18,12 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
+import thunder.hack.features.cmd.Command;
 import thunder.hack.core.manager.client.AsyncManager;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventSync;
-import thunder.hack.features.cmd.Command;
 import thunder.hack.features.modules.Module;
 import thunder.hack.features.modules.combat.Aura;
 import thunder.hack.setting.Setting;
@@ -48,7 +49,7 @@ public class MiddleClick extends Module {
     private final Setting<Boolean> silent = new Setting<>("Silent", true);
     private final Setting<Boolean> inventory = new Setting<>("Inventory", true);
     private final Setting<Integer> swapDelay = new Setting<>("SwapDelay", 100, 0, 1000, v -> !silent.getValue());
-    private final Setting<BooleanSettingGroup> antiWaste = new Setting<>("AntiWaste", new BooleanSettingGroup(true));
+    private final Setting<BooleanSettingGroup> antiWaste = new Setting<>("AntiWaste",new BooleanSettingGroup(true));
     private final Setting<Integer> durability = new Setting<>("StopOn", 90, 0, 100).addToGroup(antiWaste);
     public final Setting<Boolean> antiPickUp = new Setting<>("AntiPickUp", true);
     private final Setting<Boolean> feetExp = new Setting<>("FeetXP", false);
@@ -67,14 +68,14 @@ public class MiddleClick extends Module {
             HitResult target = mc.crosshairTarget;
 
             if (mc.player.isFallFlying()) {
-                if (mc.options.pickItemKey.isPressed())
+                if(mc.options.pickItemKey.isPressed())
                     onFlying.getValue().doAction(event);
                 state = onFlying.getValue().toString();
                 return;
             }
 
             if (target instanceof EntityHitResult ehr && ehr.getEntity() instanceof PlayerEntity) {
-                if (mc.options.pickItemKey.isPressed())
+                if(mc.options.pickItemKey.isPressed())
                     onEntity.getValue().doAction(event);
                 state = onEntity.getValue().toString();
                 return;
@@ -82,17 +83,17 @@ public class MiddleClick extends Module {
 
             if (target instanceof BlockHitResult bhr) {
                 if (mc.world.isAir(bhr.getBlockPos())) {
-                    if (mc.options.pickItemKey.isPressed())
+                    if(mc.options.pickItemKey.isPressed())
                         onAir.getValue().doAction(event);
                     state = onAir.getValue().toString();
                 } else {
-                    if (mc.options.pickItemKey.isPressed())
+                    if(mc.options.pickItemKey.isPressed())
                         onBlock.getValue().doAction(event);
                     state = onBlock.getValue().toString();
                 }
                 return;
             }
-            if (mc.options.pickItemKey.isPressed())
+            if(mc.options.pickItemKey.isPressed())
                 onAir.getValue().doAction(event);
             state = onAir.getValue().toString();
         }
@@ -300,8 +301,7 @@ public class MiddleClick extends Module {
             });
         }),
 
-        None((EventSync e) -> {
-        });
+        None((EventSync e) -> {});
 
         private final Consumer<EventSync> r;
 

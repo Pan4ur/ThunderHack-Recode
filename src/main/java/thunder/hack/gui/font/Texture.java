@@ -3,6 +3,7 @@ package thunder.hack.gui.font;
 import net.minecraft.util.Identifier;
 
 public class Texture {
+
     final Identifier id;
 
     public Texture(String path) {

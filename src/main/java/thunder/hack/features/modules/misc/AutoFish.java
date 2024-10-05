@@ -9,6 +9,7 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.features.modules.Module;
@@ -37,9 +38,11 @@ public class AutoFish extends Module {
         Sound, DataTracker
     }
 
+
     @Override
     public void onEnable() {
-        if (fullNullCheck()) disable("NPE protection");
+        if (fullNullCheck())
+            disable("NPE protection");
     }
 
     @Override
@@ -47,10 +50,11 @@ public class AutoFish extends Module {
         flag = false;
     }
 
+
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
-        if (e.getPacket() instanceof PlaySoundS2CPacket sound && detectMode.getValue() == DetectMode.Sound)
-            if (sound.getSound().value().equals(SoundEvents.ENTITY_FISHING_BOBBER_SPLASH) && mc.player.fishHook != null && mc.player.fishHook.squaredDistanceTo(sound.getX(), sound.getY(), sound.getZ()) < 4f)
+        if(e.getPacket() instanceof PlaySoundS2CPacket sound && detectMode.getValue() == DetectMode.Sound)
+            if(sound.getSound().value().equals(SoundEvents.ENTITY_FISHING_BOBBER_SPLASH) && mc.player.fishHook != null && mc.player.fishHook.squaredDistanceTo(sound.getX(), sound.getY(), sound.getZ()) < 4f)
                 catchFish();
     }
 
@@ -68,7 +72,8 @@ public class AutoFish extends Module {
             }
         }
 
-        if (!cooldown.passedMs(1000)) return;
+        if(!cooldown.passedMs(1000))
+            return;
 
         if (timeout.passedMs(45000) && mc.player.getMainHandStack().getItem() instanceof FishingRodItem) {
             mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
@@ -92,7 +97,8 @@ public class AutoFish extends Module {
             mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
             sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
-            if (autoSell.getValue() && timeout.passedMs(1000)) mc.player.networkHandler.sendChatCommand("sellfish");
+            if (autoSell.getValue() && timeout.passedMs(1000))
+                mc.player.networkHandler.sendChatCommand("sellfish");
 
             try {
                 Thread.sleep((int) MathUtility.random(899, 1399));
@@ -109,7 +115,8 @@ public class AutoFish extends Module {
     private int getRodSlot() {
         for (int i = 0; i < 9; i++) {
             final ItemStack item = mc.player.getInventory().getStack(i);
-            if (item.getItem() == Items.FISHING_ROD && item.getDamage() < 52) return i;
+            if (item.getItem() == Items.FISHING_ROD && item.getDamage() < 52)
+                return i;
         }
         return -1;
     }

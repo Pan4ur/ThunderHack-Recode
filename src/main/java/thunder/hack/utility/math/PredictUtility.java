@@ -14,20 +14,20 @@ import static thunder.hack.features.modules.Module.mc;
 
 public class PredictUtility {
     public static PlayerEntity movePlayer(PlayerEntity entity, Vec3d newPos) {
-        if (entity == null || newPos == null)
+        if(entity == null || newPos == null)
             return null;
         return equipAndReturn(entity, newPos);
     }
 
     public static PlayerEntity predictPlayer(PlayerEntity entity, int ticks) {
         Vec3d posVec = predictPosition(entity, ticks);
-        if (posVec == null)
+        if(posVec == null)
             return null;
         return equipAndReturn(entity, posVec);
     }
 
     public static Vec3d predictPosition(PlayerEntity entity, int ticks) {
-        if (entity == null)
+        if(entity == null)
             return null;
 
         Vec3d posVec = new Vec3d(entity.getX(), entity.getY(), entity.getZ());
@@ -43,7 +43,9 @@ public class PredictUtility {
                 motionX = 0;
                 motionZ = 0;
             }
+
             posVec = posVec.add(motionX, 0, motionZ);
+
         }
 
         return posVec;
@@ -51,7 +53,7 @@ public class PredictUtility {
 
     public static Box predictBox(PlayerEntity entity, int ticks) {
         Vec3d posVec = predictPosition(entity, ticks);
-        if (posVec == null)
+        if(posVec == null)
             return null;
         return createBox(posVec, entity);
     }

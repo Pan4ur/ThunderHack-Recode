@@ -16,10 +16,6 @@ import thunder.hack.utility.player.MovementUtility;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class Timer extends Module {
-    public Timer() {
-        super("Timer", Category.MOVEMENT);
-    }
-
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Normal);
     private final Setting<Boolean> old = new Setting<>("Old", false, v -> mode.is(Mode.Matrix));
     public final Setting<Float> speed = new Setting<>("Speed", 2.0f, 0.1f, 10.0f, v -> mode.getValue() != Mode.Shift);
@@ -30,6 +26,11 @@ public class Timer extends Module {
     public static float energy, yaw, pitch;
     private static double prevPosX, prevPosY, prevPosZ;
     private long cancelTime;
+    private CommonPingS2CPacket pingPacket;
+
+    public Timer() {
+        super("Timer", Category.MOVEMENT);
+    }
 
     @Override
     public void onEnable() {
@@ -49,7 +50,10 @@ public class Timer extends Module {
     @Override
     public void onUpdate() {
         switch (mode.getValue()) {
-            case Normal -> ThunderHack.TICK_TIMER = speed.getValue();
+            case Normal -> {
+                ThunderHack.TICK_TIMER = speed.getValue();
+            }
+
             case Matrix -> {
                 if (!MovementUtility.isMoving()) {
                     ThunderHack.TICK_TIMER = 1f;

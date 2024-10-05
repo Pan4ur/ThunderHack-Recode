@@ -6,12 +6,12 @@ import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
-import thunder.hack.core.manager.client.ConfigManager;
 import thunder.hack.features.cmd.Command;
-import thunder.hack.features.modules.Module;
-import thunder.hack.features.modules.client.ThunderHackGui;
+import thunder.hack.core.manager.client.ConfigManager;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.components.*;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.ThunderHackGui;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.setting.impl.ColorSetting;
@@ -29,11 +29,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static thunder.hack.features.modules.Module.mc;
 import static thunder.hack.utility.render.animation.AnimationUtility.fast;
 
-/**
- * Кто спиздит у того мать у меня под столом
- *
- * @Copyright by Pan4ur#2144
- **/
 public class ThunderGui extends Screen {
     public static CurrentMode currentMode = CurrentMode.Modules;
     public static boolean scroll_lock = false;
@@ -52,6 +47,12 @@ public class ThunderGui extends Screen {
     public final CopyOnWriteArrayList<ConfigComponent> configs = new CopyOnWriteArrayList<>();
     public final CopyOnWriteArrayList<FriendComponent> friends = new CopyOnWriteArrayList<>();
     private final int main_width = 400;
+
+    /**
+     * Кто спиздит у того мать у меня под столом
+     *
+     * @Copyright by Pan4ur#2144
+     **/
 
     public int main_posX = 100;
     public int main_posY = 100;
@@ -216,10 +217,12 @@ public class ThunderGui extends Screen {
         manager_animation = fast(manager_animation, 0, 15f);
         category_animation = fast(category_animation, 0, 15f);
 
-        // Основная плита / Main GUI
+        // Основная плита
+        // Main GUI
         Render2DEngine.drawRound(context.getMatrices(), main_posX, main_posY, main_width, main_height, 9f, ThunderHackGui.getColorByTheme(0));
 
-        // Плита с лого / Main GUI logo
+        // Плита с лого
+        // Main GUI logo
         Render2DEngine.drawRound(context.getMatrices(), main_posX + 5, main_posY + 5, 90, 30, 7f, ThunderHackGui.getColorByTheme(1));
 
         context.getMatrices().push();
@@ -587,8 +590,7 @@ public class ThunderGui extends Screen {
                 search_string = (removeLastChar(search_string));
                 return;
             }
-            if (keyCode >= GLFW.GLFW_KEY_A && keyCode <= GLFW.GLFW_KEY_Z || keyCode >= GLFW.GLFW_KEY_0 && keyCode <= GLFW.GLFW_KEY_9)
-                search_string = (search_string + typedChar);
+            if(keyCode >= GLFW.GLFW_KEY_A && keyCode <= GLFW.GLFW_KEY_Z || keyCode >= GLFW.GLFW_KEY_0 && keyCode <= GLFW.GLFW_KEY_9) search_string = (search_string + typedChar);
         }
         if (listening_config) {
             if (config_string.equalsIgnoreCase("Save config")) {

@@ -8,6 +8,7 @@ import thunder.hack.utility.render.Render2DEngine;
 import java.awt.*;
 
 public class DamageTint extends Module {
+
     public DamageTint() {
         super("DamageTint", Category.RENDER);
     }

@@ -108,6 +108,7 @@ public class AutoArmor extends Module {
 
             EquipmentSlot slot = is.getItem() instanceof ArmorItem ai ? ai.getSlotType() : EquipmentSlot.BODY;
 
+
             if (is.getItem() instanceof ElytraItem) {
                 if (!ElytraItem.isUsable(is))
                     return 0;
@@ -145,6 +146,8 @@ public class AutoArmor extends Module {
                 ItemEnchantmentsComponent enchants = EnchantmentHelper.getEnchantments(is);
 
                 //mc.world.getRegistryManager().get(Enchantments.BLAST_PROTECTION.getRegistryRef()).getEntry(Enchantments.BLAST_PROTECTION).get()
+
+
                 if (enchants.getEnchantments().contains(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(Enchantments.PROTECTION).get()))
                     prot += enchants.getLevel(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(Enchantments.PROTECTION).get()) * protectionMultiplier;
 

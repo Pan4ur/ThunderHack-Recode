@@ -31,6 +31,7 @@ public class GpsCommand extends Command {
                     sendMessage("GPS настроен на X: " + ThunderHack.gps_position.getX() + " Z: " + ThunderHack.gps_position.getZ());
                     return SINGLE_SUCCESS;
                 })));
+
         builder.executes(context -> {
             sendMessage("Попробуй .gps off / .gps x z");
             return SINGLE_SUCCESS;

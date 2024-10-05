@@ -11,10 +11,6 @@ import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.MovementUtility;
 
 public class AutoFlyme extends Module {
-    public AutoFlyme() {
-        super("AutoFlyme", Category.MISC);
-    }
-
     public final Setting<Boolean> instantSpeed = new Setting<>("InstantSpeed", true);
     public final Setting<Boolean> hover = new Setting<>("hover", false);
     public final Setting<Boolean> useTimer = new Setting<>("UseTimer", false);
@@ -23,7 +19,12 @@ public class AutoFlyme extends Module {
     public Setting<Float> speed = new Setting<>("speed", 1.05f, 0.0f, 8f, v -> hover.getValue());
 
     //фаннигейм перешел на матрикс, и теперь можно летать со скоростью 582 км/ч :skull:
+
     private final Timer timer = new Timer();
+
+    public AutoFlyme() {
+        super("AutoFlyme", Category.MISC);
+    }
 
     @Override
     public void onEnable() {

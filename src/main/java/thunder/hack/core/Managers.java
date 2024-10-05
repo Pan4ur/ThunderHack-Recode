@@ -27,7 +27,7 @@ public class Managers {
     public static final PlayerManager PLAYER = new PlayerManager();
 
     // World
-    public static final HoleManager HOLE = new HoleManager(); //todo ???
+    public static final HoleManager HOLE = new HoleManager();
     public static final WayPointManager WAYPOINT = new WayPointManager();
 
     // Client

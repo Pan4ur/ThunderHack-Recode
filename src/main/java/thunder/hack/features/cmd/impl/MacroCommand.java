@@ -25,7 +25,7 @@ public class MacroCommand extends Command {
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(literal("list").executes(context -> {
-            sendMessage(isRu() ? "Макросы:" : "Macros:");
+            sendMessage(isRu() ? "Макросы:" : "Macro list:");
             sendMessage(" ");
             Managers.MACRO.getMacros().forEach(macro -> sendMessage(macro.getName() + (macro.getBind() != -1 ? " [" + toString(macro.getBind()) + "]" : "") + " {" + macro.getText() + "}"));
             return SINGLE_SUCCESS;

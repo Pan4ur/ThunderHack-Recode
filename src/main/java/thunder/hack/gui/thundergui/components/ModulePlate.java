@@ -4,10 +4,10 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
 import thunder.hack.features.cmd.Command;
-import thunder.hack.features.modules.Module;
-import thunder.hack.features.modules.client.ThunderHackGui;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.thundergui.ThunderGui;
+import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.ThunderHackGui;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
@@ -18,6 +18,7 @@ import java.util.Objects;
 import static thunder.hack.features.modules.Module.mc;
 
 public class ModulePlate {
+
     float scroll_animation = 0f;
     private final Module module;
     private int posX;
@@ -95,6 +96,7 @@ public class ModulePlate {
         if (listening_bind) {
             FontRenderers.modules.drawString(stack, "PressKey", posX + 85 - FontRenderers.modules.getStringWidth("PressKey"), posY + 5, Render2DEngine.applyOpacity(new Color(0xB0B0B0), getFadeFactor()).getRGB());
         } else if (!Objects.equals(module.getBind().getBind(), "None")) {
+
             String sbind = module.getBind().getBind();
             if (sbind.equals("LEFT_CONTROL")) {
                 sbind = "LCtrl";
@@ -164,6 +166,7 @@ public class ModulePlate {
             fade++;
         }
     }
+
 
     private boolean isHovered(int mouseX, int mouseY) {
         return mouseX > posX && mouseX < posX + 90 && mouseY > posY && mouseY < posY + 30;
@@ -241,4 +244,5 @@ public class ModulePlate {
     public Module getModule() {
         return this.module;
     }
+
 }

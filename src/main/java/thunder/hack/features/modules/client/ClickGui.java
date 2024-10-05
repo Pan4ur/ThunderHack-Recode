@@ -4,6 +4,7 @@ import baritone.api.BaritoneAPI;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.Identifier;
 import thunder.hack.ThunderHack;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventSetting;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.font.FontRenderers;

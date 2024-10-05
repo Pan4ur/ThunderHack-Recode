@@ -14,9 +14,9 @@ import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.features.modules.client.HudEditor;
-import thunder.hack.gui.font.FontRenderers;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -25,6 +25,7 @@ import java.util.List;
 import static thunder.hack.features.modules.Module.mc;
 
 public class Render3DEngine {
+
     public static List<FillAction> FILLED_QUEUE = new ArrayList<>();
     public static List<OutlineAction> OUTLINE_QUEUE = new ArrayList<>();
     public static List<FadeAction> FADE_QUEUE = new ArrayList<>();

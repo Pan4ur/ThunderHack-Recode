@@ -269,12 +269,21 @@ public class Chams extends Module {
     }
 
     private static float getYaw(Direction direction) {
-        return switch (direction) {
-            case NORTH -> 270.0f;
-            case SOUTH -> 90.0f;
-            case EAST -> 180.0f;
-            default -> 0.0f;
-        };
+        switch (direction) {
+            case SOUTH: {
+                return 90.0f;
+            }
+            case WEST: {
+                return 0.0f;
+            }
+            case NORTH: {
+                return 270.0f;
+            }
+            case EAST: {
+                return 180.0f;
+            }
+        }
+        return 0.0f;
     }
 
     @EventHandler

@@ -11,12 +11,11 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import thunder.hack.core.Managers;
 import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.ClientSettings;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
-import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class CategoryArgumentType implements ArgumentType<String> {
     private static final List<String> EXAMPLES = Managers.MODULE.getCategories().stream()
@@ -31,7 +30,7 @@ public class CategoryArgumentType implements ArgumentType<String> {
     public String parse(StringReader reader) throws CommandSyntaxException {
         String cat = reader.readString();
         if (!EXAMPLES.contains(cat)) throw new DynamicCommandExceptionType(
-                name -> Text.literal(isRu() ? "Категории " + name.toString() + " не существует(" : "Category " + name.toString() + " does not exist :(")
+                name -> Text.literal(ClientSettings.language.getValue().equals(ClientSettings.Language.RU) ? "Категории " + name.toString() + " не существует(" : "Category " + name.toString() + " does not exists(")
         ).create(cat);
         return cat;
     }

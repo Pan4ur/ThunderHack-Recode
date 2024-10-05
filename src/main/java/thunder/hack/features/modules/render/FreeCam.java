@@ -2,6 +2,7 @@ package thunder.hack.features.modules.render;
 
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import org.lwjgl.glfw.GLFW;
@@ -13,18 +14,19 @@ import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 public class FreeCam extends Module {
-    public FreeCam() {
-        super("FreeCam", Category.RENDER);
-    }
-
     private final Setting<Float> speed = new Setting<>("HSpeed", 1f, 0.1f, 3f);
     private final Setting<Float> hspeed = new Setting<>("VSpeed", 0.42f, 0.1f, 3f);
     private final Setting<Boolean> freeze = new Setting<>("Freeze", false);
     public final Setting<Boolean> track = new Setting<>("Track", false);
 
+
     private float fakeYaw, fakePitch, prevFakeYaw, prevFakePitch, prevScroll;
     private double fakeX, fakeY, fakeZ, prevFakeX, prevFakeY, prevFakeZ;
     public LivingEntity trackEntity;
+
+    public FreeCam() {
+        super("FreeCam", Category.RENDER);
+    }
 
     @Override
     public void onEnable() {
@@ -48,7 +50,7 @@ public class FreeCam extends Module {
 
     @EventHandler
     public void onAttack(EventAttack e) {
-        if (!e.isPre() && e.getEntity() instanceof LivingEntity entity && track.getValue())
+        if(!e.isPre() && e.getEntity() instanceof LivingEntity entity && track.getValue())
             trackEntity = entity;
     }
 
@@ -63,10 +65,10 @@ public class FreeCam extends Module {
         prevFakeYaw = fakeYaw;
         prevFakePitch = fakePitch;
 
-        if (isKeyPressed(GLFW.GLFW_KEY_ESCAPE) || isKeyPressed(GLFW.GLFW_KEY_LEFT_SHIFT) || isKeyPressed(GLFW.GLFW_KEY_RIGHT_SHIFT))
+        if(isKeyPressed(GLFW.GLFW_KEY_ESCAPE) || isKeyPressed(GLFW.GLFW_KEY_LEFT_SHIFT) || isKeyPressed(GLFW.GLFW_KEY_RIGHT_SHIFT))
             trackEntity = null;
 
-        if (trackEntity != null) {
+        if(trackEntity != null) {
             fakeYaw = trackEntity.getYaw();
             fakePitch = trackEntity.getPitch();
 
@@ -88,7 +90,7 @@ public class FreeCam extends Module {
     public void onKeyboardInput(EventKeyboardInput e) {
         if (mc.player == null) return;
 
-        if (trackEntity == null) {
+        if(trackEntity == null) {
             double[] motion = MovementUtility.forward(speed.getValue());
 
             prevFakeX = fakeX;
@@ -129,8 +131,8 @@ public class FreeCam extends Module {
 
     @EventHandler
     public void onScroll(EventMouse e) {
-        if (e.getAction() == 2) {
-            if (e.getButton() > 0) speed.setValue(speed.getValue() + 0.05f);
+        if(e.getAction() == 2) {
+            if(e.getButton() > 0) speed.setValue(speed.getValue() + 0.05f);
             else speed.setValue(speed.getValue() - 0.05f);
             prevScroll = e.getButton();
         }

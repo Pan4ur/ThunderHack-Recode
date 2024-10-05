@@ -15,7 +15,10 @@ import java.util.List;
 
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
-public class UnHook extends Module { // Йо фабос, засунь в о4ко себе фалос
+public class UnHook extends Module {
+
+    // Йо фабос, засунь в о4ко себе фалос
+    // Yo dude shove a dick up your ass
     public UnHook() {
         super("UnHook", Category.CLIENT);
     }

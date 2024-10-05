@@ -20,7 +20,7 @@ public class BreakHighLight extends Module {
         super("BreakHighLight", Category.RENDER);
     }
 
-    private final Setting<Mode> mode = new Setting<>("Mode", Mode.Shrink);
+    private final Setting<Mode> mode = new Setting("Mode", Mode.Shrink);
 
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(new Color(0x90FD0000, true)));
     private final Setting<ColorSetting> color2 = new Setting<>("Color2", new ColorSetting(new Color(0xFFFD0000, true)));
@@ -37,7 +37,7 @@ public class BreakHighLight extends Module {
         if (mc.interactionManager.isBreakingBlock() && mc.crosshairTarget != null && mc.crosshairTarget instanceof BlockHitResult bhr && !mc.world.isAir(bhr.getBlockPos())) {
             Box shrunkMineBox = new Box(bhr.getBlockPos().getX(), bhr.getBlockPos().getY(), bhr.getBlockPos().getZ(), bhr.getBlockPos().getX(), bhr.getBlockPos().getY(), bhr.getBlockPos().getZ());
 
-            float noom; //ам ням ебался
+            float noom; //ам ням не ебался
 
             switch (mode.getValue()) {
                 case Grow -> noom = Render2DEngine.interpolateFloat(prevProgress, MathUtility.clamp(mc.interactionManager.currentBreakingProgress, 0f, 1f), Render3DEngine.getTickDelta());

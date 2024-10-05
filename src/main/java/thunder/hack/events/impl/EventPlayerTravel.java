@@ -7,7 +7,7 @@ public class EventPlayerTravel extends Event {
     private Vec3d mVec;
     private boolean pre;
 
-    public EventPlayerTravel(Vec3d mVec, boolean pre) {
+    public EventPlayerTravel(Vec3d mVec,boolean pre) {
         this.mVec = mVec;
         this.pre = pre;
     }

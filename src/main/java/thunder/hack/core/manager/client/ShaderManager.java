@@ -157,7 +157,7 @@ public class ShaderManager implements IManager {
             effect.setUniformValue("outlinecolor", shaders.outlineColor.getValue().getGlRed(), shaders.outlineColor.getValue().getGlGreen(), shaders.outlineColor.getValue().getGlBlue(), shaders.outlineColor.getValue().getGlAlpha());
             effect.setUniformValue("primaryColor", shaders.fillColor1.getValue().getGlRed(), shaders.fillColor1.getValue().getGlGreen(), shaders.fillColor1.getValue().getGlBlue(), shaders.fillColor1.getValue().getAlpha());
             effect.setUniformValue("secondaryColor", shaders.fillColor2.getValue().getGlRed(), shaders.fillColor2.getValue().getGlGreen(), shaders.fillColor2.getValue().getGlBlue(), shaders.fillColor1.getValue().getAlpha());
-            effect.setUniformValue("time", (System.currentTimeMillis() % 100000) / 1000f);
+            effect.setUniformValue("time", (float) ((System.currentTimeMillis() % 100000) / 1000f));
             effect.render(Render3DEngine.getTickDelta());
         }
     }

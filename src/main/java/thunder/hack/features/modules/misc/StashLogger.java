@@ -6,6 +6,7 @@ import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.chunk.WorldChunk;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ConfigManager;
 import thunder.hack.gui.notification.Notification;

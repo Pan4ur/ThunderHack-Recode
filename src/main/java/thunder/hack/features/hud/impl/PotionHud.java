@@ -4,9 +4,9 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.util.Formatting;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.features.hud.HudElement;
 import thunder.hack.features.modules.client.HudEditor;
-import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
@@ -33,7 +33,8 @@ public class PotionHud extends HudElement {
         }
     }
 
-        /*
+    /*
+
         Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
         for (StatusEffectInstance potionEffect : effects) {
             StatusEffect potion = potionEffect.getEffectType().value();
@@ -52,7 +53,10 @@ public class PotionHud extends HudElement {
             Color c = new Color(potionEffect.getEffectType().value().getColor());
             FontRenderers.sf_bold_mini.drawString(context.getMatrices(), s + "  " + s2, getPosX() + 5, getPosY() + 20 + y_offset, colored.getValue() ? c.getRGB() : HudEditor.textColor.getValue().getColor());
             y_offset += 10;
-        }*/
+        }
+
+     */
+
 
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
@@ -99,6 +103,7 @@ public class PotionHud extends HudElement {
                 Render2DEngine.horizontalGradient(context.getMatrices(), getPosX() + 2 + hAnimation / 2f - 2, getPosY() + 13.7f, getPosX() + 2 + hAnimation - 4, getPosY() + 14, HudEditor.textColor.getValue().getColorObject(), Render2DEngine.injectAlpha(HudEditor.textColor.getValue().getColorObject(), 0));
             }
         }
+
 
         Render2DEngine.addWindow(context.getMatrices(), getPosX(), getPosY(), getPosX() + hAnimation, getPosY() + vAnimation, 1f);
         int y_offset = 0;

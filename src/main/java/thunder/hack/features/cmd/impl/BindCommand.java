@@ -48,6 +48,7 @@ public class BindCommand extends Command {
                         }
                     }
 
+
                     if (key == 0) {
                         sendMessage("Unknown key '" + stringKey + "'!");
                         return SINGLE_SUCCESS;

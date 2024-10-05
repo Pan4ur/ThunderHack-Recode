@@ -28,6 +28,7 @@ public class GapplesHud extends HudElement {
     private final Setting<Boolean> crapple = new Setting<>("Crapple", true);
 
     public void onRender2D(DrawContext context) {
+
         Item targetItem = crapple.getValue() ? Items.GOLDEN_APPLE : Items.ENCHANTED_GOLDEN_APPLE;
 
         if (getItemCount(targetItem) == 0)
@@ -48,6 +49,7 @@ public class GapplesHud extends HudElement {
         context.getMatrices().translate(xPos, yPos, 0);
         context.getMatrices().multiply(RotationAxis.NEGATIVE_Z.rotation((float) Math.toRadians(-Render2DEngine.interpolateFloat(prevAngle, angle, Render3DEngine.getTickDelta()))));
         context.getMatrices().translate(-xPos, -yPos, 0);
+
 
         RenderSystem.setShaderColor(0.3f, 0.3f, 0.3f, 1f);
         context.getMatrices().translate(xPos + 20, yPos - 9, 0);

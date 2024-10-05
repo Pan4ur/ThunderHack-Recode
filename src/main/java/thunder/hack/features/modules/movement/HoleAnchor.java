@@ -11,12 +11,12 @@ import static thunder.hack.utility.world.HoleUtility.validIndestructible;
 import static thunder.hack.utility.world.HoleUtility.validTwoBlockIndestructible;
 
 public class HoleAnchor extends Module {
+    private final Setting<Integer> pitch = new Setting<>("Pitch", 60, 0, 90);
+    private final Setting<Boolean> pull = new Setting<>("Pull", true);
+
     public HoleAnchor() {
         super("HoleAnchor", Category.MOVEMENT);
     }
-
-    private final Setting<Integer> pitch = new Setting<>("Pitch", 60, 0, 90);
-    private final Setting<Boolean> pull = new Setting<>("Pull", true);
 
     @EventHandler
     public void onPlayerUpdate(PlayerUpdateEvent e) {

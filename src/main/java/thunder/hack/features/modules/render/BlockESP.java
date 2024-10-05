@@ -25,9 +25,7 @@ import java.util.concurrent.Executors;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class BlockESP extends Module {
-    public BlockESP() {
-        super("BlockESP", Category.RENDER);
-    }
+
 
     public final Setting<ItemSelectSetting> selectedBlocks = new Setting<>("SelectedBlocks", new ItemSelectSetting(new ArrayList<>()));
     public static ArrayList<BlockVec> blocks = new ArrayList<>();
@@ -40,10 +38,16 @@ public class BlockESP extends Module {
     private final Setting<Boolean> fill = new Setting<>("Fill", true);
     private final Setting<Boolean> outline = new Setting<>("Outline", true);
 
+
     private final ExecutorService searchThread = Executors.newSingleThreadExecutor();
     private final Timer searchTimer = new Timer();
     private long lastFrameTime;
     private boolean canContinue;
+
+
+    public BlockESP() {
+        super("BlockESP", Category.RENDER);
+    }
 
     @Override
     public void onEnable() {

@@ -19,8 +19,8 @@ public final class AntiBot extends Module {
     public static ArrayList<PlayerEntity> bots = new ArrayList<>();
     public Setting<Boolean> remove = new Setting<>("Remove", false);
     public Setting<Boolean> onlyAura = new Setting<>("OnlyAura", true);
-    private final Setting<Mode> mode = new Setting<>("Mode", Mode.UUIDCheck);
-    public Setting<Integer> checkticks = new Setting<>("checkTicks", 3, 0, 10, v -> mode.getValue() == Mode.MotionCheck);
+    private final Setting<Mode> mode = new Setting("Mode", Mode.UUIDCheck);
+    public Setting<Integer> checkticks = new Setting("checkTicks", 3, 0, 10, v -> mode.getValue() == Mode.MotionCheck);
     private final Timer clearTimer = new Timer();
     private int ticks = 0;
 

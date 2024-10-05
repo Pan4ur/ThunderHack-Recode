@@ -5,15 +5,16 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
 import thunder.hack.core.Managers;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.features.hud.HudElement;
 import thunder.hack.features.modules.client.HudEditor;
-import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
 public class PingHud extends HudElement {
+
     public PingHud() {
         super("Ping", 50, 10);
     }
@@ -24,7 +25,7 @@ public class PingHud extends HudElement {
         String str = "Ping " + Formatting.WHITE + Managers.SERVER.getPing();
         float pX = getPosX() > mc.getWindow().getScaledWidth() / 2f ? getPosX() - FontRenderers.getModulesRenderer().getStringWidth(str) : getPosX();
 
-        if (HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
+        if(HudEditor.hudStyle.is(HudEditor.HudStyle.Blurry)) {
             Render2DEngine.drawRoundedBlur(context.getMatrices(), pX, getPosY(), FontRenderers.getModulesRenderer().getStringWidth(str) + 21, 13f, 3, HudEditor.blurColor.getValue().getColorObject());
             Render2DEngine.drawRect(context.getMatrices(), pX + 14, getPosY() + 2, 0.5f, 8, new Color(0x44FFFFFF, true));
 

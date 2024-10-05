@@ -4,8 +4,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import thunder.hack.features.modules.Module;
 import thunder.hack.injection.accesors.IMinecraftClient;
+import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.utility.Timer;
@@ -28,20 +28,21 @@ public class TapeMouse extends Module {
 
     @Override
     public void onUpdate() {
-        if (timer.every((long) (delay.getValue() + (randomize.getValue().isEnabled() ? MathUtility.random(0, randomizeValue.getValue()) : 0))))
-            if (mode.getValue() == Mode.Left) {
-                if (!legit.getValue()) {
+        if(timer.every((long) (delay.getValue() + (randomize.getValue().isEnabled() ? MathUtility.random(0, randomizeValue.getValue()) : 0))))
+            if(mode.getValue() == Mode.Left) {
+                if(!legit.getValue()) {
                     HitResult hr = mc.crosshairTarget;
-                    if (hr != null) {
-                        if (hr instanceof EntityHitResult ehr && ehr.getEntity() != null) {
+                    if(hr != null) {
+                        if(hr instanceof EntityHitResult ehr && ehr.getEntity() != null) {
                             mc.interactionManager.attackEntity(mc.player, ehr.getEntity());
                             mc.player.swingHand(Hand.MAIN_HAND);
-                        } else if (hr instanceof BlockHitResult bhr && bhr.getBlockPos() != null && bhr.getSide() != null && !mc.world.isAir(bhr.getBlockPos())) {
+                        } else if(hr instanceof BlockHitResult bhr && bhr.getBlockPos() != null && bhr.getSide() != null && !mc.world.isAir(bhr.getBlockPos())) {
                             mc.interactionManager.attackBlock(bhr.getBlockPos(), bhr.getSide());
                             mc.player.swingHand(Hand.MAIN_HAND);
                         }
                     }
                 } else ((IMinecraftClient) mc).idoAttack();
-            } else ((IMinecraftClient) mc).idoItemUse();
+            }
+        else ((IMinecraftClient) mc).idoItemUse();
     }
 }

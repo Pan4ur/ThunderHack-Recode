@@ -15,6 +15,7 @@ import thunder.hack.utility.render.TextureStorage;
 import static thunder.hack.features.modules.Module.mc;
 
 public class CaptureMark {
+
     private static float espValue = 1f, prevEspValue;
     private static float espSpeed = 1f;
     private static boolean flipSpeed;

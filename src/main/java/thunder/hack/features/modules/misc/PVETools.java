@@ -1,4 +1,4 @@
-/*package thunder.hack.features.modules.misc;
+package thunder.hack.features.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import thunder.hack.events.impl.EventPostSync;
@@ -18,7 +18,7 @@ public class PVETools extends Module {
     private final Setting<Boolean> autoBoneMeal = new Setting<>("AutoBoneMeal", false);
     private final Setting<Boolean> Harvester = new Setting<>("Harvester", false);
 
-    // Sheep
+    // Sheeps
     private final Setting<Boolean> SheepPaint = new Setting<>("SheepPaint", false);
     private final Setting<Boolean> SheepShear = new Setting<>("SheepShear", false);
 
@@ -36,4 +36,4 @@ public class PVETools extends Module {
     }
 
     // ПИЗДЕЦ НЕ ТРОГАЙТЕ МОДУЛЬ!
-}*/
+}

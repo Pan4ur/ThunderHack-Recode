@@ -6,9 +6,9 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
-import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.features.cmd.Command;
 import thunder.hack.features.cmd.args.SearchArgumentType;
+import thunder.hack.core.manager.client.ModuleManager;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
@@ -30,7 +30,7 @@ public class NukerCommand extends Command {
             String blockName = context.getArgument("block", String.class);
 
             Block result = getRegisteredBlock(blockName);
-            if (result != null) {
+            if(result != null){
                 ModuleManager.nuker.selectedBlocks.getValue().add(result);
                 sendMessage(Formatting.GREEN + blockName + (isRu() ? " добавлен в Nuker" : " added to Nuker"));
             } else {
@@ -44,7 +44,7 @@ public class NukerCommand extends Command {
             String blockName = context.getArgument("block", String.class);
 
             Block result = getRegisteredBlock(blockName);
-            if (result != null) {
+            if(result != null){
                 ModuleManager.nuker.selectedBlocks.getValue().remove(blockName);
                 sendMessage(Formatting.GREEN + blockName + (isRu() ? " удален из Nuker" : " removed from Nuker"));
             } else {
@@ -60,7 +60,7 @@ public class NukerCommand extends Command {
             } else {
                 StringBuilder f = new StringBuilder("Nuker list: ");
 
-                for (String name : ModuleManager.nuker.selectedBlocks.getValue().getItemsById())
+                for (String name :  ModuleManager.nuker.selectedBlocks.getValue().getItemsById())
                     try {
                         f.append(name).append(", ");
                     } catch (Exception ignored) {
@@ -75,7 +75,7 @@ public class NukerCommand extends Command {
 
     public static Block getRegisteredBlock(String blockName) {
         for (Block block : Registries.BLOCK) {
-            if (block.getTranslationKey().replace("block.minecraft.", "").equalsIgnoreCase(blockName.replace("block.minecraft.", ""))) {
+            if (block.getTranslationKey().replace("block.minecraft.","").equalsIgnoreCase(blockName.replace("block.minecraft.",""))) {
                 return block;
             }
         }

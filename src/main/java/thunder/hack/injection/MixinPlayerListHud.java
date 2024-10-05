@@ -21,7 +21,7 @@ import static thunder.hack.features.modules.Module.mc;
 @Mixin(PlayerListHud.class)
 public class MixinPlayerListHud {
     private static final Comparator<Object> ENTRY_ORDERING = Comparator.comparingInt((entry) -> ((PlayerListEntry) entry).getGameMode() == GameMode.SPECTATOR ? 1 : 0)
-            .thenComparing((entry) -> Nullables.mapOrElse(((PlayerListEntry) entry).getScoreboardTeam(), Team::getName, ""))
+            .thenComparing((entry) -> (String) Nullables.mapOrElse(((PlayerListEntry) entry).getScoreboardTeam(), Team::getName, ""))
             .thenComparing((entry) -> ((PlayerListEntry) entry).getProfile().getName(), String::compareToIgnoreCase);
 
     @Inject(method = "collectPlayerEntries", at = @At("HEAD"), cancellable = true)

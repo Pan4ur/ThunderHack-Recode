@@ -16,11 +16,16 @@ import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.math.MathUtility;
 
-//https://github.com/InLieuOfLuna/elytra-recast <-- Author of this exploit
 public class ElytraRecast extends Module {
     public ElytraRecast() {
         super("ElytraRecast", Category.MOVEMENT);
     }
+
+    /*
+    https://github.com/InLieuOfLuna/elytra-recast
+                        ^ Author of this exploit
+     */
+
 
     public Setting<Exploit> exploit = new Setting<>("Exploit", Exploit.None);
     public Setting<Boolean> changePitch = new Setting<>("ChangePitch", true);
@@ -30,6 +35,7 @@ public class ElytraRecast extends Module {
     public Setting<Boolean> allowBroken = new Setting<>("AllowBroken", true);
 
     private float prevClientPitch, prevClientYaw, jitter;
+
 
     private enum Exploit {
         None, Strict, Strong
@@ -41,7 +47,8 @@ public class ElytraRecast extends Module {
             mc.player.setPitch(pitchValue.getValue());
 
         switch (exploit.getValue()) {
-            case None -> {}
+            case None -> {
+            }
             case Strict -> mc.player.setYaw(mc.player.getYaw() + jitter);
             case Strong -> mc.player.setPitch(pitchValue.getValue() - Math.abs(jitter / 2f));
         }

@@ -4,10 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.BoatEntity;
-import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityAttachS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityS2CPacket;
@@ -29,10 +26,6 @@ import thunder.hack.utility.player.MovementUtility;
 import java.util.ArrayList;
 
 public class BoatFly extends Module {
-    public BoatFly() {
-        super("BoatFly", Category.MOVEMENT);
-    }
-
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Packet);
 
     private final Setting<Boolean> phase = new Setting<>("Phase", false);
@@ -49,7 +42,7 @@ public class BoatFly extends Module {
     private final Setting<Boolean> limit = new Setting<>("Limit", true).addToGroup(advanced);
     private final Setting<Boolean> ongroundpacket = new Setting<>("OnGroundPacket", false).addToGroup(advanced);
     private final Setting<Boolean> spoofpackets = new Setting<>("SpoofPackets", false).addToGroup(advanced);
-    private final Setting<Float> jitter = new Setting<>("Jitter", 0.1f, 0.0f, 10f, v -> spoofpackets.getValue()).addToGroup(advanced);
+    private final Setting<Float> jitter = new Setting<>("Jitter", 0.1f, 0.0f, 10f, v-> spoofpackets.getValue()).addToGroup(advanced);
     private final Setting<Boolean> cancelrotations = new Setting<>("CancelRotations", true).addToGroup(advanced);
     private final Setting<Boolean> cancel = new Setting<>("Cancel", true).addToGroup(advanced);
     private final Setting<Boolean> pause = new Setting<>("Pause", false).addToGroup(advanced);
@@ -59,12 +52,17 @@ public class BoatFly extends Module {
     private final Setting<Float> timer = new Setting<>("Timer", 1f, 0.1f, 5f).addToGroup(advanced);
     public final Setting<Boolean> hideBoat = new Setting<>("HideBoat", true).addToGroup(advanced);
 
+
     private final ArrayList<VehicleMoveC2SPacket> vehiclePackets = new ArrayList<>();
     private int ticksEnabled = 0;
     private int enableDelay = 0;
     private boolean waitedCooldown = false;
     private boolean returnGravity = false;
     private boolean jitterSwitch = false;
+
+    public BoatFly() {
+        super("BoatFly", Category.MOVEMENT);
+    }
 
     @Override
     public void onEnable() {
@@ -250,7 +248,7 @@ public class BoatFly extends Module {
 
         if (returnGravity && event.getPacket() instanceof VehicleMoveC2SPacket) event.cancel();
 
-        if (event.getPacket() instanceof PlayerInputC2SPacket && allowShift.getValue()) {
+        if(event.getPacket() instanceof PlayerInputC2SPacket && allowShift.getValue()) {
             event.cancel();
         }
 

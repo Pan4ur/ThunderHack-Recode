@@ -13,6 +13,7 @@ import thunder.hack.utility.render.shaders.satin.api.managed.uniform.Uniform4f;
 import static thunder.hack.features.modules.Module.mc;
 
 public class MainMenuProgram {
+
     private Uniform1f Time;
     private Uniform2f uSize;
     private Uniform4f color;

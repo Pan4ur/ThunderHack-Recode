@@ -12,10 +12,12 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.events.impl.TotemPopEvent;
 import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.ClientSettings;
 import thunder.hack.injection.accesors.IGameMessageS2CPacket;
 import thunder.hack.gui.notification.Notification;
 import thunder.hack.setting.Setting;
@@ -23,8 +25,6 @@ import thunder.hack.utility.Timer;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class ChatUtils extends Module {
     private final Setting<Welcomer> welcomer = new Setting<>("Welcomer", Welcomer.Off);
@@ -184,7 +184,7 @@ public class ChatUtils extends Module {
 
             if (mention.getValue()) {
                 if (pac.content.getString().contains(mc.player.getName().getString()) && messageTimer.passedMs(1000)) {
-                    Managers.NOTIFICATION.publicity("ChatUtils", isRu() ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
+                    Managers.NOTIFICATION.publicity("ChatUtils", ClientSettings.language.getValue() == ClientSettings.Language.RU ? "Тебя помянули в чате!" : "You were mentioned in the chat!", 4, Notification.Type.WARNING);
                     mc.world.playSound(mc.player, mc.player.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 5f, 1f);
                 }
             }
@@ -230,7 +230,7 @@ public class ChatUtils extends Module {
     public void onPacketSend(PacketEvent.@NotNull Send e) {
         if (e.getPacket() instanceof ChatMessageC2SPacket pac) {
             if (antiCoordLeak.getValue() && pac.chatMessage.replaceAll("\\D", "").length() >= 6) {
-                sendMessage("[ChatUtils] " + (isRu() ? "В сообщении содержатся координаты!" : "The message contains coordinates!"));
+                sendMessage("[ChatUtils] " + (ClientSettings.language.getValue() == ClientSettings.Language.RU ? "В сообщении содержатся координаты!" : "The message contains coordinates!"));
                 e.cancel();
             }
 
@@ -277,8 +277,9 @@ public class ChatUtils extends Module {
                 }
                 message = builder.toString();
             }
-            if (translit.getValue())
-                message = transliterate(message);
+            if (translit.getValue()) {
+                message = transliterate(message.toString());
+            }
             skip = message;
             mc.player.networkHandler.sendChatMessage(skip);
             e.cancel();

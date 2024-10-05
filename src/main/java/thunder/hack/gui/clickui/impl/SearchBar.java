@@ -74,8 +74,12 @@ public class SearchBar extends AbstractButton {
                     listening = false;
                     moduleName = "";
                 }
-                case GLFW.GLFW_KEY_BACKSPACE -> moduleName = SliderElement.removeLastChar(moduleName);
-                case GLFW.GLFW_KEY_SPACE -> moduleName = moduleName + " ";
+                case GLFW.GLFW_KEY_BACKSPACE -> {
+                    moduleName = SliderElement.removeLastChar(moduleName);
+                }
+                case GLFW.GLFW_KEY_SPACE -> {
+                    moduleName = moduleName + " ";
+                }
             }
         }
     }

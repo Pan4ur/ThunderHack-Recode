@@ -6,9 +6,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import thunder.hack.core.Managers;
 import thunder.hack.events.impl.TotemPopEvent;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.features.hud.HudElement;
 import thunder.hack.features.modules.combat.AntiBot;
-import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
@@ -20,6 +20,7 @@ import java.awt.*;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class Companion extends HudElement {
+
     public Companion() {
         super("2DCompanion", 50, 10);
     }
@@ -39,10 +40,11 @@ public class Companion extends HudElement {
                 continue;
 
             if (isRu())
-                message = player.getName().getString() + " попнул " + (Managers.COMBAT.popList.get(player.getName().getString()) > 1 ? Managers.COMBAT.popList.get(player.getName().getString()) + " тотемов и сдох! ИЗЗЗЗИИ" : "тотем и сдох! ИЗЗЗЗИИ");
+                message = player.getName().getString() + " попнул " + (Managers.COMBAT.popList.get(player.getName().getString()) > 1 ? Managers.COMBAT.popList.get(player.getName().getString()) + "" + " тотемов и сдох!" : "тотем и сдох!");
             else
-                message = player.getName().getString() + " popped " + (Managers.COMBAT.popList.get(player.getName().getString()) > 1 ? Managers.COMBAT.popList.get(player.getName().getString()) + " totems and died EZ LMAO!" : "totem and died EZ LMAO!");
+                message = player.getName().getString() + " popped " + (Managers.COMBAT.popList.get(player.getName().getString()) > 1 ? Managers.COMBAT.popList.get(player.getName().getString()) + "" + " totems and died EZ LMAO!" : "totem and died EZ LMAO!");
             lastPop.reset();
+
         }
     }
 
@@ -53,13 +55,13 @@ public class Companion extends HudElement {
         context.getMatrices().translate((int) getPosX() + 100, (int) getPosY() + 100, 0);
         context.getMatrices().scale((float) scale.getValue() / 100f, (float) scale.getValue() / 100f, 1);
         context.getMatrices().translate(-((int) getPosX() + 100), -((int) getPosY() + 100), 0);
-        if (mode.getValue() == Mode.Boykisser)
+        if(mode.getValue() == Mode.Boykisser)
             context.drawTexture(TextureStorage.boykisser, (int) getPosX(), (int) getPosY(), 0, currentFrame * 128, 130, 128, 130, 6784);
-        else if (mode.getValue() == Mode.Paimon)
+        else if(mode.getValue() == Mode.Paimon)
             context.drawTexture(TextureStorage.paimon, (int) getPosX(), (int) getPosY(), 0, currentFrame * 200, 200, 200, 200, 10600);
-        else if (mode.getValue() == Mode.Baltika)
+        else if(mode.getValue() == Mode.Baltika)
             context.drawTexture(TextureStorage.baltika, (int) getPosX(), (int) getPosY(), 0, 0, 421, 800, 421, 800);
-        else if (mode.getValue() == Mode.Kowk)
+        else if(mode.getValue() == Mode.Kowk)
             context.drawTexture(TextureStorage.kowk, (int) getPosX(), (int) getPosY(), 0, 0, 287, 252, 287, 252);
         context.getMatrices().pop();
 
@@ -68,7 +70,7 @@ public class Companion extends HudElement {
             float factor = MathUtility.clamp(lastPop.getPassedTimeMs(), 0, 500) / 500f;
             Render2DEngine.drawRound(context.getMatrices(), getPosX() + scale.getValue() / 3f, getPosY() + 70 - scale.getValue(), factor * w, 10, 3, new Color(0xFCD7DD));
 
-            Render2DEngine.addWindow(context.getMatrices(), getPosX() + scale.getValue() / 3f, getPosY() + 72 - scale.getValue(), factor * w + getPosX() + scale.getValue() / 3f, 20 + getPosY() + 72 - scale.getValue(), 1f);
+            Render2DEngine.addWindow(context.getMatrices(), getPosX() + scale.getValue() / 3f, getPosY()  + 72 - scale.getValue(), factor * w + getPosX() + scale.getValue() / 3f, 20 + getPosY()  + 72 - scale.getValue(), 1f);
             FontRenderers.sf_bold.drawString(context.getMatrices(), message, getPosX() + 2 + scale.getValue() / 3f, getPosY() + 72 - scale.getValue(), new Color(0x484848).getRGB());
             Render2DEngine.popWindow();
         }
@@ -79,8 +81,8 @@ public class Companion extends HudElement {
             if (currentFrame > 52)
                 currentFrame = 0;
         }
-
-        if (mode.getValue() == Mode.Baltika)
+		
+        if(mode.getValue() == Mode.Baltika)
             setBounds(getPosX() + 100, getPosY() + 100, (scale.getValue() * 3f), (scale.getValue() * 3f));
         else
             setBounds(getPosX(), getPosY(), (scale.getValue() * 3f), (scale.getValue() * 3f));
@@ -92,12 +94,11 @@ public class Companion extends HudElement {
         if (event.getEntity() == mc.player) return;
 
         if (isRu())
-            message = event.getEntity().getName().getString() + " попнул " + (event.getPops() > 1 ? event.getPops() + " тотемов!" : "тотем!");
+            message = event.getEntity().getName().getString() + " попнул " + (event.getPops() > 1 ? event.getPops() + "" + " тотемов!" : "тотем!");
         else
-            message = event.getEntity().getName().getString() + " popped " + (event.getPops() > 1 ? event.getPops() + " totems!" : " a totem!");
+            message = event.getEntity().getName().getString() + " popped " + (event.getPops() > 1 ? event.getPops() + "" + " totems!" : " a totem!");
         lastPop.reset();
     }
-
     private enum Mode {
         Boykisser, Paimon, Baltika, Kowk
     }

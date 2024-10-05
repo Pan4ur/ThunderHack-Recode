@@ -1,6 +1,7 @@
 package thunder.hack.features.modules.combat;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Formatting;
 import thunder.hack.core.manager.client.ModuleManager;
@@ -14,13 +15,14 @@ import thunder.hack.utility.player.InventoryUtility;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public final class AutoGApple extends Module {
-    public final Setting<Integer> Delay = new Setting<>("UseDelay", 0, 0, 2000);
+    public final Setting<Integer> Delay = new Setting("UseDelay", 0, 0, 2000);
     private final Setting<Float> health = new Setting<>("health", 15f, 1f, 36f);
     public Setting<Boolean> absorption = new Setting<>("Absorption", false);
     public Setting<Boolean> autoTotemIntegration = new Setting<>("AutoTotemIntegration", true);
 
     private boolean isActive;
     private final Timer useDelay = new Timer();
+
 
     public AutoGApple() {
         super("AutoGApple", Category.COMBAT);

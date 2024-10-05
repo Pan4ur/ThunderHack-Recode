@@ -12,8 +12,8 @@ import net.minecraft.util.math.Direction;
 import thunder.hack.core.Core;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.*;
-import thunder.hack.features.modules.Module;
 import thunder.hack.injection.accesors.ISPacketEntityVelocity;
+import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.player.InventoryUtility;
 import thunder.hack.utility.player.MovementUtility;
@@ -21,9 +21,8 @@ import thunder.hack.utility.player.MovementUtility;
 import static thunder.hack.utility.player.MovementUtility.isMoving;
 
 public class Strafe extends Module {
-    public Strafe() { // Outdated
-        super("Strafe", Category.MOVEMENT);
-    }
+
+    // Outdated
 
     private final Setting<Boost> boost = new Setting<>("Boost", Boost.None);
     private final Setting<Float> setSpeed = new Setting<>("speed", 1.3F, 0.0F, 2f, v -> boost.getValue() == Boost.Elytra);
@@ -35,6 +34,10 @@ public class Strafe extends Module {
     public static boolean needSwap, needSprintState, disabled;
     public static int noSlowTicks;
     static long disableTime;
+
+    public Strafe() {
+        super("Strafe", Category.MOVEMENT);
+    }
 
     public double calculateSpeed(EventMove move) {
         float speedAttributes = getAIMoveSpeed();

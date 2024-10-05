@@ -18,9 +18,10 @@ import thunder.hack.utility.render.TextureStorage;
 
 import java.awt.*;
 
+
 public class KillStats extends HudElement {
-    int death = 0, killstreak = 0, kills = 0;
-    public KillStats() {
+    int death = 0,killstreak = 0,kills = 0;
+    public KillStats(){
         super("KillStats",100,35);
     }
 
@@ -32,7 +33,7 @@ public class KillStats extends HudElement {
     }
 
     @EventHandler
-    private void death(PacketEvent.Receive event) {
+    private void death(PacketEvent.Receive event){
         if(event.getPacket() instanceof EntityStatusS2CPacket pac && pac.getStatus() == 3){
             if(!(pac.getEntity(mc.world) instanceof PlayerEntity)) return;
             if(pac.getEntity(mc.world) == mc.player){
@@ -45,7 +46,6 @@ public class KillStats extends HudElement {
             }
         }
     }
-
     public void onRender2D(DrawContext context) {
         super.onRender2D(context);
 

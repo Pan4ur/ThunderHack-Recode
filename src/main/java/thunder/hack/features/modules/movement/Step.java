@@ -61,7 +61,8 @@ public class Step extends Module {
             timer = false;
         }
 
-        if (mc.player.isOnGround() && stepTimer.passedMs(stepDelay.getValue())) setStepHeight(height.getValue());
+        if (mc.player.isOnGround() && stepTimer.passedMs(stepDelay.getValue()))
+            setStepHeight(height.getValue());
         else setStepHeight(0.6F);
     }
 
@@ -70,7 +71,8 @@ public class Step extends Module {
         if (mode.getValue() == Mode.NCP) {
             double stepHeight = mc.player.getY() - mc.player.prevY;
 
-            if (stepHeight <= 0.75 || stepHeight > height.getValue() || (strict.getValue() && stepHeight > 1)) return;
+            if (stepHeight <= 0.75 || stepHeight > height.getValue() || (strict.getValue() && stepHeight > 1))
+                return;
 
             double[] offsets = getOffset(stepHeight);
             if (offsets != null && offsets.length > 1) {

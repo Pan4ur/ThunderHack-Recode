@@ -14,6 +14,7 @@ import java.util.Objects;
 import static thunder.hack.features.modules.Module.mc;
 
 public final class PlayerUtility {
+
     public static boolean isInHell() {
         if (mc.world == null) return false;
         return Objects.equals(mc.world.getRegistryKey().getValue().getPath(), "the_nether");

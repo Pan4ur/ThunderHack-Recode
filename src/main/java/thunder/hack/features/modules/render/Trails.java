@@ -18,6 +18,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.features.modules.Module;
 import thunder.hack.features.modules.client.HudEditor;
@@ -33,7 +34,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static thunder.hack.utility.render.Render2DEngine.applyOpacity;
+import static thunder.hack.utility.render.Render2DEngine.*;
 
 public class Trails extends Module {
     public Trails() {
@@ -93,9 +94,9 @@ public class Trails extends Module {
                         bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + down.getValue(), (float) pos.z).color(Render2DEngine.injectAlpha(((IEntity) entity).getTrails().get(i).color(), (int) ((alpha * ctx.animation(Render3DEngine.getTickDelta())) * 255)).getRGB());
                         bufferBuilder.vertex(stack.peek().getPositionMatrix(), (float) pos.x, (float) pos.y + width.getValue() + down.getValue(), (float) pos.z).color(Render2DEngine.injectAlpha(((IEntity) entity).getTrails().get(i).color(), (int) ((alpha * ctx.animation(Render3DEngine.getTickDelta())) * 255)).getRGB());
                     }
-
+                    
                     Render2DEngine.endBuilding(bufferBuilder);
-
+                    
                     Render3DEngine.endRender();
                     RenderSystem.enableCull();
                     RenderSystem.disableDepthTest();

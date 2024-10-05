@@ -6,14 +6,14 @@ import thunder.hack.features.modules.combat.Aura;
 import thunder.hack.setting.Setting;
 
 public class AutoSprint extends Module {
+    public static final Setting<Boolean> sprint = new Setting<>("KeepSprint", true);
+    public static final Setting<Float> motion = new Setting("Motion", 1f, 0f, 1f, v -> sprint.getValue());
+    private final Setting<Boolean> stopWhileUsing = new Setting<>("StopWhileUsing", false);
+    private final Setting<Boolean> pauseWhileAura = new Setting<>("PauseWhileAura", false);
+
     public AutoSprint() {
         super("AutoSprint", Category.MOVEMENT);
     }
-
-    public static final Setting<Boolean> sprint = new Setting<>("KeepSprint", true);
-    public static final Setting<Float> motion = new Setting<>("Motion", 1f, 0f, 1f, v -> sprint.getValue());
-    private final Setting<Boolean> stopWhileUsing = new Setting<>("StopWhileUsing", false);
-    private final Setting<Boolean> pauseWhileAura = new Setting<>("PauseWhileAura", false);
 
     @Override
     public void onUpdate() {

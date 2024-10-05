@@ -391,7 +391,8 @@ public class Aura extends Module {
         if (resolver.is(Resolver.BackTrack) && e.getPacket() instanceof CommonPingS2CPacket ping && target != null) {
             Managers.ASYNC.run(() -> mc.executeSync(() -> ping.apply(mc.getNetworkHandler())), backTicks.getValue() * 25L);
             e.cancel();
-        }*/
+        }
+         */
     }
 
     @Override
@@ -447,7 +448,7 @@ public class Aura extends Module {
         return true;
     }
 
-    private boolean shieldBreaker(boolean instant) { //todo - Actual value of parameter 'instant' is always 'false'
+    private boolean shieldBreaker(boolean instant) {
         int axeSlot = InventoryUtility.getAxe().slot();
         if (axeSlot == -1) return false;
         if (!shieldBreaker.getValue()) return false;

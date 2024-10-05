@@ -23,14 +23,19 @@ import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.Render3DEngine;
 
 public class Trajectories extends Module {
-    public Trajectories() {
-        super("Trajectories", Category.RENDER);
-    }
-
     private final Setting<Mode> mode = new Setting<>("ColorMode", Mode.Sync);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x2250b4b4), v -> mode.getValue() == Mode.Custom);
     private final Setting<Mode> lmode = new Setting<>("LandedColorMode", Mode.Sync);
     private final Setting<ColorSetting> lcolor = new Setting<>("LandedColor", new ColorSetting(0x2250b4b4), v -> lmode.getValue() == Mode.Custom);
+
+    private enum Mode {
+        Custom,
+        Sync
+    }
+
+    public Trajectories() {
+        super("Trajectories", Category.RENDER);
+    }
 
     private boolean isThrowable(Item item) {
         return item instanceof EnderPearlItem || item instanceof TridentItem || item instanceof ExperienceBottleItem || item instanceof SnowballItem || item instanceof EggItem || item instanceof SplashPotionItem || item instanceof LingeringPotionItem;
@@ -55,7 +60,7 @@ public class Trajectories extends Module {
 
     @Override
     public void onRender3D(MatrixStack stack) {
-        if (mc.options.hudHidden) return;
+        if(mc.options.hudHidden) return;
         if (mc.player == null || mc.world == null || !mc.options.getPerspective().isFirstPerson())
             return;
         Hand hand;
@@ -103,6 +108,7 @@ public class Trajectories extends Module {
         double motionY = -MathHelper.sin((mc.player.getPitch() - getThrowPitch(item)) / 180.0f * 3.141593f) * maxDist;
         double motionZ = MathHelper.cos(yaw / 180.0f * 3.1415927f) * MathHelper.cos(mc.player.getPitch() / 180.0f * 3.1415927f) * maxDist;
 
+
         float power = mc.player.getItemUseTime() / 20.0f;
         power = (power * power + power * 2.0f) / 3.0f;
 
@@ -122,6 +128,7 @@ public class Trajectories extends Module {
         motionZ *= pow;
         if (!mc.player.isOnGround())
             motionY += mc.player.getVelocity().getY();
+
 
         Vec3d lastPos;
         for (int i = 0; i < 300; i++) {
@@ -170,6 +177,7 @@ public class Trajectories extends Module {
                 ));
 
 
+
                 break;
             }
 
@@ -178,10 +186,5 @@ public class Trajectories extends Module {
 
             Render3DEngine.drawLine(lastPos, pos, mode.getValue() == Mode.Sync ? HudEditor.getColor(i) : color.getValue().getColorObject());
         }
-    }
-
-    private enum Mode {
-        Custom,
-        Sync
     }
 }

@@ -1,9 +1,11 @@
 package thunder.hack.features.modules.render;
 
+import org.jetbrains.annotations.NotNull;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 
 public class AspectRatio extends Module {
+
     public AspectRatio() {
         super("AspectRatio", Category.RENDER);
     }

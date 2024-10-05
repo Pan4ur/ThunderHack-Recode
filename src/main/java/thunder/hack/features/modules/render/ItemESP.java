@@ -38,6 +38,10 @@ public class ItemESP extends Module {
     private final Setting<ColorSetting> circleColor = new Setting<>("CircleColor", new ColorSetting(new Color(-1).getRGB()), v -> espMode.getValue() == ESPMode.Circle && !useHudColor.getValue());
     private final Setting<Integer> cPoints = new Setting<>("CirclePoints", 12, 3, 32, v -> espMode.getValue() == ESPMode.Circle);
 
+    private enum ESPMode {
+        Rect, Circle, None
+    }
+
     public void onRender2D(DrawContext context) {
         for (Entity ent : mc.world.getEntities()) {
             if (!(ent instanceof ItemEntity)) continue;
@@ -171,9 +175,5 @@ public class ItemESP extends Module {
         Box axisAlignedBB2 = ent.getBoundingBox();
         Box axisAlignedBB = new Box(axisAlignedBB2.minX - ent.getX() + x - 0.05, axisAlignedBB2.minY - ent.getY() + y, axisAlignedBB2.minZ - ent.getZ() + z - 0.05, axisAlignedBB2.maxX - ent.getX() + x + 0.05, axisAlignedBB2.maxY - ent.getY() + y + 0.15, axisAlignedBB2.maxZ - ent.getZ() + z + 0.05);
         return axisAlignedBB;
-    }
-
-    private enum ESPMode {
-        Rect, Circle, None
     }
 }

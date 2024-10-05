@@ -7,12 +7,12 @@ import net.minecraft.client.render.*;
 import net.minecraft.util.Identifier;
 import thunder.hack.ThunderHack;
 import thunder.hack.core.manager.client.ModuleManager;
+import thunder.hack.gui.clickui.impl.SearchBar;
+import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.features.modules.Module;
 import thunder.hack.features.modules.client.BaritoneSettings;
 import thunder.hack.features.modules.client.ClickGui;
 import thunder.hack.features.modules.client.HudEditor;
-import thunder.hack.gui.clickui.impl.SearchBar;
-import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.utility.render.Render2DEngine;
 import thunder.hack.utility.render.animation.AnimationUtility;
 

@@ -2,6 +2,7 @@ package thunder.hack.features.modules.client;
 
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.EventFixVelocity;
@@ -11,6 +12,7 @@ import thunder.hack.events.impl.EventPlayerTravel;
 import thunder.hack.features.modules.Module;
 import thunder.hack.features.modules.combat.Aura;
 import thunder.hack.setting.Setting;
+
 
 public class Rotations extends Module {
     public Rotations() {
@@ -60,6 +62,7 @@ public class Rotations extends Module {
             }
             return;
         }
+
 
         if (moveFix.getValue() == MoveFix.Focused && !Float.isNaN(fixRotation) && !mc.player.isRiding()) {
             if (e.isPre()) {

@@ -6,13 +6,14 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ProxyManager;
-import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -26,7 +27,9 @@ import static thunder.hack.features.modules.Module.mc;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class ProxyWindow extends WindowBase {
+
     // name ip port login password
+
     private static ProxyWindow instance;
     private ArrayList<ProxyPlate> proxyPlates = new ArrayList<>();
     private int listeningId = -1;
@@ -346,11 +349,21 @@ public class ProxyWindow extends WindowBase {
 
             if (listeningId == -3) {
                 switch (listeningType) {
-                    case Name -> addName = paste;
-                    case Ip -> addIp = paste;
-                    case Port -> addPort = paste;
-                    case Login -> addLogin = paste;
-                    case Password -> addPassword = paste;
+                    case Name -> {
+                        addName = paste;
+                    }
+                    case Ip -> {
+                        addIp = paste;
+                    }
+                    case Port -> {
+                        addPort = paste;
+                    }
+                    case Login -> {
+                        addLogin = paste;
+                    }
+                    case Password -> {
+                        addPassword = paste;
+                    }
                 }
             }
             return;
@@ -415,11 +428,21 @@ public class ProxyWindow extends WindowBase {
 
                     if (listeningId == -3) {
                         switch (listeningType) {
-                            case Name -> addName = SliderElement.removeLastChar(addName);
-                            case Ip -> addIp = SliderElement.removeLastChar(addIp);
-                            case Port -> addPort = SliderElement.removeLastChar(addPort);
-                            case Login -> addLogin = SliderElement.removeLastChar(addLogin);
-                            case Password -> addPassword = SliderElement.removeLastChar(addPassword);
+                            case Name -> {
+                                addName = SliderElement.removeLastChar(addName);
+                            }
+                            case Ip -> {
+                                addIp = SliderElement.removeLastChar(addIp);
+                            }
+                            case Port -> {
+                                addPort = SliderElement.removeLastChar(addPort);
+                            }
+                            case Login -> {
+                                addLogin = SliderElement.removeLastChar(addLogin);
+                            }
+                            case Password -> {
+                                addPassword = SliderElement.removeLastChar(addPassword);
+                            }
                         }
                     }
                 }

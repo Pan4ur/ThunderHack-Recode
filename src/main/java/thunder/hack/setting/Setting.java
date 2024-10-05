@@ -1,5 +1,6 @@
 package thunder.hack.setting;
 
+
 import thunder.hack.ThunderHack;
 import thunder.hack.events.impl.EventSetting;
 import thunder.hack.features.modules.Module;
@@ -42,7 +43,7 @@ public class Setting<T> {
         this.defaultValue = defaultValue;
         this.value = defaultValue;
         this.min = min;
-        this.max = max;
+        this. max = max;
         this.plannedValue = defaultValue;
         this.visibility = visibility;
         this.hasRestriction = true;
@@ -180,7 +181,7 @@ public class Setting<T> {
     public boolean isStringSetting() {
         return value instanceof String;
     }
-
+    
     public boolean isItemSelectSetting() {
         return value instanceof ItemSelectSetting;
     }
@@ -204,11 +205,11 @@ public class Setting<T> {
 
     public boolean isVisible() {
         if (group != null) {
-            if (group.getValue() instanceof BooleanSettingGroup bp)
+            if(group.getValue() instanceof BooleanSettingGroup bp)
                 if (!bp.isExtended())
                     return false;
 
-            if (group.getValue() instanceof SettingGroup p)
+            if(group.getValue() instanceof SettingGroup p)
                 if (!p.isExtended())
                     return false;
         }

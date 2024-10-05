@@ -21,4 +21,6 @@ public class DiscordEventHandlers extends Structure {
     protected List<String> getFieldOrder() {
         return Arrays.asList("ready", "disconnected", "errored", "joinGame", "spectateGame", "joinRequest");
     }
+    
+   
 }

@@ -10,8 +10,8 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOfferList;
-import thunder.hack.features.modules.Module;
 import thunder.hack.gui.clickui.ClickGUI;
+import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.BooleanSettingGroup;
 import thunder.hack.setting.impl.SettingGroup;
@@ -24,9 +24,6 @@ import java.util.HashMap;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class AutoTrader extends Module {
-    public AutoTrader() {
-        super("AutoTrader", Category.MISC);
-    }
 
     private final Setting<BooleanSettingGroup> buy = new Setting<>("Buy", new BooleanSettingGroup(true));
     private final Setting<String> buyItem = new Setting<>("BuyItem", "apple").addToGroup(buy);
@@ -35,6 +32,10 @@ public class AutoTrader extends Module {
     private final Setting<SettingGroup> disable = new Setting<>("Disable", new SettingGroup(false, 0));
     private final Setting<Boolean> noVillagers = new Setting<>("NoVillagers", true).addToGroup(disable);
     private final Setting<Boolean> noItems = new Setting<>("NoItems", false).addToGroup(disable);
+
+    public AutoTrader() {
+        super("AutoTrader", Category.MISC);
+    }
 
     private int interactTicks, cooldown;
     private int lastVillager;
@@ -93,7 +94,7 @@ public class AutoTrader extends Module {
                     .min(Comparator.comparing(e -> mc.player.distanceTo(e))).orElse(null);
 
             if (ent != null) {
-                float[] angles = InteractionUtility.calculateAngle(ent.getEyePos().add(Math.random() * 0.2, 0, Math.random() * 0.2));
+                float[] angles = InteractionUtility.calculateAngle(ent.getEyePos().add(Math.random() * 0.2, 0,Math.random() * 0.2));
                 mc.player.setYaw(angles[0]);
                 mc.player.setPitch(angles[1]);
                 mc.interactionManager.interactEntity(mc.player, ent, Hand.MAIN_HAND);
@@ -105,6 +106,7 @@ public class AutoTrader extends Module {
     }
 
     private boolean goodDeal(TradeOffer offer) {
+
         boolean selectedBuyItem = (offer.getSellItem().getItem().getTranslationKey().equals("item.minecraft." + buyItem.getValue())
                 || offer.getSellItem().getItem().getTranslationKey().equals("block.minecraft." + buyItem.getValue()));
 

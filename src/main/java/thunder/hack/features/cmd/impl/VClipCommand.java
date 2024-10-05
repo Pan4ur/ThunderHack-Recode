@@ -21,6 +21,7 @@ public class VClipCommand extends Command {
 
     @Override
     public void executeBuild(@NotNull LiteralArgumentBuilder<CommandSource> builder) {
+
         builder.then(literal("down").executes(context -> {
             int i;
             float y = 0.0f;

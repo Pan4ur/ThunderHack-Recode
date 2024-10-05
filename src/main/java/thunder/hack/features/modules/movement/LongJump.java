@@ -15,6 +15,7 @@ import thunder.hack.utility.player.MovementUtility;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class LongJump extends Module {
+
     public LongJump() {
         super("LongJump", Category.MOVEMENT);
     }
@@ -31,7 +32,7 @@ public class LongJump extends Module {
 
     @EventHandler
     public void onMove(EventMove e) {
-        if (prevPosition != null && mc.player.getPos().squaredDistanceTo(prevPosition) > maxDistance.getPow2Value())
+        if(prevPosition != null && mc.player.getPos().squaredDistanceTo(prevPosition) > maxDistance.getPow2Value())
             disable(isRu() ? "Прыжок выполнен! Отключаю.." : "Jump complete! Disabling..");
 
         if (MovementUtility.isMoving()) {
@@ -45,7 +46,7 @@ public class LongJump extends Module {
                     ++stage;
                 }
                 case 1 -> {
-                    mc.player.setVelocity(mc.player.getVelocity().getX(), 0.42 + isJumpBoost(), mc.player.getVelocity().getZ());
+                    mc.player.setVelocity(mc.player.getVelocity().getX(),0.42 + isJumpBoost(),mc.player.getVelocity().getZ());
                     e.setY(0.42 + isJumpBoost());
                     plannedSpeed *= 2.149f;
                     ++stage;

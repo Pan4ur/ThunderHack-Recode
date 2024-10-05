@@ -38,17 +38,21 @@ import java.util.Map;
 import java.util.UUID;
 
 public class LogoutSpots extends Module {
-    public LogoutSpots() {
-        super("LogoutSpots", Category.RENDER);
-    }
-
     private final Setting<RenderMode> renderMode = new Setting<>("RenderMode", RenderMode.TexturedChams);
     private final Setting<ColorSetting> color = new Setting<>("Color", new ColorSetting(0x8800FF00));
     private final Setting<Boolean> notifications = new Setting<>("Notifications", true);
     private final Setting<Boolean> ignoreBots = new Setting<>("IgnoreBots", true);
 
+    private enum RenderMode {
+        Chams, TexturedChams, Box
+    }
+
     private final Map<UUID, PlayerEntity> playerCache = Maps.newConcurrentMap();
     private final Map<UUID, PlayerEntity> logoutCache = Maps.newConcurrentMap();
+
+    public LogoutSpots() {
+        super("LogoutSpots", Category.RENDER);
+    }
 
     @EventHandler
     public void onPacketReceive(PacketEvent.Receive e) {
@@ -199,9 +203,5 @@ public class LogoutSpots extends Module {
         return !ent.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + ent.getName().getString()).getBytes(StandardCharsets.UTF_8))) && ent instanceof OtherClientPlayerEntity
                 && (FakePlayer.fakePlayer == null || ent.getId() != FakePlayer.fakePlayer.getId())
                 && !ent.getName().getString().contains("-");
-    }
-
-    private enum RenderMode {
-        Chams, TexturedChams, Box
     }
 }

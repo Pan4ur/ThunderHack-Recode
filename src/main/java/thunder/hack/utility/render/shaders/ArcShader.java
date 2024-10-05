@@ -3,6 +3,7 @@ package thunder.hack.utility.render.shaders;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.utility.render.shaders.satin.api.managed.ManagedCoreShader;
 import thunder.hack.utility.render.shaders.satin.api.managed.ShaderEffectManager;
 import thunder.hack.utility.render.shaders.satin.api.managed.uniform.Uniform1f;
@@ -14,6 +15,7 @@ import java.awt.*;
 import static thunder.hack.features.modules.Module.mc;
 
 public class ArcShader {
+
     private Uniform2f uLocation;
     private Uniform2f uSize;
     private Uniform1f radius;

@@ -2,6 +2,7 @@ package thunder.hack.features.modules.combat;
 
 import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.Nullable;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.player.CombatManager;
 import thunder.hack.features.modules.base.TrapModule;

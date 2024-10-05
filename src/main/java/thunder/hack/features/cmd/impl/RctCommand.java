@@ -11,7 +11,7 @@ import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class RctCommand extends Command {
-    public RctCommand() {
+    public RctCommand(){
         super("rct");
     }
 
@@ -20,7 +20,7 @@ public class RctCommand extends Command {
         builder.executes(context -> {
             String sName = mc.player.networkHandler.getServerInfo() == null ? "none" : mc.player.networkHandler.getServerInfo().address;
 
-            if (!sName.contains("funtime") && !sName.contains("spookytime")) {
+            if(!sName.contains("funtime") && !sName.contains("spookytime")){
                 sendMessage(isRu() ? "Rct работает только на фанике и спуки" : "Rct works only on funtime and spookytime");
                 return SINGLE_SUCCESS;
             }
@@ -39,4 +39,5 @@ public class RctCommand extends Command {
             return SINGLE_SUCCESS;
         });
     }
+
 }

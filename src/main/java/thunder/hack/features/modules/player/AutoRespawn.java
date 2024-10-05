@@ -2,6 +2,7 @@ package thunder.hack.features.modules.player;
 
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.util.Formatting;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.world.WayPointManager;
 import thunder.hack.features.modules.Module;
@@ -9,10 +10,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 
 public class AutoRespawn extends Module {
-    public AutoRespawn() {
-        super("AutoRespawn", Category.PLAYER);
-    }
-
+    private final Timer timer = new Timer();
     private final Setting<Boolean> deathcoords = new Setting<>("deathcoords", true);
     private final Setting<Boolean> autokit = new Setting<>("Auto Kit", false);
     private final Setting<String> kit = new Setting<>("kit name", "kitname", v -> autokit.getValue());
@@ -21,7 +19,10 @@ public class AutoRespawn extends Module {
 
     private boolean flag;
     private int waypointCount = 0;
-    private final Timer timer = new Timer();
+
+    public AutoRespawn() {
+        super("AutoRespawn", Category.PLAYER);
+    }
 
     @Override
     public void onUpdate() {
@@ -36,7 +37,7 @@ public class AutoRespawn extends Module {
                 waypointCount += 1;
                 if(deathcoords.getValue())
                     sendMessage(Formatting.GOLD + "[PlayerDeath] " + Formatting.YELLOW + (int) mc.player.getX() + " " + (int) mc.player.getY() + " " + (int) mc.player.getZ());
-                if(autowaypoint.getValue()) {
+                if(autowaypoint.getValue()){
                     WayPointManager.WayPoint wp = new WayPointManager.WayPoint((int) mc.player.getX(), (int) mc.player.getY(), (int) mc.player.getZ(), "Death №" + waypointCount, (mc.isInSingleplayer() ? "SinglePlayer" : mc.getNetworkHandler().getServerInfo().address), mc.world.getRegistryKey().getValue().getPath());
                     Managers.WAYPOINT.addWayPoint(wp);
                 }

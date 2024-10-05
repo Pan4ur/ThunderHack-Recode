@@ -37,6 +37,7 @@ public class HudElement extends Module {
 
         if (mc.currentScreen instanceof ChatScreen || mc.currentScreen instanceof HudEditorGui) {
             if (mouseButton && mouseState) {
+
                 pos.getValue().setX(Math.clamp(Render2DEngine.scrollAnimate((normaliseX() - dragX) / mc.getWindow().getScaledWidth(), pos.getValue().getX(), .1f),
                         0, 1f));
                 pos.getValue().setY(Math.clamp(Render2DEngine.scrollAnimate((normaliseY() - dragY) / mc.getWindow().getScaledHeight(), pos.getValue().getY(), .1f),
@@ -88,8 +89,10 @@ public class HudElement extends Module {
             }
             anyHovered = true;
         }
+
         // Render2DEngine.drawRect(context.getMatrices(),getPosX(), getPosY(), width, height, Color.RED);
     }
+
 
     @EventHandler
     @SuppressWarnings("unused")
@@ -116,6 +119,7 @@ public class HudElement extends Module {
                             }
                             if (isNear(hudElement.getHitY(), getHitY()))
                                 pos.getValue().setY((hudElement.getHitY() + hitDifY) / mc.getWindow().getScaledHeight());
+
                         }
                     }
 

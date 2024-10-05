@@ -24,7 +24,8 @@ public class TotemCounter extends HudElement {
     private float angle, prevAngle;
 
     public void onRender2D(DrawContext context) {
-        if (getItemCount(Items.TOTEM_OF_UNDYING) == 0)
+
+        if(getItemCount(Items.TOTEM_OF_UNDYING) == 0)
             return;
 
         float xPos = ModuleManager.crosshair.getAnimatedPosX();
@@ -43,7 +44,7 @@ public class TotemCounter extends HudElement {
         context.getMatrices().translate(-(xPos - 36), -(yPos - 9), 0);
         RenderSystem.setShaderColor(1f, 1f - factor, 1f - factor, 1f);
 
-        if (factor > 0)
+        if(factor > 0)
             Render2DEngine.drawBlurredShadow(context.getMatrices(), xPos - 34, yPos - 6, 11, 11, 8, Render2DEngine.injectAlpha(new Color(0xFF0000), (int) (255 * factor)));
 
         FontRenderers.sf_bold_mini.drawCenteredString(context.getMatrices(), getItemCount(Items.TOTEM_OF_UNDYING) + "",xPos - 28, yPos + 8, -1);
@@ -53,14 +54,14 @@ public class TotemCounter extends HudElement {
 
     @EventHandler
     public void onTotemPop(TotemPopEvent e) {
-        if (e.getEntity() == mc.player)
+        if(e.getEntity() == mc.player)
             angle = -15;
     }
 
     @Override
     public void onUpdate() {
         prevAngle = angle;
-        if (angle < 0)
+        if(angle < 0)
             angle++;
     }
 

@@ -3,12 +3,10 @@ package thunder.hack.features.modules.player;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.features.modules.Module;
@@ -16,6 +14,7 @@ import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.Bind;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InventoryUtility;
+import thunder.hack.utility.player.PlayerUtility;
 import thunder.hack.utility.player.SearchInvResult;
 
 import static thunder.hack.features.modules.client.ClientSettings.isRu;
@@ -64,7 +63,7 @@ public class ElytraSwap extends Module {
 
     @EventHandler
     public void onPacketSend(PacketEvent.SendPost e) {
-        if (e.getPacket() instanceof ClientCommandC2SPacket command
+        if(e.getPacket() instanceof ClientCommandC2SPacket command
                 && command.getMode() == ClientCommandC2SPacket.Mode.START_FALL_FLYING
                 && mode.getValue() == Mode.Bind
                 && startFireWork.getValue()) {
@@ -117,23 +116,23 @@ public class ElytraSwap extends Module {
         if (mc.player.getInventory().getStack(38).getItem() == Items.ELYTRA) {
             int slot = getChestPlateSlot();
             if (slot != -1) {
-                if (delay.getValue())
-                    Managers.ASYNC.run(() -> {
-                        swapping = true;
-                        clickSlot(slot);
-                        try {
-                            Thread.sleep(200);
-                        } catch (Exception ignored) {
-                        }
-                        clickSlot(6);
-                        try {
-                            Thread.sleep(200);
-                        } catch (Exception ignored) {
-                        }
-                        clickSlot(slot);
-                        sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                        swapping = false;
-                    });
+                if(delay.getValue())
+                Managers.ASYNC.run(() -> {
+                    swapping = true;
+                    clickSlot(slot);
+                    try {
+                        Thread.sleep(200);
+                    } catch (Exception ignored) {
+                    }
+                    clickSlot(6);
+                    try {
+                        Thread.sleep(200);
+                    } catch (Exception ignored) {
+                    }
+                    clickSlot(slot);
+                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                    swapping = false;
+                });
                 else {
                     clickSlot(slot);
                     clickSlot(6);
@@ -146,32 +145,30 @@ public class ElytraSwap extends Module {
                 return;
             }
         } else if (result.found()) {
-            if (delay.getValue())
-                new Thread(() -> {
-                    swapping = true;
-                    clickSlot(result.slot());
-                    try {
-                        Thread.sleep(200);
-                    } catch (Exception ignored) {
-                    }
-                    clickSlot(6);
-                    try {
-                        Thread.sleep(200);
-                    } catch (Exception ignored) {
-                    }
-                    clickSlot(result.slot());
-                    sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                    if (startFireWork.getValue() && mc.player.fallDistance > 0)
-                        sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
-                    swapping = false;
-                }).start();
+            if(delay.getValue())
+            new Thread(() -> {
+                swapping = true;
+                clickSlot(result.slot());
+                try {
+                    Thread.sleep(200);
+                } catch (Exception ignored) {}
+                clickSlot(6);
+                try {
+                    Thread.sleep(200);
+                } catch (Exception ignored) {}
+                clickSlot(result.slot());
+                sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                if(startFireWork.getValue() && mc.player.fallDistance > 0)
+                    sendPacket(new ClientCommandC2SPacket( mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+                swapping = false;
+            }).start();
             else {
                 clickSlot(result.slot());
                 clickSlot(6);
                 clickSlot(result.slot());
                 sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
-                if (startFireWork.getValue() && mc.player.fallDistance > 0)
-                    sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+                if(startFireWork.getValue() && mc.player.fallDistance > 0)
+                    sendPacket(new ClientCommandC2SPacket( mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
             }
         } else {
             if (disable) disable(isRu() ? "У тебя нет элитры!" : "You don't have an elytra!");

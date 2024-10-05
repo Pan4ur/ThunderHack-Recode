@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+
 public class ProxyManager implements IManager {
     private final List<ThProxy> proxies = new ArrayList<>();
     private ThProxy activeProxy;

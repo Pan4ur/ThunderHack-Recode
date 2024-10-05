@@ -18,6 +18,7 @@ import thunder.hack.utility.render.animation.AnimationUtility;
 import java.awt.*;
 
 public class Crosshair extends Module {
+
     public Crosshair() {
         super("Crosshair", Category.HUD);
     }
@@ -52,9 +53,11 @@ public class Crosshair extends Module {
         float yawDelta = mc.player.prevHeadYaw - mc.player.getHeadYaw();
         float pitchDelta = prevPitch - mc.player.getPitch();
 
+
         if (yawDelta > 0) xAnim = AnimationUtility.fast(xAnim, midX - range.getValue(), speed.getValue());
         else if (yawDelta < 0) xAnim = AnimationUtility.fast(xAnim, midX + range.getValue(), speed.getValue());
         else xAnim = AnimationUtility.fast(xAnim, midX, backSpeed.getValue());
+
 
         if (pitchDelta > 0) yAnim = AnimationUtility.fast(yAnim, midY - range.getValue(), speed.getValue());
         else if (pitchDelta < 0) yAnim = AnimationUtility.fast(yAnim, midY + range.getValue(), speed.getValue());

@@ -5,13 +5,14 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.StringHelper;
 import org.lwjgl.glfw.GLFW;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.MacroManager;
-import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.gui.clickui.ClickGUI;
 import thunder.hack.gui.clickui.impl.SliderElement;
 import thunder.hack.gui.font.FontRenderers;
 import thunder.hack.gui.windows.WindowBase;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.PositionSetting;
 import thunder.hack.utility.render.Render2DEngine;
@@ -35,6 +36,7 @@ public class MacroWindow extends WindowBase {
     private enum ListeningType {
         Name, Text, Bind
     }
+
 
     public MacroWindow(float x, float y, float width, float height, Setting<PositionSetting> position) {
         super(x, y, width, height, "Macros", position, TextureStorage.macrosIcon);

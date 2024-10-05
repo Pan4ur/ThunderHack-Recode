@@ -2,8 +2,8 @@ package thunder.hack.gui.notification;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Formatting;
-import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.gui.font.FontRenderers;
+import thunder.hack.features.modules.client.HudEditor;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 import thunder.hack.utility.render.Render2DEngine;

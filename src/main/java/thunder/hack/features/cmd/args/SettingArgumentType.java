@@ -36,4 +36,5 @@ public class SettingArgumentType implements ArgumentType<String> {
         }
         return result;
     }
+
 }

@@ -13,6 +13,7 @@ import thunder.hack.utility.render.animation.AnimationUtility;
 import java.awt.*;
 
 public class CandleHud extends HudElement {
+
     public CandleHud() {
         super("Candle", 10, 100);
     }

@@ -9,6 +9,7 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.features.cmd.Command;
 import thunder.hack.features.cmd.args.ModuleArgumentType;

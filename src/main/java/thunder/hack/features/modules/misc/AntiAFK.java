@@ -2,6 +2,7 @@ package thunder.hack.features.modules.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import thunder.hack.ThunderHack;
 import thunder.hack.core.Managers;
 import thunder.hack.events.impl.EventKeyboardInput;
 import thunder.hack.events.impl.EventSetting;
@@ -14,6 +15,7 @@ import thunder.hack.utility.player.MovementUtility;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class AntiAFK extends Module {
+
     public AntiAFK() {
         super("AntiAFK", Category.MISC);
     }
