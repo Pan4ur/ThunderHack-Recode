@@ -6,7 +6,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import thunder.hack.features.modules.Module;
-import thunder.hack.features.modules.combat.Aura;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ColorSetting;
 import thunder.hack.utility.render.Render3DEngine;
