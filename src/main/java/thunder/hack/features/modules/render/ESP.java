@@ -427,7 +427,7 @@ public class ESP extends Module {
             if (ent instanceof LivingEntity lent && lent.getHealth() != 0 && renderHealth.getValue()) {
 
                 if (healthOutline.getValue())
-                    Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 6), (float) posY - 1, (float) posX - 2, (float) endPosY + 1, healthOutlineC.getValue().getColorObject(), healthOutlineC.getValue().getColorObject(), healthOutlineC.getValue().getColorObject(), healthOutlineC.getValue().getColorObject());
+                    Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 5.5), (float) (posY - 0.5), (float) (posX - 2.5), (float) (endPosY + 0.5), healthOutlineC.getValue().getColorObject(), healthOutlineC.getValue().getColorObject(), healthOutlineC.getValue().getColorObject(), healthOutlineC.getValue().getColorObject());
 
                 Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 5), (float) posY, (float) posX - 1, (float) endPosY, healthbg.getValue().getColorObject(), healthbg.getValue().getColorObject(), healthbg.getValue().getColorObject(), healthbg.getValue().getColorObject());
 
