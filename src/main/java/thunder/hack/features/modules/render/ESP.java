@@ -71,8 +71,10 @@ public class ESP extends Module {
     private final Setting<Boolean> outline = new Setting<>("Outline", true).addToGroup(boxEsp);
     private final Setting<Colors> colorMode = new Setting<>("ColorMode", Colors.SyncColor).addToGroup(boxEsp);
     private final Setting<Boolean> renderHealth = new Setting<>("renderHealth", true).addToGroup(boxEsp);
+    private final Setting<Boolean> healthOutline = new Setting<>("healthOutline", true).addToGroup(boxEsp);
 
     private final Setting<SettingGroup> boxColors = new Setting<>("BoxColors", new SettingGroup(false, 0));
+    private final Setting<ColorSetting> boxOutline = new Setting<>("BoxOutline", new ColorSetting(new Color(0x000000))).addToGroup(boxColors);
     private final Setting<ColorSetting> playersC = new Setting<>("PlayersC", new ColorSetting(new Color(0xFF9200))).addToGroup(boxColors);
     private final Setting<ColorSetting> friendsC = new Setting<>("FriendsC", new ColorSetting(new Color(0x30FF00))).addToGroup(boxColors);
     private final Setting<ColorSetting> crystalsC = new Setting<>("CrystalsC", new ColorSetting(new Color(0x00BBFF))).addToGroup(boxColors);
@@ -82,6 +84,8 @@ public class ESP extends Module {
     private final Setting<ColorSetting> othersC = new Setting<>("OthersC", new ColorSetting(new Color(0xFF0062))).addToGroup(boxColors);
     public final Setting<ColorSetting> healthB = new Setting<>("healthB", new ColorSetting(new Color(0xff1100))).addToGroup(boxColors);
     public final Setting<ColorSetting> healthU = new Setting<>("healthU", new ColorSetting(new Color(0x2fff00))).addToGroup(boxColors);
+    private final Setting<ColorSetting> healthbg = new Setting<>("healthBG", new ColorSetting(new Color(0x000000))).addToGroup(boxColors);
+    private final Setting<ColorSetting> healthOutlineC = new Setting<>("healthOutline", new ColorSetting(new Color(0x000000))).addToGroup(boxColors);
 
     private float dizorentAnimation = 0f;
 
@@ -396,14 +400,15 @@ public class ESP extends Module {
             double endPosX = position.z;
             double endPosY = position.w;
 
-            if(outline.getValue()) {
-                Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 1F), (float) posY, (float) (posX + 0.5), (float) (endPosY + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
-                Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 1F), (float) (posY - 0.5), (float) (endPosX + 0.5), (float) (posY + 0.5 + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
-                Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (endPosX - 0.5 - 0.5), (float) posY, (float) (endPosX + 0.5), (float) (endPosY + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
-                Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 1), (float) (endPosY - 0.5 - 0.5), (float) (endPosX + 0.5), (float) (endPosY + 0.5), Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
+            if (outline.getValue()) {
+                // ебаный пиздец
+                Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 1F), (float) posY, (float) (posX + 0.5), (float) (endPosY + 0.5), boxOutline.getValue().getColorObject(), boxOutline.getValue().getColorObject(), boxOutline.getValue().getColorObject(), boxOutline.getValue().getColorObject());
+                Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 1F), (float) (posY - 0.5), (float) (endPosX + 0.5), (float) (posY + 0.5 + 0.5), boxOutline.getValue().getColorObject(), boxOutline.getValue().getColorObject(), boxOutline.getValue().getColorObject(), boxOutline.getValue().getColorObject());
+                Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (endPosX - 0.5 - 0.5), (float) posY, (float) (endPosX + 0.5), (float) (endPosY + 0.5), boxOutline.getValue().getColorObject(), boxOutline.getValue().getColorObject(), boxOutline.getValue().getColorObject(), boxOutline.getValue().getColorObject());
+                Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 1), (float) (endPosY - 0.5 - 0.5), (float) (endPosX + 0.5), (float) (endPosY + 0.5), boxOutline.getValue().getColorObject(), boxOutline.getValue().getColorObject(), boxOutline.getValue().getColorObject(), boxOutline.getValue().getColorObject());
             }
 
-            switch(colorMode.getValue()) {
+            switch (colorMode.getValue()) {
                 case Custom -> {
                     Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 0.5f), (float) posY, (float) (posX + 0.5 - 0.5), (float) endPosY, col, col, col, col);
                     Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) posX, (float) (endPosY - 0.5f), (float) endPosX, (float) endPosY, col, col, col, col);
@@ -419,13 +424,21 @@ public class ESP extends Module {
             }
 
 
-            if(ent instanceof LivingEntity lent && lent.getHealth() != 0 && renderHealth.getValue()) {
-                Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 5), (float) posY, (float) posX - 3, (float) endPosY, Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK);
-                switch(colorMode.getValue()) {
-                    case Custom -> Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 5), (float) (endPosY + (posY - endPosY) * lent.getHealth() / lent.getMaxHealth()), (float) posX - 3, (float) endPosY, healthB.getValue().getColorObject(), healthB.getValue().getColorObject(), healthU.getValue().getColorObject(), healthU.getValue().getColorObject());
-                    case SyncColor ->  Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 5), (float) (endPosY + (posY - endPosY) * lent.getHealth() / lent.getMaxHealth()), (float) posX - 3, (float) endPosY, HudEditor.getColor(90), HudEditor.getColor(90), HudEditor.getColor(270), HudEditor.getColor(270));
+            if (ent instanceof LivingEntity lent && lent.getHealth() != 0 && renderHealth.getValue()) {
+
+                if (healthOutline.getValue())
+                    Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 6), (float) posY - 1, (float) posX - 2, (float) endPosY + 1, healthOutlineC.getValue().getColorObject(), healthOutlineC.getValue().getColorObject(), healthOutlineC.getValue().getColorObject(), healthOutlineC.getValue().getColorObject());
+
+                Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 5), (float) posY, (float) posX - 1, (float) endPosY, healthbg.getValue().getColorObject(), healthbg.getValue().getColorObject(), healthbg.getValue().getColorObject(), healthbg.getValue().getColorObject());
+
+                switch (colorMode.getValue()) {
+                    case Custom ->
+                            Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 5), (float) (endPosY + (posY - endPosY) * lent.getHealth() / lent.getMaxHealth()), (float) posX - 3, (float) endPosY, healthB.getValue().getColorObject(), healthB.getValue().getColorObject(), healthU.getValue().getColorObject(), healthU.getValue().getColorObject());
+                    case SyncColor ->
+                            Render2DEngine.setRectPoints(bufferBuilder, matrix, (float) (posX - 5), (float) (endPosY + (posY - endPosY) * lent.getHealth() / lent.getMaxHealth()), (float) posX - 3, (float) endPosY, HudEditor.getColor(90), HudEditor.getColor(90), HudEditor.getColor(270), HudEditor.getColor(270));
                 }
-            } }
+            }
+        }
     }
 
     @NotNull
