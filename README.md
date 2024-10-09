@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://i.imgur.com/ZiJ0r7y.png" style="width: 69%">
+    <img src="https://i.imgur.com/DX9Z1V0.png" style="width: 69%">
 </p>
 
 
@@ -10,14 +10,18 @@
 
 <div align="center">
 
-[![Discord Mine](https://img.shields.io/discord/1140266441082404924?label=discord&logo=discord&logoColor=white)](https://discord.gg/bJajFP3kCX)
+[![Discord Mine](https://img.shields.io/discord/1140266441082404924?label=ThunderHack%20Recode%20Discord&logo=discord&logoColor=white)](https://discord.gg/bJajFP3kCX)
+[![Discord Mine](https://img.shields.io/discord/1138007062333366393?label=ulybaka1337's%20Discord&logo=discord&logoColor=white)](https://discord.gg/7radMBMnNZ)
+
 
 </div>
 
 ## Information
 
+ThunderHack Recode is closed, so... I think it is my time to shine!
+
 - Minecraft version: ```Fabric``` 1.21 (or whatever version's the latest)
-- Default ClickGui keybind - **```P```** (<--- it is not, you should go to the Discord server and ask for the real keybind)
+- Default ClickGui keybind - **```P```**
 - Default prefix - **```@```**
 - Middle click the module to bind it.
 - Be aware Expensive, DoxWare 2.0, gumballoff, Treoderia "Recode", Deluxe Client, and Quick Client are both ratted and renames of this client.
