@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.core.manager.client.ModuleManager;
-import thunder.hack.utility.OptifineCapes;
+import thunder.hack.utility.CapeHandler;
 import thunder.hack.utility.ThunderUtility;
 
 import java.io.BufferedReader;
@@ -71,7 +71,7 @@ public class MixinPlayerListEntry {
             }
 
             if (ModuleManager.capes.isEnabled())
-                OptifineCapes.loadPlayerCape(profile, id -> {
+                CapeHandler.loadPlayerCape(profile, id -> {
                     customCapeTexture = id;
                 });
         });

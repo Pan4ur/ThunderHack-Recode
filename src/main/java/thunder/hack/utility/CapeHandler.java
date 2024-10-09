@@ -17,7 +17,7 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class OptifineCapes {
+public final class CapeHandler {
     /**
      * author: @dragonostic
      * of-capes
