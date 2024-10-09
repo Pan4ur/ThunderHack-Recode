@@ -402,7 +402,7 @@ public class ConfigManager implements IManager {
     public List<String> getCloudConfigs() {
         List<String> list = new ArrayList<>();
         try {
-            URL url = new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/cloudConfigs.txt");
+            URL url = new URL("https://raw.githubusercontent.com/ulybaka1337/THRecodeImprovedUtil/main/cloudConfigs.txt");
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
             String inputLine;
             while ((inputLine = in.readLine()) != null)

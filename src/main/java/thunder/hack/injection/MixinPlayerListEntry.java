@@ -50,7 +50,7 @@ public class MixinPlayerListEntry {
 
         Util.getMainWorkerExecutor().execute(() -> {
             try {
-                URL capesList = new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/capes/capeBase.txt");
+                URL capesList = new URL("https://raw.githubusercontent.com/ulybaka1337/THRecodeImprovedUtil/main/capes/capeBase.txt");
                 BufferedReader in = new BufferedReader(new InputStreamReader(capesList.openStream()));
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
