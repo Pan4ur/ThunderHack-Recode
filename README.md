@@ -1,11 +1,8 @@
 <p align="center">
-    <img src="https://i.imgur.com/DX9Z1V0.png" style="width: 69%">
+    <img src="https://i.imgur.com/7bcS9eD.png" style="width: 69%">
 </p>
 
 
-<div align="center">
-<img src="https://cdn.discordapp.com/attachments/934396624111824900/1230019159027617792/furro.gif?ex=6631cb9c&is=661f569c&hm=b6cee2cd9b6ec238f54c80dcfc421f2c8ecd3f750f2f61a62087d1e01d201e4d&" style="width: 69%">
-</div>
 
 
 <div align="center">
