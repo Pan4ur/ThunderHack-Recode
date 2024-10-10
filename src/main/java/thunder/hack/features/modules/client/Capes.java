@@ -10,7 +10,8 @@ public class Capes extends Module {
 
     public Setting<Boolean> optifineCapes = new Setting<>("Optifine", true);
     public Setting<Boolean> minecraftcapesCapes = new Setting<>("Minecraftcapes.net", false);
-    public Setting<capePriority> priority = new Setting<>("Priority", capePriority.Optifine);
+    public Setting<Boolean> thCapes = new Setting<>("ThunderHack", true);
+    public Setting<capePriority> priority = new Setting<>("Priority", capePriority.Optifine, v -> optifineCapes.getValue() && minecraftcapesCapes.getValue());
 
-    public enum capePriority { Optifine, Minecraftcapes}
+    public enum capePriority { Optifine, Minecraftcapes }
 }

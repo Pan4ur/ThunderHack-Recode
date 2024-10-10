@@ -47,8 +47,20 @@ public class MixinPlayerListEntry {
     private void getTexture(GameProfile profile) {
         if (loadedCapeTexture) return;
         loadedCapeTexture = true;
-
         Util.getMainWorkerExecutor().execute(() -> {
+
+            if (ModuleManager.capes.isEnabled())
+                CapeHandler.loadPlayerCape(profile, id -> {
+                    customCapeTexture = id;
+                });
+
+            if (!ModuleManager.capes.thCapes.getValue()) return;
+
+            for (String str : ThunderUtility.starGazer) {
+                if (profile.getName().toLowerCase().equals(str.toLowerCase()))
+                    customCapeTexture = Identifier.of("thunderhack", "textures/capes/starcape.png");
+            }
+
             try {
                 URL capesList = new URL("https://raw.githubusercontent.com/ulybaka1337/THRecodeImprovedUtil/main/capes/capeBase.txt");
                 BufferedReader in = new BufferedReader(new InputStreamReader(capesList.openStream()));
@@ -64,16 +76,6 @@ public class MixinPlayerListEntry {
                 }
             } catch (Exception ignored) {
             }
-
-            for (String str : ThunderUtility.starGazer) {
-                if (profile.getName().toLowerCase().equals(str.toLowerCase()))
-                    customCapeTexture = Identifier.of("thunderhack", "textures/capes/starcape.png");
-            }
-
-            if (ModuleManager.capes.isEnabled())
-                CapeHandler.loadPlayerCape(profile, id -> {
-                    customCapeTexture = id;
-                });
         });
     }
 }
