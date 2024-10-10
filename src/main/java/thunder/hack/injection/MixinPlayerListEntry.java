@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import thunder.hack.core.manager.client.ModuleManager;
-import thunder.hack.utility.OptifineCapes;
+import thunder.hack.utility.CapeHandler;
 import thunder.hack.utility.ThunderUtility;
 
 import java.io.BufferedReader;
@@ -47,10 +47,22 @@ public class MixinPlayerListEntry {
     private void getTexture(GameProfile profile) {
         if (loadedCapeTexture) return;
         loadedCapeTexture = true;
-
         Util.getMainWorkerExecutor().execute(() -> {
+
+            if (ModuleManager.capes.isEnabled())
+                CapeHandler.loadPlayerCape(profile, id -> {
+                    customCapeTexture = id;
+                });
+
+            if (!ModuleManager.capes.thCapes.getValue()) return;
+
+            for (String str : ThunderUtility.starGazer) {
+                if (profile.getName().toLowerCase().equals(str.toLowerCase()))
+                    customCapeTexture = Identifier.of("thunderhack", "textures/capes/starcape.png");
+            }
+
             try {
-                URL capesList = new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/capes/capeBase.txt");
+                URL capesList = new URL("https://raw.githubusercontent.com/ulybaka1337/THRecodeImprovedUtil/main/capes/capeBase.txt");
                 BufferedReader in = new BufferedReader(new InputStreamReader(capesList.openStream()));
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
@@ -64,16 +76,6 @@ public class MixinPlayerListEntry {
                 }
             } catch (Exception ignored) {
             }
-
-            for (String str : ThunderUtility.starGazer) {
-                if (profile.getName().toLowerCase().equals(str.toLowerCase()))
-                    customCapeTexture = Identifier.of("thunderhack", "textures/capes/starcape.png");
-            }
-
-            if (ModuleManager.optifineCapes.isEnabled())
-                OptifineCapes.loadPlayerCape(profile, id -> {
-                    customCapeTexture = id;
-                });
         });
     }
 }

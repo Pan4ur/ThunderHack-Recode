@@ -61,6 +61,12 @@ public class EbatteSratte extends Module {
 
                 int n;
 
+                if (words.isEmpty() && mode.getValue() == Messages.Custom) {
+                    disable();
+                    return;
+                }
+
+
                 if (mode.getValue() == Messages.Default) n = (int) Math.floor(Math.random() * WORDS.length);
                 else n = (int) Math.floor(Math.random() * words.size());
 
