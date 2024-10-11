@@ -21,7 +21,7 @@ ThunderHack Recode is closed, so... I think it is my time to shine!
 - Default ClickGui keybind - **```P```**
 - Default prefix - **```@```**
 - Middle click the module to bind it.
-- Be aware Expensive, DoxWare 2.0, gumballoff, Treoderia "Recode", Deluxe Client, and Quick Client are both ratted and renames of this client.
+- ~~Be aware Expensive, DoxWare 2.0, gumballoff, Treoderia "Recode", Deluxe Client, and Quick Client are both ratted and renames of this client.~~ Um, actually, they are renames of original ThunderHack Recode, not this fork
 
 ## Requires these mods:
 
