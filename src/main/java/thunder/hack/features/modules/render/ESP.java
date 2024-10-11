@@ -85,7 +85,7 @@ public class ESP extends Module {
     public final Setting<ColorSetting> healthB = new Setting<>("healthB", new ColorSetting(new Color(0xff1100))).addToGroup(boxColors);
     public final Setting<ColorSetting> healthU = new Setting<>("healthU", new ColorSetting(new Color(0x2fff00))).addToGroup(boxColors);
     private final Setting<ColorSetting> healthbg = new Setting<>("healthBG", new ColorSetting(new Color(0x000000))).addToGroup(boxColors);
-    private final Setting<ColorSetting> healthOutlineC = new Setting<>("healthOutline", new ColorSetting(new Color(0x000000))).addToGroup(boxColors);
+    private final Setting<ColorSetting> healthOutlineC = new Setting<>("healthOutlineC", new ColorSetting(new Color(0x000000))).addToGroup(boxColors);
 
     private float dizorentAnimation = 0f;
 
