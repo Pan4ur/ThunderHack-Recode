@@ -35,11 +35,16 @@ ThunderHack Recode is closed, so... I think it is my time to shine!
 
 ## Credits
 
+### ThunderHack Recode
+
 - [Ai_24](https://www.youtube.com/@Ai_24) for cool showcase
 - [KiLAB Gaming](https://www.youtube.com/@KiLABGaming) for complete overview
 - [@meteordevelopment](https://github.com/meteordevelopment) for orbit
 - [@ladysnake](https://github.com/ladysnake) for satin
 - [@0x3C50](https://github.com/0x3C50/Renderer) for the renderer
+
+### ThunderHack Recode Improved
+- [@Coderx-Gamer](https://github.com/Coderx-Gamer/) for UI-Utils mod (I took a look at his code for GUI move -> Close without packet)
 
 ## Screenshots
 <details>

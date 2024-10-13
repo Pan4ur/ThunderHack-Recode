@@ -2,22 +2,30 @@ package thunder.hack.features.modules.movement;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.events.impl.EventClickSlot;
 import thunder.hack.events.impl.PacketEvent;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.Bind;
+import thunder.hack.setting.impl.BooleanSettingGroup;
+import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.MovementUtility;
 
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class GuiMove extends Module {
     public GuiMove() {
@@ -27,6 +35,12 @@ public class GuiMove extends Module {
     private final Setting<Bypass> clickBypass = new Setting<>("Bypass", Bypass.None);
     private final Setting<Boolean> rotateOnArrows = new Setting<>("RotateOnArrows", true);
     private final Setting<Boolean> sneak = new Setting<>("sneak", false);
+    private final Setting<BooleanSettingGroup> closeWithoutPacketGroup = new Setting<>("CloseWithoutPacket", new BooleanSettingGroup(false), v -> true);
+    private final Setting<Bind> closeBind = new Setting<>("CloseAndReopenBind", new Bind(GLFW.GLFW_KEY_B, false, false), v -> true).addToGroup(closeWithoutPacketGroup);
+
+    private Screen screen;
+    private ScreenHandler screenHandler;
+    private Timer bindDelay = new Timer();
 
     private final Queue<ClickSlotC2SPacket> storedClicks = new LinkedList<>();
     private AtomicBoolean pause = new AtomicBoolean();
@@ -59,6 +73,33 @@ public class GuiMove extends Module {
 
             if (sneak.getValue())
                 mc.options.sneakKey.setPressed(isKeyPressed(InputUtil.fromTranslationKey(mc.options.sneakKey.getBoundKeyTranslationKey()).getCode()));
+
+        }
+
+        if (closeWithoutPacketGroup.getValue().isEnabled()) {
+            closeWithoutPacket();
+        }
+    }
+
+    // thanks ui utils for this!
+    public void closeWithoutPacket() {
+        if (isKeyPressed(closeBind) && bindDelay.every(250)) {
+
+            if (mc.currentScreen instanceof ChatScreen) {
+                return;
+            }
+
+            if (mc.currentScreen != null) {
+                screen = mc.currentScreen;
+                screenHandler = mc.player.currentScreenHandler;
+                mc.setScreen(null);
+                if (mc.currentScreen != screen) sendMessage(isRu() ? "Интерфейс сохранен! Нажмите еще раз чтобы открыть" : "GUI have been saved! Press again to open.");
+            } else {
+                mc.setScreen(screen);
+                mc.player.currentScreenHandler = screenHandler;
+                sendMessage(isRu() ? "Интерфейс открыт." : "GUI Opened.");
+            }
+
         }
     }
 
