@@ -45,6 +45,7 @@ ThunderHack Recode is closed, so... I think it is my time to shine!
 
 ### ThunderHack Recode Improved
 - [@Coderx-Gamer](https://github.com/Coderx-Gamer/) for UI-Utils mod (I took a look at his code for GUI move -> Close without packet)
+- [@crazymoose77756](https://github.com/crazymoose77756) and leftys for Meteor Paper Dupe (I added it into PastedPaperDupe module)
 
 ## Screenshots
 <details>
