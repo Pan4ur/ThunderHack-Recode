@@ -9,7 +9,7 @@ import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
 
 public final class PacketCanceler extends Module {
-    private final Setting<Boolean> cliclSlot = new Setting<>("ClickSlotC2SPacket", false);
+    private final Setting<Boolean> clickSlot = new Setting<>("ClickSlotC2SPacket", false);
     private final Setting<Boolean> playerMovePosAndOnGround = new Setting<>("PositionAndOnGround", false);
     private final Setting<Boolean> playerMoveOnGroundOnly = new Setting<>("OnGroundOnly", false);
     private final Setting<Boolean> playerMoveLookAndOnGround = new Setting<>("LookAndOnGround", false);
@@ -20,7 +20,7 @@ public final class PacketCanceler extends Module {
     @EventHandler
     @SuppressWarnings("unused")
     private void onPacketSend(PacketEvent.@NotNull Send e) {
-        if (e.getPacket() instanceof ClickSlotC2SPacket && cliclSlot.getValue()) {
+        if (e.getPacket() instanceof ClickSlotC2SPacket && clickSlot.getValue()) {
             e.cancel();
         } else if (e.getPacket() instanceof PlayerMoveC2SPacket.PositionAndOnGround && playerMovePosAndOnGround.getValue()) {
             e.cancel();
