@@ -38,6 +38,32 @@ public class EbatteSratte extends Module {
             "СКАЖЕШЬ - БАТЯ ПИДОР, ПРОМОЛЧИШЬ - МАТЬ ШЛЮХА"
     };
 
+    private static final String[] ULYBAKA1337 = new String[]{
+            "маме твоей ебало бил",
+            "отсосите мне нежно пж",
+            "сука ебало закрой сын ущемленной мрази",
+            "зачем я твою мамку убил кроме того что она ебаная шваль",
+            "быть нищиебом означает ебать твою нищию мразотную семейку",
+            "почему твой папка пидарас",
+            "почему твоя мамка божество минета",
+            "хахаха сын обиды ебаной",
+            "ущемил всю твою мразотную семейку своим членом",
+            "почему ваша бабка отсосала всему населению планеты земля",
+            "кто мне вчера отсосал если не твоя мать",
+            "мой отец убийца зсу, и твоей мразотной семейки азовцев тоже",
+            "у тебя папка умирает в окопах!!!",
+            "мне мать твоя сосала и пересасывала",
+            "что в хуй че с хуя кто батя твой кроме пидараса",
+            "затерпи хуи по традиции твоей семейки",
+            "сука сын мрази закрой ебало",
+            "твою мать ебала черная оргия а ты со слезами на глазах затерпел",
+            "устроил золотой дождь твоей мерзкой семейке",
+            "кто папка твой кроме мерзкого выблядка",
+            "кому сосал кроме меня",
+            "отсоси ртом своей мамки мне нежно",
+            "как дрочить если не ртом твоей мамки"
+    };
+
     private final Timer timer = new Timer();
     private ArrayList<String> words = new ArrayList<>();
 
@@ -68,6 +94,7 @@ public class EbatteSratte extends Module {
 
 
                 if (mode.getValue() == Messages.Default) n = (int) Math.floor(Math.random() * WORDS.length);
+                else if (mode.getValue() == Messages.UlybakaHuevo) n = (int) Math.floor(Math.random() * ULYBAKA1337.length);
                 else n = (int) Math.floor(Math.random() * words.size());
 
                 String chatPrefix = switch (server.getValue()) {
@@ -143,6 +170,7 @@ public class EbatteSratte extends Module {
 
     public enum Messages {
         Default,
+        UlybakaHuevo,
         Custom
     }
 }
