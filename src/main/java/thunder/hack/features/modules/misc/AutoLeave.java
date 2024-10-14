@@ -5,10 +5,12 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.lwjgl.glfw.GLFW;
 import thunder.hack.core.Managers;
 import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.features.modules.Module;
 import thunder.hack.setting.Setting;
+import thunder.hack.setting.impl.Bind;
 import thunder.hack.setting.impl.SettingGroup;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.player.InventoryUtility;
@@ -33,6 +35,9 @@ public class AutoLeave extends Module {
     private final Setting<LeaveMode> staff = new Setting<>("Staff", LeaveMode.None).addToGroup(leaveIf);
     private final Setting<LeaveMode> players = new Setting<>("Players", LeaveMode.Leave).addToGroup(leaveIf);
     private final Setting<Integer> distance = new Setting<>("Distance", 256, 4, 256, v -> players.getValue() != LeaveMode.None).addToGroup(leaveIf);
+    public final Setting<Boolean> leaveOnBind = new Setting<>("LeaveOnBind", false, v -> true).addToGroup(leaveIf);
+    public final Setting<Bind> leaveBind = new Setting<>("LeaveBind", new Bind(GLFW.GLFW_KEY_N, false, false), v -> leaveOnBind.is(true)).addToGroup(leaveIf);
+    public final Setting<String> leaveChat = new Setting<>("MessageOnLeave", "", v -> true);
 
     private final Timer chatDelay = new Timer();
 
@@ -82,15 +87,27 @@ public class AutoLeave extends Module {
 
         if (staff.getValue() != LeaveMode.None && ModuleManager.staffBoard.isDisabled() && mc.player.age % 5 == 0)
             sendMessage(isRu() ? "Включи StaffBoard!" : "Turn on StaffBoard!");
+
+        if (isKeyPressed(leaveBind) && leaveOnBind.getValue())
+            leave(isRu() ? "Ливнул т.к. прожат бинд" : "Logged out because bind is pressed");
     }
 
     private void leave(String message) {
+
         if (!chatDelay.passedMs(1000))
             return;
         chatDelay.reset();
 
         if (autoDisable.getValue())
             disable(message);
+
+        if (leaveChat.getValue() != null || leaveChat.getValue() != "") {
+            if (leaveChat.getValue().contains("/")) {
+                mc.getNetworkHandler().sendChatCommand(leaveChat.getValue());
+            } else {
+                mc.getNetworkHandler().sendChatMessage(leaveChat.getValue());
+            }
+        }
 
         if (fastLeave.getValue()) sendPacket(new UpdateSelectedSlotC2SPacket(228));
         else mc.player.networkHandler.getConnection().disconnect(Text.of("[AutoLeave] " + message));
