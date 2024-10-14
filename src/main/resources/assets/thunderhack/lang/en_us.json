@@ -72,6 +72,7 @@
   "descriptions.misc.visualrange": "Alerts you about players in the visual range.",
   "descriptions.misc.worldtweaks": "Tweaks for world.",
   "descriptions.misc.xray": "Diamonds? No problem.",
+  "descriptions.misc.pastedpaperdupe": "Paper dupe by crazymoose77756 and lefty ported into thunderhack.\nRequires writable book. Relog before use",
 
   "descriptions.render.animations": "Nice hand animations.",
   "descriptions.render.aspectratio": "Allows you to change the screen aspect ratio.",
