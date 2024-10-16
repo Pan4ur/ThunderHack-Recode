@@ -57,7 +57,7 @@ public class ModuleManager implements IManager {
     public static MouseElytraFix mouseElytraFix = new MouseElytraFix();
     public static TotemAnimation totemAnimation = new TotemAnimation();
     public static PortalGodMode portalGodMode = new PortalGodMode();
-    public static OptifineCapes optifineCapes = new OptifineCapes();
+    public static Capes capes = new Capes();
     public static Notifications notifications = new Notifications();
     public static NoEntityTrace noEntityTrace = new NoEntityTrace();
     public static MessageAppend messageAppend = new MessageAppend();
@@ -260,6 +260,7 @@ public class ModuleManager implements IManager {
     public static FOV fov = new FOV();
     public static ESP esp = new ESP();
     public static RPC rpc = new RPC();
+    public static PastedPaperDupe paperdupe = new PastedPaperDupe();
 
     public ModuleManager() {
         for (Field field : getClass().getDeclaredFields()) {

@@ -1,16 +1,15 @@
 <p align="center">
-    <img src="https://i.imgur.com/ZiJ0r7y.png" style="width: 69%">
+    <img src="https://i.imgur.com/7bcS9eD.png" style="width: 69%">
 </p>
 
 
-<div align="center">
-<img src="https://cdn.discordapp.com/attachments/934396624111824900/1230019159027617792/furro.gif?ex=6631cb9c&is=661f569c&hm=b6cee2cd9b6ec238f54c80dcfc421f2c8ecd3f750f2f61a62087d1e01d201e4d&" style="width: 69%">
-</div>
 
 
 <div align="center">
 
-[![Discord Mine](https://img.shields.io/discord/1140266441082404924?label=discord&logo=discord&logoColor=white)](https://discord.gg/bJajFP3kCX)
+[![Discord Mine](https://img.shields.io/discord/1140266441082404924?label=ThunderHack%20Recode%20Discord&logo=discord&logoColor=white)](https://discord.gg/bJajFP3kCX)
+[![Discord Mine](https://img.shields.io/discord/1138007062333366393?label=ulybaka1337's%20Discord&logo=discord&logoColor=white)](https://discord.gg/7radMBMnNZ)
+
 
 </div>
 
@@ -22,11 +21,13 @@
 
 ## Information
 
+ThunderHack Recode is closed, so... I think it is my time to shine!
+
 - Minecraft version: ```Fabric``` 1.21 (or whatever version's the latest)
-- Default ClickGui keybind - **```P```** (<--- it is not, you should go to the Discord server and ask for the real keybind)
+- Default ClickGui keybind - **```P```**
 - Default prefix - **```@```**
 - Middle click the module to bind it.
-- Be aware Expensive, DoxWare 2.0, gumballoff, Treoderia "Recode", Deluxe Client, and Quick Client are both ratted and renames of this client.
+- ~~Be aware Expensive, DoxWare 2.0, gumballoff, Treoderia "Recode", Deluxe Client, and Quick Client are both ratted and renames of this client.~~ Um, actually, they are renames of original ThunderHack Recode, not this fork
 
 ## Requires these mods:
 
@@ -40,11 +41,17 @@
 
 ## Credits
 
+### ThunderHack Recode
+
 - [Ai_24](https://www.youtube.com/@Ai_24) for cool showcase
 - [KiLAB Gaming](https://www.youtube.com/@KiLABGaming) for complete overview
 - [@meteordevelopment](https://github.com/meteordevelopment) for orbit
 - [@ladysnake](https://github.com/ladysnake) for satin
 - [@0x3C50](https://github.com/0x3C50/Renderer) for the renderer
+
+### ThunderHack Recode Improved
+- [@Coderx-Gamer](https://github.com/Coderx-Gamer/) for UI-Utils mod (I took a look at his code for GUI move -> Close without packet)
+- [@crazymoose77756](https://github.com/crazymoose77756) and leftys for Meteor Paper Dupe (I added it into PastedPaperDupe module)
 
 ## Screenshots
 <details>

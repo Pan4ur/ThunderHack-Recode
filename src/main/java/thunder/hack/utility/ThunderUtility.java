@@ -56,7 +56,7 @@ public final class ThunderUtility {
 
     public static void syncVersion() {
         try {
-            if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/syncVersion121.txt").openStream())).readLine().equals(ThunderHack.VERSION))
+            if (!new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/ulybaka1337/THRecodeImprovedUtil/main/syncVersion121.txt").openStream())).readLine().equals(ThunderHack.VERSION))
                 ThunderHack.isOutdated = true;
         } catch (Exception ignored) {
         }
@@ -92,7 +92,7 @@ public final class ThunderUtility {
 
     public static void syncContributors() {
         try {
-            URL list = new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/thTeam.txt");
+            URL list = new URL("https://raw.githubusercontent.com/ulybaka1337/THRecodeImprovedUtil/main/thTeam.txt");
             BufferedReader in = new BufferedReader(new InputStreamReader(list.openStream(), StandardCharsets.UTF_8));
             String inputLine;
             int i = 0;
@@ -129,10 +129,10 @@ public final class ThunderUtility {
 
     public static void parseCommits() {
         try {
-            URL url = new URL("https://api.github.com/repos/Pan4ur/ThunderHack-Recode/commits?per_page=50");
+            URL url = new URL("https://api.github.com/repos/ulybaka1337/ThunderHack-Recode-Improved/commits?per_page=50");
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
 
-            changeLog.add("Changelog [Recode; Date: " + ThunderHack.BUILD_DATE + "; GitHash:" + ThunderHack.GITHUB_HASH + "]");
+            changeLog.add("Latest Changes [Recode Improved]");
             changeLog.add("\n");
 
             String inputLine;

@@ -42,6 +42,7 @@ import thunder.hack.utility.player.SearchInvResult;
 public final class AutoTotem extends Module {
     private final Setting<Mode> mode = new Setting<>("Mode", Mode.Matrix);
     private final Setting<OffHand> offhand = new Setting<>("Item", OffHand.Totem);
+    private final Setting<Boolean> pomoyka = new Setting<>("DoNotSwapBack", false, v -> offhand.is(OffHand.Totem));
     private final Setting<BooleanSettingGroup> bindSwap = new Setting<>("BindSwap", new BooleanSettingGroup(false), v -> offhand.is(OffHand.Totem));
     private final Setting<Bind> swapButton = new Setting<>("SwapButton", new Bind(GLFW.GLFW_KEY_CAPS_LOCK, false, false)).addToGroup(bindSwap);
     private final Setting<Swap> swapMode = new Setting<>("Swap", Swap.GappleShield).addToGroup(bindSwap);
@@ -89,7 +90,7 @@ public final class AutoTotem extends Module {
     public void onSync(EventSync e) {
         swapTo(getItemSlot());
 
-        if (rcGap.not(RCGap.Off) && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed() && !mc.player.isUsingItem())
+        if (rcGap.not(RCGap.Off) && (mc.player.getMainHandStack().getItem() instanceof SwordItem) && mc.options.useKey.isPressed() && !mc.player.isUsingItem() && !pomoyka.getValue())
             ((IMinecraftClient) mc).idoItemUse();
 
         delay--;
@@ -246,7 +247,8 @@ public final class AutoTotem extends Module {
                 if (offHandItem != Items.TOTEM_OF_UNDYING && !mc.player.getOffHandStack().isEmpty())
                     prevItem = offHandItem;
 
-                item = prevItem;
+                if (!pomoyka.getValue())
+                    item = prevItem;
 
                 if (bindSwap.getValue().isEnabled())
                     if (isKeyPressed(swapButton) && bindDelay.every(250)) {
@@ -272,7 +274,9 @@ public final class AutoTotem extends Module {
                                 else item = Items.TOTEM_OF_UNDYING;
                             }
                         }
-                        prevItem = item;
+
+                            prevItem = item;
+
                     }
             }
 
@@ -401,7 +405,7 @@ public final class AutoTotem extends Module {
         }
 
         for (int i = 9; i < 45; i++) {
-            if (mc.player.getOffHandStack().getItem() == item) return -1;
+            if (item != null && mc.player.getOffHandStack().getItem() == item) return -1;
             if (mc.player.getInventory().getStack(i >= 36 ? i - 36 : i).getItem().equals(item)) {
                 itemSlot = i >= 36 ? i - 36 : i;
                 break;

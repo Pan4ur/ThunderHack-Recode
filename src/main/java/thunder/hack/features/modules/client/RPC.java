@@ -83,7 +83,8 @@ public final class RPC extends Module {
         if (!started) {
             started = true;
             DiscordEventHandlers handlers = new DiscordEventHandlers();
-            rpc.Discord_Initialize("1093053626198523935", handlers, true, "");
+            // rpc.Discord_Initialize("1093053626198523935", handlers, true, "");
+            rpc.Discord_Initialize("1294239539711442974", handlers, true, "");
             presence.startTimestamp = (System.currentTimeMillis() / 1000L);
             presence.largeImageText = "v" + ThunderHack.VERSION + " [" + ThunderHack.GITHUB_HASH + "]";
             rpc.Discord_UpdatePresence(presence);
@@ -109,7 +110,7 @@ public final class RPC extends Module {
                     }
 
                     presence.button_label_1 = "Download";
-                    presence.button_url_1 = "https://github.com/Pan4ur/ThunderHack-Recode/";
+                    presence.button_url_1 = "https://github.com/ulybaka1337/ThunderHack-Recode-Improved/";
 
                     switch (mode.getValue()) {
                         case Recode -> presence.largeImageKey = "https://i.imgur.com/yY0z2Uq.gif";
