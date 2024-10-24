@@ -11,8 +11,10 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Direction;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.events.impl.PlayerUpdateEvent;
 import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.Religion;
 import thunder.hack.setting.Setting;
 import thunder.hack.setting.impl.ItemSelectSetting;
 import thunder.hack.utility.Timer;
@@ -21,6 +23,7 @@ import thunder.hack.utility.math.MathUtility;
 import java.util.ArrayList;
 import java.util.Random;
 
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 import static thunder.hack.features.modules.render.StorageEsp.getBlockEntities;
 
 public class ChestStealer extends Module {
@@ -38,6 +41,14 @@ public class ChestStealer extends Module {
     private final Timer autoMystDelay = new Timer();
     private final Timer timer = new Timer();
     private final Random rnd = new Random();
+
+    @Override
+    public void onEnable() {
+        if (ModuleManager.religion.isOn() && ModuleManager.religion.ReligionSetting.is(Religion.YourReligion.Christianity)) {
+            ModuleManager.religion.sendMessage(isRu() ? "Не укради!" : "Do not steal!");
+            disable();
+        }
+    }
 
     public void onRender3D(MatrixStack stack) {
         if (mc.player.currentScreenHandler instanceof GenericContainerScreenHandler chest) {

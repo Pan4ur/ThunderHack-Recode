@@ -2,13 +2,17 @@ package thunder.hack.features.modules.player;
 
 import net.minecraft.entity.player.PlayerEntity;
 import thunder.hack.core.Managers;
+import thunder.hack.core.manager.client.ModuleManager;
 import thunder.hack.features.modules.Module;
+import thunder.hack.features.modules.client.Religion;
 import thunder.hack.setting.Setting;
 import thunder.hack.utility.Timer;
 import thunder.hack.utility.math.MathUtility;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static thunder.hack.features.modules.client.ClientSettings.isRu;
 
 public class AutoSex extends Module {
     private final Setting<Integer> targetRange = new Setting<>("Target Range", 5, 1, 10);
@@ -39,6 +43,14 @@ public class AutoSex extends Module {
 
     public AutoSex() {
         super("AutoSex", Category.PLAYER);
+    }
+
+    @Override
+    public void onEnable() {
+        if (ModuleManager.religion.isOn() && ModuleManager.religion.ReligionSetting.is(Religion.YourReligion.Christianity)) {
+            ModuleManager.religion.sendMessage(isRu() ? "Не пролюбодействуй!" : "Do not do adulty!");
+            disable();
+        }
     }
 
     @Override

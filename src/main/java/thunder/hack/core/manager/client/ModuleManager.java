@@ -261,6 +261,7 @@ public class ModuleManager implements IManager {
     public static ESP esp = new ESP();
     public static RPC rpc = new RPC();
     public static PastedPaperDupe paperdupe = new PastedPaperDupe();
+    public static Religion religion = new Religion();
 
     public ModuleManager() {
         for (Field field : getClass().getDeclaredFields()) {
