@@ -132,7 +132,7 @@ public final class ThunderUtility {
             URL url = new URL("https://api.github.com/repos/ulybaka1337/ThunderHack-Recode-Improved/commits?per_page=50");
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
 
-            changeLog.add("Latest Changes [Recode Improved]");
+            changeLog.add("Latest Commits [Recode Improved]");
             changeLog.add("\n");
 
             String inputLine;
