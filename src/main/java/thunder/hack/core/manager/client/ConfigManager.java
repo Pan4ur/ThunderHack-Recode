@@ -118,7 +118,7 @@ public class ConfigManager implements IManager {
 
     public void loadCloud(String name) {
         Command.sendMessage(isRu() ? "Загружаю.." : "Downloading..");
-        try (BufferedInputStream in = new BufferedInputStream(new URL("https://raw.githubusercontent.com/Pan4ur/THRecodeUtil/main/configs/" + name + ".th").openStream());
+        try (BufferedInputStream in = new BufferedInputStream(new URL("https://raw.githubusercontent.com/ulybaka1337/THRecodeImprovedUtil/main/configs/" + name + ".th").openStream());
              FileOutputStream fileOutputStream = new FileOutputStream(new File(CONFIGS_FOLDER, name + ".th"))) {
             byte[] dataBuffer = new byte[1024];
             int bytesRead;
