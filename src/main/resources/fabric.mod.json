@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "id": "thunderhack",
-  "version": "1.7",
+  "version": "1.7.1",
   "icon": "icon.png",
-  "name": "ThunderHack",
+  "name": "ThunderHack Recode Improved",
   "description": "Player Assistance Mod",
   "authors": [
     {
@@ -17,6 +17,12 @@
       "contact": {
         "discord": "dinner_enjoyer"
       }
+    },
+    {
+      "name": "ulybaka1337",
+      "contact": {
+        "discord": "ulybaka"
+      }
     }
   ],
   "license": "GNU General Public License v3.0",
@@ -28,9 +34,9 @@
     ]
   },
   "contact": {
-    "sources": "https://github.com/Pan4ur/ThunderHack-Recode",
-    "homepage": "https://thunderhack-site.vercel.app",
-    "issues": "https://github.com/Pan4ur/ThunderHack-Recode/issues"
+    "sources": "https://github.com/ulybaka1337/ThunderHack-Recode-Improved",
+    "homepage": "https://discord.gg/7radMBMnNZ",
+    "issues": "https://github.com/ulybaka1337/ThunderHack-Recode-Improved/issues"
   },
   "mixins": [
     "thunderhack.mixins.json"
